@@ -8,3 +8,8 @@ You can also load a program from a file name by pushing it to the TextMsgBuffer 
 All unused parameters should be set to UNUSED (currently 255).
 
 If you are setting just root and bank (and it succeeds) only the bank will be named, but the root ID will be shown.
+
+
+*** This has been changed yet again ***
+
+Program changes are now handled by a completely separate function, but bank and root are still combined.

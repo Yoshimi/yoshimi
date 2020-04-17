@@ -2,11 +2,11 @@ This is intended primarily for direct transfers of text between non-RT threads, 
 
 It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.
 
-To identify such transfers 'source' has bit 7 set (ORed with 0x80). Nowhere else does this value appear and it can be readily masked out where needed. Once recognised it is passed to a separate function that does all the decoding, bypassing the normal control system. For some operations, bit 7 is then cleared so it can loop back into the 'returns' path to update the GUI or send replies to the CLI.
+To identify such transfers 'action' has bit 7 set (ORed with 0x80). Nowhere else does this value appear and it can be readily masked out where needed. Once recognised it is passed to a separate function that does all the decoding, bypassing the normal control system. For some operations, bit 7 is then cleared so it can loop back into the 'returns' path to update the GUI or send replies to the CLI.
 
 There are some occasions where both the CLI and the GUI need a text update at the same time. As these are in different threads and TextMsgBuffer::fetch() is destructive, there is no way to tell which will get the message first. For these situations a duplicate message is sent only to the CLI on the same data block using 'value' as the ID.
 
 
-An extension of this system is where bit 6 of 'source' is also set. This is used where changes will be made that directly affect the audio thread. For these controls, the audio is first faded down, then muted. The changes are then made (and messages possibly changed/created). When complete, messages are sent and finally the system is unmuted.
+An extension of this system is where bit 6 of 'action' is also set. This is used where changes will be made that directly affect the audio thread. For these controls, the audio is first faded down, then muted. The changes are then made (and messages possibly changed/created). When complete, messages are sent and finally the system is unmuted.
 
 In this last case, (both bits set) the command is passed through normally to be actioned. The particular routine then clears bit 6 so before it gets passed on to the returns thread it gets diverted to the indirect routine.

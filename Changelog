@@ -1,4 +1,12 @@
-yoshimi 1.7.1 rc2
+yoshimi 1.7.1 rc3
+
+2020-4-17 Will
+* Changed PART_POLY to PART_NORMAL.
+  It could be confused with PART_POLIPHONY.
+* Changed POLIPHONY - 20 to PART_POLIPHONY.
+* Moved default poliphony for parts from Part.cpp to globals.h
+* Yet more doc updates!
+* Set version as 1.7.1 rc3
 
 2020-4-15 Will
 * Minor correction to AddSynth Voice/List window position fetch.

@@ -23,3 +23,7 @@ direct 40 64 0 0 4 1
 
 Note:
     You only use 32 for the kit item commands, not the engine internal commands.
+
+
+
+*** This is no longer available as we've disabled direct CLI access ***

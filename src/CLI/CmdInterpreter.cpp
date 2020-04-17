@@ -4960,7 +4960,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(input);
-            if (value < 1 || (value > POLIPHONY - 20))
+            if (value < 1 || value > PART_POLIPHONY)
                 return REPLY::range_msg;
         }
         return sendNormal( synth, 0, value, controlType, PART::control::maxNotes, npart);

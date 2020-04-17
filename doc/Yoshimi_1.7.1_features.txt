@@ -29,7 +29,11 @@ A further refinement is that '/usr' directories are scanned for banks, and if fo
 
 A similar action is performed for presets directories, and although existing users will still see ones in 'HOME/{user}/.config/yoshimi' they won't be put there for new users.
 
+
 Storing GUI window positioning has been improved so it's more reliable, has better defaults, and allows the user to fix the position of more of them.
+
+
+There has been significant refactoring of critical areas of the code, resulting in improved performance, reduced redundancy, and greater clarity.
 
 
 As you can see, Yoshimi's little band of helpers have been very busy and apart from all the above, general code cleanups and improvements are continuing.

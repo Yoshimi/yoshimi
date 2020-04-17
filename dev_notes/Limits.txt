@@ -30,16 +30,17 @@ This would return 127 - the input value adusted to the maximium for master volum
 
 TODO
 
-If an out of range setting is found part way along a command chain. 'value' should be set to the byte number where the error was encountered and 'type' bit 2 will be set (otherwise it will be cleared.
+If an out of range setting is found part way along a command chain. 'value' should be set to the byte number where the error was encountered and 'type' bit 4 should be set, otherwise it should be cleared.
 
 Numbers are:
-1   Control
-2   Part
-3   Kit
-4   Engine
-5   Insert
-6   Parameter
-7   Par2
+1   control
+2   part
+3   kit
+4   engine
+5   insert
+6   parameter
+7   offset
+8   miscmsg (unlikely to see an error here)
 
 e.g
 'part' was set to 70 (invalid part number)
