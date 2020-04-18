@@ -445,7 +445,7 @@ string Bank::exportBank(string exportdir, size_t rootID, unsigned int bankID)
         }
         else
         {
-            uint32_t result = copyDir(sourcedir, exportdir);
+            uint32_t result = copyDir(sourcedir, exportdir, 0);
 
             if (result != 0)
             {
@@ -534,7 +534,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                         if (hyphen > slash && (hyphen - slash) <= 4)
                             pos = stoi(nextfile.substr(slash, hyphen)) - 1;
 
-                        if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile))
+                        if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile, 0))
                             missing = true;
                         string stub;
                         if (pos >= -1)

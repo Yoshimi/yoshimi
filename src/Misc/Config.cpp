@@ -387,9 +387,9 @@ bool Config::loadConfig(void)
     if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
-        if (isRegularFile(baseConfig) && !isRegularFile(newInstance0))
+        if (isRegularFile(baseConfig) && !isRegularFile(newInstance0), 0)
         {
-            file::copyFile(baseConfig, newInstance0);
+            file::copyFile(baseConfig, newInstance0, 0);
             Log("Reorganising config files.");
             if (isRegularFile(defaultStateName + EXTEN::state))
             {
