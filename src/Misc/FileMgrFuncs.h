@@ -279,7 +279,7 @@ inline bool copyFile(string source, string destination, char option)
 
 inline uint32_t copyDir(string source, string destination, char option)
 {
-    //std::cout << "source file " << source << "  to " << destination << std::endl;
+    //std::cout << "source dir " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
     if (dir == NULL)
         return 0xffffffff;
@@ -289,6 +289,9 @@ inline uint32_t copyDir(string source, string destination, char option)
     while ((fn = readdir(dir)))
     {
         string nextfile = string(fn->d_name);
+        //std::cout << "next file " << nextfile << std::endl;
+        if (!isRegularFile(source + "/" + nextfile))
+            continue;
         if (nextfile == "." || nextfile == "..")
             continue;
         if (copyFile(source + "/" + nextfile, destination + "/" + nextfile, option))

@@ -4,6 +4,7 @@ yoshimi 1.7.1 rc3
 * BugFix: Segfault due to change in commit
   817fbc6ea91a064839eebae1f54efc20753cb927
   Only seen by 1 person so far.
+* Trapped rogue dir in file list for directory copy.
 
 2020-4-17 Will
 * Changed PART_POLY to PART_NORMAL.
