@@ -1,4 +1,12 @@
-yoshimi 1.7.1 rc4
+yoshimi 1.7.1 rc5
+
+2020-4-19 Will
+* Includes GUI SysEf Send GUI bugfix from Jesper.
+* Reinstated aftertouch modulation.
+* Fixed foldback at zero for channel.
+  Might not be correct at zero for key.
+* Added tooltips to aftertouch controls.
+* Set version as 1.7.1 rc5
 
 2020-4-18 Will
 * BugFix: Segfault due to change in commit

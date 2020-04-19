@@ -339,7 +339,7 @@ void Part::setChannelAT(int type, int value)
 
     if (type & PART::aftertouchType::modulation)
     {
-        if (value > 0)
+        if (value > 1) // 1 seems to foldback :(
         {
             if (oldModulationState == -1)
                 oldModulationState = ctl->modwheel.data;
