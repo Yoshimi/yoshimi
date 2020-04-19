@@ -718,6 +718,9 @@ class PartUI {: {public Fl_Group, PartUI_}
           send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
+        Fl_Box {} {
+          xywh {240 106 134 62} box ENGRAVED_FRAME labelsize 11 align 2
+        }
         Fl_Pack toSysEfx {
           label {To Sys Efx}
           xywh {246 122 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 10 align 0
@@ -737,9 +740,6 @@ class PartUI {: {public Fl_Group, PartUI_}
            toSysEfx->activate();
         }}
         } {}
-        Fl_Box {} {
-          xywh {240 106 134 62} box ENGRAVED_FRAME labelsize 11 align 2
-        }
       }
       Fl_Text_Display {} {
         label {System Effect Sends}
