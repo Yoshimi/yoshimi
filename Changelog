@@ -1,4 +1,10 @@
-yoshimi 1.7.1 rc5
+yoshimi 1.7.1
+
+2020-4-20 Will
+* Added Resonance to managed windows.
+  Forgotten earlier :(
+* Final doc updates.
+* Set release version 1.7.1
 
 2020-4-19 Will
 * Includes GUI SysEf Send GUI bugfix from Jesper.

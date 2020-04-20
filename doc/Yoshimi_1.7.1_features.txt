@@ -7,7 +7,7 @@ The different behaviours are most noticable with a changing stereo position.
 
 Another quite new development is both Channel and Key aftertouch. This is still a moving target, but we are releasing it now in order to get feedback from users, which will help shape the way it develops.
 
-The controls are found in a new Aftertouch window, which is reached from the Controllers one. Currently, you can have any combination of Filter Cutoff, Filter Q, Pitch Bend and (for Channel) Volume, but Key and Channel can't have the same ones. The controls are per part/per channel - a rather curious combination. Two parts can be on the same channel getting the same incoming MIDI but having different effects.
+The controls are found in a new Aftertouch window, which is reached from the Controllers one. Currently, you can have any combination of Filter Cutoff, Filter Q, Pitch Bend, Modulation and (for Channel) Volume, but Key and Channel can't have the same ones. The controls are per part/per channel - a rather curious combination. Two parts can be on the same channel getting the same incoming MIDI but having different effects.
 
 Both Key and Channel aftertouch can also be overridden by MIDI-learn.
 
@@ -25,12 +25,12 @@ Instrument banks have also had a workover. One somewhat obscure issue used to be
 
 What happens now is that it installs the already known ones first in their original locations, then if there are more entries it scans the bank for spaces. A further refinement is that it always steps in fives. This means entries are spread as evenly as possible, but still evntually reach every possible location.
 
-A further refinement is that '/usr' directories are scanned for banks, and if found, they're copied into 'HOME/{user}/.local/yoshimi/found' this provides an editable form while preseving the originals. The final detail is that if no banks can be found at all, Yoshimi will create one bank root, with one bank, with one SubSynth instrument!
+A further refinement is that '/usr' directories are scanned for banks, and if found, they're copied into '/home/{user}/.local/yoshimi/found' this provides an editable form while preseving the originals. The final detail is that if no banks can be found at all, Yoshimi will create one bank root, with one bank, with one SubSynth instrument!
 
-A similar action is performed for presets directories, and although existing users will still see ones in 'HOME/{user}/.config/yoshimi' they won't be put there for new users.
+A similar action is performed for presets directories, and although existing users will still see ones in '/home/{user}/.config/yoshimi' they won't be put there for new users.
 
 
-Storing and recovery of GUI window positioning has been improved so it's more reliable, has better defaults, and allows the user to fix the position of more of them.
+Storing and recovery of GUI window positioning has been improved so it is more reliable, has better defaults, and allows the user to fix the position of more of them.
 
 
 There has been significant refactoring of critical areas of the code, resulting in improved performance, reduced redundancy, and greater clarity.
