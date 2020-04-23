@@ -48,11 +48,11 @@ class Config
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
-        void StartupReport(string clientName);
+        void StartupReport(const string& clientName);
         void Announce(void);
         void Usage(void);
-        void Log(const string &msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
-	void LogError(const string &msg);
+        void Log(const string& msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
+    void LogError(const string& msg);
         void flushLog(void);
 
         void clearPresetsDirlist(void);
@@ -63,7 +63,7 @@ class Config
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);
         bool restoreJsession();
-        void setJackSessionSave(int event_type, string session_file);
+        void setJackSessionSave(int event_type, const string& session_file);
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
@@ -74,8 +74,8 @@ class Config
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char lowprio, string name = "");
-        string programCmd(void) { return programcommand; }
+                         bool schedfifo, char lowprio, const string& name = "");
+        const string& programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 

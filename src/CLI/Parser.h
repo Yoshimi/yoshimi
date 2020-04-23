@@ -55,7 +55,7 @@ inline string asAlignedString(int n, int len)
  * for an unambiguous match.
  * If a string in the list is shorter than 'min' then this length is used.
  */
-inline int stringNumInList(string toFind, string * theList, size_t min)
+inline int stringNumInList(const string& toFind, string * theList, size_t min)
 {
     if (toFind.length() < min)
         return -1;
@@ -140,7 +140,7 @@ class Parser
         }
 
 
-        void setPrompt(string newPrompt)
+        void setPrompt(const string& newPrompt)
         {
             prompt = newPrompt;
         }
@@ -159,14 +159,14 @@ class Parser
         }
 
         // initialise the parser with an externally owned and managed buffer
-        void initWithExternalBuffer(string buffer)
+        void initWithExternalBuffer(const string& buffer)
         {
             if (buffer.length() == 0) return;
             cleanUp();
             point = mark = const_cast<char*>(buffer.data());
         }
 
-        void setHistoryFile(string filename)
+        void setHistoryFile(const string& filename)
         {
             if (filename.length() == 0)
                 return;

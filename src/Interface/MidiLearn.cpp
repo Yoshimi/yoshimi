@@ -856,7 +856,7 @@ void MidiLearn::updateGui(int opp)
 }
 
 
-bool MidiLearn::saveList(string name)
+bool MidiLearn::saveList(const string& name)
 {
     if (name.empty())
     {
@@ -943,7 +943,7 @@ bool MidiLearn::insertMidiListData(XMLwrapper *xml)
 }
 
 
-bool MidiLearn::loadList(string name)
+bool MidiLearn::loadList(const string& name)
 {
     if (name.empty())
     {

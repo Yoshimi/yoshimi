@@ -40,7 +40,6 @@ class MidiLearn : private DataText
     public:
         MidiLearn(SynthEngine *_synth);
         ~MidiLearn();
-        bool saveXML(string filename); // true for load ok, otherwise false
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         CommandBlock commandData;
@@ -81,7 +80,7 @@ class MidiLearn : private DataText
         bool remove(int itemNumber);
         void generalOperations(CommandBlock *getData);
         bool insertMidiListData(XMLwrapper *xml);
-        bool loadList(string name);
+        bool loadList(const string& name);
         bool extractMidiListData(bool full,  XMLwrapper *xml);
         void updateGui(int opp = 0);
 
@@ -93,7 +92,7 @@ class MidiLearn : private DataText
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show);
         string findName(list<LearnBlock>::iterator it);
         void insertLine(unsigned short int CC, unsigned char chan);
-        bool saveList(string name);
+        bool saveList(const string& name);
         SynthEngine *synth;
         void writeToGui(CommandBlock *putData);
 };
