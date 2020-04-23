@@ -89,7 +89,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         //std::cout << "Zyn doctype" << std::endl;
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
-        mxmlElementSetAttr(root, "version-major", "3");
+        mxmlElementSetAttr(root, "version-major", "2");
         mxmlElementSetAttr(root, "version-minor", "0");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
@@ -521,6 +521,9 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     }
     else
         synth->getRuntime().lastXMLmajor = 0;
+
+    if (!yoshitoo && xml_version.major > 2)
+        std::cout << "Incompatible" << std:: endl;
 
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {

@@ -34,14 +34,14 @@ add_definitions(-Wall)
 
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
-#add_definitions(-Werror) # warnings as errors
-#add_definitions(-Wfatal-errors) # stop on first
-#add_definitions(-Werror=format-security)
-#add_definitions(-Wextra)
-#add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
+add_definitions(-Werror) # warnings as errors
+add_definitions(-Wfatal-errors) # stop on first
+add_definitions(-Werror=format-security)
+add_definitions(-Wextra)
+add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.7.1")
+set (YOSHIMI_VERSION "1.7.1 M")
 
 add_definitions (-DMIN_CONFIG_MAJOR=1)
 add_definitions (-DMIN_CONFIG_MINOR=6)

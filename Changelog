@@ -1,4 +1,8 @@
-yoshimi 1.7.1
+yoshimi 1.7.1 M
+
+2020-4-23 Will
+* Confirmed Modulator improvements from Kristian.
+* Started recognition of default and changed zyn files.
 
 2020-4-20 Will
 * Added Resonance to managed windows.
