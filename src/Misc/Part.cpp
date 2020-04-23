@@ -124,7 +124,7 @@ void Part::defaults(void)
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
-    Pkeymode = PART_POLY;
+    Pkeymode = PART_NORMAL;
     PchannelATchoice = 0;
     PkeyATchoice = 0;
     setVolume(96);
@@ -141,7 +141,7 @@ void Part::defaults(void)
     TransPanning = 128; // ensure it always gets set
     Pvelsns = 64;
     Pveloffs = 64;
-    Pkeylimit = 20;
+    Pkeylimit = PART_DEFAULT_LIMIT;
     Pfrand = 0;
     Pvelrand = 0;
     PbreathControl = 2;
@@ -339,7 +339,7 @@ void Part::setChannelAT(int type, int value)
 
     if (type & PART::aftertouchType::modulation)
     {
-        if (value > 0)
+        if (value > 1) // 1 seems to foldback :(
         {
             if (oldModulationState == -1)
                 oldModulationState = ctl->modwheel.data;
@@ -384,7 +384,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     int lastnotecopy = lastnote;  // Useful after lastnote has been changed.
 
     // MonoMem stuff:
-    if (Pkeymode > PART_POLY) // if Poly is off
+    if (Pkeymode > PART_NORMAL) // if Poly is off
     {
         if (!renote)
             monomemnotes.push_back(note);        // Add note to the list.
@@ -512,7 +512,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
         // still held down or sustained for the Portamento to activate
         // (that's like Legato).
         int portamento = 0;
-        if (Pkeymode == PART_POLY || !ismonofirstnote)
+        if (Pkeymode == PART_NORMAL || !ismonofirstnote)
         {
             // I added a third argument to the
             // ctl->initportamento(...) function to be able
@@ -829,7 +829,7 @@ void Part::NoteOff(int note) //release the key
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
-                if (Pkeymode > PART_POLY  && !Pdrummode && !monomemnotes.empty())
+                if (Pkeymode > PART_NORMAL  && !Pdrummode && !monomemnotes.empty())
                     MonoMemRenote(); // To play most recent still held note.
                 else
                     ReleaseNotePos(i);
@@ -1057,7 +1057,7 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
     int keylimit = Pkeylimit;
 
     // release old keys if the number of notes>keylimit
-    if (Pkeymode == PART_POLY)
+    if (Pkeymode == PART_NORMAL)
     {
         int notecount = 0;
         for (int i = 0; i < POLIPHONY; ++i)
@@ -1450,7 +1450,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
         xml->addpar("velocity_sensing", Pvelsns);
         xml->addpar("velocity_offset", Pveloffs);
     // the following two lines maintain backward compatibility
-        xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_POLY);
+        xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_NORMAL);
         xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
         xml->addpar("channel_aftertouch", PchannelATchoice);
         xml->addpar("key_aftertouch", PkeyATchoice);
@@ -1543,7 +1543,7 @@ int Part::loadXMLinstrument(string filename)
     getfromXMLinstrument(xml);
     if (hasYoshi)
     {
-        Pkeymode = xml->getpar("key_mode", Pkeymode, PART_POLY, MIDI_LEGATO);
+        Pkeymode = xml->getpar("key_mode", Pkeymode, PART_NORMAL, MIDI_LEGATO);
         Pfrand = xml->getpar127("random_detune", Pfrand);
         if (Pfrand > 50)
             Pfrand = 50;
@@ -1682,7 +1682,7 @@ void Part::getfromXML(XMLwrapper *xml)
     if (Plegatomode) // these lines are for backward compatibility
         Pkeymode = PART_LEGATO;
     else if (Ppolymode)
-        Pkeymode = PART_POLY;
+        Pkeymode = PART_NORMAL;
     else
         Pkeymode = PART_MONO;
 
@@ -1690,14 +1690,8 @@ void Part::getfromXML(XMLwrapper *xml)
     PkeyATchoice = xml->getpar("key_aftertouch", PkeyATchoice, 0, 255);
 
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
-    if (Pkeylimit < 1)
-    {
-        Pkeylimit = POLIPHONY - 20;
-    }
-    else if(Pkeylimit > (POLIPHONY - 20))
-    {
-        Pkeylimit = POLIPHONY - 20;
-    }
+    if (Pkeylimit < 1 || Pkeylimit > PART_POLIPHONY)
+        Pkeylimit = PART_POLIPHONY;
     Pfrand = xml->getpar127("random_detune", Pfrand);
     if (Pfrand > 50)
         Pfrand = 50;

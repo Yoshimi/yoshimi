@@ -1,11 +1,12 @@
 voice aftertouch
 A0-AF
-should become CC 642
-but don't yet know how to interpret (or claim extra parameter) so it is tempoarily set as chanel aftertouch.
+becomes CC 642
+
+This is translated as CC 130 and implemented as key aftertouch and for MIDI learn. Note number is 'par' & 0xff. Pressure value is 'par' >> 8.
 
 
 channel aftertouch
 D0 = DF
 becomes CC 641
 
-This is now implemented for MIDI learn, and is further translated as CC 129.
+This is  translated as CC 129 and implemented as channel aftertouch and for MIDI learn. Pressure value is 'par'.

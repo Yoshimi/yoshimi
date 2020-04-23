@@ -1,4 +1,46 @@
-yoshimi 1.7.1 rc1
+yoshimi 1.7.1
+
+2020-4-20 Will
+* Added Resonance to managed windows.
+  Forgotten earlier :(
+* Final doc updates.
+* Set release version 1.7.1
+
+2020-4-19 Will
+* Includes GUI SysEf Send GUI bugfix from Jesper.
+* Reinstated aftertouch modulation.
+* Fixed foldback at zero for channel.
+  Might not be correct at zero for key.
+* Added tooltips to aftertouch controls.
+* Set version as 1.7.1 rc5
+
+2020-4-18 Will
+* BugFix: Segfault due to change in commit
+  817fbc6ea91a064839eebae1f54efc20753cb927
+  Only seen by 1 person so far.
+* Trapped rogue dir in file list for directory copy.
+* Confirming Bugfixes.
+* Further doc updates.
+* Set version as 1.7.1 rc4
+
+2020-4-17 Will
+* Changed PART_POLY to PART_NORMAL.
+  It could be confused with PART_POLIPHONY.
+* Changed POLIPHONY - 20 to PART_POLIPHONY.
+* Moved default poliphony for parts from Part.cpp to globals.h
+* Yet more doc updates!
+* Set version as 1.7.1 rc3
+
+2020-4-15 Will
+* Minor correction to AddSynth Voice/List window position fetch.
+  They were refetching last saved position even when moved.
+* Removed some redundant code.
+* Cleared pedantic error/warning traps in CMakeLists.txt
+* Further doc updates.
+* Set version as 1.7.1 rc2
+
+2020-4-13 Will
+* Doc updates - no code changes.
 
 2020-4-11 Will
 * Aftertouch Modulation temporarily hidden.

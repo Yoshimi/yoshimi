@@ -24,6 +24,7 @@
 #include <cerrno>
 #include <fcntl.h> // this affects error reporting
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <cstring>
 #include <string>
 #include <iostream>
@@ -216,7 +217,7 @@ inline string setExtension(const string& fname, string ext)
 }
 
 
-inline bool copyFile(const string& source, const string& destination, char option = 0)
+inline bool copyFile(const string& source, const string& destination, char option)
 {
     // options
     // 0 = always write / overwrite
@@ -276,9 +277,9 @@ inline bool copyFile(const string& source, const string& destination, char optio
 }
 
 
-inline uint32_t copyDir(const string& source, const string& destination, char option = 0)
+inline uint32_t copyDir(const string& source, const string& destination, char option)
 {
-    //std::cout << "source file " << source << "  to " << destination << std::endl;
+    //std::cout << "source dir " << source << "  to " << destination << std::endl;
     DIR *dir = opendir(source.c_str());
     if (dir == NULL)
         return 0xffffffff;
@@ -288,6 +289,9 @@ inline uint32_t copyDir(const string& source, const string& destination, char op
     while ((fn = readdir(dir)))
     {
         string nextfile = string(fn->d_name);
+        //std::cout << "next file " << nextfile << std::endl;
+        if (!isRegularFile(source + "/" + nextfile))
+            continue;
         if (nextfile == "." || nextfile == "..")
             continue;
         if (copyFile(source + "/" + nextfile, destination + "/" + nextfile, option))

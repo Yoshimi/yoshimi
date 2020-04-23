@@ -559,13 +559,17 @@ class ResonanceUI {: PresetsUI_
     engine = engine_;
     cbwidget = NULL;
     cbapplywidget = NULL;
+    resSeen = false;
     make_window();
     applybutton->hide();
     refresh();} {}
   }
   Function {~ResonanceUI()} {return_type virtual
   } {
-    code {resonancewindow->hide();} {}
+    code {
+            if (resSeen)
+                saveWin(synth, resonancewindow->x(), resonancewindow->y(), resonancewindow->visible(), "resonWin");
+            resonancewindow->hide();} {}
   }
   Function {redrawPADnoteApply()} {} {
     code {if (cbwidget!=NULL) {
@@ -611,6 +615,13 @@ class ResonanceUI {: PresetsUI_
         tname = "AddSynth Resonance";
     else
         tname = "PadSynth Resonance ";
+    if (!resSeen)
+    {
+        int fetchX, fetchY, fetchO;
+        loadWin(synth, fetchX, fetchY, fetchO, "resonWin");
+        resonancewindow->position(fetchX, fetchY);
+        resSeen = true;
+    }
     resonancewindow->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());
     resonancewindow->show();} {}
   }
@@ -629,5 +640,7 @@ class ResonanceUI {: PresetsUI_
   decl {int engine;} {private local
   }
   decl {bool ADvsPAD;} {private local
+  }
+  decl {bool resSeen;} {private local
   }
 }

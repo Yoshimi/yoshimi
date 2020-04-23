@@ -4,9 +4,9 @@ To learn, hold Ctrl while right-clicking on any GUI control. There will be a pop
 
 You will also get a message in the console window (or CLI).
 
-After that, if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop-up window will also disappear. and the console message will be "Learned" and a line underneath with exactly what contorol was caught.
+After that, if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop-up window will also disappear. and the console message will be "Learned" and a line underneath with exactly what control was caught.
 
-If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
+If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new editing window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action. There is also a config setting them makes the editing window appear whenever a new control is learned.
 
 If the controller you learned was an NRPN this will show as a hexadecimal number in the CC field, and this field will not be editable. As of V 1.5.2 there is a checkbox so that you can set this as a LSB only type (some hardware synths send these).
 
@@ -29,7 +29,7 @@ The range can either be in the style of a limiter or as compression.
 
 Blocking of all later actions on the same CC/channel pair (including system ones).
 
-Muting of this line - nullifying all of the above.
+Muting of this line - nullifying all of the above but keeping the capability.
 
 You can delete any existing line by holding down the 'CTRL' key and then clicking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
 

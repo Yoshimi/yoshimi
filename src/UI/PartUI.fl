@@ -718,6 +718,9 @@ class PartUI {: {public Fl_Group, PartUI_}
           send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
+        Fl_Box {} {
+          xywh {240 106 134 62} box ENGRAVED_FRAME labelsize 11 align 2
+        }
         Fl_Pack toSysEfx {
           label {To Sys Efx}
           xywh {246 122 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 10 align 0
@@ -737,9 +740,6 @@ class PartUI {: {public Fl_Group, PartUI_}
            toSysEfx->activate();
         }}
         } {}
-        Fl_Box {} {
-          xywh {240 106 134 62} box ENGRAVED_FRAME labelsize 11 align 2
-        }
       }
       Fl_Text_Display {} {
         label {System Effect Sends}
@@ -1015,6 +1015,12 @@ class PartUI {: {public Fl_Group, PartUI_}
       code1 {int X, Y, O; loadWin(synth, X, Y, O, "afterT"); o->position(X, Y); ATSeen = true;}
     } {
       Fl_Box {} {
+        xywh {9 5 228 171} box ENGRAVED_FRAME
+      }
+      Fl_Box {} {
+        xywh {241 5 234 143} box ENGRAVED_FRAME
+      }
+      Fl_Box {} {
         label Channel
         xywh {95 13 35 17} labelfont 1
       }
@@ -1046,13 +1052,13 @@ class PartUI {: {public Fl_Group, PartUI_}
                     channelfilterCminus->deactivate();
                 }
                 setATchannel(PART::aftertouchType::filterCutoff, o->value());}
-        xywh {25 65 70 15} down_box DOWN_BOX
+        tooltip {Between current MIDI setting and max.} xywh {25 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelfilterCminus {
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterCutoffDown, o->value());}
-        xywh {150 65 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current MIDI setting and zero} xywh {150 65 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelfilterQ {
         label {Filter Q}
@@ -1065,13 +1071,13 @@ class PartUI {: {public Fl_Group, PartUI_}
                     channelfilterQminus->deactivate();
                 }
                 setATchannel(PART::aftertouchType::filterQ, o->value());}
-        xywh {25 85 70 15} down_box DOWN_BOX
+        tooltip {Between current MIDI setting and max.} xywh {25 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelfilterQminus {
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterQdown, o->value());}
-        xywh {150 85 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current MIDI setting and zero} xywh {150 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelpitchbend {
         label {Pitch Bend}
@@ -1084,25 +1090,25 @@ class PartUI {: {public Fl_Group, PartUI_}
                     channelpitchBminus->deactivate();
                 }
                 setATchannel(PART::aftertouchType::pitchBend, o->value());}
-        xywh {25 105 70 15} down_box DOWN_BOX
+        tooltip {Between current pitch wheel position and max.} xywh {25 105 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelpitchBminus {
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::pitchBendDown, o->value());}
-        xywh {150 105 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current pitch wheel position and min.} xywh {150 105 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button channelmodulation {
         label Modulation
         callback {//
                 setATchannel(PART::aftertouchType::modulation, o->value());}
-        xywh {25 125 70 15} down_box DOWN_BOX hide deactivate
+        tooltip {Between zero and Add/Pad frequency LFO depth} xywh {25 125 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button channelvolume {
         label Volume
         callback {//
                 setATchannel(PART::aftertouchType::volume, o->value());}
-        xywh {25 145 70 15} down_box DOWN_BOX
+        tooltip {Between current part volume and max.} xywh {25 145 70 15} down_box DOWN_BOX
       }
       Fl_Box {} {
         label Key
@@ -1135,13 +1141,13 @@ class PartUI {: {public Fl_Group, PartUI_}
                     polyfilterCminus->deactivate();
                 }
                 setATkey(PART::aftertouchType::filterCutoff, o->value());}
-        xywh {270 65 70 15} down_box DOWN_BOX
+        tooltip {Between current MIDI setting and max.} xywh {270 65 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polyfilterCminus {
         label Down
         callback {//
                 setATkey(PART::aftertouchType::filterCutoffDown, o->value());}
-        xywh {395 65 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current MIDI setting and zero} xywh {395 65 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polyfilterQ {
         label {Filter Q}
@@ -1154,13 +1160,13 @@ class PartUI {: {public Fl_Group, PartUI_}
                     polyfilterQminus->deactivate();
                 }
                 setATkey(PART::aftertouchType::filterQ, o->value());}
-        xywh {270 85 70 15} down_box DOWN_BOX
+        tooltip {Between current MIDI setting and max.} xywh {270 85 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polyfilterQminus {
         label Down
         callback {//
                 setATkey(PART::aftertouchType::filterQdown, o->value());}
-        xywh {395 85 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current MIDI setting and zero} xywh {395 85 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polypitchbend {
         label {Pitch Bend}
@@ -1173,19 +1179,19 @@ class PartUI {: {public Fl_Group, PartUI_}
                     polypitchBminus->deactivate();
                 }
                 setATkey(PART::aftertouchType::pitchBend, o->value());}
-        xywh {270 105 70 15} down_box DOWN_BOX
+        tooltip {Between current pitch wheel position and max.} xywh {270 105 70 15} down_box DOWN_BOX
       }
       Fl_Check_Button polypitchBminus {
         label Down
         callback {//
                 setATkey(PART::aftertouchType::pitchBendDown, o->value());}
-        xywh {395 105 70 15} down_box DOWN_BOX deactivate
+        tooltip {Between current pitch wheel position and min.} xywh {395 105 70 15} down_box DOWN_BOX deactivate
       }
       Fl_Check_Button polymodulation {
         label Modulation
         callback {//
                 setATkey(PART::aftertouchType::modulation, o->value());}
-        xywh {270 125 70 15} down_box DOWN_BOX hide deactivate
+        tooltip {Between zero and Add/Pad frequency LFO depth} xywh {270 125 70 15} down_box DOWN_BOX
       }
       Fl_Button {} {
         label Close
@@ -1194,12 +1200,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             ctlwindow->show();
         aftertouchcontrol->hide();}
         xywh {420 154 50 20} box THIN_UP_BOX
-      }
-      Fl_Box {} {
-        xywh {9 5 228 171} box ENGRAVED_FRAME
-      }
-      Fl_Box {} {
-        xywh {241 5 234 143} box ENGRAVED_FRAME
       }
     }
     Fl_Window ctlmidi {

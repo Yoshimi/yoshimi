@@ -1940,9 +1940,12 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
             int fetchX, fetchY, fetchO;
-            loadWin(synth, fetchX, fetchY, fetchO, "adList");
-            ADnoteVoiceList->position(fetchX, fetchY);
-            listSeen = true;
+            if (!listSeen)
+            {
+                loadWin(synth, fetchX, fetchY, fetchO, "adList");
+                ADnoteVoiceList->position(fetchX, fetchY);
+                listSeen = true;
+            }
             ADnoteVoiceList->show();
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
@@ -1953,9 +1956,12 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
     voicelistitem[nvoice]->refreshlist();
     int fetchX, fetchY, fetchO;
-    loadWin(synth, fetchX, fetchY, fetchO, "adVoice");
-    ADnoteVoice->position(fetchX, fetchY);
-    voiceSeen = true;
+    if (!voiceSeen)
+    {
+        loadWin(synth, fetchX, fetchY, fetchO, "adVoice");
+        ADnoteVoice->position(fetchX, fetchY);
+        voiceSeen = true;
+    }
     ADnoteVoice->show();
     ADnoteVoice->redraw();
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
