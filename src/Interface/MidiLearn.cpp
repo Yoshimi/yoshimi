@@ -94,6 +94,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
 
     int lastpos = scan::listBlocked;
     LearnBlock foundEntry;
+    foundEntry.status = 0;
     bool firstLine = true;
     while (lastpos != scan::listEnd)
     {

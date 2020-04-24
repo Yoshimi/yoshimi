@@ -1494,6 +1494,7 @@ void InterChange::generateSpecialInstrument(int npart, std::string name)
 void InterChange::mediate()
 {
     CommandBlock getData;
+    memset(&getData.bytes, 255, sizeof(getData));
     bool more = false;
     syncWrite = true;
     do
