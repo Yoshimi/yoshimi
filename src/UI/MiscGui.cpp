@@ -1294,7 +1294,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
     }
 }
 
-string variable_prec_units(float v, string u, int maxPrec, bool roundup)
+string variable_prec_units(float v, const string& u, int maxPrec, bool roundup)
 {
     int digits = 0, lim = (int) pow(10,maxPrec);
     float _v = fabsf(v);
@@ -1312,13 +1312,13 @@ string variable_prec_units(float v, string u, int maxPrec, bool roundup)
     return custom_value_units(v, u, digits);
 }
 
-string custom_value_units(float v, string u, int prec)
+string custom_value_units(float v, const string& u, int prec)
 {
     ostringstream oss;
     oss.setf(std::ios_base::fixed);
     oss.precision(prec);
     oss << v << " " << u;
-    return(string(oss.str()));
+    return(oss.str());
 }
 
 ValueType getLFOdepthType(int group)

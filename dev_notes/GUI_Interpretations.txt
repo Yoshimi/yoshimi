@@ -10,7 +10,7 @@ unsigned char   kit
 unsigned char   engine
 unsigned char   insert
 unsigned char   parameter
-unsigned char   par2
+unsigned char   offset
 unsigned char   miscMsg
 unsigned char   spare1
 unsigned char   spare0
@@ -101,9 +101,9 @@ parameter
         formant filter
             for controls 18 - 20
                 formant number
-                par2 for vowel number
+                offset for vowel number
             for control 37
                 filter sequence position
 
-par2
+offset
     used for offsets to some parameters

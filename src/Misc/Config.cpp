@@ -190,7 +190,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     sigIntActive(0),
     ladi1IntActive(0),
     sse_level(0),
-    programcommand(string("yoshimi")),
+    programcommand("yoshimi"),
     synth(_synth),
     bRuntimeSetupCompleted(false),
     exitType(EXIT_SUCCESS)
@@ -387,9 +387,9 @@ bool Config::loadConfig(void)
     if (thisInstance == 0 && sessionStage != Session::RestoreConf)
     {
         string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
-        if (isRegularFile(baseConfig) && !isRegularFile(newInstance0))
+        if (isRegularFile(baseConfig) && !isRegularFile(newInstance0), 0)
         {
-            file::copyFile(baseConfig, newInstance0);
+            file::copyFile(baseConfig, newInstance0, 0);
             Log("Reorganising config files.");
             if (isRegularFile(defaultStateName + EXTEN::state))
             {
@@ -805,8 +805,8 @@ void Config::addConfigXML(XMLwrapper *xml)
     xml->addparbool("monitor-incoming_CCs", monitorCCin);
     xml->addparbool("open_editor_on_learned_CC",showLearnedCC);
     xml->addpar("check_pad_synth", checksynthengines);
-    xml->addpar(string("root_current_ID"), synth->ReadBankRoot());
-    xml->addpar(string("bank_current_ID"), synth->ReadBank());
+    xml->addpar("root_current_ID", synth->ReadBankRoot());
+    xml->addpar("bank_current_ID", synth->ReadBank());
     xml->endbranch(); // CONFIGURATION
 }
 
@@ -889,7 +889,7 @@ end_game:
 }
 
 
-void Config::Log(const string &msg, char tostderr)
+void Config::Log(const string& msg, char tostderr)
 {
     if ((tostderr & 2) && hideErrors)
         return;
@@ -907,7 +907,7 @@ void Config::LogError(const string &msg)
     Log("[ERROR] " + msg, 1);
 }
 
-void Config::StartupReport(string clientName)
+void Config::StartupReport(const string& clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
     if (fullInfo)
@@ -968,7 +968,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char priodec, string name)
+                         bool schedfifo, char priodec, const string& name)
 {
     pthread_attr_t attr;
     int chk;
@@ -1104,7 +1104,7 @@ bool Config::restoreJsession(void)
 }
 
 
-void Config::setJackSessionSave(int event_type, string session_file)
+void Config::setJackSessionSave(int event_type, const string& session_file)
 {
     jackSessionFile = session_file;
     __sync_and_and_fetch(&jsessionSave, 0);

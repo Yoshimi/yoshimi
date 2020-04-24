@@ -77,8 +77,8 @@ class Microtonal
         void tuningtoline(unsigned int n, char *line, int maxn);
         string tuningtotext(void);
         string keymaptotext(void);
-        int loadscl(string filename); // load the tunings from a .scl file
-        int loadkbm(string filename); // load the mapping from .kbm file
+        int loadscl(const string& filename); // load the tunings from a .scl file
+        int loadkbm(const string& filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
         int texttomapping(const char *text);
 
@@ -87,14 +87,14 @@ class Microtonal
 
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
-        bool saveXML(string filename);
-        bool loadXML(string filename);
+        bool saveXML(const string& filename);
+        bool loadXML(const string& filename);
 
     private:
         string reformatline(string text);
         bool validline(const char *line);
         int linetotunings(unsigned int nline, const char *line);
-        int loadLine(string text, size_t &point, char *line, size_t maxlen);
+        int loadLine(const string& text, size_t &point, char *line, size_t maxlen);
         // loads a line from the text file,
         // ignoring the lines beginning with "!"
         size_t octavesize;
@@ -109,8 +109,6 @@ class Microtonal
         };
         Octave octave[MAX_OCTAVE_SIZE];
         Octave tmpoctave[MAX_OCTAVE_SIZE];
-
-        float note_12et[128];
 
         SynthEngine *synth;
 };

@@ -849,8 +849,18 @@ class BankUI {: {public BankProcess_, RootProcess_}
         dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
         if (!dirname)
             return;
-        size_t idx = synth->getBankRef().addRootDir(dirname);
-        synth->getBankRef().installNewRoot(idx, dirname);
+        if(!file::isDirectory(dirname))
+        {
+            if (fl_choice("Directory is missing, or doesn't have at least \\n1 bank with at least 1 instrument. \\nCreate missing entries?", NULL, "No", "Yes") != 2)
+                return;
+            synth->getBankRef().generateSingleRoot(dirname, false);
+            synth->getGuiMaster()->updatepart();
+        }
+        else
+        {
+            size_t idx = synth->getBankRef().addRootDir(dirname);
+            synth->getBankRef().installNewRoot(idx, dirname);
+        }
         synth->saveBanks();
         readbankcfg();
         Pend->hide();}

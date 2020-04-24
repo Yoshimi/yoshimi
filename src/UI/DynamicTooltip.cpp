@@ -136,7 +136,7 @@ void DynTooltip::setOnlyValue(bool onlyval)
   Calling setOnlyValue(false) will prevent this from being
   displayed.
 */
-void DynTooltip::setTooltipText(string tt_text)
+void DynTooltip::setTooltipText(const string& tt_text)
 {
     tipText = tt_text;
     tipTextW = MAX_TEXT_WIDTH;

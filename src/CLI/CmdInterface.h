@@ -36,7 +36,7 @@ class CmdInterface
         cli::CmdInterpreter interpreter;
 
         Config& getRuntime();
-        void Log(const string &, char tostderr =0);
+        void Log(const string& , char tostderr =0);
 };
 
 #endif

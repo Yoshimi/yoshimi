@@ -67,7 +67,7 @@ PresetsStore::~PresetsStore()
 
 
 // Clipboard management
-void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
+void PresetsStore::copyclipboard(XMLwrapper *xml, const string& type)
 {
     clipboard.type = type;
     if (clipboard.data != NULL)
@@ -94,7 +94,7 @@ bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 }
 
 
-bool PresetsStore::checkclipboardtype(string type)
+bool PresetsStore::checkclipboardtype(const string& type)
 {
     // makes LFO's compatible
     if (type.find("Plfo") != string::npos
@@ -114,7 +114,7 @@ void PresetsStore::clearpresets(void)
 }
 
 
-void PresetsStore::rescanforpresets(string type, int root)
+void PresetsStore::rescanforpresets(const string& type, int root)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
@@ -191,7 +191,7 @@ void PresetsStore::rescanforpresets(string type, int root)
 }
 
 
-void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
+void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string& name)
 {
     if (firstSynth->getRuntime().presetsDirlist[0].empty())
         return;

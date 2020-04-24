@@ -48,7 +48,7 @@ Sets the part's effect 1 to type 'reverb'
 
 Notice the two capitals in reverb, these remind you of the minimum abbreviation.
 
-Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
+Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are sometimes truncated so the prompt line doesn't get unmanageably long.
 
 
 From here you can set a preset for this effect:
@@ -59,7 +59,7 @@ yoshimi p4+ eff 1 REverb-3 >
 
 Currently the presets are shown only numerically in the prompt. This is because most of them include the name of the effect so it would be tedious to type them in.
 
-From the top level, settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
+From the top level, many settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
 
 "s p 5 ef 2"
 yoshimi p5+ eff 2 REverb-1 >

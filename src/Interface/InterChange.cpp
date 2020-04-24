@@ -99,7 +99,6 @@ InterChange::InterChange(SynthEngine *_synth) :
 
 bool InterChange::Init()
 {
-    flagsValue = 0xffffffff;
 #ifndef YOSHIMI_LV2_PLUGIN
     fromCLI = new ringBuff(256, commandBlockSize);
 #endif
@@ -1470,7 +1469,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 }
 
 
-// This is only used by bank when no banks can be found
+// This is only used when no valid banks can be found
 void InterChange::generateSpecialInstrument(int npart, std::string name)
 {
     synth->part[npart]->Pname = name;

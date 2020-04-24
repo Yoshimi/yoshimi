@@ -28,8 +28,6 @@
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
-#include "Synth/LegatoTypes.h"
-
 class PADnoteParameters;
 class Controller;
 class Envelope;

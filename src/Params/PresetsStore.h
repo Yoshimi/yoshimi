@@ -46,12 +46,12 @@ class PresetsStore
         ~PresetsStore();
 
         // Clipboard stuff
-        void copyclipboard(XMLwrapper *xml, string type);
+        void copyclipboard(XMLwrapper *xml, const string& type);
         bool pasteclipboard(XMLwrapper *xml);
-        bool checkclipboardtype(string type);
+        bool checkclipboardtype(const string& type);
 
         // presets stuff
-        void copypreset(XMLwrapper *xml, string type, string name);
+        void copypreset(XMLwrapper *xml, const string& type, const string& name);
         bool pastepreset(XMLwrapper *xml, int npreset);
         void deletepreset(int npreset);
 
@@ -61,7 +61,7 @@ class PresetsStore
         };
         presetstruct presets[MAX_PRESETS];
 
-        void rescanforpresets(string type, int root);
+        void rescanforpresets(const string& type, int root);
 
     private:
         void clearpresets(void);

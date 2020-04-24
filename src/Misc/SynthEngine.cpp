@@ -29,6 +29,8 @@
 #include <set>
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -233,6 +235,19 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     oscil_sample_step_f = oscilsize_f / samplerate_f;
+
+    // Phase and frequency modulation are calculated in terms of samples, not
+    // angle/frequency, so modulation must be normalized to reference values of
+    // angle/sample and time/sample.
+
+    // oscilsize is one wavelength worth of samples, so
+    // phase modulation should scale proportionally
+    oscil_norm_factor_pm = oscilsize_f / oscilsize_ref_f;
+    // FM also depends on samples/wavelength as well as samples/time,
+    // so scale FM inversely with the sample rate.
+    oscil_norm_factor_fm =
+        oscil_norm_factor_pm * (samplerate_ref_f / samplerate_f);
+
     // distance / duration / second = distance / (duration * second)
     // While some might prefer to write this as the latter, when distance and
     // duration are constants the latter incurs two roundings while the former
@@ -998,7 +1013,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 }
 
 
-bool SynthEngine::setProgram(string fname, int npart)
+bool SynthEngine::setProgram(const string& fname, int npart)
 {
     bool ok = true;
     if (!part[npart]->loadXMLinstrument(fname))
@@ -2354,7 +2369,7 @@ void SynthEngine::ShutUp(void)
 }
 
 
-bool SynthEngine::loadStateAndUpdate(string filename)
+bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
     defaults();
     Runtime.sessionStage = Session::InProgram;
@@ -2365,7 +2380,7 @@ bool SynthEngine::loadStateAndUpdate(string filename)
 }
 
 
-bool SynthEngine::saveState(string filename)
+bool SynthEngine::saveState(const string& filename)
 {
     return Runtime.saveSessionData(filename);
 }
@@ -2382,12 +2397,12 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
 }
 
 
-bool SynthEngine::loadMicrotonal(string fname)
+bool SynthEngine::loadMicrotonal(const string& fname)
 {
     return microtonal.loadXML(setExtension(fname, EXTEN::scale));
 }
 
-bool SynthEngine::saveMicrotonal(string fname)
+bool SynthEngine::saveMicrotonal(const string& fname)
 {
     return microtonal.saveXML(setExtension(fname, EXTEN::scale));
 }
@@ -2398,7 +2413,7 @@ bool SynthEngine::installBanks()
     string bankname = name + ".banks";
 //    Runtime.Log(bankname);
     bool banksGood = false;
-    bool newBanks;
+    bool newBanks = false;
     if (isRegularFile(bankname))
     {
         XMLwrapper *xml = new XMLwrapper(this);
@@ -2464,7 +2479,7 @@ void SynthEngine::newHistory(string name, int group)
 }
 
 
-void SynthEngine::addHistory(string name, int group)
+void SynthEngine::addHistory(const string& name, int group)
 {
     if (Runtime.historyLock[group])
         return;
@@ -2473,14 +2488,10 @@ void SynthEngine::addHistory(string name, int group)
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.insert(itn, name);
-
-    for (vector<string>::iterator it = listType.begin() + 1; it < listType.end(); ++ it)
-    {
-        if (*it == name)
-            listType.erase(it);
-    }
+    itn = listType.begin(); // reinitialize after insertion
+    std::advance(itn, 1); // skip first entry
+    listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
     setLastfileAdded(group, name);
-    return;
 }
 
 
@@ -2729,7 +2740,7 @@ bool SynthEngine::saveHistory()
 }
 
 
-unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string name)
+unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, const string& name)
 {
     unsigned char result = loadVector(baseChan, name, true);
     ShutUp();
@@ -2737,7 +2748,7 @@ unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, string na
 }
 
 
-unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
+unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name, bool full)
 {
     bool a = full; full = a; // suppress warning
     unsigned char actualBase = NO_MSG; // error!
@@ -2763,7 +2774,6 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
     if (!xml->enterbranch("VECTOR"))
     {
             Runtime. Log("Extract Data, no VECTOR branch", 2);
-            delete xml;
     }
     else
     {
@@ -2792,7 +2802,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
 }
 
 
-unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper *xml, string name)
+unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper *xml, const string& name)
 {
     int lastPart = NUM_MIDI_PARTS;
     unsigned char tmp;
@@ -2881,7 +2891,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 }
 
 
-unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
+unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name, bool full)
 {
     bool a = full; full = a; // suppress warning
     unsigned char result = NO_MSG; // ok
@@ -2917,7 +2927,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, string name, bool 
 }
 
 
-bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, string name)
+bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, const string& name)
 {
     int lastPart = NUM_MIDI_PARTS;
     int x_feat = Runtime.vectordata.Xfeatures[baseChan];
@@ -3086,7 +3096,7 @@ bool SynthEngine::savePatchesXML(string filename)
 }
 
 
-bool SynthEngine::loadXML(string filename)
+bool SynthEngine::loadXML(const string& filename)
 {
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (NULL == xml)
@@ -3243,7 +3253,7 @@ void SynthEngine::closeGui()
 #endif
 
 
-string SynthEngine::makeUniqueName(string name)
+string SynthEngine::makeUniqueName(const string& name)
 {
     string result = "Yoshimi";
     if (uniqueId > 0)
@@ -3253,7 +3263,7 @@ string SynthEngine::makeUniqueName(string name)
 }
 
 
-void SynthEngine::setWindowTitle(string _windowTitle)
+void SynthEngine::setWindowTitle(const string& _windowTitle)
 {
     if (!_windowTitle.empty())
         windowTitle = _windowTitle;

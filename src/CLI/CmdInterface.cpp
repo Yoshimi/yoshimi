@@ -65,7 +65,7 @@ Config& CmdInterface::getRuntime()
     return interpreter.synth->getRuntime();
 }
 
-void CmdInterface::Log(const string &msg, char toStderr)
+void CmdInterface::Log(const string& msg, char toStderr)
 {
     getRuntime().Log(msg, toStderr);
 }
