@@ -1070,7 +1070,7 @@ union CommandBlock{
         unsigned char spare1;
         unsigned char spare0;
     } data;
-    char bytes [sizeof(data)]{};
+    char bytes [sizeof(data)];
 };
 /*
  * it is ESSENTIAL that this is a power of 2
