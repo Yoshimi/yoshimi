@@ -42,6 +42,8 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     audio.pThread = 0;
 
     midi.handle = NULL;
+    midi.addr.client = 0;
+    midi.addr.port = 0;
     midi.alsaId = -1;
     midi.pThread = 0;
     little_endian = synth->getRuntime().isLittleEndian;

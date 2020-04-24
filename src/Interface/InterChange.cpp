@@ -1495,7 +1495,7 @@ void InterChange::generateSpecialInstrument(int npart, std::string name)
 void InterChange::mediate()
 {
     CommandBlock getData;
-    bool more;
+    bool more = false;
     syncWrite = true;
     do
     {
