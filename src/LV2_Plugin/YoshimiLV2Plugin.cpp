@@ -382,6 +382,7 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, do
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
     if (synth == NULL || !synth->getRuntime().isRuntimeSetupCompleted()){
+        delete synth;
         return NULL;
     }
     Fl::lock();
