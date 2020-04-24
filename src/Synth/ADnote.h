@@ -159,7 +159,7 @@ class ADnote
             float  FilterFreqTracking;
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
-        } NoteGlobalPar;
+        } NoteGlobalPar{};
 
         // Voice parameters
         struct ADnoteVoice {
@@ -219,7 +219,7 @@ class ADnote
             float  FMDetune; // in cents
             Envelope *FMFreqEnvelope;
             Envelope *FMAmpEnvelope;
-        } NoteVoicePar[NUM_VOICES];
+        } NoteVoicePar[NUM_VOICES]{};
 
         // Internal values of the note and of the voices
         float time; // time from the start of the note
@@ -228,79 +228,79 @@ class ADnote
                             // with a known seed every time parameters are
                             // updated. This allows parameters to be changed
                             // smoothly. New notes will get a new seed.
-        uint32_t paramSeed; // The seed for paramRNG.
+        uint32_t paramSeed{}; // The seed for paramRNG.
 
         //pinking filter (Paul Kellet)
-        float pinking[NUM_VOICES][14];
+        float pinking[NUM_VOICES][14]{};
 
-        int unison_size[NUM_VOICES]; // the size of unison for a single voice
+        int unison_size[NUM_VOICES]{}; // the size of unison for a single voice
 
-        float unison_stereo_spread[NUM_VOICES]; // stereo spread of unison subvoices (0.0=mono,1.0=max)
+        float unison_stereo_spread[NUM_VOICES]{}; // stereo spread of unison subvoices (0.0=mono,1.0=max)
 
-        float *oscposlo[NUM_VOICES], *oscfreqlo[NUM_VOICES]; // fractional part (skip)
+        float *oscposlo[NUM_VOICES]{}, *oscfreqlo[NUM_VOICES]{}; // fractional part (skip)
 
-        int *oscposhi[NUM_VOICES], *oscfreqhi[NUM_VOICES]; // integer part (skip)
+        int *oscposhi[NUM_VOICES]{}, *oscfreqhi[NUM_VOICES]{}; // integer part (skip)
 
-        float *oscposloFM[NUM_VOICES], *oscfreqloFM[NUM_VOICES]; // fractional part (skip) of the Modullator
+        float *oscposloFM[NUM_VOICES]{}, *oscfreqloFM[NUM_VOICES]{}; // fractional part (skip) of the Modullator
 
-        float *unison_base_freq_rap[NUM_VOICES]; // the unison base_value
+        float *unison_base_freq_rap[NUM_VOICES]{}; // the unison base_value
 
-        float *unison_freq_rap[NUM_VOICES]; // how the unison subvoice's frequency is changed (1.0 for no change)
+        float *unison_freq_rap[NUM_VOICES]{}; // how the unison subvoice's frequency is changed (1.0 for no change)
 
         // These are set by parent voices.
-        float detuneFromParent;             // How much the voice should be detuned.
-        float unisonDetuneFactorFromParent; // How much the voice should be detuned from unison.
+        float detuneFromParent{};             // How much the voice should be detuned.
+        float unisonDetuneFactorFromParent{}; // How much the voice should be detuned from unison.
 
-        bool *unison_invert_phase[NUM_VOICES]; // which unison subvoice has phase inverted
+        bool *unison_invert_phase[NUM_VOICES]{}; // which unison subvoice has phase inverted
 
         struct { // unison vibratto
             float  amplitude; // amplitude which be added to unison_freq_rap
             float *step;      // value which increments the position
             float *position;  // between -1.0 and 1.0
-        } unison_vibratto[NUM_VOICES];
+        } unison_vibratto[NUM_VOICES]{};
 
         // integer part (skip) of the Modullator
-        unsigned int *oscposhiFM[NUM_VOICES];
-        unsigned int *oscfreqhiFM[NUM_VOICES];
+        unsigned int *oscposhiFM[NUM_VOICES]{};
+        unsigned int *oscfreqhiFM[NUM_VOICES]{};
 
-        float oldamplitude[NUM_VOICES];  // used to compute and interpolate the
-        float newamplitude[NUM_VOICES];  // amplitudes of voices and modullators
-        float FMoldamplitude[NUM_VOICES];
-        float FMnewamplitude[NUM_VOICES];
+        float oldamplitude[NUM_VOICES]{};  // used to compute and interpolate the
+        float newamplitude[NUM_VOICES]{};  // amplitudes of voices and modullators
+        float FMoldamplitude[NUM_VOICES]{};
+        float FMnewamplitude[NUM_VOICES]{};
 
-        float *FMoldsmp[NUM_VOICES]; // used by Frequency Modulation (for integration)
+        float *FMoldsmp[NUM_VOICES]{}; // used by Frequency Modulation (for integration)
 
-        float *FMFMoldsmpModded[NUM_VOICES]; // use when rendering FM modulator with parent FM
-        float *FMFMoldsmpOrig[NUM_VOICES];
-        float *oscFMoldsmpModded[NUM_VOICES]; // use when rendering oscillator for FM with parent FM
-        float *oscFMoldsmpOrig[NUM_VOICES];
+        float *FMFMoldsmpModded[NUM_VOICES]{}; // use when rendering FM modulator with parent FM
+        float *FMFMoldsmpOrig[NUM_VOICES]{};
+        float *oscFMoldsmpModded[NUM_VOICES]{}; // use when rendering oscillator for FM with parent FM
+        float *oscFMoldsmpOrig[NUM_VOICES]{};
         bool forFM; // Whether this voice will be used for FM modulation.
 
-        float **tmpwave_unison;
-        int max_unison;
+        float **tmpwave_unison{};
+        int max_unison{};
 
-        float **tmpmod_unison;
-        bool freqbasedmod[NUM_VOICES];
+        float **tmpmod_unison{};
+        bool freqbasedmod[NUM_VOICES]{};
 
-        float globaloldamplitude; // interpolate the amplitudes
-        float globalnewamplitude;
+        float globaloldamplitude{}; // interpolate the amplitudes
+        float globalnewamplitude{};
 
-        char firsttick[NUM_VOICES]; // 1 - if it is the fitst tick.
+        char firsttick[NUM_VOICES]{}; // 1 - if it is the fitst tick.
                                     // used to fade in the sound
 
         int portamento; // 1 if the note has portamento
 
-        float bandwidthDetuneMultiplier; // how the fine detunes are made bigger or smaller
+        float bandwidthDetuneMultiplier{}; // how the fine detunes are made bigger or smaller
 
         // Legato vars
-        float legatoFade;
-        float legatoFadeStep;
+        float legatoFade{};
+        float legatoFadeStep{};
 
-        float pangainL;
-        float pangainR;
+        float pangainL{};
+        float pangainR{};
 
-        ADnote **subVoice[NUM_VOICES];
-        ADnote **subFMVoice[NUM_VOICES];
+        ADnote **subVoice[NUM_VOICES]{};
+        ADnote **subFMVoice[NUM_VOICES]{};
 
         int subVoiceNumber;
         // For sub voices: The original, "topmost" voice that triggered this

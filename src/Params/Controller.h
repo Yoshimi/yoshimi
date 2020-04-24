@@ -70,61 +70,61 @@ class Controller
             int data;
             short int bendrange; // bendrange is in cents
             float relfreq; // the relative frequency (default is 1.0)
-        } pitchwheel;
+        } pitchwheel{};
 
         struct { // Expression
             int data;
             float relvolume;
             unsigned char receive;
-        } expression;
+        } expression{};
 
         struct { // Panning
             int data;
             char depth;
-        } panning;
+        } panning{};
 
         struct { // Filter cutoff
             int data;
             float relfreq;
             unsigned char depth;
-        } filtercutoff;
+        } filtercutoff{};
 
         struct { // Filter Q
             int data;
             float relq;
             unsigned char depth;
-        } filterq;
+        } filterq{};
 
         struct { // Bandwidth
             int data;
             float relbw;
             unsigned char depth;
             unsigned char exponential;
-        } bandwidth;
+        } bandwidth{};
 
         struct { // Modulation Wheel
             int data;
             float relmod;
             unsigned char depth;
             unsigned char exponential;
-        } modwheel;
+        } modwheel{};
 
         struct { // FM amplitude
             int data;
             float relamp;
             unsigned char receive;
-        } fmamp;
+        } fmamp{};
 
         struct { // Volume
             int data;
             float volume;
             unsigned char receive;
-        } volume;
+        } volume{};
 
         struct { // Sustain
             int data,sustain;
             unsigned char receive;
-        } sustain;
+        } sustain{};
 
         struct { // Portamento
             // parameters
@@ -148,19 +148,19 @@ class Controller
             float x;  // x is from 0.0 (start portamento) to 1.0 (finished portamento),
             float dx; // dx is x increment
             float origfreqrap; // this is used for computing oldfreq value from x
-        } portamento;
+        } portamento{};
 
         struct { // Resonance Center Frequency
             int data;
             float relcenter;
             unsigned char depth;
-        } resonancecenter;
+        } resonancecenter{};
 
         struct { // Resonance Bandwidth
             int data;
             float relbw;
             unsigned char depth;
-        } resonancebandwidth;
+        } resonancebandwidth{};
 private:
         SynthEngine *synth;
 };

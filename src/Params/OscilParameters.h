@@ -49,52 +49,52 @@ class OscilParameters : public Presets
          * The hmag and hphase starts counting from 0, so the first harmonic(1) has the index 0,
          * 2-nd harmonic has index 1, ..the 128 harminic has index 127
          */
-        unsigned char Phmag[MAX_AD_HARMONICS], Phphase[MAX_AD_HARMONICS];
+        unsigned char Phmag[MAX_AD_HARMONICS]{}, Phphase[MAX_AD_HARMONICS]{};
         // the MIDI parameters for mag. and phases
 
-        unsigned char Phmagtype; // 0 - Linear, 1 - dB scale (-40), 2 - dB scale (-60)
+        unsigned char Phmagtype{}; // 0 - Linear, 1 - dB scale (-40), 2 - dB scale (-60)
                                  // 3 - dB scale (-80), 4 - dB scale (-100)
-        unsigned char Pcurrentbasefunc; // The base function used - 0=sin, 1=...
-        unsigned char Pbasefuncpar; // the parameter of the base function
+        unsigned char Pcurrentbasefunc{}; // The base function used - 0=sin, 1=...
+        unsigned char Pbasefuncpar{}; // the parameter of the base function
 
-        unsigned char Pbasefuncmodulation; // what modulation is applied to the
+        unsigned char Pbasefuncmodulation{}; // what modulation is applied to the
                                            // basefunc
-        unsigned char Pbasefuncmodulationpar1,
-                      Pbasefuncmodulationpar2,
-                      Pbasefuncmodulationpar3; // the parameter of the base
+        unsigned char Pbasefuncmodulationpar1{},
+                      Pbasefuncmodulationpar2{},
+                      Pbasefuncmodulationpar3{}; // the parameter of the base
                                                // function modulation
 
-        unsigned char Prand; // 64 = no randomness
+        unsigned char Prand{}; // 64 = no randomness
                              // 63..0 - block type randomness - 0 is maximum
                              // 65..127 - each harmonic randomness - 127 is maximum
-        unsigned char Pwaveshaping, Pwaveshapingfunction;
-        unsigned char Pfiltertype, Pfilterpar1, Pfilterpar2;
-        unsigned char Pfilterbeforews;
-        unsigned char Psatype, Psapar; // spectrum adjust
+        unsigned char Pwaveshaping{}, Pwaveshapingfunction{};
+        unsigned char Pfiltertype{}, Pfilterpar1{}, Pfilterpar2{};
+        unsigned char Pfilterbeforews{};
+        unsigned char Psatype{}, Psapar{}; // spectrum adjust
 
-        unsigned char Pamprandpower, Pamprandtype; // amplitude randomness
-        int Pharmonicshift; // how the harmonics are shifted
-        int Pharmonicshiftfirst; // if the harmonic shift is done before
+        unsigned char Pamprandpower{}, Pamprandtype{}; // amplitude randomness
+        int Pharmonicshift{}; // how the harmonics are shifted
+        int Pharmonicshiftfirst{}; // if the harmonic shift is done before
                                  // waveshaping and filter
 
-        unsigned char Padaptiveharmonics; // the adaptive harmonics status
+        unsigned char Padaptiveharmonics{}; // the adaptive harmonics status
                                           // (off=0,on=1,etc..)
-        unsigned char Padaptiveharmonicsbasefreq; // the base frequency of the
+        unsigned char Padaptiveharmonicsbasefreq{}; // the base frequency of the
                                                   // adaptive harmonic (30..3000Hz)
-        unsigned char Padaptiveharmonicspower; // the strength of the effect
+        unsigned char Padaptiveharmonicspower{}; // the strength of the effect
                                                // (0=off,100=full)
-        unsigned char Padaptiveharmonicspar; // the parameters in 2,3,4.. modes
+        unsigned char Padaptiveharmonicspar{}; // the parameters in 2,3,4.. modes
                                              // of adaptive harmonics
 
-        unsigned char Pmodulation; // what modulation is applied to the oscil
-        unsigned char Pmodulationpar1,
-                      Pmodulationpar2,
-                      Pmodulationpar3; // the parameter of the parameters
+        unsigned char Pmodulation{}; // what modulation is applied to the oscil
+        unsigned char Pmodulationpar1{},
+                      Pmodulationpar2{},
+                      Pmodulationpar3{}; // the parameter of the parameters
 
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
     private:
-        FFTFREQS basefuncFFTfreqs; // Base Function Frequencies
+        FFTFREQS basefuncFFTfreqs{}; // Base Function Frequencies
 };
 
 #endif // OSCIL_PARAMETERS_H

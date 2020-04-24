@@ -53,7 +53,7 @@ class InterChange : private DataText
         ~InterChange();
         bool Init();
 
-        CommandBlock commandData;
+        CommandBlock commandData{};
 #ifndef YOSHIMI_LV2_PLUGIN
         ringBuff *fromCLI;
 #endif
@@ -62,7 +62,7 @@ class InterChange : private DataText
         ringBuff *toGUI;
         ringBuff *fromMIDI;
         ringBuff *returnsBuffer;
-        ringBuff *muteQueue;
+        ringBuff *muteQueue{};
 
         void generateSpecialInstrument(int npart, std::string name);
         void mediate(void);
@@ -83,13 +83,13 @@ class InterChange : private DataText
         unsigned int tick; // needs to be read by synth
 
     private:
-        unsigned int flagsValue;
+        unsigned int flagsValue{};
         unsigned int flagsRead(){return __sync_add_and_fetch(&flagsValue, 0);}
         unsigned int flagsReadClear(){ return __sync_fetch_and_or(&flagsValue, 0xffffffff);}
 
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
-        pthread_t  sortResultsThreadHandle;
+        pthread_t  sortResultsThreadHandle{};
         void muteQueueWrite(CommandBlock *getData);
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
         std::string formatScales(std::string text);

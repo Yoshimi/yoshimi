@@ -125,7 +125,7 @@ class XMLwrapper
             unsigned char SUBsynth_used;
             unsigned char PADsynth_used;
             bool yoshiType;
-        } information;
+        } information{};
 
         // opens a file and parse only the "information" data on it
 
@@ -156,10 +156,10 @@ class XMLwrapper
                                 const std::string& par3, const std::string& val3);
 
         // this is used to store the parents
-        mxml_node_t *parentstack[STACKSIZE];
+        mxml_node_t *parentstack[STACKSIZE]{};
         int stackpos;
         int xml_k;
-        char tabs[STACKSIZE + 2];
+        char tabs[STACKSIZE + 2]{};
 
         void push(mxml_node_t *node);
         mxml_node_t *pop(void);
@@ -169,7 +169,7 @@ class XMLwrapper
             int minor;
             int y_major;
             int y_minor;
-        } xml_version;
+        } xml_version{};
 
         bool isYoshi;
         SynthEngine *synth;

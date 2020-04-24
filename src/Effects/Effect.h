@@ -56,7 +56,7 @@ class InterpolatedParameter
         float targetValue;
         float currentValue;
         float samplesLeft;
-        float samplesToInterpolate;
+        float samplesToInterpolate{};
 };
 
 class Effect
@@ -85,10 +85,10 @@ class Effect
         void setlrcross(char Plrcross_);
 
         bool  insertion;
-        char  Ppanning;
+        char  Ppanning{};
         InterpolatedParameter pangainL;
         InterpolatedParameter pangainR;
-        char  Plrcross; // L/R mix
+        char  Plrcross{}; // L/R mix
         InterpolatedParameter lrcross;
 };
 

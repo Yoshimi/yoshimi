@@ -57,8 +57,8 @@ class EnvelopeParams : public Presets
         unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
         unsigned char Penvpoints;
         unsigned char Penvsustain; // 127 pentru dezactivat
-        unsigned char Penvdt[MAX_ENVELOPE_POINTS];
-        unsigned char Penvval[MAX_ENVELOPE_POINTS];
+        unsigned char Penvdt[MAX_ENVELOPE_POINTS]{};
+        unsigned char Penvval[MAX_ENVELOPE_POINTS]{};
         unsigned char Penvstretch; // 64=normal stretch (piano-like), 0=no stretch
         unsigned char Pforcedrelease; // 0 - OFF, 1 - ON
         unsigned char Plinearenvelope; // if the amplitude envelope is linear
@@ -76,11 +76,11 @@ class EnvelopeParams : public Presets
         void store2defaults(void);
 
         // Default parameters
-        unsigned char Denvstretch;
-        unsigned char Dforcedrelease;
-        unsigned char Dlinearenvelope;
-        unsigned char DA_dt, DD_dt, DR_dt,
-                      DA_val, DD_val, DS_val, DR_val;
+        unsigned char Denvstretch{};
+        unsigned char Dforcedrelease{};
+        unsigned char Dlinearenvelope{};
+        unsigned char DA_dt{}, DD_dt{}, DR_dt{},
+                      DA_val{}, DD_val{}, DS_val{}, DR_val{};
 };
 
 class envelopeLimit

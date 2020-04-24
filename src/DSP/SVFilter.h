@@ -49,11 +49,11 @@ class SVFilter : public Filter_
     private:
         struct fstage {
             float low, high, band, notch;
-        } st[MAX_FILTER_STAGES + 1];
+        } st[MAX_FILTER_STAGES + 1]{};
 
         struct parameters {
             float f, q, q_sqrt;
-        } par, ipar;
+        } par{}, ipar{};
 
         void singlefilterout(float *smp, fstage &x, parameters &par);
         void computefiltercoefs(void);
@@ -62,8 +62,8 @@ class SVFilter : public Filter_
         float freq; // Frequency given in Hz
         float q;    // Q factor (resonance or Q factor)
 
-        int abovenq;   // this is 1 if the frequency is above the nyquist
-        int oldabovenq;
+        int abovenq{};   // this is 1 if the frequency is above the nyquist
+        int oldabovenq{};
         int needsinterpolation, firsttime;
         float *tmpismp; // used if it needs interpolation in filterout()
 

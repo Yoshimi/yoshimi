@@ -73,7 +73,7 @@ class JackEngine : public MusicIO
 #if defined(JACK_SESSION)
             static void _jsessionCallback(jack_session_event_t *event, void *arg);
             void jsessionCallback(jack_session_event_t *event);
-            jack_session_event_t *lastevent;
+            jack_session_event_t *lastevent{};
 #endif
 
 #if defined(JACK_LATENCY)
@@ -87,15 +87,15 @@ class JackEngine : public MusicIO
             unsigned int  jackNframes;
             jack_port_t  *ports[2*NUM_MIDI_PARTS+2];
             float        *portBuffs[2*NUM_MIDI_PARTS+2];
-        } audio;
+        } audio{};
 
         struct {
             jack_port_t*       port;
             jack_ringbuffer_t *ringBuf;
             pthread_t          pThread;
-        } midi;
+        } midi{};
 
-        unsigned int internalbuff;
+        unsigned int internalbuff{};
 };
 
 #endif

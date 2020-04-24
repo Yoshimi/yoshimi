@@ -51,7 +51,7 @@ private:
    uint32_t _sampleRate;
    uint32_t _bufferSize;
    std::string _bundlePath;
-   LV2_URID_Map _uridMap;
+   LV2_URID_Map _uridMap{};
    LV2_Atom_Sequence *_midiDataPort;
    LV2_Atom_Sequence *_notifyDataPortOut;
    LV2_URID _midi_event_id;
@@ -64,7 +64,7 @@ private:
    LV2_URID _atom_event_transfer;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
-   sem_t _midiSem;
+   sem_t _midiSem{};
 
    struct midi_event {
        jack_nframes_t time;
@@ -73,11 +73,11 @@ private:
 
    float *_bFreeWheel;
 
-   jack_ringbuffer_t *_midiRingBuf;
+   jack_ringbuffer_t *_midiRingBuf{};
    pthread_t _pIdleThread;
 
-   float *lv2Left [NUM_MIDI_PARTS + 1];
-   float *lv2Right [NUM_MIDI_PARTS + 1];
+   float *lv2Left [NUM_MIDI_PARTS + 1]{};
+   float *lv2Right [NUM_MIDI_PARTS + 1]{};
 
    void process(uint32_t sample_count);
    void processMidiMessage(const uint8_t *msg);
@@ -145,7 +145,7 @@ class YoshimiLV2PluginUI: public LV2_External_UI_Widget
 {
 private:
     YoshimiLV2Plugin *_plugin;
-    LV2_External_UI_Host uiHost;
+    LV2_External_UI_Host uiHost{};
     MasterUI *_masterUI;
     LV2UI_Controller _controller;
     struct _externalUI
@@ -153,7 +153,7 @@ private:
         LV2_External_UI_Widget uiWIdget;
         YoshimiLV2PluginUI *uiInst;
     };
-    _externalUI externalUI;
+    _externalUI externalUI{};
     LV2UI_Write_Function _write_function;
 public:
     YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);

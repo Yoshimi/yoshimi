@@ -47,14 +47,14 @@ class LFO
         void computenextincrnd(void);
         float x;
         float basefreq;
-        float incx, incrnd, nextincrnd;
+        float incx{}, incrnd, nextincrnd;
         float amp1, amp2; // used for randomness
-        float lfointensity;
-        float lfornd;
-        float lfofreqrnd;
+        float lfointensity{};
+        float lfornd{};
+        float lfofreqrnd{};
         float lfoelapsed;
-        char lfotype;
-        int freqrndenabled;
+        char lfotype{};
+        int freqrndenabled{};
 
         SynthEngine *synth;
 };

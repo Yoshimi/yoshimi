@@ -56,10 +56,10 @@ class AnalogFilter : public Filter_
     private:
         struct fstage {
             float c1, c2;
-        } x[MAX_FILTER_STAGES + 1],
-          y[MAX_FILTER_STAGES + 1],
-          oldx[MAX_FILTER_STAGES + 1],
-          oldy[MAX_FILTER_STAGES + 1];
+        } x[MAX_FILTER_STAGES + 1]{},
+          y[MAX_FILTER_STAGES + 1]{},
+          oldx[MAX_FILTER_STAGES + 1]{},
+          oldy[MAX_FILTER_STAGES + 1]{};
 
         void singlefilterout(float *smp, fstage &x, fstage &y, float *c,
                              float *d);
@@ -70,14 +70,14 @@ class AnalogFilter : public Filter_
         float q;    // Q factor (resonance or Q factor)
         float gain; // the gain of the filter (if are shelf/peak) filters
 
-        int order; // the order of the filter (number of poles)
+        int order{}; // the order of the filter (number of poles)
 
-        float c[3], d[3]; // coefficients
+        float c[3]{}, d[3]{}; // coefficients
 
-        float oldc[3], oldd[3]; // old coefficients(used only if some filter parameters changes very fast, and it needs interpolation)
+        float oldc[3]{}, oldd[3]{}; // old coefficients(used only if some filter parameters changes very fast, and it needs interpolation)
 
-        float xd[3], yd[3]; // used if the filter is applied more times
-        bool needsinterpolation, firsttime;
+        float xd[3]{}, yd[3]{}; // used if the filter is applied more times
+        bool needsinterpolation{}, firsttime;
         int abovenq;    // this is 1 if the frequency is above the nyquist
         int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
 

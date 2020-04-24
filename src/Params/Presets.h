@@ -46,7 +46,7 @@ class Presets
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        char type[MAX_PRESETTYPE_SIZE];
+        char type[MAX_PRESETTYPE_SIZE]{};
 
     protected:
         void setpresettype(const char *type);

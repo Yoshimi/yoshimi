@@ -70,38 +70,38 @@ class FilterParams : public Presets
         float getformantq(unsigned char q)
             { return powf(25.0f, (q - 32.0f) / 64.0f); }
 
-        unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
-        unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)
-        unsigned char Pfreq;      // Frequency (64-central frequency)
-        unsigned char Pq;         // Q parameters (resonance or bandwidth)
-        unsigned char Pstages;    // filter stages+1
-        unsigned char Pfreqtrack; // how the filter frequency is changing
+        unsigned char Pcategory{};  // Filter category (Analog/Formant/StVar)
+        unsigned char Ptype{};      // Filter type  (for analog lpf,hpf,bpf..)
+        unsigned char Pfreq{};      // Frequency (64-central frequency)
+        unsigned char Pq{};         // Q parameters (resonance or bandwidth)
+        unsigned char Pstages{};    // filter stages+1
+        unsigned char Pfreqtrack{}; // how the filter frequency is changing
                                   // according the note frequency
-        unsigned char Pfreqtrackoffset;  // Shift range for freq tracking
-        unsigned char Pgain;      // filter's output gain
+        unsigned char Pfreqtrackoffset{};  // Shift range for freq tracking
+        unsigned char Pgain{};      // filter's output gain
 
         // Formant filter parameters
-        unsigned char Pnumformants;     // how many formants are used
-        unsigned char Pformantslowness; // how slow varies the formants
-        unsigned char Pvowelclearness;  // how vowels are kept clean (how much try
+        unsigned char Pnumformants{};     // how many formants are used
+        unsigned char Pformantslowness{}; // how slow varies the formants
+        unsigned char Pvowelclearness{};  // how vowels are kept clean (how much try
                                         // to avoid "mixed" vowels)
-        unsigned char Pcenterfreq,Poctavesfreq; // the centre frequency of the res.
+        unsigned char Pcenterfreq{},Poctavesfreq{}; // the centre frequency of the res.
                                                 // func., and the number of octaves
         struct {
             struct {
                 unsigned char freq, amp, q; // frequency,amplitude,Q
             } formants[FF_MAX_FORMANTS];
-        } Pvowels[FF_MAX_VOWELS];
+        } Pvowels[FF_MAX_VOWELS]{};
 
-        unsigned char Psequencesize;     // how many vowels are in the sequence
-        unsigned char Psequencestretch;  // how the sequence is stretched (how
+        unsigned char Psequencesize{};     // how many vowels are in the sequence
+        unsigned char Psequencestretch{};  // how the sequence is stretched (how
                                          // the input from filter envelopes/LFOs/etc.
                                          // is "stretched")
-        unsigned char Psequencereversed; // if the input from filter envelopes/LFOs/etc.
+        unsigned char Psequencereversed{}; // if the input from filter envelopes/LFOs/etc.
                                          // is reversed(negated)
         struct {
             unsigned char nvowel; // the vowel from the position
-        } Psequence[FF_MAX_SEQUENCE];
+        } Psequence[FF_MAX_SEQUENCE]{};
 
         bool changed;
 

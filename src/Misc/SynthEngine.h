@@ -67,7 +67,7 @@ class SynthEngine
         bool isLV2Plugin;
         bool needsSaving;
     public:
-        std::atomic <uint8_t> audioOut;
+        std::atomic <uint8_t> audioOut{};
         Bank bank;
         InterChange interchange;
         MidiLearn midilearn;
@@ -151,24 +151,24 @@ class SynthEngine
         void partonoffLock(int npart, int what);
         void partonoffWrite(int npart, int what);
         char partonoffRead(int npart);
-        sem_t partlock;
-        unsigned char legatoPart;
+        sem_t partlock{};
+        unsigned char legatoPart{};
         void setPartMap(int npart);
         void setAllPartMaps(void);
 
-        bool masterMono;
+        bool masterMono{};
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
 
-        Part *part[NUM_MIDI_PARTS];
+        Part *part[NUM_MIDI_PARTS]{};
         unsigned int fadeAll;
         // Per sample change in gain calculated whenever samplerate changes (which
         // is currently only on init). fadeStep is used in SynthEngine, while
         // fadeStepShort is used directly by notes, currently only for legato.
-        float fadeStep;
-        float fadeStepShort;
+        float fadeStep{};
+        float fadeStepShort{};
         float fadeLevel;
 
         // parameters
@@ -177,24 +177,24 @@ class SynthEngine
         float halfsamplerate_f;
         int buffersize;
         float buffersize_f;
-        int bufferbytes;
+        int bufferbytes{};
         int oscilsize;
         float oscilsize_f;
         int halfoscilsize;
         float halfoscilsize_f;
-        float oscil_sample_step_f;
+        float oscil_sample_step_f{};
 
         int           sent_buffersize; //used for variable length runs
         int           sent_bufferbytes; //used for variable length runs
         float         sent_buffersize_f; //used for variable length runs
-        float         fixed_sample_step_f;
-        float         TransVolume;
-        float         Pvolume;
-        float         ControlStep;
-        int           Paudiodest;
-        int           Pkeyshift;
-        unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
-        unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
+        float         fixed_sample_step_f{};
+        float         TransVolume{};
+        float         Pvolume{};
+        float         ControlStep{};
+        int           Paudiodest{};
+        int           Pkeyshift{};
+        unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS]{};
+        unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX]{};
 
         // parameters control
         void setPvolume(float value);
@@ -204,14 +204,14 @@ class SynthEngine
         void setPaudiodest(int value);
 
         // effects
-        unsigned char  syseffnum;
-        bool syseffEnable[NUM_SYS_EFX];
-        unsigned char  inseffnum;
-        EffectMgr *sysefx[NUM_SYS_EFX]; // system
-        EffectMgr *insefx[NUM_INS_EFX]; // insertion
+        unsigned char  syseffnum{};
+        bool syseffEnable[NUM_SYS_EFX]{};
+        unsigned char  inseffnum{};
+        EffectMgr *sysefx[NUM_SYS_EFX]{}; // system
+        EffectMgr *insefx[NUM_INS_EFX]{}; // insertion
 
         // part that's apply the insertion effect; -1 to disable
-        short int Pinsparts[NUM_INS_EFX];
+        short int Pinsparts[NUM_INS_EFX]{};
 
         // others ...
         Controller *ctl;
@@ -231,9 +231,9 @@ class SynthEngine
             } values;
             char bytes [sizeof(values)];
         };
-        VUtransfer VUpeak, VUcopy, VUdata;
-        unsigned int VUcount;
-        bool VUready;
+        VUtransfer VUpeak{}, VUcopy{}, VUdata{};
+        unsigned int VUcount{};
+        bool VUready{};
         void fetchMeterData(void);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
@@ -259,11 +259,11 @@ class SynthEngine
         void setNeedsSaving(bool ns) { needsSaving = ns; }
         bool getNeedsSaving() { return needsSaving; }
     private:
-        float volume;
-        float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
-        float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
+        float volume{};
+        float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS]{};
+        float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX]{};
 
-        int keyshift;
+        int keyshift{};
 
     public:
 #ifdef GUI_FLTK

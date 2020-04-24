@@ -71,22 +71,22 @@ class SUBnote
         SUBnoteParameters *pars;
 
         bool stereo;
-        int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
+        int pos[MAX_SUB_HARMONICS]{}; // chart of non-zero harmonic locations
         int numstages; // number of stages of filters
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int start; // how the harmonics start
-        float basefreq;
+        float basefreq{};
         float velocity;
         int portamento;
         int midinote;
-        float BendAdjust;
-        float OffsetHz;
+        float BendAdjust{};
+        float OffsetHz{};
         float randpanL;
         float randpanR;
 
-        Envelope *AmpEnvelope;
-        Envelope *FreqEnvelope;
-        Envelope *BandWidthEnvelope;
+        Envelope *AmpEnvelope{};
+        Envelope *FreqEnvelope{};
+        Envelope *BandWidthEnvelope{};
 
         Filter *GlobalFilterL,*GlobalFilterR;
 
@@ -99,12 +99,12 @@ class SUBnote
             NOTE_KEEPALIVE
         } NoteStatus;
         int firsttick;
-        float volume;
+        float volume{};
         float oldamplitude;
-        float newamplitude;
+        float newamplitude{};
 
-        float GlobalFilterCenterPitch; // octaves
-        float GlobalFilterFreqTracking;
+        float GlobalFilterCenterPitch{}; // octaves
+        float GlobalFilterFreqTracking{};
 
         struct bpfilter {
             float freq;
@@ -137,16 +137,16 @@ class SUBnote
         bpfilter *lfilter;
         bpfilter *rfilter;
 
-        float overtone_rolloff[MAX_SUB_HARMONICS];
-        float overtone_freq[MAX_SUB_HARMONICS];
+        float overtone_rolloff[MAX_SUB_HARMONICS]{};
+        float overtone_freq[MAX_SUB_HARMONICS]{};
 
-        float *tmpsmp;
-        float *tmprnd; // this is filled with random numbers
+        float *tmpsmp{};
+        float *tmprnd{}; // this is filled with random numbers
 
         Controller *ctl;
         int oldpitchwheel;
         int oldbandwidth;
-        float globalfiltercenterq;
+        float globalfiltercenterq{};
 
         // Legato vars
         float legatoFade;

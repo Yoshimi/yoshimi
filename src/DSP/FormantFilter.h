@@ -52,24 +52,24 @@ class FormantFilter : public Filter_
         FilterParams *pars;
         Presets::PresetsUpdate parsUpdate;
 
-        AnalogFilter *formant[FF_MAX_FORMANTS];
+        AnalogFilter *formant[FF_MAX_FORMANTS]{};
         float *inbuffer, *tmpbuf;
 
         struct {
             float freq, amp, q; // frequency,amplitude,Q
-        } formantpar[FF_MAX_VOWELS][FF_MAX_FORMANTS],
-          currentformants[FF_MAX_FORMANTS];
+        } formantpar[FF_MAX_VOWELS][FF_MAX_FORMANTS]{},
+          currentformants[FF_MAX_FORMANTS]{};
 
         struct {
             unsigned char nvowel;
-        } sequence [FF_MAX_SEQUENCE];
+        } sequence [FF_MAX_SEQUENCE]{};
 
-        float oldformantamp[FF_MAX_FORMANTS];
+        float oldformantamp[FF_MAX_FORMANTS]{};
 
         int sequencesize, numformants, firsttime;
-        float oldinput, slowinput;
-        float Qfactor, formantslowness, oldQfactor;
-        float vowelclearness, sequencestretch;
+        float oldinput, slowinput{};
+        float Qfactor{}, formantslowness{}, oldQfactor;
+        float vowelclearness{}, sequencestretch{};
 
         SynthEngine *synth;
 };

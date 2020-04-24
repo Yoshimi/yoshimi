@@ -50,7 +50,7 @@ class DynamicFilter : public Effect
         // Parametrii DynamicFilter
         bool Pchanged;
         EffectLFO lfo; // lfo-ul DynamicFilter
-        unsigned char Pvolume;
+        unsigned char Pvolume{};
         unsigned char Pdepth;
         unsigned char Pampsns;
         unsigned char Pampsnsinv; // if the filter freq is lowered if the input amplitude rises
@@ -63,10 +63,10 @@ class DynamicFilter : public Effect
         void reinitfilter(void);
 
         // Internal Values
-        float depth, ampsns, ampsmooth;
+        float depth{}, ampsns{}, ampsmooth{};
 
         Filter *filterl, *filterr;
-        float ms1, ms2, ms3, ms4; // mean squares
+        float ms1{}, ms2{}, ms3{}, ms4{}; // mean squares
 
         SynthEngine *synth;
 };

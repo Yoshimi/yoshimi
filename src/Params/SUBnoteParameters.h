@@ -49,37 +49,37 @@ class SUBnoteParameters : public Presets
         void updateFrequencyMultipliers(void);
 
         // Amplitude Parametrers
-        bool Pstereo; // true = stereo, false = mono
-        unsigned char PVolume;
-        unsigned char PPanning;
-        float pangainL;         // derived from PPanning
-        float pangainR;         // ^^
-        unsigned char PAmpVelocityScaleFunction;
+        bool Pstereo{}; // true = stereo, false = mono
+        unsigned char PVolume{};
+        unsigned char PPanning{};
+        float pangainL{};         // derived from PPanning
+        float pangainR{};         // ^^
+        unsigned char PAmpVelocityScaleFunction{};
         EnvelopeParams *AmpEnvelope;
 
         // Frequency Parameters
-        unsigned short int PDetune;
-        unsigned short int PCoarseDetune;
-        unsigned char PDetuneType;
-        unsigned char PFreqEnvelopeEnabled;
+        unsigned short int PDetune{};
+        unsigned short int PCoarseDetune{};
+        unsigned char PDetuneType{};
+        unsigned char PFreqEnvelopeEnabled{};
         EnvelopeParams *FreqEnvelope;
-        unsigned char PBandWidthEnvelopeEnabled;
+        unsigned char PBandWidthEnvelopeEnabled{};
         EnvelopeParams *BandWidthEnvelope;
 
-        unsigned char PBendAdjust; // Pitch Bend
-        unsigned char POffsetHz;
+        unsigned char PBendAdjust{}; // Pitch Bend
+        unsigned char POffsetHz{};
 
         // Filter Parameters (Global)
-        unsigned char PGlobalFilterEnabled;
+        unsigned char PGlobalFilterEnabled{};
         FilterParams *GlobalFilter;
-        unsigned char PGlobalFilterVelocityScale;
-        unsigned char PGlobalFilterVelocityScaleFunction;
+        unsigned char PGlobalFilterVelocityScale{};
+        unsigned char PGlobalFilterVelocityScaleFunction{};
         EnvelopeParams *GlobalFilterEnvelope;
 
         // Other Parameters
-        unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
+        unsigned char Pfixedfreq{};   // If the base frequency is fixed to 440 Hz
 
-        unsigned char PfixedfreqET; // Equal temperate (this is used only if the
+        unsigned char PfixedfreqET{}; // Equal temperate (this is used only if the
                                     // Pfixedfreq is enabled)
                                     // If this parameter is 0, the frequency is
                                     // fixed (to 440 Hz)
@@ -92,25 +92,25 @@ class SUBnoteParameters : public Presets
             unsigned char par1;
             unsigned char par2;
             unsigned char par3;
-        } POvertoneSpread;
-        float POvertoneFreqMult[MAX_SUB_HARMONICS];
+        } POvertoneSpread{};
+        float POvertoneFreqMult[MAX_SUB_HARMONICS]{};
 
-        unsigned char Pnumstages;   // how many times the filters are applied
-        unsigned char Pbandwidth;
+        unsigned char Pnumstages{};   // how many times the filters are applied
+        unsigned char Pbandwidth{};
 
-        unsigned char Phmagtype;    // how the magnitudes are computed
+        unsigned char Phmagtype{};    // how the magnitudes are computed
                                     // 0 = linear, 1 = -60dB, 2 = -60dB
 
-        unsigned char PfilterChanged[MAX_SUB_HARMONICS]; // 0 = no, 6 = magnitude, 7 = bandwidth
+        unsigned char PfilterChanged[MAX_SUB_HARMONICS]{}; // 0 = no, 6 = magnitude, 7 = bandwidth
 
-        unsigned char Phmag[MAX_SUB_HARMONICS];   // Magnitudes
+        unsigned char Phmag[MAX_SUB_HARMONICS]{};   // Magnitudes
 
-        unsigned char Phrelbw[MAX_SUB_HARMONICS]; // Relative BandWidth ("64"=1.0)
+        unsigned char Phrelbw[MAX_SUB_HARMONICS]{}; // Relative BandWidth ("64"=1.0)
 
-        unsigned char Pbwscale; // how much the bandwidth is increased according
+        unsigned char Pbwscale{}; // how much the bandwidth is increased according
                                 // to lower/higher frequency; 64-default
 
-        unsigned char Pstart;   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
+        unsigned char Pstart{};   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
 };
 
 #endif

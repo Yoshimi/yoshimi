@@ -54,10 +54,10 @@ class AlsaEngine : public MusicIO
         virtual void registerAudioPort(int )  {}
 
         bool little_endian;
-        bool card_endian;
-        int card_bits;
-        bool card_signed;
-        unsigned int card_chans;
+        bool card_endian{};
+        int card_bits{};
+        bool card_signed{};
+        unsigned int card_chans{};
 
     private:
         bool prepHwparams(void);
@@ -78,7 +78,7 @@ class AlsaEngine : public MusicIO
         static void *_MidiThread(void *arg);
 
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
-                                      snd_pcm_uframes_t nframes);
+                                      snd_pcm_uframes_t nframes){};
 
         struct {
             std::string        device;

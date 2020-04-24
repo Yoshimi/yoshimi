@@ -78,13 +78,13 @@ class PADnote
         int poshi_r;
         float poslo;
 
-        float basefreq;
-        float BendAdjust;
-        float OffsetHz;
+        float basefreq{};
+        float BendAdjust{};
+        float OffsetHz{};
         bool firsttime;
         bool released;
 
-        int nsample, portamento, midinote;
+        int nsample, portamento, midinote{};
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);
@@ -132,7 +132,7 @@ class PADnote
             Envelope *FilterEnvelope;
 
             LFO *FilterLfo;
-        } NoteGlobalPar;
+        } NoteGlobalPar{};
 
 
         Controller *ctl;

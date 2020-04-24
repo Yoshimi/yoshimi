@@ -55,8 +55,8 @@ private:
     pthread_t timerThreadId;
     static void *timerThread_fn(void*);
     bool timerWorking;
-    float *buffersL [NUM_MIDI_PARTS + 1];
-    float *buffersR [NUM_MIDI_PARTS + 1];
+    float *buffersL [NUM_MIDI_PARTS + 1]{};
+    float *buffersR [NUM_MIDI_PARTS + 1]{};
     audio_drivers audioDrv;
     midi_drivers midiDrv;
     MusicIO *audioIO;

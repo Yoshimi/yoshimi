@@ -78,9 +78,9 @@ class OscilGen : private WaveShapeSamples
         SynthEngine *synth;
 
         float *tmpsmps;
-        FFTFREQS outoscilFFTfreqs;
+        FFTFREQS outoscilFFTfreqs{};
 
-        float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
+        float hmag[MAX_AD_HARMONICS]{}, hphase[MAX_AD_HARMONICS]{};
         // the magnituides and the phases of the sine/nonsine harmonics
 
         FFTwrapper *fft;
@@ -128,26 +128,26 @@ class OscilGen : private WaveShapeSamples
 
 
         // Internal Data
-        unsigned char oldbasefunc,
-                      oldbasepar,
-                      oldhmagtype,
-                      oldwaveshapingfunction,
-                      oldwaveshaping;
+        unsigned char oldbasefunc{},
+                      oldbasepar{},
+                      oldhmagtype{},
+                      oldwaveshapingfunction{},
+                      oldwaveshaping{};
 
-        int oldfilterpars,
-            oldsapars,
-            oldbasefuncmodulation,
-            oldbasefuncmodulationpar1,
-            oldbasefuncmodulationpar2,
-            oldbasefuncmodulationpar3,
-            oldharmonicshift;
+        int oldfilterpars{},
+            oldsapars{},
+            oldbasefuncmodulation{},
+            oldbasefuncmodulationpar1{},
+            oldbasefuncmodulationpar2{},
+            oldbasefuncmodulationpar3{},
+            oldharmonicshift{};
 
-        int oldmodulation,
-            oldmodulationpar1,
-            oldmodulationpar2,
-            oldmodulationpar3;
+        int oldmodulation{},
+            oldmodulationpar1{},
+            oldmodulationpar2{},
+            oldmodulationpar3{};
 
-        FFTFREQS oscilFFTfreqs; // Oscillator Frequencies - this is different
+        FFTFREQS oscilFFTfreqs{}; // Oscillator Frequencies - this is different
                                 // than the hamonics set-up by the user, it may
                                 // contain time-domain data if the antialiasing
                                 // is turned off

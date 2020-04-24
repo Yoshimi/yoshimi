@@ -57,16 +57,16 @@ class LFOParams : public Presets
         void setPstretch(unsigned char n) { Pstretch = n; presetsUpdated(); }
 
         // MIDI Parameters
-        int32_t PfreqI;
-        float Pfreq;
-        unsigned char Pintensity;
-        unsigned char Pstartphase;
-        unsigned char PLFOtype;
-        unsigned char Prandomness;
-        unsigned char Pfreqrand;
-        unsigned char Pdelay;
-        unsigned char Pcontinous;
-        unsigned char Pstretch;
+        int32_t PfreqI{};
+        float Pfreq{};
+        unsigned char Pintensity{};
+        unsigned char Pstartphase{};
+        unsigned char PLFOtype{};
+        unsigned char Prandomness{};
+        unsigned char Pfreqrand{};
+        unsigned char Pdelay{};
+        unsigned char Pcontinous{};
+        unsigned char Pstretch{};
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance

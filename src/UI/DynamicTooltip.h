@@ -62,7 +62,7 @@ class DynTooltip : private Fl_Menu_Window {
   void reposition();
   void update();
 
-  float currentValue;
+  float currentValue{};
 
   string tipText;
   string valueText;

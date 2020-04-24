@@ -43,7 +43,7 @@ class MidiLearn : private DataText
         bool saveXML(string filename); // true for load ok, otherwise false
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
-        CommandBlock commandData;
+        CommandBlock commandData{};
 
         struct Control{
             unsigned char type;
@@ -56,7 +56,7 @@ class MidiLearn : private DataText
             unsigned char miscmsg;
         };
 
-        Control data;
+        Control data{};
 
         struct LearnBlock{
             unsigned short int CC;
@@ -89,7 +89,7 @@ class MidiLearn : private DataText
     private:
         list<LearnBlock> midi_list;
         string learnedName;
-        CommandBlock learnTransferBlock;
+        CommandBlock learnTransferBlock{};
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned short int CC, unsigned char chan, LearnBlock *block, bool show);
         string findName(list<LearnBlock>::iterator it);
         void insertLine(unsigned short int CC, unsigned char chan);

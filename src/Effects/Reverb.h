@@ -54,7 +54,7 @@ class Reverb : public Effect
     private:
         // Parametrii
         bool Pchanged;
-        unsigned char Pvolume;
+        unsigned char Pvolume{};
         unsigned char Ptime;
         unsigned char Pidelay;
         unsigned char Pidelayfb;
@@ -80,28 +80,28 @@ class Reverb : public Effect
         void setbandwidth(unsigned char Pbandwidth_);
         void processmono(int ch, float *output);
 
-        float erbalance;
+        float erbalance{};
 
         // Parametrii 2
-        int lohidamptype; // 0 = disable, 1 = highdamp (lowpass), 2 = lowdamp (highpass)
-        int idelaylen;
-        int rdelaylen;
-        int idelayk;
-        float lohifb;
-        float idelayfb;
+        int lohidamptype{}; // 0 = disable, 1 = highdamp (lowpass), 2 = lowdamp (highpass)
+        int idelaylen{};
+        int rdelaylen{};
+        int idelayk{};
+        float lohifb{};
+        float idelayfb{};
         float roomsize;
         float rs; // rs is used to "normalise" the volume according to the roomsize
-        int comblen[REV_COMBS * 2];
-        int aplen[REV_APS * 2];
+        int comblen[REV_COMBS * 2]{};
+        int aplen[REV_APS * 2]{};
         Unison *bandwidth;
 
         // Internal Variables
-        float *comb[REV_COMBS * 2];
-        int combk[REV_COMBS * 2];
-        float combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
-        float lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
-        float *ap[REV_APS * 2];
-        int apk[REV_APS * 2];
+        float *comb[REV_COMBS * 2]{};
+        int combk[REV_COMBS * 2]{};
+        float combfb[REV_COMBS * 2]{};// <feedback-ul fiecarui filtru "comb"
+        float lpcomb[REV_COMBS * 2]{};  // <pentru Filtrul LowPass
+        float *ap[REV_APS * 2]{};
+        int apk[REV_APS * 2]{};
         float *idelay;
         AnalogFilter *lpf;  // filters
         AnalogFilter *hpf;

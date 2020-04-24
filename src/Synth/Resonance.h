@@ -57,15 +57,15 @@ class Resonance : public Presets
         void sendcontroller(unsigned short int ctl, float par);
 
         // parameters
-        unsigned char Penabled;                 //if the ressonance is enabled
-        unsigned char Prespoints[MAX_RESONANCE_POINTS];	// how many points define the resonance function
-        unsigned char PmaxdB;			        // how many dB the signal may be amplified
-        unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res. func., and the number of octaves
-        unsigned char Pprotectthefundamental;   // the fundamental (1-st harmonic) is not damped, even it resonance function is low
+        unsigned char Penabled{};                 //if the ressonance is enabled
+        unsigned char Prespoints[MAX_RESONANCE_POINTS]{};	// how many points define the resonance function
+        unsigned char PmaxdB{};			        // how many dB the signal may be amplified
+        unsigned char Pcenterfreq{},Poctavesfreq{}; // the center frequency of the res. func., and the number of octaves
+        unsigned char Pprotectthefundamental{};   // the fundamental (1-st harmonic) is not damped, even it resonance function is low
 
         // controllers
-        float ctlcenter; // center frequency(relative)
-        float ctlbw;     // bandwidth(relative)
+        float ctlcenter{}; // center frequency(relative)
+        float ctlbw{};     // bandwidth(relative)
 };
 
 class ResonanceLimits

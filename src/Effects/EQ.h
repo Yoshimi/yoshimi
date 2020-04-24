@@ -48,7 +48,7 @@ class EQ : public Effect
     private:
         // Parameters
         bool Pchanged;
-        unsigned char Pvolume;
+        unsigned char Pvolume{};
         unsigned char Pband;
         void setvolume(unsigned char Pvolume_);
         struct {

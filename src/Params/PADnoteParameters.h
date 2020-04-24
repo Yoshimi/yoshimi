@@ -63,7 +63,7 @@ class PADnoteParameters : public Presets
 
         //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
         //the harmonic profile is used only on mode 0
-        unsigned char Pmode;
+        unsigned char Pmode{};
 
         //Harmonic profile (the frequency distribution of a single harmonic)
         struct {
@@ -89,61 +89,61 @@ class PADnoteParameters : public Presets
                                    // computed automatically
             unsigned char onehalf; // what part of the base function is used to
                                    // make the distribution
-        } Php;
+        } Php{};
 
 
-        unsigned int Pbandwidth; // the values are from 0 to 1000
-        unsigned char Pbwscale;  // how the bandwidth is increased according to
+        unsigned int Pbandwidth{}; // the values are from 0 to 1000
+        unsigned char Pbwscale{};  // how the bandwidth is increased according to
                                  // the harmonic's frequency
 
         struct { // where are positioned the harmonics (on integer multiplier or different places)
             unsigned char type;
             unsigned char par1, par2, par3; // 0..255
-        } Phrpos;
+        } Phrpos{};
 
         struct { // quality of the samples (how many samples, the length of them,etc.)
             unsigned char samplesize;
             unsigned char basenote, oct, smpoct;
-        } Pquality;
+        } Pquality{};
 
         // Frequency parameters
-        unsigned char Pfixedfreq; // If the base frequency is fixed to 440 Hz
+        unsigned char Pfixedfreq{}; // If the base frequency is fixed to 440 Hz
 
         // Equal temperate (this is used only if the Pfixedfreq is enabled)
         // If this parameter is 0, the frequency is fixed (to 440 Hz);
         // if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone
-        unsigned char      PfixedfreqET;
+        unsigned char      PfixedfreqET{};
 
-        unsigned char PBendAdjust; // Pitch Bend
-        unsigned char POffsetHz;
+        unsigned char PBendAdjust{}; // Pitch Bend
+        unsigned char POffsetHz{};
 
-        unsigned short int PDetune;       // fine detune
-        unsigned short int PCoarseDetune; // coarse detune+octave
-        unsigned char      PDetuneType;   // detune type
+        unsigned short int PDetune{};       // fine detune
+        unsigned short int PCoarseDetune{}; // coarse detune+octave
+        unsigned char      PDetuneType{};   // detune type
 
         EnvelopeParams *FreqEnvelope; // Frequency Envelope
         LFOParams *FreqLfo;           // Frequency LFO
 
         // Amplitude parameters
-        unsigned char PStereo;
-        unsigned char PPanning;  // 0 random, 64 center, 127 right
-        float         pangainL;  // derived from PPanning
-        float         pangainR;  // ^^
-        unsigned char PVolume;
-        unsigned char PAmpVelocityScaleFunction;
+        unsigned char PStereo{};
+        unsigned char PPanning{};  // 0 random, 64 center, 127 right
+        float         pangainL{};  // derived from PPanning
+        float         pangainR{};  // ^^
+        unsigned char PVolume{};
+        unsigned char PAmpVelocityScaleFunction{};
 
         EnvelopeParams *AmpEnvelope;
         LFOParams *AmpLfo;
 
         // Adjustment factor for anti-pop fadein
-        unsigned char Fadein_adjustment;
+        unsigned char Fadein_adjustment{};
 
-        unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
+        unsigned char PPunchStrength{}, PPunchTime{}, PPunchStretch{}, PPunchVelocitySensing{};
 
         // Filter Parameters
         FilterParams *GlobalFilter;
-        unsigned char PFilterVelocityScale; // filter velocity sensing
-        unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
+        unsigned char PFilterVelocityScale{}; // filter velocity sensing
+        unsigned char PFilterVelocityScaleFunction{}; // filter velocity sensing
 
         EnvelopeParams *FilterEnvelope;
         LFOParams *FilterLfo;
@@ -151,7 +151,7 @@ class PADnoteParameters : public Presets
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
-        bool Papplied;
+        bool Papplied{};
         void applyparameters(void);
         bool export2wav(std::string basefilename);
 
@@ -163,7 +163,7 @@ class PADnoteParameters : public Presets
             int size;
             float basefreq;
             float *smp;
-        } sample[PAD_MAX_SAMPLES], newsample;
+        } sample[PAD_MAX_SAMPLES]{}, newsample{};
 
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,

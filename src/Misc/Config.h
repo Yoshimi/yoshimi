@@ -93,8 +93,8 @@ class Config
         string        StateFile;
         bool          restoreJackSession;
         string        jackSessionFile;
-        int           lastXMLmajor;
-        int           lastXMLminor;
+        int           lastXMLmajor{};
+        int           lastXMLminor{};
         bool          oldConfig;
 
         static bool          showSplash;
@@ -103,7 +103,7 @@ class Config
         static int           showCLIcontext;
 
         bool          runSynth;
-        bool          isLittleEndian;
+        bool          isLittleEndian{};
         bool          finishedCLI;
         int           VirKeybLayout;
 
@@ -131,8 +131,8 @@ class Config
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         std::list<string> lastfileseen;
-        bool          sessionSeen[TOPLEVEL::XML::MLearn + 1];
-        bool          historyLock[TOPLEVEL::XML::MLearn + 1];
+        bool          sessionSeen[TOPLEVEL::XML::MLearn + 1]{};
+        bool          historyLock[TOPLEVEL::XML::MLearn + 1]{};
         bool          checksynthengines;
         int           xmlType;
         unsigned char instrumentFormat;
@@ -176,20 +176,20 @@ class Config
         int           currentPreset;
         int           tempBank;
         int           tempRoot;
-        int           noteOnSent; // note test
-        int           noteOnSeen;
-        int           noteOffSent;
-        int           noteOffSeen;
+        int           noteOnSent{}; // note test
+        int           noteOnSeen{};
+        int           noteOffSent{};
+        int           noteOffSeen{};
         unsigned int  VUcount;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
         unsigned char nrpnL;
         unsigned char nrpnH;
-        unsigned char dataL;
-        unsigned char dataH;
+        unsigned char dataL{};
+        unsigned char dataH{};
         bool          nrpnActive;
-        int           effectChange; // temporary fix
+        int           effectChange{}; // temporary fix
 
         struct{
             unsigned char Xaxis[NUM_MIDI_CHANNELS];
@@ -215,14 +215,14 @@ class Config
          * were being made every time an add or sub note
          * was processed. Now global so treat with care!
          */
-        float *genTmp1;
-        float *genTmp2;
-        float *genTmp3;
-        float *genTmp4;
+        float *genTmp1{};
+        float *genTmp2{};
+        float *genTmp3{};
+        float *genTmp4{};
 
         // as above but for part and sys effect
-        float *genMixl;
-        float *genMixr;
+        float *genMixl{};
+        float *genMixr{};
 
     private:
         void loadCmdArgs(int argc, char **argv);
@@ -237,7 +237,7 @@ class Config
         int sigIntActive;
         int ladi1IntActive;
         int sse_level;
-        int jsessionSave;
+        int jsessionSave{};
         const string programcommand;
         string jackSessionDir;
         string baseConfig;

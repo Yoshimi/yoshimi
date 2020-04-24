@@ -48,12 +48,12 @@ class Chorus : public Effect
     private:
         // Chorus Parameters
         bool Pchanged;
-        unsigned char Pvolume;
-        unsigned char Pdepth;      // the depth of the Chorus(ms)
-        unsigned char Pdelay;      // the delay (ms)
-        unsigned char Pfb;         // feedback
-        unsigned char Pflangemode; // how the LFO is scaled, to result chorus or flange
-        unsigned char Poutsub;     // if I wish to subtract the output instead of the adding it
+        unsigned char Pvolume{};
+        unsigned char Pdepth{};      // the depth of the Chorus(ms)
+        unsigned char Pdelay{};      // the delay (ms)
+        unsigned char Pfb{};         // feedback
+        unsigned char Pflangemode{}; // how the LFO is scaled, to result chorus or flange
+        unsigned char Poutsub{};     // if I wish to subtract the output instead of the adding it
         EffectLFO lfo;             // lfo-ul chorus
 
 
@@ -65,25 +65,25 @@ class Chorus : public Effect
         float getdelay(float xlfo);
 
         // Internal Values
-        float depth;
-        float delay;
+        float depth{};
+        float delay{};
         InterpolatedParameter fb;
-        float dl1;
+        float dl1{};
         float dl2;
-        float dr1;
+        float dr1{};
         float dr2;
-        float lfol;
-        float lfor;
+        float lfol{};
+        float lfor{};
 
         float *delayl;
         float *delayr;
         int maxdelay;
         int dlk;
         int drk;
-        int dlhi;
-        int dlhi2;
-        float dllo;
-        float mdel;
+        int dlhi{};
+        int dlhi2{};
+        float dllo{};
+        float mdel{};
 
         SynthEngine *synth;
 };

@@ -51,19 +51,19 @@ class Phaser : public Effect
         // Phaser Parameters
         bool Pchanged;
         EffectLFO lfo;           // <lfo-ul Phaser
-        unsigned char Pvolume;
+        unsigned char Pvolume{};
 //        unsigned char Ppanning;
-        unsigned char Pdistortion;  // Model distortion added by FET element
-        unsigned char Pdepth;    // <depth of Phaser sweep
-        unsigned char Pwidth;       //Phaser width (LFO amplitude)
-        unsigned char Pfb;       // <feedback
-        unsigned char Poffset;      //Model mismatch between variable resistors
+        unsigned char Pdistortion{};  // Model distortion added by FET element
+        unsigned char Pdepth{};    // <depth of Phaser sweep
+        unsigned char Pwidth{};       //Phaser width (LFO amplitude)
+        unsigned char Pfb{};       // <feedback
+        unsigned char Poffset{};      //Model mismatch between variable resistors
 //        unsigned char Plrcross;  // <feedback
-        unsigned char Pstages;
-        unsigned char Poutsub;   // <substract the output instead of adding it
-        unsigned char Pphase;
-        unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
-        unsigned char Panalog;
+        unsigned char Pstages{};
+        unsigned char Poutsub{};   // <substract the output instead of adding it
+        unsigned char Pphase{};
+        unsigned char Phyper{};       //lfo^2 -- converts tri into hyper-sine
+        unsigned char Panalog{};
 
         // Control Parameters
         void setvolume(unsigned char Pvolume_);
@@ -77,17 +77,17 @@ class Phaser : public Effect
 
         // Internal Values
         // int insertion; // inherited from Effect
-        bool    barber; // Barber pole phasing flag
-        float   distortion;
-        float   width;
-        float   offsetpct;
-        float   fb;
-        float   depth;
-        float   fbl;
-        float   fbr;
-        float   phase;
-        float   invperiod;
-        float   offset[12];
+        bool    barber{}; // Barber pole phasing flag
+        float   distortion{};
+        float   width{};
+        float   offsetpct{};
+        float   fb{};
+        float   depth{};
+        float   fbl{};
+        float   fbr{};
+        float   phase{};
+        float   invperiod{};
+        float   offset[12]{};
 
         float  *oldl;
         float  *oldr;
@@ -96,18 +96,18 @@ class Phaser : public Effect
         float  *yn1l;
         float  *yn1r;
 
-        float   diffl;
-        float   diffr;
-        float   oldlgain;
-        float   oldrgain;
+        float   diffl{};
+        float   diffr{};
+        float   oldlgain{};
+        float   oldrgain{};
 
-        float mis;
-        float Rmin;     // 3N5457 typical on resistance at Vgs = 0
-        float Rmax;     // Resistor parallel to FET
-        float Rmx;      // Rmin/Rmax to avoid division in loop
-        float Rconst;   // Handle parallel resistor relationship
-        float C;        // Capacitor
-        float CFs;      // A constant derived from capacitor and resistor relationships
+        float mis{};
+        float Rmin{};     // 3N5457 typical on resistance at Vgs = 0
+        float Rmax{};     // Resistor parallel to FET
+        float Rmx{};      // Rmin/Rmax to avoid division in loop
+        float Rconst{};   // Handle parallel resistor relationship
+        float C{};        // Capacitor
+        float CFs{};      // A constant derived from capacitor and resistor relationships
         void analog_setup();
         void AnalogPhase(float *smpsl, float *smpsr);
         //analog case

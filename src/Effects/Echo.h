@@ -49,11 +49,11 @@ class Echo : public Effect
     private:
         // Parameters
         bool Pchanged;
-        unsigned char Pvolume;  // 1 Volume or Dry/Wetness
+        unsigned char Pvolume{};  // 1 Volume or Dry/Wetness
         unsigned char Pdelay;   // 3 Delay of the Echo
         unsigned char Plrdelay; // 4 L/R delay difference
-        unsigned char Pfb;      // 6 Feedback
-        unsigned char Phidamp;  // 7 Dampening of the Echo
+        unsigned char Pfb{};      // 6 Feedback
+        unsigned char Phidamp{};  // 7 Dampening of the Echo
 
         void setvolume(unsigned char Pvolume_);
         void setdelay(unsigned char Pdelay_);
@@ -63,14 +63,14 @@ class Echo : public Effect
 
         // Real Parameters
         InterpolatedParameter fb, hidamp;
-        int dl, dr, delay, lrdelay;
+        int dl{}, dr{}, delay{}, lrdelay;
 
         void initdelays(void);
         float *ldelay;
         float *rdelay;
-        float  oldl, oldr; // pt. lpf
+        float  oldl{}, oldr{}; // pt. lpf
 
-        int kl, kr;
+        int kl{}, kr{};
 
         SynthEngine *synth;
 };

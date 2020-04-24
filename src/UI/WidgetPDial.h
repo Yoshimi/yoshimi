@@ -60,6 +60,6 @@ class WidgetPDial : public Fl_Dial {
 
   double oldvalue;
   DynTooltip *dyntip;
-  float home;
+  float home{};
 };
 #endif

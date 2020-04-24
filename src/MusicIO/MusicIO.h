@@ -53,8 +53,8 @@ class MusicIO
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
-        float *zynLeft [NUM_MIDI_PARTS + 1];
-        float *zynRight [NUM_MIDI_PARTS + 1];
+        float *zynLeft [NUM_MIDI_PARTS + 1]{};
+        float *zynRight [NUM_MIDI_PARTS + 1]{};
         int *interleaved;
 
         SynthEngine *synth;

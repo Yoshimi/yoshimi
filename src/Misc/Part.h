@@ -106,33 +106,33 @@ class Part
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        bool PyoshiType;
-        int PmapOffset;
-        float PnoteMap[256];
-        float         Pvolume;
-        float         TransVolume;
-        float         Ppanning;
-        float         TransPanning;
-        char Penabled; // this *must* be signed
-        unsigned char Pminkey;
-        unsigned char Pmaxkey;
-        unsigned char Pkeyshift;
-        unsigned char Prcvchn;
-        unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
-        unsigned char Pveloffs;    // velocity offset
-        unsigned char Pkitmode;    // if the kitmode is enabled
-        bool          Pkitfade;    // enables cross fading
-        unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
-        unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
-        unsigned int  PchannelATchoice;
-        unsigned int  PkeyATchoice;
-        unsigned char Pkeylimit;   // how many keys can play simultaneously,
+        bool PyoshiType{};
+        int PmapOffset{};
+        float PnoteMap[256]{};
+        float         Pvolume{};
+        float         TransVolume{};
+        float         Ppanning{};
+        float         TransPanning{};
+        char Penabled{}; // this *must* be signed
+        unsigned char Pminkey{};
+        unsigned char Pmaxkey{};
+        unsigned char Pkeyshift{};
+        unsigned char Prcvchn{};
+        unsigned char Pvelsns{};     // velocity sensing (amplitude velocity scale)
+        unsigned char Pveloffs{};    // velocity offset
+        unsigned char Pkitmode{};    // if the kitmode is enabled
+        bool          Pkitfade{};    // enables cross fading
+        unsigned char Pdrummode{};   // if all keys are mapped and the system is 12tET (used for drums)
+        unsigned char Pkeymode{};    // 0 = poly, 1 = mono, > 1 = legato;
+        unsigned int  PchannelATchoice{};
+        unsigned int  PkeyATchoice{};
+        unsigned char Pkeylimit{};   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
-        float         Pfrand;      // Part random frequency content
-        float         Pvelrand;    // Part random velocity content
-        unsigned char PbreathControl;
-        unsigned char Peffnum;
-        int           Paudiodest;  // jack output routing
+        float         Pfrand{};      // Part random frequency content
+        float         Pvelrand{};    // Part random velocity content
+        unsigned char PbreathControl{};
+        unsigned char Peffnum{};
+        int           Paudiodest{};  // jack output routing
         std::string   Pname;
 
         struct Info {
@@ -145,20 +145,20 @@ class Part
         float *partoutl;
         float *partoutr;
 
-        float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
-        float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
+        float *partfxinputl[NUM_PART_EFX + 1]{}; // Left and right signal that pass-through part effects
+        float *partfxinputr[NUM_PART_EFX + 1]{}; // [NUM_PART_EFX] is for "no effect" buffer
 
-        unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
+        unsigned char Pefxroute[NUM_PART_EFX]{}; // how the effect's output is
                                                // routed (to next effect/to out)
-        bool Pefxbypass[NUM_PART_EFX + 1];     // if the effects are bypassed,
+        bool Pefxbypass[NUM_PART_EFX + 1]{};     // if the effects are bypassed,
                                                // [NUM_PART_EFX] is for "no effect" buffer
-        EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
+        EffectMgr *partefx[NUM_PART_EFX]{};      // insertion part effects - part of the instrument
 
-        float volume;      // applied by MasterAudio
-        float pangainL;
-        float pangainR;
+        float volume{};      // applied by MasterAudio
+        float pangainL{};
+        float pangainR{};
         int lastnote;
-        bool busy;
+        bool busy{};
 
 
     private:
@@ -186,30 +186,30 @@ class Part
             int time;
         };
 
-        PartNotes partnote[POLIPHONY];
+        PartNotes partnote[POLIPHONY]{};
 
         int lastpos;              // previous pos and posb.
-        int lastposb;             // ^^
+        int lastposb{};             // ^^
         bool lastlegatomodevalid; // previous legatomodevalid.
 
-        int oldFilterState; // these for channel aftertouch
-        int oldFilterQstate;
-        int oldBendState;
-        float oldVolumeState;
-        float oldVolumeAdjust;
-        int oldModulationState;
+        int oldFilterState{}; // these for channel aftertouch
+        int oldFilterQstate{};
+        int oldBendState{};
+        float oldVolumeState{};
+        float oldVolumeAdjust{};
+        int oldModulationState{};
 
-        float *tmpoutl;
-        float *tmpoutr;
+        float *tmpoutl{};
+        float *tmpoutr{};
         float oldfreq; // for portamento
-        int partMuted;
+        int partMuted{};
         bool killallnotes;
 
         // MonoMem stuff
         std::list<unsigned char> monomemnotes; // held notes.
         struct {
             unsigned char velocity;
-        } monomem[256];    // 256 is to cover all possible note values. monomem[]
+        } monomem[256]{};    // 256 is to cover all possible note values. monomem[]
                            // is used in conjunction with the list to store the
                            // velocity value of a given note
                            // (the list only store note values). For example.
