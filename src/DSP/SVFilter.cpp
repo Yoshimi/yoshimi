@@ -53,6 +53,7 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
 
 
 SVFilter::SVFilter(const SVFilter &orig) :
+    Filter_(orig),
     par(orig.par),
     ipar(orig.ipar),
     type(orig.type),

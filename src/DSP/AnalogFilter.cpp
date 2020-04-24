@@ -59,6 +59,7 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
 
 
 AnalogFilter::AnalogFilter(const AnalogFilter &orig) :
+    Filter_(orig),
     type(orig.type),
     stages(orig.stages),
     freq(orig.freq),

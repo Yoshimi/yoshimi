@@ -74,6 +74,7 @@ FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
 
 
 FormantFilter::FormantFilter(const FormantFilter &orig) :
+    Filter_(orig),
     pars(orig.pars),
     parsUpdate(orig.parsUpdate),
     sequencesize(orig.sequencesize),

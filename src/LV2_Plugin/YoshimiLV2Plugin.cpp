@@ -656,7 +656,8 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 
 
 YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
-    :_plugin(NULL),
+    : _LV2_External_UI_Widget(),
+      _plugin(NULL),
      _masterUI(NULL),
      _controller(controller),
      _write_function(write_function)
