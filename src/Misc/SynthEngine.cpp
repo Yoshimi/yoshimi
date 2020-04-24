@@ -461,6 +461,7 @@ void SynthEngine::defaults(void)
         Pinsparts[nefx] = -1;
     }
     masterMono = false;
+    fileCompatible = true;
 
     // System Effects init
     syseffnum = 0;

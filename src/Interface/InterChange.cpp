@@ -1290,6 +1290,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         value = textMsgBuffer.push(text);
 // TODO need to inmprove message handling for multiple receivers
 
+    if (!synth->fileCompatible)
+    {
+        synth->getRuntime().Log("File from ZynAddSubFX 3.0 or later is incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
+        synth->fileCompatible = true;
+    }
+
     getData->data.value.F = float(value);
     if (write)
         lowPrioWrite = false;

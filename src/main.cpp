@@ -268,7 +268,8 @@ static void *mainGuiThread(void *arg)
                 {
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
                     if (guiMaster)
-                    { guiMaster->Log(_synth->getRuntime().LogList.front());
+                    {
+                        guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }
                 }

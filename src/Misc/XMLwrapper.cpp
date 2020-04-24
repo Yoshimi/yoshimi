@@ -523,7 +523,9 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
         synth->getRuntime().lastXMLmajor = 0;
 
     if (!yoshitoo && xml_version.major > 2)
-        std::cout << "Incompatible" << std:: endl;
+        synth->fileCompatible = false;
+    else
+        synth->fileCompatible = true;
 
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {

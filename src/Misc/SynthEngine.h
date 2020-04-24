@@ -157,6 +157,7 @@ class SynthEngine
         void setAllPartMaps(void);
 
         bool masterMono;
+        bool fileCompatible;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
