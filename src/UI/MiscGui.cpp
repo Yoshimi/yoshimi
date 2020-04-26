@@ -228,9 +228,10 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
             synth->getGuiMaster()->message->hide();
         else
         {
-            synth->getGuiMaster()->words->copy_label(name.c_str());
-            synth->getGuiMaster()->cancel->hide();
-            synth->getGuiMaster()->message->show();
+            synth->getGuiMaster()->setmessage(UNUSED, true, name, "Close");
+            //synth->getGuiMaster()->words->copy_label(name.c_str());
+            //synth->getGuiMaster()->cancel->hide();
+            //synth->getGuiMaster()->message->show();
         }
         return;
     }

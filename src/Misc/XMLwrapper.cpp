@@ -507,6 +507,7 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     }
     node = root;
     push(root);
+    synth->fileCompatible = true;
     if (zynfile)
     {
         xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
@@ -520,13 +521,12 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major));
     }
     else
+    {
         synth->getRuntime().lastXMLmajor = 0;
-
-    if (!yoshitoo && xml_version.major > 2)
-        synth->fileCompatible = false;
-    else
-        synth->fileCompatible = true;
-
+        if (xml_version.major > 2)
+            synth->fileCompatible = false;
+    }
+// std::cout << "major " << int(xml_version.major) << "  Yosh " << int(synth->getRuntime().lastXMLmajor) << std::endl;
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));

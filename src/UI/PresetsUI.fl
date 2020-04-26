@@ -53,6 +53,9 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {extern SynthEngine *firstSynth;} {public local
 }
 
+decl {\#include "MasterUI.h"} {private global
+}
+
 class PresetsUI_ {} {
   Function {refresh()} {return_type {virtual void}
   } {
@@ -177,6 +180,13 @@ class PresetsUI {} {
         p->paste(n);
         pastewin->hide();
         pui->refresh();
+        if (!synth->fileCompatible)
+        {
+            synth->getGuiMaster()->setmessage(UNUSED, true, "File from ZynAddSubFX 3.0 or later may be incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
+            synth->fileCompatible = true;
+            // this may not be necessary and anyway shouldn't
+            // be done directly - trying to get rid of these!
+        }
         if (synth->audioOut.load() == muteState::Immediate)
             synth->audioOut.store(muteState::Complete);}
         xywh {10 355 160 20} box THIN_UP_BOX

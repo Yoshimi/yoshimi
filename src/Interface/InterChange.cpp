@@ -1286,15 +1286,13 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     }
     //std::cout << ">" << text << "<" << std::endl;
 
+     // CLI message text has to be set here.
+    if (!synth->fileCompatible)
+        text += "\nIncompatible file from ZynAddSubFX 3.x";
+
     if (newMsg)
         value = textMsgBuffer.push(text);
-// TODO need to inmprove message handling for multiple receivers
-
-    if (!synth->fileCompatible)
-    {
-        synth->getRuntime().Log("File from ZynAddSubFX 3.0 or later is incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
-        synth->fileCompatible = true;
-    }
+    // TODO need to inmprove message handling for multiple receivers
 
     getData->data.value.F = float(value);
     if (write)
@@ -1327,9 +1325,28 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #endif
         if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
+
+        // cancelling and GUI report must be set after action completed.
+        if (!synth->fileCompatible)
+        {
+            synth->fileCompatible = true;
+#ifdef GUI_FLTK
+            if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI)
+            {
+                //CommandBlock putData;
+                //memcpy(putData.bytes, getData->bytes, sizeof(putData));
+                getData->data.control = TOPLEVEL::control::textMessage;
+                getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later may be incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
+                returnsBuffer->write(getData->bytes);
+            }
+#endif
+        }
     }
-    else
+    else // don't leave this hanging
+    {
+        synth->fileCompatible = true;
         std::cout << "No indirect return" << std::endl;
+    }
 }
 
 
