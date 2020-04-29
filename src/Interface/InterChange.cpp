@@ -1517,8 +1517,9 @@ void InterChange::generateSpecialInstrument(int npart, std::string name)
 void InterChange::mediate()
 {
     CommandBlock getData;
-    bool more;
+    getData.data.control = UNUSED; // No other data element could be read uninitialised
     syncWrite = true;
+    bool more;
     do
     {
         more = false;
@@ -1545,7 +1546,7 @@ void InterChange::mediate()
         {
             more = true;
             if(getData.data.part != TOPLEVEL::section::midiLearn)
-            // Normal MIDI message, not special midi-learn message
+                // Normal MIDI message, not special midi-learn message
             {
                 historyActionCheck(&getData);
                 commandSend(&getData);
@@ -1559,8 +1560,9 @@ void InterChange::mediate()
             }
 #endif
         }
-        else if (getData.data.control == TOPLEVEL::section::midiLearn) // not part!
+        else if (getData.data.control == TOPLEVEL::section::midiLearn)
         {
+//  we are looking at the MIDI learn control type that any section *except* MIDI can send.
             synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
         }
         if (returnsBuffer->read(getData.bytes))
@@ -1569,7 +1571,10 @@ void InterChange::mediate()
             more = true;
         }
 
-        int effpar = synth->getRuntime().effectChange; // temporary fix block
+         // temporary fix block
+         // TODO find a better place to put this out of the main process!
+
+        int effpar = synth->getRuntime().effectChange;
         if (effpar > 0xffff)
         {
             CommandBlock effData;

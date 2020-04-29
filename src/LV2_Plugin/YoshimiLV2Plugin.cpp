@@ -271,6 +271,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
 {
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
+    flatbankprgs.clear();
     const LV2_Feature *f = NULL;
     const Yoshimi_LV2_Options_Option *options = NULL;
     while ((f = *features) != NULL)
@@ -381,7 +382,9 @@ bool YoshimiLV2Plugin::init()
 LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
-    if (synth == NULL || !synth->getRuntime().isRuntimeSetupCompleted()){
+    if (!synth->getRuntime().isRuntimeSetupCompleted())
+    {
+        delete synth;
         return NULL;
     }
     Fl::lock();
@@ -396,9 +399,11 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, do
     YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
         return static_cast<LV2_Handle>(inst);
-    else {
+    else
+    {
         synth->getRuntime().LogError("Failed to create Yoshimi LV2 plugin");
         delete inst;
+        delete synth;
     }
     return NULL;
 }
