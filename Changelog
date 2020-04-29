@@ -2,6 +2,8 @@ yoshimi 1.7.1 M
 
 2020-4-29 Will
 * Initialisation and memory leak fixes found by Stefaan.
+* Reverted hidden buttons in instance > 0 bank windows.
+  It was causing confusion especially for LV2 users.
 
 2020-4-26 Will
 * Further work on incompatible file recognition.
