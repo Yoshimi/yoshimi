@@ -579,6 +579,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     getData->data.miscmsg = textMsgBuffer.push(text);
                     unsigned int result = synth->setProgramByName(getData);
                     text = textMsgBuffer.fetch(result & NO_MSG);
+                    synth->getRuntime().lastBankLoad = 0xffffff;
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -618,6 +619,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
+                    synth->getRuntime().lastBankLoad = 0xffffff;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedPatchset:
@@ -640,6 +642,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
+                    synth->getRuntime().lastBankLoad = 0xffffff;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedVector:
@@ -703,6 +706,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
+                    synth->getRuntime().lastBankLoad = 0xffffff;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedState:
@@ -923,7 +927,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     guiTo = true;
                     break;
                 }
-
                 case BANK::control::selectBank:
                     if (engine == UNUSED)
                         engine = getData->data.engine = synth->getRuntime().currentRoot;
@@ -3054,6 +3057,9 @@ void InterChange::commandBank(CommandBlock *getData)
             }
             break;
         }
+        case BANK::control::lastSeenInBank: // read only
+            value_int = synth->getRuntime().lastBankLoad;
+            break;
         case BANK::control::selectBank: // done elsewhere for write
             value_int = synth->ReadBank();
             break;

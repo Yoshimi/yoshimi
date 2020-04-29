@@ -173,6 +173,7 @@ class Config
         int           currentPart;
         unsigned int  currentBank;
         unsigned int  currentRoot;
+        int           lastBankLoad;
         int           currentPreset;
         int           tempBank;
         int           tempRoot;

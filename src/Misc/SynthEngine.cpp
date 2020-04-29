@@ -118,6 +118,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     presetsstore(this),
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
+    fadeStepShort(0),
     fadeLevel(0),
     samplerate(48000),
     samplerate_f(samplerate),
@@ -1009,7 +1010,10 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         partonoffLock(npart, 2); // as it was
     }
     else
+    {
         partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+        Runtime.lastBankLoad = (instrument << 16) | (banknum << 8) | root;
+    }
     return msgID;
 }
 

@@ -129,12 +129,13 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
         highlight = 0;} {}
   }
-  Function {refresh(int bk, int rt)} {} {
+  Function {refresh(int bk, int rt, int last)} {} {
     code {//
     string instrName = bank->getnamenumbered(nslot, bk, rt);
     copy_label(instrName.c_str());
     rootID = rt;
     bankID = bk;
+    lastSeen = last;
     if (bank->engines_used(rt, bk, nslot) & 8)
         labelcolor(YOSHI_COLOUR);
     else
@@ -195,6 +196,11 @@ class BankSlot {: {public Fl_Button, BankProcess_}
             pcol = PAD_COLOUR;
         else
             pcol = bcol;
+
+        if ((lastSeen & 0xff) == rootID && ((lastSeen >> 8) & 0xff) == bankID  && (lastSeen >> 16) == nslot)
+            labelfont(1);
+        else
+            labelfont(0);
     }
     draw_box(FL_FLAT_BOX, x(), y(), wid, h(), (Fl_Color) acol);
     draw_box(FL_FLAT_BOX, x() + wid, y(), wid, h(), (Fl_Color) scol);
@@ -221,6 +227,8 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   decl {int rootID;} {private local
   }
   decl {int bankID;} {private local
+  }
+  decl {int lastSeen;} {public local
   }
 }
 
@@ -1365,19 +1373,20 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
     int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+    int last = fetchData(0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank);
 
     instrumentuiwindow->copy_label(bank->getBankFileTitle(rt, bk).c_str());
 
     bankuiwindow->copy_label(bank->getRootFileTitle(rt).c_str());
 
     for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++i)
-        bs[i]->refresh(bk, rt);
+        bs[i]->refresh(bk, rt, last);
     for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
         rs[i]->rootrefresh(bk, rt);} {}
   }
-  Function {refreshbankslot(int ins, int bk, int rt)} {} {
+  Function {refreshbankslot(int ins, int bk, int rt, int last)} {} {
     code {//
-        bs[ins]->refresh(bk, rt);} {}
+        bs[ins]->refresh(bk, rt, last);} {}
   }
   Function {removeselection()} {} {
     code {//
@@ -1385,7 +1394,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         {
             int ns = nselected;
             nselected = -1;
-            bs[ns]->refresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank));
+            bs[ns]->refresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank), fetchData(0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank));
         }
         if (rselected >= 0)
         {

@@ -340,6 +340,7 @@ namespace BANK // usage BANK::control::
         deleteInstrument, // from bank
         selectFirstInstrumentToSwap,
         selectSecondInstrumentAndSwap,
+        lastSeenInBank,
 
         selectBank = 16, // in root, by ID or read ID + name
         renameBank, // or read just the name

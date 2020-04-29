@@ -177,6 +177,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentBank(0),
     currentRoot(0),
+    lastBankLoad(0xffffff),
     currentPreset(0),
     tempBank(0),
     tempRoot(0),
