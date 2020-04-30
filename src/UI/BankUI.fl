@@ -197,7 +197,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         else
             pcol = bcol;
 
-        if ((lastSeen & 0xff) == rootID && ((lastSeen >> 8) & 0xff) == bankID  && (lastSeen >> 16) == nslot)
+        if ((lastSeen & 0x7f) == rootID && ((lastSeen >> 8) & 0xff) == bankID  && ((lastSeen >> 16) & 0xff) == nslot)
             labelfont(1);
         else
             labelfont(0);
@@ -1007,7 +1007,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                     fl_alert("%s",message.c_str());
             }
             else
-                bs[insert]->copy_label(message.c_str());
+                refreshinstrumentwindow();
             break;
         case BANK::control::deleteInstrument:
             if (message.find("FAILED") != std::string::npos)
@@ -1131,10 +1131,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
         int slot = this->slot;
         int curPart = synth->getRuntime().currentPart;
-        //int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
-        //int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
-        //bool slotFilled = !bank->emptyslot(rt, bk, slot);
-        //string thisname =  bank->getname(slot, bk, rt);
         string thisname =  textMsgBuffer.fetch(fetchData(0, BANK::control::readInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, slot));
         bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)
@@ -1218,7 +1214,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
         }
         if (mode != 4)
-            refreshmainwindow();} {}
+            refreshinstrumentwindow();} {}
   }
   Function {rootprocess()} {return_type void
   } {
@@ -1250,7 +1246,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }*/
         instrumentuiwindow->show();
         set_bank_slot(); // needed by 'old' menu selector
-        refreshmainwindow();
+        refreshinstrumentwindow();
         return;
     }
 
@@ -1383,6 +1379,14 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bs[i]->refresh(bk, rt, last);
     for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
         rs[i]->rootrefresh(bk, rt);} {}
+  }
+  Function {refreshinstrumentwindow()} {} {
+    code {//
+    int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
+    int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
+    int last = fetchData(0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank);
+    for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++i)
+        bs[i]->refresh(bk, rt, last);} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt, int last)} {} {
     code {//

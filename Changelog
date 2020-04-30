@@ -1,6 +1,11 @@
 yoshimi 1.7.1 M
 
 2020-4-29 Will
+* Latest instrument now recognised by CLI.
+* Saving to bank also recognised as latest.
+* More refinements to BankUI.
+
+2020-4-29 Will
 * Initialisation and memory leak fixes found by Stefaan.
 * Reverted hidden buttons in instance > 0 bank windows.
   It was causing confusion especially for LV2 users.

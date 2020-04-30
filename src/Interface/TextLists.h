@@ -257,6 +257,7 @@ static std::string partlist [] = {
     "    -- ",             "effect dependedent controls",
     "PRogram <s>/[s]<n>",  "loads instrument ID - CLear sets default,",
     "","Group n selects from group list",
+    "LAtest",              "Show most recent bank load or save",
     "NAme <s>",            "sets the display name the part can be saved with",
     "TYPe <s>",            "sets the instrument type",
     "COPyright <s>",       "sets the instrument coyright message",

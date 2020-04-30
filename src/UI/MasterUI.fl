@@ -1667,7 +1667,7 @@ Alan Calvert started the project}
                 //bankui->readbankcfg(); // why did we have this?
             //if (insert != UNUSED || engine != UNUSED)
                 //bankui->rescan_for_banks(); // why did we have this?
-            bankui->refreshmainwindow();
+            bankui->refreshinstrumentwindow();
             updatepartprogram(kititem);
             break;
 

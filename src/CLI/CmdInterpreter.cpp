@@ -4762,6 +4762,32 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
     }
 
+    if (input.matchnMove(2, "latest"))
+    {
+        int result = readControl(synth, 0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank);
+        int root = result & 0xff;
+
+        if (root == UNUSED)
+        {
+            synth->getRuntime().Log("Latest not defined");
+            return REPLY::done_msg;
+        }
+        bool isSave = ((root & 0x80) != 0);
+        root &= 0x7f;
+
+        int part = result >> 24;
+        int instrument = (result >> 16) & 0xff;
+        int bank = (result >> 8) & 0xff;
+        string name = "Part " + to_string(part + 1);
+        if (isSave)
+            name += " sent to I ";
+        else
+            name += " is from I ";
+        name += (to_string(instrument + 1) + ", B " + to_string(bank) + ", R " + to_string(root));
+        synth->getRuntime().Log(name);
+        return REPLY::done_msg;
+    }
+
 
     if (!readControl(synth, 0, PART::control::enable, npart))
         return REPLY::inactive_msg;
