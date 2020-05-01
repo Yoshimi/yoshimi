@@ -1010,10 +1010,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         partonoffLock(npart, 2); // as it was
     }
     else
-    {
         partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
-        Runtime.lastBankPart = (npart << 24) | (instrument << 16) | (banknum << 8) | root;
-    }
     return msgID;
 }
 

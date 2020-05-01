@@ -4775,14 +4775,13 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         bool isSave = ((root & 0x80) != 0);
         root &= 0x7f;
 
-        int part = result >> 24;
-        int instrument = (result >> 16) & 0xff;
-        int bank = (result >> 8) & 0xff;
-        string name = "Part " + to_string(part + 1);
+        int instrument = result >> 15;
+        int bank = (result >> 8) & 0x7f;
+        string name = "A part was ";
         if (isSave)
-            name += " sent to I ";
+            name += "sent to I ";
         else
-            name += " is from I ";
+            name += "fetched from I ";
         name += (to_string(instrument + 1) + ", B " + to_string(bank) + ", R " + to_string(root));
         synth->getRuntime().Log(name);
         return REPLY::done_msg;

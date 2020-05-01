@@ -197,7 +197,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         else
             pcol = bcol;
 
-        if ((lastSeen & 0x7f) == rootID && ((lastSeen >> 8) & 0xff) == bankID  && ((lastSeen >> 16) & 0xff) == nslot)
+        if ((lastSeen & 0x7f) == rootID && ((lastSeen >> 8) & 0x7f) == bankID  && ((lastSeen >> 15) == nslot))
             labelfont(1);
         else
             labelfont(0);
@@ -1385,6 +1385,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     int bk = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
     int rt = fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank);
     int last = fetchData(0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank);
+    //std::cout << "here ins " << int(last >> 15) << "  bank " << int((last >> 8) & 0x7f) << "  root " << int(last & 0x7f) << std::endl;
     for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++i)
         bs[i]->refresh(bk, rt, last);} {}
   }

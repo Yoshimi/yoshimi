@@ -1659,14 +1659,12 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadInstrumentFromBank:
-            if (insert != UNUSED)
-            {
+            /*if (insert != UNUSED)
                 ;// updateBankRootDirs() // apparently not needed!
-            }
-            //if (engine != UNUSED)
-                //bankui->readbankcfg(); // why did we have this?
-            //if (insert != UNUSED || engine != UNUSED)
-                //bankui->rescan_for_banks(); // why did we have this?
+            if (engine != UNUSED)
+                bankui->readbankcfg(); // why did we have this?
+            if (insert != UNUSED || engine != UNUSED)
+                bankui->rescan_for_banks(); // why did we have this?*/
             bankui->refreshinstrumentwindow();
             updatepartprogram(kititem);
             break;

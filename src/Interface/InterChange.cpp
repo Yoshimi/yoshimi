@@ -567,7 +567,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     unsigned int result = synth->setProgramFromBank(getData);
                     text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
+                    {
+                        synth->getRuntime().lastBankPart = (value << 15) | (synth->getRuntime().currentBank << 8) | synth->getRuntime().currentRoot;
                         text = "ed " + text;
+                        //std::cout << "here ins " << int((synth->getRuntime().lastBankPart >> 15) & 0x7f) << "  bank " << int((synth->getRuntime().lastBankPart >> 8) & 0x7f) << "  root " << int(synth->getRuntime().lastBankPart & 0x7f) << std::endl;
+                    }
                     else
                         text = " FAILED " + text;
                     newMsg = true;
@@ -579,7 +583,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     getData->data.miscmsg = textMsgBuffer.push(text);
                     unsigned int result = synth->setProgramByName(getData);
                     text = textMsgBuffer.fetch(result & NO_MSG);
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     if (result < 0x1000)
                         text = "ed " + text;
                     else
@@ -604,7 +608,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
                         synth->part[value]->PyoshiType = (saveType & 2);
                         text = "d " + text;
-                        synth->getRuntime().lastBankPart = 0xffffff;
                     }
                     else
                         text = " FAILED " + text;
@@ -620,7 +623,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedPatchset:
@@ -643,7 +646,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedVector:
@@ -707,7 +710,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     }
                     else
                         text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedState:
@@ -852,7 +855,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     else
                         text = " ";
                     text += textMsgBuffer.fetch(msgID & NO_MSG);
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     break;
                 }
@@ -880,7 +883,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "FAILED Could not save " + text + " to " + to_string(insert + 1);
                     else
                     { // 0x80 on engine indicates it is a save not a load
-                        synth->getRuntime().lastBankPart = (parameter << 24) | (insert << 16) | (kititem << 8) | engine | 0x80;
+                        synth->getRuntime().lastBankPart = (insert << 15) | (kititem << 8) | engine | 0x80;
                         text = "" + to_string(insert + 1) +". " + text;
                     }
                     newMsg = true;
@@ -889,7 +892,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 case BANK::control::deleteInstrument:
                 {
                     text  = synth->bank.clearslot(value, synth->getRuntime().currentRoot,  synth->getRuntime().currentBank);
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     break;
                 }
@@ -929,7 +932,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     swapInstrument1 = UNUSED;
                     swapBank1 = UNUSED;
                     swapRoot1 = UNUSED;
-                    synth->getRuntime().lastBankPart = 0xffffff;
+                    synth->getRuntime().lastBankPart = UNUSED;
                     newMsg = true;
                     guiTo = true;
                     break;
