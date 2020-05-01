@@ -568,7 +568,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     text = textMsgBuffer.fetch(result & NO_MSG);
                     if (result < 0x1000)
                     {
-                        synth->getRuntime().lastBankPart = (value << 15) | (synth->getRuntime().currentBank << 8) | synth->getRuntime().currentRoot;
+                        if (synth->getRuntime().bankHighlight)
+                            synth->getRuntime().lastBankPart = (value << 15) | (synth->getRuntime().currentBank << 8) | synth->getRuntime().currentRoot;
+                        else
+                            synth->getRuntime().lastBankPart = UNUSED;
                         text = "ed " + text;
                         //std::cout << "here ins " << int((synth->getRuntime().lastBankPart >> 15) & 0x7f) << "  bank " << int((synth->getRuntime().lastBankPart >> 8) & 0x7f) << "  root " << int(synth->getRuntime().lastBankPart & 0x7f) << std::endl;
                     }
@@ -883,7 +886,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         text = "FAILED Could not save " + text + " to " + to_string(insert + 1);
                     else
                     { // 0x80 on engine indicates it is a save not a load
-                        synth->getRuntime().lastBankPart = (insert << 15) | (kititem << 8) | engine | 0x80;
+                        if (synth->getRuntime().bankHighlight)
+                            synth->getRuntime().lastBankPart = (insert << 15) | (kititem << 8) | engine | 0x80;
                         text = "" + to_string(insert + 1) +". " + text;
                     }
                     newMsg = true;
@@ -2576,6 +2580,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().singlePath = value;
             else
                 value = synth->getRuntime().singlePath;
+            break;
+        case CONFIG::control::enableHighlight:
+            if (write)
+                synth->getRuntime().bankHighlight = value;
+            else
+                value = synth->getRuntime().bankHighlight;
             break;
         case CONFIG::control::exposeStatus:
             if (write)

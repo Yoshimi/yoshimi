@@ -678,6 +678,10 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             contstr += "Enable Auto Instance";
             yesno = true;
             break;
+        case CONFIG::control::enableHighlight:
+            contstr += "Enable Bank Highlight";
+            yesno = true;
+            break;
         case CONFIG::control::historyLock:
         {
             string group[] = {"Instrument", "Patchset", "Scale", "State", "Vector", "Mlearn"};

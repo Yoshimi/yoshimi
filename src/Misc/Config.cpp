@@ -177,6 +177,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentBank(0),
     currentRoot(0),
+    bankHighlight(false),
     lastBankPart(UNUSED),
     currentPreset(0),
     tempBank(0),
@@ -669,6 +670,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
             }
         }
 
+        bankHighlight = xml->getparbool("bank_highlight", bankHighlight);
+
         currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
 
         Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
@@ -779,6 +782,8 @@ void Config::addConfigXML(XMLwrapper *xml)
     xml->addpar("report_XMLheaders", logXMLheaders);
     xml->addpar("virtual_keyboard_layout", VirKeybLayout + 1);
     xml->addpar("full_parameters", xmlmax);
+
+    xml->addparbool("bank_highlight", bankHighlight);
 
     xml->addpar("presetsCurrentRootID", currentPreset);
 

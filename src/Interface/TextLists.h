@@ -197,6 +197,7 @@ static std::string configlist [] = {
     "Keep [s]",            "include inactive data on all file saves (ON, {other})",
     "Gui [s]",             "* run with GUI (ON, OFF)",
     "Cli [s]",             "* run with CLI (ON, OFF)",
+    "IDentify",            "identify last bank entry fetched or added (ON, {other})",
     "LOCk <s1> <s2>",      "lock history of group s1 (ON, OFF)",
     "","INstrument, PAtchset, SCale, STate, VEctor, MLearn",
 

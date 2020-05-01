@@ -3536,6 +3536,8 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             def = 1;
             max = 2;
             break;
+        case CONFIG::control::enableHighlight:
+            break;
 
         case CONFIG::control::jackMidiSource:
             min = 3; // anything greater than max

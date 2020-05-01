@@ -61,17 +61,17 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();}
+      callback {o->hide();} open
       xywh {507 87 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
@@ -266,9 +266,16 @@ class ConfigUI {} {
           }
         }
         Fl_Group {} {
-          label Switches
-          xywh {5 25 382 277} labelsize 12 hide
+          label Switches open
+          xywh {5 25 382 277} labelsize 12
         } {
+          Fl_Check_Button bankHighlight {
+            label {Enable Bank Highlight}
+            callback {//
+                        send_data(0, CONFIG::control::enableHighlight, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Show the last patch fetched from or saved to a bank} xywh {190 40 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().bankHighlight);}
+          }
           Fl_Check_Button setDefaultState {
             label {* Start With Default State}
             callback {//
@@ -937,6 +944,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
                 case CONFIG::control::enableSinglePath:
                     singleMaster->value(value_bool);
+                    break;
+                case CONFIG::control::enableHighlight:
+                    bankHighlight->value(value_bool);
                     break;
 
                 case CONFIG::control::historyLock:

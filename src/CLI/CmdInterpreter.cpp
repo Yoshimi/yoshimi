@@ -3253,6 +3253,12 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
     }
 
+    else if (input.matchnMove(2, "identify"))
+    {
+        command = CONFIG::control::enableHighlight;
+        value = (input.toggle() == 1);
+    }
+
     else if (input.matchnMove(3, "expose"))
     {
         value = input.toggle();
