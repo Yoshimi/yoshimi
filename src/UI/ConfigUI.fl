@@ -61,17 +61,17 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open
+      callback {o->hide();}
       xywh {507 87 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12 hide
+          xywh {5 25 382 277} labelsize 12
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
@@ -266,8 +266,8 @@ class ConfigUI {} {
           }
         }
         Fl_Group {} {
-          label Switches open
-          xywh {5 25 382 277} labelsize 12
+          label Switches
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Check_Button bankHighlight {
             label {Enable Bank Highlight}

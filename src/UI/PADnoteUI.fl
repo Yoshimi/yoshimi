@@ -427,8 +427,9 @@ class PADnoteUI {: {public PresetsUI_}
           Fl_Button {} {
             label Waveform
             callback {//
-            if (oscui!=NULL) delete (oscui);
-                oscui = new OscilEditor(pars->POscil, osc, cbwidget, applybutton, synth, npart, kititem, 2);
+            if (oscui!=NULL)
+                delete (oscui);
+            oscui = new OscilEditor(pars->POscil, osc, cbwidget, applybutton, synth, npart, kititem, 2);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             tooltip {Right click: also close this} xywh {375 270 80 20} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -1344,6 +1345,7 @@ class PADnoteUI {: {public PresetsUI_}
   Function {~PADnoteUI()} {return_type virtual
   } {
     code {//
+    oscui->oscsave();
     delete(oscui);
     delete(resui);
     saveWin(synth, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");

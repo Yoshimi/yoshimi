@@ -1404,7 +1404,18 @@ class OscilEditor {: {public PresetsUI_}
     cbapplywidget=cbapplywidget_;
     make_window();
     refresh();
+    OSCseen = true;
+    int fetchX, fetchY, fetchO;
+    loadWin(synth, fetchX, fetchY, fetchO, "waveform");
+    osceditUI->position(fetchX, fetchY);
     osceditUI->show();} {}
+  }
+  Function {oscsave()} {} {
+    code {//
+    if (OSCseen)
+    {
+        saveWin(synth, osceditUI->x(), osceditUI->y(), osceditUI->visible(), "waveform");
+    }} {}
   }
   Function {~OscilEditor()} {return_type virtual
   } {
@@ -1566,6 +1577,8 @@ class OscilEditor {: {public PresetsUI_}
   decl {int kititem;} {private local
   }
   decl {int engine;} {private local
+  }
+  decl {bool OSCseen;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

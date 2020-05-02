@@ -1,5 +1,8 @@
 yoshimi 1.7.1 M
 
+2020-5-2 Will
+* Added waveform to remembered window positions.
+
 2020-5-1 Will
 * BugFix: new highlight not recognised for higher numbers.
   Loss of precision.

@@ -548,7 +548,10 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   label Waveform
                   callback {//
                     if (oscedit != NULL)
+                    {
+                        oscedit->oscsave();
                         delete oscedit;
+                    }
                     int nv = nvoice;
                     if (pars->VoicePar[nvoice].PextFMoscil >= 0)
                         nv = pars->VoicePar[nvoice].PextFMoscil;
@@ -789,7 +792,10 @@ Oscillator}
                   label Waveform
                   callback {//
     if (oscedit)
+    {
+        oscedit->oscsave();
         delete oscedit;
+    }
     int nv = nvoice;
     if (pars->VoicePar[nvoice].Pextoscil >= 0)
         nv=pars->VoicePar[nvoice].Pextoscil;
@@ -1695,6 +1701,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         hide();
         if (oscedit)
         {
+            oscedit->oscsave();
             delete oscedit;
         }
         delete oscil;
