@@ -1,5 +1,11 @@
 yoshimi 1.7.1 M
 
+2020-5-4 Will
+* BugFix: CLI not responding to engine on/off.
+  Caused by aftertouch controls shifing part enable.
+  Temporarily fixed by swapping the list order.
+  Need to sort out properly so CLI uses correct controls.
+
 2020-5-2 Will
 * Added waveform to remembered window positions.
 

@@ -493,6 +493,7 @@ static std::string subsynthlist [] = {
 
 static std::string padsynthlist [] = {
     "<ON/OFF>",                 "enables/disables the part",
+    "Apply",                    "use on 1st entry & harmonic changes",
     "Volume <n>",               "volume",
     "Pan <n>",                  "panning",
     "VElocity <n>",             "velocity sensing sensitivity",
