@@ -489,12 +489,13 @@ namespace MIDI // usage MIDI::control::noteOn
 namespace SCALES // usage SCALES::control::refFrequency
 {
     enum control : unsigned char {
-        refFrequency = 0,
+        enableMicrotonal = 0,
+        refFrequency,
         refNote,
         invertScale,
         invertedScaleCenter,
         scaleShift,
-        enableMicrotonal = 8,
+
         enableKeyboardMap = 16,
         lowKey,
         middleKey,
@@ -513,13 +514,13 @@ namespace SCALES // usage SCALES::control::refFrequency
 namespace MAIN // usage MAIN::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        mono = 0,
+        volume,
         partNumber = 14,
         availableParts,
         panLawType,
         detune = 32,
         keyShift = 35,
-        mono,
         soloType = 48,
         soloCC,
 
@@ -563,14 +564,14 @@ namespace MAIN // usage MAIN::control::volume
 namespace PART // usage PART::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        enable = 0,
+        volume,
         velocitySense,
         panning,
-        velocityOffset = 4,
+        velocityOffset,
         midiChannel,
         keyMode,
         portamento,
-        enable,
         kitItemMute,
         channelATset,
         keyATset,
@@ -692,11 +693,10 @@ namespace PART // usage PART::control::volume
 namespace ADDSYNTH // usage ADDSYNTH::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        enable = 0,
+        volume,
         velocitySense,
         panning,
-
-        enable = 8,
 
         detuneFrequency = 32,
         octave = 35,
@@ -718,12 +718,12 @@ namespace ADDSYNTH // usage ADDSYNTH::control::volume
 namespace ADDVOICE // usage ADDVOICE::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        enableVoice = 0,
+        volume,
         velocitySense,
         panning,
-        invertPhase = 4,
-        enableAmplitudeEnvelope = 7,
-        enableVoice,
+        invertPhase,
+        enableAmplitudeEnvelope,
         enableAmplitudeLFO,
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
@@ -781,11 +781,10 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
 namespace SUBSYNTH // usage SUBSYNTH::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        enable = 0,
+        volume,
         velocitySense,
         panning,
-
-        enable = 8,
 
         bandwidth = 16,
         bandwidthScale,
@@ -819,11 +818,10 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
 namespace PADSYNTH // usage PADSYNTH::control::volume
 {
     enum control : unsigned char {
-        volume = 0,
+        enable = 0,
+        volume,
         velocitySense,
         panning,
-
-        enable = 8,
 
         bandwidth = 16,
         bandwidthScale,
@@ -938,10 +936,11 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
 namespace RESONANCE // usage RESONANCE::control::maxDb
 {
     enum control : unsigned char {
-        maxDb = 0,
+        enableResonance = 0,
+        maxDb,
         centerFrequency,
         octaves,
-        enableResonance = 8,
+
         randomType = 10, // coarse, medium, fine
         interpolatePeaks = 20, // smooth, linear
         protectFundamental,

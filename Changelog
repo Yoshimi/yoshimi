@@ -2,6 +2,9 @@ yoshimi 1.7.1 M
 
 2020-5-9 Will
 * BugFix: Disabled oscillator window saving caused segfaults.
+* Reorganised several enable control values for consistency.
+* Doc updates.
+
 
 2020-5-4 Will
 * BugFix: CLI not responding to engine on/off.

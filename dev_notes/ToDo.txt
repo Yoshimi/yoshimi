@@ -4,6 +4,8 @@ BUG! part level overload indicator not cleared for part numbers > 16.
 
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
+GUI Oddity. Pres spacebar on startup and you get directed to reset. Press it after tabbing down checkboxes and you enter the MIDI learn dialogue.
+
 Revise GUI voice list related to voice editor.
 
 Effect change warning for dynfilter insert not yet done.
@@ -13,8 +15,6 @@ CLI sys/ins updates wrong.
 Some CLI addvoice kit mode controls don't update the GUI.
 
 CLI waveform (in voice) changes don't update GUI unless waveform window is open too.
-
-Find out why reporting errors in 'Bank' is very slow.
 
 Requested: auto 'apply' timer for padsynth.
 
