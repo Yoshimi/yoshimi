@@ -547,9 +547,9 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 Fl_Button changeFMoscilbutton {
                   label Waveform
                   callback {//
-                    if (oscedit != NULL)
+                    if (oscedit)
                     {
-                        //oscedit->oscsave();
+                        oscedit->oscsave();
                         delete oscedit;
                     }
                     int nv = nvoice;
@@ -793,7 +793,7 @@ Oscillator}
                   callback {//
     if (oscedit)
     {
-        //oscedit->oscsave();
+        oscedit->oscsave();
         delete oscedit;
     }
     int nv = nvoice;
@@ -1701,7 +1701,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         hide();
         if (oscedit)
         {
-            //oscedit->oscsave();
+            oscedit->oscsave();
             delete oscedit;
         }
         delete oscil;

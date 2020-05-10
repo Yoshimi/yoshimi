@@ -1345,7 +1345,8 @@ class PADnoteUI {: {public PresetsUI_}
   Function {~PADnoteUI()} {return_type virtual
   } {
     code {//
-    //oscui->oscsave();
+    if (oscui)
+        oscui->oscsave();
     delete(oscui);
     delete(resui);
     saveWin(synth, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");

@@ -1,6 +1,11 @@
 yoshimi 1.7.1 M
 
 2020-5-9 Will
+* Merged GUI fixes from Kristian.
+* Reinstated ocsillator window saving.
+  Fault was due to missing window test in PadSynth UI :(
+
+2020-5-9 Will
 * BugFix: Disabled oscillator window saving caused segfaults.
 * Reorganised several enable control values for consistency.
 * Doc updates.
