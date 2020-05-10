@@ -106,7 +106,7 @@ public:
    virtual void registerAudioPort(int) {}
 
    //static methods
-   static LV2_Handle	instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
+   static LV2_Handle	instantiate (const LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
    static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);
    static void activate(LV2_Handle instance);
    static void deactivate(LV2_Handle instance);
@@ -159,7 +159,7 @@ public:
     YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     ~YoshimiLV2PluginUI();
     bool init();
-    static LV2UI_Handle	instantiate(const struct _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
+    static LV2UI_Handle	instantiate(const LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     static void cleanup(LV2UI_Handle ui);
     static void static_guiClosed(void *arg);
     void run();
