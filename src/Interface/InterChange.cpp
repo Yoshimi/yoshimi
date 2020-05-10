@@ -1571,10 +1571,7 @@ void InterChange::mediate()
             }
 #ifdef GUI_FLTK
             else if (getData.data.control == MIDILEARN::control::reportActivity)
-            {
-                if (!toGUI->write(getData.bytes))
-                synth->getRuntime().Log("Unable to write to toGUI buffer");
-            }
+                toGUI->write(getData.bytes);
 #endif
         }
         else if (getData.data.control == TOPLEVEL::section::midiLearn)
@@ -1617,8 +1614,7 @@ void InterChange::mediate()
             effData.data.value.F = efftype;
             effData.data.part = npart;
             effData.data.engine = effnum;
-            if (!toGUI->write(effData.bytes))
-                synth->getRuntime().Log("Unable to write to toGUI buffer");
+            toGUI->write(effData.bytes);
             synth->getRuntime().effectChange = UNUSED;
         } // end of temporary fix
 
@@ -1680,11 +1676,7 @@ void InterChange::returns(CommandBlock *getData)
             tmp = TOPLEVEL::action::toAll;
 
         if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
-        {
-            //std::cout << "writing to GUI" << std::endl;
-            if (!toGUI->write(getData->bytes))
-                synth->getRuntime().Log("Unable to write to toGUI buffer");
-        }
+            toGUI->write(getData->bytes);
 #endif
     }
     if (!decodeLoopback->write(getData->bytes))
