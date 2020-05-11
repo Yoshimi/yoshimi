@@ -379,7 +379,7 @@ bool YoshimiLV2Plugin::init()
 }
 
 
-LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
@@ -716,9 +716,9 @@ bool YoshimiLV2PluginUI::init()
 }
 
 
-LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
+LV2UI_Handle YoshimiLV2PluginUI::instantiate(const LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
 {
-    const _LV2UI_Descriptor *desc = descriptor;
+    const LV2UI_Descriptor *desc = descriptor;
     descriptor = desc;
     const char *plug = plugin_uri;
     plugin_uri = plug;
