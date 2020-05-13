@@ -1063,7 +1063,7 @@ void Part::enforcekeylimit()
             || partnote[i].status == KEY_RELEASED_AND_SUSTAINED)
             notecount++;
     }
-    if (notecount > Pkeylimit)
+    while (notecount > Pkeylimit)
     {   // find out the oldest note
         int oldestnotepos = 0;
         int maxtime = 0;
@@ -1079,6 +1079,7 @@ void Part::enforcekeylimit()
             }
         }
         ReleaseNotePos(oldestnotepos);
+        --notecount;
     }
 }
 
