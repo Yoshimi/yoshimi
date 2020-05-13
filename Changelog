@@ -1,5 +1,12 @@
 yoshimi 1.7.1 M
 
+2020-5-13 Will
+* Reverted PART_POLIPHONY and POLIPHONY to single limit.
+* Refactored noteoff code.
+* Refactored and changed setnotelimit to enforcenotelimit.
+  This still isn't corrected when changing the key limit
+  downwards by more than one as it only removes the oldeest.
+
 2020-5-9 Will
 * Merged GUI fixes from Kristian.
 * Reinstated ocsillator window saving.

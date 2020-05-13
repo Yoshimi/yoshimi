@@ -112,8 +112,7 @@ const unsigned int MODOFF_COLOUR = 0x80808000;
 
 // these were previously (pointlessly) user configurable
 const unsigned char NUM_VOICES = 8;
-const unsigned char POLIPHONY = 80;
-const unsigned char PART_POLIPHONY = 60;
+const unsigned char POLIPHONY = 60;
 const unsigned char PART_DEFAULT_LIMIT = 20;
 const unsigned char NUM_SYS_EFX = 4;
 const unsigned char NUM_INS_EFX = 8;

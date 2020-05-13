@@ -97,7 +97,7 @@ class Part
         } kit[NUM_KIT_ITEMS];
 
         // Part parameters
-        void setkeylimit(unsigned char Pkeylimit_);
+        void enforcekeylimit(void);
         void setkititemstatus(int kititem, int Penabled_);
         void setVolume(float value);
         void checkVolume(float step);

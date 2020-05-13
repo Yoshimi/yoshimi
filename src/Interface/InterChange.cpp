@@ -3407,7 +3407,11 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case PART::control::maxNotes:
             if (write)
-                part->setkeylimit(value_int);
+            {
+                part->Pkeylimit = value_int;
+                if (part->Pkeymode == PART_NORMAL)
+                    part->enforcekeylimit();
+            }
             else
                 value = part->Pkeylimit;
             break;
