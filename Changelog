@@ -7,6 +7,10 @@ yoshimi 1.7.1 M
   This still isn't corrected when changing the key limit
   downwards by more than one as it only removes the oldest.
 * enforcenotelimit now loops to remove all older notes :)
+* BugFix: GUI Part volume control not working.
+  It was still using direct numeric entry so failed when the
+  recent change of control values.
+
 
 2020-5-9 Will
 * Merged GUI fixes from Kristian.

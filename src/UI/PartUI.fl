@@ -576,7 +576,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
           synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-          send_data(0, 0, o->value(), 0);}
+          send_data(0, PART::control::volume, o->value(), 0);}
           xywh {335 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PartVolume);}
           code1 {o->value(part->Pvolume);}
