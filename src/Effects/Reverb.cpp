@@ -81,7 +81,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     Plohidamp(80),
     Ptype(1),
     Proomsize(64),
-    Pbandwidth(30),
+    Pbandwidth(20),
     roomsize(1.0f),
     rs(1.0f),
     bandwidth(NULL),
@@ -553,6 +553,8 @@ void Reverb::changepar(int npar, unsigned char value)
             break;
         case 10:
             settype(value);
+            if (value == 2)
+                setbandwidth(20); // TODO use defaults
             break;
         case 11:
             setroomsize(value);

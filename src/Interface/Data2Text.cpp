@@ -3163,7 +3163,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 ref -= 2;
             effname = " Reverb ";
             controlType = reverblist[(ref) * 2];
-            if (control == 10 && addValue == true && offset > 0)
+            if (control == 10 && addValue == true)// && offset > 0)
             {
                 showValue = false;
                 switch (value)

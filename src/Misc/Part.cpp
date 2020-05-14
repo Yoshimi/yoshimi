@@ -838,7 +838,7 @@ void Part::NoteOff(int note) //release the key
                 else
                 {
                     ReleaseNotePos(i);
-                    //break; // only release one note.
+                    break; // only release one note.
                 }
             }
         }

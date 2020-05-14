@@ -1,5 +1,11 @@
 yoshimi 1.7.1 M
 
+2020-5-14 Will
+* BugFix: Reverb type to bandwidth not resetting BW control.
+* Corrected some controls still using direct numbers.
+* Note On/Off fully respects multiple same note in Poly mode.
+* Added 'Cracked Chimes' to Companion bank.
+
 2020-5-13 Will
 * Reverted PART_POLIPHONY and POLIPHONY to single limit.
 * Refactored noteoff code.
@@ -21,7 +27,6 @@ yoshimi 1.7.1 M
 * BugFix: Disabled oscillator window saving caused segfaults.
 * Reorganised several enable control values for consistency.
 * Doc updates.
-
 
 2020-5-4 Will
 * BugFix: CLI not responding to engine on/off.

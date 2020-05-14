@@ -2026,7 +2026,7 @@ void InterChange::commandMidi(CommandBlock *getData)
 
     //std::cout << "value " << value_int << "  control " << int(control) << "  chan " << int(chan) << "  char1 " << char1 << "  char2 " << int(char2) << "  param " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
 
-    if (control == 2 && char1 >= 0x80)
+    if (control == MIDI::control::controller && char1 >= 0x80)
     {
         char1 |= 0x200; // for 'specials'
     }
@@ -3251,7 +3251,7 @@ void InterChange::commandPart(CommandBlock *getData)
                                 synth->partonoffWrite(npart, 1);
                                 synth->getRuntime().currentPart = npart;
                                 getData->data.value.F = npart;
-                                getData->data.control = 14;
+                                getData->data.control = MAIN::control::partNumber;
                                 getData->data.part = TOPLEVEL::section::main;
                             }
                             else
@@ -3643,7 +3643,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::breathControlEnable:
             if (write)
                 if (value_bool)
-                    part->PbreathControl = 2;
+                    part->PbreathControl = MIDI::CC::breath;
                 else
                     part->PbreathControl = 128; // impossible CC value
             else
@@ -3771,7 +3771,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
     }
 
-    if (!write || control == 18 || control == 19)
+    if (!write || control == PART::control::minToLastKey || control == PART::control::maxToLastKey)
         getData->data.value.F = value;
 }
 
@@ -6150,11 +6150,10 @@ void InterChange::commandEffects(CommandBlock *getData)
                 eff->changepreset(value_int);
             else
             {
-                if (kititem == EFFECT::type::reverb && control == 10 && value_int == 2)
-                    // this needs to use the defaults
-                    // to all for future upgrades
-                    getData->data.miscmsg = 20;
                 eff->seteffectpar(control, value_int);
+                if (kititem == EFFECT::type::reverb && control == 10 && value_int == 2)
+                    // bandwidth type update for GUI
+                    getData->data.offset = eff->geteffectpar(12);
             }
         }
         //std::cout << "eff value " << value << "  control " << int(control) << "  band " << synth->getRuntime().EQband << std::endl;
