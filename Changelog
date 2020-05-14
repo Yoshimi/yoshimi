@@ -5,6 +5,8 @@ yoshimi 1.7.1 M
 * Corrected some controls still using direct numbers.
 * Note On/Off fully respects multiple same note in Poly mode.
 * Added 'Cracked Chimes' to Companion bank.
+* Moved '.config/yoshimi/yoshimi.history' to .share/yoshimi/recent'
+  This is for XDG compliance. It's not a config file.
 
 2020-5-13 Will
 * Reverted PART_POLIPHONY and POLIPHONY to single limit.

@@ -2585,12 +2585,15 @@ string SynthEngine::getLastfileAdded(int group)
 
 bool SynthEngine::loadHistory()
 {
-    string name = Runtime.ConfigDir + '/' + YOSHIMI;
-    string historyname = name + ".history";
+    string historyname = Runtime.localDir  + "/recent";
     if (!isRegularFile(historyname))
-    {
-        Runtime.Log("Missing history file");
-        return false;
+    {   // recover old version
+        historyname = Runtime.ConfigDir + '/' + string(YOSHIMI) + ".history";
+        if (!isRegularFile(historyname))
+        {
+            Runtime.Log("Missing recent history file");
+            return false;
+        }
     }
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
@@ -2669,8 +2672,7 @@ bool SynthEngine::loadHistory()
 
 bool SynthEngine::saveHistory()
 {
-    string name = Runtime.ConfigDir + '/' + YOSHIMI;
-    string historyname = name + ".history";
+    string historyname = Runtime.localDir  + "/recent";
     Runtime.xmlType = TOPLEVEL::XML::History;
 
     XMLwrapper *xml = new XMLwrapper(this, true);

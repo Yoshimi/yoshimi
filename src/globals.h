@@ -270,7 +270,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         MasterConfig,
         Presets,
         Bank,
-        History,
+        History
     };
 }
 
