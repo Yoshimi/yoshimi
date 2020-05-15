@@ -1752,13 +1752,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
     }
 
     if (bitTest(context, LEVEL::AddMod))
-        return REPLY::available_msg; // volume and velocity handled locally
-    if (input.matchnMove(1, "volume"))
-        cmd = PART::control::volume;
-    else if(input.matchnMove(1, "pan"))
-        cmd = PART::control::panning;
-    else if (input.matchnMove(2, "velocity"))
-        cmd = PART::control::velocitySense;
+        return REPLY::available_msg;
 
     if (cmd != -1)
     {
@@ -3750,121 +3744,135 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         return waveform(input, controlType);
     }
 
-    int value = -1;
+
     int cmd = -1;
+    if (input.matchnMove(1, "volume"))
+        cmd = ADDVOICE::control::volume;
+    else if(input.matchnMove(1, "pan"))
+        cmd = ADDVOICE::control::panning;
+    else if (input.matchnMove(2, "velocity"))
+        cmd = ADDVOICE::control::velocitySense;
+    if (cmd != -1)
+    {
+        int tmp = string2int127(input);
+        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+            return REPLY::value_msg;
+        return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+    }
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
-    if (cmd == -1)
+    int value = -1;
+    cmd = -1;
+
+    if (input.matchnMove(1, "type"))
     {
-        if (input.matchnMove(1, "type"))
-        {
-            if (input.matchnMove(1, "oscillator"))
-                value = 0;
-            else if (input.matchnMove(1, "white"))
-                value = 1;
-            else if (input.matchnMove(1, "pink"))
-                value = 2;
-            else if (input.matchnMove(1, "spot"))
-                value = 3;
-            else
-                return REPLY::range_msg;
-            cmd = ADDVOICE::control::soundType;
-        }
-        else if (input.matchnMove(3, "oscillator"))
-        {
-            if (input.matchnMove(1, "internal"))
-                value = 0;
-            else
-            {
-                int tmp = input.peek() - char('0');
-                if (tmp > 0)
-                    value = tmp;
-            }
-            if (value == -1 || value > voiceNumber)
-                return REPLY::range_msg;
-            if (value == 0)
-                value = 0xff;
-            else
-                value -= 1;
-            cmd = ADDVOICE::control::voiceOscillatorSource;
-        }
-        else if (input.matchnMove(3, "source"))
-        {
-            if (input.matchnMove(1, "local"))
-                value = 0;
-            else
-            {
-                int tmp = input.peek() - char('0');
-                if (tmp > 0)
-                    value = tmp;
-            }
-            if (value == -1 || value > voiceNumber)
-                return REPLY::range_msg;
-            if (value == 0)
-                value = 0xff;
-            else
-                value -= 1;
-            cmd = ADDVOICE::control::externalOscillator;
-        }
-        else if (input.matchnMove(1, "phase"))
-            cmd = ADDVOICE::control::voiceOscillatorPhase;
-        else if (input.matchnMove(1, "minus"))
-        {
-            value = (input.toggle() == 1);
-            cmd = ADDVOICE::control::invertPhase;
-        }
-        else if (input.matchnMove(3, "delay"))
-            cmd = ADDVOICE::control::delay;
-        else if (input.matchnMove(1, "resonance"))
-        {
-            value = (input.toggle() == 1);
-            cmd = ADDVOICE::control::enableResonance;
-        }
-        else if (input.matchnMove(2, "bypass"))
-        {
-            value = (input.toggle() == 1);
-            cmd = ADDVOICE::control::bypassGlobalFilter;
-        }
-        else if (input.matchnMove(1, "unison"))
-        {
-            value = input.toggle();
-            if (value > -1)
-                cmd = ADDVOICE::control::enableUnison;
-            else
-            {
-                if (input.matchnMove(1, "size"))
-                    cmd = ADDVOICE::control::unisonSize;
-                else if(input.matchnMove(1, "frequency"))
-                    cmd = ADDVOICE::control::unisonFrequencySpread;
-                else if(input.matchnMove(1, "phase"))
-                    cmd = ADDVOICE::control::unisonPhaseRandomise;
-                else if(input.matchnMove(1, "width"))
-                    cmd = ADDVOICE::control::unisonStereoSpread;
-                else if(input.matchnMove(1, "vibrato"))
-                    cmd = ADDVOICE::control::unisonVibratoDepth;
-                else if(input.matchnMove(1, "rate"))
-                    cmd = ADDVOICE::control::unisonVibratoSpeed;
-                else if(input.matchnMove(1, "invert"))
-                {
-                    if (controlType == TOPLEVEL::type::Read)
-                        value = 1; // dummy value
-                    else
-                    {
-                        value = stringNumInList(string{input}.substr(0, 1), unisonPhase, 1);
-                        if (value == -1)
-                            return REPLY::range_msg;
-                    }
-                     cmd = ADDVOICE::control::unisonPhaseInvert;
-                }
-            }
-            if (cmd == -1)
-                return REPLY::op_msg;
-        }
+        if (input.matchnMove(1, "oscillator"))
+            value = 0;
+        else if (input.matchnMove(1, "white"))
+            value = 1;
+        else if (input.matchnMove(1, "pink"))
+            value = 2;
+        else if (input.matchnMove(1, "spot"))
+            value = 3;
         else
+            return REPLY::range_msg;
+        cmd = ADDVOICE::control::soundType;
+    }
+    else if (input.matchnMove(3, "oscillator"))
+    {
+        if (input.matchnMove(1, "internal"))
+            value = 0;
+        else
+        {
+            int tmp = input.peek() - char('0');
+            if (tmp > 0)
+                value = tmp;
+        }
+        if (value == -1 || value > voiceNumber)
+            return REPLY::range_msg;
+        if (value == 0)
+            value = 0xff;
+        else
+            value -= 1;
+        cmd = ADDVOICE::control::voiceOscillatorSource;
+    }
+    else if (input.matchnMove(3, "source"))
+    {
+        if (input.matchnMove(1, "local"))
+            value = 0;
+        else
+        {
+            int tmp = input.peek() - char('0');
+            if (tmp > 0)
+                value = tmp;
+        }
+        if (value == -1 || value > voiceNumber)
+            return REPLY::range_msg;
+        if (value == 0)
+            value = 0xff;
+        else
+            value -= 1;
+        cmd = ADDVOICE::control::externalOscillator;
+    }
+    else if (input.matchnMove(1, "phase"))
+        cmd = ADDVOICE::control::voiceOscillatorPhase;
+    else if (input.matchnMove(1, "minus"))
+    {
+        value = (input.toggle() == 1);
+        cmd = ADDVOICE::control::invertPhase;
+    }
+    else if (input.matchnMove(3, "delay"))
+        cmd = ADDVOICE::control::delay;
+    else if (input.matchnMove(1, "resonance"))
+    {
+        value = (input.toggle() == 1);
+        cmd = ADDVOICE::control::enableResonance;
+    }
+    else if (input.matchnMove(2, "bypass"))
+    {
+        value = (input.toggle() == 1);
+        cmd = ADDVOICE::control::bypassGlobalFilter;
+    }
+    else if (input.matchnMove(1, "unison"))
+    {
+        value = input.toggle();
+        if (value > -1)
+            cmd = ADDVOICE::control::enableUnison;
+        else
+        {
+            if (input.matchnMove(1, "size"))
+                cmd = ADDVOICE::control::unisonSize;
+            else if(input.matchnMove(1, "frequency"))
+                cmd = ADDVOICE::control::unisonFrequencySpread;
+            else if(input.matchnMove(1, "phase"))
+                cmd = ADDVOICE::control::unisonPhaseRandomise;
+            else if(input.matchnMove(1, "width"))
+                cmd = ADDVOICE::control::unisonStereoSpread;
+            else if(input.matchnMove(1, "vibrato"))
+                cmd = ADDVOICE::control::unisonVibratoDepth;
+            else if(input.matchnMove(1, "rate"))
+                cmd = ADDVOICE::control::unisonVibratoSpeed;
+            else if(input.matchnMove(1, "invert"))
+            {
+                if (controlType == TOPLEVEL::type::Read)
+                    value = 1; // dummy value
+                else
+                {
+                    value = stringNumInList(string{input}.substr(0, 1), unisonPhase, 1);
+                    if (value == -1)
+                        return REPLY::range_msg;
+                }
+                    cmd = ADDVOICE::control::unisonPhaseInvert;
+            }
+        }
+        if (cmd == -1)
             return REPLY::op_msg;
     }
+    else
+        return REPLY::op_msg;
 
     if (value == -1)
         value = string2int(input);
@@ -3906,11 +3914,26 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
+    int cmd = -1;
+    if (input.matchnMove(1, "volume"))
+        cmd = ADDSYNTH::control::volume;
+    else if(input.matchnMove(1, "pan"))
+        cmd = ADDSYNTH::control::panning;
+    else if (input.matchnMove(2, "velocity"))
+        cmd = ADDSYNTH::control::velocitySense;
+    if (cmd != -1)
+    {
+        int tmp = string2int127(input);
+        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+            return REPLY::value_msg;
+        return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
+    }
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
-    int cmd = -1;
+    cmd = -1;
     int value;
     if (input.matchnMove(2, "bandwidth"))
     {
@@ -3953,11 +3976,27 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
 
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
+
+    int cmd = -1;
+    if (input.matchnMove(1, "volume"))
+        cmd = SUBSYNTH::control::volume;
+    else if(input.matchnMove(1, "pan"))
+        cmd = SUBSYNTH::control::panning;
+    else if (input.matchnMove(2, "velocity"))
+        cmd = SUBSYNTH::control::velocitySense;
+    if (cmd != -1)
+    {
+        int tmp = string2int127(input);
+        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+            return REPLY::value_msg;
+        return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+    }
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
-    int cmd = -1;
+    cmd = -1;
     if (input.matchnMove(2, "harmonic"))
     {
         int value = -1;
@@ -4093,6 +4132,22 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     }
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
+
+    int cmd = -1;
+    if (input.matchnMove(1, "volume"))
+        cmd = PADSYNTH::control::volume;
+    else if(input.matchnMove(1, "pan"))
+        cmd = PADSYNTH::control::panning;
+    else if (input.matchnMove(2, "velocity"))
+        cmd = PADSYNTH::control::velocitySense;
+    if (cmd != -1)
+    {
+        int tmp = string2int127(input);
+        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+            return REPLY::value_msg;
+        return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+    }
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
@@ -4107,7 +4162,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     }
 
-    int cmd = -1;
+    cmd = -1;
     float value = -1;
     if (input.matchnMove(2, "profile"))
     {
@@ -4909,15 +4964,24 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             value = MIN_KEY_SHIFT;
         else if(value > MAX_KEY_SHIFT)
             value = MAX_KEY_SHIFT;
-        return sendNormal( synth, TOPLEVEL::action::lowPrio, value, controlType, PART::control::keyShift, npart);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, value, controlType, PART::control::keyShift, npart);
     }
 
-    if (input.matchnMove(2, "LEvel"))
+    int cmd = -1;
+    if (input.matchnMove(1, "volume"))
+        cmd = PART::control::volume;
+    else if(input.matchnMove(1, "pan"))
+        cmd = PART::control::panning;
+    else if (input.matchnMove(2, "velocity"))
+        cmd = PART::control::velocitySense;
+    else if (input.matchnMove(2, "LEvel"))
+        cmd = PART::control::velocityOffset;
+    if (cmd != -1)
     {
-        tmp = string2int127(input);
-        if(controlType == TOPLEVEL::type::Write && tmp < 1)
+        int tmp = string2int127(input);
+        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
             return REPLY::value_msg;
-        return sendNormal( synth, 0, tmp, controlType, PART::control::velocityOffset, npart);
+        return sendNormal( synth, 0, tmp, controlType, cmd, npart);
     }
 
     if (input.matchnMove(1, "channel"))

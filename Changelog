@@ -1,12 +1,18 @@
 yoshimi 1.7.1 M
 
+2020-5-15 Will
+* Separated out CLI engine level volume, pannning, velocity.
+  This results in doplication but les complexity, and
+  less chance of control additions causing problem,
+
 2020-5-14 Will
 * BugFix: Reverb type to bandwidth not resetting BW control.
 * Corrected some controls still using direct numbers.
 * Note On/Off fully respects multiple same note in Poly mode.
 * Added 'Cracked Chimes' to Companion bank.
-* Moved '.config/yoshimi/yoshimi.history' to .share/yoshimi/recent'
-  This is for XDG compliance. It's not a config file.
+* Moved '.config/yoshimi/yoshimi.history' to:
+  '.local/share/yoshimi/recent'
+  This is for XDG compliance, as it is not a config file.
 
 2020-5-13 Will
 * Reverted PART_POLIPHONY and POLIPHONY to single limit.
