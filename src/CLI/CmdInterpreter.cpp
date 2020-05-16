@@ -294,7 +294,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
         if (inKitEditor)
         {
             result += std::to_string(kitNumber + 1);
-            if (readControl(synth, 0, PART::control::enable, npart, kitNumber, UNUSED, insert))
+            if (readControl(synth, 0, PART::control::enableKitLine, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup))
                 result += "+";
         }
     }
@@ -314,7 +314,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += ", Add";
             else
                 result += ", A";
-            if (readControl(synth, 0, ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
+            if (readControl(synth, 0, PART::control::enableAdd, npart, kit, PART::engine::addSynth, insert))
                 result += "+";
             break;
         case PART::engine::subSynth:
@@ -322,7 +322,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += ", Sub";
             else
                 result += ", S";
-            if (readControl(synth, 0, SUBSYNTH::control::enable, npart, kit, PART::engine::subSynth, insert))
+            if (readControl(synth, 0, PART::control::enableSub, npart, kit, PART::engine::subSynth, insert))
                 result += "+";
             break;
         case PART::engine::padSynth:
@@ -330,14 +330,14 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += ", Pad";
             else
                 result += ", P";
-            if (readControl(synth, 0, PADSYNTH::control::enable, npart, kit, PART::engine::padSynth, insert))
+            if (readControl(synth, 0, PART::control::enablePad, npart, kit, PART::engine::padSynth, insert))
                 result += "+";
             break;
         case PART::engine::addVoice1: // intentional drop through
         case PART::engine::addMod1:
         {
             result += ", A";
-            if (readControl(synth, 0, ADDSYNTH::control::enable, npart, kit, PART::engine::addSynth, insert))
+            if (readControl(synth, 0, PART::control::enableAdd, npart, kit, PART::engine::addSynth, insert))
                 result += "+";
 
             if (bitFindHigh(context) == LEVEL::AddVoice)
@@ -2592,7 +2592,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                     string found = "";
                     for(int voice = 0; voice < NUM_VOICES; ++voice)
                     {
-                        if (readControl(synth, 0, ADDSYNTH::control::enable, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
+                        if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
                             found += (" " + std::to_string(voice + 1));
                     }
                     if (found > "")
@@ -2651,7 +2651,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                             string found = "";
                             for(int voice = 0; voice < NUM_VOICES; ++voice)
                             {
-                                if (readControl(synth, 0, ADDSYNTH::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
+                                if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
                                 found += (" " + std::to_string(voice + 1));
                             }
                             if (found > "")
@@ -3893,10 +3893,8 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     }
     int enable = (input.toggle());
     if (enable > -1)
-    {
-        sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::addSynth, insert);
-        return REPLY::done_msg;
-    }
+        return sendNormal(synth, 0, enable, controlType, PART::control::enableAdd, npart, kit, UNUSED, insert);
+
     if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
         return REPLY::inactive_msg;
 
@@ -3968,8 +3966,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     int enable = (input.toggle());
     if (enable > -1)
     {
-        sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::subSynth, insert);
-        return REPLY::done_msg;
+        sendNormal( synth, 0, enable, controlType, PART::control::enableSub, npart, kit, PART::engine::subSynth, insert);
     }
     if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
         return REPLY::inactive_msg;
@@ -4114,8 +4111,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     int enable = (input.toggle());
     if (enable > -1)
     {
-        sendNormal( synth, 0, enable, controlType, PART::control::enable, npart, kit, PART::engine::padSynth, insert);
-        return REPLY::done_msg;
+        sendNormal( synth, 0, enable, controlType, PART::control::enablePad, npart, kit, PART::engine::padSynth, insert);
     }
     if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
         return REPLY::inactive_msg;
@@ -4752,14 +4748,26 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
     }
 
-    if (!inKitEditor)
+    int enable = input.toggle();
+    if (enable != -1)
     {
-        int enable = input.toggle();
-        if (enable != -1)
+        if (!inKitEditor)
         {
             int result = sendNormal( synth, 0, enable, controlType, PART::control::enable, npart);
             if (input.lineEnd(controlType))
                 return result;
+        }
+        else if (readControl(synth, 0, PART::control::enable, npart))
+        {
+            if (enable >= 0)
+            {
+                if (kitNumber == 0)
+                {
+                    synth->getRuntime().Log("Kit item 1 always on.");
+                    return REPLY::done_msg;
+                }
+                return sendNormal(synth, 0, enable, controlType, PART::control::enableKitLine, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
+            }
         }
     }
 
@@ -4876,21 +4884,6 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         kitMode = tmp;
         inKitEditor = (kitMode != PART::kitType::Off);
         return sendNormal( synth, 0, kitMode, controlType, PART::control::kitMode, npart);
-    }
-    if (inKitEditor)
-    {
-        int value = input.toggle();
-        if (value >= 0)
-        {
-            if (kitNumber == 0 && bitFindHigh(context) == LEVEL::Part)
-            {
-                synth->getRuntime().Log("Kit item 1 always on.");
-                return REPLY::done_msg;
-            }
-            sendNormal( synth, 0, value, controlType, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
-        }
-        if (!readControl(synth, 0, PART::control::enable, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup))
-            return REPLY::inactive_msg;
     }
 
     if (bitTest(context, LEVEL::AllFX))

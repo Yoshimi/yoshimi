@@ -1731,6 +1731,21 @@ float Part::getLimits(CommandBlock *getData)
 
     switch (control)
     {
+        case PART::control::enable:
+        case PART::control::enableAdd:
+            if (npart == 0)
+                def = 1;
+            else
+                def = 0;
+            max = 1;
+            break;
+        case PART::control::enableSub:
+        case PART::control::enablePad:
+        case PART::control::enableKitLine:
+            def = 0;
+            max = 1;
+            break;
+
         case PART::control::volume:
             type &= ~TOPLEVEL::type::Integer;
             type |= learnable;
@@ -1768,14 +1783,6 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::portamento:
             type |= learnable;
             def = 0;
-            max = 1;
-            break;
-
-        case PART::control::enable:
-            if (npart == 0)
-                def = 1;
-            else
-                def = 0;
             max = 1;
             break;
 

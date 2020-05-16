@@ -564,17 +564,21 @@ namespace PART // usage PART::control::volume
 {
     enum control : unsigned char {
         enable = 0,
+        enableAdd,
+        enableSub,
+        enablePad,
+        enableKitLine,
         volume,
         velocitySense,
         panning,
         velocityOffset,
         midiChannel,
         keyMode,
-        portamento,
-        kitItemMute,
         channelATset,
         keyATset,
-        minNote = 16,
+        portamento,
+        kitItemMute,
+        minNote,
         maxNote,
         minToLastKey,
         maxToLastKey,
@@ -692,8 +696,7 @@ namespace PART // usage PART::control::volume
 namespace ADDSYNTH // usage ADDSYNTH::control::volume
 {
     enum control : unsigned char {
-        enable = 0,
-        volume,
+        volume = 0,
         velocitySense,
         panning,
 
@@ -780,8 +783,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
 namespace SUBSYNTH // usage SUBSYNTH::control::volume
 {
     enum control : unsigned char {
-        enable = 0,
-        volume,
+        volume = 0,
         velocitySense,
         panning,
 
@@ -817,8 +819,7 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
 namespace PADSYNTH // usage PADSYNTH::control::volume
 {
     enum control : unsigned char {
-        enable = 0,
-        volume,
+        volume = 0,
         velocitySense,
         panning,
 

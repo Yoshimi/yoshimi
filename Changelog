@@ -1,8 +1,14 @@
 yoshimi 1.7.1 M
 
 2020-5-15 Will
+* Separated out part, engine, kit enable controls.
+  This actually slightly reduces the code, and reduces
+  complexity significantly.
+  There may be some GUI anomalys when CLI controlled.
+
+2020-5-15 Will
 * Separated out CLI engine level volume, pannning, velocity.
-  This results in doplication but les complexity, and
+  This results in doplication but less complexity, and
   less chance of control additions causing problem,
 
 2020-5-14 Will

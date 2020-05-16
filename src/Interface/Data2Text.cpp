@@ -1343,6 +1343,27 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
     string contstr = "";
     switch (control)
     {
+        case PART::control::enable:
+            contstr += " Enable";
+            yesno = true;
+            break;
+        case PART::control::enableAdd:
+            contstr += "AddSynth Enable";
+            yesno = true;
+            break;
+        case PART::control::enableSub:
+            contstr += "SubSynth Enable";
+            yesno = true;
+            break;
+        case PART::control::enablePad:
+            contstr += "PadSynth Enable";
+            yesno = true;
+            break;
+        case PART::control::enableKitLine:
+            contstr += " Enable";
+            yesno = true;
+            break;
+
         case PART::control::volume:
             contstr = "Volume";
             break;
@@ -1396,25 +1417,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Portamento Enable";
             yesno = true;
             break;
-        case PART::control::enable:
-            if (!kitType)
-            {
-                switch(engine)
-                {
-                    case PART::engine::addSynth:
-                        contstr += "AddSynth";
-                        break;
-                    case PART::engine::subSynth:
-                        contstr += "SubSynth";
-                        break;
-                    case PART::engine::padSynth:
-                        contstr += "PadSynth";
-                        break;
-                }
-            }
-            contstr += " Enable";
-            yesno = true;
-            break;
+
         case PART::control::kitItemMute:
             if (kitType)
             {
@@ -1440,8 +1443,11 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
 
         case PART::control::kitEffectNum:
-            if (kitType)
-                contstr = "Effect Number";
+            if (value_int == 0)
+                contstr = "Effect Off";
+            else
+                contstr = "Effect Number " + to_string(value_int);
+            showValue = false;
             break;
 
         case PART::control::maxNotes:
@@ -1500,7 +1506,8 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             break;
 
         case PART::control::effectNumber:
-            contstr = "Effect Number";
+            contstr = "Effect Number " + to_string(value_int);
+            showValue = false;
             break;
         case PART::control::effectType:
             contstr = "Effect " + to_string(effNum + 1) + " Type";

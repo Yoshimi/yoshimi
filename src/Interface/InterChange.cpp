@@ -3114,8 +3114,54 @@ void InterChange::commandPart(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
     unsigned char effNum = part->Peffnum;
+    if (!kitType)
+        kititem = 0;
+    //std::cout << "here ctrl " << int(control) << std::endl;
+    //std::cout << "kititem " << int(kititem) << std::endl;
     switch (control)
     {
+        case PART::control::enable:
+            if (write)
+            {
+                if (value_bool && synth->getRuntime().currentPart != npart) // make it a part change
+                {
+                    synth->partonoffWrite(npart, 1);
+                    synth->getRuntime().currentPart = npart;
+                    getData->data.value.F = npart;
+                    getData->data.control = MAIN::control::partNumber;
+                    getData->data.part = TOPLEVEL::section::main;
+                }
+                else
+                    synth->partonoffWrite(npart, value_int);
+            }
+            else
+                value = synth->partonoffRead(npart);
+            break;
+        case PART::control::enableAdd:
+            if (write)
+                part->kit[kititem].Padenabled = value_bool;
+            else
+                value = part->kit[kititem].Padenabled;
+            break;
+        case PART::control::enableSub:
+            if (write)
+                part->kit[kititem].Psubenabled = value_bool;
+            else
+                value = part->kit[kititem].Psubenabled;
+            break;
+        case PART::control::enablePad:
+            if (write)
+                part->kit[kititem].Ppadenabled = value_bool;
+            else
+                value = part->kit[kititem].Ppadenabled;
+            break;
+        case PART::control::enableKitLine:
+            if (write)
+                part->setkititemstatus(kititem, value_bool);
+            else
+                value = part->kit[kititem].Penabled;
+            break;
+
         case PART::control::volume:
             if (write)
                 part->setVolume(value);
@@ -3189,79 +3235,6 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->portamento.portamento = value_bool;
             else
                 value = part->ctl->portamento.portamento;
-            break;
-        case PART::control::enable:
-            if (kitType)
-            {
-                switch(engine)
-                {
-                    case PART::engine::addSynth:
-                        if (write)
-                            part->kit[kititem].Padenabled = value_bool;
-                        else
-                            value = part->kit[kititem].Padenabled;
-                        break;
-                    case PART::engine::subSynth:
-                        if (write)
-                            part->kit[kititem].Psubenabled = value_bool;
-                        else
-                            value = part->kit[kititem].Psubenabled;
-                        break;
-                    case PART::engine::padSynth:
-                        if (write)
-                            part->kit[kititem].Ppadenabled = value_bool;
-                        else
-                            value = part->kit[kititem].Ppadenabled;
-                        break;
-                    default:
-                        if (write)
-                            part->setkititemstatus(kititem, value_bool);
-                        else
-                            value = part->kit[kititem].Penabled;
-                        break;
-                }
-            }
-            else
-            {
-                switch(engine)
-                {
-                    case PART::engine::addSynth:
-                        if (write)
-                            part->kit[0].Padenabled = value_bool;
-                        else
-                            value = part->kit[0].Padenabled;
-                        break;
-                    case PART::engine::subSynth:
-                        if (write)
-                            part->kit[0].Psubenabled = value_bool;
-                        else
-                            value = part->kit[0].Psubenabled;
-                        break;
-                    case PART::engine::padSynth:
-                        if (write)
-                            part->kit[0].Ppadenabled = value_bool;
-                        else
-                            value = part->kit[0].Ppadenabled;
-                        break;
-                    case UNUSED:
-                        if (write)
-                        {
-                            if (value_bool && synth->getRuntime().currentPart != npart) // make it a part change
-                            {
-                                synth->partonoffWrite(npart, 1);
-                                synth->getRuntime().currentPart = npart;
-                                getData->data.value.F = npart;
-                                getData->data.control = MAIN::control::partNumber;
-                                getData->data.part = TOPLEVEL::section::main;
-                            }
-                            else
-                                synth->partonoffWrite(npart, value_int);
-                        }
-                        else
-                            value = synth->partonoffRead(npart);
-                        break;
-                }
-            }
             break;
         case PART::control::kitItemMute:
             if (kitType)

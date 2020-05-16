@@ -430,10 +430,6 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
             def = 64;
             break;
 
-        case SUBSYNTH::control::enable:
-            max = 1;
-            break;
-
         case SUBSYNTH::control::bandwidth:
             def = 40;
             break;

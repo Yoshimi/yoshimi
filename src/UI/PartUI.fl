@@ -246,7 +246,7 @@ class PartKitItem {: {public Fl_Group}
                   synth->getGuiMaster()->partui->adeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, n, 0, TOPLEVEL::insert::kitGroup);}
+          send_data(0, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
@@ -275,7 +275,7 @@ class PartKitItem {: {public Fl_Group}
                   synth->getGuiMaster()->partui->subeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, n, 1, TOPLEVEL::insert::kitGroup);}
+          send_data(0, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
@@ -304,7 +304,7 @@ class PartKitItem {: {public Fl_Group}
                   synth->getGuiMaster()->partui->padeditbutton->deactivate();
           }
           synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, n, 2, TOPLEVEL::insert::kitGroup);}
+          send_data(0, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
@@ -333,7 +333,7 @@ class PartKitItem {: {public Fl_Group}
         }
         else
             o->value(1);
-        send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
+        send_data(0, PART::control::enableKitLine, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
         xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",(n&15)+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
@@ -1511,7 +1511,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             }
             checkEngines();
 
-            send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, UNUSED, 0);}
+            send_data(0, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1553,7 +1553,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             }
             checkEngines();
 
-            send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, UNUSED, 1);}
+            send_data(0, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
@@ -1595,7 +1595,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             }
             checkEngines();
 
-            send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, UNUSED, 2);}
+            send_data(0, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
@@ -1834,6 +1834,16 @@ class PartUI {: {public Fl_Group, PartUI_}
         int displaypart = newpart % NUM_MIDI_CHANNELS;
         switch (control)
         {
+            case PART::control::enable:
+                if (engine == 255)
+                {
+                    synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                    if (valBool)
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
+                    else
+                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
+                }
+                break;
             case PART::control::volume:
                 synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
                 break;
@@ -1847,16 +1857,6 @@ class PartUI {: {public Fl_Group, PartUI_}
                 else
                     synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
                 break;
-            case PART::control::enable:
-                if (engine == 255)
-                {
-                    synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
-                    if (valBool)
-                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
-                    else
-                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
-                }
-                break;
             case PART::control::audioDestination:
                 int send = valInt - 1;
                 if (send < 0 or send > 2)
@@ -1869,8 +1869,76 @@ class PartUI {: {public Fl_Group, PartUI_}
         return;
     bool sameEff = (engine == ninseff);
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
+    if (!kitType)
+        kititem = 0;
     switch(control)
     {
+        case PART::control::enable:
+            partGroupEnable->value(valBool);
+            if (valBool)
+            {
+                partgroupui->activate();
+                toSysEfx->activate();
+            }
+            else
+            {
+                partgroupui->deactivate();
+                toSysEfx->deactivate();
+            }
+            break;
+        case PART::control::enableAdd:
+            partkititem[kititem]->adcheck->value(valBool);
+            if (valBool)
+            {
+                partkititem[kititem]->adeditbutton->activate();
+                if (kititem == 0)
+                    instrumentaddbox->color(ADD_COLOUR);
+            }
+            else
+            {
+                partkititem[kititem]->adeditbutton->deactivate();
+                if (kititem == 0)
+                    instrumentaddbox->color(BASE_COLOUR);
+            }
+            break;
+        case PART::control::enableSub:
+            partkititem[kititem]->subcheck->value(valBool);
+            if (valBool)
+            {
+                partkititem[kititem]->subeditbutton->activate();
+                if (kititem == 0)
+                    instrumentsubbox->color(SUB_COLOUR);
+            }
+            else
+            {
+                partkititem[kititem]->subeditbutton->deactivate();
+                if (kititem == 0)
+                    instrumentsubbox->color(BASE_COLOUR);
+            }
+            break;
+        case PART::control::enablePad:
+            partkititem[kititem]->padcheck->value(valBool);
+            if (valBool)
+            {
+                partkititem[kititem]->padeditbutton->activate();
+                if (kititem ==0)
+                    instrumentpadbox->color(PAD_COLOUR);
+            }
+            else
+            {
+                partkititem[kititem]->padeditbutton->deactivate();
+                if (kititem ==0)
+                    instrumentpadbox->color(BASE_COLOUR);
+            }
+            break;
+        case PART::control::enableKitLine:
+            partkititem[kititem]->enabledcheck->value(valBool);
+            if (valBool)
+                partkititem[kititem]->partkititemgroup->activate();
+            else
+                partkititem[kititem]->clearLine();
+            break;
+
         case PART::control::volume:
             partvol->value(value);
             break;
@@ -1930,185 +1998,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             enportamento->value(valBool);
             break;
 
-        case PART::control::enable:
-        {
-            if (kitType)
-            {
-                switch(engine)
-                {
-                    case 0:
-                        partkititem[kititem]->adcheck->value(valBool);
-                        if (valBool)
-                        {
-                            partkititem[kititem]->adeditbutton->activate();
-                            instrumentaddbox->color(ADD_COLOUR);
-                        }
-                        else
-                        {
-                            partkititem[kititem]->adeditbutton->deactivate();
-                            instrumentaddbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    case 1:
-                        partkititem[kititem]->subcheck->value(valBool);
-                        if (valBool)
-                        {
-                            partkititem[kititem]->subeditbutton->activate();
-                            instrumentsubbox->color(SUB_COLOUR);
-                        }
-                        else
-                        {
-                            partkititem[kititem]->subeditbutton->deactivate();
-                            instrumentsubbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    case 2:
-                        partkititem[kititem]->padcheck->value(valBool);
-                        if (valBool)
-                        {
-                            partkititem[kititem]->padeditbutton->activate();
-                            instrumentpadbox->color(PAD_COLOUR);
-                        }
-                        else
-                        {
-                            partkititem[kititem]->padeditbutton->deactivate();
-                            instrumentpadbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    default:
-                        partkititem[kititem]->enabledcheck->value(valBool);
-                        if (valBool)
-                            partkititem[kititem]->partkititemgroup->activate();
-                        else
-                            partkititem[kititem]->clearLine();
-                        break;
-                }
-                if (kititem == 0)
-                {
-                    switch(engine)
-                    {
-                        case 0:
-                            partkititem[kititem]->adcheck->value(valBool);
-                            adsynenabledcheck->value(valBool);
-                            if (valBool)
-                            {
-                                adeditbutton->activate();
-                                addbox->color(ADD_COLOUR);
-                                instrumentaddbox->color(ADD_COLOUR);
-                            }
-                            else
-                            {
-                                adeditbutton->deactivate();
-                                addbox->color(BASE_COLOUR);
-                                instrumentaddbox->color(BASE_COLOUR);
-                            }
-                            break;
-                        case 1:
-                            partkititem[kititem]->subcheck->value(valBool);
-                            subsynenabledcheck->value(valBool);
-                            if (valBool)
-                            {
-                                subeditbutton->activate();
-                                subbox->color(SUB_COLOUR);
-                                instrumentsubbox->color(SUB_COLOUR);
-                            }
-                            else
-                            {
-                                subeditbutton->deactivate();
-                                subbox->color(BASE_COLOUR);
-                                instrumentsubbox->color(BASE_COLOUR);
-                            }
-                            break;
-                        case 2:
-                            partkititem[kititem]->padcheck->value(valBool);
-                            padsynenabledcheck->value(valBool);
-                            if (valBool)
-                            {
-                                padeditbutton->activate();
-                                padbox->color(PAD_COLOUR);
-                                instrumentpadbox->color(PAD_COLOUR);
-                            }
-                            else
-                            {
-                                padeditbutton->deactivate();
-                                padbox->color(BASE_COLOUR);
-                                instrumentpadbox->color(BASE_COLOUR);
-                            }
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                switch(engine)
-                {
-                    case 0:
-                        partkititem[0]->adcheck->value(valBool);
-                        adsynenabledcheck->value(valBool);
-                        if (valBool)
-                        {
-                            adeditbutton->activate();
-                            addbox->color(ADD_COLOUR);
-                            instrumentaddbox->color(ADD_COLOUR);
-                        }
-                        else
-                        {
-                            adeditbutton->deactivate();
-                            addbox->color(BASE_COLOUR);
-                            instrumentaddbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    case 1:
-                        partkititem[0]->subcheck->value(valBool);
-                        subsynenabledcheck->value(valBool);
-                        if (valBool)
-                        {
-                            subeditbutton->activate();
-                            subbox->color(SUB_COLOUR);
-                            instrumentsubbox->color(SUB_COLOUR);
-                        }
-                        else
-                        {
-                            subeditbutton->deactivate();
-                            subbox->color(BASE_COLOUR);
-                            instrumentsubbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    case 2:
-                        partkititem[0]->padcheck->value(valBool);
-                        padsynenabledcheck->value(valBool);
-                        if (valBool)
-                        {
-                            padeditbutton->activate();
-                            padbox->color(PAD_COLOUR);
-                            instrumentpadbox->color(PAD_COLOUR);
-                        }
-                        else
-                        {
-                            padeditbutton->deactivate();
-                            padbox->color(BASE_COLOUR);
-                            instrumentpadbox->color(BASE_COLOUR);
-                        }
-                        break;
-                    case 255:
-                        partGroupEnable->value(valBool);
-                        if (valBool)
-                        {
-                            partgroupui->activate();
-                            toSysEfx->activate();
-                        }
-                        else
-                        {
-                            partgroupui->deactivate();
-                            toSysEfx->deactivate();
-                        }
-                        break;
-                }
-            }
-            instrumentlabel->copy_label(part->Pname.c_str());
-            synth->getGuiMaster()->updatepanel();
-            break;
-        }
         case PART::control::kitItemMute:
             partkititem[kititem]->mutedcheck->value(valBool);
             break;

@@ -894,12 +894,6 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
                 def = 64;
                 break;
 
-            case ADDSYNTH::control::enable:
-                type |= learnable;
-                def = 1;
-                max = 1;
-                break;
-
             case ADDSYNTH::control::detuneFrequency:
                 type |= learnable;
                 min = -8192;
