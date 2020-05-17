@@ -282,7 +282,7 @@ static std::string partlist [] = {
     "   EFfect <n>",       "select effect for this item (0-none, 1-3)",
     "   NAme <s>",         "set the name for this item",
     "   DRum <s>",         "set kit to drum mode (OFF, {other})",
-    "   DIsable",          "disable kit mode",
+    "   NORmal",           "disable kit mode",
     "ADDsynth ...",        "enter AddSynth context",
     "SUBsynth ...",        "enter SubSynth context",
     "PADsynth ...",        "enter PadSynth context",

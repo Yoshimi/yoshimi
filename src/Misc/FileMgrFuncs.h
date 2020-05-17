@@ -55,7 +55,6 @@ const string scalaKeymap =   ".kbm";
 const string vector =        ".xvy";
 const string mlearn =        ".xly";
 const string MSwave=         ".wav";
-const string window =        ".windows";
 
 }//(End)namespace EXTEN
 

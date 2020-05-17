@@ -3116,8 +3116,7 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char effNum = part->Peffnum;
     if (!kitType)
         kititem = 0;
-    //std::cout << "here ctrl " << int(control) << std::endl;
-    //std::cout << "kititem " << int(kititem) << std::endl;
+
     switch (control)
     {
         case PART::control::enable:

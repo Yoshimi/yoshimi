@@ -1569,7 +1569,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
     // TODO integrate modulator controls properly
     int cmd = -1;
     int engine = contextToEngines(context);
-    int insert = UNUSED;
+    //int insert = UNUSED;
     int kit = UNUSED;
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber; // voice numbers are 0 to 7
@@ -1767,58 +1767,6 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         return sendNormal( synth, 0, string2float(input), controlType, cmd, npart, kit, engine);
     }
 
-    if (cmd == -1 && bitFindHigh(context) == LEVEL::Part)
-    { // the following can only be done at part/kit level
-        int value = 0;
-        if (input.matchnMove(2, "min"))
-        {
-            cmd = PART::control::minNote;
-            if(controlType == TOPLEVEL::type::Write)
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                if (input.matchnMove(1, "last"))
-                {
-                    cmd = PART::control::minToLastKey;
-                }
-                else
-                {
-                    value = string2int(input);
-                    if (value > synth->part[npart]->Pmaxkey)
-                        return REPLY::high_msg;
-                }
-            }
-
-        }
-        else if (input.matchnMove(2, "max"))
-        {
-            cmd = PART::control::maxNote;
-            if(controlType == TOPLEVEL::type::Write)
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                if (input.matchnMove(1, "last"))
-                {
-                    cmd = PART::control::maxToLastKey;
-                }
-                else
-                {
-                    value = string2int(input);
-                    if (value < synth->part[npart]->Pminkey)
-                        return REPLY::low_msg;
-                }
-            }
-
-        }
-        if (cmd > -1)
-        {
-            if (inKitEditor)
-                insert = TOPLEVEL::insert::kitGroup;
-            else
-                kit = UNUSED;
-            return sendNormal( synth, 0, value, controlType, cmd, npart, kit, UNUSED, insert);
-        }
-    }
     //std::cout << ">>  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
     return REPLY::todo_msg;
 }
@@ -4861,7 +4809,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         return REPLY::inactive_msg;
 
     tmp = -1;
-    if (input.matchnMove(2, "disable"))
+    if (input.matchnMove(3, "normal"))
         tmp = PART::kitType::Off;
     else if(input.matchnMove(2, "multi"))
         tmp = PART::kitType::Multi;
@@ -4944,9 +4892,54 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
     }
 
-    tmp = partCommonControls(input, controlType);
-    if (tmp != REPLY::todo_msg)
-        return tmp;
+    int value = 0;
+    int cmd = -1;
+    if (input.matchnMove(2, "min"))
+    {
+        cmd = PART::control::minNote;
+        if(controlType == TOPLEVEL::type::Write)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (input.matchnMove(1, "last"))
+                cmd = PART::control::minToLastKey;
+            else
+            {
+                value = string2int(input);
+                if (value > synth->part[npart]->Pmaxkey)
+                    return REPLY::high_msg;
+            }
+        }
+
+    }
+    else if (input.matchnMove(2, "max"))
+    {
+        cmd = PART::control::maxNote;
+        if(controlType == TOPLEVEL::type::Write)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (input.matchnMove(1, "last"))
+                cmd = PART::control::maxToLastKey;
+            else
+            {
+                value = string2int(input);
+                if (value < synth->part[npart]->Pminkey)
+                    return REPLY::low_msg;
+            }
+        }
+
+    }
+    if (cmd > -1)
+    {
+        int insert = UNUSED;
+        int kit = kitNumber;
+        if (inKitEditor)
+            insert = TOPLEVEL::insert::kitGroup;
+        else
+            kit = UNUSED;
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kit, UNUSED, insert);
+    }
 
     if (input.matchnMove(2, "shift"))
     {
@@ -4960,7 +4953,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         return sendNormal(synth, TOPLEVEL::action::lowPrio, value, controlType, PART::control::keyShift, npart);
     }
 
-    int cmd = -1;
+    cmd = -1;
     if (input.matchnMove(1, "volume"))
         cmd = PART::control::volume;
     else if(input.matchnMove(1, "pan"))

@@ -1,6 +1,12 @@
 yoshimi 1.7.1 M
 
-2020-5-15 Will
+2020-5-16 Will
+* Moved CLI part specific controls from Common to Part.
+  Don't know why they were in Common anyway.
+* Changed CLI kit mode Disable to Normal.
+  Clearer, and less chance of confusion.
+
+2020-5-16 Will
 * Separated out part, engine, kit enable controls.
   This actually slightly reduces the code, and reduces
   complexity significantly.
