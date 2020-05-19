@@ -1732,7 +1732,14 @@ float Part::getLimits(CommandBlock *getData)
     switch (control)
     {
         case PART::control::enable:
+            if (npart == 0)
+                def = 1;
+            else
+                def = 0;
+            max = 1;
+            break;
         case PART::control::enableAdd:
+            type |= learnable;
             if (npart == 0)
                 def = 1;
             else
@@ -1741,6 +1748,10 @@ float Part::getLimits(CommandBlock *getData)
             break;
         case PART::control::enableSub:
         case PART::control::enablePad:
+            type |= learnable;
+            def = 0;
+            max = 1;
+            break;
         case PART::control::enableKitLine:
             def = 0;
             max = 1;

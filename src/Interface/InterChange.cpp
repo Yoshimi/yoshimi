@@ -1749,12 +1749,16 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char miscmsg = getData->data.miscmsg;
 
     bool isGui = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     char button = type & 3;
-
-    //std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
-    //std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
+    /*if (control > 0 && getData->data.part < 64)
+    {
+        std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
+        std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
+    }*/
 
     if (!isGui && button == 1)
     {
@@ -1810,7 +1814,8 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 
     Part *part = synth->part[npart];
-
+//std::cout << "type " << int(getData->data.type & 64) << std::endl;
+//std::cout << "ctrl " << int(getData->data.control) << std::endl;
     if (part->busy && engine == PART::engine::padSynth)
     {
         getData->data.type &= ~TOPLEVEL::type::Write; // turn it into a read
@@ -1826,16 +1831,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
     if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != 8 && part->kit[kititem].Penabled == false)
-    {
         return false; // attempt to access not enabled kititem
-    }
 
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
         if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
-        {
             return false;
-        }
+
         commandPart(getData);
         return true;
     }

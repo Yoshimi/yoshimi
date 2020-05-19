@@ -1,6 +1,10 @@
 yoshimi 1.7.1 M
 
-2020-5-16 Will
+2020-5-19 Will
+* Fixed regression CLI not enabling PadSyth.
+* Separated out CLI engine detune controls.
+
+2020-5-17 Will
 * Moved CLI part specific controls from Common to Part.
   Don't know why they were in Common anyway.
 * Changed CLI kit mode Disable to Normal.

@@ -1579,78 +1579,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
 
     if (bitFindHigh(context) != LEVEL::Part)
     {
-        // these are all common to Add, Sub, Pad, Voice
         int value = 0;
-        if (input.matchnMove(3, "detune"))
-        {
-            if (input.matchnMove(1, "fine"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                if (engine >= PART::engine::addMod1)
-                    cmd = ADDVOICE::control::modulatorDetuneFrequency;
-                else
-                    cmd = ADDSYNTH::control::detuneFrequency;
-            }
-            else if (input.matchnMove(1, "coarse"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                if (engine >= PART::engine::addMod1)
-                    cmd = ADDVOICE::control::modulatorCoarseDetune;
-                else
-                    cmd = ADDSYNTH::control::coarseDetune;
-            }
-            else if (input.matchnMove(1, "type"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                if (controlType == TOPLEVEL::type::Read)
-                    value = 2; // dummy value
-                else
-                {
-                    string name = string{input}.substr(0,3);
-                    value = stringNumInList(name, detuneType, 3);
-                }
-                if (value == -1)
-                    return REPLY::range_msg;
-                if (engine >= PART::engine::addMod1)
-                    cmd = ADDVOICE::control::modulatorDetuneType;
-                else
-                    cmd = ADDSYNTH::control::detuneType;
-            }
-        }
-        else if (input.matchnMove(3, "octave"))
-        {
-            if (input.lineEnd(controlType))
-                return REPLY::value_msg;
-            value = string2int(input);
-            if (engine >= PART::engine::addMod1)
-                cmd = ADDVOICE::control::modulatorOctave;
-            else
-                cmd = ADDSYNTH::control::octave;
-        }
-
-        if (cmd == -1 && input.matchnMove(3, "lfo"))
-        {
-            if(engine == PART::engine::subSynth)
-                return REPLY::available_msg;
-            bitSet(context, LEVEL::LFO);
-            return LFOselect(input, controlType);
-        }
-        if (cmd == -1 && input.matchnMove(3, "filter"))
-        {
-            bitSet(context, LEVEL::Filter);
-            return filterSelect(input, controlType);
-        }
-        if (cmd == -1 && input.matchnMove(3, "envelope"))
-        {
-            bitSet(context, LEVEL::Envelope);
-            return envelopeSelect(input, controlType);
-        }
-
         // not AddVoice
         if (cmd == -1 && (input.matchnMove(3, "stereo") && bitFindHigh(context) != LEVEL::AddVoice))
         {
@@ -1661,12 +1590,7 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
         if (cmd == -1 && (bitFindHigh(context) != LEVEL::AddSynth))
         {
             int tmp_cmd = -1;
-            if (input.matchnMove(3, "fixed"))
-            {
-                value = (input.toggle() == 1);
-                cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
-            }
-            else if (input.matchnMove(3, "equal"))
+            if (input.matchnMove(3, "equal"))
                 tmp_cmd = SUBSYNTH::control::equalTemperVariation;
             else if (input.matchnMove(3, "bend"))
             {
@@ -3594,6 +3518,11 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
             value = (input.toggle() == 1);
             cmd = ADDVOICE::control::modulatorDetuneFromBaseOsc;
         }
+        else if (input.matchnMove(3, "fixed"))
+        {
+            value = (input.toggle() == 1);
+            cmd = ADDVOICE::control::modulatorFrequencyAs440Hz;
+        }
 
         else if (input.matchnMove(1, "volume"))
             cmd = ADDVOICE::control::modulatorAmplitude;
@@ -3630,6 +3559,49 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
             cmd = ADDVOICE::control::modulatorOscillatorPhase;
     }
 
+    if (cmd == -1)
+    {
+        if (input.matchnMove(3, "detune"))
+        {
+            if (input.matchnMove(1, "fine"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                cmd = ADDVOICE::control::modulatorDetuneFrequency;
+            }
+            else if (input.matchnMove(1, "coarse"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                cmd = ADDVOICE::control::modulatorCoarseDetune;
+            }
+            else if (input.matchnMove(1, "type"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                if (controlType == TOPLEVEL::type::Read)
+                    value = 2; // dummy value
+                else
+                {
+                    string name = string{input}.substr(0,3);
+                    value = stringNumInList(name, detuneType, 3);
+                }
+                if (value == -1)
+                    return REPLY::range_msg;
+                cmd = ADDVOICE::control::modulatorDetuneType;
+            }
+        }
+        else if (input.matchnMove(3, "octave"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = ADDVOICE::control::modulatorOctave;
+        }
+    }
+
     if (cmd > -1)
     {
         if (value == -1)
@@ -3638,13 +3610,6 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
             value = -1; // special case for modulator sources
         return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
     }
-
-/*
- * The following control need to be integrated with
- * partCommonControls(), but this needs checking for
- * possible clashes. The envelope enable controls can
- * then also be more fully integrated.
- */
 
     if (input.matchnMove(3, "envelope"))
     {
@@ -3674,10 +3639,8 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
 
     int enable = (input.toggle());
     if (enable > -1)
-    {
-        sendNormal( synth, 0, enable, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
-        return REPLY::done_msg;
-    }
+        return sendNormal( synth, 0, enable, controlType, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+
     if (!input.lineEnd(controlType) && !readControl(synth, 0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
         return REPLY::inactive_msg;
 
@@ -3692,7 +3655,6 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         return waveform(input, controlType);
     }
 
-
     int cmd = -1;
     if (input.matchnMove(1, "volume"))
         cmd = ADDVOICE::control::volume;
@@ -3700,6 +3662,8 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         cmd = ADDVOICE::control::panning;
     else if (input.matchnMove(2, "velocity"))
         cmd = ADDVOICE::control::velocitySense;
+    if (input.lineEnd(controlType))
+        return REPLY::value_msg;
     if (cmd != -1)
     {
         int tmp = string2int127(input);
@@ -3708,11 +3672,82 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
     }
 
+    int value = 0;
+    cmd = -1;
+    if (input.matchnMove(3, "detune"))
+    {
+        if (input.matchnMove(1, "fine"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = ADDVOICE::control::detuneFrequency;
+        }
+        else if (input.matchnMove(1, "coarse"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = ADDVOICE::control::coarseDetune;
+        }
+        else if (input.matchnMove(1, "type"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (controlType == TOPLEVEL::type::Read)
+                value = 2; // dummy value
+            else
+            {
+                string name = string{input}.substr(0,3);
+                value = stringNumInList(name, detuneType, 3);
+            }
+            if (value == -1)
+                return REPLY::range_msg;
+            cmd = ADDVOICE::control::detuneType;
+        }
+    }
+    else if (input.matchnMove(3, "fixed"))
+    {
+        value = (input.toggle() == 1);
+        cmd = ADDVOICE::control::baseFrequencyAs440Hz;
+    }
+    else if (input.matchnMove(3, "octave"))
+    {
+        if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+        value = string2int(input);
+        cmd = ADDVOICE::control::octave;
+    }
+
+
+
+    if (cmd > -1)
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+
+    if (input.matchnMove(3, "lfo"))
+    {
+        bitSet(context, LEVEL::LFO);
+        return LFOselect(input, controlType);
+    }
+    if (input.matchnMove(3, "filter"))
+    {
+        bitSet(context, LEVEL::Filter);
+        return filterSelect(input, controlType);
+    }
+    if (input.matchnMove(3, "envelope"))
+    {
+        bitSet(context, LEVEL::Envelope);
+        return envelopeSelect(input, controlType);
+    }
+
+
+
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
-    int value = -1;
+    value = -1;
     cmd = -1;
 
     if (input.matchnMove(1, "type"))
@@ -3840,10 +3875,14 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         insert = TOPLEVEL::insert::kitGroup;
     }
     int enable = (input.toggle());
+    // This is a part command, but looks like AddSynth the the CLI user
     if (enable > -1)
-        return sendNormal(synth, 0, enable, controlType, PART::control::enableAdd, npart, kit, UNUSED, insert);
+        sendNormal(synth, 0, enable, controlType, PART::control::enableAdd, npart, kit, UNUSED, insert);
 
-    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
+    if (input.lineEnd(controlType))
+        return REPLY::done_msg;
+
+    if (!readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::addSynth, insert))
         return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "resonance"))
@@ -3854,6 +3893,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
+        // starting point for envelopes etc.
         insertType = TOPLEVEL::insertType::amplitude;
         return addVoice(input, controlType);
     }
@@ -3875,12 +3915,78 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
     }
 
+    int value = 0;
+    cmd = -1;
+    if (input.matchnMove(3, "detune"))
+    {
+        if (input.matchnMove(1, "fine"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = ADDSYNTH::control::detuneFrequency;
+        }
+        else if (input.matchnMove(1, "coarse"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = ADDSYNTH::control::coarseDetune;
+        }
+        else if (input.matchnMove(1, "type"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (controlType == TOPLEVEL::type::Read)
+                value = 2; // dummy value
+            else
+            {
+                string name = string{input}.substr(0,3);
+                value = stringNumInList(name, detuneType, 3);
+            }
+            if (value == -1)
+                return REPLY::range_msg;
+            cmd = ADDSYNTH::control::detuneType;
+        }
+    }
+    else if (input.matchnMove(3, "octave"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        value = string2int(input);
+        cmd = ADDSYNTH::control::octave;
+    }
+
+    if (cmd > -1)
+    {
+        sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
+        return REPLY::done_msg;
+    }
+
+    if (input.matchnMove(3, "lfo"))
+    {
+        bitSet(context, LEVEL::LFO);
+        return LFOselect(input, controlType);
+    }
+    if (input.matchnMove(3, "filter"))
+    {
+        bitSet(context, LEVEL::Filter);
+        return filterSelect(input, controlType);
+    }
+    if (input.matchnMove(3, "envelope"))
+    {
+        bitSet(context, LEVEL::Envelope);
+        return envelopeSelect(input, controlType);
+    }
+
+
+
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
 
     cmd = -1;
-    int value;
     if (input.matchnMove(2, "bandwidth"))
     {
         if (input.lineEnd(controlType))
@@ -3912,15 +4018,15 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         insert = TOPLEVEL::insert::kitGroup;
     }
     int enable = (input.toggle());
+    // This is a part command, but looks like SubSynth the the CLI user
     if (enable > -1)
-    {
-        sendNormal( synth, 0, enable, controlType, PART::control::enableSub, npart, kit, PART::engine::subSynth, insert);
-    }
-    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
-        return REPLY::inactive_msg;
+        sendNormal( synth, 0, enable, controlType, PART::control::enableSub, npart, kit, UNUSED, insert);
 
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
+
+    if (!readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::subSynth, insert))
+        return REPLY::inactive_msg;
 
     int cmd = -1;
     if (input.matchnMove(1, "volume"))
@@ -3936,6 +4042,72 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
             return REPLY::value_msg;
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
     }
+
+
+ // subsynth
+        float value = 0;
+        if (input.matchnMove(3, "detune"))
+        {
+            if (input.matchnMove(1, "fine"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                cmd = SUBSYNTH::control::detuneFrequency;
+            }
+            else if (input.matchnMove(1, "coarse"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                cmd = SUBSYNTH::control::coarseDetune;
+            }
+            else if (input.matchnMove(1, "type"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                if (controlType == TOPLEVEL::type::Read)
+                    value = 2; // dummy value
+                else
+                {
+                    string name = string{input}.substr(0,3);
+                    value = stringNumInList(name, detuneType, 3);
+                }
+                if (value == -1)
+                    return REPLY::range_msg;
+                cmd = SUBSYNTH::control::detuneType;
+            }
+        }
+        if (input.matchnMove(3, "fixed"))
+            {
+                value = (input.toggle() == 1);
+                cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
+            }
+        else if (input.matchnMove(3, "octave"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = SUBSYNTH::control::octave;
+        }
+        if (cmd == -1 && input.matchnMove(3, "filter"))
+        {
+            bitSet(context, LEVEL::Filter);
+            return filterSelect(input, controlType);
+        }
+        if (cmd == -1 && input.matchnMove(3, "envelope"))
+        {
+            bitSet(context, LEVEL::Envelope);
+            return envelopeSelect(input, controlType);
+        }
+        if (cmd > -1)
+        {
+            return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+        }
+
+
+
+
 
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
@@ -4001,7 +4173,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         }
     }
 
-    float value = -1;
+    value = -1;
     if (cmd == -1)
     {
         if (input.matchnMove(2, "band"))
@@ -4057,11 +4229,14 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         insert = TOPLEVEL::insert::kitGroup;
     }
     int enable = (input.toggle());
+    // This is a part command, but looks like PadSynth the the CLI user
     if (enable > -1)
-    {
-        sendNormal( synth, 0, enable, controlType, PART::control::enablePad, npart, kit, PART::engine::padSynth, insert);
-    }
-    if (!input.lineEnd(controlType) && !readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
+        sendNormal( synth, 0, enable, controlType, PART::control::enablePad, npart, kit, UNUSED, insert);
+
+    if (input.lineEnd(controlType))
+        return REPLY::done_msg;
+
+    if (!readControl(synth, 0, PART::control::enable, npart, kit, PART::engine::padSynth, insert))
         return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "resonance"))
@@ -4074,8 +4249,6 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         bitSet(context, LEVEL::Oscillator);
         return waveform(input, controlType);
     }
-    if (input.lineEnd(controlType))
-        return REPLY::done_msg;
 
     int cmd = -1;
     if (input.matchnMove(1, "volume"))
@@ -4092,6 +4265,76 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     }
 
+    float value = 0;
+    cmd = -1;
+    if (input.matchnMove(3, "detune"))
+    {
+        if (input.matchnMove(1, "fine"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = PADSYNTH::control::detuneFrequency;
+        }
+        else if (input.matchnMove(1, "coarse"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = PADSYNTH::control::coarseDetune;
+        }
+        else if (input.matchnMove(1, "type"))
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (controlType == TOPLEVEL::type::Read)
+                value = 2; // dummy value
+            else
+            {
+                string name = string{input}.substr(0,3);
+                value = stringNumInList(name, detuneType, 3);
+            }
+            if (value == -1)
+                return REPLY::range_msg;
+            cmd = PADSYNTH::control::detuneType;
+        }
+    }
+    else if (input.matchnMove(3, "fixed"))
+    {
+        value = (input.toggle() == 1);
+        cmd = PADSYNTH::control::baseFrequencyAs440Hz;
+    }
+    else if (input.matchnMove(3, "octave"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        value = string2int(input);
+        cmd = PADSYNTH::control::octave;
+    }
+
+
+    if (cmd > -1)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+
+    if (input.matchnMove(3, "lfo"))
+    {
+        bitSet(context, LEVEL::LFO);
+        return LFOselect(input, controlType);
+    }
+    if (input.matchnMove(3, "filter"))
+    {
+        bitSet(context, LEVEL::Filter);
+        return filterSelect(input, controlType);
+    }
+    if (input.matchnMove(3, "envelope"))
+    {
+        bitSet(context, LEVEL::Envelope);
+        return envelopeSelect(input, controlType);
+    }
+
+
+
+
     int result = partCommonControls(input, controlType);
     if (result != REPLY::todo_msg)
         return result;
@@ -4107,7 +4350,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     }
 
     cmd = -1;
-    float value = -1;
+    value = -1;
     if (input.matchnMove(2, "profile"))
     {
         if (input.matchnMove(1, "gauss"))
