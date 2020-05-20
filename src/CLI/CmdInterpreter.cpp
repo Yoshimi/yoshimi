@@ -1566,7 +1566,6 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
 {
-    // TODO integrate modulator controls properly
     int cmd = -1;
     int engine = contextToEngines(context);
     //int insert = UNUSED;
@@ -1630,41 +1629,6 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
                     return REPLY::value_msg;
                 value = string2int(input);
                 cmd = tmp_cmd;
-            }
-        }
-        // Sub/Pad only
-        if (cmd == -1 && (bitFindHigh(context) == LEVEL::SubSynth || bitFindHigh(context) == LEVEL::PadSynth))
-        {
-            value = -1;
-            if (input.matchnMove(2, "overtone"))
-            {
-                if (input.matchnMove(1, "Position"))
-                {
-                    if (controlType == TOPLEVEL::type::Read)
-                        value = 1; // dummy value
-                    else
-                    {
-                        value = stringNumInList(string{input}.substr(0, 2), subPadPosition, 2);
-                        if (value == -1)
-                            return REPLY::range_msg;
-                    }
-                    cmd = SUBSYNTH::control::overtonePosition;
-                }
-                else
-                {
-                    if (input.matchnMove(1, "First"))
-                        cmd = SUBSYNTH::control::overtoneParameter1;
-                    else if (input.matchnMove(1, "Second"))
-                        cmd = SUBSYNTH::control::overtoneParameter2;
-                    else if (input.matchnMove(1, "Harmonic"))
-                        cmd = SUBSYNTH::control::overtoneForceHarmonics;
-                    if (cmd > -1)
-                    {
-                        if (input.lineEnd(controlType))
-                            return REPLY::value_msg;
-                        value = string2int(input);
-                    }
-                }
             }
         }
 
@@ -3458,6 +3422,9 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 {
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
+
+// NOTE modulator number always the same as voice.
+
     int value;
     int cmd = -1;
     string name = string{input}.substr(0,3);
@@ -3618,7 +3585,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
     }
 
     if (cmd == -1)
-        return partCommonControls(input, controlType);//REPLY::available_msg;
+        return partCommonControls(input, controlType);
 
     return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
@@ -3673,7 +3640,6 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     }
 
     int value = 0;
-    cmd = -1;
     if (input.matchnMove(3, "detune"))
     {
         if (input.matchnMove(1, "fine"))
@@ -3748,8 +3714,6 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         return result;
 
     value = -1;
-    cmd = -1;
-
     if (input.matchnMove(1, "type"))
     {
         if (input.matchnMove(1, "oscillator"))
@@ -3916,7 +3880,6 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     }
 
     int value = 0;
-    cmd = -1;
     if (input.matchnMove(3, "detune"))
     {
         if (input.matchnMove(1, "fine"))
@@ -3986,7 +3949,6 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (result != REPLY::todo_msg)
         return result;
 
-    cmd = -1;
     if (input.matchnMove(2, "bandwidth"))
     {
         if (input.lineEnd(controlType))
@@ -4043,67 +4005,107 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
     }
 
-
- // subsynth
-        float value = 0;
-        if (input.matchnMove(3, "detune"))
-        {
-            if (input.matchnMove(1, "fine"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                cmd = SUBSYNTH::control::detuneFrequency;
-            }
-            else if (input.matchnMove(1, "coarse"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                cmd = SUBSYNTH::control::coarseDetune;
-            }
-            else if (input.matchnMove(1, "type"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                if (controlType == TOPLEVEL::type::Read)
-                    value = 2; // dummy value
-                else
-                {
-                    string name = string{input}.substr(0,3);
-                    value = stringNumInList(name, detuneType, 3);
-                }
-                if (value == -1)
-                    return REPLY::range_msg;
-                cmd = SUBSYNTH::control::detuneType;
-            }
-        }
-        if (input.matchnMove(3, "fixed"))
-            {
-                value = (input.toggle() == 1);
-                cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
-            }
-        else if (input.matchnMove(3, "octave"))
+    int value = 0;
+    if (input.matchnMove(3, "detune"))
+    {
+        if (input.matchnMove(1, "fine"))
         {
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(input);
-            cmd = SUBSYNTH::control::octave;
+            cmd = SUBSYNTH::control::detuneFrequency;
         }
-        if (cmd == -1 && input.matchnMove(3, "filter"))
+        else if (input.matchnMove(1, "coarse"))
         {
-            bitSet(context, LEVEL::Filter);
-            return filterSelect(input, controlType);
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = SUBSYNTH::control::coarseDetune;
         }
-        if (cmd == -1 && input.matchnMove(3, "envelope"))
+        else if (input.matchnMove(1, "type"))
         {
-            bitSet(context, LEVEL::Envelope);
-            return envelopeSelect(input, controlType);
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            if (controlType == TOPLEVEL::type::Read)
+                value = 2; // dummy value
+            else
+            {
+                string name = string{input}.substr(0,3);
+                value = stringNumInList(name, detuneType, 3);
+            }
+            if (value == -1)
+                return REPLY::range_msg;
+            cmd = SUBSYNTH::control::detuneType;
         }
-        if (cmd > -1)
+    }
+    else if (input.matchnMove(3, "fixed"))
+    {
+        value = (input.toggle() == 1);
+        cmd = SUBSYNTH::control::baseFrequencyAs440Hz;
+    }
+    else if (input.matchnMove(3, "octave"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        value = string2int(input);
+        cmd = SUBSYNTH::control::octave;
+    }
+
+    if (cmd == -1 && input.matchnMove(3, "filter"))
+    {
+        bitSet(context, LEVEL::Filter);
+        return filterSelect(input, controlType);
+    }
+    if (cmd == -1 && input.matchnMove(3, "envelope"))
+    {
+        bitSet(context, LEVEL::Envelope);
+        return envelopeSelect(input, controlType);
+    }
+
+    if (cmd > -1)
+    {
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+    }
+
+    value = -1;
+    if (input.matchnMove(2, "overtone"))
+    {
+        if (input.matchnMove(1, "Position"))
         {
-            return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+            if (controlType == TOPLEVEL::type::Read)
+                value = 1; // dummy value
+            else
+            {
+                value = stringNumInList(string{input}.substr(0, 2), subPadPosition, 2);
+                if (value == -1)
+                    return REPLY::range_msg;
+            }
+            cmd = SUBSYNTH::control::overtonePosition;
         }
+        else
+        {
+            if (input.matchnMove(1, "First"))
+                cmd = SUBSYNTH::control::overtoneParameter1;
+            else if (input.matchnMove(1, "Second"))
+                cmd = SUBSYNTH::control::overtoneParameter2;
+            else if (input.matchnMove(1, "Harmonic"))
+                cmd = SUBSYNTH::control::overtoneForceHarmonics;
+            if (cmd > -1)
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+            }
+        }
+    }
+
+    if (cmd > -1)
+
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
+
+
+
+
 
 
 
@@ -4113,7 +4115,6 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     if (result != REPLY::todo_msg)
         return result;
 
-    cmd = -1;
     if (input.matchnMove(2, "harmonic"))
     {
         int value = -1;
@@ -4265,8 +4266,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     }
 
-    float value = 0;
-    cmd = -1;
+    int value = 0;
     if (input.matchnMove(3, "detune"))
     {
         if (input.matchnMove(1, "fine"))
@@ -4332,6 +4332,48 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         return envelopeSelect(input, controlType);
     }
 
+    value = -1;
+    if (input.matchnMove(2, "overtone"))
+    {
+        if (input.matchnMove(1, "Position"))
+        {
+            if (controlType == TOPLEVEL::type::Read)
+                value = 1; // dummy value
+            else
+            {
+                value = stringNumInList(string{input}.substr(0, 2), subPadPosition, 2);
+                if (value == -1)
+                    return REPLY::range_msg;
+            }
+            cmd = PADSYNTH::control::overtonePosition;
+        }
+        else
+        {
+            if (input.matchnMove(1, "First"))
+                cmd = PADSYNTH::control::overtoneParameter1;
+            else if (input.matchnMove(1, "Second"))
+                cmd = PADSYNTH::control::overtoneParameter2;
+            else if (input.matchnMove(1, "Harmonic"))
+                cmd = PADSYNTH::control::overtoneForceHarmonics;
+            if (cmd > -1)
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+            }
+        }
+    }
+
+    if (cmd > -1)
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
+
+
+
+
+
+
+
+
 
 
 
@@ -4349,7 +4391,6 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     }
 
-    cmd = -1;
     value = -1;
     if (input.matchnMove(2, "profile"))
     {
@@ -5196,7 +5237,6 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         return sendNormal(synth, TOPLEVEL::action::lowPrio, value, controlType, PART::control::keyShift, npart);
     }
 
-    cmd = -1;
     if (input.matchnMove(1, "volume"))
         cmd = PART::control::volume;
     else if(input.matchnMove(1, "pan"))

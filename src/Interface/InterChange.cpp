@@ -1749,15 +1749,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char miscmsg = getData->data.miscmsg;
 
     bool isGui = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     char button = type & 3;
     /*if (control > 0 && getData->data.part < 64)
     {
         std::cout << "Type " << int(type) << "  Control " << int(control) << "  Part " << int(npart) << "  Kit " << int(kititem) << "  Engine " << int(engine) << std::endl;
-        std::cout  << "Insert " << int(insert)<< "  Parameter " << int(parameter) << "  miscmsg " << int(miscmsg) << std::endl;
+        std::cout  << "Insert " << int(insert)<< "  Parameter " << int(getData->data.parameter) << "  miscmsg " << int(getData->data.miscmsg) << std::endl;
     }*/
 
     if (!isGui && button == 1)
@@ -1814,8 +1812,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 
     Part *part = synth->part[npart];
-//std::cout << "type " << int(getData->data.type & 64) << std::endl;
-//std::cout << "ctrl " << int(getData->data.control) << std::endl;
     if (part->busy && engine == PART::engine::padSynth)
     {
         getData->data.type &= ~TOPLEVEL::type::Write; // turn it into a read

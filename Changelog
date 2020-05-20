@@ -1,5 +1,8 @@
 yoshimi 1.7.1 M
 
+2020-5-20 Will
+* Separated out CLI SubSynth and PadSynth overtones.
+
 2020-5-19 Will
 * Fixed regression CLI not enabling PadSyth.
 * Separated out CLI engine detune controls.
