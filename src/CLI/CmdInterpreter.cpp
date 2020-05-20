@@ -1564,77 +1564,6 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
 }
 
 
-int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
-{
-    int cmd = -1;
-    int engine = contextToEngines(context);
-    //int insert = UNUSED;
-    int kit = UNUSED;
-    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
-        engine += voiceNumber; // voice numbers are 0 to 7
-
-    if (inKitEditor)
-        kit = kitNumber;
-
-    if (bitFindHigh(context) != LEVEL::Part)
-    {
-        int value = 0;
-        // not AddVoice
-        if (cmd == -1 && (input.matchnMove(3, "stereo") && bitFindHigh(context) != LEVEL::AddVoice))
-        {
-            cmd = ADDSYNTH::control::stereo;
-            value = (input.toggle() == 1);
-        }
-        // not AddSynth
-        if (cmd == -1 && (bitFindHigh(context) != LEVEL::AddSynth))
-        {
-            int tmp_cmd = -1;
-            if (input.matchnMove(3, "equal"))
-                tmp_cmd = SUBSYNTH::control::equalTemperVariation;
-            else if (input.matchnMove(3, "bend"))
-            {
-                if (input.matchnMove(1, "adjust"))
-                    tmp_cmd = SUBSYNTH::control::pitchBendAdjustment;
-                else if (input.matchnMove(1, "offset"))
-                    tmp_cmd = SUBSYNTH::control::pitchBendOffset;
-            }
-            if (tmp_cmd > -1)
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                cmd = tmp_cmd;
-            }
-        }
-
-        if (cmd > -1)
-        {
-            sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, engine);
-            return REPLY::done_msg;
-        }
-    }
-
-    if (bitTest(context, LEVEL::AddMod))
-        return REPLY::available_msg;
-
-    if (cmd != -1)
-    {
-        if (input.lineEnd(controlType))
-            return REPLY::value_msg;
-
-        if (bitFindHigh(context) == LEVEL::Part)
-            kit = UNUSED;
-        else
-            kit = kitNumber;
-
-        return sendNormal( synth, 0, string2float(input), controlType, cmd, npart, kit, engine);
-    }
-
-    //std::cout << ">>  type " << controlType << "  cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
-    return REPLY::todo_msg;
-}
-
-
 int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
 {
     int cmd = -1;
@@ -3559,9 +3488,6 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
         return envelopeSelect(input, controlType);
     }
 
-    if (cmd == -1)
-        return partCommonControls(input, controlType);
-
     return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
 }
 
@@ -3660,7 +3586,26 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         cmd = ADDVOICE::control::octave;
     }
 
-
+    else
+    {
+        int tmp_cmd = -1;
+        if (input.matchnMove(3, "equal"))
+            tmp_cmd = ADDVOICE::control::equalTemperVariation;
+        else if (input.matchnMove(3, "bend"))
+        {
+            if (input.matchnMove(1, "adjust"))
+                tmp_cmd = ADDVOICE::control::pitchBendAdjustment;
+            else if (input.matchnMove(1, "offset"))
+                tmp_cmd = ADDVOICE::control::pitchBendOffset;
+        }
+        if (tmp_cmd > -1)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = tmp_cmd;
+        }
+    }
 
     if (cmd > -1)
         return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
@@ -3680,13 +3625,6 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         bitSet(context, LEVEL::Envelope);
         return envelopeSelect(input, controlType);
     }
-
-
-
-
-    int result = partCommonControls(input, controlType);
-    if (result != REPLY::todo_msg)
-        return result;
 
     value = -1;
     if (input.matchnMove(1, "type"))
@@ -3894,6 +3832,11 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         value = string2int(input);
         cmd = ADDSYNTH::control::octave;
     }
+    else if (input.matchnMove(3, "stereo"))
+    {
+        cmd = ADDSYNTH::control::stereo;
+        value = (input.toggle() == 1);
+    }
     else
     {
         int tmp_cmd = -1;
@@ -3937,13 +3880,6 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         bitSet(context, LEVEL::Envelope);
         return envelopeSelect(input, controlType);
     }
-
-
-
-
-    int result = partCommonControls(input, controlType);
-    if (result != REPLY::todo_msg)
-        return result;
 
     if (input.matchnMove(2, "bandwidth"))
     {
@@ -4046,6 +3982,32 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         value = string2int(input);
         cmd = SUBSYNTH::control::octave;
     }
+    else if (input.matchnMove(3, "stereo"))
+    {
+        cmd = SUBSYNTH::control::stereo;
+        value = (input.toggle() == 1);
+    }
+
+    else
+    {
+        int tmp_cmd = -1;
+        if (input.matchnMove(3, "equal"))
+            tmp_cmd = SUBSYNTH::control::equalTemperVariation;
+        else if (input.matchnMove(3, "bend"))
+        {
+            if (input.matchnMove(1, "adjust"))
+                tmp_cmd = SUBSYNTH::control::pitchBendAdjustment;
+            else if (input.matchnMove(1, "offset"))
+                tmp_cmd = SUBSYNTH::control::pitchBendOffset;
+        }
+        if (tmp_cmd > -1)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = tmp_cmd;
+        }
+    }
 
     if (cmd == -1 && input.matchnMove(3, "filter"))
     {
@@ -4098,18 +4060,6 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     if (cmd > -1)
 
         return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
-
-
-
-
-
-
-
-
-
-    int result = partCommonControls(input, controlType);
-    if (result != REPLY::todo_msg)
-        return result;
 
     if (input.matchnMove(2, "harmonic"))
     {
@@ -4307,7 +4257,32 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         value = string2int(input);
         cmd = PADSYNTH::control::octave;
     }
+    else if (input.matchnMove(3, "stereo"))
+    {
+        cmd = PADSYNTH::control::stereo;
+        value = (input.toggle() == 1);
+    }
 
+    else
+    {
+        int tmp_cmd = -1;
+        if (input.matchnMove(3, "equal"))
+            tmp_cmd = PADSYNTH::control::equalTemperVariation;
+        else if (input.matchnMove(3, "bend"))
+        {
+            if (input.matchnMove(1, "adjust"))
+                tmp_cmd = PADSYNTH::control::pitchBendAdjustment;
+            else if (input.matchnMove(1, "offset"))
+                tmp_cmd = PADSYNTH::control::pitchBendOffset;
+        }
+        if (tmp_cmd > -1)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = tmp_cmd;
+        }
+    }
 
     if (cmd > -1)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
@@ -4387,20 +4362,6 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
     if (cmd > -1)
         return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
-
-
-
-
-
-
-
-
-
-
-
-    int result = partCommonControls(input, controlType);
-    if (result != REPLY::todo_msg)
-        return result;
 
     if (input.matchnMove(2, "xport"))
     {

@@ -87,7 +87,6 @@ class CmdInterpreter
         int effectsList(Parser& input, bool presets = false);
         int effects(Parser& input, unsigned char controlType);
         int midiControllers(Parser& input, unsigned char controlType);
-        int partCommonControls(Parser& input, unsigned char controlType);
         int LFOselect(Parser& input, unsigned char controlType);
         int filterSelect(Parser& input, unsigned char controlType);
         int envelopeSelect(Parser& input, unsigned char controlType);
