@@ -1606,31 +1606,6 @@ int CmdInterpreter::partCommonControls(Parser& input, unsigned char controlType)
                 cmd = tmp_cmd;
             }
         }
-        // Add/Pad only
-        if (cmd == -1 && (bitFindHigh(context) == LEVEL::AddSynth || bitFindHigh(context) == LEVEL::PadSynth))
-        {
-            int tmp_cmd = -1;
-            if (input.matchnMove(3, "depop"))
-                tmp_cmd = ADDSYNTH::control::dePop;
-            else if (input.matchnMove(2, "punch"))
-            {
-                if (input.matchnMove(1, "power"))
-                    tmp_cmd = ADDSYNTH::control::punchStrength;
-                else if (input.matchnMove(1, "duration"))
-                    tmp_cmd = ADDSYNTH::control::punchDuration;
-                else if (input.matchnMove(1, "stretch"))
-                    tmp_cmd = ADDSYNTH::control::punchStretch;
-                else if (input.matchnMove(1, "velocity"))
-                    tmp_cmd = ADDSYNTH::control::punchVelocity;
-            }
-            if (tmp_cmd > -1)
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                cmd = tmp_cmd;
-            }
-        }
 
         if (cmd > -1)
         {
@@ -3919,12 +3894,33 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         value = string2int(input);
         cmd = ADDSYNTH::control::octave;
     }
+    else
+    {
+        int tmp_cmd = -1;
+        if (input.matchnMove(3, "depop"))
+            tmp_cmd = ADDSYNTH::control::dePop;
+        else if (input.matchnMove(2, "punch"))
+        {
+            if (input.matchnMove(1, "power"))
+                tmp_cmd = ADDSYNTH::control::punchStrength;
+            else if (input.matchnMove(1, "duration"))
+                tmp_cmd = ADDSYNTH::control::punchDuration;
+            else if (input.matchnMove(1, "stretch"))
+                tmp_cmd = ADDSYNTH::control::punchStretch;
+            else if (input.matchnMove(1, "velocity"))
+                tmp_cmd = ADDSYNTH::control::punchVelocity;
+        }
+        if (tmp_cmd > -1)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = tmp_cmd;
+        }
+    }
 
     if (cmd > -1)
-    {
-        sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
-        return REPLY::done_msg;
-    }
+        return sendNormal( synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
 
     if (input.matchnMove(3, "lfo"))
     {
@@ -4361,6 +4357,31 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
                     return REPLY::value_msg;
                 value = string2int(input);
             }
+        }
+    }
+
+    else
+    {
+        int tmp_cmd = -1;
+        if (input.matchnMove(3, "depop"))
+            tmp_cmd = PADSYNTH::control::dePop;
+        else if (input.matchnMove(2, "punch"))
+        {
+            if (input.matchnMove(1, "power"))
+                tmp_cmd = PADSYNTH::control::punchStrength;
+            else if (input.matchnMove(1, "duration"))
+                tmp_cmd = PADSYNTH::control::punchDuration;
+            else if (input.matchnMove(1, "stretch"))
+                tmp_cmd = PADSYNTH::control::punchStretch;
+            else if (input.matchnMove(1, "velocity"))
+                tmp_cmd = PADSYNTH::control::punchVelocity;
+        }
+        if (tmp_cmd > -1)
+        {
+            if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+            value = string2int(input);
+            cmd = tmp_cmd;
         }
     }
 

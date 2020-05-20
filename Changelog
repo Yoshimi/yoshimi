@@ -2,6 +2,7 @@ yoshimi 1.7.1 M
 
 2020-5-20 Will
 * Separated out CLI SubSynth and PadSynth overtones.
+* Separated out CLI de-pop and punch.
 
 2020-5-19 Will
 * Fixed regression CLI not enabling PadSyth.
