@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-5-27 Will
+* GUI and CLI fully in sync for Add, Sub, Pad enables.
+  Includes correct action for kit mode.
+
 2020-5-20 Will
 * Separated out CLI SubSynth and PadSynth overtones.
 * Separated out CLI de-pop and punch.

@@ -232,21 +232,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Check_Button adcheck {
           callback {//
-          int x = o->value();
-          if (x)
-              adeditbutton->activate();
-          else
-              adeditbutton->deactivate();
-          if (n == 0)
-          {
-              synth->getGuiMaster()->partui->adsynenabledcheck->value(x);
-              if (x)
-                  synth->getGuiMaster()->partui->adeditbutton->activate();
-              else
-                  synth->getGuiMaster()->partui->adeditbutton->deactivate();
-          }
-          synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
+
+          send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
@@ -261,21 +248,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Check_Button subcheck {
           callback {//
-          int x = o->value();
-          if (x)
-              subeditbutton->activate();
-          else
-              subeditbutton->deactivate();
-          if (n == 0)
-          {
-              synth->getGuiMaster()->partui->subsynenabledcheck->value(x);
-              if (x)
-                  synth->getGuiMaster()->partui->subeditbutton->activate();
-              else
-                  synth->getGuiMaster()->partui->subeditbutton->deactivate();
-          }
-          synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
+
+          send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
@@ -290,21 +264,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Check_Button padcheck {
           callback {//
-          int x = o->value();
-          if (x)
-              padeditbutton->activate();
-          else
-              padeditbutton->deactivate();
-          if (n == 0)
-          {
-              synth->getGuiMaster()->partui->padsynenabledcheck->value(x);
-              if (x)
-                  synth->getGuiMaster()->partui->padeditbutton->activate();
-              else
-                  synth->getGuiMaster()->partui->padeditbutton->deactivate();
-          }
-          synth->getGuiMaster()->partui->checkEngines();
-          send_data(0, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
+
+          send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
@@ -431,7 +392,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             case 97: // a
                 if (Fl::event_button() == 3)
                 {
-                    send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 0);
+                    send_data(0, PART::control::enableAdd, 1, TOPLEVEL::type::Integer, UNUSED, 0);
                     adsynenabledcheck->value(1);
                 }
 
@@ -448,7 +409,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             case 115: // s
                 if (Fl::event_button() == 3)
                 {
-                    send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 1);
+                    send_data(0, PART::control::enableSub, 1, TOPLEVEL::type::Integer, UNUSED, 1);
                     subsynenabledcheck->value(1);
                 }
                 lastkey = -1;
@@ -465,7 +426,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             case 112: // p
                 if (Fl::event_button() == 3)
                 {
-                    send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 2);
+                    send_data(0, PART::control::enablePad, 1, TOPLEVEL::type::Integer, UNUSED, 2);
                     padsynenabledcheck->value(1);
                 }
                 lastkey = -1;
@@ -1496,22 +1457,8 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
-            int x = o->value();
-            if (x == 0)
-                adeditbutton->deactivate();
-            else
-                adeditbutton->activate();
-            partkititem[0]->adcheck->value(x);
-            if (partKitOn)
-            {
-            if (x == 0)
-                partkititem[0]->adeditbutton->deactivate();
-            else
-                partkititem[0]->adeditbutton->activate();
-            }
-            checkEngines();
 
-            send_data(0, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1538,22 +1485,8 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Check_Button subsynenabledcheck {
             label Enabled
             callback {//
-            int x = o->value();
-            if (x == 0)
-                subeditbutton->deactivate();
-            else
-                subeditbutton->activate();
-            partkititem[0]->subcheck->value(x);
-            if (partKitOn)
-            {
-            if (x == 0)
-                partkititem[0]->subeditbutton->deactivate();
-            else
-                partkititem[0]->subeditbutton->activate();
-            }
-            checkEngines();
 
-            send_data(0, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
@@ -1580,22 +1513,8 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Check_Button padsynenabledcheck {
             label Enabled
             callback {//
-            int x = o->value();
-            if (x == 0)
-                padeditbutton->deactivate();
-            else
-                padeditbutton->activate();
-            partkititem[0]->padcheck->value(x);
-            if (partKitOn)
-            {
-            if (x == 0)
-                partkititem[0]->padeditbutton->deactivate();
-            else
-                partkititem[0]->padeditbutton->activate();
-            }
-            checkEngines();
 
-            send_data(0, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
@@ -1835,14 +1754,11 @@ class PartUI {: {public Fl_Group, PartUI_}
         switch (control)
         {
             case PART::control::enable:
-                if (engine == 255)
-                {
-                    synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
-                    if (valBool)
-                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
-                    else
-                        synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
-                }
+                synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
+                if (valBool)
+                    synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
+                else
+                    synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
                 break;
             case PART::control::volume:
                 synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
@@ -1892,13 +1808,19 @@ class PartUI {: {public Fl_Group, PartUI_}
             {
                 partkititem[kititem]->adeditbutton->activate();
                 if (kititem == 0)
-                    instrumentaddbox->color(ADD_COLOUR);
+                {
+                    adsynenabledcheck->value(1);
+                    adeditbutton->activate();
+                }
             }
             else
             {
                 partkititem[kititem]->adeditbutton->deactivate();
                 if (kititem == 0)
-                    instrumentaddbox->color(BASE_COLOUR);
+                {
+                    adsynenabledcheck->value(0);
+                    adeditbutton->deactivate();
+                }
             }
             break;
         case PART::control::enableSub:
@@ -1907,13 +1829,19 @@ class PartUI {: {public Fl_Group, PartUI_}
             {
                 partkititem[kititem]->subeditbutton->activate();
                 if (kititem == 0)
-                    instrumentsubbox->color(SUB_COLOUR);
+                {
+                    subsynenabledcheck->value(1);
+                    subeditbutton->activate();
+                }
             }
             else
             {
                 partkititem[kititem]->subeditbutton->deactivate();
                 if (kititem == 0)
-                    instrumentsubbox->color(BASE_COLOUR);
+                {
+                    subsynenabledcheck->value(0);
+                    subeditbutton->deactivate();
+                }
             }
             break;
         case PART::control::enablePad:
@@ -1922,13 +1850,19 @@ class PartUI {: {public Fl_Group, PartUI_}
             {
                 partkititem[kititem]->padeditbutton->activate();
                 if (kititem ==0)
-                    instrumentpadbox->color(PAD_COLOUR);
+                {
+                    padsynenabledcheck->value(1);
+                    padeditbutton->activate();
+                }
             }
             else
             {
                 partkititem[kititem]->padeditbutton->deactivate();
                 if (kititem ==0)
-                    instrumentpadbox->color(BASE_COLOUR);
+                {
+                    padsynenabledcheck->value(0);
+                    padeditbutton->deactivate();
+                }
             }
             break;
         case PART::control::enableKitLine:
@@ -2251,7 +2185,9 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
         default:
             break;
-    }} {}
+    }
+    if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
+    checkEngines();} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2471,64 +2407,49 @@ class PartUI {: {public Fl_Group, PartUI_}
     partname = instrumentName; // this needs improving
     if (synth->getRuntime().checksynthengines)
     {
-        if (!partKitOn)
-        {
-            engine |= adsynenabledcheck->value();
-            engine |= (subsynenabledcheck->value() << 1);
-            engine |= (padsynenabledcheck->value() << 2);
-        }
+        if (adsynenabledcheck->value())
+            addbox->color(ADD_COLOUR);
         else
+            addbox->color(BASE_COLOUR);
+        ADD->damage(1);
+        if (subsynenabledcheck->value())
+            subbox->color(SUB_COLOUR);
+        else
+            subbox->color(BASE_COLOUR);
+        SUB->damage(1);
+        if (padsynenabledcheck->value())
+            padbox->color(SUB_COLOUR);
+        else
+            padbox->color(BASE_COLOUR);
+        PAD->damage(1);
+        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
-            for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-            {
-                if (partkititem[i]->enabledcheck->value())
-                { // nested so we don't access non existent
-                    if (partkititem[i]->mutedcheck->value() == 0)
-                    {
-                        engine |= partkititem[i]->adcheck->value();
-                        engine |= (partkititem[i]->subcheck->value() << 1);
-                        engine |= (partkititem[i]->padcheck->value() << 2);
-                    }
+            if (partkititem[i]->enabledcheck->value())
+            { // nested so we don't access non existent
+                if (partkititem[i]->mutedcheck->value() == 0)
+                {
+                    engine |= partkititem[i]->adcheck->value();
+                    engine |= (partkititem[i]->subcheck->value() << 1);
+                    engine |= (partkititem[i]->padcheck->value() << 2);
                 }
             }
         }
     }
     if (engine & 1) // addsynth
-    {
-        addbox->color(ADD_COLOUR);
         instrumentaddbox->color(ADD_COLOUR);
-    }
     else
-    {
-        addbox->color(BASE_COLOUR);
         instrumentaddbox->color(BASE_COLOUR);
-    }
     if (engine & 2) // subynth
-    {
-        subbox->color(SUB_COLOUR);
         instrumentsubbox->color(SUB_COLOUR);
-    }
     else
-    {
-        subbox->color(BASE_COLOUR);
         instrumentsubbox->color(BASE_COLOUR);
-    }
     if (engine & 4) // padsynth
-    {
-        padbox->color(PAD_COLOUR);
         instrumentpadbox->color(PAD_COLOUR);
-    }
     else
-    {
-        padbox->color(BASE_COLOUR);
         instrumentpadbox->color(BASE_COLOUR);
-    }
 
-    ADD->damage(1);
     instrumentaddbox->damage(1);
-    SUB->damage(1);
     instrumentsubbox->damage(1);
-    PAD->damage(1);
     instrumentpadbox->damage(1);
     instrumentlabel->copy_label(instrumentName.c_str());
 

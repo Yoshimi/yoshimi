@@ -22,8 +22,6 @@ Expand MIDI-learn to include:
     learn groups (paging)
     GUI view by group but CLI and running search only by CC & chan
 
-Make NRPN MIDI-learn able to be re-learned.
-
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
 
