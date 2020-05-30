@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-5-30 Will
+* CLI only shows GUI sys/ins effect changes when visible.
+  Updates the settings but doesn't change selection shown.
+
 2020-5-27 Will
 * GUI and CLI fully in sync for Add, Sub, Pad enables.
   Includes correct action for kit mode.

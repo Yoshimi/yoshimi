@@ -1493,7 +1493,8 @@ Alan Calvert started the project}
                 sysefftype->value(value_int);
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
-                showSysEfxUI();
+                if (sysinsgroup->value() == SystemEffectsGrp)
+                    showSysEfxUI();
             }
             else if (control == EFFECT::sysIns::effectEnable)
             {
@@ -1512,7 +1513,8 @@ Alan Calvert started the project}
         {
             ninseff = engine;
             setInsEff(ninseff);
-            showInsEfxUI();
+            if (sysinsgroup->value() == InsertionEffectsGrp)
+                showInsEfxUI();
             inseffectui->UpdatePresetColour(parameter, insefftype->value());
 
         }
@@ -1523,7 +1525,8 @@ Alan Calvert started the project}
             insefftype->value(value_int);
             setInsEff(ninseff);
             inseffectui->UpdatePresetColour(parameter, insefftype->value());
-            showInsEfxUI();
+            if (sysinsgroup->value() == InsertionEffectsGrp)
+                showInsEfxUI();
         }
         else if (control == EFFECT::sysIns::effectDestination)
         {
@@ -1534,7 +1537,8 @@ Alan Calvert started the project}
             {
                 insefftype->activate();
                 setInsEff(ninseff);
-                showInsEfxUI();
+                if (sysinsgroup->value() == InsertionEffectsGrp)
+                    showInsEfxUI();
             }
         }
         return;
