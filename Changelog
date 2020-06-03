@@ -1,5 +1,10 @@
 yoshimi 1.7.1 M
 
+2020-6-3 Will
+* Unified random panning, with variable position and width.
+  Fixed values until parameter setup and control done,
+  but follows pan law.
+
 2020-5-30 Will
 * CLI only shows GUI sys/ins effect changes when visible.
   Updates the settings but doesn't change selection shown.

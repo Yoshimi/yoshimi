@@ -125,6 +125,42 @@ inline bool bitTest(unsigned int value, unsigned int bit)
     return false;
 }
 
+inline void setRandomPan(float rand, float& left, float& right, unsigned char compensation, char pan, char range)
+{
+    float min = float (pan - range) / 126.0f;
+    if (min < 0)
+        min = 0;
+    float max = float (pan + range) / 126.0f;;
+    if (max > 1)
+        max = 1;
+    float t = rand * (max-min) + min;
+    switch (compensation)
+    {
+        case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
+            if (t > 0.5f)
+            {
+                right = 0.5f;
+                left = (1.0f - t);
+            }
+            else
+            {
+                right = t;
+                left = 0.5f;
+            }
+            break;
+        case MAIN::panningType::normal: // Yoshimi - per side + 3dB mono -3dB
+            left = cosf(t * HALFPI);
+            right = sinf(t * HALFPI);
+            break;
+        case MAIN::panningType::boost: // boost - per side + 6dB mono 0dB
+            left = (1.0 - t);
+            right = t;
+            break;
+        default: // no panning
+            left = 0.7;
+            right = 0.7;
+    }
+}
 
 inline void setAllPan(float position, float& left, float& right, unsigned char compensation)
 {

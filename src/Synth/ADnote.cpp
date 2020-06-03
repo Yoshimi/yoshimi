@@ -37,6 +37,7 @@
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
+#include "Misc/NumericFuncs.h"
 
 #include "globals.h"
 
@@ -44,6 +45,7 @@ using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
 using synth::aboveAmplitudeThreshold;
+using func::setRandomPan;
 
 using std::isgreater;
 
@@ -393,9 +395,11 @@ void ADnote::construct()
 
     paramSeed = synth->randomINT();
 
-    float t = synth->numRandom();
-    NoteGlobalPar.randpanL = cosf(t * HALFPI);
-    NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
+    //float t = synth->numRandom();
+    //NoteGlobalPar.randpanL = cosf(t * HALFPI);
+    //NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
+
+    setRandomPan(synth->numRandom(), NoteGlobalPar.randpanL, NoteGlobalPar.randpanR, synth->getRuntime().panLaw, 64, 63);
 
     NoteGlobalPar.Fadein_adjustment =
         adpars->GlobalPar.Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
@@ -1032,9 +1036,11 @@ void ADnote::initParameters(void)
 
         NoteVoicePar[nvoice].noisetype = adpars->VoicePar[nvoice].Type;
 
-        float t = synth->numRandom();
-        NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
-        NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
+        //float t = synth->numRandom();
+        //NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
+        //NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
+
+        setRandomPan(synth->numRandom(), NoteVoicePar[nvoice].randpanL, NoteVoicePar[nvoice].randpanR, synth->getRuntime().panLaw, 64, 63);
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)

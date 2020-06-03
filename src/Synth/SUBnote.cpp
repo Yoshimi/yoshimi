@@ -37,12 +37,14 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
 #include "Synth/SUBnote.h"
+#include "Misc/NumericFuncs.h"
 
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
 using synth::aboveAmplitudeThreshold;
 
+using func::setRandomPan;
 
 // These have little reason to exist, as GCC actually performs constant folding
 // on logf even on -O0 and Clang (currently, as of 9.0.1) constant-folds these
@@ -81,9 +83,11 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     start = pars->Pstart;
     firsttick = 1;
 
-    float t = synth->numRandom();
-    randpanL = cosf(t * HALFPI);
-    randpanR = cosf((1.0f - t) * HALFPI);
+    //float t = synth->numRandom();
+    //randpanL = cosf(t * HALFPI);
+    //randpanR = cosf((1.0f - t) * HALFPI);
+
+    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, 64, 63);
 
     numharmonics = 0;
     lfilter = NULL;

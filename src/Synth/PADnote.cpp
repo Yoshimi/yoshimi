@@ -36,11 +36,13 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
 #include "Synth/PADnote.h"
+#include "Misc/NumericFuncs.h"
 
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
 using synth::aboveAmplitudeThreshold;
+using func::setRandomPan;
 
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
@@ -65,9 +67,11 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     realfreq = basefreq;
 
-    float t = synth->numRandom();
+    /*float t = synth->numRandom();
     randpanL = cosf(t * HALFPI);
-    randpanR = cosf((1.0f - t) * HALFPI);
+    randpanR = cosf((1.0f - t) * HALFPI);*/
+
+    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, 64, 63);
 
     NoteGlobalPar.Fadein_adjustment =
             pars->Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
