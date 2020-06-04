@@ -1727,13 +1727,20 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
     {
         case ADDSYNTH::control::volume:
             contstr = "Volume";
-
             break;
         case ADDSYNTH::control::velocitySense:
             contstr = "Vel Sens";
             break;
+
         case ADDSYNTH::control::panning:
             contstr = "Panning";
+            break;
+        case ADDSYNTH::control::enableRandomPan:
+            contstr = "Random Pan";
+            yesno = true;
+            break;
+        case ADDSYNTH::control::randomWidth:
+            contstr = "Random Width";
             break;
 
         case ADDSYNTH::control::detuneFrequency:

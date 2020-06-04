@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 #include "DSP/FFTwrapper.h"
 #include "Synth/Envelope.h"
@@ -399,7 +400,7 @@ void ADnote::construct()
     //NoteGlobalPar.randpanL = cosf(t * HALFPI);
     //NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
 
-    setRandomPan(synth->numRandom(), NoteGlobalPar.randpanL, NoteGlobalPar.randpanR, synth->getRuntime().panLaw, 64, 63);
+    setRandomPan(synth->numRandom(), NoteGlobalPar.randpanL, NoteGlobalPar.randpanR, synth->getRuntime().panLaw, adpars->GlobalPar.PPanning, adpars->GlobalPar.PWidth);
 
     NoteGlobalPar.Fadein_adjustment =
         adpars->GlobalPar.Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
@@ -2677,7 +2678,7 @@ int ADnote::noteout(float *outl, float *outr)
 
         pangainL = adpars->GlobalPar.pangainL; // assume it's not random panning ...
         pangainR = adpars->GlobalPar.pangainR;
-        if (adpars->randomGlobalPan())         // it is random panning
+        if (adpars->GlobalPar.PRandom)         // it is random panning
         {
             pangainL = NoteGlobalPar.randpanL;
             pangainR = NoteGlobalPar.randpanR;

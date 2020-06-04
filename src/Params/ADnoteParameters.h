@@ -61,8 +61,9 @@ struct ADnoteGlobalParam {
     LFOParams      *FreqLfo;          // Frequency LFO
 
     // Amplitude global parameters
-    char  PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
-    //bool  randomPan;
+    char  PPanning; // 1 - left, 64 - center, 127 - right
+    bool  PRandom;
+    char  PWidth;
     float pangainL; // derived from PPanning
     float pangainR; // ^
     unsigned char PVolume;
@@ -202,7 +203,6 @@ class ADnoteParameters : public Presets
         float getUnisonFrequencySpreadCents(int nvoice);
         void setGlobalPan(char pan, unsigned char panLaw);
         void setVoicePan(int voice, char pan, unsigned char panLaw);
-        bool randomGlobalPan(void) { return !GlobalPar.PPanning; }
         bool randomVoicePan(int nvoice) { return !VoicePar[nvoice].PPanning; }
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];

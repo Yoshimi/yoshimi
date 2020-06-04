@@ -463,6 +463,7 @@ void SynthEngine::defaults(void)
     }
     masterMono = false;
     fileCompatible = true;
+    usingYoshiType = false;
 
     // System Effects init
     syseffnum = 0;

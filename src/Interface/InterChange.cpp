@@ -3784,6 +3784,18 @@ void InterChange::commandAdd(CommandBlock *getData)
             else
                 value = pars->GlobalPar.PPanning;
             break;
+        case ADDSYNTH::control::enableRandomPan:
+            if (write)
+                pars->GlobalPar.PRandom = value_int;
+            else
+                value = pars->GlobalPar.PRandom;
+            break;
+        case ADDSYNTH::control::randomWidth:
+            if (write)
+                pars->GlobalPar.PWidth = value_int;
+            else
+                value = pars->GlobalPar.PWidth;
+            break;
 
         case ADDSYNTH::control::detuneFrequency:
             if (write)

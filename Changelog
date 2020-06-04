@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-6-4 Will
+* First trial of AddSynth Gobal random width control.
+  Has partial legacy compatibility.
+
 2020-6-3 Will
 * Unified random panning, with variable position and width.
   Fixed values until parameter setup and control done,

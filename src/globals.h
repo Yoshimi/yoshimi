@@ -699,6 +699,8 @@ namespace ADDSYNTH // usage ADDSYNTH::control::volume
         volume = 0,
         velocitySense,
         panning,
+        enableRandomPan,
+        randomWidth,
 
         detuneFrequency = 32,
         octave = 35,

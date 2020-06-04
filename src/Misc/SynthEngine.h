@@ -158,6 +158,7 @@ class SynthEngine
 
         bool masterMono;
         bool fileCompatible;
+        bool usingYoshiType;
 
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
