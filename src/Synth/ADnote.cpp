@@ -1882,6 +1882,9 @@ void ADnote::applyVoiceOscillatorRingModulation(int nvoice)
                                        FMnewamplitude[nvoice], i,
                                        synth->sent_buffersize);
             tw[i] *= mod[i] * amp + (1.0 - amp);
+            // below gives amp mod instead
+            // the audible difference is quite subtle
+            //tw[i] *= (mod[i] + 1.0f) * 0.5 * amp + (1.0 - amp);
         }
     }
 }
