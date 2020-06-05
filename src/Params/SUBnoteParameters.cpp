@@ -110,12 +110,7 @@ void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
     if (!randomPan())
-    {
-        //float t = (float)(PPanning - 1) / 126.0f;
-        //pangainL = cosf(t * HALFPI);
-        //pangainR = cosf((1.0f - t) * HALFPI);
         setAllPan(PPanning, pangainL, pangainR, panLaw);
-    }
     else
         pangainL = pangainR = 0.7f;
 }

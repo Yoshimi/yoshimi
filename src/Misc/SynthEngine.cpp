@@ -151,8 +151,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
     audioOut.store(muteState::Active);
-    //if (bank.roots.empty())
-        //bank.addDefaultRootDirs();
 
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
@@ -365,15 +363,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.midiLearnLoad = "";
         }
     }
-
-    // just to make sure we're in sync
-    /*if (uniqueId == 0)
-    {
-        if (Runtime.showGui)
-            createEmptyFile(runGui);
-        else
-            deleteFile(runGui);
-    }*/
 
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
@@ -2436,7 +2425,6 @@ bool SynthEngine::installBanks()
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
     if (newBanks)
         Runtime.Log(textMsgBuffer.fetch(setRootBank(5, 5) & 0xff));
-        //bank.setCurrentRootID(0);
     else
         Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank) & 0xff));
 #ifdef GUI_FLTK

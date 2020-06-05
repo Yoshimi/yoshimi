@@ -3,6 +3,7 @@ yoshimi 1.7.1 M
 2020-6-5 Will
 * Added line in AddNote.cpp ring mod code for amp mod.
   Commented out, but there for trials.
+* General cleanups and removed reduntant code.
 
 2020-6-4 Will
 * First trial of AddSynth Gobal random width control.

@@ -1157,11 +1157,8 @@ void Bank::addDefaultRootDirs(string bankdirs[])
 
 void Bank::generateSingleRoot(const string& newRoot, bool clear)
 {
-    /*cout << "generating" << endl;
-    string ourDir = synth->getRuntime().definedBankRoot;
-    createDir(ourDir);
-    createDir(ourDir + "/yoshimi");
-    string newRoot = synth->getRuntime().definedBankRoot + "yoshimi/banks";*/
+    //cout << "generating" << endl;
+
     createDir(newRoot);
 
     // add bank

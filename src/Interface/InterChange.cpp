@@ -599,6 +599,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 {
                     bool ok = true;
                     int saveType = synth->getRuntime().instrumentFormat;
+                    // This is both. Below we send them individually.
 
                     if (saveType & 2) // Yoshimi format
                         ok = synth->part[value]->saveXML(text, true);
@@ -1524,10 +1525,6 @@ void InterChange::generateSpecialInstrument(int npart, std::string name)
     pars->Phmag[1] = 75;
     pars->Phmag[2] = 40;
     pars->Pbandwidth = 60;
-
-    //EffectMgr *eff;
-    //eff = synth->part[npart]->partefx[0];
-
 }
 
 

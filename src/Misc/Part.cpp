@@ -26,7 +26,6 @@
 
 */
 
-
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
@@ -53,8 +52,6 @@ using file::findLeafName;
 using func::dB2rap;
 using func::findSplitPoint;
 using func::setAllPan;
-
-//extern unsigned char panLaw;
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
@@ -1297,9 +1294,6 @@ void Part::checkPanning(float step, unsigned char panLaw)
     float actualPan = ((TransPanning + 1.0f) * (126.0f / 127.0f));
      // resolves min value full Left
     setAllPan(actualPan, pangainL,pangainR, panLaw);
-    //t = ((TransPanning > 0) ? (TransPanning - 1) : 0.0f) / 126.0f;
-    //pangainL = cosf(t * HALFPI);
-    //pangainR = cosf((1.0f - t) * HALFPI);
 }
 
 

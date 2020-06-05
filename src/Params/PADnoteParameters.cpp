@@ -228,8 +228,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
         x *= freqmult;
 
         // do the modulation of the profile
-        //x += sinf(x_before_freq_mult * 3.1415926f * modfreq) * modpar1;
-        x += sinf(x_before_freq_mult * PI * modfreq) * modpar1; // should be the same
+        x += sinf(x_before_freq_mult * PI * modfreq) * modpar1;
 
         x = fmodf(x + 1000.0f, 1.0f) * 2.0f - 1.0f;
         // this is the base function of the profile
@@ -407,8 +406,6 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
                                                        int profilesize,
                                                        float bwadjust)
 {
-    //for (int i = 0; i < size; ++i)
-    //    spectrum[i] = 0.0;
     memset(spectrum, 0, sizeof(float) * size);
 
     //float harmonics[synth->getOscilsize() / 2];
@@ -521,8 +518,6 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
                                                     int size,
                                                     float basefreq)
 {
-    //for (int i = 0; i < size; ++i)
-    //    spectrum[i] = 0.0;
     memset(spectrum, 0, sizeof(float) * size);
 
     float harmonics[synth->halfoscilsize];
@@ -684,12 +679,7 @@ void PADnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
     if (!randomPan())
-    {
-        //float t = (float)(PPanning - 1) / 126.0f;
-        //pangainL = cosf(t * HALFPI);
-        //pangainR = cosf((1.0f - t) * HALFPI);
         setAllPan(PPanning, pangainL, pangainR, panLaw);
-    }
     else
         pangainL = pangainR = 0.7f;
 }

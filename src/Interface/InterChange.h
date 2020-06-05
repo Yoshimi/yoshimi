@@ -38,7 +38,6 @@ class DataText;
 
 // used by main.cpp and SynthEngine.cpp
 extern std::string singlePath;
-extern std::string runGui;
 extern int startInstance;
 
 
