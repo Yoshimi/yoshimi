@@ -1349,7 +1349,7 @@ bool Bank::setCurrentRootID(size_t newRootID)
 {
     size_t oldRoot = synth->getRuntime().currentRoot;
     if(roots.count(newRootID) == 0)
-        synth->getRuntime().currentRoot = roots.begin()->first;
+        return false;
     else
         synth->getRuntime().currentRoot = newRootID;
     for (size_t id = 0; id < MAX_BANKS_IN_ROOT; ++id)
