@@ -245,7 +245,7 @@ class PADnoteUI {: {public PresetsUI_}
     }
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {1164 237 535 450} type Double hide
+      xywh {42 52 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
     } {
@@ -898,7 +898,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Pan
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Panning - leftmost/zero is Random} xywh {135 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+              tooltip Panning xywh {135 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code1 {o->value(pars->PPanning);}
               class WidgetPDial
             }
@@ -906,7 +906,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Width
               callback {//
     send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Global random width} xywh {195 42 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+              tooltip {Random width} xywh {195 42 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
               code1 {o->value(pars->PWidth);}
               class WidgetPDial
             }

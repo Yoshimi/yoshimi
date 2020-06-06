@@ -52,6 +52,8 @@ void SUBnoteParameters::defaults(void)
 {
     PVolume = 96;
     setPan(PPanning = 64, synth->getRuntime().panLaw);
+    PRandom = false;
+    PWidth = 63;
     PAmpVelocityScaleFunction = 90;
     Pfixedfreq = 0;
     PfixedfreqET = 0;
@@ -109,7 +111,7 @@ SUBnoteParameters::~SUBnoteParameters()
 void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
-    if (!randomPan())
+    if (!PRandom)
         setAllPan(PPanning, pangainL, pangainR, panLaw);
     else
         pangainL = pangainR = 0.7f;
@@ -118,6 +120,7 @@ void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 
 void SUBnoteParameters::add2XML(XMLwrapper *xml)
 {
+    bool yoshiFormat = synth->usingYoshiType;
     xml->information.SUBsynth_used = 1;
 
     xml->addpar("num_stages",Pnumstages);
@@ -139,6 +142,15 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
         xml->addparbool("stereo", (Pstereo) ? 1 : 0);
         xml->addpar("volume",PVolume);
         xml->addpar("panning",PPanning);
+        if (yoshiFormat)
+        {
+            xml->addpar("panning", PPanning);
+            xml->addparbool("random_pan", PRandom);
+            xml->addpar("random_width", PWidth);
+        }
+        else if (PRandom)
+            xml->addpar("panning", 0);
+
         xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
         xml->beginbranch("AMPLITUDE_ENVELOPE");
             AmpEnvelope->add2XML(xml);
@@ -291,6 +303,17 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         Pstereo = (xpar != 0) ? true : false;
         PVolume=xml->getpar127("volume",PVolume);
         setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
+        PRandom = xml->getparbool("random_pan", PRandom);
+        int test = xml->getpar127("random_width", UNUSED);
+        if (test < 64)
+            PWidth = test; // new Yoshimi type
+        else if (PPanning == 0) // it's a legacy file
+        {
+            PPanning = 64;
+            PRandom = 1;
+            PWidth = 63;
+        }
+
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         if (xml->enterbranch("AMPLITUDE_ENVELOPE"))
         {
@@ -423,6 +446,15 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case SUBSYNTH::control::panning:
             def = 64;
+            break;
+
+        case SUBSYNTH::control::enableRandomPan:
+            max = 1;
+            break;
+
+        case SUBSYNTH::control::randomWidth:
+            def = 63;
+            max = 63;
             break;
 
         case SUBSYNTH::control::bandwidth:

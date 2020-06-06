@@ -173,7 +173,7 @@ class SUBnoteUI {: {public PresetsUI_}
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {1 21 735 470} type Double hide
+      xywh {1125 435 735 470} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
     } {
@@ -208,16 +208,16 @@ class SUBnoteUI {: {public PresetsUI_}
           label Volume
           callback {//
           send_data (0, SUBSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Volume xywh {37 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip Volume xywh {20 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
           class WidgetPDial
         }
         Fl_Dial vsns {
-          label {Veloc Sens}
+          label {Vel Sens}
           callback {//
           send_data (0, SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Velocity sensing} xywh {98 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity sensing} xywh {70 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
@@ -225,21 +225,11 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial pan {
           label Pan
           callback {//
-          randompan->value(o->value() < 1);
           send_data (0, SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Panning - zero/leftmost is Random} xywh {157 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+          tooltip Panning xywh {115 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PPanning);}
           class WidgetPDial
-        }
-        Fl_Light_Button randompan {
-          label Rand
-          callback {//
-          pan->value(0);
-          o->value(1);
-          send_data (0, SUBSYNTH::control::panning, 0, TOPLEVEL::type::Integer);}
-          xywh {179 49 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
-          code0 {o->value(pars->randomPan());}
         }
         Fl_Group ampenv {
           label {SUBsynth - Amplitude Envelope}
@@ -247,6 +237,27 @@ class SUBnoteUI {: {public PresetsUI_}
           code0 {o->init(pars->AmpEnvelope, npart, kititem, 1, 0);}
           class EnvelopeUI
         } {}
+        Fl_Dial panwidth {
+          label Width
+          callback {//
+          send_data (0, SUBSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
+          tooltip {Random Width} xywh {175 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 63 step 1 value 63
+          code1 {o->value(pars->PWidth);}
+          class WidgetPDial
+        }
+        Fl_Check_Button randompan {
+          label Rand
+          callback {//
+        int tmp = o->value();
+        if (tmp == 0)
+            panwidth->deactivate();
+        else
+            panwidth->activate();
+        send_data(0, SUBSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
+          tooltip {Enable random panning} xywh {152 31 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+          code0 {o->value(pars->PRandom);}
+          code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
+        }
       }
       Fl_Group {} {
         xywh {504 406 226 35} box THIN_UP_FRAME
@@ -702,7 +713,12 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::panning:
             pan->value(value);
-            randompan->value(value == 0);
+            break;
+        case SUBSYNTH::control::enableRandomPan:
+            randompan->value(val_bool);
+            break;
+        case SUBSYNTH::control::randomWidth:
+            panwidth->value(value);
             break;
 
         case SUBSYNTH::control::bandwidth:

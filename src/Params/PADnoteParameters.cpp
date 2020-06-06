@@ -759,6 +759,7 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 
 void PADnoteParameters::add2XML(XMLwrapper *xml)
 {
+    bool yoshiFormat = synth->usingYoshiType;
     xml->information.PADsynth_used = 1;
 
     xml->addparbool("stereo", PStereo);
@@ -806,6 +807,15 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->beginbranch("AMPLITUDE_PARAMETERS");
         xml->addpar("volume",PVolume);
         xml->addpar("panning",PPanning);
+        if (yoshiFormat)
+        {
+            xml->addpar("panning", PPanning);
+            xml->addparbool("random_pan", PRandom);
+            xml->addpar("random_width", PWidth);
+        }
+        else if (PRandom)
+            xml->addpar("panning", 0);
+
         xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
         xml->addpar("fadein_adjustment", Fadein_adjustment);
         xml->addpar("punch_strength",PPunchStrength);
@@ -916,6 +926,17 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     {
         PVolume=xml->getpar127("volume",PVolume);
         setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
+        PRandom = xml->getparbool("random_pan", PRandom);
+        int test = xml->getpar127("random_width", UNUSED);
+        if (test < 64)
+            PWidth = test; // new Yoshimi type
+        else if (PPanning == 0) // it's a legacy file
+        {
+            PPanning = 64;
+            PRandom = 1;
+            PWidth = 63;
+        }
+
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         Fadein_adjustment = xml->getpar127("fadein_adjustment", Fadein_adjustment);
         PPunchStrength=xml->getpar127("punch_strength",PPunchStrength);
@@ -1006,6 +1027,15 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case PADSYNTH::control::panning:
             type |= learnable;
+            break;
+
+        case PADSYNTH::control::enableRandomPan:
+            max = 1;
+            break;
+
+        case PADSYNTH::control::randomWidth:
+            def = 63;
+            max = 63;
             break;
 
         case PADSYNTH::control::bandwidth:

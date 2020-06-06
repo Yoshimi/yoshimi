@@ -83,11 +83,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     start = pars->Pstart;
     firsttick = 1;
 
-    //float t = synth->numRandom();
-    //randpanL = cosf(t * HALFPI);
-    //randpanR = cosf((1.0f - t) * HALFPI);
-
-    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, 64, 63);
+    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, pars->PPanning, pars->PWidth);
 
     numharmonics = 0;
     lfilter = NULL;
@@ -774,7 +770,7 @@ int SUBnote::noteout(float *outl, float *outr)
 
     float pangainL = pars->pangainL; // assume non random pan
     float pangainR = pars->pangainR;
-    if (pars->randomPan())
+    if (pars->PRandom)
     {
         pangainL = randpanL;
         pangainR = randpanR;

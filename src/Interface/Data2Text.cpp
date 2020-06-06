@@ -2121,6 +2121,13 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
         case SUBSYNTH::control::panning:
             contstr = "Panning";
             break;
+        case SUBSYNTH::control::enableRandomPan:
+            contstr = "Random Pan";
+            yesno = true;
+            break;
+        case SUBSYNTH::control::randomWidth:
+            contstr = "Random Width";
+            break;
 
         case SUBSYNTH::control::bandwidth:
             contstr = "";

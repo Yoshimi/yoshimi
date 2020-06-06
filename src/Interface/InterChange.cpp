@@ -4383,6 +4383,18 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->PPanning;
             break;
+        case SUBSYNTH::control::enableRandomPan:
+            if (write)
+                pars->PRandom = value_int;
+            else
+                value = pars->PRandom;
+            break;
+        case SUBSYNTH::control::randomWidth:
+            if (write)
+                pars->PWidth = value_int;
+            else
+                value = pars->PWidth;
+            break;
 
         case SUBSYNTH::control::bandwidth:
             if (write)
