@@ -49,7 +49,6 @@ class PADnoteParameters : public Presets
 
         void defaults(void);
         void setPan(char pan, unsigned char panLaw);
-        bool randomPan(void) { return !PPanning; }
 
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
@@ -126,7 +125,9 @@ class PADnoteParameters : public Presets
 
         // Amplitude parameters
         unsigned char PStereo;
-        unsigned char PPanning;  // 0 random, 64 center, 127 right
+        unsigned char PPanning;  // 1 left, 64 center, 127 right
+        bool  PRandom;
+        char  PWidth;
         float         pangainL;  // derived from PPanning
         float         pangainR;  // ^^
         unsigned char PVolume;

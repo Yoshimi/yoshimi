@@ -241,9 +241,11 @@ this->pars=pars;} {}
 class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
+    comment {randompan MUST be after panwidth} {in_source in_header
+    }
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {143 20 535 450} type Double hide
+      xywh {1164 237 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
     } {
@@ -878,7 +880,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Volume
               callback {//
               send_data(0, PADSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Volume xywh {24 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+              tooltip Volume xywh {20 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
               code0 {o->setValueType(VC_InstrumentVolume);}
               code1 {o->value(pars->PVolume);}
               class WidgetPDial
@@ -887,7 +889,7 @@ class PADnoteUI {: {public PresetsUI_}
               label {Vel Sens}
               callback {//
               send_data(0, PADSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {102 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {70 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
               code1 {o->setValueType(VC_AmpVelocitySense);}
               class WidgetPDial
@@ -896,17 +898,30 @@ class PADnoteUI {: {public PresetsUI_}
               label Pan
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
-              code0 {o->setValueType(VC_PanningRandom);}
+              tooltip {Panning - leftmost/zero is Random} xywh {135 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code1 {o->value(pars->PPanning);}
               class WidgetPDial
             }
-            Fl_Light_Button randompan {
+            Fl_Dial panwidth {
+              label Width
+              callback {//
+    send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
+              tooltip {Global random width} xywh {195 42 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+              code1 {o->value(pars->PWidth);}
+              class WidgetPDial
+            }
+            Fl_Check_Button randompan {
               label Rand
               callback {//
-              send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, 0, TOPLEVEL::type::Integer);}
-              tooltip {Random panning On/Off} xywh {197 77 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
-              code0 {o->value(pars->randomPan());}
+        int tmp = o->value();
+        if (tmp == 0)
+            panwidth->deactivate();
+        else
+            panwidth->activate();
+        send_data(0, PADSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
+              tooltip {Enable random panning} xywh {175 51 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+              code0 {o->value(pars->PRandom);}
+              code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
             }
             Fl_Dial dpop {
               label {D.Pop}
@@ -967,6 +982,9 @@ class PADnoteUI {: {public PresetsUI_}
               send_data(0, PADSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 249 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
               code0 {o->value(pars->PStereo);}
+            }
+            Fl_Box {} {
+              xywh {119 41 4 47} box THIN_DOWN_FRAME
             }
           }
           Fl_Group {} {
@@ -1070,7 +1088,13 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::panning:
             pan->value(value);
-            randompan->value(value == 0);
+            break;
+        case PADSYNTH::control::enableRandomPan:
+            randompan->value(value_bool);
+            break;
+
+        case PADSYNTH::control::randomWidth:
+            panwidth->value(value);
             break;
 
         case PADSYNTH::control::bandwidth:

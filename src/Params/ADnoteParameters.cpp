@@ -78,9 +78,9 @@ void ADnoteParameters::defaults(void)
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
     setGlobalPan(GlobalPar.PPanning = 64, synth->getRuntime().panLaw); // center
+    GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.PRandom = false;
     GlobalPar.PWidth = 63;
-    GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.AmpEnvelope->defaults();
     GlobalPar.AmpLfo->defaults();
     GlobalPar.Fadein_adjustment = FADEIN_ADJUSTMENT_SCALE;

@@ -726,6 +726,8 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         volume,
         velocitySense,
         panning,
+        enableRandomPan,
+        randomWidth,
         invertPhase,
         enableAmplitudeEnvelope,
         enableAmplitudeLFO,
@@ -788,6 +790,8 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
         volume = 0,
         velocitySense,
         panning,
+        enableRandomPan,
+        randomWidth,
 
         bandwidth = 16,
         bandwidthScale,
@@ -824,6 +828,8 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         volume = 0,
         velocitySense,
         panning,
+        enableRandomPan,
+        randomWidth,
 
         bandwidth = 16,
         bandwidthScale,

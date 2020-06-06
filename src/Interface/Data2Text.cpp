@@ -2271,6 +2271,13 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::panning:
             contstr = "Panning";
             break;
+        case PADSYNTH::control::enableRandomPan:
+            contstr = "Random Pan";
+            yesno = true;
+            break;
+        case PADSYNTH::control::randomWidth:
+            contstr = "Random Width";
+            break;
 
         case PADSYNTH::control::bandwidth:
             contstr = "Bandwidth";

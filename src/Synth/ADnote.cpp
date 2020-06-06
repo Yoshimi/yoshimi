@@ -396,10 +396,6 @@ void ADnote::construct()
 
     paramSeed = synth->randomINT();
 
-    //float t = synth->numRandom();
-    //NoteGlobalPar.randpanL = cosf(t * HALFPI);
-    //NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
-
     setRandomPan(synth->numRandom(), NoteGlobalPar.randpanL, NoteGlobalPar.randpanR, synth->getRuntime().panLaw, adpars->GlobalPar.PPanning, adpars->GlobalPar.PWidth);
 
     NoteGlobalPar.Fadein_adjustment =

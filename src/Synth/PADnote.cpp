@@ -67,11 +67,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     realfreq = basefreq;
 
-    /*float t = synth->numRandom();
-    randpanL = cosf(t * HALFPI);
-    randpanR = cosf((1.0f - t) * HALFPI);*/
-
-    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, 64, 63);
+    setRandomPan(synth->numRandom(), randpanL, randpanR, synth->getRuntime().panLaw, pars->PPanning, pars->PWidth);
 
     NoteGlobalPar.Fadein_adjustment =
             pars->Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
@@ -546,7 +542,7 @@ int PADnote::noteout(float *outl,float *outr)
 
     float pangainL = pars->pangainL; // assume non random pan
     float pangainR = pars->pangainR;
-    if (pars->randomPan())
+    if (pars->PRandom)
     {
         pangainL = randpanL;
         pangainR = randpanR;

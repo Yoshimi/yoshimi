@@ -1922,6 +1922,9 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
           tooltip {Disable individual Harmonic Amplitude randomisation for voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
+        Fl_Box {} {
+          xywh {119 21 4 47} box THIN_DOWN_FRAME
+        }
       }
       Fl_Group {} {
         label FILTER

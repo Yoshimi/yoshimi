@@ -137,6 +137,8 @@ void PADnoteParameters::defaults(void)
     PVolume = 90;
     setPan(PPanning = 64, synth->getRuntime().panLaw); // center
     PAmpVelocityScaleFunction = 64;
+    PRandom = false;
+    PWidth = 63;
     AmpEnvelope->defaults();
     AmpLfo->defaults();
     Fadein_adjustment = FADEIN_ADJUSTMENT_SCALE;
@@ -678,7 +680,7 @@ void PADnoteParameters::applyparameters()
 void PADnoteParameters::setPan(char pan, unsigned char panLaw)
 {
     PPanning = pan;
-    if (!randomPan())
+    if (!PRandom)
         setAllPan(PPanning, pangainL, pangainR, panLaw);
     else
         pangainL = pangainR = 0.7f;

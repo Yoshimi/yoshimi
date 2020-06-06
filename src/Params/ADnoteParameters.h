@@ -133,9 +133,8 @@ struct ADnoteVoiceParam { // Voice parameters
     LFOParams *FreqLfo;
 
     // Amplitude parameters
-    unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
+    unsigned char PPanning; //  1 - left, 64 - center, 127 - right
                             // panning is ignored if the instrument is mono
-    //bool  randomPan;
     float pangainL;         // derived from PPanning
     float pangainR;         // ^
     unsigned char PVolume;
