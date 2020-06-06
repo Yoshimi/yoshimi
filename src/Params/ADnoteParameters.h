@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2018, Will Godfrey
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -135,6 +135,8 @@ struct ADnoteVoiceParam { // Voice parameters
     // Amplitude parameters
     unsigned char PPanning; //  1 - left, 64 - center, 127 - right
                             // panning is ignored if the instrument is mono
+    bool  PRandom;
+    char  PWidth;
     float pangainL;         // derived from PPanning
     float pangainR;         // ^
     unsigned char PVolume;
@@ -202,7 +204,6 @@ class ADnoteParameters : public Presets
         float getUnisonFrequencySpreadCents(int nvoice);
         void setGlobalPan(char pan, unsigned char panLaw);
         void setVoicePan(int voice, char pan, unsigned char panLaw);
-        bool randomVoicePan(int nvoice) { return !VoicePar[nvoice].PPanning; }
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         static int ADnote_unison_sizes[15];

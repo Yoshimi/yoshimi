@@ -4,6 +4,8 @@ yoshimi 1.7.1 M
 * Trial of PadSynth random width control done.
 * Trial of SubSynth random width control done.
 * Added forgotten PadSynth random load and save :(
+* Trial of AddVoice random width control mostly done.
+  Voice list not included yet.
 
 2020-6-5 Will
 * Added line in AddNote.cpp ring mod code for amp mod.

@@ -3959,6 +3959,19 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
+            case ADDVOICE::control::enableRandomPan:
+                if (write)
+                    pars->VoicePar[nvoice].PRandom = value_int;
+                else
+                    value = pars->VoicePar[nvoice].PRandom;
+                break;
+            case ADDVOICE::control::randomWidth:
+                if (write)
+                    pars->VoicePar[nvoice].PWidth = value_int;
+                else
+                    value = pars->VoicePar[nvoice].PWidth;
+                break;
+
         case ADDVOICE::control::invertPhase:
             if (write)
                 pars->VoicePar[nvoice].PVolumeminus = value_bool;

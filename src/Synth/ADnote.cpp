@@ -1033,11 +1033,7 @@ void ADnote::initParameters(void)
 
         NoteVoicePar[nvoice].noisetype = adpars->VoicePar[nvoice].Type;
 
-        //float t = synth->numRandom();
-        //NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
-        //NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
-
-        setRandomPan(synth->numRandom(), NoteVoicePar[nvoice].randpanL, NoteVoicePar[nvoice].randpanR, synth->getRuntime().panLaw, 64, 63);
+        setRandomPan(synth->numRandom(), NoteVoicePar[nvoice].randpanL, NoteVoicePar[nvoice].randpanR, synth->getRuntime().panLaw, adpars->VoicePar[nvoice].PPanning, adpars->VoicePar[nvoice].PWidth);
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)
@@ -2610,7 +2606,7 @@ int ADnote::noteout(float *outl, float *outr)
 
         pangainL = adpars->VoicePar[nvoice].pangainL; // assume voice not random pan
         pangainR = adpars->VoicePar[nvoice].pangainR;
-        if (adpars->randomVoicePan(nvoice)) // is random panning
+        if (adpars->VoicePar[nvoice].PRandom)
         {
             pangainL = NoteVoicePar[nvoice].randpanL;
             pangainR = NoteVoicePar[nvoice].randpanR;

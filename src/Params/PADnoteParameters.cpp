@@ -806,7 +806,6 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
         xml->addpar("volume",PVolume);
-        xml->addpar("panning",PPanning);
         if (yoshiFormat)
         {
             xml->addpar("panning", PPanning);
@@ -815,6 +814,8 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
         }
         else if (PRandom)
             xml->addpar("panning", 0);
+        else
+            xml->addpar("panning",PPanning);
 
         xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
         xml->addpar("fadein_adjustment", Fadein_adjustment);

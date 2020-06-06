@@ -1852,6 +1852,14 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
         case ADDVOICE::control::panning:
             contstr = " Panning";
             break;
+        case ADDVOICE::control::enableRandomPan:
+            contstr = " Random Pan";
+            yesno = true;
+            break;
+        case ADDVOICE::control::randomWidth:
+            contstr = " Random Width";
+            break;
+
         case ADDVOICE::control::invertPhase:
             contstr = " Minus";
             yesno = true;
@@ -2061,7 +2069,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = " Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);

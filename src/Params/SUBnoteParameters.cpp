@@ -141,7 +141,6 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->beginbranch("AMPLITUDE_PARAMETERS");
         xml->addparbool("stereo", (Pstereo) ? 1 : 0);
         xml->addpar("volume",PVolume);
-        xml->addpar("panning",PPanning);
         if (yoshiFormat)
         {
             xml->addpar("panning", PPanning);
@@ -150,6 +149,8 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
         }
         else if (PRandom)
             xml->addpar("panning", 0);
+        else
+            xml->addpar("panning",PPanning);
 
         xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
         xml->beginbranch("AMPLITUDE_ENVELOPE");
