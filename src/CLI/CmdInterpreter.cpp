@@ -3529,12 +3529,12 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         cmd = ADDVOICE::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = ADDVOICE::control::panning;
-    else if(input.matchnMove(2, "random"))
+    else if(input.matchnMove(2, "prandom"))
     {
         cmd = ADDVOICE::control::enableRandomPan;
         tmp = (input.toggle() == 1);
     }
-    else if(input.matchnMove(2, "width"))
+    else if(input.matchnMove(2, "pwidth"))
         cmd = ADDVOICE::control::randomWidth;
 
     else if (input.matchnMove(2, "velocity"))
@@ -3794,12 +3794,12 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         cmd = ADDSYNTH::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = ADDSYNTH::control::panning;
-    else if(input.matchnMove(2, "random"))
+    else if(input.matchnMove(2, "prandom"))
     {
         cmd = ADDSYNTH::control::enableRandomPan;
         tmp = (input.toggle() == 1);
     }
-    else if(input.matchnMove(2, "width"))
+    else if(input.matchnMove(2, "pwidth"))
         cmd = ADDSYNTH::control::randomWidth;
     else if (input.matchnMove(2, "velocity"))
         cmd = ADDSYNTH::control::velocitySense;
@@ -3951,12 +3951,12 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         cmd = SUBSYNTH::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = SUBSYNTH::control::panning;
-    else if(input.matchnMove(2, "random"))
+    else if(input.matchnMove(2, "prandom"))
     {
         cmd = SUBSYNTH::control::enableRandomPan;
         tmp = (input.toggle() == 1);
     }
-    else if(input.matchnMove(2, "width"))
+    else if(input.matchnMove(2, "pwidth"))
         cmd = SUBSYNTH::control::randomWidth;
 
     else if (input.matchnMove(2, "velocity"))
