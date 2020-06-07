@@ -3,6 +3,7 @@ yoshimi 1.7.1 M
 2020-6-7 Will
 * Random pan width enabled for CLI.
 * Unified CLI panning controls.
+* Updated docs.
 
 2020-6-6 Will
 * Trial of PadSynth random width control done.
