@@ -171,6 +171,8 @@ class SUBnoteharmonic {: {public Fl_Group}
 class SUBnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
+    comment {randompan MUST be placed after panwidth} {in_source in_header
+    }
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
       xywh {1125 435 735 470} type Double hide
@@ -208,7 +210,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label Volume
           callback {//
           send_data (0, SUBSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Volume xywh {20 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip Volume xywh {20 20 29 29} box ROUND_UP_BOX labelsize 10 align 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
           class WidgetPDial
@@ -217,7 +219,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label {Vel Sens}
           callback {//
           send_data (0, SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Velocity sensing} xywh {70 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity sensing} xywh {66 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
@@ -226,7 +228,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label Pan
           callback {//
           send_data (0, SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Panning xywh {115 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+          tooltip Panning xywh {118 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PPanning);}
           class WidgetPDial
@@ -241,7 +243,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label Width
           callback {//
           send_data (0, SUBSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Random Width} xywh {175 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 63 step 1 value 63
+          tooltip {Random Width} xywh {178 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
           code1 {o->value(pars->PWidth);}
           class WidgetPDial
         }
@@ -254,9 +256,12 @@ class SUBnoteUI {: {public PresetsUI_}
         else
             panwidth->activate();
         send_data(0, SUBSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
-          tooltip {Enable random panning} xywh {152 31 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+          tooltip {Enable random panning} xywh {155 31 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
           code0 {o->value(pars->PRandom);}
           code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
+        }
+        Fl_Box {} {
+          xywh {108 22 4 37} box THIN_DOWN_FRAME
         }
       }
       Fl_Group {} {
@@ -716,6 +721,10 @@ class SUBnoteUI {: {public PresetsUI_}
             break;
         case SUBSYNTH::control::enableRandomPan:
             randompan->value(val_bool);
+            if (val_bool)
+                panwidth->activate();
+            else
+                panwidth->deactivate();
             break;
         case SUBSYNTH::control::randomWidth:
             panwidth->value(value);

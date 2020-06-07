@@ -3524,19 +3524,30 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     }
 
     int cmd = -1;
+    int tmp = -1;
     if (input.matchnMove(1, "volume"))
         cmd = ADDVOICE::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = ADDVOICE::control::panning;
+    else if(input.matchnMove(2, "random"))
+    {
+        cmd = ADDVOICE::control::enableRandomPan;
+        tmp = (input.toggle() == 1);
+    }
+    else if(input.matchnMove(2, "width"))
+        cmd = ADDVOICE::control::randomWidth;
+
     else if (input.matchnMove(2, "velocity"))
         cmd = ADDVOICE::control::velocitySense;
-    if (input.lineEnd(controlType))
-        return REPLY::value_msg;
+
     if (cmd != -1)
     {
-        int tmp = string2int127(input);
-        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
-            return REPLY::value_msg;
+        if (tmp == -1)
+        {
+            tmp = string2int127(input);
+            if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+                return REPLY::value_msg;
+        }
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
     }
 
@@ -3778,17 +3789,29 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
 
     int cmd = -1;
+    int tmp = -1;
     if (input.matchnMove(1, "volume"))
         cmd = ADDSYNTH::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = ADDSYNTH::control::panning;
+    else if(input.matchnMove(2, "random"))
+    {
+        cmd = ADDSYNTH::control::enableRandomPan;
+        tmp = (input.toggle() == 1);
+    }
+    else if(input.matchnMove(2, "width"))
+        cmd = ADDSYNTH::control::randomWidth;
     else if (input.matchnMove(2, "velocity"))
         cmd = ADDSYNTH::control::velocitySense;
     if (cmd != -1)
     {
-        int tmp = string2int127(input);
-        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
-            return REPLY::value_msg;
+        if (tmp == -1)
+        {
+            if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+                return REPLY::value_msg;
+            tmp = string2int127(input);
+        }
+
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
     }
 
@@ -3923,17 +3946,29 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         return REPLY::inactive_msg;
 
     int cmd = -1;
+    int tmp = -1;
     if (input.matchnMove(1, "volume"))
         cmd = SUBSYNTH::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = SUBSYNTH::control::panning;
+    else if(input.matchnMove(2, "random"))
+    {
+        cmd = SUBSYNTH::control::enableRandomPan;
+        tmp = (input.toggle() == 1);
+    }
+    else if(input.matchnMove(2, "width"))
+        cmd = SUBSYNTH::control::randomWidth;
+
     else if (input.matchnMove(2, "velocity"))
         cmd = SUBSYNTH::control::velocitySense;
     if (cmd != -1)
     {
-        int tmp = string2int127(input);
-        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
-            return REPLY::value_msg;
+        if (tmp == -1)
+        {
+            tmp = string2int127(input);
+            if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+                return REPLY::value_msg;
+        }
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
     }
 
@@ -4198,17 +4233,29 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     }
 
     int cmd = -1;
+    int tmp = -1;
     if (input.matchnMove(1, "volume"))
         cmd = PADSYNTH::control::volume;
     else if(input.matchnMove(1, "pan"))
         cmd = PADSYNTH::control::panning;
+    else if(input.matchnMove(2, "prandom"))
+    {
+        cmd = SUBSYNTH::control::enableRandomPan;
+        tmp = (input.toggle() == 1);
+    }
+    else if(input.matchnMove(2, "pwidth"))
+        cmd = SUBSYNTH::control::randomWidth;
+
     else if (input.matchnMove(2, "velocity"))
         cmd = PADSYNTH::control::velocitySense;
     if (cmd != -1)
     {
-        int tmp = string2int127(input);
-        if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
-            return REPLY::value_msg;
+        if (tmp == -1)
+        {
+            tmp = string2int127(input);
+            if(controlType == TOPLEVEL::type::Write && input.isAtEnd())
+                return REPLY::value_msg;
+        }
         return sendNormal(synth, 0, tmp, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     }
 

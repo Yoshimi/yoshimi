@@ -1091,6 +1091,10 @@ class PADnoteUI {: {public PresetsUI_}
             break;
         case PADSYNTH::control::enableRandomPan:
             randompan->value(value_bool);
+            if (value_bool)
+                panwidth->activate();
+            else
+                panwidth->deactivate();
             break;
 
         case PADSYNTH::control::randomWidth:

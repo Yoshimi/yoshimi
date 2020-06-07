@@ -1223,6 +1223,10 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableRandomPan:
             voicerandompan->value(val_bool);
+            if (val_bool)
+                voicewidth->activate();
+            else
+                voicewidth->deactivate();
             break;
 
         case ADDVOICE::control::randomWidth:
@@ -2336,6 +2340,10 @@ switch (num)
 
         case ADDSYNTH::control::enableRandomPan:
             globalrandompan->value(val_bool);
+            if (val_bool)
+                globalwidth->activate();
+            else
+                globalwidth->deactivate();
             amplitudegrp->changed();
             break;
 
