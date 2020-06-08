@@ -151,7 +151,7 @@ class ADvoicelistitem {: {public Fl_Group}
         Fl_Box modlabel {
           label N
           callback {//
-    update_modlabel();}
+                update_modlabel();}
           xywh {127 3 20 20} labelfont 1 labelsize 13 labelcolor 7
         }
         Fl_Value_Output detunevalueoutput {
@@ -163,7 +163,7 @@ class ADvoicelistitem {: {public Fl_Group}
         Fl_Slider voicedetune {
           callback {//
             int detune = lrint(o->value());
-            collect_data(synth, detune, 0, (Fl::event_button() | 0xd0), ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_data(synth, detune, TOPLEVEL::action::forceUpdate, Fl::event_button() | TOPLEVEL::type::Write, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {365 3 164 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           class mwheel_slider_rev
@@ -605,7 +605,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 else
                     voiceFMparametersgroup->activate();
                 o->redraw();
-                send_data(0, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
+                send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
             xywh {535 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
@@ -1233,7 +1233,6 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             voicewidth->value(value);
             break;
 
-
         case ADDVOICE::control::invertPhase:
             VolumeMinus->value(val_bool);
             break;
@@ -1256,6 +1255,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::modulatorType:
             ModType->value((int)value);
+            synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->update_modlabel();
             if (value == 0)
                     voiceFMparametersgroup->deactivate();
                 else
@@ -2059,7 +2059,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Spinner currentvoicecounter {
         label {Current Voice}
         callback {//
-            editVoice(lrint(o->value()) - 1)}
+            editVoice(lrint(o->value()) - 1);}
         xywh {35 583 40 24} labelfont 1 labelsize 12 align 8 maximum 8 textfont 1 hide
       }
       Fl_Group advoice {
@@ -2468,7 +2468,8 @@ switch (num)
             voicelistitem[i]->refreshlist();
 
         resui->refresh();
-        currentvoicecounter->do_callback();} {}
+        editVoice(nvoice);
+        //currentvoicecounter->do_callback();} {}
   }
   Function {editVoice(int nvoice_)} {return_type void
   } {
@@ -2479,7 +2480,7 @@ switch (num)
         delete advoice;
         advoice = new ADvoiceUI(0, 0, 765, 585);
         ADnoteVoice->add(advoice);
-        currentvoicecounter->value(nvoice + 1);
+        //currentvoicecounter->value(nvoice + 1);
         advoice->init(pars, npart, kititem, nvoice);
         advoice->show();
         ADnoteVoice->redraw();

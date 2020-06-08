@@ -1,5 +1,10 @@
 yoshimi 1.7.1 M
 
+2020-6-8 Will
+* AddVoice Listitem now sees mod oscilator.
+  Not yet fully updated.
+* Fixed regression: listitem freq slide now correct.
+
 2020-6-7 Will
 * Random pan width enabled for CLI.
 * Unified CLI panning controls.

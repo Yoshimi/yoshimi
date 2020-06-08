@@ -37,4 +37,6 @@ RPNs (channel based)
 
 Improve Copy & Paste functionality.
 
+SYSEX - do we need it? If so, for what and how?
+
 Documentation!
