@@ -1721,15 +1721,15 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
 
         case 5:
-            part = chan | 0x10;
+            part = chan | NUM_MIDI_CHANNELS;
             break;
 
         case 6:
-            part = chan | 0x20;
+            part = chan | (NUM_MIDI_CHANNELS * 2);
             break;
 
         case 7:
-            part = chan | 0x30;
+            part = chan | (NUM_MIDI_CHANNELS * 3);
             break;
 
         case 8:
@@ -1776,7 +1776,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         CommandBlock putData;
         memset(&putData, 0xff, sizeof(putData));
         putData.data.value.F = par;
-        putData.data.type = 0xd0;
+        putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
         putData.data.source = TOPLEVEL::action::fromMIDI | TOPLEVEL::action::muteAndLoop;
         putData.data.control = 8;
         putData.data.part = TOPLEVEL::section::midiIn;
@@ -1853,6 +1853,8 @@ void SynthEngine::partonoffWrite(int npart, int what)
     if (npart >= Runtime.NumAvailableParts)
         return;
     unsigned char original = part[npart]->Penabled;
+    if (original > 1)
+        original = 1;
     unsigned char tmp = original;
     switch (what)
     {
@@ -1866,7 +1868,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
             tmp -= 1;
             break;
         case 2:
-            if (tmp != 1) // nearer to on
+            if (tmp < 1) // nearer to on
                 tmp += 1;
             break;
         default:
@@ -1879,7 +1881,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
         VUpeak.values.parts[npart] = 1e-9f;
         VUpeak.values.partsR[npart] = 1e-9f;
     }
-    else if (tmp != 1 && original == 1) // disable if it wasn't already off
+    else if (tmp < 1 && original == 1) // disable if it wasn't already off
     {
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)

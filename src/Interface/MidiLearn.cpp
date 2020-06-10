@@ -155,7 +155,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
 
         CommandBlock putData;
         putData.data.value.F = value;
-        putData.data.type = 0x40 | (foundEntry.data.type & 0x80);
+        putData.data.type = TOPLEVEL::type::Write | (foundEntry.data.type & TOPLEVEL::type::Integer);
         // write command from midi with original integer / float type
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.control = foundEntry.data.control;
@@ -693,7 +693,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
         memset(&putData, 0xff, putSize);
         putData.data.value.F = 0;
         putData.data.source = TOPLEVEL::action::toAll;
-        putData.data.type = 0xc8;
+        putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
         putData.data.control = TOPLEVEL::control::textMessage;
         putData.data.part = TOPLEVEL::section::midiIn;
         putData.data.parameter = 0x80;

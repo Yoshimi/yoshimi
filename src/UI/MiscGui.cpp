@@ -94,7 +94,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 
     if (part != TOPLEVEL::section::midiLearn)
     { // midilearn must pass though un-modified
-        unsigned char typetop = type & 0xc0;
+        unsigned char typetop = type & (TOPLEVEL::type::Write | TOPLEVEL::type::Integer);
         unsigned char buttons = type & 7;
         if (part == TOPLEVEL::section::main && (control != MAIN::control::volume &&  control  != MAIN::control::detune))
             type = 1;
