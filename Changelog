@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-6-10 Will
+* Further work on random pan for compatibility.
+  Should be complete now!
+
 2020-6-8 Will
 * AddVoice Listitem now sees mod oscilator.
   Not yet fully updated.

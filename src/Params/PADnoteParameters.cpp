@@ -759,7 +759,8 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 
 void PADnoteParameters::add2XML(XMLwrapper *xml)
 {
-    bool yoshiFormat = synth->usingYoshiType;
+    // currently not used
+    // bool yoshiFormat = synth->usingYoshiType;
     xml->information.PADsynth_used = 1;
 
     xml->addparbool("stereo", PStereo);
@@ -806,13 +807,13 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
         xml->addpar("volume",PVolume);
-        if (yoshiFormat)
-        {
-            xml->addpar("panning", PPanning);
-            xml->addparbool("random_pan", PRandom);
-            xml->addpar("random_width", PWidth);
-        }
-        else if (PRandom)
+        // new yoshi type
+        xml->addpar("pan_pos", PPanning);
+        xml->addparbool("random_pan", PRandom);
+        xml->addpar("random_width", PWidth);
+
+        // legacy
+        if (PRandom)
             xml->addpar("panning", 0);
         else
             xml->addpar("panning",PPanning);
@@ -926,16 +927,22 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
     {
         PVolume=xml->getpar127("volume",PVolume);
-        setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
-        PRandom = xml->getparbool("random_pan", PRandom);
         int test = xml->getpar127("random_width", UNUSED);
-        if (test < 64)
-            PWidth = test; // new Yoshimi type
-        else if (PPanning == 0) // it's a legacy file
+        if (test < 64) // new Yoshi type
         {
-            PPanning = 64;
-            PRandom = 1;
-            PWidth = 63;
+            PWidth = test;
+            setPan(xml->getpar127("pan_pos",PPanning), synth->getRuntime().panLaw);
+            PRandom = xml->getparbool("random_pan", PRandom);
+        }
+        else // legacy
+        {
+            setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
+            if (PPanning == 0)
+            {
+                PPanning = 64;
+                PRandom = true;
+                PWidth = 63;
+            }
         }
 
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);

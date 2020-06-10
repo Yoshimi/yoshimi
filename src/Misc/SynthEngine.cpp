@@ -3048,11 +3048,14 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 
 int SynthEngine::getalldata(char **data)
 {
+    bool oldFormat = usingYoshiType;
+    usingYoshiType = true; // make sure everything is saved
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     midilearn.insertMidiListData(xml);
     *data = xml->getXMLdata();
     delete xml;
+    usingYoshiType = oldFormat;
     return strlen(*data) + 1;
 }
 
@@ -3079,12 +3082,15 @@ void SynthEngine::putalldata(const char *data, int size)
 
 bool SynthEngine::savePatchesXML(string filename)
 {
+    bool oldFormat = usingYoshiType;
+    usingYoshiType = true; // make sure everything is saved
     filename = setExtension(filename, EXTEN::patchset);
     Runtime.xmlType = TOPLEVEL::XML::Patch;
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
+    usingYoshiType = oldFormat;
     return result;
 }
 
