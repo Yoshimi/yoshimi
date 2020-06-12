@@ -640,13 +640,14 @@ static std::string LFOlist [] = {
     "AR <n>",           "amplitude randomness",
     "FR <n>",           "frequency randomness",
     "Type <s>",         "LFO oscillator shape",
-    "","SIne, TRiangle, SQuare, RUp (ramp up), RDown (ramp down), E1down, E2down",
+    "","SIne, TRiangle, SQuare, RUp (ramp up), RDown (ramp down), E1down (exp. 1), E2down (exp. 1)",
+    "","SH (sample/hold), RSU (rand square up), RSD (rand square down)",
     "e.g. S FI T RU",     "set filter type ramp up",
     "end"
 };
 // TODO need to find a way to safely (and efficiently) combine these
 static std::string LFOtype [] = {
-    "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down", "E2down", "end"
+    "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down (exp. 1)", "E2down (exp. 2)", "SH (sample/hold)", "RSU (rand square up)", "RSD (rand square dn)", "end"
 };
 
 static std::string filterlist [] = {

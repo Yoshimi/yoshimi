@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -35,6 +35,8 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
     lfopars(_lfopars),
     lfoUpdate(lfopars),
     basefreq(_basefreq),
+    sampandholdvalue(0.0f),
+    issampled(0), // initialized to 0 for correct startup
     synth(_synth)
 {
     if (lfopars->Pstretch == 0)
@@ -152,6 +154,65 @@ float LFO::lfoout(void)
 
         case 6: // LFO_EXP_DOWN 2
             out = powf(0.001f, x) * 2.0f - 1.0f;
+            break;
+
+        case 7: // LFO_SAMPLE_&_HOLD
+            if (x < 0.5f)
+            {
+                if (issampled == 0)
+                {
+                    issampled = 1;
+                    sampandholdvalue = synth->numRandom();
+                    //out = (sampandholdvalue - 0.5f) * 2.0f;
+                }
+                out = (sampandholdvalue - 0.5f) * 2.0f;
+            }
+            else
+            {
+                if (issampled == 1)
+                {
+                    issampled = 0;
+                    sampandholdvalue = synth->numRandom();
+                    //out = (sampandholdvalue - 0.5f) * 2.0f;
+                }
+                out = (sampandholdvalue - 0.5f) * 2.0f;
+            }
+            break;
+
+        case 8: // LFO_RANDOM_SQUARE_UP
+            if (x < 0.5f)
+            {
+                if (issampled == 1)
+                    issampled = 0;
+                out = -1.0f;
+            }
+            else
+            {
+                if (issampled == 0)
+                {
+                    issampled = 1;
+                    sampandholdvalue = synth->numRandom();
+                }
+                out = sampandholdvalue;
+            }
+            break;
+
+        case 9: // LFO_RANDOM_SQUARE_DOWN
+            if (x < 0.5f)
+            {
+                if (issampled == 1)
+                    issampled = 0;
+                out = 1.0f;
+            }
+            else
+            {
+                if (issampled == 0)
+                {
+                    issampled = 1;
+                    sampandholdvalue = synth->numRandom();
+                }
+                out = sampandholdvalue - 1.0f;
+            }
             break;
 
         default:

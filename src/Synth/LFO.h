@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017, Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -55,6 +55,9 @@ class LFO
         float lfoelapsed;
         char lfotype;
         int freqrndenabled;
+
+        float sampandholdvalue;
+        int issampled;
 
         SynthEngine *synth;
 };

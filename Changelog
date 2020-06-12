@@ -1,5 +1,8 @@
 yoshimi 1.7.1 M
 
+2020-612 Will
+* Applied patches from Marco for additional LFO types.
+
 2020-6-10 Will
 * Further work on random pan for compatibility.
   Should be complete now!

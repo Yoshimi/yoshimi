@@ -193,7 +193,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
         case LFOINSERT::control::amplitudeRandomness:
             break;
         case LFOINSERT::control::type:
-            max = 6;
+            max = 9;
             type &= ~learnable;
             break;
         case LFOINSERT::control::continuous:
