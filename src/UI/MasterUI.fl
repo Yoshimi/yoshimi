@@ -2441,7 +2441,7 @@ Alan Calvert started the project}
     loadWin(synth, fetchX, fetchY, fetchO, "bankBank");
     bankui->bankuiwindow->position(fetchX, fetchY);
     if (fetchO)
-    bankui->bankuiwindow->show();
+        bankui->bankuiwindow->show();
     loadWin(synth, fetchX, fetchY, fetchO, "bankRoot");
     bankui->rootuiwindow->position(fetchX, fetchY);
     if (fetchO)

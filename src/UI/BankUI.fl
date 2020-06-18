@@ -1063,16 +1063,16 @@ class BankUI {: {public BankProcess_, RootProcess_}
   Function {BankUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
+    fnr = &RootProcess_::rootprocess;
+    root = synth->getBankPtr();
     fnc = &BankProcess_::process;
     bank = synth->getBankPtr();
     what = 0;
     nselected = -1;
     rselected = -1;
     make_window();
-    mode = 1;
     r_mode = 1;
-    fnr = &RootProcess_::rootprocess;
-    root = synth->getBankPtr();
+    mode = 1;
     bankS = 0;
     rootFrom = 0;
     bankFrom = 0;

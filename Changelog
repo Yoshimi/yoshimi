@@ -1,6 +1,10 @@
 yoshimi 1.7.1 M
 
-2020-612 Will
+2020-6-18 Will
+* BugFix: banks doing unnecessary rewrites to local/share
+  A minor banks issue also seen - to be fixed.
+
+2020-6-12 Will
 * Applied patches from Marco for additional LFO types.
 
 2020-6-10 Will

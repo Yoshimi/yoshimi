@@ -1065,28 +1065,38 @@ bool Bank::transferDefaultDirs(string bankdirs[])
         return false;
     bool found = false;
     // always want these
-    createDir(ourDir + "yoshimi");
-    createDir(ourDir + "yoshimi/banks");
-    if (isDirectory(bankdirs[6]))
-        if (transferOneDir(bankdirs, 0, 6))
-            found = true;
-    if (isDirectory(bankdirs[1]) || isDirectory(bankdirs[2]))
+    if (isDirectory(ourDir + "yoshimi"))
+        found = true;
+    else
     {
-        if (transferOneDir(bankdirs, 0, 1))
-            found = true;
-        if (transferOneDir(bankdirs, 0, 2))
-            found = true;
+        createDir(ourDir + "yoshimi");
+        createDir(ourDir + "yoshimi/banks");
+        if (isDirectory(bankdirs[6]))
+            if (transferOneDir(bankdirs, 0, 6))
+                found = true;
+        if (isDirectory(bankdirs[1]) || isDirectory(bankdirs[2]))
+        {
+            if (transferOneDir(bankdirs, 0, 1))
+                found = true;
+            if (transferOneDir(bankdirs, 0, 2))
+                found = true;
+        }
     }
 
     //might not have these
-    if (isDirectory(bankdirs[3]) || isDirectory(bankdirs[4]))
+    if (isDirectory(ourDir + "zynaddsubfx"))
+        found = true;
+    else
     {
-        createDir(ourDir + "zynaddsubfx");
-        createDir(ourDir + "zynaddsubfx/banks");
-        if (transferOneDir(bankdirs, 5, 3))
-            found = true;
-        if (transferOneDir(bankdirs, 5, 4))
-            found = true;
+        if (isDirectory(bankdirs[3]) || isDirectory(bankdirs[4]))
+        {
+            createDir(ourDir + "zynaddsubfx");
+            createDir(ourDir + "zynaddsubfx/banks");
+            if (transferOneDir(bankdirs, 5, 3))
+                found = true;
+            if (transferOneDir(bankdirs, 5, 4))
+                found = true;
+        }
     }
     return found;
 }
