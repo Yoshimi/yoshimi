@@ -2429,9 +2429,9 @@ bool SynthEngine::installBanks()
         Runtime.Log(textMsgBuffer.fetch(setRootBank(5, 5) & 0xff));
     else
         Runtime.Log(textMsgBuffer.fetch(setRootBank(Runtime.tempRoot, Runtime.tempBank) & 0xff));
-#ifdef GUI_FLTK
-    GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 1);
-#endif
+//#ifdef GUI_FLTK
+    //GuiThreadMsg::sendMessage((this), GuiThreadMsg::RefreshCurBank, 0);
+//#endif
     return true;
 }
 

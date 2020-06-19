@@ -1,5 +1,12 @@
 yoshimi 1.7.1 M
 
+2020-6-19 Will
+* Moved bank refresh thead message from SynthEngine to main.
+  doesn't seen relevant for LV2.
+* Moved NewSynth thread message to end of startup code.
+* Moved Fl::lock to early in main().
+* Early start message now in detached thread.
+
 2020-6-18 Will
 * BugFix: banks doing unnecessary rewrites to local/share
   A minor banks issue also seen - to be fixed.

@@ -158,7 +158,14 @@ void do_start(void)
         usleep(10000);
         Fl::check();
     }
+    usleep(600000);
+    usleep(600000);
 }
+
+void do_splash(void)
+{
+}
+
 #endif
 
 static void *mainGuiThread(void *arg)
@@ -167,12 +174,6 @@ static void *mainGuiThread(void *arg)
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-    static bool first = true;
-    if (first)
-    {
-        first = false;
-        Fl::lock();
-    }
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -207,8 +208,9 @@ static void *mainGuiThread(void *arg)
     while (firstSynth == NULL); // just wait
 
 #ifdef GUI_FLTK
-    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 #endif
+
     if (firstRuntime->autoInstance)
         newBlock();
     while (firstRuntime->runSynth)
@@ -500,14 +502,22 @@ int main(int argc, char *argv[])
                 break;
             }
     }
+
+
     if (useGui)
-        do_start();
+    {
+        Fl::lock();
+        if (!showSplash)
+        {
+            std::thread firstwin (do_start);
+            firstwin.detach();
+        }
+    }
 
     bool guiStarted = false;
     time(&old_father_time);
     here_and_now = old_father_time;
 #endif
-
 
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
@@ -577,6 +587,9 @@ int main(int argc, char *argv[])
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks();
+#ifdef GUI_FLTK
+    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+#endif
 
     //create command line processing thread
     pthread_t cmdThr;
