@@ -19,9 +19,6 @@
 
 */
 
-// approx timeout in seconds.
-#define SPLASH_TIME 3
-
 #include <sys/mman.h>
 #include <iostream>
 #include <string>
@@ -134,67 +131,71 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-#ifdef GUI_FLTK
-void do_start(void)
-{
-    std::string startup = YOSHIMI_VERSION;
-    startup = "Yoshimi V " + startup + " is starting";
-    int w = 300;
-    int h = 36;
-    int sx = (Fl::w() - w) / 2;
-    int sy = (Fl::h() - h) / 2;
-    Fl_Window window(sx, sy, w, h, "yoshimi start");
-    Fl_Box box(2, 2, w-4, h-4, startup.c_str());
-    box.box(FL_EMBOSSED_FRAME);
-    box.labelsize(16);
-    box.labelfont(FL_BOLD);
-    box.labelcolor(YOSHI_COLOUR);
-    window.end();
-    window.border(false);
-
-    for (int i = 0; i < 10; ++i)
-    {
-        window.show();
-        usleep(10000);
-        Fl::check();
-    }
-    usleep(600000);
-    usleep(600000);
-}
-
-void do_splash(void)
-{
-}
-
-#endif
-
 static void *mainGuiThread(void *arg)
 {
     sem_post((sem_t *)arg);
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
+
+    Fl::lock();
+
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
     const unsigned char lgreen = 0xf7;
     const unsigned char lblue = 0xff;
+    int winH, winW;
+    int LbX, LbY, LbW, LbH;
+    int timeout;
 
-    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
-    Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
-    Fl_Box box(0, 0, splashWidth,splashHeight);
-    box.image(pix);
     std::string startup = YOSHIMI_VERSION;
-    startup = "V " + startup;
-    Fl_Box boxLb(0, splashHeight - textY - textHeight, splashWidth, textHeight, startup.c_str());
-    boxLb.box(FL_NO_BOX);
-    boxLb.align(FL_ALIGN_CENTER);
-    boxLb.labelsize(textHeight);
-    boxLb.labeltype(FL_NORMAL_LABEL);
-    boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
-    boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+    if (showSplash)
+    {
+        startup = "V " + startup;
+        winH = splashHeight;
+        winW = splashWidth;
+        LbX = 0;
+        LbY = winH - textY - textHeight;
+        LbW = winW;
+        LbH = textHeight;
+        timeout = 4;
+    }
+    else
+    {
+        startup = "Yoshimi V " + startup + " is starting";
+        winH = 36;
+        winW = 300;
+        LbX = 2;
+        LbY = 2;
+        LbW = winW - 4;
+        LbH = winH -4;
+        timeout = 2;
+    }
+    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
+    Fl_Window winSplash(winW, winH, "yoshimi splash screen");
+    Fl_Box box(0, 0, winW,winH);
+    Fl_Box boxLb(LbX, LbY, LbW, LbH, startup.c_str());
+
+    if (showSplash)
+    {
+        box.image(pix);
+        boxLb.box(FL_NO_BOX);
+        boxLb.align(FL_ALIGN_CENTER);
+        boxLb.labelsize(textHeight);
+        boxLb.labeltype(FL_NORMAL_LABEL);
+        boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
+        boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+    }
+    else
+    {
+        boxLb.box(FL_EMBOSSED_FRAME);
+        boxLb.labelsize(16);
+        boxLb.labelfont(FL_BOLD);
+        boxLb.labelcolor(YOSHI_COLOUR);
+    }
     winSplash.border(false);
-    if (splashSet && bShowGui && showSplash)
+    if (splashSet && bShowGui)
     {
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
     }
@@ -202,7 +203,8 @@ static void *mainGuiThread(void *arg)
         splashSet = false;
     do
     {
-            usleep(33333);
+        winSplash.show();
+        usleep(33333);
     }
 #endif
     while (firstSynth == NULL); // just wait
@@ -210,7 +212,6 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 #endif
-
     if (firstRuntime->autoInstance)
         newBlock();
     while (firstRuntime->runSynth)
@@ -221,11 +222,14 @@ static void *mainGuiThread(void *arg)
         {
             if (splashSet)
             {
-                winSplash.show();
-                usleep(1000);
+                if (showSplash)
+                {
+                    winSplash.show(); // keeps it in front;
+                    usleep(1000);
+                }
                 if(time(&here_and_now) < 0) // no time?
-                    here_and_now = old_father_time + SPLASH_TIME;
-                if ((here_and_now - old_father_time) >= SPLASH_TIME)
+                    here_and_now = old_father_time + timeout;
+                if ((here_and_now - old_father_time) >= timeout)
                 {
                     splashSet = false;
                     winSplash.hide();
@@ -434,11 +438,9 @@ int main(int argc, char *argv[])
      */
     std::string Home = getenv("HOME");
     std::string Config = file::loadText(Home + "/.config/yoshimi/yoshimi.config");
-    bool runGui = false;
     if (Config.empty())
     {
         std::cout << "Not there" << std::endl;
-        runGui = true;
         showSplash = true;
     }
     else
@@ -450,13 +452,6 @@ int main(int argc, char *argv[])
             std::string line = func::nextLine(Config);
             //std::cout << count << "  " << line  << std::endl;
             ++ count;
-
-            if (line.find("enable_gui") != std::string::npos)
-            {
-                ++ found;
-                if (line.find("yes") != std::string::npos)
-                    runGui = true;
-            }
             if (line.find("enable_splash") != std::string::npos)
             {
                 ++ found;
@@ -485,35 +480,6 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef GUI_FLTK
-    bool useGui = false;
-    if (runGui)
-        useGui = true;
-    if (argc > 1)
-    {
-        for (int n = 1; n < argc; ++ n)
-            if (string(argv[n]) == "-i" || string(argv[n]) == "--no-gui" )
-            {
-                useGui = false; // overRide saved settings
-                break;
-            }
-            else if (string(argv[n]) == "-I" || string(argv[n]) == "--gui" )
-            {
-                useGui = true; // overRide saved settings
-                break;
-            }
-    }
-
-
-    if (useGui)
-    {
-        Fl::lock();
-        if (!showSplash)
-        {
-            std::thread firstwin (do_start);
-            firstwin.detach();
-        }
-    }
-
     bool guiStarted = false;
     time(&old_father_time);
     here_and_now = old_father_time;

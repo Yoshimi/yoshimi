@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-6-20 Will
+* BugFix: New stand-alone startup crashing on some window managers.
+  Now using a different (non-threaded) structure.
+
 2020-6-19 Will
 * Moved bank refresh thead message from SynthEngine to main.
   doesn't seen relevant for LV2.
