@@ -404,6 +404,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
                 string instname = candidate.substr(0, candidate.size() -  exten.size());
                 addtobank(rootID, banknum, -1, candidate, instname);
             }
+            InstrumentsInBanks += 1;
         }
     }
     thisBank.clear();
@@ -1035,7 +1036,6 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         instrRef.PADsynth_used = (names & 4) > 0;
         instrRef.yoshiType = (names & 8) > 0;//xml->information.yoshiType;
     }
-    InstrumentsInBanks += 1;
     return 0;
 }
 
@@ -1530,8 +1530,6 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
 bool Bank::installRoots(void)
 {
     RootEntryMap::const_iterator it;
-    InstrumentsInBanks = 0;
-    BanksInRoots = 0;
     for (it = roots.begin(); it != roots.end(); ++it)
     {
         size_t rootID = it->first;
@@ -1605,7 +1603,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
                     roots [rootID].banks [id].dirname = trybank;
                     loadbank(rootID, id);
                     b_it = thisRoot.erase(b_it);
-                    ++ banksFound;
+                    ++banksFound;
                     break;
                 }
             }
