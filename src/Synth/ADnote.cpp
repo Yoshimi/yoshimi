@@ -277,7 +277,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
         oscfreqlo[i] = new float[unison];
         memcpy(oscfreqlo[i], orig.oscfreqlo[i], unison * sizeof(float));
 
-        oscfreqhiFM[i] = new unsigned int[unison];
+        oscfreqhiFM[i] = new int[unison];
         memcpy(oscfreqhiFM[i], orig.oscfreqhiFM[i], unison * sizeof(unsigned int));
 
         oscfreqloFM[i] = new float[unison];
@@ -289,7 +289,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
         oscposlo[i] = new float[unison];
         memcpy(oscposlo[i], orig.oscposlo[i], unison * sizeof(float));
 
-        oscposhiFM[i] = new unsigned int[unison];
+        oscposhiFM[i] = new int[unison];
         memcpy(oscposhiFM[i], orig.oscposhiFM[i], unison * sizeof(unsigned int));
 
         oscposloFM[i] = new float[unison];
@@ -511,11 +511,11 @@ void ADnote::construct()
 
         oscfreqhi[nvoice] = new int[unison];
         oscfreqlo[nvoice] = new float[unison];
-        oscfreqhiFM[nvoice] = new unsigned int[unison];
+        oscfreqhiFM[nvoice] = new int[unison];
         oscfreqloFM[nvoice] = new float[unison];
         oscposhi[nvoice] = new int[unison];
         oscposlo[nvoice] = new float[unison];
-        oscposhiFM[nvoice] = new unsigned int[unison];
+        oscposhiFM[nvoice] = new int[unison];
         oscposloFM[nvoice] = new float[unison];
 
         NoteVoicePar[nvoice].Enabled = true;
@@ -1315,8 +1315,13 @@ void ADnote::computeNoteParameters(void)
         int new_phase_offset = (int)((adpars->VoicePar[nvoice].Poscilphase - 64.0f)
                                     / 128.0f * synth->oscilsize + synth->oscilsize * 4);
         int phase_offset_diff = new_phase_offset - NoteVoicePar[nvoice].phase_offset;
-        for (int k = 0; k < unison; ++k)
+        for (int k = 0; k < unison; ++k) {
             oscposhi[nvoice][k] = (oscposhi[nvoice][k] + phase_offset_diff) % synth->oscilsize;
+            if (oscposhi[nvoice][k] < 0)
+                // This is necessary, because C '%' operator does not always
+                // return a positive result.
+                oscposhi[nvoice][k] += synth->oscilsize;
+        }
         NoteVoicePar[nvoice].phase_offset = new_phase_offset;
 
         if (NoteVoicePar[nvoice].FMEnabled != NONE
@@ -1349,6 +1354,10 @@ void ADnote::computeNoteParameters(void)
             {
                 oscposhiFM[nvoice][k] += FMphase_offset_diff;
                 oscposhiFM[nvoice][k] %= synth->oscilsize;
+                if (oscposhiFM[nvoice][k] < 0)
+                    // This is necessary, because C '%' operator does not always
+                    // return a positive result.
+                    oscposhiFM[nvoice][k] += synth->oscilsize;
             }
             NoteVoicePar[nvoice].FMphase_offset = new_FMphase_offset;
         }

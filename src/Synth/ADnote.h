@@ -260,8 +260,8 @@ class ADnote
         } unison_vibratto[NUM_VOICES];
 
         // integer part (skip) of the Modullator
-        unsigned int *oscposhiFM[NUM_VOICES];
-        unsigned int *oscfreqhiFM[NUM_VOICES];
+        int *oscposhiFM[NUM_VOICES];
+        int *oscfreqhiFM[NUM_VOICES];
 
         float oldamplitude[NUM_VOICES];  // used to compute and interpolate the
         float newamplitude[NUM_VOICES];  // amplitudes of voices and modullators
