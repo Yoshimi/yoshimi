@@ -69,11 +69,14 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     paramsUpdate(adpars),
     synth(_synth)
 {
+    for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+        NoteVoicePar[nvoice].phase_offset = 0;
+
     construct();
 }
 
-ADnote::ADnote(ADnote *topVoice_, float freq_, int subVoiceNumber_, float *parentFMmod_,
-               bool forFM_) :
+ADnote::ADnote(ADnote *topVoice_, float freq_, int phase_offset_, int subVoiceNumber_,
+               float *parentFMmod_, bool forFM_) :
     adpars(topVoice_->adpars),
     stereo(adpars->GlobalPar.PStereo),
     midinote(topVoice_->midinote),
@@ -90,6 +93,11 @@ ADnote::ADnote(ADnote *topVoice_, float freq_, int subVoiceNumber_, float *paren
     paramsUpdate(adpars),
     synth(topVoice_->synth)
 {
+    for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+        // Start phase: Should be negative so that the zero phase in the first
+        // cycle will result in a positive phase change.
+        NoteVoicePar[nvoice].phase_offset = synth->oscilsize - phase_offset_;
+
     construct();
 }
 
@@ -547,10 +555,11 @@ void ADnote::construct()
             NoteVoicePar[nvoice].OscilSmp = topVoice->NoteVoicePar[nvoice].OscilSmp;
         }
 
-        NoteVoicePar[nvoice].phase_offset = 0;
-
-        int oscposhi_start =
-            adpars->VoicePar[vc].OscilSmp->getPhase();
+        int oscposhi_start;
+        if (NoteVoicePar[nvoice].Voice == -1)
+            oscposhi_start = adpars->VoicePar[vc].OscilSmp->getPhase();
+        else
+            oscposhi_start = 0;
         int kth_start = oscposhi_start;
         for (int k = 0; k < unison; ++k)
         {
@@ -668,6 +677,7 @@ void ADnote::initSubVoices(void)
                 float *freqmod = freqbasedmod[nvoice] ? tmpmod_unison[k] : parentFMmod;
                 subVoice[nvoice][k] = new ADnote(topVoice,
                                                  getVoiceBaseFreq(nvoice),
+                                                 oscposhi[nvoice][k],
                                                  NoteVoicePar[nvoice].Voice,
                                                  freqmod, forFM);
             }
@@ -680,6 +690,7 @@ void ADnote::initSubVoices(void)
             for (int k = 0; k < unison_size[nvoice]; ++k) {
                 subFMVoice[nvoice][k] = new ADnote(topVoice,
                                                    getFMVoiceBaseFreq(nvoice),
+                                                   oscposhiFM[nvoice][k],
                                                    NoteVoicePar[nvoice].FMVoice,
                                                    parentFMmod, voiceForFM);
             }
