@@ -1870,6 +1870,7 @@ float Part::getLimits(CommandBlock *getData)
             def = 0;
             break;
         case PART::control::effectBypass:
+            type |= learnable;
             max = 1;
             def = 0;
             break;

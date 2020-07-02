@@ -475,8 +475,8 @@ int main(int argc, char *argv[])
 
         if ((firstTime - secondTime) > 0)
         {
-                kill(firstpid, SIGUSR2); // this just sends a message
-                return 0;
+                kill(firstpid, SIGUSR2); // send message to 1st instance
+                return 0; // exit quietly
         }
     }
 #ifdef GUI_FLTK

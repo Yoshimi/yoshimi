@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-7-2 Will
+* System Effect Enable now MIDI-learnable.
+* Part Effect Bypass  now MIDI-learnable.
+
 2020-6-20 Will
 * BugFix: New stand-alone startup crashing on some window managers.
   Now using a different (non-threaded) structure.

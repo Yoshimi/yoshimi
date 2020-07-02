@@ -3493,8 +3493,10 @@ void InterChange::commandPart(CommandBlock *getData)
             part->Peffnum = engine;
             if (write)
             {
-                part->Pefxbypass[engine] = value_bool;
-                if (!value_bool)
+                bool newSwitch = value_bool;
+                bool oldSwitch = part->Pefxbypass[engine];
+                part->Pefxbypass[engine] = newSwitch;
+                if (newSwitch != oldSwitch)
                     part->partefx[engine]->cleanup();
             }
             else
@@ -6063,8 +6065,10 @@ void InterChange::commandSysIns(CommandBlock *getData)
             case EFFECT::sysIns::effectEnable: // system only
                 if (write)
                 {
-                    synth->syseffEnable[effnum] = (value != 0);
-                    if (value != 0)
+                    bool newSwitch = YOSH::F2B(value);
+                    bool oldSwitch = synth->syseffEnable[effnum];
+                    synth->syseffEnable[effnum] = newSwitch;
+                    if (newSwitch != oldSwitch)
                         synth->sysefx[effnum]->cleanup();
                 }
                 else
@@ -6406,7 +6410,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             return value;
     }
 
-    // these two should realy be in effects
+    // not sure where the following should realy be
     if (npart == TOPLEVEL::section::systemEffects)
     {
         min = 0;
@@ -6428,6 +6432,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             case EFFECT::sysIns::effectEnable:
                 def = 1;
                 max = 1;
+                getData->data.type |= TOPLEVEL::type::Learnable;
                 break;
         }
 

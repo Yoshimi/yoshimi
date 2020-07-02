@@ -1323,6 +1323,7 @@ Alan Calvert started the project}
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
     int value_int = lrint(value);
+    bool value_bool = YOSH::F2B(value);
     int chan = kititem & 0x3f;
     bool isSingle = kititem >= 0x40;
     int mask = NUM_MIDI_CHANNELS - 1;
@@ -1498,8 +1499,8 @@ Alan Calvert started the project}
             }
             else if (control == EFFECT::sysIns::effectEnable)
             {
-               SysEffOn->value(value_int);
-               if (value_int)
+               SysEffOn->value(value_bool);
+               if (value_bool)
                     sysefftype->activate();
                 else
                     sysefftype->deactivate();

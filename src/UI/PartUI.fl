@@ -1324,7 +1324,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Bypass
         callback {//
         send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 22} down_box DOWN_BOX labelsize 12 align 4
+        tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 21} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 12 align 4
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
       }
       Fl_Button {} {
