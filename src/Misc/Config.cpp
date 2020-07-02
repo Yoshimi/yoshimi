@@ -395,7 +395,7 @@ bool Config::loadConfig(void)
             Log("Reorganising config files.");
             if (isRegularFile(defaultStateName + EXTEN::state))
             {
-                if(!isRegularFile(defaultSession))
+                if (!isRegularFile(defaultSession))
                 {
                     renameFile(defaultStateName + EXTEN::state, defaultSession);
                     Log("Moving default state file.");
@@ -460,7 +460,7 @@ bool Config::loadConfig(void)
 
     //std::cout << "Session Stage " << sessionStage << std::endl;
 
-    if(sessionStage == Session::RestoreConf)
+    if (sessionStage == Session::RestoreConf)
         return true;
 
     if (sessionStage != Session::Normal)
@@ -593,7 +593,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     }
 
     // the following three retained here for compatibility with old config type
-    if(!rateChanged)
+    if (!rateChanged)
         Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
     if (!bufferChanged)
         Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
@@ -640,7 +640,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (sessionStage != Session::InProgram)
     {
 
-        if(!rateChanged)
+        if (!rateChanged)
             Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
         if (!bufferChanged)
             Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
@@ -677,7 +677,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
         // engines
-        if(!engineChanged)
+        if (!engineChanged)
             audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
         if (!midiChanged)
             midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
@@ -690,7 +690,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         // jack settings
         jackServer = xml->getparstr("linux_jack_server");
         jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
-        if(!connectJackChanged)
+        if (!connectJackChanged)
             connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
 
         // midi options

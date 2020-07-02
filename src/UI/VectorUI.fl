@@ -94,7 +94,7 @@ class VectorUI {} {
           int size;
           string name;
 
-          if(Xcc < 14)
+          if (Xcc < 14)
           {
               fl_alert("Nothing to save!");
               ok = false;
@@ -836,7 +836,7 @@ class VectorUI {} {
     unsigned int engine = 0;
     if (synth->getRuntime().checksynthengines)
     {
-        for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (synth->part[npart]->kit[i].Padenabled)
                 engine |= 1;
@@ -909,7 +909,7 @@ class VectorUI {} {
     code {//
     int min = 0;
     int max = NUM_MIDI_CHANNELS;
-    if(BaseC < NUM_MIDI_CHANNELS)
+    if (BaseC < NUM_MIDI_CHANNELS)
     {
         min = BaseC;
         max = BaseC + 1;
@@ -942,12 +942,12 @@ class VectorUI {} {
     code {//
 for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
 {
-    if(nval > NUM_MIDI_CHANNELS * 3)
+    if (nval > NUM_MIDI_CHANNELS * 3)
         Ygroup->activate();
     else
         Ygroup->deactivate();
 
-    if(nval > NUM_MIDI_CHANNELS)
+    if (nval > NUM_MIDI_CHANNELS)
         Xgroup->activate();
     else
         Xgroup->deactivate();

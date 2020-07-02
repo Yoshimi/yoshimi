@@ -220,19 +220,19 @@ bool AlsaEngine::openMidi(void)
 
 void AlsaEngine::Close(void)
 {
-    if(synth->getRuntime().runSynth)
+    if (synth->getRuntime().runSynth)
     {
         synth->getRuntime().runSynth = false;
     }
 
-    if(midi.pThread != 0) //wait for midi thread to finish
+    if (midi.pThread != 0) //wait for midi thread to finish
     {
         void *ret = NULL;
         pthread_join(midi.pThread, &ret);
         midi.pThread = 0;
     }
 
-    if(audio.pThread != 0) //wait for audio thread to finish
+    if (audio.pThread != 0) //wait for audio thread to finish
     {
         void *ret = NULL;
         pthread_join(audio.pThread, &ret);
@@ -265,7 +265,7 @@ std::string AlsaEngine::midiClientName(void)
     //Andrew Deryabin: for multi-instance support add unique id to
     //instances other then default (0)
     unsigned int synthUniqueId = synth->getUniqueId();
-    if(synthUniqueId > 0)
+    if (synthUniqueId > 0)
     {
         char sUniqueId [256];
         memset(sUniqueId, 0, sizeof(sUniqueId));
@@ -751,7 +751,7 @@ void *AlsaEngine::MidiThread(void)
             snd_seq_free_event(event);
         }
 ;
-        if(chk < 0)
+        if (chk < 0)
         {
             usleep(1024);
         }

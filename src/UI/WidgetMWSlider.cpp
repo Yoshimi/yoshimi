@@ -62,12 +62,12 @@ void mwheel_val_slider::setGraphicsType(ValueType vt)
 
 void mwheel_val_slider::useCustomTip(bool enabled)
 {
-    if(!enabled)
+    if (!enabled)
     {
         dyntip->hide();
     }
     customTip = enabled;
-    if(!tipText.empty())
+    if (!tipText.empty())
         tooltip(tipText.c_str());
 }
 
@@ -85,14 +85,14 @@ double mwheel_val_slider::value()
 
 void mwheel_val_slider::tooltip(const char* tip)
 {
-     if(tip)
+     if (tip)
      {
          tipText = string(tip);
          dyntip->setTooltipText(tipText);
      }
     /* Call base class with empty string to prevent
        potential parent group tooltip from showing */
-    if(customTip)
+    if (customTip)
     {
         Fl_Widget::tooltip("");
     } else {
@@ -110,14 +110,14 @@ int mwheel_val_slider::_handle(int res, int event)
     {
 
     case FL_MOUSEWHEEL: {
-        if(!Fl::event_inside(this))
+        if (!Fl::event_inside(this))
         {
             return 1;
         }
         double range = std::abs(maximum() - minimum());
         int step_size = (reverse * Fl::event_dy() > 0) ? 1 : -1;
 
-        if(Fl::event_state(FL_CTRL) != 0)
+        if (Fl::event_state(FL_CTRL) != 0)
         {
             step_size *= step();
             if (range > 256) // Scale stepping for large ranges
@@ -138,7 +138,7 @@ int mwheel_val_slider::_handle(int res, int event)
         break;
     }
 
-    if(customTip)
+    if (customTip)
     {
         dyntip->setValue(value());
         dyntip->tipHandle(event);

@@ -216,7 +216,7 @@ float LFO::lfoout(void)
             break;
 
         default:
-            out = cosf( x * TWOPI); // LFO_SINE
+            out = cosf(x * TWOPI); // LFO_SINE
     }
 
     if (lfotype == 0 || lfotype == 1)
@@ -263,7 +263,7 @@ float LFO::amplfoout(void)
 
 void LFO::computenextincrnd(void)
 {
-    if(!freqrndenabled)
+    if (!freqrndenabled)
         return;
     incrnd = nextincrnd;
     nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);

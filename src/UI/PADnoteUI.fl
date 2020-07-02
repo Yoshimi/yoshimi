@@ -367,7 +367,7 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.amp.type);}
-              code1 {if (o->value() > 0) ampgroup->activate(); else ampgroup->deactivate();}
+              code1 {if (YOSH::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {
               MenuItem {} {
                 label OFF
@@ -506,7 +506,7 @@ class PADnoteUI {: {public PresetsUI_}
                   send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
             xywh {325 315 85 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Phrpos.type);}
-            code1 {if (o->value() > 0) hrgroup->activate(); else hrgroup->deactivate();}
+            code1 {if (YOSH::F2B(o->value())) hrgroup->activate(); else hrgroup->deactivate();}
           } {
             MenuItem {} {
               label Harmonic

@@ -132,12 +132,12 @@ class MicrotonalUI {} {
         }
         Fl_Button AsetBack {
           callback {//
-          if(refFreq < A_MIN)
+          if (refFreq < A_MIN)
           {
               refFreq = A_MIN;
               afreqinput->value(refFreq);
           }
-          else if(refFreq > A_MAX)
+          else if (refFreq > A_MAX)
           {
               refFreq = A_MAX;
               afreqinput->value(refFreq);
@@ -151,12 +151,12 @@ class MicrotonalUI {} {
         }
         Fl_Return_Button afreqset {
           callback {//
-          if(refFreq < A_MIN)
+          if (refFreq < A_MIN)
           {
               refFreq = A_MIN;
               afreqinput->value(refFreq);
           }
-          else if(refFreq > A_MAX)
+          else if (refFreq > A_MAX)
           {
               refFreq = A_MAX;
               afreqinput->value(refFreq);
@@ -282,7 +282,7 @@ class MicrotonalUI {} {
             int max = lastnotecounter->value() - 1;
             if (tmp < min)
             {
-                if(oldMid == min)
+                if (oldMid == min)
                     tmp = max;
                 else
                     tmp = min;
@@ -290,7 +290,7 @@ class MicrotonalUI {} {
             }
             else if (tmp > max)
             {
-                if(oldMid == max)
+                if (oldMid == max)
                     tmp = min;
                 else
                     tmp = max;
@@ -571,7 +571,7 @@ class MicrotonalUI {} {
   }
   Function {checkInvert()} {} {
     code {//
-    if((enableMicrotonal->value() && mappingenabledbutton->value()) || !invertKeys->value())
+    if ((enableMicrotonal->value() && mappingenabledbutton->value()) || !invertKeys->value())
         centerinvertcounter->deactivate();
     else
         centerinvertcounter->activate();} {}
@@ -592,7 +592,7 @@ class MicrotonalUI {} {
             message += "Value is too small";
             break;
         case -2:
-            if(type)
+            if (type)
                 message += "Must be numbers (like 232.59)\\n or divisions (like 121/64)";
             else
                 message += "Invalid characters";

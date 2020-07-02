@@ -189,7 +189,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
         if (idx != NULL)
         {
             seen |= 2;
-            if(strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
+            if (strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
                 information.ADDsynth_used = 1;
         }
 
@@ -197,7 +197,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
         if (idx != NULL)
         {
             seen |= 4;
-            if(strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
+            if (strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
                 information.SUBsynth_used = 1;
         }
 
@@ -205,7 +205,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
         if (idx != NULL)
         {
             seen |= 1;
-            if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
+            if (strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
                 information.PADsynth_used = 1;
         }
     }

@@ -218,14 +218,14 @@ return(nearestpoint);} {}
     fl_draw(tmpstr, ox + lx - 20, oy + ly - 10, 20, 10, FL_ALIGN_RIGHT, NULL, 0);
 
     //Draw formatted point value in the top right corner when dragging points
-    if(currentpoint >= 0)
+    if (currentpoint >= 0)
     {
         string valDesc;
         float val = (float) env->Penvval[currentpoint];
         switch(env->Envmode){
             case ENVMODE::amplitudeLin: //linear amplitude
             case ENVMODE::amplitudeLog: //db amplitude
-                if(env->Plinearenvelope)
+                if (env->Plinearenvelope)
                     valDesc = convert_value(VC_EnvelopeLinAmpSusVal, val);
                 else
                     valDesc = convert_value(VC_EnvelopeAmpSusVal, val);
@@ -277,7 +277,7 @@ return(nearestpoint);} {}
         int ny = 127 - (int) (y_ * 127.0 / h());
         if (ny < 0)
             ny = 0;
-        if ( ny> 127)
+        if (ny> 127)
             ny = 127;
 
         int dx = (int)((x_- cpx) * 0.1);
@@ -839,8 +839,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     unsigned char offset = getData->data.offset;
 
     int value_int = lrint(value);
-    bool value_bool = (value > 0.5);
-    bool isFreemode = (freemodebutton->value() > 0.5);
+    bool value_bool = YOSH::F2B(value);
+    bool isFreemode = YOSH::F2B(freemodebutton->value());
     bool NotUs = ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI || (getData->data.source & TOPLEVEL::action::forceUpdate));
 
     if (part != npart || (eng >= 128 && eng != engine))
@@ -929,7 +929,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
             break;
 
         case ENVELOPEINSERT::control::releaseTime:
-            if(NotUs)
+            if (NotUs)
             {
                 switch (par)
                 {
@@ -950,7 +950,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
             break;
 
         case ENVELOPEINSERT::control::releaseLevel:
-            if(NotUs)
+            if (NotUs)
             {
                 switch (par)
                 {
@@ -1233,7 +1233,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   Function {setAmpSusVType(bool linear)} {return_type void
   } {
     code {//
-    if(linear)
+    if (linear)
         e1sval->setValueType(VC_EnvelopeLinAmpSusVal);
     else
         e1sval->setValueType(VC_EnvelopeAmpSusVal);} {}

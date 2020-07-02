@@ -71,7 +71,7 @@ class XMLwrapper
 
         // we always save with a blank first line
         const char *removeBlanks(const char *c)
-        {while(isspace(*c)) ++c; return c;}
+        {while (isspace(*c)) ++c; return c;}
 
         // LOAD from XML
         bool loadXMLfile(const std::string& filename); // true if loaded ok

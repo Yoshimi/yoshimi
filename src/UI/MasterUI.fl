@@ -200,7 +200,7 @@ class MasterUI {: {private GuiUpdates}
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
       string starterror = "";
-      if(synth->getIsLV2Plugin())
+      if (synth->getIsLV2Plugin())
       {
           masterwindow->label(_label);
       }
@@ -294,12 +294,12 @@ class MasterUI {: {private GuiUpdates}
           MenuItem newinstanceid {
             label {&New instance...}
             callback {//
-            if(synth->getIsLV2Plugin())
+            if (synth->getIsLV2Plugin())
             {
                 fl_alert("Start new instances from host");
                 return;
             }
-            if(synth->getUniqueId() != 0)
+            if (synth->getUniqueId() != 0)
             {
                 fl_alert("Only main instance can start others");
                 return;
@@ -404,7 +404,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Clear}
             callback {//
-            if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
+            if (fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
                 send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
@@ -444,7 +444,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Save External...}
             callback {//
             bool valid = false;
-            for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
+            for (int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
                 if (synth->part[npart]->Pname != DEFAULT_NAME)
                 {
                     valid = true;
@@ -622,7 +622,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
           if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           {
-              if(wasCtrl || (Fl::event_state(FL_CTRL) != 0))
+              if (wasCtrl || (Fl::event_state(FL_CTRL) != 0))
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
               else
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}}
@@ -994,7 +994,7 @@ any later version.}
           xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 145
           code0 {//
             o->copy_label((string("Yoshimi version ")
-                           + string( YOSHIMI_VERSION )).c_str());}
+                           + string(YOSHIMI_VERSION)).c_str());}
         }
         Fl_Button {} {
           label more
@@ -1340,9 +1340,9 @@ Alan Calvert started the project}
         { // panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
-                if(panellistitem[i]->partenabled->value() != 0)
+                if (panellistitem[i]->partenabled->value() != 0)
                 {
-                    if((isSingle && i == (chan & mask)
+                    if ((isSingle && i == (chan & mask)
                                  && panellistitem[i]->partrcv->value() == (chan & mask)
                                  && (chan / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS))
                          || (!isSingle && panellistitem[i]->partrcv->value() == (chan & mask)))
@@ -1365,7 +1365,7 @@ Alan Calvert started the project}
                 break;
             case MIDI::control::controller:
                 //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
-                if(engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
+                if (engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
                     int newch = partui->midich->value() - 1;
                     switch (synth->getRuntime().channelSwitchType)
@@ -1381,9 +1381,9 @@ Alan Calvert started the project}
                             break;
 
                         case MIDI::SoloType::Column:
-                            if(value_int == npart)
+                            if (value_int == npart)
                                 newch = (value_int & mask);
-                            else if((value_int & mask) == (npart & mask))
+                            else if ((value_int & mask) == (npart & mask))
                                 newch = (value_int & mask) + NUM_MIDI_CHANNELS;
                             break;
 
@@ -2234,7 +2234,7 @@ Alan Calvert started the project}
   } {
     code {//
     bool changed = false;
-    if(panelgroup >= partmax)
+    if (panelgroup >= partmax)
     {
         panelgroup = 0;
         Panelgroups->value(0);
@@ -2310,7 +2310,7 @@ Alan Calvert started the project}
     code {//
     for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
     {
-        if(panellistitem[i] && panellistitem[i]->partVUMeter)
+        if (panellistitem[i] && panellistitem[i]->partVUMeter)
         {
             panellistitem[i]->partVUMeter->resetPart(true);
         }
@@ -2483,7 +2483,7 @@ Alan Calvert started the project}
     if (fetchO)
         partui->ctlmidi->show();
     loadWin(synth, fetchX, fetchY, fetchO, "partEdit");
-    if(fetchO)
+    if (fetchO)
         partui->instrumenteditwindow->show();} {}
   }
   Function {checkBuffer(void)} {} {

@@ -127,7 +127,7 @@ class ResonanceGraph {: {public Fl_Box}
 
     for (i=1;i<10;i++)
     {
-        if(i==1)
+        if (i==1)
         {
             draw_freq_line(i*100.0);
             draw_freq_line(i*1000.0);
@@ -173,7 +173,7 @@ class ResonanceGraph {: {public Fl_Box}
     int x_ = Fl::event_x() - x();
     int y_ = Fl::event_y() - y();
 
-    if ( (x_ >= 0) && (x_ < w()) && (y_ >= 0) && (y_ < h()))
+    if ((x_ >= 0) && (x_ < w()) && (y_ >= 0) && (y_ < h()))
     {
         khzvalue->value(respar->getfreqx(x_ * 1.0 / w()) / 1000.0);
         dbvalue->value((1.0 - y_ * 2.0 / h()) * respar->PmaxdB);

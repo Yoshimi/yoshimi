@@ -383,7 +383,7 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
         name += " all ";
     else if (control >= VECTOR::control::Ycontroller)
         name += "Y ";
-    else if(control >= VECTOR::control::Xcontroller)
+    else if (control >= VECTOR::control::Xcontroller)
         name += "X ";
 
     if (isFeature)
@@ -893,7 +893,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             else
             {
                 contstr += "Condition - ";
-                 if(synth->getRuntime().configChanged)
+                 if (synth->getRuntime().configChanged)
                      contstr += "DIRTY";
                  else
                      contstr += "CLEAN";
@@ -1225,7 +1225,7 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::readMainLRpeak:
             showValue = false;
-            if(kititem == 1)
+            if (kititem == 1)
                 contstr = "Right";
             else
                 contstr = "Left";
@@ -1234,7 +1234,7 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         case MAIN::control::readMainLRrms:
             showValue = false;
-            if(kititem == 1)
+            if (kititem == 1)
                 contstr = "Right";
             else
                 contstr = "Left";
@@ -2472,7 +2472,7 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
-    else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
@@ -3329,14 +3329,14 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             effname = " EQ ";
             if (control > 1)
             {
-                if(offset)
+                if (offset)
                     effname += "(Band " + to_string(int(parameter)) + ") ";
                 if (ref > 10)
                     ref -= 7;
                 else    // there is no 3 to 9 in the list names
                 {       // but there is an extra line after 10
                     ref -= 8;
-                    if(addValue == true && offset > 0)
+                    if (addValue == true && offset > 0)
                     {
                         showValue = false;
                         contstr = " " + stringCaps(eqtypes[value], 1);
@@ -3349,7 +3349,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         case EFFECT::type::dynFilter:
             effname = " DynFilter ";
             controlType = dynfilterlist[control * 2];
-            if(addValue == true && offset > 0)
+            if (addValue == true && offset > 0)
             {
                 if (control == 4)
                 {

@@ -273,7 +273,7 @@ class PartKitItem {: {public Fl_Group}
           callback {//
           send_data(0, PART::control::kitEffectNum, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
-          code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
+          code0 {o->add("OFF"); char nrstr[10]; for (int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
         } {}
       }
@@ -488,7 +488,7 @@ class PartUI {: {public Fl_Group, PartUI_}
               tmp = fl_input("Instrument name:", tmp);
               if (tmp != NULL)
               {
-                  if( !string(tmp).empty() && string(tmp) != oldName )
+                  if (!string(tmp).empty() && string(tmp) != oldName )
                   {
                       if (string(tmp) == DEFAULT_NAME)
                           fl_alert("Can't use name of default sound");
@@ -944,7 +944,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Check_Button proprt {
           label {Proprt.}
           callback {//
-          if(o->value())
+          if (o->value())
           {
               propta->activate();
               proptb->activate();
@@ -957,7 +957,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           send_data(0, PART::control::enableProportionalPortamento, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
-          code1 {if(o->value()){propta->activate();proptb->activate();}}
+          code1 {if (o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
         }
       }
@@ -1899,7 +1899,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::keyMode:
             legatoMode->labelcolor(FL_BLACK);
-            if(valInt > 1)
+            if (valInt > 1)
             {
                 keymode->value(2);
                 if (drumMode->value())
@@ -2121,7 +2121,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::enableProportionalPortamento:
             proprt->value(valInt);
-            if(value != 0)
+            if (value != 0)
             {
                 propta->activate();
                 proptb->activate();
@@ -2177,7 +2177,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             instrumentType->value(value);
             break;
         case PART::control::defaultInstrumentCopyright:
-            if(parameter == 0)
+            if (parameter == 0)
                 copyright->value(text.c_str());
             break;
         case PART::control::resetAllControllers:
@@ -2228,7 +2228,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     thresh->value(part->ctl->portamento.pitchthresh);
     propta->value(part->ctl->portamento.propRate);
     proprt->value(part->ctl->portamento.proportional);
-    if(proprt->value())
+    if (proprt->value())
     {
         propta->activate();
         proptb->activate();
@@ -2527,7 +2527,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     engine = 0;
     if (synth->getRuntime().checksynthengines)
     {
-        for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (part->kit[i].Padenabled)
                 engine |= 1;

@@ -175,7 +175,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
                 deltanote++;
         float rap_anote_middlenote =
             (deltanote == 0) ? (1.0f) : (octave[(deltanote - 1) % octavesize].tuning);
-        if(deltanote != 0)
+        if (deltanote != 0)
             rap_anote_middlenote *= powf(octave[octavesize - 1].tuning,
                                          (deltanote - 1) / octavesize);
         if (minus)
@@ -227,7 +227,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
 string Microtonal::reformatline(string text)
 {
-    text.erase(remove_if( text.begin(), text.end(),
+    text.erase(remove_if (text.begin(), text.end(),
      [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
 
     size_t found;
@@ -238,7 +238,7 @@ string Microtonal::reformatline(string text)
         text = tmp + text;
     }
     found = text.size();
-    if ( found < 11)
+    if (found < 11)
     {
         string tmp  (11 - found, '0'); // trailing zeros
         text += tmp;
@@ -935,9 +935,9 @@ float Microtonal::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

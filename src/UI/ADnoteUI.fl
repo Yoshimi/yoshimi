@@ -86,7 +86,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Check_Button voiceresonanceenabled {
           callback {//
-    bool enab = (o->value() > 0.5);
+    bool enab = YOSH::F2B(o->value());
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
 
     collect_data(synth, enab, 0, (Fl::event_button() | TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
@@ -173,7 +173,7 @@ class ADvoicelistitem {: {public Fl_Group}
           callback {//
               synth->getGuiMaster()->partui->adnoteui->setVoiceTabs(nvoice);
               synth->getGuiMaster()->partui->adnoteui->fromVoiceList = true;
-              if((Fl::event_button() == 3)){
+              if ((Fl::event_button() == 3)){
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();
               }}
           tooltip {Right click: also close this} xywh {41 4 40 19} box THIN_UP_BOX labelfont 1 labelsize 12
@@ -182,7 +182,7 @@ class ADvoicelistitem {: {public Fl_Group}
       Fl_Check_Button voiceenabled {
         label 1
         callback {//
-    bool enab = (o->value() > 0.5);
+    bool enab = YOSH::F2B(o->value());
     collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (Fl::event_button() | TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
         xywh {20 3 20 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 4
         code0 {char tmp[12]; snprintf(tmp, 12, "%d", nvoice + 1); o->label(strdup(tmp));}
@@ -667,7 +667,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             Fl_Check_Button FreqLfoEn {
               label On
               callback {//
-    bool enab = (o->value() > 0.5);
+    bool enab = YOSH::F2B(o->value());
     if (enab)
     {
         voicefreqlfogroup->activate();
@@ -832,7 +832,7 @@ Oscillator}
           Fl_Check_Button ResonanceEn {
             label Resonance
             callback {//
-    bool enab = (o->value() > 0.5);
+    bool enab = YOSH::F2B(o->value());
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(0, ADDVOICE::control::enableResonance, enab, TOPLEVEL::type::Integer);}
@@ -842,7 +842,7 @@ Oscillator}
           Fl_Group unisongroup {
             xywh {90 400 437 53} box PLASTIC_UP_BOX color 231 deactivate
             code0 {int tmp = pars->VoicePar[nvoice].Unison_size; if (tmp > 1) o->activate();}
-            code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if(pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
+            code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if (pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {
             Fl_Spinner unisonsize {
               label Size
@@ -1120,7 +1120,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             callback {//
                   if (nvoice == 0)
                       o->deactivate();
-                  if (o->value() > 0) {
+                  if (YOSH::F2B(o->value())) {
                       oscGroup->deactivate();
                       SoundType->deactivate();
                   } else {
@@ -1364,7 +1364,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 unisonsize->value(tmp);
                 int colr = FL_BLACK;
                 int i = 0;
-                while(pars->ADnote_unison_sizes[i] != 0)
+                while (pars->ADnote_unison_sizes[i] != 0)
                 {
                     if (pars->ADnote_unison_sizes[i] == tmp)
                     {
@@ -2074,35 +2074,35 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       }
       Fl_Tabs voiceTabs {
         callback {//
-if(o->value() == g1)
+if (o->value() == g1)
 {
     editVoice(0);
 }
-else if(voiceTabs->value() == g2)
+else if (voiceTabs->value() == g2)
 {
     editVoice(1);
 }
-else if(voiceTabs->value() == g3)
+else if (voiceTabs->value() == g3)
 {
     editVoice(2);
 }
-else if(voiceTabs->value() == g4)
+else if (voiceTabs->value() == g4)
 {
     editVoice(3);
 }
-else if(voiceTabs->value() == g5)
+else if (voiceTabs->value() == g5)
 {
     editVoice(4);
 }
-else if(voiceTabs->value() == g6)
+else if (voiceTabs->value() == g6)
 {
     editVoice(5);
 }
-else if(voiceTabs->value() == g7)
+else if (voiceTabs->value() == g7)
 {
     editVoice(6);
 }
-else if(voiceTabs->value() == g8)
+else if (voiceTabs->value() == g8)
 {
     editVoice(7);
 }}

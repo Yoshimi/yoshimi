@@ -697,9 +697,9 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 
     basefilename += "_PADsynth_";
     bool isOK = true;
-    for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
+    for (int k = 0; k < PAD_MAX_SAMPLES; ++k)
     {
-        if(sample[k].smp == NULL)
+        if (sample[k].smp == NULL)
             continue;
         char tmpstr[20];
         snprintf(tmpstr, 20, "_%02d", k + 1);
@@ -737,7 +737,7 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         strcpy(buffer + 36, temp.c_str());
         block = nsmps * 2; // data size
         memcpy(buffer + 40, &block, 4);
-        for(int i = 0; i < nsmps; ++i)
+        for (int i = 0; i < nsmps; ++i)
         {
             sBlock = (sample[k].smp[i] * 32767.0f);
             buffer [44 + i * 2] = sBlock & 0xff;
@@ -1253,9 +1253,9 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

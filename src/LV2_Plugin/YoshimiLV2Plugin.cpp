@@ -197,7 +197,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
     size_t paddedSize = (neededAtomSize + 7U) & (~7U);
-    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
+    if (synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
     {
         synth->setNeedsSaving(false);
         aSeq->atom.type = _atom_type_sequence;
@@ -214,7 +214,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
         aSeq->atom.size += paddedSize;
     }
-    else if(aSeq)
+    else if (aSeq)
     {
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
     }
@@ -350,7 +350,7 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    if(!_synth->Init(_sampleRate, _bufferSize))
+    if (!_synth->Init(_sampleRate, _bufferSize))
     {
         synth->getRuntime().LogError("Can't init synth engine");
 	return false;

@@ -28,7 +28,7 @@ WavFile::WavFile(string filename, int samplerate, int channels)
       file(fopen(filename.c_str(), "w"))
 
 {
-    if(file)
+    if (file)
     {
  //       cout << "INFO: Making space for wave file header" << endl;
         //making space for the header written at destruction
@@ -41,7 +41,7 @@ WavFile::WavFile(string filename, int samplerate, int channels)
 
 WavFile::~WavFile()
 {
-    if(file)
+    if (file)
     {
 //        cout << "INFO: Writing wave file header" << endl;
 
@@ -86,7 +86,7 @@ bool WavFile::good() const
 
 void WavFile::writeStereoSamples(int nsmps, short int *smps)
 {
-    if(file)
+    if (file)
     {
         fwrite(smps, nsmps, 4, file);
         sampleswritten += nsmps;
@@ -96,7 +96,7 @@ void WavFile::writeStereoSamples(int nsmps, short int *smps)
 
 void WavFile::writeMonoSamples(int nsmps, short int *smps)
 {
-    if(file)
+    if (file)
     {
         fwrite(smps, nsmps, 2, file);
         sampleswritten += nsmps;

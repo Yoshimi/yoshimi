@@ -48,7 +48,7 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
     unison_bandwidth_cents(10.0f),
     synth(_synth)
 {
-    if(max_delay < 10)
+    if (max_delay < 10)
         max_delay = 10;
     delay_buffer = new float[max_delay];
     memset(delay_buffer, 0, max_delay * sizeof(float));
@@ -73,7 +73,7 @@ void Unison::setSize(int new_size)
     if (uv)
         delete [] uv;
     uv = new UnisonVoice [unison_size];
-    for(int i = 0; i < unison_size; ++i)
+    for (int i = 0; i < unison_size; ++i)
     {
         uv [i].setPosition(synth->numRandom() * 1.8f - 0.9f);
     }
@@ -105,7 +105,7 @@ void Unison::setBandwidth(float bandwidth)
 
 void Unison::updateParameters(void)
 {
-    if(!uv)
+    if (!uv)
         return;
     float increments_per_second = synth->samplerate_f / (float)update_period_samples;
 //	printf("#%g, %g\n",increments_per_second,base_freq);
@@ -127,7 +127,7 @@ void Unison::updateParameters(void)
 
     //#warning
     //    todo: test if unison_amplitude_samples is to big and reallocate bigger memory
-    if(unison_amplitude_samples >= max_delay - 1)
+    if (unison_amplitude_samples >= max_delay - 1)
         unison_amplitude_samples = max_delay - 2;
     updateUnisonData();
 }
@@ -145,7 +145,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
     float xpos = (float)update_period_sample_k * xpos_step;
     for (int i = 0; i < bufsize; ++i)
     {
-        if(update_period_sample_k++ >= update_period_samples)
+        if (update_period_sample_k++ >= update_period_samples)
         {
             updateUnisonData();
             update_period_sample_k = 0;
@@ -163,7 +163,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
             int posi_next = posi + 1;
             if (posi >= max_delay)
                 posi -= max_delay;
-            if(posi_next >= max_delay)
+            if (posi_next >= max_delay)
                 posi_next -= max_delay;
             float posf = pos - floorf(pos);
             out += ((1.0f - posf) * delay_buffer[posi] + posf * delay_buffer[posi_next]) * sign;
@@ -212,7 +212,7 @@ void Unison::updateUnisonData()
 
         newval = 1.0f + 0.5f * (vibratto_val + 1.0f) * unison_amplitude_samples * uv[k].relative_amplitude;
 
-        if(first_time)
+        if (first_time)
             uv[k].realpos1 = uv[k].realpos2 = newval;
         else
         {

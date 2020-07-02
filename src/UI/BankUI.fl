@@ -163,7 +163,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         scol = 6;
         pcol = 6;
     }
-    else if(bank->emptyslot(rootID, bankID, nslot))
+    else if (bank->emptyslot(rootID, bankID, nslot))
     {
         if (nslot < 128)
         {
@@ -184,15 +184,15 @@ class BankSlot {: {public Fl_Button, BankProcess_}
             bcol = 51;
         else
             bcol = 17;
-        if(engine & 1)
+        if (engine & 1)
             acol = ADD_COLOUR;
         else
             acol = bcol;
-        if(engine & 2)
+        if (engine & 2)
             scol = SUB_COLOUR;
         else
             scol = bcol;
-        if(engine & 4)
+        if (engine & 4)
             pcol = PAD_COLOUR;
         else
             pcol = bcol;
@@ -433,7 +433,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button writebutton {
           label SAVE
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               mode = 2;
           removeselection();}
           xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
@@ -441,7 +441,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button readbutton {
           label SELECT
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               mode = 1;
           removeselection();}
           xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
@@ -450,7 +450,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button clearbutton {
           label DELETE
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               mode = 3;
           removeselection();}
           xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
@@ -458,7 +458,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button swapbutton {
           label SWAP
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               mode = 4;
           removeselection();}
           xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
@@ -466,7 +466,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button renamebutton {
           label RENAME
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               mode = 5;
           removeselection();}
           xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
@@ -752,7 +752,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootreadbutton {
           label SELECT
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 1;
           removeselection();}
           xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
@@ -761,7 +761,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootrenamebutton {
           label RENAME
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 5;
           removeselection();}
           xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
@@ -769,7 +769,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootwritebutton {
           label ADD
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 2;
           removeselection();}
           xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
@@ -777,7 +777,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootclearbutton {
           label DELETE
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 3;
           removeselection();}
           xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
@@ -785,7 +785,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootswapbutton {
           label SWAP
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 4;
           removeselection();}
           xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
@@ -793,7 +793,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootimportbutton {
           label IMPORT
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 6;
           removeselection();}
           xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 93 labelfont 8 labelsize 9
@@ -801,7 +801,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootexportbutton {
           label EXPORT
           callback {//
-          if (o->value() > 0.5)
+          if (YOSH::F2B(o->value()))
               r_mode = 7;
           removeselection();}
           xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9
@@ -857,7 +857,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
         if (!dirname)
             return;
-        if(!file::isDirectory(dirname))
+        if (!file::isDirectory(dirname))
         {
             if (fl_choice("Directory is missing, or doesn't have at least \\n1 bank with at least 1 instrument. \\nCreate missing entries?", NULL, "No", "Yes") != 2)
                 return;
@@ -988,13 +988,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
     switch(control)
     {
         case BANK::control::exportBank:
-            if(source == TOPLEVEL::action::fromGUI)
+            if (source == TOPLEVEL::action::fromGUI)
                 fl_alert("%s",message.c_str());
             break;
         case BANK::control::renameInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             }
             else
@@ -1003,7 +1003,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::saveInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             }
             else
@@ -1012,7 +1012,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::deleteInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             }
             else
@@ -1023,7 +1023,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::selectSecondInstrumentAndSwap:
 
             if (message.find("FAILED") != std::string::npos)
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             rescan_for_banks();
             break;
@@ -1033,7 +1033,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             break;
         case BANK::control::renameBank:
         if (message.find("FAILED") != std::string::npos)
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             rescan_for_banks();
             break;
@@ -1042,7 +1042,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             break;
         case BANK::control::selectSecondBankAndSwap:
             if (message.find("FAILED") != std::string::npos)
-                if(source == TOPLEVEL::action::fromGUI)
+                if (source == TOPLEVEL::action::fromGUI)
                     fl_alert("%s",message.c_str());
             rescan_for_banks();
             break;
@@ -1121,7 +1121,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rescan_for_banks();
     unsearched = true;
     searchType->value(1);
-    /*if(synth->getRuntime().checksynthengines)
+    /*if (synth->getRuntime().checksynthengines)
         B_search->activate();
     else
         B_search->deactivate();*/} {}
@@ -1418,7 +1418,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (!it->second.dirname.empty())
         {
             int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-            if(it->first == fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank))
+            if (it->first == fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank))
             {
                 banklist->value(n); // ensure correct bank in list
             }
@@ -1430,18 +1430,18 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     size_t curID = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);
     const Fl_Menu_Item *curItem = 0;
-    for(int i = 0; i < banklist->size(); i++)
+    for (int i = 0; i < banklist->size(); i++)
     {
         const Fl_Menu_Item *item = banklist->menu() + i;
-        if(item->label())
+        if (item->label())
         {
-            if(curID == reinterpret_cast<size_t>(item->user_data()))
+            if (curID == reinterpret_cast<size_t>(item->user_data()))
             {
                 curItem = item;
             }
         }
     }
-    if(curItem)
+    if (curItem)
     {
         banklist->value(curItem);
     }
@@ -1472,12 +1472,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rootsbrowse->clear();
     const RootEntryMap &roots = synth->getBankRef().getRoots();
     RootEntryMap::const_iterator it;
-    for(it = roots.begin(); it != roots.end(); ++it)
+    for (it = roots.begin(); it != roots.end(); ++it)
     {
         if (!it->second.path.empty())
         {
             tmp = asString(it->first) + ". " + it->second.path;
-            if(it->first == fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank))
+            if (it->first == fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank))
             {
                 tmp += " *";
             }

@@ -481,7 +481,7 @@ inline void SubFilterB(const float coeff[4], float &src, float work[4])
 //in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
 {
-    if(synth->getIsLV2Plugin()){
+    if (synth->getIsLV2Plugin()){
         filterVarRun(filter, smps);
         return;
     }
@@ -491,7 +491,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
     float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
 
-    for(int i = 0; i < blocksize; i += 8)
+    for (int i = 0; i < blocksize; i += 8)
     {
         SubFilterA(coeff, smps[i + 0], work);
         SubFilterB(coeff, smps[i + 1], work);
@@ -504,7 +504,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
     }
     if (remainder > 0)
     {
-        for(int i = blocksize; i < blocksize + remainder ; i += 2)
+        for (int i = blocksize; i < blocksize + remainder ; i += 2)
         {
             SubFilterA(coeff, smps[i + 0], work);
             SubFilterB(coeff, smps[i + 1], work);
@@ -524,10 +524,10 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
     float tmpout;
     int runLength = synth->sent_buffersize;
     int i = 0;
-    if(runLength >= 8){
+    if (runLength >= 8){
         float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
         float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
-        while(runLength >= 8){
+        while (runLength >= 8){
             SubFilterA(coeff, smps[i + 0], work);
             SubFilterB(coeff, smps[i + 1], work);
             SubFilterA(coeff, smps[i + 2], work);
@@ -545,7 +545,7 @@ void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
         filter.yn2 = work[3];
     }
 
-    for(; i < synth->sent_buffersize; ++i){
+    for (; i < synth->sent_buffersize; ++i){
         tmpout=smps[i] * filter.b0 + filter.b2 * filter.xn2
                -filter.a1 * filter.yn1 - filter.a2 * filter.yn2;
         filter.xn2=filter.xn1;
@@ -639,9 +639,9 @@ void SUBnote::computeallfiltercoefs()
                 gain = tmpgain;
             else
                 gain = 1.0f;
-            computefiltercoefs( lfilter[nph + n * numstages],
-                                lfilter[nph + n *numstages].freq * envfreq,
-                                lfilter[nph + n * numstages].bw * envbw, gain);
+            computefiltercoefs(lfilter[nph + n * numstages],
+                               lfilter[nph + n *numstages].freq * envfreq,
+                               lfilter[nph + n * numstages].bw * envbw, gain);
         }
     }
     if (stereo)
@@ -653,9 +653,9 @@ void SUBnote::computeallfiltercoefs()
                     gain = tmpgain;
                 else
                     gain = 1.0f;
-                computefiltercoefs( rfilter[nph + n * numstages],
-                                    rfilter[nph + n * numstages].freq * envfreq,
-                                    rfilter[nph + n * numstages].bw * envbw, gain);
+                computefiltercoefs(rfilter[nph + n * numstages],
+                                   rfilter[nph + n * numstages].freq * envfreq,
+                                   rfilter[nph + n * numstages].bw * envbw, gain);
             }
         }
     oldbandwidth = ctl->bandwidth.data;

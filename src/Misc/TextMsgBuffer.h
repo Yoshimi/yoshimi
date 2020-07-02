@@ -119,9 +119,9 @@ inline int TextMsgBuffer::push(std::string _text)
     std::list<std::string>::iterator it = buffer.begin();
     int idx = 0;
 
-    while(it != buffer.end())
+    while (it != buffer.end())
     {
-        if ( *it == "")
+        if (*it == "")
         {
             *it = text;
 #ifdef REPORT_MISCMSG
@@ -154,7 +154,7 @@ inline std::string TextMsgBuffer::fetch(int _pos)
     std::list<std::string>::iterator it = buffer.begin();
     int idx = 0;
 
-    while(it != buffer.end())
+    while (it != buffer.end())
     {
         if (idx == pos)
         {

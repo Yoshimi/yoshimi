@@ -370,42 +370,42 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Instrument);}
             xywh {240 120 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Check_Button H_patchset {
             label {Patch Set}
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Patch);}
             xywh {240 140 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Check_Button H_scale {
             label Scale
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Scale);}
             xywh {240 160 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Check_Button H_state {
             label State
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::State);}
             xywh {240 180 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Check_Button H_vector {
             label Vector
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Vector);}
             xywh {240 200 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Check_Button H_mlearn {
             label {Midi Learn}
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::MLearn);}
             xywh {240 220 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio) > 0.5f);}
+            code0 {o->value(YOSH::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
           }
           Fl_Box {} {
             label {* Changing these settings requires a restart}

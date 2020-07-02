@@ -223,7 +223,7 @@ void SUBnoteParameters::updateFrequencyMultipliers(void)
     float tmp = 0.0f;
     int   thresh = 0;
 
-    for(int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
         float n1     = n + 1.0f;
         switch(POvertoneSpread.type)
@@ -427,9 +427,9 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
-                if(value < 0)
+                if (value < 0)
                     value = 0;
-                else if(value > 127)
+                else if (value > 127)
                     value = 127;
                 break;
             case TOPLEVEL::type::Minimum:
@@ -574,9 +574,9 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

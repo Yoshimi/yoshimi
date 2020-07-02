@@ -329,7 +329,7 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
             }
         }
         xml->exitbranch();
-        //if(geteffectpar(-1))
+        //if (geteffectpar(-1))
             //cout << "Some pars changed" << endl;
     }
     cleanup();

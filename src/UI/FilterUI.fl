@@ -166,7 +166,7 @@ class FormantFilterGraph {: {public Fl_Box}
             fl_draw(tmpstr.c_str(), ox + 1, oy + 15, 40, 12, FL_ALIGN_LEFT, NULL, 0);
         }
 
-        if(hoverFormant >= 0 && hoverFormant != *nformant)
+        if (hoverFormant >= 0 && hoverFormant != *nformant)
         {
             fl_color(fl_darker(FL_YELLOW));
             draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[hoverFormant].freq));
@@ -216,10 +216,10 @@ switch(event)
   {
       int minDiff = INT_MAX;
       int relPos = (int)(127.0f * ((float) Fl::event_x() / w()));
-      for(int i = 0; i < pars->Pnumformants; ++i)
+      for (int i = 0; i < pars->Pnumformants; ++i)
       {
           int diff = abs(pars->Pvowels[*nvowel].formants[i].freq - relPos);
-          if(diff < minDiff)
+          if (diff < minDiff)
           {
               minDiff = diff;
               hoverFormant = i;
@@ -229,7 +229,7 @@ switch(event)
       return 1;
   }
   case FL_PUSH:
-      if(Fl::event_key() > FL_Button + FL_RIGHT_MOUSE)
+      if (Fl::event_key() > FL_Button + FL_RIGHT_MOUSE)
       {
           handle(FL_KEYDOWN); // Non-LMB/MMB/RMB button - check for forward/backward
           return 0;
@@ -238,7 +238,7 @@ switch(event)
       Fl::pushed(this);
 
        // select formant closest to cursor
-      if(selectedFormant < 0 && Fl::event_button() != FL_MIDDLE_MOUSE)
+      if (selectedFormant < 0 && Fl::event_button() != FL_MIDDLE_MOUSE)
       {
           selectedFormant = hoverFormant;
           delegate(parent.formantnumber, hoverFormant);
@@ -258,7 +258,7 @@ switch(event)
       int hDiff = 127 * (xRef - Fl::event_x()) / w();
       int vDiff = 127 * (yRef - Fl::event_y()) / h();
 
-      if(Fl::event_button2()) // Always prioritize center frequency changes
+      if (Fl::event_button2()) // Always prioritize center frequency changes
       {
           fl_cursor(FL_CURSOR_WE);
           delegate(parent.cfknob, limit(cFreqRef + hDiff, 0, 127));
@@ -268,7 +268,7 @@ switch(event)
          fl_cursor(FL_CURSOR_MOVE);
           delegate(parent.formant_freq_dial, limit(freqRef - hDiff, 0, 127));
 
-          if(qMode)
+          if (qMode)
               delegate(parent.formant_q_dial, limit(qRef + vDiff, 0, 127));
           else
               delegate(parent.formant_amp_dial, limit(ampRef + vDiff, 0, 127));
@@ -277,12 +277,12 @@ switch(event)
   }
   case FL_KEYDOWN: // changes active vowel with left/right , x/z, or forward/back mouse buttons
 
-      if(Fl::event_key(FL_Left) || Fl::event_key(122) || Fl::event_key() == FL_Button + 8)
+      if (Fl::event_key(FL_Left) || Fl::event_key(122) || Fl::event_key() == FL_Button + 8)
       {
           delegate(parent.vowelnumber, (FF_MAX_VOWELS + ((*nvowel) - 1)) % FF_MAX_VOWELS);
           hoverFormant = -1;
       }
-      else if(Fl::event_key(FL_Right) || Fl::event_key(120) || Fl::event_key() == FL_Button + 9)
+      else if (Fl::event_key(FL_Right) || Fl::event_key(120) || Fl::event_key() == FL_Button + 9)
       {
           delegate(parent.vowelnumber, ((*nvowel) + 1) % FF_MAX_VOWELS);
           hoverFormant = -1;
@@ -291,7 +291,7 @@ switch(event)
   case FL_MOUSEWHEEL:
   {
       int offset = Fl::event_dy() * (Fl::event_ctrl() ? 1 : 4);
-      if(Fl::event_shift())
+      if (Fl::event_shift())
           delegate(parent.cfknob, limit(pars->Pcenterfreq + offset, 0, 127));
       else
           delegate(parent.octknob, limit(pars->Poctavesfreq + offset, 0, 127));
@@ -299,15 +299,15 @@ switch(event)
   }
   case FL_RELEASE:
 
-      if(Fl::event_inside(this))
+      if (Fl::event_inside(this))
           fl_cursor(FL_CURSOR_HAND);
 
-      if(Fl::event_button() == FL_RIGHT_MOUSE)
+      if (Fl::event_button() == FL_RIGHT_MOUSE)
           qMode = false;
-      else if(Fl::event_button() == FL_LEFT_MOUSE)
+      else if (Fl::event_button() == FL_LEFT_MOUSE)
           qMode = true;
 
-      if(!Fl::event_button1() && !Fl::event_button3())
+      if (!Fl::event_button1() && !Fl::event_button3())
       {
           selectedFormant = -1;
           return 1;
@@ -319,7 +319,7 @@ switch(event)
       Fl::pushed(this);
       return 1;
   case FL_LEAVE:
-      if(!Fl::event_inside(this)) // Cover for some strange events when clicking
+      if (!Fl::event_inside(this)) // Cover for some strange events when clicking
       {
           hoverFormant = -1;
           qMode = false;
@@ -335,7 +335,7 @@ return Fl_Box::handle(event);} {}
   } {
     code {// If widget value has changed, update and perform manual callback
 
-        if(w->value() != value)
+        if (w->value() != value)
         {
             w->value(value);
             w->do_callback();
@@ -774,7 +774,7 @@ pars=NULL;
         stcounter->value(pars->Pstages);
         int categ = pars->Pcategory;
 
-        if ( categ == 0 || categ == 2)
+        if (categ == 0 || categ == 2)
         {
             if (categ == 0)
             {

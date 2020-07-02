@@ -117,13 +117,13 @@ Phaser::~Phaser()
     if (oldr != NULL)
         delete [] oldr;
 
-    if(xn1l)
+    if (xn1l)
         delete[] xn1l;
-    if(yn1l)
+    if (yn1l)
         delete[] yn1l;
-    if(xn1r)
+    if (xn1r)
         delete[] xn1r;
-    if(yn1r)
+    if (yn1r)
         delete[] yn1r;
 }
 
@@ -131,7 +131,7 @@ Phaser::~Phaser()
 // Effect output
 void Phaser::out(float *smpsl, float *smpsr)
 {
-    if(Panalog)
+    if (Panalog)
         AnalogPhase(smpsl, smpsr);
     else
         NormalPhase(smpsl, smpsr);
@@ -156,7 +156,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     modl = limit(modl, ZERO_, ONE_);
     modr = limit(modr, ZERO_, ONE_);
 
-    if(Phyper)
+    if (Phyper)
     {
         // Triangle wave squared is approximately sine on bottom, triangle on top
         // Result is exponential sweep more akin to filter in synth with
@@ -177,7 +177,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     oldlgain = modl;
     oldrgain = modr;
 
-   for(int i = 0; i < synth->sent_buffersize; ++i)
+   for (int i = 0; i < synth->sent_buffersize; ++i)
    {
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
@@ -185,7 +185,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
         float xnl(smpsl[i] * pangainL.getAndAdvanceValue());
         float xnr(smpsr[i] * pangainR.getAndAdvanceValue());
 
-        if(barber)
+        if (barber)
         {
             gl = fmodf((gl + 0.25f), ONE_);
             gr = fmodf((gr + 0.25f), ONE_);
@@ -201,7 +201,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
         efxoutr[i] = xnr;
     }
 
-    if(Poutsub)
+    if (Poutsub)
     {
         invSignal(efxoutl, synth->sent_buffersize);
         invSignal(efxoutr, synth->sent_buffersize);
@@ -212,7 +212,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
 float Phaser::applyPhase(float x, float g, float fb,
                          float &hpf, float *yn1, float *xn1)
 {
-    for(int j = 0; j < Pstages; ++j)
+    for (int j = 0; j < Pstages; ++j)
     { //Phasing routine
         mis = 1.0f + offsetpct * offset[j];
 
@@ -233,7 +233,7 @@ float Phaser::applyPhase(float x, float g, float fb,
 
         xn1[j] = x;
         x = yn1[j];
-        if(j == 1)
+        if (j == 1)
             x += fb; // Insert feedback after first phase stage
     }
     return x;
@@ -363,15 +363,15 @@ void Phaser::setstages(unsigned char Pstages_)
 {
     if (oldl != NULL)
         delete [] oldl;
-    if(xn1l)
+    if (xn1l)
         delete[] xn1l;
-    if(yn1l)
+    if (yn1l)
         delete[] yn1l;
     if (oldr != NULL)
         delete [] oldr;
-    if(xn1r)
+    if (xn1r)
         delete[] xn1r;
-    if(yn1r)
+    if (yn1r)
         delete[] yn1r;
 
     Pstages = (Pstages_ >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : Pstages_;
@@ -590,9 +590,9 @@ float Phaserlimit::getlimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
             break;
         case TOPLEVEL::type::Minimum:

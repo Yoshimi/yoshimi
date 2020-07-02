@@ -248,7 +248,7 @@ float OscilGen::basefunc_pulsesine(float x, float a)
     x = (fmodf(x, 1.0f) - 0.5f) * expf((a - 0.5f) * logf(128.0f));
     if (x < -0.5f)
         x = -0.5f;
-    else if (x > 0.5f)
+    else if (YOSH::F2B(x))
         x = 0.5f;
     x = sinf(x * TWOPI);
     return x;
@@ -310,9 +310,9 @@ float OscilGen::basefunc_spike(float x, float a)
 {
     float b = a * 0.66666; // the width of the range: if a == 0.5, b == 0.33333
 
-    if(x < 0.5)
+    if (x < 0.5)
     {
-        if(x < (0.5 - (b / 2.0)))
+        if (x < (0.5 - (b / 2.0)))
             return 0.0;
         else
 	{
@@ -322,7 +322,7 @@ float OscilGen::basefunc_spike(float x, float a)
     }
     else
     {
-        if(x > (0.5 + (b / 2.0)))
+        if (x > (0.5 + (b / 2.0)))
             return 0.0;
         else
 	{
@@ -341,10 +341,10 @@ float OscilGen::basefunc_circle(float x, float a)
     b = 2 - (a * 2); // b goes from 2 to 0
     x = x * 4;
 
-    if(x < 2)
+    if (x < 2)
     {
         x = x - 1; // x goes from -1 to 1
-        if((x < -b) || (x > b))
+        if ((x < -b) || (x > b))
             y = 0;
         else
             y = sqrt(1 - (pow(x, 2) / pow(b, 2)));  // normally * a^2, but a stays 1
@@ -352,7 +352,7 @@ float OscilGen::basefunc_circle(float x, float a)
     else
     {
         x = x - 3; // x goes from -1 to 1 as well
-        if((x < -b) || (x > b))
+        if ((x < -b) || (x > b))
             y = 0;
         else
             y = -sqrt(1 - (pow(x, 2) / pow(b, 2)));

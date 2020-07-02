@@ -85,7 +85,7 @@ void newBlock()
     {
         if ((firstRuntime->activeInstance >> i) & 1)
         {
-            while(configuring)
+            while (configuring)
                 usleep(1000);
             // in case there is still an instance starting from elsewhere
             configuring = true;
@@ -122,7 +122,7 @@ void yoshimiSigHandler(int sig)
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
         case SIGUSR2: // start next instance
-            if(isSingleMaster)
+            if (isSingleMaster)
                 newInstance();
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
@@ -227,7 +227,7 @@ static void *mainGuiThread(void *arg)
                     winSplash.show(); // keeps it in front;
                     usleep(1000);
                 }
-                if(time(&here_and_now) < 0) // no time?
+                if (time(&here_and_now) < 0) // no time?
                     here_and_now = old_father_time + timeout;
                 if ((here_and_now - old_father_time) >= timeout)
                 {
@@ -350,7 +350,7 @@ int mainCreateNewInstance(unsigned int forceId)
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
-        if(firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
+        if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
         {
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
         }
@@ -514,7 +514,7 @@ int main(int argc, char *argv[])
 
         std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< std::endl;
     }
-    if(sem_init(&semGui, 0, 0) == 0)
+    if (sem_init(&semGui, 0, 0) == 0)
     {
         if (pthread_attr_init(&attr) == 0)
         {
@@ -560,7 +560,7 @@ int main(int argc, char *argv[])
     //create command line processing thread
     pthread_t cmdThr;
 
-    if(bShowCmdLine)
+    if (bShowCmdLine)
     {
         if (pthread_attr_init(&attr) == 0)
         {
@@ -574,7 +574,7 @@ int main(int argc, char *argv[])
 
     void *ret;
     pthread_join(thr, &ret);
-    if(ret == (void *)1)
+    if (ret == (void *)1)
     {
         goto bail_out;
     }
@@ -588,7 +588,7 @@ bail_out:
         SynthEngine *_synth = it->first;
         MusicClient *_client = it->second;
         _synth->getRuntime().runSynth = false;
-        if(!bExitSuccess)
+        if (!bExitSuccess)
         {
             _synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
         }
@@ -605,7 +605,7 @@ bail_out:
             delete _synth;
         }
     }
-    if(bShowCmdLine)
+    if (bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
     {

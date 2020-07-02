@@ -584,7 +584,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
         xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
         code0 {o->value(pars->POvertoneSpread.type);}
-        code1 {if (o->value() > 0) spreadGroup->activate(); else spreadGroup->deactivate();}
+        code1 {if (YOSH::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
       } {
         MenuItem {} {
           label Harmonic

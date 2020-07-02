@@ -175,7 +175,7 @@ class PresetsUI {} {
             return;
         }
         synth->audioOut.store(muteState::Request);
-        while(synth->audioOut.load() == muteState::Request)
+        while (synth->audioOut.load() == muteState::Request)
             usleep (1000); // wait for full mute
         p->paste(n);
         pastewin->hide();
@@ -195,7 +195,7 @@ class PresetsUI {} {
         label {Paste from Clipboard}
         callback {//
         synth->audioOut.store(muteState::Request);
-        while(synth->audioOut.load() == muteState::Request)
+        while (synth->audioOut.load() == muteState::Request)
             usleep (1000); // wait for full mute
         p->paste(0);
         pastewin->hide();
@@ -221,7 +221,7 @@ class PresetsUI {} {
         label Delete
         callback {//
         int n = pastebrowse->value();
-        if ( n != 0)
+        if (n != 0)
             p->deletepreset(n);
         rescan();}
         xywh {180 355 75 20} box THIN_UP_BOX

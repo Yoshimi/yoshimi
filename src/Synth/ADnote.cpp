@@ -1410,7 +1410,7 @@ void ADnote::computeNoteParameters(void)
             }
 
         // unison vibrattos
-        if(true_unison > 1)
+        if (true_unison > 1)
         {
             for (int k = 0; k < unison; ++k) // reduce the frequency difference
                                              // for larger vibrattos
@@ -1466,7 +1466,7 @@ void ADnote::computeNoteParameters(void)
 
                 case 1:
                     for (int k = 0; k < unison; ++k)
-                        unison_invert_phase[nvoice][k] = (paramRNG.numRandom() > 0.5f);
+                        unison_invert_phase[nvoice][k] = YOSH::F2B(paramRNG.numRandom());
                     break;
 
                 default:
@@ -2057,7 +2057,7 @@ void ADnote::computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
             if (FMmode == PW_MOD && (k & 1))
                 carposhi += NoteVoicePar[nvoice].phase_offset;
 
-            if(carposlo >= 1.0f)
+            if (carposlo >= 1.0f)
             {
                 carposhi++;
                 carposlo -= 1.0f;
@@ -2201,7 +2201,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice)
             int carposhi = poshi + FMmodfreqhi;
             float carposlo = poslo + FMmodfreqlo;
 
-            if(carposlo >= 1.0f)
+            if (carposlo >= 1.0f)
             {
                 carposhi++;
                 carposlo -= 1.0f;
@@ -2473,9 +2473,9 @@ int ADnote::noteout(float *outl, float *outr)
                 bool is_pwm = NoteVoicePar[nvoice].FMEnabled == PW_MOD;
                 if (is_pwm)
                 {
-                    if(unison_size[nvoice] > 2)
+                    if (unison_size[nvoice] > 2)
                         stereo_pos = k/2 / (float)((unison_size[nvoice] / 2) - 1) * 2.0f - 1.0f;
-                } else if(unison_size[nvoice] > 1)
+                } else if (unison_size[nvoice] > 1)
                 {
                     stereo_pos = (float) k
                         / (float)(unison_size[nvoice]

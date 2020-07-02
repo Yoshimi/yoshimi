@@ -306,9 +306,9 @@ float OscilParameters::getLimits(CommandBlock *getData)
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
-                if(value < min)
+                if (value < min)
                     value = min;
-                else if(value > max)
+                else if (value > max)
                     value = max;
             break;
             case TOPLEVEL::type::Minimum:
@@ -460,9 +460,9 @@ float OscilParameters::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

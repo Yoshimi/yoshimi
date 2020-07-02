@@ -173,7 +173,7 @@ void *InterChange::_sortResultsThread(void *arg)
 
 void *InterChange::sortResultsThread(void)
 {
-    while(synth->getRuntime().runSynth)
+    while (synth->getRuntime().runSynth)
     {
         /*
          * To maintain portability we synthesise a very simple low accuracy
@@ -225,7 +225,7 @@ void *InterChange::sortResultsThread(void)
 
         while (decodeLoopback->read(getData.bytes))
         {
-            if(getData.data.part == TOPLEVEL::section::midiLearn)
+            if (getData.data.part == TOPLEVEL::section::midiLearn)
                 synth->midilearn.generalOperations(&getData);
             else if (getData.data.source >= TOPLEVEL::action::lowPrio)
                 indirectTransfers(&getData);
@@ -306,7 +306,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char parameter = getData->data.parameter;
     //unsigned char miscmsg = getData->data.miscmsg;
 
-    while(syncWrite)
+    while (syncWrite)
         usleep(10);
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
@@ -452,7 +452,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
                 case SCALES::control::importScl:
                     value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
-                    if(value > 0)
+                    if (value > 0)
                     {
                         text = "";
                         char *buf = new char[100];
@@ -468,7 +468,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 case SCALES::control::importKbm:
                     value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
-                    if(value > 0)
+                    if (value > 0)
                     {
                         text = "";
                         int map;
@@ -620,7 +620,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 }
                 case MAIN::control::loadNamedPatchset:
                     vectorClear(NUM_MIDI_CHANNELS);
-                    if(synth->loadPatchSetAndUpdate(text))
+                    if (synth->loadPatchSetAndUpdate(text))
                     {
                         synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                         text = "ed " + text;
@@ -631,7 +631,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     newMsg = true;
                     break;
                 case MAIN::control::saveNamedPatchset:
-                    if(synth->savePatchesXML(text))
+                    if (synth->savePatchesXML(text))
                     {
                         synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
                         text = "d " + text;
@@ -1136,7 +1136,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     if (write)
                     {
                         text = synth->getRuntime().ConfigFile;
-                        if(synth->getRuntime().saveConfig())
+                        if (synth->getRuntime().saveConfig())
                             text = "d " + text;
                         else
                             text = " FAILED " + text;
@@ -1148,7 +1148,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                     break;
                 case CONFIG::control::historyLock:
                 {
-                    if(write)
+                    if (write)
                         synth->setHistoryLock(kititem, value);
                     else
                         value = synth->getHistoryLock(kititem);
@@ -1380,8 +1380,8 @@ std::string InterChange::formatScales(std::string text)
     do
     {
         current = next + 1;
-        next = text.find_first_of( delimiters, current );
-        word = text.substr( current, next - current );
+        next = text.find_first_of(delimiters, current );
+        word = text.substr(current, next - current );
 
         found = word.find('.');
         if (found != string::npos)
@@ -1392,7 +1392,7 @@ std::string InterChange::formatScales(std::string text)
                 word = tmp + word;
             }
             found = word.size();
-            if ( found < 11)
+            if (found < 11)
             {
                 std::string tmp  (11 - found, '0'); // trailing zeros
                 word += tmp;
@@ -1409,7 +1409,7 @@ std::string InterChange::formatScales(std::string text)
 
 float InterChange::readAllData(CommandBlock *getData)
 {
-    if(getData->data.type & TOPLEVEL::type::Limits) // these are static
+    if (getData->data.type & TOPLEVEL::type::Limits) // these are static
     {
         //std::cout << "Read Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << std::endl;
         /*
@@ -1541,7 +1541,7 @@ void InterChange::mediate()
         if (fromCLI->read(getData.bytes))
         {
             more = true;
-            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
+            if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -1551,7 +1551,7 @@ void InterChange::mediate()
         if (fromGUI->read(getData.bytes))
         {
             more = true;
-            if(getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
+            if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -1559,7 +1559,7 @@ void InterChange::mediate()
         if (fromMIDI->read(getData.bytes))
         {
             more = true;
-            if(getData.data.part != TOPLEVEL::section::midiLearn)
+            if (getData.data.part != TOPLEVEL::section::midiLearn)
                 // Normal MIDI message, not special midi-learn message
             {
                 historyActionCheck(&getData);
@@ -3097,7 +3097,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
 
-    if ( kitType && kititem >= NUM_KIT_ITEMS)
+    if (kitType && kititem >= NUM_KIT_ITEMS)
     {
         getData->data.source = TOPLEVEL::action::noAction;
         synth->getRuntime().Log("Invalid kit number");
@@ -3305,7 +3305,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int > part->Pmaxkey)
+                    if (value_int > part->Pmaxkey)
                         part->Pminkey = part->Pmaxkey;
                     else
                         part->Pminkey = part->lastnote;
@@ -3319,7 +3319,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int < part->kit[kititem].Pminkey)
+                    if (value_int < part->kit[kititem].Pminkey)
                         part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
                     else
                         part->kit[kititem].Pmaxkey = part->lastnote;
@@ -3330,7 +3330,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 if ((write) && part->lastnote >= 0)
                 {
-                    if(value_int < part->Pminkey)
+                    if (value_int < part->Pminkey)
                         part->Pmaxkey = part->Pminkey;
                     else
                         part->Pmaxkey = part->lastnote;
@@ -3506,7 +3506,7 @@ void InterChange::commandPart(CommandBlock *getData)
         }
 
         case PART::control::defaultInstrument: // doClearPart
-            if(write)
+            if (write)
             {
                 synth->partonoffWrite(npart, -1);
                 getData->data.source = TOPLEVEL::action::lowPrio;
@@ -4955,7 +4955,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
             getData->data.value.F = oscil->Phmag[control];
         return;
     }
-    else if(insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         if (write)
         {
@@ -5382,7 +5382,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             break;
         case LFOINSERT::control::continuous:
             if (write)
-                pars->setPcontinous((val > 0.5f));
+                pars->setPcontinous(YOSH::F2B(val));
             else
                 val = pars->Pcontinous;
             break;
@@ -6225,7 +6225,7 @@ void InterChange::testLimits(CommandBlock *getData)
                 getData->data.miscmsg = textMsgBuffer.push(text);
             return;
         }
-        if(control == CONFIG::control::bankCC)
+        if (control == CONFIG::control::bankCC)
         {
             if (value != 0 && value != 32)
                 return;
@@ -6344,9 +6344,9 @@ float InterChange::returnLimits(CommandBlock *getData)
             switch (request)
             {
                 case TOPLEVEL::type::Adjust:
-                    if(value < min)
+                    if (value < min)
                         value = min;
-                    else if(value > max)
+                    else if (value > max)
                         value = max;
                     break;
                 case TOPLEVEL::type::Minimum:
@@ -6392,9 +6392,9 @@ float InterChange::returnLimits(CommandBlock *getData)
             switch (request)
             {
                 case TOPLEVEL::type::Adjust:
-                    if(value < min)
+                    if (value < min)
                         value = min;
-                    else if(value > max)
+                    else if (value > max)
                         value = max;
                 break;
                 case TOPLEVEL::type::Minimum:
@@ -6439,9 +6439,9 @@ float InterChange::returnLimits(CommandBlock *getData)
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
-                if(value < min)
+                if (value < min)
                     value = min;
-                else if(value > max)
+                else if (value > max)
                     value = max;
             break;
             case TOPLEVEL::type::Minimum:
@@ -6479,9 +6479,9 @@ float InterChange::returnLimits(CommandBlock *getData)
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
-                if(value < min)
+                if (value < min)
                     value = min;
-                else if(value > max)
+                else if (value > max)
                     value = max;
             break;
             case TOPLEVEL::type::Minimum:
@@ -6506,9 +6506,9 @@ float InterChange::returnLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

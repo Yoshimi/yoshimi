@@ -75,7 +75,7 @@ class Reverb : public Effect
         void setidelayfb(unsigned char Pidelayfb_);
         void sethpf(unsigned char Phpf_);
         void setlpf(unsigned char Plpf_);
-        void settype( unsigned char Ptype_);
+        void settype(unsigned char Ptype_);
         void setroomsize(unsigned char Proomsize_);
         void setbandwidth(unsigned char Pbandwidth_);
         void processmono(int ch, float *output);

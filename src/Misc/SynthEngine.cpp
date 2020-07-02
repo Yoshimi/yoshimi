@@ -882,7 +882,7 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
             if (notinplace)
             {
                 name = "No bank " + asString(banknum);
-                if(root < UNUSED)
+                if (root < UNUSED)
                     name += " in root " + to_string(root) + ".";
                 else
                     name += " in this root.";
@@ -1217,7 +1217,7 @@ void SynthEngine::ListVectors(list<string>& msg_buf)
 
     for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
     {
-        if(SingleVector(msg_buf, chan))
+        if (SingleVector(msg_buf, chan))
             found = true;
     }
     if (!found)
@@ -1445,7 +1445,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 {
                     if (value < MIN_KEY_SHIFT + 64)
                         value = MIN_KEY_SHIFT + 64;
-                    else if(value > MAX_KEY_SHIFT + 64)
+                    else if (value > MAX_KEY_SHIFT + 64)
                         value = MAX_KEY_SHIFT + 64;
                     part[npart]->Pkeyshift = value;
                     setPartMap(npart);
@@ -1817,7 +1817,7 @@ void SynthEngine::resetAll(bool andML)
         string filename = Runtime.defaultStateName;
         if (this != firstSynth)
             filename += ("-" + to_string(this->getUniqueId()));
-        if(isRegularFile(filename + ".state"))
+        if (isRegularFile(filename + ".state"))
         {
             Runtime.StateFile = filename;
             Runtime.restoreSessionData(Runtime.StateFile);
@@ -2563,7 +2563,7 @@ string SynthEngine::getLastfileAdded(int group)
 {
     list<string>::iterator it = Runtime.lastfileseen.begin();
     int count = 0;
-    while ( count < group && it != Runtime.lastfileseen.end())
+    while (count < group && it != Runtime.lastfileseen.end())
     {
         ++it;
         ++count;
@@ -3064,7 +3064,7 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(const char *data, int size)
 {
-    while(isspace(*data))
+    while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
     XMLwrapper *xml = new XMLwrapper(this, true);
@@ -3353,9 +3353,9 @@ float SynthEngine::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:
@@ -3446,9 +3446,9 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:
@@ -3615,9 +3615,9 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

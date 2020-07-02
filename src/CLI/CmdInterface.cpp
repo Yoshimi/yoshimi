@@ -85,12 +85,12 @@ void CmdInterface::cmdIfaceCommandLoop()
     parser.setHistoryFile(hist_filename);
     interpreter.synth = firstSynth;
     bool exit = false;
-    while(!exit)
+    while (!exit)
     {
         parser.readline();
         if (parser.isTooLarge())
             std::cout << "*** Error: line too long" << std::endl;
-        else if(parser.isValid())
+        else if (parser.isValid())
         {
             // in case it's been changed from elsewhere
             interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);

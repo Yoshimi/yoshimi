@@ -423,7 +423,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::block:
             break;
         case MIDILEARN::control::ignoreMove:
-            if(type != UNUSED) // edit line in place
+            if (type != UNUSED) // edit line in place
             {
                 midilearnkititem[value]->blockcheck->value((type & 1) != 0);
                 midilearnkititem[value]->compresscheck->value((type & 2) != 0);
@@ -468,7 +468,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             break;
         case MIDILEARN::control::reportActivity: // flash LED
             IDold = kititem | (engine << 8);
-            for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
+            for (int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
             {
                 if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {

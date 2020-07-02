@@ -472,7 +472,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     list<LearnBlock>::iterator it = midi_list.begin();
     it = midi_list.begin();
 
-    while(lineNo < value && it != midi_list.end())
+    while (lineNo < value && it != midi_list.end())
     {
         ++ it;
         ++lineNo;
@@ -637,12 +637,12 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         int lineNo = 0;
         if (midi_list.size() > 0)
         { // CC is priority
-            while(CC > it->CC && it != midi_list.end())
+            while (CC > it->CC && it != midi_list.end())
             { // find start of group
                 ++it;
                 ++lineNo;
             }
-            while(CC == it->CC && chan >= it->chan && it != midi_list.end())
+            while (CC == it->CC && chan >= it->chan && it != midi_list.end())
             { // insert at end of same channel
                 ++it;
                 ++lineNo;
@@ -739,12 +739,12 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     int lineNo = 0;
     if (midi_list.size() > 0)
     { // CC is priority
-        while(CC > it->CC && it != midi_list.end()) // CC is priority
+        while (CC > it->CC && it != midi_list.end()) // CC is priority
         { // find start of group
             ++it;
             ++lineNo;
         }
-        while(CC == it->CC && chan >= it->chan && it != midi_list.end())
+        while (CC == it->CC && chan >= it->chan && it != midi_list.end())
         { // insert at end of same channel
             ++it;
             ++lineNo;
@@ -785,7 +785,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
     }
     while (!ok && tries < 3);
 
-    if(!ok)
+    if (!ok)
         synth->getRuntime().Log("toGui buffer full!", 2);
 }
 

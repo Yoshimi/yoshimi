@@ -347,7 +347,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
         xml->addpar("random_width", VoicePar[nvoice].PWidth);
 
         // legacy
-        if(VoicePar[nvoice].PRandom)
+        if (VoicePar[nvoice].PRandom)
             xml->addpar("panning", 0);
         else
             xml->addpar("panning", VoicePar[nvoice].PPanning);
@@ -1024,9 +1024,9 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
         switch (request)
         {
             case TOPLEVEL::type::Adjust:
-                if(value < min)
+                if (value < min)
                     value = min;
-                else if(value > max)
+                else if (value > max)
                     value = max;
             break;
             case TOPLEVEL::type::Minimum:
@@ -1299,9 +1299,9 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

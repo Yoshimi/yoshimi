@@ -85,7 +85,7 @@ eff = eff_;
 
         if (freqx > 0.0 && freqx < 1.0)
         fl_line(x() + (int) (freqx * w()), y(),
-            x() + (int) (freqx * w()), y( ) + h());} {}
+            x() + (int) (freqx * w()), y() + h());} {}
   }
   Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h(), i, iy, oiy;
@@ -108,7 +108,7 @@ eff = eff_;
 
         for (i = 1; i < 10; ++i)
         {
-            if(i == 1)
+            if (i == 1)
             {
                 draw_freq_line(i * 100.0,0);
                 draw_freq_line(i * 1000.0,0);
@@ -1777,7 +1777,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         case EFFECT::type::eq:
             //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
-            if(control == EFFECT::control::level)
+            if (control == EFFECT::control::level)
             {
                 eqp0->value(value);
             }
@@ -1822,7 +1822,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             break;
 
         case EFFECT::type::dynFilter:
-            if(isdynfilter)
+            if (isdynfilter)
             { // shouldn't get here
                 //cout << "DyneFilter" << endl;
                 return;

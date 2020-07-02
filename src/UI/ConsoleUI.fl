@@ -47,7 +47,7 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   Function {scroll_to_last_line()} {return_type void
   } {
     code {//
-    if(mVScrollBar->visible() &&
+    if (mVScrollBar->visible() &&
        mVScrollBar->value() > mNBufferLines - mNVisibleLines)
     {
         insert_position(mBuffer->length());

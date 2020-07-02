@@ -23,10 +23,10 @@ cmake_policy (VERSION 3.0)
 cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 NEW)
-endif() # opengl version
+endif () # opengl version
 if (POLICY CMP0072)
     cmake_policy (SET CMP0072 OLD)
-endif()
+endif ()
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
@@ -78,7 +78,7 @@ if (HasJackSession)
     option (JackSessionSupport "Include Jack Session Support" ON)
 else()
     set (JackSessionSupport OFF)
-endif()
+endif ()
 
 option (BuildFor0ld_X86 "Build for legacy x86 system" OFF)
 
@@ -135,7 +135,7 @@ set (BuildOptionsRelease
 
 if (BuildWithFLTK)
     add_definitions (-DGUI_FLTK)
-endif()
+endif ()
 
 find_package (PkgConfig REQUIRED)
 
@@ -143,9 +143,9 @@ include (CheckFunctionExists)
 
 check_function_exists(exp10f EXP10F)
 
-if(EXP10F)
+if (EXP10F)
     add_definitions(-DHAVE_EXP10F)
-endif()
+endif ()
 
 check_c_source_compiles (
     "#include <argp.h>
@@ -161,7 +161,7 @@ check_c_source_compiles (
 if (NOT LIBC_HAS_ARGP)
     message(STATUS "libc does not have argp")
     find_library (ARGP_LIB argp REQUIRED)
-endif()
+endif ()
 
 # libz
 find_package(ZLIB REQUIRED)
@@ -173,13 +173,13 @@ pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
 pkg_check_modules (MXML REQUIRED mxml>=2.5)
 
 # Alsa
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     pkg_check_modules (ALSA REQUIRED alsa>=1.0.17)
     add_definitions(-DHAVE_ALSA)
     FIND_LIBRARY(LIBDL_LINUX NAMES dl)
 else()
 
-endif()
+endif ()
 
 # Jack
 pkg_check_modules (JACK REQUIRED jack>=0.115.6)
@@ -198,7 +198,7 @@ if (BuildWithFLTK)
     mark_as_advanced (FLTK_DIR)
     mark_as_advanced (FLTK_FLUID_EXECUTABLE)
     mark_as_advanced (FLTK_MATH_LIBRARY)
-endif()
+endif ()
 
 
 # libncurses / libcursesw
@@ -220,14 +220,14 @@ find_library(Readline_LIBRARY
 )
 
 #find_package(PkgConfig REQUIRED)
-if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
+if (Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
     set(READLINE_FOUND TRUE)
 else()
     FIND_LIBRARY(Readline_LIBRARY NAMES readline)
     include(FindPackageHandleStandardArgs)
     FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
     MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif()
+endif ()
 
 mark_as_advanced(
     Readline_ROOT_DIR
@@ -235,11 +235,11 @@ mark_as_advanced(
     Readline_LIBRARY
 )
 
-if(READLINE_FOUND)
+if (READLINE_FOUND)
     message (STATUS "Readline library found" )
 else()
     message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
-endif()
+endif ()
 
 # set platform specific compiler flags
 if (BuildFor0ld_X86)
@@ -254,7 +254,7 @@ elseif (BuildForThisCPU)
     set (OurCxxFlags ${BuildOptionsThisCPU})
 else()
     set (OurCxxFlags ${BuildOptionsBasic})
-endif()
+endif ()
 set (CMAKE_CXX_FLAGS "${OurCxxFlags} ${CMAKE_CXX_FLAGS}")
 
 if (BuildForDebug)
@@ -265,7 +265,7 @@ else()
     set (CMAKE_BUILD_TYPE "Release")
     set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsRelease})
     message (STATUS "RELEASE Build, flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
-endif()
+endif ()
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.desktop.in"
@@ -359,7 +359,7 @@ if (BuildWithFLTK)
         UI/MiscGui.cpp
     )
     set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
-endif()
+endif ()
 
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
@@ -371,11 +371,11 @@ add_definitions (-DYOSHIMI="yoshimi")
 
 if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
-endif()
+endif ()
 
 if (ReportNotes)
     add_definitions (-DREPORT_NOTES_ON_OFF)
-endif()
+endif ()
 
 add_definitions(-DDEFAULT_AUDIO=jack_audio)
 
@@ -386,7 +386,7 @@ if (JackSessionSupport)
     add_definitions(-DJACK_SESSION)
 else()
     message(STATUS "Without jack session support")
-endif()
+endif ()
 
 # Check for jack latency API >= 0.120.1
 check_c_source_compiles (
@@ -402,7 +402,7 @@ check_c_source_compiles (
 
 if (HasJackLatency)
     add_definitions(-DJACK_LATENCY)
-endif()
+endif ()
 
 set (ProgSources
     ${Interface_Sources}
@@ -443,9 +443,9 @@ set(ExternLibraries
     ${LIBDL_LINUX}
 )
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
     link_directories(/usr/local/lib)
-endif()
+endif ()
 
 add_executable (yoshimi ${ProgSources} main.cpp)
 
@@ -454,7 +454,7 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 if (ARGP_LIB)
     target_link_libraries (yoshimi ${ARGP_LIB})
-endif()
+endif ()
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
@@ -543,15 +543,15 @@ add_custom_target (distclean
 if (LV2Plugin)
     if (NOT BuildWithFLTK)
         message(FATAL_ERROR "Can't build LV2 headless")
-    endif()
+    endif ()
     if (EXISTS $ENV{LV2_PATH})
         set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH
         "Specifies where the LV2 libraries should be installed")
     else()
         set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH
         "Specifies where the LV2 libraries should be installed")
-    endif()
+    endif ()
 
     pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
     add_subdirectory(LV2_Plugin)
-endif()
+endif ()

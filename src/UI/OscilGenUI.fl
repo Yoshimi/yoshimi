@@ -252,7 +252,7 @@ class Oscilloscope {: {public Fl_Box}
     else
         oscilSmp->getcurrentbasefunction(smps);
 
-    if (damage( )!= 1)
+    if (damage() != 1)
     {
         fl_color(0, 0, 0);
         fl_rectf(ox, oy, lx, ly);

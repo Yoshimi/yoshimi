@@ -106,7 +106,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
             newValue = synth->interchange.readAllData(&putData);
             //if (newValue != value)
                 //std::cout << "Gui limits " << value <<" to " << newValue << std::endl;
-            if(Fl::event_state(FL_CTRL) != 0)
+            if (Fl::event_state(FL_CTRL) != 0)
             {
                 if (putData.data.type & TOPLEVEL::type::Learnable)
                 {
@@ -132,7 +132,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                 // has to be write as it's 'set default'
             }
         }
-        else if(buttons > 2)
+        else if (buttons > 2)
             type = 1; // change scroll wheel to button 1
         type |= typetop;
     }
@@ -339,7 +339,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (engine == PART::engine::padSynth) // padsynth
     {
-        if(synth->getGuiMaster()->partui->padnoteui)
+        if (synth->getGuiMaster()->partui->padnoteui)
         {
             switch (insert)
             {
@@ -390,17 +390,17 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case TOPLEVEL::insert::oscillatorGroup:
                 case TOPLEVEL::insert::harmonicAmplitude:
                 case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                    if(synth->getGuiMaster()->partui->padnoteui->oscui)
+                    if (synth->getGuiMaster()->partui->padnoteui->oscui)
                         synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::resonanceGroup:
                 case TOPLEVEL::insert::resonanceGraphInsert:
-                    if(synth->getGuiMaster()->partui->padnoteui->resui)
+                    if (synth->getGuiMaster()->partui->padnoteui->resui)
                         synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
                     break;
             }
         }
-        else if(miscmsg != NO_MSG)
+        else if (miscmsg != NO_MSG)
         {
             textMsgBuffer.fetch(miscmsg); // clear any text out.
         }
@@ -607,7 +607,7 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f,"s",2));
 
         case VC_LFOstartphase:
-            if((int)val == 0)
+            if ((int)val == 0)
                 return("random");
             else
                 return(custom_value_units(((int)val - 64.0f) / 127.0f
@@ -616,14 +616,14 @@ string convert_value(ValueType type, float val)
             // unfortunately converttofree() is not called in time for us to
             // be able to use env->getdt(), so we have to compute ourselves
             f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
-            if(f >= 1000)
+            if (f >= 1000)
                 return variable_prec_units(f/1000.0f, "s", 2);
             else
                 return variable_prec_units(f, "ms", 2);
 
         case VC_EnvelopeFreqVal:
             f=(powf(2.0f, 6.0f * fabsf((int)val - 64.0f) / 64.0f) -1.0f) * 100.0f;
-            if((int)val<64) f = -f;
+            if ((int)val<64) f = -f;
             return variable_prec_units(f, "cents", 2);
 
         case VC_EnvelopeFilterVal:
@@ -722,10 +722,10 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
 
         case VC_ADDVoiceDelay:
-            if((int) val == 0)
+            if ((int) val == 0)
                 return "No delay";
             f = (expf((val/127.0f) * logf(50.0f)) - 1) / 10;
-            if(f >= 1)
+            if (f >= 1)
                 return variable_prec_units(f, "s", 2, true);
             else
                 return variable_prec_units(f * 1000, "ms", 1);
@@ -755,20 +755,20 @@ string convert_value(ValueType type, float val)
 
         case VC_PanningRandom:
             i = lrint(val);
-            if(i==0)
+            if (i==0)
                 return("random");
-            else if(i==64)
+            else if (i==64)
                 return("centered");
-            else if(i<64)
+            else if (i<64)
                 return(custom_value_units((64.0f - i) / 63.0f * 100.0f,"% left"));
             else
                 return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
 
         case VC_PanningStd:
             i = lrint(val);
-            if(i==64)
+            if (i==64)
                 return("centered");
-            else if(i<64)
+            else if (i<64)
                 return(custom_value_units((64.0f - i) / 64.0f * 100.0f,"% left"));
             else
                 return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
@@ -805,9 +805,9 @@ string convert_value(ValueType type, float val)
 
         case VC_FixedFreqET:
             f = powf(2.0f, (lrint(val) - 1) / 63.0f) - 1.0f;
-            if(lrint(val) <= 1) /* 0 and 1 are both fixed */
+            if (lrint(val) <= 1) /* 0 and 1 are both fixed */
                 return "Fixed";
-            else if(lrint(val) <= 64)
+            else if (lrint(val) <= 64)
                 return custom_value_units(powf(2.0f,f),"x /octave up",2);
             else
                 return custom_value_units(powf(3.0f,f),"x /octave up",2);
@@ -852,7 +852,7 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "x", 3);
 
         case VC_SubBandwidthScale:
-            if((int)val == 0)
+            if ((int)val == 0)
                 return "Constant";
 	    f = val / 64.0f * 3.0f;
             return "Factor (100,10k): " +
@@ -860,14 +860,14 @@ string convert_value(ValueType type, float val)
                 variable_prec_units(powf(0.1,f), "x", 4);
 
         case VC_FilterVelocitySense: // this is also shown graphically
-            if((int)val==127)
+            if ((int)val==127)
                 return("off");
             else
                 return(custom_value_units(val,""));
             break;
 
         case VC_FXSysSend:
-            if((int)val==0)
+            if ((int)val==0)
                 return("-inf dB");
             else
                 return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
@@ -909,7 +909,7 @@ string convert_value(ValueType type, float val)
         case VC_FXEchoDW:
             s.clear();
             f = (int)val / 127.0f;
-            if(f < 0.5f)
+            if (f < 0.5f)
             {
                 f = f * 2.0f;
                 f *= f;  // for Reverb and Echo
@@ -969,7 +969,7 @@ string convert_value(ValueType type, float val)
         case VC_FXReverbDW:
             s.clear();
             f = (int)val / 127.0f;
-            if(f < 0.5f)
+            if (f < 0.5f)
             {
                 f = f * 2.0f;
                 f *= f;  // for Reverb and Echo
@@ -1023,7 +1023,7 @@ string convert_value(ValueType type, float val)
         case VC_FXdefaultDW:
             s.clear();
             f = (int)val / 127.0f;
-            if(f < 0.5f)
+            if (f < 0.5f)
             {
                 f = f * 2.0f;
                 f = 20.0f * logf(f) / logf(10.0f);
@@ -1125,13 +1125,13 @@ inline void grid(int x, int y, int w, int h, int sections)
 
         int j = 1;
         int gDist = h / sections;
-        for(; j < sections; j++) /* Vertical */
+        for (; j < sections; j++) /* Vertical */
         {
             fl_line(x, y - gDist * j, x + w, y - gDist * j);
         }
 
         gDist = w / sections;
-        for(j = 1; j < sections; j++) /* Horizontal */
+        for (j = 1; j < sections; j++) /* Horizontal */
         {
             fl_line(x + gDist * j, y, x + gDist * j, y - h);
         }
@@ -1164,7 +1164,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         else
         {
             fl_begin_line();
-            for(i = 0; i < _w; i++)
+            for (i = 0; i < _w; i++)
             {
                 x = (float)i / (float)_w;
                 y = powf(x,p) * _h;
@@ -1182,7 +1182,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         fl_begin_line();
         x = 0;
         float frac = 1.0f / (float)_w;
-        for(i = 0; i < _w; i++)
+        for (i = 0; i < _w; i++)
         {
             y = (atanf((x * 2.0f - 1.0f) * p) / atanf(p) + 1.0f) * 0.5f * _h;
             fl_vertex((float)x0 + i, (float)y0 - y);
@@ -1215,7 +1215,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         /* Scale lines */
 
         fl_font(fl_font(),8);
-        for(i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
+        for (i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
         {
             y = ry * (i + 1);
             fl_color(169,169,169);
@@ -1232,13 +1232,13 @@ void custom_graphics(ValueType vt, float val,int W,int H)
 
         fl_color(196,196,196); /* Lighter inner lines*/
 
-        for(i = 10;i != 0; i *= 10)
+        for (i = 10;i != 0; i *= 10)
         {
-            for(j = 2; j < 10; j++)
+            for (j = 2; j < 10; j++)
             {
                 x = x0 + rx * (log10(i * j) - lg1020) + 1;
                 fl_line(x, y0, x, y0 - _h);
-                if(i * j >= 20000)
+                if (i * j >= 20000)
                 {
                     i = 0;
                     break;
@@ -1247,7 +1247,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         }
 
         fl_font(fl_font(),10);
-        for(i = 0; i < 4; i++) /* 20, 100, 1k, 10k */
+        for (i = 0; i < 4; i++) /* 20, 100, 1k, 10k */
         {
             x = x0 + (i == 0 ?  0 : ((float)i + 1 - lg1020) * rx);
             fl_color(127,127,127); /* Darker boundary lines */
@@ -1265,7 +1265,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
 
         /* Function curve */
         fl_color(FL_BLUE);
-        if((int)val == 0)
+        if ((int)val == 0)
         {
             fl_line(x0, cy, x0 + _w, cy);
         }
@@ -1299,9 +1299,9 @@ string variable_prec_units(float v, const string& u, int maxPrec, bool roundup)
 {
     int digits = 0, lim = (int) pow(10,maxPrec);
     float _v = fabsf(v);
-    while(maxPrec > digits)
+    while (maxPrec > digits)
     {
-        if(_v >= lim)
+        if (_v >= lim)
             break;
         digits++;
         lim /= 10;

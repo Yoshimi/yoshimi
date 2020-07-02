@@ -265,7 +265,7 @@ inline bool copyFile(const string& source, const string& destination, char optio
     outfile.close();
     delete[] memblock;
 
-    if(option == 2)
+    if (option == 2)
     {
         struct timespec ts[2];
         ts[1].tv_sec = (sourceInfo.st_mtime % 10000000000);
@@ -431,7 +431,7 @@ inline string loadText(const string& filename)
     // no Yoshimi text lines should get anywhere near this!
     while (!feof(readfile))
     {
-        if(fgets(line , 1024 , readfile))
+        if (fgets(line , 1024 , readfile))
             text += string(line);
     }
     fclose (readfile);

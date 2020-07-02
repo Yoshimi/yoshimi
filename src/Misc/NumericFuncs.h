@@ -39,7 +39,7 @@ inline T limit(T val, T min, T max)
 
 inline void invSignal(float *sig, size_t len)
 {
-    for(size_t i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
         sig[i] *= -1.0f;
 }
 
@@ -137,7 +137,7 @@ inline void setRandomPan(float rand, float& left, float& right, unsigned char co
     switch (compensation)
     {
         case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
-            if (t > 0.5f)
+            if (YOSH::F2B(t))
             {
                 right = 0.5f;
                 left = (1.0f - t);
@@ -168,7 +168,7 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
     switch (compensation)
     {
         case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
-            if (t > 0.5f)
+            if (YOSH::F2B(t))
             {
                 right = 0.5f;
                 left = (1.0f - t);

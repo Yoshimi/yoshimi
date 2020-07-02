@@ -261,7 +261,7 @@ void Part::setChannelAT(int type, int value)
     {
         if (value > 0)
         {
-            if(oldFilterState == -1)
+            if (oldFilterState == -1)
                 oldFilterState = ctl->filtercutoff.data;
             float adjust = oldFilterState / 127.0f;
             if (type & PART::aftertouchType::filterCutoffDown)
@@ -280,7 +280,7 @@ void Part::setChannelAT(int type, int value)
     {
         if (value > 0)
         {
-            if(oldFilterQstate == -1)
+            if (oldFilterQstate == -1)
                 oldFilterQstate = ctl->filtercutoff.data;
             float adjust = oldFilterQstate / 127.0f;
             if (type & PART::aftertouchType::filterQdown)
@@ -578,11 +578,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         continue; // We will not perform legato across 2 key regions.
 
                     partnote[pos].kititem[ci].sendtoparteffect =
-                        ( kit[item].Psendtoparteffect < NUM_PART_EFX)
+                        (kit[item].Psendtoparteffect < NUM_PART_EFX)
                             ? kit[item].Psendtoparteffect
                             : NUM_PART_EFX; // if this parameter is 127 for "unprocessed"
                     partnote[posb].kititem[ci].sendtoparteffect =
-                        ( kit[item].Psendtoparteffect < NUM_PART_EFX)
+                        (kit[item].Psendtoparteffect < NUM_PART_EFX)
                             ? kit[item].Psendtoparteffect
                             : NUM_PART_EFX;
 
@@ -1934,9 +1934,9 @@ float Part::getLimits(CommandBlock *getData)
     switch (request)
     {
         case TOPLEVEL::type::Adjust:
-            if(value < min)
+            if (value < min)
                 value = min;
-            else if(value > max)
+            else if (value > max)
                 value = max;
         break;
         case TOPLEVEL::type::Minimum:

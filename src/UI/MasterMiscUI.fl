@@ -292,7 +292,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
         for (int i = 1; i < 1 - MIN_DB; ++i)
         {
             int ty = ly + (int)(tmp * i);
-            if ( i % 5 == 0)
+            if (i % 5 == 0)
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
             if (i % 10 == 0)
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
@@ -336,7 +336,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
                 maxdbr = NO_DB;
                 clipped = 0;
                	MasterUI *masterUI = synth->getGuiMaster(false);
-               	if(masterUI)
+               	if (masterUI)
                     masterUI->resetPartsClip();
             }
             return 1;
@@ -374,7 +374,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
     {
         panelpart.clip[i] = false;
         panelpart.clipR[i] = false;
-        if(!clipOnly)
+        if (!clipOnly)
         {
             panelpart.oldpeak[i] = 0;
             panelpart.oldpeakR[i] = 0;
@@ -525,7 +525,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
 
       send_data(TOPLEVEL::action::forceUpdate, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 9 textsize 10
-          code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+          code0 {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
                 if (i == 9)
                     o->add("Dr10");
@@ -557,7 +557,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {//
-        if (o->value() > 0.5f)
+        if (YOSH::F2B(o->value()))
             synth->getGuiMaster()->activePart = npart + *plgroup;
         else
             synth->getGuiMaster()->activePart = UNUSED;
@@ -660,7 +660,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     unsigned int engine = 0;
     if (synth->getRuntime().checksynthengines)
     {
-        for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (synth->part[npart]->kit[i].Padenabled)
                 engine |= 1;

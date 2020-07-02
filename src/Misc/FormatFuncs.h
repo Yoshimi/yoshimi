@@ -239,7 +239,7 @@ inline std::string formatTextLines(std::string text, size_t maxLen)
     while (pos < lineLen && pos > oldPos)
     {
         pos = text.rfind(' ', pos);
-        if(pos < oldPos)
+        if (pos < oldPos)
         {
             pos = oldPos + maxLen + 1; // inserted char
             text.insert(pos, 1, lineEnd);

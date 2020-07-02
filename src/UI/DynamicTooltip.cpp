@@ -44,7 +44,7 @@ static bool _recent;
 
 /* Delayed display of tooltip - callbackk*/
 static void delayedShow(void* dyntip){
-    if(DynTooltip* tip = (DynTooltip*) dyntip)
+    if (DynTooltip* tip = (DynTooltip*) dyntip)
        tip->dynshow(0);
 }
 
@@ -93,7 +93,7 @@ void DynTooltip::hide()
 
 void DynTooltip::dynshow(float timeout)
 {
-    if(timeout <= 0){
+    if (timeout <= 0){
         Fl::remove_timeout(delayedShow, this);
         _recent = true;
         reposition();
@@ -112,7 +112,7 @@ void DynTooltip::setValue(float val)
     if (val != currentValue)
     {
         currentValue = val;
-        if(positioned)
+        if (positioned)
             update();
     }
 }
@@ -126,7 +126,7 @@ void DynTooltip::setOnlyValue(bool onlyval)
     if (onlyValue != onlyval)
     {
         onlyValue = onlyval;
-        if(positioned)
+        if (positioned)
             update();
     }
 }
@@ -146,7 +146,7 @@ void DynTooltip::setTooltipText(const string& tt_text)
     fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
     fl_measure(tipText.c_str(), tipTextW, tipTextH, 0);
 
-    if(positioned)
+    if (positioned)
         update();
 }
 
@@ -156,7 +156,7 @@ void DynTooltip::setTooltipText(const string& tt_text)
 void DynTooltip::setValueType(ValueType vt)
 {
     valueType = vt;
-    if(positioned)
+    if (positioned)
         update();
 }
 
@@ -169,7 +169,7 @@ void DynTooltip::setGraphicsType(ValueType gvt)
 {
     graphicsType = gvt;
     custom_graph_dimensions(graphicsType, graphW, graphH);
-    if(positioned)
+    if (positioned)
         update();
 }
 
@@ -188,7 +188,7 @@ void DynTooltip::setOffset(int x, int y)
 */
 inline void DynTooltip::reposition()
 {
-    if(!positioned)
+    if (!positioned)
     {
         position(Fl::event_x_root() + xoffs, Fl::event_y_root() + yoffs);
         positioned = true;
@@ -220,7 +220,7 @@ void DynTooltip::update()
     int _w = max(valTextW, graphW);
     int _h = valTextH + graphH;
 
-    if(!onlyValue)
+    if (!onlyValue)
     {
         _w = max(_w, tipTextW);
         _h += tipTextH;
@@ -252,7 +252,7 @@ void DynTooltip::draw()
     fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
 
     /* Draw tooltip text */
-    if(!onlyValue)
+    if (!onlyValue)
     {
         fl_draw(tipText.c_str(), x, y, _w, tipTextH,
                 Fl_Align((tipTextW < valTextW || tipTextW < graphW ?
@@ -265,7 +265,7 @@ void DynTooltip::draw()
             Fl_Align(FL_ALIGN_CENTER | FL_ALIGN_WRAP));
 
     /* Draw additional graphics */
-    if(graphicsType != VC_plainValue)
+    if (graphicsType != VC_plainValue)
         custom_graphics(graphicsType, currentValue, w(), h() - mh);
 }
 
