@@ -1,5 +1,12 @@
 yoshimi 1.7.1 M
 
+2020-7-5 Will
+* BugFix: Part edit SubSynth button showing wrong colour.
+* BugFix: EQ effect not showing correct controls active.
+  Particularly when loading patch/instrument.
+* Default bank ID correction.
+* Doc Updates.
+
 2020-7-2 Will
 * System Effect Enable now MIDI-learnable.
 * Part Effect Bypass  now MIDI-learnable.

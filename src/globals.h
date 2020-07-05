@@ -47,7 +47,7 @@
 #define Cshift2I 23
 
 /*
- * proposed conversions from float to hi res int
+ * proposed conversions from float to hi res 32 bit int
  * multiplier is 1000000
  *
  * for LFO freq turns actual value 85.25 into 85250000
@@ -59,6 +59,8 @@
  *
  * also use for integers that need higher resolution
  * such as unspecified 0-127 integers
+ *
+ * Note: 127 * 0x1020408 = 0x7ffffff8 = 0x7f << 24
 */
 
 // many of the following are for convenience and consistency

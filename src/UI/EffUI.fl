@@ -1228,7 +1228,6 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       }
       Fl_Group bandgroup {
         xywh {245 40 130 50} box ENGRAVED_FRAME
-        code0 {if (eff->geteffectpar(10)==0) o->deactivate();}
       } {
         Fl_Dial freqdial {
           label Freq
@@ -2058,20 +2057,25 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             effdistorsionwindow->show();
             break;
         case 7:
+        {
             eqband = 0;
+            int type = eff->geteffectpar(10);
             eqp0->value(eff->geteffectpar(0));
             bandcounter->value(eqband);
-            typechoice->value(eff->geteffectpar(10));
-            eqgraph->redraw();
+            typechoice->value(type);
             freqdial->value(eff->geteffectpar(11));
             gaindial->value(eff->geteffectpar(12));
-            if (eff->geteffectpar(10) < 6)
-                gaindial->deactivate();
             qdial->value(eff->geteffectpar(13));
+            if (type < 3)
+                qdial->deactivate();
+            if (type < 6)
+                gaindial->deactivate();
             stagescounter->value(eff->geteffectpar(14));
+            eqgraph->redraw();
             eqgraph->init(eff);
             effeqwindow->show();
             break;
+        }
         case 8:
             make_filter_window();
             dfp->value(eff->getpreset());

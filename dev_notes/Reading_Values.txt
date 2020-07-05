@@ -1,9 +1,11 @@
+updated 5/7/2020
+
 Reads are made by direct calls (not buffered), but if dynamic values are being read and an actual write is taking place the reads are temporarily blocked.
 
 If bit 2 of 'type' is set on entry then the command is passed on to the limits tests - see Limits.txt
 
 In general it returns a float representing the wanted element.
 
-If bit 7 of 'type' set is returned this should be regarded as an integer.
+If bit 7 of 'type' is returned as set this should be regarded as an integer.
 
-If bit 6 set is returned then the control is MIDI-learnable.
+If bit 5 is returned as set then the control is MIDI-learnable.

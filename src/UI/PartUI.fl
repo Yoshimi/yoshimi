@@ -2418,7 +2418,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             subbox->color(BASE_COLOUR);
         SUB->damage(1);
         if (padsynenabledcheck->value())
-            padbox->color(SUB_COLOUR);
+            padbox->color(PAD_COLOUR);
         else
             padbox->color(BASE_COLOUR);
         PAD->damage(1);
