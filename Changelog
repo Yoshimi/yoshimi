@@ -1,5 +1,12 @@
 yoshimi 1.7.1 M
 
+2020-7-6 Will
+* Corrected dynamic tooltip for engine level pan controls.
+* Implemented dynamic tooltip for pan width controls.
+  Repurposed the (now redundant) panningRandom type.
+* Framed and highlighted engine level Vol/Pan control groups.
+  They now look like the stock inserts.
+
 2020-7-5 Will
 * BugFix: Part edit SubSynth button showing wrong colour.
 * BugFix: EQ effect not showing correct controls active.

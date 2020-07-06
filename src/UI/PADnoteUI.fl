@@ -778,6 +778,9 @@ class PADnoteUI {: {public PresetsUI_}
           label {Envelopes&LFOs}
           xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12 hide
         } {
+          Fl_Box {} {
+            xywh {9 27 232 68} box PLASTIC_THIN_UP_BOX color 223
+          }
           Fl_Group {} {
             label FREQUENCY
             xywh {5 275 525 125} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
@@ -899,6 +902,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
               tooltip Panning xywh {135 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+              code0 {o->setValueType(VC_PanningStd);}
               code1 {o->value(pars->PPanning);}
               class WidgetPDial
             }
@@ -907,6 +911,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
     send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Random width} xywh {195 42 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+              code0 {o->setValueType(VC_PanningRandom);}
               code1 {o->value(pars->PWidth);}
               class WidgetPDial
             }

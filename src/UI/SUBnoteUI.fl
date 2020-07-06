@@ -189,6 +189,9 @@ class SUBnoteUI {: {public PresetsUI_}
           code2 {new Fl_Box(0,0,3,o->h());}
         } {}
       }
+      Fl_Box {} {
+        xywh {8 8 208 58} box PLASTIC_THIN_UP_BOX color 223
+      }
       Fl_Button {} {
         label Close
         callback {//
@@ -229,7 +232,7 @@ class SUBnoteUI {: {public PresetsUI_}
           callback {//
           send_data (0, SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
           tooltip Panning xywh {118 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(VC_PanningRandom);}
+          code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->PPanning);}
           class WidgetPDial
         }
@@ -244,6 +247,7 @@ class SUBnoteUI {: {public PresetsUI_}
           callback {//
           send_data (0, SUBSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Random Width} xywh {178 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+          code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PWidth);}
           class WidgetPDial
         }

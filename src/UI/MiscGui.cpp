@@ -754,15 +754,7 @@ string convert_value(ValueType type, float val)
                 return s + "between 0 and " + to_string(i) + "%";
 
         case VC_PanningRandom:
-            i = lrint(val);
-            if (i==0)
-                return("random");
-            else if (i==64)
-                return("centered");
-            else if (i<64)
-                return(custom_value_units((64.0f - i) / 63.0f * 100.0f,"% left"));
-            else
-                return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+            return(custom_value_units(val / 63.0f * 100.0f,"%"));
 
         case VC_PanningStd:
             i = lrint(val);
