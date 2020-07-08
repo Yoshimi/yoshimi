@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-7-8 Will
+* Updated Advanced User Manual 1.7.1 +.
+  Still carries 1.7.1 version in the filename.
+
 2020-7-6 Will
 * Corrected dynamic tooltip for engine level pan controls.
 * Implemented dynamic tooltip for pan width controls.

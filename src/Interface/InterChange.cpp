@@ -1354,7 +1354,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 //CommandBlock putData;
                 //memcpy(putData.bytes, getData->bytes, sizeof(putData));
                 getData->data.control = TOPLEVEL::control::textMessage;
-                getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later may be incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
+                getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later has parameter types changed incompatibly with earlier versions, and with Yoshimi. It may not perform correctly.");
                 returnsBuffer->write(getData->bytes);
             }
 #endif

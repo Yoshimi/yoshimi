@@ -182,7 +182,7 @@ class PresetsUI {} {
         pui->refresh();
         if (!synth->fileCompatible)
         {
-            synth->getGuiMaster()->setmessage(UNUSED, true, "File from ZynAddSubFX 3.0 or later may be incompatible with earlier versions and with Yoshimi. It is unlikely to perform correctly.");
+            synth->getGuiMaster()->setmessage(UNUSED, true, "File from ZynAddSubFX 3.0 or later has parameter types changed incompatibly with earlier versions, and with Yoshimi. It may not perform correctly.");
             synth->fileCompatible = true;
             // this may not be necessary and anyway shouldn't
             // be done directly - trying to get rid of these!
