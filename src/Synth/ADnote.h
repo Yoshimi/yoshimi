@@ -154,9 +154,6 @@ class ADnote
             // Filter global parameters
             Filter *GlobalFilterL;
             Filter *GlobalFilterR;
-            float  FilterCenterPitch; // octaves
-            float  FilterQ;
-            float  FilterFreqTracking;
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
         } NoteGlobalPar;
@@ -200,9 +197,6 @@ class ADnote
             // Filter parameters
             Filter   *VoiceFilterL;
             Filter   *VoiceFilterR;
-
-            float  FilterCenterPitch;
-            float  FilterFreqTracking;
 
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;

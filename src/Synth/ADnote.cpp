@@ -201,8 +201,6 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
 
         vpar.Punch = oldvpar.Punch;
 
-        vpar.FilterCenterPitch = oldvpar.FilterCenterPitch;
-        vpar.FilterFreqTracking = oldvpar.FilterFreqTracking;
         vpar.FMFreqFixed = oldvpar.FMFreqFixed;
         vpar.FMVoice = oldvpar.FMVoice;
         vpar.FMphase_offset = oldvpar.FMphase_offset;
@@ -1163,18 +1161,9 @@ void ADnote::computeNoteParameters(void)
                                      adpars->GlobalPar.PDetune);
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
-    NoteGlobalPar.FilterCenterPitch =
-        adpars->GlobalPar.GlobalFilter->getfreq() // center freq
-        + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
-        * (velF(velocity, adpars->GlobalPar.PFilterVelocityScaleFunction) - 1);
-
     NoteGlobalPar.Volume =
         4.0f * powf(0.1f, 3.0f * (1.0f - adpars->GlobalPar.PVolume / 96.0f))  //-60 dB .. 0 dB
         * velF(velocity, adpars->GlobalPar.PAmpVelocityScaleFunction); // velocity sensing
-
-    NoteGlobalPar.FilterQ = adpars->GlobalPar.GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking =
-        adpars->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
@@ -1229,17 +1218,6 @@ void ADnote::computeNoteParameters(void)
                 getDetune(adpars->GlobalPar.PDetuneType, adpars->VoicePar[nvoice].
                           PFMCoarseDetune, adpars->VoicePar[nvoice].PFMDetune);
 
-        NoteVoicePar[nvoice].FilterCenterPitch =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreq()
-            + adpars->VoicePar[nvoice].PFilterVelocityScale
-            / 127.0f * 6.0f       //velocity sensing
-            * (velF(velocity,
-                    adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
-        if (NoteVoicePar[nvoice].VoiceFilterL != NULL)
-        {
-            NoteVoicePar[nvoice].VoiceFilterL->setq(adpars->VoicePar[nvoice].VoiceFilter->getq());
-            NoteVoicePar[nvoice].VoiceFilterR->setq(adpars->VoicePar[nvoice].VoiceFilter->getq());
-        }
         NoteVoicePar[nvoice].filterbypass = adpars->VoicePar[nvoice].Pfilterbypass;
 
         NoteVoicePar[nvoice].FMDetuneFromBaseOsc =
@@ -1303,9 +1281,6 @@ void ADnote::computeNoteParameters(void)
 
         if (adpars->VoicePar[nvoice].PVolumeminus)
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
-
-        NoteVoicePar[nvoice].FilterFreqTracking =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
 
         int unison = unison_size[nvoice];
 
@@ -1636,6 +1611,15 @@ float ADnote::getVoiceBaseFreq(int nvoice)
 // Computes all the parameters for each tick
 void ADnote::computeWorkingParameters(void)
 {
+    float filterCenterPitch =
+        adpars->GlobalPar.GlobalFilter->getfreq() // center freq
+        + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
+        * (velF(velocity, adpars->GlobalPar.PFilterVelocityScaleFunction) - 1);
+
+    float filterQ = adpars->GlobalPar.GlobalFilter->getq();
+    float filterFreqTracking =
+        adpars->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
+
     float filterpitch, filterfreq;
     float globalpitch = 0.01f * (NoteGlobalPar.FreqEnvelope->envout()
                        + NoteGlobalPar.FreqLfo->lfoout() * ctl->modwheel.relmod);
@@ -1645,13 +1629,13 @@ void ADnote::computeWorkingParameters(void)
                          * NoteGlobalPar.AmpLfo->amplfoout();
     float globalfilterpitch = NoteGlobalPar.FilterEnvelope->envout()
                               + NoteGlobalPar.FilterLfo->lfoout()
-                              + NoteGlobalPar.FilterCenterPitch;
+                              + filterCenterPitch;
 
     float tmpfilterfreq = globalfilterpitch + ctl->filtercutoff.relfreq
-          + NoteGlobalPar.FilterFreqTracking;
+          + filterFreqTracking;
 
     tmpfilterfreq = NoteGlobalPar.GlobalFilterL->getrealfreq(tmpfilterfreq);
-    float globalfilterq = NoteGlobalPar.FilterQ * ctl->filterq.relq;
+    float globalfilterq = filterQ * ctl->filterq.relq;
     NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq, globalfilterq);
     if (stereo)
         NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq, globalfilterq);
@@ -1690,16 +1674,22 @@ void ADnote::computeWorkingParameters(void)
         // Voice Filter
         if (NoteVoicePar[nvoice].VoiceFilterL != NULL)
         {
-            filterpitch = NoteVoicePar[nvoice].FilterCenterPitch;
+            filterpitch =
+                adpars->VoicePar[nvoice].VoiceFilter->getfreq()
+                + adpars->VoicePar[nvoice].PFilterVelocityScale
+                / 127.0f * 6.0f       //velocity sensing
+                * (velF(velocity,
+                        adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
+            filterQ = adpars->VoicePar[nvoice].VoiceFilter->getq();
             if (NoteVoicePar[nvoice].FilterEnvelope != NULL)
                 filterpitch += NoteVoicePar[nvoice].FilterEnvelope->envout();
             if (NoteVoicePar[nvoice].FilterLfo != NULL)
                 filterpitch += NoteVoicePar[nvoice].FilterLfo->lfoout();
-            filterfreq = filterpitch + NoteVoicePar[nvoice].FilterFreqTracking;
+            filterfreq = filterpitch + adpars->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
             filterfreq = NoteVoicePar[nvoice].VoiceFilterL->getrealfreq(filterfreq);
-            NoteVoicePar[nvoice].VoiceFilterL->setfreq(filterfreq);
+            NoteVoicePar[nvoice].VoiceFilterL->setfreq_and_q(filterfreq, filterQ);
             if (stereo && NoteVoicePar[nvoice].VoiceFilterR)
-                NoteVoicePar[nvoice].VoiceFilterR->setfreq(filterfreq);
+                NoteVoicePar[nvoice].VoiceFilterR->setfreq_and_q(filterfreq, filterQ);
 
         }
         if (!NoteVoicePar[nvoice].noisetype) // voice is not noise
