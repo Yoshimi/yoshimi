@@ -71,11 +71,11 @@ void mwheel_val_slider::useCustomTip(bool enabled)
         tooltip(tipText.c_str());
 }
 
-void mwheel_val_slider::value(double val)
+int mwheel_val_slider::value(double val)
 {
-    Fl_Valuator::value(val);
     dyntip->setValue(val);
     dyntip->setOnlyValue(true);
+    return Fl_Valuator::value(val);
 }
 
 double mwheel_val_slider::value()
