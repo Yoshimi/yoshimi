@@ -353,18 +353,18 @@ class Oscilharmonic {: {public Fl_Group}
         callback {//
         int x = 64;
         if (Fl::event_button3())
-            o->value(x);
+            o->value(127 - x);
         else
-            x = (int)o->value();
+            x = 127 - (int)o->value();
 
         if (x == 64)
             o->selection_color(0);
         else
             o->selection_color(222);
 
-        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, 127 - x, TOPLEVEL::type::Integer);}
+        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
         xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
-        code0 {o->value(oscil->Phphase[n]);}
+        code0 {o->value(127 - oscil->Phphase[n]);}
         code1 {if (oscil->Phphase[n]==64) o->selection_color(0);}
         class PSlider
       }
@@ -412,7 +412,7 @@ class Oscilharmonic {: {public Fl_Group}
   Function {refresh()} {} {
     code {//
     mag->value(127-oscil->Phmag[n]);
-    phase->value(oscil->Phphase[n]);
+    phase->value(127-oscil->Phphase[n]);
 
     if (oscil->Phmag[n]==64)
         mag->selection_color(0);
@@ -1221,10 +1221,9 @@ class OscilEditor {: {public PresetsUI_}
                 {
                     for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                     {
-                        h[i]->mag->value(64);;
-                        h[i]->phase->value(64);
+                        h[i]->mag->value(63);;
+                        h[i]->phase->value(63);
                     }
-                    h[0]->mag->value(127);
                     harmonicshiftcounter->value(0);
                     h[0]->mag->value(0);
                     wshbutton->value(0);
@@ -1233,12 +1232,12 @@ class OscilEditor {: {public PresetsUI_}
                 }
                 for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                 {
-                    if (h[i]->mag->value() == 64)
+                    if (h[i]->mag->value() == 63)
                         h[i]->mag->selection_color(0);
                     else
                         h[i]->mag->selection_color(222);
 
-                    if (h[i]->phase->value() == 64)
+                    if (h[i]->phase->value() == 63)
                         h[i]->phase->selection_color(0);
                     else
                         h[i]->phase->selection_color(222);
@@ -1347,9 +1346,9 @@ class OscilEditor {: {public PresetsUI_}
             case OSCILLATOR::control::clearHarmonics:
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
-                    h[i]->mag->value(64);
+                    h[i]->mag->value(63);
                     h[i]->mag->selection_color(0);
-                    h[i]->phase->value(64);
+                    h[i]->phase->value(63);
                     h[i]->phase->selection_color(0);
                 }
                 h[0]->mag->value(0);
