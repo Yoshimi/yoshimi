@@ -36,6 +36,7 @@ enum ValueType {
     VC_percent128,
     VC_percent255,
     VC_percent64_127,
+    VC_PhaseOffset,
     VC_GlobalFineDetune,
     VC_MasterVolume,
     VC_LFOfreq,
