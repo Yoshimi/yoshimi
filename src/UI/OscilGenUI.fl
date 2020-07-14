@@ -186,7 +186,7 @@ class PSlider {: {public mwheel_slider}
   Function {update_selection_color(int new_value)} {return_type void
   } {
     code {
-    const int default_val = 63; // Turn into member variable if needed
+    const int default_val = 0; // Turn into member variable if needed
     selection_color(new_value == default_val ? 0 : 222);
   } {private}
   }
@@ -344,32 +344,33 @@ class Oscilharmonic {: {public Fl_Group}
     } {
       Fl_Slider mag {
         callback {//
-        int x=64;
+        int x = 64;
         if (Fl::event_button3())
         {
             if (n == 0)
                 x = 127;
-            o->value(127 - x);
+            o->value(64 - x);
         }
         else
-            x = 127 - (int)o->value();
+            x = 64 - (int)o->value();
 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
-        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX maximum 127 step 1 value 64
-        code0 {o->value(127-oscil->Phmag[n]);}
+        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1 value 0
+        code0 {o->value(64 - oscil->Phmag[n]);}
         class PSlider
       }
       Fl_Slider phase {
         callback {//
         int x = 64;
         if (Fl::event_button3())
-            o->value(127 - x);
+            o->value(0);
         else
-            x = 127 - (int)o->value();
+            x = 64 - (int)o->value();
 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
-        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX maximum 127 step 1 value 64
-        code0 {o->value(127 - oscil->Phphase[n]);}
+        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1 value 0
+        code0 {o->value(64 - oscil->Phphase[n]);}
+        code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
         class PSlider
       }
       Fl_Box {} {
@@ -415,8 +416,8 @@ class Oscilharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-    mag->value(127-oscil->Phmag[n]);
-    phase->value(127-oscil->Phphase[n]);
+    mag->value(64 - oscil->Phmag[n]);
+    phase->value(64 - oscil->Phphase[n]);
     } {}
   }
   Function {~Oscilharmonic()} {} {
@@ -1121,12 +1122,12 @@ class OscilEditor {: {public PresetsUI_}
     bool baseSet = false;
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        h[control]->mag->value(127 - value);
+        h[control]->mag->value(64 - value);
     }
 
     else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        h[control]->phase->value(127 - value);
+        h[control]->phase->value(64 - value);
     }
 
     else
@@ -1208,8 +1209,8 @@ class OscilEditor {: {public PresetsUI_}
                 {
                     for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                     {
-                        h[i]->mag->value(63);;
-                        h[i]->phase->value(63);
+                        h[i]->mag->value(0);;
+                        h[i]->phase->value(0);
                     }
                     harmonicshiftcounter->value(0);
                     h[0]->mag->value(0);
@@ -1321,8 +1322,8 @@ class OscilEditor {: {public PresetsUI_}
             case OSCILLATOR::control::clearHarmonics:
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
-                    h[i]->mag->value(63);
-                    h[i]->phase->value(63);
+                    h[i]->mag->value(0);
+                    h[i]->phase->value(0);
                 }
                 h[0]->mag->value(0);
                 break;
