@@ -582,6 +582,12 @@ string convert_value(ValueType type, float val)
         case VC_PhaseOffset:
             return(custom_value_units(val / 64.0f * 90.0f,"°",1));
 
+        case VC_WaveHarmonicMagnitude: {
+            const string unit = val > 0 ? "% (inverted)" : "%";
+            const int denom = val >= 0 ? 64 : -63;
+            return(custom_value_units(val / denom * 100.0f,unit,1));
+        }
+
         case VC_GlobalFineDetune:
             return(custom_value_units((val-64),"cents",1));
 

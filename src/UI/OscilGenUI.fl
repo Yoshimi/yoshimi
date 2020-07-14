@@ -357,6 +357,7 @@ class Oscilharmonic {: {public Fl_Group}
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
         xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1 value 0
         code0 {o->value(64 - oscil->Phmag[n]);}
+        code1 {o->setValueType(VC_WaveHarmonicMagnitude); o->useCustomTip(true);}
         class PSlider
       }
       Fl_Slider phase {
