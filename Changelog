@@ -1,5 +1,8 @@
 yoshimi 1.7.1 M
 
+2020-7-14 Will
+* Manual correction NRPN History MSB
+
 2020-7-8 Will
 * Updated Advanced User Manual 1.7.1 +.
   Still carries 1.7.1 version in the filename.
