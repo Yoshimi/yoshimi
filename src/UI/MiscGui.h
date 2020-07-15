@@ -82,6 +82,7 @@ enum ValueType {
     VC_SubBandwidth,
     VC_SubBandwidthScale,
     VC_SubBandwidthRel,
+    VC_SubHarmonicMagnitude,
     VC_FXSysSend,
     VC_FXEchoVol,
     VC_FXEchoDelay,

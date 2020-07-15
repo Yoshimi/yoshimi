@@ -852,6 +852,9 @@ string convert_value(ValueType type, float val)
 	    f = powf(100.0f, val / 64.0f);
             return variable_prec_units(f, "x", 3);
 
+        case VC_SubHarmonicMagnitude:
+            return custom_value_units(val / 127.0f * 100.0f, "%", 1);
+
         case VC_SubBandwidthScale:
             if ((int)val == 0)
                 return "Constant";

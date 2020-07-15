@@ -90,6 +90,7 @@ class SUBnoteharmonic {: {public Fl_Group}
 	}
         tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX minimum 127 maximum 0 step 1 value 127
         code0 {o->value(pars->Phmag[n]);}
+        code1 {o->setValueType(VC_SubHarmonicMagnitude); o->useCustomTip(true);}
         class PSlider
       }
       Fl_Slider bw {
