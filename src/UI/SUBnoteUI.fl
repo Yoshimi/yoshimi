@@ -50,6 +50,9 @@ decl {\#include "FilterUI.h"} {public local
 decl {\#include "PresetsUI.h"} {public local
 }
 
+decl {\#include "OscilGenUI.h"} {public local
+}
+
 decl {\#include "Params/SUBnoteParameters.h"} {public local
 }
 
@@ -75,45 +78,36 @@ class SUBnoteharmonic {: {public Fl_Group}
         callback {//
         int x = 0;
         if (Fl::event_button() != 3)
-            x = 127 - lrint(o->value());
+            x = lrint(o->value());
         else
         {
             if (n == 0)
                 x = 127;
-            o->value(127 - x);
+            o->value(x);
         }
 
         send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);
-
-        if (x == 0)
-            o->selection_color(0);
-        else
-            o->selection_color(222);}
-        tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
-        code0 {o->value(127-pars->Phmag[n]);}
-        code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
-        class mwheel_slider
+	}
+        tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX minimum 127 maximum 0 step 1 value 127
+        code0 {o->value(pars->Phmag[n]);}
+        class PSlider
       }
       Fl_Slider bw {
         callback {//
         int x = 64;
         if (Fl::event_button() != 3)
-            x = 127 - lrint(o->value());
+            x = 64 + lrint(o->value());
         else
-            o->value(x - 1);
+            o->value(0);
 
         send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);
 
-        if (x == 64)
-            o->selection_color(0);
-        else
-            o->selection_color(222);}
-        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 63
+	}
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1 value 0
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
-        code2 {o->value(127-pars->Phrelbw[n]);}
-        code3 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
-        class mwheel_slider
+        code2 {o->value(pars->Phrelbw[n] - 64);}
+        class PSlider
       }
       Fl_Box {} {
         xywh {15 228 5 3} box FLAT_BOX color 39
@@ -147,9 +141,9 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-    mag->value(127-pars->Phmag[n]);
-    if (pars->Phmag[n]==0) mag->selection_color(0);
-        bw->value(127-pars->Phrelbw[n]);} {}
+    mag->value(pars->Phmag[n]);
+    bw->value(pars->Phrelbw[n] - 64);
+    } {}
   }
   Function {~SUBnoteharmonic()} {} {
     code {//
@@ -452,16 +446,13 @@ class SUBnoteUI {: {public PresetsUI_}
         callback {//
         for (int i = 0; i < MAX_SUB_HARMONICS; i++)
         {
-            h[i]->mag->value(127);
-            h[i]->mag->selection_color(0);
+            h[i]->mag->value(0);
             pars->Phmag[i] = 0;
-            h[i]->bw->value(64);
-            h[i]->bw->selection_color(0);
+            h[i]->bw->value(0);
             pars->Phrelbw[i] = 64;
         }
 
-        h[0]->mag->selection_color(222);
-        h[0]->mag->value(0);
+        h[0]->mag->value(127);
         SUBparameters->redraw();
         send_data (0, SUBSYNTH::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -701,12 +692,12 @@ class SUBnoteUI {: {public PresetsUI_}
     bool val_bool = YOSH::F2B(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        h[control]->mag->value(127 - (int) value);
+        h[control]->mag->value((int) value);
         return;
     }
     if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        h[control]->bw->value(127 - (int) value);
+        h[control]->bw->value((int)value - 64);
         return;
     }
 
@@ -840,13 +831,10 @@ class SUBnoteUI {: {public PresetsUI_}
         case SUBSYNTH::control::clearHarmonics:
             for (int i = 0; i < MAX_SUB_HARMONICS; i++)
             {
-                h[i]->mag->value(127);
-                h[i]->mag->selection_color(0);
-                h[i]->bw->value(64);
-                h[i]->bw->selection_color(0);
+                h[i]->mag->value(0);
+                h[i]->bw->value(0);
             }
-            h[0]->mag->selection_color(222);
-            h[0]->mag->value(0);
+            h[0]->mag->value(127);
             break;
 
         case SUBSYNTH::control::stereo:

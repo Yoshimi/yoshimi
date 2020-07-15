@@ -849,7 +849,7 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "cents", 3);
 
         case VC_SubBandwidthRel:
-	    f = powf(100.0f, (63 - (int)val) / 64.0f);
+	    f = powf(100.0f, val / 64.0f);
             return variable_prec_units(f, "x", 3);
 
         case VC_SubBandwidthScale:
