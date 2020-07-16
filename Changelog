@@ -1,5 +1,10 @@
 yoshimi 1.7.1 M
 
+2020-7-16 Will
+* Updated user guide to include latest changes.
+* Changed AddVoice delay slider to not show boxed value.
+  It makes the track longer and it's already in the tooltip.
+
 2020-7-16 Jesper
 * Added dynamic tooltips for AddSynth phase offset sliders,
   waveform editor per-harmonic phase offset and magnitude

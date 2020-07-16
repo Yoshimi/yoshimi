@@ -1096,10 +1096,10 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label Delay
             callback {//
                 send_data(0, ADDVOICE::control::delay, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Time before the voice activates} xywh {73 51 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
+            tooltip {Time before the voice activates} xywh {76 51 80 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
             code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
-            class mwheel_val_slider_rev
+            class mwheel_slider_rev
           }
         }
         Fl_Check_Button bypassfiltercheckbutton {
