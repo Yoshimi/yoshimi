@@ -579,6 +579,15 @@ string convert_value(ValueType type, float val)
         case VC_percent64_127:
             return(custom_value_units((val-64) / 63.0f * 100.0f+0.05f,"%",1));
 
+        case VC_PhaseOffset:
+            return(custom_value_units(val / 64.0f * 90.0f,"°",1));
+
+        case VC_WaveHarmonicMagnitude: {
+            const string unit = val > 0 ? "% (inverted)" : "%";
+            const int denom = val >= 0 ? 64 : -63;
+            return(custom_value_units(val / denom * 100.0f,unit,1));
+        }
+
         case VC_GlobalFineDetune:
             return(custom_value_units((val-64),"cents",1));
 
@@ -840,8 +849,11 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "cents", 3);
 
         case VC_SubBandwidthRel:
-	    f = powf(100.0f, (63 - (int)val) / 64.0f);
+	    f = powf(100.0f, val / 64.0f);
             return variable_prec_units(f, "x", 3);
+
+        case VC_SubHarmonicMagnitude:
+            return custom_value_units(val / 127.0f * 100.0f, "%", 1);
 
         case VC_SubBandwidthScale:
             if ((int)val == 0)

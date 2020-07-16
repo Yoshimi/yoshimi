@@ -43,7 +43,7 @@ class mwheel_val_slider : public Fl_Value_Slider {
   /* Overridden widget methods */
   int handle(int ev);
   void tooltip(const char* tip);
-  void value(double);
+  int value(double);
   double value();
 
  protected:

@@ -183,14 +183,30 @@ class PSlider {: {public mwheel_slider}
   Function {PSlider(int x,int y, int w, int h, const char *label=0):mwheel_slider(x,y,w,h,label)} {} {
     code {;} {}
   }
+  Function {update_selection_color(int new_value)} {return_type void
+  } {
+    code {
+    const int default_val = 0; // Turn into member variable if needed
+    selection_color(new_value == default_val ? 0 : 222);
+  } {private}
+  }
+  Function {value()} {return_type double} {code {return mwheel_slider::value();} {}}
+  Function {value(double val)} {return_type int
+  } {
+    code {
+    update_selection_color((int) val);
+    return mwheel_slider::value(val);} {}
+  }
   Function {handle(int event)} {return_type int
   } {
     code {int X=x(),Y=y(),W=w(),H=h();
 
-    if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0))
-        return(mwheel_slider::handle(event));
+    int rval = 1;
 
-    if (!Fl::event_inside(X,Y,W,H))
+    if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0))
+        rval = mwheel_slider::handle(event);
+
+    else if (!Fl::event_inside(X,Y,W,H))
     {
         if (event==FL_DRAG)
         {
@@ -198,11 +214,10 @@ class PSlider {: {public mwheel_slider}
             mwheel_slider::handle(FL_LEAVE);
             deactivate();
             activate();
-            return(1);
         }
         else
         {
-            return(mwheel_slider::handle(event));
+            rval = mwheel_slider::handle(event);
         }
     }
     else
@@ -210,7 +225,8 @@ class PSlider {: {public mwheel_slider}
         mwheel_slider::handle(FL_PUSH);
     }
 
-    return(1);} {}
+    update_selection_color((int) value());
+    return rval;} {}
   }
 }
 
@@ -328,44 +344,34 @@ class Oscilharmonic {: {public Fl_Group}
     } {
       Fl_Slider mag {
         callback {//
-        int x=64;
+        int x = 64;
         if (Fl::event_button3())
         {
             if (n == 0)
                 x = 127;
-            o->value(127 - x);
+            o->value(64 - x);
         }
         else
-            x = 127 - (int)o->value();
-
-        if (x==64)
-            o->selection_color(0);
-        else
-            o->selection_color(222);
+            x = 64 - (int)o->value();
 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
-        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
-        code0 {o->value(127-oscil->Phmag[n]);}
-        code1 {if (oscil->Phmag[n]==64) o->selection_color(0);}
+        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1 value 0
+        code0 {o->value(64 - oscil->Phmag[n]);}
+        code1 {o->setValueType(VC_WaveHarmonicMagnitude); o->useCustomTip(true);}
         class PSlider
       }
       Fl_Slider phase {
         callback {//
         int x = 64;
         if (Fl::event_button3())
-            o->value(x);
+            o->value(0);
         else
-            x = (int)o->value();
+            x = 64 - (int)o->value();
 
-        if (x == 64)
-            o->selection_color(0);
-        else
-            o->selection_color(222);
-
-        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, 127 - x, TOPLEVEL::type::Integer);}
-        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
-        code0 {o->value(oscil->Phphase[n]);}
-        code1 {if (oscil->Phphase[n]==64) o->selection_color(0);}
+        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
+        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1 value 0
+        code0 {o->value(64 - oscil->Phphase[n]);}
+        code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
         class PSlider
       }
       Fl_Box {} {
@@ -411,18 +417,9 @@ class Oscilharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-    mag->value(127-oscil->Phmag[n]);
-    phase->value(oscil->Phphase[n]);
-
-    if (oscil->Phmag[n]==64)
-        mag->selection_color(0);
-    else
-        mag->selection_color(222);
-
-    if (oscil->Phphase[n]==64)
-        phase->selection_color(0);
-    else
-        phase->selection_color(222);} {}
+    mag->value(64 - oscil->Phmag[n]);
+    phase->value(64 - oscil->Phphase[n]);
+    } {}
   }
   Function {~Oscilharmonic()} {} {
     code {//
@@ -1126,20 +1123,12 @@ class OscilEditor {: {public PresetsUI_}
     bool baseSet = false;
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        h[control]->mag->value(127 - value);
-        if (value == 64)
-            h[control]->mag->selection_color(0);
-        else
-            h[control]->mag->selection_color(222);
+        h[control]->mag->value(64 - value);
     }
 
     else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
-        h[control]->phase->value(127 - value);
-        if (value == 64)
-            h[control]->phase->selection_color(0);
-        else
-            h[control]->phase->selection_color(222);
+        h[control]->phase->value(64 - value);
     }
 
     else
@@ -1221,27 +1210,14 @@ class OscilEditor {: {public PresetsUI_}
                 {
                     for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                     {
-                        h[i]->mag->value(64);;
-                        h[i]->phase->value(64);
+                        h[i]->mag->value(0);;
+                        h[i]->phase->value(0);
                     }
-                    h[0]->mag->value(127);
                     harmonicshiftcounter->value(0);
                     h[0]->mag->value(0);
                     wshbutton->value(0);
                     fltbutton->value(0);
                     sabutton->value(0);
-                }
-                for (int i = 0; i<MAX_AD_HARMONICS; ++i)
-                {
-                    if (h[i]->mag->value() == 64)
-                        h[i]->mag->selection_color(0);
-                    else
-                        h[i]->mag->selection_color(222);
-
-                    if (h[i]->phase->value() == 64)
-                        h[i]->phase->selection_color(0);
-                    else
-                        h[i]->phase->selection_color(222);
                 }
                 baseSet = true;
                 set = false;
@@ -1347,13 +1323,10 @@ class OscilEditor {: {public PresetsUI_}
             case OSCILLATOR::control::clearHarmonics:
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
-                    h[i]->mag->value(64);
-                    h[i]->mag->selection_color(0);
-                    h[i]->phase->value(64);
-                    h[i]->phase->selection_color(0);
+                    h[i]->mag->value(0);
+                    h[i]->phase->value(0);
                 }
                 h[0]->mag->value(0);
-                h[0]->mag->selection_color(222);
                 break;
 
             case OSCILLATOR::control::convertToSine:

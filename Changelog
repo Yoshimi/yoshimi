@@ -1,5 +1,13 @@
 yoshimi 1.7.1 M
 
+2020-7-16 Jesper
+* Added dynamic tooltips for AddSynth phase offset sliders,
+  waveform editor per-harmonic phase offset and magnitude
+  sliders, and SubSynth per-harmonic magnitude sliders.
+* Changed direction of per-harmonic phase offset slider in
+  the waveform editor to make it consistent with other phase
+  offset controls.
+
 2020-7-14 Will
 * Manual correction NRPN History MSB
 

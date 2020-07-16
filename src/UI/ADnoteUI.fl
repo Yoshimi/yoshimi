@@ -568,8 +568,9 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   label Phase
                   callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
-                  xywh {659 401 75 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+                  tooltip {Phase offset} xywh {659 401 75 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
+                  code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   class mwheel_slider_rev
                 }
                 Fl_Choice ExtModOsc {
@@ -812,8 +813,9 @@ Oscillator}
                   label Phase
                   callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
-                  xywh {10 568 70 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+                  tooltip {Phase offset} xywh {10 568 70 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].Poscilphase);}
+                  code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   class mwheel_slider_rev
                 }
               }
