@@ -1381,6 +1381,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 }
                 unisonsize->labelcolor(colr);
                 unisongroup->redraw();
+                UnisonEn->redraw();
             }
             break;
 
@@ -1415,6 +1416,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 }
                 unisonsize->labelcolor(colr);
                 unisongroup->redraw();
+                 UnisonEn->redraw();
             }
             break;
 

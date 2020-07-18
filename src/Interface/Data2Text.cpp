@@ -1439,7 +1439,8 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Max To Last";
             break;
         case PART::control::resetMinMaxKey:
-            contstr = "Reset Key Range";
+            contstr = "Full Key Range";
+            showValue = false;
             break;
 
         case PART::control::kitEffectNum:

@@ -5243,6 +5243,9 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         }
 
     }
+    else if (input.matchnMove(2, "full"))
+         cmd = PART::control::resetMinMaxKey;
+
     if (cmd > -1)
     {
         int insert = UNUSED;

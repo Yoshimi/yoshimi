@@ -12,8 +12,6 @@ Revise GUI voice list related to voice editor.
 
 Effect change warning for dynfilter insert not yet done.
 
-Some CLI addvoice kit mode controls don't update the GUI.
-
 CLI waveform (in voice) changes don't update GUI unless waveform window is open too.
 
 Requested: auto 'apply' timer for padsynth.

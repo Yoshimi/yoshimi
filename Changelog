@@ -1,5 +1,10 @@
 yoshimi 1.7.1 M
 
+2020-7-18 Will
+* CLI can now restore full key range for part and kit mode.
+* Unison enable button now correct when set from CLI.
+* Updated docs.
+
 2020-7-16 Will
 * Updated user guide to include latest changes.
 * Changed AddVoice delay slider to not show boxed value.
