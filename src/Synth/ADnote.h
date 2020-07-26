@@ -50,8 +50,8 @@ class ADnote
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
                int portamento_, int midinote_, SynthEngine *_synth);
-        ADnote(ADnote *topVoice_, float freq_, int subVoiceNumber_, float *parentFMmod_,
-               bool forFM_);
+        ADnote(ADnote *topVoice_, float freq_, int phase_offset_, int subVoiceNumber_,
+               float *parentFMmod_, bool forFM_);
         ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
         ~ADnote();
 
@@ -154,9 +154,6 @@ class ADnote
             // Filter global parameters
             Filter *GlobalFilterL;
             Filter *GlobalFilterR;
-            float  FilterCenterPitch; // octaves
-            float  FilterQ;
-            float  FilterFreqTracking;
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
         } NoteGlobalPar;
@@ -200,9 +197,6 @@ class ADnote
             // Filter parameters
             Filter   *VoiceFilterL;
             Filter   *VoiceFilterR;
-
-            float  FilterCenterPitch;
-            float  FilterFreqTracking;
 
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
@@ -260,8 +254,8 @@ class ADnote
         } unison_vibratto[NUM_VOICES];
 
         // integer part (skip) of the Modullator
-        unsigned int *oscposhiFM[NUM_VOICES];
-        unsigned int *oscfreqhiFM[NUM_VOICES];
+        int *oscposhiFM[NUM_VOICES];
+        int *oscfreqhiFM[NUM_VOICES];
 
         float oldamplitude[NUM_VOICES];  // used to compute and interpolate the
         float newamplitude[NUM_VOICES];  // amplitudes of voices and modullators

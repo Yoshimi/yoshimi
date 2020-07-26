@@ -1846,6 +1846,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             case UNUSED:
                 commandPad(getData);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
@@ -1864,21 +1865,25 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
                 commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
                 commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::resonanceGroup:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
+                part->kit[kititem].padpars->presetsUpdated();
                 break;
         }
-        part->kit[kititem].padpars->presetsUpdated();
         return true;
     }
 
@@ -1888,12 +1893,15 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             case UNUSED:
                 commandSub(getData);
+                part->kit[kititem].subpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
                 commandSub(getData);
+                part->kit[kititem].subpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
                 commandSub(getData);
+                part->kit[kititem].subpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::filterGroup:
                 commandFilter(getData);
@@ -1908,7 +1916,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
-        part->kit[kititem].subpars->presetsUpdated();
         return true;
     }
 
@@ -1925,6 +1932,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             case UNUSED:
                 commandAddVoice(getData);
+                part->kit[kititem].adpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
@@ -1972,9 +1980,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscil);
                 }
+                part->kit[kititem].adpars->presetsUpdated();
                 break;
         }
-        part->kit[kititem].adpars->presetsUpdated();
         return true;
     }
 
@@ -1984,6 +1992,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             case UNUSED:
                 commandAdd(getData);
+                part->kit[kititem].adpars->presetsUpdated();
                 break;
             case TOPLEVEL::insert::LFOgroup:
                 commandLFO(getData);
@@ -1999,9 +2008,9 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             case TOPLEVEL::insert::resonanceGroup:
             case TOPLEVEL::insert::resonanceGraphInsert:
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
+                part->kit[kititem].adpars->presetsUpdated();
                 break;
         }
-        part->kit[kititem].adpars->presetsUpdated();
         return true;
     }
     getData->data.source = TOPLEVEL::action::noAction;
