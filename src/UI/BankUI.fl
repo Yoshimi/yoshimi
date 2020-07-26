@@ -977,7 +977,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    //int value_int = getData->data.value.F;
+    //int value_int = getData->data.value;
     unsigned char control = getData->data.control;
     //unsigned char kititem = getData->data.kit;
     //unsigned char engine= getData->data.engine;

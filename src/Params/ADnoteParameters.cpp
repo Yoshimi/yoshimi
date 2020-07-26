@@ -916,7 +916,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
 float ADnoteParameters::getLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;

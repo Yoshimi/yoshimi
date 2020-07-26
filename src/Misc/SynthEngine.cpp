@@ -778,7 +778,7 @@ void SynthEngine::SetZynControls(bool in_place)
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     // TODO the next line is wrong, it should really be
     // handled by MIDI
@@ -949,7 +949,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
     if (notinplace && Runtime.showTimes)
         gettimeofday(&tv1, NULL);
 
-    int instrument = int(getData->data.value.F);
+    int instrument = int(getData->data.value);
     int banknum = getData->data.engine;
     if (banknum == UNUSED)
         banknum = Runtime.currentBank;
@@ -1775,7 +1775,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
     {
         CommandBlock putData;
         memset(&putData, 0xff, sizeof(putData));
-        putData.data.value.F = par;
+        putData.data.value = par;
         putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
         putData.data.source = TOPLEVEL::action::fromMIDI | TOPLEVEL::action::muteAndLoop;
         putData.data.control = 8;
@@ -1827,7 +1827,7 @@ void SynthEngine::resetAll(bool andML)
     {
         CommandBlock putData;
         memset(&putData, 0xff, sizeof(putData));
-        putData.data.value.F = 0;
+        putData.data.value = 0;
         putData.data.type = 0;
         putData.data.control = MIDILEARN::control::clearAll;
         putData.data.part = TOPLEVEL::section::midiLearn;
@@ -3272,7 +3272,7 @@ void SynthEngine::setWindowTitle(const string& _windowTitle)
 
 float SynthEngine::getLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
@@ -3374,7 +3374,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
 float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
@@ -3467,7 +3467,7 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
 
 float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 

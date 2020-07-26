@@ -114,7 +114,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
         }
         else
         {
-            putData.data.value.F = float(par2);
+            putData.data.value = float(par2);
             putData.data.type = 8;
             putData.data.control = (event == 0x80);
             putData.data.part = TOPLEVEL::section::midiIn;

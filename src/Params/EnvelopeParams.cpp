@@ -299,7 +299,7 @@ void EnvelopeParams::store2defaults(void)
 
 float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;

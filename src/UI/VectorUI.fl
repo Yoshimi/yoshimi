@@ -522,7 +522,7 @@ class VectorUI {} {
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char miscmsg = getData->data.miscmsg;

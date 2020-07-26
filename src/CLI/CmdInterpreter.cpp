@@ -5468,7 +5468,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
 
     /*CommandBlock getData;
-    getData.data.value.F = 0;
+    getData.data.value = 0;
     getData.data.part = TOPLEVEL::section::copyPaste;
     getData.data.kit = 0;
     getData.data.engine = 135;
@@ -6545,7 +6545,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
 
         CommandBlock putData;
-        putData.data.value.F = 0;
+        putData.data.value = 0;
         putData.data.control = control;
         putData.data.part = part;
         putData.data.kit = kit;

@@ -46,23 +46,6 @@
 #define Fmul2I 1073741823
 #define Cshift2I 23
 
-/*
- * proposed conversions from float to hi res 32 bit int
- * multiplier is 1000000
- *
- * for LFO freq turns actual value 85.25 into 85250000
- * current step size 0.06 becomes 6000
- *
- * scales reference frequency 440Hz becomes 440000000
- * At 20Hz resolution is still better than 1/1000 cent
- * Assumed detectable interval is 5 cents
- *
- * also use for integers that need higher resolution
- * such as unspecified 0-127 integers
- *
- * Note: 127 * 0x1020408 = 0x7ffffff8 = 0x7f << 24
-*/
-
 // many of the following are for convenience and consistency
 // changing them is likely to have unpredicable consequences
 
@@ -1064,10 +1047,7 @@ namespace EFFECT // usage EFFECT::type::none
 
 union CommandBlock{
     struct{
-        union{
-            float F;
-            int32_t I;
-        } value;
+        float value;
         unsigned char type;
         unsigned char source;
         unsigned char control;

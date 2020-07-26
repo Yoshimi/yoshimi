@@ -865,7 +865,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-            int value_int = lrint(getData->data.value.F);
+            int value_int = lrint(getData->data.value);
             bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
             unsigned char control = getData->data.control;
             unsigned char kititem = getData->data.kit;
@@ -1312,7 +1312,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
             CommandBlock getData;
-            getData.data.value.F = value;
+            getData.data.value = value;
             getData.data.control = control;
             getData.data.part = 248;
             synth->interchange.testLimits(&getData);

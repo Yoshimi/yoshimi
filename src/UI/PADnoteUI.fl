@@ -1073,7 +1073,7 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     bool value_bool = YOSH::F2B(value);
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;

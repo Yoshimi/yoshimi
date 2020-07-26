@@ -24,7 +24,7 @@
 
 string UnifiedPresets::findSectionName(CommandBlock *getData)
 {
-    unsigned char value = int (getData->data.value.F + 0.5f);
+    unsigned char value = int (getData->data.value + 0.5f);
     int engine = getData->data.engine;
     int insert = getData->data.insert;
     string name = "unrecognised";

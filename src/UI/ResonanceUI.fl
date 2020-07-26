@@ -470,7 +470,7 @@ class ResonanceUI {: PresetsUI_
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;

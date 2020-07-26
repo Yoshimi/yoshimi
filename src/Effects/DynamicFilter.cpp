@@ -369,7 +369,7 @@ unsigned char DynamicFilter::getpar(int npar)
 
 float Dynamlimit::getlimits(CommandBlock *getData)
 {
-    int value = getData->data.value.F;
+    int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & 3; // clear upper bits
     int npart = getData->data.part;

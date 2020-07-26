@@ -69,7 +69,7 @@ std::string DataText::withValue(std::string resolved, unsigned char type, bool s
 string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
     SynthEngine *synth = _synth;
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -296,7 +296,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
 
 string DataText::resolveVector(CommandBlock *getData, bool addValue)
 {
-    int value_int = lrint(getData->data.value.F);
+    int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.insert;
 
@@ -409,7 +409,7 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
 
 string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 {
-    int value = getData->data.value.F;
+    int value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char parameter = getData->data.parameter;
 
@@ -552,7 +552,7 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 
 string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     bool write = getData->data.type & TOPLEVEL::type::Write;
@@ -912,7 +912,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 
 string DataText::resolveBank(CommandBlock *getData, bool)
 {
-    int value_int = lrint(getData->data.value.F);
+    int value_int = lrint(getData->data.value);
     int control = getData->data.control;
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
@@ -976,7 +976,7 @@ string DataText::resolveBank(CommandBlock *getData, bool)
 
 string DataText::resolveMain(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int value_int = lrint(value);
 
     unsigned char control = getData->data.control;
@@ -1293,7 +1293,7 @@ string DataText::resolveAftertouch(bool type, int value, bool addValue)
 
 string DataText::resolvePart(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1712,7 +1712,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
 
 string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1800,7 +1800,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 
 string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2079,7 +2079,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 
 string DataText::resolveSub(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2244,7 +2244,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
 
 string DataText::resolvePad(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2440,7 +2440,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
 
 string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2608,7 +2608,7 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
 
 string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 {
-    int value = int(getData->data.value.F + 0.5f);
+    int value = int(getData->data.value + 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2703,7 +2703,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 
 string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 {
-    int value_int = int(getData->data.value.F);
+    int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2783,7 +2783,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 
 string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 {
-    int value_int = int(getData->data.value.F);
+    int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2938,7 +2938,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 
 string DataText::resolveEnvelope(CommandBlock *getData, bool)
 {
-    int value = lrint(getData->data.value.F);
+    int value = lrint(getData->data.value);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -3066,7 +3066,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 
 string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 {
-    int value = lrint(getData->data.value.F);
+    int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;

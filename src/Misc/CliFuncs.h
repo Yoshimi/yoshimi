@@ -75,7 +75,7 @@ inline float readControl(SynthEngine *synth,
     float value;
     CommandBlock putData;
 
-    putData.data.value.F = 0;
+    putData.data.value = 0;
     putData.data.type = 0;
     putData.data.source = action;
     putData.data.control = control;
@@ -105,7 +105,7 @@ inline string readControlText(SynthEngine *synth,
     float value;
     CommandBlock putData;
 
-    putData.data.value.F = 0;
+    putData.data.value = 0;
     putData.data.type = 0;
     putData.data.source = action;
     putData.data.control = control;
@@ -127,7 +127,7 @@ inline void readLimits(SynthEngine *synth,
 {
     CommandBlock putData;
 
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
@@ -184,7 +184,7 @@ inline int sendNormal(SynthEngine *synth,
 
     CommandBlock putData;
 
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
@@ -219,7 +219,7 @@ inline int sendNormal(SynthEngine *synth,
                 return REPLY::available_msg;
             if (newValue != value && (type & TOPLEVEL::type::Write))
             { // checking the original type not the reported one
-                putData.data.value.F = newValue;
+                putData.data.value = newValue;
                 synth->getRuntime().Log("Range adjusted");
             }
         }
@@ -254,7 +254,7 @@ inline int sendDirect(SynthEngine *synth,
         request = type & TOPLEVEL::type::Default;
     CommandBlock putData;
 
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;

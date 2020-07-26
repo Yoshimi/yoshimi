@@ -214,7 +214,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     //std::cout << "CC buffered" << std::endl;
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = par;
+    putData.data.value = par;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = 2;
@@ -571,14 +571,14 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             break;
 
         case 4: // Set part's channel number
-            putData.data.value.F = par;
+            putData.data.value = par;
             putData.data.control = 5;
             putData.data.part = synth->getRuntime().vectordata.Part;
             break;
 
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
-            putData.data.value.F = par;
+            putData.data.value = par;
             putData.data.control = 120;
             putData.data.part = synth->getRuntime().vectordata.Part;
             putData.data.parameter = 192;
@@ -590,7 +590,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
                 par = MIN_KEY_SHIFT;
             else if (par > MAX_KEY_SHIFT)
                 par = MAX_KEY_SHIFT;
-            putData.data.value.F = par;
+            putData.data.value = par;
             putData.data.control = 35;
             putData.data.part = synth->getRuntime().vectordata.Part;
             break;
@@ -669,7 +669,7 @@ void MidiDecode::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_pla
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = 0xff;
+    putData.data.value = 0xff;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = MIDI::control::bankChange;
@@ -696,7 +696,7 @@ void MidiDecode::setMidiProgram(unsigned char ch, int prg, bool in_place)
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
-    putData.data.value.F = prg;
+    putData.data.value = prg;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
     putData.data.control = MIDI::control::instrument;

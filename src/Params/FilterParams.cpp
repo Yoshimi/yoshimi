@@ -391,7 +391,7 @@ void FilterParams::getfromXML(XMLwrapper *xml)
 
 float filterLimit::getFilterLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int kitItem = getData->data.kit;

@@ -154,7 +154,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
             value += minOut;
 
         CommandBlock putData;
-        putData.data.value.F = value;
+        putData.data.value = value;
         putData.data.type = TOPLEVEL::type::Write | (foundEntry.data.type & TOPLEVEL::type::Integer);
         // write command from midi with original integer / float type
         putData.data.source = TOPLEVEL::action::toAll;
@@ -387,7 +387,7 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOperations(CommandBlock *getData)
 {
-    int value = getData->data.value.F;
+    int value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 //    unsigned char part = getData->data.part;
@@ -602,7 +602,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         CommandBlock putData;
         memset(&putData.bytes, 255, sizeof(putData));
         // need to work on this more
-        putData.data.value.F = value;
+        putData.data.value = value;
         putData.data.type = type;
         putData.data.control = MIDILEARN::control::ignoreMove;
         putData.data.kit = kit;
@@ -665,7 +665,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
 string MidiLearn::findName(list<LearnBlock>::iterator it)
 {
     CommandBlock putData;
-    putData.data.value.I = 0;
+    putData.data.value = 0;
     putData.data.source = 0;
 
     putData.data.type = it->data.type;
@@ -691,7 +691,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
         CommandBlock putData;
         int putSize = sizeof(putData);
         memset(&putData, 0xff, putSize);
-        putData.data.value.F = 0;
+        putData.data.value = 0;
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
         putData.data.control = TOPLEVEL::control::textMessage;
@@ -817,7 +817,7 @@ void MidiLearn::updateGui(int opp)
         if (opp == MIDILEARN::control::hideGUI)
             return;
     }
-    putData.data.value.F = 0;
+    putData.data.value = 0;
     writeToGui(&putData);
 
     if (opp >= MIDILEARN::control::hideGUI) // just sending back gui message
@@ -829,7 +829,7 @@ void MidiLearn::updateGui(int opp)
     while (it != midi_list.end())
     {
         unsigned short int newCC = (it->CC) & MIDI::CC::maxNRPN;
-        putData.data.value.F = lineNo;
+        putData.data.value = lineNo;
         putData.data.type = it->status;
         putData.data.source = TOPLEVEL::action::toAll;
         putData.data.control = MIDILEARN::control::CCorChannel;

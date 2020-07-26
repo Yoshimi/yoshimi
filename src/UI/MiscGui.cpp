@@ -47,7 +47,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
         action |= request;
     CommandBlock putData;
 
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.type = type;
     putData.data.source = action;
     putData.data.control = control;
@@ -82,7 +82,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     }
 
     CommandBlock putData;
-    putData.data.value.F = value;
+    putData.data.value = value;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;
@@ -126,7 +126,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
             }
             else
             {
-                putData.data.value.F = newValue;
+                putData.data.value = newValue;
                 type = TOPLEVEL::type::Write;
                 action |= TOPLEVEL::action::forceUpdate;
                 // has to be write as it's 'set default'

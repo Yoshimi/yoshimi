@@ -1198,7 +1198,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char voice = getData->data.engine;
     //std::cout << "voice " << int(voice) << "   nvoice " << int(nvoice) << std::endl;
@@ -2333,7 +2333,7 @@ switch (num)
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     unsigned char control = getData->data.control;
     bool val_bool = YOSH::F2B(value);
     switch(control)

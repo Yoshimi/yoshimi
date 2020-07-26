@@ -1,5 +1,16 @@
 yoshimi 1.7.1 M
 
+2020-7-26 Will
+* Merged following fixes from Kristian
+  Avoid out-of-bounds phase when moving the phase slider of live
+   voice.
+  Fix unison phase randomness not being respected in sub voices.
+  Optimize: Avoid running a full note update when only one part
+   has changed
+
+* Reverted union for 'value' in command block.
+  Not using the int version, and seems unnecessary.
+
 2020-7-18 Will
 * CLI can now restore full key range for part and kit mode.
 * Unison enable button now correct when set from CLI.

@@ -838,7 +838,7 @@ bool Microtonal::loadXML(const string& filename)
 
 float Microtonal::getLimits(CommandBlock *getData)
 {
-    float value = getData->data.value.F;
+    float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
