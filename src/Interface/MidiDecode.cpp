@@ -240,51 +240,48 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
     {
         if (ctrl == MIDI::CC::nrpnLSB)
         {
-            if (synth->getRuntime().nrpnL != param)
+            nHigh = synth->getRuntime().nrpnH;
+            nLow = param;
+            synth->getRuntime().nrpnL = nLow;
+            if (nHigh == 0x44 && (nLow == 0x44 || nLow == 0x45)) // shutdown controls
             {
-                synth->getRuntime().nrpnL = param;
-                unsigned char type = synth->getRuntime().nrpnH;
-                if (type >= 0x41 && type <= 0x43)
-                { // shortform
-
-                    if (param > 0x77) // disable it
+                if (nLow == 0x45)
+                    synth->getRuntime().exitType = FORCED_EXIT;
+                synth->getRuntime().runSynth = false;
+                return true; // bye bye everyone
+            }
+            if (nHigh == 0x41 || nHigh == 0x42) // Solo controls
+            {
+                if (nHigh == 0x41) // type - must set this first
+                {
+                    if (nLow > MIDI::SoloType::Channel)
+                        nLow = MIDI::SoloType::Disabled;
+                    synth->getRuntime().channelSwitchType = nLow; // row/column/loop/channel
+                    //sendMidiCC(in_place, 0, MIDI::CC::soloType, nLow);
+                    return true;
+                }
+                if (nHigh == 0x42) // CC
+                {
+                    if (nLow < MIDI::CC::allSoundOff)
                     {
-                        synth->getRuntime().channelSwitchType = 0;
-                        synth->getRuntime().channelSwitchCC = 0x80;
-                    }
-                    else
-                    {
-                        synth->getRuntime().channelSwitchType = type & 3; // row/column/loop
-                        synth->getRuntime().channelSwitchCC = param;
+                        synth->getRuntime().channelSwitchCC = nLow;
+                        //sendMidiCC(in_place, 0, MIDI::CC::soloCC, nLow);
                     }
                     return true;
                 }
-                if (type == 0x44 && (param == 0x44 || param == 0x45))
-                {
-                    if (param == 0x45)
-                        synth->getRuntime().exitType = FORCED_EXIT;
-                    synth->getRuntime().runSynth = false;
-                    return true; // bye bye everyone
-                }
-                //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
-            nLow = param;
-            nHigh = synth->getRuntime().nrpnH;
         }
         else // MSB
         {
-            if (synth->getRuntime().nrpnH != param)
-            {
-                synth->getRuntime().nrpnH = param;
-                //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
-            if (param == 0x41) // set shortform
+            nHigh = param;
+            nLow = synth->getRuntime().nrpnL;
+            synth->getRuntime().nrpnH = nHigh;
+            //synth->getRuntime().Log("Set nrpn MSB to " + asString(nHigh));
+            if (nHigh >= 0x41 && nHigh <= 0x44) // set shortform
             {
                 synth->getRuntime().nrpnL = 0x7f;
                 return true;
             }
-            }
-            nHigh = param;
-            nLow = synth->getRuntime().nrpnL;
         }
         synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
         synth->getRuntime().dataH = 0x80; //  so these are now invalid

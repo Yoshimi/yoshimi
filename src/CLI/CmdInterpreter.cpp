@@ -5668,15 +5668,15 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
             return sendNormal(synth, 0, value, controlType, MAIN::control::soloCC, TOPLEVEL::section::main);
         }
 
-        else if (input.matchnMove(1, "row"))
+        else if (input.matchnMove(2, "row"))
             value = MIDI::SoloType::Row;
-        else if (input.matchnMove(1, "column"))
+        else if (input.matchnMove(2, "column"))
             value = MIDI::SoloType::Column;
-        else if (input.matchnMove(1, "loop"))
+        else if (input.matchnMove(2, "loop"))
             value = MIDI::SoloType::Loop;
-        else if (input.matchnMove(1, "twoway"))
+        else if (input.matchnMove(2, "twoway"))
             value = MIDI::SoloType::TwoWay;
-        else if (input.matchnMove(1, "channel"))
+        else if (input.matchnMove(2, "channel"))
             value = MIDI::SoloType::Channel;
         return sendNormal(synth, 0, value, controlType, MAIN::control::soloType, TOPLEVEL::section::main);
     }

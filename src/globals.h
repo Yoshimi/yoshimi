@@ -448,6 +448,8 @@ namespace MIDI // usage MIDI::control::noteOn
         pitchWheelInner = 128,
         channelPressureInner,
         keyPressureInner,
+        soloType,
+        soloCC,
 
         pitchWheel = 640,
         channelPressure,
