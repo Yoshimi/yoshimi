@@ -217,7 +217,7 @@ void MidiDecode::sendMidiCC(bool inSync, unsigned char chan, int type, short int
     putData.data.value = par;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
-    putData.data.control = 2;
+    putData.data.control = MIDI::control::controller;
     putData.data.part = TOPLEVEL::section::midiIn;
     putData.data.kit = chan;
     putData.data.engine = type;
@@ -257,18 +257,13 @@ bool MidiDecode::nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place
                     if (nLow > MIDI::SoloType::Channel)
                         nLow = MIDI::SoloType::Disabled;
                     synth->getRuntime().channelSwitchType = nLow; // row/column/loop/channel
-                    //sendMidiCC(in_place, 0, MIDI::CC::soloType, nLow);
-                    return true;
                 }
-                if (nHigh == 0x42) // CC
+                else // CC
                 {
                     if (nLow < MIDI::CC::allSoundOff)
-                    {
                         synth->getRuntime().channelSwitchCC = nLow;
-                        //sendMidiCC(in_place, 0, MIDI::CC::soloCC, nLow);
-                    }
-                    return true;
                 }
+                return true;
             }
         }
         else // MSB

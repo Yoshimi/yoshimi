@@ -1,5 +1,10 @@
 yoshimi 1.7.1 M
 
+2020-8-2 Will
+* Clarifed CLI 'solo' controls.
+* Further refinements to 'solo' NRPNs
+* Updated docs.
+
 2020-7-30 Will
 * BugFix: NRPN 'Solo' not working. Changed actual control numbers.
 * Revised NRPN recognition, particularly shortform ones.

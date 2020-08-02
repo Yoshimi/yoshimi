@@ -1093,7 +1093,7 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             if (addValue)
             {
                 if (value_int > 127)
-                    contstr += "undefined - set mode first";
+                    contstr += "undefined - set type first";
                 else
                     contstr += to_string(value_int);
             }
