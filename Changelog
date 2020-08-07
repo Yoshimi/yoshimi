@@ -1,5 +1,9 @@
 yoshimi 1.7.1 M
 
+2020-8-8 Will
+* Removed references to Jack in LV2.
+  Used time_t instead of jack_nframes_t
+
 2020-8-2 Will
 * Clarifed CLI 'solo' controls.
 * Further refinements to 'solo' NRPNs
