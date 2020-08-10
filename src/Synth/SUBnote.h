@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010 Alan Calvert
     Copyright 2014-2017 Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -74,6 +74,7 @@ class SUBnote
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int start; // how the harmonics start
         float basefreq;
+        float initialfreq;
         float velocity;
         int portamento;
         int midinote;

@@ -6,7 +6,7 @@
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -90,6 +90,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     rfilter = NULL;
 
     setBaseFreq(freq);
+    initialfreq = freq;
 
     oldpitchwheel = 0;
     oldbandwidth = 64;
@@ -713,7 +714,7 @@ int SUBnote::noteout(float *outl, float *outr)
 
     if (subNoteChange.checkUpdated())
     {
-        setBaseFreq(basefreq);
+        setBaseFreq(initialfreq);
         computeNoteParameters();
     }
 
