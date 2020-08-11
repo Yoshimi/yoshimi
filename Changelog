@@ -1,6 +1,9 @@
 yoshimi 1.7.1 M
 
-2020-8-1- Will
+2020-8-11- Will
+* BugFix: GUI kitmode entries updating wrong items.
+
+2020-8-10- Will
 * Provisional fix for SubSynth frequency bug.
 
 2020-8-8 Will

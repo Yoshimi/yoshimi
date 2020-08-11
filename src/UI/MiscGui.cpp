@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2019 Will Godfrey & others
+    Copyright 2016-2020 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -336,7 +336,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
-
+    if (kititem != synth->getGuiMaster()->partui->lastkititem)
+        return; // not for us!
     if (engine == PART::engine::padSynth) // padsynth
     {
         if (synth->getGuiMaster()->partui->padnoteui)
