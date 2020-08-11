@@ -2,6 +2,8 @@ yoshimi 1.7.1 M
 
 2020-8-11- Will
 * BugFix: GUI kitmode entries updating wrong items.
+* Started work on Banks enhancement.
+  Currently disabled.
 
 2020-8-10- Will
 * Provisional fix for SubSynth frequency bug.

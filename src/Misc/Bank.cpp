@@ -42,6 +42,7 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
+#include "ConfBuild.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
@@ -62,6 +63,7 @@ using file::deleteFile;
 using file::findLeafName;
 using file::setExtension;
 using file::extendLocalPath;
+using file::loadText;
 using file::saveText;
 
 using func::asString;
@@ -1058,6 +1060,31 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 }
 
 
+void Bank::updateShare(string bankdirs[], string localDir, string shareID)
+{
+    cout << "writing version " << shareID << endl;
+    saveText(to_string(BUILD_NUMBER), shareID);
+    string thisDir = localDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
+    if (!isDirectory(thisDir))
+        return;
+    cout << bankdirs[1] << endl;
+    if (isDirectory(bankdirs[1]))
+        checkShare(thisDir, bankdirs[1]);
+
+    if (isDirectory(bankdirs[2]))
+     checkShare(thisDir, bankdirs[2]);
+
+    if (isDirectory(bankdirs[6]))
+        checkShare(thisDir, bankdirs[6]);
+}
+
+
+void Bank::checkShare(string sourceDir, string thisDir)
+{
+    cout << "S " << sourceDir << "  D " << thisDir << endl;
+}
+
+
 bool Bank::transferDefaultDirs(string bankdirs[])
 {
     string ourDir = synth->getRuntime().definedBankRoot;
@@ -1523,6 +1550,13 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         //cout << "Defined new root ID " << asString(newIndex) << " as " << found << endl;
     }
     installRoots();
+
+    /*if (isDirectory(localDir))
+    {
+        string shareID = localDir + "version";
+        if (loadText(shareID) != to_string(BUILD_NUMBER))
+            updateShare(bankdirs, localDir, shareID);
+    }*/
     return newRoots;
 }
 
