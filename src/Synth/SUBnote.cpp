@@ -58,7 +58,7 @@ const float LOG_0_0001 = logf(0.0001f);
 const float LOG_0_00001 = logf(0.00001f);
 
 
-SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
+SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float basefreq_,
                  float velocity_, int portamento_, int midinote_, SynthEngine *_synth) :
     pars(parameters),
     velocity(velocity_ > 1.0f ? 1.0f : velocity_),
@@ -89,16 +89,16 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     lfilter = NULL;
     rfilter = NULL;
 
-    setBaseFreq(freq);
-    initialfreq = freq;
+    basefreq = basefreq_;
+    computeNoteFreq();
 
     oldpitchwheel = 0;
     oldbandwidth = 64;
 
     if (pars->Pfixedfreq == 0)
-        initparameters(basefreq);
+        initparameters(notefreq);
     else
-        initparameters(basefreq / 440.0f * freq);
+        initparameters(notefreq / 440.0f * basefreq);
 
     computeNoteParameters();
     computecurrentparameters();
@@ -115,6 +115,7 @@ SUBnote::SUBnote(const SUBnote &orig) :
     numharmonics(orig.numharmonics),
     start(orig.start),
     basefreq(orig.basefreq),
+    notefreq(orig.notefreq),
     velocity(orig.velocity),
     portamento(orig.portamento),
     midinote(orig.midinote),
@@ -182,13 +183,14 @@ SUBnote::SUBnote(const SUBnote &orig) :
 }
 
 
-void SUBnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
+void SUBnote::legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_)
 {
     velocity = velocity_ > 1.0f ? 1.0f : velocity_;
     portamento = portamento_;
     midinote = midinote_;
 
-    setBaseFreq(freq_);
+    basefreq = basefreq_;
+    computeNoteFreq();
 
     if (!portamento) // Do not crossfade portamento
     {
@@ -216,6 +218,7 @@ void SUBnote::legatoFadeOut(const SUBnote &orig)
     volume = orig.volume;
 
     basefreq = orig.basefreq;
+    notefreq = orig.notefreq;
 
     // Not sure if this is necessary
     oldamplitude = orig.oldamplitude;
@@ -305,7 +308,7 @@ int SUBnote::createNewFilters()
     {
         if (pars->Phmag[n] == 0 || alreadyEnabled[n])
             continue;
-        if (n * basefreq > synth->halfsamplerate_f)
+        if (n * notefreq > synth->halfsamplerate_f)
             break; // remove the freqs above the Nyquist freq
         pos[numharmonics++] = n;
         alreadyEnabled[n] = true;
@@ -335,28 +338,28 @@ int SUBnote::createNewFilters()
     return numharmonics - origNumHarmonics;
 }
 
-void SUBnote::setBaseFreq(float basefreq_)
+void SUBnote::computeNoteFreq()
 {
     if (pars->Pfixedfreq == 0)
-        basefreq = basefreq_;
+        notefreq = basefreq;
     else
     {
-        basefreq = 440.0f;
+        notefreq = 440.0f;
         int fixedfreqET = pars->PfixedfreqET;
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
             float tmp =
                 (midinote - 69.0f) / 12.0f * powf(2.0f, (((fixedfreqET - 1) / 63.0f) - 1.0f));
             if (fixedfreqET <= 64)
-                basefreq *= powf(2.0f, tmp);
+                notefreq *= powf(2.0f, tmp);
             else
-                basefreq *= powf(3.0f, tmp);
+                notefreq *= powf(3.0f, tmp);
         }
     }
 
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
-    basefreq *= powf(2.0f, detune / 1200.0f); // detune
-//    basefreq*=ctl->pitchwheel.relfreq;//pitch wheel
+    notefreq *= powf(2.0f, detune / 1200.0f); // detune
+//    notefreq*=ctl->pitchwheel.relfreq;//pitch wheel
 }
 
 void SUBnote::computeNoteParameters()
@@ -714,7 +717,7 @@ int SUBnote::noteout(float *outl, float *outr)
 
     if (subNoteChange.checkUpdated())
     {
-        setBaseFreq(initialfreq);
+        computeNoteFreq();
         computeNoteParameters();
     }
 
@@ -896,7 +899,7 @@ void SUBnote::updatefilterbank(void)
 
     for (int n = 0; n < numharmonics; ++n)
     {
-        float freq =  basefreq * pars->POvertoneFreqMult[pos[n]];
+        float freq =  notefreq * pars->POvertoneFreqMult[pos[n]];
         overtone_freq[n] = freq;
         overtone_rolloff[n] = computerolloff(freq);
 

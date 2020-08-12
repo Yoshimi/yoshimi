@@ -44,7 +44,7 @@ class SUBnote
         SUBnote(const SUBnote &rhs);
         ~SUBnote();
 
-        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
+        void legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const SUBnote &syncwith);
 
         int noteout(float *outl,float *outr); // note output, return 0 if the
@@ -74,7 +74,7 @@ class SUBnote
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int start; // how the harmonics start
         float basefreq;
-        float initialfreq;
+        float notefreq;
         float velocity;
         int portamento;
         int midinote;
@@ -128,7 +128,7 @@ class SUBnote
         void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void computeNoteParameters();
-        void setBaseFreq(float basefreq_);
+        void computeNoteFreq();
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
         float getHgain(int harmonic);
