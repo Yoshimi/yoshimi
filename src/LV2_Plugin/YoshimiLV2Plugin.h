@@ -67,7 +67,7 @@ private:
    sem_t _midiSem;
 
    struct midi_event {
-       time_t time;//jack_nframes_t time;
+       uint32_t time;//jack_nframes_t time;
        char data[4]; // all events of interest are <= 4bytes
    };
 

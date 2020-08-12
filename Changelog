@@ -1,4 +1,13 @@
-yoshimi 1.7.1 M
+yoshimi 1.7.2 rc2
+
+2020-8-12- Will
+* Merged in pull reqeuest for Kristian.
+  Completes SubSynth frequency correction for all
+  detune cases.
+* Further bank startup enhancement and enabled.
+  Copies new default instruments into .share
+* Set latest Advanced guide.
+
 
 2020-8-11- Will
 * BugFix: GUI kitmode entries updating wrong items.

@@ -219,18 +219,25 @@ inline string setExtension(const string& fname, string ext)
 inline bool copyFile(const string& source, const string& destination, char option)
 {
     // options
-    // 0 = always write / overwrite
-    // 1 = only write if not already present
+    // 0 = only write if not already present
+    // 1 = always write / overwrite
     // 2 = only write if newer
 
-    if (option == 0 && isRegularFile(destination))
+    if (option == 0)
     {
-        //std::cout << "Writing " << destination << std::endl;
-        return 0; // counts as a successful write
+        if(isRegularFile(destination))
+        {
+            //std::cout << "Not writing " << destination << std::endl;
+            return 0; // counts as a successful write
+        }
+        else
+        {
+            ;//std::cout << "Writing " << destination << std::endl;
+        }
     }
 
-    //if (option == 1 && isRegularFile(destination))
-        //std::cout << "Exists " << destination << std::endl;
+    if (false)//option != 0 && isRegularFile(destination))
+        std::cout << "Exists " << destination << std::endl;
 
 
     struct stat sourceInfo;

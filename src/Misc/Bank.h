@@ -171,7 +171,7 @@ class Bank
 
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
         void updateShare(string bankdirs[], string localDir, string shareID);
-        void checkShare(string sourceDir, string thisDir);
+        void checkShare(string sourceDir, string destinationDir);
         bool transferDefaultDirs(string bankdirs[]);
         bool transferOneDir(string bankdirs[], int baseNumber, int listNumber);
 

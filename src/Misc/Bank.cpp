@@ -1062,26 +1062,25 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 
 void Bank::updateShare(string bankdirs[], string localDir, string shareID)
 {
-    cout << "writing version " << shareID << endl;
+    //cout << "writing version " << shareID << endl;
     saveText(to_string(BUILD_NUMBER), shareID);
-    string thisDir = localDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
-    if (!isDirectory(thisDir))
+    string next = "/Will_Godfrey_Companion";
+    string destinationDir = localDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
+    if (!isDirectory(destinationDir))
         return;
     cout << bankdirs[1] << endl;
-    if (isDirectory(bankdirs[1]))
-        checkShare(thisDir, bankdirs[1]);
+    if (isDirectory(bankdirs[1] + next))
+        checkShare(bankdirs[1] + next, destinationDir);
 
-    if (isDirectory(bankdirs[2]))
-     checkShare(thisDir, bankdirs[2]);
-
-    if (isDirectory(bankdirs[6]))
-        checkShare(thisDir, bankdirs[6]);
+    if (isDirectory(bankdirs[2] + next))
+     checkShare(bankdirs[2] + next, destinationDir);
 }
 
 
-void Bank::checkShare(string sourceDir, string thisDir)
+void Bank::checkShare(string sourceDir, string destinationDir)
 {
-    cout << "S " << sourceDir << "  D " << thisDir << endl;
+    //cout << "S " << sourceDir << "  D " << destinationDir << endl;
+    copyDir(sourceDir, destinationDir, 0);
 }
 
 
@@ -1551,12 +1550,12 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     }
     installRoots();
 
-    /*if (isDirectory(localDir))
+    if (isDirectory(localDir))
     {
         string shareID = localDir + "version";
         if (loadText(shareID) != to_string(BUILD_NUMBER))
             updateShare(bankdirs, localDir, shareID);
-    }*/
+    }
     return newRoots;
 }
 
