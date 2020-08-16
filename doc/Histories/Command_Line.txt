@@ -1,0 +1,99 @@
+When running from the command line, once the 'up and running' message has been seen much of Yoshimi can be controlled here.
+
+Commands are not case sensitive and an invalid one will return a message that attempts to highlight the problem.
+
+There are a group of commands that are always available. These are
+
+? (Help)
+List
+RESet
+EXit
+..
+/
+
+Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available.
+
+Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
+
+All number ranges follow the same pattern as the GUI. Most (but not all) start from one. e.g. The first part number is 1, but the first bank is 0.
+
+The prompt will always show what level you are on along with relevant information. You will also get a confirmation message after each command, but - for clarity - those are not included in the examples below.
+
+Starting from the prompt: yoshimi >
+
+Enter:
+
+"s p 2 pr 107"
+
+and the prompt will change to:
+
+yoshimi part 2+ >
+
+This will set part number 2 to program number 107 from the current instrument bank.
+
+You are now on part 2 as the current part and all commands will now relate to this. At this level you can change the current part simply with:
+
+"s 4"
+yoshimi part 4 >
+
+You are now on part number 4, but that part is currently disabled. Most of the controls are now checked to ensure they are active when you try to change them, so enable the part.
+
+"s on"
+yoshimi part 4+ >
+
+"s ef re"
+yoshimi p4+ eff 1 REverb-0 >
+
+Sets the part's effect 1 to type 'reverb'
+
+Notice the two capitals in reverb, these remind you of the minimum abbreviation.
+
+Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are sometimes truncated so the prompt line doesn't get unmanageably long.
+
+
+From here you can set a preset for this effect:
+
+"s pre 3"
+
+yoshimi p4+ eff 1 REverb-3 >
+
+Currently the presets are shown only numerically in the prompt. This is because most of them include the name of the effect so it would be tedious to type them in.
+
+From the top level, many settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
+
+"s p 5 ef 2"
+yoshimi p5+ eff 2 REverb-1 >
+
+You can't combine type and preset as they are both at the same level.
+
+To go back one level:
+
+".."
+yoshimi part 5+>
+
+and to go back to the top:
+
+"/"
+yoshimi >
+
+These last can also be put on the front of any other command.
+Starting where we were before:
+
+yoshimi p4+ eff 2 REver-3 >
+" ..s vol 70"
+yoshimi part 4+>
+
+Part 4 volume is now at 70, and you are once again at part level, not part efx level.
+
+The help menus and lists are also mostly context sensitive. This should help avoid clutter and confusion.
+
+Originally these notes included the currently implemented commands, but as this is very much a moving target, it is simpler to just ask you to run Yoshimi and type "?"
+
+Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated.
+
+A few more may be added, and the organisation of them may be changed slightly.
+
+If any configuration settings are changed, either here or in the gui, you will be given a warning when you exit, with the option to continue running so you can save the changes.
+
+
+As well as a 'last used' history, Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.

@@ -1,4 +1,4 @@
-These files are loosely organised info.  Much of this is being turned into proper documentation.
+These files are loosely organised info.  As many of these have now been turned into proper documentation in the Yoshimi Advanced User Manual, they will be moved into histories, and no longer be updated.
 
 Any additional notes are more than welcome. If you like, you can send them to me at:
 
