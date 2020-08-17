@@ -1,25 +1,20 @@
-V1.7.1
+V1.7.2
 
 In brief:
 
-One instantly noticeable feature is a new 'Pan Law' entry in the main window.
+In the voice editors you can now change the width and centre position of random panning.
 
-There is a new channel based setting for Solo.
+Last seen banked instrument can now be highlighted.
 
-Another quite new development is both Channel and Key aftertouch.
+There are three more options in LFO type.
 
-Legato performance has been improved and made smoother.
+In the 'doc' directory we've added a PDF with a brief list of all CCs and NRPNs that Yoshimi recognises.
 
-There is a new waveform shape available to AddSynth and PadSynth.
+All these are of course accessible to the command line.
 
-Storing and recovery of GUI window positioning has been improved.
+More details are in /doc/Yoshimi_1.7.2_features.txt
 
-Instrument banks have also had a workover with added proctections.
-
-The underlying code continues to be refined and improved.
-
-More details are in /doc/Yoshimi_1.7.1_features.txt
-
+We welcome all help and feedback. We listen and respond to suggestions and problems.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi
