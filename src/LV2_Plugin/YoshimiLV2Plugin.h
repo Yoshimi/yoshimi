@@ -2,6 +2,7 @@
     YoshimiLV2Plugin
 
     Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
+    Copyright 2020 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -35,8 +36,6 @@
 #include <string>
 #include <vector>
 #include <semaphore.h>
-//#include <jack/jack.h>
-//#include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
@@ -67,13 +66,12 @@ private:
    sem_t _midiSem;
 
    struct midi_event {
-       uint32_t time;//jack_nframes_t time;
+       uint32_t time;
        char data[4]; // all events of interest are <= 4bytes
    };
 
    float *_bFreeWheel;
 
-   //jack_ringbuffer_t *_midiRingBuf;
    pthread_t _pIdleThread;
 
    float *lv2Left [NUM_MIDI_PARTS + 1];

@@ -1,4 +1,9 @@
-yoshimi 1.7.2
+yoshimi 1.7.2 M
+
+2020-8-18 Will
+* Bugfix: Segfault on LV2 due to untested thread join.
+* Cleaned up some warnings from lv2lint test program.
+  Two warnings remaining. Also one fail I don't understand :(
 
 2020-8-16 Will
 * Final doc updates.

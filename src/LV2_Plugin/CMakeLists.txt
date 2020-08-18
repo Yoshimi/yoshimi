@@ -2,6 +2,7 @@
 #   CMakeLists.txt (LV2)
 #
 #   Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
+#   Copyright 2018-2020 Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General

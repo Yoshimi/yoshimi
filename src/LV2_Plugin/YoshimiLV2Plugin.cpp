@@ -336,7 +336,8 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
             getProgram(flatbankprgs.size() + 1);
         }
         _synth->getRuntime().runSynth = false;
-        pthread_join(_pIdleThread, NULL);
+        if(_pIdleThread)
+            pthread_join(_pIdleThread, NULL);
         delete _synth;
         _synth = NULL;
     }
@@ -732,7 +733,6 @@ LV2UI_Handle YoshimiLV2PluginUI::instantiate(const LV2UI_Descriptor *descriptor,
     else
         delete uiinst;
     return NULL;
-
 }
 
 
