@@ -1,5 +1,10 @@
 yoshimi 1.7.2 M
 
+2020-8-19 Will
+* Reverted removal of lv2ext/programs#Interface
+  Needed by Carla to identify banks.
+* Ensured last fix was applied to both yoshimi & yoshimi-multi
+
 2020-8-18 Will
 * Bugfix: Segfault on LV2 due to untested thread join.
 * Cleaned up some warnings from lv2lint test program.

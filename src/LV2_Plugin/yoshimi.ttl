@@ -28,7 +28,13 @@
     opts:supportedOptions <http://lv2plug.in/ns/ext/buf-size#minBlockLength>,
       <http://lv2plug.in/ns/ext/buf-size#nominalBlockLength> ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface>;
+
+    opts:requiredOption <http://lv2plug.in/ns/ext/buf-size#maxBlockLength>;
+    opts:supportedOptions <http://lv2plug.in/ns/ext/buf-size#minBlockLength>,
+      <http://lv2plug.in/ns/ext/buf-size#nominalBlockLength>;
+
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface>,
+                      <http://kxstudio.sf.net/ns/lv2ext/programs#Interface>;
 
     ui:ui <http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI> ;
 
@@ -275,12 +281,21 @@
     doap:name "Yoshimi";
     doap:maintainer [
          foaf:name "Andrew Deryabin";
+         foaf:homepage <http://yoshimi.sourceforge.net> ;
          foaf:mbox <mailto:andrewderyabin@gmail.com>;
     ] ;
+    doap:license <http://opensource.org/licenses/GPL-2.0> ;
+    lv2:minorVersion 7;
+    lv2:microVersion 2;
 
     lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map>,
       <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength>,
       opts:options;
+
+    opts:requiredOption <http://lv2plug.in/ns/ext/buf-size#maxBlockLength> ;
+    opts:supportedOptions <http://lv2plug.in/ns/ext/buf-size#minBlockLength>,
+      <http://lv2plug.in/ns/ext/buf-size#nominalBlockLength> ;
+    lv2:optionalFeature lv2:hardRTCapable ;
 
     opts:requiredOption <http://lv2plug.in/ns/ext/buf-size#maxBlockLength>;
     opts:supportedOptions <http://lv2plug.in/ns/ext/buf-size#minBlockLength>,
