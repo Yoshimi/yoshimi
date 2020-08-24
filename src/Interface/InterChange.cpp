@@ -1194,6 +1194,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                         {
                             synth->part[npart]->setkititemstatus(kititem, value);
                             synth->partonoffWrite(npart, 2);
+                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         }
                     break;
 
@@ -1205,7 +1206,16 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             getData->data.source &= ~TOPLEVEL::action::lowPrio;
                         }
                         break;
-
+                    case PART::control::enablePad:
+                        if (write)
+                        {
+                            int temp = kititem;
+                            if (temp >= NUM_KIT_ITEMS)
+                                temp = 0;
+                            setpadparams(npart, temp);
+                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+                        }
+                        break;
                     case PART::control::padsynthParameters:
                         if (write)
                         {
@@ -3166,13 +3176,19 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::enablePad:
             if (write)
+            {
                 part->kit[kititem].Ppadenabled = value_bool;
+                if (!part->kit[kititem].padpars->Papplied)
+                {
+                    synth->partonoffWrite(npart, -1);
+                    getData->data.source = TOPLEVEL::action::lowPrio;
+                }
+            }
             else
                 value = part->kit[kititem].Ppadenabled;
             break;
         case PART::control::enableKitLine:
             if (write)
-                //part->setkititemstatus(kititem, value_bool);
             {
                 synth->partonoffWrite(npart, -1);
                 getData->data.source = TOPLEVEL::action::lowPrio;
