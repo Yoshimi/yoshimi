@@ -214,6 +214,11 @@ void *InterChange::sortResultsThread(void)
 
         CommandBlock getData;
 
+        /* It is possible that several operations initiated from
+         * different sources complete within the same period
+         * (especially with large buffer sizes) so this small
+         * ring buffer ensures they can all clear together.
+         */
         while (synth->audioOut.load() == muteState::Active)
         {
             //std::cout << "here fetching" << std:: endl;
@@ -1183,6 +1188,13 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                             value = synth->part[npart]->Pkeyshift - 64;
                         getData->data.source &= ~TOPLEVEL::action::lowPrio;
                     }
+                    break;
+                    case PART::control::enableKitLine:
+                        if (write)
+                        {
+                            synth->part[npart]->setkititemstatus(kititem, value);
+                            synth->partonoffWrite(npart, 2);
+                        }
                     break;
 
                     case PART::control::defaultInstrument: // clear part
@@ -3160,7 +3172,11 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::enableKitLine:
             if (write)
-                part->setkititemstatus(kititem, value_bool);
+                //part->setkititemstatus(kititem, value_bool);
+            {
+                synth->partonoffWrite(npart, -1);
+                getData->data.source = TOPLEVEL::action::lowPrio;
+            }
             else
                 value = part->kit[kititem].Penabled;
             break;

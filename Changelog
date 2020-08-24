@@ -1,5 +1,9 @@
 yoshimi 1.7.2 M
 
+2020-8-24 Will
+* Enabling part kit items now goes theough indirect transfers.
+  Stops Xruns, but part is now silenced during this.
+
 2020-8-19 Will
 * Commented out 'Warnings as errors' in CMakeLists.txt
   Was causing problems for less experienced builders.
