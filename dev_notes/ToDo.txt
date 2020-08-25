@@ -1,7 +1,5 @@
 BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
 
-BUG! part level overload indicator not cleared for part numbers > 16.
-
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
 GUI Oddity. Pres spacebar on startup and you get directed to reset. Press it after tabbing down checkboxes and you enter the MIDI learn dialogue.

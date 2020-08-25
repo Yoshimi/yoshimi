@@ -1,10 +1,15 @@
 yoshimi 1.7.2 M
 
+2020-8-25 Will
+* Click on mixer volume clears all overloads on that column.
+  But overload warning only set for currently visible row.
+* Small clarifying change to part send text in main window.
+
 2020-8-24 Will
 * Enabling part kit items now goes through indirect transfers.
   Stops Xruns, but part is now silenced during this.
 * First time enabling of PadSynth applies parameters.
-  Has to silence the part in the precess.
+  Has to silence the part in the process.
 
 2020-8-19 Will
 * Commented out 'Warnings as errors' in CMakeLists.txt

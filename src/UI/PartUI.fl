@@ -703,7 +703,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         } {}
       }
       Fl_Text_Display {} {
-        label {System Effect Sends}
+        label {Send to System Effect}
         xywh {255 134 103 15} box NO_BOX labelsize 11 align 2
       }
       Fl_Check_Button partGroupEnable {
