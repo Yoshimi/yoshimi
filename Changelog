@@ -1,5 +1,8 @@
 yoshimi 1.7.2 M
 
+2020-9-2 Will
+* Simplified GUI code for button 3 use.
+
 2020-8-25 Will
 * Click on mixer volume clears all overloads on that column.
   But overload warning only set for currently visible row.

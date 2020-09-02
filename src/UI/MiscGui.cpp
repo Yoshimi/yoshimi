@@ -93,14 +93,15 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.miscmsg = miscmsg;
 
     if (part != TOPLEVEL::section::midiLearn)
-    { // midilearn must pass though un-modified
+    { // midilearn UI must pass though un-modified
         unsigned char typetop = type & (TOPLEVEL::type::Write | TOPLEVEL::type::Integer);
-        unsigned char buttons = type & 7;
+        unsigned char buttons = Fl::event_button();
         if (part == TOPLEVEL::section::main && (control != MAIN::control::volume &&  control  != MAIN::control::detune))
             type = 1;
 
         if (buttons == 3 && Fl::event_is_click())
         {
+            // check range & if learnable
             float newValue;
             putData.data.type = 3 | TOPLEVEL::type::Limits;
             newValue = synth->interchange.readAllData(&putData);

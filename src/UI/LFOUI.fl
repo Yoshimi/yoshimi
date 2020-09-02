@@ -229,7 +229,7 @@ pars=NULL;} {}
   Function {send_data(int action, int group, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::LFOgroup, group);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::LFOgroup, group);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

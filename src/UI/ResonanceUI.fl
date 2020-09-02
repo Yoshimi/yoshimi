@@ -11,7 +11,7 @@ comment {ResonanceUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2015-2019, Will Godfrey
+Copyright 2015-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -79,7 +79,7 @@ class ResonanceGraph {: {public Fl_Box}
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, (Fl::event_button() | type), RESONANCE::control::graphPoint, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert, control);} {}
+    collect_data(synth, value, action, type, RESONANCE::control::graphPoint, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert, control);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -466,7 +466,7 @@ class ResonanceUI {: PresetsUI_
     else
         insert = TOPLEVEL::insert::resonanceGroup;
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, (type | Fl::event_button()), control, npart, kititem, engine, insert);} {}
+    collect_data(synth, value, action, type, control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

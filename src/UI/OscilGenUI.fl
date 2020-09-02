@@ -397,7 +397,7 @@ class Oscilharmonic {: {public Fl_Group}
   Function {send_data(int action, int insert, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, insert);} {}
   }
   Function {init(OscilParameters *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -1106,7 +1106,7 @@ class OscilEditor {: {public PresetsUI_}
         if (control == PART::control::padsynthParameters)
             insert = UNUSED;
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

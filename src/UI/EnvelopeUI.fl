@@ -11,7 +11,7 @@ comment {Envelope.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2019 Will Godfrey
+Copyright 2016-2020 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -71,7 +71,7 @@ pair=NULL;} {}
   Function {send_data(int action, int control, int offset, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, offset);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, offset);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
@@ -826,7 +826,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   }
   Function {send_data(int action, int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int offset = UNUSED)} {} {
     code {//
-    collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, offset);} {}
+    collect_data(synth, value, action, type, control, npart, kititem, engine, insert, group, offset);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

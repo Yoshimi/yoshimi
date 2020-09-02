@@ -804,7 +804,7 @@ pars=NULL;
   Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int offset = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, (Fl::event_button() | type), control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, offset);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, offset);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
