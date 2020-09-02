@@ -6538,11 +6538,16 @@ float InterChange::returnLimits(CommandBlock *getData)
         return value;
     }
 
+    if (npart == TOPLEVEL::section::midiIn)
+    {
+        return value; // TODO sort this properly
+    }
 
     min = 0;
     max = 127;
     def = 0;
     std::cout << "Using unknown defaults" << std::endl;
+    //std::cout << "Part " << int(npart) << std::endl;
 
     switch (request)
     {
