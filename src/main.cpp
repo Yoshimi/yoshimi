@@ -159,7 +159,7 @@ static void *mainGuiThread(void *arg)
         LbY = winH - textY - textHeight;
         LbW = winW;
         LbH = textHeight;
-        timeout = 4;
+        timeout = 5;
     }
     else
     {
@@ -170,7 +170,7 @@ static void *mainGuiThread(void *arg)
         LbY = 2;
         LbW = winW - 4;
         LbH = winH -4;
-        timeout = 2;
+        timeout = 3;
     }
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
     Fl_Window winSplash(winW, winH, "yoshimi splash screen");
@@ -217,26 +217,7 @@ static void *mainGuiThread(void *arg)
     while (firstRuntime->runSynth)
     {
         firstRuntime->signalCheck();
-#ifdef GUI_FLTK
-        if (bShowGui)
-        {
-            if (splashSet)
-            {
-                if (showSplash)
-                {
-                    winSplash.show(); // keeps it in front;
-                    usleep(1000);
-                }
-                if (time(&here_and_now) < 0) // no time?
-                    here_and_now = old_father_time + timeout;
-                if ((here_and_now - old_father_time) >= timeout)
-                {
-                    splashSet = false;
-                    winSplash.hide();
-                }
-            }
-        }
-#endif
+
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
@@ -297,6 +278,21 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
             if (bShowGui)
             {
+                if (splashSet)
+                {
+                    if (showSplash)
+                    {
+                        winSplash.show(); // keeps it in front;
+                        usleep(1000);
+                    }
+                    if (time(&here_and_now) < 0) // no time?
+                        here_and_now = old_father_time + timeout;
+                    if ((here_and_now - old_father_time) >= timeout)
+                    {
+                        splashSet = false;
+                        winSplash.hide();
+                    }
+                }
                 Fl::wait(0.033333);
                 GuiThreadMsg::processGuiMessages();
             }

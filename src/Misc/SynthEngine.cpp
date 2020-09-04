@@ -150,8 +150,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
 
-    audioOut.store(muteState::Active);
-
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
         Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
@@ -215,12 +213,7 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
-    if (!interchange.Init())
-    {
-        Runtime.LogError("interChange init failed");
-        goto bail_out;
-    }
-
+    audioOut.store(muteState::Active);
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
 
@@ -363,6 +356,14 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.midiLearnLoad = "";
         }
     }
+    /*
+     * put here so its threads don't run until everthing else is ready
+     */
+    if (!interchange.Init())
+    {
+        Runtime.LogError("interChange init failed");
+        goto bail_out;
+    }
 
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
@@ -421,6 +422,8 @@ string SynthEngine::manualname(void)
 
 void SynthEngine::defaults(void)
 {
+    for (int i = 0; i <NUM_MIDI_PARTS; ++i)
+        partonoffLock(i, 0); // ensure parts are disabled
     setPvolume(90);
     TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
@@ -441,8 +444,6 @@ void SynthEngine::defaults(void)
     VUdata.values.partsR[0] = -1.0f;
     VUcopy.values.parts[0]= -1.0f;
     VUcopy.values.partsR[0]= -1.0f;
-
-    partonoffLock(0, 1); // enable the first part
 
     inseffnum = 0;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -493,6 +494,7 @@ void SynthEngine::defaults(void)
 #endif
 
     Runtime.effectChange = UNUSED; // temporary fix
+    partonoffLock(0, 1); // enable the first part
 }
 
 

@@ -1,5 +1,11 @@
 yoshimi 1.7.2 M
 
+2020-9-4 Will
+* Slightly increased splash times and moved timeout point.
+* Moved Interchange Init to end of Synth Init.
+  Ensures everything set before Interchange threads run.
+* Disabled all parts at start of default setting.
+
 2020-9-2 Will
 * Simplified GUI code for button 3 use.
 * Temporary fix to virtual keyboard default controller.
