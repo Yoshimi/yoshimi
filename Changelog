@@ -1,5 +1,12 @@
 yoshimi 1.7.2 M
 
+2020-9-6 Will
+* Major revision of virtual keyboard.
+  Controller values match existing settings.
+  Displayed values updated when changing channel.
+  RH button defaults recognised.
+* Updated Docs.
+
 2020-9-4 Will
 * Slightly increased splash times and moved timeout point.
 * Moved Interchange Init to end of Synth Init.

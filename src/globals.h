@@ -625,6 +625,9 @@ namespace PART // usage PART::control::volume
         midiFilterQ,
         midiFilterCutoff,
         midiBandwidth,
+        midiFMamp,
+        midiResonanceCenter,
+        midiResonanceBandwidth,
     // end of midi controls
 
         instrumentCopyright = 220,

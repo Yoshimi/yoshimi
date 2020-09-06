@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014 -2020, Will Godfrey
+Copyright 2014-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -97,6 +97,7 @@ class VirKeys {: {public Fl_Box}
     synth = _synth;
     for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
+    pitchWh = 0;
     midich = 0;
     midivel = 100;
     midioct = 2;
@@ -303,6 +304,8 @@ class VirKeys {: {public Fl_Box}
   }
   decl {int pressed[N_OCT * 12 + 1];} {private local
   }
+  decl {int pitchWh;} {public local
+  }
   decl {unsigned char midich;} {public local
   }
   decl {unsigned char midivel;} {public local
@@ -322,7 +325,7 @@ class VirKeyboard {} {
       callback {//
       relaseallkeys();
       virkeyboardwindow->hide();}
-      xywh {95 119 650 130} type Double hide
+      xywh {488 193 650 130} type Double hide
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -334,6 +337,8 @@ class VirKeyboard {} {
         label {Key   }
         callback {//
         relaseallkeys();
+        if (Fl::event_button() == 3)
+             o->value(3);
         virkeys->keyoct1 = (int)o->value();
         virkeys->take_focus();}
         tooltip {. 2 3    5 6 7 ...
@@ -348,6 +353,8 @@ q w e r  t y u ...} xywh {365 95 45 15} type Simple labelsize 10 align 4 when 6 
         label {Maps  }
         callback {//
         relaseallkeys();
+        if (Fl::event_button() == 3)
+             o->value(2);
         virkeys->keyoct2=(int) o->value();
         virkeys->take_focus();}
         tooltip {. s d   g h j ...
@@ -373,6 +380,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         label Octave
         callback {//
         relaseallkeys();
+        if (Fl::event_button() == 3)
+             o->value(2);
         virkeys->midioct=(int) o->value();
         virkeys->take_focus();}
         tooltip {Midi Octave} xywh {257 106 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
@@ -385,77 +394,40 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         virkeyboardwindow->hide();}
         xywh {452 101 55 20} box THIN_UP_BOX labelsize 12
       }
-      Fl_Value_Output ctlval {
-        label Cval
-        callback {o->value(oldcontrol);}
-        xywh {628 12 18 15} box ENGRAVED_BOX labelsize 8 align 1 textsize 7
-        code0 {o->value(oldcontrol);}
-      }
-      Fl_Slider {} {
+      Fl_Slider controlslider {
         callback {//
         oldcontrol = 127 - o->value();
+        int ctl = findcontroller(controller->value());
         if (Fl::event_button() == 3)
         {
-            oldcontrol = 64;
-            o->value(64);
+            oldcontrol = int(collect_readData(synth, 0, ctl, TOPLEVEL::section::midiIn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::type::Default));
+            o->value(127 - oldcontrol);
             o->damage();
         }
-        ctlval->do_callback();
-        int ctl = midictl;
         virkeys->take_focus();
-        send_data(0, 2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, ctl);}
-        tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
+        send_data(TOPLEVEL::action::fromMIDI, 2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, midictl);}
+        tooltip {Controller value} xywh {628 10 18 112} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
+        code1 {o->setValueType(VC_plainReverse); o->useCustomTip(true);}
         class mwheel_slider
       }
-      Fl_Choice {} {
+      Fl_Choice controller {
         label Controller
         callback {//
-        switch((int) o->value() + 1)
+        setpoint2midictl(o->value());
+        if (midictl != MIDI::CC::null)
         {
-            case 1:
-                midictl = MIDI::CC::modulation;
-                break;
-            case 2:
-                midictl = MIDI::CC::volume;
-                break;
-            case 3:
-                midictl = MIDI::CC::panning;
-                break;
-            case 4:
-                midictl = MIDI::CC::expression;
-                break;
-            case 5:
-                midictl = MIDI::CC::sustain;
-                break;
-            case 6:
-                midictl = MIDI::CC::portamento;
-                break;
-            case 7:
-                midictl = MIDI::CC::filterQ;
-                break;
-            case 8:
-                midictl = MIDI::CC::filterCutoff;
-                break;
-            case 9:
-                midictl = MIDI::CC::bandwidth;
-                break;
-            case 10:
-                midictl = MIDI::CC::fmamp;
-                break;
-            case 11:
-                midictl = MIDI::CC::resonanceCenter;
-                break;
-            case 12:
-                midictl = MIDI::CC::resonanceBandwidth;
-                break;
-            default:
-                midictl = MIDI::CC::null;
-                break;
+            int ctl = findcontroller(o->value());
+            if (ctl != UNUSED)
+            {
+                int value = collect_readData(synth, 0, ctl, virkeys->midich);
+                controlslider->value(127 - value);
+            }
+
         }
         virkeys->take_focus();}
         xywh {524 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
-        code0 {midictl=MIDI::CC::filterCutoff;o->value(7);}
+        code0 {midictl = MIDI::CC::filterCutoff;o->value(7);}
       } {
         MenuItem {} {
           label {01: Mod.Wheel}
@@ -521,13 +493,15 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         label {MIDI Channel}
         callback {//
         relaseallkeys();
+        if (Fl::event_button() == 3)
+             o->value(1);
         virkeys->midich = lrint(o->value()) - 1;
+        controller->do_callback();
         virkeys->take_focus();}
         xywh {45 106 36 17} labelsize 9 align 1 maximum 16 textsize 10
         code0 {o->value(virkeys->midich + 1);}
       }
       Fl_Slider pitchwheel {
-        label Pwh
         callback {//
         int old = o->value();
         if (Fl::event_button() == 3)
@@ -537,11 +511,105 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->damage();
         }
         virkeys->take_focus();
-        send_data(0, 2, -old, TOPLEVEL::type::Integer, virkeys->midich, 128)}
-        xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
+        send_data(0, MIDI::control::controller, -old, TOPLEVEL::type::Integer, virkeys->midich, MIDI::CC::pitchWheelInner)}
+        tooltip {Pitch Wheel} xywh {6 10 18 112} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
+        code0 {o->value(virkeys->pitchWh);}
+        code1 {o->setValueType(VC_pitchWheel); o->useCustomTip(true);}
         class mwheel_slider
       }
     }
+  }
+  Function {setpoint2midictl(int setpoint)} {} {
+    code {//
+        switch(setpoint)
+        {
+            case 0:
+                midictl = MIDI::CC::modulation;
+                break;
+            case 1:
+                midictl = MIDI::CC::volume;
+                break;
+            case 2:
+                midictl = MIDI::CC::panning;
+                break;
+            case 3:
+                midictl = MIDI::CC::expression;
+                break;
+            case 4:
+                midictl = MIDI::CC::sustain;
+                break;
+            case 5:
+                midictl = MIDI::CC::portamento;
+                break;
+            case 6:
+                midictl = MIDI::CC::filterQ;
+                break;
+            case 7:
+                midictl = MIDI::CC::filterCutoff;
+                break;
+            case 8:
+                midictl = MIDI::CC::bandwidth;
+                break;
+            case 9:
+                midictl = MIDI::CC::fmamp;
+                break;
+            case 10:
+                midictl = MIDI::CC::resonanceCenter;
+                break;
+            case 11:
+                midictl = MIDI::CC::resonanceBandwidth;
+                break;
+            default:
+                midictl = MIDI::CC::null;
+                break;
+        }} {}
+  }
+  Function {findcontroller(int setpoint)} {return_type int
+  } {
+    code {//
+            int ctl = UNUSED;
+            switch(setpoint)
+            {
+                case 0:
+                    ctl = PART::control::midiModWheel;
+                    break;
+                case 1:
+                    ctl = PART::control::volume;
+                    break;
+                case 2:
+                    ctl = PART::control::panning;
+                    break;
+                case 3:
+                    ctl = PART::control::midiExpression;
+                    break;
+                case 4:
+                    ctl = PART::control::midiSustain;
+                    break;
+                case 5:
+                    ctl = PART::control::midiPortamento;
+                    break;
+                case 6:
+                    ctl = PART::control::midiFilterQ;
+                    break;
+                case 7:
+                    ctl = PART::control::midiFilterCutoff;
+                    break;
+                case 8:
+                    ctl = PART::control::midiBandwidth;
+                    break;
+                case 9:
+                    ctl = PART::control::midiFMamp;
+                    break;
+                case 10:
+                    ctl = PART::control::midiResonanceCenter;
+                    break;
+                case 11:
+                    ctl = PART::control::midiResonanceBandwidth;
+                    break;
+                default:
+                    break;
+            }
+            return ctl;} {}
   }
   Function {VirKeyboard(SynthEngine *_synth)} {} {
     code {//

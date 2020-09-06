@@ -91,56 +91,61 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
+    if (action == TOPLEVEL::action::fromMIDI)
+        type = type | 1; // faking MIDI from virtual keyboard
+    else
+    {
+        if (part != TOPLEVEL::section::midiLearn)
+        { // midilearn UI must pass though un-modified
+            unsigned char typetop = type & (TOPLEVEL::type::Write | TOPLEVEL::type::Integer);
+            unsigned char buttons = Fl::event_button();
+            if (part == TOPLEVEL::section::main && (control != MAIN::control::volume &&  control  != MAIN::control::detune))
+                type = 1;
 
-    if (part != TOPLEVEL::section::midiLearn)
-    { // midilearn UI must pass though un-modified
-        unsigned char typetop = type & (TOPLEVEL::type::Write | TOPLEVEL::type::Integer);
-        unsigned char buttons = Fl::event_button();
-        if (part == TOPLEVEL::section::main && (control != MAIN::control::volume &&  control  != MAIN::control::detune))
-            type = 1;
-
-        if (buttons == 3 && Fl::event_is_click())
-        {
-            // check range & if learnable
-            float newValue;
-            putData.data.type = 3 | TOPLEVEL::type::Limits;
-            newValue = synth->interchange.readAllData(&putData);
-            //if (newValue != value)
-                //std::cout << "Gui limits " << value <<" to " << newValue << std::endl;
-            if (Fl::event_state(FL_CTRL) != 0)
+            if (buttons == 3 && Fl::event_is_click())
             {
-                if (putData.data.type & TOPLEVEL::type::Learnable)
+                // check range & if learnable
+                float newValue;
+                putData.data.type = 3 | TOPLEVEL::type::Limits;
+                newValue = synth->interchange.readAllData(&putData);
+                //if (newValue != value)
+                    //std::cout << "Gui limits " << value <<" to " << newValue << std::endl;
+                if (Fl::event_state(FL_CTRL) != 0)
                 {
-                    // identifying this for button 3 as MIDI learn
-                    type = TOPLEVEL::type::LearnRequest;
+                    if (putData.data.type & TOPLEVEL::type::Learnable)
+                    {
+                        // identifying this for button 3 as MIDI learn
+                        type = TOPLEVEL::type::LearnRequest;
+                    }
+                    else
+                    {
+                        synth->getGuiMaster()->setmessage(UNUSED, false, "Can't learn this control");
+                        synth->getRuntime().Log("Can't MIDI-learn this control");
+                        /* can't use fl_alert here.
+                        * For some reason it goes into a loop on spin boxes
+                        * and runs menus up to their max value.
+                        */
+                        type = TOPLEVEL::type::Learnable;
+                    }
                 }
                 else
                 {
-                    synth->getGuiMaster()->setmessage(UNUSED, false, "Can't learn this control");
-                    synth->getRuntime().Log("Can't MIDI-learn this control");
-                    /* can't use fl_alert here.
-                     * For some reason it goes into a loop on spin boxes
-                     * and runs menus up to their max value.
-                     */
-                    type = TOPLEVEL::type::Learnable;
+                    putData.data.value = newValue;
+                    type = TOPLEVEL::type::Write;
+                    action |= TOPLEVEL::action::forceUpdate;
+                    // has to be write as it's 'set default'
                 }
             }
-            else
-            {
-                putData.data.value = newValue;
-                type = TOPLEVEL::type::Write;
-                action |= TOPLEVEL::action::forceUpdate;
-                // has to be write as it's 'set default'
-            }
+            else if (buttons > 2)
+                type = 1; // change scroll wheel to button 1
+            type |= typetop;
+            action |= TOPLEVEL::action::fromGUI;
         }
-        else if (buttons > 2)
-            type = 1; // change scroll wheel to button 1
-        type |= typetop;
     }
 
     putData.data.type = type;
-    putData.data.source = action | TOPLEVEL::action::fromGUI;
-//cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
+    putData.data.source = action;
+    //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }
@@ -569,6 +574,12 @@ string convert_value(ValueType type, float val)
     string s;
     switch(type)
     {
+        case VC_plainReverse:
+            return(custom_value_units(127.0f - val,"",1));
+
+        case VC_pitchWheel:
+            return(custom_value_units(-val,"",1));
+
         case VC_percent127:
             return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
 

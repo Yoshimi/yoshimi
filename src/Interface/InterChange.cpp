@@ -3734,17 +3734,21 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case PART::control::midiExpression:
             if (write)
-            {
                 part->SetController(MIDI::CC::expression, value);
-            }
             else
                 value = part->ctl->expression.data;
             break;
         case PART::control::midiSustain:
-            ; // not yet
+            if (write)
+                part->ctl->setsustain(value);
+            else
+                value = part->ctl->sustain.data;
             break;
         case PART::control::midiPortamento:
-            ; // not yet
+            if (write)
+                part->ctl->setportamento(value);
+            else
+                value = part->ctl->portamento.data;
             break;
         case PART::control::midiFilterQ:
             if (write)
@@ -3763,6 +3767,25 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->setbandwidth(value);
             else
                 value = part->ctl->bandwidth.data;
+            break;
+
+        case PART::control::midiFMamp:
+            if (write)
+                part->ctl->setfmamp(value);
+            else
+                value = part->ctl->fmamp.data;
+            break;
+        case PART::control::midiResonanceCenter:
+            if (write)
+                part->ctl->setresonancecenter(value);
+            else
+                value = part->ctl->resonancecenter.data;
+            break;
+        case PART::control::midiResonanceBandwidth:
+            if (write)
+                part->ctl->setresonancebw(value);
+            else
+                value = part->ctl->resonancebandwidth.data;
             break;
 
         case PART::control::instrumentCopyright: // done elsewhere
@@ -6540,7 +6563,50 @@ float InterChange::returnLimits(CommandBlock *getData)
 
     if (npart == TOPLEVEL::section::midiIn)
     {
-        return value; // TODO sort this properly
+        min = 0;
+        max = 127;
+        switch (control)
+        {
+            case PART::control::volume:
+                def = 96;
+                break;
+            case PART::control::midiExpression:
+                def = 127;
+                break;
+            case PART::control::midiSustain:
+                def = 0;
+                break;
+            case PART::control::midiPortamento:
+                def = 0;
+                break;
+            case PART::control::midiFMamp:
+                def = 127;
+                break;
+            default:
+                def = 64;
+        }
+        std::cout << "here " << int(def) << std::endl;
+
+
+        switch (request)
+        {
+            case TOPLEVEL::type::Adjust:
+                if (value < min)
+                    value = min;
+                else if (value > max)
+                    value = max;
+            break;
+            case TOPLEVEL::type::Minimum:
+                value = min;
+                break;
+            case TOPLEVEL::type::Maximum:
+                value = max;
+                break;
+            case TOPLEVEL::type::Default:
+                value = def;
+                break;
+        }
+        return value;
     }
 
     min = 0;

@@ -32,6 +32,8 @@ using file::loadText;
 
 enum ValueType {
     VC_plainValue,
+    VC_plainReverse,
+    VC_pitchWheel,
     VC_percent127,
     VC_percent128,
     VC_percent255,
