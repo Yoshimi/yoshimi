@@ -5857,6 +5857,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         return Reply::DONE;
     }
+
     if (input.nextChar('/'))
     {
         input.skip(1);
@@ -5878,6 +5879,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         return Reply::DONE;
     }
+
     if (input.startsWith(".."))
     {
         input.skip(2);
@@ -6081,6 +6083,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::what("add");
         }
     }
+
     if (input.matchWord(3, "import") || input.matchWord(3, "export") )
     { // need the double test to find which then move along line
         int type = 0;
@@ -6408,7 +6411,15 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))
-            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 0);
+        {
+            if (bitFindHigh(context) == LEVEL::Part)
+                return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 0);
+            else
+            {
+                synth->getRuntime().Log("Only available at part level");
+                return Reply::DONE;
+            }
+        }
         return Reply::what("load");
     }
 

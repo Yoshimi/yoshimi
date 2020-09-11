@@ -4,8 +4,6 @@ Minor bug Multi instances produce jack error reports when main instance closed, 
 
 GUI Oddity. Pres spacebar on startup and you get directed to reset. Press it after tabbing down checkboxes and you enter the MIDI learn dialogue.
 
-Do proper limits testing for virtual keyboard routing through midiIn.
-
 Investigate AddSynth amplitude modulation. Basic code is commented out in ring modulation.
 
 Revise GUI voice list related to voice editor.
