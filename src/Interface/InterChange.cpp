@@ -5887,6 +5887,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 pars->Penvval[point] = val;
                 getData->data.value = val;
                 getData->data.offset = Xincrement;
+                pars->presetsUpdated();
             }
             else
                 getData->data.value = UNUSED;
@@ -5910,6 +5911,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
             getData->data.value = envpoints;
+            pars->presetsUpdated();
         }
         return;
     }
@@ -5929,6 +5931,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 Xincrement = 0;
             else
                 pars->Penvdt[point] = Xincrement;
+            pars->presetsUpdated();
         }
         else
         {

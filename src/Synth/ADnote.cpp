@@ -741,7 +741,7 @@ void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int mid
         if (subVoice[i] != NULL)
             for (int k = 0; k < unison_size[i]; ++k)
                 subVoice[i][k]->legatoFadeIn(getVoiceBaseFreq(i), velocity_, portamento_, midinote_);
-        else if (subFMVoice[i] != NULL)
+        if (subFMVoice[i] != NULL)
             for (int k = 0; k < unison_size[i]; ++k)
                 subFMVoice[i][k]->legatoFadeIn(getFMVoiceBaseFreq(i), velocity_, portamento_, midinote_);
     }
@@ -853,7 +853,7 @@ void ADnote::legatoFadeOut(const ADnote &orig)
         if (subVoice[i] != NULL)
             for (int k = 0; k < unison_size[i]; ++k)
                 subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
-        else if (subFMVoice[i] != NULL)
+        if (subFMVoice[i] != NULL)
             for (int k = 0; k < unison_size[i]; ++k)
                 subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
     }
