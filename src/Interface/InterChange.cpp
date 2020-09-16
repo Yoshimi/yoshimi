@@ -308,7 +308,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
+    //unsigned char parameter = getData->data.parameter;
     //unsigned char miscmsg = getData->data.miscmsg;
 
     while (syncWrite)
@@ -540,151 +540,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         {
             if (npart < NUM_MIDI_PARTS)
             {
-                switch(control)
-                {
-                    case PART::control::keyShift:
-                    {
-                        if (write)
-                        {
-                            synth->part[npart]->Pkeyshift = value + 64;
-                            synth->setPartMap(npart);
-                        }
-                        else
-                            value = synth->part[npart]->Pkeyshift - 64;
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                    }
-                    break;
-                    case PART::control::enableKitLine:
-                        if (write)
-                        {
-                            synth->part[npart]->setkititemstatus(kititem, value);
-                            synth->partonoffWrite(npart, 2);
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        }
-                    break;
-
-                    case PART::control::defaultInstrument: // clear part
-                        if (write)
-                        {
-                            doClearPart(npart);
-                            synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        }
-                        break;
-                    case PART::control::enablePad:
-                        if (write)
-                        {
-                            int temp = kititem;
-                            if (temp >= NUM_KIT_ITEMS)
-                                temp = 0;
-                            setpadparams(npart, temp);
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        }
-                        break;
-                    case PART::control::padsynthParameters:
-                        if (write)
-                        {
-                            setpadparams(npart, kititem);
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        }
-                        else
-                            value = synth->part[npart]->kit[kititem].padpars->Papplied;
-                        break;
-
-                    case PART::control::audioDestination:
-                        if (npart < synth->getRuntime().NumAvailableParts)
-                        {
-                            if (value & 2)
-                            {
-                                mainRegisterAudioPort(synth, npart);
-                            }
-                            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        }
-                        break;
-                    case PART::control::instrumentCopyright:
-                        if (write)
-                        {
-                            synth->part[npart]->info.Pauthor = text;
-                            guiTo = true;
-                        }
-                        else
-                            text = synth->part[npart]->info.Pauthor;
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        newMsg = true;
-                        break;
-                    case PART::control::instrumentComments:
-                        if (write)
-                        {
-                            synth->part[npart]->info.Pcomments = text;
-                            guiTo = true;
-                        }
-                        else
-                            text = synth->part[npart]->info.Pcomments;
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        newMsg = true;
-                        break;
-                    case PART::control::instrumentName: // part or kit item names
-                        if (kititem == UNUSED)
-                        {
-                            if (write)
-                            {
-                                synth->part[npart]->Pname = text;
-                                guiTo = true;
-                            }
-                            else
-                            {
-                                text = synth->part[npart]->Pname;
-                            }
-                        }
-                        else if (synth->part[npart]->Pkitmode)
-                        {
-                            if (kititem >= NUM_KIT_ITEMS)
-                                text = " FAILED out of range";
-                            else
-                            {
-                                if (write)
-                                {
-                                    synth->part[npart]->kit[kititem].Pname = text;
-                                    guiTo = true;
-                                }
-                                else
-                                {
-                                    text = synth->part[npart]->kit[kititem].Pname;
-                                }
-                            }
-                        }
-                        else
-                            text = " FAILED Not in kit mode";
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        newMsg = true;
-                        break;
-                    case PART::control::instrumentType:
-                        if (write)
-                        {
-                            synth->part[npart]->info.Ptype = value;
-                            guiTo = true;
-                        }
-                        else
-                            value = synth->part[npart]->info.Ptype;
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        break;
-                    case PART::control::defaultInstrumentCopyright:
-                        std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
-                        if (parameter == 0) // load
-                        {
-                            text = loadText(name); // TODO provide failure warning
-                            synth->part[npart]->info.Pauthor = text;
-                            guiTo = true;
-                        }
-                        else
-                        {
-                            text = synth->part[npart]->info.Pauthor;
-                            saveText(text, name);
-                        }
-                        getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                        newMsg = true;
-                        break;
-                }
+                value = indirectPart(getData, synth, newMsg, guiTo, text);
             }
             break;
         }
@@ -1423,6 +1279,165 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
     return value;
 }
 
+
+int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text)
+{
+    bool write = (getData->data.type & TOPLEVEL::type::Write);
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int npart = getData->data.part;
+    int kititem = getData->data.kit;
+    int parameter = getData->data.parameter;
+
+    Part *part = synth->part[npart];
+
+    switch(control)
+    {
+        case PART::control::keyShift:
+        {
+            if (write)
+            {
+                part->Pkeyshift = value + 64;
+                synth->setPartMap(npart);
+            }
+            else
+                value = part->Pkeyshift - 64;
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+        }
+        break;
+        case PART::control::enableKitLine:
+            if (write)
+            {
+                part->setkititemstatus(kititem, value);
+                synth->partonoffWrite(npart, 2);
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+        break;
+
+        case PART::control::defaultInstrument: // clear part
+            if (write)
+            {
+                doClearPart(npart);
+                synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            break;
+        case PART::control::enablePad:
+            if (write)
+            {
+                int temp = kititem;
+                if (temp >= NUM_KIT_ITEMS)
+                    temp = 0;
+                setpadparams(npart, temp);
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            break;
+        case PART::control::padsynthParameters:
+            if (write)
+            {
+                setpadparams(npart, kititem);
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            else
+                value = part->kit[kititem].padpars->Papplied;
+            break;
+
+        case PART::control::audioDestination:
+            if (npart < synth->getRuntime().NumAvailableParts)
+            {
+                if (value & 2)
+                {
+                    mainRegisterAudioPort(synth, npart);
+                }
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            break;
+        case PART::control::instrumentCopyright:
+            if (write)
+            {
+                part->info.Pauthor = text;
+                guiTo = true;
+            }
+            else
+                text = part->info.Pauthor;
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            newMsg = true;
+            break;
+        case PART::control::instrumentComments:
+            if (write)
+            {
+                part->info.Pcomments = text;
+                guiTo = true;
+            }
+            else
+                text = part->info.Pcomments;
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            newMsg = true;
+            break;
+        case PART::control::instrumentName: // part or kit item names
+            if (kititem == UNUSED)
+            {
+                if (write)
+                {
+                    part->Pname = text;
+                    guiTo = true;
+                }
+                else
+                {
+                    text = part->Pname;
+                }
+            }
+            else if (part->Pkitmode)
+            {
+                if (kititem >= NUM_KIT_ITEMS)
+                    text = " FAILED out of range";
+                else
+                {
+                    if (write)
+                    {
+                        part->kit[kititem].Pname = text;
+                        guiTo = true;
+                    }
+                    else
+                    {
+                        text = part->kit[kititem].Pname;
+                    }
+                }
+            }
+            else
+                text = " FAILED Not in kit mode";
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            newMsg = true;
+            break;
+        case PART::control::instrumentType:
+            if (write)
+            {
+                part->info.Ptype = value;
+                guiTo = true;
+            }
+            else
+                value = part->info.Ptype;
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            break;
+        case PART::control::defaultInstrumentCopyright:
+            std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
+            if (parameter == 0) // load
+            {
+                text = loadText(name); // TODO provide failure warning
+                part->info.Pauthor = text;
+                guiTo = true;
+            }
+            else
+            {
+                text = part->info.Pauthor;
+                saveText(text, name);
+            }
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            newMsg = true;
+            break;
+    }
+    return value;
+}
 
 std::string InterChange::formatScales(std::string text)
 {

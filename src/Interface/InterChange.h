@@ -89,6 +89,7 @@ class InterChange : private DataText
         int indirectMain(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectBank(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
+        int indirectPart(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         std::string formatScales(std::string text);
 
         unsigned int lockTime;
