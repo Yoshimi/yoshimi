@@ -86,6 +86,7 @@ class InterChange : private DataText
         pthread_t  sortResultsThreadHandle;
         void muteQueueWrite(CommandBlock *getData);
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
+        int indirectScales(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectMain(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectBank(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);

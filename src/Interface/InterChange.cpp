@@ -304,7 +304,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     int value = lrint(getData->data.value);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
+    unsigned char switchNum = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
@@ -320,7 +320,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     (void) guiTo; // suppress warning when headless build
     unsigned char newMsg = false;//NO_MSG;
 
-    if (npart == TOPLEVEL::section::main && control == MAIN::control::loadFileFromList)
+    if (switchNum == TOPLEVEL::section::main && control == MAIN::control::loadFileFromList)
     {
         //std::cout << "kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert) << std::endl;
         int result = synth->LoadNumbered(kititem, engine);
@@ -379,7 +379,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     else
         text = "";
 
-    int switchNum = npart;
     if (control == TOPLEVEL::control::textMessage)
         switchNum = TOPLEVEL::section::message; // this is a bit hacky :(
 
@@ -435,115 +434,31 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             break;
         }
         case TOPLEVEL::section::scales:
-        {
-            switch(control)
-            {
-                case SCALES::control::tuning:
-                    text = formatScales(text);
-                    value = synth->microtonal.texttotunings(text.c_str());
-                    if (value > 0)
-                        synth->setAllPartMaps();
-                    break;
-                case SCALES::control::keyboardMap:
-                    text = formatScales(text);
-                    value = synth->microtonal.texttomapping(text.c_str());
-                    if (value > 0)
-                        synth->setAllPartMaps();
-                    break;
-
-                case SCALES::control::importScl:
-                    value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
-                    if (value > 0)
-                    {
-                        text = "";
-                        char *buf = new char[100];
-                        for (int i = 0; i < value; ++ i)
-                        {
-                            synth->microtonal.tuningtoline(i, buf, 100);
-                            if (i > 0)
-                                text += "\n";
-                            text += std::string(buf);
-                        }
-                        delete [] buf;
-                    }
-                    break;
-                case SCALES::control::importKbm:
-                    value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
-                    if (value > 0)
-                    {
-                        text = "";
-                        int map;
-                        for (int i = 0; i < value; ++ i)
-                        {
-                            if (i > 0)
-                                text += "\n";
-                            map = synth->microtonal.Pmapping[i];
-                            if (map == -1)
-                                text += 'x';
-                            else
-                                text += std::to_string(map);
-                        }
-                        getData->data.kit = synth->microtonal.PrefNote;
-                        getData->data.engine = synth->microtonal.Pfirstkey;
-                        getData->data.insert = synth->microtonal.Pmiddlenote;
-                        getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
-                        synth->setAllPartMaps();
-                    }
-                    break;
-
-                case SCALES::control::name:
-                    if (write)
-                    {
-                        synth->microtonal.Pname = text;
-                    }
-                    else
-                        text = synth->microtonal.Pname;
-                    newMsg = true;
-                    break;
-                case SCALES::control::comment:
-                    if (write)
-                        synth->microtonal.Pcomment = text;
-                    else
-                        text = synth->microtonal.Pcomment;
-                    newMsg = true;
-                    break;
-            }
-            getData->data.source &= ~TOPLEVEL::action::lowPrio;
-            guiTo = true;
+            value = indirectScales(getData, synth, newMsg, guiTo, text);
             break;
-        }
+
         case TOPLEVEL::section::main:
-        {
             value = indirectMain(getData, synth, newMsg, guiTo, text);
             break;
-        }
 
         case TOPLEVEL::section::bank: // instrument / bank
-        {
             value = indirectBank(getData, synth, newMsg, guiTo, text);
             break;
-        }
 
         case TOPLEVEL::section::config:
-        {
             value = indirectConfig(getData, synth, newMsg, guiTo, text);
             break;
-        }
 
         case TOPLEVEL::section::message:
-        {
             newMsg = true;
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
-        }
         default:
-        {
-            if (npart < NUM_MIDI_PARTS)
+            if (switchNum < NUM_MIDI_PARTS)
             {
                 value = indirectPart(getData, synth, newMsg, guiTo, text);
             }
             break;
-        }
     }
     //std::cout << ">" << text << "<" << std::endl;
 
@@ -572,7 +487,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #endif
         bool ok = returnsBuffer->write(getData->bytes);
 #ifdef GUI_FLTK
-        if (synth->getRuntime().showGui && npart == TOPLEVEL::section::scales && control == SCALES::control::importScl)
+        if (synth->getRuntime().showGui && switchNum == TOPLEVEL::section::scales && control == SCALES::control::importScl)
         {   // loading a tuning includes a name and comment!
             getData->data.control = SCALES::control::name;
             getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
@@ -581,7 +496,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
-        if (synth->getRuntime().showGui && npart == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
+        if (synth->getRuntime().showGui && switchNum == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
             synth->midilearn.updateGui();
         /*
          * This needs improving. We should only set it
@@ -612,6 +527,90 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         synth->fileCompatible = true;
         std::cout << "No indirect return" << std::endl;
     }
+}
+
+
+int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text)
+{
+    bool write = (getData->data.type & TOPLEVEL::type::Write);
+    int value = getData->data.value;
+    int control = getData->data.control;
+
+    switch(control)
+    {
+        case SCALES::control::tuning:
+            text = formatScales(text);
+            value = synth->microtonal.texttotunings(text.c_str());
+            if (value > 0)
+                synth->setAllPartMaps();
+            break;
+        case SCALES::control::keyboardMap:
+            text = formatScales(text);
+            value = synth->microtonal.texttomapping(text.c_str());
+            if (value > 0)
+                synth->setAllPartMaps();
+            break;
+
+        case SCALES::control::importScl:
+            value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
+            if (value > 0)
+            {
+                text = "";
+                char *buf = new char[100];
+                for (int i = 0; i < value; ++ i)
+                {
+                    synth->microtonal.tuningtoline(i, buf, 100);
+                    if (i > 0)
+                        text += "\n";
+                    text += std::string(buf);
+                }
+                delete [] buf;
+            }
+            break;
+        case SCALES::control::importKbm:
+            value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
+            if (value > 0)
+            {
+                text = "";
+                int map;
+                for (int i = 0; i < value; ++ i)
+                {
+                    if (i > 0)
+                        text += "\n";
+                    map = synth->microtonal.Pmapping[i];
+                    if (map == -1)
+                        text += 'x';
+                    else
+                        text += std::to_string(map);
+                }
+                getData->data.kit = synth->microtonal.PrefNote;
+                getData->data.engine = synth->microtonal.Pfirstkey;
+                getData->data.insert = synth->microtonal.Pmiddlenote;
+                getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
+                synth->setAllPartMaps();
+            }
+            break;
+
+        case SCALES::control::name:
+            if (write)
+            {
+                synth->microtonal.Pname = text;
+            }
+            else
+                text = synth->microtonal.Pname;
+            newMsg = true;
+            break;
+        case SCALES::control::comment:
+            if (write)
+                synth->microtonal.Pcomment = text;
+            else
+                text = synth->microtonal.Pcomment;
+            newMsg = true;
+            break;
+    }
+    getData->data.source &= ~TOPLEVEL::action::lowPrio;
+    guiTo = true;
+    return value;
 }
 
 
