@@ -379,10 +379,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     else
         text = "";
 
-    unsigned int tmp;
-    std::string name;
-    bool learnUpdate = false;
-
     int switchNum = npart;
     if (control == TOPLEVEL::control::textMessage)
         switchNum = TOPLEVEL::section::message; // this is a bit hacky :(
@@ -518,324 +514,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         }
         case TOPLEVEL::section::main:
         {
-            switch (control)
-            {
-                case MAIN::control::detune:
-                {
-                    if (write)
-                    {
-                        synth->microtonal.Pglobalfinedetune = value;
-                        synth->setAllPartMaps();
-                    }
-                    else
-                        value = synth->microtonal.Pglobalfinedetune;
-                    break;
-                }
-                case MAIN::control::keyShift:
-                {
-                    if (write)
-                    {
-                        synth->setPkeyshift(value + 64);
-                        synth->setAllPartMaps();
-                    }
-                    else
-                        value = synth->Pkeyshift - 64;
-                    break;
-                }
-
-                case MAIN::control::exportBank:
-                {
-                    if (kititem == UNUSED)
-                        kititem = synth->getRuntime().currentRoot;
-                    text = synth->bank.exportBank(text, kititem, value);
-                    newMsg = true;
-                    break;
-                }
-
-                case MAIN::control::importBank:
-                {
-                    if (kititem == UNUSED)
-                        kititem = synth->getRuntime().currentRoot;
-                    text = synth->bank.importBank(text, kititem, value);
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::deleteBank:
-                {
-                    text = synth->bank.removebank(value, kititem);
-                    newMsg = true;
-                    break;
-                }
-
-                case MAIN::control::loadInstrumentFromBank:
-                {
-                    unsigned int result = synth->setProgramFromBank(getData);
-                    text = textMsgBuffer.fetch(result & NO_MSG);
-                    if (result < 0x1000)
-                    {
-                        if (synth->getRuntime().bankHighlight)
-                            synth->getRuntime().lastBankPart = (value << 15) | (synth->getRuntime().currentBank << 8) | synth->getRuntime().currentRoot;
-                        else
-                            synth->getRuntime().lastBankPart = UNUSED;
-                        text = "ed " + text;
-                        //std::cout << "here ins " << int((synth->getRuntime().lastBankPart >> 15) & 0x7f) << "  bank " << int((synth->getRuntime().lastBankPart >> 8) & 0x7f) << "  root " << int(synth->getRuntime().lastBankPart & 0x7f) << std::endl;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                }
-
-                case MAIN::control::loadInstrumentByName:
-                {
-                    getData->data.miscmsg = textMsgBuffer.push(text);
-                    unsigned int result = synth->setProgramByName(getData);
-                    text = textMsgBuffer.fetch(result & NO_MSG);
-                    synth->getRuntime().lastBankPart = UNUSED;
-                    if (result < 0x1000)
-                        text = "ed " + text;
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                }
-
-                case MAIN::control::saveNamedInstrument:
-                {
-                    bool ok = true;
-                    int saveType = synth->getRuntime().instrumentFormat;
-                    // This is both. Below we send them individually.
-
-                    if (saveType & 2) // Yoshimi format
-                        ok = synth->part[value]->saveXML(text, true);
-                    if (ok && (saveType & 1)) // legacy
-                        ok = synth->part[value]->saveXML(text, false);
-
-                    if (ok)
-                    {
-                        synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = true;
-                        synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
-                        synth->part[value]->PyoshiType = (saveType & 2);
-                        text = "d " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::loadNamedPatchset:
-                    vectorClear(NUM_MIDI_CHANNELS);
-                    if (synth->loadPatchSetAndUpdate(text))
-                    {
-                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
-                        text = "ed " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = UNUSED;
-                    newMsg = true;
-                    break;
-                case MAIN::control::saveNamedPatchset:
-                    if (synth->savePatchesXML(text))
-                    {
-                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
-                        text = "d " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                case MAIN::control::loadNamedVector:
-                    tmp = synth->loadVectorAndUpdate(insert, text);
-                    if (tmp < NO_MSG)
-                    {
-                        getData->data.insert = tmp;
-                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
-                        text = "ed " + text + " to chan " + std::to_string(int(tmp + 1));
-                    }
-                    else
-                        text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = UNUSED;
-                    newMsg = true;
-                    break;
-                case MAIN::control::saveNamedVector:
-                {
-                    std::string oldname = synth->getRuntime().vectordata.Name[insert];
-                    int pos = oldname.find("No Name");
-                    if (pos >=0 && pos < 2)
-                        synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
-                    tmp = synth->saveVector(insert, text, true);
-                    if (tmp == NO_MSG)
-                    {
-                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
-                        text = "d " + text;
-                    }
-                    else
-                    {
-                        name = textMsgBuffer.fetch(tmp);
-                        if (name != "FAIL")
-                            text = " " + name;
-                        else
-                            text = " FAILED " + text;
-                    }
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::loadNamedScale:
-                    if (synth->loadMicrotonal(text))
-                    {
-                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
-                        text = "ed " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                case MAIN::control::saveNamedScale:
-                    if (synth->saveMicrotonal(text))
-                    {
-                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
-                        text = "d " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                case MAIN::control::loadNamedState:
-                    vectorClear(NUM_MIDI_CHANNELS);
-                    if (synth->loadStateAndUpdate(text))
-                    {
-                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
-                        name += ("-" + to_string(synth->getUniqueId()));
-                        name += ".state";
-                        if ((text != name)) // never include default state
-                            synth->addHistory(text, TOPLEVEL::XML::State);
-                        text = "ed " + text;
-                        learnUpdate = true;
-                        /*
-                         * This needs improving. We should only set it
-                         * when the state file contains a learn list.
-                         */
-                    }
-                    else
-                        text = " FAILED " + text;
-                    synth->getRuntime().lastBankPart = UNUSED;
-                    newMsg = true;
-                    break;
-                case MAIN::control::saveNamedState:
-                {
-                    string filename = setExtension(text, EXTEN::state);
-                    if (synth->saveState(filename))
-                    {
-                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
-                        name += ("-" + to_string(synth->getUniqueId()));
-                        name += ".state";
-                        if ((text != name)) // never include default state
-                            synth->addHistory(filename, TOPLEVEL::XML::State);
-                        text = "d " + text;
-                    }
-                    else
-                        text = " FAILED " + text;
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::loadFileFromList:
-                    break; // do nothing here
-                case MAIN::control::exportPadSynthSamples:
-                {
-                    unsigned char partnum = insert;
-                    synth->partonoffWrite(partnum, -1);
-                    setpadparams(partnum, kititem);
-                    if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
-                        text = "d " + text;
-                    else
-                        text = " FAILED some samples " + text;
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::masterReset:
-                    synth->resetAll(0);
-                    break;
-                case MAIN::control::masterResetAndMlearn:
-                    synth->resetAll(1);
-                    break;
-                case MAIN::control::openManualPDF: // display user guide
-                {
-                    std::string manfile = synth->manualname();
-                    unsigned int pos = manfile.rfind(".") + 1;
-                    int wanted = std::stoi(manfile.substr(pos, 3));
-                    int count = wanted + 2;
-                    manfile = manfile.substr(0, pos);
-                    std::string path = "";
-                    while (path == "" && count >= 0) // scan current first, then older versions
-                    {
-                        --count;
-                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
-                        if (path == "")
-                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
-                        if (path == "")
-                        path = findFile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
-                    }
-                    std::cout << "man " << manfile << "\npath " << path << std::endl;
-                    if (path == "")
-                        text = "Can't find manual :(";
-                    else if (count < wanted)
-                        text = "Can't find current manual. Using older one";
-                    if (path != "")
-                    {
-                        std::string command = "xdg-open " + path + "&";
-                        FILE *fp = popen(command.c_str(), "r");
-                        if (fp == NULL)
-                            text = "Can't find PDF reader :(";
-                        pclose(fp);
-                    }
-                    newMsg = true;
-                    break;
-                }
-                case MAIN::control::startInstance:
-                    if (synth == firstSynth)
-                    {
-                        if (value > 0 && value < 32)
-                            startInstance = value | 0x80;
-                        else
-                            startInstance = 0x81; // next available
-                        while (startInstance > 0x80)
-                            usleep(1000);
-                        value = startInstance; // actual instance found
-                        startInstance = 0; // just to be sure
-                    }
-                    break;
-                case MAIN::control::stopInstance:
-                    text = std::to_string(value) + " ";
-                    if (value < 0 || value >= 32)
-                        text += "Out of range";
-                    else
-                    {
-                        SynthEngine *toClose = firstSynth->getSynthFromId(value);
-                        if (toClose == firstSynth && value > 0)
-                            text += "Can't find";
-                        else
-                        {
-                            toClose->getRuntime().runSynth = false;
-                            text += "Closed";
-                        }
-                    }
-                    newMsg = true;
-                    break;
-
-                case MAIN::control::stopSound:
-#ifdef REPORT_NOTES_ON_OFF
-                    // note test
-                    synth->getRuntime().Log("note on sent " + std::to_string(synth->getRuntime().noteOnSent));
-                    synth->getRuntime().Log("note on seen " + std::to_string(synth->getRuntime().noteOnSeen));
-                    synth->getRuntime().Log("note off sent " + std::to_string(synth->getRuntime().noteOffSent));
-                    synth->getRuntime().Log("note off seen " + std::to_string(synth->getRuntime().noteOffSeen));
-                    synth->getRuntime().Log("notes hanging sent " + std::to_string(synth->getRuntime().noteOnSent - synth->getRuntime().noteOffSent));
-                    synth->getRuntime().Log("notes hanging seen " + std::to_string(synth->getRuntime().noteOnSeen - synth->getRuntime().noteOffSeen));
-#endif
-                    synth->ShutUp();
-                    break;
-            }
+            value = indirectMain(getData, synth, newMsg, text);
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             if (control != MAIN::control::startInstance && control != MAIN::control::stopInstance)
                 guiTo = true;
@@ -1360,8 +1039,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
             ok &= returnsBuffer->write(getData->bytes);
         }
-        if (synth->getRuntime().showGui && learnUpdate)
+        if (synth->getRuntime().showGui && npart == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
             synth->midilearn.updateGui();
+        /*
+         * This needs improving. We should only set it
+         * when the state file contains a learn list.
+         */
 #endif
         if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
@@ -1387,6 +1070,334 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         synth->fileCompatible = true;
         std::cout << "No indirect return" << std::endl;
     }
+}
+
+
+int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, std::string &text)
+{
+    bool write = (getData->data.type & TOPLEVEL::type::Write);
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int kititem = getData->data.kit;
+    int insert = getData->data.insert;
+    switch (control)
+            {
+                case MAIN::control::detune:
+                {
+                    if (write)
+                    {
+                        synth->microtonal.Pglobalfinedetune = value;
+                        synth->setAllPartMaps();
+                    }
+                    else
+                        value = synth->microtonal.Pglobalfinedetune;
+                    break;
+                }
+                case MAIN::control::keyShift:
+                {
+                    if (write)
+                    {
+                        synth->setPkeyshift(value + 64);
+                        synth->setAllPartMaps();
+                    }
+                    else
+                        value = synth->Pkeyshift - 64;
+                    break;
+                }
+
+                case MAIN::control::exportBank:
+                {
+                    if (kititem == UNUSED)
+                        kititem = synth->getRuntime().currentRoot;
+                    text = synth->bank.exportBank(text, kititem, value);
+                    newMsg = true;
+                    break;
+                }
+
+                case MAIN::control::importBank:
+                {
+                    if (kititem == UNUSED)
+                        kititem = synth->getRuntime().currentRoot;
+                    text = synth->bank.importBank(text, kititem, value);
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::deleteBank:
+                {
+                    text = synth->bank.removebank(value, kititem);
+                    newMsg = true;
+                    break;
+                }
+
+                case MAIN::control::loadInstrumentFromBank:
+                {
+                    unsigned int result = synth->setProgramFromBank(getData);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
+                    if (result < 0x1000)
+                    {
+                        if (synth->getRuntime().bankHighlight)
+                            synth->getRuntime().lastBankPart = (value << 15) | (synth->getRuntime().currentBank << 8) | synth->getRuntime().currentRoot;
+                        else
+                            synth->getRuntime().lastBankPart = UNUSED;
+                        text = "ed " + text;
+                        //std::cout << "here ins " << int((synth->getRuntime().lastBankPart >> 15) & 0x7f) << "  bank " << int((synth->getRuntime().lastBankPart >> 8) & 0x7f) << "  root " << int(synth->getRuntime().lastBankPart & 0x7f) << std::endl;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                }
+
+                case MAIN::control::loadInstrumentByName:
+                {
+                    getData->data.miscmsg = textMsgBuffer.push(text);
+                    unsigned int result = synth->setProgramByName(getData);
+                    text = textMsgBuffer.fetch(result & NO_MSG);
+                    synth->getRuntime().lastBankPart = UNUSED;
+                    if (result < 0x1000)
+                        text = "ed " + text;
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                }
+
+                case MAIN::control::saveNamedInstrument:
+                {
+                    bool ok = true;
+                    int saveType = synth->getRuntime().instrumentFormat;
+                    // This is both. Below we send them individually.
+
+                    if (saveType & 2) // Yoshimi format
+                        ok = synth->part[value]->saveXML(text, true);
+                    if (ok && (saveType & 1)) // legacy
+                        ok = synth->part[value]->saveXML(text, false);
+
+                    if (ok)
+                    {
+                        synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = true;
+                        synth->addHistory(setExtension(text, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
+                        synth->part[value]->PyoshiType = (saveType & 2);
+                        text = "d " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::loadNamedPatchset:
+                    vectorClear(NUM_MIDI_CHANNELS);
+                    if (synth->loadPatchSetAndUpdate(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
+                        text = "ed " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    synth->getRuntime().lastBankPart = UNUSED;
+                    newMsg = true;
+                    break;
+                case MAIN::control::saveNamedPatchset:
+                    if (synth->savePatchesXML(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::patchset), TOPLEVEL::XML::Patch);
+                        text = "d " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                case MAIN::control::loadNamedVector:
+                {
+                    int tmp = synth->loadVectorAndUpdate(insert, text);
+                    if (tmp < NO_MSG)
+                    {
+                        getData->data.insert = tmp;
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
+                        text = "ed " + text + " to chan " + std::to_string(int(tmp + 1));
+                    }
+                    else
+                        text = " FAILED " + text;
+                    synth->getRuntime().lastBankPart = UNUSED;
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::saveNamedVector:
+                {
+                    std::string oldname = synth->getRuntime().vectordata.Name[insert];
+                    int pos = oldname.find("No Name");
+                    if (pos >=0 && pos < 2)
+                        synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
+                    int tmp = synth->saveVector(insert, text, true);
+                    if (tmp == NO_MSG)
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
+                        text = "d " + text;
+                    }
+                    else
+                    {
+                        string name = textMsgBuffer.fetch(tmp);
+                        if (name != "FAIL")
+                            text = " " + name;
+                        else
+                            text = " FAILED " + text;
+                    }
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::loadNamedScale:
+                    if (synth->loadMicrotonal(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
+                        text = "ed " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                case MAIN::control::saveNamedScale:
+                    if (synth->saveMicrotonal(text))
+                    {
+                        synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
+                        text = "d " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                case MAIN::control::loadNamedState:
+                    vectorClear(NUM_MIDI_CHANNELS);
+                    if (synth->loadStateAndUpdate(text))
+                    {
+                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                        name += ("-" + to_string(synth->getUniqueId()));
+                        name += ".state";
+                        if ((text != name)) // never include default state
+                            synth->addHistory(text, TOPLEVEL::XML::State);
+                        text = "ed " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    synth->getRuntime().lastBankPart = UNUSED;
+                    newMsg = true;
+                    break;
+                case MAIN::control::saveNamedState:
+                {
+                    string filename = setExtension(text, EXTEN::state);
+                    if (synth->saveState(filename))
+                    {
+                        string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                        name += ("-" + to_string(synth->getUniqueId()));
+                        name += ".state";
+                        if ((text != name)) // never include default state
+                            synth->addHistory(filename, TOPLEVEL::XML::State);
+                        text = "d " + text;
+                    }
+                    else
+                        text = " FAILED " + text;
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::loadFileFromList:
+                    break; // do nothing here
+                case MAIN::control::exportPadSynthSamples:
+                {
+                    unsigned char partnum = insert;
+                    synth->partonoffWrite(partnum, -1);
+                    setpadparams(partnum, kititem);
+                    if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
+                        text = "d " + text;
+                    else
+                        text = " FAILED some samples " + text;
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::masterReset:
+                    synth->resetAll(0);
+                    break;
+                case MAIN::control::masterResetAndMlearn:
+                    synth->resetAll(1);
+                    break;
+                case MAIN::control::openManualPDF: // display user guide
+                {
+                    std::string manfile = synth->manualname();
+                    unsigned int pos = manfile.rfind(".") + 1;
+                    int wanted = std::stoi(manfile.substr(pos, 3));
+                    int count = wanted + 2;
+                    manfile = manfile.substr(0, pos);
+                    std::string path = "";
+                    while (path == "" && count >= 0) // scan current first, then older versions
+                    {
+                        --count;
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
+                        if (path == "")
+                        path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
+                        if (path == "")
+                        path = findFile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
+                    }
+                    std::cout << "man " << manfile << "\npath " << path << std::endl;
+                    if (path == "")
+                        text = "Can't find manual :(";
+                    else if (count < wanted)
+                        text = "Can't find current manual. Using older one";
+                    if (path != "")
+                    {
+                        std::string command = "xdg-open " + path + "&";
+                        FILE *fp = popen(command.c_str(), "r");
+                        if (fp == NULL)
+                            text = "Can't find PDF reader :(";
+                        pclose(fp);
+                    }
+                    newMsg = true;
+                    break;
+                }
+                case MAIN::control::startInstance:
+                    if (synth == firstSynth)
+                    {
+                        if (value > 0 && value < 32)
+                            startInstance = value | 0x80;
+                        else
+                            startInstance = 0x81; // next available
+                        while (startInstance > 0x80)
+                            usleep(1000);
+                        value = startInstance; // actual instance found
+                        startInstance = 0; // just to be sure
+                    }
+                    break;
+                case MAIN::control::stopInstance:
+                    text = std::to_string(value) + " ";
+                    if (value < 0 || value >= 32)
+                        text += "Out of range";
+                    else
+                    {
+                        SynthEngine *toClose = firstSynth->getSynthFromId(value);
+                        if (toClose == firstSynth && value > 0)
+                            text += "Can't find";
+                        else
+                        {
+                            toClose->getRuntime().runSynth = false;
+                            text += "Closed";
+                        }
+                    }
+                    newMsg = true;
+                    break;
+
+                case MAIN::control::stopSound:
+#ifdef REPORT_NOTES_ON_OFF
+                    // note test
+                    synth->getRuntime().Log("note on sent " + std::to_string(synth->getRuntime().noteOnSent));
+                    synth->getRuntime().Log("note on seen " + std::to_string(synth->getRuntime().noteOnSeen));
+                    synth->getRuntime().Log("note off sent " + std::to_string(synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("note off seen " + std::to_string(synth->getRuntime().noteOffSeen));
+                    synth->getRuntime().Log("notes hanging sent " + std::to_string(synth->getRuntime().noteOnSent - synth->getRuntime().noteOffSent));
+                    synth->getRuntime().Log("notes hanging seen " + std::to_string(synth->getRuntime().noteOnSeen - synth->getRuntime().noteOffSeen));
+#endif
+                    synth->ShutUp();
+                    break;
+            }
+
+
+    return value;
 }
 
 
