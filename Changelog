@@ -6,6 +6,8 @@ yoshimi 1.7.2 M
   Don't understand how sustainPedalEnable can ever be
   relevant in addVoice! (InterChange.cpp line 1969);
 * Split indirectMain out of indirectTransfers.
+* Cleaned up indirectMain.
+* Split indirectBank out of indirectTransfers.
 
 2020-9-11 Will
 * Fixed some confusing CLI info typos.
