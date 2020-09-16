@@ -11,6 +11,7 @@ yoshimi 1.7.2 M
 * Split indirectConfig out of indirectTransfers.
 * Split indirectPart out of indirectTransfers.
 * Split indirectScales out of indirectTransfers.
+* Spilt indirectVector & indirectMidi from indirectTransfers.
 
 2020-9-11 Will
 * Fixed some confusing CLI info typos.

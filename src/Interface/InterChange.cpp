@@ -385,54 +385,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     switch(switchNum)
     {
         case TOPLEVEL::section::vector:
-        {
-            switch(control)
-            {
-                case VECTOR::control::name:
-                    if (write)
-                    {
-                        synth->getRuntime().vectordata.Name[insert] = text;
-                    }
-                    else
-                        text = synth->getRuntime().vectordata.Name[insert];
-                    newMsg = true;
-                    getData->data.source &= ~TOPLEVEL::action::lowPrio;
-                    guiTo = true;
-                    break;
-            }
+            value = indirectMidi(getData, synth, newMsg, guiTo, text);
             break;
-        }
-        case TOPLEVEL::section::midiIn: // program / bank / root
-        {
-            //std::cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << std::endl;
 
-            int msgID;
-            if (control == MIDI::control::instrument)
-            {
-                msgID = synth->setProgramFromBank(getData);
-                getData->data.control = MAIN::control::loadInstrumentFromBank;
-                getData->data.part = TOPLEVEL::section::main;
-                // moved to 'main' for return updates.
-                if (msgID > NO_MSG)
-                    text = " FAILED " + text;
-                else
-                    text = "ed ";
-            }
-            else
-            {
-                msgID = synth->setRootBank(getData->data.insert, getData->data.engine);
-                if (msgID > NO_MSG)
-                    text = "FAILED " + text;
-                else
-                    text = "";
-            }
-            text += textMsgBuffer.fetch(msgID & NO_MSG);
-            newMsg = true;
-            getData->data.source = TOPLEVEL::action::toAll;
-            // everyone will want to knopw about these!
-            guiTo = true;
+        case TOPLEVEL::section::midiIn: // program / bank / root
+            value = indirectMidi(getData, synth, newMsg, guiTo, text);
             break;
-        }
         case TOPLEVEL::section::scales:
             value = indirectScales(getData, synth, newMsg, guiTo, text);
             break;
@@ -527,6 +485,65 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         synth->fileCompatible = true;
         std::cout << "No indirect return" << std::endl;
     }
+}
+
+
+int InterChange::indirectVector(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text)
+{
+    bool write = (getData->data.type & TOPLEVEL::type::Write);
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int insert = getData->data.insert;
+
+    switch(control)
+    {
+        case VECTOR::control::name:
+            if (write)
+                synth->getRuntime().vectordata.Name[insert] = text;
+            else
+                text = synth->getRuntime().vectordata.Name[insert];
+            newMsg = true;
+            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            guiTo = true;
+            break;
+    }
+
+    return value;
+}
+
+
+int InterChange::indirectMidi(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text)
+{
+    int value = getData->data.value;
+    int control = getData->data.control;
+    //std::cout << " interchange prog " << value << "  chan " << int(kititem) << "  bank " << int(engine) << "  root " << int(insert) << std::endl;
+
+    int msgID;
+    if (control == MIDI::control::instrument)
+    {
+        msgID = synth->setProgramFromBank(getData);
+        getData->data.control = MAIN::control::loadInstrumentFromBank;
+        getData->data.part = TOPLEVEL::section::main;
+        // moved to 'main' for return updates.
+        if (msgID > NO_MSG)
+            text = " FAILED " + text;
+        else
+            text = "ed ";
+    }
+    else
+    {
+        msgID = synth->setRootBank(getData->data.insert, getData->data.engine);
+        if (msgID > NO_MSG)
+            text = "FAILED " + text;
+        else
+            text = "";
+    }
+    text += textMsgBuffer.fetch(msgID & NO_MSG);
+    newMsg = true;
+    getData->data.source = TOPLEVEL::action::toAll;
+    // everyone will want to knopw about these!
+    guiTo = true;
+    return value;
 }
 
 

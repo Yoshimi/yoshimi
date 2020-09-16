@@ -206,6 +206,10 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     enum control : unsigned char {
         // insert any new entries here
+
+        /*
+         * the following values must never appear in any other sections
+         */
         textMessage = 254, // FE
         forceExit // this is effective from *any* section!
     };
