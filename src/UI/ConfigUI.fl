@@ -893,7 +893,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         value_int = value_int >> 1;
                         ++ tmp; // count the bits for switch number
                     }
-                    buff_size->value(tmp);
+                    buff_size->value(tmp - 1);
                     break;
                 case CONFIG::control::padSynthInterpolation:
                     pad_interpol->value(value_int);

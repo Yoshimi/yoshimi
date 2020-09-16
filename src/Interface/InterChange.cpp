@@ -526,135 +526,10 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
         case TOPLEVEL::section::config:
         {
-            switch (control)
-            {
-                case CONFIG::control::jackMidiSource:
-                    if (write)
-                    {
-                        synth->getRuntime().jackMidiDevice = text;
-                        synth->getRuntime().configChanged = true;
-                    }
-                    else
-                        text = synth->getRuntime().jackMidiDevice;
-                    newMsg = true;
-                    break;
-                case CONFIG::control::jackServer:
-                    if (write)
-                    {
-                        synth->getRuntime().jackServer = text;
-                        synth->getRuntime().configChanged = true;
-                    }
-                    else
-                        text = synth->getRuntime().jackServer;
-                    newMsg = true;
-                    break;
-                case CONFIG::control::alsaMidiSource:
-                    if (write)
-                    {
-                        synth->getRuntime().alsaMidiDevice = text;
-                        synth->getRuntime().configChanged = true;
-                    }
-                    else
-                        text = synth->getRuntime().alsaMidiDevice;
-                    newMsg = true;
-                    break;
-                case CONFIG::control::alsaAudioDevice:
-                    if (write)
-                    {
-                        synth->getRuntime().alsaAudioDevice = text;
-                        synth->getRuntime().configChanged = true;
-                    }
-                    else
-                        text = synth->getRuntime().alsaAudioDevice;
-                    newMsg = true;
-                    break;
-                case CONFIG::control::addPresetRootDir:
-                {
-                    bool isOK = false;
-                    if (isDirectory(text))
-                        isOK= true;
-                    else
-                    {
-                        if (createDir(text))
-                        {
-                            text = " FAILED could not create " + text;
-                        }
-                        else
-                            isOK = true;
-                    }
-                    if (isOK)
-                    {
-                        int i = 0;
-                        while (!firstSynth->getRuntime().presetsDirlist[i].empty())
-                            ++i;
-                        if (i > (MAX_PRESETS - 2))
-                            text = " FAILED preset list full";
-                        else
-                        {
-                            firstSynth->getRuntime().presetsDirlist[i] = text;
-                            text = "ed " + text;
-                        }
-                    }
-                    newMsg = true;
-                    synth->getRuntime().configChanged = true;
-                    break;
-                }
-                case CONFIG::control::removePresetRootDir:
-                {
-                    int i = value;
-                    text = firstSynth->getRuntime().presetsDirlist[i];
-                    while (!firstSynth->getRuntime().presetsDirlist[i + 1].empty())
-                    {
-                        firstSynth->getRuntime().presetsDirlist[i] = firstSynth->getRuntime().presetsDirlist[i + 1];
-                        ++i;
-                    }
-                    firstSynth->getRuntime().presetsDirlist[i] = "";
-                    synth->getRuntime().currentPreset = 0;
-                    newMsg = true;
-                    synth->getRuntime().configChanged = true;
-                    break;
-                }
-                case CONFIG::control::currentPresetRoot:
-                {
-                    if (write)
-                    {
-                        synth->getRuntime().currentPreset = value;
-                        synth->getRuntime().configChanged = true;
-                    }
-                    else
-                        value = synth->getRuntime().currentPreset = value;
-                    text = firstSynth->getRuntime().presetsDirlist[value];
-                    newMsg = true;
-                    break;
-                }
-                case CONFIG::control::saveCurrentConfig:
-                    if (write)
-                    {
-                        text = synth->getRuntime().ConfigFile;
-                        if (synth->getRuntime().saveConfig())
-                            text = "d " + text;
-                        else
-                            text = " FAILED " + text;
-                    }
-                    else
-                        text = "READ";
-                    newMsg = true;
-                    getData->data.miscmsg = textMsgBuffer.push(text); // slightly odd case
-                    break;
-                case CONFIG::control::historyLock:
-                {
-                    if (write)
-                        synth->setHistoryLock(kititem, value);
-                    else
-                        value = synth->getHistoryLock(kititem);
-                    break;
-                }
-            }
-            if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
-                guiTo = true;
-            getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            value = indirectConfig(getData, synth, newMsg, guiTo, text);
             break;
         }
+
         case TOPLEVEL::section::message:
         {
             newMsg = true;
@@ -1407,6 +1282,143 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             synth->getRuntime().banksChecked = true;
         break;
     }
+    getData->data.source &= ~TOPLEVEL::action::lowPrio;
+    return value;
+}
+
+
+int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text)
+{
+    bool write = (getData->data.type & TOPLEVEL::type::Write);
+    int value = getData->data.value;
+    int control = getData->data.control;
+    int kititem = getData->data.kit;
+    switch (control)
+    {
+        case CONFIG::control::jackMidiSource:
+            if (write)
+            {
+                synth->getRuntime().jackMidiDevice = text;
+                synth->getRuntime().configChanged = true;
+            }
+            else
+                text = synth->getRuntime().jackMidiDevice;
+            newMsg = true;
+            break;
+        case CONFIG::control::jackServer:
+            if (write)
+            {
+                synth->getRuntime().jackServer = text;
+                synth->getRuntime().configChanged = true;
+            }
+            else
+                text = synth->getRuntime().jackServer;
+            newMsg = true;
+            break;
+        case CONFIG::control::alsaMidiSource:
+            if (write)
+            {
+                synth->getRuntime().alsaMidiDevice = text;
+                synth->getRuntime().configChanged = true;
+            }
+            else
+                text = synth->getRuntime().alsaMidiDevice;
+            newMsg = true;
+            break;
+        case CONFIG::control::alsaAudioDevice:
+            if (write)
+            {
+                synth->getRuntime().alsaAudioDevice = text;
+                synth->getRuntime().configChanged = true;
+            }
+            else
+                text = synth->getRuntime().alsaAudioDevice;
+            newMsg = true;
+            break;
+        case CONFIG::control::addPresetRootDir:
+        {
+            bool isOK = false;
+            if (isDirectory(text))
+                isOK= true;
+            else
+            {
+                if (createDir(text))
+                {
+                    text = " FAILED could not create " + text;
+                }
+                else
+                    isOK = true;
+            }
+            if (isOK)
+            {
+                int i = 0;
+                while (!firstSynth->getRuntime().presetsDirlist[i].empty())
+                    ++i;
+                if (i > (MAX_PRESETS - 2))
+                    text = " FAILED preset list full";
+                else
+                {
+                    firstSynth->getRuntime().presetsDirlist[i] = text;
+                    text = "ed " + text;
+                }
+            }
+            newMsg = true;
+            synth->getRuntime().configChanged = true;
+            break;
+        }
+        case CONFIG::control::removePresetRootDir:
+        {
+            int i = value;
+            text = firstSynth->getRuntime().presetsDirlist[i];
+            while (!firstSynth->getRuntime().presetsDirlist[i + 1].empty())
+            {
+                firstSynth->getRuntime().presetsDirlist[i] = firstSynth->getRuntime().presetsDirlist[i + 1];
+                ++i;
+            }
+            firstSynth->getRuntime().presetsDirlist[i] = "";
+            synth->getRuntime().currentPreset = 0;
+            newMsg = true;
+            synth->getRuntime().configChanged = true;
+            break;
+        }
+        case CONFIG::control::currentPresetRoot:
+        {
+            if (write)
+            {
+                synth->getRuntime().currentPreset = value;
+                synth->getRuntime().configChanged = true;
+            }
+            else
+                value = synth->getRuntime().currentPreset = value;
+            text = firstSynth->getRuntime().presetsDirlist[value];
+            newMsg = true;
+            break;
+        }
+        case CONFIG::control::saveCurrentConfig:
+            if (write)
+            {
+                text = synth->getRuntime().ConfigFile;
+                if (synth->getRuntime().saveConfig())
+                    text = "d " + text;
+                else
+                    text = " FAILED " + text;
+            }
+            else
+                text = "READ";
+            newMsg = true;
+            getData->data.miscmsg = textMsgBuffer.push(text); // slightly odd case
+            break;
+        case CONFIG::control::historyLock:
+        {
+            if (write)
+                synth->setHistoryLock(kititem, value);
+            else
+                value = synth->getHistoryLock(kititem);
+            break;
+        }
+    }
+    if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
+        guiTo = true;
     getData->data.source &= ~TOPLEVEL::action::lowPrio;
     return value;
 }
