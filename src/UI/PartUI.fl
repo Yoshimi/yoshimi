@@ -811,7 +811,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button sustain {
         label Sustain
         callback {//
-        send_data(0, 137, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::sustainPedalEnable, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Sustain pedal enable} xywh {225 81 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
       }

@@ -1862,84 +1862,14 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return false;
     }
 
-    if (engine == PART::engine::padSynth)
-    {
-        switch(insert)
-        {
-            case UNUSED:
-                commandPad(getData);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::LFOgroup:
-                commandLFO(getData);
-                break;
-            case TOPLEVEL::insert::filterGroup:
-                commandFilter(getData);
-                break;
-            case TOPLEVEL::insert::envelopeGroup:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::envelopePoints:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::envelopePointChange:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::oscillatorGroup:
-                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::harmonicAmplitude:
-                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::resonanceGroup:
-                commandResonance(getData, part->kit[kititem].padpars->resonance);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::resonanceGraphInsert:
-                commandResonance(getData, part->kit[kititem].padpars->resonance);
-                part->kit[kititem].padpars->presetsUpdated();
-                break;
-        }
-        return true;
-    }
+    if (engine == PART::engine::addSynth)
+        return processAdd(getData, synth);
 
     if (engine == PART::engine::subSynth)
-    {
-        switch (insert)
-        {
-            case UNUSED:
-                commandSub(getData);
-                part->kit[kititem].subpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::harmonicAmplitude:
-                commandSub(getData);
-                part->kit[kititem].subpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandSub(getData);
-                part->kit[kititem].subpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::filterGroup:
-                commandFilter(getData);
-                break;
-            case TOPLEVEL::insert::envelopeGroup:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::envelopePoints:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::envelopePointChange:
-                commandEnvelope(getData);
-                break;
-        }
-        return true;
-    }
+        return processSub(getData, synth);
+
+    if (engine == PART::engine::padSynth)
+        return processPad(getData, synth);
 
     if (engine >= PART::engine::addVoice1)
     {
@@ -1950,95 +1880,193 @@ bool InterChange::commandSendReal(CommandBlock *getData)
             synth->getRuntime().finishedCLI = true;
             return false;
         }
-        switch (insert)
-        {
-            case UNUSED:
-                commandAddVoice(getData);
-                part->kit[kititem].adpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::LFOgroup:
-                commandLFO(getData);
-                break;
-            case TOPLEVEL::insert::filterGroup:
-                commandFilter(getData);
-                break;
-            case TOPLEVEL::insert::envelopeGroup:
-            case TOPLEVEL::insert::envelopePoints:
-            case TOPLEVEL::insert::envelopePointChange:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::oscillatorGroup:
-            case TOPLEVEL::insert::harmonicAmplitude:
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                if (engine >= PART::engine::addMod1)
-                {
-                    engine -= PART::engine::addMod1;
-                    if (control != 113)
-                    {
-                        int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
-                        //std::cout << "ext Mod osc " << voicechange << std::endl;
-                        if (voicechange != -1)
-                        {
-                            engine = voicechange;
-                            getData->data.engine = engine +  PART::addMod1;
-                        }   // force it to external mod
-                    }
-
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscilFM);
-                }
-                else
-                {
-                    engine -= PART::engine::addVoice1;
-                    if (control != 137)
-                    {
-                        int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
-                        //std::cout << "ext voice osc " << voicechange << std::endl;
-                        if (voicechange != -1)
-                        {
-                            engine = voicechange;
-                            getData->data.engine = engine | PART::engine::addVoice1;
-                        }   // force it to external voice
-                    }
-
-                    commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscil);
-                }
-                part->kit[kititem].adpars->presetsUpdated();
-                break;
-        }
-        return true;
+        return processVoice(getData, synth);
     }
 
-    if (engine == PART::engine::addSynth)
-    {
-        switch (insert)
-        {
-            case UNUSED:
-                commandAdd(getData);
-                part->kit[kititem].adpars->presetsUpdated();
-                break;
-            case TOPLEVEL::insert::LFOgroup:
-                commandLFO(getData);
-                break;
-            case TOPLEVEL::insert::filterGroup:
-                commandFilter(getData);
-                break;
-            case TOPLEVEL::insert::envelopeGroup:
-            case TOPLEVEL::insert::envelopePoints:
-            case TOPLEVEL::insert::envelopePointChange:
-                commandEnvelope(getData);
-                break;
-            case TOPLEVEL::insert::resonanceGroup:
-            case TOPLEVEL::insert::resonanceGraphInsert:
-                commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
-                part->kit[kititem].adpars->presetsUpdated();
-                break;
-        }
-        return true;
-    }
     getData->data.source = TOPLEVEL::action::noAction;
     synth->getRuntime().Log("Invalid engine number");
     synth->getRuntime().finishedCLI = true;
     return false;
+}
+
+
+bool InterChange::processAdd(CommandBlock *getData, SynthEngine *synth)
+{
+    Part *part = synth->part[getData->data.part];
+    int kititem = getData->data.kit;
+    switch(getData->data.insert)
+    {
+        case UNUSED:
+            commandAdd(getData);
+            part->kit[kititem].adpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::LFOgroup:
+            commandLFO(getData);
+            break;
+        case TOPLEVEL::insert::filterGroup:
+            commandFilter(getData);
+            break;
+        case TOPLEVEL::insert::envelopeGroup:
+        case TOPLEVEL::insert::envelopePoints:
+        case TOPLEVEL::insert::envelopePointChange:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::resonanceGroup:
+        case TOPLEVEL::insert::resonanceGraphInsert:
+            commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
+            part->kit[kititem].adpars->presetsUpdated();
+            break;
+        }
+    return true;
+}
+
+
+bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
+{
+    Part *part = synth->part[getData->data.part];
+    int control = getData->data.control;
+    int kititem = getData->data.kit;
+    int engine = getData->data.engine;
+    switch(getData->data.insert)
+    {
+        case UNUSED:
+            commandAddVoice(getData);
+            part->kit[kititem].adpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::LFOgroup:
+            commandLFO(getData);
+            break;
+        case TOPLEVEL::insert::filterGroup:
+            commandFilter(getData);
+            break;
+        case TOPLEVEL::insert::envelopeGroup:
+        case TOPLEVEL::insert::envelopePoints:
+        case TOPLEVEL::insert::envelopePointChange:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::oscillatorGroup:
+        case TOPLEVEL::insert::harmonicAmplitude:
+        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            if (engine >= PART::engine::addMod1)
+            {
+                engine -= PART::engine::addMod1;
+                if (control != ADDVOICE::control::modulatorOscillatorSource)
+                {
+                    int voicechange = part->kit[kititem].adpars->VoicePar[engine].PextFMoscil;
+                    //std::cout << "ext Mod osc " << voicechange << std::endl;
+                    if (voicechange != -1)
+                    {
+                        engine = voicechange;
+                        getData->data.engine = engine +  PART::addMod1;
+                    }   // force it to external mod
+                }
+
+                commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscilFM);
+            }
+            else
+            {
+                engine -= PART::engine::addVoice1;
+                if (control != PART::control::sustainPedalEnable) // how can this ever be true!!!
+                {
+                    int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
+                    //std::cout << "ext voice osc " << voicechange << std::endl;
+                    if (voicechange != -1)
+                    {
+                        engine = voicechange;
+                        getData->data.engine = engine | PART::engine::addVoice1;
+                    }   // force it to external voice
+                }
+                commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscil);
+            }
+            part->kit[kititem].adpars->presetsUpdated();
+            break;
+    }
+    return true;
+}
+
+
+bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
+{
+    Part *part = synth->part[getData->data.part];
+    int kititem = getData->data.kit;
+    switch(getData->data.insert)
+    {
+        case UNUSED:
+            commandSub(getData);
+            part->kit[kititem].subpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::harmonicAmplitude:
+            commandSub(getData);
+            part->kit[kititem].subpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            commandSub(getData);
+            part->kit[kititem].subpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::filterGroup:
+            commandFilter(getData);
+            break;
+        case TOPLEVEL::insert::envelopeGroup:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::envelopePoints:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::envelopePointChange:
+            commandEnvelope(getData);
+            break;
+    }
+    return true;
+}
+
+
+bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
+{
+    Part *part = synth->part[getData->data.part];
+    int kititem = getData->data.kit;
+    switch(getData->data.insert)
+    {
+        case UNUSED:
+            commandPad(getData);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::LFOgroup:
+            commandLFO(getData);
+            break;
+        case TOPLEVEL::insert::filterGroup:
+            commandFilter(getData);
+            break;
+        case TOPLEVEL::insert::envelopeGroup:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::envelopePoints:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::envelopePointChange:
+            commandEnvelope(getData);
+            break;
+        case TOPLEVEL::insert::oscillatorGroup:
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::harmonicAmplitude:
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::resonanceGroup:
+            commandResonance(getData, part->kit[kititem].padpars->resonance);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+        case TOPLEVEL::insert::resonanceGraphInsert:
+            commandResonance(getData, part->kit[kititem].padpars->resonance);
+            part->kit[kititem].padpars->presetsUpdated();
+            break;
+    }
+    return true;
 }
 
 

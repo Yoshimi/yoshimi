@@ -1,5 +1,11 @@
 yoshimi 1.7.2 M
 
+2020-9-16 Will
+* Split out engine pocesses from commandSendReal.
+* Found and replaced 2 magic numbers.
+  Don't understand how sustainPedalEnable can ever be
+  relevant in addVoice! (InterChange.cpp line 1969);
+
 2020-9-11 Will
 * Fixed some confusing CLI info typos.
 * Corrected CLI anomaly with instrument default copyright.

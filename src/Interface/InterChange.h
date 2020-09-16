@@ -93,6 +93,10 @@ class InterChange : private DataText
         unsigned int swapRoot1;
         unsigned int swapBank1;
         unsigned int swapInstrument1;
+        bool processAdd(CommandBlock *getData, SynthEngine *synth);
+        bool processVoice(CommandBlock *getData, SynthEngine *synth);
+        bool processSub(CommandBlock *getData, SynthEngine *synth);
+        bool processPad(CommandBlock *getData, SynthEngine *synth);
 
         void commandMidi(CommandBlock *getData);
         void vectorClear(int Nvector);
