@@ -99,17 +99,7 @@ int WidgetPDial::handle(int event)
         if (event == FL_PUSH)
         {
             Fl::belowmouse(this); /* Ensures other widgets receive FL_RELEASE */
-            /*if (home > -0.5f && Fl::event_button() == 3)
-            {
-                value(home);
-                value_damage();
-                if (this->when() != 0)
-                    do_callback();
-                res = 1;
-                break;
-            }*/
-            //if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
-                do_callback();
+            do_callback();
             oldvalue = value();
         }
         my = -((Fl::event_y() - y()) * 2 - h());

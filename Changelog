@@ -1,5 +1,9 @@
 yoshimi 1.7.2 M
 
+2020-9-20 Will
+* Removed very old commented out WidgetPdial code.
+  It was a bit hacky and was long since superceded.
+
 2020-9-16 Will
 * Split out engine processes from commandSendReal.
 * Found and replaced 2 magic numbers.
