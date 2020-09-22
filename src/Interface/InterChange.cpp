@@ -385,7 +385,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     switch(switchNum)
     {
         case TOPLEVEL::section::vector:
-            value = indirectMidi(getData, synth, newMsg, guiTo, text);
+            value = indirectVector(getData, synth, newMsg, guiTo, text);
             break;
 
         case TOPLEVEL::section::midiIn: // program / bank / root

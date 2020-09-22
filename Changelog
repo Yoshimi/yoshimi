@@ -1,6 +1,10 @@
 yoshimi 1.7.2 M
 
 2020-9-20 Will
+* BugFix: Indirect vector not being called.
+  Copy and paste error :(
+
+2020-9-20 Will
 * Removed very old commented out WidgetPdial code.
   It was a bit hacky and was long since superceded.
 
