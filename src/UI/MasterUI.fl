@@ -2427,8 +2427,7 @@ Alan Calvert started the project}
   } {
     code {return synth;} {}
   }
-  Function {loadWindowData()} {open
-  } {
+  Function {loadWindowData()} {} {
     code {//
     int fetchX, fetchY, fetchO;
     loadWin(synth, fetchX, fetchY, fetchO, "mixer");
@@ -2467,6 +2466,8 @@ Alan Calvert started the project}
     vectorui->vectorwindow->position(fetchX, fetchY);
     if (fetchO)
         vectorui->vectorwindow->show();
+    else
+        vectorui->vectorwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "midiLearn");
     midilearnui->midilearnwindow->position(fetchX, fetchY);
     if (fetchO)
@@ -2482,6 +2483,8 @@ Alan Calvert started the project}
     loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi");
     if (fetchO)
         partui->ctlmidi->show();
+    else
+        partui->ctlmidi->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "partEdit");
     if (fetchO)
         partui->instrumenteditwindow->show();} {}

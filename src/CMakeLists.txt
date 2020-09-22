@@ -356,6 +356,7 @@ if (BuildWithFLTK)
         UI/DynamicTooltip.cpp
         UI/WidgetPDial.cpp
         UI/WidgetMWSlider.cpp
+        UI/YoshiWin.cpp
         UI/MiscGui.cpp
     )
     set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})

@@ -29,10 +29,11 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
+    \#include <iostream>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
 }
@@ -44,6 +45,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
+    \#include "UI/YoshiWin.h"
     \#include "Params/Controller.h"} {public global
 }
 
@@ -355,9 +357,10 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window partgroup {
       xywh {1112 270 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -1165,10 +1168,17 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window ctlmidi {
       label {MIDI Controls}
-      xywh {661 261 365 60} type Double hide
+      callback {//
+	//std::cout <<"event " << Fl::event() << std::endl;
+        if (Fl::event() == 10)
+            o->hide();
+        else if (Fl::event() == 11)
+            ctlmidiRtext();} open selected
+      xywh {661 261 365 60} type Double resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
       code1 {int fetchX, fetchY, fetchO; loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi"); o->position(fetchX, fetchY);}
       code2 {midiSeen = true;}
+      class YoshiWin visible
     } {
       Fl_Dial modulation {
         label Modulation
@@ -1210,7 +1220,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         code0 {o->value(part->ctl->bandwidth.data);}
         class WidgetPDial
       }
-      Fl_Button {} {
+      Fl_Button ctlmidiclose {
         label Close
         callback {//
                 ctlmidi->hide();}
@@ -2571,6 +2581,35 @@ class PartUI {: {public Fl_Group, PartUI_}
     filterq->value(part->ctl->filterq.data);
     filtercutoff->value(part->ctl->filtercutoff.data);
     masterbandwidth->value(part->ctl->bandwidth.data);} {}
+  }
+  Function {ctlmidiRtext()} {open
+  } {
+    code {//
+    float defW = 365;
+    float defH = 50;
+    float dW = ctlmidi->w() / defW;
+    float dH = ctlmidi->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    //int size = int(dScale * 10);
+    //std::cout << "In ctlmidi size " << size << std::endl;
+
+    modulation->labelsize(int(dScale * 10)-1);
+    expression->labelsize(int(dScale * 10)-1);
+    filterq->labelsize(int(dScale * 10)-1);
+    filtercutoff->labelsize(int(dScale * 10)-1);
+    masterbandwidth->labelsize(int(dScale * 10)-1);
+    ctlmidiclose->labelsize(int(dScale * 14)-1);
+    ctlmidi->redraw();} {}
+  }
+  Function {ctlRtext()} {} {
+    code {//
+    std::cout << "In ctl" << std::endl;} {}
   }
   Function {~PartUI()} {} {
     code {//

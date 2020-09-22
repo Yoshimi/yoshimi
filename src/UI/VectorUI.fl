@@ -29,7 +29,8 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-decl {\#include "UI/MiscGui.h"} {public local
+decl {\#include "UI/YoshiWin.h"
+      \#include "UI/MiscGui.h"} {public local
 }
 
 decl {\#include "BankUI.h"} {public local
@@ -57,13 +58,19 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class VectorUI {} {
-  Function {make_window(void)} {} {
+class VectorUI {open
+} {
+  Function {make_window(void)} {open
+  } {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
       callback {//
-      o->hide()}
-      xywh {245 162 375 295} type Double labelfont 13 labelsize 12 align 0 hide
+          if (Fl::event() == 10)
+              o->hide();
+          else if (Fl::event() == 11)
+              vectorRtext();} open
+      xywh {776 278 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
+      class YoshiWin
     } {
       Fl_Spinner setbasechan {
         label {Base Channel}
@@ -73,20 +80,20 @@ class VectorUI {} {
         tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
         code0 {o->value(BaseChan + 1);}
       }
-      Fl_Menu_Button {} {
+      Fl_Menu_Button options {
         label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
         code0 {(void) o; // suppress warning}
         code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
         code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
       } {
-        MenuItem {} {
+        MenuItem load {
           label Load
           callback {//
           loadVector("");}
           xywh {0 0 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem save {
           label Save
           callback {//
           bool ok = true;
@@ -133,13 +140,13 @@ class VectorUI {} {
           paramsui->Show(TOPLEVEL::XML::Vector);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
-        MenuItem {} {
+        MenuItem clearch {
           label {Clear Chan}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
           xywh {30 30 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem clearall {
           label {Clear All}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);}
@@ -147,7 +154,7 @@ class VectorUI {} {
         }
       }
       Fl_Group Xgroup {
-        label X open
+        label X
         xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
       } {
         Fl_Box AddBackL {
@@ -160,7 +167,7 @@ class VectorUI {} {
           xywh {127 53 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display XinstL {
-          private xywh {20 69 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          xywh {20 69 160 1} box NO_BOX labelsize 12 align 97 textsize 12
         }
         Fl_Button XL {
           callback {//
@@ -179,7 +186,7 @@ class VectorUI {} {
           xywh {127 115 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display XinstR {
-          private xywh {20 131 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          xywh {20 131 160 1} box NO_BOX labelsize 12 align 97 textsize 12
         }
         Fl_Button XR {
           callback {//
@@ -202,11 +209,11 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
-          MenuItem {} {
+          MenuItem X1off {
             label Off
             xywh {10 10 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X1vol {
             label Vol
             xywh {0 0 34 20} labelsize 12
           }
@@ -225,15 +232,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
-          MenuItem {} {
+          MenuItem X2off {
             label Off
             xywh {20 20 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X2pan {
             label Pan
             xywh {20 20 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X2panR {
             label {Pan R}
             xywh {40 40 34 20} labelsize 12
           }
@@ -252,15 +259,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
-          MenuItem {} {
+          MenuItem X3off {
             label Off
             xywh {30 30 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X3filt {
             label Filt
             xywh {30 30 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X3filtR {
             label {Filt R}
             xywh {40 40 34 20} labelsize 12
           }
@@ -279,15 +286,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
-          MenuItem {} {
+          MenuItem X4off {
             label Off
             xywh {40 40 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X4mod {
             label Mod
             xywh {50 50 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem X4modR {
             label {Mod R}
             xywh {40 40 34 20} labelsize 12
           }
@@ -382,11 +389,11 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
-          MenuItem {} {
+          MenuItem Y1off {
             label Off
             xywh {50 50 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y1vol {
             label Vol
             xywh {10 10 34 20} labelsize 12
           }
@@ -405,15 +412,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
-          MenuItem {} {
+          MenuItem Y2off {
             label Off
             xywh {60 60 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y2pan {
             label Pan
             xywh {30 30 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y2panR {
             label {Pan R}
             xywh {50 50 34 20} labelsize 12
           }
@@ -432,15 +439,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
         } {
-          MenuItem {} {
+          MenuItem Y3off {
             label Off
             xywh {70 70 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y3filt {
             label Filt
             xywh {40 40 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y3filtR {
             label {Filt R}
             xywh {50 50 34 20} labelsize 12
           }
@@ -459,15 +466,15 @@ class VectorUI {} {
           send_data(0, VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
         } {
-          MenuItem {} {
+          MenuItem Y4off {
             label Off
             xywh {80 80 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y4mod {
             label Mod
             xywh {50 50 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y4modR {
             label {Mod R}
             xywh {60 60 34 20} labelsize 12
           }
@@ -513,7 +520,7 @@ class VectorUI {} {
   }
   Function {send_data(int action, int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
-        if (control != 84 && control != 85 && control != 96)
+        if (control != 84 && control != 85 && control != VECTOR::control::erase)
         {
             insert = BaseChan;
         }
@@ -647,7 +654,7 @@ class VectorUI {} {
   }
   Function {~VectorUI()} {} {
     code {//
-    saveWin(synth, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");  
+    saveWin(synth, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
     vectorwindow->hide();
     delete  vectorwindow;} {}
   }
@@ -770,6 +777,78 @@ class VectorUI {} {
         Yfeat4->value(1);
     else
         Yfeat4->value(0);} {}
+  }
+  Function {vectorRtext()} {} {
+    code {//
+    float defW = 375;
+    float defH = 295;
+    float dW = vectorwindow->w() / defW;
+    float dH = vectorwindow->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    setbasechan->labelsize(int(dScale * 12));
+    setbasechan->textsize(int(dScale * 12));
+    options->labelsize(int(dScale * 12));
+        load->labelsize(int(dScale * 12));
+        save->labelsize(int(dScale * 12));
+        recenthistory->labelsize(int(dScale * 12));
+        clearch->labelsize(int(dScale * 12));
+        clearall->labelsize(int(dScale * 12));
+
+    Xgroup->labelsize(int(dScale * 16));
+    Xcontrol->labelsize(int(dScale * 12));
+        Xcontrol->textsize(int(dScale * 12));
+    XinstL->labelsize(int(dScale * 12));
+    XinstR->labelsize(int(dScale * 12));
+    Xfeat->labelsize(int(dScale * 12));
+    Xfeat1->labelsize(int(dScale * 12));
+        X1off->labelsize(int(dScale * 12));
+        X1vol->labelsize(int(dScale * 12));
+    Xfeat2->labelsize(int(dScale * 12));
+        X2off->labelsize(int(dScale * 12));
+        X2pan->labelsize(int(dScale * 12));
+        X2panR->labelsize(int(dScale * 12));
+    Xfeat3->labelsize(int(dScale * 12));
+        X3off->labelsize(int(dScale * 12));
+        X3filt->labelsize(int(dScale * 12));
+        X3filtR->labelsize(int(dScale * 12));
+    Xfeat4->labelsize(int(dScale * 12));
+        X4off->labelsize(int(dScale * 12));
+        X4mod->labelsize(int(dScale * 12));
+        X4modR->labelsize(int(dScale * 12));
+
+    Ygroup->labelsize(int(dScale * 16));
+    Ycontrol->labelsize(int(dScale * 12));
+        Ycontrol->textsize(int(dScale * 12));
+    YinstU->labelsize(int(dScale * 12));
+    YinstD->labelsize(int(dScale * 12));
+    Yfeat->labelsize(int(dScale * 12));
+    Yfeat1->labelsize(int(dScale * 12));
+        Y1off->labelsize(int(dScale * 12));
+        Y1vol->labelsize(int(dScale * 12));
+    Yfeat2->labelsize(int(dScale * 12));
+        Y2off->labelsize(int(dScale * 12));
+        Y2pan->labelsize(int(dScale * 12));
+        Y2panR->labelsize(int(dScale * 12));
+    Yfeat3->labelsize(int(dScale * 12));
+        Y3off->labelsize(int(dScale * 12));
+        Y3filt->labelsize(int(dScale * 12));
+        Y3filtR->labelsize(int(dScale * 12));
+    Yfeat4->labelsize(int(dScale * 12));
+        Y4off->labelsize(int(dScale * 12));
+        Y4mod->labelsize(int(dScale * 12));
+        Y4modR->labelsize(int(dScale * 12));
+
+    Loaded->labelsize(int(dScale * 12));
+    Closevector->labelsize(int(dScale * 12));
+
+    vectorwindow->redraw();} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
