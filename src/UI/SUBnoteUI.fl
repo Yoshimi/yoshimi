@@ -29,10 +29,11 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
-decl {\#include "UI/MiscGui.h"} {public local
+decl {\#include "UI/MiscGui.h"
+     \#include "UI/YoshiWin.h"} {public local
 }
 
 decl {\#include "UI/WidgetPDial.h"} {public local
@@ -68,10 +69,9 @@ decl {\#include "Misc/SynthHelper.h"
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
-  Function {make_window()} {private
-  } {
+  Function {make_window()} {} {
     Fl_Window harmonic {
-      xywh {801 500 50 300} type Double box NO_BOX hide
+      xywh {801 500 50 300} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -86,8 +86,7 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->value(x);
         }
 
-        send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);
-	}
+        send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
         tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX minimum 127 maximum 0 step 1 value 127
         code0 {o->value(pars->Phmag[n]);}
         code1 {o->setValueType(VC_SubHarmonicMagnitude); o->useCustomTip(true);}
@@ -101,10 +100,8 @@ class SUBnoteharmonic {: {public Fl_Group}
         else
             o->value(0);
 
-        send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);
-
-	}
-        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1 value 0
+        send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
         code2 {o->value(pars->Phrelbw[n] - 64);}
@@ -143,8 +140,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   Function {refresh()} {} {
     code {//
     mag->value(pars->Phmag[n]);
-    bw->value(pars->Phrelbw[n] - 64);
-    } {}
+    bw->value(pars->Phrelbw[n] - 64);} {}
   }
   Function {~SUBnoteharmonic()} {} {
     code {//
@@ -163,18 +159,25 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_}
+class SUBnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     comment {randompan MUST be placed after panwidth} {in_source in_header
     }
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {1125 435 735 470} type Double hide
+      callback {//
+          if (Fl::event() == 10)
+              o->hide();
+          else if (Fl::event() == 11)
+              subRtext();} open selected
+      xywh {1086 469 735 470} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
+      class YoshiWin
     } {
-      Fl_Scroll {} {
+      Fl_Scroll {} {open
         xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
@@ -504,7 +507,7 @@ class SUBnoteUI {: {public PresetsUI_}
         }
       }
       Fl_Group globalfiltergroup {
-        label { FILTER }
+        label { FILTER } open
         xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
         code0 {if (pars->PGlobalFilterEnabled==0) o->deactivate();}
       } {
@@ -679,6 +682,28 @@ class SUBnoteUI {: {public PresetsUI_}
     freqenvelopegroup->refresh();
     filterui->refresh();
     filterenv->refresh();} {}
+  }
+  Function {subRtext()} {open
+  } {
+    code {//
+    /*float defW = 375;
+    float defH = 295;
+    float dW = SUBparameters->w() / defW;
+    float dH = SUBparameters->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    
+     for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
+     {
+        // ?
+     }*/
+
+    SUBparameters->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//

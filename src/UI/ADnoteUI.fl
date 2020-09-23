@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -50,6 +50,9 @@ decl {\#include <string>
     \#include "OscilGenUI.h"} {public global
 }
 
+decl {\#include "UI/YoshiWin.h"} {private global
+}
+
 decl {\#include "MasterUI.h"} {private global
 }
 
@@ -65,7 +68,7 @@ class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
-      xywh {117 302 635 30} type Double box ENGRAVED_BOX hide
+      xywh {125 238 635 30} type Double box ENGRAVED_BOX hide
       class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
@@ -375,7 +378,7 @@ else
   }
 }
 
-class ADvoiceUI {: {public Fl_Group}
+class ADvoiceUI {open : {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
@@ -1767,17 +1770,23 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {: {public PresetsUI_}
+class ADnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     comment {globalrandompan MUST be after globalwidth} {in_source in_header
     }
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      xywh {151 81 535 405} type Double hide
+      callback {//
+     if (Fl::event() == 10)
+         o->hide();
+     else if (Fl::event() == 11)
+        addRtext();} open
+      xywh {190 83 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
+      class YoshiWin
     } {
       Fl_Group {} {
         label FREQUENCY
@@ -2188,8 +2197,12 @@ else if (voiceTabs->value() == g8)
     }
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
-      xywh {101 233 705 260} type Double hide
+      callback {//
+        if (Fl::event() == 10)
+            o->hide();} selected
+      xywh {101 233 705 260} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
+      class YoshiWin visible
     } {
       Fl_Text_Display {} {
         label {No.}
@@ -2444,7 +2457,8 @@ switch (num)
         delete ADnoteVoice;
         delete resui;} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open
+  } {
     code {//
         globalvolume->value(pars->GlobalPar.PVolume);
         vsns->value(pars->GlobalPar.PAmpVelocityScaleFunction);
@@ -2483,6 +2497,27 @@ switch (num)
         resui->refresh();
         editVoice(nvoice);
         //currentvoicecounter->do_callback();} {}
+  }
+  Function {addRtext()} {open
+  } {
+    code {//
+    float defW = 535;
+    float defH = 405;
+    float dW = ADnoteGlobalParameters->w() / defW;
+    float dH =  ADnoteGlobalParameters->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+     
+    amplfo->lfoRtext(dScale);
+    freqlfo->lfoRtext(dScale);
+    filterlfo->lfoRtext(dScale);
+
+    ADnoteGlobalParameters->redraw();} {}
   }
   Function {editVoice(int nvoice_)} {return_type void
   } {
