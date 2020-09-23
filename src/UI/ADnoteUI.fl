@@ -2199,10 +2199,10 @@ else if (voiceTabs->value() == g8)
       label {ADsynth Voices list}
       callback {//
         if (Fl::event() == 10)
-            o->hide();} selected
-      xywh {101 233 705 260} type Double
+            o->hide();}
+      xywh {101 233 705 260} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
-      class YoshiWin visible
+      class YoshiWin
     } {
       Fl_Text_Display {} {
         label {No.}
@@ -2517,7 +2517,10 @@ switch (num)
     freqlfo->lfoRtext(dScale);
     filterlfo->lfoRtext(dScale);
 
-    ADnoteGlobalParameters->redraw();} {}
+    filterui->filterRtext(dScale);
+
+    ADnoteGlobalParameters->redraw();} {selected
+    }
   }
   Function {editVoice(int nvoice_)} {return_type void
   } {

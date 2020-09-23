@@ -78,13 +78,12 @@ decl {class FilterUI;} {public global
 }
 
 decl {\#include "Misc/FormatFuncs.h"
-    using func::asString;
-} {private local
+    using func::asString;} {private local
 }
+
 decl {\#include "Misc/NumericFuncs.h"
     using func::rap2dB;
-    using func::limit;
-} {private local
+    using func::limit;} {private local
 }
 
 class FormantFilterGraph {: {public Fl_Box}
@@ -353,7 +352,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -376,7 +375,7 @@ pars=NULL;
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {               Filter Params}
+        label {               Filter Params} open
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -386,39 +385,39 @@ pars=NULL;
           tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
-          MenuItem {} {
+          MenuItem anlpf {
             label LPF1
             xywh {40 40 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anhpf {
             label HPF1
             xywh {50 50 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anlpf2 {
             label LPF2
             xywh {60 60 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anhpf2 {
             label HPF2
             xywh {70 70 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anbpf2 {
             label BPF2
             xywh {82 82 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem annf2 {
             label NF2
             xywh {94 94 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anpkf2 {
             label PkF2
             xywh {104 104 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anlsh2 {
             label LSh2
             xywh {114 114 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem anhsh2 {
             label HSh2
             xywh {124 124 100 20} labelfont 1 labelsize 10
           }
@@ -430,19 +429,19 @@ pars=NULL;
           tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
-          MenuItem {} {
+          MenuItem svlpf {
             label 1LPF
             xywh {134 134 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem svhpf {
             label 1HPF
             xywh {144 144 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem svbpf {
             label 1BPF
             xywh {154 154 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem svnf {
             label 1NF
             xywh {164 164 100 20} labelfont 1 labelsize 10
           }
@@ -454,15 +453,15 @@ pars=NULL;
           tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
-          MenuItem {} {
+          MenuItem analog {
             label Analog
             xywh {50 50 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem formant {
             label Formant
             xywh {60 60 100 20} labelfont 1 labelsize 10
           }
-          MenuItem {} {
+          MenuItem stvar {
             label StVarF
             xywh {70 70 100 20} labelfont 1 labelsize 10
           }
@@ -522,23 +521,47 @@ pars=NULL;
         Fl_Choice stcounter {
           label St
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value(), TOPLEVEL::type::Write);
+
+// stages has been fixed at 5 (current max stages) until a programatic
+// way can be found to set names (rather than text)}
           tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {74 10 35 15} down_box BORDER_BOX labelsize 10 align 8 textfont 1 textsize 10
-          code1 {for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};}
+          code1 {/*for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};*/}
           code2 {o->value(pars->Pstages);}
-        } {}
+        } {
+          MenuItem stage1 {
+            label x1
+            xywh {0 0 35 15} labelfont 1 labelsize 10
+          }
+          MenuItem stage2 {
+            label x2
+            xywh {10 10 35 15} labelfont 1 labelsize 10
+          }
+          MenuItem stage3 {
+            label x3
+            xywh {20 20 35 15} labelfont 1 labelsize 10
+          }
+          MenuItem stage4 {
+            label x4
+            xywh {30 30 35 15} labelfont 1 labelsize 10
+          }
+          MenuItem stage5 {
+            label x5
+            xywh {40 40 35 15} labelfont 1 labelsize 10
+          }
+        }
       }
       Fl_Button editbutton {
         label Edit
         callback {formantparswindow->show();}
         xywh {5 40 52 26} box PLASTIC_UP_BOX labelfont 1 labelsize 11
       }
-      Fl_Button {} {
+      Fl_Button filtC {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
-      Fl_Button {} {
+      Fl_Button filtP {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
@@ -551,7 +574,8 @@ pars=NULL;
       }
     }
   }
-  Function {make_formant_window()} {} {
+  Function {make_formant_window()} {open
+  } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
       xywh {89 20 700 205} type Double labelfont 1 labelsize 12 hide
@@ -800,6 +824,55 @@ pars=NULL;
             cfreqdial->label("BS.pos");
         }
         filterparamswindow->redraw();} {}
+  }
+  Function {filterRtext(float dScale)} {} {
+    code {//
+            //printf("scale %f\\n", dScale);
+            int size = int(dScale * 10);
+
+            filterparamswindow->labelsize(size);
+
+            cfreqdial->labelsize(size);
+            qdial->labelsize(size);
+            freqtrdial->labelsize(size);
+            vsnsadial->labelsize(size);
+            gaindial->labelsize(size);
+
+            filtertype->labelsize(size);
+            analog->labelsize(size);
+            formant->labelsize(size);
+            stvar->labelsize(size);
+
+
+            stcounter->labelsize(size);
+            stage1->labelsize(size);
+            stage2->labelsize(size);
+            stage3->labelsize(size);
+            stage4->labelsize(size);
+            stage5->labelsize(size);
+
+            analogfiltertypechoice->labelsize(size);
+            anlpf->labelsize(size);
+            anhpf->labelsize(size);
+            anlpf2->labelsize(size);
+            anhpf2->labelsize(size);
+            anbpf2->labelsize(size);
+            annf2->labelsize(size);
+            anpkf2->labelsize(size);
+            anlsh2->labelsize(size);
+            anhsh2->labelsize(size);
+
+            svfiltertypechoice->labelsize(size);
+            svlpf->labelsize(size);
+            svhpf->labelsize(size);
+            svbpf->labelsize(size);
+            svnf->labelsize(size);
+
+            editbutton->labelsize(size);
+            filtC->labelsize(size);
+            filtP->labelsize(size);
+
+            freqtrackoffset->labelsize(size);} {}
   }
   Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int offset = UNUSED)} {} {
     code {//
