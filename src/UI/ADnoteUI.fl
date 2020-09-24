@@ -2512,12 +2512,18 @@ switch (num)
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-     
+
     amplfo->lfoRtext(dScale);
     freqlfo->lfoRtext(dScale);
     filterlfo->lfoRtext(dScale);
 
+    ampenv->envRtext(dScale);
+    freqenv->envRtext(dScale);
+    filterenv->envRtext(dScale);
+
     filterui->filterRtext(dScale);
+
+
 
     ADnoteGlobalParameters->redraw();} {selected
     }

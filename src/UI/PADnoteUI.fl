@@ -1084,14 +1084,18 @@ class PADnoteUI {open : {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-    
+
     amplfo->lfoRtext(dScale);
     freqlfo->lfoRtext(dScale);
     filterlfo->lfoRtext(dScale);
 
+    ampenv->envRtext(dScale);
+    freqenv->envRtext(dScale);
+    filterenv->envRtext(dScale);
+
     filterui->filterRtext(dScale);
 
-    
+
     padnotewindow->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {

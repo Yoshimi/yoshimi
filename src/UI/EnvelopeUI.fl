@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -313,7 +313,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {: {public Fl_Group,PresetsUI_}
+class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -443,11 +443,11 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     }
   }
   Function {make_ADSR_window()} {} {
-    Fl_Window envADSR {open
+    Fl_Window envADSR {
       xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
       class Fl_Group
     } {
-      Fl_Group {} {
+      Fl_Group e1name {
         label {Amplitude Env}
         xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
@@ -503,7 +503,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
         }
-        Fl_Button {} {
+        Fl_Button e1E {
           label E
           callback {freemodeeditwindow->show();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
@@ -516,13 +516,13 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
-        Fl_Button {} {
+        Fl_Button e1C {
           label C
           callback {//
           synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Button {} {
+        Fl_Button e1P {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
@@ -535,7 +535,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       xywh {1183 190 210 70} type Double hide
       class Fl_Group
     } {
-      Fl_Group {} {
+      Fl_Group e2name {
         label {Frequency Env}
         xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
@@ -591,18 +591,18 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
-        Fl_Button {} {
+        Fl_Button e2C {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Button {} {
+        Fl_Button e2P {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
-      Fl_Button {} {
+      Fl_Button e2E {
         label E
         callback {freemodeeditwindow->show();
         send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
@@ -615,7 +615,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       xywh {1121 294 275 70} type Double color 50 labelfont 1 hide
       class Fl_Group
     } {
-      Fl_Group {} {
+      Fl_Group e3name {
         label {Filter Envelope}
         xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
@@ -689,21 +689,21 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
-        Fl_Button {} {
+        Fl_Button e3E {
           label E
           callback {//
           freemodeeditwindow->show();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
-        Fl_Button {} {
+        Fl_Button e3C {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Button {} {
+        Fl_Button e3P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);} selected
           xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -714,7 +714,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       xywh {1209 649 210 70} type Double hide
       class Fl_Group
     } {
-      Fl_Group {} {
+      Fl_Group e4name {
         label {BandWidth Env}
         xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
@@ -770,18 +770,18 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
-        Fl_Button {} {
+        Fl_Button e4C {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Button {} {
+        Fl_Button e4P {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
-      Fl_Button {} {
+      Fl_Button e4E {
         label E
         callback {freemodeeditwindow->show();
         send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
@@ -805,18 +805,18 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           code0 {o->init(env, npart, kititem, engine, group);}
           class EnvelopeFreeEdit
         }
-        Fl_Button {} {
+        Fl_Button efE {
           label E
           callback {freemodeeditwindow->show();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
-        Fl_Button {} {
+        Fl_Button efC {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Button {} {
+        Fl_Button efP {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
@@ -1229,6 +1229,63 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     envwindow->resize(this->x(),this->y(),this->w(),this->h());
 
     envwindow->show();} {}
+  }
+  Function {envRtext(float dScale)} {open
+  } {
+    code {//
+        int size = int(dScale * 10);
+        
+        e1name->labelsize(size);
+        e1adt->labelsize(size);
+        e1ddt->labelsize(size);
+        e1rdt->labelsize(size);
+        e1sval->labelsize(size);
+        e1forcedrelease->labelsize(size);
+        e1envstretch->labelsize(size);
+        e1E->labelsize(size);
+        e1linearenvelope->labelsize(size);
+        e1C->labelsize(size);
+        e1P->labelsize(size);
+        
+        e2name->labelsize(size);
+        e2aval->labelsize(size);
+        e2adt->labelsize(size);
+        e2rval->labelsize(size);
+        e2rdt->labelsize(size);
+        e2envstretch->labelsize(size);
+        e2forcedrelease->labelsize(size);
+        e2C->labelsize(size);
+        e2P->labelsize(size);
+        e2E->labelsize(size);
+        
+        e3name->labelsize(size);
+        e3aval->labelsize(size);
+        e3adt->labelsize(size);
+        e3dval->labelsize(size);
+        e3ddt->labelsize(size);
+        e3rval->labelsize(size);
+        e3rdt->labelsize(size);
+        e3envstretch->labelsize(size);
+        e3forcedrelease->labelsize(size);
+        e3C->labelsize(size);
+        e3P->labelsize(size);
+        e3E->labelsize(size);
+        
+        e4name->labelsize(size);
+        e4aval->labelsize(size);
+        e4adt->labelsize(size);
+        e4rval->labelsize(size);
+        e4rdt->labelsize(size);
+        e4envstretch->labelsize(size);
+        e4forcedrelease->labelsize(size);
+        e4C->labelsize(size);
+        e4P->labelsize(size);
+        e4E->labelsize(size);
+        
+        freeeditsmall->labelsize(size);
+        efC->labelsize(size);
+        efP->labelsize(size);
+        efE->labelsize(size);} {}
   }
   Function {setAmpSusVType(bool linear)} {return_type void
   } {
