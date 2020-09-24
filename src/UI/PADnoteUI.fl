@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -43,6 +43,9 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
+}
+
+decl {\#include "UI/YoshiWin.h"} {private global
 }
 
 decl {\#include "ResonanceUI.h"
@@ -238,23 +241,30 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {: {public PresetsUI_}
+class PADnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     comment {randompan MUST be after panwidth} {in_source in_header
     }
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {42 52 535 450} type Double hide
+      callback {//
+          if (Fl::event() == 10)
+              o->hide();
+          else if (Fl::event() == 11)
+              padRtext();} open selected
+      xywh {184 49 535 450} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
+      class YoshiWin
     } {
       Fl_Tabs {} {
         callback {//
             if (o->value() != harmonicstructuregroup)
                 applybutton->hide();
             else
-                applybutton->show();}
+                applybutton->show();} open
         xywh {0 0 535 405}
       } {
         Fl_Group harmonicstructuregroup {
@@ -775,7 +785,7 @@ class PADnoteUI {: {public PresetsUI_}
           }
         }
         Fl_Group {} {
-          label {Envelopes&LFOs}
+          label {Envelopes&LFOs} open
           xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Box {} {
@@ -1059,6 +1069,30 @@ class PADnoteUI {: {public PresetsUI_}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX color 51 labelfont 1 labelsize 12 align 128
       }
     }
+  }
+  Function {padRtext()} {open
+  } {
+    code {//
+    float defW = 535;
+    float defH = 450;
+    float dW =  padnotewindow->w() / defW;
+    float dH =  padnotewindow->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    
+    amplfo->lfoRtext(dScale);
+    freqlfo->lfoRtext(dScale);
+    filterlfo->lfoRtext(dScale);
+
+    filterui->filterRtext(dScale);
+
+    
+    padnotewindow->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {
     code {//

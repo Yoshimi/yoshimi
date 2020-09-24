@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -369,13 +369,14 @@ pars=NULL;
         hide();
         delete (formantparswindow);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window filterui {
       xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {               Filter Params} open
+        label {               Filter Params}
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -518,37 +519,14 @@ pars=NULL;
           code1 {o->setValueType(VC_FilterGain);}
           class WidgetPDial
         }
-        Fl_Choice stcounter {
-          label St
+        Fl_Counter stcounter {
+          label {St.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value(), TOPLEVEL::type::Write);
-
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value() - 1, TOPLEVEL::type::Write);
+         
 // stages has been fixed at 5 (current max stages) until a programatic
-// way can be found to set names (rather than text)}
-          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {74 10 35 15} down_box BORDER_BOX labelsize 10 align 8 textfont 1 textsize 10
-          code1 {/*for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};*/}
-          code2 {o->value(pars->Pstages);}
-        } {
-          MenuItem stage1 {
-            label x1
-            xywh {0 0 35 15} labelfont 1 labelsize 10
-          }
-          MenuItem stage2 {
-            label x2
-            xywh {10 10 35 15} labelfont 1 labelsize 10
-          }
-          MenuItem stage3 {
-            label x3
-            xywh {20 20 35 15} labelfont 1 labelsize 10
-          }
-          MenuItem stage4 {
-            label x4
-            xywh {30 30 35 15} labelfont 1 labelsize 10
-          }
-          MenuItem stage5 {
-            label x5
-            xywh {40 40 35 15} labelfont 1 labelsize 10
-          }
+// way can be found to set max to this value}
+          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {78 10 31 15} type Simple labelsize 10 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10
         }
       }
       Fl_Button editbutton {
@@ -577,7 +555,7 @@ pars=NULL;
   Function {make_formant_window()} {open
   } {
     Fl_Window formantparswindow {
-      label {Formant Filter Parameters}
+      label {Formant Filter Parameters} selected
       xywh {89 20 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {
@@ -795,7 +773,7 @@ pars=NULL;
         qdial->value(pars->Pq);
         freqtrdial->value(pars->Pfreqtrack);
         gaindial->value(pars->Pgain);
-        stcounter->value(pars->Pstages);
+        stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
         int categ = pars->Pcategory;
 
         if (categ == 0 || categ == 2)
@@ -836,6 +814,7 @@ pars=NULL;
             qdial->labelsize(size);
             freqtrdial->labelsize(size);
             vsnsadial->labelsize(size);
+            vsnsdial->labelsize(size);
             gaindial->labelsize(size);
 
             filtertype->labelsize(size);
@@ -845,11 +824,7 @@ pars=NULL;
 
 
             stcounter->labelsize(size);
-            stage1->labelsize(size);
-            stage2->labelsize(size);
-            stage3->labelsize(size);
-            stage4->labelsize(size);
-            stage5->labelsize(size);
+            stcounter->textsize(size);
 
             analogfiltertypechoice->labelsize(size);
             anlpf->labelsize(size);
@@ -879,6 +854,11 @@ pars=NULL;
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::filterGroup, parameter, offset);} {}
   }
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
+  } {
+    code {//
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
+  }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
@@ -887,6 +867,8 @@ pars=NULL;
     unsigned char kititem = getData->data.kit;
     unsigned char eng = getData->data.engine;
     int value_int = lrint(value);
+    
+    bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
 
     if (part != npart || (kititem != EFFECT::type::dynFilter && eng != engine))
         return;
@@ -934,7 +916,8 @@ pars=NULL;
             break;
 
         case FILTERINSERT::control::stages:
-            stcounter->value(value_int);
+            if (!fromUs)
+                stcounter->value(value_int + 1);
             formantfiltergraph->redraw();
             break;
 
@@ -1063,6 +1046,7 @@ pars=NULL;
     else
         vsnsdial->value(*velsns);
     switchcategory(pars->Pcategory);
+    stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
     formantparswindow->label(this->label());
     update_formant_window();} {}
   }
