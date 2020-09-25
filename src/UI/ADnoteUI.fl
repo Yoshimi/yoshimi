@@ -2520,7 +2520,8 @@ switch (num)
         editVoice(nvoice);
         //currentvoicecounter->do_callback();} {}
   }
-  Function {addRtext()} {} {
+  Function {addRtext()} {open
+  } {
     code {//
     float defW = 535;
     float defH = 405;
@@ -2546,7 +2547,8 @@ switch (num)
 
 
 
-    ADnoteGlobalParameters->redraw();} {}
+    ADnoteGlobalParameters->redraw();} {selected
+    }
   }
   Function {addVoiceRtext()} {} {
     code {//
@@ -2585,8 +2587,7 @@ switch (num)
         advoice->init(pars, npart, kititem, nvoice);
         advoice->show();
         ADnoteVoice->redraw();
-        ADnoteVoice->show();} {selected
-    }
+        ADnoteVoice->show();} {}
   }
   decl {ADnoteParameters *pars;} {private local
   }

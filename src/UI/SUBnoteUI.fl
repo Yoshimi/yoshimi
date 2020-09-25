@@ -71,7 +71,7 @@ class SUBnoteharmonic {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window harmonic {
-      xywh {801 500 50 300} type Double box NO_BOX hide resizable
+      xywh {800 500 50 300} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -101,17 +101,17 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->value(0);
 
         send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
-        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 126} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 128} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
         code2 {o->value(pars->Phrelbw[n] - 64);}
         class PSlider
       }
-      Fl_Box {} {
-        xywh {15 228 5 3} box FLAT_BOX color 39
+      Fl_Box h_dash {
+        xywh {16 227 10 3} box FLAT_BOX color 39
         code0 {if (n+1==MAX_SUB_HARMONICS) o->hide();}
       }
-      Fl_Box {} {
+      Fl_Box h_num {
         label 01
         xywh {0 142 15 15} labelfont 1 labelsize 12 align 16
         code0 {char tmp[12];snprintf(tmp,12,"%d",n+1);o->label(strdup(tmp));}
@@ -171,17 +171,17 @@ class SUBnoteUI {open : {public PresetsUI_}
           if (Fl::event() == 10)
               o->hide();
           else if (Fl::event() == 11)
-              subRtext();} open selected
-      xywh {1086 469 735 470} type Double hide
+              subRtext();} open
+      xywh {1086 469 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
       class YoshiWin
     } {
-      Fl_Scroll {} {open
+      Fl_Scroll frame {open
         xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
-          xywh {5 148 435 290} type HORIZONTAL
+          xywh {4 148 435 290} type HORIZONTAL resizable
           code0 {new Fl_Box(0,0,9,o->h());}
           code1 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,20,o->h(),"");h[i]->init(pars, i, npart, kititem);}}
           code2 {new Fl_Box(0,0,3,o->h());}
@@ -686,8 +686,8 @@ class SUBnoteUI {open : {public PresetsUI_}
   Function {subRtext()} {open
   } {
     code {//
-    /*float defW = 375;
-    float defH = 295;
+    float defW = 735;
+    float defH = 470;
     float dW = SUBparameters->w() / defW;
     float dH = SUBparameters->h() / defH;
     float dScale;
@@ -697,13 +697,26 @@ class SUBnoteUI {open : {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-    
-     for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
-     {
-        // ?
-     }*/
 
-    SUBparameters->redraw();} {}
+    ampenv->envRtext(dScale);
+    bandwidthenvelopegroup->envRtext(dScale);
+    filterenv->envRtext(dScale);
+    freqenvelopegroup->envRtext(dScale);
+    
+    filterui->filterRtext(dScale);
+    
+    frame->size(int(435 * dW), int(326 * dH));
+    harmonics->size(int(435 * dW), int(295 * dH));
+    
+    for (int i=0;i<MAX_SUB_HARMONICS;i++)
+    {
+        h[i]->size(20 * dW, 300 * dH);
+        h[i]->h_num->labelsize(int(12 * dScale));
+        h[i]->h_dash->size(int(10 * dW), int(3 * dH));
+    }
+
+    SUBparameters->redraw();} {selected
+    }
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
