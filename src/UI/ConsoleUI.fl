@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -28,6 +28,9 @@ decl {\#include <string>} {public local
 }
 
 decl {\#include "FL/Fl_Text_Display.H"} {public local
+}
+
+decl {\#include "UI/YoshiWin.h"} {public local
 }
 
 decl {using namespace std;} {public local
@@ -47,7 +50,7 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   Function {scroll_to_last_line()} {return_type void
   } {
     code {//
-    if (mVScrollBar->visible() &&
+   if (mVScrollBar->visible() &&
        mVScrollBar->value() > mNBufferLines - mNVisibleLines)
     {
         insert_position(mBuffer->length());
@@ -56,15 +59,21 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   }
 }
 
-class ConsoleUI {} {
+class ConsoleUI {open
+} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
-      callback {o->hide()}
+      callback {//
+     if (Fl::event() == 10)
+         o->hide();
+     else if (Fl::event() == 11)
+        consoleRtext();}
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
+      class YoshiWin
     } {
       Fl_Text_Display logText {
-        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35
+        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35 resizable
         class ConsoleTextDisplay
       }
     }
@@ -96,5 +105,24 @@ class ConsoleUI {} {
   decl {Fl_Text_Buffer *txtbuf;} {private local
   }
   decl {int bufsize;} {private local
+  }
+  Function {consoleRtext()} {open
+  } {
+    code {//
+    float defW = 385;
+    float defH = 185;
+    float dW = logConsole->w() / defW;
+    float dH =  logConsole->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    logText->textsize(int(dScale * 13));
+    logConsole->redraw();} {selected
+    }
   }
 }
