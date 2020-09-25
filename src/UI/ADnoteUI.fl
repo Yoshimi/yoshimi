@@ -380,21 +380,22 @@ else
 
 class ADvoiceUI {open : {public Fl_Group}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
-      xywh {208 251 760 610} type Double box NO_BOX hide
+      label Voice open
+      xywh {208 251 760 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
       Fl_Box {} {
         xywh {8 71 233 64} box PLASTIC_THIN_UP_BOX color 223
       }
-      Fl_Group voiceparametersgroup {
+      Fl_Group voiceparametersgroup {open
         xywh {0 0 760 615} box THIN_UP_FRAME color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
-        Fl_Group voicemodegroup {
+        Fl_Group voicemodegroup {open
           xywh {0 0 760 615}
         } {
           Fl_Group voiceFMparametersgroup {
@@ -1044,7 +1045,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           }
         }
         Fl_Group voicefiltergroup {
-          label {FILTER      }
+          label {FILTER      } open
           xywh {245 35 285 245} box UP_FRAME labelfont 1 labelsize 12 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
@@ -1713,6 +1714,30 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
 }} {}
   }
+  Function {voiceRtext(float dScale)} {open
+  } {
+    code {//
+   voiceamplfogroup->lfoRtext(dScale);
+   voiceampenvgroup->envRtext(dScale);
+   
+   voicefilterlfogroup->lfoRtext(dScale);
+   voicefilterenvgroup->envRtext(dScale);
+   
+   voicefreqlfogroup->lfoRtext(dScale);
+   voicefreqenvgroup->envRtext(dScale);
+
+   voicefilter->filterRtext(dScale);
+   
+   
+    //freqlfo->lfoRtext(dScale);
+    //filterlfo->lfoRtext(dScale);
+
+   // ADnoteVoiceenvRtext[nvoice](dScale);
+    //freqenv->envRtext(dScale);
+    //filterenv->envRtext(dScale);
+
+    //filterui->filterRtext(dScale);} {}
+  }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
         synth = parameters->getSynthEngine();
@@ -1782,7 +1807,7 @@ class ADnoteUI {open : {public PresetsUI_}
      if (Fl::event() == 10)
          o->hide();
      else if (Fl::event() == 11)
-        addRtext();} open
+        addRtext();}
       xywh {190 83 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
@@ -2075,8 +2100,14 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     }
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters}
-      xywh {594 95 760 610} type Double hide
+      callback {//
+     if (Fl::event() == 10)
+         o->hide();
+     else if (Fl::event() == 11)
+        addVoiceRtext();} open
+      xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
+      class YoshiWin
     } {
       Fl_Spinner currentvoicecounter {
         label {Current Voice}
@@ -2429,7 +2460,8 @@ switch (num)
 
     }} {}
   }
-  Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
+  Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {open
+  } {
     code {//
         synth = parameters->getSynthEngine();
         pars = parameters;
@@ -2498,8 +2530,7 @@ switch (num)
         editVoice(nvoice);
         //currentvoicecounter->do_callback();} {}
   }
-  Function {addRtext()} {open
-  } {
+  Function {addRtext()} {} {
     code {//
     float defW = 535;
     float defH = 405;
@@ -2525,23 +2556,53 @@ switch (num)
 
 
 
-    ADnoteGlobalParameters->redraw();} {selected
-    }
+    ADnoteGlobalParameters->redraw();} {}
   }
-  Function {editVoice(int nvoice_)} {return_type void
+  Function {addVoiceRtext()} {open
+  } {
+    code {//
+    float defW = 760;
+    float defH = 610;
+    float dW = ADnoteVoice->w() / defW;
+    float dH =  ADnoteVoice->h() / defH;
+    float dScale;
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    advoice->voiceRtext(dScale);
+   
+
+
+   ADnoteVoice->redraw();} {}
+  }
+  Function {editVoice(int nvoice_)} {open return_type void
   } {
     code {//
         nvoice = nvoice_;
         advoice->hide();
+        int X = ADnoteVoice->x();
+        int Y = ADnoteVoice->y();
+        int W = ADnoteVoice->w();
+        int H = ADnoteVoice->h();
+        float dW = W / 765;
+        float dH = H / 585;
         ADnoteVoice->remove(advoice);
         delete advoice;
         advoice = new ADvoiceUI(0, 0, 765, 585);
+        ADnoteVoice->resize(X, Y,765*dW, 585*dH);
+        advoice->resize(X, Y,765*dW, 585*dH);
         ADnoteVoice->add(advoice);
+
         //currentvoicecounter->value(nvoice + 1);
         advoice->init(pars, npart, kititem, nvoice);
         advoice->show();
         ADnoteVoice->redraw();
-        ADnoteVoice->show();} {}
+        ADnoteVoice->show();} {selected
+    }
   }
   decl {ADnoteParameters *pars;} {private local
   }
