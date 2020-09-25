@@ -383,7 +383,7 @@ class ADvoiceUI {open : {public Fl_Group}
   Function {make_window()} {open
   } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
+      label Voice
       xywh {208 251 760 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
@@ -1726,17 +1726,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    voicefreqlfogroup->lfoRtext(dScale);
    voicefreqenvgroup->envRtext(dScale);
 
-   voicefilter->filterRtext(dScale);
-   
-   
-    //freqlfo->lfoRtext(dScale);
-    //filterlfo->lfoRtext(dScale);
-
-   // ADnoteVoiceenvRtext[nvoice](dScale);
-    //freqenv->envRtext(dScale);
-    //filterenv->envRtext(dScale);
-
-    //filterui->filterRtext(dScale);} {}
+   voicefilter->filterRtext(dScale);} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
@@ -1797,7 +1787,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
 class ADnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     comment {globalrandompan MUST be after globalwidth} {in_source in_header
     }
@@ -2558,13 +2548,14 @@ switch (num)
 
     ADnoteGlobalParameters->redraw();} {}
   }
-  Function {addVoiceRtext()} {open
-  } {
+  Function {addVoiceRtext()} {} {
     code {//
     float defW = 760;
     float defH = 610;
-    float dW = ADnoteVoice->w() / defW;
-    float dH =  ADnoteVoice->h() / defH;
+    float dW;
+    float dH;
+    dW = ADnoteVoice->w() / defW;
+    dH =  ADnoteVoice->h() / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -2576,28 +2567,21 @@ switch (num)
     advoice->voiceRtext(dScale);
    
 
-
    ADnoteVoice->redraw();} {}
   }
   Function {editVoice(int nvoice_)} {open return_type void
   } {
     code {//
         nvoice = nvoice_;
+        
+        int adW = advoice->w();
+        int adH = advoice->h();
         advoice->hide();
-        int X = ADnoteVoice->x();
-        int Y = ADnoteVoice->y();
-        int W = ADnoteVoice->w();
-        int H = ADnoteVoice->h();
-        float dW = W / 765;
-        float dH = H / 585;
         ADnoteVoice->remove(advoice);
         delete advoice;
-        advoice = new ADvoiceUI(0, 0, 765, 585);
-        ADnoteVoice->resize(X, Y,765*dW, 585*dH);
-        advoice->resize(X, Y,765*dW, 585*dH);
+        
+        advoice = new ADvoiceUI(0, 0, adW, adH);
         ADnoteVoice->add(advoice);
-
-        //currentvoicecounter->value(nvoice + 1);
         advoice->init(pars, npart, kititem, nvoice);
         advoice->show();
         ADnoteVoice->redraw();
