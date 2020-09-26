@@ -29,6 +29,9 @@ This file is derivative of ZynAddSubFX original code.
 decl {\#include <cmath>} {public local
 }
 
+decl {\#include <FL/Fl_File_Chooser.H>} {public local
+}
+
 decl {\#include "UI/YoshiWin.h"} {public local
 }
 
@@ -791,14 +794,14 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button close {
         label {Close Unsaved}
         callback {//
-                    configwindow->do_callback();}
+                    configwindow->hide()}
         xywh {275 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button save {
         label {Save and Close}
         callback {//
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push("DUMMY"));
-                    configwindow->do_callback();}
+                    configwindow->hide();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1029,7 +1032,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
                 case CONFIG::control::alsaSampleRate:
                     alsaSamplerate->value(convertSrate(value_int));
-                    Fl::check();
                     break;
                 case CONFIG::control::addPresetRootDir:
                 case CONFIG::control::removePresetRootDir:
@@ -1043,7 +1045,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     else
                         readpresetcfg();
                     break;
-                };
+                }
                 case CONFIG::control::bankRootCC:
                     switch (value_int)
                     {
