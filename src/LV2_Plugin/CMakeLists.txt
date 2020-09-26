@@ -104,6 +104,7 @@ set (FltkUI_sources
     ../UI/DynamicTooltip.cpp
     ../UI/WidgetPDial.cpp
     ../UI/WidgetMWSlider.cpp
+    ../UI/YoshiWin.cpp
 )
 
 add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
