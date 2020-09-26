@@ -849,18 +849,18 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         xywh {210 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
       }
-      Fl_Button {} {
+      Fl_Button pSave {
         label {Save and Close}
         callback {//
                     synth->getRuntime().saveConfig();
                     presets->hide();}
-        xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
+        xywh {208 268 118 20} box THIN_UP_BOX labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button pClose {
         label {Close Unsaved}
         callback {//
                     presets->hide();}
-        xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
+        xywh {334 268 118 20} box THIN_UP_BOX labelsize 12
       }
     }
   }
@@ -1484,6 +1484,15 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
+    
+    int size = int(12 * dScale);
+    addpreset->labelsize(size);
+    removepresetbutton->labelsize(size);
+    makedefaultpresetbutton->labelsize(size);
+    pSave->labelsize(size);
+    pClose->labelsize(size);
+    
+    presetbrowse->textsize(size);
 
     presets->redraw();} {}
   }

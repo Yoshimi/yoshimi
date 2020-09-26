@@ -2434,34 +2434,50 @@ Alan Calvert started the project}
     panelwindow->position(fetchX, fetchY);
     if (fetchO)
         mixerpanel->do_callback();
+    else
+        mixerpanel->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "bankInst");
     bankui->instrumentuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->instrumentuiwindow->show();
+    else
+        bankui->instrumentuiwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "bankBank");
     bankui->bankuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->bankuiwindow->show();
+    else
+        bankui->bankuiwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "bankRoot");
     bankui->rootuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->rootuiwindow->show();
+    else
+        bankui->rootuiwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "vertKeyb");
     virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
     if (fetchO)
         virkeyboard->virkeyboardwindow->show();
+    else
+        virkeyboard->virkeyboardwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "config");
     configui->configwindow->position(fetchX, fetchY);
     if (fetchO)
         configui->Show(); // this does some initialising
+    else
+        configui->configwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "log");
     yoshiLog->logConsole->position(fetchX, fetchY);
     if (fetchO)
         yoshiLog->logConsole->show();
+    else
+        yoshiLog->logConsole->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "scales");
     microtonalui->microtonaluiwindow->position(fetchX, fetchY);
     if (fetchO)
         microtonalui->microtonaluiwindow->show();
+    else
+        microtonalui->microtonaluiwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "vector");
     vectorui->vectorwindow->position(fetchX, fetchY);
     if (fetchO)
@@ -2472,6 +2488,8 @@ Alan Calvert started the project}
     midilearnui->midilearnwindow->position(fetchX, fetchY);
     if (fetchO)
         midilearnui->midilearnwindow->show();
+    else
+        midilearnui->midilearnwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "ctlWin");
     if (fetchO)
     {
@@ -2479,6 +2497,8 @@ Alan Calvert started the project}
         loadWin(synth, fetchX, fetchY, fetchO, "afterT");
         if (fetchO)
             partui->aftertouchcontrol->show();
+        else
+            partui->aftertouchcontrol->hide();
     }
     loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi");
     if (fetchO)
@@ -2487,11 +2507,13 @@ Alan Calvert started the project}
         partui->ctlmidi->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "partEdit");
     if (fetchO)
-        partui->instrumenteditwindow->show();} {}
+        partui->instrumenteditwindow->show();
+    else
+        partui->instrumenteditwindow->hide();} {}
   }
   Function {checkBuffer(void)} {} {
     code {//
-read_updates(synth);} {}
+            read_updates(synth);} {}
   }
   decl {ConfigUI *configui;} {public local
   }
