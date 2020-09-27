@@ -2435,7 +2435,7 @@ Alan Calvert started the project}
     if (fetchO)
         mixerpanel->do_callback();
     else
-        mixerpanel->hide();
+        panelwindow->hide();
     loadWin(synth, fetchX, fetchY, fetchO, "bankInst");
     bankui->instrumentuiwindow->position(fetchX, fetchY);
     if (fetchO)
