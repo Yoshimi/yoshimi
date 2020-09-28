@@ -316,7 +316,7 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem {} {
             label {&Settings...}
-            callback {configui->Show();}
+            callback {configui->Show(synth);}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
           }
           MenuItem {} {
@@ -477,7 +477,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem {} {
             label {&Preset Dirs...}
             callback {//
-            configui->presets->show();}
+            configui->Showpresets(synth);}
             xywh {0 0 34 20} labelsize 12
           }
         }
@@ -667,7 +667,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button vectors {
           label Vectors
           callback {//
-          vectorui->vectorwindow->show();}
+          vectorui->Show(synth);}
           tooltip {Vector Setup Window} xywh {203 30 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
@@ -2436,58 +2436,61 @@ Alan Calvert started the project}
         mixerpanel->do_callback();
     else
         panelwindow->hide();
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankInst");
     bankui->instrumentuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->instrumentuiwindow->show();
     else
         bankui->instrumentuiwindow->hide();
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankBank");
     bankui->bankuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->bankuiwindow->show();
     else
         bankui->bankuiwindow->hide();
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankRoot");
     bankui->rootuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->rootuiwindow->show();
     else
         bankui->rootuiwindow->hide();
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vertKeyb");
     virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
     if (fetchO)
         virkeyboard->virkeyboardwindow->show();
     else
         virkeyboard->virkeyboardwindow->hide();
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "config");
-    configui->configwindow->position(fetchX, fetchY);
-    if (fetchO)
-        configui->Show(); // this does some initialising
-    else
-        configui->configwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "log");
-    if (fetchO)
+    //loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "config");
+    //configui->configwindow->position(fetchX, fetchY);
+    //if (fetchO)
+    if (lastSeen(synth, "config"))
+        configui->Show(synth); // this does some initialising
+
+    if (lastSeen(synth, "log"))
         yoshiLog->Show(synth);
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "scales");
     microtonalui->microtonaluiwindow->position(fetchX, fetchY);
     if (fetchO)
         microtonalui->microtonaluiwindow->show();
     else
         microtonalui->microtonaluiwindow->hide();
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vector");
-    vectorui->vectorwindow->position(fetchX, fetchY);
-    if (fetchO)
-        vectorui->vectorwindow->show();
-    else
-        vectorui->vectorwindow->hide();
+
+    if (lastSeen(synth, "vector"))
+        vectorui->Show(synth);
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "midiLearn");
     midilearnui->midilearnwindow->position(fetchX, fetchY);
     if (fetchO)
         midilearnui->midilearnwindow->show();
     else
         midilearnui->midilearnwindow->hide();
+
     if (lastSeen(synth, "ctlWin"))
     {
         partui->ctlwindow->show();
@@ -2496,8 +2499,10 @@ Alan Calvert started the project}
         else
             partui->aftertouchcontrol->hide();
     }
+
     if (lastSeen(synth, "ctlmidi"))
         partui->Showctlmidi();
+
     if (lastSeen(synth, "partEdit"))
         partui->instrumenteditwindow->show();
     else

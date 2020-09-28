@@ -2201,7 +2201,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     subnoteui = NULL;
     padnoteui = NULL;
     ctlSeen = false;
-    midiSeen = false;
     ATSeen = false;
     editSeen = false;
     kitSeen = false;
@@ -2577,8 +2576,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (fetchW > 0 && fetchH > 0)
         ctlmidi->size(fetchW, fetchH);
     ctlmidi->resizable();
-    ctlmidi->show();
-    midiSeen = true;} {}
+    ctlmidi->show();} {}
   }
   Function {ctlmidirefresh()} {} {
     code {//
@@ -2633,8 +2631,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         saveWin(synth, 0, 0, ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     ctlwindow->hide();
     delete ctlwindow;
-    if (midiSeen)
-        saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
+    saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
     if (efxSeen)
@@ -2689,8 +2686,6 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {int keyATselection;} {private local
   }
   decl {bool ctlSeen;} {public local
-  }
-  decl {bool midiSeen;} {public local
   }
   decl {bool ATSeen;} {public local
   }

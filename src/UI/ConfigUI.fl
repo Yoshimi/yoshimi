@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -60,7 +60,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {open
+class ConfigUI {selected
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -1125,9 +1125,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {~ConfigUI()} {} {
     code {//
-        saveWin(synth, 0, 0,configwindow->x(), configwindow->y(), configwindow->visible(), "config");
-        if (presetseen)
-            saveWin(synth, 0, 0, presets->x(), presets->y(), presets->visible(), "presets");
+        saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), configwindow->visible(), "config");
+        saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), presets->visible(), "presets");
+        presets->hide();
         configwindow->hide();
         delete configwindow;} {}
   }
@@ -1310,7 +1310,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
     }} {}
   }
-  Function {Show()} {} {
+  Function {Show(SynthEngine *synth)} {} {
     code {//
                     if (synth->getIsLV2Plugin() == false && synth->getUniqueId() == 0)
                         singleMaster->show();
@@ -1320,7 +1320,24 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         alsaSource->activate();
                     else
                         alsaSource->deactivate();
+                        
+                    int fetchW, fetchH, fetchX, fetchY, fetchO;
+                    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "config");
+                    configwindow->position(fetchX, fetchY);
+                    if (fetchW > 0 && fetchH > 0)
+                       configwindow->size(fetchW, fetchH);
+                    configwindow->resizable();
                     configwindow->show();} {}
+  }
+  Function {Showpresets(SynthEngine *synth)} {} {
+    code {//                    
+                    int fetchW, fetchH, fetchX, fetchY, fetchO;
+                    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");
+                    presets->position(fetchX, fetchY);
+                    if (fetchW > 0 && fetchH > 0)
+                       presets->size(fetchW, fetchH);
+                    presets->resizable();
+                    presets->show();} {}
   }
   Function {configRtext()} {} {
     code {//

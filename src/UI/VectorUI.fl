@@ -58,17 +58,15 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class VectorUI {open
-} {
-  Function {make_window(void)} {open
-  } {
+class VectorUI {} {
+  Function {make_window(void)} {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
       callback {//
           if (Fl::event() == 10)
               o->hide();
           else if (Fl::event() == 11)
-              vectorRtext();} open
+              vectorRtext();}
       xywh {776 278 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
       class YoshiWin
     } {
@@ -517,6 +515,7 @@ class VectorUI {open
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
+    code {printf("Hello, World!\\n");} {}
   }
   Function {send_data(int action, int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -654,9 +653,9 @@ class VectorUI {open
   }
   Function {~VectorUI()} {} {
     code {//
-    saveWin(synth, 0, 0, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
-    vectorwindow->hide();
-    delete  vectorwindow;} {}
+        saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
+        vectorwindow->hide();
+        delete  vectorwindow;} {}
   }
   Function {updateAll(bool everything = true)} {} {
     code {//
@@ -694,6 +693,16 @@ class VectorUI {open
     }
     Loaded->copy_label(loadlabel[0].c_str());
     setbasechan->value(1);} {}
+  }
+  Function {Show(SynthEngine *synth)} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vector");
+    vectorwindow->position(fetchX, fetchY);
+    if (fetchW > 0 && fetchH > 0)
+        vectorwindow->size(fetchW, fetchH);
+    vectorwindow->resizable();
+    vectorwindow->show();} {}
   }
   Function {setbuttons()} {} {
     code {//
