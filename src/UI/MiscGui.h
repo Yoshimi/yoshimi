@@ -187,5 +187,12 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
     }
 }
 
+inline bool lastSeen(SynthEngine *synth, std::string filename)
+{
+    int w, h, x, y, o;
+    loadWin(synth, w, h, x, y, o, filename);
+    return o;
+}
+
 
 #endif

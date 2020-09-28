@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -59,8 +59,7 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   }
 }
 
-class ConsoleUI {open
-} {
+class ConsoleUI {} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
@@ -78,8 +77,9 @@ class ConsoleUI {open
       }
     }
   }
-  Function {ConsoleUI()} {} {
+  Function {ConsoleUI(SynthEngine *_synth)} {} {
     code {//
+    synth = _synth;
     bufsize = 8192;
     make_window();
     txtbuf = new Fl_Text_Buffer(bufsize);
@@ -89,7 +89,8 @@ class ConsoleUI {open
     code {//
       //if (NULL != txtbuf)
          // delete txtbuf;
-
+      //if (logSeen)
+      saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), logConsole->visible(), "log");
       logConsole->hide();
       delete logConsole;} {}
   }
@@ -106,8 +107,7 @@ class ConsoleUI {open
   }
   decl {int bufsize;} {private local
   }
-  Function {consoleRtext()} {open
-  } {
+  Function {consoleRtext()} {} {
     code {//
     float defW = 385;
     float defH = 185;
@@ -122,7 +122,21 @@ class ConsoleUI {open
         dScale = 0.2f;
 
     logText->textsize(int(dScale * 13));
-    logConsole->redraw();} {selected
-    }
+    logConsole->redraw();} {}
+  }
+  Function {Show(SynthEngine *synth)} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "log");
+    logConsole->position(fetchX, fetchY);
+    if (fetchW > 0 && fetchH > 0)
+        logConsole->size(fetchW, fetchH);
+    logConsole->resizable();
+    logConsole->show();
+    logSeen = true;} {}
+  }
+  decl {bool logSeen;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 }

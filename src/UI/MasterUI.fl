@@ -187,7 +187,7 @@ class MasterUI {: {private GuiUpdates}
       paramsui = new ParametersUI(synth);
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
-      yoshiLog = new ConsoleUI();
+      yoshiLog = new ConsoleUI(synth);
       openedit = false;
       make_window();
 
@@ -321,7 +321,7 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem {} {
             label {&Reports...}
-            callback {yoshiLog->logConsole->show();}
+            callback {yoshiLog->Show(synth);}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
@@ -2405,7 +2405,7 @@ Alan Calvert started the project}
   Function {setLogging(bool isConsole)} {} {
     code {//
     if (isConsole)
-        yoshiLog->logConsole->show();
+        yoshiLog->Show(synth);
     else
         yoshiLog->logConsole->hide();} {}
   }
@@ -2466,12 +2466,10 @@ Alan Calvert started the project}
         configui->Show(); // this does some initialising
     else
         configui->configwindow->hide();
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "log");
-    yoshiLog->logConsole->position(fetchX, fetchY);
     if (fetchO)
-        yoshiLog->logConsole->show();
-    else
-        yoshiLog->logConsole->hide();
+        yoshiLog->Show(synth);
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "scales");
     microtonalui->microtonaluiwindow->position(fetchX, fetchY);
     if (fetchO)
@@ -2490,21 +2488,17 @@ Alan Calvert started the project}
         midilearnui->midilearnwindow->show();
     else
         midilearnui->midilearnwindow->hide();
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin");
-    if (fetchO)
+    if (lastSeen(synth, "ctlWin"))
     {
         partui->ctlwindow->show();
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT");
-        if (fetchO)
+        if (lastSeen(synth, "afterT"))
             partui->aftertouchcontrol->show();
         else
             partui->aftertouchcontrol->hide();
     }
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
-    if (fetchO)
+    if (lastSeen(synth, "ctlmidi"))
         partui->Showctlmidi();
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit");
-    if (fetchO)
+    if (lastSeen(synth, "partEdit"))
         partui->instrumenteditwindow->show();
     else
         partui->instrumenteditwindow->hide();} {}
