@@ -568,7 +568,7 @@ class ResonanceUI {: PresetsUI_
   } {
     code {
             if (resSeen)
-                saveWin(synth, resonancewindow->x(), resonancewindow->y(), resonancewindow->visible(), "resonWin");
+                saveWin(synth, 0, 0, resonancewindow->x(), resonancewindow->y(), resonancewindow->visible(), "resonWin");
             resonancewindow->hide();} {}
   }
   Function {redrawPADnoteApply()} {} {
@@ -617,8 +617,8 @@ class ResonanceUI {: PresetsUI_
         tname = "PadSynth Resonance ";
     if (!resSeen)
     {
-        int fetchX, fetchY, fetchO;
-        loadWin(synth, fetchX, fetchY, fetchO, "resonWin");
+        int fetchW, fetchH, fetchX, fetchY, fetchO;
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "resonWin");
         resonancewindow->position(fetchX, fetchY);
         resSeen = true;
     }

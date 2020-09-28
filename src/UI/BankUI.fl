@@ -1103,13 +1103,13 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
   Function {~BankUI()} {return_type virtual
   } {
     code {//
-        saveWin(synth, instrumentuiwindow->x(), instrumentuiwindow->y(), instrumentuiwindow->visible(), "bankInst");
+        saveWin(synth, 0, 0, instrumentuiwindow->x(), instrumentuiwindow->y(), instrumentuiwindow->visible(), "bankInst");
         instrumentuiwindow->hide();
         delete instrumentuiwindow;
-        saveWin(synth,  bankuiwindow->x(),  bankuiwindow->y(),  bankuiwindow->visible(), "bankBank");
+        saveWin(synth, 0, 0,  bankuiwindow->x(),  bankuiwindow->y(),  bankuiwindow->visible(), "bankBank");
         bankuiwindow->hide();
         delete bankuiwindow;
-        saveWin(synth,  rootuiwindow->x(),  rootuiwindow->y(), rootuiwindow->visible(), "bankRoot");
+        saveWin(synth, 0, 0,  rootuiwindow->x(),  rootuiwindow->y(), rootuiwindow->visible(), "bankRoot");
         rootuiwindow->hide();
         delete rootuiwindow;} {}
   }

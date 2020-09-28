@@ -741,7 +741,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       label Controllers
       xywh {748 171 505 130} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
-      code1 {int fetchX, fetchY, fetchO; loadWin(synth, fetchX, fetchY, fetchO, "ctlWin"); o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin"); o->position(fetchX, fetchY);}
       code2 {ctlSeen = true;}
     } {
       Fl_Dial volrng {
@@ -976,7 +976,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window aftertouchcontrol {
       label Aftertouch
       xywh {1207 59 485 180} type Double hide
-      code1 {int X, Y, O; loadWin(synth, X, Y, O, "afterT"); o->position(X, Y); ATSeen = true;}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT"); o->position(fetchX, fetchY); ATSeen = true;}
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME
@@ -1176,7 +1176,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             ctlmidiRtext();}
       xywh {661 261 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
-      code1 {int fetchX, fetchY, fetchO; loadWin(synth, fetchX, fetchY, fetchO, "ctlmidi"); o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi"); o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Dial modulation {
@@ -1230,7 +1230,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       label {Part's Insert Effects}
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
-      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "partEfx");o->position(fetchX, fetchY);efxSeen = true;}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");o->position(fetchX, fetchY);efxSeen = true;}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -1354,7 +1354,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       label {Instrument Kit}
       xywh {355 84 670 370} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
-      code1 {int fetchX, fetchY, fetchO; loadWin(synth, fetchX, fetchY, fetchO, "partKit"); o->position(fetchX, fetchY); kitSeen = true;}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partKit"); o->position(fetchX, fetchY); kitSeen = true;}
     } {
       Fl_Button {} {
         label Close
@@ -1454,7 +1454,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {1245 202 395 385} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
-      code2 {int fetchX, fetchY, fetchO; loadWin(synth, fetchX, fetchY, fetchO, "partEdit"); o->position(fetchX, fetchY); editSeen = true;}
+      code2 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit"); o->position(fetchX, fetchY); editSeen = true;}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -2620,27 +2620,27 @@ class PartUI {: {public Fl_Group, PartUI_}
         delete padnoteui;
     partgroup->hide();
     if (ATSeen)
-        saveWin(synth, aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
+        saveWin(synth, 0, 0, aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
     if (ctlSeen)
-        saveWin(synth, ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
+        saveWin(synth, 0, 0, ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     ctlwindow->hide();
     delete ctlwindow;
     if (midiSeen)
-        saveWin(synth, ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
+        saveWin(synth, 0, 0, ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
     if (efxSeen)
-        saveWin(synth, partfx->x(), partfx->y(), partfx->visible(), "partEfx");
+        saveWin(synth, 0, 0, partfx->x(), partfx->y(), partfx->visible(), "partEfx");
     partfx->hide();
     delete partfx;
     if (kitSeen)
-        saveWin(synth, instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
+        saveWin(synth, 0, 0, instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
     instrumentkitlist->hide();
     delete instrumentkitlist;
     if (editSeen)
-        saveWin(synth, instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
+        saveWin(synth, 0, 0, instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
     instrumenteditwindow->hide();
     delete instrumenteditwindow;} {}
   }

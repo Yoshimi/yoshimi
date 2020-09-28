@@ -137,29 +137,31 @@ private:
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
 };
 
-inline void saveWin(SynthEngine *synth, int x, int y, int o, std::string filename)
+inline void saveWin(SynthEngine *synth, int w, int h, int x, int y, int o, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
-    std::string values =  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(o);
+    std::string values =  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(w) + " " + std::to_string(h) + " " + std::to_string(o);
     //std::cout << values << std::endl;
     saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
 }
 
-inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string filename)
+inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";;
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
     //std::cout << synth->getRuntime().ConfigDir << "/windows/" << ID << filename << std::endl;
+    w = h = o = 0;
     if (values == "")
     {
         x = y = 80;
-        o = 0;
     }
     else
     {
         size_t pos = values.find(' ');
         if (pos == string::npos)
+        {
             x = y = 80;
+        }
         else
         {
             x = stoi(values.substr(0, pos));
@@ -168,8 +170,19 @@ inline void loadWin(SynthEngine *synth, int& x, int& y, int& o, std::string file
             y = stoi(values.substr(pos));
             if (y < 10)
                 y = 10;
-            o = stoi(values.substr(values.rfind(' ')));
-            //std::cout << "x " << x << "   y " << y <<  "   o " << o << std::endl;
+            pos = values.find(' ', pos + 1);
+            if (pos == string::npos)
+                return;
+            w = stoi(values.substr(pos));
+            pos = values.find(' ', pos + 1);
+            if (pos == string::npos)
+                return;
+            h = stoi(values.substr(pos));
+            pos = values.find(' ', pos + 1);
+            if (pos == string::npos)
+                return;
+            o = stoi(values.substr(pos));
+            std::cout << "x " << x << "   y " << y  << "   w " << w << "   h " << h <<  "   o " << o << "  " << filename << std::endl;
         }
     }
 }

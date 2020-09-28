@@ -654,7 +654,7 @@ class VectorUI {open
   }
   Function {~VectorUI()} {} {
     code {//
-    saveWin(synth, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
+    saveWin(synth, 0, 0, vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
     vectorwindow->hide();
     delete  vectorwindow;} {}
   }

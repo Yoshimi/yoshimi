@@ -1800,7 +1800,7 @@ class ADnoteUI {open : {public PresetsUI_}
         addRtext();}
       xywh {190 83 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Group {} {
@@ -2025,10 +2025,10 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
-            int fetchX, fetchY, fetchO;
+            int fetchW, fetchH, fetchX, fetchY, fetchO;
             if (!listSeen)
             {
-                loadWin(synth, fetchX, fetchY, fetchO, "adList");
+                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adList");
                 ADnoteVoiceList->position(fetchX, fetchY);
                 listSeen = true;
             }
@@ -2041,10 +2041,10 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         label {Show Voice Parameters}
         callback {//
     voicelistitem[nvoice]->refreshlist();
-    int fetchX, fetchY, fetchO;
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
     if (!voiceSeen)
     {
-        loadWin(synth, fetchX, fetchY, fetchO, "adVoice");
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adVoice");
         ADnoteVoice->position(fetchX, fetchY);
         voiceSeen = true;
     }
@@ -2466,12 +2466,12 @@ switch (num)
   } {
     code {//
         if (listSeen)
-            saveWin(synth, ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
+            saveWin(synth, 0, 0, ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
-        saveWin(synth, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
+        saveWin(synth, 0, 0, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
         ADnoteGlobalParameters->hide();
         if (voiceSeen)
-            saveWin(synth, ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
+            saveWin(synth, 0, 0, ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
         ADnoteVoice->hide();
         delete ADnoteVoiceList;
         delete ADnoteGlobalParameters;

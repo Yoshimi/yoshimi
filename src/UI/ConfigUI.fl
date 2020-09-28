@@ -813,7 +813,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         presetsRtext();}
       xywh {5 437 460 295} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
-      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "presets");o->position(fetchX, fetchY); presetseen = true;}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");o->position(fetchX, fetchY); presetseen = true;}
       class YoshiWin
     } {
       Fl_Browser presetbrowse {
@@ -1125,9 +1125,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {~ConfigUI()} {} {
     code {//
-        saveWin(synth,configwindow->x(), configwindow->y(), configwindow->visible(), "config");
+        saveWin(synth, 0, 0,configwindow->x(), configwindow->y(), configwindow->visible(), "config");
         if (presetseen)
-            saveWin(synth, presets->x(), presets->y(), presets->visible(), "presets");
+            saveWin(synth, 0, 0, presets->x(), presets->y(), presets->visible(), "presets");
         configwindow->hide();
         delete configwindow;} {}
   }

@@ -622,7 +622,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   Function {~VirKeyboard()} {} {
     code {//
-    saveWin(synth, virkeyboardwindow->x(), virkeyboardwindow->y(), virkeyboardwindow->visible(), "vertKeyb");
+    saveWin(synth, 0, 0, virkeyboardwindow->x(), virkeyboardwindow->y(), virkeyboardwindow->visible(), "vertKeyb");
     virkeyboardwindow->hide();
     delete virkeyboardwindow;} {}
   }

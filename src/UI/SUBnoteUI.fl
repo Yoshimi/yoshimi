@@ -174,7 +174,7 @@ class SUBnoteUI {open : {public PresetsUI_}
               subRtext();} open
       xywh {1086 469 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
-      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "sub");o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Scroll frame {open
@@ -892,7 +892,7 @@ class SUBnoteUI {open : {public PresetsUI_}
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
-    saveWin(synth, SUBparameters->x(),SUBparameters->y(), SUBparameters->visible(), "sub");
+    saveWin(synth, 0, 0, SUBparameters->x(),SUBparameters->y(), SUBparameters->visible(), "sub");
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }

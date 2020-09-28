@@ -543,7 +543,7 @@ class MicrotonalUI {} {
   }
   Function {~MicrotonalUI()} {} {
     code {//
-    saveWin(synth, microtonaluiwindow->x(), microtonaluiwindow->y(), microtonaluiwindow->visible(), "scales");
+    saveWin(synth, 0, 0, microtonaluiwindow->x(), microtonaluiwindow->y(), microtonaluiwindow->visible(), "scales");
     microtonaluiwindow->hide();
     delete tuningsinput;
     delete mappinginput;

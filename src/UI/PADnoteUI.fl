@@ -256,7 +256,7 @@ class PADnoteUI {open : {public PresetsUI_}
               padRtext();} open selected
       xywh {184 49 535 450} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
-      code1 {int fetchX, fetchY, fetchO;loadWin(synth, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Tabs {} {
@@ -1420,7 +1420,7 @@ class PADnoteUI {open : {public PresetsUI_}
         oscui->oscsave();
     delete(oscui);
     delete(resui);
-    saveWin(synth, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");
+    saveWin(synth, 0, 0, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }
