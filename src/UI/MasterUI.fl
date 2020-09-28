@@ -2502,12 +2502,7 @@ Alan Calvert started the project}
     }
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
     if (fetchO)
-    {
-        partui->ctlmidi->show();
-        partui->midiSeen = true;
-    }
-    else
-        partui->ctlmidi->hide();
+        partui->Showctlmidi();
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit");
     if (fetchO)
         partui->instrumenteditwindow->show();

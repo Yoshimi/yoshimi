@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -357,14 +357,15 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {} {
-    Fl_Window partgroup {
+  Function {make_window()} {open
+  } {
+    Fl_Window partgroup {open
       xywh {1112 270 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -599,13 +600,9 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Controllers
           callback {//
           if (Fl::event_button() != 3)
-          {
               ctlwindow->show();
-          }
           else
-          {
-              midiSeen = true;
-              ctlmidi->show();}}
+              Showctlmidi();} selected
           tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
@@ -1176,7 +1173,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             ctlmidiRtext();}
       xywh {661 261 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi"); o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Dial modulation {
@@ -1231,6 +1227,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {134 114 385 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
       code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");o->position(fetchX, fetchY);efxSeen = true;}
+      code2 {if (fetchW > 0 && fetchH > 0){o->size(fetchW, fetchH);}}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -1700,6 +1697,17 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {274 347 78 7} box NO_BOX labelfont 1
       }
     }
+  }
+  Function {Showctlmidi()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
+    ctlmidi->position(fetchX, fetchY);
+    if (fetchW > 0 && fetchH > 0)
+        ctlmidi->size(fetchW, fetchH);
+    ctlmidi->resizable();
+    ctlmidi->show();
+    midiSeen = true;} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -2581,8 +2589,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     filtercutoff->value(part->ctl->filtercutoff.data);
     masterbandwidth->value(part->ctl->bandwidth.data);} {}
   }
-  Function {ctlmidiRtext()} {open
-  } {
+  Function {ctlmidiRtext()} {} {
     code {//
     float defW = 365;
     float defH = 50;
@@ -2628,7 +2635,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlwindow->hide();
     delete ctlwindow;
     if (midiSeen)
-        saveWin(synth, 0, 0, ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
+        saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
     if (efxSeen)
