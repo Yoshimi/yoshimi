@@ -2572,9 +2572,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
-    ctlmidi->position(fetchX, fetchY);
+    
     if (fetchW > 0 && fetchH > 0)
-        ctlmidi->size(fetchW, fetchH);
+        ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
+    else
+        ctlmidi->position(fetchX, fetchY);
     ctlmidi->resizable();
     ctlmidi->show();} {}
   }

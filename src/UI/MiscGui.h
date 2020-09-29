@@ -147,7 +147,7 @@ inline void saveWin(SynthEngine *synth, int w, int h, int x, int y, int o, std::
 
 inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, std::string filename)
 {
-    std::string ID = std::to_string(synth->getUniqueId()) + "-";;
+    std::string ID = std::to_string(synth->getUniqueId()) + "-";
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
     //std::cout << synth->getRuntime().ConfigDir << "/windows/" << ID << filename << std::endl;
     w = h = o = 0;
@@ -167,17 +167,21 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
             x = stoi(values.substr(0, pos));
             if (x < 4)
                 x = 4;
+
             y = stoi(values.substr(pos));
             if (y < 10)
                 y = 10;
+
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
             w = stoi(values.substr(pos));
+
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
             h = stoi(values.substr(pos));
+
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
@@ -189,9 +193,9 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
 
 inline bool lastSeen(SynthEngine *synth, std::string filename)
 {
-    int w, h, x, y, o;
-    loadWin(synth, w, h, x, y, o, filename);
-    return o;
+    std::string ID = std::to_string(synth->getUniqueId()) + "-";
+    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    return (stoi(values.substr(values.rfind(' '))) == 1);
 }
 
 

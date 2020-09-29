@@ -128,12 +128,14 @@ class ConsoleUI {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "log");
-    logConsole->position(fetchX, fetchY);
+    
     if (fetchW > 0 && fetchH > 0)
-        logConsole->size(fetchW, fetchH);
+        logConsole->resize(fetchX, fetchY, fetchW, fetchH);
+    else
+        logConsole->position(fetchX, fetchY);
     logConsole->resizable();
     logConsole->show();
-    logSeen = true;} {}
+    //logSeen = true;} {}
   }
   decl {bool logSeen;} {private local
   }

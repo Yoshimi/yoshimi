@@ -2429,7 +2429,6 @@ Alan Calvert started the project}
   }
   Function {loadWindowData()} {} {
     code {//
-    bool LV2Running = synth->getIsLV2Plugin();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
     panelwindow->position(fetchX, fetchY);
@@ -2466,26 +2465,12 @@ Alan Calvert started the project}
     else
         virkeyboard->virkeyboardwindow->hide();
 
-    if (!LV2Running)
-    {
-        if (lastSeen(synth, "config"))
-            configui->Show(synth); // this does some initialising
-
-        if (lastSeen(synth, "log"))
-            yoshiLog->Show(synth);
-    }
-
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "scales");
     microtonalui->microtonaluiwindow->position(fetchX, fetchY);
     if (fetchO)
         microtonalui->microtonaluiwindow->show();
     else
         microtonalui->microtonaluiwindow->hide();
-    if (!LV2Running)
-    {
-        if (lastSeen(synth, "vector"))
-            vectorui->Show(synth);
-    }
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "midiLearn");
     midilearnui->midilearnwindow->position(fetchX, fetchY);
@@ -2493,24 +2478,34 @@ Alan Calvert started the project}
         midilearnui->midilearnwindow->show();
     else
         midilearnui->midilearnwindow->hide();
-    if (!LV2Running)
+    if (synth->getIsLV2Plugin())
+    return;
+
+    if (lastSeen(synth, "config"))
+        configui->Show(synth); // this does some initialising
+
+    if (lastSeen(synth, "log"))
+        yoshiLog->Show(synth);
+
+    if (lastSeen(synth, "vector"))
+        vectorui->Show(synth);
+
+    if (lastSeen(synth, "ctlWin"))
     {
-        if (lastSeen(synth, "ctlWin"))
-        {
-            partui->ctlwindow->show();
-            if (lastSeen(synth, "afterT"))
-                partui->aftertouchcontrol->show();
-            else
-                partui->aftertouchcontrol->hide();
-        }
-
-        if (lastSeen(synth, "ctlmidi"))
-            partui->Showctlmidi();
-
-        if (lastSeen(synth, "partEdit"))
-            partui->instrumenteditwindow->show();
+        partui->ctlwindow->show();
+        if (lastSeen(synth, "afterT"))
+            partui->aftertouchcontrol->show();
         else
-            partui->instrumenteditwindow->hide();}} {}
+            partui->aftertouchcontrol->hide();
+    }
+
+    if (lastSeen(synth, "ctlmidi"))
+        partui->Showctlmidi();
+
+    if (lastSeen(synth, "partEdit"))
+        partui->instrumenteditwindow->show();
+    else
+        partui->instrumenteditwindow->hide();} {}
   }
   Function {checkBuffer(void)} {} {
     code {//

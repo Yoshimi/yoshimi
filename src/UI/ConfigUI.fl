@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -60,7 +60,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {selected
+class ConfigUI {open
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -1323,21 +1323,25 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         
                     int fetchW, fetchH, fetchX, fetchY, fetchO;
                     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "config");
-                    configwindow->position(fetchX, fetchY);
+                    
                     if (fetchW > 0 && fetchH > 0)
-                       configwindow->size(fetchW, fetchH);
+                       configwindow->resize(fetchX, fetchY, fetchW, fetchH);
+                    else
+                       configwindow->position(fetchX, fetchY);
                     configwindow->resizable();
                     configwindow->show();} {}
   }
   Function {Showpresets(SynthEngine *synth)} {} {
     code {//                    
-                    int fetchW, fetchH, fetchX, fetchY, fetchO;
-                    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");
-                    presets->position(fetchX, fetchY);
-                    if (fetchW > 0 && fetchH > 0)
-                       presets->size(fetchW, fetchH);
-                    presets->resizable();
-                    presets->show();} {}
+                int fetchW, fetchH, fetchX, fetchY, fetchO;
+                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");
+                
+                if (fetchW > 0 && fetchH > 0)
+                   presets->resize(fetchX, fetchY, fetchW, fetchH);
+                else
+                   presets->position(fetchX, fetchY);
+                presets->resizable();
+                presets->show();} {}
   }
   Function {configRtext()} {} {
     code {//
