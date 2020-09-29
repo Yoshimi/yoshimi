@@ -186,7 +186,7 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
             if (pos == string::npos)
                 return;
             o = stoi(values.substr(pos));
-            std::cout << "x " << x << "   y " << y  << "   w " << w << "   h " << h <<  "   o " << o << "  " << filename << std::endl;
+            //std::cout << "x " << x << "   y " << y  << "   w " << w << "   h " << h <<  "   o " << o << "  " << filename << std::endl;
         }
     }
 }

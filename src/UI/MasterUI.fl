@@ -2478,8 +2478,6 @@ Alan Calvert started the project}
         midilearnui->midilearnwindow->show();
     else
         midilearnui->midilearnwindow->hide();
-    if (synth->getIsLV2Plugin())
-    return;
 
     if (lastSeen(synth, "config"))
         configui->Show(synth); // this does some initialising
