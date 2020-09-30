@@ -185,16 +185,16 @@ class PSlider {: {public mwheel_slider}
   }
   Function {update_selection_color(int new_value)} {return_type void
   } {
-    code {
-    const int default_val = 0; // Turn into member variable if needed
-    selection_color(new_value == default_val ? 0 : 222);
-  } {private}
+    code {const int default_val = 0; // Turn into member variable if needed
+    selection_color(new_value == default_val ? 0 : 222);} {}
   }
-  Function {value()} {return_type double} {code {return mwheel_slider::value();} {}}
+  Function {value()} {return_type double
+  } {
+    code {return mwheel_slider::value();} {}
+  }
   Function {value(double val)} {return_type int
   } {
-    code {
-    update_selection_color((int) val);
+    code {update_selection_color((int) val);
     return mwheel_slider::value(val);} {}
   }
   Function {handle(int event)} {return_type int
@@ -355,7 +355,7 @@ class Oscilharmonic {: {public Fl_Group}
             x = 64 - (int)o->value();
 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
-        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1 value 0
+        xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1
         code0 {o->value(64 - oscil->Phmag[n]);}
         code1 {o->setValueType(VC_WaveHarmonicMagnitude); o->useCustomTip(true);}
         class PSlider
@@ -369,7 +369,7 @@ class Oscilharmonic {: {public Fl_Group}
             x = 64 - (int)o->value();
 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
-        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1 value 0
+        xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1
         code0 {o->value(64 - oscil->Phphase[n]);}
         code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
         class PSlider
@@ -418,8 +418,7 @@ class Oscilharmonic {: {public Fl_Group}
   Function {refresh()} {} {
     code {//
     mag->value(64 - oscil->Phmag[n]);
-    phase->value(64 - oscil->Phphase[n]);
-    } {}
+    phase->value(64 - oscil->Phphase[n]);} {}
   }
   Function {~Oscilharmonic()} {} {
     code {//
@@ -1387,7 +1386,7 @@ class OscilEditor {: {public PresetsUI_}
     code {//
     if (OSCseen)
     {
-        saveWin(synth, 0, 0, osceditUI->x(), osceditUI->y(), osceditUI->visible(), "waveform");
+        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "waveform");
     }} {}
   }
   Function {~OscilEditor()} {return_type virtual

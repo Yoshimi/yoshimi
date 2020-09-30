@@ -195,7 +195,30 @@ inline bool lastSeen(SynthEngine *synth, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
-    return (stoi(values.substr(values.rfind(' '))) == 1);
+    //std::cout << values << " " << filename << std::endl;
+    size_t pos = values.rfind(' ');
+    if (pos == string::npos)
+        return false;
+    ++pos;
+    if (values.substr(pos) == "1")
+        return true;
+    return false;
+}
+
+inline void setVisible(SynthEngine *synth, bool v, std::string filename)
+{
+    std::string ID = std::to_string(synth->getUniqueId()) + "-";
+    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    size_t pos = values.rfind(' ');
+    if (pos == string::npos)
+        return;
+    ++ pos;
+    bool vis = stoi(values.substr(pos));
+    if (vis == v)
+        return;
+    values.replace(pos, 1, std::to_string(v));
+    //std::cout << v << " " << values << " " << filename << std::endl;
+    saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
 }
 
 

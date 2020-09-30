@@ -568,7 +568,7 @@ class ResonanceUI {: PresetsUI_
   } {
     code {
             if (resSeen)
-                saveWin(synth, 0, 0, resonancewindow->x(), resonancewindow->y(), resonancewindow->visible(), "resonWin");
+                saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), resonancewindow->visible(), "resonWin");
             resonancewindow->hide();} {}
   }
   Function {redrawPADnoteApply()} {} {

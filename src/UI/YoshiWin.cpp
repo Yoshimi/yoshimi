@@ -45,7 +45,6 @@ void textResize(void* done) {
   //printf("Timeout expired!\n");
   if (done != NULL)
   {
-      //std::cout << "test" << std::endl;
       Fl_Double_Window* currentWin = reinterpret_cast<Fl_Double_Window*>(done);
       currentWin->do_callback();
   }
@@ -57,5 +56,6 @@ void YoshiWin::resize(int x, int y, int w, int h)
   //std::cout << "Resized: x" << x << "  y" << y << "  w " << w << "  h " << h << std::endl;
 
   Fl::remove_timeout(textResize, NULL);
-  Fl::add_timeout(0.5, textResize, this);
+  Fl::add_timeout(0.2, textResize, this);
+  // ensure at least one refresh within FLTK update
 }

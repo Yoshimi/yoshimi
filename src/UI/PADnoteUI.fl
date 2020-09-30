@@ -1420,7 +1420,7 @@ class PADnoteUI {open : {public PresetsUI_}
         oscui->oscsave();
     delete(oscui);
     delete(resui);
-    saveWin(synth, 0, 0, padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");
+    saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(),padnotewindow->y(), padnotewindow->visible(), "pad");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }

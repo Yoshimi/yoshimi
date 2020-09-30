@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -106,7 +106,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -132,13 +132,13 @@ class MasterUI {: {private GuiUpdates}
   }
   Function {~MasterUI()} {} {
     code {//
-      saveWin(synth, 0, 0, masterwindow->x(), masterwindow->y(), 1, "master");
+      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), 1, "master");
       masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
       syseffsendwindow->hide();
       delete syseffsendwindow;
-      saveWin(synth, 0, 0, panelwindow->x(), panelwindow->y(), panelwindow->visible(), "mixer");
+      saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelwindow->visible(), "mixer");
       panelwindow->hide();
       delete panelwindow;
       if (microtonalui)
@@ -168,7 +168,7 @@ class MasterUI {: {private GuiUpdates}
 
       if (yoshiLog)
       {
-          saveWin(synth, 0, 0, yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "log");
+          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "log");
           delete yoshiLog;
       }
       delete masterwindow;} {}
@@ -2427,7 +2427,8 @@ Alan Calvert started the project}
   } {
     code {return synth;} {}
   }
-  Function {loadWindowData()} {} {
+  Function {loadWindowData()} {open
+  } {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
@@ -2481,12 +2482,18 @@ Alan Calvert started the project}
 
     if (lastSeen(synth, "config"))
         configui->Show(synth); // this does some initialising
+    else
+        configui->configwindow->hide();
 
     if (lastSeen(synth, "log"))
         yoshiLog->Show(synth);
+    else
+        yoshiLog->logConsole->hide();
 
     if (lastSeen(synth, "vector"))
         vectorui->Show(synth);
+    else
+        vectorui->vectorwindow->hide();
 
     if (lastSeen(synth, "ctlWin"))
     {
@@ -2496,14 +2503,19 @@ Alan Calvert started the project}
         else
             partui->aftertouchcontrol->hide();
     }
+    else
+        partui->ctlwindow->hide();
 
     if (lastSeen(synth, "ctlmidi"))
         partui->Showctlmidi();
+    else
+        partui->ctlmidi->hide();
 
     if (lastSeen(synth, "partEdit"))
         partui->instrumenteditwindow->show();
     else
-        partui->instrumenteditwindow->hide();} {}
+        partui->instrumenteditwindow->hide();} {selected
+    }
   }
   Function {checkBuffer(void)} {} {
     code {//

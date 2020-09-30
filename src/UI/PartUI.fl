@@ -2572,7 +2572,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
-    
+
     if (fetchW > 0 && fetchH > 0)
         ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     else
@@ -2610,7 +2610,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     filtercutoff->labelsize(size);
     masterbandwidth->labelsize(size);
     ctlmidiclose->labelsize(int(dScale * 14)-1);
-    ctlmidi->redraw();} {}
+    ctlmidi->redraw();
+    saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");} {}
   }
   Function {ctlRtext()} {} {
     code {//
@@ -2618,6 +2619,16 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {~PartUI()} {} {
     code {//
+    if (ATSeen)
+        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
+    if (ctlSeen)
+        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
+    if (efxSeen)
+        saveWin(synth, partfx->w(), partfx->h(), partfx->x(), partfx->y(), partfx->visible(), "partEfx");
+    if (kitSeen)
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
+    if (editSeen)
+        saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
         delete adnoteui;
     if (subnoteui)
@@ -2625,27 +2636,17 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (padnoteui)
         delete padnoteui;
     partgroup->hide();
-    if (ATSeen)
-        saveWin(synth, 0, 0, aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
-    if (ctlSeen)
-        saveWin(synth, 0, 0, ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     ctlwindow->hide();
     delete ctlwindow;
-    saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
+    setVisible(synth, ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
-    if (efxSeen)
-        saveWin(synth, 0, 0, partfx->x(), partfx->y(), partfx->visible(), "partEfx");
     partfx->hide();
     delete partfx;
-    if (kitSeen)
-        saveWin(synth, 0, 0, instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
     instrumentkitlist->hide();
     delete instrumentkitlist;
-    if (editSeen)
-        saveWin(synth, 0, 0, instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
     instrumenteditwindow->hide();
     delete instrumenteditwindow;} {}
   }

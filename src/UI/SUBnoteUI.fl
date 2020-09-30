@@ -702,12 +702,12 @@ class SUBnoteUI {open : {public PresetsUI_}
     bandwidthenvelopegroup->envRtext(dScale);
     filterenv->envRtext(dScale);
     freqenvelopegroup->envRtext(dScale);
-    
+
     filterui->filterRtext(dScale);
-    
+
     frame->size(int(435 * dW), int(326 * dH));
     harmonics->size(int(435 * dW), int(295 * dH));
-    
+
     for (int i=0;i<MAX_SUB_HARMONICS;i++)
     {
         h[i]->size(20 * dW, 300 * dH);
@@ -892,7 +892,7 @@ class SUBnoteUI {open : {public PresetsUI_}
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
-    saveWin(synth, 0, 0, SUBparameters->x(),SUBparameters->y(), SUBparameters->visible(), "sub");
+    saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(),SUBparameters->y(), SUBparameters->visible(), "sub");
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }

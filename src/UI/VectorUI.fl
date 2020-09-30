@@ -515,7 +515,6 @@ class VectorUI {} {
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
-    code {printf("Hello, World!\\n");} {}
   }
   Function {send_data(int action, int control, float value, int type, int part = TOPLEVEL::section::vector, int kit = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -653,7 +652,7 @@ class VectorUI {} {
   }
   Function {~VectorUI()} {} {
     code {//
-        saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");
+        setVisible(synth, vectorwindow->visible(), "vector");
         vectorwindow->hide();
         delete  vectorwindow;} {}
   }
@@ -857,7 +856,8 @@ class VectorUI {} {
     Loaded->labelsize(int(dScale * 12));
     Closevector->labelsize(int(dScale * 12));
 
-    vectorwindow->redraw();} {}
+    vectorwindow->redraw();
+    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//

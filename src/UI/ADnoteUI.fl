@@ -1719,10 +1719,10 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     code {//
    voiceamplfogroup->lfoRtext(dScale);
    voiceampenvgroup->envRtext(dScale);
-   
+
    voicefilterlfogroup->lfoRtext(dScale);
    voicefilterenvgroup->envRtext(dScale);
-   
+
    voicefreqlfogroup->lfoRtext(dScale);
    voicefreqenvgroup->envRtext(dScale);
 
@@ -2466,12 +2466,12 @@ switch (num)
   } {
     code {//
         if (listSeen)
-            saveWin(synth, 0, 0, ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
+            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
-        saveWin(synth, 0, 0, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
+        saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
         ADnoteGlobalParameters->hide();
         if (voiceSeen)
-            saveWin(synth, 0, 0, ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
+            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
         ADnoteVoice->hide();
         delete ADnoteVoiceList;
         delete ADnoteGlobalParameters;
@@ -2564,7 +2564,7 @@ switch (num)
         dScale = 0.2f;
 
     advoice->voiceRtext(dScale);
-   
+
 
    ADnoteVoice->redraw();} {}
   }
@@ -2572,13 +2572,13 @@ switch (num)
   } {
     code {//
         nvoice = nvoice_;
-        
+
         int adW = advoice->ADnoteVoiceParameters->w();
         int adH = advoice->ADnoteVoiceParameters->h();
         advoice->hide();
         ADnoteVoice->remove(advoice);
         delete advoice;
-        
+
         advoice = new ADvoiceUI(0, 0, adW, adH);
         ADnoteVoice->add(advoice);
         advoice->init(pars, npart, kititem, nvoice);
