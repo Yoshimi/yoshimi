@@ -378,10 +378,9 @@ else
   }
 }
 
-class ADvoiceUI {open : {public Fl_Group}
+class ADvoiceUI {: {public Fl_Group}
 } {
-  Function {make_window()} {selected
-  } {
+  Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
       xywh {208 251 760 610} type Double box NO_BOX hide resizable
@@ -1714,8 +1713,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
 }} {}
   }
-  Function {voiceRtext(float dScale)} {open
-  } {
+  Function {voiceRtext(float dScale)} {} {
     code {//
    voiceamplfogroup->lfoRtext(dScale);
    voiceampenvgroup->envRtext(dScale);
@@ -1800,7 +1798,6 @@ class ADnoteUI {open : {public PresetsUI_}
         addRtext();}
       xywh {190 83 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");o->position(fetchX, fetchY);}
       class YoshiWin
     } {
       Fl_Group {} {
@@ -2058,6 +2055,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button {} {
         label Close
         callback {//
+            addRtext();
             ADnoteGlobalParameters->hide();
             if (Fl::event_button() == 3)
             {
@@ -2094,7 +2092,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
      if (Fl::event() == 10)
          o->hide();
      else if (Fl::event() == 11)
-        addVoiceRtext();} open
+        addVoiceRtext();}
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       class YoshiWin
@@ -2468,7 +2466,7 @@ switch (num)
         if (listSeen)
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
-        saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), ADnoteGlobalParameters->visible(), "adGlobal");
+        setVisible(synth, false, "adGlobal");
         ADnoteGlobalParameters->hide();
         if (voiceSeen)
             saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
@@ -2517,9 +2515,26 @@ switch (num)
         resui->refresh();
         editVoice(nvoice);} {}
   }
+  Function {ShowGlobal()} {open
+  } {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
+    if (fetchW > 0 && fetchH > 0)
+        ADnoteGlobalParameters->position(fetchX, fetchY);
+    else
+    {
+        ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
+        //ADnoteGlobalParameters->show();
+    }} {selected
+    }
+  }
   Function {addRtext()} {open
   } {
     code {//
+
+    std::cout << "addRtext" << std::endl;
+
     float defW = 535;
     float defH = 405;
     float dW = ADnoteGlobalParameters->w() / defW;
@@ -2542,13 +2557,31 @@ switch (num)
 
     filterui->filterRtext(dScale);
 
+    int size = int(10 * dScale);
+    globalvolume->labelsize(size);
+    vsns->labelsize(size);
+    globalpan->labelsize(size);
+    globalwidth->labelsize(size);
+    globalrandompan->labelsize(size);
+    depop->labelsize(size);
+    pstr->labelsize(size);
+    pt->labelsize(size);
+    pstc->labelsize(size);
+    pvel->labelsize(size);
+    rndgrp->labelsize(size);
+
+    stereo->labelsize(size);
 
 
-    ADnoteGlobalParameters->redraw();} {}
+
+
+
+    ADnoteGlobalParameters->redraw();
+    if (ADnoteGlobalParameters->visible())
+        saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
   }
-  Function {addVoiceRtext()} {open
-  } {
-    code {//
+  Function {addVoiceRtext()} {} {
+    code {// this is just for the outer skin
     float defW = 760;
     float defH = 610;
     float dW;

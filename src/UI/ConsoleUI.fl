@@ -69,6 +69,7 @@ class ConsoleUI {} {
      else if (Fl::event() == 11)
         consoleRtext();}
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
+      code0 {o->size_range(385,185);}
       class YoshiWin
     } {
       Fl_Text_Display logText {

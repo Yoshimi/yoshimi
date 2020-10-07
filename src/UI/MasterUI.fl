@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -106,7 +106,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1552,8 +1552,16 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::partNumber:
+        {
+            bool ctlmidiSeen = partui->ctlmidi->visible();
+
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 activePart = value_int;
+
+            openedit = partui->instrumenteditwindow->visible();
+            // openedit also set by right click in mixer panel
+            // might need further refinement
+
             partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1563,6 +1571,12 @@ Alan Calvert started the project}
             partui->npart = activePart;
             npartcounter->value(activePart + 1);
             npartcounter->redraw();
+
+            if (ctlmidiSeen)
+                partui->Showctlmidi();
+            else
+                partui->ctlmidi->hide();
+
             updatepanel();
             if (openedit)
             {
@@ -1570,6 +1584,7 @@ Alan Calvert started the project}
                 openedit = false;
             }
             break;
+        }
 
         case MAIN::control::availableParts:
             partmax = value_int;
@@ -2427,8 +2442,7 @@ Alan Calvert started the project}
   } {
     code {return synth;} {}
   }
-  Function {loadWindowData()} {open
-  } {
+  Function {loadWindowData()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
@@ -2514,8 +2528,7 @@ Alan Calvert started the project}
     if (lastSeen(synth, "partEdit"))
         partui->instrumenteditwindow->show();
     else
-        partui->instrumenteditwindow->hide();} {selected
-    }
+        partui->instrumenteditwindow->hide();} {}
   }
   Function {checkBuffer(void)} {} {
     code {//

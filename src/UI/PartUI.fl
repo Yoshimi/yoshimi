@@ -1217,7 +1217,8 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button ctlmidiclose {
         label Close
         callback {//
-                ctlmidi->hide();}
+                ctlmidi->hide();
+                setVisible(synth, false, "ctlmidi");}
         xywh {309 35 50 20} box THIN_UP_BOX
       }
     }
@@ -2520,7 +2521,10 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
 
     if (engine == 0 && adnoteui != NULL)
+    {
+        adnoteui->ShowGlobal();
         adnoteui->ADnoteGlobalParameters->show();
+    }
     if (engine == 1 && subnoteui != NULL)
         subnoteui->SUBparameters->show();
     if (engine == 2 && adnoteui != NULL)
@@ -2578,6 +2582,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     else
         ctlmidi->position(fetchX, fetchY);
     ctlmidi->resizable();
+    ctlmidi->size_range(365, 60);
     ctlmidi->show();} {}
   }
   Function {ctlmidirefresh()} {} {
@@ -2595,6 +2600,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     float dW = ctlmidi->w() / defW;
     float dH = ctlmidi->h() / defH;
     float dScale;
+
     if (dW < dH)
         dScale = dW;
     else
@@ -2611,7 +2617,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     masterbandwidth->labelsize(size);
     ctlmidiclose->labelsize(int(dScale * 14)-1);
     ctlmidi->redraw();
-    saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");} {}
+    saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), true, "ctlmidi");} {}
   }
   Function {ctlRtext()} {} {
     code {//
@@ -2630,11 +2636,20 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (editSeen)
         saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
+    {
+        adnoteui->ADnoteGlobalParameters->hide();
         delete adnoteui;
+    }
     if (subnoteui)
+    {
+        //subnoteui->hide();
         delete subnoteui;
+    }
     if (padnoteui)
+    {
+        //padnoteui->hide();
         delete padnoteui;
+    }
     partgroup->hide();
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
