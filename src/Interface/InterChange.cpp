@@ -3987,11 +3987,11 @@ void InterChange::commandAdd(CommandBlock *getData)
                     getData->data.value = 1;
                     value_int = 1;
                 }
-                pars->GlobalPar.PDetuneType = value_int +1;
+                pars->GlobalPar.PDetuneType = value_int;
             }
             else
             {
-                value = pars->GlobalPar.PDetuneType -1;
+                value = pars->GlobalPar.PDetuneType;
                 if (value < 1)
                     value = 1;
             }

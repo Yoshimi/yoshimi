@@ -1,5 +1,8 @@
 yoshimi 1.7.2 M
 
+2020-10-8 Will
+* BugFix: Addsynth Global detune type range wrong.
+
 2020-9-20 Will
 * BugFix: Indirect vector not being called.
   Copy and paste error :(
