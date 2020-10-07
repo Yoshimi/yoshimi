@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -1783,7 +1783,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {open : {public PresetsUI_}
+class ADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {private
   } {
@@ -1796,11 +1796,12 @@ class ADnoteUI {open : {public PresetsUI_}
          o->hide();
      else if (Fl::event() == 11)
         addRtext();}
-      xywh {190 83 535 405} type Double hide resizable
+      xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
+      code1 {o->size_range(535, 405);}
       class YoshiWin
     } {
-      Fl_Group {} {
+      Fl_Group globalfreq {
         label FREQUENCY
         xywh {5 255 525 115} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
       } {
@@ -2014,10 +2015,10 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         label { Stereo}
         callback {//
 send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-        xywh {8 220 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
+        xywh {8 220 61 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
-      Fl_Button {} {
+      Fl_Button showvoicelist {
         label {Show Voice List}
         callback {//
             for (int i = 0; i < NUM_VOICES; ++i)
@@ -2034,7 +2035,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
                 ADnoteGlobalParameters->hide();}
         tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button showvoicepars {
         label {Show Voice Parameters}
         callback {//
     voicelistitem[nvoice]->refreshlist();
@@ -2052,7 +2053,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         ADnoteGlobalParameters->hide();}
         tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button globalclose {
         label Close
         callback {//
             addRtext();
@@ -2066,7 +2067,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             }}
         tooltip {Right click: also reopen previous} xywh {476 375 54 25} box THIN_UP_BOX labelfont 1 labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button resonance {
         label Resonance
         callback {//
     resui->resonancewindow->redraw();
@@ -2075,12 +2076,12 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         ADnoteGlobalParameters->hide();}
         tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button globalcopy {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {414 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
-      Fl_Button {} {
+      Fl_Button globalpaste {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {444 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
@@ -2515,8 +2516,7 @@ switch (num)
         resui->refresh();
         editVoice(nvoice);} {}
   }
-  Function {ShowGlobal()} {open
-  } {
+  Function {ShowGlobal()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
@@ -2526,14 +2526,10 @@ switch (num)
     {
         ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
         //ADnoteGlobalParameters->show();
-    }} {selected
-    }
+    }} {}
   }
-  Function {addRtext()} {open
-  } {
+  Function {addRtext()} {} {
     code {//
-
-    std::cout << "addRtext" << std::endl;
 
     float defW = 535;
     float defH = 405;
@@ -2558,6 +2554,8 @@ switch (num)
     filterui->filterRtext(dScale);
 
     int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
     globalvolume->labelsize(size);
     vsns->labelsize(size);
     globalpan->labelsize(size);
@@ -2572,13 +2570,30 @@ switch (num)
 
     stereo->labelsize(size);
 
+    globalfreq->labelsize(size12);
+    detunevalueoutput->labelsize(size);
+        detunevalueoutput->textsize(size);
+    octave->labelsize(size);
+        octave->textsize(size11);
+    relBwidth->labelsize(size);
+    detunetype->labelsize(size);
+//    L35cents->labelsize(size11);
 
+    coarsedet->labelsize(size);
+        coarsedet->textsize(size11);
+
+
+    showvoicepars->labelsize(size12);
+    showvoicelist->labelsize(size12);
+    resonance->labelsize(size12);
+    globalcopy->labelsize(size11);
+    globalpaste->labelsize(size11);
+    globalclose->labelsize(size11);
 
 
 
     ADnoteGlobalParameters->redraw();
-    if (ADnoteGlobalParameters->visible())
-        saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
+    saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
   }
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
