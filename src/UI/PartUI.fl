@@ -2582,7 +2582,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     else
         ctlmidi->position(fetchX, fetchY);
     ctlmidi->resizable();
-    ctlmidi->size_range(365, 60);
+    ctlmidi->size_range(365, 60, 0, 0, 0, 0, 1);
     ctlmidi->show();} {}
   }
   Function {ctlmidirefresh()} {} {
