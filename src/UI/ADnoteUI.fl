@@ -447,7 +447,7 @@ class ADvoiceUI {: {public Fl_Group}
               Fl_Value_Output fmdetunevalueoutput {
                 label Detune
                 callback {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                xywh {542 239 36 16} box THIN_DOWN_BOX labelsize 8 align 5 minimum -5000 maximum 5000 textfont 1 textsize 8
+                xywh {542 239 36 16} box THIN_DOWN_BOX labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
                 code0 {o->step(0.01, 1);}
                 code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
               }
@@ -501,7 +501,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 code0 {o->value(pars->VoicePar[nvoice].PFMFixedFreq);}
               }
             }
-            Fl_Group {} {
+            Fl_Group Modampgrp {
               label {Mod AMPLITUDE}
               xywh {535 55 220 149} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
@@ -556,15 +556,10 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 label {                       }
                 xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
               } {
-                Fl_Text_Display {} {
+                Fl_Text_Display ModLocalOsc {
                   label {Local Oscillator}
-                  xywh {553 385 95 2} box NO_BOX labelfont 1 labelsize 13
+                  xywh {553 385 95 2} box NO_BOX labelfont 1 labelsize 12
                 }
-                Fl_Group fmoscil {
-                  xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
-                  code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
-                  code1 {update_fmoscil();}
-                } {}
                 Fl_Button changeFMoscilbutton {
                   label Waveform
                   callback {//
@@ -579,7 +574,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     oscedit = new OscilEditor(pars->VoicePar[nv].POscilFM, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {666 372 62 12} box THIN_UP_BOX labelfont 1 labelsize 9
+                  xywh {666 369 71 18} box THIN_UP_BOX labelfont 1 labelsize 10
                   code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider ModPhase {
@@ -599,6 +594,11 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   code0 {o->add("Internal");}
                   code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Mod.%2d", i + 1); o->add(tmp);};}
                   code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
+                } {}
+                Fl_Group fmoscil {
+                  xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+                  code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
+                  code1 {update_fmoscil();}
                 } {}
               }
               Fl_Box modvoicelabel {
@@ -631,27 +631,27 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             xywh {535 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
-            MenuItem {} {
+            MenuItem Moff {
               label OFF
               xywh {40 40 100 20} labelfont 1
             }
-            MenuItem {} {
+            MenuItem Mmorph {
               label MORPH
               xywh {50 50 100 20} labelfont 1
             }
-            MenuItem {} {
+            MenuItem Mring {
               label RING
               xywh {60 60 100 20} labelfont 1
             }
-            MenuItem {} {
+            MenuItem Mpm {
               label PM
               xywh {70 70 100 20} labelfont 1
             }
-            MenuItem {} {
+            MenuItem Mfm {
               label FM
               xywh {80 80 100 20} labelfont 1
             }
-            MenuItem {} {
+            MenuItem Mpwm {
               label PWM
               xywh {90 90 100 20} labelfont 1
             }
@@ -1772,13 +1772,14 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    voicefreqenvgroup->envRtext(dScale);
 
    voicefilter->filterRtext(dScale);
-   
+
    int size = int(10 * dScale);
    int size11 = int(11 * dScale);
    int size12 = int(12 * dScale);
-   
-   voiceonbutton->labelsize(int(14 * dScale));
-   
+   int size14 = int(14 * dScale);
+
+   voiceonbutton->labelsize(size14);
+
    amplitudegroup->labelsize(size12);
    voicevolume->labelsize(size);
    voicevsns->labelsize(size);
@@ -1788,15 +1789,15 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    AmpEnvEn->labelsize(size);
    AmpLfoEn->labelsize(size);
    VolumeMinus->labelsize(size);
-   
+
    voicefiltergroup->labelsize(size12);
    FilterEnvEn->labelsize(size);
    FilterLfoEn->labelsize(size);
-   
+
    Delay->labelsize(size11);
    bypassfiltercheckbutton->labelsize(size12);
    FilterEn->labelsize(size);
-   
+
    freqencygrp->labelsize(size12);
    FreqEn->labelsize(size);
    FreqLfoEn->labelsize(size);
@@ -1816,7 +1817,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    Freq440->labelsize(size11);
    fixedfreqetdial->labelsize(size);
    offset->labelsize(size);
-   
+
    unisonsize->labelsize(size);
         unisonsize->textsize(size11);
    UnisonStereo->labelsize(size);
@@ -1835,7 +1836,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
        inv20->labelsize(size11);
    UnisonEn->labelsize(size);
    unisName->labelsize(size12);
-   
+
    extvoicegroup->labelsize(size12);
    ExtOsc->labelsize(size);
    SoundType->labelsize(size);
@@ -1843,13 +1844,62 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    Vwhite->labelsize(size11);
    Vpink->labelsize(size11);
    Vspot->labelsize(size11);
-   
+
    oscParamBox->labelsize(size12);
    UseOsc->labelsize(size);
    changevoiceoscilbutton->labelsize(size);
    VoiceOscPhase->labelsize(size);
-   
-   noiselabel->labelsize(int(50 * dScale));} {}
+
+   noiselabel->labelsize(int(50 * dScale));
+   osclabel->labelsize(int(50 * dScale));
+
+   voiceFMparametersgroup->labelsize(size12);
+   voiceFMampenvgroup->envRtext(dScale);
+   voiceFMfreqenvgroup->envRtext(dScale);
+
+   ExtMod->labelsize(size);
+
+   Modampgrp->labelsize(size11);
+   ModVolume->labelsize(size11);
+       ModVolume->textsize(size);
+   ModVsense->labelsize(size11);
+       ModVsense->textsize(size);
+   ModFdamp->labelsize(size11);
+       ModFdamp->textsize(size);
+   ModAmpEn->labelsize(size);
+
+   modfrequency->labelsize(size11);
+   ModCoarseDetune->labelsize(size);
+       ModCoarseDetune->textsize(size);
+   ModOctave->labelsize(size);
+       ModOctave->textsize(size);
+   fmdetunevalueoutput->labelsize(size);
+       fmdetunevalueoutput->textsize(size);
+   detuneFromBaseOsc->labelsize(size11);
+   Mod440->labelsize(size11);
+   ModDetuneType->labelsize(size);
+       Mdefault->labelsize(size11);
+       ML35cents->labelsize(size11);
+       ML10cents->labelsize(size11);
+       ME100cents->labelsize(size11);
+       ME1200cents->labelsize(size11);
+
+   ModFreqEn->labelsize(size);
+
+   ModType->labelsize(size11);
+       Moff->labelsize(size14);
+       Mmorph->labelsize(size14);
+       Mring->labelsize(size14);
+       Mpm->labelsize(size14);
+       Mfm->labelsize(size14);
+       Mpwm->labelsize(size14);
+
+  ModLocalOsc->labelsize(size12);
+  changeFMoscilbutton->labelsize(size);
+  ModPhase->labelsize(size);
+  ExtModOsc->labelsize(size);
+
+  modvoicelabel->labelsize(int(40 * dScale));} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
@@ -2285,7 +2335,7 @@ else if (voiceTabs->value() == g7)
 else if (voiceTabs->value() == g8)
 {
     editVoice(7);
-}} open
+}}
         xywh {5 0 525 30} box PLASTIC_UP_BOX color 40 selection_color 231 labelfont 1 align 4
       } {
         Fl_Group g1 {
@@ -2694,7 +2744,7 @@ switch (num)
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
     int size12 = int(12 * dScale);
-    
+
     amplitudegrp->labelsize(size12);
     globalvolume->labelsize(size);
     vsns->labelsize(size);
@@ -2707,9 +2757,9 @@ switch (num)
     pstc->labelsize(size);
     pvel->labelsize(size);
     rndgrp->labelsize(size);
-    
+
     stereo->labelsize(size11);
-    
+
     filtergrp->labelsize(size12);
 
     globalfreq->labelsize(size12);
@@ -2754,7 +2804,7 @@ switch (num)
         dScale = 0.2f;
 
     advoice->voiceRtext(dScale);
-    
+
     int size = int(14 * dScale);
     g1->labelsize(size);
     g2->labelsize(size);
@@ -2764,10 +2814,10 @@ switch (num)
     g6->labelsize(size);
     g7->labelsize(size);
     g8->labelsize(size);
-    
+
     Vname->labelsize( int(12 * dScale));
     Vclose->labelsize( int(12 * dScale));
-    
+
     Vcopy->labelsize( int(11 * dScale));
     Vpaste->labelsize( int(11 * dScale));
 
