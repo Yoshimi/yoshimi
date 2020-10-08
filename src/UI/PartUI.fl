@@ -2576,14 +2576,16 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
-
+    ctlmidi->show();
     if (fetchW > 0 && fetchH > 0)
+    {
         ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
+        ctlmidiRtext(); // we shoudn't need this!
+    }
     else
         ctlmidi->position(fetchX, fetchY);
     ctlmidi->resizable();
-    ctlmidi->size_range(365, 60, 0, 0, 0, 0, 1);
-    ctlmidi->show();} {}
+    ctlmidi->size_range(365, 60, 0, 0, 0, 0, 1);} {}
   }
   Function {ctlmidirefresh()} {} {
     code {//
