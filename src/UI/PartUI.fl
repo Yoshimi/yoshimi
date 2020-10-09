@@ -364,7 +364,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {1112 270 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -599,9 +599,13 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Controllers
           callback {//
           if (Fl::event_button() != 3)
-              ctlwindow->show();
+          {
+              Showctl();
+          }
           else
-              Showctlmidi();}
+          {
+              Showctlmidi();
+          }}
           tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
@@ -735,10 +739,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window ctlwindow {
       label Controllers
+      callback {//
+        if (Fl::event() == 10)
+            o->hide();
+       // else if (Fl::event() == 11)
+           // ctlRtext();}
       xywh {748 171 505 130} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin"); o->position(fetchX, fetchY);}
-      code2 {ctlSeen = true;}
     } {
       Fl_Dial volrng {
         label {Vol Rng}
@@ -845,20 +852,20 @@ class PartUI {: {public Fl_Group, PartUI_}
         code0 {o->value(part->ctl->filtercutoff.depth);}
         class WidgetPDial
       }
-      Fl_Button {} {
+      Fl_Button ctlclose {
         label Close
         callback {//
-        aftertouchcontrol->hide();
+        //aftertouchcontrol->hide();
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
       }
-      Fl_Button {} {
+      Fl_Button resetallctl {
         label {Reset all controllers}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
-      Fl_Group {} {
+      Fl_Group ctlresonance {
         label Resonance
         xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10 align 5
       } {
@@ -879,11 +886,11 @@ class PartUI {: {public Fl_Group, PartUI_}
           class WidgetPDial
         }
       }
-      Fl_Group {} {
+      Fl_Group ctlportamento {
         label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10
       } {
-        Fl_Box {} {
+        Fl_Box ctlx100 {
           label {x100 cnt.}
           xywh {400 50 55 15} labelsize 10 align 16
         }
@@ -963,7 +970,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button aftertouch {
         label Aftertouch
         callback {//;
-                aftertouchcontrol->show();
+                ShowAT();
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
         xywh {245 105 130 20}
@@ -971,8 +978,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window aftertouchcontrol {
       label Aftertouch
-      xywh {1207 59 485 180} type Double hide
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT"); o->position(fetchX, fetchY); ATSeen = true;}
+      callback {//
+        if (Fl::event() == 10)
+            o->hide();
+        else if (Fl::event() == 11)
+            ATRtext();}
+      xywh {718 91 485 180} type Double hide resizable
+      class YoshiWin
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME
@@ -980,7 +992,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Box {} {
         xywh {241 5 234 143} box ENGRAVED_FRAME
       }
-      Fl_Box {} {
+      Fl_Box ATchan {
         label Channel
         xywh {95 13 35 17} labelfont 1
       }
@@ -1070,7 +1082,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 setATchannel(PART::aftertouchType::volume, o->value());}
         tooltip {Between current part volume and max.} xywh {25 145 70 15} down_box DOWN_BOX
       }
-      Fl_Box {} {
+      Fl_Box ATkey {
         label Key
         xywh {328 13 35 17} labelfont 1
       }
@@ -1170,7 +1182,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             o->hide();
         else if (Fl::event() == 11)
             ctlmidiRtext();}
-      xywh {661 261 365 60} type Double hide resizable
+      xywh {608 398 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
       class YoshiWin
     } {
@@ -2594,6 +2606,41 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     editSeen = true;} {}
   }
+  Function {Showctl()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin");
+    //ctlwindow->show();
+    /*if (fetchW > 0 && fetchH > 0)
+    {
+        ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);
+        ctlRtext(); // we shoudn't need this!
+    }
+    else*/
+        ctlwindow->position(fetchX, fetchY);
+    //ctlwindow->resizable();
+    //ctlwindow->size_range(505, 130, 0, 0, 0, 0, 1);
+    ctlwindow->show();
+    std::cout << "seen ctl" << std::endl;
+    ctlSeen = true;} {}
+  }
+  Function {ShowAT()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT");
+    aftertouchcontrol->show();
+    if (fetchW > 0 && fetchH > 0)
+    {
+        aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
+        ATRtext(); // we shoudn't need this!
+    }
+    else
+        aftertouchcontrol->position(fetchX, fetchY);
+    aftertouchcontrol->resizable();
+    aftertouchcontrol->size_range(485, 180, 0, 0, 0, 0, 1);
+    aftertouchcontrol->show();
+    ATSeen = true;} {}
+  }
   Function {Showctlmidi()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
@@ -2640,7 +2687,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     ADD->labelsize(size14);
     adsynenabledcheck->labelsize(size11);
     adeditbutton->labelsize(size14);
-    
+
     SUB->labelsize(size14);
     subsynenabledcheck->labelsize(size11);
     subeditbutton->labelsize(size14);
@@ -2648,7 +2695,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     PAD->labelsize(size14);
     padsynenabledcheck->labelsize(size11);
     padeditbutton->labelsize(size14);
-    
+
     kitedit->labelsize(size14);
     effects->labelsize(size14);
 
@@ -2689,7 +2736,73 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ctlRtext()} {} {
     code {//
-    std::cout << "In ctl" << std::endl;} {}
+    float defW = 505;
+    float defH = 130;
+    float dW = ctlwindow->w() / defW;
+    float dH = ctlwindow->h() / defH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    int size = int(dScale * 10);
+
+    volrng->labelsize(size);
+
+
+
+
+
+
+
+
+
+
+    ctlwindow->redraw();
+    saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), true, "ctlWin");} {}
+  }
+  Function {ATRtext()} {} {
+    code {//
+    float defW = 485;
+    float defH = 180;
+    float dW = aftertouchcontrol->w() / defW;
+    float dH = aftertouchcontrol->h() / defH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    int size14 = int(dScale * 14);
+
+    ATchan->labelsize(size14);
+    channeloff->labelsize(size14);
+    channelfiltercutoff->labelsize(size14);
+    channelfilterCminus->labelsize(size14);
+    channelfilterQ->labelsize(size14);
+    channelfilterQminus->labelsize(size14);
+    channelpitchbend->labelsize(size14);
+    channelpitchBminus->labelsize(size14);
+    channelmodulation->labelsize(size14);
+    channelvolume->labelsize(size14);
+
+    ATkey->labelsize(size14);
+    polyoff->labelsize(size14);
+    polyfiltercutoff->labelsize(size14);
+    polyfilterCminus->labelsize(size14);
+    polyfilterQ->labelsize(size14);
+    polyfilterQminus->labelsize(size14);
+    polypitchbend->labelsize(size14);
+    polypitchBminus->labelsize(size14);
+    polymodulation->labelsize(size14);
+
+    aftertouchcontrol->redraw();
+    saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), true, "afterT");} {}
   }
   Function {ctlmidiRtext()} {} {
     code {//
@@ -2705,8 +2818,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-    int size = int(dScale * 10);
-    //std::cout << "In ctlmidi size " << size << std::endl;
+    int size = int(dScale * 10);;
 
     modulation->labelsize(size);
     expression->labelsize(size);
@@ -2720,7 +2832,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {~PartUI()} {} {
     code {//
     if (ATSeen)
-        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), aftertouchcontrol->visible(), "afterT");
+        setVisible(synth, aftertouchcontrol->visible(), "afterT");
     if (ctlSeen)
         saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     if (efxSeen)
@@ -2728,7 +2840,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (kitSeen)
         saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
     if (editSeen)
-        saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(), instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
+        setVisible(synth, instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
     {
         adnoteui->ADnoteGlobalParameters->hide();

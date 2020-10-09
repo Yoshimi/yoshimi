@@ -2511,15 +2511,14 @@ Alan Calvert started the project}
         vectorui->vectorwindow->hide();
 
     if (lastSeen(synth, "ctlWin"))
-    {
-        partui->ctlwindow->show();
-        if (lastSeen(synth, "afterT"))
-            partui->aftertouchcontrol->show();
-        else
-            partui->aftertouchcontrol->hide();
-    }
+        partui->Showctl();
     else
         partui->ctlwindow->hide();
+
+    if (lastSeen(synth, "afterT"))
+        partui->ShowAT();
+    else
+        partui->aftertouchcontrol->hide();
 
     if (lastSeen(synth, "ctlmidi"))
         partui->Showctlmidi();
