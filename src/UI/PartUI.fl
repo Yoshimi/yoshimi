@@ -364,7 +364,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {1112 270 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -457,7 +457,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         if (!divert)
         {
             lastkey = -1;
-            instrumenteditwindow->show();
+            Showedit();
         }}
           xywh {330 6 42 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
@@ -1448,10 +1448,15 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {1245 202 395 385} type Double hide
+      callback {//
+        if (Fl::event() == 10)
+            o->hide();
+        else if (Fl::event() == 11)
+            editRtext();}
+      xywh {330 188 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
-      code2 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit"); o->position(fetchX, fetchY); editSeen = true;}
+      class YoshiWin
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1480,7 +1485,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -1508,7 +1513,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -1536,11 +1541,11 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
                 instrumenteditwindow->hide();}
-            tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
-        Fl_Button {} {
+        Fl_Button kitedit {
           label {Kit Edit}
           callback {//
           instrumentkitlist->show();
@@ -1548,23 +1553,23 @@ class PartUI {: {public Fl_Group, PartUI_}
               instrumenteditwindow->hide();}
           tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
-        Fl_Button {} {
+        Fl_Button effects {
           label Effects
           callback {//
           partfx->show();
           if ((Fl::event_button() == 3))
               instrumenteditwindow->hide();}
-          tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
+          tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1
         }
       }
       Fl_Group {} {
         xywh {0 5 395 215} box ENGRAVED_FRAME
       } {
-        Fl_Text_Display {} {
+        Fl_Text_Display A_C_display {
           label {Author and Copyright}
           xywh {171 44 148 4} box NO_BOX labelsize 12
         }
-        Fl_Button {} {
+        Fl_Button A_C_default {
           label Default
           callback {//
             int param = 0;
@@ -1595,71 +1600,71 @@ class PartUI {: {public Fl_Group, PartUI_}
           xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textsize 10
           code0 {o->value(part->info.Ptype);}
         } {
-          MenuItem {} {
+          MenuItem Tundefined {
             label undefined
             xywh {20 20 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tpiano {
             label Piano
             xywh {10 10 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TchromPerc {
             label {Chromatic Percussion}
             xywh {20 20 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Torgan {
             label Organ
             xywh {30 30 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tguitar {
             label Guitar
             xywh {40 40 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tbass {
             label Bass
             xywh {50 50 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TsoloStrings {
             label {Solo Strings}
             xywh {60 60 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tensemble {
             label Ensemble
             xywh {70 70 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tbrass {
             label Brass
             xywh {80 80 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Treed {
             label Reed
             xywh {90 90 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tpipe {
             label Pipe
             xywh {100 100 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TsynthLead {
             label {Synth Lead}
             xywh {110 110 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TsynthPad {
             label {Synth Pad}
             xywh {120 120 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TsynthEff {
             label {Synth Effects}
             xywh {130 130 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tethnic {
             label Ethnic
             xywh {140 140 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem Tpercussive {
             label Percussive
             xywh {150 150 100 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem TsoundEff {
             label {Sound Effects}
             xywh {160 160 100 20} labelfont 1 labelsize 11
           }
@@ -1687,14 +1692,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
-      Fl_Button {} {
+      Fl_Button editClose {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {294 358 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
+        xywh {294 358 80 21} box THIN_UP_BOX labelfont 1
       }
-      Fl_Text_Display {} {
+      Fl_Text_Display humanise_display {
         label Humanise
-        xywh {274 347 78 7} box NO_BOX labelfont 1
+        xywh {288 353 78 7} box NO_BOX labelfont 1 labelsize 16
       }
     }
   }
@@ -2572,6 +2577,23 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Edit").c_str());} {}
   }
+  Function {Showedit()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit");
+    instrumenteditwindow->show();
+    if (fetchW > 0 && fetchH > 0)
+    {
+        instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
+        editRtext(); // we shoudn't need this!
+    }
+    else
+        instrumenteditwindow->position(fetchX, fetchY);
+    instrumenteditwindow->resizable();
+    instrumenteditwindow->size_range(395, 385, 0, 0, 0, 0, 1);
+
+    editSeen = true;} {}
+  }
   Function {Showctlmidi()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
@@ -2594,6 +2616,80 @@ class PartUI {: {public Fl_Group, PartUI_}
     filterq->value(part->ctl->filterq.data);
     filtercutoff->value(part->ctl->filtercutoff.data);
     masterbandwidth->value(part->ctl->bandwidth.data);} {}
+  }
+  Function {editRtext()} {} {
+    code {//
+    float defW = 395;
+    float defH = 385;
+    float dW = instrumenteditwindow->w() / defW;
+    float dH = instrumenteditwindow->h() / defH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+    int size14 = int(14 * dScale);
+
+    ADD->labelsize(size14);
+    adsynenabledcheck->labelsize(size11);
+    adeditbutton->labelsize(size14);
+    
+    SUB->labelsize(size14);
+    subsynenabledcheck->labelsize(size11);
+    subeditbutton->labelsize(size14);
+
+    PAD->labelsize(size14);
+    padsynenabledcheck->labelsize(size11);
+    padeditbutton->labelsize(size14);
+    
+    kitedit->labelsize(size14);
+    effects->labelsize(size14);
+
+    A_C_display->labelsize(size12);
+    A_C_default->labelsize(size12);
+    copyright->labelsize(size12);
+    	copyright->textsize(size14);
+    commentField->labelsize(size12);
+    	commentField->textsize(size14);
+    instrumentType->labelsize(size11);
+        Tundefined->labelsize(size11);
+        Tpiano->labelsize(size11);
+        TchromPerc->labelsize(size11);
+        Torgan->labelsize(size11);
+        Tguitar->labelsize(size11);
+        Tbass->labelsize(size11);
+        TsoloStrings->labelsize(size11);
+        Tensemble->labelsize(size11);
+        Tbrass->labelsize(size11);
+        Treed->labelsize(size11);
+        Tpipe->labelsize(size11);
+        TsynthLead->labelsize(size11);
+        TsynthPad->labelsize(size11);
+        TsynthEff->labelsize(size11);
+        Tethnic->labelsize(size11);
+        Tpercussive->labelsize(size11);
+        TsoundEff->labelsize(size11);
+
+    humanise->labelsize(size12);
+    	humanise->textsize(size);
+    velocityhumanise->labelsize(size12);
+    	velocityhumanise->textsize(size);
+    editClose->labelsize(size14);
+    humanise_display->labelsize(int(16 * dScale));
+
+    instrumenteditwindow->redraw();
+    saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), true, "partEdit");} {}
+  }
+  Function {ctlRtext()} {} {
+    code {//
+    std::cout << "In ctl" << std::endl;} {}
   }
   Function {ctlmidiRtext()} {} {
     code {//
@@ -2620,10 +2716,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlmidiclose->labelsize(int(dScale * 14)-1);
     ctlmidi->redraw();
     saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), true, "ctlmidi");} {}
-  }
-  Function {ctlRtext()} {} {
-    code {//
-    std::cout << "In ctl" << std::endl;} {}
   }
   Function {~PartUI()} {} {
     code {//

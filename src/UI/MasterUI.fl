@@ -1552,17 +1552,16 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::partNumber:
-        {
+            {
             bool ctlmidiSeen = partui->ctlmidi->visible();
+            if(partui->instrumenteditwindow->visible())
+                openedit = true;
+            // openedit also set by right click in mixer panel
+            // might need further refinement
 
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 activePart = value_int;
 
-            openedit = partui->instrumenteditwindow->visible();
-            // openedit also set by right click in mixer panel
-            // might need further refinement
-
-            partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
             partuigroup->add(partui);
@@ -1580,11 +1579,13 @@ Alan Calvert started the project}
             updatepanel();
             if (openedit)
             {
-                partui->instrumenteditwindow->show();
+                partui->Showedit();
                 openedit = false;
             }
+            else
+                partui->instrumenteditwindow->hide();
+            }
             break;
-        }
 
         case MAIN::control::availableParts:
             partmax = value_int;
@@ -2526,7 +2527,7 @@ Alan Calvert started the project}
         partui->ctlmidi->hide();
 
     if (lastSeen(synth, "partEdit"))
-        partui->instrumenteditwindow->show();
+        partui->Showedit();
     else
         partui->instrumenteditwindow->hide();} {}
   }
