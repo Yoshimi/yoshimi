@@ -2543,7 +2543,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         adnoteui->ADnoteGlobalParameters->show();
     }
     if (engine == 1 && subnoteui != NULL)
-        subnoteui->SUBparameters->show();
+        subnoteui->Showsub();
     if (engine == 2 && adnoteui != NULL)
         padnoteui->padnotewindow->show();} {}
   }
