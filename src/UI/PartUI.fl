@@ -2544,8 +2544,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     if (engine == 1 && subnoteui != NULL)
         subnoteui->Showsub();
-    if (engine == 2 && adnoteui != NULL)
-        padnoteui->padnotewindow->show();} {}
+    if (engine == 2 && padnoteui != NULL)
+        padnoteui->Showpad();} {}
   }
   Function {setinstrumentlabel(string text = "")} {} {
     code {//

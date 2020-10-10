@@ -133,7 +133,7 @@ pars=NULL;} {}
           label Type
           callback {//
           send_data(0, group, LFOINSERT::control::type, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
+          tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 9 align 2 textsize 8
         } {
           MenuItem Lsine {
             label SINE
@@ -240,24 +240,23 @@ pars=NULL;} {}
     freqrand->labelsize(knobsize);
     stretch->labelsize(knobsize);
 
-    Lsine->labelsize(knobsize);
-    Ltri->labelsize(knobsize);
-    Lsqr->labelsize(knobsize);
-    Lrup->labelsize(knobsize);
-    Lrdn->labelsize(knobsize);
-    Le1dn->labelsize(knobsize);
-    Le2dn->labelsize(knobsize);
-    Lsh->labelsize(knobsize);
-    Lrsqu->labelsize(knobsize);
-    Lrsqd->labelsize(knobsize);
-    
+    LFOtype->labelsize(int(9 * dScale));
+        Lsine->labelsize(knobsize);
+        Ltri->labelsize(knobsize);
+        Lsqr->labelsize(knobsize);
+        Lrup->labelsize(knobsize);
+        Lrdn->labelsize(knobsize);
+        Le1dn->labelsize(knobsize);
+        Le2dn->labelsize(knobsize);
+        Lsh->labelsize(knobsize);
+        Lrsqu->labelsize(knobsize);
+        Lrsqd->labelsize(knobsize);
+
     lfoC->labelsize(knobsize);
     lfoP->labelsize(knobsize);
-    
+
     continous->labelsize(knobsize);
 
-    lfotype->labelsize(knobsize);
-    //printf("size %d\\n", knobsize);
     lfoui->redraw();} {}
   }
   Function {send_data(int action, int group, int control, float value, int type)} {} {
@@ -317,8 +316,7 @@ pars=NULL;} {}
             break;
     }} {}
   }
-  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {open
-  } {
+  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
     pars=lfopars_;
     synth = pars->getSynthEngine();

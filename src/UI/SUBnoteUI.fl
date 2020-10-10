@@ -698,7 +698,7 @@ class SUBnoteUI {: {public PresetsUI_}
     filterenv->refresh();} {}
   }
   Function {Showsub()} {} {
-    code {// 
+    code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "sub");
     SUBparameters->show();
@@ -725,7 +725,7 @@ class SUBnoteUI {: {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-        
+
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
     //int size12 = int(12 * dScale);
@@ -746,14 +746,14 @@ class SUBnoteUI {: {public PresetsUI_}
         h[i]->h_num->labelsize(int(12 * dScale));
         h[i]->h_dash->size(int(10 * dW), int(3 * dH));
     }
-    
+
     ampgrp->labelsize(size11);
     vol->labelsize(size);
     vsns->labelsize(size);
     pan->labelsize(size);
     panwidth->labelsize(size);
     randompan->labelsize(size11);
-    
+
     freqsettingsui->labelsize(size11);
     freqee->labelsize(size);
     octave->labelsize(size);
@@ -771,14 +771,14 @@ class SUBnoteUI {: {public PresetsUI_}
         subE1200->labelsize(size);
     coarsedet->labelsize(size);
         coarsedet->textsize(size11);
-    
+
     bandwidthsettingsui->labelsize(size11);
     bwee->labelsize(size);
     bandwidth->labelsize(size);
          bandwidth->textsize(size);
     bwidthscale->labelsize(size);
         bwidthscale->textsize(size);
-    
+
     spreadGroup->labelsize(size11);
     spreadpar1->labelsize(size);
     spreadpar2->labelsize(size);
@@ -792,7 +792,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Ssine->labelsize(size11);
         Spower->labelsize(size11);
         Sshift->labelsize(size11);
-        
+
     globalfiltergroup->labelsize(size11);
     filtere->labelsize(size);
     filterstages->labelsize(size);
@@ -807,7 +807,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Szero->labelsize(size11);
         Srnd->labelsize(size11);
         Smax->labelsize(size11);
-    
+
     stereo->labelsize(size);
     subClear->labelsize(size11);
     subCopy->labelsize(size11);
