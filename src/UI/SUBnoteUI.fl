@@ -167,15 +167,16 @@ class SUBnoteUI {: {public PresetsUI_}
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
       callback {//
-          if (Fl::event() == 10)
+          if (Fl::event() == FL_CLOSE)
               o->hide();
-          else if (Fl::event() == 11)
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               subRtext();}
       xywh {446 515 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
+      code1 {subDW = o->w();subDH=o->h();}
       class YoshiWin
     } {
-      Fl_Scroll frame {
+      Fl_Scroll frame {open
         xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
@@ -709,26 +710,28 @@ class SUBnoteUI {: {public PresetsUI_}
     }
     else
         SUBparameters->position(fetchX, fetchY);
-    SUBparameters->resizable();
-    SUBparameters->size_range(735, 470, 0, 0, 0, 0, 1);} {}
+
+    SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);} {}
   }
   Function {subRtext()} {} {
     code {//
-    float defW = 735;
-    float defH = 470;
-    float dW = SUBparameters->w() / defW;
-    float dH = SUBparameters->h() / defH;
+    float dW = SUBparameters->w() / subDW;
+    float dH = SUBparameters->h() / subDH;
     float dScale;
-    if (dW < dH)
-        dScale = dW;
+    if (Fl::event_button3)
+        dScale = 1;
     else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
+    {
+        if (dW < dH)
+            dScale = dW;
+        else
+            dScale = dH;
+        if (dScale < 0.2f)
+            dScale = 0.2f;
+    }
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
-    //int size12 = int(12 * dScale);
 
     ampenv->envRtext(dScale);
     bandwidthenvelopegroup->envRtext(dScale);
@@ -1004,5 +1007,9 @@ class SUBnoteUI {: {public PresetsUI_}
   decl {int npart;} {private local
   }
   decl {int kititem;} {private local
+  }
+  decl {float subDW;} {private local
+  }
+  decl {float subDH;} {private local
   }
 }
