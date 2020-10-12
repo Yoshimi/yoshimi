@@ -315,7 +315,8 @@ return(1);} {}
 
 class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
-  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {//
     synth = NULL;
     env=NULL;
@@ -703,7 +704,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         }
         Fl_Button e3P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);} selected
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -789,10 +790,11 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
     }
   }
-  Function {make_free_window()} {} {
-    Fl_Window envfree {
-      xywh {874 240 205 70} type Double color 50 labelfont 1 hide resizable
-      class Fl_Group
+  Function {make_free_window()} {open
+  } {
+    Fl_Window envfree {open
+      xywh {874 240 205 70} type Double color 50 labelfont 1 resizable
+      class Fl_Group visible
     } {
       Fl_Group envfreegroup {
         label {Amplitude Env}
@@ -805,22 +807,22 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
           code0 {o->init(env, npart, kititem, engine, group);}
           class EnvelopeFreeEdit
         }
-        Fl_Button efE {
-          label E
-          callback {freemodeeditwindow->show();
+      }
+      Fl_Button efC {
+        label C
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+        xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+      }
+      Fl_Button efP {
+        label P
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+        xywh {168 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+      }
+      Fl_Button efE {
+        label E
+        callback {freemodeeditwindow->show();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-          xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
-        }
-        Fl_Button efC {
-          label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
-          xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
-        }
-        Fl_Button efP {
-          label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
-          xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
-        }
+        xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
   }
@@ -1233,7 +1235,15 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
   Function {envRtext(float dScale)} {open
   } {
     code {//
+        int X = this->x();
+        int Y = this->y();
+        int W = this->w();
+        int H = this->h();
+        
+        dScale = H / 70.0f;
+        
         int size = int(dScale * 10);
+
         
         e1name->labelsize(size);
         e1adt->labelsize(size);
@@ -1282,10 +1292,16 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         e4P->labelsize(size);
         e4E->labelsize(size);
         
-        freeeditsmall->labelsize(size);
+        envfreegroup->labelsize(size);
         efC->labelsize(size);
         efP->labelsize(size);
-        efE->labelsize(size);} {}
+        efE->labelsize(size);
+
+        //std::cout << "W " << W << "  H " << H << std::endl;
+        envfree->resize(X, Y, W, H);
+        
+        freeeditsmall->resize(int(X + 5*dScale), int(Y + 20*dScale), int(W - 9*dScale), int(H - 25*dScale));} {selected
+    }
   }
   Function {setAmpSusVType(bool linear)} {return_type void
   } {

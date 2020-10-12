@@ -815,7 +815,7 @@ class SUBnoteUI {: {public PresetsUI_}
     subClose->labelsize(size11);
 
     SUBparameters->redraw();
-    saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(),SUBparameters->y(), true, "sub");} {}
+    saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), true, "sub");} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
