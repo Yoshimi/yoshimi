@@ -35,6 +35,9 @@ This file is a derivative of the ZynAddSubFX original.
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/YoshiWin.h"} {public local
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -315,8 +318,7 @@ return(1);} {}
 
 class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
-  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
     synth = NULL;
     env=NULL;
@@ -328,52 +330,31 @@ class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
     envfree=NULL;} {}
   }
   Function {~EnvelopeUI()} {} {
-    code {envwindow->hide();
-hide();
-freemodeeditwindow->hide();
-delete (freemodeeditwindow);} {}
+    code {//
+	if (freemodeeditwindow->x() > 4)
+            saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(),freemodeeditwindow->visible(), "zenvFree " + to_string(engine) + " " + to_string(group));
+        freemodeeditwindow->hide();
+        delete (freemodeeditwindow);
+        envwindow->hide();
+        hide();} {}
   }
-  Function {make_freemode_edit_window()} {} {
+  Function {make_freemode_edit_window()} {open
+  } {
     Fl_Window freemodeeditwindow {
       label Envelope
-      xywh {795 68 575 180} type Double hide
+      callback {//
+	std::cout << "freeresize" << std::endl;
+        if (Fl::event() == 10)
+            o->hide();
+        else if (Fl::event() == 11)
+            envfreeRtext();} open selected
+      xywh {614 158 575 180} type Double resizable visible
     } {
       Fl_Box freeedit {
         label Envelope
         xywh {5 5 565 145} box FLAT_BOX color 0
         code0 {o->init(env, npart, kititem, engine, group);}
         class EnvelopeFreeEdit
-      }
-      Fl_Button addpoint {
-        label {Add point}
-        callback {//
-        int curpoint = freeedit->lastpoint;
-        if (curpoint<0)
-            return;
-        if (env->Penvpoints >= MAX_ENVELOPE_POINTS)
-            return;
-
-        int value = env->Penvval[curpoint];
-        int offset = env->Penvdt[curpoint];
-
-        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints, offset);}
-        xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
-        code0 {if (env->Pfreemode==0) o->hide();}
-      }
-      Fl_Button deletepoint {
-        label {Delete point}
-        callback {//
-        int curpoint = freeedit->lastpoint;
-        if (curpoint < 1)
-            return;
-        if (curpoint >= env->Penvpoints-1)
-            return;
-        if (env->Penvpoints <= 3)
-            return;
-
-send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints);}
-        xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
-        code0 {if (env->Pfreemode==0) o->hide();}
       }
       Fl_Light_Button freemodebutton {
         label FreeMode
@@ -391,13 +372,45 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write);}
         tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11
       }
-      Fl_Check_Button forcedreleasecheck {
-        label frcR
+      Fl_Button addpoint {
+        label {Add point}
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Forced Release} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(env->Pforcedrelease);}
+        int curpoint = freeedit->lastpoint;
+        if (curpoint<0)
+            return;
+        if (env->Penvpoints >= MAX_ENVELOPE_POINTS)
+            return;
+
+        int value = env->Penvval[curpoint];
+        int offset = env->Penvdt[curpoint];
+
+        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints, offset);}
+        xywh {112 155 80 20} box THIN_UP_BOX labelsize 11
+        code0 {if (env->Pfreemode==0) o->hide();}
+      }
+      Fl_Button deletepoint {
+        label {Delete point}
+        callback {//
+        int curpoint = freeedit->lastpoint;
+        if (curpoint < 1)
+            return;
+        if (curpoint >= env->Penvpoints-1)
+            return;
+        if (env->Penvpoints <= 3)
+            return;
+
+send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints);}
+        xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
+        code0 {if (env->Pfreemode==0) o->hide();}
+      }
+      Fl_Counter sustaincounter {
+        label Sust
+        callback {//
+        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainPoint, o->value(), TOPLEVEL::type::Write);}
+        tooltip {Sustain (0 is disabled)} xywh {315 158 40 15} type Simple labelsize 11 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        code0 {o->value(env->Penvsustain);}
         code1 {if (env->Pfreemode==0) o->hide();}
+        code2 {o->maximum(env->Penvpoints-2);}
       }
       Fl_Dial envstretchdial {
         label {Str.}
@@ -409,37 +422,37 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         code2 {o->setValueType(VC_EnvStretch);}
         class WidgetPDial
       }
-      Fl_Button {} {
-        label Close
-        callback {freemodeeditwindow->hide();}
-        xywh {519 155 44 20} box THIN_UP_BOX labelsize 12
-      }
       Fl_Check_Button linearenvelopecheck {
         label L
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Linear Envelope} xywh {410 151 30 15} down_box DOWN_BOX labelsize 10
+        tooltip {Linear Envelope} xywh {415 151 30 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
       }
-      Fl_Counter sustaincounter {
-        label Sust
+      Fl_Check_Button forcedreleasecheck {
+        label frcR
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainPoint, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Sustain (0 is disabled)} xywh {315 155 40 15} type Simple labelsize 11 align 4 minimum 0 maximum 127 step 1
-        code0 {o->value(env->Penvsustain);}
+        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
+        tooltip {Forced Release} xywh {415 165 40 15} down_box DOWN_BOX labelsize 10
+        code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
-        code2 {o->maximum(env->Penvpoints-2);}
       }
-      Fl_Button {} {
+      Fl_Button freecopy {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
-        xywh {465 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {465 158 16 16} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
-      Fl_Button {} {
+      Fl_Button freepaste {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
-        xywh {482 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {486 158 16 16} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+      }
+      Fl_Button freeClose {
+        label Close
+        callback {freemodeeditwindow->hide();
+saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "zenvFree " + to_string(engine) + " " + to_string(group));}
+        xywh {519 155 44 20} box THIN_UP_BOX labelsize 12
       }
     }
   }
@@ -506,7 +519,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         }
         Fl_Button e1E {
           label E
-          callback {freemodeeditwindow->show();
+          callback {//
+          showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
@@ -605,8 +619,9 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
       Fl_Button e2E {
         label E
-        callback {freemodeeditwindow->show();
-        send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
+        callback {//
+      showfree();
+      send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
@@ -693,7 +708,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         Fl_Button e3E {
           label E
           callback {//
-          freemodeeditwindow->show();
+          showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
           xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
@@ -784,17 +799,17 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
       Fl_Button e4E {
         label E
-        callback {freemodeeditwindow->show();
+        callback {//
+        showfree();
         send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
   }
-  Function {make_free_window()} {open
-  } {
-    Fl_Window envfree {open
-      xywh {874 240 205 70} type Double color 50 labelfont 1 resizable
-      class Fl_Group visible
+  Function {make_free_window()} {} {
+    Fl_Window envfree {
+      xywh {874 240 205 70} type Double color 50 labelfont 1 hide resizable
+      class Fl_Group
     } {
       Fl_Group envfreegroup {
         label {Amplitude Env}
@@ -820,7 +835,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
       Fl_Button efE {
         label E
-        callback {freemodeeditwindow->show();
+        callback {showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
@@ -1052,6 +1067,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
     if (env->Envmode == ENVMODE::bandwidth) envfreegroup->label("Bandwidth Env");
 
     freemodeeditwindow->label(this->label());
+    freemodeeditwindow->hide();
 
     freeeditsmall->setpair(freeedit);
     freeedit->setpair(freeeditsmall);
@@ -1076,7 +1092,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         env->Pfreemode = 0;
     reinitcore(env->Pfreemode);} {}
   }
-  Function {reinitcore(bool freemode)} {} {
+  Function {reinitcore(bool freemode)} {open
+  } {
     code {//
     if (freemode)
         freemodebutton->value(1);
@@ -1084,10 +1101,10 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         freemodebutton->value(0);
 
     hide();
-    int winx = freemodeeditwindow->x();
-    int winy = freemodeeditwindow->y();
+    //int winx = freemodeeditwindow->x();
+    //int winy = freemodeeditwindow->y();
 
-    freemodeeditwindow->hide();
+    //freemodeeditwindow->hide();
 
     envwindow->hide();
     Fl_Group *par = envwindow->parent();
@@ -1099,8 +1116,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
 
     par->show();
     show();
-    freemodeeditwindow->position(winx, winy);
-    freemodeeditwindow->show();
+    //freemodeeditwindow->position(winx, winy);
+    //freemodeeditwindow->show();
 
     if (freemode)
     {
@@ -1232,19 +1249,63 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
 
     envwindow->show();} {}
   }
-  Function {envRtext(float dScale)} {open
+  Function {showfree()} {open
   } {
+    code {//
+        int fetchW, fetchH, fetchX, fetchY, fetchO;
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "zenvFree " + to_string(engine) + " " + to_string(group));
+    	freemodeeditwindow->show();
+    	if (fetchW > 0 && fetchH > 0)
+    	{
+           freemodeeditwindow->resize(fetchX, fetchY, fetchW, fetchH);
+           envfreeRtext();
+    	}
+   	else
+            freemodeeditwindow->position(fetchX, fetchY);
+        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {}
+  }
+  Function {envfreeRtext()} {} {
+    code {//
+        float defW = 575;
+        float defH = 180;
+        float dW = freemodeeditwindow->w() / defW;
+        float dH = freemodeeditwindow->h() / defH;
+        float dScale;
+        if (dW < dH)
+            dScale = dW;
+        else
+            dScale = dH;
+        if (dScale < 0.2f)
+            dScale = 0.2f;
+
+        int size = int(10 * dScale);
+        int size11 = int(11 * dScale);
+        int size12 = int(12 * dScale);
+
+        freemodebutton->labelsize(size11);
+        addpoint->labelsize(size11);
+        deletepoint->labelsize(size11);
+        sustaincounter->labelsize(size11);
+            sustaincounter->textsize(size12);
+        envstretchdial->labelsize(size);
+        linearenvelopecheck->labelsize(size);
+        forcedreleasecheck->labelsize(size);
+        freecopy->labelsize(size);
+        freepaste->labelsize(size);
+        freeClose->labelsize(size12);} {}
+  }
+  Function {envRtext(float dScale)} {} {
     code {//
         int X = this->x();
         int Y = this->y();
         int W = this->w();
         int H = this->h();
-        
+
         dScale = H / 70.0f;
-        
+
         int size = int(dScale * 10);
 
-        
+
         e1name->labelsize(size);
         e1adt->labelsize(size);
         e1ddt->labelsize(size);
@@ -1256,7 +1317,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         e1linearenvelope->labelsize(size);
         e1C->labelsize(size);
         e1P->labelsize(size);
-        
+
         e2name->labelsize(size);
         e2aval->labelsize(size);
         e2adt->labelsize(size);
@@ -1267,7 +1328,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         e2C->labelsize(size);
         e2P->labelsize(size);
         e2E->labelsize(size);
-        
+
         e3name->labelsize(size);
         e3aval->labelsize(size);
         e3adt->labelsize(size);
@@ -1280,7 +1341,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         e3C->labelsize(size);
         e3P->labelsize(size);
         e3E->labelsize(size);
-        
+
         e4name->labelsize(size);
         e4aval->labelsize(size);
         e4adt->labelsize(size);
@@ -1291,7 +1352,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         e4C->labelsize(size);
         e4P->labelsize(size);
         e4E->labelsize(size);
-        
+
         envfreegroup->labelsize(size);
         efC->labelsize(size);
         efP->labelsize(size);
@@ -1299,9 +1360,8 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
 
         //std::cout << "W " << W << "  H " << H << std::endl;
         envfree->resize(X, Y, W, H);
-        
-        freeeditsmall->resize(int(X + 5*dScale), int(Y + 20*dScale), int(W - 9*dScale), int(H - 25*dScale));} {selected
-    }
+
+        freeeditsmall->resize(int(X + 5*dScale), int(Y + 20*dScale), int(W - 9*dScale), int(H - 25*dScale));} {}
   }
   Function {setAmpSusVType(bool linear)} {return_type void
   } {

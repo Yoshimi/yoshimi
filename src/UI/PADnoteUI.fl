@@ -1093,7 +1093,7 @@ class PADnoteUI {: {public PresetsUI_}
     if (fetchW > 0 && fetchH > 0)
     {
         padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);
-        padRtext(); // we shoudn't need this!
+        padRtext();
     }
     else
         padnotewindow->position(fetchX, fetchY);

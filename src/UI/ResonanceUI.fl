@@ -635,7 +635,7 @@ class ResonanceUI {: PresetsUI_
         else
         {
             resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
-            resonanceRtext(); // we shoudn't need this!
+            resonanceRtext();
         }
         resSeen = true;
     }

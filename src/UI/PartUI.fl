@@ -2597,7 +2597,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (fetchW > 0 && fetchH > 0)
     {
         instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
-        editRtext(); // we shoudn't need this!
+        editRtext();
     }
     else
         instrumenteditwindow->position(fetchX, fetchY);
@@ -2614,7 +2614,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     /*if (fetchW > 0 && fetchH > 0)
     {
         ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);
-        ctlRtext(); // we shoudn't need this!
+        ctlRtext();
     }
     else*/
         ctlwindow->position(fetchX, fetchY);
@@ -2632,7 +2632,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (fetchW > 0 && fetchH > 0)
     {
         aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
-        ATRtext(); // we shoudn't need this!
+        ATRtext();
     }
     else
         aftertouchcontrol->position(fetchX, fetchY);
@@ -2649,7 +2649,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (fetchW > 0 && fetchH > 0)
     {
         ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
-        ctlmidiRtext(); // we shoudn't need this!
+        ctlmidiRtext();
     }
     else
         ctlmidi->position(fetchX, fetchY);

@@ -705,7 +705,7 @@ class SUBnoteUI {: {public PresetsUI_}
     if (fetchW > 0 && fetchH > 0)
     {
         SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
-        subRtext(); // we shoudn't need this!
+        subRtext();
     }
     else
         SUBparameters->position(fetchX, fetchY);
