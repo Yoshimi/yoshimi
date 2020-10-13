@@ -294,9 +294,9 @@ class ResonanceUI {: PresetsUI_
     Fl_Window resonancewindow {
       label Resonance
       callback {//
-          if (Fl::event() == 10)
+          if (Fl::event() == FL_CLOSE)
               o->hide();
-          else if (Fl::event() == 11)
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               resonanceRtext();}
       xywh {393 72 780 305} type Double hide resizable
       class YoshiWin

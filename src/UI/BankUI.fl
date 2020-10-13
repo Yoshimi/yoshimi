@@ -321,9 +321,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         instrumentRtext();}
       xywh {758 312 780 575} type Double labelsize 12 hide resizable
       class YoshiWin
@@ -537,9 +537,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     Fl_Window searchwin {
       label {Bank Search}
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
          searchRtext();}
       xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       class YoshiWin
@@ -664,9 +664,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     Fl_Window bankuiwindow {
       label Root
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
          bankRtext();}
       xywh {84 223 775 575} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
@@ -849,9 +849,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     Fl_Window rootuiwindow {
       label {Bank Root Paths}
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
          rootRtext();}
       xywh {300 77 465 295} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}

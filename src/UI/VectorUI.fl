@@ -63,9 +63,9 @@ class VectorUI {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
       callback {//
-          if (Fl::event() == 10)
+          if (Fl::event() == FL_CLOSE)
               o->hide();
-          else if (Fl::event() == 11)
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               vectorRtext();}
       xywh {776 278 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
       class YoshiWin

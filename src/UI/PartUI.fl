@@ -740,9 +740,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window ctlwindow {
       label Controllers
       callback {//
-        if (Fl::event() == 10)
+        if (Fl::event() == FL_CLOSE)
             o->hide();
-       // else if (Fl::event() == 11)
+       // else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
            // ctlRtext();}
       xywh {748 171 505 130} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
@@ -979,9 +979,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window aftertouchcontrol {
       label Aftertouch
       callback {//
-        if (Fl::event() == 10)
+        if (Fl::event() == FL_CLOSE)
             o->hide();
-        else if (Fl::event() == 11)
+        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
             ATRtext();}
       xywh {718 91 485 180} type Double hide resizable
       class YoshiWin
@@ -1178,9 +1178,9 @@ class PartUI {: {public Fl_Group, PartUI_}
       label {MIDI Controls}
       callback {//
 	//std::cout <<"event " << Fl::event() << std::endl;
-        if (Fl::event() == 10)
+        if (Fl::event() == FL_CLOSE)
             o->hide();
-        else if (Fl::event() == 11)
+        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
             ctlmidiRtext();}
       xywh {608 398 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
@@ -1461,9 +1461,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {//
-        if (Fl::event() == 10)
+        if (Fl::event() == FL_CLOSE)
             o->hide();
-        else if (Fl::event() == 11)
+        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
             editRtext();}
       xywh {330 188 395 385} type Double hide resizable
       code0 {seteditname();}

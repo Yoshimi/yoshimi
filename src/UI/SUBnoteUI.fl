@@ -718,17 +718,13 @@ class SUBnoteUI {: {public PresetsUI_}
     float dW = SUBparameters->w() / subDW;
     float dH = SUBparameters->h() / subDH;
     float dScale;
-    if (Fl::event_button3)
-        dScale = 1;
+
+    if (dW < dH)
+        dScale = dW;
     else
-    {
-        if (dW < dH)
-            dScale = dW;
-        else
-            dScale = dH;
-        if (dScale < 0.2f)
-            dScale = 0.2f;
-    }
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);

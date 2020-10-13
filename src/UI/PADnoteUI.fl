@@ -249,9 +249,9 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {//
-          if (Fl::event() == 10)
+          if (Fl::event() == FL_CLOSE)
               o->hide();
-          else if (Fl::event() == 11)
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               padRtext();}
       xywh {711 582 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
@@ -1014,19 +1014,19 @@ class PADnoteUI {: {public PresetsUI_}
             } {
               MenuItem padL35 {
                 label L35cents
-                xywh {0 0 36 21} labelsize 11
+                xywh {0 0 36 21} labelfont 1 labelsize 11
               }
               MenuItem padL10 {
                 label L10cents
-                xywh {10 10 36 21} labelsize 11
+                xywh {10 10 36 21} labelfont 1 labelsize 11
               }
               MenuItem padE100 {
                 label E100cents
-                xywh {20 20 36 21} labelsize 11
+                xywh {20 20 36 21} labelfont 1 labelsize 11
               }
               MenuItem padE1200 {
                 label E1200cents
-                xywh {30 30 36 21} labelsize 11
+                xywh {30 30 36 21} labelfont 1 labelsize 11
               }
             }
             Fl_Counter coarsedet {

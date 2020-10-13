@@ -64,9 +64,9 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {if (Fl::event() == 10)
+      callback {if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         configRtext();}
       xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
@@ -806,9 +806,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     }
     Fl_Window presets {
       label Presets
-      callback {if (Fl::event() == 10)
+      callback {if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         presetsRtext();}
       xywh {5 437 460 295} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}

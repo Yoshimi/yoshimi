@@ -64,9 +64,9 @@ class ConsoleUI {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         consoleRtext();}
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
       code0 {o->size_range(385,185);}

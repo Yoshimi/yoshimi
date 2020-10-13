@@ -1967,9 +1967,9 @@ class ADnoteUI {: {public PresetsUI_}
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         addRtext();}
       xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
@@ -2283,9 +2283,9 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters}
       callback {//
-     if (Fl::event() == 10)
+     if (Fl::event() == FL_CLOSE)
          o->hide();
-     else if (Fl::event() == 11)
+     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         addVoiceRtext();}
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
@@ -2406,7 +2406,7 @@ else if (voiceTabs->value() == g8)
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
       callback {//
-        if (Fl::event() == 10)
+        if (Fl::event() == FL_CLOSE)
             o->hide();}
       xywh {101 233 705 260} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
