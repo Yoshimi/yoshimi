@@ -6,8 +6,16 @@ PadSynth
 Subsyth - but harmonics height issues
 Resonance
 LFOs
+Part
+    instrumenteditwindow
+    ctlmidi
+    ctlwindow
+    aftertouchcontrol - but phantom reopens sometimes
+
 
 In progress
+Part
+    partfx
 Addsynth
 Envelopes
 Filters
