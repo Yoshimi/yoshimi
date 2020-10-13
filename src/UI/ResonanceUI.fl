@@ -299,6 +299,7 @@ class ResonanceUI {: PresetsUI_
           else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               resonanceRtext();}
       xywh {393 72 780 305} type Double hide resizable
+      code0 {resDW = o->w();resDH = o->h();}
       class YoshiWin
     } {
       Fl_Group editor {
@@ -568,7 +569,6 @@ class ResonanceUI {: PresetsUI_
     engine = engine_;
     cbwidget = NULL;
     cbapplywidget = NULL;
-    resSeen = false;
     make_window();
     applybutton->hide();
     refresh();} {}
@@ -626,28 +626,21 @@ class ResonanceUI {: PresetsUI_
         tname = "PadSynth Resonance ";
     resonancewindow->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());
     resonancewindow->show();
-    //if (!resSeen)
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "resonWin");
+    if( fetchW == 0 || fetchH == 0)
+        resonancewindow->position(fetchX, fetchY);
+    else
     {
-        int fetchW, fetchH, fetchX, fetchY, fetchO;
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "resonWin");
-        if( fetchW == 0 || fetchH == 0)
-            resonancewindow->position(fetchX, fetchY);
-        else
-        {
-            resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
-            resonanceRtext();
-        }
-        resSeen = true;
+        resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
+        resonanceRtext();
     }
-    resonancewindow->size_range(780, 305, 0, 0, 0, 0, 1);} {}
+    resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);} {}
   }
   Function {resonanceRtext()} {} {
     code {//
-
-        float defW = 780;
-        float defH = 305;
-        float dW =  resonancewindow->w() / defW;
-        float dH =  resonancewindow->h() / defH;
+        float dW =  resonancewindow->w() / resDW;
+        float dH =  resonancewindow->h() / resDH;
         float dScale;
         if (dW < dH)
             dScale = dW;
@@ -705,5 +698,9 @@ class ResonanceUI {: PresetsUI_
   decl {bool ADvsPAD;} {private local
   }
   decl {bool resSeen;} {private local
+  }
+  decl {float resDW;} {private local
+  }
+  decl {float resDH;} {private local
   }
 }

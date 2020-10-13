@@ -2,7 +2,8 @@
 version 1.0304
 header_name {.h}
 code_name {.cc}
-comment {Copyright 2016-2020, Will Godfrey
+comment {
+Copyright 2016-2020, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -68,6 +69,7 @@ class VectorUI {} {
           else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
               vectorRtext();}
       xywh {776 278 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
+      code0 {vecDW = o->w();vecDH = o->h();}
       class YoshiWin
     } {
       Fl_Spinner setbasechan {
@@ -328,7 +330,8 @@ class VectorUI {} {
       Fl_Button Closevector {
         label Close
         callback {//
-        vectorwindow->hide()}
+        vectorwindow->hide();
+        setVisible(synth, false, "vector");}
         xywh {310 265 57 20} labelfont 13 labelsize 12
       }
       Fl_Group Ygroup {
@@ -693,16 +696,6 @@ class VectorUI {} {
     Loaded->copy_label(loadlabel[0].c_str());
     setbasechan->value(1);} {}
   }
-  Function {Show(SynthEngine *synth)} {} {
-    code {//
-    int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vector");
-    vectorwindow->position(fetchX, fetchY);
-    if (fetchW > 0 && fetchH > 0)
-        vectorwindow->size(fetchW, fetchH);
-    vectorwindow->resizable();
-    vectorwindow->show();} {}
-  }
   Function {setbuttons()} {} {
     code {//
     Xcc = synth->getRuntime().vectordata.Xaxis[BaseChan];
@@ -786,12 +779,24 @@ class VectorUI {} {
     else
         Yfeat4->value(0);} {}
   }
+  Function {Show(SynthEngine *synth)} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vector");
+    vectorwindow->show();
+    if (fetchW == 0 || fetchH == 0)
+        vectorwindow->position(fetchX, fetchY);
+    else
+    {
+        vectorwindow->resize(fetchX, fetchY, fetchW, fetchH);
+        vectorRtext();
+    }
+    vectorwindow->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);} {}
+  }
   Function {vectorRtext()} {} {
     code {//
-    float defW = 375;
-    float defH = 295;
-    float dW = vectorwindow->w() / defW;
-    float dH = vectorwindow->h() / defH;
+    float dW = vectorwindow->w() / vecDW;
+    float dH = vectorwindow->h() / vecDH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -800,64 +805,67 @@ class VectorUI {} {
     if (dScale < 0.2f)
         dScale = 0.2f;
 
-    setbasechan->labelsize(int(dScale * 12));
-    setbasechan->textsize(int(dScale * 12));
-    options->labelsize(int(dScale * 12));
-        load->labelsize(int(dScale * 12));
-        save->labelsize(int(dScale * 12));
-        recenthistory->labelsize(int(dScale * 12));
-        clearch->labelsize(int(dScale * 12));
-        clearall->labelsize(int(dScale * 12));
+    int size12 = int(dScale * 12);
+    int size16 = int(dScale * 16);
 
-    Xgroup->labelsize(int(dScale * 16));
-    Xcontrol->labelsize(int(dScale * 12));
-        Xcontrol->textsize(int(dScale * 12));
-    XinstL->labelsize(int(dScale * 12));
-    XinstR->labelsize(int(dScale * 12));
-    Xfeat->labelsize(int(dScale * 12));
-    Xfeat1->labelsize(int(dScale * 12));
-        X1off->labelsize(int(dScale * 12));
-        X1vol->labelsize(int(dScale * 12));
-    Xfeat2->labelsize(int(dScale * 12));
-        X2off->labelsize(int(dScale * 12));
-        X2pan->labelsize(int(dScale * 12));
-        X2panR->labelsize(int(dScale * 12));
-    Xfeat3->labelsize(int(dScale * 12));
-        X3off->labelsize(int(dScale * 12));
-        X3filt->labelsize(int(dScale * 12));
-        X3filtR->labelsize(int(dScale * 12));
-    Xfeat4->labelsize(int(dScale * 12));
-        X4off->labelsize(int(dScale * 12));
-        X4mod->labelsize(int(dScale * 12));
-        X4modR->labelsize(int(dScale * 12));
+    setbasechan->labelsize(size12);
+    setbasechan->textsize(size12);
+    options->labelsize(size12);
+        load->labelsize(size12);
+        save->labelsize(size12);
+        recenthistory->labelsize(size12);
+        clearch->labelsize(size12);
+        clearall->labelsize(size12);
 
-    Ygroup->labelsize(int(dScale * 16));
-    Ycontrol->labelsize(int(dScale * 12));
-        Ycontrol->textsize(int(dScale * 12));
-    YinstU->labelsize(int(dScale * 12));
-    YinstD->labelsize(int(dScale * 12));
-    Yfeat->labelsize(int(dScale * 12));
-    Yfeat1->labelsize(int(dScale * 12));
-        Y1off->labelsize(int(dScale * 12));
-        Y1vol->labelsize(int(dScale * 12));
-    Yfeat2->labelsize(int(dScale * 12));
-        Y2off->labelsize(int(dScale * 12));
-        Y2pan->labelsize(int(dScale * 12));
-        Y2panR->labelsize(int(dScale * 12));
-    Yfeat3->labelsize(int(dScale * 12));
-        Y3off->labelsize(int(dScale * 12));
-        Y3filt->labelsize(int(dScale * 12));
-        Y3filtR->labelsize(int(dScale * 12));
-    Yfeat4->labelsize(int(dScale * 12));
-        Y4off->labelsize(int(dScale * 12));
-        Y4mod->labelsize(int(dScale * 12));
-        Y4modR->labelsize(int(dScale * 12));
+    Xgroup->labelsize(size16);
+    Xcontrol->labelsize(size12);
+        Xcontrol->textsize(size12);
+    XinstL->labelsize(size12);
+    XinstR->labelsize(size12);
+    Xfeat->labelsize(size12);
+    Xfeat1->labelsize(size12);
+        X1off->labelsize(size12);
+        X1vol->labelsize(size12);
+    Xfeat2->labelsize(size12);
+        X2off->labelsize(size12);
+        X2pan->labelsize(size12);
+        X2panR->labelsize(size12);
+    Xfeat3->labelsize(size12);
+        X3off->labelsize(size12);
+        X3filt->labelsize(size12);
+        X3filtR->labelsize(size12);
+    Xfeat4->labelsize(size12);
+        X4off->labelsize(size12);
+        X4mod->labelsize(size12);
+        X4modR->labelsize(size12);
 
-    Loaded->labelsize(int(dScale * 12));
-    Closevector->labelsize(int(dScale * 12));
+    Ygroup->labelsize(size16);
+    Ycontrol->labelsize(size12);
+        Ycontrol->textsize(size12);
+    YinstU->labelsize(size12);
+    YinstD->labelsize(size12);
+    Yfeat->labelsize(size12);
+    Yfeat1->labelsize(size12);
+        Y1off->labelsize(size12);
+        Y1vol->labelsize(size12);
+    Yfeat2->labelsize(size12);
+        Y2off->labelsize(size12);
+        Y2pan->labelsize(size12);
+        Y2panR->labelsize(size12);
+    Yfeat3->labelsize(size12);
+        Y3off->labelsize(size12);
+        Y3filt->labelsize(size12);
+        Y3filtR->labelsize(size12);
+    Yfeat4->labelsize(size12);
+        Y4off->labelsize(size12);
+        Y4mod->labelsize(size12);
+        Y4modR->labelsize(size12);
+
+    Loaded->labelsize(size12);
+    Closevector->labelsize(size12);
 
     vectorwindow->redraw();
-    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), vectorwindow->visible(), "vector");} {}
+    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), true, "vector");} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
@@ -1062,6 +1070,10 @@ for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
   decl {int Ycc;} {private local
   }
   decl {unsigned int Yf;} {private local
+  }
+  decl {float vecDW;} {private local
+  }
+  decl {float vecDH;} {private local
   }
   decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
   }

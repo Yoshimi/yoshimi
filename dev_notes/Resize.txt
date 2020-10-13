@@ -1,0 +1,17 @@
+Completed
+Console
+Vector
+PadSynth
+Subsyth - but harmonics height issues
+Resonance
+LFOs
+
+In progress
+Config
+Addsynth
+Envelopes
+Filters
+
+
+Started
+Bank

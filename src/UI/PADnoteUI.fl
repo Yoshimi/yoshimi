@@ -255,7 +255,7 @@ class PADnoteUI {: {public PresetsUI_}
               padRtext();}
       xywh {711 582 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "pad");o->position(fetchX, fetchY);}
+      code1 {padDW = o->w(); padDH = o->h();}
       class YoshiWin
     } {
       Fl_Tabs {} {
@@ -1098,14 +1098,12 @@ class PADnoteUI {: {public PresetsUI_}
     else
         padnotewindow->position(fetchX, fetchY);
     padnotewindow->resizable();
-    padnotewindow->size_range(535, 440, 0, 0, 0, 0, 1);} {}
+    padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);} {}
   }
   Function {padRtext()} {} {
     code {//
-    float defW = 535;
-    float defH = 440;
-    float dW =  padnotewindow->w() / defW;
-    float dH =  padnotewindow->h() / defH;
+    float dW =  padnotewindow->w() / padDW;
+    float dH =  padnotewindow->h() / padDH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1608,5 +1606,9 @@ class PADnoteUI {: {public PresetsUI_}
   decl {int npart;} {private local
   }
   decl {int kititem;} {private local
+  }
+  decl {float padDW;} {private local
+  }
+  decl {float padDH;} {private local
   }
 }

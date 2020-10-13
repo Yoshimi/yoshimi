@@ -84,6 +84,7 @@ pars=NULL;} {}
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
+        label LFO
         xywh {0 0 230 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial freq {
@@ -210,10 +211,6 @@ pars=NULL;} {}
           synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
           xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
-        Fl_Box lfotype {
-          label LFO
-          xywh {58 5 100 11} labelfont 1 labelsize 10
-        }
       }
     }
   }
@@ -231,31 +228,33 @@ pars=NULL;} {}
   }
   Function {lfoRtext(float dScale)} {} {
     code {//
-    int knobsize = int(dScale * 10);
-    freq->labelsize(knobsize);
-    intensity->labelsize(knobsize);
-    delay->labelsize(knobsize);
-    startphase->labelsize(knobsize);
-    randomness->labelsize(knobsize);
-    freqrand->labelsize(knobsize);
-    stretch->labelsize(knobsize);
+
+    int size = int(dScale * 10);
+    lfoparamswindow->labelsize(size);
+    freq->labelsize(size);
+    intensity->labelsize(size);
+    delay->labelsize(size);
+    startphase->labelsize(size);
+    randomness->labelsize(size);
+    freqrand->labelsize(size);
+    stretch->labelsize(size);
 
     LFOtype->labelsize(int(9 * dScale));
-        Lsine->labelsize(knobsize);
-        Ltri->labelsize(knobsize);
-        Lsqr->labelsize(knobsize);
-        Lrup->labelsize(knobsize);
-        Lrdn->labelsize(knobsize);
-        Le1dn->labelsize(knobsize);
-        Le2dn->labelsize(knobsize);
-        Lsh->labelsize(knobsize);
-        Lrsqu->labelsize(knobsize);
-        Lrsqd->labelsize(knobsize);
+        Lsine->labelsize(size);
+        Ltri->labelsize(size);
+        Lsqr->labelsize(size);
+        Lrup->labelsize(size);
+        Lrdn->labelsize(size);
+        Le1dn->labelsize(size);
+        Le2dn->labelsize(size);
+        Lsh->labelsize(size);
+        Lrsqu->labelsize(size);
+        Lrsqd->labelsize(size);
 
-    lfoC->labelsize(knobsize);
-    lfoP->labelsize(knobsize);
+    lfoC->labelsize(size);
+    lfoP->labelsize(size);
 
-    continous->labelsize(knobsize);
+    continous->labelsize(size);
 
     lfoui->redraw();} {}
   }
@@ -330,7 +329,7 @@ pars=NULL;} {}
     refresh();
 
     lfoui->resize(this->x(),this->y(),this->w(),this->h());
-    lfotype->label(this->label());} {}
+    lfoparamswindow->label(this->label());} {}
   }
   decl {LFOParams *pars;} {private local
   }
