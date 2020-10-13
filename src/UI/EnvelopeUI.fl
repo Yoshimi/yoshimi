@@ -347,7 +347,7 @@ class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
         if (Fl::event() == FL_CLOSE)
             o->hide();
         else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            envfreeRtext();} open selected
+            envfreeRtext();} open
       xywh {614 158 575 180} type Double resizable visible
     } {
       Fl_Box freeedit {
@@ -1045,7 +1045,8 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     if (change)
         freeedit->redraw();} {}
   }
-  Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
+  Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {open
+  } {
     code {//
     env=env_;
     synth = env->getSynthEngine();
@@ -1072,7 +1073,8 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     freeeditsmall->setpair(freeedit);
     freeedit->setpair(freeeditsmall);
 
-    refresh();} {}
+    refresh();} {selected
+    }
   }
   Function {reinit()} {} {
     code {//

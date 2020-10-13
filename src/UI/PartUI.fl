@@ -733,133 +733,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         code0 {o->value(part->Penabled == 1);}
       }
     }
-    Fl_Window partfx {
-      label {Part's Insert Effects}
-      xywh {134 114 385 160} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");o->position(fetchX, fetchY);efxSeen = true;}
-      code2 {if (fetchW > 0 && fetchH > 0){o->size(fetchW, fetchH);}}
-      code3 {fxDW = o->w(); fxDH = o->h();}
-    } {
-      Fl_Spinner inseffnocounter {
-        callback {//
-                ninseff = o->value() - 1;
-                insefftype->value(part->partefx[ninseff]->geteffect());
-
-                inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-                int x = part->Pefxroute[ninseff];
-                if (x == 127)
-                    x = 1;
-                bypasseff->value(part->Pefxbypass[ninseff]);
-                sendtochoice->value(x);
-
-                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {Effect No.} xywh {35 8 35 22} labelsize 12 maximum 3 textsize 11
-        code1 {o->value(ninseff+1);}
-      }
-      Fl_Choice insefftype {
-        callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {Effect Type} xywh {104 8 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
-        code0 {o->value(part->partefx[ninseff]->geteffect());}
-      } {
-        MenuItem {} {
-          label {No Effect}
-          xywh {35 35 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label Reverb
-          xywh {45 45 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label Echo
-          xywh {55 55 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label Chorus
-          xywh {65 65 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label Phaser
-          xywh {70 70 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label AlienWah
-          xywh {80 80 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label Distortion
-          xywh {90 90 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label EQ
-          xywh {100 100 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label DynFilter
-          xywh {110 110 100 20} labelfont 1 labelsize 10
-        }
-      }
-      Fl_Group inseffectuigroup {
-        xywh {5 37 380 96} box FLAT_BOX color 48
-      } {
-        Fl_Group inseffectui {
-          xywh {5 38 379 95}
-          code0 {o->init(part->partefx[ninseff], npart, ninseff);}
-          class EffUI
-        } {}
-      }
-      Fl_Button {} {
-        label Close
-        callback {//
-        partfx->hide();
-        setVisible(synth, false, "partEfx");
-        if ((Fl::event_button() == 3))
-            synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        tooltip {Right click: also reopen previous} xywh {314 136 60 20} box THIN_UP_BOX
-      }
-      Fl_Choice sendtochoice {
-        label To
-        callback {//
-        send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        xywh {244 8 90 22} down_box BORDER_BOX labelfont 1 labelsize 11
-        code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
-        code1 {o->value(x);}
-      } {
-        MenuItem {} {
-          label {Next Effect}
-          xywh {45 45 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label {Part Out}
-          xywh {55 55 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem {} {
-          label {Dry Out}
-          xywh {65 65 100 20} labelfont 1 labelsize 10
-        }
-      }
-      Fl_Check_Button bypasseff {
-        label Bypass
-        callback {//
-        send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 21} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 12 align 4
-        code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
-      }
-      Fl_Button {} {
-        label C
-        callback {//
-        synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
-        xywh {350 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
-      }
-      Fl_Button {} {
-        label P
-        callback {//
-        synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
-        synth->getRuntime().effectChange = npart | (ninseff << 8); // temporary fix}
-        xywh {350 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
-      }
-    }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
       xywh {355 84 670 370} type Double hide
@@ -1079,7 +952,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button effects {
           label Effects
           callback {//
-          partfx->show();
+          Showefx();
           if ((Fl::event_button() == 3))
           {
               setVisible(synth, false, "partEdit");
@@ -1227,6 +1100,137 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Text_Display humanise_display {
         label Humanise
         xywh {288 353 78 7} box NO_BOX labelfont 1 labelsize 16
+      }
+    }
+    Fl_Window partfx {
+      label {Part's Insert Effects}
+      callback {//
+          if (Fl::event() == FL_CLOSE)
+              o->hide();
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
+              efxRtext();}
+      xywh {520 67 385 160} type Double hide resizable
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
+      code1 {fxDW = o->w(); fxDH = o->h();}
+      class YoshiWin
+    } {
+      Fl_Spinner inseffnocounter {
+        callback {//
+                ninseff = o->value() - 1;
+                insefftype->value(part->partefx[ninseff]->geteffect());
+
+                inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
+                int x = part->Pefxroute[ninseff];
+                if (x == 127)
+                    x = 1;
+                bypasseff->value(part->Pefxbypass[ninseff]);
+                sendtochoice->value(x);
+
+                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        tooltip {Effect No.} xywh {20 8 35 22} labelsize 12 maximum 3 textsize 12
+        code1 {o->value(ninseff+1);}
+      }
+      Fl_Choice insefftype {
+        callback {//
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11
+        code0 {o->value(part->partefx[ninseff]->geteffect());}
+      } {
+        MenuItem effNone {
+          label {No Effect}
+          xywh {35 35 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effReverb {
+          label Reverb
+          xywh {45 45 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effEcho {
+          label Echo
+          xywh {55 55 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effChorus {
+          label Chorus
+          xywh {65 65 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effPhaser {
+          label Phaser
+          xywh {70 70 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effAlienwah {
+          label AlienWah
+          xywh {80 80 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effDistortion {
+          label Distortion
+          xywh {90 90 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effEQ {
+          label EQ
+          xywh {100 100 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effDynfilter {
+          label DynFilter
+          xywh {110 110 100 20} labelfont 1 labelsize 12
+        }
+      }
+      Fl_Group inseffectuigroup {
+        xywh {3 37 380 96} box FLAT_BOX color 48
+      } {
+        Fl_Group inseffectui {
+          xywh {5 38 379 95}
+          code0 {o->init(part->partefx[ninseff], npart, ninseff);}
+          class EffUI
+        } {}
+      }
+      Fl_Choice sendtochoice {
+        label To
+        callback {//
+        send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12
+        code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
+        code1 {o->value(x);}
+      } {
+        MenuItem effNext {
+          label {Next Effect}
+          xywh {45 45 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effPart {
+          label {Part Out}
+          xywh {55 55 100 20} labelfont 1 labelsize 12
+        }
+        MenuItem effDry {
+          label {Dry Out}
+          xywh {65 65 100 20} labelfont 1 labelsize 12
+        }
+      }
+      Fl_Button effCopy {
+        label C
+        callback {//
+        synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
+        xywh {346 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+      }
+      Fl_Button effPaste {
+        label P
+        callback {//
+        synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
+        synth->getRuntime().effectChange = npart | (ninseff << 8); // temporary fix}
+        xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+      }
+      Fl_Check_Button bypasseff {
+        label Bypass
+        callback {//
+        send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 12
+        code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
+      }
+      Fl_Button effClose {
+        label Close
+        callback {//
+        partfx->hide();
+        setVisible(synth, false, "partEfx");
+        if ((Fl::event_button() == 3))
+            synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+        tooltip {Right click: also reopen previous} xywh {307 136 60 20} box THIN_UP_BOX
       }
     }
     comment {ctlmidi, ctlwindow, aftertouch control MUST be that order} {in_source in_header
@@ -1472,7 +1476,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           label {Prp.Rate}
           callback {//
           send_data(0, PART::control::proportionalPortamentoRate, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 1410 maximum 127 step 1
+          tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
           class WidgetPDial
         }
@@ -1480,7 +1484,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           label {Prp.Dpth}
           callback {//
           send_data(0, PART::control::proportionalPortamentoDepth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 1410 maximum 127 step 1
+          tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
           class WidgetPDial
         }
@@ -2669,6 +2673,18 @@ class PartUI {: {public Fl_Group, PartUI_}
     filtercutoff->value(part->ctl->filtercutoff.data);
     masterbandwidth->value(part->ctl->bandwidth.data);} {}
   }
+  Function {Showefx()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");
+    partfx->show();
+    if (fetchW > 0 && fetchH > 0)
+        partfx->resize(fetchX, fetchY, fetchW, fetchH);
+    else
+        partfx->position(fetchX, fetchY);
+    partfx->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);
+    efxRtext();} {}
+  }
   Function {editRtext()} {} {
     code {//
     float dW = instrumenteditwindow->w() / editDW;
@@ -2851,13 +2867,52 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlmidi->redraw();
     saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), true, "ctlmidi");} {}
   }
+  Function {efxRtext()} {} {
+    code {//
+    float dW = partfx->w() / fxDW;
+    float dH =  partfx->h() / fxDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size12 = int(12 * dScale);
+    inseffnocounter->labelsize(size12);
+        inseffnocounter->textsize(size12);
+    insefftype->labelsize(size12);
+        effNone->labelsize(size12);
+        effReverb->labelsize(size12);
+        effEcho->labelsize(size12);
+        effChorus->labelsize(size12);
+        effPhaser->labelsize(size12);
+        effAlienwah->labelsize(size12);
+        effDistortion->labelsize(size12);
+        effEQ->labelsize(size12);
+        effDynfilter->labelsize(size12);
+
+    sendtochoice->labelsize(size12);
+        effNext->labelsize(size12);
+        effPart->labelsize(size12);
+        effDry->labelsize(size12);
+
+    effCopy->labelsize(size12);
+    effPaste->labelsize(size12);
+    bypasseff->labelsize(size12);
+    effClose->labelsize(int(14 * dScale));
+
+    partfx->redraw();
+    saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), true, "partEfx");} {}
+  }
   Function {~PartUI()} {} {
     code {//
     setVisible(synth, aftertouchcontrol->visible(), "afterT");
     if (ctlSeen)
         setVisible(synth, ctlwindow->visible(), "ctlWin");
-    if (efxSeen)
-        setVisible(synth, partfx->visible(), "partEfx");
+    setVisible(synth, partfx->visible(), "partEfx");
     if (kitSeen)
         setVisible(synth, instrumentkitlist->visible(), "partKit");
     if (editSeen)
