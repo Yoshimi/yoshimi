@@ -2069,6 +2069,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 part->partefx[engine]->geteffect();
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
                 inseffectui->refresh(part->partefx[engine], npart, engine);
+                efxRtext();
             }
             break;
 
@@ -2903,6 +2904,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     effPaste->labelsize(size12);
     bypasseff->labelsize(size12);
     effClose->labelsize(int(14 * dScale));
+    
+    inseffectui->effRtext(dScale, insefftype->value());
 
     partfx->redraw();
     saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), true, "partEfx");} {}

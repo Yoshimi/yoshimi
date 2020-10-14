@@ -41,6 +41,9 @@ decl {\#include <iostream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/YoshiWin.h"} {public local
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -220,7 +223,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {915 700 379 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
-      Fl_Text_Display {} {
+      Fl_Text_Display noeffect {
         label {No Effects Applied}
         xywh {120 35 10 20} box NO_BOX labelfont 1 labelcolor 37 align 8
       }
@@ -231,7 +234,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1005 24 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
       class Fl_Group
     } {
-      Fl_Text_Display {} {
+      Fl_Text_Display revname {
         label {Reverb }
         xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 labelcolor 36 align 8
       }
@@ -241,55 +244,55 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {115 13 90 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem rev1 {
           label {Cathedral 1}
           xywh {10 10 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev2 {
           label {Cathedral 2}
           xywh {20 20 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev3 {
           label {Cathedral 3}
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev4 {
           label {Hall 1}
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev5 {
           label {Hall 2}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev6 {
           label {Room 1}
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev7 {
           label {Room 2}
           xywh {70 70 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev8 {
           label Basement
           xywh {80 80 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev9 {
           label Tunnel
           xywh {90 90 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev10 {
           label {Echoed 1}
           xywh {100 100 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev11 {
           label {Echoed 2}
           xywh {110 110 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev12 {
           label {Very Long 1}
           xywh {120 120 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem rev13 {
           label {Very Long 2}
           xywh {130 130 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
@@ -300,15 +303,15 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem revrand {
           label Random
           xywh {20 20 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem revfree {
           label Freeverb
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem revband {
           label Bandwidth
           xywh {45 45 100 20} labelfont 1 labelsize 10
         }
@@ -418,52 +421,52 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1006 149 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
+      Fl_Text_Display echoname {
+        label Echo
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice echop {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::echo, TOPLEVEL::type::Integer);}
         xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem echo1 {
           label {Echo 1}
           xywh {20 20 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo2 {
           label {Echo 2}
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo3 {
           label {Echo 3}
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo4 {
           label {Simple Echo}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo5 {
           label Canyon
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo6 {
           label {Panning Echo 1}
           xywh {70 70 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo7 {
           label {Panning Echo 2}
           xywh {80 80 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo8 {
           label {Panning Echo 3}
           xywh {90 90 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem echo9 {
           label {Feedback Echo}
           xywh {100 100 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-      }
-      Fl_Text_Display {} {
-        label Echo
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial echop0 {
         label Vol
@@ -534,56 +537,56 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1002 382 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
+      Fl_Text_Display chorusname {
+        label Chorus
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice chorusp {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
         xywh {121 13 96 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem chorus1 {
           label {Chorus 1}
           xywh {20 20 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus2 {
           label {Chorus 2}
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus3 {
           label {Chorus 3}
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus4 {
           label {Celeste 1}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus5 {
           label {Celeste 2}
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus6 {
           label {Flange 1}
           xywh {70 70 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus7 {
           label {Flange 2}
           xywh {80 80 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus8 {
           label {Flange 3}
           xywh {90 90 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus9 {
           label {Flange 4}
           xywh {100 100 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem chorus10 {
           label {Flange 5}
           xywh {110 110 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-      }
-      Fl_Text_Display {} {
-        label Chorus
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial chorusp0 {
         label Vol
@@ -665,7 +668,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button chorusflange {
         label Flange
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
@@ -681,14 +684,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice chorusp4 {
         label {LFO type}
         callback {//
-        send_data(0, 4, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
+        send_data(0, 4, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);} open
         tooltip {LFO function} xywh {154 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
-        MenuItem {} {
+        MenuItem chorussine {
           label SINE
           xywh {15 15 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem chorustriangle {
           label TRI
           xywh {25 25 100 20} labelfont 1 labelsize 10
         }
@@ -700,64 +703,64 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {991 245 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
       class Fl_Group
     } {
+      Fl_Text_Display phasername {
+        label Phaser
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice phaserp {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 14 selection_color 0 labelsize 11 align 1 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem phaser1 {
           label {Phaser 1}
           xywh {30 30 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser2 {
           label {Phaser 2}
           xywh {40 40 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser3 {
           label {Phaser 3}
           xywh {50 50 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser4 {
           label {Phaser 4}
           xywh {60 60 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser5 {
           label {Phaser 5}
           xywh {70 70 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser6 {
           label {Phaser 6}
           xywh {80 80 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser7 {
           label {APhaser 1}
           xywh {45 45 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser8 {
           label {APhaser 2}
           xywh {55 55 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser9 {
           label {APhaser 3}
           xywh {65 65 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser10 {
           label {APhaser 4}
           xywh {75 75 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser11 {
           label {APhaser 5}
           xywh {85 85 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phaser12 {
           label {APhaser 6}
           xywh {95 95 100 20} labelfont 1 labelsize 10
         }
-      }
-      Fl_Text_Display {} {
-        label Phaser
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial phaserp0 {
         label Vol
@@ -800,11 +803,11 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(0, 4, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         tooltip {LFO function} xywh {156 62 50 18} down_box BORDER_BOX labelsize 10 align 2 textsize 8
       } {
-        MenuItem {} {
+        MenuItem phasersine {
           label SINE
           xywh {15 15 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem phasertriangle {
           label TRI
           xywh {25 25 100 20} labelfont 1 labelsize 10
         }
@@ -895,32 +898,32 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1013 520 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
+      Fl_Text_Display alienname {
+        label AlienWah
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice awp {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
         xywh {135 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textfont 1 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem alien1 {
           label {Alienwah 1}
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem alien2 {
           label {Alienwah 2}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem alien3 {
           label {Alienwah 3}
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem alien4 {
           label {Alienwah 4}
           xywh {70 70 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-      }
-      Fl_Text_Display {} {
-        label AlienWah
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial awp0 {
         label Vol
@@ -988,14 +991,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice awp4 {
         label {LFO type}
         callback {//
-        send_data(0, 4, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
+        send_data(0, 4, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);} open
         tooltip {LFO function} xywh {155 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
-        MenuItem {} {
+        MenuItem awpsine {
           label SINE
           xywh {15 15 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem awptriangle {
           label TRI
           xywh {25 25 100 20} labelfont 1 labelsize 10
         }
@@ -1022,40 +1025,40 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1013 641 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
+      Fl_Text_Display distname {
+        label Distortion
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice distp {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {139 13 96 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem dist1 {
           label {Overdrive 1}
           xywh {20 20 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dist2 {
           label {Overdrive 2}
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dist3 {
           label {A. Exciter 1}
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dist4 {
           label {A. Exciter 2}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dist5 {
           label {Guitar Amp}
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dist6 {
           label Quantisize
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-      }
-      Fl_Text_Display {} {
-        label Distortion
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial distp0 {
         label Vol
@@ -1125,59 +1128,59 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(0, 5, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {190 50 60 20} box UP_BOX down_box BORDER_BOX labelsize 11 align 2 textsize 10
       } {
-        MenuItem {} {
+        MenuItem distpt1 {
           label Atan
           xywh {55 55 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt2 {
           label Asym1
           xywh {65 65 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt3 {
           label Pow
           xywh {75 75 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt4 {
           label Sine
           xywh {85 85 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt5 {
           label Qnts
           xywh {95 95 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt6 {
           label Zigzg
           xywh {105 105 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt7 {
           label Lmt
           xywh {115 115 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt8 {
           label LmtU
           xywh {125 125 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt9 {
           label LmtL
           xywh {135 135 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt10 {
           label ILmt
           xywh {147 147 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt11 {
           label Clip
           xywh {157 157 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt12 {
           label Asym2
           xywh {75 75 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt13 {
           label Pow2
           xywh {85 85 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem distpt14 {
           label Sgm
           xywh {95 95 100 20} labelfont 1 labelsize 10
         }
@@ -1207,7 +1210,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1010 762 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
-      Fl_Text_Display {} {
+      Fl_Text_Display eqname {
         label EQ
         xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
@@ -1267,43 +1270,43 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), EFFECT::type::eq, TOPLEVEL::type::Integer);}
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
-        MenuItem {} {
+        MenuItem typeoff {
           label OFF
           xywh {0 0 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type1 {
           label Lp1
           xywh {10 10 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type2 {
           label Hp1
           xywh {20 20 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type3 {
           label Lp2
           xywh {30 30 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type4 {
           label Hp2
           xywh {40 40 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type5 {
           label Bp2
           xywh {50 50 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type6 {
           label N2
           xywh {60 60 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type7 {
           label Pk
           xywh {80 80 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type8 {
           label LSh
           xywh {70 70 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem type9 {
           label HSh
           xywh {80 80 100 20} labelfont 1 labelsize 10
         }
@@ -1319,36 +1322,36 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       xywh {1009 883 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
+      Fl_Text_Display dfname {
+        label DynFilter
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
+      }
       Fl_Choice dfp {
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
-        xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 10 textsize 10 textcolor 7
+        xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 10 textcolor 7
       } {
-        MenuItem {} {
+        MenuItem dftype1 {
           label WahWah
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dftype2 {
           label AutoWah
           xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dftype3 {
           label Sweep
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dftype4 {
           label VocalMorph1
           xywh {50 50 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-        MenuItem {} {
+        MenuItem dftype5 {
           label VocalMorph2
           xywh {60 60 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
-      }
-      Fl_Text_Display {} {
-        label DynFilter
-        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial dfp0 {
         label Vol
@@ -1401,18 +1404,18 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(0, 4, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
         tooltip {LFO function} xywh {152 55 48 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
-        MenuItem {} {
+        MenuItem dfpsine {
           label SINE
           xywh {15 15 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem dfptriangle {
           label TRI
           xywh {25 25 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Button {} {
+      Fl_Button filter {
         label Filter
-        callback {filterwindow->show();}
+        callback {Showfilt();}
         xywh {235 13 37 16} box PLASTIC_THIN_UP_BOX labelsize 11
       }
       Fl_Group {} {
@@ -1444,7 +1447,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   Function {make_filter_window()} {} {
     Fl_Window filterwindow {
       label {Filter Parameters for DynFilter Eff.}
-      xywh {1109 779 290 110} type Double hide
+      callback {//
+          if (Fl::event() == FL_CLOSE)
+              o->hide();
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
+              filtRtext();}
+      xywh {1109 779 290 110} type Double hide resizable
+      code0 {filtDW = o->w(); filtDH = o->h();}
+      class YoshiWin
     } {
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter}
@@ -1452,7 +1462,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         code0 {o->init(eff->filterpars,NULL,NULL, npart, EFFECT::type::dynFilter, neff);}
         class FilterUI
       } {}
-      Fl_Button {} {
+      Fl_Button filterclose {
         label Close
         callback {filterwindow->hide();}
         xywh {124 86 46 20} box THIN_UP_BOX labelsize 12
@@ -2143,6 +2153,301 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     }
     //cout << "Col " << textCol << "  eff " << efftype << endl;} {}
   }
+  Function {effRtext(float dScale, int efftype)} {} {
+    code {//
+        //std::cout << "scale " << dScale << "  type " << efftype << std::endl;
+        int size = int(10 * dScale);
+        int size11 = int(11 * dScale);
+        int size12 = int(12 * dScale);
+
+        switch (efftype)
+        {
+            case 0:
+                noeffect->labelsize(14 * dScale);
+                break;
+            case 1: // reverb
+                revname->labelsize(size12);
+                revp->labelsize(size11);
+                    rev1->labelsize(size);
+                    rev2->labelsize(size);
+                    rev3->labelsize(size);
+                    rev4->labelsize(size);
+                    rev5->labelsize(size);
+                    rev6->labelsize(size);
+                    rev7->labelsize(size);
+                    rev8->labelsize(size);
+                    rev9->labelsize(size);
+                    rev10->labelsize(size);
+                    rev11->labelsize(size);
+                    rev12->labelsize(size);
+                    rev13->labelsize(size);
+
+                revp->labelsize(size11);
+                    revrand->labelsize(size);
+                    revfree->labelsize(size);
+                    revband->labelsize(size);
+
+                revp0->labelsize(size11);
+                revp1->labelsize(size11);
+                revp2->labelsize(size11);
+                revp3->labelsize(size11);
+                revp4->labelsize(size11);
+                revp12->labelsize(size11);
+                revp6->labelsize(size11);
+                revp7->labelsize(size11);
+                revp8->labelsize(size11);
+                revp9->labelsize(size11);
+                revp11->labelsize(size11);
+                break;
+            case 2: // echo
+                echoname->labelsize(size12);
+                echop->labelsize(size11);
+                    echo1->labelsize(size);
+                    echo2->labelsize(size);
+                    echo3->labelsize(size);
+                    echo4->labelsize(size);
+                    echo5->labelsize(size);
+                    echo6->labelsize(size);
+                    echo7->labelsize(size);
+                    echo8->labelsize(size);
+                    echo9->labelsize(size);
+
+                echop0->labelsize(size11);
+                echop1->labelsize(size11);
+                echop2->labelsize(size11);
+                echop3->labelsize(size11);
+                echop4->labelsize(size11);
+                echop5->labelsize(size11);
+                echop6->labelsize(size11);
+            	break;
+            case 3: // chorus
+                chorusname->labelsize(size12);
+                chorusp->labelsize(size11);
+                    chorus1->labelsize(size);
+                    chorus2->labelsize(size);
+                    chorus3->labelsize(size);
+                    chorus4->labelsize(size);
+                    chorus5->labelsize(size);
+                    chorus6->labelsize(size);
+                    chorus7->labelsize(size);
+                    chorus8->labelsize(size);
+                    chorus9->labelsize(size);
+                    chorus10->labelsize(size);
+
+                chorusp0->labelsize(size11);
+                chorusp1->labelsize(size11);
+                chorusp2->labelsize(size11);
+                chorusp3->labelsize(size11);
+                chorusp5->labelsize(size11);
+                chorusp6->labelsize(size11);
+                chorusp7->labelsize(size11);
+                chorusp8->labelsize(size11);
+                chorusp9->labelsize(size11);
+                chorusflange->labelsize(size);
+                chorusp11->labelsize(size11);
+                chorusp4->labelsize(size);
+                chorussine->labelsize(size);
+                chorustriangle->labelsize(size);
+                break;
+            case 4: // phaser
+                phasername->labelsize(size12);
+                phaserp->labelsize(size11);
+                    phaser1->labelsize(size);
+                    phaser2->labelsize(size);
+                    phaser3->labelsize(size);
+                    phaser4->labelsize(size);
+                    phaser5->labelsize(size);
+                    phaser6->labelsize(size);
+                    phaser7->labelsize(size);
+                    phaser8->labelsize(size);
+                    phaser9->labelsize(size);
+                    phaser10->labelsize(size);
+                    phaser11->labelsize(size);
+                    phaser12->labelsize(size);
+                phaserp0->labelsize(size11);
+                phaserp2->labelsize(size11);
+                phaserp3->labelsize(size11);
+                phaserp4->labelsize(size);
+                    phasersine->labelsize(size);
+                    phasertriangle->labelsize(size);
+
+                phaserp5->labelsize(size11);
+                phaserp6->labelsize(size11);
+                phaserp8->labelsize(size11);
+                    phaserp8->textsize(size11);
+                phaserp9->labelsize(size11);
+                phaserp10->labelsize(size11);
+                phaserp11->labelsize(size11);
+                phaserp12->labelsize(size11);
+                phaserp13->labelsize(size11);
+                phaserp14->labelsize(size11);
+                break;
+            case 5: // alienwah
+                alienname->labelsize(size12);
+                awp->labelsize(size11);
+                    alien1->labelsize(size);
+                    alien2->labelsize(size);
+                    alien3->labelsize(size);
+                    alien4->labelsize(size);
+
+                awp0->labelsize(size11);
+                awp1->labelsize(size11);
+                awp2->labelsize(size11);
+                awp3->labelsize(size11);
+                awp5->labelsize(size11);
+                awp6->labelsize(size11);
+                awp7->labelsize(size11);
+                awp9->labelsize(size11);
+                awp4->labelsize(size);
+                    awpsine->labelsize(size);
+                    awptriangle->labelsize(size);
+
+                awp10->labelsize(size11);
+                awp8->labelsize(size11);
+                    awp8->textsize(size11);
+                break;
+            case 6: // distortion
+                distname->labelsize(size12);
+                distp->labelsize(size11);
+                    dist1->labelsize(size);
+                    dist2->labelsize(size);
+                    dist3->labelsize(size);
+                    dist4->labelsize(size);
+                    dist5->labelsize(size);
+                    dist6->labelsize(size);
+
+                distp0->labelsize(size11);
+                distp1->labelsize(size11);
+                distp2->labelsize(size11);
+                distp3->labelsize(size11);
+                distp4->labelsize(size11);
+                distp7->labelsize(size11);
+                distp8->labelsize(size11);
+                distp5->labelsize(size11);
+                    distpt1->labelsize(size);
+                    distpt2->labelsize(size);
+                    distpt3->labelsize(size);
+                    distpt4->labelsize(size);
+                    distpt5->labelsize(size);
+                    distpt6->labelsize(size);
+                    distpt7->labelsize(size);
+                    distpt8->labelsize(size);
+                    distpt9->labelsize(size);
+                    distpt10->labelsize(size);
+                    distpt11->labelsize(size);
+                    distpt12->labelsize(size);
+                    distpt13->labelsize(size);
+                    distpt14->labelsize(size);
+
+                distp6->labelsize(size11);
+                distp9->labelsize(size11);
+                distp10->labelsize(size11);
+                break;
+            case 7: // EQ
+                eqname->labelsize(size12);
+                eqp0->labelsize(size11);
+                bandcounter->labelsize(size11);
+                    bandcounter->textsize(size11);
+
+                freqdial->labelsize(size11);
+                gaindial->labelsize(size11);
+                qdial->labelsize(size11);
+                stagescounter->labelsize(size);
+                    stagescounter->textsize(size11);
+
+                typechoice->labelsize(size11);
+                    typeoff->labelsize(size);
+                    type1->labelsize(size);
+                    type2->labelsize(size);
+                    type3->labelsize(size);
+                    type4->labelsize(size);
+                    type5->labelsize(size);
+                    type6->labelsize(size);
+                    type7->labelsize(size);
+                    type8->labelsize(size);
+                    type9->labelsize(size);
+                break;
+            case 8: // dynfilter
+                dfname->labelsize(size12);
+                dfp->labelsize(size11);
+                    dftype1->labelsize(size);
+                    dftype2->labelsize(size);
+                    dftype3->labelsize(size);
+                    dftype4->labelsize(size);
+                    dftype5->labelsize(size);
+
+                dfp0->labelsize(size11);
+                dfp1->labelsize(size11);
+                dfp2->labelsize(size11);
+                dfp3->labelsize(size11);
+                dfp5->labelsize(size11);
+                dfp6->labelsize(size11);
+                dfp4->labelsize(size);
+                    dfpsine->labelsize(size);
+                    dfptriangle->labelsize(size);
+
+                filter->labelsize(size11);
+                dfp7->labelsize(size11);
+                dfp9->labelsize(size11);
+                dfp8->labelsize(size11);
+
+                filterclose->labelsize(size12);
+                break;
+            default:
+                break;
+        }} {}
+  }
+  Function {Showfilt()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "dynFilter");
+    filterwindow->show();
+    if (fetchW > 0 && fetchH > 0)
+    {
+        filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
+        filtRtext();
+    }
+    else
+       filterwindow->position(fetchX, fetchY);
+
+   filterwindow->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);} {}
+  }
+  Function {filtRtext()} {} {
+    code {//
+    float dW = filterwindow->w() / filtDW;
+    float dH = filterwindow->h() / filtDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    filterclose->labelsize(12 * dScale);
+    ;
+    fwin_filterui->filterRtext(dScale);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    filterwindow->redraw();
+    saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), true, "dynFilter");} {}
+  }
   Function {EQbandUpdate()} {} {
     code {//
     int npb = eqband * 5 + 10;
@@ -2186,5 +2491,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   decl {int npart;} {private local
   }
   decl {int neff;} {private local
+  }
+  decl {float filtDW;} {private local
+  }
+  decl {float filtDH;} {private local
   }
 }

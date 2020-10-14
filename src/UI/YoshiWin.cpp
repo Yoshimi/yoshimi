@@ -34,7 +34,6 @@ YoshiWin::YoshiWin(int x,int y, int w, int h, const char *label) : Fl_Double_Win
     ;
 }
 
-
 YoshiWin::~YoshiWin()
 {
     ;

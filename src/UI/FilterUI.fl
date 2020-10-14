@@ -371,9 +371,9 @@ pars=NULL;
   }
   Function {make_window()} {open
   } {
-    Fl_Window filterui {
-      xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
-      class Fl_Group
+    Fl_Window filterui {open selected
+      xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12
+      class Fl_Group visible
     } {
       Fl_Group filterparamswindow {
         label {               Filter Params}
@@ -555,7 +555,7 @@ pars=NULL;
   Function {make_formant_window()} {open
   } {
     Fl_Window formantparswindow {
-      label {Formant Filter Parameters} selected
+      label {Formant Filter Parameters}
       xywh {89 20 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {

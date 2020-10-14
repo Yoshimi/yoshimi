@@ -11,11 +11,10 @@ Part
     ctlmidi
     ctlwindow
     aftertouchcontrol - but phantom reopens sometimes
+    partfx - need to identify saved sizes from syseff and inseff
 
 
 In progress
-Part
-    partfx
 Addsynth
 Envelopes
 Filters
