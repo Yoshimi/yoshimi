@@ -18,6 +18,8 @@ In progress
 Addsynth
 Envelopes
 Filters
+Part
+    instrumentkitlist
 
 
 Started

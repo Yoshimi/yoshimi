@@ -128,17 +128,17 @@ class PartKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window partkititem {
-      xywh {726 127 670 30} type Double hide
+      xywh {433 86 670 20} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
-        xywh {55 0 605 20} box FLAT_BOX
+        xywh {55 4 605 20}
         code0 {if (part->kit[n].Penabled == 0) o->deactivate();}
       } {
         Fl_Check_Button mutedcheck {
           callback {//
           send_data(0, PART::control::kitItemMute, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {60 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {60 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Pmuted);}
         }
         Fl_Button labelbutton {
@@ -150,7 +150,7 @@ class PartKitItem {: {public Fl_Group}
               send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, 1, textMsgBuffer.push(string(tmp)));
               o->copy_label(tmp);
           }}
-          xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
+          xywh {90 4 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
           code0 {o->copy_label(part->kit[n].Pname.c_str());}
         }
         Fl_Counter minkcounter {
@@ -164,10 +164,10 @@ class PartKitItem {: {public Fl_Group}
           }
 
           send_data(0, PART::control::minNote, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {225 0 55 15} type Simple minimum 0 maximum 128 step 1
+          xywh {225 4 55 15} type Simple minimum 0 maximum 128 step 1 textfont 1 textsize 12
           code0 {o->value(part->kit[n].Pminkey);}
         }
-        Fl_Button {} {
+        Fl_Button setmin {
           label m
           callback {//
           int last = part->lastnote;
@@ -182,9 +182,9 @@ class PartKitItem {: {public Fl_Group}
           minkcounter->value(tmp);
 
           send_data(0, PART::control::minToLastKey, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          tooltip {set the minimum key to the last pressed key} xywh {285 3 15 12} box THIN_UP_BOX labelsize 10
+          tooltip {set the minimum key to the last pressed key} xywh {285 7 15 12} box THIN_UP_BOX labelsize 10
         }
-        Fl_Button {} {
+        Fl_Button setmax {
           label M
           callback {//
           int last = part->lastnote;
@@ -199,16 +199,16 @@ class PartKitItem {: {public Fl_Group}
           maxkcounter->value(tmp);
 
           send_data(0, PART::control::maxToLastKey, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          tooltip {set the maximum key to the last pressed key} xywh {315 3 15 12} box THIN_UP_BOX labelsize 10
+          tooltip {set the maximum key to the last pressed key} xywh {315 7 15 12} box THIN_UP_BOX labelsize 10
         }
-        Fl_Button {} {
+        Fl_Button setfull {
           label R
           callback {//
           minkcounter->value(0);
           maxkcounter->value(127);
 
           send_data(0, PART::control::resetMinMaxKey, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 7 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Counter maxkcounter {
           callback {//
@@ -220,7 +220,7 @@ class PartKitItem {: {public Fl_Group}
               o->value(tmp);
           }
           send_data(0, PART::control::maxNote, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {335 0 55 15} type Simple minimum 0 maximum 128 step 1
+          xywh {335 4 55 15} type Simple minimum 0 maximum 128 step 1 textfont 1 textsize 12
           code0 {o->value(part->kit[n].Pmaxkey);}
         }
         Fl_Button adeditbutton {
@@ -229,14 +229,14 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,0);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {420 0 40 15} box THIN_UP_BOX labelsize 11
+          xywh {420 4 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {400 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Padenabled);}
         }
         Fl_Button subeditbutton {
@@ -245,14 +245,14 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,1);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {490 0 40 15} box THIN_UP_BOX labelsize 11
+          xywh {490 4 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {470 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Psubenabled);}
         }
         Fl_Button padeditbutton {
@@ -261,20 +261,20 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,2);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {560 0 40 15} box THIN_UP_BOX labelsize 11
+          xywh {560 4 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {540 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
         Fl_Choice sendtoeffect {
           callback {//
           send_data(0, PART::control::kitEffectNum, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+          xywh {615 4 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for (int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
         } {}
@@ -297,7 +297,7 @@ class PartKitItem {: {public Fl_Group}
         else
             o->value(1);
         send_data(0, PART::control::enableKitLine, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-        xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
+        xywh {30 4 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 4
         code0 {snprintf(label,10,"%d",(n&15)+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->hide();}
@@ -338,6 +338,29 @@ class PartKitItem {: {public Fl_Group}
     partui = partui_;
     make_window();
     end();} {}
+  }
+  Function {itemRtext(float dScale)} {} {
+    code {//
+    int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+
+    enabledcheck->labelsize(size12);
+    mutedcheck->labelsize(size11);
+    labelbutton->labelsize(size);
+    minkcounter->textsize(size12);
+    setmin->labelsize(size);
+    setmax->labelsize(size);
+    setfull->labelsize(size);
+    maxkcounter->textsize(size12);
+    adeditbutton->labelsize(size11);
+    adcheck->labelsize(size11);
+    subeditbutton->labelsize(size11);
+    subcheck->labelsize(size11);
+    padeditbutton->labelsize(size11);
+    padcheck->labelsize(size11);
+    sendtoeffect->labelsize(size);
+         sendtoeffect->textsize(size);} {}
   }
   Function {~PartKitItem()} {} {
     code {//
@@ -735,50 +758,53 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {355 84 670 370} type Double hide
+      xywh {229 151 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO; loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partKit"); o->position(fetchX, fetchY); kitSeen = true;}
+      code2 {kitDW = o->w(); kitDH = o->h();}
     } {
-      Fl_Button {} {
-        label Close
-        callback {//
-        instrumentkitlist->hide();
-        setVisible(synth, false, "partKit");
-        if ((Fl::event_button() == 3))
-        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX
-      }
-      Fl_Scroll kitlist {
-        xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
+      Fl_Group kitlist {
+        xywh {4 20 662 324} box THIN_UP_FRAME
       } {
-        Fl_Pack {} {
-          xywh {0 20 670 320}
+        Fl_Pack kitpack {
+          xywh {0 21 670 322}
           code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){partkititem[i]=new PartKitItem(0,0,670,20,"");partkititem[i]->init(part, i, npart, this);}}
         } {}
       }
-      Fl_Box {} {
+      Fl_Box kitnum {
         label {No.}
         xywh {10 0 25 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box kitmute {
         label Mute
         xywh {55 0 25 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box kitID {
+        label Name
+        xywh {137 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box kitminkey {
         label {Min key}
         xywh {235 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box kitmaxkey {
         label {Max key}
         xywh {345 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box kitadd {
         label ADsynth
         xywh {410 0 50 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box kitsub {
         label SUBsynth
         xywh {470 0 60 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box kitpad {
+        label PADsynth
+        xywh {540 0 60 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box kitfxnum {
+        label {FX.r.}
+        xywh {620 0 30 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Choice kitMode {
         label Mode
@@ -791,24 +817,24 @@ class PartUI {: {public Fl_Group, PartUI_}
             kitlist->deactivate();
 
         send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer);}
-        tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
+        tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
         code1 {partKitOn = o->value() > 0;}
         code2 {if (!partKitOn) kitlist->deactivate();}
       } {
-        MenuItem {} {
+        MenuItem modeoff {
           label {     Off}
           xywh {0 0 100 20} labelfont 1 labelsize 11
         }
-        MenuItem {} {
+        MenuItem modemulti {
           label {    Multi}
           xywh {10 10 100 20} labelfont 1 labelsize 11
         }
-        MenuItem {} {
+        MenuItem modesingle {
           label {  Single}
           xywh {20 20 100 20} labelfont 1 labelsize 11
         }
-        MenuItem {} {
+        MenuItem modecrossfade {
           label Crossfade
           xywh {0 0 34 20} labelfont 1 labelsize 11
         }
@@ -817,20 +843,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         label {Drum mode}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 10
+        tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(part->Pdrummode);}
       }
-      Fl_Box {} {
-        label {FX.r.}
-        xywh {620 0 30 15} labelfont 1 labelsize 11 align 18
-      }
-      Fl_Box {} {
-        label PADsynth
-        xywh {540 0 60 15} labelfont 1 labelsize 11 align 18
-      }
-      Fl_Box {} {
-        label Name
-        xywh {137 0 40 15} labelfont 1 labelsize 11 align 18
+      Fl_Button kitClose {
+        label Close
+        callback {//
+        instrumentkitlist->hide();
+        //setVisible(synth, false, "partKit");
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "partKit");
+        if ((Fl::event_button() == 3))
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX
       }
     }
     Fl_Window instrumenteditwindow {
@@ -942,7 +966,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button kitedit {
           label {Kit Edit}
           callback {//
-          instrumentkitlist->show();
+          Showkit();
           if ((Fl::event_button() == 3))
           {
               setVisible(synth, false, "partEdit");
@@ -2686,6 +2710,19 @@ class PartUI {: {public Fl_Group, PartUI_}
     partfx->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);
     efxRtext();} {}
   }
+  Function {Showkit()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partKit");
+    instrumentkitlist->show();
+    if (fetchW > 0 && fetchH > 0)
+        instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
+    else
+        instrumentkitlist->position(fetchX, fetchY);
+    instrumentkitlist->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);
+    kitRtext();
+    kitSeen = true;} {}
+  }
   Function {editRtext()} {} {
     code {//
     float dW = instrumenteditwindow->w() / editDW;
@@ -2865,6 +2902,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     filtercutoff->labelsize(size);
     masterbandwidth->labelsize(size);
     ctlmidiclose->labelsize(int(dScale * 14)-1);
+
     ctlmidi->redraw();
     saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), true, "ctlmidi");} {}
   }
@@ -2904,11 +2942,57 @@ class PartUI {: {public Fl_Group, PartUI_}
     effPaste->labelsize(size12);
     bypasseff->labelsize(size12);
     effClose->labelsize(int(14 * dScale));
-    
+
     inseffectui->effRtext(dScale, insefftype->value());
 
     partfx->redraw();
     saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), true, "partEfx");} {}
+  }
+  Function {kitRtext()} {} {
+    code {//
+    float dW = instrumentkitlist->w() / kitDW;
+    float dH =  instrumentkitlist->h() / kitDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size11 = int(11 * dScale);
+
+    kitnum->labelsize(size11);
+    kitmute->labelsize(size11);
+    kitID->labelsize(size11);
+    kitminkey->labelsize(size11);
+    kitmaxkey->labelsize(size11);
+    kitadd->labelsize(size11);
+    kitsub->labelsize(size11);
+    kitpad->labelsize(size11);
+    kitfxnum->labelsize(size11);
+    kitMode->labelsize(size11);
+        modeoff->labelsize(size11);
+        modemulti->labelsize(size11);
+        modesingle->labelsize(size11);
+        modecrossfade->labelsize(size11);
+
+    drumMode->labelsize(size11);
+    kitClose->labelsize(int(12 * dScale));
+
+
+   kitpack->resize(0, int(21 * dH), int(670 * dW), int(322 * dH));
+
+   for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+   {
+       partkititem[i]->size(int(670 * dW), int(20 * dH));
+       partkititem[i]->partkititemgroup->size(int(605 * dW), int(20 * dH));
+       partkititem[i]->itemRtext(dScale);
+   }
+
+    instrumentkitlist->redraw();
+    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), true, "partKit");} {}
   }
   Function {~PartUI()} {} {
     code {//
@@ -2916,8 +3000,10 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (ctlSeen)
         setVisible(synth, ctlwindow->visible(), "ctlWin");
     setVisible(synth, partfx->visible(), "partEfx");
-    if (kitSeen)
-        setVisible(synth, instrumentkitlist->visible(), "partKit");
+
+    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
+    //if (kitSeen)
+        //setVisible(synth, instrumentkitlist->visible(), "partKit");
     if (editSeen)
         setVisible(synth, instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
@@ -3017,5 +3103,9 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {float editDW;} {public local
   }
   decl {float editDH;} {public local
+  }
+  decl {float kitDW;} {public local
+  }
+  decl {float kitDH;} {public local
   }
 }
