@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -109,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -176,7 +176,8 @@ class MasterUI {: {private GuiUpdates}
       }
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init(const char *_label)} {open
+  } {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -196,7 +197,15 @@ class MasterUI {: {private GuiUpdates}
 
       int fetchW, fetchH, fetchX, fetchY, fetchO;
       loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "master");
-      masterwindow->position(fetchX, fetchY);
+      if (fetchW ==0 || fetchH == 0)
+          masterwindow->position(fetchX, fetchY);
+      else
+      {
+          masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
+          mainRtext();
+      }
+      masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);
+      
       bool foundWindows = true;
       if (instance == 0)
           foundWindows = fetchO;
@@ -235,10 +244,13 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
+        if (Fl::event() == FL_CLOSE)
+        {
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
             if (!force && synth->getRuntime().configChanged)
@@ -272,8 +284,15 @@ class MasterUI {: {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }}
-      xywh {6 423 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+            }
+        }
+        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
+	{
+                mainRtext();
+        }} open selected
+      xywh {38 547 385 470} type Double labelfont 13 labelsize 12 resizable
+      code0 {mainDW = o->w(); mainDH = o->h();}
+      class YoshiWin xclass Yoshimi visible
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -607,7 +626,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  }
+        label {Master  } open
         xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Dial globalfinedetune {
@@ -619,7 +638,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
           class WidgetPDial
         }
-        Fl_Button {} {
+        Fl_Button mainreset {
           label Reset
           callback {//
           bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
@@ -632,7 +651,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           tooltip {Clear all dynamic settings
 (+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
-        Fl_Button {} {
+        Fl_Button mainstop {
           label {Stop!}
           callback {//
           send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
@@ -647,7 +666,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           code1 {o->value(synth->Pvolume);}
           class WidgetPDial
         }
-        Fl_Button {} {
+        Fl_Button mainvirtkeyb {
           label {Virtual Keyboard}
           callback {//
           virkeyboard->virkeyboardwindow->show();}
@@ -660,12 +679,11 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           panelwindow->show();}
           tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
-        Fl_Button {} {
+        Fl_Button mainmidilearn {
           label {Midi Learn}
           callback {//
                 midilearnui->midilearnwindow->show();}
           tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
-          code0 {/*if (synth->getRuntime().toConsole == false){o->deactivate();yoshiLog->Hide();}*/}
         }
         Fl_Button vectors {
           label Vectors
@@ -2544,6 +2562,37 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
+  Function {mainRtext()} {open
+  } {
+    code {//
+    printf("in mainRtext\\n");
+
+    float dW = masterwindow->w() / mainDW;
+    float dH = masterwindow->h() / mainDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
+
+    mainreset->labelsize(size11);
+    mainstop->labelsize(size11);
+    mainvirtkeyb->labelsize(size11);
+    mixerpanel->labelsize(size11);
+    mainmidilearn->labelsize(size11);
+    vectors->labelsize(size11);
+    globalfinedetune->labelsize(size);
+    mastervolumedial->labelsize(size);
+
+     masterwindow->redraw();
+     saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");} {}
+  }
   Function {msgRtext()} {} {
     code {//
     printf("in msgRtext\\n");
@@ -2565,7 +2614,7 @@ Alan Calvert started the project}
     yesdoit->labelsize(size14);
     cancel->labelsize(size14);
     closebutton->labelsize(size14);
-    
+
     message->redraw();} {}
   }
   decl {ConfigUI *configui;} {public local
@@ -2620,6 +2669,10 @@ Alan Calvert started the project}
   decl {int msgGroup;} {private local
   }
   decl {bool openedit;} {public local
+  }
+  decl {float mainDW;} {private local
+  }
+  decl {float mainDH;} {private local
   }
   decl {float msgDW;} {private local
   }
