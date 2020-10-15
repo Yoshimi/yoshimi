@@ -44,6 +44,9 @@ decl {\#include <fstream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/YoshiWin.h"} {public local
+}
+
 decl {\#include "ADnoteUI.h"} {public local
 }
 
@@ -1248,8 +1251,15 @@ Alan Calvert started the project}
     }
     Fl_Window message {
       label Yoshimi
-      xywh {9 25 290 85} type Double labelsize 12 hide
+      callback {//
+          if (Fl::event() == FL_CLOSE)
+              o->hide();
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
+              msgRtext();}
+      xywh {9 25 290 85} type Double labelsize 12 hide resizable
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
+      code1 {msgDW = o->w(); msgDH = o->h();}
+      class YoshiWin
     } {
       Fl_Box words {
         label {?}
@@ -2534,6 +2544,30 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
+  Function {msgRtext()} {} {
+    code {//
+    printf("in msgRtext\\n");
+
+    float dW = message->w() / msgDW;
+    float dH = message->h() / msgDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size14 = int(14 * dScale);
+
+    words->labelsize(12 * dScale);
+    yesdoit->labelsize(size14);
+    cancel->labelsize(size14);
+    closebutton->labelsize(size14);
+    
+    message->redraw();} {}
+  }
   decl {ConfigUI *configui;} {public local
   }
   decl {ParametersUI *paramsui;} {public local
@@ -2586,5 +2620,9 @@ Alan Calvert started the project}
   decl {int msgGroup;} {private local
   }
   decl {bool openedit;} {public local
+  }
+  decl {float msgDW;} {private local
+  }
+  decl {float msgDH;} {private local
   }
 }
