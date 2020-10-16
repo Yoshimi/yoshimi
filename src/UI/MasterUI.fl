@@ -197,6 +197,7 @@ class MasterUI {open : {private GuiUpdates}
 
       int fetchW, fetchH, fetchX, fetchY, fetchO;
       loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "master");
+      masterwindow->size_range(mainDW, mainDH, 1680, 1050, 0, 0, 1);
       if (fetchW ==0 || fetchH == 0)
           masterwindow->position(fetchX, fetchY);
       else
@@ -204,8 +205,7 @@ class MasterUI {open : {private GuiUpdates}
           masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
           mainRtext();
       }
-      masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);
-      
+
       bool foundWindows = true;
       if (instance == 0)
           foundWindows = fetchO;
@@ -244,13 +244,8 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
-    Fl_Window masterwindow {
-      label {Yoshimi meets ZynAddSubFX}
-      callback {//
-        if (Fl::event() == FL_CLOSE)
-        {
+  Function {closecheck()} {} {
+    code {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
             if (!force && synth->getRuntime().configChanged)
@@ -284,12 +279,17 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }
-        }
+            }} {}
+  }
+  Function {make_window()} {open
+  } {
+    Fl_Window masterwindow {
+      label {Yoshimi meets ZynAddSubFX}
+      callback {//
+        if (Fl::event() == FL_CLOSE)
+            closecheck();
         else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-	{
-                mainRtext();
-        }} open selected
+            mainRtext();} open selected
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = o->w(); mainDH = o->h();}
       class YoshiWin xclass Yoshimi visible
@@ -301,11 +301,11 @@ class MasterUI {open : {private GuiUpdates}
         xywh {-7 0 395 25} labelsize 12 textsize 12
         class ClearMenuBar
       } {
-        Submenu {} {
+        Submenu Yoshimi {
           label {&Yoshimi}
           xywh {0 0 96 20} labelsize 12
         } {
-          MenuItem {} {
+          MenuItem Y_about {
             label {&About...}
             callback {//
                     Contributors->hide();
@@ -336,17 +336,17 @@ class MasterUI {open : {private GuiUpdates}
             send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
             xywh {0 0 31 21} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y_settings {
             label {&Settings...}
             callback {configui->Show(synth);}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y_reports {
             label {&Reports...}
             callback {yoshiLog->Show(synth);}
             xywh {0 0 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y_manual {
             label {&View Manual}
             callback {//
             words->copy_label("Searching for the manual.");
@@ -356,9 +356,9 @@ class MasterUI {open : {private GuiUpdates}
             return;}
             xywh {0 0 34 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Y_exit {
             label {E&xit}
-            callback {masterwindow->do_callback();}
+            callback {closecheck();}
             xywh {10 10 100 20} labelsize 12
           }
         }
@@ -369,12 +369,12 @@ class MasterUI {open : {private GuiUpdates}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Instrument);}
           code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
         } {
-          MenuItem {} {
+          MenuItem I_show {
             label {S&how Stored...}
             callback {bankui->Show();}
             xywh {20 20 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem I_load {
             label {&Load External...}
             callback {//
                 string lastname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
@@ -388,7 +388,7 @@ class MasterUI {open : {private GuiUpdates}
                 do_load_instrument(filename);}
             tooltip {Load an instrument (.xi*) file} xywh {30 30 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem I_save {
             label {&Save External...}
             callback {//
                 if (synth->part[activePart]->Pname == DEFAULT_NAME)
@@ -423,14 +423,14 @@ class MasterUI {open : {private GuiUpdates}
             paramsui->Show(TOPLEVEL::XML::Instrument);}
             xywh {10 10 34 21} labelsize 12
           }
-          MenuItem {} {
+          MenuItem I_clear {
             label {&Clear}
             callback {//
             if (fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
                 send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem I_search {
             label {S&earch...}
             callback {//
         if (!synth->getRuntime().checksynthengines)
@@ -450,13 +450,13 @@ class MasterUI {open : {private GuiUpdates}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Patch);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
-          MenuItem {} {
+          MenuItem P_show {
             label {S&how Patch Banks...}
             callback {//
             bankui->bankuiwindow->show();}
             xywh {30 30 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem P_load {
             label {&Load External...}
             callback {//
             do_load_master(NULL);}
@@ -486,17 +486,17 @@ class MasterUI {open : {private GuiUpdates}
             xywh {0 0 34 21} labelsize 12
           }
         }
-        Submenu {} {
+        Submenu Paths {
           label {Pat&hs}
           xywh {0 0 65 20} labelsize 12
         } {
-          MenuItem {} {
+          MenuItem RootDir {
             label {&Bank Root Dirs...}
             callback {//
             bankui->rootuiwindow->show();}
             xywh {30 30 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem PresetDir {
             label {&Preset Dirs...}
             callback {//
             configui->Showpresets(synth);}
@@ -510,13 +510,13 @@ class MasterUI {open : {private GuiUpdates}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Scale);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
-          MenuItem {} {
+          MenuItem S_show {
             label {S&how Settings...}
             callback {//
             microtonalui->microtonaluiwindow->show();}
             xywh {20 20 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem S_load {
             label {&Load...}
             callback {//
     string lastname = synth->lastItemSeen(TOPLEVEL::XML::Scale);
@@ -528,7 +528,7 @@ class MasterUI {open : {private GuiUpdates}
         do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem S_save {
             label {&Save...}
             callback {//
                 string lastname = synth->getLastfileAdded(TOPLEVEL::XML::Scale);
@@ -554,7 +554,7 @@ class MasterUI {open : {private GuiUpdates}
 paramsui->Show(TOPLEVEL::XML::Scale);}
             xywh {20 20 34 21} labelsize 12
           }
-          MenuItem {} {
+          MenuItem S_clear {
             label {&Clear}
             callback {\#
             if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
@@ -569,7 +569,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             xywh {0 0 34 20} labelsize 12
           }
         }
-        Submenu {} {
+        Submenu State {
           label {S&tate}
           xywh {0 0 60 20} labelsize 12
           code0 {(void) o; // suppress warning}
@@ -608,7 +608,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
-          MenuItem {} {
+          MenuItem Default {
             label {Save as &Default}
             callback {//
                 string name = synth->getRuntime().defaultStateName;
@@ -626,7 +626,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  } open
+        label {Master  }
         xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Dial globalfinedetune {
@@ -717,42 +717,42 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label Type
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
-            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
+            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
-            MenuItem {} {
+            MenuItem sys_off {
               label {No Effect}
               xywh {10 10 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_1 {
               label Reverb
               xywh {20 20 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_2 {
               label Echo
               xywh {30 30 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_3 {
               label Chorus
               xywh {40 40 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_4 {
               label Phaser
               xywh {50 50 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_5 {
               label AlienWah
               xywh {60 60 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_6 {
               label Distortion
               xywh {70 70 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_7 {
               label EQ
               xywh {80 80 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem sys_8 {
               label DynFilter
               xywh {90 90 100 20} labelfont 1 labelsize 10
             }
@@ -767,18 +767,18 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {247 129 16 15} down_box DOWN_BOX value 1 labelfont 1 labelsize 11 align 4
           }
-          Fl_Button {} {
+          Fl_Button sysEffSend {
             label {Send to}
             callback {//
             syseffsendwindow->show();}
             xywh {275 126 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
-          Fl_Button {} {
+          Fl_Button sysCopy {
             label C
             callback {presetsui->copy(synth->sysefx[nsyseff]);}
             xywh {350 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
-          Fl_Button {} {
+          Fl_Button sysPaste {
             label P
             callback {//
             presetsui->paste(synth->sysefx[nsyseff], syseffectui);
@@ -806,39 +806,39 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           } {
-            MenuItem {} {
+            MenuItem ins_off {
               label {No Effect}
               xywh {25 25 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_1 {
               label Reverb
               xywh {35 35 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_2 {
               label Echo
               xywh {45 45 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_3 {
               label Chorus
               xywh {55 55 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_4 {
               label Phaser
               xywh {60 60 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_5 {
               label AlienWah
               xywh {70 70 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_6 {
               label Distortion
               xywh {80 80 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_7 {
               label EQ
               xywh {90 90 100 20} labelfont 1 labelsize 10
             }
-            MenuItem {} {
+            MenuItem ins_8 {
               label DynFilter
               xywh {100 100 100 20} labelfont 1 labelsize 10
             }
@@ -847,16 +847,16 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label {To }
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectDestination, o->value() - 2, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
-            xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
+            xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 11 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
           } {}
-          Fl_Button {} {
+          Fl_Button insCopy {
             label C
             callback {presetsui->copy(synth->insefx[ninseff]);}
             xywh {350 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
-          Fl_Button {} {
+          Fl_Button insPaste {
             label P
             callback {//
             presetsui->paste(synth->insefx[ninseff], inseffectui);
@@ -869,7 +869,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
-        Fl_Group syseffectui {
+        Fl_Group syseffectui {open
           xywh {3 158 384 95} labeltype NO_LABEL
           code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
           class EffUI
@@ -927,7 +927,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         label Shift
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
+        tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textfont 1 textsize 12
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
       }
@@ -965,15 +965,15 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
    Per side | Equivalent Mono} xywh {219 340 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
         code0 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {
-        MenuItem {} {
+        MenuItem pancut {
           label {Cut: 0dB | -6dB}
           xywh {15 15 100 20} labelfont 1 labelsize 11
         }
-        MenuItem {} {
+        MenuItem pannorm {
           label {Default: +3dB | -3dB}
           xywh {25 25 100 20} labelfont 1 labelsize 11
         }
-        MenuItem {} {
+        MenuItem panboost {
           label {Boost: +6dB | 0dB}
           tooltip {Per side + 6dB, Mono 0dB} xywh {35 35 100 20} labelfont 1 labelsize 11
         }
@@ -1594,6 +1594,7 @@ Alan Calvert started the project}
             partui = new PartUI(0, 0, 765, 525);
             partuigroup->add(partui);
             partui->init(synth->part[activePart], activePart, bankui);
+            partui->groupRtext(mainScale);
             partui->redraw();
             partui->npart = activePart;
             npartcounter->value(activePart + 1);
@@ -2006,6 +2007,7 @@ Alan Calvert started the project}
     partui = new PartUI(0, 0, 765, 525);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
+    partui->groupRtext(mainScale);
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
@@ -2565,8 +2567,6 @@ Alan Calvert started the project}
   Function {mainRtext()} {open
   } {
     code {//
-    printf("in mainRtext\\n");
-
     float dW = masterwindow->w() / mainDW;
     float dH = masterwindow->h() / mainDH;
     float dScale;
@@ -2577,9 +2577,50 @@ Alan Calvert started the project}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
+    mainScale = dScale;
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+
+    Yoshimi->labelsize(size12);
+        Y_about->labelsize(size12);
+        newinstanceid->labelsize(size12);
+        Y_settings->labelsize(size12);
+        Y_reports->labelsize(size12);
+        Y_manual->labelsize(size12);
+        Y_exit->labelsize(size12);
+
+    Instruments->labelsize(size12);
+        I_show->labelsize(size12);
+        I_load->labelsize(size12);
+        I_save->labelsize(size12);
+        RecentInstruments->labelsize(size12);
+        I_clear->labelsize(size12);
+        I_search->labelsize(size12);
+
+    Parameters->labelsize(size12);
+        P_show->labelsize(size12);
+        P_load->labelsize(size12);
+        Save->labelsize(size12);
+        RecentParams->labelsize(size12);
+
+    Paths->labelsize(size12);
+        RootDir->labelsize(size12);
+        PresetDir->labelsize(size12);
+
+    Scales->labelsize(size12);
+        S_show->labelsize(size12);
+        S_load->labelsize(size12);
+        S_save->labelsize(size12);
+        RecentScale->labelsize(size12);
+        S_clear->labelsize(size12);
+
+    State->labelsize(size12);
+        loadState->labelsize(size12);
+        saveState->labelsize(size12);
+        Default->labelsize(size12);
+        RecentState->labelsize(size12);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
@@ -2589,9 +2630,56 @@ Alan Calvert started the project}
     vectors->labelsize(size11);
     globalfinedetune->labelsize(size);
     mastervolumedial->labelsize(size);
+    mastermono->labelsize(size11);
+    masterkeyshift->labelsize(size);
+        masterkeyshift->textsize(size12);
 
-     masterwindow->redraw();
-     saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");} {}
+    SystemEffectsGrp->labelsize(size12);
+    syseffnocounter->labelsize(size11);
+        syseffnocounter->textsize(size11);
+    sysefftype->labelsize(size11);
+        sys_off->labelsize(size);
+        sys_1->labelsize(size);
+        sys_2->labelsize(size);
+        sys_3->labelsize(size);
+        sys_4->labelsize(size);
+        sys_5->labelsize(size);
+        sys_6->labelsize(size);
+        sys_7->labelsize(size);
+        sys_8->labelsize(size);
+
+    SysEffOn->labelsize(size11);
+    sysEffSend->labelsize(size11);
+    sysCopy->labelsize(size11);
+    sysPaste->labelsize(size11);
+
+    InsertionEffectsGrp->labelsize(size12);
+    inseffnocounter->labelsize(size11);
+        inseffnocounter->textsize(size11);
+    insefftype->labelsize(size11);
+    insefftype->labelsize(size11);
+        ins_off->labelsize(size);
+        ins_1->labelsize(size);
+        ins_2->labelsize(size);
+        ins_3->labelsize(size);
+        ins_4->labelsize(size);
+        ins_5->labelsize(size);
+        ins_6->labelsize(size);
+        ins_7->labelsize(size);
+        ins_8->labelsize(size);
+
+    inseffpart->labelsize(size11);
+    insCopy->labelsize(size11);
+    insPaste->labelsize(size11);
+
+    panning_law->labelsize(size12);
+        pancut->labelsize(size11);
+        pannorm->labelsize(size11);
+        panboost->labelsize(size11);
+
+    partui->groupRtext(dScale);
+    masterwindow->redraw();
+    saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");} {}
   }
   Function {msgRtext()} {} {
     code {//
@@ -2673,6 +2761,8 @@ Alan Calvert started the project}
   decl {float mainDW;} {private local
   }
   decl {float mainDH;} {private local
+  }
+  decl {float mainScale;} {private local
   }
   decl {float msgDW;} {private local
   }
