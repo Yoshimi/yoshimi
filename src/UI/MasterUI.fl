@@ -176,8 +176,7 @@ class MasterUI {open : {private GuiUpdates}
       }
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {open
-  } {
+  Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -244,7 +243,8 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {closecheck()} {} {
+  Function {closecheck()} {selected
+  } {
     code {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
@@ -289,7 +289,7 @@ class MasterUI {open : {private GuiUpdates}
         if (Fl::event() == FL_CLOSE)
             closecheck();
         else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            mainRtext();} open selected
+            mainRtext();} open
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = o->w(); mainDH = o->h();}
       class YoshiWin xclass Yoshimi visible
@@ -2564,8 +2564,7 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
-  Function {mainRtext()} {open
-  } {
+  Function {mainRtext()} {} {
     code {//
     float dW = masterwindow->w() / mainDW;
     float dH = masterwindow->h() / mainDH;
@@ -2669,6 +2668,8 @@ Alan Calvert started the project}
         ins_8->labelsize(size);
 
     inseffpart->labelsize(size11);
+        inseffpart->textsize(size11);
+        setinspartlist(); // there should be a better way :(
     insCopy->labelsize(size11);
     insPaste->labelsize(size11);
 
