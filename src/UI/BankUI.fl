@@ -315,9 +315,10 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_}
+class BankUI {open : {public BankProcess_, RootProcess_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window instrumentuiwindow {
       label Bank
       callback {//
@@ -325,7 +326,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
         instrumentRtext();}
-      xywh {758 312 780 575} type Double labelsize 12 hide resizable
+      xywh {748 279 780 575} type Double labelsize 12 hide resizable
+      code0 {o->size_range(780, 575, 0,0,0,0,1);}
       class YoshiWin
     } {
       Fl_Choice banklist {
@@ -667,10 +669,10 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
      if (Fl::event() == FL_CLOSE)
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         bankRtext();}
+         bankRtext();} open
       xywh {84 223 775 575} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
-      code1 {//if (synth->getUniqueId() == 0) //rootmodeselect->show();}
+      code1 {o->size_range(775, 575, 0,0,0,0,1);}
       code2 {bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
       class YoshiWin
     } {
@@ -852,11 +854,12 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
      if (Fl::event() == FL_CLOSE)
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         rootRtext();}
-      xywh {300 77 465 295} type Double labelsize 12 hide resizable
+         rootRtext();} open selected
+      xywh {88 54 465 295} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
       code2 {if (synth->getUniqueId() == 0) {addrootdirbutton->show();  removerootdirbutton->show();  changeIDbutton->show();}}
+      code3 {o->size_range(465, 295, 0,0,0,0,1);}
       class YoshiWin
     } {
       Fl_Browser rootsbrowse {
@@ -1513,6 +1516,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
 
     int size = int(12 * dScale);
 
+   /* banklist->labelsize(size); // doesn't seem to work :(
+        banklist->textsize(size);
+        rescan_for_banks(); */
     bankroot->labelsize(size);
     bankinst->labelsize(size);
     bankcurrent->labelsize(size);
