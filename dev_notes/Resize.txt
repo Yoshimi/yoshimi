@@ -8,20 +8,23 @@ Resonance
 LFOs
 Part
     instrumenteditwindow
-    ctlmidi
+    ctlmidi - but phantom reopens sometimes
     ctlwindow
     aftertouchcontrol - but phantom reopens sometimes
-    partfx - need to identify saved sizes from syseff and inseff
+    partfx
 Main
     message window
+
 
 
 In progress
 Addsynth
 Envelopes
 Filters
+
 Main
-    masterwindow
+    masterwindow need to do sys/ins effects
+
 Part
     instrumentkitlist
 

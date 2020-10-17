@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -109,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -243,8 +243,7 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {closecheck()} {selected
-  } {
+  Function {closecheck()} {} {
     code {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
@@ -281,18 +280,17 @@ class MasterUI {open : {private GuiUpdates}
                 synth->guiClosed(true);
             }} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
         if (Fl::event() == FL_CLOSE)
             closecheck();
         else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            mainRtext();} open
-      xywh {38 547 385 470} type Double labelfont 13 labelsize 12 resizable
+            mainRtext();}
+      xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = o->w(); mainDH = o->h();}
-      class YoshiWin xclass Yoshimi visible
+      class YoshiWin xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -1591,7 +1589,7 @@ Alan Calvert started the project}
                 activePart = value_int;
 
             delete partui;
-            partui = new PartUI(0, 0, 765, 525);
+            partui = new PartUI(0, 0, 765 * mainScale, 525 * mainScale);
             partuigroup->add(partui);
             partui->init(synth->part[activePart], activePart, bankui);
             partui->groupRtext(mainScale);
@@ -2671,6 +2669,11 @@ Alan Calvert started the project}
         inseffpart->textsize(size11);
     insCopy->labelsize(size11);
     insPaste->labelsize(size11);
+
+    npartcounter->labelsize(size11);
+        npartcounter->textsize(size11);
+    maxparts->labelsize(size11);
+        maxparts->textsize(size11);
 
     panning_law->labelsize(size12);
         pancut->labelsize(size11);

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -71,8 +71,8 @@ class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window syseffsend {
-      xywh {916 486 30 30} type Double box NO_BOX labelfont 1
-      class Fl_Group visible
+      xywh {916 486 30 30} type Double box NO_BOX labelfont 1 hide
+      class Fl_Group
     } {
       Fl_Dial sysend {
         callback {//
@@ -390,14 +390,13 @@ class PartUI {open : {public Fl_Group, PartUI_}
   } {
     Fl_Window partgroup {
       xywh {1023 99 380 170} type Double box NO_BOX hide
-      code0 {groupDW = o->w(); groupDH = o->h();}
       class Fl_Group
     } {
       Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
-        Fl_Button {} {
+        Fl_Button partedit {
           label Edit
           callback {//
         bool divert = true;
@@ -611,11 +610,11 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code0 {int tmp = synth->ReadPartKeyMode(npart);}
           code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {
-          MenuItem {} {
+          MenuItem keypoly {
             label Poly
             xywh {0 0 34 20} labelfont 1 labelsize 11
           }
-          MenuItem {} {
+          MenuItem keymono {
             label Mono
             xywh {10 10 34 20} labelfont 1 labelsize 11
           }
@@ -624,7 +623,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             xywh {20 20 34 20} labelfont 1 labelsize 11
           }
         }
-        Fl_Button {} {
+        Fl_Button partcontrollers {
           label Controllers
           callback {//
           if (Fl::event_button() != 3)
@@ -681,7 +680,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code0 {o->range(0.0, 127.0);o->step(1.0);}
           code1 {o->value(part->Pmaxkey);}
         }
-        Fl_Button {} {
+        Fl_Button setmin {
           label Set
           callback {//
           if (part->lastnote >= 0)
@@ -690,7 +689,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           send_data(0, PART::control::minToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
         }
-        Fl_Button {} {
+        Fl_Button setnorm {
           label R
           callback {//
           minkcounter->value(0);
@@ -699,7 +698,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           send_data(0, PART::control::resetMinMaxKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
         }
-        Fl_Button {} {
+        Fl_Button setmax {
           label Set
           callback {//
           if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
@@ -3003,22 +3002,50 @@ class PartUI {open : {public Fl_Group, PartUI_}
     code {//
     partgroup->size(380 * dScale, 170 * dScale);
     partgroupui->size(378 * dScale, 168 * dScale);
+
+    /* The above have to be numerically fixed as the relative size
+     * can change when a part number is changed. The group is deleted
+     * and re-creacted based on the *current* master window
+    */
+
     toSysEfx->size(122 * dScale, 39 * dScale);
-    
+
     for (int i = 0; i < NUM_SYS_EFX; ++ i)
     {
-    	psyef[i]->size(25 * dScale, 25 * dScale);
-    	psyef[i]->sysRsize(dScale);
+        psyef[i]->size(25 * dScale, 25 * dScale);
+        psyef[i]->sysRsize(dScale);
     }
-    
-    int size = int(10 * dScale);
 
+    int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+    partedit->labelsize(size12);
+    instrumentlabel->labelsize(size12);
     syseffname->labelsize(size);
     velocityoffset->labelsize(size);
     velocitysense->labelsize(size);
     partpan->labelsize(size);
-    partvol->labelsize(size);} {selected
-    }
+    partvol->labelsize(size);
+    enportamento->labelsize(size11);
+    midich->labelsize(size11);
+        midich->textsize(size11);
+    keymode->labelsize(size11);
+        keypoly->labelsize(size11);
+        keymono->labelsize(size11);
+        legatoMode->labelsize(size11);
+    partcontrollers->labelsize(size12);
+    partkeyshift->labelsize(size);
+        partkeyshift->textsize(size11);
+    partkeylimit->labelsize(size);
+        partkeylimit->textsize(size11);
+    minkcounter->labelsize(size);
+        minkcounter->textsize(size11);
+    maxkcounter->labelsize(size);
+        maxkcounter->textsize(size11);
+    setmin->labelsize(size);
+    setnorm->labelsize(size11);
+    setmax->labelsize(size);
+    partGroupEnable->labelsize(size11);} {}
   }
   Function {~PartUI()} {} {
     code {//
@@ -3133,9 +3160,5 @@ class PartUI {open : {public Fl_Group, PartUI_}
   decl {float kitDW;} {public local
   }
   decl {float kitDH;} {public local
-  }
-  decl {float groupDW;} {public local
-  }
-  decl {float groupDH;} {public local
   }
 }
