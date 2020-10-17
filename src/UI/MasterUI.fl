@@ -2669,7 +2669,6 @@ Alan Calvert started the project}
 
     inseffpart->labelsize(size11);
         inseffpart->textsize(size11);
-        setinspartlist(); // there should be a better way :(
     insCopy->labelsize(size11);
     insPaste->labelsize(size11);
 
