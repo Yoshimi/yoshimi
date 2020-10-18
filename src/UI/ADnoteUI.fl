@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -1958,9 +1958,9 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {: {public PresetsUI_}
+class ADnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     comment {globalrandompan MUST be after globalwidth} {in_source in_header
     }
@@ -1970,11 +1970,10 @@ class ADnoteUI {: {public PresetsUI_}
      if (Fl::event() == FL_CLOSE)
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        addRtext();}
-      xywh {1179 128 535 405} type Double hide resizable
+        addRtext();} open
+      xywh {1179 128 535 405} type Double resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {o->size_range(535, 405, 0, 0, 0, 0, 1);}
-      class YoshiWin
+      code1 {o->size_range(535, 405, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Group globalfreq {
         label FREQUENCY
@@ -2061,7 +2060,7 @@ class ADnoteUI {: {public PresetsUI_}
         xywh {8 7 233 68} box PLASTIC_THIN_UP_BOX color 223
       }
       Fl_Group amplitudegrp {
-        label AMPLITUDE
+        label AMPLITUDE open
         xywh {5 5 240 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Dial globalvolume {
@@ -2176,7 +2175,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         }
       }
       Fl_Group filtergrp {
-        label FILTER
+        label FILTER open
         xywh {245 5 285 250} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
       } {
         Fl_Group filterenv {
@@ -2704,7 +2703,8 @@ switch (num)
         resui->refresh();
         editVoice(nvoice);} {}
   }
-  Function {ShowGlobal()} {} {
+  Function {ShowGlobal()} {open
+  } {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
@@ -2713,8 +2713,24 @@ switch (num)
     else
     {
         ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
-        addRtext();
     }} {}
+  }
+  Function {wincheck()} {open
+  } {
+    code {//
+    if (ADnoteGlobalParameters->visible() && ADnoteGlobalParameters->w() != lastglobalW)
+    {
+        addRtext();
+        lastglobalW = ADnoteGlobalParameters->w();
+    }
+    
+    if (ampenv)
+        ampenv->wincheck();
+    if (filterenv)
+        filterenv->wincheck();
+    if (freqenv)
+        freqenv->wincheck();} {selected
+    }
   }
   Function {addRtext()} {} {
     code {//
@@ -2842,6 +2858,8 @@ switch (num)
         addVoiceRtext();} {}
   }
   decl {ADnoteParameters *pars;} {private local
+  }
+  decl {int lastglobalW;} {private local
   }
   decl {bool voiceSeen;} {public local
   }

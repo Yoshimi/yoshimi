@@ -342,13 +342,7 @@ class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
   } {
     Fl_Window freemodeeditwindow {
       label Envelope
-      callback {//
-	std::cout << "freeresize" << std::endl;
-        if (Fl::event() == FL_CLOSE)
-            o->hide();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            envfreeRtext();} open selected
-      xywh {614 158 575 180} type Double resizable visible
+      xywh {614 158 575 180} type Double hide resizable
     } {
       Fl_Box freeedit {
         label Envelope
@@ -1054,6 +1048,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     kititem = kititem_;
     engine = engine_;
     group = group_;
+    lastfreeW = 0;
     make_ADSR_window();
     make_ASR_window();
     make_ADSRfilter_window();
@@ -1263,14 +1258,35 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     	}
    	else
             freemodeeditwindow->position(fetchX, fetchY);
-        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {}
+        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {selected
+    }
   }
-  Function {envfreeRtext()} {} {
+  Function {wincheck()} {open
+  } {
     code {//
+    if (freemodeeditwindow->visible() && freemodeeditwindow->w() != lastfreeW)
+    {
+        envfreeRtext();
+        lastfreeW = freemodeeditwindow->w();
+    }} {}
+  }
+  Function {envfreeRtext()} {open
+  } {
+    code {//
+        int W =  Fl::w();
+        int H =  Fl::h();
+        int w = freemodeeditwindow->w();
+        int h = freemodeeditwindow->h();
+        while (w > W || h > H)
+        {
+            w /= 2;
+            h /= 2;
+            freemodeeditwindow->size(w, h);
+        };
         float defW = 575;
         float defH = 180;
-        float dW = freemodeeditwindow->w() / defW;
-        float dH = freemodeeditwindow->h() / defH;
+        float dW = w / defW;
+        float dH = h / defH;
         float dScale;
         if (dW < dH)
             dScale = dW;
@@ -1385,5 +1401,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   decl {int engine;} {private local
   }
   decl {int group;} {private local
+  }
+  decl {int lastfreeW;} {private local
   }
 }

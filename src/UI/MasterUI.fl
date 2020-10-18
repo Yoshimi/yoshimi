@@ -109,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -243,8 +243,10 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {closecheck()} {} {
-    code {//
+  Function {make_window()} {} {
+    Fl_Window masterwindow {
+      label {Yoshimi meets ZynAddSubFX}
+      callback {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
             if (!force && synth->getRuntime().configChanged)
@@ -278,19 +280,9 @@ class MasterUI {: {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} {}
-  }
-  Function {make_window()} {} {
-    Fl_Window masterwindow {
-      label {Yoshimi meets ZynAddSubFX}
-      callback {//
-        if (Fl::event() == FL_CLOSE)
-            closecheck();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            mainRtext();}
+            }}
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
-      code0 {mainDW = o->w(); mainDH = o->h();}
-      class YoshiWin xclass Yoshimi
+      code0 {mainDW = o->w(); mainDH = o->h();} xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -356,7 +348,7 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem Y_exit {
             label {E&xit}
-            callback {closecheck();}
+            callback {masterwindow->do_callback();}
             xywh {10 10 100 20} labelsize 12
           }
         }
@@ -1579,9 +1571,9 @@ Alan Calvert started the project}
 
         case MAIN::control::partNumber:
             {
-            bool ctlmidiSeen = partui->ctlmidi->visible();
-            if(partui->instrumenteditwindow->visible())
-                openedit = true;
+            //bool ctlmidiSeen = partui->ctlmidi->visible();
+            //if(partui->instrumenteditwindow->visible())
+                //openedit = true;
             // openedit also set by right click in mixer panel
             // might need further refinement
 
@@ -1598,9 +1590,10 @@ Alan Calvert started the project}
             npartcounter->value(activePart + 1);
             npartcounter->redraw();
 
-            if (ctlmidiSeen)
-                partui->Showctlmidi();
-            else
+            partui->ctlwindow->hide();
+            //if (ctlmidiSeen)
+                //partui->Showctlmidi();
+            //else
                 partui->ctlmidi->hide();
 
             updatepanel();
@@ -2481,12 +2474,8 @@ Alan Calvert started the project}
     else
         panelwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankInst");
-    bankui->instrumentuiwindow->position(fetchX, fetchY);
-    if (fetchO)
-        bankui->instrumentuiwindow->show();
-    else
-        bankui->instrumentuiwindow->hide();
+    if (lastSeen(synth, "bankInst"))
+        bankui->ShowInst();
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankBank");
     bankui->bankuiwindow->position(fetchX, fetchY);
@@ -2562,10 +2551,29 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
+  Function {wincheck()} {} {
+    code {//
+    if (masterwindow->w() != lastmainW)
+    {
+        mainRtext();
+        lastmainW = masterwindow->w();
+    }} {}
+  }
   Function {mainRtext()} {} {
     code {//
-    float dW = masterwindow->w() / mainDW;
-    float dH = masterwindow->h() / mainDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = masterwindow->w();
+    int h = masterwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        masterwindow->size(w, h);
+    };
+
+    float dW = w / mainDW;
+    float dH = h / mainDH;
     float dScale;
 
     if (dW < dH)
@@ -2682,14 +2690,23 @@ Alan Calvert started the project}
 
     partui->groupRtext(dScale);
     masterwindow->redraw();
-    saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");} {}
+    saveWin(synth, w, h, masterwindow->x(), masterwindow->y(), true, "master");} {}
   }
   Function {msgRtext()} {} {
     code {//
-    printf("in msgRtext\\n");
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = message->w();
+    int h = message->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        message->size(w, h);
+    };
 
-    float dW = message->w() / msgDW;
-    float dH = message->h() / msgDH;
+    float dW = w / msgDW;
+    float dH = h / msgDH;
     float dScale;
 
     if (dW < dH)
@@ -2760,6 +2777,8 @@ Alan Calvert started the project}
   decl {int msgGroup;} {private local
   }
   decl {bool openedit;} {public local
+  }
+  decl {int lastmainW;} {private local
   }
   decl {float mainDW;} {private local
   }

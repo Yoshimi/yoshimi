@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -315,19 +315,14 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {: {public BankProcess_, RootProcess_}
+class BankUI {open : {public BankProcess_, RootProcess_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window instrumentuiwindow {
-      label Bank
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        instrumentRtext();}
-      xywh {748 279 780 575} type Double labelsize 12 hide resizable
+      label Bank open
+      xywh {261 240 780 575} type Double labelsize 12 hide resizable
       code0 {o->size_range(780, 575, 0,0,0,0,1);}
-      class YoshiWin
     } {
       Fl_Choice banklist {
         callback {//
@@ -676,6 +671,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {o->size_range(775, 575, 0,0,0,0,1);}
       code2 {bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
+      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "bankBank");}
       class YoshiWin
     } {
       Fl_Button bankroot {
@@ -711,7 +707,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             rootmodeselect->hide();
         }*/
 
-        instrumentuiwindow->show();
+        ShowInst();
         if (Fl::event_button() == 3)
         {
             bankuiwindow->hide();
@@ -846,7 +842,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 else if (bankFrom == 3)
                 {
                     instFrom = 2;
-                    instrumentuiwindow->show();
+                    ShowInst();
                 }
             }
             else
@@ -1103,6 +1099,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     what = 0;
     nselected = -1;
     rselected = -1;
+    instrumentSeen = false;
     make_window();
     r_mode = 1;
     mode = 1;
@@ -1111,11 +1108,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
     bankFrom = 0;
     instFrom = 0;} {}
   }
-  Function {~BankUI()} {return_type virtual
+  Function {~BankUI()} {open return_type virtual
   } {
     code {//
         setVisible(synth, instrumentuiwindow->visible(), "bankInst");
         instrumentuiwindow->hide();
+        instrumentSeen = false;
         delete instrumentuiwindow;
         setVisible(synth, bankuiwindow->visible(), "bankBank");
         bankuiwindow->hide();
@@ -1124,15 +1122,30 @@ class BankUI {: {public BankProcess_, RootProcess_}
         rootuiwindow->hide();
         delete rootuiwindow;} {}
   }
-  Function {Show()} {} {
+  Function {Show()} {open
+  } {
     code {// called from part UI
     rescan_for_banks();
     set_bank_slot();
-    instrumentuiwindow->show();
+    ShowInst();
     readbutton->value(1);
     mode = 1;
     removeselection();
-    refreshmainwindow();} {}
+    refreshmainwindow();} {selected
+    }
+  }
+  Function {ShowInst()} {open
+  } {
+    code {//
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "bankInst");
+    if (W == 0 || H == 0)
+        instrumentuiwindow->size(X, Y);
+    else
+        instrumentuiwindow->resize(X, Y, W, H);
+    instrumentuiwindow->show();
+    instrumentSeen = true;} {}
   }
   Function {Hide()} {} {
     code {// called from master UI
@@ -1268,7 +1281,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             modeselect->hide();
             rootmodeselect->hide();
         }*/
-        instrumentuiwindow->show();
+        ShowInst();
         set_bank_slot(); // needed by 'old' menu selector
         refreshinstrumentwindow();
         return;
@@ -1415,12 +1428,30 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bs[i]->refresh(bk, rt, last);
     }} {}
   }
+  Function {wincheck()} {} {
+    code {//
+    if (instrumentSeen && instrumentuiwindow->w() != lastinstrumentW)
+    {
+        instrumentRtext();
+        lastinstrumentW = instrumentuiwindow->w();
+    }} {}
+  }
   Function {instrumentRtext()} {} {
     code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = instrumentuiwindow->w();
+    int h = instrumentuiwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        instrumentuiwindow->size(w, h);
+    };
     float defW = 780;
     float defH = 575;
-    float dW = instrumentuiwindow->w() / defW;
-    float dH =  instrumentuiwindow->h() / defH;
+    float dW = w / defW;
+    float dH =  h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1457,14 +1488,25 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
 
     instrumentuiwindow->redraw();
-    saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), true, "bankInst");} {}
+    saveWin(synth, w, h, instrumentuiwindow->x(), instrumentuiwindow->y(), true, "bankInst");} {}
   }
   Function {searchRtext()} {} {
     code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = searchwin->w();
+    int h = searchwin->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        searchwin->size(w, h);
+    };
+
     float defW = 305;
     float defH = 490;
-    float dW = searchwin->w() / defW;
-    float dH = searchwin->h() / defH;
+    float dW = w / defW;
+    float dH = h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1504,10 +1546,21 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {bankRtext()} {} {
     code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = bankuiwindow->w();
+    int h = bankuiwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        bankuiwindow->size(w, h);
+    };
+
     float defW = 775;
     float defH = 575;
-    float dW = bankuiwindow->w() / defW;
-    float dH =  bankuiwindow->h() / defH;
+    float dW = w / defW;
+    float dH =  h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1538,14 +1591,25 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
 
     bankuiwindow->redraw();
-    saveWin(synth, bankuiwindow->w(), bankuiwindow->h(),  bankuiwindow->x(),  bankuiwindow->y(), true, "bankBank");} {}
+    saveWin(synth, w, h,  bankuiwindow->x(),  bankuiwindow->y(), true, "bankBank");} {}
   }
   Function {rootRtext()} {} {
     code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = rootuiwindow->w();
+    int h = rootuiwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        rootuiwindow->size(w, h);
+    };
+
     float defW = 465;
     float defH = 295;
-    float dW = rootuiwindow->w() / defW;
-    float dH = rootuiwindow->h() / defH;
+    float dW = w / defW;
+    float dH = h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1569,7 +1633,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rootsbrowse->textsize(size);
 
     rootuiwindow->redraw();
-    saveWin(synth, rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), true, "bankRoot");} {}
+    saveWin(synth, w, h,  rootuiwindow->x(),  rootuiwindow->y(), true, "bankRoot");} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt, int last)} {} {
     code {//
@@ -1713,5 +1777,15 @@ class BankUI {: {public BankProcess_, RootProcess_}
   decl {int instFrom;} {private local
   }
   decl {bool unsearched;} {public local
+  }
+  decl {int lastinstrumentW;} {private local
+  }
+  decl {int instrumentSeen;} {private local
+  }
+  decl {int lastbankW;} {private local
+  }
+  decl {int lastrootW;} {private local
+  }
+  decl {int lastsearchW;} {private local
   }
 }
