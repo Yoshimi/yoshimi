@@ -171,8 +171,14 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
 
         vpar.OscilSmp = NULL;
         vpar.FMSmp = NULL;
-        vpar.VoiceOut = NULL;
         vpar.FMEnabled = oldvpar.FMEnabled;
+
+        if (oldvpar.VoiceOut != NULL) {
+            vpar.VoiceOut = (float*)fftwf_malloc(synth->bufferbytes);
+            // Not sure the memcpy is necessary
+            memcpy(vpar.VoiceOut, oldvpar.VoiceOut, synth->bufferbytes);
+        } else
+            vpar.VoiceOut = NULL;
 
         // The above vars are checked in killNote() even when the voice is
         // disabled, so short-circuit only after they are set
@@ -269,11 +275,6 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
             new Envelope(*oldvpar.FMAmpEnvelope) :
             NULL;
 
-        if (oldvpar.VoiceOut != NULL) {
-            vpar.VoiceOut = (float*)fftwf_malloc(synth->bufferbytes);
-            // Not sure the memcpy is necessary
-            memcpy(vpar.VoiceOut, oldvpar.VoiceOut, synth->bufferbytes);
-        }
         // NoteVoicePar done
 
         int unison = unison_size[i];
