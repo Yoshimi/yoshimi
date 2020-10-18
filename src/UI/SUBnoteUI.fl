@@ -166,17 +166,12 @@ class SUBnoteUI {: {public PresetsUI_}
     }
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              subRtext();}
       xywh {446 515 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
-      class YoshiWin
+      code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Scroll frame {open
+      Fl_Scroll frame {
         xywh {5 140 435 326} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
@@ -704,19 +699,24 @@ class SUBnoteUI {: {public PresetsUI_}
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "sub");
     SUBparameters->show();
     if (fetchW > 0 && fetchH > 0)
-    {
         SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
-        subRtext();
-    }
     else
-        SUBparameters->position(fetchX, fetchY);
-
-    SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);} {}
+        SUBparameters->position(fetchX, fetchY);} {}
   }
   Function {subRtext()} {} {
     code {//
-    float dW = SUBparameters->w() / subDW;
-    float dH = SUBparameters->h() / subDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = SUBparameters->w();
+    int subh = SUBparameters->h();
+    while (w > W || subh > H)
+    {
+        w /= 2;
+        subh /= 2;
+        SUBparameters->size(w, subh);
+    };
+    float dW = w / subDW;
+    float dH = subh / subDH;
     float dScale;
 
     if (dW < dH)
@@ -726,8 +726,14 @@ class SUBnoteUI {: {public PresetsUI_}
     if (dScale < 0.2f)
         dScale = 0.2f;
 
-    int size = int(10 * dScale);
-    int size11 = int(11 * dScale);
+    ampenv->wincheck();
+    bandwidthenvelopegroup->wincheck();
+    filterenv->wincheck();
+    freqenvelopegroup->wincheck();
+
+    if (!SUBparameters->visible() || SUBparameters->w() == lastsubW)
+        return;
+    lastsubW = SUBparameters->w();
 
     ampenv->envRtext(dScale);
     bandwidthenvelopegroup->envRtext(dScale);
@@ -735,6 +741,9 @@ class SUBnoteUI {: {public PresetsUI_}
     freqenvelopegroup->envRtext(dScale);
 
     filterui->filterRtext(dScale);
+
+    int size = int(10 * dScale);
+    int size11 = int(11 * dScale);
 
     frame->size(int(435 * dW), int(326 * dH));
     harmonics->size(int(435 * dW), int(275 * dH * 1.1));
@@ -814,7 +823,7 @@ class SUBnoteUI {: {public PresetsUI_}
     subClose->labelsize(size11);
 
     SUBparameters->redraw();
-    saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), true, "sub");} {}
+    saveWin(synth, w, subh, SUBparameters->x(), SUBparameters->y(), true, "sub");} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
@@ -985,6 +994,7 @@ class SUBnoteUI {: {public PresetsUI_}
     synth = pars->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
+    lastsubW = 0;
     make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
@@ -1007,5 +1017,7 @@ class SUBnoteUI {: {public PresetsUI_}
   decl {float subDW;} {private local
   }
   decl {float subDH;} {private local
+  }
+  decl {int lastsubW;} {private local
   }
 }

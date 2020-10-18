@@ -1102,8 +1102,19 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {padRtext()} {} {
     code {//
-    float dW =  padnotewindow->w() / padDW;
-    float dH =  padnotewindow->h() / padDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = padnotewindow->w();
+    int h = padnotewindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        padnotewindow->size(w, h);
+    };
+
+    float dW =  w / padDW;
+    float dH =  h / padDH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -1111,6 +1122,14 @@ class PADnoteUI {: {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
+
+    ampenv->wincheck();
+    freqenv->wincheck();
+    filterenv->wincheck();
+
+    if (!padnotewindow->visible() || padnotewindow->w() == lastpadW)
+        return;
+    lastpadW = padnotewindow->w();
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
@@ -1265,7 +1284,7 @@ class PADnoteUI {: {public PresetsUI_}
     padClose->labelsize(size12);
 
     padnotewindow->redraw();
-    saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), true, "pad");} {}
+    saveWin(synth, w, h, padnotewindow->x(), padnotewindow->y(), true, "pad");} {}
   }
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -1578,6 +1597,7 @@ class PADnoteUI {: {public PresetsUI_}
     pars = parameters;
     npart = npart_;
     kititem = kititem_;
+    lastpadW = 0;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
     make_window();} {}
@@ -1610,5 +1630,7 @@ class PADnoteUI {: {public PresetsUI_}
   decl {float padDW;} {private local
   }
   decl {float padDH;} {private local
+  }
+  decl {int lastpadW;} {private local
   }
 }
