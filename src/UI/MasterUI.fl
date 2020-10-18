@@ -109,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1259,15 +1259,10 @@ Alan Calvert started the project}
     }
     Fl_Window message {
       label Yoshimi
-      callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              msgRtext();}
       xywh {9 25 290 85} type Double labelsize 12 hide resizable
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
       code1 {msgDW = o->w(); msgDH = o->h();}
-      class YoshiWin
+      code2 {o->size_range(290, 85, 0, 0, 0, 0, 1);}
     } {
       Fl_Box words {
         label {?}
@@ -1891,10 +1886,12 @@ Alan Calvert started the project}
             cancel->show();
         }
         closebutton->copy_label(B1.c_str());
+        int X, Y, W, H, O;
+        loadWin(synth, W, H,  X,  Y, O, "message");
         if (fixedPos)
-            message->position(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2);
+            message->resize(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2, W, H);
         else
-            message->position(Fl::event_x_root() + 16, Fl::event_y_root());
+            message->resize(Fl::event_x_root() + 16, Fl::event_y_root(), W, H);
         words->copy_label(text.c_str());
         message->show();} {}
   }
@@ -2557,6 +2554,12 @@ Alan Calvert started the project}
     {
         mainRtext();
         lastmainW = masterwindow->w();
+    }
+    
+    if (message->visible() && message->w() != lastmsgW)
+    {
+        msgRtext();
+        lastmsgW = message->w();
     }} {}
   }
   Function {mainRtext()} {} {
@@ -2693,7 +2696,7 @@ Alan Calvert started the project}
     saveWin(synth, w, h, masterwindow->x(), masterwindow->y(), true, "master");} {}
   }
   Function {msgRtext()} {} {
-    code {//
+    code {//  
     int W =  Fl::w();
     int H =  Fl::h();
     int w = message->w();
@@ -2723,7 +2726,8 @@ Alan Calvert started the project}
     cancel->labelsize(size14);
     closebutton->labelsize(size14);
 
-    message->redraw();} {}
+    message->redraw();
+    saveWin(synth, w, h,  message->x(),  message->y(), true, "message");} {}
   }
   decl {ConfigUI *configui;} {public local
   }
@@ -2789,5 +2793,7 @@ Alan Calvert started the project}
   decl {float msgDW;} {private local
   }
   decl {float msgDH;} {private local
+  }
+  decl {int lastmsgW;} {private local
   }
 }

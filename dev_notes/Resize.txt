@@ -6,27 +6,24 @@ PadSynth
 Subsyth - but harmonics height issues
 Resonance
 LFOs
+Envelopes
 Part
     instrumenteditwindow
+    instrumentkitlist
     ctlmidi - but phantom reopens sometimes
     ctlwindow
     aftertouchcontrol - but phantom reopens sometimes
     partfx
+    ( some of these fail on part number changes)
 Main
     message window
 
 
-
 In progress
 Addsynth
-Envelopes
 Filters
-
 Main
     masterwindow need to do sys/ins effects
-
-Part
-    instrumentkitlist
 
 
 Started

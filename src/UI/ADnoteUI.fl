@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -612,7 +612,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Source
               callback {//
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 10 align 9 textfont 1 textsize 10
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1 textsize 14
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -628,7 +628,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
-            xywh {535 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
+            xywh {535 32 88 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
             MenuItem Moff {
@@ -1762,6 +1762,17 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
   Function {voiceRtext(float dScale)} {} {
     code {//
+
+   voiceampenvgroup->wincheck();
+   voicefilterenvgroup->wincheck();
+   voicefreqenvgroup->wincheck();
+
+   voiceFMampenvgroup->wincheck();
+   voiceFMfreqenvgroup->wincheck();
+
+   if (dScale == lastdScale)
+       return;
+
    voiceamplfogroup->lfoRtext(dScale);
    voiceampenvgroup->envRtext(dScale);
 
@@ -1772,6 +1783,8 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    voicefreqenvgroup->envRtext(dScale);
 
    voicefilter->filterRtext(dScale);
+
+   lastdScale = dScale;
 
    int size = int(10 * dScale);
    int size11 = int(11 * dScale);
@@ -1839,6 +1852,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
    extvoicegroup->labelsize(size12);
    ExtOsc->labelsize(size);
+       ExtOsc->textsize(size);
    SoundType->labelsize(size);
    Vsound->labelsize(size11);
    Vwhite->labelsize(size11);
@@ -1847,6 +1861,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
    oscParamBox->labelsize(size12);
    UseOsc->labelsize(size);
+       UseOsc->textsize(size);
    changevoiceoscilbutton->labelsize(size);
    VoiceOscPhase->labelsize(size);
 
@@ -1857,7 +1872,8 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    voiceFMampenvgroup->envRtext(dScale);
    voiceFMfreqenvgroup->envRtext(dScale);
 
-   ExtMod->labelsize(size);
+   ExtMod->labelsize(size11);
+       ExtMod->textsize(size14);
 
    Modampgrp->labelsize(size11);
    ModVolume->labelsize(size11);
@@ -1898,6 +1914,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   changeFMoscilbutton->labelsize(size);
   ModPhase->labelsize(size);
   ExtModOsc->labelsize(size);
+      ExtModOsc->textsize(size);
 
   modvoicelabel->labelsize(int(40 * dScale));} {}
   }
@@ -1908,6 +1925,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         npart = npart_;
         kititem = kititem_;
         nvoice = nvoice_;
+        lastdScale = 0;
         fft = new FFTwrapper(synth->oscilsize);
         oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
         oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
@@ -1956,11 +1974,13 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
   decl {SynthEngine *synth;} {private local
   }
+  decl {float lastdScale;} {private local
+  }
 }
 
-class ADnoteUI {open : {public PresetsUI_}
+class ADnoteUI {: {public PresetsUI_}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     comment {globalrandompan MUST be after globalwidth} {in_source in_header
     }
@@ -1970,10 +1990,10 @@ class ADnoteUI {open : {public PresetsUI_}
      if (Fl::event() == FL_CLOSE)
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        addRtext();} open
-      xywh {1179 128 535 405} type Double resizable
+        addRtext();}
+      xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {o->size_range(535, 405, 0, 0, 0, 0, 1);} visible
+      code1 {o->size_range(535, 405, 0, 0, 0, 0, 1);}
     } {
       Fl_Group globalfreq {
         label FREQUENCY
@@ -2060,7 +2080,7 @@ class ADnoteUI {open : {public PresetsUI_}
         xywh {8 7 233 68} box PLASTIC_THIN_UP_BOX color 223
       }
       Fl_Group amplitudegrp {
-        label AMPLITUDE open
+        label AMPLITUDE
         xywh {5 5 240 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Dial globalvolume {
@@ -2175,7 +2195,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         }
       }
       Fl_Group filtergrp {
-        label FILTER open
+        label FILTER
         xywh {245 5 285 250} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
       } {
         Fl_Group filterenv {
@@ -2281,15 +2301,9 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     }
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters}
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        addVoiceRtext();}
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {o->size_range(532, 427, 0, 0, 0, 0, 1);}
-      class YoshiWin
     } {
       Fl_Group advoice {
         xywh {0 0 764 615} box BORDER_BOX
@@ -2642,6 +2656,8 @@ switch (num)
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
+        lastglobalW = 0;
+        lastvoiceW = 0;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
         voiceSeen = false;
@@ -2703,8 +2719,7 @@ switch (num)
         resui->refresh();
         editVoice(nvoice);} {}
   }
-  Function {ShowGlobal()} {open
-  } {
+  Function {ShowGlobal()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
@@ -2715,30 +2730,41 @@ switch (num)
         ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     }} {}
   }
-  Function {wincheck()} {open
-  } {
+  Function {wincheck()} {} {
     code {//
     if (ADnoteGlobalParameters->visible() && ADnoteGlobalParameters->w() != lastglobalW)
     {
         addRtext();
         lastglobalW = ADnoteGlobalParameters->w();
     }
-    
+
     if (ampenv)
         ampenv->wincheck();
     if (filterenv)
         filterenv->wincheck();
     if (freqenv)
-        freqenv->wincheck();} {selected
-    }
+        freqenv->wincheck();
+
+    if (ADnoteVoice->visible())
+        addVoiceRtext();} {}
   }
   Function {addRtext()} {} {
     code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = ADnoteGlobalParameters->w();
+    int h = ADnoteGlobalParameters->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        ADnoteGlobalParameters->size(w, h);
+    };
 
     float defW = 535;
     float defH = 405;
-    float dW = ADnoteGlobalParameters->w() / defW;
-    float dH =  ADnoteGlobalParameters->h() / defH;
+    float dW = w / defW;
+    float dH =  h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -2801,16 +2827,27 @@ switch (num)
     globalclose->labelsize(size11);
 
     ADnoteGlobalParameters->redraw();
-    saveWin(synth, ADnoteGlobalParameters->w(), ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
+    saveWin(synth, w, h, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
   }
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w =ADnoteVoice->w();
+    int h = ADnoteVoice->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        ADnoteVoice->size(w, h);
+    };
+
     float defW = 760;
     float defH = 610;
     float dW;
     float dH;
-    dW = ADnoteVoice->w() / defW;
-    dH =  ADnoteVoice->h() / defH;
+    dW = w / defW;
+    dH = h / defH;
     float dScale;
     if (dW < dH)
         dScale = dW;
@@ -2820,6 +2857,11 @@ switch (num)
         dScale = 0.2f;
 
     advoice->voiceRtext(dScale);
+
+    if (ADnoteVoice->visible() && ADnoteVoice->w() == lastvoiceW)
+        return;
+
+    lastvoiceW = ADnoteVoice->w();
 
     int size = int(14 * dScale);
     g1->labelsize(size);
@@ -2860,6 +2902,8 @@ switch (num)
   decl {ADnoteParameters *pars;} {private local
   }
   decl {int lastglobalW;} {private local
+  }
+  decl {int lastvoiceW;} {private local
   }
   decl {bool voiceSeen;} {public local
   }

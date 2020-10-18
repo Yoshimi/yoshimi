@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -316,7 +316,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -338,8 +338,7 @@ class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
         envwindow->hide();
         hide();} {}
   }
-  Function {make_freemode_edit_window()} {open
-  } {
+  Function {make_freemode_edit_window()} {} {
     Fl_Window freemodeeditwindow {
       label Envelope
       xywh {614 158 575 180} type Double hide resizable
@@ -1039,8 +1038,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     if (change)
         freeedit->redraw();} {}
   }
-  Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {open
-  } {
+  Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
     env=env_;
     synth = env->getSynthEngine();
@@ -1088,8 +1086,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         env->Pfreemode = 0;
     reinitcore(env->Pfreemode);} {}
   }
-  Function {reinitcore(bool freemode)} {open
-  } {
+  Function {reinitcore(bool freemode)} {} {
     code {//
     if (freemode)
         freemodebutton->value(1);
@@ -1245,8 +1242,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 
     envwindow->show();} {}
   }
-  Function {showfree()} {open
-  } {
+  Function {showfree()} {} {
     code {//
         int fetchW, fetchH, fetchX, fetchY, fetchO;
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "zenvFree " + to_string(engine) + " " + to_string(group));
@@ -1258,11 +1254,9 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     	}
    	else
             freemodeeditwindow->position(fetchX, fetchY);
-        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {selected
-    }
+        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {}
   }
-  Function {wincheck()} {open
-  } {
+  Function {wincheck()} {} {
     code {//
     if (freemodeeditwindow->visible() && freemodeeditwindow->w() != lastfreeW)
     {
@@ -1270,8 +1264,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         lastfreeW = freemodeeditwindow->w();
     }} {}
   }
-  Function {envfreeRtext()} {open
-  } {
+  Function {envfreeRtext()} {} {
     code {//
         int W =  Fl::w();
         int H =  Fl::h();
@@ -1283,6 +1276,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             h /= 2;
             freemodeeditwindow->size(w, h);
         };
+        //std::cout << "here envefree" << std::endl;
         float defW = 575;
         float defH = 180;
         float dW = w / defW;
@@ -1375,7 +1369,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         efP->labelsize(size);
         efE->labelsize(size);
 
-        //std::cout << "W " << W << "  H " << H << std::endl;
         envfree->resize(X, Y, W, H);
 
         freeeditsmall->resize(int(X + 5*dScale), int(Y + 20*dScale), int(W - 9*dScale), int(H - 25*dScale));} {}
