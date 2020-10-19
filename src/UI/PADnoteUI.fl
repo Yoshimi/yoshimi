@@ -256,6 +256,7 @@ class PADnoteUI {: {public PresetsUI_}
       xywh {711 582 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
+      code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
       class YoshiWin
     } {
       Fl_Tabs {} {
@@ -1091,17 +1092,25 @@ class PADnoteUI {: {public PresetsUI_}
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "pad");
     padnotewindow->show();
     if (fetchW > 0 && fetchH > 0)
-    {
         padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);
-        padRtext();
-    }
     else
-        padnotewindow->position(fetchX, fetchY);
-    padnotewindow->resizable();
-    padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);} {}
+        padnotewindow->position(fetchX, fetchY);} {}
   }
   Function {padRtext()} {} {
     code {//
+    ampenv->wincheck();
+    freqenv->wincheck();
+    filterenv->wincheck(); 
+    if (!padnotewindow->visible()) 
+        return;
+
+    if (padnotewindow->x() == lastpadX && padnotewindow->y() == lastpadY && padnotewindow->w() == lastpadW)
+        return;
+        
+    lastpadX = padnotewindow->x();
+    lastpadY = padnotewindow->y();
+    lastpadW = padnotewindow->w();
+
     int W =  Fl::w();
     int H =  Fl::h();
     int w = padnotewindow->w();
@@ -1122,14 +1131,6 @@ class PADnoteUI {: {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-
-    ampenv->wincheck();
-    freqenv->wincheck();
-    filterenv->wincheck();
-
-    if (!padnotewindow->visible() || padnotewindow->w() == lastpadW)
-        return;
-    lastpadW = padnotewindow->w();
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
@@ -1597,7 +1598,7 @@ class PADnoteUI {: {public PresetsUI_}
     pars = parameters;
     npart = npart_;
     kititem = kititem_;
-    lastpadW = 0;
+    lastpadX = lastpadY = lastpadW = 0xffff;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
     make_window();} {}
@@ -1630,6 +1631,10 @@ class PADnoteUI {: {public PresetsUI_}
   decl {float padDW;} {private local
   }
   decl {float padDH;} {private local
+  }
+  decl {int lastpadX;} {private local
+  }
+  decl {int lastpadY;} {private local
   }
   decl {int lastpadW;} {private local
   }

@@ -2269,10 +2269,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     adnoteui = NULL;
     subnoteui = NULL;
     padnoteui = NULL;
-    ctlSeen = false;
-    ATSeen = false;
-    editSeen = false;
-    efxSeen = false;
+    lastkitX = lastkitY = lastkitW = 0xffff;
     lastkititem = -1;} {}
   }
   Function {updatecontrollers()} {} {
@@ -2649,8 +2646,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     else
         instrumenteditwindow->position(fetchX, fetchY);
     instrumenteditwindow->size_range(editDW, editDH, 0, 0, 0, 0, 1);
-    editRtext();
-    editSeen = true;} {}
+    editRtext();} {}
   }
   Function {Showctl()} {} {
     code {//
@@ -2662,9 +2658,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     else
         ctlwindow->position(fetchX, fetchY);
     ctlwindow->size_range(ctlDW, ctlDH, 0, 0, 0, 0, 1);
-    ctlRtext();
-    std::cout << "seen ctl" << std::endl;
-    ctlSeen = true;} {}
+    ctlRtext();} {}
   }
   Function {ShowAT()} {} {
     code {//
@@ -2676,8 +2670,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     else
         aftertouchcontrol->position(fetchX, fetchY);
     ATRtext();
-    aftertouchcontrol->size_range(485, 180, 0, 0, 0, 0, 1);
-    ATSeen = true;} {}
+    aftertouchcontrol->size_range(485, 180, 0, 0, 0, 0, 1);} {}
   }
   Function {Showctlmidi()} {} {
     code {//
@@ -2724,9 +2717,11 @@ class PartUI {open : {public Fl_Group, PartUI_}
   }
   Function {wincheck()} {} {
     code {//
-    if (instrumentkitlist->visible() && instrumentkitlist->w() != lastkitW)
+    if (instrumentkitlist->visible() && instrumentkitlist->x() != lastkitX && instrumentkitlist->y() != lastkitY && instrumentkitlist->w() != lastkitW)
     {
         kitRtext();
+        lastkitX = instrumentkitlist->x();
+        lastkitY = instrumentkitlist->y();
         lastkitW = instrumentkitlist->w();
     }
     if (adnoteui)
@@ -3074,8 +3069,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     setVisible(synth, ctlwindow->visible(), "ctlWin");
     setVisible(synth, partfx->visible(), "partEfx");
     setVisible(synth, instrumentkitlist->visible(), "partKit");
-    if (editSeen)
-        setVisible(synth, instrumenteditwindow->visible(), "partEdit");
+    setVisible(synth, instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
     {
         adnoteui->ADnoteGlobalParameters->hide();
@@ -3144,14 +3138,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
   }
   decl {int keyATselection;} {private local
   }
-  decl {bool ctlSeen;} {public local
-  }
-  decl {bool ATSeen;} {public local
-  }
-  decl {bool editSeen;} {public local
-  }
-  decl {bool efxSeen;} {public local
-  }
   decl {float midiDW;} {public local
   }
   decl {float midiDH;} {public local
@@ -3175,6 +3161,10 @@ class PartUI {open : {public Fl_Group, PartUI_}
   decl {float kitDW;} {public local
   }
   decl {float kitDH;} {public local
+  }
+  decl {int lastkitX;} {private local
+  }
+  decl {int lastkitY;} {private local
   }
   decl {int lastkitW;} {private local
   }

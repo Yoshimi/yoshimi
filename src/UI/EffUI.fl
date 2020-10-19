@@ -2273,6 +2273,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
                 phaserp5->labelsize(size11);
                 phaserp6->labelsize(size11);
+                phaserp7->labelsize(size11);
                 phaserp8->labelsize(size11);
                     phaserp8->textsize(size11);
                 phaserp9->labelsize(size11);

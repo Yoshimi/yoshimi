@@ -180,7 +180,8 @@ class MasterUI {: {private GuiUpdates}
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
-
+      lastmainX = lastmainY = lastmainW == 0xffff;
+      lastsyseffX = lastsyseffY = lastsyseffW = 0xffff;
       partmax = synth->getRuntime().NumAvailableParts;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
@@ -1072,10 +1073,12 @@ Alan Calvert started the project}
     }
     Fl_Window syseffsendwindow {
       label {Sys Send}
-      xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide
+      xywh {43 63 120 246} type Double labelfont 13 labelsize 13 hide resizable
+      code0 {syseffDW = 120; syseffDH = 50;}
+      code1 {o->size_range(120, 242, 0, 0, 0, 0, 1);}
     } {
-      Fl_Scroll {} {
-        xywh {10 45 107 170} box FLAT_BOX
+      Fl_Scroll syseffgroup {open
+        xywh {9 46 109 172} box FLAT_BOX
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
                 for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; neff2++)}
@@ -1087,14 +1090,14 @@ Alan Calvert started the project}
                 syseffsend[neff1][neff2]->setValueType(VC_FXSysSend);
             }}
       } {}
-      Fl_Button {} {
+      Fl_Button syseffClose {
         label Close
         callback {//
         syseffsendwindow->hide();}
-        xywh {20 220 80 25} box THIN_UP_BOX
+        xywh {20 216 80 25} box THIN_UP_BOX
       }
-      Fl_Box {} {
-        label {Send system effect's output to other system effects}
+      Fl_Box syseffname {
+        label {Send output of system effect  to other system effects}
         xywh {5 5 110 35} labelsize 10 align 192
       }
     }
@@ -1508,7 +1511,10 @@ Alan Calvert started the project}
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 if (sysinsgroup->value() == SystemEffectsGrp)
+                {
                     showSysEfxUI();
+                    syseffectui->effRtext(mainScale, sysefftype->value());
+                }
             }
             else if (control == EFFECT::sysIns::effectEnable)
             {
@@ -1540,7 +1546,10 @@ Alan Calvert started the project}
             setInsEff(ninseff);
             inseffectui->UpdatePresetColour(parameter, insefftype->value());
             if (sysinsgroup->value() == InsertionEffectsGrp)
+            {
                 showInsEfxUI();
+                inseffectui->effRtext(mainScale, insefftype->value());
+            }
         }
         else if (control == EFFECT::sysIns::effectDestination)
         {
@@ -1590,6 +1599,7 @@ Alan Calvert started the project}
                 //partui->Showctlmidi();
             //else
                 partui->ctlmidi->hide();
+            partui->aftertouchcontrol->hide();
 
             updatepanel();
             if (openedit)
@@ -2464,6 +2474,10 @@ Alan Calvert started the project}
   Function {loadWindowData()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
+
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "syseffsend");
+    syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
+
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
     panelwindow->position(fetchX, fetchY);
     if (fetchO)
@@ -2550,17 +2564,27 @@ Alan Calvert started the project}
   }
   Function {wincheck()} {} {
     code {//
-    if (masterwindow->w() != lastmainW)
+    if (masterwindow->x() != lastmainX || masterwindow->y() != lastmainY || masterwindow->w() != lastmainW)
     {
         mainRtext();
+        lastmainX = masterwindow->x();
+        lastmainY = masterwindow->y();
         lastmainW = masterwindow->w();
     }
-    
+
     if (message->visible() && message->w() != lastmsgW)
     {
         msgRtext();
         lastmsgW = message->w();
-    }} {}
+    }
+
+    if (syseffsendwindow->visible() && (syseffsendwindow->x() != lastsyseffX || syseffsendwindow->y() != lastsyseffY || syseffsendwindow->w() != lastsyseffW))
+    {
+        syseffRtext();
+        lastsyseffX = syseffsendwindow->x();
+        lastsyseffY = syseffsendwindow->y();
+        lastsyseffW = syseffsendwindow->w();
+     }} {}
   }
   Function {mainRtext()} {} {
     code {//
@@ -2660,6 +2684,8 @@ Alan Calvert started the project}
     sysEffSend->labelsize(size11);
     sysCopy->labelsize(size11);
     sysPaste->labelsize(size11);
+    syseffectui->effRtext(dScale, sysefftype->value());
+
 
     InsertionEffectsGrp->labelsize(size12);
     inseffnocounter->labelsize(size11);
@@ -2680,6 +2706,7 @@ Alan Calvert started the project}
         inseffpart->textsize(size11);
     insCopy->labelsize(size11);
     insPaste->labelsize(size11);
+    inseffectui->effRtext(dScale, insefftype->value());
 
     npartcounter->labelsize(size11);
         npartcounter->textsize(size11);
@@ -2695,8 +2722,50 @@ Alan Calvert started the project}
     masterwindow->redraw();
     saveWin(synth, w, h, masterwindow->x(), masterwindow->y(), true, "master");} {}
   }
+  Function {syseffRtext()} {} {
+    code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = syseffsendwindow->w();
+    int h = syseffsendwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        syseffsendwindow->size(w, h);
+    };
+
+    float dW = w / syseffDW;
+    float dH = h / syseffDH;
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    int size = int(10 * dScale);
+
+    syseffgroup->resize(int(9 * dScale), int(46 * dScale), int(109 * dScale), int(172 * dScale));
+    syseffname->labelsize(size);
+
+    for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
+        for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
+        {
+            syseffsend[neff1][neff2]->labelsize(size);
+            syseffsend[neff1][neff2]->resize(int((-25 * dScale) + (35 * (neff2)) * dScale), int((66 * dScale) + (neff1 * dScale * 52)), int(35 * dScale), int(30 * dScale));
+        }
+
+    syseffClose->labelsize(int(14 * dScale));
+
+
+    syseffsendwindow->redraw();
+    saveWin(synth, w, h, syseffsendwindow->x(), syseffsendwindow->y(), true, "syseffsend");} {}
+  }
   Function {msgRtext()} {} {
-    code {//  
+    code {//
     int W =  Fl::w();
     int H =  Fl::h();
     int w = message->w();
@@ -2782,6 +2851,10 @@ Alan Calvert started the project}
   }
   decl {bool openedit;} {public local
   }
+  decl {int lastmainX;} {private local
+  }
+  decl {int lastmainY;} {private local
+  }
   decl {int lastmainW;} {private local
   }
   decl {float mainDW;} {private local
@@ -2795,5 +2868,15 @@ Alan Calvert started the project}
   decl {float msgDH;} {private local
   }
   decl {int lastmsgW;} {private local
+  }
+  decl {float syseffDW;} {private local
+  }
+  decl {float syseffDH;} {private local
+  }
+  decl {int lastsyseffX;} {private local
+  }
+  decl {int lastsyseffY;} {private local
+  }
+  decl {int lastsyseffW;} {private local
   }
 }

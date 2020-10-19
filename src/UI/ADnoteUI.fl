@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -612,7 +612,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Source
               callback {//
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1 textsize 14
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -1978,7 +1978,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {: {public PresetsUI_}
+class ADnoteUI {selected : {public PresetsUI_}
 } {
   Function {make_window()} {private
   } {
@@ -2656,7 +2656,7 @@ switch (num)
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
-        lastglobalW = 0;
+        lastglobalX = lastglobalY = lastglobalW = 0xffff;
         lastvoiceW = 0;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
@@ -2732,24 +2732,30 @@ switch (num)
   }
   Function {wincheck()} {} {
     code {//
-    if (ADnoteGlobalParameters->visible() && ADnoteGlobalParameters->w() != lastglobalW)
-    {
-        addRtext();
-        lastglobalW = ADnoteGlobalParameters->w();
-    }
+    addRtext();
+    
+    if (ADnoteVoice->visible())
+        addVoiceRtext();
 
     if (ampenv)
         ampenv->wincheck();
     if (filterenv)
         filterenv->wincheck();
     if (freqenv)
-        freqenv->wincheck();
-
-    if (ADnoteVoice->visible())
-        addVoiceRtext();} {}
+        freqenv->wincheck();} {}
   }
   Function {addRtext()} {} {
     code {//
+    ampenv->wincheck();
+    freqenv->wincheck();
+    filterenv->wincheck();
+
+    if (!ADnoteGlobalParameters->visible())
+        return;
+
+    if (ADnoteGlobalParameters->x() == lastglobalX && ADnoteGlobalParameters->y() == lastglobalY && ADnoteGlobalParameters->w() == lastglobalW)
+        return;
+
     int W =  Fl::w();
     int H =  Fl::h();
     int w = ADnoteGlobalParameters->w();
@@ -2760,7 +2766,7 @@ switch (num)
         h /= 2;
         ADnoteGlobalParameters->size(w, h);
     };
-
+    
     float defW = 535;
     float defH = 405;
     float dW = w / defW;
@@ -2782,6 +2788,10 @@ switch (num)
     filterenv->envRtext(dScale);
 
     filterui->filterRtext(dScale);
+
+    lastglobalX = ADnoteGlobalParameters->x();
+    lastglobalY = ADnoteGlobalParameters->y();
+    lastglobalW = ADnoteGlobalParameters->w();
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
@@ -2900,6 +2910,10 @@ switch (num)
         addVoiceRtext();} {}
   }
   decl {ADnoteParameters *pars;} {private local
+  }
+  decl {int lastglobalX;} {private local
+  }
+  decl {int lastglobalY;} {private local
   }
   decl {int lastglobalW;} {private local
   }

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"
@@ -159,7 +159,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_}
+class SUBnoteUI {selected : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
@@ -705,6 +705,21 @@ class SUBnoteUI {: {public PresetsUI_}
   }
   Function {subRtext()} {} {
     code {//
+    ampenv->wincheck();
+    bandwidthenvelopegroup->wincheck();
+    filterenv->wincheck();
+    freqenvelopegroup->wincheck();
+
+    if (!SUBparameters->visible())
+        return;
+        
+    if(SUBparameters->x() == lastsubX && SUBparameters->y() == lastsubY && SUBparameters->w() == lastsubW)
+         return;
+
+    lastsubX = SUBparameters->x();
+    lastsubY = SUBparameters->y();
+    lastsubW = SUBparameters->w();
+
     int W =  Fl::w();
     int H =  Fl::h();
     int w = SUBparameters->w();
@@ -725,15 +740,6 @@ class SUBnoteUI {: {public PresetsUI_}
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-
-    ampenv->wincheck();
-    bandwidthenvelopegroup->wincheck();
-    filterenv->wincheck();
-    freqenvelopegroup->wincheck();
-
-    if (!SUBparameters->visible() || SUBparameters->w() == lastsubW)
-        return;
-    lastsubW = SUBparameters->w();
 
     ampenv->envRtext(dScale);
     bandwidthenvelopegroup->envRtext(dScale);
@@ -994,7 +1000,7 @@ class SUBnoteUI {: {public PresetsUI_}
     synth = pars->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
-    lastsubW = 0;
+    lastsubX = lastsubY = lastsubW = 0xffff;
     make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
@@ -1017,6 +1023,10 @@ class SUBnoteUI {: {public PresetsUI_}
   decl {float subDW;} {private local
   }
   decl {float subDH;} {private local
+  }
+  decl {int lastsubX;} {private local
+  }
+  decl {int lastsubY;} {private local
   }
   decl {int lastsubW;} {private local
   }

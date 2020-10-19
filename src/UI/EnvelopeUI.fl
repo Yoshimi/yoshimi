@@ -1046,7 +1046,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     kititem = kititem_;
     engine = engine_;
     group = group_;
-    lastfreeW = 0;
+    lastfreeX = lastfreeY = lastfreeW = 0xffff;
     make_ADSR_window();
     make_ASR_window();
     make_ADSRfilter_window();
@@ -1258,11 +1258,14 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {wincheck()} {} {
     code {//
-    if (freemodeeditwindow->visible() && freemodeeditwindow->w() != lastfreeW)
-    {
-        envfreeRtext();
-        lastfreeW = freemodeeditwindow->w();
-    }} {}
+    if (!freemodeeditwindow->visible())
+        return;
+    if (freemodeeditwindow->x() == lastfreeX && freemodeeditwindow->y() == lastfreeY && freemodeeditwindow->w() == lastfreeW)
+        return;
+    envfreeRtext();
+    lastfreeX = freemodeeditwindow->x();
+    lastfreeY = freemodeeditwindow->y();
+    lastfreeW = freemodeeditwindow->w();} {}
   }
   Function {envfreeRtext()} {} {
     code {//
@@ -1394,6 +1397,10 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   decl {int engine;} {private local
   }
   decl {int group;} {private local
+  }
+  decl {int lastfreeX;} {private local
+  }
+  decl {int lastfreeY;} {private local
   }
   decl {int lastfreeW;} {private local
   }
