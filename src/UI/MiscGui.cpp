@@ -154,11 +154,10 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     synth->getGuiMaster()->wincheck();
-    synth->getGuiMaster()->partui->wincheck();
-    synth->getGuiMaster()->bankui->wincheck();
+
     /*
-     * The above three only do significant work
-     * if their respective windows are resized.
+     * The above only does significant work
+     * if windows are resized.
      */
 
     CommandBlock getData;

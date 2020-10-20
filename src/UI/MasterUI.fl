@@ -140,8 +140,12 @@ class MasterUI {: {private GuiUpdates}
       aboutwindow->hide();
       delete aboutwindow;
       syseffsendwindow->hide();
+      saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "syseffsend");
       delete syseffsendwindow;
       saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelwindow->visible(), "mixer");
+      message->hide();
+      saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "message");
+      delete message;
       panelwindow->hide();
       delete panelwindow;
       if (microtonalui)
@@ -174,14 +178,15 @@ class MasterUI {: {private GuiUpdates}
           saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "log");
           delete yoshiLog;
       }
+      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
-      lastmainX = lastmainY = lastmainW == 0xffff;
-      lastsyseffX = lastsyseffY = lastsyseffW = 0xffff;
+      msgSeen = false;
+      syseffSeen = false;
       partmax = synth->getRuntime().NumAvailableParts;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
@@ -1093,7 +1098,8 @@ Alan Calvert started the project}
       Fl_Button syseffClose {
         label Close
         callback {//
-        syseffsendwindow->hide();}
+        syseffsendwindow->hide();
+        syseffSeen = false;}
         xywh {20 216 80 25} box THIN_UP_BOX
       }
       Fl_Box syseffname {
@@ -1293,7 +1299,8 @@ Alan Calvert started the project}
         callback {//
                 yesdoit->hide();
                 cancel->hide();
-                message->hide();}
+                message->hide();
+                msgSeen = false;}
         xywh {211 60 70 20}
       }
     }
@@ -2564,11 +2571,12 @@ Alan Calvert started the project}
   }
   Function {wincheck()} {} {
     code {//
-    if (masterwindow->x() != lastmainX || masterwindow->y() != lastmainY || masterwindow->w() != lastmainW)
+    static int lastmainW = 0;
+    static int lastmsgW = 0;
+    static int lastsyseffW = 0;
+    if (masterwindow->w() != lastmainW)
     {
         mainRtext();
-        lastmainX = masterwindow->x();
-        lastmainY = masterwindow->y();
         lastmainW = masterwindow->w();
     }
 
@@ -2576,15 +2584,18 @@ Alan Calvert started the project}
     {
         msgRtext();
         lastmsgW = message->w();
+        msgSeen = true;
     }
 
-    if (syseffsendwindow->visible() && (syseffsendwindow->x() != lastsyseffX || syseffsendwindow->y() != lastsyseffY || syseffsendwindow->w() != lastsyseffW))
+    if (syseffsendwindow->visible() &&  syseffsendwindow->w() != lastsyseffW)
     {
         syseffRtext();
-        lastsyseffX = syseffsendwindow->x();
-        lastsyseffY = syseffsendwindow->y();
         lastsyseffW = syseffsendwindow->w();
-     }} {}
+        syseffSeen = true;
+     }
+
+     partui->wincheck();
+     bankui->wincheck();} {}
   }
   Function {mainRtext()} {} {
     code {//
@@ -2592,6 +2603,7 @@ Alan Calvert started the project}
     int H =  Fl::h();
     int w = masterwindow->w();
     int h = masterwindow->h();
+
     while (w > W || h > H)
     {
         w /= 2;
@@ -2719,8 +2731,7 @@ Alan Calvert started the project}
         panboost->labelsize(size11);
 
     partui->groupRtext(dScale);
-    masterwindow->redraw();
-    saveWin(synth, w, h, masterwindow->x(), masterwindow->y(), true, "master");} {}
+    masterwindow->redraw();} {}
   }
   Function {syseffRtext()} {} {
     code {//
@@ -2761,8 +2772,7 @@ Alan Calvert started the project}
     syseffClose->labelsize(int(14 * dScale));
 
 
-    syseffsendwindow->redraw();
-    saveWin(synth, w, h, syseffsendwindow->x(), syseffsendwindow->y(), true, "syseffsend");} {}
+    syseffsendwindow->redraw();} {}
   }
   Function {msgRtext()} {} {
     code {//
@@ -2795,8 +2805,7 @@ Alan Calvert started the project}
     cancel->labelsize(size14);
     closebutton->labelsize(size14);
 
-    message->redraw();
-    saveWin(synth, w, h,  message->x(),  message->y(), true, "message");} {}
+    message->redraw();} {}
   }
   decl {ConfigUI *configui;} {public local
   }
@@ -2851,12 +2860,6 @@ Alan Calvert started the project}
   }
   decl {bool openedit;} {public local
   }
-  decl {int lastmainX;} {private local
-  }
-  decl {int lastmainY;} {private local
-  }
-  decl {int lastmainW;} {private local
-  }
   decl {float mainDW;} {private local
   }
   decl {float mainDH;} {private local
@@ -2867,16 +2870,12 @@ Alan Calvert started the project}
   }
   decl {float msgDH;} {private local
   }
-  decl {int lastmsgW;} {private local
+  decl {bool msgSeen;} {private local
   }
   decl {float syseffDW;} {private local
   }
   decl {float syseffDH;} {private local
   }
-  decl {int lastsyseffX;} {private local
-  }
-  decl {int lastsyseffY;} {private local
-  }
-  decl {int lastsyseffW;} {private local
+  decl {bool syseffSeen;} {private local
   }
 }
