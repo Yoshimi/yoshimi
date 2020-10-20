@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"
@@ -159,7 +159,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {selected : {public PresetsUI_}
+class SUBnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
@@ -698,6 +698,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "sub");
     SUBparameters->show();
+    subSeen = true;
     if (fetchW > 0 && fetchH > 0)
         SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
     else
@@ -712,12 +713,10 @@ class SUBnoteUI {selected : {public PresetsUI_}
 
     if (!SUBparameters->visible())
         return;
-        
-    if(SUBparameters->x() == lastsubX && SUBparameters->y() == lastsubY && SUBparameters->w() == lastsubW)
+
+    if(SUBparameters->w() == lastsubW)
          return;
 
-    lastsubX = SUBparameters->x();
-    lastsubY = SUBparameters->y();
     lastsubW = SUBparameters->w();
 
     int W =  Fl::w();
@@ -828,8 +827,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
     subPaste->labelsize(size11);
     subClose->labelsize(size11);
 
-    SUBparameters->redraw();
-    saveWin(synth, w, subh, SUBparameters->x(), SUBparameters->y(), true, "sub");} {}
+    SUBparameters->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
@@ -1000,13 +998,15 @@ class SUBnoteUI {selected : {public PresetsUI_}
     synth = pars->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
-    lastsubX = lastsubY = lastsubW = 0xffff;
+    lastsubW = 0;
+    subSeen = false;
     make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
-    setVisible(synth, SUBparameters->visible(), "sub");
+    if(subSeen)
+        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(),  SUBparameters->visible(), "sub");
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }
@@ -1024,10 +1024,8 @@ class SUBnoteUI {selected : {public PresetsUI_}
   }
   decl {float subDH;} {private local
   }
-  decl {int lastsubX;} {private local
-  }
-  decl {int lastsubY;} {private local
-  }
   decl {int lastsubW;} {private local
+  }
+  decl {bool subSeen;} {private local
   }
 }
