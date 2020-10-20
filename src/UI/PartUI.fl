@@ -2584,10 +2584,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
 
     if (engine == 0 && adnoteui != NULL)
-    {
         adnoteui->ShowGlobal();
-        adnoteui->ADnoteGlobalParameters->show();
-    }
     if (engine == 1 && subnoteui != NULL)
         subnoteui->Showsub();
     if (engine == 2 && padnoteui != NULL)
