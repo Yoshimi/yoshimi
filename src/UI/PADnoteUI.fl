@@ -1074,6 +1074,8 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button padClose {
         label Close
         callback {//
+        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "pad");
+        padSeen = false;
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
         {

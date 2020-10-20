@@ -618,6 +618,8 @@ class SUBnoteUI {: {public PresetsUI_}
       Fl_Button subClose {
         label Close
         callback {//
+        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), false, "sub");
+        subSeen = false;
         SUBparameters->hide();
         if ((Fl::event_button() == 3))
         {

@@ -2268,7 +2268,8 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button globalclose {
         label Close
         callback {//
-            addRtext();
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "adGlobal");
+            globalSeen = false;
             ADnoteGlobalParameters->hide();
             if (Fl::event_button() == 3)
             {
@@ -2303,7 +2304,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
-      code1 {o->size_range(532, 427, 0, 0, 0, 0, 1);}
+      code1 {o->size_range(760, 610, 0, 0, 0, 0, 1);}
     } {
       Fl_Group advoice {
         xywh {0 0 764 615} box BORDER_BOX
@@ -2396,6 +2397,8 @@ else if (voiceTabs->value() == g8)
         label Close
         callback {//
             ADnoteVoice->hide();
+            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), false, "adVoice");
+            voiceSeen = false;
             if (Fl::event_button() == 3)
             {
                 if (fromVoiceList)
@@ -2669,7 +2672,6 @@ switch (num)
         if (listSeen)
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
-        setVisible(synth, false, "adGlobal");
         if (globalSeen)
             saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "adGlobal");
         ADnoteGlobalParameters->hide();

@@ -860,16 +860,10 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      callback {//
-        if (Fl::event() == FL_CLOSE)
-            o->hide();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            editRtext();}
       xywh {330 188 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = o->w(); editDH = o->h();}
-      class YoshiWin
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -898,7 +892,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
             {
-                setVisible(synth, false, "partEdit");
                 instrumenteditwindow->hide();}}
             tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
@@ -928,7 +921,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
             {
-                setVisible(synth, false, "partEdit");
                 instrumenteditwindow->hide();}}
             tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
@@ -958,7 +950,6 @@ class PartUI {: {public Fl_Group, PartUI_}
             seteditname();
             if ((Fl::event_button() == 3))
             {
-                setVisible(synth, false, "partEdit");
                 instrumenteditwindow->hide();}}
             tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
@@ -970,7 +961,6 @@ class PartUI {: {public Fl_Group, PartUI_}
           Showkit();
           if ((Fl::event_button() == 3))
           {
-              setVisible(synth, false, "partEdit");
               instrumenteditwindow->hide();}}
           tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
@@ -980,7 +970,6 @@ class PartUI {: {public Fl_Group, PartUI_}
           Showefx();
           if ((Fl::event_button() == 3))
           {
-              setVisible(synth, false, "partEdit");
               instrumenteditwindow->hide();}}
           tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1
         }
@@ -1118,7 +1107,8 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button editClose {
         label Close
         callback {//
-                  setVisible(synth, false, "partEdit");
+                  saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "partEdit");
+                  editSeen = false;
                   instrumenteditwindow->hide();}
         xywh {294 358 80 21} box THIN_UP_BOX labelfont 1
       }
@@ -1129,15 +1119,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
-      callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              efxRtext();}
       xywh {520 67 385 160} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
-      class YoshiWin
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -1251,8 +1235,9 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button effClose {
         label Close
         callback {//
+        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "partEfx");
+        fxSeen = false;
         partfx->hide();
-        setVisible(synth, false, "partEfx");
         if ((Fl::event_button() == 3))
             synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         tooltip {Right click: also reopen previous} xywh {307 136 60 20} box THIN_UP_BOX
@@ -1262,16 +1247,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window ctlmidi {
       label {MIDI Controls}
-      callback {//
-	//std::cout <<"event " << Fl::event() << std::endl;
-        if (Fl::event() == FL_CLOSE)
-            o->hide();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            ctlmidiRtext();}
       xywh {591 324 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
       code1 {midiDW = o->w(); midiDH = o->h();}
-      class YoshiWin
     } {
       Fl_Dial modulation {
         label Modulation
@@ -1316,22 +1294,17 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button ctlmidiclose {
         label Close
         callback {//
-                ctlmidi->hide();
-                setVisible(synth, false, "ctlmidi");}
+                saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "ctlmidi");
+                ctlmidiSeen = false;
+                ctlmidi->hide();}
         xywh {309 35 50 20} box THIN_UP_BOX
       }
     }
     Fl_Window ctlwindow {
       label Controllers
-      callback {//
-        if (Fl::event() == FL_CLOSE)
-            o->hide();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            ctlRtext();}
-      xywh {748 171 505 130} type Double hide resizable
+      xywh {568 179 505 130} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
       code1 {ctlDW = o->w(); ctlDH = o->h();}
-      class YoshiWin
     } {
       Fl_Dial volrng {
         label {Vol Rng}
@@ -1557,21 +1530,16 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button ctlclose {
         label Close
         callback {//;
-        setVisible(synth, false, "ctlWin");
+        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "ctlWin");
+        ctlSeen = false;
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
       }
     }
     Fl_Window aftertouchcontrol {
       label Aftertouch
-      callback {//
-        if (Fl::event() == FL_CLOSE)
-            o->hide();
-        else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-            ATRtext();}
-      xywh {718 91 485 180} type Double hide resizable
+      xywh {569 115 485 180} type Double hide resizable
       code0 {atDW = o->w(); atDH = o->h();}
-      class YoshiWin
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME
@@ -1755,10 +1723,11 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button {} {
         label Close
         callback {//
+        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "afterT");
+        atSeen = false;
+        aftertouchcontrol->hide();
         if ((Fl::event_button() == 3))
-            ctlwindow->show();
-        setVisible(synth, false, "afterT");
-        aftertouchcontrol->hide();}
+            ctlwindow->show();}
         xywh {420 154 50 20} box THIN_UP_BOX
       }
     }
@@ -2094,7 +2063,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 part->partefx[engine]->geteffect();
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
                 inseffectui->refresh(part->partefx[engine], npart, engine);
-                efxRtext();
+                fxRtext();
             }
             break;
 
@@ -2268,7 +2237,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     adnoteui = NULL;
     subnoteui = NULL;
     padnoteui = NULL;
+    editSeen = false;
+    fxSeen = false;
     kitSeen = false;
+    ctlSeen = false;
+    ctlmidiSeen = false;
+    atSeen = false;
     lastkititem = -1;} {}
   }
   Function {updatecontrollers()} {} {
@@ -2637,35 +2611,36 @@ class PartUI {: {public Fl_Group, PartUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit");
     instrumenteditwindow->show();
+    editSeen = true;
     if (fetchW > 0 && fetchH > 0)
         instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
     else
         instrumenteditwindow->position(fetchX, fetchY);
-    instrumenteditwindow->size_range(editDW, editDH, 0, 0, 0, 0, 1);
-    editRtext();} {}
+    instrumenteditwindow->size_range(editDW, editDH, 0, 0, 0, 0, 1);} {}
   }
   Function {Showctl()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin");
     ctlwindow->show();
+    ctlSeen = true;
     if (fetchW > 0 && fetchH > 0)
         ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);
     else
         ctlwindow->position(fetchX, fetchY);
-    ctlwindow->size_range(ctlDW, ctlDH, 0, 0, 0, 0, 1);
-    ctlRtext();} {}
+    ctlwindow->size_range(ctlDW, ctlDH, 0, 0, 0, 0, 1);} {}
   }
   Function {ShowAT()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT");
     aftertouchcontrol->show();
+    atSeen = true;
     if (fetchW > 0 && fetchH > 0)
         aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
     else
         aftertouchcontrol->position(fetchX, fetchY);
-    ATRtext();
+
     aftertouchcontrol->size_range(485, 180, 0, 0, 0, 0, 1);} {}
   }
   Function {Showctlmidi()} {} {
@@ -2673,12 +2648,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
     ctlmidi->show();
+    ctlmidiSeen = true;
     if (fetchW > 0 && fetchH > 0)
         ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     else
         ctlmidi->position(fetchX, fetchY);
-    ctlmidi->size_range(midiDW, midiDH, 0, 0, 0, 0, 1);
-    ctlmidiRtext();} {}
+    ctlmidi->size_range(midiDW, midiDH, 0, 0, 0, 0, 1);} {}
   }
   Function {ctlmidirefresh()} {} {
     code {//
@@ -2693,12 +2668,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");
     partfx->show();
+    fxSeen = true;
     if (fetchW > 0 && fetchH > 0)
         partfx->resize(fetchX, fetchY, fetchW, fetchH);
     else
         partfx->position(fetchX, fetchY);
-    partfx->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);
-    efxRtext();} {}
+    partfx->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);} {}
   }
   Function {Showkit()} {} {
     code {//
@@ -2714,12 +2689,48 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {wincheck()} {} {
     code {//
-    static int lastkitW;
+    static int lasteditW = 0;
+    static int lastfxW = 0;
+    static int lastkitW = 0;
+    static int lastctlW = 0;
+    static int lastmidiW = 0;
+    static int lastatW = 0;
+
+    if (instrumenteditwindow->visible() && instrumenteditwindow->w() != lasteditW)
+    {
+        editRtext();
+        lasteditW = instrumenteditwindow->w();
+    }
+
+    if (partfx->visible() && partfx->w() != lastfxW)
+    {
+        fxRtext();
+        lastfxW = partfx->w();
+    }
+
+
     if (instrumentkitlist->visible() && instrumentkitlist->w() != lastkitW)
     {
         kitRtext();
         lastkitW = instrumentkitlist->w();
     }
+    if (ctlwindow->visible() && ctlwindow->w() != lastctlW)
+    {
+        ctlmidiRtext();
+        lastctlW = ctlwindow->w();
+    }
+
+    if (ctlmidi->visible() && ctlmidi->w() != lastmidiW)
+    {
+        ctlmidiRtext();
+        lastmidiW = ctlmidi->w();
+    }
+    if (aftertouchcontrol->visible() && aftertouchcontrol->w() != lastatW)
+    {
+        ATRtext();
+        lastatW = aftertouchcontrol->w();
+    }
+
     if (adnoteui)
         adnoteui->wincheck();
     if (subnoteui)
@@ -2729,8 +2740,19 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {editRtext()} {} {
     code {//
-    float dW = instrumenteditwindow->w() / editDW;
-    float dH = instrumenteditwindow->h() / editDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = instrumenteditwindow->w();
+    int h = instrumenteditwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        instrumenteditwindow->size(w, h);
+    };
+
+    float dW = w / editDW;
+    float dH = h / editDH;
     float dScale;
 
     if (dW < dH)
@@ -2792,13 +2814,23 @@ class PartUI {: {public Fl_Group, PartUI_}
     editClose->labelsize(size14);
     humanise_display->labelsize(int(16 * dScale));
 
-    instrumenteditwindow->redraw();
-    saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), true, "partEdit");} {}
+    instrumenteditwindow->redraw();} {}
   }
   Function {ctlRtext()} {} {
     code {//
-    float dW = ctlwindow->w() / ctlDW;
-    float dH = ctlwindow->h() / ctlDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = ctlwindow->w();
+    int h =ctlwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+       ctlwindow->size(w, h);
+    };
+
+    float dW = w / ctlDW;
+    float dH = h / ctlDH;
     float dScale;
 
     if (dW < dH)
@@ -2845,13 +2877,23 @@ class PartUI {: {public Fl_Group, PartUI_}
     resetallctl->labelsize(size14);
     aftertouch->labelsize(size14);
     ctlclose->labelsize(size14);
-    ctlwindow->redraw();
-    saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), true, "ctlWin");} {}
+    ctlwindow->redraw();} {}
   }
   Function {ATRtext()} {} {
     code {//
-    float dW = aftertouchcontrol->w() / atDW;
-    float dH = aftertouchcontrol->h() / atDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = aftertouchcontrol->w();
+    int h = aftertouchcontrol->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        aftertouchcontrol->size(w, h);
+    };
+
+    float dW = w / atDW;
+    float dH = h / atDH;
     float dScale;
 
     if (dW < dH)
@@ -2883,8 +2925,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     polypitchBminus->labelsize(size14);
     polymodulation->labelsize(size14);
 
-    aftertouchcontrol->redraw();
-    saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), true, "afterT");} {}
+    aftertouchcontrol->redraw();} {}
   }
   Function {ctlmidiRtext()} {} {
     code {//
@@ -2918,13 +2959,23 @@ class PartUI {: {public Fl_Group, PartUI_}
     masterbandwidth->labelsize(size);
     ctlmidiclose->labelsize(int(dScale * 14)-1);
 
-    ctlmidi->redraw();
-    saveWin(synth, w, h, ctlmidi->x(), ctlmidi->y(), true, "ctlmidi");} {}
+    ctlmidi->redraw();} {}
   }
-  Function {efxRtext()} {} {
+  Function {fxRtext()} {} {
     code {//
-    float dW = partfx->w() / fxDW;
-    float dH =  partfx->h() / fxDH;
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = partfx->w();
+    int h = partfx->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        partfx->size(w, h);
+    };
+
+    float dW = w / fxDW;
+    float dH =  h / fxDH;
     float dScale;
 
     if (dW < dH)
@@ -2960,8 +3011,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     inseffectui->effRtext(dScale, insefftype->value());
 
-    partfx->redraw();
-    saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), true, "partEfx");} {}
+    partfx->redraw();} {}
   }
   Function {kitRtext(bool force = false)} {} {
     code {//
@@ -3077,10 +3127,6 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {~PartUI()} {} {
     code {//
-    setVisible(synth, aftertouchcontrol->visible(), "afterT");
-    setVisible(synth, ctlwindow->visible(), "ctlWin");
-    setVisible(synth, partfx->visible(), "partEfx");
-    setVisible(synth, instrumenteditwindow->visible(), "partEdit");
     if (adnoteui)
     {
         adnoteui->ADnoteGlobalParameters->hide();
@@ -3097,20 +3143,35 @@ class PartUI {: {public Fl_Group, PartUI_}
         delete padnoteui;
     }
     partgroup->hide();
+    if (atSeen)
+        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(),aftertouchcontrol->visible(), "afterT");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
+
+    if (ctlSeen)
+        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
     ctlwindow->hide();
     delete ctlwindow;
-    setVisible(synth, ctlmidi->visible(), "ctlmidi");
+
+    if (ctlmidiSeen)
+        saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
-    partfx->hide();
-    delete partfx;
+
     if (kitSeen)
         saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
     instrumentkitlist->hide();
     delete instrumentkitlist;
+
+    if (fxSeen)
+        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(),  partfx->visible(), "partEfx");
+    partfx->hide();
+    delete partfx;
+
+    if (editSeen)
+        saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
     instrumenteditwindow->hide();
+
     delete instrumenteditwindow;} {}
   }
   decl {Part *part;} {public local
@@ -3155,21 +3216,31 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   decl {float midiDH;} {public local
   }
+  decl {bool ctlmidiSeen;} {private local
+  }
   decl {float atDW;} {public local
   }
   decl {float atDH;} {public local
+  }
+  decl {bool atSeen;} {private local
   }
   decl {float ctlDW;} {public local
   }
   decl {float ctlDH;} {public local
   }
+  decl {bool ctlSeen;} {private local
+  }
   decl {float fxDW;} {public local
   }
   decl {float fxDH;} {public local
   }
+  decl {bool fxSeen;} {private local
+  }
   decl {float editDW;} {public local
   }
   decl {float editDH;} {public local
+  }
+  decl {bool editSeen;} {private local
   }
   decl {float kitDW;} {public local
   }
