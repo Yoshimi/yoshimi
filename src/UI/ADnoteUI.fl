@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -1978,7 +1978,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
 }
 
-class ADnoteUI {selected : {public PresetsUI_}
+class ADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {private
   } {
@@ -2656,7 +2656,8 @@ switch (num)
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
-        lastglobalX = lastglobalY = lastglobalW = 0xffff;
+        lastglobalW = 0;
+        globalSeen = false;
         lastvoiceW = 0;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
@@ -2671,6 +2672,8 @@ switch (num)
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
         ADnoteVoiceList->hide();
         setVisible(synth, false, "adGlobal");
+        if (globalSeen)
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "adGlobal");
         ADnoteGlobalParameters->hide();
         if (voiceSeen)
             saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
@@ -2723,6 +2726,8 @@ switch (num)
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
+    ADnoteGlobalParameters->show();
+    globalSeen = true;
     if (fetchW == 0 || fetchH == 0)
         ADnoteGlobalParameters->position(fetchX, fetchY);
     else
@@ -2733,7 +2738,7 @@ switch (num)
   Function {wincheck()} {} {
     code {//
     addRtext();
-    
+
     if (ADnoteVoice->visible())
         addVoiceRtext();
 
@@ -2753,8 +2758,9 @@ switch (num)
     if (!ADnoteGlobalParameters->visible())
         return;
 
-    if (ADnoteGlobalParameters->x() == lastglobalX && ADnoteGlobalParameters->y() == lastglobalY && ADnoteGlobalParameters->w() == lastglobalW)
+    if (ADnoteGlobalParameters->w() == lastglobalW)
         return;
+    lastglobalW = ADnoteGlobalParameters->w();
 
     int W =  Fl::w();
     int H =  Fl::h();
@@ -2766,7 +2772,7 @@ switch (num)
         h /= 2;
         ADnoteGlobalParameters->size(w, h);
     };
-    
+
     float defW = 535;
     float defH = 405;
     float dW = w / defW;
@@ -2788,10 +2794,6 @@ switch (num)
     filterenv->envRtext(dScale);
 
     filterui->filterRtext(dScale);
-
-    lastglobalX = ADnoteGlobalParameters->x();
-    lastglobalY = ADnoteGlobalParameters->y();
-    lastglobalW = ADnoteGlobalParameters->w();
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
@@ -2836,8 +2838,7 @@ switch (num)
     globalpaste->labelsize(size11);
     globalclose->labelsize(size11);
 
-    ADnoteGlobalParameters->redraw();
-    saveWin(synth, w, h, ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), true, "adGlobal");} {}
+    ADnoteGlobalParameters->redraw();} {}
   }
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
@@ -2911,9 +2912,7 @@ switch (num)
   }
   decl {ADnoteParameters *pars;} {private local
   }
-  decl {int lastglobalX;} {private local
-  }
-  decl {int lastglobalY;} {private local
+  decl {bool globalSeen;} {private local
   }
   decl {int lastglobalW;} {private local
   }
