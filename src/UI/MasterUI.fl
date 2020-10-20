@@ -1591,23 +1591,7 @@ Alan Calvert started the project}
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 activePart = value_int;
 
-            delete partui;
-            partui = new PartUI(0, 0, 765 * mainScale, 525 * mainScale);
-            partuigroup->add(partui);
-            partui->init(synth->part[activePart], activePart, bankui);
-            partui->groupRtext(mainScale);
-            partui->redraw();
-            partui->npart = activePart;
-            npartcounter->value(activePart + 1);
-            npartcounter->redraw();
-
-            partui->ctlwindow->hide();
-            //if (ctlmidiSeen)
-                //partui->Showctlmidi();
-            //else
-                partui->ctlmidi->hide();
-            partui->aftertouchcontrol->hide();
-
+            partNew(activePart);
             updatepanel();
             if (openedit)
             {
@@ -2013,6 +1997,7 @@ Alan Calvert started the project}
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
+    partui->kitRtext(true);
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
