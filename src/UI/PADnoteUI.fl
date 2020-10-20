@@ -1091,6 +1091,7 @@ class PADnoteUI {: {public PresetsUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "pad");
     padnotewindow->show();
+    padSeen = true;
     if (fetchW > 0 && fetchH > 0)
         padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);
     else
@@ -1100,15 +1101,13 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
     ampenv->wincheck();
     freqenv->wincheck();
-    filterenv->wincheck(); 
-    if (!padnotewindow->visible()) 
+    filterenv->wincheck();
+    if (!padnotewindow->visible())
         return;
 
-    if (padnotewindow->x() == lastpadX && padnotewindow->y() == lastpadY && padnotewindow->w() == lastpadW)
+    if (padnotewindow->w() == lastpadW)
         return;
-        
-    lastpadX = padnotewindow->x();
-    lastpadY = padnotewindow->y();
+
     lastpadW = padnotewindow->w();
 
     int W =  Fl::w();
@@ -1284,8 +1283,7 @@ class PADnoteUI {: {public PresetsUI_}
     padPaste->labelsize(size11);
     padClose->labelsize(size12);
 
-    padnotewindow->redraw();
-    saveWin(synth, w, h, padnotewindow->x(), padnotewindow->y(), true, "pad");} {}
+    padnotewindow->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -1598,7 +1596,8 @@ class PADnoteUI {: {public PresetsUI_}
     pars = parameters;
     npart = npart_;
     kititem = kititem_;
-    lastpadX = lastpadY = lastpadW = 0xffff;
+    lastpadW = 0;
+    padSeen = false;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
     make_window();} {}
@@ -1610,7 +1609,8 @@ class PADnoteUI {: {public PresetsUI_}
         oscui->oscsave();
     delete(oscui);
     delete(resui);
-    setVisible(synth, padnotewindow->visible(), "pad");
+    if (padSeen)
+        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padnotewindow->visible(), "pad");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }
@@ -1632,10 +1632,8 @@ class PADnoteUI {: {public PresetsUI_}
   }
   decl {float padDH;} {private local
   }
-  decl {int lastpadX;} {private local
-  }
-  decl {int lastpadY;} {private local
-  }
   decl {int lastpadW;} {private local
+  }
+  decl {bool padSeen;} {private local
   }
 }
