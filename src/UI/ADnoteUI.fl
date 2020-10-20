@@ -1980,7 +1980,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
 class ADnoteUI {: {public PresetsUI_}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     comment {globalrandompan MUST be after globalwidth} {in_source in_header
     }
@@ -2247,6 +2247,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     voicelistitem[nvoice]->refreshlist();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     ADnoteVoice->show();
+    voiceSeen = true;
     if (!voiceSeen)
     {
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adVoice");
@@ -2257,7 +2258,6 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
             addVoiceRtext();
         }
-        voiceSeen = true;
     }
     ADnoteVoice->redraw();
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
@@ -2300,7 +2300,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       }
     }
     Fl_Window ADnoteVoice {
-      label {ADsynth Voice Parameters}
+      label {ADsynth Voice Parameters} open
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {o->size_range(532, 427, 0, 0, 0, 0, 1);}
@@ -2659,9 +2659,9 @@ switch (num)
         lastglobalW = 0;
         globalSeen = false;
         lastvoiceW = 0;
+        voiceSeen = false;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
-        voiceSeen = false;
         listSeen = false;
         make_window();} {}
   }
@@ -2868,8 +2868,11 @@ switch (num)
         dScale = 0.2f;
 
     advoice->voiceRtext(dScale);
+    
+    if (!ADnoteVoice->visible())
+        return;
 
-    if (ADnoteVoice->visible() && ADnoteVoice->w() == lastvoiceW)
+    if (ADnoteVoice->w() == lastvoiceW)
         return;
 
     lastvoiceW = ADnoteVoice->w();
@@ -2916,9 +2919,9 @@ switch (num)
   }
   decl {int lastglobalW;} {private local
   }
-  decl {int lastvoiceW;} {private local
-  }
   decl {bool voiceSeen;} {public local
+  }
+  decl {int lastvoiceW;} {private local
   }
   decl {bool listSeen;} {public local
   }
