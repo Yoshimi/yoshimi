@@ -1115,9 +1115,9 @@ Alan Calvert started the project}
     }
     Fl_Window panelwindow {
       label {Yoshimi Mixer Panel} open
-      xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 resizable
+      xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code0 {o->size_range(936, 288, 0, 0, 0, 0, 1);// 1040 320}
-      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());} visible
+      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {
         xywh {0 6 1040 270} type HORIZONTAL
@@ -1133,15 +1133,15 @@ Alan Calvert started the project}
         label {Change to 1 x 16}
         callback {//
         panelType = 1;
-        updatepanel();} selected
-        xywh {360 290 118 25} box THIN_UP_BOX labelsize 13
+        updatepanel();}
+        xywh {360 290 118 25} box THIN_UP_BOX
       }
       Fl_Button todeep {
         label {Change to 2 x 8}
         callback {//
         panelType = 2;
         updatepanel();}
-        xywh {831 290 116 25} box THIN_UP_BOX labelsize 13
+        xywh {831 290 116 25} box THIN_UP_BOX
       }
       Fl_Choice Panelgroups {
         label {Part Group}
@@ -1259,8 +1259,8 @@ Alan Calvert started the project}
         label Close
         callback {//
     panelType |= 4;
-    panelwindow->hide();}
-        xywh {969 290 55 25} box THIN_UP_BOX labelsize 13
+    panelwindow->hide();} selected
+        xywh {969 290 55 25} box THIN_UP_BOX labelfont 1
       }
     }
     Fl_Window message {
@@ -2774,6 +2774,31 @@ Alan Calvert started the project}
     for (int i = 0; i < 16; ++ i)
         panellistitem[i]->size(65 * dW, 270 * dH);
         //panellistitem[i]->resize((8 + (i * 64)) * dW, 6 * dH, 64 * dW, 270 * dH);
+
+    int size12 = int(12 * dScale);
+    int size14 = int(14 * dScale);
+    towide->labelsize(size14);
+    todeep->labelsize(size14);
+    Panelgroups->labelsize(size12);
+        row1->labelsize(size12);
+        row2->labelsize(size12);
+        row3->labelsize(size12);
+        row4->labelsize(size12);
+    Panelsmallgroups->labelsize(size12);
+        row1small->labelsize(size12);
+        row2small->labelsize(size12);
+    CSspinner->labelsize(size12);
+        CSspinner->textsize(size12);
+    CSpend->labelsize(size12);
+    channelswitch->labelsize(size12);
+        switchoff->labelsize(size12);
+        switchrow->labelsize(size12);
+        switchcolumn->labelsize(size12);
+        switchloop->labelsize(size12);
+        switchtwoway->labelsize(size12);
+        switchchannel->labelsize(size12);
+    Panelclose->labelsize(size14);
+
     panelwindow->redraw();} {}
   }
   Function {syseffRtext()} {} {

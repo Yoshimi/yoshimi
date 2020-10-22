@@ -7,6 +7,7 @@ Subsyth - but harmonics height issues
 Resonance
 LFOs
 Envelopes
+Filters - not formant
 Part
     instrumenteditwindow
     instrumentkitlist
@@ -14,17 +15,19 @@ Part
     ctlwindow
     aftertouchcontrol - but phantom reopens sometimes
     partfx
-    ( some of these fail on part number changes)
 Main
     message window
 
 
 In progress
 Addsynth
+   (sometimes fails on part number changes)
 Filters
+    formant window
+Main
+    mixer window (only single row)
 
 
 Started
 Bank
-Main
-    mixer window (only single row)
+
