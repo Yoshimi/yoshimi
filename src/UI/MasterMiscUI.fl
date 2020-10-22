@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -107,7 +107,7 @@ decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
 
-class VUMeter {: {public Fl_Box, private GuiUpdates}
+class VUMeter {open : {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -136,7 +136,8 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {selected
+    }
   }
   Function {draw_master()} {} {
     code {//

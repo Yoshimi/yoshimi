@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -109,7 +109,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -142,7 +142,7 @@ class MasterUI {: {private GuiUpdates}
       syseffsendwindow->hide();
       saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "syseffsend");
       delete syseffsendwindow;
-      saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelwindow->visible(), "mixer");
+      saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "mixer");
       message->hide();
       saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "message");
       delete message;
@@ -181,10 +181,12 @@ class MasterUI {: {private GuiUpdates}
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init(const char *_label)} {open
+  } {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
+      panelType = 1;
       msgSeen = false;
       syseffSeen = false;
       partmax = synth->getRuntime().NumAvailableParts;
@@ -249,7 +251,8 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -671,6 +674,9 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mixerpanel {
           label {Mixer Panel}
           callback {//
+          panelType &= 3;
+          if (panelType == 0)
+              panelType = 1;
           updatepanel();
           panelwindow->show();}
           tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
@@ -1108,72 +1114,56 @@ Alan Calvert started the project}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Mixer Panel}
-      xywh {483 128 550 670} type Double labelfont 13 labelsize 13 hide
-      code0 {//if (synth->getRuntime().single_row_panel) ;}
-      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
+      label {Yoshimi Mixer Panel} open
+      xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 resizable
+      code0 {o->size_range(936, 288, 0, 0, 0, 0, 1);// 1040 320}
+      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());} visible
     } {
       Fl_Pack Panelpack1 {
-        xywh {8 10 533 286} type HORIZONTAL
+        xywh {0 6 1040 270} type HORIZONTAL
         code0 {//
-          for (int i = 0; i < 8; i++)
+          for (int i = 0; i < 16; i++)
           {
-              panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+              panellistitem[i] = new Panellistitem(0, 0, 64, 270, "");
               panellistitem[i]->init(i, bankui, synth);
           }}
-        code1 {o->spacing(-3);}
+        code1 {o->spacing(0);}
       } {}
-      Fl_Pack Panelpack2 {
-        xywh {8 325 533 286} type HORIZONTAL
-        code0 {//
-            for (int i = 8; i < 16; i++)
-            {
-                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
-                 panellistitem[i]->init(i, bankui, synth);
-            }}
-        code1 {o->spacing(-3);}
-      } {}
-      Fl_Button Panelclose {
-        label Close
-        callback {//
-        panelwindow->hide();}
-        xywh {482 646 55 25} box THIN_UP_BOX labelsize 13
-      }
-      Fl_Button {} {
+      Fl_Button towide {
         label {Change to 1 x 16}
         callback {//
-        synth->getRuntime().single_row_panel = 1;
-        updatepanel();}
-        xywh {354 640 118 25} box THIN_UP_BOX labelsize 13
+        panelType = 1;
+        updatepanel();} selected
+        xywh {360 290 118 25} box THIN_UP_BOX labelsize 13
       }
-      Fl_Button {} {
+      Fl_Button todeep {
         label {Change to 2 x 8}
         callback {//
-        synth->getRuntime().single_row_panel = 0;
+        panelType = 2;
         updatepanel();}
-        xywh {821 319 116 25} box THIN_UP_BOX labelsize 13
+        xywh {831 290 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Choice Panelgroups {
         label {Part Group}
         callback {//
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelsmallgroups->value(o->value());
-        updatepanel();}
-        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        updatepanel();} open
+        xywh {5 296 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
-        MenuItem {} {
+        MenuItem row1 {
           label {1 to 16}
           xywh {0 0 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem row2 {
           label {17 to 32}
           xywh {0 0 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem row3 {
           label {33 to 48}
           xywh {0 0 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem row4 {
           label {49 to 64}
           xywh {0 0 34 20} labelsize 12
         }
@@ -1183,14 +1173,14 @@ Alan Calvert started the project}
         callback {//
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         Panelgroups->value(o->value());
-        updatepanel();}
-        xywh {12 650 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        updatepanel();} open
+        xywh {5 296 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
-        MenuItem {} {
+        MenuItem row1small {
           label {1 to 16}
           xywh {10 10 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem row2small {
           label {17 to 32}
           xywh {10 10 34 20} labelsize 12
         }
@@ -1199,7 +1189,7 @@ Alan Calvert started the project}
         label CC
         callback {//
         CSpend->show();}
-        xywh {216 650 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
+        xywh {209 296 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
         code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
       }
@@ -1229,13 +1219,13 @@ Alan Calvert started the project}
         {
             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloCC, CSspinner->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);
         }}
-        tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+        tooltip {Click to set} xywh {276 294 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
         label Solo
         callback {//
-                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {125 650 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);} open
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {114 296 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
@@ -1264,6 +1254,13 @@ Alan Calvert started the project}
           label Channel
           xywh {0 0 34 20} labelsize 12
         }
+      }
+      Fl_Button Panelclose {
+        label Close
+        callback {//
+    panelType |= 4;
+    panelwindow->hide();}
+        xywh {969 290 55 25} box THIN_UP_BOX labelsize 13
       }
     }
     Fl_Window message {
@@ -1909,7 +1906,18 @@ Alan Calvert started the project}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
-    if (synth->getRuntime().single_row_panel)
+    std::cout << "panel type " << panelType << std::endl;
+    if (panelType == 2)
+    {
+        towide->show();
+        todeep->hide();
+    }
+    else
+    {
+        towide->hide();
+        todeep->show();
+    }
+   /* if (synth->getRuntime().single_row_panel)
     {
             panelwindow->size(1085,350);
             Panelpack2->position(544,10);
@@ -1930,7 +1938,7 @@ Alan Calvert started the project}
             channelswitch->position(130,645);
             CSspinner->position(216,645);
             CSpend->position(275,643);
-    }
+    }*/
 
     for (int npart = 0; npart < partmax; ++npart)
     {
@@ -2471,11 +2479,23 @@ Alan Calvert started the project}
     syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
-    panelwindow->position(fetchX, fetchY);
-    if (fetchO)
-        mixerpanel->do_callback();
+
+    if (fetchO == (fetchO & 3))
+    {
+
+        if (fetchW == 0 || fetchH == 0)
+            panelwindow->position(fetchX, fetchY);
+        else
+            panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
+        panelwindow->show();
+        panelType = fetchO & 3;
+        updatepanel();
+    }
     else
+    {
+        panelType = fetchO;
         panelwindow->hide();
+    }
 
     if (lastSeen(synth, "bankInst"))
         bankui->ShowInst();
@@ -2557,6 +2577,7 @@ Alan Calvert started the project}
   Function {wincheck()} {} {
     code {//
     static int lastmainW = 0;
+    static int lastpanelW = 0;
     static int lastmsgW = 0;
     static int lastsyseffW = 0;
     if (masterwindow->w() != lastmainW)
@@ -2564,6 +2585,13 @@ Alan Calvert started the project}
         mainRtext();
         lastmainW = masterwindow->w();
     }
+
+    if (panelwindow->visible() && panelwindow->w() != lastpanelW)
+    {
+        panelRtext();
+        lastpanelW = panelwindow->w();
+    }
+
 
     if (message->visible() && message->w() != lastmsgW)
     {
@@ -2718,6 +2746,36 @@ Alan Calvert started the project}
     partui->groupRtext(dScale);
     masterwindow->redraw();} {}
   }
+  Function {panelRtext()} {open
+  } {
+    code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = panelwindow->w();
+    int h = panelwindow->h();
+    while (w > W || h > H)
+    {
+        w /= 2;
+        h /= 2;
+        panelwindow->size(w, h);
+    };
+
+    float dW = w / float(1040);
+    float dH = h / float(320);
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    for (int i = 0; i < 16; ++ i)
+        panellistitem[i]->size(65 * dW, 270 * dH);
+        //panellistitem[i]->resize((8 + (i * 64)) * dW, 6 * dH, 64 * dW, 270 * dH);
+    panelwindow->redraw();} {}
+  }
   Function {syseffRtext()} {} {
     code {//
     int W =  Fl::w();
@@ -2850,6 +2908,8 @@ Alan Calvert started the project}
   decl {float mainDH;} {private local
   }
   decl {float mainScale;} {private local
+  }
+  decl {int panelType;} {private local
   }
   decl {float msgDW;} {private local
   }

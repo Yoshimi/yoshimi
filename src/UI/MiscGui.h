@@ -191,7 +191,7 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
     }
 }
 
-inline bool lastSeen(SynthEngine *synth, std::string filename)
+inline int lastSeen(SynthEngine *synth, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
     std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
@@ -200,9 +200,7 @@ inline bool lastSeen(SynthEngine *synth, std::string filename)
     if (pos == string::npos)
         return false;
     ++pos;
-    if (values.substr(pos) == "1")
-        return true;
-    return false;
+    return stoi(values.substr(pos));
 }
 
 inline void setVisible(SynthEngine *synth, bool v, std::string filename)

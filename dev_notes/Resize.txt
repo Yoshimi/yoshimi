@@ -22,9 +22,9 @@ Main
 In progress
 Addsynth
 Filters
-Main
-    masterwindow need to do sys/ins effects
 
 
 Started
 Bank
+Main
+    mixer window (only single row)
