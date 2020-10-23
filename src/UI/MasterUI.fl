@@ -32,6 +32,18 @@ This file is a derivative of the ZynAddSubFX original.
 } {in_source in_header
 }
 
+decl {\#define PANEL_SINGLE_X 1040} {public local
+}
+
+decl {\#define PANEL_SINGLE_Y 320} {public local
+}
+
+decl {\#define PANEL_DUAL_X 530} {public local
+}
+
+decl {\#define PANEL_DUAL_Y 630} {public local
+}
+
 decl {\#include <string>} {public local
 }
 
@@ -133,8 +145,7 @@ class MasterUI {open : {private GuiUpdates}
       activePart = 0;
       yoshiLog = NULL;} {}
   }
-  Function {~MasterUI()} {open
-  } {
+  Function {~MasterUI()} {} {
     code {//
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), 1, "master");
       masterwindow->hide();
@@ -145,17 +156,16 @@ class MasterUI {open : {private GuiUpdates}
       saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "syseffsend");
       delete syseffsendwindow;
 
-      if ((panelType & 3) != 0)
+      if (panelType < 4)
           saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "mixer");
+      panelwindow->hide();
+      delete panelwindow;
 
       message->hide();
       saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "message");
       delete message;
 
-      panelwindow->hide();
-      delete panelwindow;
-
-      if (microtonalui)
+        if (microtonalui)
           delete microtonalui;
       if (bankui)
           delete bankui;
@@ -257,8 +267,7 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -680,10 +689,9 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mixerpanel {
           label {Mixer Panel}
           callback {//
-          int tmp = panelType & 3;
-          if (tmp == 0)
-              tmp = 1;
-          changepanelstyle(tmp);
+          if(panelwindow->visible())
+              return;
+          panelType &= 3;
           updatepanel();
           panelwindow->show();}
           tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
@@ -1121,7 +1129,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Mixer Panel}
+      label {Yoshimi Mixer Panel} open
       xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
@@ -1908,35 +1916,69 @@ Alan Calvert started the project}
     int tmp = part % NUM_MIDI_CHANNELS;
     panellistitem[tmp]->refresh();} {}
   }
-  Function {changepanelstyle(int type)} {open
-  } {
+  Function {changepanelstyle(int type)} {} {
     code {//
     if (type == 0)
         type = 1;
+    panelwindow->hide();
     if (type != panelType)
     {
-        panelwindow->hide();
     	if (type == 1)
     	{
-            panelwindow->size(1040, 320);
-            panelwindow->size_range(936, 288, 0, 0, 0, 0, 1);
+            panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
+            panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
             towide->hide();
             todeep->show();
     	}
-    	else
+    	else if (type == 2)
     	{
-    	    panelwindow->size(530,630);
+    	    panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
+            panelwindow->size_range((PANEL_DUAL_X * 9) / 10, (PANEL_DUAL_Y * 9) / 10, 0, 0, 0, 0, 1);
+            towide->show();
+            todeep->hide();
+        }
+    }
+    panelwindow->show();
+    panelType = type;
+    panelRtext();} {}
+  }
+  Function {Showpanel()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
+    if (fetchO == 0)
+        fetchO = 1; // it's never been seen
+    int tmp = fetchO & 3;
+
+    if (tmp == 1)
+    	{
+            panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
+            towide->hide();
+            todeep->show();
+    	}
+    	else if (tmp == 2)
+    	{
             panelwindow->size_range(477, 567, 0, 0, 0, 0, 1);
             towide->show();
             todeep->hide();
         }
+
+    if (fetchW == 0 || fetchH == 0)
+        panelwindow->position(fetchX, fetchY);
+    else
+        panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
+
+    if (fetchO < 4)
+    {
+        panelType = tmp;
         panelwindow->show();
-        panelwindow->redraw();
+        updatepanel();
     }
-    panelType = type;
-    panelRtext();
-    std::cout << "panel type " << panelType << std::endl;} {selected
-    }
+    else
+    {
+        panelType = fetchO;
+        panelwindow->hide();
+    }} {}
   }
   Function {panelRtext()} {open
   } {
@@ -1950,30 +1992,32 @@ Alan Calvert started the project}
 
     if (panelType == 1)
     {
-        dW = w / float(1040);
-        dH = h / float(320);
+        dW = w / float(PANEL_SINGLE_X);
+        dH = h / float(PANEL_SINGLE_Y);
 
     }
     else
     {
-        dW = w / float(530);
-        dH = h / float(630);
+        dW = w / float(PANEL_DUAL_X);
+        dH = h / float(PANEL_DUAL_Y);
     }
 
-    if (w > W || h > H)
-        panelwindow->position(10, 20); // zero makes some WMs unhappy
+    if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
     {
-        while (w > W || h > H)
+        panelwindow->position(10, 30); // zero makes some WMs unhappy
         {
-            w /= 2;
-            h /= 2; 
+            while (w > W || h > H)
+            {
+                w /= 2;
+                h /= 2;
+            }
+            panelwindow->size(w, h);
         }
-        panelwindow->size(w, h);
     }
-    
+
     float dScale;
-    
-   
+
+
     if (dW < dH)
         dScale = dW;
     else
@@ -2005,7 +2049,7 @@ Alan Calvert started the project}
 
 
     }
-    
+
     int size12 = int(12 * dScale);
     int size14 = int(14 * dScale);
     towide->labelsize(size14);
@@ -2030,7 +2074,8 @@ Alan Calvert started the project}
         switchchannel->labelsize(size12);
     Panelclose->labelsize(size14);
 
-    panelwindow->redraw();} {}
+    panelwindow->redraw();} {selected
+    }
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
@@ -2572,7 +2617,7 @@ Alan Calvert started the project}
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "syseffsend");
     syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
+    /*loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
     int tmp = fetchO & 3;
     //changepanelstyle(tmp); // needed for opening from mixer button
     if (fetchO == tmp)
@@ -2590,7 +2635,8 @@ Alan Calvert started the project}
     {
         panelType = fetchO;
         panelwindow->hide();
-    }
+    }*/
+    Showpanel();
 
     if (lastSeen(synth, "bankInst"))
         bankui->ShowInst();
