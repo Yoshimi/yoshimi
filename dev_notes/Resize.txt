@@ -17,15 +17,13 @@ Part
     partfx
 Main
     message window
-
+    mixer window (may need more adjustments)
 
 In progress
 Addsynth
    (sometimes fails on part number changes)
 Filters
     formant window
-Main
-    mixer window (only single row)
 
 
 Started

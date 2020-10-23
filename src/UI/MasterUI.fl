@@ -41,7 +41,7 @@ decl {\#define PANEL_SINGLE_Y 320} {public local
 decl {\#define PANEL_DUAL_X 530} {public local
 }
 
-decl {\#define PANEL_DUAL_Y 630} {public local
+decl {\#define PANEL_DUAL_Y 600} {public local
 }
 
 decl {\#include <string>} {public local
@@ -267,7 +267,8 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1929,6 +1930,7 @@ Alan Calvert started the project}
             panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
             towide->hide();
             todeep->show();
+            Panelclose->position(975, 290);
     	}
     	else if (type == 2)
     	{
@@ -2047,6 +2049,13 @@ Alan Calvert started the project}
             panellistitem[i]->itemRtext(dScale);
         }
 
+        towide->resize(335 * dW, (PANEL_DUAL_Y - 30) * dH, 130 * dW, 25 * dH);
+        Panelsmallgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
+        Panelgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
+        CSspinner->resize(173 * dW, (PANEL_DUAL_Y - 23) * dH, 50 * dW, 18 * dH);
+        CSpend->resize(227 * dW, (PANEL_DUAL_Y - 30) * dH, 74 * dW, 25 * dH);
+        channelswitch->resize(95 * dW, (PANEL_DUAL_Y -23) * dH, 74 * dW, 18 * dH);
+        Panelclose->resize((PANEL_DUAL_X - 55) * dW, (PANEL_DUAL_Y - 30) * dH, 50 * dW, 25 * dH);
 
     }
 
