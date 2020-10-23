@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -107,7 +107,7 @@ decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
 
-class VUMeter {open : {public Fl_Box, private GuiUpdates}
+class VUMeter {: {public Fl_Box, private GuiUpdates}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -136,8 +136,7 @@ class VUMeter {open : {public Fl_Box, private GuiUpdates}
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {return_type float
   } {
     code {//
-        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {selected
-    }
+        return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
   }
   Function {draw_master()} {} {
     code {//
@@ -425,11 +424,11 @@ class Panellistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window panellistitem {
-      xywh {1195 20 60 270} type Double hide
+      xywh {648 54 65 270} type Double hide
       class Fl_Group
     } {
       Fl_Group panellistitemgroup {
-        xywh {0 -5 64 279} box PLASTIC_THIN_UP_BOX
+        xywh {0 -5 65 279} box PLASTIC_THIN_UP_BOX
         code0 {if (!synth->partonoffRead(npart + *plgroup)) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
@@ -452,7 +451,7 @@ class Panellistitem {: {public Fl_Group}
             tooltip {Click here to clear overload warning.} xywh {30 64 26 111} box NO_BOX
           }
         }
-        Fl_Button {} {
+        Fl_Button partEdit {
           label Edit
           callback {//
               int newpart = npart | synth->getGuiMaster()->panelgroup;
@@ -507,7 +506,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         realvalue = o->value();
 
     send_data(TOPLEVEL::action::forceUpdate, PART::control::volume, realvalue, TOPLEVEL::type::Integer);}
-          xywh {8 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
+          xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
           class mwheel_slider
@@ -567,7 +566,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         else
             synth->getGuiMaster()->activePart = UNUSED;
     send_data(TOPLEVEL::action::forceUpdate, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
-        xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
+        xywh {10 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->partonoffRead(npart + *plgroup));}
       }
     }
@@ -687,6 +686,23 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
   decl {SynthEngine *synth;} {private local
   }
   decl {int *plgroup;} {public local
+  }
+  Function {itemRtext(float dScale)} {} {
+    code {//
+    int size = int(10 * dScale);
+    int size14 = int(14 * dScale);
+
+    partEdit->labelsize(size);
+    partname->labelsize(size);
+    partvolume->labelsize(size14);
+    partpanning->labelsize(size14);
+    partrcv->labelsize(size);
+       partrcv->textsize(size);
+    audiosend->labelsize(size);
+        main->labelsize(size);
+        part->labelsize(size);
+        both->labelsize(size);
+    partenabled->labelsize(int(15 * dScale));} {}
   }
 }
 
