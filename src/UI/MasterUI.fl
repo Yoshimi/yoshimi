@@ -186,8 +186,7 @@ class MasterUI {open : {private GuiUpdates}
           delete yoshiLog;
       }
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");
-      delete masterwindow;} {selected
-    }
+      delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
     code {//
@@ -1122,7 +1121,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Mixer Panel} open
+      label {Yoshimi Mixer Panel}
       xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
@@ -1909,24 +1908,129 @@ Alan Calvert started the project}
     int tmp = part % NUM_MIDI_CHANNELS;
     panellistitem[tmp]->refresh();} {}
   }
-  Function {changepanelstyle(int type)} {} {
+  Function {changepanelstyle(int type)} {open
+  } {
     code {//
     if (type == 0)
         type = 1;
-    panelType = type;
-    if (type == 1)
+    if (type != panelType)
     {
-        panelwindow->size_range(936, 288, 0, 0, 0, 0, 1);// 1040 320
-        towide->hide();
-        todeep->show();    }
+        panelwindow->hide();
+    	if (type == 1)
+    	{
+            panelwindow->size(1040, 320);
+            panelwindow->size_range(936, 288, 0, 0, 0, 0, 1);
+            towide->hide();
+            todeep->show();
+    	}
+    	else
+    	{
+    	    panelwindow->size(530,630);
+            panelwindow->size_range(477, 567, 0, 0, 0, 0, 1);
+            towide->show();
+            todeep->hide();
+        }
+        panelwindow->show();
+        panelwindow->redraw();
+    }
+    panelType = type;
+    panelRtext();
+    std::cout << "panel type " << panelType << std::endl;} {selected
+    }
+  }
+  Function {panelRtext()} {open
+  } {
+    code {//
+    int W =  Fl::w();
+    int H =  Fl::h();
+    int w = panelwindow->w();
+    int h = panelwindow->h();
+    float dW;
+    float dH;
+
+    if (panelType == 1)
+    {
+        dW = w / float(1040);
+        dH = h / float(320);
+
+    }
     else
     {
-        panelwindow->size_range(936, 288, 0, 0, 0, 0, 1);
-        towide->show();
-        todeep->hide();
+        dW = w / float(530);
+        dH = h / float(630);
     }
 
-    std::cout << "panel type " << panelType << std::endl;} {}
+    if (w > W || h > H)
+        panelwindow->position(10, 20); // zero makes some WMs unhappy
+    {
+        while (w > W || h > H)
+        {
+            w /= 2;
+            h /= 2; 
+        }
+        panelwindow->size(w, h);
+    }
+    
+    float dScale;
+    
+   
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+
+    if (panelType == 1)
+    {
+        for (int i = 0; i < 16; ++ i)
+        {
+            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+
+    }
+    else
+    {
+        for (int i = 0; i < 8; ++ i)
+        {
+            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+        for (int i = 8; i < 16; ++ i)
+        {
+            panellistitem[i]->resize((8 + ((i - 8) * 64)) * dW, 290 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+
+
+    }
+    
+    int size12 = int(12 * dScale);
+    int size14 = int(14 * dScale);
+    towide->labelsize(size14);
+    todeep->labelsize(size14);
+    Panelgroups->labelsize(size12);
+        row1->labelsize(size12);
+        row2->labelsize(size12);
+        row3->labelsize(size12);
+        row4->labelsize(size12);
+    Panelsmallgroups->labelsize(size12);
+        row1small->labelsize(size12);
+        row2small->labelsize(size12);
+    CSspinner->labelsize(size12);
+        CSspinner->textsize(size12);
+    CSpend->labelsize(size12);
+    channelswitch->labelsize(size12);
+        switchoff->labelsize(size12);
+        switchrow->labelsize(size12);
+        switchcolumn->labelsize(size12);
+        switchloop->labelsize(size12);
+        switchtwoway->labelsize(size12);
+        switchchannel->labelsize(size12);
+    Panelclose->labelsize(size14);
+
+    panelwindow->redraw();} {}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
@@ -2736,63 +2840,6 @@ Alan Calvert started the project}
 
     partui->groupRtext(dScale);
     masterwindow->redraw();} {}
-  }
-  Function {panelRtext()} {open
-  } {
-    code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = panelwindow->w();
-    int h = panelwindow->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        panelwindow->size(w, h);
-    };
-
-    float dW = w / float(1040);
-    float dH = h / float(320);
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
-
-    for (int i = 0; i < 16; ++ i)
-    {
-        panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
-        panellistitem[i]->itemRtext(dScale);
-    }
-
-    int size12 = int(12 * dScale);
-    int size14 = int(14 * dScale);
-    towide->labelsize(size14);
-    todeep->labelsize(size14);
-    Panelgroups->labelsize(size12);
-        row1->labelsize(size12);
-        row2->labelsize(size12);
-        row3->labelsize(size12);
-        row4->labelsize(size12);
-    Panelsmallgroups->labelsize(size12);
-        row1small->labelsize(size12);
-        row2small->labelsize(size12);
-    CSspinner->labelsize(size12);
-        CSspinner->textsize(size12);
-    CSpend->labelsize(size12);
-    channelswitch->labelsize(size12);
-        switchoff->labelsize(size12);
-        switchrow->labelsize(size12);
-        switchcolumn->labelsize(size12);
-        switchloop->labelsize(size12);
-        switchtwoway->labelsize(size12);
-        switchchannel->labelsize(size12);
-    Panelclose->labelsize(size14);
-
-    panelwindow->redraw();} {}
   }
   Function {syseffRtext()} {} {
     code {//
