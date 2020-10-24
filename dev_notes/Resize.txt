@@ -1,31 +1,33 @@
 Completed
-Console
-Config
-Vector
-PadSynth
-Subsyth - but harmonics height issues
-Resonance
-LFOs
-Envelopes
-Filters - not formant
-Part
-    instrumenteditwindow
-    instrumentkitlist
-    ctlmidi - but phantom reopens sometimes
-    ctlwindow
-    aftertouchcontrol - but phantom reopens sometimes
-    partfx
-Main
-    message window
-    mixer window (may need more adjustments)
+    Console
+    Config
+    Vector
+    PadSynth
+    Subsyth - but harmonics height issues
+    Addsynth
+        Voice
+        Voice List
+    Resonance
+    LFOs
+    Envelopes
+    Filters - not formant
+    Part
+        instrumenteditwindow
+        instrumentkitlist
+        ctlmidi
+        ctlwindow
+        aftertouchcontrol
+        partfx
+    Main
+        message window
+        mixer window (may need more adjustments)
+
 
 In progress
-Addsynth
-   (sometimes fails on part number changes)
-Filters
-    formant window
-
+    Addsynth
+        Global (sometimes fails on part number changes)
+    Filters
+        formant window
+    Bank
 
 Started
-Bank
-
