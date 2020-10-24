@@ -1208,7 +1208,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         voice -= PART::engine::addVoice1;
     int tmp;
     bool val_bool = YOSH::F2B(value);
-    if (voice != nvoice)
+    if (control != ADDVOICE::control::enableVoice &&  voice != nvoice)
         return;
 
     switch(control)
@@ -2122,7 +2122,7 @@ else if (voiceTabs->value() == g8)
         xywh {5 0 525 30} box PLASTIC_UP_BOX color 40 selection_color 231 labelfont 1 align 4
       } {
         Fl_Group g1 {
-          label {   1   } open
+          label {   1   }
           xywh {40 50 40 27} labelfont 1
           code0 {setTabColour(0);}
         } {}

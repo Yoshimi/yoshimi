@@ -1,5 +1,8 @@
 yoshimi 1.7.2 M
 
+2020-10-24 Will
+* Bugfix: Voice enable not recognised from voice list.
+
 2020-10-8 Will
 * BugFix: Addsynth Global detune type range wrong.
 
