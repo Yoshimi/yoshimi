@@ -248,16 +248,10 @@ class PADnoteUI {: {public PresetsUI_}
     }
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              padRtext();}
-      xywh {711 582 535 440} type Double hide resizable
+      xywh {515 162 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
-      class YoshiWin
     } {
       Fl_Tabs {} {
         callback {//
@@ -1148,6 +1142,7 @@ class PADnoteUI {: {public PresetsUI_}
     filterui->filterRtext(dScale);
 
     harmonicstructuregroup->labelsize(size12);
+    harmonicprofile->labelsize(size12);
     hpbasetype->labelsize(size);
         hbgauss->labelsize(size);
         hbsquare->labelsize(size);
@@ -1248,6 +1243,8 @@ class PADnoteUI {: {public PresetsUI_}
     resonance->labelsize(size12);
     waveform->labelsize(size12);
 
+    filtergrp->labelsize(size11);
+    
     envelopes->labelsize(size12);
     ampgrp->labelsize(size11);
     volume->labelsize(size);

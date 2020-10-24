@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -131,6 +131,7 @@ class MasterUI {open : {private GuiUpdates}
       nsyseff = 0;
       npart = 0;
       panelgroup = 0;
+      panelScale = 1;
       for (int i = 0; i < NUM_SYS_EFX; ++i)
       {
           for (int j = 0; j < NUM_SYS_EFX; ++j)
@@ -267,8 +268,7 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1982,8 +1982,7 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {panelRtext()} {open
-  } {
+  Function {panelRtext()} {} {
     code {//
     int W =  Fl::w();
     int H =  Fl::h();
@@ -2010,8 +2009,8 @@ Alan Calvert started the project}
         {
             while (w > W || h > H)
             {
-                w /= 2;
-                h /= 2;
+                w *= 0.8f;
+                h *= 0.8f;
             }
             panelwindow->size(w, h);
         }
@@ -2019,14 +2018,13 @@ Alan Calvert started the project}
 
     float dScale;
 
-
     if (dW < dH)
         dScale = dW;
     else
         dScale = dH;
     if (dScale < 0.2f)
         dScale = 0.2f;
-
+    panelScale = dScale;
     if (panelType == 1)
     {
         for (int i = 0; i < 16; ++ i)
@@ -2083,8 +2081,7 @@ Alan Calvert started the project}
         switchchannel->labelsize(size12);
     Panelclose->labelsize(size14);
 
-    panelwindow->redraw();} {selected
-    }
+    panelwindow->redraw();} {}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
@@ -3042,5 +3039,7 @@ Alan Calvert started the project}
   decl {float syseffDH;} {private local
   }
   decl {bool syseffSeen;} {private local
+  }
+  decl {float panelScale;} {private local
   }
 }
