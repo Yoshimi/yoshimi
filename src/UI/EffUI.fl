@@ -1908,7 +1908,6 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
     effdistorsionwindow->position(px,py);
     effeqwindow->position(px,py);
     effdynamicfilterwindow->position(px,py);
-    std::cout << "eff " << eff << "  part " << npart << "  neff " << neff << std::endl;
     refresh(eff, npart, neff);} {}
   }
   Function {refresh(EffectMgr *eff_, int npart_, int neff_)} {} {

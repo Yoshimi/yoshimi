@@ -627,7 +627,7 @@ class ResonanceUI {: PresetsUI_
     resonancewindow->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());
     resonancewindow->show();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Resonance");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Resonance " + to_string(engine));
     if( fetchW == 0 || fetchH == 0)
         resonancewindow->position(fetchX, fetchY);
     else
@@ -679,7 +679,7 @@ class ResonanceUI {: PresetsUI_
         resClose->labelsize(size12);
 
         resonancewindow->redraw();
-        saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), true, "Resonance");} {}
+        saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), true, "Resonance " + to_string(engine));} {}
   }
   decl {Resonance *respar;} {public local
   }
