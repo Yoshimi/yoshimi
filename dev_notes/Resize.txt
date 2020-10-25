@@ -10,7 +10,7 @@ Completed
     Resonance
     LFOs
     Envelopes
-    Filters - not formant
+    Filters
     Part
         instrumenteditwindow
         instrumentkitlist
@@ -19,15 +19,23 @@ Completed
         aftertouchcontrol
         partfx
     Main
+        master window
         message window
-        mixer window (may need more adjustments)
+        mixer window
 
 
 In progress
     Addsynth
-        Global (sometimes fails on part number changes)
-    Filters
-        formant window
+        Global - sometimes fails on part number changes
     Bank
 
-Started
+
+Not started
+    About (in master)
+    Formant (in filters)
+    Microtonal
+    Oscilgen
+    Parameters
+    Presets
+    Midilearn
+    Virtkeyboard
