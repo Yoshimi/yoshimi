@@ -22,11 +22,13 @@ Completed
         master window
         message window
         mixer window
+        sys/ins window
 
 
 In progress
     Addsynth
-        Global - sometimes fails on part number changes
+        Global - text scale sometimes fails
+    Oscilgen
     Bank
 
 
@@ -34,7 +36,6 @@ Not started
     About (in master)
     Formant (in filters)
     Microtonal
-    Oscilgen
     Parameters
     Presets
     Midilearn
