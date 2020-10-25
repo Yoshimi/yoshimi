@@ -2253,7 +2253,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             int fetchW, fetchH, fetchX, fetchY, fetchO;
             if (!listSeen)
             {
-                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adList");
+                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
                 ADnoteVoiceList->resize(fetchX, fetchY,fetchW, fetchH);
                 addVoiceListRtext();
                 listSeen = true;
@@ -2272,7 +2272,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     ADnoteVoice->show();
     if (!voiceSeen)
     {
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adVoice");
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-voice");
         if (fetchW == 0 || fetchH == 0)
             ADnoteVoice->position(fetchX, fetchY);
         else
@@ -2291,7 +2291,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button globalclose {
         label Close
         callback {//
-            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "adGlobal");
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "AddSynth");
             globalSeen = false;
             ADnoteGlobalParameters->hide();
             if (Fl::event_button() == 3)
@@ -2420,7 +2420,7 @@ else if (voiceTabs->value() == g8)
         label Close
         callback {//
             ADnoteVoice->hide();
-            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), false, "adVoice");
+            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), false, "AddSynth-voice");
             voiceSeen = false;
             if (Fl::event_button() == 3)
             {
@@ -2476,7 +2476,7 @@ else if (voiceTabs->value() == g8)
         label Close
         callback {//
             ADnoteVoiceList->hide();
-            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), false, "adList");
+            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), false, "AddSynth-list");
             listSeen = false;
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->show();}
@@ -2692,13 +2692,13 @@ switch (num)
   } {
     code {//
         if (listSeen)
-            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "adList");
+            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "AddSynth-list");
         ADnoteVoiceList->hide();
         if (globalSeen)
-            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "adGlobal");
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "AddSynth");
         ADnoteGlobalParameters->hide();
         if (voiceSeen)
-            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "adVoice");
+            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "AddSynth-voice");
         ADnoteVoice->hide();
         delete ADnoteVoiceList;
         delete ADnoteGlobalParameters;
@@ -2747,7 +2747,7 @@ switch (num)
   Function {ShowGlobal()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "adGlobal");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth");
     ADnoteGlobalParameters->show();
     addRtext(); // we shouldn't need this :(
     if (fetchW == 0 || fetchH == 0)

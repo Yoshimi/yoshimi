@@ -529,7 +529,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
-    code {saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), midilearnwindow->visible(), "midiLearn");
+    code {saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), midilearnwindow->visible(), "Midi-learn");
 midilearnwindow->hide();
 delete midilearnwindow;} {}
   }

@@ -354,7 +354,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         {
             rootFrom = 3;
             instrumentuiwindow->hide();
-            setVisible(synth, false, "bankInst");
+            setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
         tooltip {Show root paths. Right click: also close this} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
@@ -367,7 +367,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         {
             bankFrom = 3;
             instrumentuiwindow->hide();
-            setVisible(synth, false, "bankInst");
+            setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
         tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
@@ -500,7 +500,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         }
         instFrom = 0; // to avoid later confusion!
         instrumentuiwindow->hide();
-        setVisible(synth, false, "bankInst");}
+        setVisible(synth, false, "Bank-instrument");}
         tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {
@@ -671,7 +671,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {o->size_range(775, 575, 0,0,0,0,1);}
       code2 {bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
-      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "bankBank");}
+      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "Bank-bank");}
       class YoshiWin
     } {
       Fl_Button bankroot {
@@ -682,7 +682,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         {
             rootFrom = 2;
             bankuiwindow->hide();
-            setVisible(synth, false, "bankBank");
+            setVisible(synth, false, "Bank-bank");
         }
         else
             rootFrom = 0;}
@@ -711,7 +711,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         if (Fl::event_button() == 3)
         {
             bankuiwindow->hide();
-            setVisible(synth, false, "bankBank");}}
+            setVisible(synth, false, "Bank-bank");}}
         tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
       }
       Fl_Group bankgroup {
@@ -831,7 +831,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         label Close
         callback {//
             bankuiwindow->hide();
-            setVisible(synth, false, "bankBank");
+            setVisible(synth, false, "Bank-bank");
             if (Fl::event_button() == 3)
             {
                 if (bankFrom == 1)
@@ -938,7 +938,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         {
             bankFrom = 1;
             rootuiwindow->hide();
-            setVisible(synth, false, "bankRoot");
+            setVisible(synth, false, "Bank-root");
         }
         else
             rootFrom = 0;}
@@ -979,7 +979,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         else
             rootFrom = 0;
         rootuiwindow->hide();
-        setVisible(synth, false, "bankRoot");}
+        setVisible(synth, false, "Bank-root");}
         tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1111,14 +1111,14 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   Function {~BankUI()} {open return_type virtual
   } {
     code {//
-        setVisible(synth, instrumentuiwindow->visible(), "bankInst");
+        setVisible(synth, instrumentuiwindow->visible(), "Bank-instrument");
         instrumentuiwindow->hide();
         instrumentSeen = false;
         delete instrumentuiwindow;
-        setVisible(synth, bankuiwindow->visible(), "bankBank");
+        setVisible(synth, bankuiwindow->visible(), "Bank-bank");
         bankuiwindow->hide();
         delete bankuiwindow;
-        setVisible(synth, rootuiwindow->visible(), "bankRoot");
+        setVisible(synth, rootuiwindow->visible(), "Bank-root");
         rootuiwindow->hide();
         delete rootuiwindow;} {}
   }
@@ -1139,7 +1139,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     code {//
 
     int X, Y, W, H, O;
-    loadWin(synth, W, H, X, Y, O, "bankInst");
+    loadWin(synth, W, H, X, Y, O, "Bank-instrument");
     if (W == 0 || H == 0)
         instrumentuiwindow->size(X, Y);
     else
@@ -1150,7 +1150,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   Function {Hide()} {} {
     code {// called from master UI
     instrumentuiwindow->hide();
-    setVisible(synth, false, "bankInst");} {}
+    setVisible(synth, false, "Bank-instrument");} {}
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
     code {//
@@ -1488,7 +1488,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     }
 
     instrumentuiwindow->redraw();
-    saveWin(synth, w, h, instrumentuiwindow->x(), instrumentuiwindow->y(), true, "bankInst");} {}
+    saveWin(synth, w, h, instrumentuiwindow->x(), instrumentuiwindow->y(), true, "Bank-instrument");} {}
   }
   Function {searchRtext()} {} {
     code {//
@@ -1591,7 +1591,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     }
 
     bankuiwindow->redraw();
-    saveWin(synth, w, h,  bankuiwindow->x(),  bankuiwindow->y(), true, "bankBank");} {}
+    saveWin(synth, w, h,  bankuiwindow->x(),  bankuiwindow->y(), true, "Bank-bank");} {}
   }
   Function {rootRtext()} {} {
     code {//
@@ -1633,7 +1633,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     rootsbrowse->textsize(size);
 
     rootuiwindow->redraw();
-    saveWin(synth, w, h,  rootuiwindow->x(),  rootuiwindow->y(), true, "bankRoot");} {}
+    saveWin(synth, w, h,  rootuiwindow->x(),  rootuiwindow->y(), true, "Bank-root");} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt, int last)} {} {
     code {//

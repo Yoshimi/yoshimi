@@ -1107,7 +1107,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button editClose {
         label Close
         callback {//
-                  saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "partEdit");
+                  saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "Part-edit");
                   editSeen = false;
                   instrumenteditwindow->hide();}
         xywh {294 358 80 21} box THIN_UP_BOX labelfont 1
@@ -1235,7 +1235,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button effClose {
         label Close
         callback {//
-        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "partEfx");
+        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
         fxSeen = false;
         partfx->hide();
         if ((Fl::event_button() == 3))
@@ -1294,7 +1294,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button ctlmidiclose {
         label Close
         callback {//
-                saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "ctlmidi");
+                saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
                 ctlmidiSeen = false;
                 ctlmidi->hide();}
         xywh {309 35 50 20} box THIN_UP_BOX
@@ -1530,7 +1530,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button ctlclose {
         label Close
         callback {//;
-        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "ctlWin");
+        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "Part-controllers");
         ctlSeen = false;
         ctlwindow->hide();}
         xywh {405 105 95 20} box THIN_UP_BOX
@@ -1723,7 +1723,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button {} {
         label Close
         callback {//
-        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "afterT");
+        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
         atSeen = false;
         aftertouchcontrol->hide();
         if ((Fl::event_button() == 3))
@@ -2609,7 +2609,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {Showedit()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEdit");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-edit");
     instrumenteditwindow->show();
     editSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -2621,7 +2621,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {Showctl()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlWin");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-controllers");
     ctlwindow->show();
     ctlSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -2633,7 +2633,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {ShowAT()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "afterT");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-aftertouch");
     aftertouchcontrol->show();
     atSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -2646,7 +2646,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {Showctlmidi()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "ctlmidi");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-ctlmidi");
     ctlmidi->show();
     ctlmidiSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -2666,7 +2666,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {Showefx()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partEfx");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-effects");
     partfx->show();
     fxSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -2678,7 +2678,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {Showkit()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partKit");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-kit");
     instrumentkitlist->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);
     instrumentkitlist->show();
     kitSeen = true;
@@ -3018,7 +3018,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (force)
     {
         int fetchW, fetchH, fetchX, fetchY, fetchO;
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "partKit");
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-kit");
         instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
         //kitSeen = true;
     }
@@ -3144,32 +3144,32 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     partgroup->hide();
     if (atSeen)
-        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(),aftertouchcontrol->visible(), "afterT");
+        saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(),aftertouchcontrol->visible(), "Part-aftertouch");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
 
     if (ctlSeen)
-        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "ctlWin");
+        saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), ctlwindow->visible(), "Part-controllers");
     ctlwindow->hide();
     delete ctlwindow;
 
     if (ctlmidiSeen)
-        saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "ctlmidi");
+        saveWin(synth, ctlmidi->w(), ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), ctlmidi->visible(), "Part-ctlmidi");
     ctlmidi->hide();
     delete ctlmidi;
 
     if (kitSeen)
-        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "partKit");
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), instrumentkitlist->visible(), "Part-kit");
     instrumentkitlist->hide();
     delete instrumentkitlist;
 
     if (fxSeen)
-        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(),  partfx->visible(), "partEfx");
+        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(),  partfx->visible(), "Part-effects");
     partfx->hide();
     delete partfx;
 
     if (editSeen)
-        saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), instrumenteditwindow->visible(), "partEdit");
+        saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), instrumenteditwindow->visible(), "Part-edit");
     instrumenteditwindow->hide();
 
     delete instrumenteditwindow;} {}

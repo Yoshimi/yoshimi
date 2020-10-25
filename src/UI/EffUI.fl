@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -193,7 +193,7 @@ eff = eff_;
   }
 }
 
-class EffUI {: {public Fl_Group,public PresetsUI_}
+class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -201,7 +201,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     filterwindow = NULL;
     fwin_filterui = NULL;} {}
   }
-  Function {~EffUI()} {} {
+  Function {~EffUI()} {selected
+  } {
     code {effnullwindow->hide();        // delete (effnullwindow);
         effreverbwindow->hide();        // delete (effreverbwindow);
         effechowindow->hide();          // delete (effechowindow);
@@ -1877,7 +1878,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             break;
     }} {}
   }
-  Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
+  Function {init(EffectMgr *eff_, int npart_, int neff_)} {open
+  } {
     code {//
     eff=eff_;
     npart = npart_;
@@ -1906,7 +1908,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     effdistorsionwindow->position(px,py);
     effeqwindow->position(px,py);
     effdynamicfilterwindow->position(px,py);
-
+    std::cout << "eff " << eff << "  part " << npart << "  neff " << neff << std::endl;
     refresh(eff, npart, neff);} {}
   }
   Function {refresh(EffectMgr *eff_, int npart_, int neff_)} {} {
@@ -2402,7 +2404,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   Function {Showfilt()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "dynFilter");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xFilter-dynamic " + to_string(npart));
     filterwindow->show();
     if (fetchW > 0 && fetchH > 0)
     {
@@ -2431,24 +2433,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     ;
     fwin_filterui->filterRtext(dScale);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     filterwindow->redraw();
-    saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), true, "dynFilter");} {}
+    saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), true, "xFilter-dynamic " + to_string(npart));} {}
   }
   Function {EQbandUpdate()} {} {
     code {//

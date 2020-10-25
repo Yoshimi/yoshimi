@@ -332,7 +332,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
   Function {~EnvelopeUI()} {} {
     code {//
 	if (freemodeeditwindow->x() > 4)
-            saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(),freemodeeditwindow->visible(), "zenvFree " + to_string(engine) + " " + to_string(group));
+            saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(),freemodeeditwindow->visible(), "xEnvelope-free " + to_string(engine) + " " + to_string(group));
         freemodeeditwindow->hide();
         delete (freemodeeditwindow);
         envwindow->hide();
@@ -444,7 +444,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       Fl_Button freeClose {
         label Close
         callback {freemodeeditwindow->hide();
-saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "zenvFree " + to_string(engine) + " " + to_string(group));}
+saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "xEnvelope-free " + to_string(engine) + " " + to_string(group));}
         xywh {519 155 44 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1245,7 +1245,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   Function {showfree()} {} {
     code {//
         int fetchW, fetchH, fetchX, fetchY, fetchO;
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "zenvFree " + to_string(engine) + " " + to_string(group));
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xEnvelope-free " + to_string(engine) + " " + to_string(group));
     	freemodeeditwindow->show();
     	if (fetchW > 0 && fetchH > 0)
     	{

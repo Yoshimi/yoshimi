@@ -796,7 +796,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         label {Close Unsaved}
         callback {//
                     configwindow->hide();
-                    setVisible(synth, false, "config");}
+                    setVisible(synth, false, "Config");}
         xywh {275 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button save {
@@ -816,7 +816,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          presetsRtext();}
       xywh {5 437 460 295} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");o->position(fetchX, fetchY);}
+      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config-presets");o->position(fetchX, fetchY);}
       code2 {preDW = o->w();preDH = o->h();}
       class YoshiWin
     } {
@@ -864,7 +864,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         label {Close Unsaved}
         callback {//
                     presets->hide();
-                    setVisible(synth, false, "presets");}
+                    setVisible(synth, false, "Config-presets");}
         xywh {334 268 118 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1129,10 +1129,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {~ConfigUI()} {} {
     code {//
-        setVisible(synth, presets->visible(), "presets");
+        setVisible(synth, presets->visible(), "Config-presets");
         presets->hide();
         delete presets;
-        setVisible(synth, configwindow->visible(), "config");
+        setVisible(synth, configwindow->visible(), "Config");
         configwindow->hide();
         delete configwindow;} {}
   }
@@ -1327,7 +1327,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         alsaSource->deactivate();
 
                     int fetchW, fetchH, fetchX, fetchY, fetchO;
-                    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "config");
+                    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config");
                     configwindow->show();
 
                     if (fetchW > 0 && fetchH > 0)
@@ -1342,7 +1342,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {Showpresets(SynthEngine *synth)} {} {
     code {//
                 int fetchW, fetchH, fetchX, fetchY, fetchO;
-                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "presets");
+                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config-presets");
                 presets->show();
                 if (fetchW > 0 && fetchH > 0)
                 {
@@ -1501,7 +1501,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     save->labelsize(size);
 
     configwindow->redraw();
-    saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "config");} {}
+    saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");} {}
   }
   Function {presetsRtext()} {} {
     code {//
@@ -1525,7 +1525,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     presetbrowse->textsize(size);
 
     presets->redraw();
-    saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), true, "presets");} {}
+    saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), true, "Config-presets");} {}
   }
   Function {testCC(int value, int control)} {return_type string
   } {

@@ -331,7 +331,7 @@ class VectorUI {} {
         label Close
         callback {//
         vectorwindow->hide();
-        setVisible(synth, false, "vector");}
+        setVisible(synth, false, "Vector");}
         xywh {310 265 57 20} labelfont 13 labelsize 12
       }
       Fl_Group Ygroup {
@@ -655,7 +655,7 @@ class VectorUI {} {
   }
   Function {~VectorUI()} {} {
     code {//
-        setVisible(synth, vectorwindow->visible(), "vector");
+        setVisible(synth, vectorwindow->visible(), "Vector");
         vectorwindow->hide();
         delete  vectorwindow;} {}
   }
@@ -782,7 +782,7 @@ class VectorUI {} {
   Function {Show(SynthEngine *synth)} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vector");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Vector");
     vectorwindow->show();
     if (fetchW == 0 || fetchH == 0)
         vectorwindow->position(fetchX, fetchY);
@@ -865,7 +865,7 @@ class VectorUI {} {
     Closevector->labelsize(size12);
 
     vectorwindow->redraw();
-    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), true, "vector");} {}
+    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), true, "Vector");} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//

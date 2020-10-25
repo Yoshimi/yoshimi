@@ -148,22 +148,22 @@ class MasterUI {open : {private GuiUpdates}
   }
   Function {~MasterUI()} {} {
     code {//
-      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), 1, "master");
+      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), 1, "Master");
       masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
 
       syseffsendwindow->hide();
-      saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "syseffsend");
+      saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "Master-systemeffectsend");
       delete syseffsendwindow;
 
       if (panelType < 4)
-          saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "mixer");
+          saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
       panelwindow->hide();
       delete panelwindow;
 
       message->hide();
-      saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "message");
+      saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "Master-message");
       delete message;
 
         if (microtonalui)
@@ -193,10 +193,10 @@ class MasterUI {open : {private GuiUpdates}
 
       if (yoshiLog)
       {
-          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "log");
+          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
       }
-      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "master");
+      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
@@ -220,7 +220,7 @@ class MasterUI {open : {private GuiUpdates}
       make_window();
 
       int fetchW, fetchH, fetchX, fetchY, fetchO;
-      loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "master");
+      loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
       masterwindow->size_range(mainDW, mainDH, 1680, 1050, 0, 0, 1);
       if (fetchW ==0 || fetchH == 0)
           masterwindow->position(fetchX, fetchY);
@@ -1272,7 +1272,7 @@ Alan Calvert started the project}
         label Close
         callback {//
     panelType |= 4;
-    saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "mixer");
+    saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
     panelwindow->hide();}
         xywh {975 290 60 25} box THIN_UP_BOX labelfont 1
       }
@@ -1899,7 +1899,7 @@ Alan Calvert started the project}
         }
         closebutton->copy_label(B1.c_str());
         int X, Y, W, H, O;
-        loadWin(synth, W, H,  X,  Y, O, "message");
+        loadWin(synth, W, H,  X,  Y, O, "Master-message");
         if (fixedPos)
             message->resize(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2, W, H);
         else
@@ -1948,7 +1948,7 @@ Alan Calvert started the project}
   Function {Showpanel()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Mixer");
     if (fetchO == 0)
         fetchO = 1; // it's never been seen
     int tmp = fetchO & 3;
@@ -2621,10 +2621,10 @@ Alan Calvert started the project}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "syseffsend");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-systemeffectsend");
     syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
-    /*loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "mixer");
+    /*loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Mixer");
     int tmp = fetchO & 3;
     //changepanelstyle(tmp); // needed for opening from mixer button
     if (fetchO == tmp)
@@ -2645,75 +2645,75 @@ Alan Calvert started the project}
     }*/
     Showpanel();
 
-    if (lastSeen(synth, "bankInst"))
+    if (lastSeen(synth, "Bank-instrument"))
         bankui->ShowInst();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankBank");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Bank-bank");
     bankui->bankuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->bankuiwindow->show();
     else
         bankui->bankuiwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "bankRoot");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Bank-root");
     bankui->rootuiwindow->position(fetchX, fetchY);
     if (fetchO)
         bankui->rootuiwindow->show();
     else
         bankui->rootuiwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "vertKeyb");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-virtualkeyboard");
     virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
     if (fetchO)
         virkeyboard->virkeyboardwindow->show();
     else
         virkeyboard->virkeyboardwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "scales");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Scales");
     microtonalui->microtonaluiwindow->position(fetchX, fetchY);
     if (fetchO)
         microtonalui->microtonaluiwindow->show();
     else
         microtonalui->microtonaluiwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "midiLearn");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-learn");
     midilearnui->midilearnwindow->position(fetchX, fetchY);
     if (fetchO)
         midilearnui->midilearnwindow->show();
     else
         midilearnui->midilearnwindow->hide();
 
-    if (lastSeen(synth, "config"))
+    if (lastSeen(synth, "Config"))
         configui->Show(synth); // this does some initialising
     else
         configui->configwindow->hide();
 
-    if (lastSeen(synth, "log"))
+    if (lastSeen(synth, "System-log"))
         yoshiLog->Show(synth);
     else
         yoshiLog->logConsole->hide();
 
-    if (lastSeen(synth, "vector"))
+    if (lastSeen(synth, "Vector"))
         vectorui->Show(synth);
     else
         vectorui->vectorwindow->hide();
 
-    if (lastSeen(synth, "ctlWin"))
+    if (lastSeen(synth, "Part-controllers"))
         partui->Showctl();
     else
         partui->ctlwindow->hide();
 
-    if (lastSeen(synth, "afterT"))
+    if (lastSeen(synth, "Part-aftertouch"))
         partui->ShowAT();
     else
         partui->aftertouchcontrol->hide();
 
-    if (lastSeen(synth, "ctlmidi"))
+    if (lastSeen(synth, "Part-ctlmidi"))
         partui->Showctlmidi();
     else
         partui->ctlmidi->hide();
 
-    if (lastSeen(synth, "partEdit"))
+    if (lastSeen(synth, "Part-edit"))
         partui->Showedit();
     else
         partui->instrumenteditwindow->hide();} {}

@@ -1068,7 +1068,7 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button padClose {
         label Close
         callback {//
-        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "pad");
+        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "PadSynth");
         padSeen = false;
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
@@ -1085,7 +1085,7 @@ class PADnoteUI {: {public PresetsUI_}
   Function {Showpad()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "pad");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "PadSynth");
     padnotewindow->show();
     padSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -1609,7 +1609,7 @@ class PADnoteUI {: {public PresetsUI_}
     delete(oscui);
     delete(resui);
     if (padSeen)
-        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padnotewindow->visible(), "pad");
+        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padnotewindow->visible(), "PadSynth");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }

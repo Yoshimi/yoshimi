@@ -89,7 +89,7 @@ class ConsoleUI {} {
   }
   Function {~ConsoleUI()} {} {
     code {//
-      setVisible(synth, logConsole->visible(), "log");
+      setVisible(synth, logConsole->visible(), "System-log");
       logConsole->hide();
       delete logConsole;} {}
   }
@@ -120,12 +120,12 @@ class ConsoleUI {} {
 
     logText->textsize(int(dScale * 13));
     logConsole->redraw();
-    saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), true, "log");} {}
+    saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), true, "System-log");} {}
   }
   Function {Show(SynthEngine *synth)} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "log");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "System-log");
 
     if (fetchW > 0 && fetchH > 0)
         logConsole->resize(fetchX, fetchY, fetchW, fetchH);

@@ -618,7 +618,7 @@ class SUBnoteUI {: {public PresetsUI_}
       Fl_Button subClose {
         label Close
         callback {//
-        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), false, "sub");
+        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), false, "SubSynth");
         subSeen = false;
         SUBparameters->hide();
         if ((Fl::event_button() == 3))
@@ -698,7 +698,7 @@ class SUBnoteUI {: {public PresetsUI_}
   Function {Showsub()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "sub");
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "SubSynth");
     SUBparameters->show();
     subSeen = true;
     if (fetchW > 0 && fetchH > 0)
@@ -1008,7 +1008,7 @@ class SUBnoteUI {: {public PresetsUI_}
   } {
     code {//
     if(subSeen)
-        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(),  SUBparameters->visible(), "sub");
+        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(),  SUBparameters->visible(), "SubSynth");
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }
