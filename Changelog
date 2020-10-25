@@ -1,5 +1,9 @@
 yoshimi 1.7.2 M
 
+2020-10-25 Will
+* BugFix: Failing to load some .scl files.
+  Microsoft format text generating blank lines.
+
 2020-10-24 Will
 * Bugfix: Voice enable not recognised from voice list.
 
