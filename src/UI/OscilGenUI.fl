@@ -442,14 +442,15 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {: {public PresetsUI_}
+class OscilEditor {open : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
-      xywh {4 48 735 595} type Double hide
+      xywh {4 48 735 595} type Double hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
+      code2 {o->size_range(735, 595, 0, 0, 0, 0, 1);}
     } {
       Fl_Button applybutton {
         label Apply
@@ -1534,6 +1535,17 @@ class OscilEditor {: {public PresetsUI_}
         applybutton->redraw();
 };} {}
   }
+  Function {waveRtext()} {open
+  } {
+    code {//
+        float dScale = osceditUI->w() / float(735);
+
+        int size14 = int(14 * dScale);
+        applybutton->labelsize(size14);
+
+        std::cout << "wave scale " << dScale << std::endl;} {selected
+    }
+  }
   decl {OscilParameters *oscil;} {private local
   }
   decl {FFTwrapper *fft;} {private local
@@ -1553,11 +1565,5 @@ class OscilEditor {: {public PresetsUI_}
   decl {bool OSCseen;} {private local
   }
   decl {SynthEngine *synth;} {private local
-  }
-  Function {waveRtext()} {selected
-  } {
-    code {//
-
-    printf("In waveform!\\n");} {}
   }
 }

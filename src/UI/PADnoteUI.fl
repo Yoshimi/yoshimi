@@ -1096,9 +1096,12 @@ class PADnoteUI {open : {public PresetsUI_}
   Function {padRtext()} {open
   } {
     code {//
+    static int lastpadW = 0;
     static int lastWaveW = 0;
     if (oscui)
     {
+        if(oscui->osceditUI->x() > Fl::w() - 10 || oscui->osceditUI->y() > Fl::h() - 10)
+            oscui->osceditUI->position(30, 30);
         if (oscui->osceditUI->visible() && lastWaveW != oscui->osceditUI->w())
         {
             lastWaveW = oscui->osceditUI->w();
@@ -1112,21 +1115,24 @@ class PADnoteUI {open : {public PresetsUI_}
     if (!padnotewindow->visible())
         return;
 
+    if(padnotewindow->x() > Fl::w() - 10 || padnotewindow->y() > Fl::h() - 10)
+        padnotewindow->position(30, 30);
+
     if (padnotewindow->w() == lastpadW)
         return;
 
     lastpadW = padnotewindow->w();
 
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = padnotewindow->w();
     int h = padnotewindow->h();
-    while (w > W || h > H)
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         padnotewindow->size(w, h);
-    };
+    };*/
 
     float dW =  w / padDW;
     float dH =  h / padDH;
@@ -1255,7 +1261,7 @@ class PADnoteUI {open : {public PresetsUI_}
     waveform->labelsize(size12);
 
     filtergrp->labelsize(size11);
-    
+
     envelopes->labelsize(size12);
     ampgrp->labelsize(size11);
     volume->labelsize(size);
@@ -1607,7 +1613,6 @@ class PADnoteUI {open : {public PresetsUI_}
     pars = parameters;
     npart = npart_;
     kititem = kititem_;
-    lastpadW = 0;
     padSeen = false;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
@@ -1642,8 +1647,6 @@ class PADnoteUI {open : {public PresetsUI_}
   decl {float padDW;} {private local
   }
   decl {float padDH;} {private local
-  }
-  decl {int lastpadW;} {private local
   }
   decl {bool padSeen;} {private local
   }

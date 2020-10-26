@@ -1357,6 +1357,16 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {configRtext()} {} {
     code {//
+    static int lastconfigW = 0;
+
+    if(configwindow->x() > Fl::w() - 10 || configwindow->y() > Fl::h() - 10)
+        configwindow->position(30, 30);
+
+    if (lastconfigW == configwindow->w())
+        return;
+
+    lastconfigW = configwindow->w();
+
     float dW = configwindow->w() / confDW;
     float dH =  configwindow->h() / confDH;
     float dScale;
@@ -1505,6 +1515,16 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {presetsRtext()} {} {
     code {//
+    static int lastpresetW = 0;
+
+    if(presets->x() > Fl::w() - 10 || presets->y() > Fl::h() - 10)
+        presets->position(30, 30);
+
+    if (lastpresetW == presets->w())
+        return;
+
+    lastpresetW = presets->w();
+
     float dW = presets->w() / preDW;
     float dH =  presets->h() / preDH;
     float dScale;

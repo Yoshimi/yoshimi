@@ -108,6 +108,16 @@ class ConsoleUI {} {
   }
   Function {consoleRtext()} {} {
     code {//
+    static int lastlogW = 0;
+
+    if(logConsole->x() > Fl::w() - 10 || logConsole->y() > Fl::h() - 10)
+        logConsole->position(30, 30);
+
+    if (lastlogW == logConsole->w())
+        return;
+
+    lastlogW = logConsole->w();
+
     float dW = logConsole->w() / logDW;
     float dH =  logConsole->h() / logDH;
     float dScale;

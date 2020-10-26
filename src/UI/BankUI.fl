@@ -1430,24 +1430,33 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   Function {wincheck()} {} {
     code {//
-    if (instrumentSeen && instrumentuiwindow->w() != lastinstrumentW)
+    if (instrumentSeen)
     {
         instrumentRtext();
-        lastinstrumentW = instrumentuiwindow->w();
     }} {}
   }
   Function {instrumentRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    static int lastinstrumentW = 0;
+
+    if(instrumentuiwindow->x() > Fl::w() - 10 || instrumentuiwindow->y() > Fl::h() - 10)
+        instrumentuiwindow->position(30, 30);
+
+    if (lastinstrumentW == instrumentuiwindow->w())
+        return;
+
+    lastinstrumentW = instrumentuiwindow->w();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = instrumentuiwindow->w();
     int h = instrumentuiwindow->h();
-    while (w > W || h > H)
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         instrumentuiwindow->size(w, h);
-    };
+    };*/
     float defW = 780;
     float defH = 575;
     float dW = w / defW;
@@ -1492,16 +1501,26 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   Function {searchRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    static int lastsearchW = 0;
+
+    if(searchwin->x() > Fl::w() - 10 || searchwin->y() > Fl::h() - 10)
+        searchwin->position(30, 30);
+
+    if (lastsearchW == searchwin->w())
+        return;
+
+    lastsearchW = searchwin->w();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = searchwin->w();
     int h = searchwin->h();
-    while (w > W || h > H)
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         searchwin->size(w, h);
-    };
+    };*/
 
     float defW = 305;
     float defH = 490;
@@ -1546,16 +1565,26 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   Function {bankRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    static int lastbankW = 0;
+
+    if (bankuiwindow->x() > Fl::w() - 10 || bankuiwindow->y() > Fl::h() - 10)
+        bankuiwindow->position(30, 30);
+
+    if (lastbankW == bankuiwindow->w())
+        return;
+
+    lastbankW = bankuiwindow->w();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = bankuiwindow->w();
     int h = bankuiwindow->h();
-    while (w > W || h > H)
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         bankuiwindow->size(w, h);
-    };
+    };*/
 
     float defW = 775;
     float defH = 575;
@@ -1595,16 +1624,26 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   Function {rootRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    static int lastrootW = 0;
+
+    if (rootuiwindow->x() > Fl::w() - 10 || rootuiwindow->y() > Fl::h() - 10)
+        rootuiwindow->position(30, 30);
+
+    if (lastrootW == rootuiwindow->w())
+        return;
+
+    lastrootW = rootuiwindow->w();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = rootuiwindow->w();
     int h = rootuiwindow->h();
-    while (w > W || h > H)
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         rootuiwindow->size(w, h);
-    };
+    };*/
 
     float defW = 465;
     float defH = 295;
@@ -1778,14 +1817,6 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   decl {bool unsearched;} {public local
   }
-  decl {int lastinstrumentW;} {private local
-  }
   decl {int instrumentSeen;} {private local
-  }
-  decl {int lastbankW;} {private local
-  }
-  decl {int lastrootW;} {private local
-  }
-  decl {int lastsearchW;} {private local
   }
 }

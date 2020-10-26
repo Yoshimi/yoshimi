@@ -2417,6 +2417,10 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   }
   Function {filtRtext()} {} {
     code {//
+
+    if(filterwindow->x() > Fl::w() - 10 || filterwindow->y() > Fl::h() - 10)
+        filterwindow->position(30, 30);
+
     float dW = filterwindow->w() / filtDW;
     float dH = filterwindow->h() / filtDH;
     float dScale;

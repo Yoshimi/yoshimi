@@ -708,6 +708,7 @@ class SUBnoteUI {: {public PresetsUI_}
   }
   Function {subRtext()} {} {
     code {//
+    static int lastsubW = 0;
     ampenv->wincheck();
     bandwidthenvelopegroup->wincheck();
     filterenv->wincheck();
@@ -716,21 +717,24 @@ class SUBnoteUI {: {public PresetsUI_}
     if (!SUBparameters->visible())
         return;
 
+    if(SUBparameters->x() > Fl::w() - 10 || SUBparameters->y() > Fl::h() - 10)
+        SUBparameters->position(30, 30);
+
     if(SUBparameters->w() == lastsubW)
          return;
 
     lastsubW = SUBparameters->w();
 
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = SUBparameters->w();
     int subh = SUBparameters->h();
-    while (w > W || subh > H)
+    /*while (w > W || subh > H)
     {
         w /= 2;
         subh /= 2;
         SUBparameters->size(w, subh);
-    };
+    };*/
     float dW = w / subDW;
     float dH = subh / subDH;
     float dScale;
@@ -1000,7 +1004,6 @@ class SUBnoteUI {: {public PresetsUI_}
     synth = pars->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
-    lastsubW = 0;
     subSeen = false;
     make_window();} {}
   }
@@ -1025,8 +1028,6 @@ class SUBnoteUI {: {public PresetsUI_}
   decl {float subDW;} {private local
   }
   decl {float subDH;} {private local
-  }
-  decl {int lastsubW;} {private local
   }
   decl {bool subSeen;} {private local
   }

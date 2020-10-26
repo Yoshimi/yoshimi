@@ -1787,6 +1787,8 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    static int lastWaveW = 0;
    if (oscedit)
    {
+    	if(oscedit->osceditUI->x() > Fl::w() - 10 || oscedit->osceditUI->y() > Fl::h() - 10)
+            oscedit->osceditUI->position(30, 30);
        if (oscedit->osceditUI->visible() && lastWaveW != oscedit->osceditUI->w())
        {
            lastWaveW = oscedit->osceditUI->w();
@@ -1799,6 +1801,9 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
    voiceFMampenvgroup->wincheck();
    voiceFMfreqenvgroup->wincheck();
+
+   if (!ADnoteVoiceParameters->visible())
+       return;
 
    if (dScale == lastdScale)
        return;
@@ -2774,15 +2779,13 @@ switch (num)
     static int lastListW = 0;
 
     addRtext();
+    addVoiceRtext();
 
     if (ADnoteVoiceList->visible() && lastListW != ADnoteVoiceList->w())
     {
         addVoiceListRtext();
         lastListW = ADnoteVoiceList->w();
     }
-
-    if (ADnoteVoice->visible())
-        addVoiceRtext();
 
     if (ampenv)
         ampenv->wincheck();
@@ -2800,20 +2803,26 @@ switch (num)
 
     if (!ADnoteGlobalParameters->visible())
         return;
+
+    if(ADnoteGlobalParameters->x() > Fl::w() - 10 || ADnoteGlobalParameters->y() > Fl::h() - 10)
+        ADnoteGlobalParameters->position(30, 30);
+
     if (ADnoteGlobalParameters->w() == lastglobalW)
         return;
+
     lastglobalW = ADnoteGlobalParameters->w();
 
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = ADnoteGlobalParameters->w();
     int h = ADnoteGlobalParameters->h();
-    while (w > W || h > H)
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         ADnoteGlobalParameters->size(w, h);
-    };
+    };*/
 
     float defW = 535;
     float defH = 405;
@@ -2885,16 +2894,18 @@ switch (num)
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
     static int lastvoiceW = 0;
-    int W =  Fl::w();
-    int H =  Fl::h();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w =ADnoteVoice->w();
     int h = ADnoteVoice->h();
-    while (w > W || h > H)
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         ADnoteVoice->size(w, h);
-    };
+    };*/
 
     float defW = 760;
     float defH = 610;
@@ -2910,10 +2921,13 @@ switch (num)
     if (dScale < 0.2f)
         dScale = 0.2f;
 
-    advoice->voiceRtext(dScale);
+    advoice->voiceRtext(dScale); // must be entered (for waveform)
 
     if (!ADnoteVoice->visible())
         return;
+
+    if(ADnoteVoice->x() > Fl::w() - 10 || ADnoteVoice->y() > Fl::h() - 10)
+        ADnoteVoice->position(30, 30);
 
     if (ADnoteVoice->w() == lastvoiceW)
         return;
@@ -2940,16 +2954,17 @@ switch (num)
   }
   Function {addVoiceListRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w =ADnoteVoiceList->w();
     int h = ADnoteVoiceList->h();
-    while (w > W || h > H)
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
-        ADnoteVoiceList->size(w, h);
-    };
+    };*/
 
     float defW = 705;
     float defH = 260;
@@ -2965,10 +2980,14 @@ switch (num)
     if (dScale < 0.2f)
         dScale = 0.2f;
 
-    advoice->voiceRtext(dScale);
+    //advoice->voiceRtext(dScale);
 
     if (!ADnoteVoiceList->visible())
         return;
+
+    if(ADnoteVoiceList->x() > Fl::w() - 10 || ADnoteVoiceList->y() > Fl::h() - 10)
+        ADnoteVoiceList->position(30, 30);
+
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
@@ -2986,7 +3005,6 @@ switch (num)
     listWave->labelsize(size11);
     listModulator->labelsize(size11);
     listClose->labelsize(int(14 * dScale));
-
 
     ADnoteVoiceList->redraw();} {}
   }

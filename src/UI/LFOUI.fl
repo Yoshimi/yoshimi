@@ -228,7 +228,6 @@ pars=NULL;} {}
   }
   Function {lfoRtext(float dScale)} {} {
     code {//
-
     int size = int(dScale * 10);
     lfoparamswindow->labelsize(size);
     freq->labelsize(size);

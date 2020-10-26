@@ -1269,6 +1269,10 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {envfreeRtext()} {} {
     code {//
+
+        if(freemodeeditwindow->x() > Fl::w() - 10 || freemodeeditwindow->y() > Fl::h() - 10)
+            freemodeeditwindow->position(30, 30);
+
         int W =  Fl::w();
         int H =  Fl::h();
         int w = freemodeeditwindow->w();
