@@ -1164,14 +1164,16 @@ class OscilEditor {open : {public PresetsUI_}
 
             case OSCILLATOR::control::baseFunctionType:
                 bftype->value(value);
-                if (value < OSCILLATOR::wave::triangle)
+                if (value < OSCILLATOR::wave::triangle || oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
+                {
                     bfslider->deactivate();
-                else
-                    bfslider->activate();
-                if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::triangle)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec))
                     basefuncmodulation->deactivate();
+                }
                 else
+                {
+                    bfslider->activate();
                     basefuncmodulation->activate();
+                }
                 baseSet = true;
                 break;
 

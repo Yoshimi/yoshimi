@@ -1,5 +1,8 @@
 yoshimi 1.7.2 M
 
+2020-10-27 Will
+* BugFix: base func mod not enabled for triangle wave.
+
 2020-10-25 Will
 * BugFix: Failing to load some .scl files.
   Microsoft format text generating blank lines.
