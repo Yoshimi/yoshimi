@@ -315,14 +315,14 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {open : {public BankProcess_, RootProcess_}
+class BankUI {selected : {public BankProcess_, RootProcess_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
-      label Bank open
-      xywh {261 240 780 575} type Double labelsize 12 hide resizable
-      code0 {o->size_range(780, 575, 0,0,0,0,1);}
+      label Bank
+      xywh {83 157 780 570} type Double labelsize 12 hide resizable
+      code0 {instDW = o->w(), instDH = o->h();}
+      code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
       Fl_Choice banklist {
         callback {//
@@ -541,6 +541,8 @@ class BankUI {open : {public BankProcess_, RootProcess_}
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
          searchRtext();}
       xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
+      code0 {searchDW = o->w(); searchDH = o->h();}
+      code1 {searchwin->size_range(searchDW, searchDH, 0, 0, 0, 0, 1);}
       class YoshiWin
     } {
       Fl_Browser searchbrowse {
@@ -667,11 +669,11 @@ class BankUI {open : {public BankProcess_, RootProcess_}
          o->hide();
      else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
          bankRtext();}
-      xywh {84 223 775 575} type Double labelsize 12 hide resizable
+      xywh {84 223 780 570} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
-      code1 {o->size_range(775, 575, 0,0,0,0,1);}
-      code2 {bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
-      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "Bank-bank");}
+      code1 {bankDW = o->w();bankDH = o->h();}
+      code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
+      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "Bank-bank");bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
       class YoshiWin
     } {
       Fl_Button bankroot {
@@ -1108,7 +1110,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     bankFrom = 0;
     instFrom = 0;} {}
   }
-  Function {~BankUI()} {open return_type virtual
+  Function {~BankUI()} {return_type virtual
   } {
     code {//
         setVisible(synth, instrumentuiwindow->visible(), "Bank-instrument");
@@ -1122,8 +1124,7 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         rootuiwindow->hide();
         delete rootuiwindow;} {}
   }
-  Function {Show()} {open
-  } {
+  Function {Show()} {} {
     code {// called from part UI
     rescan_for_banks();
     set_bank_slot();
@@ -1131,11 +1132,9 @@ class BankUI {open : {public BankProcess_, RootProcess_}
     readbutton->value(1);
     mode = 1;
     removeselection();
-    refreshmainwindow();} {selected
-    }
+    refreshmainwindow();} {}
   }
-  Function {ShowInst()} {open
-  } {
+  Function {ShowInst()} {} {
     code {//
 
     int X, Y, W, H, O;
@@ -1457,8 +1456,8 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         h /= 2;
         instrumentuiwindow->size(w, h);
     };*/
-    float defW = 780;
-    float defH = 575;
+    float defW = float(instDW);
+    float defH = float(instDH);
     float dW = w / defW;
     float dH =  h / defH;
     float dScale;
@@ -1522,8 +1521,8 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         searchwin->size(w, h);
     };*/
 
-    float defW = 305;
-    float defH = 490;
+    float defW = searchDW;
+    float defH = searchDH;
     float dW = w / defW;
     float dH = h / defH;
     float dScale;
@@ -1586,8 +1585,8 @@ class BankUI {open : {public BankProcess_, RootProcess_}
         bankuiwindow->size(w, h);
     };*/
 
-    float defW = 775;
-    float defH = 575;
+    float defW = float(bankDW);
+    float defH = float(bankDH);
     float dW = w / defW;
     float dH =  h / defH;
     float dScale;
@@ -1813,10 +1812,22 @@ class BankUI {open : {public BankProcess_, RootProcess_}
   }
   decl {int bankFrom;} {private local
   }
+  decl {int bankDW;} {private local
+  }
+  decl {int bankDH;} {private local
+  }
   decl {int instFrom;} {private local
+  }
+  decl {int instDW;} {private local
+  }
+  decl {int instDH;} {private local
+  }
+  decl {int instrumentSeen;} {private local
   }
   decl {bool unsearched;} {public local
   }
-  decl {int instrumentSeen;} {private local
+  decl {int searchDW;} {private local
+  }
+  decl {int searchDH;} {private local
   }
 }

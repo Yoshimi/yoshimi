@@ -1010,7 +1010,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Box {} {
           label {Yoshimi
 meets
-ZynAddSubFX} selected
+ZynAddSubFX}
           xywh {10 15 345 70} labelfont 9 labelsize 18 labelcolor 216 align 16 when 0
         }
         Fl_Box {} {
@@ -1965,7 +1965,21 @@ Alan Calvert started the project}
             towide->show();
             todeep->hide();
         }
+    if (fetchX + fetchW > Fl::w() - 30|| fetchY + fetchH > Fl::h() - 30)
+    {
+        fetchX = fetchY = 30;
+        if (tmp == 1)
+        {
+            fetchW = PANEL_SINGLE_X;
+            fetchH = PANEL_SINGLE_Y;
+        }
+        else
+        {
+            fetchW = 477;
+            fetchH = 567;
+        }
 
+    }
     if (fetchW == 0 || fetchH == 0)
         panelwindow->position(fetchX, fetchY);
     else
@@ -1983,10 +1997,11 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {panelRtext()} {} {
+  Function {panelRtext()} {open
+  } {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = panelwindow->w();
     int h = panelwindow->h();
     float dW;
@@ -2004,7 +2019,7 @@ Alan Calvert started the project}
         dH = h / float(PANEL_DUAL_Y);
     }
 
-    if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
+    /*if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
     {
         panelwindow->position(10, 30); // zero makes some WMs unhappy
         {
@@ -2015,7 +2030,7 @@ Alan Calvert started the project}
             }
             panelwindow->size(w, h);
         }
-    }
+    }*/
 
     float dScale;
 
@@ -2722,7 +2737,8 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
-  Function {wincheck()} {} {
+  Function {wincheck()} {open
+  } {
     code {//
     static int lastmainW = 0;
     static int lastpanelW = 0;
@@ -2756,21 +2772,25 @@ Alan Calvert started the project}
      }
 
      partui->wincheck();
-     bankui->wincheck();} {}
+     bankui->wincheck();} {selected
+    }
   }
   Function {mainRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = masterwindow->w();
     int h = masterwindow->h();
 
-    while (w > W || h > H)
+    if(masterwindow->x() > Fl::w() - 10 || masterwindow->y() > Fl::h() - 10)
+        masterwindow->position(30, 30);
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         masterwindow->size(w, h);
-    };
+    };*/
 
     float dW = w / mainDW;
     float dH = h / mainDH;
@@ -2896,16 +2916,20 @@ Alan Calvert started the project}
   }
   Function {syseffRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = syseffsendwindow->w();
     int h = syseffsendwindow->h();
-    while (w > W || h > H)
+
+    if(syseffsendwindow->x() > Fl::w() - 10 || syseffsendwindow->y() > Fl::h() - 10)
+        syseffsendwindow->position(30, 30);
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         syseffsendwindow->size(w, h);
-    };
+    };*/
 
     float dW = w / syseffDW;
     float dH = h / syseffDH;
@@ -2937,16 +2961,20 @@ Alan Calvert started the project}
   }
   Function {msgRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
+    //int W =  Fl::w();
+    //int H =  Fl::h();
     int w = message->w();
     int h = message->h();
-    while (w > W || h > H)
+
+    if(message->x() > Fl::w() - 10 ||message->y() > Fl::h() - 10)
+        message->position(30, 30);
+
+    /*while (w > W || h > H)
     {
         w /= 2;
         h /= 2;
         message->size(w, h);
-    };
+    };*/
 
     float dW = w / msgDW;
     float dH = h / msgDH;
