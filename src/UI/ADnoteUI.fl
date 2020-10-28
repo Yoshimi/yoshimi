@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -399,7 +399,7 @@ else
   }
 }
 
-class ADvoiceUI {open : {public Fl_Group}
+class ADvoiceUI {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
@@ -411,7 +411,7 @@ class ADvoiceUI {open : {public Fl_Group}
       Fl_Box {} {
         xywh {8 71 233 64} box PLASTIC_THIN_UP_BOX color 223
       }
-      Fl_Group voiceparametersgroup {open
+      Fl_Group voiceparametersgroup {
         xywh {0 0 760 615} box THIN_UP_FRAME color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -586,6 +586,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   callback {//
                     if (oscedit)
                         delete oscedit;
+                    lastWaveW = 0;
                     int nv = nvoice;
                     if (pars->VoicePar[nvoice].PextFMoscil >= 0)
                         nv = pars->VoicePar[nvoice].PextFMoscil;
@@ -853,7 +854,7 @@ Oscillator}
                   callback {//
     if (oscedit)
         delete oscedit;
-
+    lastWaveW = 0;
     int nv = nvoice;
     if (pars->VoicePar[nvoice].Pextoscil >= 0)
         nv=pars->VoicePar[nvoice].Pextoscil;
@@ -1255,7 +1256,8 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     code {//
         nvoice = 0;
         pars = NULL;
-        oscedit = NULL;} {}
+        oscedit = NULL;
+        lastWaveW = 0;} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
@@ -1776,13 +1778,11 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
 }} {}
   }
-  Function {voiceRtext(float dScale)} {open
-  } {
+  Function {voiceRtext(float dScale)} {} {
     code {//
-   static int lastWaveW = 0;
    if (oscedit)
    {
-    	if(oscedit->osceditUI->x() > Fl::w() - 10 || oscedit->osceditUI->y() > Fl::h() - 10)
+        if(oscedit->osceditUI->x() > Fl::w() - 10 || oscedit->osceditUI->y() > Fl::h() - 10)
             oscedit->osceditUI->position(30, 30);
        if (oscedit->osceditUI->visible() && lastWaveW != oscedit->osceditUI->w())
        {
@@ -1946,8 +1946,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   ExtModOsc->labelsize(size);
       ExtModOsc->textsize(size);
 
-  modvoicelabel->labelsize(int(40 * dScale));} {selected
-    }
+  modvoicelabel->labelsize(int(40 * dScale));} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
@@ -2003,6 +2002,8 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   decl {SynthEngine *synth;} {private local
   }
   decl {float lastdScale;} {private local
+  }
+  decl {int lastWaveW;} {private local
   }
 }
 
@@ -2689,6 +2690,7 @@ switch (num)
         npart = npart_;
         kititem = kititem_;
         globalSeen = false;
+        lastglobalW = 0;
         voiceSeen = false;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
@@ -2756,7 +2758,7 @@ switch (num)
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth");
     ADnoteGlobalParameters->show();
-    addRtext(); // we shouldn't need this :(
+    lastglobalW = 0;
     if (fetchW == 0 || fetchH == 0)
         ADnoteGlobalParameters->position(fetchX, fetchY);
     else
@@ -2765,8 +2767,7 @@ switch (num)
     }
     globalSeen = true;} {}
   }
-  Function {wincheck()} {open
-  } {
+  Function {wincheck()} {} {
     code {//
     static int lastListW = 0;
 
@@ -2788,7 +2789,6 @@ switch (num)
   }
   Function {addRtext()} {} {
     code {//
-    static int lastglobalW = 0;
     ampenv->wincheck();
     freqenv->wincheck();
     filterenv->wincheck();
@@ -3021,6 +3021,8 @@ switch (num)
   decl {ADnoteParameters *pars;} {private local
   }
   decl {bool globalSeen;} {private local
+  }
+  decl {int lastglobalW;} {private local
   }
   decl {bool voiceSeen;} {public local
   }

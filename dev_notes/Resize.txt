@@ -7,6 +7,7 @@ Completed
     Addsynth
         Voice
         Voice List
+    Oscilgen
     Resonance
     LFOs
     Envelopes
@@ -28,7 +29,6 @@ Completed
 In progress
     Addsynth
         Global - sometimes fails text resize
-    Oscilgen - but sometimes fails internal resize
     Bank
 
 

@@ -453,6 +453,7 @@ class PADnoteUI {: {public PresetsUI_}
             callback {//
             if (oscui!=NULL)
                 delete (oscui);
+            lastWaveW = 0;
             oscui = new OscilEditor(pars->POscil, osc, cbwidget, applybutton, synth, npart, kititem, 2);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
@@ -1096,7 +1097,6 @@ class PADnoteUI {: {public PresetsUI_}
   Function {padRtext()} {} {
     code {//
     static int lastpadW = 0;
-    static int lastWaveW = 0;
     if (oscui)
     {
         if(oscui->osceditUI->x() > Fl::w() - 10 || oscui->osceditUI->y() > Fl::h() - 10)
@@ -1612,6 +1612,7 @@ class PADnoteUI {: {public PresetsUI_}
     npart = npart_;
     kititem = kititem_;
     padSeen = false;
+    lastWaveW = 0;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
     make_window();} {}
@@ -1646,5 +1647,7 @@ class PADnoteUI {: {public PresetsUI_}
   decl {float padDH;} {private local
   }
   decl {bool padSeen;} {private local
+  }
+  decl {int lastWaveW;} {private local
   }
 }

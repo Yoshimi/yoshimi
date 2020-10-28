@@ -199,7 +199,8 @@ class MasterUI {open : {private GuiUpdates}
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init(const char *_label)} {open
+  } {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -266,7 +267,8 @@ class MasterUI {open : {private GuiUpdates}
       else if (instance == 0 && synth->getRuntime().banksChecked == false)
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
-          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
+          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {selected
+    }
   }
   Function {make_window()} {open
   } {
@@ -1925,17 +1927,17 @@ Alan Calvert started the project}
     panelwindow->hide();
     if (type != panelType)
     {
-    	if (type == 1)
-    	{
+        if (type == 1)
+        {
             panelwindow->size(PANEL_SINGLE_X, PANEL_SINGLE_Y);
             panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
             towide->hide();
             todeep->show();
             Panelclose->position(975, 290);
-    	}
-    	else if (type == 2)
-    	{
-    	    panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
+        }
+        else if (type == 2)
+        {
+            panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
             panelwindow->size_range((PANEL_DUAL_X * 9) / 10, (PANEL_DUAL_Y * 9) / 10, 0, 0, 0, 0, 1);
             towide->show();
             todeep->hide();
@@ -1954,13 +1956,13 @@ Alan Calvert started the project}
     int tmp = fetchO & 3;
 
     if (tmp == 1)
-    	{
+        {
             panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
             towide->hide();
             todeep->show();
-    	}
-    	else if (tmp == 2)
-    	{
+        }
+        else if (tmp == 2)
+        {
             panelwindow->size_range(477, 567, 0, 0, 0, 0, 1);
             towide->show();
             todeep->hide();
@@ -2772,8 +2774,7 @@ Alan Calvert started the project}
      }
 
      partui->wincheck();
-     bankui->wincheck();} {selected
-    }
+     bankui->wincheck();} {}
   }
   Function {mainRtext()} {} {
     code {//
