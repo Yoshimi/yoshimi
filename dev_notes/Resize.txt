@@ -12,6 +12,7 @@ Completed
     LFOs
     Envelopes
     Filters
+    Microtonal
     Part
         instrumenteditwindow
         instrumentkitlist
@@ -35,7 +36,6 @@ In progress
 Not started
     About (in master)
     Formant (in filters)
-    Microtonal
     Parameters
     Presets
     Midilearn

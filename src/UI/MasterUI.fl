@@ -199,8 +199,7 @@ class MasterUI {open : {private GuiUpdates}
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {open
-  } {
+  Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -267,11 +266,9 @@ class MasterUI {open : {private GuiUpdates}
       else if (instance == 0 && synth->getRuntime().banksChecked == false)
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
-          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {selected
-    }
+          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1999,108 +1996,6 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {panelRtext()} {open
-  } {
-    code {//
-    //int W =  Fl::w();
-    //int H =  Fl::h();
-    int w = panelwindow->w();
-    int h = panelwindow->h();
-    float dW;
-    float dH;
-
-    if (panelType == 1)
-    {
-        dW = w / float(PANEL_SINGLE_X);
-        dH = h / float(PANEL_SINGLE_Y);
-
-    }
-    else
-    {
-        dW = w / float(PANEL_DUAL_X);
-        dH = h / float(PANEL_DUAL_Y);
-    }
-
-    /*if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
-    {
-        panelwindow->position(10, 30); // zero makes some WMs unhappy
-        {
-            while (w > W || h > H)
-            {
-                w *= 0.8f;
-                h *= 0.8f;
-            }
-            panelwindow->size(w, h);
-        }
-    }*/
-
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
-    panelScale = dScale;
-    if (panelType == 1)
-    {
-        for (int i = 0; i < 16; ++ i)
-        {
-            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
-            panellistitem[i]->itemRtext(dScale);
-        }
-
-    }
-    else
-    {
-        for (int i = 0; i < 8; ++ i)
-        {
-            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
-            panellistitem[i]->itemRtext(dScale);
-        }
-        for (int i = 8; i < 16; ++ i)
-        {
-            panellistitem[i]->resize((8 + ((i - 8) * 64)) * dW, 290 * dH, 63 * dW, 268 * dH);
-            panellistitem[i]->itemRtext(dScale);
-        }
-
-        towide->resize(335 * dW, (PANEL_DUAL_Y - 30) * dH, 130 * dW, 25 * dH);
-        Panelsmallgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
-        Panelgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
-        CSspinner->resize(173 * dW, (PANEL_DUAL_Y - 23) * dH, 50 * dW, 18 * dH);
-        CSpend->resize(227 * dW, (PANEL_DUAL_Y - 30) * dH, 74 * dW, 25 * dH);
-        channelswitch->resize(95 * dW, (PANEL_DUAL_Y -23) * dH, 74 * dW, 18 * dH);
-        Panelclose->resize((PANEL_DUAL_X - 55) * dW, (PANEL_DUAL_Y - 30) * dH, 50 * dW, 25 * dH);
-
-    }
-
-    int size12 = int(12 * dScale);
-    int size14 = int(14 * dScale);
-    towide->labelsize(size14);
-    todeep->labelsize(size14);
-    Panelgroups->labelsize(size12);
-        row1->labelsize(size12);
-        row2->labelsize(size12);
-        row3->labelsize(size12);
-        row4->labelsize(size12);
-    Panelsmallgroups->labelsize(size12);
-        row1small->labelsize(size12);
-        row2small->labelsize(size12);
-    CSspinner->labelsize(size12);
-        CSspinner->textsize(size12);
-    CSpend->labelsize(size12);
-    channelswitch->labelsize(size12);
-        switchoff->labelsize(size12);
-        switchrow->labelsize(size12);
-        switchcolumn->labelsize(size12);
-        switchloop->labelsize(size12);
-        switchtwoway->labelsize(size12);
-        switchchannel->labelsize(size12);
-    Panelclose->labelsize(size14);
-
-    panelwindow->redraw();} {}
-  }
   Function {updatepanel(bool full = false)} {} {
     code {//
     for (int npart = 0; npart < partmax; ++npart)
@@ -2687,7 +2582,10 @@ Alan Calvert started the project}
         virkeyboard->virkeyboardwindow->hide();
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Scales");
-    microtonalui->microtonaluiwindow->position(fetchX, fetchY);
+    if (fetchW == 0 || fetchH == 0)
+        microtonalui->microtonaluiwindow->position(fetchX, fetchY);
+    else
+        microtonalui->microtonaluiwindow->resize(fetchX, fetchY, fetchW, fetchH);
     if (fetchO)
         microtonalui->microtonaluiwindow->show();
     else
@@ -2746,6 +2644,7 @@ Alan Calvert started the project}
     static int lastpanelW = 0;
     static int lastmsgW = 0;
     static int lastsyseffW = 0;
+    static int lastscaleW = 0;
     if (masterwindow->w() != lastmainW)
     {
         mainRtext();
@@ -2773,8 +2672,15 @@ Alan Calvert started the project}
         syseffSeen = true;
      }
 
+     if (microtonalui->microtonaluiwindow->visible() && lastscaleW != microtonalui->microtonaluiwindow->w())
+     {
+         microtonalui->scaleRtext();
+         lastscaleW = microtonalui->microtonaluiwindow->w();
+     }
+
      partui->wincheck();
-     bankui->wincheck();} {}
+     bankui->wincheck();} {selected
+    }
   }
   Function {mainRtext()} {} {
     code {//
@@ -2996,6 +2902,107 @@ Alan Calvert started the project}
     closebutton->labelsize(size14);
 
     message->redraw();} {}
+  }
+  Function {panelRtext()} {} {
+    code {//
+    //int W =  Fl::w();
+    //int H =  Fl::h();
+    int w = panelwindow->w();
+    int h = panelwindow->h();
+    float dW;
+    float dH;
+
+    if (panelType == 1)
+    {
+        dW = w / float(PANEL_SINGLE_X);
+        dH = h / float(PANEL_SINGLE_Y);
+
+    }
+    else
+    {
+        dW = w / float(PANEL_DUAL_X);
+        dH = h / float(PANEL_DUAL_Y);
+    }
+
+    /*if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
+    {
+        panelwindow->position(10, 30); // zero makes some WMs unhappy
+        {
+            while (w > W || h > H)
+            {
+                w *= 0.8f;
+                h *= 0.8f;
+            }
+            panelwindow->size(w, h);
+        }
+    }*/
+
+    float dScale;
+
+    if (dW < dH)
+        dScale = dW;
+    else
+        dScale = dH;
+    if (dScale < 0.2f)
+        dScale = 0.2f;
+    panelScale = dScale;
+    if (panelType == 1)
+    {
+        for (int i = 0; i < 16; ++ i)
+        {
+            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+
+    }
+    else
+    {
+        for (int i = 0; i < 8; ++ i)
+        {
+            panellistitem[i]->resize((8 + (i * 64)) * dW, 12 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+        for (int i = 8; i < 16; ++ i)
+        {
+            panellistitem[i]->resize((8 + ((i - 8) * 64)) * dW, 290 * dH, 63 * dW, 268 * dH);
+            panellistitem[i]->itemRtext(dScale);
+        }
+
+        towide->resize(335 * dW, (PANEL_DUAL_Y - 30) * dH, 130 * dW, 25 * dH);
+        Panelsmallgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
+        Panelgroups->resize(5 * dW, (PANEL_DUAL_Y - 23) * dH, 86 * dW, 18 * dH);
+        CSspinner->resize(173 * dW, (PANEL_DUAL_Y - 23) * dH, 50 * dW, 18 * dH);
+        CSpend->resize(227 * dW, (PANEL_DUAL_Y - 30) * dH, 74 * dW, 25 * dH);
+        channelswitch->resize(95 * dW, (PANEL_DUAL_Y -23) * dH, 74 * dW, 18 * dH);
+        Panelclose->resize((PANEL_DUAL_X - 55) * dW, (PANEL_DUAL_Y - 30) * dH, 50 * dW, 25 * dH);
+
+    }
+
+    int size12 = int(12 * dScale);
+    int size14 = int(14 * dScale);
+    towide->labelsize(size14);
+    todeep->labelsize(size14);
+    Panelgroups->labelsize(size12);
+        row1->labelsize(size12);
+        row2->labelsize(size12);
+        row3->labelsize(size12);
+        row4->labelsize(size12);
+    Panelsmallgroups->labelsize(size12);
+        row1small->labelsize(size12);
+        row2small->labelsize(size12);
+    CSspinner->labelsize(size12);
+        CSspinner->textsize(size12);
+    CSpend->labelsize(size12);
+    channelswitch->labelsize(size12);
+        switchoff->labelsize(size12);
+        switchrow->labelsize(size12);
+        switchcolumn->labelsize(size12);
+        switchloop->labelsize(size12);
+        switchtwoway->labelsize(size12);
+        switchchannel->labelsize(size12);
+    Panelclose->labelsize(size14);
+
+    panelwindow->redraw();} {}
   }
   decl {ConfigUI *configui;} {public local
   }
