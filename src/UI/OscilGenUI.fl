@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -249,7 +249,8 @@ class Oscilloscope {: {public Fl_Box}
     oscilSmp=oscilSmp_;
     oscbase=oscbase_;} {}
   }
-  Function {init(OscilGen *oscilSmp_,int oscbase_,int phase_, SynthEngine *_synth)} {} {
+  Function {init(OscilGen *oscilSmp_,int oscbase_,int phase_, SynthEngine *_synth)} {open
+  } {
     code {//
     synth = _synth;
     oscilSmp=oscilSmp_;
@@ -339,7 +340,7 @@ class Oscilharmonic {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window harmonic {
-      private xywh {329 192 50 225} type Double box NO_BOX labelsize 10 hide
+      private xywh {329 192 25 225} type Double box NO_BOX labelsize 10 hide
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -374,13 +375,13 @@ class Oscilharmonic {: {public Fl_Group}
         code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
         class PSlider
       }
-      Fl_Box {} {
+      Fl_Box magblock {
         xywh {15 60 5 5} box FLAT_BOX color 39
       }
-      Fl_Box {} {
+      Fl_Box phaseblock {
         xywh {15 178 5 5} box FLAT_BOX color 39
       }
-      Fl_Box {} {
+      Fl_Box number {
         xywh {-4 124 36 15} labelfont 1 labelsize 12 align 20
         code0 {if (n < 99 || (n & 1) == 0) {char tmp[12]; snprintf(tmp, 12, "%d", n + 1); o->label(strdup(tmp));}}
       }
@@ -442,16 +443,16 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {open : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window osceditUI {
-      label {ADsynth Oscillator Editor} open
+      label {ADsynth Oscillator Editor}
       xywh {4 48 735 595} type Double hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
-      code2 {o->size_range(735, 595, 0, 0, 0, 0, 1);}
+      code2 {waveDW = o->w(); waveDH = o->h();}
+      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Button applybutton {
         label Apply
@@ -718,6 +719,8 @@ class OscilEditor {open : {public PresetsUI_}
       Fl_Button oscilClose {
         label Close
         callback {//
+        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "Waveform " + to_string(waveType));
+        OSCseen = false;
         osceditUI->hide();
         if ((Fl::event_button() == 3))
         {
@@ -908,7 +911,7 @@ class OscilEditor {open : {public PresetsUI_}
           xywh {115 115 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group {} {selected
+      Fl_Group {} {
         xywh {594 308 136 30} box ENGRAVED_BOX
       } {
         Fl_Choice sabutton {
@@ -1091,12 +1094,12 @@ class OscilEditor {open : {public PresetsUI_}
         callback {synth->getGuiMaster()->getPresetsUi()->paste(oscil,this);}
         xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
-      Fl_Scroll _this_has_to_be_the_last {
+      Fl_Scroll frame {
         xywh {5 340 660 250} type HORIZONTAL box ENGRAVED_FRAME
       } {
         Fl_Pack harmonics {
           xywh {10 345 650 225} type HORIZONTAL
-          code0 {for (int i=0;i<MAX_AD_HARMONICS;i++){h[i]=new Oscilharmonic(0,0,20,o->h(),"");h[i]->init(oscil,i,oscildisplaygroup,oldosc,cbwidget,applybutton, synth, npart, kititem, engine);}}
+          code0 {for (int i=0; i<MAX_AD_HARMONICS; ++i){h[i]=new Oscilharmonic(0,0,20,o->h(),"");h[i]->init(oscil,i,oscildisplaygroup,oldosc,cbwidget,applybutton, synth, npart, kititem, engine);}}
         } {}
       }
     }
@@ -1213,7 +1216,7 @@ class OscilEditor {open : {public PresetsUI_}
                 {
                     for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                     {
-                        h[i]->mag->value(0);;
+                        h[i]->mag->value(0);
                         h[i]->phase->value(0);
                     }
                     harmonicshiftcounter->value(0);
@@ -1380,22 +1383,25 @@ class OscilEditor {open : {public PresetsUI_}
     cbapplywidget=cbapplywidget_;
     make_window();
     refresh();
-    OSCseen = true;
+    if (engine == PART::engine::padSynth)
+        waveType = 2;
+    else
+        waveType = 0;
+    osceditUI->show();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Waveform");
-    osceditUI->position(fetchX, fetchY);
-    osceditUI->show();} {}
-  }
-  Function {oscsave()} {} {
-    code {//
-    if (OSCseen)
-    {
-        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "Waveform");
-    }} {}
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Waveform " + to_string(waveType));
+    if (fetchW == 0 || fetchH == 0)
+        osceditUI->position(fetchX, fetchY);
+    else
+        osceditUI->resize(fetchX, fetchY, fetchW, fetchH);
+    OSCseen = true;} {}
   }
   Function {~OscilEditor()} {return_type virtual
   } {
-    code {osceditUI->hide();
+    code {//
+    if (OSCseen)
+        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "Waveform " + to_string(waveType));
+    osceditUI->hide();
     delete (osceditUI);
     delete oscilSmp;
     delete fft;} {}
@@ -1538,10 +1544,9 @@ class OscilEditor {open : {public PresetsUI_}
         applybutton->redraw();
 };} {}
   }
-  Function {waveRtext()} {open
-  } {
+  Function {waveRtext()} {} {
     code {//
-        float dScale = osceditUI->w() / float(735);
+        float dScale = osceditUI->w() / float(waveDW);
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);
         int size12 = int(12 * dScale);
@@ -1662,8 +1667,13 @@ class OscilEditor {open : {public PresetsUI_}
         tosine->labelsize(size11);
         oscilC->labelsize(size);
         oscilP->labelsize(size);
-
-
+	//frame->size(660 * dScale, 250 * dScale);
+        harmonics->size(650 * dScale, 235 * dScale);
+        for (int i= 0; i < MAX_AD_HARMONICS; i++)
+        {
+            h[i]->size(20 * dScale, 225 * dScale);
+            h[i]->number->labelsize(size12);
+        }
 
         osceditUI->redraw();} {}
   }
@@ -1682,6 +1692,12 @@ class OscilEditor {open : {public PresetsUI_}
   decl {int kititem;} {private local
   }
   decl {int engine;} {private local
+  }
+  decl {int waveDW;} {private local
+  }
+  decl {int waveDH;} {private local
+  }
+  decl {int waveType;} {private local
   }
   decl {bool OSCseen;} {private local
   }

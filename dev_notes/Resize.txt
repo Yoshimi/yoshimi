@@ -27,8 +27,8 @@ Completed
 
 In progress
     Addsynth
-        Global - text scale sometimes fails
-    Oscilgen
+        Global - sometimes fails text resize
+    Oscilgen - but sometimes fails internal resize
     Bank
 
 
