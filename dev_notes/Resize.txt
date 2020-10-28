@@ -3,7 +3,7 @@ Completed
     Config
     Vector
     PadSynth
-    Subsyth - but harmonics height issues
+    Subsyth
     Addsynth
         Voice
         Voice List

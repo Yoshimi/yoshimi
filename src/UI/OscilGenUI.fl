@@ -1668,6 +1668,7 @@ class OscilEditor {: {public PresetsUI_}
         oscilC->labelsize(size);
         oscilP->labelsize(size);
         frame->scroll_to(0, 0);
+        frame->scrollbar_size(12 * dScale);
         harmonics->size(650 * dScale, 235 * dScale);
         for (int i= 0; i < MAX_AD_HARMONICS; i++)
         {
