@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -315,7 +315,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 }
 
-class BankUI {selected : {public BankProcess_, RootProcess_}
+class BankUI {: {public BankProcess_, RootProcess_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
@@ -338,18 +338,13 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Button B_search {
         label Search
         callback {//
-       if (unsearched)
-       {
-           fillBrowser(1);
-           unsearched = false;
-       }
-       searchwin->show();}
+        ShowSearch();}
         tooltip {Select instrument from list, by type} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
       }
       Fl_Button insRoots {
         label Roots
         callback {//
-        rootuiwindow->show();
+        ShowRoot();
         if ((Fl::event_button() == 3))
         {
             rootFrom = 3;
@@ -362,7 +357,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Button insBanks {
         label Banks
         callback {//
-        bankuiwindow->show();
+        Showbank();
         if ((Fl::event_button() == 3))
         {
             bankFrom = 3;
@@ -383,7 +378,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Group insgroup {
         xywh {5 34 772 485} labelsize 12
       } {
-        Fl_Pack {} {
+        Fl_Group insframe1 {
           xywh {10 39 150 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 0; i < 32; ++i)
@@ -393,7 +388,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
                             (BankProcess_ *)this, bank, &nselected);
             }}
         } {}
-        Fl_Pack {} {
+        Fl_Group insframe2 {
           xywh {163 39 150 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 32; i < 64; ++i)
@@ -403,7 +398,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
                             (BankProcess_ *)this, bank, &nselected);
             }}
         } {}
-        Fl_Pack {} {
+        Fl_Group insframe3 {
           xywh {316 39 150 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 64; i < 96; ++i)
@@ -413,7 +408,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
                             (BankProcess_ *)this, bank, &nselected);
             }}
         } {}
-        Fl_Pack {} {
+        Fl_Group insframe4 {
           xywh {469 39 150 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 96; i < 128; ++i)
@@ -423,7 +418,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
                             (BankProcess_ *)this, bank, &nselected);
             }}
         } {}
-        Fl_Pack {} {
+        Fl_Group insframe5 {
           xywh {622 39 150 481} color 48 labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 128; i < 160; ++i)
@@ -491,7 +486,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
             if (instFrom == 2)
             {
                 bankFrom = 3;
-                bankuiwindow->show();
+                Showbank();
             }
             else if (instFrom == 4)
             {
@@ -500,7 +495,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         }
         instFrom = 0; // to avoid later confusion!
         instrumentuiwindow->hide();
-        setVisible(synth, false, "Bank-instrument");}
+        saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");}
         tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {
@@ -563,6 +558,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Button searchClose {
         label Close
         callback {//
+        saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-root");
+        searchSeen = false;
         searchwin->hide();}
         xywh {228 451 65 24} labelsize 12 align 192
       }
@@ -673,13 +670,12 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
       code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
-      code3 {int X, Y, W, H, O;loadWin(synth, W, H, X, Y, O, "Bank-bank");bankS = fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank);}
       class YoshiWin
     } {
       Fl_Button bankroot {
         label Roots
         callback {//
-        rootuiwindow->show();
+        ShowRoot();
         if ((Fl::event_button() == 3))
         {
             rootFrom = 2;
@@ -719,7 +715,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Group bankgroup {
         xywh {5 34 766 491} labelsize 12
       } {
-        Fl_Pack {} {
+        Fl_Group {} {
           xywh {10 39 186 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
@@ -731,7 +727,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
 
           }}
         } {}
-        Fl_Pack {} {
+        Fl_Group {} {
           xywh {200 39 186 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
@@ -743,7 +739,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
 
           }}
         } {}
-        Fl_Pack {} {
+        Fl_Group {} {
           xywh {390 39 186 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
@@ -755,7 +751,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
 
           }}
         } {}
-        Fl_Pack {} {
+        Fl_Group {} {
           xywh {580 39 185 481} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
@@ -833,13 +829,14 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         label Close
         callback {//
             bankuiwindow->hide();
-            setVisible(synth, false, "Bank-bank");
+            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(),  bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
+            bankSeen = false;
             if (Fl::event_button() == 3)
             {
                 if (bankFrom == 1)
                 {
                     rootFrom = 2;
-                    rootuiwindow->show();
+                    ShowRoot();
                 }
                 else if (bankFrom == 3)
                 {
@@ -862,8 +859,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       xywh {88 54 465 295} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
-      code2 {if (synth->getUniqueId() == 0) {addrootdirbutton->show();  removerootdirbutton->show();  changeIDbutton->show();}}
-      code3 {o->size_range(465, 295, 0,0,0,0,1);}
+      code2 {rootDW = o->w(); rootDH = o->h();}
+      code3 {o->size_range(rootDW, rootDH, 0,0,0,0,1);}
       class YoshiWin
     } {
       Fl_Browser rootsbrowse {
@@ -935,7 +932,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Button showdefaultrootdirbutton {
         label {Open current}
         callback {//
-        bankuiwindow->show();
+        Showbank();
         if (Fl::event_button() == 3)
         {
             bankFrom = 1;
@@ -967,7 +964,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
       Fl_Spinner changeIDbutton {
         label {Change ID}
         callback {Pend->show();}
-        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12 hide deactivate
+        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12
         code0 {oldrootID = o->value();}
       }
       Fl_Button rootClose {
@@ -976,11 +973,13 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         if (Fl::event_button() == 3)
         {
             if (rootFrom == 2)
-            bankuiwindow->show();
+            Showbank();
         }
         else
             rootFrom = 0;
         rootuiwindow->hide();
+        saveWin(synth, rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
+        rootSeen = false;
         setVisible(synth, false, "Bank-root");}
         tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
@@ -1102,6 +1101,9 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     nselected = -1;
     rselected = -1;
     instrumentSeen = false;
+    bankSeen = false;
+    rootSeen = false;
+    searchSeen = false;
     make_window();
     r_mode = 1;
     mode = 1;
@@ -1113,15 +1115,25 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
   Function {~BankUI()} {return_type virtual
   } {
     code {//
-        setVisible(synth, instrumentuiwindow->visible(), "Bank-instrument");
+        if (instrumentSeen)
+            saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), instrumentuiwindow->visible(), "Bank-instrument");
         instrumentuiwindow->hide();
         instrumentSeen = false;
         delete instrumentuiwindow;
-        setVisible(synth, bankuiwindow->visible(), "Bank-bank");
+        if (bankSeen)
+            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), bankuiwindow->visible(), "Bank-bank");
         bankuiwindow->hide();
+        bankSeen = false;
         delete bankuiwindow;
-        setVisible(synth, rootuiwindow->visible(), "Bank-root");
+        if (rootSeen)
+            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), rootuiwindow->visible(), "Bank-root");
+        rootSeen = false;
         rootuiwindow->hide();
+        if (searchSeen)
+            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), searchwin->visible(), "Bank-search");
+        searchwin->hide();
+        delete searchwin;
+
         delete rootuiwindow;} {}
   }
   Function {Show()} {} {
@@ -1145,6 +1157,50 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         instrumentuiwindow->resize(X, Y, W, H);
     instrumentuiwindow->show();
     instrumentSeen = true;} {}
+  }
+  Function {Showbank()} {} {
+    code {//
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Bank-bank");
+    if (W == 0 || H == 0)
+        bankuiwindow->size(X, Y);
+    else
+        bankuiwindow->resize(X, Y, W, H);
+    bankuiwindow->show();
+    bankRtext();
+    bankSeen = true;} {}
+  }
+  Function {ShowRoot()} {} {
+    code {//
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Bank-root");
+    if (W == 0 || H == 0)
+        rootuiwindow->size(X, Y);
+    else
+        rootuiwindow->resize(X, Y, W, H);
+    rootuiwindow->show();
+    rootRtext();
+    rootSeen = true;} {}
+  }
+  Function {ShowSearch()} {} {
+    code {//
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Bank-search");
+    if (W == 0 || H == 0)
+        searchwin->size(X, Y);
+    else
+        searchwin->resize(X, Y, W, H);
+    if (unsearched)
+    {
+        fillBrowser(1);
+        unsearched = false;
+    }
+    searchwin->show();
+    searchRtext();
+    searchSeen = true;} {}
   }
   Function {Hide()} {} {
     code {// called from master UI
@@ -1488,15 +1544,37 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     insClose->labelsize(size);
 
     banklist->textsize(size);
-
+    int lineX;
+    int lineY;
     for (int i = 0; i < MAX_INSTRUMENTS_IN_BANK; ++i)
     {
-        bs[i]->size(int(30 * dW), int(insgroup->h() / 32));
+        if (i < 32)
+        {
+            lineX = int(5 * dScale);
+        }
+        else if (i < 64)
+        {
+            lineX = int(160 * dScale);
+        }
+        else if (i < 96)
+        {
+            lineX = int(315 * dScale);
+        }
+        else if (i < 128)
+        {
+            lineX = int(470 * dScale);
+        }
+        else
+        {
+            lineX = int(625 * dScale);
+        }
+        lineY = int((((i & 31) * 15.4f) + 33) * dScale);
+        bs[i]->resize(lineX,  lineY , int(152 * dScale), 15 * dScale);
         bs[i]->labelsize(int(13 * dScale));
     }
 
     instrumentuiwindow->redraw();
-    saveWin(synth, w, h, instrumentuiwindow->x(), instrumentuiwindow->y(), true, "Bank-instrument");} {}
+    //saveWin(synth, w, h, instrumentuiwindow->x(), instrumentuiwindow->y(), true, "Bank-instrument");} {}
   }
   Function {searchRtext()} {} {
     code {//
@@ -1611,15 +1689,34 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
     rootexportbutton->labelsize(int(9 * dScale));
 
     bankClose->labelsize(size);
-
+    int lineX;
+    int lineY;
     for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
     {
-        rs[i]->size(int(35 * dW), int(bankgroup->h() / 32));
+        if (i < 32)
+        {
+            lineX = int(6 * dScale);
+        }
+        else if (i < 64)
+        {
+            lineX = int(200 * dScale);
+        }
+        else if (i < 96)
+        {
+            lineX = int(393 * dScale);
+        }
+        else
+        {
+            lineX = int(586 * dScale);
+        }
+
+        lineY = int((((i & 31) * 15.4f) + 33) * dScale);
+        rs[i]->resize(lineX,  lineY , int(188 * dScale), 15 * dScale);
         rs[i]->labelsize(int(13 * dScale) - 1);
     }
 
     bankuiwindow->redraw();
-    saveWin(synth, w, h,  bankuiwindow->x(),  bankuiwindow->y(), true, "Bank-bank");} {}
+    //saveWin(synth, w, h,  bankuiwindow->x(),  bankuiwindow->y(), true, "Bank-bank");} {}
   }
   Function {rootRtext()} {} {
     code {//
@@ -1644,8 +1741,8 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         rootuiwindow->size(w, h);
     };*/
 
-    float defW = 465;
-    float defH = 295;
+    float defW = rootDW;
+    float defH = rootDH;
     float dW = w / defW;
     float dH = h / defH;
     float dScale;
@@ -1667,11 +1764,10 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
         changeIDbutton->textsize(size);
 
     rootClose->labelsize(size);
-
     rootsbrowse->textsize(size);
 
     rootuiwindow->redraw();
-    saveWin(synth, w, h,  rootuiwindow->x(),  rootuiwindow->y(), true, "Bank-root");} {}
+    //saveWin(synth, w, h,  rootuiwindow->x(),  rootuiwindow->y(), true, "Bank-root");} {}
   }
   Function {refreshbankslot(int ins, int bk, int rt, int last)} {} {
     code {//
@@ -1810,11 +1906,19 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
   }
   decl {int rootFrom;} {private local
   }
+  decl {bool rootSeen;} {private local
+  }
+  decl {int rootDW;} {private local
+  }
+  decl {int rootDH;} {private local
+  }
   decl {int bankFrom;} {private local
   }
   decl {int bankDW;} {private local
   }
   decl {int bankDH;} {private local
+  }
+  decl {bool bankSeen;} {private local
   }
   decl {int instFrom;} {private local
   }
@@ -1822,12 +1926,14 @@ class BankUI {selected : {public BankProcess_, RootProcess_}
   }
   decl {int instDH;} {private local
   }
-  decl {int instrumentSeen;} {private local
+  decl {bool instrumentSeen;} {private local
   }
   decl {bool unsearched;} {public local
   }
   decl {int searchDW;} {private local
   }
   decl {int searchDH;} {private local
+  }
+  decl {bool searchSeen;} {private local
   }
 }

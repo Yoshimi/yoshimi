@@ -13,6 +13,7 @@ Completed
     Envelopes
     Filters
     Microtonal
+    Bank
     Part
         instrumenteditwindow
         instrumentkitlist
@@ -30,7 +31,6 @@ Completed
 In progress
     Addsynth
         Global - sometimes fails text resize
-    Bank
 
 
 Not started

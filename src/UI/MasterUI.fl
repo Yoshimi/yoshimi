@@ -453,8 +453,7 @@ class MasterUI {open : {private GuiUpdates}
             fl_alert("'Show engines/types' must be checked in Mixer Panel");
             return;
         }
-        bankui->B_search->do_callback();
-        bankui->searchwin->show();}
+        bankui->ShowSearch();}
             xywh {0 0 34 20} labelsize 12
           }
         }
@@ -468,7 +467,7 @@ class MasterUI {open : {private GuiUpdates}
           MenuItem P_show {
             label {S&how Patch Banks...}
             callback {//
-            bankui->bankuiwindow->show();}
+            bankui->Showbank();}
             xywh {30 30 100 20} labelsize 12
           }
           MenuItem P_load {
@@ -508,7 +507,7 @@ class MasterUI {open : {private GuiUpdates}
           MenuItem RootDir {
             label {&Bank Root Dirs...}
             callback {//
-            bankui->rootuiwindow->show();}
+            bankui->ShowRoot();}
             xywh {30 30 100 20} labelsize 12
           }
           MenuItem PresetDir {
@@ -2563,14 +2562,14 @@ Alan Calvert started the project}
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Bank-bank");
     bankui->bankuiwindow->position(fetchX, fetchY);
     if (fetchO)
-        bankui->bankuiwindow->show();
+        bankui->Showbank();
     else
         bankui->bankuiwindow->hide();
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Bank-root");
     bankui->rootuiwindow->position(fetchX, fetchY);
     if (fetchO)
-        bankui->rootuiwindow->show();
+        bankui->ShowRoot();
     else
         bankui->rootuiwindow->hide();
 
