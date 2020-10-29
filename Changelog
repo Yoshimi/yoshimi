@@ -1,4 +1,8 @@
-yoshimi 1.7.2 M
+yoshimi 1.7.3
+
+2020-10-29 Will
+*Updated docs.
+* Set release as 1.7.3 (mantenance)
 
 2020-10-27 Will
 * BugFix: base func mod not enabled for triangle wave.

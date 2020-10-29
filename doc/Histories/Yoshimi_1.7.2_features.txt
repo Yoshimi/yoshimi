@@ -1,0 +1,41 @@
+V 1.7.2
+
+Once again this release is mostly small features and code improvements.
+
+The most noticable change is that in AddSynth, Voice, Subsynth and Padsynth the Amplitude panel is now shown as a panel, not just the background colour. It also has the controls re-arranged and an extra one.
+
+
+Random panning is now selected only by the dedicated 'Rand' button, not the pan position one. Once selected, the new width control becomes active and sets the left/right limits of randomness. Also, the original Pan control is still active, and sets the centre of this width. So, if you have a width of 50% and position of 25% left, the actual panning range will be from 75% left to 25% right.
+
+In order to maintain backwards compatibility as far as possible, there are new entries saved in instrument files so that older versions will be able to interpret random switching correctly, but will not see the width and position in random mode.
+
+
+When managing instruments in banks you can now set a config switch so that the last one you loaded or saved is highlighted as bold text. This is particularly useful where instruments have a different internal name to the filename, or no instrument name at all. There are quite a lot of these!
+
+
+There are three new options for LFO types based on randomised variations on a square wave. These don't seem to sound like LFOs at all and are probably of most interest to those making experimental music, or EDM etc.
+
+
+These controls have, of course been made accessible to the CLI. There have also been some small changes in the CLI commands to make them more consistent and easier to memorise.
+
+
+Some bit-rot has been cleaned out from our NRPN code, and there is now a quick reference list of all the CCs and NRPNs that Yoshimi recognises. Full details are of course in the Advanced User Guide.
+
+
+Some of the original text 'notes' in the doc directory have now been moved into the Histories directory and will no longer be updated. They were copied into the Advanced User Guide some time ago, expanded on and kept fully up-to-date there.
+
+
+We are still sorting out occasional bugs of course. It will be more worrying when we can't find any. It might mean they were hiding better!
+
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org
