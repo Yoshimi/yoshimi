@@ -755,7 +755,7 @@ class SUBnoteUI {: {public PresetsUI_}
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
-
+    frame->scroll_to(0, 0);
     frame->size(int(435 * dW), int(326 * dH));
     frame->scrollbar_size(12 * dScale);
     harmonics->size(int(435 * dW), int(275 * dH * 1.1));
