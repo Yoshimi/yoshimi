@@ -1,0 +1,15 @@
+V 1.7.3
+
+There are no new features at all in this release! It is a maintenance one, with a few bugfixes and quite a lot of code refinements, preparing for bigger things :)
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

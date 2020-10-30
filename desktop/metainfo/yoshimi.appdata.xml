@@ -18,7 +18,7 @@
     </p>
   </description>
   <releases>
-​    <release version="1.7.2" date="2020-08-17" />
+​    <release version="1.7.3" date="2020-10-29" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>
