@@ -530,15 +530,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window searchwin {
       label {Bank Search}
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         searchRtext();}
       xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       code0 {searchDW = o->w(); searchDH = o->h();}
       code1 {searchwin->size_range(searchDW, searchDH, 0, 0, 0, 0, 1);}
-      class YoshiWin
     } {
       Fl_Browser searchbrowse {
         callback {//
@@ -661,16 +655,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window bankuiwindow {
       label Root
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         bankRtext();}
       xywh {84 223 780 570} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
       code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
-      class YoshiWin
     } {
       Fl_Button bankroot {
         label Roots
@@ -851,17 +839,11 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window rootuiwindow {
       label {Bank Root Paths}
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         rootRtext();}
       xywh {88 54 465 295} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
       code2 {rootDW = o->w(); rootDH = o->h();}
       code3 {o->size_range(rootDW, rootDH, 0,0,0,0,1);}
-      class YoshiWin
     } {
       Fl_Browser rootsbrowse {
         callback {int tmp = o->value();
@@ -1486,9 +1468,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
   Function {wincheck()} {} {
     code {//
     if (instrumentSeen)
-    {
         instrumentRtext();
-    }} {}
+    if (searchSeen)
+        searchRtext();
+    if (bankSeen)
+        bankRtext();
+    if (rootSeen)
+        rootRtext();} {}
   }
   Function {instrumentRtext()} {} {
     code {//

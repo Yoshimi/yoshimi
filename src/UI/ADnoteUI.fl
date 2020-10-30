@@ -2015,11 +2015,6 @@ class ADnoteUI {: {public PresetsUI_}
     }
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        addRtext();}
       xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->size_range(535, 405, 0, 0, 0, 0, 1);}
@@ -2435,7 +2430,7 @@ else if (voiceTabs->value() == g8)
                 if (fromVoiceList)
                     ADnoteVoiceList->show();
                 else
-                    ADnoteGlobalParameters->show();
+                    ShowGlobal();
             }}
         tooltip {Right click: also reopen previous} xywh {650 575 90 25} box THIN_UP_BOX labelfont 1 labelsize 12
       }
@@ -2487,7 +2482,7 @@ else if (voiceTabs->value() == g8)
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), false, "AddSynth-list");
             listSeen = false;
             if (Fl::event_button() == 3)
-                ADnoteGlobalParameters->show();}
+                ShowGlobal();}
         tooltip {Right click: also reopen previous} xywh {582 235 62 20} labelfont 1 labelsize 12
       }
       Fl_Group {} {
@@ -2765,12 +2760,12 @@ switch (num)
     {
         ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     }
+    addRtext();
     globalSeen = true;} {}
   }
   Function {wincheck()} {} {
     code {//
     static int lastListW = 0;
-
     addRtext();
     addVoiceRtext();
 
@@ -2804,27 +2799,12 @@ switch (num)
 
     lastglobalW = ADnoteGlobalParameters->w();
 
-    //int W =  Fl::w();
-    //int H =  Fl::h();
     int w = ADnoteGlobalParameters->w();
-    int h = ADnoteGlobalParameters->h();
-
-    /*while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        ADnoteGlobalParameters->size(w, h);
-    };*/
+    //int h = ADnoteGlobalParameters->h();
 
     float defW = 535;
-    float defH = 405;
-    float dW = w / defW;
-    float dH =  h / defH;
-    float dScale;
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+
+    float dScale = w / defW;
     if (dScale < 0.2f)
         dScale = 0.2f;
 
