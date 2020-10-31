@@ -1273,17 +1273,10 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         if(freemodeeditwindow->x() > Fl::w() - 10 || freemodeeditwindow->y() > Fl::h() - 10)
             freemodeeditwindow->position(30, 30);
 
-        int W =  Fl::w();
-        int H =  Fl::h();
+        //int W =  Fl::w();
+        //int H =  Fl::h();
         int w = freemodeeditwindow->w();
         int h = freemodeeditwindow->h();
-        while (w > W || h > H)
-        {
-            w /= 2;
-            h /= 2;
-            freemodeeditwindow->size(w, h);
-        };
-        //std::cout << "here envefree" << std::endl;
         float defW = 575;
         float defH = 180;
         float dW = w / defW;

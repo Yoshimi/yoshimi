@@ -2768,7 +2768,7 @@ switch (num)
     code {//
     static int lastListW = 0;
     static int lastResuiW = 0;
-    
+
     addRtext();
     addVoiceRtext();
 

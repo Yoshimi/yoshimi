@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"
@@ -159,7 +159,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_}
+class SUBnoteUI {open : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
@@ -706,13 +706,17 @@ class SUBnoteUI {: {public PresetsUI_}
     else
         SUBparameters->position(fetchX, fetchY);} {}
   }
-  Function {subRtext()} {} {
+  Function {subRtext()} {open
+  } {
     code {//
     static int lastsubW = 0;
     ampenv->wincheck();
     bandwidthenvelopegroup->wincheck();
     filterenv->wincheck();
     freqenvelopegroup->wincheck();
+    
+    if (filterui->formantparswindow->visible())
+        filterui->formantRtext();
 
     if (!SUBparameters->visible())
         return;
@@ -834,7 +838,8 @@ class SUBnoteUI {: {public PresetsUI_}
     subPaste->labelsize(size11);
     subClose->labelsize(size11);
 
-    SUBparameters->redraw();} {}
+    SUBparameters->redraw();} {selected
+    }
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//

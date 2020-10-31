@@ -30,11 +30,11 @@ Completed
 
 
 In progress
+    Formant (in filters) - resize very unstable so disabled for now
 
 
 Not started
     About (in master)
-    Formant (in filters)
     Parameters
     Presets
     Midilearn
