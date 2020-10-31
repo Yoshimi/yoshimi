@@ -293,14 +293,9 @@ class ResonanceUI {: PresetsUI_
   Function {make_window()} {} {
     Fl_Window resonancewindow {
       label Resonance
-      callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              resonanceRtext();}
-      xywh {393 72 780 305} type Double hide resizable
+      xywh {235 45 780 305} type Double hide resizable
       code0 {resDW = o->w();resDH = o->h();}
-      class YoshiWin
+      code1 {resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group editor {
         xywh {0 0 777 305}
@@ -456,7 +451,9 @@ class ResonanceUI {: PresetsUI_
       Fl_Button resClose {
         label Close
         callback {//
+          saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), false, "Resonance " + to_string(engine));
           resonancewindow->hide();
+          resSeen = false;
           if ((Fl::event_button() == 3))
           {
               if (ADvsPAD)
@@ -576,9 +573,7 @@ class ResonanceUI {: PresetsUI_
   Function {~ResonanceUI()} {return_type virtual
   } {
     code {//
-
-            setVisible(synth, resonancewindow->visible(), "Resonance");
-            resonancewindow->hide();} {}
+            saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), resSeen, "Resonance " + to_string(engine));            resonancewindow->hide();} {}
   }
   Function {redrawPADnoteApply()} {} {
     code {if (cbwidget!=NULL) {
@@ -631,21 +626,20 @@ class ResonanceUI {: PresetsUI_
     if( fetchW == 0 || fetchH == 0)
         resonancewindow->position(fetchX, fetchY);
     else
-    {
         resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
-        resonanceRtext();
-    }
-    resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);} {}
+    resonanceRtext();} {}
   }
   Function {resonanceRtext()} {} {
     code {//
-        float dW =  resonancewindow->w() / resDW;
-        float dH =  resonancewindow->h() / resDH;
-        float dScale;
-        if (dW < dH)
-            dScale = dW;
-        else
-            dScale = dH;
+        if(resonancewindow->x() > Fl::w() - 10 || resonancewindow->y() > Fl::h() - 10)
+            resonancewindow->position(30, 30);
+        //float dW =  resonancewindow->w() / resDW;
+        //float dH =  resonancewindow->h() / resDH;
+        float dScale = resonancewindow->w() / resDW;
+        //if (dW < dH)
+        //    dScale = dW;
+        //else
+        //    dScale = dH;
         if (dScale < 0.2f)
             dScale = 0.2f;
 
@@ -678,8 +672,7 @@ class ResonanceUI {: PresetsUI_
         applybutton->labelsize(size12);
         resClose->labelsize(size12);
 
-        resonancewindow->redraw();
-        saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), true, "Resonance " + to_string(engine));} {}
+        resonancewindow->redraw();} {}
   }
   decl {Resonance *respar;} {public local
   }

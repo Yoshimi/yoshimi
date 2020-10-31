@@ -52,6 +52,7 @@
     #include <FL/Fl.H>
     #include <FL/Fl_Window.H>
     #include <FL/Fl_PNG_Image.H>
+    #include <FL/Fl_Tooltip.H>
     #include "Misc/Splash.h"
 #endif
 
@@ -139,6 +140,22 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
 
     Fl::lock();
+
+    /*printf("== SCREEN INFO ==\n");
+    int count = Fl::screen_count ();
+    printf("Screen count: %d\n", count);
+    float w, h;
+    for (int i = 0; i < count; i++)
+    {
+        Fl::screen_dpi(w, h, i);
+        printf("DPI (%d): %f, %f\n", i, w, h);
+    }
+    float refDPI = 102.453776;
+    int fontSize = (14 * w / refDPI);
+    printf("ORIG TT FONT SIZE: %d\n", Fl_Tooltip::size());
+
+    Fl_Tooltip::size(fontSize);
+    printf("New TT FONT SIZE: %d\n", fontSize);*/
 
     const int textHeight = 15;
     const int textY = 10;

@@ -1071,6 +1071,7 @@ class PADnoteUI {: {public PresetsUI_}
         callback {//
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "PadSynth");
         padSeen = false;
+        resui->resonancewindow->hide();
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
         {
@@ -1112,7 +1113,10 @@ class PADnoteUI {: {public PresetsUI_}
     freqenv->wincheck();
     filterenv->wincheck();
     if (!padnotewindow->visible())
+    {
+        resui->resonancewindow->hide();
         return;
+    }
 
     if(padnotewindow->x() > Fl::w() - 10 || padnotewindow->y() > Fl::h() - 10)
         padnotewindow->position(30, 30);
@@ -1623,8 +1627,7 @@ class PADnoteUI {: {public PresetsUI_}
     if (oscui)
         delete(oscui);
     delete(resui);
-    if (padSeen)
-        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padnotewindow->visible(), "PadSynth");
+    saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padSeen, "PadSynth");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }

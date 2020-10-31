@@ -2296,6 +2296,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
             saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "AddSynth");
             globalSeen = false;
+            resui->resonancewindow->hide();
             ADnoteGlobalParameters->hide();
             if (Fl::event_button() == 3)
             {
@@ -2704,6 +2705,7 @@ switch (num)
         if (voiceSeen)
             saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "AddSynth-voice");
         ADnoteVoice->hide();
+        resui->resonancewindow->hide();
         delete ADnoteVoiceList;
         delete ADnoteGlobalParameters;
         delete ADnoteVoice;
@@ -2766,6 +2768,7 @@ switch (num)
   Function {wincheck()} {} {
     code {//
     static int lastListW = 0;
+    static int lastResuiW = 0;
     addRtext();
     addVoiceRtext();
 
@@ -2774,6 +2777,13 @@ switch (num)
         addVoiceListRtext();
         lastListW = ADnoteVoiceList->w();
     }
+
+    if (resui->resonancewindow->visible() && lastResuiW != resui->resonancewindow->w())
+    {
+        resui->resonanceRtext();
+        lastResuiW = resui->resonancewindow->w();
+    }
+
 
     if (ampenv)
         ampenv->wincheck();
@@ -2789,7 +2799,10 @@ switch (num)
     filterenv->wincheck();
 
     if (!ADnoteGlobalParameters->visible())
+    {
+        resui->resonancewindow->hide();
         return;
+    }
 
     if(ADnoteGlobalParameters->x() > Fl::w() - 10 || ADnoteGlobalParameters->y() > Fl::h() - 10)
         ADnoteGlobalParameters->position(30, 30);
@@ -2809,11 +2822,12 @@ switch (num)
         dScale = 0.2f;
 
     amplfo->lfoRtext(dScale);
-    freqlfo->lfoRtext(dScale);
-    filterlfo->lfoRtext(dScale);
-
     ampenv->envRtext(dScale);
+
+    freqlfo->lfoRtext(dScale);
     freqenv->envRtext(dScale);
+
+    filterlfo->lfoRtext(dScale);
     filterenv->envRtext(dScale);
 
     filterui->filterRtext(dScale);

@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -2678,8 +2678,7 @@ Alan Calvert started the project}
      }
 
      partui->wincheck();
-     bankui->wincheck();} {selected
-    }
+     bankui->wincheck();} {}
   }
   Function {mainRtext()} {} {
     code {//
