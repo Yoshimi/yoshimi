@@ -5,6 +5,7 @@ Completed
     PadSynth
     Subsyth
     Addsynth
+        Global
         Voice
         Voice List
     Oscilgen
@@ -29,8 +30,6 @@ Completed
 
 
 In progress
-    Addsynth
-        Global - sometimes fails text resize
 
 
 Not started

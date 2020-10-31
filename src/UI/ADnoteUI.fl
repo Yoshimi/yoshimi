@@ -2762,13 +2762,13 @@ switch (num)
     {
         ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     }
-    addRtext();
     globalSeen = true;} {}
   }
   Function {wincheck()} {} {
     code {//
     static int lastListW = 0;
     static int lastResuiW = 0;
+    
     addRtext();
     addVoiceRtext();
 
@@ -2810,7 +2810,13 @@ switch (num)
     if (ADnoteGlobalParameters->w() == lastglobalW)
         return;
 
-    lastglobalW = ADnoteGlobalParameters->w();
+    if (lastglobalW < 3)
+    {
+       ++lastglobalW; // a hack
+       return; // can be called before completely redrawn
+    }
+    else
+        lastglobalW = ADnoteGlobalParameters->w();
 
     int w = ADnoteGlobalParameters->w();
     //int h = ADnoteGlobalParameters->h();
