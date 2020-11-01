@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of original ZynAddSubFX code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <stdlib.h>} {public local
@@ -318,14 +318,18 @@ class VirKeys {: {public Fl_Box}
   }
 }
 
-class VirKeyboard {} {
-  Function {make_window()} {} {
+class VirKeyboard {open
+} {
+  Function {make_window()} {open
+  } {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {//
       relaseallkeys();
-      virkeyboardwindow->hide();}
-      xywh {488 193 650 130} type Double hide
+      virkeyboardwindow->hide();} open
+      xywh {488 193 650 130} type Double resizable
+      code0 {virtDW = o->w(); virtDH = o->h();}
+      code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -387,7 +391,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         tooltip {Midi Octave} xywh {257 106 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->midioct);}
       }
-      Fl_Button {} {
+      Fl_Button virtClose {
         label Close
         callback {//
         relaseallkeys();
@@ -638,6 +642,19 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   Function {relaseallkeys()} {} {
     code {virkeys->relaseallkeys(0);} {}
   }
+  Function {virtRtext()} {open
+  } {
+    code {//
+    if(virkeyboardwindow->x() > Fl::w() - 10 || virkeyboardwindow->y() > Fl::h() - 10)
+        virkeyboardwindow->position(30, 30);
+    
+    float dScale = virkeyboardwindow->w() / float(virtDW);
+    
+    int size12 = int(12 * dScale);
+    
+    virtClose->labelsize(size12);} {selected
+    }
+  }
   decl {int midictl;} {private local
   }
   decl {int oldcontrol;} {private local
@@ -645,5 +662,9 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   decl {SynthEngine *synth;} {private local
   }
   decl {std::string keyboardlabel;} {private local
+  }
+  decl {int virtDW;} {private local
+  }
+  decl {int virtDH;} {private local
   }
 }

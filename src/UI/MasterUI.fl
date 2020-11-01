@@ -2574,9 +2574,15 @@ Alan Calvert started the project}
         bankui->rootuiwindow->hide();
 
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-virtualkeyboard");
-    virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
+    if (fetchW == 0 || fetchH == 0)
+        virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
+    else
+        virkeyboard->virkeyboardwindow->resize(fetchX, fetchY, fetchW, fetchH);
     if (fetchO)
+    {
         virkeyboard->virkeyboardwindow->show();
+        virkeyboard->virtRtext();
+    }
     else
         virkeyboard->virkeyboardwindow->hide();
 
@@ -2644,6 +2650,7 @@ Alan Calvert started the project}
     static int lastmsgW = 0;
     static int lastsyseffW = 0;
     static int lastscaleW = 0;
+    static int lastvirtW = 0;
     if (masterwindow->w() != lastmainW)
     {
         mainRtext();
@@ -2676,6 +2683,12 @@ Alan Calvert started the project}
          microtonalui->scaleRtext();
          lastscaleW = microtonalui->microtonaluiwindow->w();
      }
+
+     if (virkeyboard->virkeyboardwindow->visible() && lastvirtW != virkeyboard->virkeyboardwindow->w())
+     {
+         virkeyboard->virtRtext();
+         lastvirtW = virkeyboard->virkeyboardwindow->w();
+    }
 
      partui->wincheck();
      bankui->wincheck();} {}
