@@ -15,6 +15,7 @@ Completed
     Filters
     Microtonal
     Bank
+    Virkeyboard
     Part
         instrumenteditwindow
         instrumentkitlist
@@ -31,7 +32,6 @@ Completed
 
 In progress
     Formant (in filters) - resize very unstable so disabled for now
-    Virkeyboard
 
 
 Not started

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of original ZynAddSubFX code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <stdlib.h>} {public local
@@ -81,20 +81,24 @@ decl {const int keysoct1azerty[]={'a',233,'z','\\"','e','r','(','t','-','y',232,
 decl {const int keysoct2azerty[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {private local
 }
 
+decl {const int SIZE_WHITE = 14;} {private local
+}
+
+decl {const int SIZE_BLACK = 8;} {private local
+}
+
 class VirKeys {: {public Fl_Box}
 } {
   decl {static const int N_OCT = 6;} {private local
   }
-  decl {static const int SIZE_WHITE = 14;} {private local
-  }
-  decl {static const int SIZE_BLACK = 8;} {private local
-  }
   Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {} {}
   }
-  Function {init(SynthEngine *_synth)} {} {
+  Function {init(SynthEngine *_synth, float &scaledWhite, float &scaledBlack)} {} {
     code {//
     synth = _synth;
+    keyWhite = &scaledWhite;
+    keyBlack = &scaledBlack;
     for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
     pitchWh = 0;
@@ -122,11 +126,11 @@ class VirKeys {: {public Fl_Box}
         fl_line(ox, oy + ly, ox + lx, oy + ly);
         for (i = 0; i < N_OCT * 7 + 1; ++i)
         {
-            fl_line(ox + i * SIZE_WHITE, oy, ox + i * SIZE_WHITE, oy + ly);
+            fl_line(ox + i * (*keyWhite), oy, ox + i * (*keyWhite), oy + ly);
             int ik = i % 7;
             if (ik == 1 || ik == 2 || ik == 4 || ik == 5 || ik == 6)
-                fl_rectf(ox + i * SIZE_WHITE - SIZE_BLACK / 2, oy,
-                            SIZE_BLACK + 1, ly * 3 / 5);
+                fl_rectf(ox + i * (*keyWhite) - (*keyBlack) / 2, oy,
+                            (*keyBlack) + 1, ly * 3 / 5);
         }
     }
 
@@ -140,8 +144,8 @@ class VirKeys {: {public Fl_Box}
                 fl_color(250, 240, 230);
             else
                 fl_color(FL_BLUE);
-            fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE + 3, oy + ly * 3 / 5 + 2,
-                        SIZE_WHITE - 4, ly * 2 / 5 - 3);
+            fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) + 3, oy + ly * 3 / 5 + 2,
+                        (*keyWhite) - 4, ly * 2 / 5 - 3);
         }
         else
         {   // black keys
@@ -150,8 +154,8 @@ class VirKeys {: {public Fl_Box}
                 fl_color(FL_BLACK);
             else
                 fl_color(FL_BLUE);
-            fl_rectf(ox + (kv + 7 * noct) * SIZE_WHITE - SIZE_BLACK / 2 + 2, oy + 2,
-                        SIZE_BLACK - 3, ly * 3 / 5 - 5);
+            fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) - (*keyBlack) / 2 + 2, oy + 2,
+                        (*keyBlack) - 3, ly * 3 / 5 - 5);
         }
     }} {}
   }
@@ -160,7 +164,7 @@ class VirKeys {: {public Fl_Box}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
-  Function {handle(int event)} {return_type int
+  Function {handle(int event)} {open return_type int
   } {
     code {//
     int i;
@@ -175,7 +179,7 @@ class VirKeys {: {public Fl_Box}
 
         if (y_ > ly * 3 / 5)
         {   // white keys
-            int pos = x_ / SIZE_WHITE;
+            int pos = x_ / (*keyWhite);
             if (pos < 0)
                 return 1;
             for (i = 0; i < 12; ++i)
@@ -189,7 +193,7 @@ class VirKeys {: {public Fl_Box}
         }
         else
         {   // black keys
-            int pos = (x_ + SIZE_WHITE / 2) / SIZE_WHITE;
+            int pos = (x_ + (*keyWhite) / 2) / (*keyWhite);
             if (pos < 0)
                 return 1;
             for (i = 1; i < 12; ++i)
@@ -316,28 +320,30 @@ class VirKeys {: {public Fl_Box}
   }
   decl {SynthEngine *synth;} {private local
   }
+  decl {float *keyWhite;} {private local
+  }
+  decl {float *keyBlack;} {private local
+  }
 }
 
-class VirKeyboard {open
-} {
-  Function {make_window()} {open
-  } {
+class VirKeyboard {} {
+  Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {//
       relaseallkeys();
-      virkeyboardwindow->hide();} open
-      xywh {488 193 650 130} type Double resizable
+      virkeyboardwindow->hide();}
+      tooltip {+ Shift to hold or release keys} xywh {1085 88 650 130} type Double hide resizable
       code0 {virtDW = o->w(); virtDH = o->h();}
-      code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);} visible
+      code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Box virkeys {
         label Keyboard
-        xywh {32 10 590 80} box FLAT_BOX color 17
-        code0 {o->init(synth);}
+        xywh {32 10 587 80} box FLAT_BOX color 17
+        code0 {o->init(synth, scaledWhite, scaledBlack);}
         class VirKeys
       }
-      Fl_Counter {} {
+      Fl_Counter key {
         label {Key   }
         callback {//
         relaseallkeys();
@@ -349,11 +355,11 @@ class VirKeyboard {open
 q w e r  t y u ...} xywh {365 95 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct1);}
       }
-      Fl_Text_Display {} {
+      Fl_Text_Display oct1 {
         label Oct
         xywh {407 108 30 0} labelsize 10 textsize 10
       }
-      Fl_Counter {} {
+      Fl_Counter maps {
         label {Maps  }
         callback {//
         relaseallkeys();
@@ -365,11 +371,11 @@ q w e r  t y u ...} xywh {365 95 45 15} type Simple labelsize 10 align 4 when 6 
 z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct2);}
       }
-      Fl_Text_Display {} {
+      Fl_Text_Display oct2 {
         label Oct
         xywh {407 122 30 0} labelsize 10 textsize 10
       }
-      Fl_Value_Slider {} {
+      Fl_Value_Slider velocity {
         label Velocity
         callback {//
         if (Fl::event_button() == 3)
@@ -380,7 +386,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         code0 {o->value(virkeys->midivel);}
         class mwheel_val_slider_rev
       }
-      Fl_Counter {} {
+      Fl_Counter octave {
         label Octave
         callback {//
         relaseallkeys();
@@ -433,56 +439,56 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         xywh {524 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
         code0 {midictl = MIDI::CC::filterCutoff;o->value(7);}
       } {
-        MenuItem {} {
+        MenuItem cont1 {
           label {01: Mod.Wheel}
           xywh {0 0 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont2 {
           label {07: Volume}
           xywh {10 10 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont3 {
           label {10: Panning}
           xywh {20 20 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont4 {
           label {11: Expression}
           xywh {30 30 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont5 {
           label {64: Sustain}
           xywh {40 40 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont6 {
           label {65: Portamento}
           xywh {50 50 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont7 {
           label {71: Filter Q}
           xywh {60 60 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont8 {
           label {74: Filter Freq.}
           xywh {70 70 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont9 {
           label {75: Bandwidth}
           xywh {80 80 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont10 {
           label {76: FM Gain}
           xywh {90 90 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont11 {
           label {77: Res. c. freq}
           xywh {100 100 100 20} labelfont 1 labelsize 10
         }
-        MenuItem {} {
+        MenuItem cont12 {
           label {78: Res. bw.}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Dial {} {
+      Fl_Dial random {
         label Vrnd
         callback {//
         if (Fl::event_button() == 3)
@@ -502,7 +508,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         virkeys->midich = lrint(o->value()) - 1;
         controller->do_callback();
         virkeys->take_focus();}
-        xywh {45 106 36 17} labelsize 9 align 1 maximum 16 textsize 10
+        xywh {45 106 36 17} labelsize 10 align 1 maximum 16 textsize 10
         code0 {o->value(virkeys->midich + 1);}
       }
       Fl_Slider pitchwheel {
@@ -642,18 +648,47 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   Function {relaseallkeys()} {} {
     code {virkeys->relaseallkeys(0);} {}
   }
-  Function {virtRtext()} {open
-  } {
+  Function {virtRtext()} {} {
     code {//
     if(virkeyboardwindow->x() > Fl::w() - 10 || virkeyboardwindow->y() > Fl::h() - 10)
         virkeyboardwindow->position(30, 30);
-    
+
     float dScale = virkeyboardwindow->w() / float(virtDW);
-    
+
+    scaledWhite = SIZE_WHITE * dScale;
+    scaledBlack = SIZE_BLACK * dScale;
+    int size = int(10 * dScale);
     int size12 = int(12 * dScale);
-    
-    virtClose->labelsize(size12);} {selected
-    }
+
+    key->labelsize(size);
+        key->textsize(size);
+    oct1->labelsize(size);
+    maps->labelsize(size);
+        maps->textsize(size);
+    oct2->labelsize(size);
+    velocity->labelsize(size);
+        velocity->textsize(size);
+    octave->labelsize(size);
+        octave->textsize(size);
+    controller->labelsize(size);
+        cont1->labelsize(size);
+        cont2->labelsize(size);
+        cont3->labelsize(size);
+        cont4->labelsize(size);
+        cont5->labelsize(size);
+        cont6->labelsize(size);
+        cont7->labelsize(size);
+        cont8->labelsize(size);
+        cont9->labelsize(size);
+        cont10->labelsize(size);
+        cont11->labelsize(size);
+        cont12->labelsize(size);
+    random->labelsize(size);
+    midichannel->labelsize(size);
+        midichannel->textsize(size);
+    virtClose->labelsize(size12);
+
+    virkeyboardwindow->redraw();} {}
   }
   decl {int midictl;} {private local
   }
@@ -666,5 +701,9 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   decl {int virtDW;} {private local
   }
   decl {int virtDH;} {private local
+  }
+  decl {float scaledWhite;} {private local
+  }
+  decl {float scaledBlack;} {private local
   }
 }
