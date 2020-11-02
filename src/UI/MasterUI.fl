@@ -221,7 +221,6 @@ class MasterUI {open : {private GuiUpdates}
 
       int fetchW, fetchH, fetchX, fetchY, fetchO;
       loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
-      //masterwindow->size_range(mainDW, mainDH, 1680, 1050, 0, 0, 1);
       if (fetchW ==0 || fetchH == 0)
           masterwindow->position(fetchX, fetchY);
       else
@@ -2694,11 +2693,13 @@ Alan Calvert started the project}
         lastvirtW = virkeyboard->virkeyboardwindow->w();
     }
 
+    if (paramsui->Recent->visible())
+        paramsui->paramRtext();
+
      partui->wincheck();
      bankui->wincheck();} {}
   }
-  Function {mainRtext()} {open
-  } {
+  Function {mainRtext()} {} {
     code {//
     //int W =  Fl::w();
     //int H =  Fl::h();

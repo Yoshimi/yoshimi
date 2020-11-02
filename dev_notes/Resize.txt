@@ -47,6 +47,7 @@ Completed
         message window
         mixer window
         sys/ins window
+        parameters
 
 
 In progress
@@ -55,6 +56,5 @@ In progress
 
 Not started
     About (in master)
-    Parameters
     Presets
 

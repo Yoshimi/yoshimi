@@ -41,7 +41,9 @@ class ParametersUI {} {
     Fl_Window Recent {
       label {Recent Parameters}
       callback {o->hide()}
-      xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide
+      xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide resizable
+      code0 {paramDW = o->w(); paramDH = o->h();}
+      code1 {o->size_range(paramDW, paramDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Browser BrowseRecent {
         callback {//
@@ -86,7 +88,9 @@ class ParametersUI {} {
       }
       Fl_Button CloseRecent {
         label Close
-        callback {Recent->hide()}
+        callback {
+            saveWin(synth, Recent->w(), Recent->h(), Recent->x(), Recent->y(), false, "Master-recent");
+            Recent->hide();}
         xywh {83 159 57 20} labelfont 13 labelsize 12
       }
     }
@@ -146,6 +150,10 @@ class ParametersUI {} {
     }
 
     BrowseRecent->set_changed();
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-recent");
+    if (fetchW != 0 && fetchH != 0)
+        Recent->size(fetchW, fetchH);
     Recent->show();
     Loading->hide();
     CloseRecent->show();} {}
@@ -156,10 +164,32 @@ class ParametersUI {} {
   }
   Function {~ParametersUI()} {} {
     code {//
+    saveWin(synth, Recent->w(), Recent->h(), Recent->x(), Recent->y(), Recent->visible(), "Master-recent");
     Recent->hide();} {}
+  }
+  Function {paramRtext()} {} {
+    code {//
+    static int lastParamW = 0;
+    if (lastParamW == Recent->w())
+        return;
+    lastParamW = Recent->w();
+
+    float dScale = Recent->w() / float(paramDW);
+
+    int size12 = int(12 * dScale);
+
+    BrowseRecent->textsize(size12);
+    Loading->labelsize(size12);
+    CloseRecent->labelsize(size12);
+
+    Recent->redraw();} {}
   }
   decl {SynthEngine *synth;} {private local
   }
   decl {int H_type;} {private local
+  }
+  decl {int paramDW;} {private local
+  }
+  decl {int paramDH;} {private local
   }
 }
