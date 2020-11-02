@@ -387,7 +387,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         case TOPLEVEL::section::vector:
             value = indirectVector(getData, synth, newMsg, guiTo, text);
             break;
-
+        case TOPLEVEL::section::midiLearn:
+            if (control == MIDILEARN::control::findSize)
+                value = synth->midilearn.findSize();
+            // very naughty! should do better
+            break;
         case TOPLEVEL::section::midiIn: // program / bank / root
             value = indirectMidi(getData, synth, newMsg, guiTo, text);
             break;

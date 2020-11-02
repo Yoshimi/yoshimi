@@ -2676,18 +2676,21 @@ Alan Calvert started the project}
         syseffRtext();
         lastsyseffW = syseffsendwindow->w();
         syseffSeen = true;
-     }
+    }
 
-     if (microtonalui->microtonaluiwindow->visible() && lastscaleW != microtonalui->microtonaluiwindow->w())
-     {
-         microtonalui->scaleRtext();
-         lastscaleW = microtonalui->microtonaluiwindow->w();
-     }
+    if (microtonalui->microtonaluiwindow->visible() && lastscaleW != microtonalui->microtonaluiwindow->w())
+    {
+        microtonalui->scaleRtext();
+        lastscaleW = microtonalui->microtonaluiwindow->w();
+    }
 
-     if (virkeyboard->virkeyboardwindow->visible() && lastvirtW != virkeyboard->virkeyboardwindow->w())
-     {
-         virkeyboard->virtRtext();
-         lastvirtW = virkeyboard->virkeyboardwindow->w();
+    if (midilearnui->midilearnwindow->visible())
+        midilearnui->learnRtext();
+
+    if (virkeyboard->virkeyboardwindow->visible() && lastvirtW != virkeyboard->virkeyboardwindow->w())
+    {
+        virkeyboard->virtRtext();
+        lastvirtW = virkeyboard->virkeyboardwindow->w();
     }
 
      partui->wincheck();

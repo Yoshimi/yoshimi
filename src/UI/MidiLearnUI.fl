@@ -96,71 +96,71 @@ class MidiLearnKitItem {: {public Fl_Group}
           callback {send_data(0, 48);}
           tooltip {Incoming channel} xywh {137 0 39 15} down_box BORDER_BOX selection_color 49 labelsize 12 textsize 12
         } {
-          MenuItem {} {
+          MenuItem chan1 {
             label 1
             xywh {0 0 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan2 {
             label 2
             xywh {10 10 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan3 {
             label 3
             xywh {20 20 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan4 {
             label 4
             xywh {30 30 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan5 {
             label 5
             xywh {40 40 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan6 {
             label 6
             xywh {50 50 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan7 {
             label 7
             xywh {60 60 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan8 {
             label 8
             xywh {70 70 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan9 {
             label 9
             xywh {80 80 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan10 {
             label 10
             xywh {90 90 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan11 {
             label 11
             xywh {100 100 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan12 {
             label 12
             xywh {110 110 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan13 {
             label 13
             xywh {120 120 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan14 {
             label 14
             xywh {130 130 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan15 {
             label 15
             xywh {140 140 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chan16 {
             label 16
             xywh {150 150 26 15} labelsize 11
           }
-          MenuItem {} {
+          MenuItem chanAll {
             label All
             xywh {160 160 26 15} labelsize 11
           }
@@ -214,7 +214,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         else
             midilearnkititemgroup->activate();
         send_data(0, MIDILEARN::control::mute);}
-        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
@@ -291,6 +291,48 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
   decl {unsigned char stat;} {public local
   }
+  Function {kitRscale(float dScale, int line)} {} {
+    code {//
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+    int size14 = int(14 * dScale);
+
+    chan1->labelsize(size11);
+    chan2->labelsize(size11);
+    chan3->labelsize(size11);
+    chan4->labelsize(size11);
+    chan5->labelsize(size11);
+    chan6->labelsize(size11);
+    chan7->labelsize(size11);
+    chan8->labelsize(size11);
+    chan9->labelsize(size11);
+    chan10->labelsize(size11);
+    chan11->labelsize(size11);
+    chan12->labelsize(size11);
+    chan13->labelsize(size11);
+    chan14->labelsize(size11);
+    chan15->labelsize(size11);
+    chan16->labelsize(size11);
+    chanAll->labelsize(size11);
+
+    CCcounter->labelsize(size12);
+        CCcounter->textsize(size12);
+    nrpn->labelsize(size12);
+    sevenbit->labelsize(size14);
+    channelchoice->labelsize(size12);
+        channelchoice->textsize(size12);
+    compresscheck->labelsize(size14);
+    blockcheck->labelsize(size14);
+    activity->labelsize(size14);
+    minval->labelsize(size12);
+        minval->textsize(size12);
+    maxval->labelsize(size12);
+        maxval->textsize(size12);
+    mutecheck->labelsize(size12);
+    commandName->labelsize(int(10 * dScale));
+
+     midilearnkititem->redraw();} {}
+  }
 }
 
 class MidiLearnUI {} {
@@ -299,8 +341,10 @@ class MidiLearnUI {} {
       label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide resizable
       code0 {send_data(TOPLEVEL::action::lowPrio, MIDILEARN::control::sendRefreshRequest, 0, 3);}
+      code1 {learnDW = o->w(); learnDH = o->h();}
+      code2 {o->size_range(learnDW, learnDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
@@ -311,39 +355,39 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label {No Entries}
         xywh {290 131 206 44} labelsize 32
       }
-      Fl_Box {} {
+      Fl_Box mutebox {
         label Mute
         xywh {18 0 41 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box ccbox {
         label CC
         xywh {80 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box chanbox {
         label Chan
         xywh {139 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box blockbox {
         label Block
         xywh {355 0 50 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box limitbox {
         label Limit
         xywh {310 0 48 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box controlbox {
         label {Control Function}
         xywh {530 0 130 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box minbox {
         label {Min %}
         xywh {200 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Box {} {
+      Fl_Box maxbox {
         label {Max %}
         xywh {263 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Button {} {
+      Fl_Button close {
         label Close
         callback {midilearnwindow->hide();}
         xywh {730 262 63 20} box THIN_UP_BOX
@@ -517,6 +561,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
     if (status & 4)
         midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
+    learnW = 0;
     midilearnwindow->redraw();} {}
   }
   Function {MidiLearnUI(SynthEngine *_synth)} {} {
@@ -526,7 +571,8 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         midilearnkititem[i] = NULL;
     make_window();
     setWindowTitle();
-    num = 0;} {}
+    num = 0;
+    learnW = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
     code {saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), midilearnwindow->visible(), "Midi-learn");
@@ -559,6 +605,48 @@ delete midilearnwindow;} {}
         name = " - " + name;
     midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
   }
+  Function {learnRtext()} {} {
+    code {//
+    if (learnW == midilearnwindow->w())
+        return;
+    learnW = midilearnwindow->w();
+    if(midilearnwindow->x() > Fl::w() - 10 || midilearnwindow->y() > Fl::h() - 10)
+        midilearnwindow->position(30, 30);
+
+    float dScale = midilearnwindow->w() / float(learnDW);
+
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+
+    close->labelsize(size12);
+    load->labelsize(size12);
+    save->labelsize(size12);
+    clear->labelsize(size12);
+    recent->labelsize(size12);
+
+    mutebox->labelsize(size11);
+    ccbox->labelsize(size11);
+    chanbox->labelsize(size11);
+    blockbox->labelsize(size11);
+    limitbox->labelsize(size11);
+    controlbox->labelsize(size11);
+    minbox->labelsize(size11);
+    maxbox->labelsize(size11);
+
+    none->labelsize(int(32 * dScale));
+    int count = collect_readData(synth, 0, MIDILEARN::control::findSize, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED,TOPLEVEL::action::lowPrio);
+    if (count > 0)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            midilearnkititem[i]->kitRscale(dScale, i);
+            midilearnkititem[i]->resize(2 * dScale, (21 + i * 20) * dScale, 818 * dScale, 20 * dScale);
+
+        }
+    }
+    //kitlist->redraw();
+    midilearnwindow->redraw();} {}
+  }
   decl {int lastkititem;} {public local
   }
   decl {SynthEngine *synth;} {private local
@@ -566,5 +654,11 @@ delete midilearnwindow;} {}
   decl {MidiLearnKitItem *midilearnkititem[MIDI_LEARN_BLOCK];} {private local
   }
   decl {int num;} {private local
+  }
+  decl {int learnDW;} {private local
+  }
+  decl {int learnDH;} {private local
+  }
+  decl {int learnW;} {private local
   }
 }

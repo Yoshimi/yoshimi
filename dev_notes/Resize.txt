@@ -14,6 +14,7 @@ If it is visible, and it's size has changed it will then perform the actual text
 
 Usually only one window at a time will be changing, so apart from the tests made on the way, there is little extra work.
 
+Currently no FLTK alert windows resize. We will be replacing them with our own code.
 
 Completed
     Console
@@ -32,6 +33,7 @@ Completed
     Filters
     Microtonal
     Bank
+    Midilearn
     Virkeyboard
     Part
         instrumenteditwindow
@@ -55,5 +57,4 @@ Not started
     About (in master)
     Parameters
     Presets
-    Midilearn
 
