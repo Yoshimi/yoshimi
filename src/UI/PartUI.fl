@@ -863,7 +863,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {330 188 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
-      code2 {editDW = o->w(); editDH = o->h();}
+      code2 {editDW = 395; editDH = 385;}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -3078,7 +3078,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {groupRtext(float dScale)} {} {
     code {//
-    partgroup->size(380 * dScale, 170 * dScale);
+    partgroup->resize(3 * dScale, 255 * dScale, 380 * dScale, 170 * dScale);
     partgroupui->size(378 * dScale, 168 * dScale);
 
     /* The above have to be numerically fixed as the relative size

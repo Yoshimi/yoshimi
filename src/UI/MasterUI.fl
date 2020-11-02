@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {selected : {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -221,7 +221,7 @@ class MasterUI {selected : {private GuiUpdates}
 
       int fetchW, fetchH, fetchX, fetchY, fetchO;
       loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
-      masterwindow->size_range(mainDW, mainDH, 1680, 1050, 0, 0, 1);
+      //masterwindow->size_range(mainDW, mainDH, 1680, 1050, 0, 0, 1);
       if (fetchW ==0 || fetchH == 0)
           masterwindow->position(fetchX, fetchY);
       else
@@ -268,7 +268,8 @@ class MasterUI {selected : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -307,7 +308,8 @@ class MasterUI {selected : {private GuiUpdates}
                 synth->guiClosed(true);
             }}
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
-      code0 {mainDW = o->w(); mainDH = o->h();} xclass Yoshimi
+      code0 {mainDW = 385; mainDH = 470;}
+      code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -2642,8 +2644,7 @@ Alan Calvert started the project}
     code {//
             read_updates(synth);} {}
   }
-  Function {wincheck()} {open
-  } {
+  Function {wincheck()} {} {
     code {//
     static int lastmainW = 0;
     static int lastpanelW = 0;
@@ -2696,7 +2697,8 @@ Alan Calvert started the project}
      partui->wincheck();
      bankui->wincheck();} {}
   }
-  Function {mainRtext()} {} {
+  Function {mainRtext()} {open
+  } {
     code {//
     //int W =  Fl::w();
     //int H =  Fl::h();
