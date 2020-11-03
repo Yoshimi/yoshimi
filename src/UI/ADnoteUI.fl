@@ -2331,7 +2331,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       xywh {594 95 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
-      code1 {o->size_range(760, 610, 0, 0, 0, 0, 1);}
+      code1 {o->size_range(760 * 9 / 10, 610 * 9 / 10, 0, 0, 0, 0, 1);}
     } {
       Fl_Group advoice {
         xywh {0 0 764 615} box BORDER_BOX

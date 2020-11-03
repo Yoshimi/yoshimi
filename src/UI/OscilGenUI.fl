@@ -445,14 +445,15 @@ class Oscilharmonic {: {public Fl_Group}
 
 class OscilEditor {: {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       xywh {4 48 735 595} type Double hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w(); waveDH = o->h();}
-      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
+      code3 {o->size_range(waveDW * 9 / 10, waveDH * 9 / 10, 0, 0, 0, 0, 1);}
     } {
       Fl_Button applybutton {
         label Apply

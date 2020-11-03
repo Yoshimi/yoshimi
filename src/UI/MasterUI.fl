@@ -1935,7 +1935,7 @@ Alan Calvert started the project}
         else if (type == 2)
         {
             panelwindow->size(PANEL_DUAL_X, PANEL_DUAL_Y);
-            panelwindow->size_range((PANEL_DUAL_X * 9) / 10, (PANEL_DUAL_Y * 9) / 10, 0, 0, 0, 0, 1);
+            panelwindow->size_range((PANEL_DUAL_X * 4) / 5, (PANEL_DUAL_Y * 4) / 5, 0, 0, 0, 0, 1);
             towide->show();
             todeep->hide();
         }
