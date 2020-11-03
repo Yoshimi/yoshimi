@@ -61,8 +61,7 @@ class PresetsUI_ {} {
   } {
     code {;} {}
   }
-  Function {~PresetsUI_()} {open
-  } {
+  Function {~PresetsUI_()} {} {
     code {;} {}
   }
 }
@@ -72,7 +71,8 @@ class PresetsUI {} {
     code {//
     synth = _synth;
     p = NULL;
-    make_window();} {}
+    make_window();
+    presetsDW = 265; // shared between both} {}
   }
   Function {~PresetsUI()} {} {
     code {//
@@ -84,7 +84,10 @@ class PresetsUI {} {
   Function {make_window()} {} {
     Fl_Window copywin {
       label {Copy to Clipboard/Preset}
-      xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide modal
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"PresetWin");
+o->hide();}
+      xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
+      code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser copybrowse {
         callback {int val = o->value();
@@ -116,13 +119,14 @@ class PresetsUI {} {
         copywin->hide();}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
-      Fl_Button {} {
+      Fl_Button copycancel {
         label Cancel
         callback {//
-        copywin->hide();}
+        copywin->hide();
+        saveWin(synth, copywin->w(), copywin->h(), copywin->x(), copywin->y(), false,"PresetWin");}
         xywh {160 385 80 35} box THIN_UP_BOX align 192
       }
-      Fl_Box {} {
+      Fl_Box copytype {
         label {Type:}
         xywh {10 5 40 15} labelsize 11 align 20
       }
@@ -149,7 +153,10 @@ class PresetsUI {} {
     }
     Fl_Window pastewin {
       label {Paste from Clipboard/Preset}
-      xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide modal
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"PresetWin");
+o->hide();}
+      xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
+      code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser pastebrowse {
         callback {//
@@ -204,16 +211,17 @@ class PresetsUI {} {
             synth->audioOut.store(muteState::Complete);}
         xywh {25 385 90 35} box THIN_UP_BOX align 192
       }
-      Fl_Button {} {
+      Fl_Button pastecancel {
         label Cancel
         callback {//
-        pastewin->hide();}
+        pastewin->hide();
+        saveWin(synth, pastewin->w(), pastewin->h(), pastewin->x(), pastewin->y(), false,"PresetWin");}
         xywh {160 385 80 35} box THIN_UP_BOX align 192
       }
       Fl_Box pastetypetext {
         xywh {55 5 200 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 align 20
       }
-      Fl_Box {} {
+      Fl_Box pastetype {
         label {Type:}
         xywh {15 5 40 15} labelsize 11 align 20
       }
@@ -290,15 +298,76 @@ class PresetsUI {} {
             break;
         copybrowse->add(name.c_str());
         pastebrowse->add(name.c_str());
-    }} {}
+    }
+    int  W, H, X, Y, O;
+    loadWin(synth, W, H, X, Y, O, "PresetWin");
+    copywin->resize(X, Y, W, H);
+    pastewin->resize(X, Y, W, H);
+    presetsRtext();} {}
   }
   Function {Hide()} {} {
     code {copywin->hide();} {}
+  }
+  Function {presetsRtext()} {} {
+    code {//
+    static int copyW = 0;
+    static int pasteW = 0;
+
+    if (copywin->visible())
+    {
+        if (copyW != copywin->w())
+        {
+            copyW = copywin->w();
+            pasteW = 0;
+
+            float dScale = copywin->w() / float(presetsDW);
+
+            int size14 = int(14 * dScale);
+            int size11 = int(11 * dScale);
+
+            copybrowse->textsize(size14);
+            copypbutton->labelsize(size14);
+            copybutton->labelsize(size14);
+            copycancel->labelsize(size14);
+            presetname->textsize(size14);
+            copytype->labelsize(size11);
+            copytypetext->labelsize(size11);
+
+            copywin->redraw();
+        }
+    }
+    else if (pastewin->visible())
+    {
+        if (pasteW != pastewin->w())
+        {
+            pasteW = pastewin->w();
+            copyW = 0;
+
+            float dScale = pastewin->w() / float(presetsDW);
+
+            int size14 = int(14 * dScale);
+            int size11 = int(11 * dScale);
+
+            pastebrowse->textsize(size14);
+            pastepbutton->labelsize(size14);
+            pastebutton->labelsize(size14);
+            pastecancel->labelsize(size14);
+            deletepbutton->labelsize(size14);
+            pastetype->labelsize(size11);
+            pastetypetext->labelsize(size11);
+
+            pastewin->redraw();
+
+
+        }
+    }} {}
   }
   decl {Presets *p;} {public local
   }
   decl {PresetsUI_ *pui;} {public local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int presetsDW;} {private local
   }
 }

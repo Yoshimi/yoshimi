@@ -35,6 +35,7 @@ Completed
     Bank
     Midilearn
     Virkeyboard
+    Presets
     Part
         instrumenteditwindow
         instrumentkitlist
@@ -56,5 +57,3 @@ In progress
 
 Not started
     About (in master)
-    Presets
-

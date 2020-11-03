@@ -2663,7 +2663,6 @@ Alan Calvert started the project}
         lastpanelW = panelwindow->w();
     }
 
-
     if (message->visible() && message->w() != lastmsgW)
     {
         msgRtext();
@@ -2695,6 +2694,8 @@ Alan Calvert started the project}
 
     if (paramsui->Recent->visible())
         paramsui->paramRtext();
+
+    presetsui->presetsRtext();
 
      partui->wincheck();
      bankui->wincheck();} {}
