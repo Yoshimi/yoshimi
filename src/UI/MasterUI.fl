@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -2654,7 +2654,10 @@ Alan Calvert started the project}
     if (masterwindow->w() != lastmainW)
     {
         mainRtext();
-        lastmainW = masterwindow->w();
+        if (lastmainW < 3)
+            ++lastmainW;
+        else
+            lastmainW = masterwindow->w();
     }
 
     if (panelwindow->visible() && panelwindow->w() != lastpanelW)
@@ -2698,7 +2701,8 @@ Alan Calvert started the project}
     presetsui->presetsRtext();
 
      partui->wincheck();
-     bankui->wincheck();} {}
+     bankui->wincheck();} {selected
+    }
   }
   Function {mainRtext()} {} {
     code {//

@@ -3123,7 +3123,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     setmin->labelsize(size);
     setnorm->labelsize(size11);
     setmax->labelsize(size);
-    partGroupEnable->labelsize(size11);} {}
+    partGroupEnable->labelsize(size11);
+    
+    partgroup->redraw();} {}
   }
   Function {~PartUI()} {} {
     code {//

@@ -2294,7 +2294,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button globalclose {
         label Close
         callback {//
-            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "AddSynth");
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  false, "AddSynth");
             globalSeen = false;
             resui->resonancewindow->hide();
             ADnoteGlobalParameters->hide();
@@ -2807,19 +2807,18 @@ switch (num)
     if(ADnoteGlobalParameters->x() > Fl::w() - 10 || ADnoteGlobalParameters->y() > Fl::h() - 10)
         ADnoteGlobalParameters->position(30, 30);
 
-    if (ADnoteGlobalParameters->w() == lastglobalW)
-        return;
 
     if (lastglobalW < 3)
     {
        ++lastglobalW; // a hack
        return; // can be called before completely redrawn
     }
-    else
-        lastglobalW = ADnoteGlobalParameters->w();
+
+    if (lastglobalW == ADnoteGlobalParameters->w())
+        return;
+    lastglobalW = ADnoteGlobalParameters->w();
 
     int w = ADnoteGlobalParameters->w();
-    //int h = ADnoteGlobalParameters->h();
 
     float defW = 535;
 
