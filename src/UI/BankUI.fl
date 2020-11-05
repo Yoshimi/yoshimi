@@ -1133,10 +1133,16 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Bank-instrument");
-    if (W == 0 || H == 0)
+    if (W < instDW || H < instDH)
+    {
+        W = instDW;
+        H = instDH;
         instrumentuiwindow->size(X, Y);
+
+    }
     else
         instrumentuiwindow->resize(X, Y, W, H);
+    lastinstrumentW = 0;
     instrumentuiwindow->show();
     instrumentSeen = true;} {}
   }
@@ -1195,6 +1201,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rescan_for_banks();
     unsearched = true;
     searchType->value(1);
+    lastinstrumentW = 0;
     /*if (synth->getRuntime().checksynthengines)
         B_search->activate();
     else
@@ -1478,8 +1485,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {instrumentRtext()} {} {
     code {//
-    static int lastinstrumentW = 0;
-
     if(instrumentuiwindow->x() > Fl::w() - 10 || instrumentuiwindow->y() > Fl::h() - 10)
         instrumentuiwindow->position(30, 30);
 
@@ -1911,6 +1916,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
   decl {int instDW;} {private local
   }
   decl {int instDH;} {private local
+  }
+  decl {int lastinstrumentW;} {private local
   }
   decl {bool instrumentSeen;} {private local
   }
