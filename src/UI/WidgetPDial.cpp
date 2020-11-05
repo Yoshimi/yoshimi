@@ -212,13 +212,16 @@ void WidgetPDial::draw()
     cairo_arc(cr,0,0,d*rCint,0,2*M_PI);
     cairo_fill(cr);
     //drawing the "light" circle:
+    int linewidth = int(2.0f * sx / 30);
+    if (linewidth < 2)
+        linewidth = 2;
     if (active_r())
     {
         cairo_set_source_rgb(cr,0,197.0/255,245.0/255); //light blue
     } else {
         cairo_set_source_rgb(cr,0.6,0.7,0.8);
     }
-    cairo_set_line_width (cr, 2);
+    cairo_set_line_width (cr, linewidth);
     cairo_new_sub_path(cr);
     cairo_arc(cr,0,0,d*rGear,0.75*M_PI,+val*1.5*M_PI+0.75*M_PI);
     cairo_stroke(cr);
@@ -230,7 +233,7 @@ void WidgetPDial::draw()
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);
     }
     cairo_rotate(cr,val*3/2*M_PI+0.25*M_PI);
-    cairo_set_line_width (cr, 2.3);
+    cairo_set_line_width (cr, linewidth);
     cairo_move_to(cr,0,0);
     cairo_line_to(cr,0,d*rHand);
     cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
