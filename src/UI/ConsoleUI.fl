@@ -64,14 +64,12 @@ class ConsoleUI {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {//
-     if (Fl::event() == FL_CLOSE)
+         saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"System-log");
          o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-        consoleRtext();}
+     }
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
       code0 {logDW = o->w();logDH = o->h();}
       code1 {o->size_range(logDW,logDH);}
-      class YoshiWin
     } {
       Fl_Text_Display logText {
         xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35 resizable
@@ -137,10 +135,12 @@ class ConsoleUI {} {
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "System-log");
 
-    if (fetchW > 0 && fetchH > 0)
-        logConsole->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        logConsole->position(fetchX, fetchY);
+    if (fetchW < logDW || fetchH < logDH)
+    {
+        fetchW = logDW;
+        fetchH = logDH;
+    }
+    logConsole->resize(fetchX, fetchY, fetchW, fetchH);
     logConsole->show();} {}
   }
   decl {float logDW;} {private local
