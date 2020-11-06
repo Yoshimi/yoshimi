@@ -1312,8 +1312,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         int W = this->w();
         int H = this->h();
 
-        dScale = H / 70.0f;
-
         int size = int(dScale * 10);
 
 

@@ -2022,7 +2022,7 @@ class ADnoteUI {: {public PresetsUI_}
     o->hide();}
       xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
-      code1 {addDW = 535; addDH = 485;}
+      code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group globalfreq {
@@ -2827,17 +2827,15 @@ switch (num)
 
     if (lastglobalW < 3)
     {
-       ++lastglobalW; // a hack
-       return; // can be called before completely redrawn
+       ++lastglobalW;
+       return; // in case it is  called before completely redrawn
     }
 
     if (lastglobalW == ADnoteGlobalParameters->w())
         return;
     lastglobalW = ADnoteGlobalParameters->w();
 
-    int w = ADnoteGlobalParameters->w();
-
-    float dScale = w / float(addDW);
+    float dScale = ADnoteGlobalParameters->w() / float(addDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -2936,8 +2934,7 @@ switch (num)
 
    ADnoteVoice->redraw();} {}
   }
-  Function {addVoiceListRtext()} {open
-  } {
+  Function {addVoiceListRtext()} {} {
     code {//
     static int lastlistW = 0;
 
