@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -241,13 +241,14 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {: {public PresetsUI_}
+class PADnoteUI {open : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be after panwidth} {in_source in_header
     }
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
+      callback {padClose->do_callback();}
       xywh {515 162 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
@@ -1089,15 +1090,18 @@ class PADnoteUI {: {public PresetsUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "PadSynth");
     padnotewindow->show();
+    lastpadW = 0;
     padSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        padnotewindow->position(fetchX, fetchY);} {}
+    if (fetchW < padDW || fetchH < padDH)
+    {
+        fetchW = padDW;
+        fetchH = padDH;
+    }
+    
+    padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);} {}
   }
   Function {padRtext()} {} {
     code {//
-    static int lastpadW = 0;
     if (oscui)
     {
         if(oscui->osceditUI->x() > Fl::w() - 10 || oscui->osceditUI->y() > Fl::h() - 10)
@@ -1126,24 +1130,7 @@ class PADnoteUI {: {public PresetsUI_}
 
     lastpadW = padnotewindow->w();
 
-    //int W =  Fl::w();
-    //int H =  Fl::h();
-    int w = padnotewindow->w();
-    int h = padnotewindow->h();
-    /*while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        padnotewindow->size(w, h);
-    };*/
-
-    float dW =  w / padDW;
-    float dH =  h / padDH;
-    float dScale;
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    float dScale = padnotewindow->w() / float(padDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -1617,6 +1604,7 @@ class PADnoteUI {: {public PresetsUI_}
     kititem = kititem_;
     padSeen = false;
     lastWaveW = 0;
+    lastpadW = 0;
     oscui = NULL;
     resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
     make_window();} {}
@@ -1648,6 +1636,8 @@ class PADnoteUI {: {public PresetsUI_}
   decl {float padDW;} {private local
   }
   decl {float padDH;} {private local
+  }
+  decl {int lastpadW;} {selected private local
   }
   decl {bool padSeen;} {private local
   }

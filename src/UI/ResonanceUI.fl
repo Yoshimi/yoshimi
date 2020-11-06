@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>} {public local
@@ -288,11 +288,12 @@ class ResonanceGraph {: {public Fl_Box}
   }
 }
 
-class ResonanceUI {: PresetsUI_
+class ResonanceUI {selected : PresetsUI_
 } {
   Function {make_window()} {} {
     Fl_Window resonancewindow {
       label Resonance
+      callback {resClose->do_callback();}
       xywh {235 45 780 305} type Double hide resizable
       code0 {resDW = o->w();resDH = o->h();}
       code1 {resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);}
@@ -623,23 +624,21 @@ class ResonanceUI {: PresetsUI_
     resonancewindow->show();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Resonance " + to_string(engine));
-    if( fetchW == 0 || fetchH == 0)
-        resonancewindow->position(fetchX, fetchY);
-    else
-        resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
+    if(fetchW < resDW || fetchH < resDH)
+    {
+        fetchW = resDW;
+        fetchH = resDH;
+    }
+    resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
     resonanceRtext();} {}
   }
   Function {resonanceRtext()} {} {
     code {//
         if(resonancewindow->x() > Fl::w() - 10 || resonancewindow->y() > Fl::h() - 10)
             resonancewindow->position(30, 30);
-        //float dW =  resonancewindow->w() / resDW;
-        //float dH =  resonancewindow->h() / resDH;
+
         float dScale = resonancewindow->w() / resDW;
-        //if (dW < dH)
-        //    dScale = dW;
-        //else
-        //    dScale = dH;
+
         if (dScale < 0.2f)
             dScale = 0.2f;
 

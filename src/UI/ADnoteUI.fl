@@ -2260,19 +2260,16 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
             int fetchW, fetchH, fetchX, fetchY, fetchO;
+            lastlistW = 0;
             ADnoteVoiceList->show();
-            if (!listSeen)
+            loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
+            if (fetchW < listDW || fetchH < listDH)
             {
-                loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
-                if (fetchW < listDW || fetchH < listDH)
-                {
-                    fetchW = listDW;
-                    fetchH = listDH;
-                }
-                ADnoteVoiceList->resize(fetchX, fetchY,fetchW, fetchH);
-                addVoiceListRtext();
-                listSeen = true;
+                fetchW = listDW;
+                fetchH = listDH;
             }
+            ADnoteVoiceList->resize(fetchX, fetchY,fetchW, fetchH);
+
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
         tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12
@@ -2497,7 +2494,7 @@ o->hide();}
         callback {//
             ADnoteVoiceList->hide();
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), false, "AddSynth-list");
-            listSeen = false;
+
             if (Fl::event_button() == 3)
                 ShowGlobal();}
         tooltip {Right click: also reopen previous} xywh {582 235 62 20} labelfont 1 labelsize 12
@@ -2706,14 +2703,13 @@ switch (num)
         voiceSeen = false;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
-        listSeen = false;
+        lastlistW = 0;
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual
   } {
     code {//
-        if (listSeen)
-            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "AddSynth-list");
+        saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "AddSynth-list");
         ADnoteVoiceList->hide();
         if (globalSeen)
             saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "AddSynth");
@@ -2783,24 +2779,19 @@ switch (num)
   }
   Function {wincheck()} {} {
     code {//
-    static int lastListW = 0;
     static int lastResuiW = 0;
 
     addRtext();
     addVoiceRtext();
 
-    if (ADnoteVoiceList->visible() && lastListW != ADnoteVoiceList->w())
-    {
+    if (ADnoteVoiceList->visible())
         addVoiceListRtext();
-        lastListW = ADnoteVoiceList->w();
-    }
 
     if (resui->resonancewindow->visible() && lastResuiW != resui->resonancewindow->w())
     {
         resui->resonanceRtext();
         lastResuiW = resui->resonancewindow->w();
     }
-
 
     if (ampenv)
         ampenv->wincheck();
@@ -2898,7 +2889,7 @@ switch (num)
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
     static int lastvoiceW = 0;
-    
+
     float dScale = ADnoteVoice->w() / float(voiceDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
@@ -2936,24 +2927,18 @@ switch (num)
   }
   Function {addVoiceListRtext()} {} {
     code {//
-    static int lastlistW = 0;
-
 
     if (lastlistW == ADnoteVoiceList->w())
         return;
 
     lastlistW = ADnoteVoiceList->w();
-    
+
     float dScale = ADnoteVoiceList->w() / float(listDW);
     if (dScale < 0.2f)
-        dScale = 0.2f;
-
-    if (!ADnoteVoiceList->visible())
-        return;
+        dScale = 0.2f;;
 
     if(ADnoteVoiceList->x() > Fl::w() - 10 || ADnoteVoiceList->y() > Fl::h() - 10)
         ADnoteVoiceList->position(30, 30);
-
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
@@ -3008,11 +2993,11 @@ switch (num)
   }
   decl {int voiceDH;} {private local
   }
-  decl {bool listSeen;} {public local
-  }
   decl {int listDW;} {private local
   }
   decl {int listDH;} {private local
+  }
+  decl {int lastlistW;} {private local
   }
   decl {ResonanceUI *resui;} {public local
   }
