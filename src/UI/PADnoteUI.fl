@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -241,7 +241,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {open : {public PresetsUI_}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be after panwidth} {in_source in_header
@@ -1615,7 +1615,8 @@ class PADnoteUI {open : {public PresetsUI_}
     if (oscui)
         delete(oscui);
     delete(resui);
-    saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padSeen, "PadSynth");
+    if (padSeen)
+        saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padSeen, "PadSynth");
     padnotewindow->hide();
     delete(padnotewindow);} {}
   }
@@ -1637,7 +1638,7 @@ class PADnoteUI {open : {public PresetsUI_}
   }
   decl {float padDH;} {private local
   }
-  decl {int lastpadW;} {selected private local
+  decl {int lastpadW;} {private local
   }
   decl {bool padSeen;} {private local
   }

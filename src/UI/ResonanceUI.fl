@@ -288,7 +288,7 @@ class ResonanceGraph {: {public Fl_Box}
   }
 }
 
-class ResonanceUI {selected : PresetsUI_
+class ResonanceUI {open : PresetsUI_
 } {
   Function {make_window()} {} {
     Fl_Window resonancewindow {
@@ -452,7 +452,8 @@ class ResonanceUI {selected : PresetsUI_
       Fl_Button resClose {
         label Close
         callback {//
-          saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), false, "Resonance " + to_string(engine));
+          if (resSeen)
+              saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), false, "Resonance " + to_string(engine));
           resonancewindow->hide();
           resSeen = false;
           if ((Fl::event_button() == 3))
@@ -568,13 +569,18 @@ class ResonanceUI {selected : PresetsUI_
     cbwidget = NULL;
     cbapplywidget = NULL;
     make_window();
+    resSeen = false;
     applybutton->hide();
     refresh();} {}
   }
-  Function {~ResonanceUI()} {return_type virtual
+  Function {~ResonanceUI()} {open return_type virtual
   } {
     code {//
-            saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), resSeen, "Resonance " + to_string(engine));            resonancewindow->hide();} {}
+    if (resSeen)
+        saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), true, "Resonance " + to_string(engine));
+    resSeen = false;
+    resonancewindow->hide();} {selected
+    }
   }
   Function {redrawPADnoteApply()} {} {
     code {if (cbwidget!=NULL) {
@@ -629,6 +635,7 @@ class ResonanceUI {selected : PresetsUI_
         fetchW = resDW;
         fetchH = resDH;
     }
+    resSeen = true;
     resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
     resonanceRtext();} {}
   }

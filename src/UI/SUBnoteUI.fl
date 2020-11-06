@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"
@@ -159,13 +159,18 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {open : {public PresetsUI_}
+class SUBnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
     }
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
+      callback {//
+    if (subSeen)
+        saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
+    subSeen = false;
+    o->hide();}
       xywh {446 515 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
@@ -700,16 +705,18 @@ class SUBnoteUI {open : {public PresetsUI_}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "SubSynth");
     SUBparameters->show();
+    lastsubW = 0;
     subSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        SUBparameters->position(fetchX, fetchY);} {}
+    if (fetchW < subDW || fetchH < subDH)
+    {
+        fetchW = subDW;
+        fetchH = subDH;
+    }
+    
+    SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);;} {}
   }
-  Function {subRtext()} {open
-  } {
+  Function {subRtext()} {} {
     code {//
-    static int lastsubW = 0;
     ampenv->wincheck();
     bandwidthenvelopegroup->wincheck();
     filterenv->wincheck();
@@ -729,24 +736,7 @@ class SUBnoteUI {open : {public PresetsUI_}
 
     lastsubW = SUBparameters->w();
 
-    //int W =  Fl::w();
-    //int H =  Fl::h();
-    int w = SUBparameters->w();
-    int subh = SUBparameters->h();
-    /*while (w > W || subh > H)
-    {
-        w /= 2;
-        subh /= 2;
-        SUBparameters->size(w, subh);
-    };*/
-    float dW = w / subDW;
-    float dH = subh / subDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    float dScale = SUBparameters->w() / float(subDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -760,15 +750,15 @@ class SUBnoteUI {open : {public PresetsUI_}
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
     frame->scroll_to(0, 0);
-    frame->size(int(435 * dW), int(326 * dH));
+    frame->size(int(435 * dScale), int(326 * dScale));
     frame->scrollbar_size(12 * dScale);
-    harmonics->size(int(435 * dW), int(275 * dH * 1.1));
+    harmonics->size(int(435 * dScale), int(275 * dScale * 1.1));
 
     for (int i=0;i<MAX_SUB_HARMONICS;i++)
     {
-        h[i]->size(20 * dW, 275 * dH * 1.1);
+        h[i]->size(20 * dScale, 275 * dScale * 1.1);
         h[i]->h_num->labelsize(int(12 * dScale));
-        h[i]->h_dash->size(int(10 * dW), int(3 * dH));
+        h[i]->h_dash->size(int(10 * dScale), int(3 * dScale));
     }
 
     ampgrp->labelsize(size11);
@@ -838,8 +828,7 @@ class SUBnoteUI {open : {public PresetsUI_}
     subPaste->labelsize(size11);
     subClose->labelsize(size11);
 
-    SUBparameters->redraw();} {selected
-    }
+    SUBparameters->redraw();} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
@@ -1010,14 +999,16 @@ class SUBnoteUI {open : {public PresetsUI_}
     synth = pars->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
+    lastsubW = 0;
     subSeen = false;
     make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//
-    if(subSeen)
-        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(),  SUBparameters->visible(), "SubSynth");
+    if (subSeen)
+        saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(),  true, "SubSynth");
+    subSeen = false;
     SUBparameters->hide();
     delete(SUBparameters);} {}
   }
@@ -1036,5 +1027,7 @@ class SUBnoteUI {open : {public PresetsUI_}
   decl {float subDH;} {private local
   }
   decl {bool subSeen;} {private local
+  }
+  decl {int lastsubW;} {private local
   }
 }

@@ -2020,10 +2020,10 @@ class ADnoteUI {: {public PresetsUI_}
     globalSeen = false;
     resui->resonancewindow->hide();
     o->hide();}
-      xywh {1179 128 535 405} type Double hide resizable
+      xywh {1179 128 535 405} type Double resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {addDW = 535; addDH = 405;}
-      code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
+      code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Group globalfreq {
         label FREQUENCY
@@ -2262,6 +2262,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             int fetchW, fetchH, fetchX, fetchY, fetchO;
             lastlistW = 0;
             ADnoteVoiceList->show();
+            listSeen = true;
             loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
             if (fetchW < listDW || fetchH < listDH)
             {
@@ -2458,7 +2459,9 @@ else if (voiceTabs->value() == g8)
     }
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
-      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-list");
+      callback {if (listSeen)
+    saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-list");
+listSeen = false;
 o->hide();}
       xywh {101 233 705 260} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
@@ -2493,6 +2496,7 @@ o->hide();}
         label Close
         callback {//
             ADnoteVoiceList->hide();
+            listSeen = false;
             saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), false, "AddSynth-list");
 
             if (Fl::event_button() == 3)
@@ -2704,18 +2708,23 @@ switch (num)
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
         lastlistW = 0;
+        listSeen = false;
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual
   } {
     code {//
-        saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), ADnoteVoiceList->visible(), "AddSynth-list");
+        if(listSeen)
+            saveWin(synth, ADnoteVoiceList->w(), ADnoteVoiceList->h(), ADnoteVoiceList->x(), ADnoteVoiceList->y(), listSeen, "AddSynth-list");
         ADnoteVoiceList->hide();
+        listSeen = false;
         if (globalSeen)
-            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->y(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(),  ADnoteGlobalParameters->visible(), "AddSynth");
+            saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), globalSeen, "AddSynth");
         ADnoteGlobalParameters->hide();
+        globalSeen = false;
         if (voiceSeen)
-            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), ADnoteVoice->visible(), "AddSynth-voice");
+            saveWin(synth, ADnoteVoice->w(), ADnoteVoice->h(), ADnoteVoice->x(), ADnoteVoice->y(), voiceSeen, "AddSynth-voice");
+        voiceSeen = false;
         ADnoteVoice->hide();
         resui->resonancewindow->hide();
         delete ADnoteVoiceList;
@@ -2928,6 +2937,11 @@ switch (num)
   Function {addVoiceListRtext()} {} {
     code {//
 
+    if (lastlistW < 3)
+    {
+        ++lastlistW;
+        return;
+    }
     if (lastlistW == ADnoteVoiceList->w())
         return;
 
@@ -2979,13 +2993,13 @@ switch (num)
   }
   decl {ADnoteParameters *pars;} {private local
   }
-  decl {bool globalSeen;} {private local
-  }
   decl {int addDW;} {private local
   }
   decl {int addDH;} {private local
   }
   decl {int lastglobalW;} {private local
+  }
+  decl {bool globalSeen;} {private local
   }
   decl {bool voiceSeen;} {public local
   }
@@ -2998,6 +3012,8 @@ switch (num)
   decl {int listDH;} {private local
   }
   decl {int lastlistW;} {private local
+  }
+  decl {bool listSeen;} {public local
   }
   decl {ResonanceUI *resui;} {public local
   }
