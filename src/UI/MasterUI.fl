@@ -305,7 +305,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }}
+            }} open
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -2054,12 +2054,13 @@ Alan Calvert started the project}
         partui->checkEngines();
         updatepanel();} {}
   }
-  Function {partNew(int _npart)} {} {
+  Function {partNew(int _npart)} {open
+  } {
     code {//
     int nval = _npart;
     partuigroup->remove(partui);
     delete partui;
-    partui = new PartUI(0, 0, 765, 525);
+    partui = new PartUI(3 * mainScale, 255 * mainScale, 765 * mainScale, 525 * mainScale);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
@@ -2070,7 +2071,8 @@ Alan Calvert started the project}
     updatelistitem(npart);
     updatelistitem(nval);
     activePart = nval;
-    npart = nval;} {}
+    npart = nval;} {selected
+    }
   }
   Function {updatepart()} {} {
     code {//
@@ -2701,8 +2703,7 @@ Alan Calvert started the project}
     presetsui->presetsRtext();
 
      partui->wincheck();
-     bankui->wincheck();} {selected
-    }
+     bankui->wincheck();} {}
   }
   Function {mainRtext()} {} {
     code {//

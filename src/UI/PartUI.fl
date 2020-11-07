@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -384,9 +384,10 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window partgroup {
       xywh {1023 99 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -864,6 +865,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = 395; editDH = 385;}
+      code3 {instrumenteditwindow->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -2439,6 +2441,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     fetchKey();
     partgroup->show();
     lastkey = -1;
+    lasteditW = 0;
     end();} {}
   }
   Function {checkEngines(string instrumentName = "")} {} {
@@ -2606,17 +2609,20 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Edit").c_str());} {}
   }
-  Function {Showedit()} {} {
+  Function {Showedit()} {open
+  } {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-edit");
     instrumenteditwindow->show();
     editSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        instrumenteditwindow->position(fetchX, fetchY);
-    instrumenteditwindow->size_range(editDW, editDH, 0, 0, 0, 0, 1);} {}
+    if (fetchW < editDW || fetchH < editDH)
+    {
+        fetchW = editDW;
+        fetchH = editDH;
+    }
+    instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    lasteditW = 0;} {}
   }
   Function {Showctl()} {} {
     code {//
@@ -2687,20 +2693,17 @@ class PartUI {: {public Fl_Group, PartUI_}
     else
         instrumentkitlist->position(fetchX, fetchY);} {}
   }
-  Function {wincheck()} {} {
+  Function {wincheck()} {open
+  } {
     code {//
-    static int lasteditW = 0;
     static int lastfxW = 0;
     static int lastkitW = 0;
     static int lastctlW = 0;
     static int lastmidiW = 0;
     static int lastatW = 0;
 
-    if (instrumenteditwindow->visible() && instrumenteditwindow->w() != lasteditW)
-    {
+    if (instrumenteditwindow->visible())
         editRtext();
-        lasteditW = instrumenteditwindow->w();
-    }
 
     if (partfx->visible() && partfx->w() != lastfxW)
     {
@@ -2736,29 +2739,19 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (subnoteui)
         subnoteui->subRtext();
     if (padnoteui)
-        padnoteui->padRtext();} {}
+        padnoteui->padRtext();} {selected
+    }
   }
-  Function {editRtext()} {} {
+  Function {editRtext()} {open
+  } {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = instrumenteditwindow->w();
-    int h = instrumenteditwindow->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        instrumenteditwindow->size(w, h);
-    };
 
-    float dW = w / editDW;
-    float dH = h / editDH;
-    float dScale;
+    if (lasteditW == instrumenteditwindow->w())
+        return;
+    lasteditW = instrumenteditwindow->w();
 
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    float dScale = instrumenteditwindow->w() / editDW;
+
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -3079,9 +3072,9 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {groupRtext(float dScale)} {} {
     code {//
     partgroup->resize(3 * dScale, 255 * dScale, 380 * dScale, 170 * dScale);
-    partgroupui->size(378 * dScale, 168 * dScale);
+    //partgroupui->size(378 * dScale, 168 * dScale);
 
-    /* The above have to be numerically fixed as the relative size
+    /* The above has to be numerically fixed as the relative size
      * can change when a part number is changed. The group is deleted
      * and re-creacted based on the *current* master window
     */
@@ -3249,5 +3242,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {float kitDH;} {public local
   }
   decl {bool kitSeen;} {private local
+  }
+  decl {int lasteditW;} {private local
   }
 }
