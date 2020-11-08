@@ -52,7 +52,7 @@ Completed
 
 
 In progress
-    Formant (in filters) - resize very unstable so disabled for now
+    Formant (in filters)
 
 
 Not started
