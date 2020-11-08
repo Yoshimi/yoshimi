@@ -553,7 +553,23 @@ pars=NULL;
       }
       Fl_Button editbutton {
         label Edit
-        callback {formantparswindow->show();}
+        callback {//
+    int X, Y, W, H, O;
+    int type = engine;
+    if (type > 2)
+        type = 3;
+    //std::cout << "type open " << type << std::endl;
+    loadWin(synth, W, H, X, Y, O, "xFilter-formant " + to_string(type));
+    if (W < formantDW || H < formantDH)
+    {
+        W = formantDW;
+        H = formantDH;
+    }
+    formantparswindow->resize(X, Y, W, H);
+    lastformantW = 0;
+    formantSeen = true;
+    formantRtext();
+    formantparswindow->show();}
         xywh {5 40 52 26} box PLASTIC_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button filtC {
@@ -577,12 +593,13 @@ pars=NULL;
   Function {make_formant_window()} {open
   } {
     Fl_Window formantparswindow {
-      label {Formant Filter Parameters} open selected
+      label {Formant Filter Parameters}
+      callback {formClose->do_callback();} open
       xywh {94 78 700 205} type Double labelfont 1 labelsize 12 hide resizable
       code0 {formantDW = o->w(); formantDH = o->h();}
       code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {1 1 698 203} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -742,7 +759,16 @@ pars=NULL;
         }
         Fl_Button formClose {
           label Close
-          callback {formantparswindow->hide();}
+          callback {//
+    int type = engine;
+    if (engine > 2)
+        type = 3;
+    //std::cout << "type close " << type << std::endl;
+    if (formantSeen)
+        saveWin(synth, formantparswindow->w(), formantparswindow->h(), formantparswindow->x(), formantparswindow->y(), false, "xFilter-formant " +to_string(type));
+    formantSeen = false,
+    formantparswindow->hide();
+    lastformantW = 0;}
           xywh {643 170 50 25} box THIN_UP_BOX
         }
         Fl_Button formCopy {
@@ -880,11 +906,10 @@ pars=NULL;
   Function {formantRtext()} {open
   } {
     code {//
-    static int formantW = 0;
-    if (formantW == formantparswindow->w())
+    if (lastformantW == formantparswindow->w())
         return;
-    formantW = formantparswindow->w();
-
+    lastformantW = formantparswindow->w();
+    //std::cout << "formant seen" << std::endl; 
     float dScale = formantparswindow->w() / float(formantDW);
     
     int size11 = int(11 * dScale);
@@ -893,7 +918,8 @@ pars=NULL;
     formClose->labelsize(size14);
     formvowel->labelsize(size14);
     formCopy->labelsize(size11);
-    formPaste->labelsize(size11);} {}
+    formPaste->labelsize(size11);} {selected
+    }
   }
   Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int offset = UNUSED)} {} {
     code {//
@@ -1062,7 +1088,8 @@ pars=NULL;
             break;
     }} {}
   }
-  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
+  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {open
+  } {
     code {//
     pars=filterpars_;
     synth = pars->getSynthEngine();
@@ -1071,6 +1098,8 @@ pars=NULL;
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
+    lastformantW = 0;
+    formantSeen = false;
     make_window();
     end();
     make_formant_window();
@@ -1146,5 +1175,9 @@ pars=NULL;
   decl {int formantDW;} {private local
   }
   decl {int formantDH;} {private local
+  }
+  decl {int lastformantW;} {private local
+  }
+  decl {bool formantSeen;} {private local
   }
 }
