@@ -138,6 +138,7 @@ return(nearestpoint);} {}
     int ox = x();
     int oy = y();
     int lx = w();
+    fl_line_style(0, int(1 * lx / 190.0f));
     int ly = h();
     if (env->Pfreemode==0)
         env->converttofree();

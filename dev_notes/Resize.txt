@@ -31,6 +31,7 @@ Completed
     LFOs
     Envelopes
     Filters
+        formant window
     Microtonal
     Bank
     Midilearn
@@ -52,7 +53,7 @@ Completed
 
 
 In progress
-    Formant (in filters)
+    nothing!
 
 
 Not started

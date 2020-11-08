@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -108,7 +108,7 @@ class FormantFilterGraph {: {public Fl_Box}
         int maxdB = 30;
         int ox = x(), oy = y(), lx = w(), ly = h(), i, oiy;
         float freqx;
-        
+
         int points = 475;
         float mag = lx / float(points);
         fl_line_style(0, 2 * mag); // part of new resizable code
@@ -164,11 +164,11 @@ class FormantFilterGraph {: {public Fl_Box}
             string tmpstr = asString((float)
                 (pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq) / 1000.0))
                     + " kHz";
-            fl_draw(tmpstr.c_str(), ox + 1, oy + 1, 40, 12, FL_ALIGN_LEFT, NULL, 0);
+            fl_draw(tmpstr.c_str(), ox + 2, oy + 2, 40, 12, FL_ALIGN_LEFT, NULL, 0);
             tmpstr = asString((int)
                 (rap2dB(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain()))
                     + " dB";
-            fl_draw(tmpstr.c_str(), ox + 1, oy + 15, 40, 12, FL_ALIGN_LEFT, NULL, 0);
+            fl_draw(tmpstr.c_str(), ox + 2, oy + 15, 40, 12, FL_ALIGN_LEFT, NULL, 0);
         }
 
         if (hoverFormant >= 0 && hoverFormant != *nformant)
@@ -181,7 +181,7 @@ class FormantFilterGraph {: {public Fl_Box}
         fl_color(FL_RED);
 
         pars->formantfilterH(*nvowel, points, graphpoints);
-        
+
         int lastpos = ox;
         oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < points; ++i)
@@ -196,9 +196,9 @@ class FormantFilterGraph {: {public Fl_Box}
         parent.formantRtext();
 
         /*  original version
-        
+
         pars->formantfilterH(*nvowel, lx, graphpoints);
-        
+
         oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < lx; ++i)
         {
@@ -375,7 +375,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {open : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -393,7 +393,7 @@ pars=NULL;
         delete (formantparswindow);} {}
   }
   Function {make_window()} {} {
-    Fl_Window filterui {
+    Fl_Window filterui {open
       xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
@@ -566,6 +566,8 @@ pars=NULL;
         H = formantDH;
     }
     formantparswindow->resize(X, Y, W, H);
+    lastformantX = 0;
+    lastformantY = 0;
     lastformantW = 0;
     formantSeen = true;
     formantRtext();
@@ -590,16 +592,15 @@ pars=NULL;
       }
     }
   }
-  Function {make_formant_window()} {open
-  } {
+  Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      callback {formClose->do_callback();} open
+      callback {formClose->do_callback();}
       xywh {94 78 700 205} type Double labelfont 1 labelsize 12 hide resizable
       code0 {formantDW = o->w(); formantDH = o->h();}
       code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {1 1 698 203} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -903,23 +904,60 @@ pars=NULL;
 
             freqtrackoffset->labelsize(size);} {}
   }
-  Function {formantRtext()} {open
-  } {
+  Function {formantRtext()} {} {
     code {//
-    if (lastformantW == formantparswindow->w())
+    /*
+     * This is very different from other windows because it is called
+     * via the draw mewthod, not the usual chain.
+    */
+    
+    if (lastformantX == formantparswindow->x() && lastformantY == formantparswindow->y() &&lastformantW == formantparswindow->w())
         return;
+    lastformantX = formantparswindow->x();
+    lastformantY = formantparswindow->y();
     lastformantW = formantparswindow->w();
-    //std::cout << "formant seen" << std::endl; 
+    
+    if(formantparswindow->x() > Fl::w() - 10 || formantparswindow->y() > Fl::h() - 10)
+        formantparswindow->position(30, 30);
+        
+    //std::cout << "formant seen" << std::endl;
     float dScale = formantparswindow->w() / float(formantDW);
-    
+
+    int size = int(10 * dScale);
     int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
     int size14 = int(14 * dScale);
-    
+
+    formantnumber->labelsize(size);
+        formantnumber->textsize(size);
+    vowelnumber->labelsize(size);
+        vowelnumber->textsize(size11);
+
+    formant_freq_dial->labelsize(size);
+    formant_q_dial->labelsize(size);
+    formant_amp_dial->labelsize(size);
+
+    seqsize->labelsize(size);
+        seqsize->textsize(size11);
+    seqpos->labelsize(size);
+        seqpos->textsize(size);
+    vowel_counter->labelsize(size);
+        vowel_counter->textsize(size);
+    neginput->labelsize(size);
+    strchdial->labelsize(size);
+    formantcount->labelsize(size);
+        formantcount->textsize(size12);
+    frsldial->labelsize(size);
+    centerfreqvo->labelsize(size12);
+        centerfreqvo->textsize(size11);
+    octavesfreqvo->labelsize(size12);
+        octavesfreqvo->textsize(size11);
+    wvknob->labelsize(size);
+
     formClose->labelsize(size14);
     formvowel->labelsize(size14);
     formCopy->labelsize(size11);
-    formPaste->labelsize(size11);} {selected
-    }
+    formPaste->labelsize(size11);} {}
   }
   Function {send_data(int action, int control, float value, int type, int parameter = UNUSED, int offset = UNUSED)} {} {
     code {//
@@ -1088,8 +1126,7 @@ pars=NULL;
             break;
     }} {}
   }
-  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {open
-  } {
+  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//
     pars=filterpars_;
     synth = pars->getSynthEngine();
@@ -1098,6 +1135,8 @@ pars=NULL;
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
+    lastformantX = 0;
+    lastformantY = 0;
     lastformantW = 0;
     formantSeen = false;
     make_window();
@@ -1175,6 +1214,10 @@ pars=NULL;
   decl {int formantDW;} {private local
   }
   decl {int formantDH;} {private local
+  }
+  decl {int lastformantX;} {private local
+  }
+  decl {int lastformantY;} {private local
   }
   decl {int lastformantW;} {private local
   }
