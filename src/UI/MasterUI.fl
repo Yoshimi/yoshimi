@@ -163,7 +163,6 @@ class MasterUI {open : {private GuiUpdates}
       delete panelwindow;
 
       message->hide();
-      saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), msgSeen, "Master-message");
       delete message;
 
         if (microtonalui)
@@ -2886,36 +2885,14 @@ Alan Calvert started the project}
 
     syseffClose->labelsize(int(14 * dScale));
 
-
     syseffsendwindow->redraw();} {}
   }
   Function {msgRtext()} {} {
     code {//
-    //int W =  Fl::w();
-    //int H =  Fl::h();
-    int w = message->w();
-    int h = message->h();
-
     if(message->x() > Fl::w() - 10 ||message->y() > Fl::h() - 10)
         message->position(30, 30);
 
-    /*while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        message->size(w, h);
-    };*/
-
-    float dW = w / msgDW;
-    float dH = h / msgDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
+    float dScale = message->w() / float(msgDW);
 
     int size14 = int(14 * dScale);
 
@@ -2924,7 +2901,8 @@ Alan Calvert started the project}
     cancel->labelsize(size14);
     closebutton->labelsize(size14);
 
-    message->redraw();} {}
+    message->redraw();
+    saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), true, "Master-message");} {}
   }
   Function {panelRtext()} {} {
     code {//
