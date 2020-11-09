@@ -50,6 +50,7 @@ Completed
         mixer window
         sys/ins window
         parameters
+        about
 
 
 In progress
@@ -57,4 +58,4 @@ In progress
 
 
 Not started
-    About (in master)
+    {crickets}

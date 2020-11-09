@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -148,8 +148,6 @@ class MasterUI {open : {private GuiUpdates}
   }
   Function {~MasterUI()} {} {
     code {//
-      saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), 1, "Master");
-      masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
 
@@ -196,6 +194,7 @@ class MasterUI {open : {private GuiUpdates}
           delete yoshiLog;
       }
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
+      masterwindow->hide();
       delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
@@ -266,8 +265,7 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -304,7 +302,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open
+            }}
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -317,15 +315,21 @@ class MasterUI {open : {private GuiUpdates}
         class ClearMenuBar
       } {
         Submenu Yoshimi {
-          label {&Yoshimi}
+          label {&Yoshimi} open
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem Y_about {
             label {&About...}
             callback {//
-                    Contributors->hide();
-                    aboutwindow->show();
-                    aboutFirst->show();}
+            int X, Y, W, H, O;
+            loadWin(synth, W, H, X, Y, O, "Master-about");
+            if (W < aboutDW || H < aboutDH)
+            {
+                W = aboutDW;
+                H = aboutDH;
+            }
+            aboutwindow->resize(X, Y, W, H);
+            aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
           }
           MenuItem newinstanceid {
@@ -999,19 +1003,21 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
     comment {line spaces in boxes below are critical} {in_source in_header
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi} open
-      xywh {46 64 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
+      label {About Yoshimi}
+      xywh {46 64 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide resizable
+      code0 {aboutDW = 365; aboutDH = 290;}
+      code1 {o->size_range(aboutDW,aboutDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Group aboutFirst {open
-        xywh {0 0 365 290} hide
+      Fl_Group aboutFirst {
+        xywh {0 0 365 290}
       } {
-        Fl_Box {} {
+        Fl_Box about1 {
           label {Yoshimi
 meets
 ZynAddSubFX}
           xywh {10 15 345 70} labelfont 9 labelsize 18 labelcolor 216 align 16 when 0
         }
-        Fl_Box {} {
+        Fl_Box about2 {
           label {Copyright 2002-2009, Nasca O. Paul and others
 Copyright 2009-2011, Alan Calvert
 Copyright 2012-2013, Jeremy Jongepier and others
@@ -1020,38 +1026,38 @@ LV2 plugin Copyright 2014, Andrew Deryabin
 Splash Image Copyright 2017, Jesper Lloyd}
           xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11
         }
-        Fl_Box {} {
+        Fl_Box about3 {
           label {This is free software, and comes with ABSOLUTELY NO
 WARRANTY; you may redistribute it and/or modify it
 under the terms of GPL version 2, or (at your option)
 any later version.}
           xywh {10 190 340 53} labelsize 11
         }
-        Fl_Box {} {
+        Fl_Box about4 {
           label { version}
           xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 145
           code0 {//
             o->copy_label((string("Yoshimi version ")
                            + string(YOSHIMI_VERSION)).c_str());}
         }
-        Fl_Button {} {
+        Fl_Button about5 {
           label more
           callback {//
-                 Contributors->show();
+                 contributors->show();
                  aboutFirst->hide();}
           tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} labelsize 11
         }
       }
-      Fl_Group Contributors {open
+      Fl_Group contributors {
         xywh {5 5 355 280} box FLAT_BOX color 7 labelcolor 7 hide
       } {
-        Fl_Box {} {
+        Fl_Box cont1 {
           label {Some people who have helped Yoshimi
  in various ways since
 Alan Calvert started the project}
           xywh {12 8 340 57} color 7 labelfont 9 labelsize 15 labelcolor 4
         }
-        Fl_Box {} {
+        Fl_Box cont2 {
           label {
           Chris Ahlstrom
           Kristian Amlie
@@ -1070,7 +1076,7 @@ Alan Calvert started the project}
           }
           xywh {25 70 155 200} labelsize 12
         }
-        Fl_Box {} {
+        Fl_Box cont3 {
           label {
           Tito Latini
           Rainer Liffers
@@ -1090,9 +1096,11 @@ Alan Calvert started the project}
           xywh {194 70 155 200} labelsize 12
         }
       }
-      Fl_Button {} {
+      Fl_Button aboutClose {
         label Close
         callback {//
+        aboutFirst->show();
+        contributors->hide();
         aboutwindow->hide();}
         xywh {305 253 43 22} box THIN_UP_BOX labelsize 11
       }
@@ -2053,8 +2061,7 @@ Alan Calvert started the project}
         partui->checkEngines();
         updatepanel();} {}
   }
-  Function {partNew(int _npart)} {open
-  } {
+  Function {partNew(int _npart)} {} {
     code {//
     int nval = _npart;
     partuigroup->remove(partui);
@@ -2070,8 +2077,7 @@ Alan Calvert started the project}
     updatelistitem(npart);
     updatelistitem(nval);
     activePart = nval;
-    npart = nval;} {selected
-    }
+    npart = nval;} {}
   }
   Function {updatepart()} {} {
     code {//
@@ -2652,6 +2658,7 @@ Alan Calvert started the project}
     static int lastsyseffW = 0;
     static int lastscaleW = 0;
     static int lastvirtW = 0;
+    static int lastaboutW = 0;
     if (masterwindow->w() != lastmainW)
     {
         mainRtext();
@@ -2696,13 +2703,43 @@ Alan Calvert started the project}
         lastvirtW = virkeyboard->virkeyboardwindow->w();
     }
 
+    if (aboutwindow->visible() && lastaboutW != aboutwindow->w())
+    {
+        aboutRtext();
+        lastaboutW = aboutwindow->w();
+    }
+
     if (paramsui->Recent->visible())
         paramsui->paramRtext();
 
-    presetsui->presetsRtext();
+     presetsui->presetsRtext();
 
      partui->wincheck();
      bankui->wincheck();} {}
+  }
+  Function {aboutRtext()} {open
+  } {
+    code {//
+    if(aboutwindow->x() > Fl::w() - 10 || aboutwindow->y() > Fl::h() - 10)
+        aboutwindow->position(30, 30);
+
+    float dScale = aboutwindow->w() / float(aboutDW);
+
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+
+    about2->labelsize(size11);
+    about3->labelsize(size11);
+    about4->labelsize(size12);
+    about5->labelsize(size11);
+    cont2->labelsize(size12);
+    cont3->labelsize(size12);
+    aboutClose->labelsize(size11);
+    about1->labelsize(int(18 * dScale));
+    cont1->labelsize(int(15 * dScale));
+
+    aboutwindow->redraw();
+    saveWin(synth, aboutwindow->w(), aboutwindow->h(), aboutwindow->x(), aboutwindow->y(), true, "Master-about");} {}
   }
   Function {mainRtext()} {} {
     code {//
@@ -3079,5 +3116,9 @@ Alan Calvert started the project}
   decl {bool syseffSeen;} {private local
   }
   decl {float panelScale;} {private local
+  }
+  decl {int aboutDW;} {private local
+  }
+  decl {int aboutDH;} {private local
   }
 }

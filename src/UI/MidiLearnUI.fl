@@ -291,7 +291,7 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
   decl {unsigned char stat;} {public local
   }
-  Function {kitRscale(float dScale, int line)} {} {
+  Function {kitRscale(float dScale)} {} {
     code {//
     int size11 = int(11 * dScale);
     int size12 = int(12 * dScale);
@@ -639,7 +639,7 @@ delete midilearnwindow;} {}
     {
         for (int i = 0; i < count; ++i)
         {
-            midilearnkititem[i]->kitRscale(dScale, i);
+            midilearnkititem[i]->kitRscale(dScale);
             midilearnkititem[i]->resize(2 * dScale, (21 + i * 20) * dScale, 818 * dScale, 20 * dScale);
 
         }
