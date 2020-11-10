@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -146,7 +146,8 @@ class MasterUI {: {private GuiUpdates}
       activePart = 0;
       yoshiLog = NULL;} {}
   }
-  Function {~MasterUI()} {} {
+  Function {~MasterUI()} {open
+  } {
     code {//
       aboutwindow->hide();
       delete aboutwindow;
@@ -163,10 +164,12 @@ class MasterUI {: {private GuiUpdates}
       message->hide();
       delete message;
 
-        if (microtonalui)
+      if (microtonalui)
           delete microtonalui;
+
       if (bankui)
           delete bankui;
+
       if (virkeyboard)
           delete virkeyboard;
 
@@ -174,17 +177,14 @@ class MasterUI {: {private GuiUpdates}
           delete configui;
 
       if (presetsui)
-      {
-          presetsui->Hide();
           delete presetsui;
-      }
+
       if (paramsui)
-      {
-          paramsui->Hide();
           delete paramsui;
-      }
+
       if (vectorui)
           delete vectorui;
+
       if (midilearnui)
           delete midilearnui;
 
@@ -193,9 +193,12 @@ class MasterUI {: {private GuiUpdates}
           saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
       }
+
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
+
       masterwindow->hide();
-      delete masterwindow;} {}
+      delete masterwindow;} {selected
+    }
   }
   Function {Init(const char *_label)} {} {
     code {//
@@ -265,7 +268,8 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -302,7 +306,7 @@ class MasterUI {: {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }}
+            }} open
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -644,7 +648,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  }
+        label {Master  } open
         xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Dial globalfinedetune {
@@ -1282,10 +1286,14 @@ Alan Calvert started the project}
     panelwindow->hide();}
         xywh {975 290 60 25} box THIN_UP_BOX labelfont 1
       }
+      Fl_Button {} {
+        label {text here}
+        xywh {25 25 70 20}
+      }
     }
     Fl_Window message {
-      label Yoshimi
-      xywh {9 25 290 85} type Double labelsize 12 hide resizable
+      label Yoshimi open
+      xywh {58 81 290 85} type Double labelsize 12 hide resizable
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
       code1 {msgDW = o->w(); msgDH = o->h();}
       code2 {o->size_range(290, 85, 0, 0, 0, 0, 1);}

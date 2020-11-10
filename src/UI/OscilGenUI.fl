@@ -102,12 +102,13 @@ class OscilSpectrum {: {public Fl_Box}
     int oy = y();
     int lx = w();
     int ly = h();
+    //fl_line_style(0, int(1 * ly / 50.0f));
+    fl_line_style(0, 1);
     const int maxdb = 60; // must be multiple of 10
     int GX = 2;
     int n = lx / GX - 1;
     if (n > synth->halfoscilsize)
         n = synth->halfoscilsize;
-
     float x;
     float* spc = new float[n];
     for (int i = 0; i < n; ++i)
@@ -263,6 +264,7 @@ class Oscilloscope {: {public Fl_Box}
     int oy = y();
     int lx = w();
     int ly = h() - 1;
+    fl_line_style(0, int(2 * ly / 190.0f));
     float smps[synth->oscilsize];
     if (oscbase == 0)
         oscilSmp->get(smps, -1.0);
@@ -315,14 +317,19 @@ class Oscilloscope {: {public Fl_Box}
     else
         fl_color(this->parent()->labelcolor());
     int ph = int((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
+    int lastx, lasty, nextx, nexty;
     for (int i = 1; i < lx; ++i)
     {
-        int k1 = int(synth->oscilsize_f * (i - 1) / lx) + ph;
-        int k2 = int(synth->oscilsize_f * i / lx) + ph;
-        float y1 = smps[k1 % synth->oscilsize] / max;
-        float y2 = smps[k2 % synth->oscilsize] / max;
-        fl_line(i - 1 + ox, int(y1 * ly / 2.0) + oy + ly / 2, i + ox,
-                int(y2 * ly / 2.0) + oy + ly / 2);
+        int k = int(synth->oscilsize_f * (i - 1) / lx) + ph;
+        float y = smps[k % synth->oscilsize] / max;
+        nextx = i + ox;
+        nexty = int(y * ly / 2.0) + oy + ly / 2;
+        if (i == 1)
+            fl_line(nextx - 1, int(y * ly / 2.0) + oy + ly / 2, nextx, nexty);
+        else
+            fl_line(lastx, lasty, nextx, nexty);
+        lastx = nextx;
+        lasty = nexty;
             }} {}
   }
   decl {OscilGen *oscilSmp;} {private local

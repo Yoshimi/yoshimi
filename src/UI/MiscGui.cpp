@@ -269,12 +269,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         if (name.empty())
             synth->getGuiMaster()->message->hide();
         else
-        {
             synth->getGuiMaster()->setmessage(UNUSED, true, name, "Close");
-            //synth->getGuiMaster()->words->copy_label(name.c_str());
-            //synth->getGuiMaster()->cancel->hide();
-            //synth->getGuiMaster()->message->show();
-        }
         return;
     }
     if (npart == TOPLEVEL::section::scales)
