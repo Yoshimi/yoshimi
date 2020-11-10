@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>} {public local
@@ -86,7 +86,7 @@ class ResonanceGraph {: {public Fl_Box}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
-    respar=respar_;
+    respar = respar_;
     synth = respar->getSynthEngine();
     npart = npart_;
     kititem = kititem_;
@@ -98,10 +98,9 @@ class ResonanceGraph {: {public Fl_Box}
   }
   Function {draw_freq_line(float freq)} {} {
     code {//
-    float freqx=respar->getfreqpos(freq);
-    if ((freqx>0.0)&&(freqx<1.0))
-        fl_line(x()+(int) (freqx*w()),y(),
-    x()+(int) (freqx*w()),y()+h());} {}
+    float freqx = respar->getfreqpos(freq);
+    if ((freqx>0.0) && (freqx<1.0))
+        fl_line(x() + (int) (freqx * w()), y(), x() + (int) (freqx*w()), y() + h());} {}
   }
   Function {draw()} {} {
     code {//
@@ -110,10 +109,8 @@ class ResonanceGraph {: {public Fl_Box}
     int lx=w();
     int ly=h();
     int i;
-    int ix;
-    int iy;
-    int oiy;
     float freqx;
+    fl_line_style(0, int(2 * ly/256));
 
     fl_color(FL_BLACK);
     fl_rectf(ox,oy,lx,ly);
@@ -160,15 +157,24 @@ class ResonanceGraph {: {public Fl_Box}
     }
 
     //draw the data
-    fl_color(FL_RED);
-    oiy=(int)(respar->Prespoints[0]/128.0*ly);
-    for (i=1;i<MAX_RESONANCE_POINTS;i++)
+    fl_color(FL_YELLOW);
+    float ix = ox;
+    int oix = int(ix);
+    int iy;
+    int ny = oy + ly;
+    int oiy;
+    float dx = 1.0f / MAX_RESONANCE_POINTS * lx;
+    float dy = 128.0 / ly;
+    oiy = ny - int(respar->Prespoints[0] / dy);
+    for (i = 1; i < MAX_RESONANCE_POINTS; i++)
     {
-        ix=(int)(i*1.0/MAX_RESONANCE_POINTS*lx);
-        iy=(int)(respar->Prespoints[i]/128.0*ly);
-        fl_line(ox+ix-1,oy+ly-oiy,ox+ix,oy+ly-iy);
-        oiy=iy;
-    }} {}
+        ix += dx;
+        iy = ny - int(respar->Prespoints[i] / dy);
+        fl_line(oix, oiy, ix, iy);
+        oix = ix;
+        oiy = iy;
+    }
+    fl_line_style(0, 1);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -288,7 +294,7 @@ class ResonanceGraph {: {public Fl_Box}
   }
 }
 
-class ResonanceUI {open : PresetsUI_
+class ResonanceUI {: PresetsUI_
 } {
   Function {make_window()} {} {
     Fl_Window resonancewindow {
@@ -573,14 +579,13 @@ class ResonanceUI {open : PresetsUI_
     applybutton->hide();
     refresh();} {}
   }
-  Function {~ResonanceUI()} {open return_type virtual
+  Function {~ResonanceUI()} {return_type virtual
   } {
     code {//
     if (resSeen)
         saveWin(synth, resonancewindow->w(), resonancewindow->h(), resonancewindow->x(), resonancewindow->y(), true, "Resonance " + to_string(engine));
     resSeen = false;
-    resonancewindow->hide();} {selected
-    }
+    resonancewindow->hide();} {}
   }
   Function {redrawPADnoteApply()} {} {
     code {if (cbwidget!=NULL) {
