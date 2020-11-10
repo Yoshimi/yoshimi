@@ -1286,10 +1286,6 @@ Alan Calvert started the project}
     panelwindow->hide();}
         xywh {975 290 60 25} box THIN_UP_BOX labelfont 1
       }
-      Fl_Button {} {
-        label {text here}
-        xywh {25 25 70 20}
-      }
     }
     Fl_Window message {
       label Yoshimi open

@@ -157,7 +157,7 @@ class ResonanceGraph {: {public Fl_Box}
     }
 
     //draw the data
-    fl_color(FL_YELLOW);
+    fl_color(FL_RED);
     float ix = ox;
     int oix = int(ix);
     int iy;
