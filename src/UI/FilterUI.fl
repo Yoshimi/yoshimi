@@ -194,6 +194,7 @@ class FormantFilterGraph {: {public Fl_Box}
             lastpos = nextpos;
         }
         parent.formantRtext();
+        fl_line_style(0,1);
 
         /*  original version
 
@@ -910,16 +911,16 @@ pars=NULL;
      * This is very different from other windows because it is called
      * via the draw mewthod, not the usual chain.
     */
-    
+
     if (lastformantX == formantparswindow->x() && lastformantY == formantparswindow->y() &&lastformantW == formantparswindow->w())
         return;
     lastformantX = formantparswindow->x();
     lastformantY = formantparswindow->y();
     lastformantW = formantparswindow->w();
-    
+
     if(formantparswindow->x() > Fl::w() - 10 || formantparswindow->y() > Fl::h() - 10)
         formantparswindow->position(30, 30);
-        
+
     //std::cout << "formant seen" << std::endl;
     float dScale = formantparswindow->w() / float(formantDW);
 

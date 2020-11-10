@@ -249,7 +249,8 @@ return(nearestpoint);} {}
         strcpy(tmpstr, valDesc.c_str());
         fl_color(FL_CYAN);
         fl_draw(tmpstr, ox + lx - 30, oy, 30, 25, FL_ALIGN_RIGHT, NULL, 0);
-}} {}
+}
+fl_line_style(0,1);} {}
   }
   Function {handle(int event)} {return_type int
   } {
