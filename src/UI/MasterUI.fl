@@ -144,7 +144,8 @@ class MasterUI {: {private GuiUpdates}
       presetsui = NULL;
       paramsui = NULL;
       activePart = 0;
-      yoshiLog = NULL;} {}
+      yoshiLog = NULL;
+      queryDW = 0;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -192,7 +193,7 @@ class MasterUI {: {private GuiUpdates}
           saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
       }
-      
+
       if (querywindow)
       {
           querywindow->hide();
@@ -280,10 +281,11 @@ class MasterUI {: {private GuiUpdates}
             bool force = Fl::event_state(FL_CTRL);
             if (!force && synth->getRuntime().configChanged)
             {
-                int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+                //int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+                int r = query("!", "!", "!", "Parameters Changed.\\nSave on exit?");
                 switch (r)
                 {
-                    case 0:
+                    case 3:
                         synth->getRuntime().configChanged = false;
                         // this seems backwards but it *always* saves.
                         // seeing configChanged makes it reload the old settings first.
@@ -436,7 +438,8 @@ class MasterUI {: {private GuiUpdates}
                 if (filename == NULL)
                     return;
                 if (isRegularFile(string(filename)))
-                    if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+                    //if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+                        if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
                 return;}
@@ -452,7 +455,8 @@ class MasterUI {: {private GuiUpdates}
           MenuItem I_clear {
             label {&Clear}
             callback {//
-            if (fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
+            //if (fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
+                if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
             xywh {35 35 100 20} labelsize 12
           }
@@ -461,7 +465,8 @@ class MasterUI {: {private GuiUpdates}
             callback {//
         if (!synth->getRuntime().checksynthengines)
         {
-            fl_alert("'Show engines/types' must be checked in Mixer Panel");
+            //fl_alert("'Show engines/types' must be checked in Mixer Panel");
+            query("", "", "", "'Show engines/types' must be checked in Mixer Panel");
             return;
         }
         bankui->ShowSearch();}
@@ -567,7 +572,8 @@ class MasterUI {: {private GuiUpdates}
                     return;
                 filename = fl_filename_setext(filename, EXTEN::scale.c_str());
                 if (isRegularFile(string(filename)))
-                    if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+                    //if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));}
             xywh {25 25 100 20} labelsize 12
@@ -582,7 +588,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem S_clear {
             label {&Clear}
             callback {\#
-            if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
+            //if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
+            if (query("", "Yes", "No", "Set scales to the defaults?") > 1)
             {
                 synth->microtonal.defaults();
                 synth->setAllPartMaps();
@@ -667,7 +674,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           label Reset
           callback {//
           bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
-          if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
+          //if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
+          if (query("", "Yes", "No", "Set *ALL* dynamic values to their defaults?") > 1)
           {
               if (wasCtrl || (Fl::event_state(FL_CTRL) != 0))
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
@@ -1333,7 +1341,8 @@ Alan Calvert started the project}
       label Yoshimi user_data_type {void *}
       callback {cancelQ->do_callback();}
       xywh {5 207 420 105} type Double hide resizable
-      code0 {o->size_range(420, 105, 0, 0, 0, 0, 1);} modal
+      code0 {queryDW = 420; queryDH = 105;}
+      code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Button yesQ {
         label Yes
@@ -1947,7 +1956,7 @@ Alan Calvert started the project}
         }
         yesQ->show();
     }
-    
+
     if (two == "")
         noQ->hide();
     else
@@ -1961,7 +1970,7 @@ Alan Calvert started the project}
             noQ->copy_label(two.c_str());
         }
         noQ->show();
-    }  
+    }
     if (three == "")
     {
         cancelQ->copy_label("OK");
@@ -1980,12 +1989,23 @@ Alan Calvert started the project}
         typeQ->copy_label("?");
     }
 
-
     textQ->copy_label(text.c_str());
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Master-query");
+
+    if (W < queryDW || H < queryDH)
+    {
+        W = queryDW;
+        H = queryDH;
+    }
+    querywindow->resize(X, Y, W, H);
+
     querywindow->show();
     int result = 0;
     while(querywindow->shown())
     {
+        queryRtext();
         if (yesQ->value())
             result = 3;
         else if (noQ->value())
@@ -1994,7 +2014,26 @@ Alan Calvert started the project}
             result = 1;
         Fl::wait();
     }
+    saveWin(synth, querywindow->w(),querywindow->h(), querywindow->x(), querywindow->y(), false, "Master-query");
     return result;} {}
+  }
+  Function {queryRtext()} {} {
+    code {//
+    if (lastqueryW == querywindow->w())
+        return;
+    lastqueryW = querywindow->w();
+
+    float dScale = querywindow->w() / float(queryDW);
+
+    int size14 = int(14 * dScale);
+
+    yesQ->labelsize(size14);
+    noQ->labelsize(size14);
+    cancelQ->labelsize(size14);
+    textQ->labelsize(size14);
+    typeQ->labelsize(int(40 * dScale));
+
+    querywindow->redraw();} {}
   }
   Function {setmessage(int group, bool fixedPos, string text, string B1 = "Close", string B2 = "", string B3 = "")} {} {
     code {//
@@ -2365,7 +2404,8 @@ Alan Calvert started the project}
         if (result)
         {
             result = false;
-            if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
+            //if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
+            if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                 return;
         }
     }
@@ -2470,7 +2510,7 @@ Alan Calvert started the project}
     return changed;} {}
   }
   Function {strategicRetreat(void)} {} {
-    code {fl_alert("Bad things happened,\\nYoshimi strategically retreats.");} {}
+    code {query("", "", "", "Bad things happened,\\nYoshimi strategically retreats.");} {}
   }
   Function {Log(string msg)} {} {
     code {yoshiLog->log(msg);} {}
@@ -2639,9 +2679,6 @@ Alan Calvert started the project}
         bankui-> rescan_for_banks();
     }} {}
   }
-  Function {ShowAlert(int num)} {} {
-    code {fl_alert("%s", textMsgBuffer.fetch(num).c_str());} {}
-  }
   Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
@@ -2790,6 +2827,9 @@ Alan Calvert started the project}
         lastmsgW = message->w();
         msgSeen = true;
     }
+
+    if (querywindow->visible())
+        queryRtext();
 
     if (syseffsendwindow->visible() &&  syseffsendwindow->w() != lastsyseffW)
     {
@@ -3229,5 +3269,11 @@ Alan Calvert started the project}
   decl {int aboutDW;} {private local
   }
   decl {int aboutDH;} {private local
+  }
+  decl {int queryDW;} {private local
+  }
+  decl {int queryDH;} {private local
+  }
+  decl {int lastqueryW;} {private local
   }
 }
