@@ -144,7 +144,7 @@ static void *mainGuiThread(void *arg)
      * Below is a pragmatic method of making tooltips
      * fairly readable at all screen resolutions.
      */
-    Fl_Tooltip::size(int(14.0f * Fl::h() / 768.0f));
+    Fl_Tooltip::size(int(12.0f * Fl::w() / 1024.0f));
 
     const int textHeight = 15;
     const int textY = 10;
