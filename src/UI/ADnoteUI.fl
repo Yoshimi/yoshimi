@@ -2020,10 +2020,10 @@ class ADnoteUI {: {public PresetsUI_}
     globalSeen = false;
     resui->resonancewindow->hide();
     o->hide();}
-      xywh {1179 128 535 405} type Double resizable
+      xywh {1179 128 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {addDW = 535; addDH = 405;}
-      code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);} visible
+      code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group globalfreq {
         label FREQUENCY

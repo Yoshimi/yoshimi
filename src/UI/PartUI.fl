@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -384,11 +384,10 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_}
+class PartUI {: {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {open
-  } {
-    Fl_Window partgroup {open
+  Function {make_window()} {} {
+    Fl_Window partgroup {
       xywh {1023 99 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
@@ -2700,8 +2699,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     else
         instrumentkitlist->position(fetchX, fetchY);} {}
   }
-  Function {wincheck()} {open
-  } {
+  Function {wincheck()} {} {
     code {//
     static int lastfxW = 0;
     static int lastkitW = 0;;
@@ -2742,8 +2740,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     if (subnoteui)
         subnoteui->subRtext();
     if (padnoteui)
-        padnoteui->padRtext();} {selected
-    }
+        padnoteui->padRtext();} {}
   }
   Function {editRtext()} {} {
     code {//
@@ -3114,8 +3111,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
 
     partgroup->redraw();} {}
   }
-  Function {~PartUI()} {open
-  } {
+  Function {~PartUI()} {} {
     code {//
     if (adnoteui)
     {

@@ -54,7 +54,7 @@ Completed
 
 
 In progress
-    nothing!
+    replacement choice/ alert window
 
 
 Not started

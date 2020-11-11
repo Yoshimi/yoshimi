@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -146,8 +146,7 @@ class MasterUI {open : {private GuiUpdates}
       activePart = 0;
       yoshiLog = NULL;} {}
   }
-  Function {~MasterUI()} {open
-  } {
+  Function {~MasterUI()} {} {
     code {//
       aboutwindow->hide();
       delete aboutwindow;
@@ -193,12 +192,17 @@ class MasterUI {open : {private GuiUpdates}
           saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
       }
+      
+      if (querywindow)
+      {
+          querywindow->hide();
+          delete querywindow;
+      }
 
       saveWin(synth, masterwindow->w(), masterwindow->h(), masterwindow->x(), masterwindow->y(), true, "Master");
 
       masterwindow->hide();
-      delete masterwindow;} {selected
-    }
+      delete masterwindow;} {}
   }
   Function {Init(const char *_label)} {} {
     code {//
@@ -268,8 +272,7 @@ class MasterUI {open : {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -306,7 +309,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open
+            }}
       xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -648,7 +651,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  } open
+        label {Master  }
         xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Dial globalfinedetune {
@@ -676,7 +679,8 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mainstop {
           label {Stop!}
           callback {//
-          send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+    std::cout << "query " << query("!", "!", "!", "a much longer test to see if the word wrapping works correctly and generally check things") << std::endl;
+    send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -1288,7 +1292,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window message {
-      label Yoshimi open
+      label Yoshimi
       xywh {58 81 290 85} type Double labelsize 12 hide resizable
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
       code1 {msgDW = o->w(); msgDH = o->h();}
@@ -1323,6 +1327,42 @@ Alan Calvert started the project}
                 message->hide();
                 msgSeen = false;}
         xywh {211 60 70 20}
+      }
+    }
+    Fl_Window querywindow {
+      label Yoshimi user_data_type {void *}
+      callback {cancelQ->do_callback();}
+      xywh {5 207 420 105} type Double hide resizable
+      code0 {o->size_range(420, 105, 0, 0, 0, 0, 1);} modal
+    } {
+      Fl_Button yesQ {
+        label Yes
+        callback {//
+    querywindow->hide();}
+        xywh {205 80 60 20}
+        code0 {o->value(0);}
+      }
+      Fl_Button noQ {
+        label No
+        callback {//
+    querywindow->hide();}
+        xywh {276 80 60 20}
+        code0 {o->value(0);}
+      }
+      Fl_Button cancelQ {
+        label Cancel
+        callback {//
+    querywindow->hide();}
+        xywh {348 80 66 20} labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Box typeQ {
+        label {?}
+        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40
+      }
+      Fl_Box textQ {
+        label {text goes here}
+        xywh {65 11 345 63} align 128
       }
     }
   }
@@ -1889,6 +1929,72 @@ Alan Calvert started the project}
             resetPartsClip();
             break;
     }} {}
+  }
+  Function {query(string one, string two, string three, string text)} {return_type int
+  } {
+    code {//
+    if (one == "")
+        yesQ->hide();
+    else
+    {
+        if(one == "!")
+        {
+            yesQ->copy_label("Yes");
+        }
+        else
+        {
+            yesQ->copy_label(one.c_str());
+        }
+        yesQ->show();
+    }
+    
+    if (two == "")
+        noQ->hide();
+    else
+    {
+        if (two == "!")
+        {
+            noQ->copy_label("No");
+        }
+        else
+        {
+            noQ->copy_label(two.c_str());
+        }
+        noQ->show();
+    }  
+    if (three == "")
+    {
+        cancelQ->copy_label("OK");
+        typeQ->copy_label("!");
+    }
+    else
+    {
+        if (three == "!")
+        {
+            cancelQ->copy_label("Cancel");
+        }
+        else
+        {
+            cancelQ->copy_label(three.c_str());
+        }
+        typeQ->copy_label("?");
+    }
+
+
+    textQ->copy_label(text.c_str());
+    querywindow->show();
+    int result = 0;
+    while(querywindow->shown())
+    {
+        if (yesQ->value())
+            result = 3;
+        else if (noQ->value())
+            result = 2;
+        else if  (cancelQ->value())
+            result = 1;
+        Fl::wait();
+    }
+    return result;} {}
   }
   Function {setmessage(int group, bool fixedPos, string text, string B1 = "Close", string B2 = "", string B3 = "")} {} {
     code {//
@@ -2721,8 +2827,7 @@ Alan Calvert started the project}
      partui->wincheck();
      bankui->wincheck();} {}
   }
-  Function {aboutRtext()} {open
-  } {
+  Function {aboutRtext()} {} {
     code {//
     if(aboutwindow->x() > Fl::w() - 10 || aboutwindow->y() > Fl::h() - 10)
         aboutwindow->position(30, 30);
