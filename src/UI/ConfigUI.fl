@@ -619,7 +619,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                                     candidate = 128;
                                     break;
                             }
-                            fl_alert("In use for %s",name.c_str());
+                            alert(synth, "In use for " + name);
                         }
                         send_data(0, CONFIG::control::bankRootCC, candidate, TOPLEVEL::type::Integer);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {234 57 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
@@ -673,7 +673,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                                     candidate = 128;
                                     break;
                             }
-                            fl_alert("In use for %s",name.c_str());
+                            alert(synth, "In use for " + name);
                         }
                         send_data(0, CONFIG::control::bankCC, candidate, TOPLEVEL::type::Integer);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
@@ -727,7 +727,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         string name = testCC(candidate, CONFIG::control::extendedProgramChangeCC);
                         if (!name.empty())
                         {
-                            fl_alert("In use for %s",name.c_str());
+                            alert(synth, "In use for " + name);
                             if (EPCvalue < 128)
                             {
                                 EPCspinner->value(EPCvalue);
@@ -1045,7 +1045,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     if (msg.find("FAILED") == 1)
                     {
                         if (wasFromHere)
-                            fl_alert("%s", msg.c_str());
+                            alert(synth, msg);
                     }
                     else
                         readpresetcfg();
@@ -1116,7 +1116,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 case CONFIG::control::saveCurrentConfig:
                     name = msg;
                     if (wasFromHere && name.find("FAILED") == 1)
-                        fl_alert("%s",name.c_str());
+                        alert(synth, name);
                     break;
     }} {}
   }

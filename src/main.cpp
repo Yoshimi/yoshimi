@@ -356,10 +356,11 @@ int mainCreateNewInstance(unsigned int forceId)
         {
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
         }
+        // not too happy this is possible, maybe gui should be wrapped in a namespace
         if (synth->getRuntime().audioEngine < 1)
-            fl_alert("Yoshimi can't find an available sound system. Running with no Audio");
+            alert(synth, "Yoshimi can't find an available sound system. Running with no Audio");
         if (synth->getRuntime().midiEngine < 1)
-            fl_alert("Yoshimi can't find an input system. Running with no MIDI");
+            alert(synth, "Yoshimi can't find an input system. Running with no MIDI");
     }
     else
         synth->getRuntime().toConsole = false;

@@ -520,7 +520,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   if (!string(tmp).empty() && string(tmp) != oldName )
                   {
                       if (string(tmp) == DEFAULT_NAME)
-                          fl_alert("Can't use name of default sound");
+                          alert(synth, "Can't use name of default sound");
                       else
                       {
                           unsigned char id = textMsgBuffer.push(string(tmp));

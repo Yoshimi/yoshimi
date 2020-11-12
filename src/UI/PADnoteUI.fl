@@ -1097,7 +1097,7 @@ class PADnoteUI {: {public PresetsUI_}
         fetchW = padDW;
         fetchH = padDH;
     }
-    
+
     padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);} {}
   }
   Function {padRtext()} {} {
@@ -1539,7 +1539,7 @@ class PADnoteUI {: {public PresetsUI_}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("Some samples have failed.");
+                    alert(synth, "Some samples have failed.");
             }
             applybutton->color(FL_GRAY);
             applybutton->redraw();

@@ -100,7 +100,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     {
         if (collect_readData(synth, 0, PART::control::partBusy, part))
         {
-            fl_alert("Part %d is busy", int(part));
+            alert(synth, "Part " + to_string(part + 1) + " is busy");
             return;
         }
     }

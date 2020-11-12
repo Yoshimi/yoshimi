@@ -687,7 +687,7 @@ class MicrotonalUI {} {
             message += "Value out of range";
             break;
     }
-    fl_alert("%s", message.c_str());} {}
+    alert(synth, message);} {}
   }
   decl {Microtonal *microtonal;} {private local
   }

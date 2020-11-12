@@ -1001,13 +1001,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
     {
         case BANK::control::exportBank:
             if (source == TOPLEVEL::action::fromGUI)
-                fl_alert("%s",message.c_str());
+                alert(synth, message);
             break;
         case BANK::control::renameInstrument:
             if (message.find("FAILED") != std::string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             }
             else
                 bs[insert]->copy_label(message.c_str());
@@ -1016,7 +1016,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             if (message.find("FAILED") != std::string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             }
             else
                 refreshinstrumentwindow();
@@ -1025,7 +1025,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             if (message.find("FAILED") != std::string::npos)
             {
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             }
             else
                 rescan_for_banks();
@@ -1036,7 +1036,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
             if (message.find("FAILED") != std::string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             rescan_for_banks();
             break;
 
@@ -1046,7 +1046,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::renameBank:
         if (message.find("FAILED") != std::string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             rescan_for_banks();
             break;
 
@@ -1055,7 +1055,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::selectSecondBankAndSwap:
             if (message.find("FAILED") != std::string::npos)
                 if (source == TOPLEVEL::action::fromGUI)
-                    fl_alert("%s",message.c_str());
+                    alert(synth, message);
             rescan_for_banks();
             break;
 
@@ -1218,7 +1218,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         {
             if (synth->getGuiMaster()->activePart == UNUSED)
             {
-                fl_alert("Active part disabled");
+                alert(synth, "Active part disabled");
                 return;
             }
             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main,synth->getGuiMaster()->activePart);
@@ -1236,7 +1236,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 if (newname)
                 {
                     if (string(newname) == DEFAULT_NAME)
-                        fl_alert("Can't use name of default sound");
+                        alert(synth, "Can't use name of default sound");
                     else if (strlen(newname) > 3)
                         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
                 }
@@ -1249,7 +1249,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             bool doit = true;
             if (synth->part[curPart]->Pname == DEFAULT_NAME)
             {
-                fl_alert("Can't store instrument with default name");
+                alert(synth, "Can't store instrument with default name");
                 setread();
                 doit = false;
             }
@@ -1363,7 +1363,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (!thisname.empty())
         {
             setrootread();
-            fl_alert("Bank %d already in use for %s", slot, thisname.c_str());
+            alert(synth, "Bank " + to_string(slot) + " already in use for " + thisname);
             return;
         }
         const char *dirname;
@@ -1377,7 +1377,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (!bank->newIDbank(dirname, (unsigned int)slot))
         {
             setrootread();
-            fl_alert("Could not make a new bank directory.");
+            alert(synth, "Could not make a new bank directory.");
             return;
         }
         bank->setCurrentBankID(slot);
