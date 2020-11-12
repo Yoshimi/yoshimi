@@ -110,7 +110,7 @@ class ResonanceGraph {: {public Fl_Box}
     int ly=h();
     int i;
     float freqx;
-    fl_line_style(0, int(2 * ly/256));
+    fl_line_style(0, int(1 * ly/256));
 
     fl_color(FL_BLACK);
     fl_rectf(ox,oy,lx,ly);
@@ -157,6 +157,7 @@ class ResonanceGraph {: {public Fl_Box}
     }
 
     //draw the data
+    fl_line_style(0, int(2 * ly/256));
     fl_color(FL_RED);
     float ix = ox;
     int oix = int(ix);

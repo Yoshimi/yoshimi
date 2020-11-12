@@ -263,7 +263,7 @@ class Oscilloscope {: {public Fl_Box}
     int oy = y();
     int lx = w();
     int ly = h() - 1;
-    fl_line_style(0, int(2 * ly / 190.0f));
+    fl_line_style(0, int(1 * ly / 190.0f));
     float smps[synth->oscilsize];
     if (oscbase == 0)
         oscilSmp->get(smps, -1.0);
@@ -308,7 +308,7 @@ class Oscilloscope {: {public Fl_Box}
         int tmp = int(ly / (float)GY * i);
         fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
     }
-
+    fl_line_style(0, int(2 * ly / 190.0f));
     // draw the function
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
     if (this->active_r())

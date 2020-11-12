@@ -93,6 +93,8 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_color(220,220,220);
         else
             fl_color(160,165,165);
+        float scale =  lx / 430.0f;
+        fl_line_style(0, int(1 * scale));
         int rbw = (int)(realbw * (lx - 1.0) / 2.0);
         for (int i = lx / 2 - rbw; i < (lx / 2 + rbw); i++)
             fl_line(ox+i, oy, ox+i, oy + ly - 1);
@@ -116,22 +118,31 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         fl_line(ox + lx / 2, oy, ox + lx / 2, oy + ly);
 
         //draw the graph
-        int old = 0;
+        fl_line_style(0, int(2 * scale));
+        int oi = 0;
+        int ov = 0;
         for (int i = 0; i < lx; i++)
         {
-            int val = (int) ((ly - 2) * smps[i]);
+            int val = int((ly - 2) * smps[i]);
+            int next = val;
+            if (next < 2) // this is messy, shouldn't be needed!
+                next = 2;
+            
             if (active)
                 fl_color(180, 210, 240);
             else
                 fl_color(150, 150, 155);
-            fl_line(ox + i, oy + ly - 1, ox + i, oy + ly - 1 - val);
+            if (val != 0)
+                fl_line(ox + i, oy + ly, ox + i, oy + ly - val);
+            
             if (active)
                 fl_color(0, 0, 100);
             else
                 fl_color(150, 150, 150);
             if (i > 0)
-                fl_line(ox + i - 1, oy + ly - 2 - old, ox + i, oy + ly - 2 - val);
-            old = val;
+                fl_line(ox + oi - 1 * scale, oy + ly - ov, ox + i, oy + ly - next);
+            oi = i;
+            ov = next;
         }
 
         if (active)
@@ -139,7 +150,8 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         else
             fl_color(150, 160, 170);
         fl_line(ox + lx / 2 - rbw, oy, ox + lx / 2 - rbw, oy + ly - 1);
-        fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);} {}
+        fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
+        fl_line_style(0, 1);} {}
   }
   decl {PADnoteParameters *pars;} {public local
   }
@@ -160,7 +172,8 @@ this->pars=pars;} {}
         const int maxdb = 60;
         int ox = x(), oy = y(), lx = w(), ly = h();
         const int maxharmonic = 64;
-
+        float scale = lx / 525;
+        fl_line_style(0, 1 * scale);
         for (int i = 1; i < maxharmonic; i++)
         {
             fl_color(200, 200, 200);
@@ -223,7 +236,7 @@ this->pars=pars;} {}
                 }
             }
         }
-
+        fl_line_style(0, 2 * scale);
         for (int i = 0; i < lx; i++)
         {
             float x = spectrum[i];
@@ -233,7 +246,8 @@ this->pars=pars;} {}
                 continue;
             int yy = (int)(x * ly);
             fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
-        }} {}
+        }
+        fl_line_style(0, 1);} {}
   }
   decl {PADnoteParameters *pars;} {public local
   }
@@ -249,7 +263,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {515 162 535 440} type Double hide resizable
+      xywh {157 448 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}

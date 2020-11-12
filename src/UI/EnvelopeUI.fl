@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -65,7 +65,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 }
 
-class EnvelopeFreeEdit {: {public Fl_Box}
+class EnvelopeFreeEdit {open : {public Fl_Box}
 } {
   Function {EnvelopeFreeEdit(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {env=NULL;
@@ -132,13 +132,13 @@ for (int i = 0; i < env->Penvpoints; i++)
 };
 return(nearestpoint);} {}
   }
-  Function {draw()} {private
+  Function {draw()} {open private
   } {
     code {//
     int ox = x();
     int oy = y();
     int lx = w();
-    fl_line_style(0, int(1 * lx / 190.0f));
+    fl_line_style(0, int(1 * lx / 500.0f));
     int ly = h();
     if (env->Pfreemode==0)
         env->converttofree();
@@ -162,6 +162,7 @@ return(nearestpoint);} {}
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
     //draws the evelope points and lines
+    fl_line_style(0, int(2 * lx / 500.0f));
     Fl_Color alb = FL_WHITE;
     if (!active_r())
         alb = fl_rgb_color(180,180,180);
@@ -186,6 +187,7 @@ return(nearestpoint);} {}
     };
 
     //draw the last moved point point (if exists)
+    fl_line_style(0, int(1 * lx / 500.0f));
     if (lastpoint>=0)
     {
         fl_color(FL_CYAN);
@@ -250,7 +252,8 @@ return(nearestpoint);} {}
         fl_color(FL_CYAN);
         fl_draw(tmpstr, ox + lx - 30, oy, 30, 25, FL_ALIGN_RIGHT, NULL, 0);
 }
-fl_line_style(0,1);} {}
+fl_line_style(0,1);} {selected
+    }
   }
   Function {handle(int event)} {return_type int
   } {
@@ -318,7 +321,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {: {public Fl_Group,PresetsUI_}
+class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
