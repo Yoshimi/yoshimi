@@ -252,7 +252,7 @@ class MasterUI {: {private GuiUpdates}
       }
       masterwindow->show();
       if (starterror.find("Could not") != std::string::npos)
-          fl_alert("%s", starterror.c_str());
+          query("", "", "", starterror);
 
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
@@ -281,7 +281,6 @@ class MasterUI {: {private GuiUpdates}
             bool force = Fl::event_state(FL_CTRL);
             if (!force && synth->getRuntime().configChanged)
             {
-                //int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
                 int r = query("!", "!", "!", "Parameters Changed.\\nSave on exit?");
                 switch (r)
                 {
@@ -346,12 +345,12 @@ class MasterUI {: {private GuiUpdates}
             callback {//
             if (synth->getIsLV2Plugin())
             {
-                fl_alert("Start new instances from host");
+                query("", "", "", "Start new instances from host");
                 return;
             }
             if (synth->getUniqueId() != 0)
             {
-                fl_alert("Only main instance can start others");
+                query("", "", "", "Only main instance can start others");
                 return;
             }
 
@@ -421,7 +420,7 @@ class MasterUI {: {private GuiUpdates}
             callback {//
                 if (synth->part[activePart]->Pname == DEFAULT_NAME)
                 {
-                    fl_alert("Nothing to save!");
+                    query("", "", "", "Nothing to save!");
                     return;
                 }
                 string newname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
@@ -438,7 +437,6 @@ class MasterUI {: {private GuiUpdates}
                 if (filename == NULL)
                     return;
                 if (isRegularFile(string(filename)))
-                    //if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
@@ -455,7 +453,6 @@ class MasterUI {: {private GuiUpdates}
           MenuItem I_clear {
             label {&Clear}
             callback {//
-            //if (fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", partui->npart + 1) > 1)
                 if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
             xywh {35 35 100 20} labelsize 12
@@ -465,7 +462,6 @@ class MasterUI {: {private GuiUpdates}
             callback {//
         if (!synth->getRuntime().checksynthengines)
         {
-            //fl_alert("'Show engines/types' must be checked in Mixer Panel");
             query("", "", "", "'Show engines/types' must be checked in Mixer Panel");
             return;
         }
@@ -505,7 +501,7 @@ class MasterUI {: {private GuiUpdates}
             if (valid)
                 do_save_master();
             else
-                fl_alert("Nothing to save!");}
+                query("", "", "", "Nothing to save!");}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentParams {
@@ -572,7 +568,6 @@ class MasterUI {: {private GuiUpdates}
                     return;
                 filename = fl_filename_setext(filename, EXTEN::scale.c_str());
                 if (isRegularFile(string(filename)))
-                    //if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                     if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));}
@@ -588,7 +583,6 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem S_clear {
             label {&Clear}
             callback {\#
-            //if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
             if (query("", "Yes", "No", "Set scales to the defaults?") > 1)
             {
                 synth->microtonal.defaults();
@@ -674,7 +668,6 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           label Reset
           callback {//
           bool wasCtrl = (Fl::event_state(FL_CTRL) != 0);
-          //if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
           if (query("", "Yes", "No", "Set *ALL* dynamic values to their defaults?") > 1)
           {
               if (wasCtrl || (Fl::event_state(FL_CTRL) != 0))
@@ -1242,7 +1235,7 @@ Alan Calvert started the project}
         string name = synth->getRuntime().masterCCtest(candidate);
         if (!name.empty())
         {
-            fl_alert("In use for %s",name.c_str());
+            query("", "", "", "In use for " + name);
             if (CS_CC < 128)
             {
                 CSspinner->value(CS_CC);
@@ -1367,7 +1360,7 @@ Alan Calvert started the project}
       }
       Fl_Box typeQ {
         label {?}
-        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40
+        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40 labelcolor 217
       }
       Fl_Box textQ {
         label {text goes here}
@@ -1734,21 +1727,21 @@ Alan Calvert started the project}
         case MAIN::control::exportBank:
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
-                fl_alert("%s",name.c_str());
+                query("", "", "", name);
             break;
         case MAIN::control::importBank: // import bank
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
             {
                 if (name.find("FAILED") == 1)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
                 else
                 {
                     unsigned int other = name.find(" : ");
                     if (other < 1024) // a bit of a hack :(
                     {
                         name = name.substr(other + 3);
-                        fl_alert("%s",name.c_str());
+                        query("", "", "", name);
                     }
                 }
             }
@@ -1759,7 +1752,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             bankui->rescan_for_banks();
             bankui->set_bank_slot();
@@ -1786,7 +1779,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1801,7 +1794,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1818,7 +1811,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1833,7 +1826,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1849,7 +1842,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1863,7 +1856,7 @@ Alan Calvert started the project}
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
-                    fl_alert("%s",name.c_str());
+                    query("", "", "", name);
             }
             else
             {
@@ -1876,7 +1869,7 @@ Alan Calvert started the project}
         case MAIN::control::saveNamedScale: // save scales
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
-                fl_alert("%s",name.c_str());
+                query("", "", "", name);
             else
                 RecentScale->activate();
             break;
@@ -1885,7 +1878,7 @@ Alan Calvert started the project}
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
             {
-                fl_alert("%s",name.c_str());
+                query("", "", "", name);
                 refresh_master_ui(1);
             }
             else
@@ -1898,7 +1891,7 @@ Alan Calvert started the project}
         case MAIN::control::saveNamedState: // save state
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
-                fl_alert("%s",name.c_str());
+                query("", "", "", name);
             else
                 setMasterLabel(findLeafName(name) + " - State");
             break;
@@ -1926,7 +1919,7 @@ Alan Calvert started the project}
         case MAIN::control::openManualPDF:
             message->hide();
             if (miscmsg != NO_MSG)
-                fl_alert("%s", textMsgBuffer.fetch(miscmsg).c_str());
+                query("", "", "", textMsgBuffer.fetch(miscmsg));
             break;
 
         case MAIN::control::startInstance: // new instance (do nothing here)
@@ -2404,7 +2397,6 @@ Alan Calvert started the project}
         if (result)
         {
             result = false;
-            //if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
             if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                 return;
         }

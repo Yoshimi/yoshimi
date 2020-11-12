@@ -118,6 +118,9 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
 
 void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff);
 
+void alert(SynthEngine *synth, string message);
+int choice(SynthEngine *synth, string one, string two, string three, string message);
+
 string convert_value(ValueType type, float val);
 
 string variable_prec_units(float v, const string& u, int maxPrec, bool roundup = false);
@@ -132,6 +135,7 @@ class GuiUpdates {
 
 public:
     void read_updates(SynthEngine *synth);
+
 private:
     void decode_envelope(SynthEngine *synth, CommandBlock *getData);
     void decode_updates(SynthEngine *synth, CommandBlock *getData);
@@ -218,6 +222,5 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
     //std::cout << v << " " << values << " " << filename << std::endl;
     saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
 }
-
 
 #endif

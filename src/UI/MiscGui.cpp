@@ -174,6 +174,16 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }
 
+void alert(SynthEngine *synth, string message)
+{
+    synth->getGuiMaster()->query("", "", "", message);
+}
+
+int choice(SynthEngine *synth, string one, string two, string three, string message)
+{
+    return synth->getGuiMaster()->query(one, two, three, message);
+}
+
 
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
@@ -1400,3 +1410,4 @@ ValueType getFilterFreqTrackType(int offset)
         default: return(VC_FilterFreqTrack1);
     }
 }
+

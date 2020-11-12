@@ -103,7 +103,7 @@ class VectorUI {} {
 
           if (Xcc < 14)
           {
-              fl_alert("Nothing to save!");
+              alert(synth, "Nothing to save!");
               ok = false;
           }
           else
@@ -124,7 +124,7 @@ class VectorUI {} {
                       name = "No instruments set!";
                   else
                       name = "Only " + to_string(count/NUM_MIDI_CHANNELS) + " of " +  to_string(size/NUM_MIDI_CHANNELS) + " instruments set!";
-                  fl_alert("%s",name.c_str());
+                  alert(synth, name);
                   ok = false;
               }
           }

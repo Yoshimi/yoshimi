@@ -254,7 +254,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         case MIDILEARN::control::deleteLine:
             doit = (Fl::event_state(FL_CTRL) != 0);
             if (doit)
-                doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+                doit = (choice(synth, "", "Yes", "No", "Remove line " + to_string( n + 1) + " " + commandName->label() + "?") > 1);
             break;
         case MIDILEARN::control::CCorChannel:
             CC = lrint(CCcounter->value());
@@ -425,7 +425,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button clear {
         label Clear
         callback {//
-        if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
+        if (choice(synth, "", "Yes", "No", "Remove all entries") < 2)
             return;
 
         send_data(0, MIDILEARN::control::clearAll,0,0);

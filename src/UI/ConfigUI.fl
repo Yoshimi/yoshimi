@@ -338,7 +338,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                         int tmp = o->value();
                         int doit = true;
                         if (tmp == 0)
-                            doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
+                            doit = choice(synth, "", "Yes", "No", "Are you sure you want to disable the GUI?\\nThis can only be restored via the command line.") > 1;
                         if (doit)
                             send_data(0, CONFIG::control::enableGUI, o->value(), TOPLEVEL::type::Integer);
                         else
