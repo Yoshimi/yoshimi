@@ -742,7 +742,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Button clearHarm {
         label Clear
         callback {//
-        if (fl_choice("Clear the harmonics settings?", NULL,"No","Yes") < 2)
+        if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -1086,7 +1086,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Button tosine {
         label Sine
         callback {//
-        if (fl_choice("Convert to SINE?",NULL, "No","Yes") < 2)
+        if (choice(synth, "", "Yes", "No", "Convert to SINE?") < 2)
             return;
 
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer);}

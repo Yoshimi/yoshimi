@@ -288,7 +288,7 @@ class PartKitItem {: {public Fl_Group}
         callback {//
         int answer = 1;
         if (o->value() == 0)
-            answer = (fl_choice("Delete the item?", NULL,"No","Yes") > 1);
+            answer = (choice(synth, "", "Yes", "No", "Delete the item?") > 1);
         if (answer != 0)
         {
             if (o->value() == 0)

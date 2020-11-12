@@ -994,7 +994,7 @@ class VectorUI {} {
 
     string filename = setExtension(string(file), "xvy");
     if (isRegularFile(filename))
-        if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
+        if (choice(synth, "", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
             return;
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)

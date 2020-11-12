@@ -867,7 +867,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             return;
         if (!file::isDirectory(dirname))
         {
-            if (fl_choice("Directory is missing, or doesn't have at least \\n1 bank with at least 1 instrument. \\nCreate missing entries?", NULL, "No", "Yes") != 2)
+            if (choice(synth, "", "Yes", "No", "Directory is missing, or doesn't have at least \\n one bank with at least one instrument. \\nCreate missing entries?") != 2)
                 return;
             synth->getBankRef().generateSingleRoot(dirname, false);
             synth->getGuiMaster()->updatepart();
@@ -1255,7 +1255,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             else if (slotFilled)
             {
-                if (fl_choice("Overwrite the slot no. %d ?", NULL, "No", "Yes", slot + 1) < 2)
+                if (choice(synth, "", "Yes", "No", "Overwrite the slot no." + to_string(slot + 1) + "?") < 2)
                 {
                     setread();
                     doit = false;
@@ -1272,7 +1272,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         {   // Clears the slot (choices reversed for 'No' priority)
             if (slotFilled)
             {
-                if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
+                if (choice(synth, "", "Yes", "No", "Clear the slot no. " + to_string(slot + 1) + "?") > 1)
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);
             }
             setread();
@@ -1390,13 +1390,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     if (r_mode == 3 && !thisname.empty())
     {   // Remove bank and file contents (choices reversed for 'No' priority)
-        if (fl_choice("Completely remove %s?", NULL, "No", "Yes", thisname.c_str()) > 1)
+        if (choice(synth, "", "Yes", "No", "Completely remove " + thisname + "?") > 1)
         {
             int clearit = true;
             int count = bank->getBankSize(slot, rt);
             if (count > 1)
-                clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
-                                    NULL, "STOP !", "Continue", count) > 1;
+                clearit = choice(synth, "Yes", "", "STOP!", "There are " + to_string(count) + " instruments in this bank\\nThey will be permanently deleted") == 3;
             if (clearit)
             {
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::deleteBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main);

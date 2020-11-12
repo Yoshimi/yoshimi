@@ -356,7 +356,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         callback {//
         if (env->Pfreemode != 0)
         {
-            bool answer = fl_choice("Disable the free mode of the Envelope?", NULL, "No", "Yes") > 1;
+            bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
             if (!answer)
             {
                 o->value(1); // back as it was
@@ -1074,7 +1074,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     code {//
     if (env->Pfreemode != 0)
     {
-        bool answer = fl_choice("Disable the free mode of the Envelope?", NULL, "No", "Yes") > 1;
+        bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
         if (!answer)
         {
             freemodebutton->value(1); // back as it was
