@@ -51,10 +51,11 @@ Completed
         sys/ins window
         parameters
         about
+        choice/alert windows
 
 
 In progress
-    replacement choice/ alert window
+    (none)
 
 
 Not started

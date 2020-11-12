@@ -539,7 +539,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem S_show {
             label {S&how Settings...}
             callback {//
-            microtonalui->microtonaluiwindow->show();}
+            microtonalui->showScales();}
             xywh {20 20 100 20} labelsize 12
           }
           MenuItem S_load {
@@ -1863,6 +1863,7 @@ Alan Calvert started the project}
                 RecentScale->activate();
                 microtonalui->microtonaluiwindow->hide();
                 microtonalui->make_window();
+                microtonalui->showScales();
             }
             break;
 
@@ -2733,13 +2734,8 @@ Alan Calvert started the project}
     else
         virkeyboard->virkeyboardwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Scales");
-    if (fetchW == 0 || fetchH == 0)
-        microtonalui->microtonaluiwindow->position(fetchX, fetchY);
-    else
-        microtonalui->microtonaluiwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    if (fetchO)
-        microtonalui->microtonaluiwindow->show();
+    if (lastSeen(synth, "Scales"))
+        microtonalui->showScales();
     else
         microtonalui->microtonaluiwindow->hide();
 
@@ -2795,7 +2791,6 @@ Alan Calvert started the project}
     static int lastpanelW = 0;
     static int lastmsgW = 0;
     static int lastsyseffW = 0;
-    static int lastscaleW = 0;
     static int lastvirtW = 0;
     static int lastaboutW = 0;
     if (masterwindow->w() != lastmainW)
@@ -2830,11 +2825,8 @@ Alan Calvert started the project}
         syseffSeen = true;
     }
 
-    if (microtonalui->microtonaluiwindow->visible() && lastscaleW != microtonalui->microtonaluiwindow->w())
-    {
+    if (microtonalui->microtonaluiwindow->visible())
         microtonalui->scaleRtext();
-        lastscaleW = microtonalui->microtonaluiwindow->w();
-    }
 
     if (midilearnui->midilearnwindow->visible())
         midilearnui->learnRtext();

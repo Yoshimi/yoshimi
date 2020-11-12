@@ -65,6 +65,7 @@ class MicrotonalUI {} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
+      callback {scaleClose->do_callback();}
       xywh {612 332 410 485} type Double hide resizable
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
@@ -397,7 +398,10 @@ class MicrotonalUI {} {
       }
       Fl_Button scaleClose {
         label Close
-        callback {microtonaluiwindow->hide();}
+        callback {//
+    saveWin(synth, microtonaluiwindow->w(), microtonaluiwindow->h(), microtonaluiwindow->x(), microtonaluiwindow->y(), false, "Scales");
+    microtonaluiwindow->hide();
+    lastscaleSeen = false;}
         xywh {315 447 67 28} box THIN_UP_BOX down_box THIN_DOWN_BOX
       }
     }
@@ -550,18 +554,40 @@ class MicrotonalUI {} {
     code {//
     synth = synth_;
     microtonal=microtonal_;
+    lastscaleW = 0;
+    lastscaleSeen = false;
     make_window();} {}
   }
   Function {~MicrotonalUI()} {} {
     code {//
-    saveWin(synth, microtonaluiwindow->w(), microtonaluiwindow->h(), microtonaluiwindow->x(), microtonaluiwindow->y(), microtonaluiwindow->visible(), "Scales");
+    if (lastscaleSeen)
+        saveWin(synth, microtonaluiwindow->w(), microtonaluiwindow->h(), microtonaluiwindow->x(), microtonaluiwindow->y(), true, "Scales");
     microtonaluiwindow->hide();
     delete tuningsinput;
     delete mappinginput;
     delete microtonaluiwindow;} {}
   }
+  Function {showScales()} {} {
+    code {//
+    int fetchX, fetchY, fetchW, fetchH, fetchO;
+
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Scales");
+    if (fetchW < scaleDW || fetchH < scaleDH)
+    {
+        fetchW = scaleDW;
+        fetchH = scaleDH;
+    }
+    microtonaluiwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    lastscaleW = 0;
+    lastscaleSeen = true;
+    microtonaluiwindow->show();} {}
+  }
   Function {scaleRtext()} {} {
     code {//
+    if (lastscaleW == microtonaluiwindow->w())
+        return;
+    lastscaleW = microtonaluiwindow->w();
+
     if(microtonaluiwindow->x() > Fl::w() - 10 || microtonaluiwindow->y() > Fl::h() - 10)
         microtonaluiwindow->position(30, 30);
 
@@ -706,5 +732,9 @@ class MicrotonalUI {} {
   decl {int scaleDW;} {private local
   }
   decl {int scaleDH;} {private local
+  }
+  decl {int lastscaleW;} {private local
+  }
+  decl {bool lastscaleSeen;} {private local
   }
 }
