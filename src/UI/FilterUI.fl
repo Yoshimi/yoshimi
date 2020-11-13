@@ -110,8 +110,8 @@ class FormantFilterGraph {: {public Fl_Box}
         float freqx;
 
         int points = 475;
-        float mag = lx / float(points);
-        fl_line_style(0, 2 * mag); // part of new resizable code
+        float scale = lx / float(points);
+        fl_line_style(0, 1 * scale); // part of new resizable code
 
         fl_color(FL_BLACK);
         fl_rectf(ox, oy, lx, ly);
@@ -154,8 +154,9 @@ class FormantFilterGraph {: {public Fl_Box}
             fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
         }
 
+        fl_line_style(0, 2 * scale);
         fl_color(FL_YELLOW);
-        fl_font(FL_HELVETICA, 10);
+        fl_font(FL_HELVETICA, 10 * scale);
         if (*nformant < pars->Pnumformants)
         {
             draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq));
@@ -164,11 +165,11 @@ class FormantFilterGraph {: {public Fl_Box}
             string tmpstr = asString((float)
                 (pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq) / 1000.0))
                     + " kHz";
-            fl_draw(tmpstr.c_str(), ox + 2, oy + 2, 40, 12, FL_ALIGN_LEFT, NULL, 0);
+            fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 2 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
             tmpstr = asString((int)
                 (rap2dB(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain()))
                     + " dB";
-            fl_draw(tmpstr.c_str(), ox + 2, oy + 15, 40, 12, FL_ALIGN_LEFT, NULL, 0);
+            fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 15 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
         }
 
         if (hoverFormant >= 0 && hoverFormant != *nformant)
@@ -186,7 +187,7 @@ class FormantFilterGraph {: {public Fl_Box}
         oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < points; ++i)
         {
-            int nextpos = ox + int(i * mag);
+            int nextpos = ox + int(i * scale);
             int iy = (int) ((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
             if (iy >= 0 && oiy >= 0 && iy < ly && oiy < lx)
                 fl_line(lastpos, oy + ly - oiy, nextpos, oy + ly - iy);
