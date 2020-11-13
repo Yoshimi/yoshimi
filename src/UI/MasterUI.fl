@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -273,7 +273,8 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1933,7 +1934,7 @@ Alan Calvert started the project}
             break;
     }} {}
   }
-  Function {query(string one, string two, string three, string text)} {return_type int
+  Function {query(string one, string two, string three, string text)} {open return_type int
   } {
     code {//
     if (one == "")
@@ -1993,7 +1994,8 @@ Alan Calvert started the project}
         W = queryDW;
         H = queryDH;
     }
-    querywindow->resize(X, Y, W, H);
+    querywindow->resize(Fl::event_x_root() + 16, Fl::event_y_root(), W, H);
+    //querywindow->resize(X, Y, W, H);
 
     querywindow->show();
     int result = 0;
@@ -2009,7 +2011,8 @@ Alan Calvert started the project}
         Fl::wait();
     }
     saveWin(synth, querywindow->w(),querywindow->h(), querywindow->x(), querywindow->y(), false, "Master-query");
-    return result;} {}
+    return result;} {selected
+    }
   }
   Function {queryRtext()} {} {
     code {//
