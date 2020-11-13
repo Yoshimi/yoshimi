@@ -8,8 +8,7 @@ comment {BankUI.h} {not_in_source in_header
 comment {BankUI.cc} {in_source not_in_header
 }
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
 Copyright 2014-2020, Will Godfrey & others
@@ -530,6 +529,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window searchwin {
       label {Bank Search}
+      callback {searchClose->do_callback();}
       xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       code0 {searchDW = o->w(); searchDH = o->h();}
       code1 {searchwin->size_range(searchDW, searchDH, 0, 0, 0, 0, 1);}
@@ -552,7 +552,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button searchClose {
         label Close
         callback {//
-        saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-root");
+        saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
         searchSeen = false;
         searchwin->hide();}
         xywh {228 451 65 24} labelsize 12 align 192
@@ -1098,21 +1098,21 @@ class BankUI {: {public BankProcess_, RootProcess_}
   } {
     code {//
         if (instrumentSeen)
-            saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), instrumentuiwindow->visible(), "Bank-instrument");
+            saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");
         instrumentuiwindow->hide();
         instrumentSeen = false;
         delete instrumentuiwindow;
         if (bankSeen)
-            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), bankuiwindow->visible(), "Bank-bank");
+            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
         bankuiwindow->hide();
         bankSeen = false;
         delete bankuiwindow;
         if (rootSeen)
-            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), rootuiwindow->visible(), "Bank-root");
+            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
         rootSeen = false;
         rootuiwindow->hide();
         if (searchSeen)
-            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), searchwin->visible(), "Bank-search");
+            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
         searchwin->hide();
         delete searchwin;
 
@@ -1137,11 +1137,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     {
         W = instDW;
         H = instDH;
-        instrumentuiwindow->size(X, Y);
-
     }
-    else
-        instrumentuiwindow->resize(X, Y, W, H);
+    instrumentuiwindow->resize(X, Y, W, H);
     lastinstrumentW = 0;
     instrumentuiwindow->show();
     instrumentSeen = true;} {}
@@ -1151,10 +1148,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Bank-bank");
-    if (W == 0 || H == 0)
-        bankuiwindow->size(X, Y);
-    else
-        bankuiwindow->resize(X, Y, W, H);
+    if (W < bankDW || H < bankDH)
+    {
+        W = bankDW;
+        H = bankDH;
+    }
+    bankuiwindow->resize(X, Y, W, H);
     bankuiwindow->show();
     bankRtext();
     bankSeen = true;} {}
@@ -1164,10 +1163,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Bank-root");
-    if (W == 0 || H == 0)
-        rootuiwindow->size(X, Y);
-    else
-        rootuiwindow->resize(X, Y, W, H);
+    if (W < rootDW || H < rootDH)
+    {
+        W = rootDW;
+        H = rootDH;
+    }
+    rootuiwindow->resize(X, Y, W, H);
     rootuiwindow->show();
     rootRtext();
     rootSeen = true;} {}
@@ -1177,10 +1178,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Bank-search");
-    if (W == 0 || H == 0)
-        searchwin->size(X, Y);
-    else
-        searchwin->resize(X, Y, W, H);
+    if (W < searchDW || H < searchDH)
+    {
+        W = searchDW;
+        H = searchDH;
+    }
+    searchwin->resize(X, Y, W, H);
     if (unsearched)
     {
         fillBrowser(1);
