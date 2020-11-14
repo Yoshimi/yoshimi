@@ -190,7 +190,7 @@ class MasterUI {: {private GuiUpdates}
 
       if (yoshiLog)
       {
-          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
+          //saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
       }
 
@@ -370,7 +370,11 @@ class MasterUI {: {private GuiUpdates}
           }
           MenuItem Y_reports {
             label {&Reports...}
-            callback {yoshiLog->Show(synth);}
+            callback {//
+                         if (synth->getRuntime().toConsole)
+                             yoshiLog->Show(synth);
+                         else
+                             alert(synth, "Logging configured for std::cout");}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem Y_manual {
@@ -1147,6 +1151,7 @@ Alan Calvert started the project}
     }
     Fl_Window panelwindow {
       label {Yoshimi Mixer Panel}
+      callback {Panelclose->do_callback();}
       xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
@@ -2470,11 +2475,6 @@ Alan Calvert started the project}
     updatepanel(type > 0);
     if (type != 5)
         vectorui->RefreshChans();
-    //bankui->Hide();
-    /*if (synth->getRuntime().toConsole == false)
-        Reports->deactivate();
-    else
-        Reports->activate();*/
     mastermono->value(0);
     mastermono->label("S");
     if (type == 0x14)
@@ -2660,7 +2660,9 @@ Alan Calvert started the project}
     if (isConsole)
         yoshiLog->Show(synth);
     else
-        yoshiLog->logConsole->hide();} {}
+    {
+        setVisible(synth, false, "System-log");
+        yoshiLog->logConsole->hide();}} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -2684,26 +2686,8 @@ Alan Calvert started the project}
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-systemeffectsend");
     syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
-    /*loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Mixer");
-    int tmp = fetchO & 3;
-    //changepanelstyle(tmp); // needed for opening from mixer button
-    if (fetchO == tmp)
-    {
-
-        if (fetchW == 0 || fetchH == 0)
-            panelwindow->position(fetchX, fetchY);
-        else
-            panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
-        panelwindow->show();
-        changepanelstyle(tmp);
-        updatepanel();
-    }
-    else
-    {
-        panelType = fetchO;
-        panelwindow->hide();
-    }*/
-    Showpanel();
+    if (lastSeen(synth, "Mixer") & 3)
+        Showpanel();
 
     if (lastSeen(synth, "Bank-instrument"))
         bankui->ShowInst();
@@ -2752,6 +2736,7 @@ Alan Calvert started the project}
     else
         configui->configwindow->hide();
 
+    //if (synth->getRuntime().toConsole)
     if (lastSeen(synth, "System-log"))
         yoshiLog->Show(synth);
     else
@@ -2803,6 +2788,8 @@ Alan Calvert started the project}
             lastmainW = masterwindow->w();
     }
 
+    if (yoshiLog->logConsole->visible())
+        yoshiLog->consoleRtext();
     if (panelwindow->visible() && panelwindow->w() != lastpanelW)
     {
         panelRtext();

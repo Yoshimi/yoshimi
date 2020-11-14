@@ -63,12 +63,8 @@ class ConsoleUI {} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
-      callback {//
-         saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"System-log");
-         o->hide();
-     }
-      xywh {5 20 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
-      code0 {logDW = o->w();logDH = o->h();}
+      xywh {397 70 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
+      code0 {logDW = 385;logDH = 185;}
       code1 {o->size_range(logDW,logDH);}
     } {
       Fl_Text_Display logText {
@@ -83,11 +79,11 @@ class ConsoleUI {} {
     bufsize = 8192;
     make_window();
     txtbuf = new Fl_Text_Buffer(bufsize);
+    lastlogW = 0;
     logText->buffer(txtbuf);} {}
   }
   Function {~ConsoleUI()} {} {
     code {//
-      setVisible(synth, logConsole->visible(), "System-log");
       logConsole->hide();
       delete logConsole;} {}
   }
@@ -106,8 +102,6 @@ class ConsoleUI {} {
   }
   Function {consoleRtext()} {} {
     code {//
-    static int lastlogW = 0;
-
     if(logConsole->x() > Fl::w() - 10 || logConsole->y() > Fl::h() - 10)
         logConsole->position(30, 30);
 
@@ -141,6 +135,7 @@ class ConsoleUI {} {
         fetchH = logDH;
     }
     logConsole->resize(fetchX, fetchY, fetchW, fetchH);
+    lastlogW = 0;
     logConsole->show();} {}
   }
   decl {float logDW;} {private local
@@ -148,5 +143,7 @@ class ConsoleUI {} {
   decl {float logDH;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int lastlogW;} {private local
   }
 }

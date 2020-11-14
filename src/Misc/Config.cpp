@@ -295,7 +295,7 @@ void Config::flushLog(void)
     {
         while (LogList.size())
         {
-            std::cerr << LogList.front() << std::endl;
+            std::cout << LogList.front() << std::endl;
             LogList.pop_front();
         }
     }
