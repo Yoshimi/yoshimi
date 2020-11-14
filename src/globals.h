@@ -137,6 +137,7 @@ namespace YOSH
     // float to bool done this way to ensure consistency
     // we are always using positive values
     inline bool F2B(float value) {return value > 0.5f;}
+    const float tipscale = (10.0f / 1024);
 }
 
 /*

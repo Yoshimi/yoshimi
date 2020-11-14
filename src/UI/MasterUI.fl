@@ -1120,7 +1120,7 @@ Alan Calvert started the project}
       code0 {syseffDW = 120; syseffDH = 50;}
       code1 {o->size_range(120, 242, 0, 0, 0, 0, 1);}
     } {
-      Fl_Scroll syseffgroup {open
+      Fl_Group syseffgroup {open
         xywh {9 46 109 172} box FLAT_BOX
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
