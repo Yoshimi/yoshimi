@@ -2834,10 +2834,16 @@ Alan Calvert started the project}
     if (paramsui->Recent->visible())
         paramsui->paramRtext();
 
-     presetsui->presetsRtext();
+    if (configui->configwindow->visible())
+        configui->configRtext();
 
-     partui->wincheck();
-     bankui->wincheck();} {}
+    if (configui->presets->visible())
+        configui->presetsRtext();
+
+    presetsui->presetsRtext();
+
+    partui->wincheck();
+    bankui->wincheck();} {}
   }
   Function {aboutRtext()} {} {
     code {//

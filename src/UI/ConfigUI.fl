@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -60,20 +60,16 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {} {
+class ConfigUI {selected
+} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         configRtext();}
       xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
-      class YoshiWin
+      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Tabs configTabs {
         xywh {5 5 380 298}
@@ -795,8 +791,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button close {
         label {Close Unsaved}
         callback {//
-                    configwindow->hide();
-                    setVisible(synth, false, "Config");}
+         configwindow->hide();
+         configSeen = false;
+         saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
         xywh {275 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button save {
@@ -809,16 +806,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     }
     Fl_Window presets {
       label Presets
-      callback {//
-     if (Fl::event() == FL_CLOSE)
-         o->hide();
-     else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-         presetsRtext();}
+      callback {pClose->do_callback();}
       xywh {5 437 460 295} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
-      code1 {int fetchW, fetchH, fetchX, fetchY, fetchO;loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config-presets");o->position(fetchX, fetchY);}
-      code2 {preDW = o->w();preDH = o->h();}
-      class YoshiWin
+      code1 {preDW = o->w();preDH = o->h();}
+      code2 {o->size_range(preDW, preDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Browser presetbrowse {
         callback {//
@@ -863,8 +855,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button pClose {
         label {Close Unsaved}
         callback {//
-                    presets->hide();
-                    setVisible(synth, false, "Config-presets");}
+        saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), false, "Config-presets");
+        presetsSeen = false;
+        presets->hide();}
         xywh {334 268 118 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1129,10 +1122,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {~ConfigUI()} {} {
     code {//
-        setVisible(synth, presets->visible(), "Config-presets");
+        if (presetsSeen)
+            saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), true, "Config-presets");
         presets->hide();
         delete presets;
-        setVisible(synth, configwindow->visible(), "Config");
+        
+        if (configSeen)
+            saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");
         configwindow->hide();
         delete configwindow;} {}
   }
@@ -1328,54 +1324,41 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
                     int fetchW, fetchH, fetchX, fetchY, fetchO;
                     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config");
-                    configwindow->show();
-
-                    if (fetchW > 0 && fetchH > 0)
+                    if (fetchW < confDW || fetchH < confDH)
                     {
-                       configwindow->resize(fetchX, fetchY, fetchW, fetchH);
-                       configRtext();
+                        fetchW = confDW;
+                        fetchH = confDH;
                     }
-                    else
-                       configwindow->position(fetchX, fetchY);
-                    configwindow->size_range(confDW, confDH, 0, 0, 0, 0, 1);} {}
+                    configwindow->resize(fetchX, fetchY, fetchW, fetchH);
+                    lastconfigW = 0;
+                    configwindow->show();} {}
   }
   Function {Showpresets(SynthEngine *synth)} {} {
     code {//
                 int fetchW, fetchH, fetchX, fetchY, fetchO;
                 loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config-presets");
-                presets->show();
-                if (fetchW > 0 && fetchH > 0)
-                {
-                    presets->resize(fetchX, fetchY, fetchW, fetchH);
-                    presetsRtext();
-                }
-                else
-                   presets->position(fetchX, fetchY);
-                presets->resizable();
 
-                presets->size_range(preDW, preDH, 0, 0, 0, 0, 1);} {}
+                if (fetchW < preDW || fetchH < preDH)
+                {
+                    fetchW = preDW;
+                    fetchH = preDH;
+                }
+                presets->resize(fetchX, fetchY, fetchW, fetchH);
+                presets->resizable();
+                lastpresetW = 0;
+                presetsSeen = true;
+                presets->show();} {}
   }
   Function {configRtext()} {} {
     code {//
-    static int lastconfigW = 0;
-
     if(configwindow->x() > Fl::w() - 10 || configwindow->y() > Fl::h() - 10)
         configwindow->position(30, 30);
 
     if (lastconfigW == configwindow->w())
         return;
-
     lastconfigW = configwindow->w();
 
-    float dW = configwindow->w() / confDW;
-    float dH =  configwindow->h() / confDH;
-    float dScale;
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
+    float dScale =  configwindow->w() / confDW;
 
     int size = int(dScale * 12);
 
@@ -1510,13 +1493,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     close->labelsize(size);
     save->labelsize(size);
 
-    configwindow->redraw();
-    saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");} {}
+    configwindow->redraw();} {}
   }
   Function {presetsRtext()} {} {
     code {//
-    static int lastpresetW = 0;
-
     if(presets->x() > Fl::w() - 10 || presets->y() > Fl::h() - 10)
         presets->position(30, 30);
 
@@ -1525,17 +1505,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     lastpresetW = presets->w();
 
-    float dW = presets->w() / preDW;
-    float dH =  presets->h() / preDH;
-    float dScale;
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
+    float dScale = presets->w() / preDW;
 
     int size = int(12 * dScale);
+
     addpreset->labelsize(size);
     removepresetbutton->labelsize(size);
     makedefaultpresetbutton->labelsize(size);
@@ -1544,8 +1517,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     presetbrowse->textsize(size);
 
-    presets->redraw();
-    saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), true, "Config-presets");} {}
+    presets->redraw();} {}
   }
   Function {testCC(int value, int control)} {return_type string
   } {
@@ -1576,5 +1548,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   decl {float preDW;} {private local
   }
   decl {float preDH;} {private local
+  }
+  decl {int lastconfigW;} {private local
+  }
+  decl {int lastpresetW;} {private local
+  }
+  decl {bool configSeen;} {private local
+  }
+  decl {bool presetsSeen;} {private local
   }
 }

@@ -357,8 +357,6 @@ o->hide();}
             pastetypetext->labelsize(size11);
 
             pastewin->redraw();
-
-
         }
     }} {}
   }
