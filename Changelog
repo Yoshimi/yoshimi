@@ -1,5 +1,8 @@
 yoshimi 1.7.3
 
+2020-11-15 Will
+BugFix: GUI not setting kit item names.
+
 2020-10-29 Will
 *Updated docs.
 * Set release as 1.7.3 (mantenance)
