@@ -145,7 +145,7 @@ class PartKitItem {: {public Fl_Group}
           const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
           if (tmp != NULL)
           {
-              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, 1, textMsgBuffer.push(string(tmp)));
+              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup, UNUSED, textMsgBuffer.push(string(tmp)));
               o->copy_label(tmp);
           }}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
@@ -306,7 +306,7 @@ class PartKitItem {: {public Fl_Group}
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart, kititem, engine, insert, parameter, miscmsg);} {}
+        collect_data(synth, value, action, type, control, npart, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
