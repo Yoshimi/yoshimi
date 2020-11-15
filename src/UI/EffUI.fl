@@ -1882,8 +1882,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             break;
     }} {}
   }
-  Function {init(EffectMgr *eff_, int npart_, int neff_)} {open
-  } {
+  Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {//
     eff=eff_;
     npart = npart_;
