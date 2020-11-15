@@ -1253,6 +1253,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {591 324 365 60} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
       code1 {midiDW = o->w(); midiDH = o->h();}
+      code2 {o->size_range(midiDW, midiDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Dial modulation {
         label Modulation
@@ -2659,13 +2660,15 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-ctlmidi");
-    ctlmidi->show();
-    ctlmidiSeen = true;
+    checkSane(fetchX, fetchY, fetchW, fetchH, midiDW, midiDH);
+    
     if (fetchW > 0 && fetchH > 0)
         ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     else
         ctlmidi->position(fetchX, fetchY);
-    ctlmidi->size_range(midiDW, midiDH, 0, 0, 0, 0, 1);} {}
+
+    ctlmidi->show();
+    ctlmidiSeen = true;} {}
   }
   Function {ctlmidirefresh()} {} {
     code {//
@@ -2913,27 +2916,8 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ctlmidiRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = ctlmidi->w();
-    int h = ctlmidi->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        ctlmidi->size(w, h);
-    };
+    float dScale = ctlmidi->w() / midiDW;
 
-    float dW = w / midiDW;
-    float dH = h / midiDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
     int size = int(dScale * 10);;
 
     modulation->labelsize(size);

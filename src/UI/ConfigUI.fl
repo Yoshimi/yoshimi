@@ -64,6 +64,7 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
+      callback {close->do_callback();}
       xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
@@ -798,8 +799,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button save {
         label {Save and Close}
         callback {//
-                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push("DUMMY"));
-                    configwindow->hide();}
+         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push("DUMMY"));
+         configwindow->hide();
+         configSeen = false;
+         saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1117,6 +1120,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             synth = _synth;
             make_window();
             readpresetcfg();
+            configSeen = false;
+            presetsSeen = false;
             selectedRootID = -1;} {}
   }
   Function {~ConfigUI()} {} {
@@ -1125,7 +1130,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), true, "Config-presets");
         presets->hide();
         delete presets;
-        
+
         if (configSeen)
             saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");
         configwindow->hide();
@@ -1322,6 +1327,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         alsaSource->deactivate();
 
                     int fetchW, fetchH, fetchX, fetchY, fetchO;
+                    checkSane(fetchX, fetchY, fetchW, fetchH, confDW, confDH);
                     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config");
                     if (fetchW < confDW || fetchH < confDH)
                     {
@@ -1330,6 +1336,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     }
                     configwindow->resize(fetchX, fetchY, fetchW, fetchH);
                     lastconfigW = 0;
+                    configSeen = true;
                     configwindow->show();} {}
   }
   Function {Showpresets(SynthEngine *synth)} {} {
@@ -1350,9 +1357,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {configRtext()} {} {
     code {//
-    if(configwindow->x() > Fl::w() - 10 || configwindow->y() > Fl::h() - 10)
-        configwindow->position(30, 30);
-
     if (lastconfigW == configwindow->w())
         return;
     lastconfigW = configwindow->w();

@@ -223,4 +223,33 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
     saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
 }
 
+inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH)
+{
+    int maxW = Fl::w() - 5; // wiggle room
+    int maxH = Fl::h() - 30; // space for minimal titlebar
+
+    if ((x + w ) > maxW) // postion
+        x = 5;
+    if ((y + h) > maxH)
+        y = 30;
+
+    if ((w / defW) != (h / defH)) // ratio
+        w = h / defH * defW; // doesn't matter which one we pick!
+
+    if (w > maxW || h > maxH) // size
+    {
+        h = maxH;
+        w = maxW;
+        if (h / defH > w / defW)
+        {
+            h = w / defW * defH;
+        }
+        else
+        {
+            w = h / defH * defW;
+        }
+        //std::cout << "w " << w << "  h " << h << std::endl;
+    }
+}
+
 #endif

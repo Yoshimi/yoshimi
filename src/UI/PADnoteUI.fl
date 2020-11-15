@@ -81,7 +81,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   Function {draw()} {} {
     code {//
-        int ox = x(), oy = y(), lx =w (), ly = h();
+        int ox = x(), oy = y(), lx =w (), ly = h() - 1;
         if (!visible()) return;
         float smps[lx];
 
@@ -118,31 +118,37 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         fl_line(ox + lx / 2, oy, ox + lx / 2, oy + ly);
 
         //draw the graph
-        fl_line_style(0, int(2 * scale));
-        int oi = 0;
-        int ov = 0;
-        for (int i = 0; i < lx; i++)
+        int step = 2 * scale;
+        fl_line_style(0, step);
+        
+        for (int i = 0; i < lx; i += step)
         {
-            int val = int((ly - 2) * smps[i]);
-            int next = val;
-            if (next < 2) // this is messy, shouldn't be needed!
-                next = 2;
-            
-            if (active)
+             int val = int((ly - 2) * smps[i]);
+              if (active)
                 fl_color(180, 210, 240);
             else
                 fl_color(150, 150, 155);
             if (val != 0)
                 fl_line(ox + i, oy + ly, ox + i, oy + ly - val);
+
+        }
+        
+        int oi = 0;
+        float ov = 0;
+        
+        for (int i = 0; i < lx; i++)
+        {
+            int ni = ox + i;
+            float nv = (ly - 2) * smps[i];
             
             if (active)
                 fl_color(0, 0, 100);
             else
                 fl_color(150, 150, 150);
             if (i > 0)
-                fl_line(ox + oi - 1 * scale, oy + ly - ov, ox + i, oy + ly - next);
-            oi = i;
-            ov = next;
+                fl_line(oi, oy + ly - ov, ni, oy + ly - nv);
+            oi = ni;
+            ov = nv;
         }
 
         if (active)
