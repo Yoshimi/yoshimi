@@ -848,8 +848,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Stages
         callback {//
         send_data(0, 8, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
-        xywh {324 63 45 15} type Simple labelsize 11 minimum 0 maximum 127 step 1 textfont 1 textsize 11
-        code0 {o->range(1,MAX_PHASER_STAGES);}
+        xywh {324 63 45 15} type Simple labelsize 11 minimum 1 maximum 12 step 1 textfont 1 textsize 11
       }
       Fl_Dial phaserp9 {
         label {L/R}
@@ -996,7 +995,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Choice awp4 {
         label {LFO type}
         callback {//
-        send_data(0, 4, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);} open
+        send_data(0, 4, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
         tooltip {LFO function} xywh {155 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem awpsine {
@@ -1020,8 +1019,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Delay
         callback {//
         send_data(0, 8, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
-        xywh {305 55 35 15} type Simple labelsize 11 minimum 0 maximum 127 step 1 textsize 11
-        code0 {o->range(1,MAX_ALIENWAH_DELAY);}
+        xywh {305 55 35 15} type Simple labelsize 11 minimum 0 maximum 100 step 1 textsize 11
       }
     }
   }

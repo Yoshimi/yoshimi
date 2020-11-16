@@ -317,7 +317,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     if (Runtime.sessionStage == Session::Default || Runtime.sessionStage == Session::StartupSecond || Runtime.sessionStage == Session::JackSecond)
         Runtime.restoreSessionData(Runtime.StateFile);
-
     if (Runtime.paramsLoad.size())
     {
         string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);

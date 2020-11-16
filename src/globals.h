@@ -103,34 +103,21 @@ const unsigned char NUM_SYS_EFX = 4;
 const unsigned char NUM_INS_EFX = 8;
 const unsigned char NUM_PART_EFX = 3;
 const unsigned char NUM_KIT_ITEMS = 16;
-const float VELOCITY_MAX_SCALE = 8.0f;
 const unsigned char FADEIN_ADJUSTMENT_SCALE = 20;
 const unsigned char MAX_EQ_BANDS = 8;  // MAX_EQ_BANDS must be less than 20
 const unsigned char MAX_FILTER_STAGES = 5;
 const unsigned char FF_MAX_VOWELS = 6;
 const unsigned char FF_MAX_FORMANTS = 12;
 const unsigned char FF_MAX_SEQUENCE = 8;
-const unsigned char MAX_PHASER_STAGES = 12;
-const unsigned char MAX_ALIENWAH_DELAY = 100;
 
 #define DEFAULT_NAME "Simple Sound"
 #define UNTITLED "No Title"
 
-const unsigned char FORCED_EXIT = 16;
-
+#define FORCED_EXIT 16
 
 enum muteState {Idle, Pending, Fading, Active, Complete, Request, Immediate};
 
-enum Session : unsigned char {
-    Normal = 0,
-    Default,
-    JackFirst,
-    JackSecond,
-    StartupFirst,
-    StartupSecond,
-    InProgram,
-    RestoreConf
-};
+enum Session {Normal, Default, JackFirst, JackSecond, StartupFirst, StartupSecond, InProgram, RestoreConf};
 
 namespace YOSH
 {
@@ -258,7 +245,9 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Vector, //     per channel Vector settings
         // insert any new lists here
         MLearn, //     learned MIDI CC lists
-        Config, // only file types from here onwards
+
+        // only file types from here onwards
+        Config,
         MasterConfig,
         Presets,
         Bank,
@@ -303,6 +292,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaAudioDevice,
         alsaPreferredAudio,
         alsaSampleRate,
+
         // end of engine controls
         addPresetRootDir = 60,
         removePresetRootDir,

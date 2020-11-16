@@ -374,7 +374,7 @@ void Phaser::setstages(unsigned char Pstages_)
     if (yn1r)
         delete[] yn1r;
 
-    Pstages = (Pstages_ >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : Pstages_;
+    Pstages = Pstages_;
     oldl = new float[Pstages * 2];
     oldr = new float[Pstages * 2];
     xn1l = new float[Pstages];

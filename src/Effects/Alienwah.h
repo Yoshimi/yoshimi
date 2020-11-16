@@ -35,8 +35,6 @@ using namespace std;
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
-#define MAX_ALIENWAH_DELAY 100
-
 class SynthEngine;
 
 class Alienwah : public Effect

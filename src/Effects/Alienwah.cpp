@@ -168,7 +168,7 @@ void Alienwah::setdelay(unsigned char _delay)
         delete [] oldl;
     if (oldr != NULL)
         delete [] oldr;
-    Pdelay = (_delay >= MAX_ALIENWAH_DELAY) ? MAX_ALIENWAH_DELAY : _delay;
+    Pdelay = _delay;
     oldl = new complex<float>[Pdelay];
     oldr = new complex<float>[Pdelay];
     cleanup();
@@ -310,7 +310,6 @@ float Alienlimit::getlimits(CommandBlock *getData)
         case 7:
             break;
         case 8:
-            min = 1;
             max = 100;
             canLearn = 0;
             break;

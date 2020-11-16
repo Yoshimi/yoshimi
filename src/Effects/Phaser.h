@@ -31,8 +31,6 @@
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
-#define MAX_PHASER_STAGES 12
-
 class SynthEngine;
 
 class Phaser : public Effect
