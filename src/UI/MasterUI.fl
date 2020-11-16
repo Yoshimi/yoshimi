@@ -684,7 +684,6 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mainstop {
           label {Stop!}
           callback {//
-    std::cout << "query " << query("!", "!", "!", "a much longer test to see if the word wrapping works correctly and generally check things") << std::endl;
     send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
           tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }

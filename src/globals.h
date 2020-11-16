@@ -86,14 +86,14 @@ const unsigned char NO_MSG = 255; // these two may become different
 const unsigned char UNUSED = 255;
 
 // GUI colours
-const unsigned int ADD_COLOUR = 0xdfafbf00;
-const unsigned int BASE_COLOUR = 0xbfbfbf00;
-const unsigned int SUB_COLOUR = 0xafcfdf00;
-const unsigned int PAD_COLOUR = 0xcfdfaf00;
-const unsigned int YOSHI_COLOUR = 0x0000e100;
-const unsigned int EXTOSC_COLOUR = 0x8fbfdf00;
-const unsigned int EXTVOICE_COLOUR = 0x9fdf8f00;
-const unsigned int MODOFF_COLOUR = 0x80808000;
+#define ADD_COLOUR 0xdfafbf00
+#define BASE_COLOUR 0xbfbfbf00
+#define SUB_COLOUR 0xafcfdf00
+#define PAD_COLOUR 0xcfdfaf00
+#define YOSHI_COLOUR 0x0000e100
+#define EXTOSC_COLOUR 0x8fbfdf00
+#define EXTVOICE_COLOUR 0x9fdf8f00
+#define MODOFF_COLOUR 0x80808000
 
 // these were previously (pointlessly) user configurable
 const unsigned char NUM_VOICES = 8;
@@ -113,8 +113,8 @@ const unsigned char FF_MAX_SEQUENCE = 8;
 const unsigned char MAX_PHASER_STAGES = 12;
 const unsigned char MAX_ALIENWAH_DELAY = 100;
 
-const std::string DEFAULT_NAME = "Simple Sound";
-const std::string UNTITLED = "No Title";
+#define DEFAULT_NAME "Simple Sound"
+#define UNTITLED "No Title"
 
 const unsigned char FORCED_EXIT = 16;
 
@@ -1055,6 +1055,9 @@ namespace EFFECT // usage EFFECT::type::none
     };
 }
 
+/*
+ * it is ESSENTIAL that the size is a power of 2
+ */
 union CommandBlock{
     struct{
         float value;
@@ -1073,9 +1076,5 @@ union CommandBlock{
     } data;
     char bytes [sizeof(data)];
 };
-/*
- * it is ESSENTIAL that this is a power of 2
- */
-const size_t commandBlockSize = sizeof(CommandBlock);
 
 #endif
