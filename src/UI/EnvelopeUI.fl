@@ -230,20 +230,20 @@ return(nearestpoint);} {}
         string valDesc;
         float val = (float) env->Penvval[currentpoint];
         switch(env->Envmode){
-            case ENVMODE::amplitudeLin: //linear amplitude
-            case ENVMODE::amplitudeLog: //db amplitude
+            case ENVGROUP::mode::amplitudeLin: //linear amplitude
+            case ENVGROUP::mode::amplitudeLog: //db amplitude
                 if (env->Plinearenvelope)
                     valDesc = convert_value(VC_EnvelopeLinAmpSusVal, val);
                 else
                     valDesc = convert_value(VC_EnvelopeAmpSusVal, val);
                 break;
-            case ENVMODE::frequency: //frequency offset
+            case ENVGROUP::mode::frequency: //frequency offset
                 valDesc = convert_value(VC_EnvelopeFreqVal, val);
                 break;
-            case ENVMODE::filter: //filter frequency offset
+            case ENVGROUP::mode::filter: //filter frequency offset
                 valDesc = convert_value(VC_EnvelopeFilterVal, val);
                 break;
-            case ENVMODE::bandwidth: //bandwidth offset (unformatted)
+            case ENVGROUP::mode::bandwidth: //bandwidth offset (unformatted)
                 valDesc = convert_value(VC_EnvelopeBandwidthVal, val);
                 break;
             default:
@@ -1061,9 +1061,9 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 
     envwindow=NULL;
 
-    if (env->Envmode == ENVMODE::frequency) envfreegroup->label("Frequency Env");
-    if (env->Envmode == ENVMODE::filter) envfreegroup->label("Filter Envelope");
-    if (env->Envmode == ENVMODE::bandwidth) envfreegroup->label("Bandwidth Env");
+    if (env->Envmode == ENVGROUP::mode::frequency) envfreegroup->label("Frequency Env");
+    if (env->Envmode == ENVGROUP::mode::filter) envfreegroup->label("Filter Envelope");
+    if (env->Envmode == ENVGROUP::mode::bandwidth) envfreegroup->label("Bandwidth Env");
 
     freemodeeditwindow->label(this->label());
     freemodeeditwindow->hide();
@@ -1165,8 +1165,8 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     {
         switch(env->Envmode)
         {
-            case(ENVMODE::amplitudeLin):
-            case(ENVMODE::amplitudeLog):
+            case(ENVGROUP::mode::amplitudeLin):
+            case(ENVGROUP::mode::amplitudeLog):
                 e1adt->value(env->PA_dt);
                 e1ddt->value(env->PD_dt);
                 e1sval->value(env->PS_val);
@@ -1176,7 +1176,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
                 e1linearenvelope->value(env->Plinearenvelope);
                 e1forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(ENVMODE::frequency):
+            case(ENVGROUP::mode::frequency):
                 e2aval->value(env->PA_val);
                 e2adt->value(env->PA_dt);
                 e2rdt->value(env->PR_dt);
@@ -1184,7 +1184,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
                 e2envstretch->value(env->Penvstretch);
                 e2forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(ENVMODE::filter):
+            case(ENVGROUP::mode::filter):
                 e3aval->value(env->PA_val);
                 e3adt->value(env->PA_dt);
                 e3dval->value(env->PD_val);
@@ -1194,7 +1194,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
                 e3envstretch->value(env->Penvstretch);
                 e3forcedrelease->value(env->Pforcedrelease);
                 break;
-            case(ENVMODE::bandwidth):
+            case(ENVGROUP::mode::bandwidth):
                 e4aval->value(env->PA_val);
                 e4adt->value(env->PA_dt);
                 e4rdt->value(env->PR_dt);
@@ -1221,17 +1221,17 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     {
         switch(env->Envmode)
         {
-            case(ENVMODE::amplitudeLin):
-            case(ENVMODE::amplitudeLog):
+            case(ENVGROUP::mode::amplitudeLin):
+            case(ENVGROUP::mode::amplitudeLog):
                 envwindow=envADSR;
                 break;
-            case(ENVMODE::frequency):
+            case(ENVGROUP::mode::frequency):
                 envwindow=envASR;
                 break;
-            case(ENVMODE::filter):
+            case(ENVGROUP::mode::filter):
                 envwindow=envADSRfilter;
                 break;
-            case(ENVMODE::bandwidth):
+            case(ENVGROUP::mode::bandwidth):
                 envwindow=envASRbw;
                 break;
             default:

@@ -147,13 +147,15 @@ namespace YOSH
  */
 
 
-namespace ENVMODE
+namespace ENVGROUP
 {
-    const unsigned char amplitudeLin = 1;
-    const unsigned char amplitudeLog = 2;
-    const unsigned char frequency = 3;
-    const unsigned char filter = 4;
-    const unsigned char bandwidth = 5;
+    enum mode : int {
+        amplitudeLin = 1,
+        amplitudeLog,
+        frequency,
+        filter,
+        bandwidth
+    };
 }
 
 namespace TOPLEVEL // usage TOPLEVEL::section::vector

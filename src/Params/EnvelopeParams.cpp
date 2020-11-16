@@ -41,7 +41,7 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
     Penvstretch(Penvstretch_),
     Pforcedrelease(Pforcedrelease_),
     Plinearenvelope(0),
-    Envmode(ENVMODE::amplitudeLin)
+    Envmode(ENVGROUP::mode::amplitudeLin)
 {
     int i;
 
@@ -74,7 +74,7 @@ float EnvelopeParams::getdt(char i)
 void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 {
     setpresettype("Penvamplitude");
-    Envmode = ENVMODE::amplitudeLin;
+    Envmode = ENVGROUP::mode::amplitudeLin;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
@@ -88,7 +88,7 @@ void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 {
     setpresettype("Penvamplitude");
-    Envmode = ENVMODE::amplitudeLog;
+    Envmode = ENVGROUP::mode::amplitudeLog;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
@@ -102,7 +102,7 @@ void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 {
     setpresettype("Penvfrequency");
-    Envmode = ENVMODE::frequency;
+    Envmode = ENVGROUP::mode::frequency;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
@@ -116,7 +116,7 @@ void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt, char R_dt, char R_val)
 {
     setpresettype("Penvfilter");
-    Envmode = ENVMODE::filter;
+    Envmode = ENVGROUP::mode::filter;
     PA_val = A_val;
     PA_dt = A_dt;
     PD_val = D_val;
@@ -132,7 +132,7 @@ void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_d
 void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
 {
     setpresettype("Penvbandwidth");
-    Envmode = ENVMODE::bandwidth;
+    Envmode = ENVGROUP::mode::bandwidth;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
@@ -148,7 +148,7 @@ void EnvelopeParams::converttofree(void)
 {
     switch (Envmode)
     {
-        case ENVMODE::amplitudeLin:
+        case ENVGROUP::mode::amplitudeLin:
         Penvpoints = 4;
         Penvsustain = 2;
         Penvval[0] = 0;
@@ -160,7 +160,7 @@ void EnvelopeParams::converttofree(void)
         Penvval[3] = 0;
         break;
 
-    case ENVMODE::amplitudeLog:
+    case ENVGROUP::mode::amplitudeLog:
         Penvpoints = 4;
         Penvsustain = 2;
         Penvval[0] = 0;
@@ -172,7 +172,7 @@ void EnvelopeParams::converttofree(void)
         Penvval[3] = 0;
         break;
 
-    case ENVMODE::frequency:
+    case ENVGROUP::mode::frequency:
         Penvpoints = 3;
         Penvsustain = 1;
         Penvval[0] = PA_val;
@@ -182,7 +182,7 @@ void EnvelopeParams::converttofree(void)
         Penvval[2] = PR_val;
         break;
 
-    case ENVMODE::filter:
+    case ENVGROUP::mode::filter:
         Penvpoints = 4;
         Penvsustain = 2;
         Penvval[0] = PA_val;
@@ -194,7 +194,7 @@ void EnvelopeParams::converttofree(void)
         Penvval[3] = PR_val;
         break;
 
-    case ENVMODE::bandwidth:
+    case ENVGROUP::mode::bandwidth:
         Penvpoints = 3;
         Penvsustain = 1;
         Penvval[0] = PA_val;
