@@ -386,7 +386,8 @@ class PartKitItem {: {public Fl_Group}
 
 class PartUI {: {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window partgroup {
       xywh {1023 99 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -764,6 +765,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {229 151 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
+      code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group kitlist {
         xywh {4 20 662 324} box THIN_UP_FRAME
@@ -1125,6 +1127,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       xywh {520 67 385 160} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
+      code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -1547,6 +1550,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       label Aftertouch
       xywh {569 115 485 180} type Double hide resizable
       code0 {atDW = o->w(); atDH = o->h();}
+      code1 {o->size_range(atDW, atDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME
@@ -2619,54 +2623,65 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-edit");
-    instrumenteditwindow->show();
-    editSeen = true;
+    
     if (fetchW < editDW || fetchH < editDH)
     {
         fetchW = editDW;
         fetchH = editDH;
     }
+    checkSane(fetchX, fetchY, fetchW, fetchH, editDW, editDH);
+    
     instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    lasteditW = 0;} {}
+    lasteditW = 0;
+    instrumenteditwindow->show();
+    editSeen = true;} {}
   }
   Function {Showctl()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-controllers");
-    ctlwindow->show();
-    ctlSeen = true;
+    
     if (fetchW < ctlDW || fetchH < ctlDH)
     {
         fetchW = ctlDW;
         fetchH = ctlDH;
     }
-    ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);;
-    lastctlW = 0;} {}
+    checkSane(fetchX, fetchY, fetchW, fetchH, ctlDW, ctlDH);
+    
+    ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    lastctlW = 0;
+    ctlwindow->show();
+    ctlSeen = true;} {}
   }
   Function {ShowAT()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-aftertouch");
-    aftertouchcontrol->show();
-    atSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        aftertouchcontrol->position(fetchX, fetchY);
+    
+    if (fetchW < atDW || fetchH < atDH)
+    {
+        fetchW = atDW;
+        fetchH = atDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, atDW, atDH);
 
-    aftertouchcontrol->size_range(485, 180, 0, 0, 0, 0, 1);} {}
+    aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
+    aftertouchcontrol->show();
+    atSeen = true;} {}
   }
   Function {Showctlmidi()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-ctlmidi");
+    
+    if (fetchW < midiDW || fetchH < midiDH)
+    {
+        fetchW = midiDW;
+        fetchH = midiDH;
+    }
     checkSane(fetchX, fetchY, fetchW, fetchH, midiDW, midiDH);
     
-    if (fetchW > 0 && fetchH > 0)
-        ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        ctlmidi->position(fetchX, fetchY);
-
+    ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     ctlmidi->show();
     ctlmidiSeen = true;} {}
   }
@@ -2682,25 +2697,33 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-effects");
+    
+    if (fetchW < fxDW || fetchH < fxDH)
+    {
+        fetchW = fxDW;
+        fetchH = fxDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, fxDW, fxDH);
+    
+    partfx->resize(fetchX, fetchY, fetchW, fetchH);   
     partfx->show();
-    fxSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        partfx->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        partfx->position(fetchX, fetchY);
-    partfx->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);} {}
+    fxSeen = true;} {}
   }
   Function {Showkit()} {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-kit");
-    instrumentkitlist->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);
+    
+    if (fetchW < kitDW || fetchH < kitDH)
+    {
+        fetchW = kitDW;
+        fetchH = kitDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, kitDW, kitDH);
+    
+    instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
     instrumentkitlist->show();
-    kitSeen = true;
-    if (fetchW > 0 && fetchH > 0)
-        instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
-    else
-        instrumentkitlist->position(fetchX, fetchY);} {}
+    kitSeen = true;} {}
   }
   Function {wincheck()} {} {
     code {//
@@ -2747,15 +2770,11 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {editRtext()} {} {
     code {//
-    if(instrumenteditwindow->x() > Fl::w() - 10 || instrumenteditwindow->y() > Fl::h() - 10)
-        instrumenteditwindow->position(30, 30);
-
     if (lasteditW == instrumenteditwindow->w())
         return;
     lasteditW = instrumenteditwindow->w();
 
     float dScale = instrumenteditwindow->w() / float(editDW);
-
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -2815,17 +2834,14 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ctlRtext()} {} {
     code {//
-    if(ctlwindow->x() > Fl::w() - 10 || ctlwindow->y() > Fl::h() - 10)
-        ctlwindow->position(30, 30);
-
     if (lastctlW == ctlwindow->w())
         return;
     lastctlW = ctlwindow->w();
 
     float dScale =  ctlwindow->w() / float(ctlDW);
-
     if (dScale < 0.2f)
         dScale = 0.2f;
+        
     int size = int(dScale * 10);
     int size14 = int(dScale * 14);
 
@@ -2868,27 +2884,10 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ATRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = aftertouchcontrol->w();
-    int h = aftertouchcontrol->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        aftertouchcontrol->size(w, h);
-    };
-
-    float dW = w / atDW;
-    float dH = h / atDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    float dScale =  aftertouchcontrol->w() / float(atDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
+
     int size14 = int(dScale * 14);
 
     ATchan->labelsize(size14);
@@ -2916,9 +2915,11 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ctlmidiRtext()} {} {
     code {//
-    float dScale = ctlmidi->w() / midiDW;
+    float dScale = ctlmidi->w() / float(midiDW);
+    if (dScale < 0.2f)
+        dScale = 0.2f;
 
-    int size = int(dScale * 10);;
+    int size = int(dScale * 10);
 
     modulation->labelsize(size);
     expression->labelsize(size);
@@ -2931,25 +2932,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {fxRtext()} {} {
     code {//
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = partfx->w();
-    int h = partfx->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        partfx->size(w, h);
-    };
-
-    float dW = w / fxDW;
-    float dH =  h / fxDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    float dScale =  partfx->w() / float(fxDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -2989,26 +2972,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-kit");
         instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
         //kitSeen = true;
-    }
-    int W =  Fl::w();
-    int H =  Fl::h();
-    int w = instrumentkitlist->w();
-    int h =instrumentkitlist->h();
-    while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        instrumentkitlist->size(w, h);
     };
-
-    float dW = w / kitDW;
-    float dH =  h / kitDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
+    
+    float dW = instrumentkitlist->w() / float(kitDW);
+    float dH = instrumentkitlist->h() / float(kitDH);
+    
+    float dScale = dW;
     if (dScale < 0.2f)
         dScale = 0.2f;
 
@@ -3033,12 +3002,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     kitClose->labelsize(int(12 * dScale));
 
 
-   kitpack->resize(0, int(21 * dH), int(670 * dW), int(322 * dH));
+   kitpack->resize(0, int(21.0f * dH), int(670.0f * dW), int(322.0f * dH));
 
    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
    {
-       partkititem[i]->size(int(670 * dW), int(20 * dH));
-       partkititem[i]->partkititemgroup->size(int(605 * dW), int(20 * dH));
+       partkititem[i]->size(int(670.0f * dW), int(20.0f * dH));
+       partkititem[i]->partkititemgroup->size(int(605.0f * dW), int(20.0f * dH));
        partkititem[i]->itemRtext(dScale);
    }
 
