@@ -561,7 +561,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {//
-        if (YOSH::F2B(o->value()))
+        if (_SYS_::F2B(o->value()))
             synth->getGuiMaster()->activePart = npart + *plgroup;
         else
             synth->getGuiMaster()->activePart = UNUSED;

@@ -1461,7 +1461,7 @@ void ADnote::computeNoteParameters(void)
 
                 case 1:
                     for (int k = 0; k < unison; ++k)
-                        unison_invert_phase[nvoice][k] = YOSH::F2B(paramRNG.numRandom());
+                        unison_invert_phase[nvoice][k] = _SYS_::F2B(paramRNG.numRandom());
                     break;
 
                 default:

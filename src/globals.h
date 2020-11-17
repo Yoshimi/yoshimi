@@ -115,15 +115,15 @@
 
 #define FORCED_EXIT 16
 
-enum muteState {Idle, Pending, Fading, Active, Complete, Request, Immediate};
-
-enum Session {Normal, Default, JackFirst, JackSecond, StartupFirst, StartupSecond, InProgram, RestoreConf};
-
-namespace YOSH
+namespace _SYS_
 {
     // float to bool done this way to ensure consistency
     // we are always using positive values
     inline bool F2B(float value) {return value > 0.5f;}
+
+    enum mute {Idle, Pending, Fading, Active, Complete, Request, Immediate};
+
+    enum type {Normal, Default, JackFirst, JackSecond, StartupFirst, StartupSecond, InProgram, RestoreConf};
 }
 
 /*
@@ -667,7 +667,7 @@ namespace PART // usage PART::control::volume
             pitchBend = 16,
             pitchBendDown = 32,
             volume = 64,
-            modulation = 128 // this must be highest bit
+            modulation = 128 // this MUST be the highest bit
         };
     }
 

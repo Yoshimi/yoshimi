@@ -419,7 +419,7 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.amp.type);}
-              code1 {if (YOSH::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
+              code1 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {
               MenuItem hampoff {
                 label OFF
@@ -593,7 +593,7 @@ class PADnoteUI {: {public PresetsUI_}
                   send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
             xywh {325 315 85 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Phrpos.type);}
-            code1 {if (YOSH::F2B(o->value())) hrgroup->activate(); else hrgroup->deactivate();}
+            code1 {if (_SYS_::F2B(o->value())) hrgroup->activate(); else hrgroup->deactivate();}
           } {
             MenuItem HRharmonic {
               label Harmonic
@@ -1325,7 +1325,7 @@ class PADnoteUI {: {public PresetsUI_}
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
     unsigned char miscmsg = getData->data.miscmsg;

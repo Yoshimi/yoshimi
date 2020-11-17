@@ -89,7 +89,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Check_Button voiceresonanceenabled {
           callback {//
-    bool enab = YOSH::F2B(o->value());
+    bool enab = _SYS_::F2B(o->value());
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
 
     collect_data(synth, enab, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
@@ -189,7 +189,7 @@ class ADvoicelistitem {: {public Fl_Group}
       } {}
       Fl_Check_Button voiceenabled {
         callback {//
-    bool enab = YOSH::F2B(o->value());
+    bool enab = _SYS_::F2B(o->value());
     collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
         xywh {18 7 15 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
@@ -708,7 +708,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             Fl_Check_Button FreqLfoEn {
               label On
               callback {//
-    bool enab = YOSH::F2B(o->value());
+    bool enab = _SYS_::F2B(o->value());
     if (enab)
     {
         voicefreqlfogroup->activate();
@@ -892,7 +892,7 @@ Oscillator}
           Fl_Check_Button ResonanceEn {
             label Resonance
             callback {//
-    bool enab = YOSH::F2B(o->value());
+    bool enab = _SYS_::F2B(o->value());
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(0, ADDVOICE::control::enableResonance, enab, TOPLEVEL::type::Integer);}
@@ -1193,7 +1193,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             callback {//
                   if (nvoice == 0)
                       o->deactivate();
-                  if (YOSH::F2B(o->value())) {
+                  if (_SYS_::F2B(o->value())) {
                       oscGroup->deactivate();
                       SoundType->deactivate();
                   } else {
@@ -1275,7 +1275,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     else if (voice >= PART::engine::addVoice1)
         voice -= PART::engine::addVoice1;
     int tmp;
-    bool val_bool = YOSH::F2B(value);
+    bool val_bool = _SYS_::F2B(value);
     if (control != ADDVOICE::control::enableVoice &&  voice != nvoice)
         return;
 
@@ -2615,7 +2615,7 @@ switch (num)
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
-    bool val_bool = YOSH::F2B(value);
+    bool val_bool = _SYS_::F2B(value);
     switch(control)
     {
         case ADDSYNTH::control::volume:

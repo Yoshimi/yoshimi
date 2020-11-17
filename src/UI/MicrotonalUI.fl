@@ -428,7 +428,7 @@ class MicrotonalUI {} {
 
     unsigned char miscmsg = getData->data.miscmsg;
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
     string msg;
 
     switch (control)

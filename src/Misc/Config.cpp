@@ -137,7 +137,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     loadDefaultState(false),
-    sessionStage(Session::Normal),
+    sessionStage(_SYS_::type::Normal),
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
@@ -346,7 +346,7 @@ bool Config::loadConfig(void)
     int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
     yoshimi += ("-" + asString(thisInstance));
-    if (thisInstance == 0 && sessionStage != Session::RestoreConf)
+    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
 
@@ -386,7 +386,7 @@ bool Config::loadConfig(void)
 
     ConfigFile = ConfigDir + yoshimi;
 
-    if (thisInstance == 0 && sessionStage != Session::RestoreConf)
+    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
         if (isRegularFile(baseConfig) && !isRegularFile(newInstance0), 0)
@@ -448,7 +448,7 @@ bool Config::loadConfig(void)
                     delete xml;
                 }
             }
-            if (thisInstance == 0 && sessionStage != Session::RestoreConf)
+            if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
             {
                 if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
                     oldConfig = true;
@@ -460,10 +460,10 @@ bool Config::loadConfig(void)
 
     //std::cout << "Session Stage " << sessionStage << std::endl;
 
-    if (sessionStage == Session::RestoreConf)
+    if (sessionStage == _SYS_::type::RestoreConf)
         return true;
 
-    if (sessionStage != Session::Normal)
+    if (sessionStage != _SYS_::type::Normal)
     {
         XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
@@ -473,10 +473,10 @@ bool Config::loadConfig(void)
             isok = xml->loadXMLfile(StateFile);
             if (isok)
             {
-                if (sessionStage == Session::StartupFirst)
-                    sessionStage = Session::StartupSecond;
-                else if (sessionStage == Session::JackFirst)
-                    sessionStage = Session::JackSecond;
+                if (sessionStage == _SYS_::type::StartupFirst)
+                    sessionStage = _SYS_::type::StartupSecond;
+                else if (sessionStage == _SYS_::type::JackFirst)
+                    sessionStage = _SYS_::type::JackSecond;
                 isok = extractConfigData(xml);
             }
             else
@@ -492,7 +492,7 @@ void Config::restoreConfig(SynthEngine *_synth)
     size_t tmpRoot = _synth->ReadBankRoot();
     size_t tmpBank = _synth->ReadBank();
     int tmpChanged = configChanged;
-    sessionStage = Session::RestoreConf;
+    sessionStage = _SYS_::type::RestoreConf;
 
     // restore old settings
     loadConfig();
@@ -623,21 +623,21 @@ bool Config::extractConfigData(XMLwrapper *xml)
      * default state must be first test as we need to abort
      * and fetch this instead
      */
-    if (sessionStage == Session::Normal)
+    if (sessionStage == _SYS_::type::Normal)
     {
         loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
         if (loadDefaultState)
         {
             xml->exitbranch(); // CONFIGURATION
             configChanged = true;
-            sessionStage = Session::Default;
+            sessionStage = _SYS_::type::Default;
             StateFile = defaultSession;
             Log("Loading default state");
             return true;
         }
     }
 
-    if (sessionStage != Session::InProgram)
+    if (sessionStage != _SYS_::type::InProgram)
     {
 
         if (!rateChanged)
@@ -1451,7 +1451,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'S':
             if (arg)
             {
-                settings->sessionStage = Session::StartupFirst;
+                settings->sessionStage = _SYS_::type::StartupFirst;
                 settings->configChanged = true;
                 settings->StateFile = string(arg);
             }
@@ -1461,7 +1461,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'u':
             if (arg)
             {
-                settings->sessionStage = Session::JackFirst;
+                settings->sessionStage = _SYS_::type::JackFirst;
                 settings->configChanged = true;
                 settings->StateFile = setExtension(string(arg), EXTEN::state);
             }

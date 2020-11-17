@@ -4,7 +4,7 @@ It closely follows the context idea that the rest of Yoshimi uses. The way this 
 
 First of all the 33mS timer used to fetch VU metering data also sets a trigger. This is then recognised by the normal update code in "MiscGui" which passes the request on to "MasterUI", and then clears the trigger. This procedure ensures that there will be at least 33mS between redraws, thus reducing processor loading.
 
-When "MasterUI" first gets the call it passes it on to all the other top level windows in sequence, but *only* if their size has actually changed. It then passes the call uinconditionally to the other main areas, PartUI and BankUI, and finally runs through its own objects.
+When "MasterUI" first gets the call it passes it on to all the other top level windows in sequence, but *only* if their size has actually changed. It then passes the call unconditionally to the other main areas, PartUI and BankUI, and finally runs through its own objects.
 
 Part and Bank will themselves portion out calls to subsections depending on whether they can be dealt with directly, or have to be passed further down the stack. For an extreme example, the Amplitude Freemode window in Addsynth Voice has to unconditionally receive this call. It's complete route is:
 

@@ -213,7 +213,7 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
-    audioOut.store(muteState::Active);
+    audioOut.store(_SYS_::mute::Active);
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
 
@@ -315,7 +315,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     defaults();
     ClearNRPNs();
 
-    if (Runtime.sessionStage == Session::Default || Runtime.sessionStage == Session::StartupSecond || Runtime.sessionStage == Session::JackSecond)
+    if (Runtime.sessionStage == _SYS_::type::Default || Runtime.sessionStage == _SYS_::type::StartupSecond || Runtime.sessionStage == _SYS_::type::JackSecond)
         Runtime.restoreSessionData(Runtime.StateFile);
     if (Runtime.paramsLoad.size())
     {
@@ -1934,38 +1934,38 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     unsigned char sound = audioOut.load();
     switch (sound)
     {
-        case muteState::Pending:
+        case _SYS_::mute::Pending:
             // set by resolver
             fadeLevel = 1.0f;
-            audioOut.store(muteState::Fading);
-            sound = muteState::Fading;
+            audioOut.store(_SYS_::mute::Fading);
+            sound = _SYS_::mute::Fading;
             //std::cout << "here fading" << std:: endl;
             break;
-        case muteState::Fading:
+        case _SYS_::mute::Fading:
             if (fadeLevel < 0.001f)
             {
-                audioOut.store(muteState::Active);
-                sound = muteState::Active;
+                audioOut.store(_SYS_::mute::Active);
+                sound = _SYS_::mute::Active;
                 fadeLevel = 0;
             }
             break;
-        case muteState::Active:
+        case _SYS_::mute::Active:
             // cleared by resolver
             break;
-        case muteState::Complete:
+        case _SYS_::mute::Complete:
             // set by resolver and paste
-            audioOut.store(muteState::Idle);
+            audioOut.store(_SYS_::mute::Idle);
             //std::cout << "here complete" << std:: endl;
             break;
-        case muteState::Request:
+        case _SYS_::mute::Request:
             // set by paste routine
-            audioOut.store(muteState::Immediate);
-            sound = muteState::Active;
+            audioOut.store(_SYS_::mute::Immediate);
+            sound = _SYS_::mute::Active;
             //std::cout << "here requesting" << std:: endl;
             break;
-        case muteState::Immediate:
+        case _SYS_::mute::Immediate:
             // cleared by paste routine
-            sound = muteState::Active;
+            sound = _SYS_::mute::Active;
             break;
         default:
             break;
@@ -1982,7 +1982,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
-    if (sound == muteState::Active)
+    if (sound == _SYS_::mute::Active)
     {
         for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
@@ -2144,7 +2144,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (sound == muteState::Fading) // fadeLevel must also have been set
+            if (sound == _SYS_::mute::Fading) // fadeLevel must also have been set
             {
                 for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
@@ -2367,7 +2367,7 @@ void SynthEngine::ShutUp(void)
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
     defaults();
-    Runtime.sessionStage = Session::InProgram;
+    Runtime.sessionStage = _SYS_::type::InProgram;
     Runtime.stateChanged = true;
     bool result = Runtime.restoreSessionData(filename);
     ShutUp();

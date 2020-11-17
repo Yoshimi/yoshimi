@@ -65,7 +65,7 @@ MusicIO::~MusicIO()
 
 void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
 {
-    if (synth->audioOut.load() != muteState::Idle)
+    if (synth->audioOut.load() != _SYS_::mute::Idle)
         return; // nobody listening!
 
     bool inSync = LV2_engine || (synth->getRuntime().audioEngine == jack_audio && synth->getRuntime().midiEngine == jack_midi);

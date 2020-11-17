@@ -248,7 +248,7 @@ float OscilGen::basefunc_pulsesine(float x, float a)
     x = (fmodf(x, 1.0f) - 0.5f) * expf((a - 0.5f) * logf(128.0f));
     if (x < -0.5f)
         x = -0.5f;
-    else if (YOSH::F2B(x))
+    else if (_SYS_::F2B(x))
         x = 0.5f;
     x = sinf(x * TWOPI);
     return x;

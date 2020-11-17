@@ -137,7 +137,7 @@ inline void setRandomPan(float rand, float& left, float& right, unsigned char co
     switch (compensation)
     {
         case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
-            if (YOSH::F2B(t))
+            if (_SYS_::F2B(t))
             {
                 right = 0.5f;
                 left = (1.0f - t);
@@ -168,7 +168,7 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
     switch (compensation)
     {
         case MAIN::panningType::cut: // ZynAddSubFX - per side 0dB mono -6dB
-            if (YOSH::F2B(t))
+            if (_SYS_::F2B(t))
             {
                 right = 0.5f;
                 left = (1.0f - t);

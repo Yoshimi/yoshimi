@@ -434,7 +434,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button writebutton {
           label SAVE
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               mode = 2;
           removeselection();}
           xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
@@ -442,7 +442,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button readbutton {
           label SELECT
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               mode = 1;
           removeselection();}
           xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
@@ -451,7 +451,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button clearbutton {
           label DELETE
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               mode = 3;
           removeselection();}
           xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
@@ -459,7 +459,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button swapbutton {
           label SWAP
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               mode = 4;
           removeselection();}
           xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
@@ -467,7 +467,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button renamebutton {
           label RENAME
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               mode = 5;
           removeselection();}
           xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
@@ -758,7 +758,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootreadbutton {
           label SELECT
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 1;
           removeselection();}
           xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12
@@ -767,7 +767,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootrenamebutton {
           label RENAME
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 5;
           removeselection();}
           xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12
@@ -775,7 +775,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootwritebutton {
           label ADD
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 2;
           removeselection();}
           xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12
@@ -783,7 +783,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootclearbutton {
           label DELETE
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 3;
           removeselection();}
           xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12
@@ -791,7 +791,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootswapbutton {
           label SWAP
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 4;
           removeselection();}
           xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12
@@ -799,7 +799,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootimportbutton {
           label IMPORT
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 6;
           removeselection();}
           xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 93 labelfont 8 labelsize 9
@@ -807,7 +807,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Light_Button rootexportbutton {
           label EXPORT
           callback {//
-          if (YOSH::F2B(o->value()))
+          if (_SYS_::F2B(o->value()))
               r_mode = 7;
           removeselection();}
           xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9

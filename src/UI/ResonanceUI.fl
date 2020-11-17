@@ -210,7 +210,7 @@ class ResonanceGraph {: {public Fl_Box}
         {
             int sn = (int)(x_ * 1.0 / w() * MAX_RESONANCE_POINTS);
             int sp=127 - (int)(y_ * 1.0 / h() * 127);
-            if (YOSH::F2B(leftbutton))
+            if (_SYS_::F2B(leftbutton))
             {
                 send_data(action, sn, sp, TOPLEVEL::type::Integer);
             }
@@ -523,7 +523,7 @@ class ResonanceUI {: PresetsUI_
                 break;
 
             case RESONANCE::control::enableResonance:
-                if (YOSH::F2B(value))
+                if (_SYS_::F2B(value))
                 {
                     enabled->value(1);
                     editor->activate();
@@ -544,7 +544,7 @@ class ResonanceUI {: PresetsUI_
                 break;
 
             case RESONANCE::control::protectFundamental:
-                p1st->value(YOSH::F2B(value));
+                p1st->value(_SYS_::F2B(value));
                 break;
 
             case RESONANCE::control::clearGraph:
@@ -605,7 +605,7 @@ class ResonanceUI {: PresetsUI_
   Function {refresh()} {} {
     code {//
     redrawPADnoteApply();
-    if (YOSH::F2B(respar->Penabled))
+    if (_SYS_::F2B(respar->Penabled))
     {
         enabled->value(1);
         editor->activate();

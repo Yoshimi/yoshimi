@@ -462,7 +462,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
         xywh {460 171 87 20} down_box BORDER_BOX labelsize 11 align 2 textsize 11
         code0 {o->value(pars->POvertoneSpread.type);}
-        code1 {if (YOSH::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
+        code1 {if (_SYS_::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
       } {
         MenuItem Sharmonic {
           label Harmonic
@@ -840,7 +840,7 @@ class SUBnoteUI {: {public PresetsUI_}
     float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
-    bool val_bool = YOSH::F2B(value);
+    bool val_bool = _SYS_::F2B(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         h[control]->mag->value((int) value);
@@ -903,7 +903,7 @@ class SUBnoteUI {: {public PresetsUI_}
             break;
 
         case SUBSYNTH::control::baseFrequencyAs440Hz:
-            hz440->value(YOSH::F2B(value));
+            hz440->value(_SYS_::F2B(value));
             if (value == 0)
                 fixedfreqetdial->deactivate();
             else

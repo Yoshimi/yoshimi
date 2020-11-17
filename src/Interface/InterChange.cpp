@@ -219,13 +219,13 @@ void *InterChange::sortResultsThread(void)
          * (especially with large buffer sizes) so this small
          * ring buffer ensures they can all clear together.
          */
-        while (synth->audioOut.load() == muteState::Active)
+        while (synth->audioOut.load() == _SYS_::mute::Active)
         {
             //std::cout << "here fetching" << std:: endl;
             if (muteQueue->read(getData.bytes))
                 indirectTransfers(&getData);
             else
-                synth->audioOut.store(muteState::Complete);
+                synth->audioOut.store(_SYS_::mute::Complete);
         }
 
         while (decodeLoopback->read(getData.bytes))
@@ -291,10 +291,10 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
         std::cout << "failed to write to muteQueue" << std::endl;
         return;
     }
-    if (synth->audioOut.load() == muteState::Idle)
+    if (synth->audioOut.load() == _SYS_::mute::Idle)
     {
         //std::cout << "here pending" << std:: endl;
-        synth->audioOut.store(muteState::Pending);
+        synth->audioOut.store(_SYS_::mute::Pending);
     }
 }
 
@@ -2419,7 +2419,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
 
     switch (control)
     {
@@ -2574,7 +2574,7 @@ void InterChange::commandConfig(CommandBlock *getData)
 
     bool mightChange = true;
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
 
     switch (control)
     {
@@ -3232,7 +3232,7 @@ void InterChange::commandPart(CommandBlock *getData)
         return;
     }
     int value_int = lrint(value);
-    char value_bool = YOSH::F2B(value);
+    char value_bool = _SYS_::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -3917,7 +3917,7 @@ void InterChange::commandAdd(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = lrint(value);
-    char value_bool = YOSH::F2B(value);
+    char value_bool = _SYS_::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -4095,7 +4095,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = lrint(value);
-    char value_bool = YOSH::F2B(value);
+    char value_bool = _SYS_::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -4508,7 +4508,7 @@ void InterChange::commandSub(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = lrint(value);
-    char value_bool = YOSH::F2B(value);
+    char value_bool = _SYS_::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -4779,7 +4779,7 @@ void InterChange::commandPad(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = lrint(value);
-    char value_bool = YOSH::F2B(value);
+    char value_bool = _SYS_::F2B(value);
 
     Part *part;
     part = synth->part[npart];
@@ -5100,7 +5100,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
     unsigned char insert = getData->data.insert;
 
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
@@ -5367,7 +5367,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
@@ -5543,7 +5543,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             break;
         case LFOINSERT::control::continuous:
             if (write)
-                pars->setPcontinous(YOSH::F2B(val));
+                pars->setPcontinous(_SYS_::F2B(val));
             else
                 val = pars->Pcontinous;
             break;
@@ -6229,7 +6229,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
             case EFFECT::sysIns::effectEnable: // system only
                 if (write)
                 {
-                    bool newSwitch = YOSH::F2B(value);
+                    bool newSwitch = _SYS_::F2B(value);
                     bool oldSwitch = synth->syseffEnable[effnum];
                     synth->syseffEnable[effnum] = newSwitch;
                     if (newSwitch != oldSwitch)

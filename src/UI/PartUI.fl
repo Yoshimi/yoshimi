@@ -1793,7 +1793,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
-    bool valBool = YOSH::F2B(value);
+    bool valBool = _SYS_::F2B(value);
     int valInt = lrint(value);
     string text;
     if (miscmsg != NO_MSG)

@@ -557,7 +557,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
     unsigned char kititem = getData->data.kit;
     bool write = getData->data.type & TOPLEVEL::type::Write;
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
 
     string contstr = "";
     switch (control)
@@ -1304,7 +1304,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
+    bool value_bool = _SYS_::F2B(value);
 
     if (control == UNUSED)
         return "Number of parts";

@@ -854,8 +854,8 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     unsigned char offset = getData->data.offset;
 
     int value_int = lrint(value);
-    bool value_bool = YOSH::F2B(value);
-    bool isFreemode = YOSH::F2B(freemodebutton->value());
+    bool value_bool = _SYS_::F2B(value);
+    bool isFreemode = _SYS_::F2B(freemodebutton->value());
     bool NotUs = ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI || (getData->data.source & TOPLEVEL::action::forceUpdate));
 
     if (part != npart || (eng >= 128 && eng != engine))
