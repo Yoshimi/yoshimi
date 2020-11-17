@@ -2020,7 +2020,7 @@ class ADnoteUI {: {public PresetsUI_}
     globalSeen = false;
     resui->resonancewindow->hide();
     o->hide();}
-      xywh {1179 128 535 405} type Double hide resizable
+      xywh {572 130 535 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
@@ -2260,16 +2260,19 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
             int fetchW, fetchH, fetchX, fetchY, fetchO;
-            lastlistW = 0;
-            ADnoteVoiceList->show();
-            listSeen = true;
             loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
+            
             if (fetchW < listDW || fetchH < listDH)
             {
                 fetchW = listDW;
                 fetchH = listDH;
             }
+            checkSane(fetchX, fetchY,fetchW, fetchH, listDW, listDH);
             ADnoteVoiceList->resize(fetchX, fetchY,fetchW, fetchH);
+            lastlistW = 0;
+            ADnoteVoiceList->show();
+            listSeen = true;
+
 
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
@@ -2280,7 +2283,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
     voicelistitem[nvoice]->refreshlist();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    ADnoteVoice->show();
+    
     if (!voiceSeen)
     {
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-voice");
@@ -2290,10 +2293,16 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
             fetchH = voiceDH;
         }
         ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
-        addVoiceRtext();
+        //addVoiceRtext();
+        checkSane(fetchX, fetchY, fetchW, fetchH, voiceDW, voiceDH);
     }
-    voiceSeen = true;
+    
     ADnoteVoice->redraw();
+    ADnoteVoice->show();
+    lastvoiceW = 0;
+    voiceSeen = true;
+
+    
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
@@ -2339,7 +2348,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
-      xywh {594 95 760 610} type Double hide resizable
+      xywh {373 93 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
@@ -2705,6 +2714,7 @@ switch (num)
         globalSeen = false;
         lastglobalW = 0;
         voiceSeen = false;
+        lastvoiceW = 0;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
         lastlistW = 0;
@@ -2775,15 +2785,18 @@ switch (num)
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth");
-    ADnoteGlobalParameters->show();
-    lastglobalW = 0;
 
     if (fetchW < addDW || fetchH < addDH)
     {
         fetchW = addDW;
         fetchH = addDH;
     }
+    checkSane(fetchX, fetchY, fetchW, fetchH, addDW, addDH);
+    
+    
+    lastglobalW = 0;
     ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
+    ADnoteGlobalParameters->show();
     globalSeen = true;} {}
   }
   Function {wincheck()} {} {
@@ -2820,10 +2833,6 @@ switch (num)
         resui->resonancewindow->hide(); // will need to add envelope/filter inserts
         return;
     }
-
-    if(ADnoteGlobalParameters->x() > Fl::w() - 10 || ADnoteGlobalParameters->y() > Fl::h() - 10)
-        ADnoteGlobalParameters->position(30, 30);
-
 
     if (lastglobalW < 3)
     {
@@ -2897,7 +2906,6 @@ switch (num)
   }
   Function {addVoiceRtext()} {} {
     code {// this is just for the outer skin
-    static int lastvoiceW = 0;
 
     float dScale = ADnoteVoice->w() / float(voiceDW);
     if (dScale < 0.2f)
@@ -2907,9 +2915,12 @@ switch (num)
 
     if (!ADnoteVoice->visible())
         return;
-
-    if(ADnoteVoice->x() > Fl::w() - 10 || ADnoteVoice->y() > Fl::h() - 10)
-        ADnoteVoice->position(30, 30);
+        
+    if (lastvoiceW < 2)
+    {
+        ++lastvoiceW;
+        return;
+    }
 
     if (ADnoteVoice->w() == lastvoiceW)
         return;
@@ -2950,9 +2961,6 @@ switch (num)
     float dScale = ADnoteVoiceList->w() / float(listDW);
     if (dScale < 0.2f)
         dScale = 0.2f;;
-
-    if(ADnoteVoiceList->x() > Fl::w() - 10 || ADnoteVoiceList->y() > Fl::h() - 10)
-        ADnoteVoiceList->position(30, 30);
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
@@ -3001,11 +3009,13 @@ switch (num)
   }
   decl {bool globalSeen;} {private local
   }
-  decl {bool voiceSeen;} {public local
-  }
   decl {int voiceDW;} {private local
   }
   decl {int voiceDH;} {private local
+  }
+  decl {int lastvoiceW;} {private local
+  }
+  decl {bool voiceSeen;} {public local
   }
   decl {int listDW;} {private local
   }

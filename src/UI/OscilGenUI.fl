@@ -452,8 +452,7 @@ class Oscilharmonic {: {public Fl_Group}
 
 class OscilEditor {: {public PresetsUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       xywh {4 48 735 595} type Double hide resizable
@@ -1395,13 +1394,18 @@ class OscilEditor {: {public PresetsUI_}
         waveType = 2;
     else
         waveType = 0;
-    osceditUI->show();
+    
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Waveform " + to_string(waveType));
-    if (fetchW == 0 || fetchH == 0)
-        osceditUI->position(fetchX, fetchY);
-    else
-        osceditUI->resize(fetchX, fetchY, fetchW, fetchH);
+    if (fetchW < waveDW || fetchH < waveDH)
+    {
+        fetchW = waveDW;
+        fetchH = waveDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, waveDW, waveDH);
+    osceditUI->resize(fetchX, fetchY, fetchW, fetchH);
+    
+    osceditUI->show();
     OSCseen = true;} {}
   }
   Function {~OscilEditor()} {return_type virtual
@@ -1555,6 +1559,7 @@ class OscilEditor {: {public PresetsUI_}
   Function {waveRtext()} {} {
     code {//
         float dScale = osceditUI->w() / float(waveDW);
+        
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);
         int size12 = int(12 * dScale);
