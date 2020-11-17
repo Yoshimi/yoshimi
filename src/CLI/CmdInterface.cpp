@@ -54,7 +54,6 @@ using cli::readControl;
 
 extern SynthEngine *firstSynth;
 
-
 CmdInterface::CmdInterface() :
     interpreter{}
 { }

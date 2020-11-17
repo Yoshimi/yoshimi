@@ -50,40 +50,40 @@
 // changing them is likely to have unpredicable consequences
 
 // sizes
-const unsigned char COMMAND_SIZE = 252;
-const unsigned char MAX_HISTORY = 25;
-const int MAX_PRESETS = 1000;
-const unsigned char MAX_PRESET_DIRS = 128;
-const unsigned char MAX_BANK_ROOT_DIRS = 128;
-const unsigned char MAX_BANKS_IN_ROOT = 128;
-const unsigned char MAX_INSTRUMENTS_IN_BANK = 160;
-const unsigned char MAX_AD_HARMONICS = 128;
-const unsigned char MAX_SUB_HARMONICS = 64;
-const unsigned char PAD_MAX_SAMPLES = 96;
-const unsigned char NUM_MIDI_PARTS = 64;
-const unsigned char PART_NORMAL = 0;
-const unsigned char PART_MONO = 1;
-const unsigned char PART_LEGATO = 2;
-const unsigned char MIDI_NOT_LEGATO = 3;
-const unsigned char MIDI_LEGATO = 4;
-const unsigned char NUM_MIDI_CHANNELS = 16;
-const unsigned char MIDI_LEARN_BLOCK = 200;
-const int MAX_ENVELOPE_POINTS = 40;
-const int MIN_ENVELOPE_DB = -60;
-const int MAX_RESONANCE_POINTS = 256;
-const int MAX_KEY_SHIFT = 36;
-const int MIN_KEY_SHIFT = -36;
-const float A_MIN = 30.0f;
-const float A_DEF = 440.0f;
-const float A_MAX = 1100.0f;
+#define COMMAND_SIZE 252
+#define MAX_HISTORY 25
+#define MAX_PRESETS 1000
+#define MAX_PRESET_DIRS 128
+#define MAX_BANK_ROOT_DIRS 128
+#define MAX_BANKS_IN_ROOT 128
+#define MAX_INSTRUMENTS_IN_BANK 160
+#define MAX_AD_HARMONICS 128
+#define MAX_SUB_HARMONICS 64
+#define PAD_MAX_SAMPLES 96
+#define NUM_MIDI_PARTS 64
+#define PART_NORMAL 0
+#define PART_MONO 1
+#define PART_LEGATO 2
+#define MIDI_NOT_LEGATO 3
+#define MIDI_LEGATO 4
+#define NUM_MIDI_CHANNELS 16
+#define MIDI_LEARN_BLOCK 200
+#define MAX_ENVELOPE_POINTS 40
+#define MIN_ENVELOPE_DB -60
+#define MAX_RESONANCE_POINTS 256
+#define MAX_KEY_SHIFT 36
+#define MIN_KEY_SHIFT -36
+#define A_MIN 30.0f
+#define A_DEF 440.0f
+#define A_MAX 1100.0f
 
 
-const unsigned int MIN_OSCIL_SIZE = 256; // MAX_AD_HARMONICS * 2
-const unsigned int MAX_OSCIL_SIZE = 16384;
-const unsigned int MIN_BUFFER_SIZE = 16;
-const unsigned int MAX_BUFFER_SIZE = 8192;
-const unsigned char NO_MSG = 255; // these two may become different
-const unsigned char UNUSED = 255;
+#define MIN_OSCIL_SIZE 256 // MAX_AD_HARMONICS * 2
+#define MAX_OSCIL_SIZE 16384
+#define MIN_BUFFER_SIZE 16
+#define MAX_BUFFER_SIZE 8192
+#define NO_MSG 255 // these two may become different
+#define UNUSED 255
 
 // GUI colours
 #define ADD_COLOUR 0xdfafbf00
@@ -96,19 +96,19 @@ const unsigned char UNUSED = 255;
 #define MODOFF_COLOUR 0x80808000
 
 // these were previously (pointlessly) user configurable
-const unsigned char NUM_VOICES = 8;
-const unsigned char POLIPHONY = 60;
-const unsigned char PART_DEFAULT_LIMIT = 20;
-const unsigned char NUM_SYS_EFX = 4;
-const unsigned char NUM_INS_EFX = 8;
-const unsigned char NUM_PART_EFX = 3;
-const unsigned char NUM_KIT_ITEMS = 16;
-const unsigned char FADEIN_ADJUSTMENT_SCALE = 20;
-const unsigned char MAX_EQ_BANDS = 8;  // MAX_EQ_BANDS must be less than 20
-const unsigned char MAX_FILTER_STAGES = 5;
-const unsigned char FF_MAX_VOWELS = 6;
-const unsigned char FF_MAX_FORMANTS = 12;
-const unsigned char FF_MAX_SEQUENCE = 8;
+#define NUM_VOICES 8
+#define POLIPHONY 60
+#define PART_DEFAULT_LIMIT 20
+#define NUM_SYS_EFX 4
+#define NUM_INS_EFX 8
+#define NUM_PART_EFX 3
+#define NUM_KIT_ITEMS 16
+#define FADEIN_ADJUSTMENT_SCALE 20
+#define MAX_EQ_BANDS 8  // MAX_EQ_BANDS must be less than 20
+#define MAX_FILTER_STAGES 5
+#define FF_MAX_VOWELS 6
+#define FF_MAX_FORMANTS 12
+#define FF_MAX_SEQUENCE 8
 
 #define DEFAULT_NAME "Simple Sound"
 #define UNTITLED "No Title"
@@ -124,7 +124,8 @@ namespace YOSH
     // float to bool done this way to ensure consistency
     // we are always using positive values
     inline bool F2B(float value) {return value > 0.5f;}
-    const float tipscale = (10.0f / 1024);
+    // 1024 is the reference width
+    inline float tipscale(void) {return(10.0f / 1024);}
 }
 
 /*
@@ -132,18 +133,6 @@ namespace YOSH
  * group order must not change, but the actual values can
  * and new entries can be added between the group ends
  */
-
-
-namespace ENVGROUP
-{
-    enum mode : int {
-        amplitudeLin = 1,
-        amplitudeLog,
-        frequency,
-        filter,
-        bandwidth
-    };
-}
 
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
@@ -164,34 +153,37 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     };
 
     namespace type {
-        // bits 0, 1
-        const unsigned char Adjust = 0; // return value adjusted within limits
-        const unsigned char Read = 0; // i.e. !write
-        const unsigned char Minimum = 1; // return this value
-        const unsigned char Maximum = 2; // return this value
-        const unsigned char Default = 3; // return this value
-        // remaining used bit-wise
-        const unsigned char Limits = 4; // read above limits
-        const unsigned char Error = 8;
-        const unsigned char LearnRequest = 16;
-        const unsigned char Learnable = 32;
-        const unsigned char Write = 64;
-        const unsigned char Integer = 128; // false = float
+        enum {
+            // bits 0, 1 as values
+            Adjust = 0, // return value adjusted within limits
+            Minimum, // return this value
+            Maximum, // return this value
+            Default, // return this value
+            // remaining used bit-wise
+            Limits, // read limits shown above
+            Error = 8,
+            LearnRequest = 16,
+            Learnable = 32,
+            Write = 64,
+            Integer = 128 // false = float
+        };
     }
 
     namespace action {
-        // bits 0 to 3
-        const unsigned char toAll = 0; // except MIDI
-        const unsigned char fromMIDI = 1;
-        const unsigned char fromCLI = 2;
-        const unsigned char fromGUI = 3;
-        // space for any other sources
-        const unsigned char noAction = 15; // internal use
-        // remaining used bit-wise
-        const unsigned char forceUpdate = 32;
-        const unsigned char loop = 64; // internal use
-        const unsigned char lowPrio = 128;
-        const unsigned char muteAndLoop = 192;
+        enum {
+            // bits 0 to 3
+            toAll = 0, // except MIDI
+            fromMIDI,
+            fromCLI,
+            fromGUI,
+            // space for any other sources
+            noAction = 15, // internal use
+            // remaining used bit-wise
+            forceUpdate = 32,
+            loop = 64, // internal use
+            lowPrio = 128,
+            muteAndLoop = 192
+        };
     }
 
     enum control : unsigned char {
@@ -667,16 +659,29 @@ namespace PART // usage PART::control::volume
         addMod8
     };
 
-    namespace aftertouchType { // all powers of 2 handled bit-wise
-        const unsigned int off = 0;
-        const unsigned int filterCutoff = 1;
-        const unsigned int filterCutoffDown = 2;
-        const unsigned int filterQ = 4;
-        const unsigned int filterQdown = 8;
-        const unsigned int pitchBend = 16;
-        const unsigned int pitchBendDown = 32;
-        const unsigned int volume = 64;
-        const unsigned int modulation = 128; // this must be highest bit
+    namespace aftertouchType {
+        enum {  // all powers of 2 handled bit-wise
+            off = 0,
+            filterCutoff,
+            filterCutoffDown,
+            filterQ = 4,
+            filterQdown = 8,
+            pitchBend = 16,
+            pitchBendDown = 32,
+            volume = 64,
+            modulation = 128 // this must be highest bit
+        };
+    }
+
+    namespace envelope
+    {
+        enum groupmode : int {
+            amplitudeLin = 1,
+            amplitudeLog,
+            frequency,
+            filter,
+            bandwidth
+        };
     }
 }
 
@@ -909,22 +914,22 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
     enum wave : unsigned char {
         sine = 0,
         triangle,
-         pulse,
-         saw,
-         power,
-         gauss,
-         diode,
-         absSine,
-         pulseSine,
-         stretchSine,
-         chirp,
-         absStretchSine,
-         chebyshev,
-         square,
-         spike,
-         circle,
-         hyperSec,
-         user
+        pulse,
+        saw,
+        power,
+        gauss,
+        diode,
+        absSine,
+        pulseSine,
+        stretchSine,
+        chirp,
+        absStretchSine,
+        chebyshev,
+        square,
+        spike,
+        circle,
+        hyperSec,
+        user
     };
 }
 

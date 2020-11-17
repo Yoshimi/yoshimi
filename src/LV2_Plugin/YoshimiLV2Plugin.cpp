@@ -395,7 +395,7 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sam
      * fairly readable at all screen resolutions.
      */
 
-    Fl_Tooltip::size(int(YOSH::tipscale * Fl::w()));
+    Fl_Tooltip::size(int(YOSH::tipscale() * Fl::w()));
 
     /*
      * Perform further global initialisation.

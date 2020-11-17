@@ -52,6 +52,8 @@
 // global variable; see SynthEngine.cpp and main.cpp
 extern SynthEngine *firstSynth;
 
+// these two are both zero and repesented by an enum entry
+const unsigned char type_read = TOPLEVEL::type::Adjust;
 
 namespace cli {
 
@@ -1128,7 +1130,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
          * If it's not valid we don't block, but pass on to
          * other command tests routines.
          */
-        if (controlType == TOPLEVEL::type::Read)
+        if (controlType == type_read)
             value = 1; // dummy value
         switch (nFXtype)
         {
@@ -1629,7 +1631,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(1, "type"))
     {
-        if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+        if (controlType == type_read && input.isAtEnd())
             value = 0;
         else
         {
@@ -1725,7 +1727,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "category"))
     {
-        if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+        if (controlType == type_read && input.isAtEnd())
                 value = 0; // dummy value
         else
         {
@@ -1833,7 +1835,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(2, "type"))
         {
-            if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+            if (controlType == type_read && input.isAtEnd())
                 value = 0;
             switch (baseType)
             {
@@ -2800,7 +2802,7 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
     if (input.matchnMove(1, "name"))
     {
         string name = string{input};
-        if (controlType != TOPLEVEL::type::Read && name <= "!")
+        if (controlType != type_read && name <= "!")
             return REPLY::value_msg;
         int miscMsg = textMsgBuffer.push(string(input));
         int tmp = readControl(synth, 0, BANK::control::selectBank, TOPLEVEL::section::bank);
@@ -2848,7 +2850,7 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         isRoot = true;
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
-    if (input.isdigit() || controlType == TOPLEVEL::type::Read)
+    if (input.isdigit() || controlType == type_read)
     {
         int tmp = string2int127(input);
         input.skipChars();
@@ -3452,7 +3454,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
             {
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                if (controlType == TOPLEVEL::type::Read)
+                if (controlType == type_read)
                     value = 2; // dummy value
                 else
                 {
@@ -3572,7 +3574,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
         {
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 2; // dummy value
             else
             {
@@ -3728,7 +3730,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
                 cmd = ADDVOICE::control::unisonVibratoSpeed;
             else if (input.matchnMove(1, "invert"))
             {
-                if (controlType == TOPLEVEL::type::Read)
+                if (controlType == type_read)
                     value = 1; // dummy value
                 else
                 {
@@ -3836,7 +3838,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         {
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 2; // dummy value
             else
             {
@@ -3993,7 +3995,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         {
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 2; // dummy value
             else
             {
@@ -4065,7 +4067,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     {
         if (input.matchnMove(1, "Position"))
         {
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 1; // dummy value
             else
             {
@@ -4280,7 +4282,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         {
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 2; // dummy value
             else
             {
@@ -4355,7 +4357,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     {
         if (input.matchnMove(1, "Position"))
         {
-            if (controlType == TOPLEVEL::type::Read)
+            if (controlType == type_read)
                 value = 1; // dummy value
             else
             {
@@ -4720,7 +4722,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
     int engine = contextToEngines(context);
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
 
-    if (controlType == TOPLEVEL::type::Read && input.isAtEnd())
+    if (controlType == type_read && input.isAtEnd())
         value = 0; // dummy value
     else
     {
@@ -5328,7 +5330,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             if (input.matchnMove(1, "Modulation"))
                 tmp |= PART::aftertouchType::modulation;
         }
-        if (tmp == PART::aftertouchType::modulation * 2 && controlType != TOPLEVEL::type::Read)
+        if (tmp == PART::aftertouchType::modulation * 2 && controlType != type_read)
             return REPLY::value_msg;
         return sendNormal(synth, 0, tmp & (PART::aftertouchType::modulation * 2 - 1), controlType, cmd, npart);
     }
@@ -5973,7 +5975,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
          * we no longer test for line end as some contexts can return
          * useful information with a simple read.
          */
-        return Reply{commandReadnSet(input, TOPLEVEL::type::Read)};
+        return Reply{commandReadnSet(input, type_read)};
     }
 
     if (input.matchnMove(3, "minimum"))
