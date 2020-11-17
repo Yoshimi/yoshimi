@@ -52,7 +52,6 @@
     #include <FL/Fl.H>
     #include <FL/Fl_Window.H>
     #include <FL/Fl_PNG_Image.H>
-    #include <FL/Fl_Tooltip.H>
     #include "Misc/Splash.h"
 #endif
 
@@ -140,12 +139,6 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
 
     Fl::lock();
-    /*
-     * Below is a pragmatic method of making tooltips
-     * fairly readable at all screen resolutions.
-     */
-    Fl_Tooltip::size(int(YOSH::tipscale() * Fl::w()));
-
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;

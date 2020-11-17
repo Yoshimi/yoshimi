@@ -29,7 +29,6 @@
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
     #include "MasterUI.h"
-    #include <FL/Fl_Tooltip.H>
 #endif
 
 
@@ -390,13 +389,6 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sam
         return NULL;
     }
     Fl::lock();
-    /*
-     * Below is a pragmatic method of making tooltips
-     * fairly readable at all screen resolutions.
-     */
-
-    Fl_Tooltip::size(int(YOSH::tipscale() * Fl::w()));
-
     /*
      * Perform further global initialisation.
      * For stand-alone the equivalent init happens in main(),

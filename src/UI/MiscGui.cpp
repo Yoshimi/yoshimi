@@ -26,6 +26,7 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
+#include <FL/Fl_Tooltip.H>
 
 #include <cairo.h>
 #include <cairo-xlib.h>
@@ -184,13 +185,23 @@ int choice(SynthEngine *synth, string one, string two, string three, string mess
     return synth->getGuiMaster()->query(one, two, three, message);
 }
 
-
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
+    static int oldW = 0;
     if (resizeTrig)
     {
         resizeTrig = false;
         synth->getGuiMaster()->wincheck();
+    /*
+     * Below is a pragmatic method of making tooltips
+     * fairly readable at all screen resolutions.
+     * 1024 is the reference width.
+     */
+        if (oldW != Fl::w())
+        {
+            Fl_Tooltip::size(int(10.0f / 1024 * Fl::w()));
+            oldW = Fl::w();
+        }
     }
 
     /*
