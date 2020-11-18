@@ -201,6 +201,8 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         {
             Fl_Tooltip::size(int(10.0f / 1024 * Fl::w()));
             oldW = Fl::w();
+            synth->getGuiMaster()->Showmaster();
+            // ensure it's always completely visible
         }
     }
 

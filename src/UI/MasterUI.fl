@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -226,7 +226,7 @@ class MasterUI {: {private GuiUpdates}
       openedit = false;
       make_window();
 
-      int fetchW, fetchH, fetchX, fetchY, fetchO;
+      /*int fetchW, fetchH, fetchX, fetchY, fetchO;
       loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
       if (fetchW ==0 || fetchH == 0)
           masterwindow->position(fetchX, fetchY);
@@ -234,11 +234,11 @@ class MasterUI {: {private GuiUpdates}
       {
           masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
           mainRtext();
-      }
+      }*/
 
-      bool foundWindows = true;
-      if (instance == 0)
-          foundWindows = fetchO;
+      bool foundWindows = Showmaster();
+      if (instance > 0)
+          foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
       string starterror = "";
@@ -251,7 +251,7 @@ class MasterUI {: {private GuiUpdates}
           starterror = textMsgBuffer.fetch(0);
           setMasterLabel(synth->getRuntime().paramsLoad);
       }
-      masterwindow->show();
+      //masterwindow->show();
       if (starterror.find("Could not") != std::string::npos)
           query("", "", "", starterror);
 
@@ -273,6 +273,24 @@ class MasterUI {: {private GuiUpdates}
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
+  }
+  Function {Showmaster()} {return_type bool
+  } {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
+    if (fetchW < mainDW || fetchH < mainDH)
+    {
+        fetchW = mainDW;
+        fetchH = mainDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, mainDW, mainDH);
+    
+    masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    mainRtext();
+    masterwindow->show();
+
+    return (fetchO != 0);} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -324,7 +342,7 @@ class MasterUI {: {private GuiUpdates}
         class ClearMenuBar
       } {
         Submenu Yoshimi {
-          label {&Yoshimi} open
+          label {&Yoshimi}
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem Y_about {
@@ -337,6 +355,7 @@ class MasterUI {: {private GuiUpdates}
                 W = aboutDW;
                 H = aboutDH;
             }
+            checkSane(X, Y, W, H, aboutDW, aboutDH);
             aboutwindow->resize(X, Y, W, H);
             aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
@@ -2000,8 +2019,8 @@ Alan Calvert started the project}
         W = queryDW;
         H = queryDH;
     }
+    checkSane(X, Y, W, H, queryDW, queryDH);
     querywindow->resize(Fl::event_x_root() + 16, Fl::event_y_root(), W, H);
-    //querywindow->resize(X, Y, W, H);
 
     querywindow->show();
     int result = 0;
@@ -2057,6 +2076,14 @@ Alan Calvert started the project}
         closebutton->copy_label(B1.c_str());
         int X, Y, W, H, O;
         loadWin(synth, W, H,  X,  Y, O, "Master-message");
+        if(W < msgDW || H < msgDW)
+        {
+            W = msgDW;
+            H = msgDH;
+            
+        }
+        checkSane(X, Y, W, H, msgDW, msgDH);
+        
         if (fixedPos)
             message->resize(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2, W, H);
         else
@@ -2107,40 +2134,40 @@ Alan Calvert started the project}
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Mixer");
     if (fetchO == 0)
-        fetchO = 1; // it's never been seen
-    int tmp = fetchO & 3;
+        fetchO = 1; // it's never been seen so set the default
 
-    if (tmp == 1)
-        {
-            panelwindow->size_range((PANEL_SINGLE_X * 9) / 10, (PANEL_SINGLE_Y * 9) / 10, 0, 0, 0, 0, 1);
-            towide->hide();
-            todeep->show();
-        }
-        else if (tmp == 2)
-        {
-            panelwindow->size_range(477, 567, 0, 0, 0, 0, 1);
-            towide->show();
-            todeep->hide();
-        }
-    if (fetchX + fetchW > Fl::w() - 30|| fetchY + fetchH > Fl::h() - 30)
+    // assune default sizes
+    int defW = (PANEL_SINGLE_X * 9) / 10;
+    int defH = (PANEL_SINGLE_Y * 9) / 10;
+
+    if (fetchW < (PANEL_DUAL_X * 9) / 10 || fetchH < defH)
     {
-        fetchX = fetchY = 30;
-        if (tmp == 1)
-        {
-            fetchW = PANEL_SINGLE_X;
-            fetchH = PANEL_SINGLE_Y;
-        }
-        else
-        {
-            fetchW = 477;
-            fetchH = 567;
-        }
-
+        fetchW = defW;
+        fetchH = defH;
+        fetchO = 1; // it's messed up so force default
     }
-    if (fetchW == 0 || fetchH == 0)
-        panelwindow->position(fetchX, fetchY);
-    else
-        panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    
+    int tmp = fetchO & 3;
+    if (tmp == 2)
+    {
+        defW = (PANEL_DUAL_X * 9) / 10;
+        defH = (PANEL_DUAL_Y * 9) / 10;
+    }
+    
+    if (tmp == 1)
+    {
+        towide->hide();
+        todeep->show();
+    }
+    else if (tmp == 2)
+    {
+        towide->show();
+        todeep->hide();
+    }
+    
+    panelwindow->size_range(defW, defH, 0, 0, 0, 0, 1);
+    checkSane(fetchX, fetchY, fetchW, fetchH, defW, defH);
+    panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
 
     if (fetchO < 4)
     {
@@ -2862,9 +2889,6 @@ Alan Calvert started the project}
   }
   Function {aboutRtext()} {} {
     code {//
-    if(aboutwindow->x() > Fl::w() - 10 || aboutwindow->y() > Fl::h() - 10)
-        aboutwindow->position(30, 30);
-
     float dScale = aboutwindow->w() / float(aboutDW);
 
     int size11 = int(11 * dScale);
@@ -3045,9 +3069,6 @@ Alan Calvert started the project}
   }
   Function {msgRtext()} {} {
     code {//
-    if(message->x() > Fl::w() - 10 ||message->y() > Fl::h() - 10)
-        message->position(30, 30);
-
     float dScale = message->w() / float(msgDW);
 
     int size14 = int(14 * dScale);
@@ -3080,19 +3101,6 @@ Alan Calvert started the project}
         dW = w / float(PANEL_DUAL_X);
         dH = h / float(PANEL_DUAL_Y);
     }
-
-    /*if ((w + panelwindow->x()) > W || (h + panelwindow->y())> H)
-    {
-        panelwindow->position(10, 30); // zero makes some WMs unhappy
-        {
-            while (w > W || h > H)
-            {
-                w *= 0.8f;
-                h *= 0.8f;
-            }
-            panelwindow->size(w, h);
-        }
-    }*/
 
     float dScale;
 
