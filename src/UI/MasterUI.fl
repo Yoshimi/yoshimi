@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -151,6 +151,11 @@ class MasterUI {open : {private GuiUpdates}
     code {//
       aboutwindow->hide();
       delete aboutwindow;
+
+      if (logenable)
+          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(), yoshiLog->logConsole->y(), true, "System-log");
+      else
+          setVisible(synth, false, "System-log");
 
       syseffsendwindow->hide();
       if (syseffSeen)
@@ -190,10 +195,7 @@ class MasterUI {open : {private GuiUpdates}
           delete midilearnui;
 
       if (yoshiLog)
-      {
-          //saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(),yoshiLog->logConsole->y(), yoshiLog->logConsole->visible(), "System-log");
           delete yoshiLog;
-      }
 
       if (querywindow)
       {
@@ -225,17 +227,6 @@ class MasterUI {open : {private GuiUpdates}
       yoshiLog = new ConsoleUI(synth);
       openedit = false;
       make_window();
-
-      /*int fetchW, fetchH, fetchX, fetchY, fetchO;
-      loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master");
-      if (fetchW ==0 || fetchH == 0)
-          masterwindow->position(fetchX, fetchY);
-      else
-      {
-          masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-          mainRtext();
-      }*/
-
       bool foundWindows = Showmaster();
       if (instance > 0)
           foundWindows = true; //  not relevant for later windows
@@ -251,13 +242,12 @@ class MasterUI {open : {private GuiUpdates}
           starterror = textMsgBuffer.fetch(0);
           setMasterLabel(synth->getRuntime().paramsLoad);
       }
-      //masterwindow->show();
       if (starterror.find("Could not") != std::string::npos)
           query("", "", "", starterror);
 
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
-
+      logenable = fetchData(0, CONFIG::control::reportsDestination, TOPLEVEL::section::config);
       if (!foundWindows)
       {
           string msg = "As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.";
@@ -285,7 +275,7 @@ class MasterUI {open : {private GuiUpdates}
         fetchH = mainDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, mainDW, mainDH);
-    
+
     masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
     mainRtext();
     masterwindow->show();
@@ -391,10 +381,10 @@ class MasterUI {open : {private GuiUpdates}
           MenuItem Y_reports {
             label {&Reports...}
             callback {//
-                         if (synth->getRuntime().toConsole)
-                             yoshiLog->Show(synth);
-                         else
-                             alert(synth, "Logging configured for std::cout");}
+    if (logenable)
+        yoshiLog->Show(synth);
+    else
+        alert(synth, "Logging configured for std::cout");}
             xywh {0 0 34 20} labelsize 12
           }
           MenuItem Y_manual {
@@ -2080,10 +2070,10 @@ Alan Calvert started the project}
         {
             W = msgDW;
             H = msgDH;
-            
+
         }
         checkSane(X, Y, W, H, msgDW, msgDH);
-        
+
         if (fixedPos)
             message->resize(masterwindow->x() + masterwindow->w() / 2 - message->w() / 2, masterwindow->y() + masterwindow->h() / 2 - message->h() / 2, W, H);
         else
@@ -2146,14 +2136,14 @@ Alan Calvert started the project}
         fetchH = defH;
         fetchO = 1; // it's messed up so force default
     }
-    
+
     int tmp = fetchO & 3;
     if (tmp == 2)
     {
         defW = (PANEL_DUAL_X * 9) / 10;
         defH = (PANEL_DUAL_Y * 9) / 10;
     }
-    
+
     if (tmp == 1)
     {
         towide->hide();
@@ -2164,7 +2154,7 @@ Alan Calvert started the project}
         towide->show();
         todeep->hide();
     }
-    
+
     panelwindow->size_range(defW, defH, 0, 0, 0, 0, 1);
     checkSane(fetchX, fetchY, fetchW, fetchH, defW, defH);
     panelwindow->resize(fetchX, fetchY, fetchW, fetchH);
@@ -2568,14 +2558,14 @@ Alan Calvert started the project}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-systemeffectsend");
-    
+
     if(fetchW < syseffDW || fetchH < syseffDH)
     {
         fetchW = syseffDW;
         fetchH = syseffDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, syseffDW, syseffDH);
-    
+
     syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
     syseffsendwindow->redraw();
     syseffsendwindow->show();
@@ -2703,12 +2693,17 @@ Alan Calvert started the project}
   }
   Function {setLogging(bool isConsole)} {} {
     code {//
-    if (isConsole)
+    logenable = isConsole;
+    if (logenable)
+    {
+        setVisible(synth, true, "System-log");
         yoshiLog->Show(synth);
+    }
     else
     {
         setVisible(synth, false, "System-log");
-        yoshiLog->logConsole->hide();}} {}
+        yoshiLog->logConsole->hide();
+    }} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -3253,5 +3248,7 @@ Alan Calvert started the project}
   decl {int queryDH;} {private local
   }
   decl {int lastqueryW;} {private local
+  }
+  decl {bool logenable;} {private local
   }
 }
