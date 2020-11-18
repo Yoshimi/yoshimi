@@ -153,7 +153,8 @@ class MasterUI {: {private GuiUpdates}
       delete aboutwindow;
 
       syseffsendwindow->hide();
-      saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), syseffSeen, "Master-systemeffectsend");
+      if (syseffSeen)
+          saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), true, "Master-systemeffectsend");
       delete syseffsendwindow;
 
       if (panelType < 4)
@@ -311,7 +312,7 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {38 547 385 470} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {42 469 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
     } {
@@ -803,7 +804,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           Fl_Button sysEffSend {
             label {Send to}
             callback {//
-            syseffsendwindow->show();}
+    showSysEffSends();}
             xywh {275 126 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
           Fl_Button sysCopy {
@@ -1119,9 +1120,10 @@ Alan Calvert started the project}
     }
     Fl_Window syseffsendwindow {
       label {Sys Send}
-      xywh {43 63 120 246} type Double labelfont 13 labelsize 13 hide resizable
-      code0 {syseffDW = 120; syseffDH = 50;}
-      code1 {o->size_range(120, 242, 0, 0, 0, 0, 1);}
+      callback {syseffClose->do_callback();}
+      xywh {43 63 120 245} type Double labelfont 13 labelsize 13 hide resizable
+      code0 {syseffDW = 120; syseffDH = 245;}
+      code1 {o->size_range(syseffDW, syseffDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group syseffgroup {open
         xywh {9 46 109 172} box FLAT_BOX
@@ -1139,8 +1141,9 @@ Alan Calvert started the project}
       Fl_Button syseffClose {
         label Close
         callback {//
-        syseffsendwindow->hide();
-        syseffSeen = false;}
+    saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), false, "Master-systemeffectsend");
+    syseffsendwindow->hide();
+    syseffSeen = false;}
         xywh {20 216 80 25} box THIN_UP_BOX
       }
       Fl_Box syseffname {
@@ -2534,6 +2537,23 @@ Alan Calvert started the project}
     inseffectuigroup->activate();
     inseffectuigroup->show();} {}
   }
+  Function {showSysEffSends()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-systemeffectsend");
+    
+    if(fetchW < syseffDW || fetchH < syseffDH)
+    {
+        fetchW = syseffDW;
+        fetchH = syseffDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, syseffDW, syseffDH);
+    
+    syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    syseffsendwindow->redraw();
+    syseffsendwindow->show();
+    syseffSeen = true;} {}
+  }
   Function {setinspartlist()} {} {
     code {//
     inseffpart->clear();
@@ -2682,9 +2702,6 @@ Alan Calvert started the project}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Master-systemeffectsend");
-    syseffsendwindow->resize(fetchX, fetchY, fetchW, fetchH);
-
     if (lastSeen(synth, "Mixer") & 3)
         Showpanel();
 
@@ -2809,7 +2826,6 @@ Alan Calvert started the project}
     {
         syseffRtext();
         lastsyseffW = syseffsendwindow->w();
-        syseffSeen = true;
     }
 
     if (microtonalui->microtonaluiwindow->visible())
@@ -3008,31 +3024,8 @@ Alan Calvert started the project}
   }
   Function {syseffRtext()} {} {
     code {//
-    //int W =  Fl::w();
-    //int H =  Fl::h();
-    int w = syseffsendwindow->w();
-    int h = syseffsendwindow->h();
+    float dScale = syseffsendwindow->w() / float(syseffDW);
 
-    if(syseffsendwindow->x() > Fl::w() - 10 || syseffsendwindow->y() > Fl::h() - 10)
-        syseffsendwindow->position(30, 30);
-
-    /*while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        syseffsendwindow->size(w, h);
-    };*/
-
-    float dW = w / syseffDW;
-    float dH = h / syseffDH;
-    float dScale;
-
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
 
     int size = int(10 * dScale);
 

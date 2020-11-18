@@ -704,16 +704,17 @@ class SUBnoteUI {: {public PresetsUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "SubSynth");
-    SUBparameters->show();
-    lastsubW = 0;
-    subSeen = true;
     if (fetchW < subDW || fetchH < subDH)
     {
         fetchW = subDW;
         fetchH = subDH;
     }
+    checkSane(fetchX, fetchY, fetchW, fetchH, subDW, subDH);
     
-    SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);;} {}
+    SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
+    SUBparameters->show();
+    lastsubW = 0;
+    subSeen = true;} {}
   }
   Function {subRtext()} {} {
     code {//
@@ -727,9 +728,6 @@ class SUBnoteUI {: {public PresetsUI_}
 
     if (!SUBparameters->visible())
         return;
-
-    if(SUBparameters->x() > Fl::w() - 10 || SUBparameters->y() > Fl::h() - 10)
-        SUBparameters->position(30, 30);
 
     if(SUBparameters->w() == lastsubW)
          return;

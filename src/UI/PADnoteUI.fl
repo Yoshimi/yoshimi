@@ -1109,23 +1109,22 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "PadSynth");
-    padnotewindow->show();
-    lastpadW = 0;
-    padSeen = true;
     if (fetchW < padDW || fetchH < padDH)
     {
         fetchW = padDW;
         fetchH = padDH;
     }
+    checkSane(fetchX, fetchY, fetchW, fetchH, padDW, padDH);
 
-    padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);} {}
+    padnotewindow->resize(fetchX, fetchY, fetchW, fetchH);
+    padnotewindow->show();
+    lastpadW = 0;
+    padSeen = true;} {}
   }
   Function {padRtext()} {} {
     code {//
     if (oscui)
     {
-        if(oscui->osceditUI->x() > Fl::w() - 10 || oscui->osceditUI->y() > Fl::h() - 10)
-            oscui->osceditUI->position(30, 30);
         if (oscui->osceditUI->visible() && lastWaveW != oscui->osceditUI->w())
         {
             lastWaveW = oscui->osceditUI->w();
