@@ -120,7 +120,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         //draw the graph
         int step = 2 * scale;
         fl_line_style(0, step);
-        
+
         for (int i = 0; i < lx; i += step)
         {
              int val = int((ly - 2) * smps[i]);
@@ -132,15 +132,15 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
                 fl_line(ox + i, oy + ly, ox + i, oy + ly - val);
 
         }
-        
+
         int oi = 0;
         float ov = 0;
-        
+
         for (int i = 0; i < lx; i++)
         {
             int ni = ox + i;
             float nv = (ly - 2) * smps[i];
-            
+
             if (active)
                 fl_color(0, 0, 100);
             else
@@ -463,7 +463,7 @@ class PADnoteUI {: {public PresetsUI_}
             label Resonance
             callback {//
             resui->resonancewindow->redraw();
-            resui->Show(false);
+            resui->Show();
             resui->setcbwidget(cbwidget, applybutton);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
@@ -1123,6 +1123,7 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {padRtext()} {} {
     code {//
+    static int lastResuiW = 0;
     if (oscui)
     {
         if (oscui->osceditUI->visible() && lastWaveW != oscui->osceditUI->w())
@@ -1132,14 +1133,15 @@ class PADnoteUI {: {public PresetsUI_}
         }
     }
 
+    if (resui->resonancewindow->visible() && lastResuiW != resui->resonancewindow->w())
+    {
+        resui->resonanceRtext();
+        lastResuiW = resui->resonancewindow->w();
+    }
+
     ampenv->wincheck();
     freqenv->wincheck();
     filterenv->wincheck();
-    if (!padnotewindow->visible())
-    {
-        resui->resonancewindow->hide();
-        return;
-    }
 
     if(padnotewindow->x() > Fl::w() - 10 || padnotewindow->y() > Fl::h() - 10)
         padnotewindow->position(30, 30);

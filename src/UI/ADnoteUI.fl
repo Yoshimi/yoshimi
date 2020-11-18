@@ -2261,7 +2261,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
                 voicelistitem[i]->refreshlist();
             int fetchW, fetchH, fetchX, fetchY, fetchO;
             loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-list");
-            
+
             if (fetchW < listDW || fetchH < listDH)
             {
                 fetchW = listDW;
@@ -2283,7 +2283,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         callback {//
     voicelistitem[nvoice]->refreshlist();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
-    
+
     if (!voiceSeen)
     {
         loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-voice");
@@ -2296,13 +2296,13 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         //addVoiceRtext();
         checkSane(fetchX, fetchY, fetchW, fetchH, voiceDW, voiceDH);
     }
-    
+
     ADnoteVoice->redraw();
     ADnoteVoice->show();
     lastvoiceW = 0;
     voiceSeen = true;
 
-    
+
     synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
@@ -2328,7 +2328,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         label Resonance
         callback {//
     resui->resonancewindow->redraw();
-    resui->Show(true);
+    resui->Show();
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
         tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12
@@ -2792,8 +2792,8 @@ switch (num)
         fetchH = addDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, addDW, addDH);
-    
-    
+
+
     lastglobalW = 0;
     ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     ADnoteGlobalParameters->show();
@@ -2827,12 +2827,6 @@ switch (num)
     ampenv->wincheck();
     freqenv->wincheck();
     filterenv->wincheck();
-
-    if (!ADnoteGlobalParameters->visible())
-    {
-        resui->resonancewindow->hide(); // will need to add envelope/filter inserts
-        return;
-    }
 
     if (lastglobalW < 3)
     {
@@ -2915,7 +2909,7 @@ switch (num)
 
     if (!ADnoteVoice->visible())
         return;
-        
+
     if (lastvoiceW < 2)
     {
         ++lastvoiceW;

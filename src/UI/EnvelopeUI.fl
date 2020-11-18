@@ -346,7 +346,10 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
   Function {make_freemode_edit_window()} {} {
     Fl_Window freemodeeditwindow {
       label Envelope
+      callback {freeClose->do_callback();}
       xywh {614 158 575 180} type Double hide resizable
+      code0 {freeDW = o->w(); freeDH = o->h();}
+      code1 {o->size_range(freeDW, freeDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Box freeedit {
         label Envelope
@@ -1249,17 +1252,19 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {showfree()} {} {
     code {//
-        int fetchW, fetchH, fetchX, fetchY, fetchO;
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xEnvelope-free " + to_string(engine) + " " + to_string(group));
-    	freemodeeditwindow->show();
-    	if (fetchW > 0 && fetchH > 0)
-    	{
-           freemodeeditwindow->resize(fetchX, fetchY, fetchW, fetchH);
-           envfreeRtext();
-    	}
-   	else
-            freemodeeditwindow->position(fetchX, fetchY);
-        freemodeeditwindow->size_range(575, 180, 0, 0, 0, 0, 1);} {}
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xEnvelope-free " + to_string(engine) + " " + to_string(group));
+
+    if (fetchW < freeDW || fetchH < freeDH)
+    {
+        fetchW = freeDW;
+        fetchH = freeDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, freeDW, freeDH);
+
+    freemodeeditwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    freemodeeditwindow->show();
+    envfreeRtext();} {}
   }
   Function {wincheck()} {} {
     code {//
@@ -1274,12 +1279,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {envfreeRtext()} {} {
     code {//
-
-        if(freemodeeditwindow->x() > Fl::w() - 10 || freemodeeditwindow->y() > Fl::h() - 10)
-            freemodeeditwindow->position(30, 30);
-
-        //int W =  Fl::w();
-        //int H =  Fl::h();
         int w = freemodeeditwindow->w();
         int h = freemodeeditwindow->h();
         float defW = 575;
@@ -1403,5 +1402,9 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   decl {int lastfreeY;} {private local
   }
   decl {int lastfreeW;} {private local
+  }
+  decl {int freeDW;} {private local
+  }
+  decl {int freeDH;} {private local
   }
 }

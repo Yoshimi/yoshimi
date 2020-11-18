@@ -50,9 +50,6 @@ decl {\#include <iostream>} {private local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -465,7 +462,7 @@ class ResonanceUI {: PresetsUI_
           resSeen = false;
           if ((Fl::event_button() == 3))
           {
-              if (ADvsPAD)
+              if (engine == PART::engine::addSynth)
                   synth->getGuiMaster()->partui->adnoteui->ADnoteGlobalParameters->show();
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
@@ -624,16 +621,15 @@ class ResonanceUI {: PresetsUI_
     p1st->value(respar->Pprotectthefundamental);
     rg->redraw();} {}
   }
-  Function {Show(bool _ADvsPAD)} {} {
+  Function {Show()} {} {
     code {//
-    ADvsPAD = _ADvsPAD;
     string tname;
-    if (engine == 0)
+    if (engine == PART::engine::addSynth)
         tname = "AddSynth Resonance";
     else
         tname = "PadSynth Resonance ";
     resonancewindow->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());
-    resonancewindow->show();
+    ;
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Resonance " + to_string(engine));
     if(fetchW < resDW || fetchH < resDH)
@@ -641,15 +637,15 @@ class ResonanceUI {: PresetsUI_
         fetchW = resDW;
         fetchH = resDH;
     }
-    resSeen = true;
+    checkSane(fetchX, fetchY, fetchW, fetchH, resDW, resDH);
+
     resonancewindow->resize(fetchX, fetchY, fetchW, fetchH);
-    resonanceRtext();} {}
+    resonancewindow->show();
+    resonanceRtext();
+    resSeen = true;} {}
   }
   Function {resonanceRtext()} {} {
     code {//
-        if(resonancewindow->x() > Fl::w() - 10 || resonancewindow->y() > Fl::h() - 10)
-            resonancewindow->position(30, 30);
-
         float dScale = resonancewindow->w() / resDW;
 
         if (dScale < 0.2f)
@@ -699,8 +695,6 @@ class ResonanceUI {: PresetsUI_
   decl {int kititem;} {private local
   }
   decl {int engine;} {private local
-  }
-  decl {bool ADvsPAD;} {private local
   }
   decl {bool resSeen;} {private local
   }
