@@ -709,7 +709,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mainvirtkeyb {
           label {Virtual Keyboard}
           callback {//
-          virkeyboard->virkeyboardwindow->show();}
+          virkeyboard->ShowKbd();}
           tooltip {Virtual Keyboard} xywh {85 60 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mixerpanel {
@@ -2744,16 +2744,8 @@ Alan Calvert started the project}
     else
         bankui->rootuiwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-virtualkeyboard");
-    if (fetchW == 0 || fetchH == 0)
-        virkeyboard->virkeyboardwindow->position(fetchX, fetchY);
-    else
-        virkeyboard->virkeyboardwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    if (fetchO)
-    {
-        virkeyboard->virkeyboardwindow->show();
-        virkeyboard->virtRtext();
-    }
+    if (lastSeen(synth, "Midi-virtualkeyboard"))
+        virkeyboard->ShowKbd();
     else
         virkeyboard->virkeyboardwindow->hide();
 
@@ -2846,6 +2838,9 @@ Alan Calvert started the project}
         syseffRtext();
         lastsyseffW = syseffsendwindow->w();
     }
+
+    if (vectorui->vectorwindow->visible())
+        vectorui->vectorRtext();
 
     if (microtonalui->microtonaluiwindow->visible())
         microtonalui->scaleRtext();

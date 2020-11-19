@@ -326,13 +326,13 @@ class VirKeys {: {public Fl_Box}
   }
 }
 
-class VirKeyboard {} {
+class VirKeyboard {open
+} {
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {//
-      relaseallkeys();
-      virkeyboardwindow->hide();}
+      virtClose->do_callback();;}
       tooltip {+ Shift to hold or release keys} xywh {1085 88 650 130} type Double hide resizable
       code0 {virtDW = o->w(); virtDH = o->h();}
       code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);}
@@ -401,7 +401,10 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         label Close
         callback {//
         relaseallkeys();
-        virkeyboardwindow->hide();}
+        virkeyboardwindow->hide();
+        saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), false, "Midi-virtualkeyboard");
+        virtSeen = false;
+    	lastvirtW = 0;}
         xywh {452 101 55 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Slider controlslider {
@@ -628,11 +631,14 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     oldcontrol = 64;
     make_window();
     keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
-    virkeyboardwindow->label(keyboardlabel.c_str());} {}
+    virkeyboardwindow->label(keyboardlabel.c_str());
+    virtSeen = false;
+    lastvirtW = 0;} {}
   }
   Function {~VirKeyboard()} {} {
     code {//
-    saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), virkeyboardwindow->visible(), "Midi-virtualkeyboard");
+    if (virtSeen)
+        saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), true, "Midi-virtualkeyboard");
     virkeyboardwindow->hide();
     delete virkeyboardwindow;} {}
   }
@@ -640,6 +646,22 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     code {//
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
+  }
+  Function {ShowKbd()} {} {
+    code {//
+    int fetchX, fetchY, fetchW, fetchH, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-virtualkeyboard");
+    if (fetchW < virtDW || fetchH < virtDH)
+    {
+        fetchW = virtDW;
+        fetchH = virtDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, virtDW, virtDH);
+
+    virkeyboardwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    virkeyboardwindow->show();
+    virtSeen = true;
+    lastvirtW = 0;} {}
   }
   Function {Hide()} {} {
     code {//
@@ -650,8 +672,9 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   Function {virtRtext()} {} {
     code {//
-    if(virkeyboardwindow->x() > Fl::w() - 10 || virkeyboardwindow->y() > Fl::h() - 10)
-        virkeyboardwindow->position(30, 30);
+    if (lastvirtW == virkeyboardwindow->w())
+        return;
+    lastvirtW = virkeyboardwindow->w();
 
     float dScale = virkeyboardwindow->w() / float(virtDW);
 
@@ -701,6 +724,10 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   decl {int virtDW;} {private local
   }
   decl {int virtDH;} {private local
+  }
+  decl {int lastvirtW;} {private local
+  }
+  decl {bool virtSeen;} {private local
   }
   decl {float scaledWhite;} {private local
   }

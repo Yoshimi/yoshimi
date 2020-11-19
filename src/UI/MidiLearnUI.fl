@@ -392,7 +392,8 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label Close
         callback {//
     saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), false, "Midi-learn");
-    midilearnwindow->hide();}
+    midilearnwindow->hide();
+    learnSeen = false;}
         xywh {730 262 63 20} box THIN_UP_BOX
       }
       Fl_Button load {

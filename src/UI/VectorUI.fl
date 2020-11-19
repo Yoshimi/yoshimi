@@ -64,13 +64,10 @@ class VectorUI {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
       callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              vectorRtext();}
+      Closevector->do_callback();}
       xywh {776 278 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
       code0 {vecDW = o->w();vecDH = o->h();}
-      class YoshiWin
+      code1 {o->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Spinner setbasechan {
         label {Base Channel}
@@ -330,8 +327,10 @@ class VectorUI {} {
       Fl_Button Closevector {
         label Close
         callback {//
+            saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), false, "Vector");
         vectorwindow->hide();
-        setVisible(synth, false, "Vector");}
+        setVisible(synth, false, "Vector");
+        vectorSeen = false;}
         xywh {310 265 57 20} labelfont 13 labelsize 12
       }
       Fl_Group Ygroup {
@@ -651,11 +650,14 @@ class VectorUI {} {
     Yf = 0;
     make_window();
     vectorwindow->copy_label(synth->makeUniqueName("Vectors").c_str());
-    updateAll();} {}
+    updateAll();
+    vectorSeen = false;
+    lastvectorW = 0;} {}
   }
   Function {~VectorUI()} {} {
     code {//
-        setVisible(synth, vectorwindow->visible(), "Vector");
+        if (vectorSeen)
+            saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), true, "Vector");
         vectorwindow->hide();
         delete  vectorwindow;} {}
   }
@@ -784,17 +786,23 @@ class VectorUI {} {
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Vector");
     vectorwindow->show();
-    if (fetchW == 0 || fetchH == 0)
-        vectorwindow->position(fetchX, fetchY);
-    else
+    if (fetchW < vecDW || fetchH < vecDH)
     {
-        vectorwindow->resize(fetchX, fetchY, fetchW, fetchH);
-        vectorRtext();
+        fetchW = vecDW;
+        fetchH = vecDH;
     }
-    vectorwindow->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);} {}
+    checkSane(fetchX, fetchY, fetchW, fetchH, vecDW, vecDH, true);
+
+    vectorwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    vectorSeen = true;
+    lastvectorW = 0;} {}
   }
   Function {vectorRtext()} {} {
     code {//
+    if (lastvectorW == vectorwindow->w())
+        return;
+    lastvectorW = vectorwindow->w();    
+        
     float dW = vectorwindow->w() / vecDW;
     float dH = vectorwindow->h() / vecDH;
     float dScale;
@@ -864,8 +872,7 @@ class VectorUI {} {
     Loaded->labelsize(size12);
     Closevector->labelsize(size12);
 
-    vectorwindow->redraw();
-    saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), true, "Vector");} {}
+    vectorwindow->redraw();} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
@@ -1076,5 +1083,9 @@ for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
   decl {float vecDH;} {private local
   }
   decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
+  }
+  decl {bool vectorSeen;} {private local
+  }
+  decl {int lastvectorW;} {private local
   }
 }
