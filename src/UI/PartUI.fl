@@ -2623,14 +2623,14 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-edit");
-    
+
     if (fetchW < editDW || fetchH < editDH)
     {
         fetchW = editDW;
         fetchH = editDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, editDW, editDH);
-    
+
     instrumenteditwindow->resize(fetchX, fetchY, fetchW, fetchH);
     lasteditW = 0;
     instrumenteditwindow->show();
@@ -2640,14 +2640,14 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-controllers");
-    
+
     if (fetchW < ctlDW || fetchH < ctlDH)
     {
         fetchW = ctlDW;
         fetchH = ctlDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, ctlDW, ctlDH);
-    
+
     ctlwindow->resize(fetchX, fetchY, fetchW, fetchH);
     lastctlW = 0;
     ctlwindow->show();
@@ -2657,7 +2657,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-aftertouch");
-    
+
     if (fetchW < atDW || fetchH < atDH)
     {
         fetchW = atDW;
@@ -2673,14 +2673,14 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-ctlmidi");
-    
+
     if (fetchW < midiDW || fetchH < midiDH)
     {
         fetchW = midiDW;
         fetchH = midiDH;
     }
-    checkSane(fetchX, fetchY, fetchW, fetchH, midiDW, midiDH);
-    
+    checkSane(fetchX, fetchY, fetchW, fetchH, midiDW, midiDH, true);
+
     ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     ctlmidi->show();
     ctlmidiSeen = true;} {}
@@ -2697,15 +2697,15 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-effects");
-    
+
     if (fetchW < fxDW || fetchH < fxDH)
     {
         fetchW = fxDW;
         fetchH = fxDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, fxDW, fxDH);
-    
-    partfx->resize(fetchX, fetchY, fetchW, fetchH);   
+
+    partfx->resize(fetchX, fetchY, fetchW, fetchH);
     partfx->show();
     fxSeen = true;} {}
   }
@@ -2713,14 +2713,14 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Part-kit");
-    
+
     if (fetchW < kitDW || fetchH < kitDH)
     {
         fetchW = kitDW;
         fetchH = kitDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, kitDW, kitDH);
-    
+
     instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
     instrumentkitlist->show();
     kitSeen = true;} {}
@@ -2841,7 +2841,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     float dScale =  ctlwindow->w() / float(ctlDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
-        
+
     int size = int(dScale * 10);
     int size14 = int(dScale * 14);
 
@@ -2973,10 +2973,10 @@ class PartUI {: {public Fl_Group, PartUI_}
         instrumentkitlist->resize(fetchX, fetchY, fetchW, fetchH);
         //kitSeen = true;
     };
-    
+
     float dW = instrumentkitlist->w() / float(kitDW);
     float dH = instrumentkitlist->h() / float(kitDH);
-    
+
     float dScale = dW;
     if (dScale < 0.2f)
         dScale = 0.2f;

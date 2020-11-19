@@ -30,6 +30,9 @@ decl {\#include <string>} {public local
 decl {\#include "FL/Fl_Text_Display.H"} {public local
 }
 
+decl {\#include "UI/YoshiWin.h"} {public local
+}
+
 decl {using namespace std;} {public local
 }
 
@@ -111,7 +114,7 @@ class ConsoleUI {} {
     int maxW = Fl::w() - 5; // wiggle room
     int maxH = Fl::h() - 30; // space for minimal titlebar
     
-    if ((fetchX + fetchW ) > maxW) // postion
+    if ((fetchX + fetchW) > maxW) // postion
         fetchX = maxW / 2;        
     if ((fetchY + fetchH) > maxH)
         fetchY = maxH / 2;
@@ -128,9 +131,6 @@ class ConsoleUI {} {
   }
   Function {consoleRtext()} {} {
     code {//
-    if(logConsole->x() > Fl::w() - 10 || logConsole->y() > Fl::h() - 10)
-        logConsole->position(30, 30);
-
     if (lastlogW == logConsole->w())
         return;
 
