@@ -577,6 +577,8 @@ class MicrotonalUI {} {
         fetchW = scaleDW;
         fetchH = scaleDH;
     }
+    checkSane(fetchX, fetchY, fetchW, fetchH, scaleDW, scaleDH);
+    
     microtonaluiwindow->resize(fetchX, fetchY, fetchW, fetchH);
     lastscaleW = 0;
     lastscaleSeen = true;
@@ -587,9 +589,6 @@ class MicrotonalUI {} {
     if (lastscaleW == microtonaluiwindow->w())
         return;
     lastscaleW = microtonaluiwindow->w();
-
-    if(microtonaluiwindow->x() > Fl::w() - 10 || microtonaluiwindow->y() > Fl::h() - 10)
-        microtonaluiwindow->position(30, 30);
 
     float dScale = microtonaluiwindow->w() / float(scaleDW);
 

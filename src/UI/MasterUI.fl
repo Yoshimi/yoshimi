@@ -725,7 +725,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         Fl_Button mainmidilearn {
           label {Midi Learn}
           callback {//
-                midilearnui->midilearnwindow->show();}
+                midilearnui->showLearn();}
           tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button vectors {
@@ -2762,10 +2762,8 @@ Alan Calvert started the project}
     else
         microtonalui->microtonaluiwindow->hide();
 
-    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-learn");
-    midilearnui->midilearnwindow->position(fetchX, fetchY);
-    if (fetchO)
-        midilearnui->midilearnwindow->show();
+    if (lastSeen(synth, "Midi-learn"))
+        midilearnui->showLearn();
     else
         midilearnui->midilearnwindow->hide();
 
@@ -2774,7 +2772,6 @@ Alan Calvert started the project}
     else
         configui->configwindow->hide();
 
-    //if (synth->getRuntime().toConsole)
     if (lastSeen(synth, "System-log"))
         yoshiLog->Show(synth);
     else

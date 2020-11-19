@@ -339,6 +339,7 @@ class MidiLearnUI {} {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
       label {Midi Learn}
+      callback {close->do_callback();}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
 Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide resizable
@@ -389,7 +390,9 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
       Fl_Button close {
         label Close
-        callback {midilearnwindow->hide();}
+        callback {//
+    saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), false, "Midi-learn");
+    midilearnwindow->hide();}
         xywh {730 262 63 20} box THIN_UP_BOX
       }
       Fl_Button load {
@@ -443,6 +446,22 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
+  }
+  Function {showLearn()} {} {
+    code {//
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+    loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Midi-learn");
+    if (fetchW < learnDW || fetchH < learnDH)
+    {
+        fetchW = learnDW;
+        fetchH = learnDH;
+    }
+    checkSane(fetchX, fetchY, fetchW, fetchH, learnDW, learnDH);
+
+    midilearnwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    midilearnwindow->show();
+    learnW = 0;
+    learnSeen = true;} {}
   }
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -572,12 +591,15 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     make_window();
     setWindowTitle();
     num = 0;
-    learnW = 0;} {}
+    learnW = 0;
+    learnSeen = false;} {}
   }
   Function {~MidiLearnUI()} {} {
-    code {saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), midilearnwindow->visible(), "Midi-learn");
-midilearnwindow->hide();
-delete midilearnwindow;} {}
+    code {//
+    if (learnSeen)
+        saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), true, "Midi-learn");
+    midilearnwindow->hide();
+    delete midilearnwindow;} {}
   }
   Function {clearAll(bool empty)} {} {
     code {//
@@ -610,8 +632,6 @@ delete midilearnwindow;} {}
     if (learnW == midilearnwindow->w())
         return;
     learnW = midilearnwindow->w();
-    if(midilearnwindow->x() > Fl::w() - 10 || midilearnwindow->y() > Fl::h() - 10)
-        midilearnwindow->position(30, 30);
 
     float dScale = midilearnwindow->w() / float(learnDW);
 
@@ -644,7 +664,6 @@ delete midilearnwindow;} {}
 
         }
     }
-    //kitlist->redraw();
     midilearnwindow->redraw();} {}
   }
   decl {int lastkititem;} {public local
@@ -660,5 +679,7 @@ delete midilearnwindow;} {}
   decl {int learnDH;} {private local
   }
   decl {int learnW;} {private local
+  }
+  decl {bool learnSeen;} {private local
   }
 }

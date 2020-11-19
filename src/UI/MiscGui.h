@@ -236,15 +236,22 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     if ((w / defW) != (h / defH)) // ratio
         w = h / defH * defW; // doesn't matter which one we pick!
 
+    int adjustW;
+    int adjustH;
     if(halfsize)
     {
-        maxW = maxW / 2;
-        maxH = maxH / 2;
+        adjustW = maxW / 2;
+        adjustH = maxH / 2;
+    }
+    else
+    {
+        adjustW = maxW - 20; // extra clearance for margins
+        adjustH = maxH - 10;
     }
     if (w > maxW || h > maxH) // size
     {
-        h = maxH;
-        w = maxW;
+        h = adjustH;
+        w = adjustW;
         if (h / defH > w / defW)
         {
             h = w / defW * defH;
