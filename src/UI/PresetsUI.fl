@@ -72,7 +72,8 @@ class PresetsUI {} {
     synth = _synth;
     p = NULL;
     make_window();
-    presetsDW = 265; // shared between both} {}
+    presetsDW = 265; // these are shared between both
+    presetsDH = 430;} {}
   }
   Function {~PresetsUI()} {} {
     code {//
@@ -84,7 +85,7 @@ class PresetsUI {} {
   Function {make_window()} {} {
     Fl_Window copywin {
       label {Copy to Clipboard/Preset}
-      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"PresetWin");
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
@@ -153,7 +154,7 @@ o->hide();}
     }
     Fl_Window pastewin {
       label {Paste from Clipboard/Preset}
-      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), o->visible(),"PresetWin");
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
@@ -301,6 +302,13 @@ o->hide();}
     }
     int  W, H, X, Y, O;
     loadWin(synth, W, H, X, Y, O, "PresetWin");
+    if (W < presetsDW || H < presetsDH)
+    {
+        W = presetsDW;
+        H = presetsDH;
+    }
+    checkSane(X, Y, W, H, presetsDW, presetsDH, true);
+    
     copywin->resize(X, Y, W, H);
     pastewin->resize(X, Y, W, H);
     presetsRtext();} {}
@@ -367,5 +375,7 @@ o->hide();}
   decl {SynthEngine *synth;} {private local
   }
   decl {int presetsDW;} {private local
+  }
+  decl {int presetsDH;} {private local
   }
 }
