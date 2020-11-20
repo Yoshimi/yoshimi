@@ -3342,6 +3342,10 @@ float SynthEngine::getLimits(CommandBlock *getData)
             max = 0;
             break;
 
+        case MAIN::control::loadInstrumentFromBank:
+            return value; // this is just a workround :(
+            break;
+
         default:
             type |= TOPLEVEL::type::Error;
             break;
