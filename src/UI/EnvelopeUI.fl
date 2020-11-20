@@ -853,7 +853,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char par = getData->data.parameter;
+    unsigned char param = getData->data.parameter;
     unsigned char offset = getData->data.offset;
 
     int value_int = lrint(value);
@@ -885,7 +885,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         case ENVELOPEINSERT::control::attackLevel:
             if (NotUs)
             {
-                switch (par)
+                switch (param)
                 {
                     case TOPLEVEL::insertType::frequency:
                         e2aval->value(value);
@@ -903,7 +903,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         case ENVELOPEINSERT::control::attackTime:
             if (NotUs)
             {
-                switch (par)
+                switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
                         e1adt->value(value);
@@ -922,14 +922,14 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::decayLevel:
-            if (par == TOPLEVEL::insertType::filter && NotUs)
+            if (param == TOPLEVEL::insertType::filter && NotUs)
                 e3dval->value(value);
             break;
 
         case ENVELOPEINSERT::control::decayTime:
             if (NotUs)
             {
-                switch (par)
+                switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
                         e1ddt->value(value);
@@ -942,14 +942,14 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::sustainLevel:
-            if (par == TOPLEVEL::insertType::amplitude && NotUs)
+            if (param == TOPLEVEL::insertType::amplitude && NotUs)
                 e1sval->value(value);
             break;
 
         case ENVELOPEINSERT::control::releaseTime:
             if (NotUs)
             {
-                switch (par)
+                switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
                         e1rdt->value(value);
@@ -970,7 +970,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         case ENVELOPEINSERT::control::releaseLevel:
             if (NotUs)
             {
-                switch (par)
+                switch (param)
                 {
                     case TOPLEVEL::insertType::frequency:
                         e2rval->value(value);
@@ -986,7 +986,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::stretch:
-            switch (par)
+            switch (param)
             {
                 case TOPLEVEL::insertType::amplitude:
                     e1envstretch->value(value);
@@ -1006,7 +1006,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::forcedRelease:
-            switch (par)
+            switch (param)
             {
                 case TOPLEVEL::insertType::amplitude:
                     e1forcedrelease->value(value_bool);
@@ -1026,7 +1026,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::linearEnvelope:
-            if (par == TOPLEVEL::insertType::amplitude)
+            if (param == TOPLEVEL::insertType::amplitude)
             {
                 e1linearenvelope->value(value_bool);
                 linearenvelopecheck->value(value_bool);
@@ -1076,24 +1076,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 
     refresh();} {}
   }
-  Function {reinit()} {} {
-    code {//
-    if (env->Pfreemode != 0)
-    {
-        bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
-        if (!answer)
-        {
-            freemodebutton->value(1); // back as it was
-            return;
-        }
-    }
-
-    if (env->Pfreemode == 0)
-        env->Pfreemode = 1;
-    else
-        env->Pfreemode = 0;
-    reinitcore(env->Pfreemode);} {}
-  }
   Function {reinitcore(bool freemode)} {} {
     code {//
     if (freemode)
@@ -1136,7 +1118,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 }} {}
   }
   Function {refresh()} {} {
-    code {//
+    code {//    
     freemodebutton->value(env->Pfreemode);
 
     sustaincounter->value(env->Penvsustain);
@@ -1210,17 +1192,19 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         }
     }
     else
-    {
         envfree->redraw();
-    }
 
     envADSR->hide();
     envASR->hide();
     envADSRfilter->hide();
     envASRbw->hide();
     envfree->hide();
-
-    if (env->Pfreemode==0)
+/*
+    We now always initialse and position related groups as well as the freemode one
+    This is to ensure that resizing will have the correct starting size and position
+    even if a part was loaded specifying the freemode form.
+*/
+    //if (env->Pfreemode==0)
     {
         switch(env->Envmode)
         {
@@ -1240,14 +1224,17 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             default:
                 break;
         }
+        envwindow->resize(this->x(),this->y(),this->w(),this->h());
     }
-    else
+    //else
+    if (env->Pfreemode)
     {
         envwindow=envfree;
+        envwindow->resize(this->x(),this->y(),this->w(),this->h());
     }
 
-    envwindow->resize(this->x(),this->y(),this->w(),this->h());
-
+    //envwindow->resize(this->x(),this->y(),this->w(),this->h());
+    
     envwindow->show();} {}
   }
   Function {showfree()} {} {
