@@ -105,7 +105,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
             return;
         }
     }
-
     CommandBlock putData;
     putData.data.value = value;
     putData.data.control = control;
@@ -116,6 +115,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
+
     if (action == TOPLEVEL::action::fromMIDI)
         type = type | 1; // faking MIDI from virtual keyboard
     else
@@ -170,7 +170,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 
     putData.data.type = type;
     putData.data.source = action;
-    //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " par2 " << int(par2) << endl;
+    //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " offset " << int(offset) << " msg " << int(miscmsg) << endl;
     if (!synth->interchange.fromGUI->write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }

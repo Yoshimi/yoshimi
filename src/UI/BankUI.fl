@@ -319,6 +319,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
       label Bank
+      callback {Hide(0);}
       xywh {83 157 780 570} type Double labelsize 12 hide resizable
       code0 {instDW = o->w(), instDH = o->h();}
       code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
@@ -347,7 +348,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if ((Fl::event_button() == 3))
         {
             rootFrom = 3;
-            instrumentuiwindow->hide();
+            Hide(0);
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
@@ -360,7 +361,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if ((Fl::event_button() == 3))
         {
             bankFrom = 3;
-            instrumentuiwindow->hide();
+            Hide(0);
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
@@ -493,7 +494,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
         }
         instFrom = 0; // to avoid later confusion!
-        instrumentuiwindow->hide();
+        Hide(0);
         saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");}
         tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
@@ -529,7 +530,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window searchwin {
       label {Bank Search}
-      callback {searchClose->do_callback();}
+      callback {Hide(3);}
       xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       code0 {searchDW = o->w(); searchDH = o->h();}
       code1 {searchwin->size_range(searchDW, searchDH, 0, 0, 0, 0, 1);}
@@ -552,9 +553,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button searchClose {
         label Close
         callback {//
-        saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
-        searchSeen = false;
-        searchwin->hide();}
+        Hide(3);}
         xywh {228 451 65 24} labelsize 12 align 192
       }
       Fl_Button searchT {
@@ -655,6 +654,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window bankuiwindow {
       label Root
+      callback {Hide(1);}
       xywh {84 223 780 570} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
@@ -667,8 +667,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if ((Fl::event_button() == 3))
         {
             rootFrom = 2;
-            bankuiwindow->hide();
-            setVisible(synth, false, "Bank-bank");
+            Hide(1);
         }
         else
             rootFrom = 0;}
@@ -696,8 +695,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         ShowInst();
         if (Fl::event_button() == 3)
         {
-            bankuiwindow->hide();
-            setVisible(synth, false, "Bank-bank");}}
+            Hide(1);}}
         tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
       }
       Fl_Group bankgroup {
@@ -816,9 +814,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button bankClose {
         label Close
         callback {//
-            bankuiwindow->hide();
-            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(),  bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
-            bankSeen = false;
+            Hide(1);
             if (Fl::event_button() == 3)
             {
                 if (bankFrom == 1)
@@ -839,6 +835,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window rootuiwindow {
       label {Bank Root Paths}
+      callback {Hide(2);}
       xywh {88 54 465 295} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
@@ -918,8 +915,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (Fl::event_button() == 3)
         {
             bankFrom = 1;
-            rootuiwindow->hide();
-            setVisible(synth, false, "Bank-root");
+            Hide(2);
         }
         else
             rootFrom = 0;}
@@ -959,10 +955,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;
-        rootuiwindow->hide();
-        saveWin(synth, rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
-        rootSeen = false;
-        setVisible(synth, false, "Bank-root");}
+        Hide(2);}
         tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1098,21 +1091,18 @@ class BankUI {: {public BankProcess_, RootProcess_}
   } {
     code {//
         if (instrumentSeen)
-            saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");
+            saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), true, "Bank-instrument");
         instrumentuiwindow->hide();
-        instrumentSeen = false;
         delete instrumentuiwindow;
         if (bankSeen)
-            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
+            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), true, "Bank-bank");
         bankuiwindow->hide();
-        bankSeen = false;
         delete bankuiwindow;
         if (rootSeen)
-            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
-        rootSeen = false;
+            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), true, "Bank-root");
         rootuiwindow->hide();
         if (searchSeen)
-            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
+            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), true, "Bank-search");
         searchwin->hide();
         delete searchwin;
 
@@ -1138,6 +1128,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         W = instDW;
         H = instDH;
     }
+    checkSane(X, Y, W, H, instDW, instDH);
+
     instrumentuiwindow->resize(X, Y, W, H);
     lastinstrumentW = 0;
     instrumentuiwindow->show();
@@ -1153,6 +1145,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         W = bankDW;
         H = bankDH;
     }
+    checkSane(X, Y, W, H, bankDW, bankDH);
+
     bankuiwindow->resize(X, Y, W, H);
     bankuiwindow->show();
     bankRtext();
@@ -1168,6 +1162,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         W = rootDW;
         H = rootDH;
     }
+    checkSane(X, Y, W, H, rootDW, rootDH);
+
     rootuiwindow->resize(X, Y, W, H);
     rootuiwindow->show();
     rootRtext();
@@ -1183,6 +1179,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         W = searchDW;
         H = searchDH;
     }
+    checkSane(X, Y, W, H, searchDW, searchDH);
+
     searchwin->resize(X, Y, W, H);
     if (unsearched)
     {
@@ -1193,10 +1191,33 @@ class BankUI {: {public BankProcess_, RootProcess_}
     searchRtext();
     searchSeen = true;} {}
   }
-  Function {Hide()} {} {
-    code {// called from master UI
-    instrumentuiwindow->hide();
-    setVisible(synth, false, "Bank-instrument");} {}
+  Function {Hide(int type = 0)} {} {
+    code {// also called from master UI
+    switch (type)
+    {
+        case 0:
+            saveWin(synth,instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");
+            instrumentuiwindow->hide();
+            instrumentSeen = false;
+            break;
+        case 1:
+            saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
+            bankuiwindow->hide();
+            bankSeen = false;
+            break;
+        case 2:
+            saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
+            rootuiwindow->hide();
+            rootSeen = false;
+            break;
+        case 3:
+            saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
+            searchwin->hide();
+            searchSeen = false;
+            break;
+        default:
+            break;
+    }} {}
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
     code {//
@@ -1224,10 +1245,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 alert(synth, "Active part disabled");
                 return;
             }
-            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main,synth->getGuiMaster()->activePart);
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart);
             // Reads from slot
             if (what == 3)
-                instrumentuiwindow->hide();
+                Hide(0);
             return;
         }
 
@@ -1315,7 +1336,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
         instFrom = 2;
         if (what == 3)
-            bankuiwindow->hide();
+            Hide(1);
 
         cbwig->do_callback();
         /*if (synth->getUniqueId() == 0)
