@@ -1245,7 +1245,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 alert(synth, "Active part disabled");
                 return;
             }
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart);
+            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart);
             // Reads from slot
             if (what == 3)
                 Hide(0);
