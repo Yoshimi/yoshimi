@@ -363,14 +363,15 @@ class MasterUI {: {private GuiUpdates}
                 query("", "", "", "Only main instance can start others");
                 return;
             }
-
-            const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
+            setInstance->show();
+            /*const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
             if (sId == NULL)
                 return;
             unsigned int forceId = 0;
             if (sId)
                 forceId = string2uint(sId);
-            send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+            send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+            */}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem Y_settings {
@@ -1019,6 +1020,44 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         MenuItem panboost {
           label {Boost: +6dB | 0dB}
           tooltip {Per side + 6dB, Mono 0dB} xywh {35 35 100 20} labelfont 1 labelsize 11
+        }
+      }
+      Fl_Group setInstance {
+        xywh {82 27 193 60} box PLASTIC_UP_BOX color 221 hide
+      } {
+        Fl_Button {} {
+          xywh {84 29 188 57} box NO_BOX
+        }
+        Fl_Text_Display InstBlurb {
+          label {Accept next, or enter
+Instance from 1 to 31}
+          xywh {95 59 163 6} box NO_BOX labelsize 12
+        }
+        Fl_Button nextInst {
+          label Next
+          callback {//
+    send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+    setInstance->hide();}
+          xywh {93 60 56 22} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        }
+        Fl_Button cancelInst {
+          label Cancel
+          callback {//
+    setInstance->hide();}
+          xywh {209 60 56 22} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        }
+        Fl_Button {} {
+          callback {//}
+          xywh {162 60 37 22} box FLAT_BOX down_box FLAT_BOX labelfont 1 labelsize 11
+        }
+        Fl_Input valueInst {
+          callback {//
+    int result = string2uint(o->value());
+    if (result < 1 || result > 31)
+        result = 0;
+    send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, result, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+    setInstance->hide();}
+          xywh {162 60 37 22} textsize 11
         }
       }
     }
@@ -2977,6 +3016,11 @@ Alan Calvert started the project}
     mastermono->labelsize(size11);
     masterkeyshift->labelsize(size);
         masterkeyshift->textsize(size12);
+        
+    InstBlurb->labelsize(size11);
+    nextInst->labelsize(size11);
+    valueInst->textsize(size11);
+    cancelInst->labelsize(size11);
 
     SystemEffectsGrp->labelsize(size12);
     syseffnocounter->labelsize(size11);
