@@ -528,7 +528,8 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
             synth->getGuiMaster()->setmessage(UNUSED, false, textMsgBuffer.fetch(miscmsg), "Close", "Cancel");
             break;
         case MIDILEARN::control::sendRefreshRequest:
-            midilearnwindow->show();
+            //midilearnwindow->show();
+            showLearn();
             break;
         case MIDILEARN::control::reportActivity: // flash LED
             IDold = kititem | (engine << 8);
