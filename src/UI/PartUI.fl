@@ -386,8 +386,7 @@ class PartKitItem {: {public Fl_Group}
 
 class PartUI {: {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window partgroup {
       xywh {1023 99 380 170} type Double box NO_BOX hide
       class Fl_Group
@@ -1548,6 +1547,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window aftertouchcontrol {
       label Aftertouch
+      callback {atClose->do_callback();}
       xywh {569 115 485 180} type Double hide resizable
       code0 {atDW = o->w(); atDH = o->h();}
       code1 {o->size_range(atDW, atDH, 0, 0, 0, 0, 1);}
@@ -1731,7 +1731,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 setATkey(PART::aftertouchType::modulation, o->value());}
         tooltip {Between zero and Add/Pad frequency LFO depth} xywh {270 125 70 15} down_box DOWN_BOX
       }
-      Fl_Button {} {
+      Fl_Button atClose {
         label Close
         callback {//
         saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
@@ -2911,6 +2911,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     polypitchBminus->labelsize(size14);
     polymodulation->labelsize(size14);
 
+    atClose->labelsize(size14);
+    
     aftertouchcontrol->redraw();} {}
   }
   Function {ctlmidiRtext()} {} {
