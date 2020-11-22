@@ -364,11 +364,9 @@ class MasterUI {: {private GuiUpdates}
                 return;
             }
             setInstance->show();
-            /*const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
-            if (sId == NULL)
-                return;
+            /*string sId = input_text(synth, "Accept next, or enter desired instance id...", "next");
             unsigned int forceId = 0;
-            if (sId)
+            if (sId > "" && sId != "next")
                 forceId = string2uint(sId);
             send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
             */}
@@ -1422,6 +1420,19 @@ Alan Calvert started the project}
         xywh {65 11 345 63} align 128
       }
     }
+    Fl_Window textwindow {
+      label Yoshimi
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false, "Master-textin");
+o->hide();}
+      xywh {222 50 270 60} type Double hide resizable
+      code0 {textinDW = o->w(); textinDH = o->h();}
+      code1 {o->size_range(textinDW, textinDH, 0, 0, 0, 0, 1);} modal
+    } {
+      Fl_Input textLine {
+        label {input:}
+        xywh {20 23 230 25} align 1
+      }
+    }
   }
   Function {send_data(int action, int control, float value, int type, int part = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
@@ -2067,24 +2078,6 @@ Alan Calvert started the project}
     saveWin(synth, querywindow->w(),querywindow->h(), querywindow->x(), querywindow->y(), false, "Master-query");
     return result;} {}
   }
-  Function {queryRtext()} {} {
-    code {//
-    if (lastqueryW == querywindow->w())
-        return;
-    lastqueryW = querywindow->w();
-
-    float dScale = querywindow->w() / float(queryDW);
-
-    int size14 = int(14 * dScale);
-
-    yesQ->labelsize(size14);
-    noQ->labelsize(size14);
-    cancelQ->labelsize(size14);
-    textQ->labelsize(size14);
-    typeQ->labelsize(int(40 * dScale));
-
-    querywindow->redraw();} {}
-  }
   Function {setmessage(int group, bool fixedPos, string text, string B1 = "Close", string B2 = "", string B3 = "")} {} {
     code {//
         msgGroup = group;
@@ -2119,6 +2112,49 @@ Alan Calvert started the project}
             message->resize(Fl::event_x_root() + 16, Fl::event_y_root(), W, H);
         words->copy_label(text.c_str());
         message->show();} {}
+  }
+  Function {setinput(string label, string oldLine)} {return_type string
+  } {
+    code {//
+    textLine->copy_label(label.c_str());
+    textLine->value(oldLine.c_str());
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Master-textin");
+    X = Fl::event_x_root(); // aways want these relative to parent
+    Y = Fl::event_y_root();
+    if(W < textinDW || H < textinDH)
+    {
+        W = textinDW;
+        H = textinDH;
+    }
+    checkSane(X, Y, W, H, textinDW, textinDH, true);
+
+    textwindow->size(W, H);
+    textwindow->show();
+    string result;
+    string oldline = textLine->value();
+    size_t pos = 1;
+    while (textwindow->shown())
+    {
+        textinRtext();
+        result = string(textLine->value());
+        Fl::wait();
+        pos = result.find_last_not_of(' ');
+        if (pos != string::npos)
+            pos -= result.find_first_not_of(' ');
+        if (Fl::event_key() == FL_Enter)
+        {
+            if (pos == 0 || pos > 1)
+                textwindow->hide();
+            else
+                textLine->copy_label("Must be at least 3 letters or none");
+        }
+    }
+    saveWin(synth, textwindow->w(), textwindow->h(), textwindow->x(), textwindow->y(), false, "Master-textin");
+    if (pos == 0 || pos == string::npos)
+        return oldline;
+
+    return result;} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -2856,6 +2892,7 @@ Alan Calvert started the project}
 
     if (yoshiLog->logConsole->visible())
         yoshiLog->consoleRtext();
+
     if (panelwindow->visible() && panelwindow->w() != lastpanelW)
     {
         panelRtext();
@@ -2868,9 +2905,6 @@ Alan Calvert started the project}
         lastmsgW = message->w();
         msgSeen = true;
     }
-
-    if (querywindow->visible())
-        queryRtext();
 
     if (syseffsendwindow->visible() &&  syseffsendwindow->w() != lastsyseffW)
     {
@@ -2913,42 +2947,13 @@ Alan Calvert started the project}
     partui->wincheck();
     bankui->wincheck();} {}
   }
-  Function {aboutRtext()} {} {
-    code {//
-    float dScale = aboutwindow->w() / float(aboutDW);
-
-    int size11 = int(11 * dScale);
-    int size12 = int(12 * dScale);
-
-    about2->labelsize(size11);
-    about3->labelsize(size11);
-    about4->labelsize(size12);
-    about5->labelsize(size11);
-    cont2->labelsize(size12);
-    cont3->labelsize(size12);
-    aboutClose->labelsize(size11);
-    about1->labelsize(int(18 * dScale));
-    cont1->labelsize(int(15 * dScale));
-
-    aboutwindow->redraw();
-    saveWin(synth, aboutwindow->w(), aboutwindow->h(), aboutwindow->x(), aboutwindow->y(), true, "Master-about");} {}
-  }
   Function {mainRtext()} {} {
     code {//
-    //int W =  Fl::w();
-    //int H =  Fl::h();
     int w = masterwindow->w();
     int h = masterwindow->h();
 
     if(masterwindow->x() > Fl::w() - 10 || masterwindow->y() > Fl::h() - 10)
         masterwindow->position(30, 30);
-
-    /*while (w > W || h > H)
-    {
-        w /= 2;
-        h /= 2;
-        masterwindow->size(w, h);
-    };*/
 
     float dW = w / mainDW;
     float dH = h / mainDH;
@@ -3016,7 +3021,7 @@ Alan Calvert started the project}
     mastermono->labelsize(size11);
     masterkeyshift->labelsize(size);
         masterkeyshift->textsize(size12);
-        
+
     InstBlurb->labelsize(size11);
     nextInst->labelsize(size11);
     valueInst->textsize(size11);
@@ -3076,41 +3081,6 @@ Alan Calvert started the project}
 
     partui->groupRtext(dScale);
     masterwindow->redraw();} {}
-  }
-  Function {syseffRtext()} {} {
-    code {//
-    float dScale = syseffsendwindow->w() / float(syseffDW);
-
-
-    int size = int(10 * dScale);
-
-    syseffgroup->resize(int(9 * dScale), int(46 * dScale), int(109 * dScale), int(172 * dScale));
-    syseffname->labelsize(size);
-
-    for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
-        for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
-        {
-            syseffsend[neff1][neff2]->labelsize(size);
-            syseffsend[neff1][neff2]->resize(int((-25 * dScale) + (35 * (neff2)) * dScale), int((66 * dScale) + (neff1 * dScale * 52)), int(35 * dScale), int(30 * dScale));
-        }
-
-    syseffClose->labelsize(int(14 * dScale));
-
-    syseffsendwindow->redraw();} {}
-  }
-  Function {msgRtext()} {} {
-    code {//
-    float dScale = message->w() / float(msgDW);
-
-    int size14 = int(14 * dScale);
-
-    words->labelsize(12 * dScale);
-    yesdoit->labelsize(size14);
-    cancel->labelsize(size14);
-    closebutton->labelsize(size14);
-
-    message->redraw();
-    saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), true, "Master-message");} {}
   }
   Function {panelRtext()} {} {
     code {//
@@ -3200,6 +3170,94 @@ Alan Calvert started the project}
 
     panelwindow->redraw();} {}
   }
+  Function {aboutRtext()} {} {
+    code {//
+    float dScale = aboutwindow->w() / float(aboutDW);
+
+    int size11 = int(11 * dScale);
+    int size12 = int(12 * dScale);
+
+    about2->labelsize(size11);
+    about3->labelsize(size11);
+    about4->labelsize(size12);
+    about5->labelsize(size11);
+    cont2->labelsize(size12);
+    cont3->labelsize(size12);
+    aboutClose->labelsize(size11);
+    about1->labelsize(int(18 * dScale));
+    cont1->labelsize(int(15 * dScale));
+
+    aboutwindow->redraw();
+    saveWin(synth, aboutwindow->w(), aboutwindow->h(), aboutwindow->x(), aboutwindow->y(), true, "Master-about");} {}
+  }
+  Function {syseffRtext()} {} {
+    code {//
+    float dScale = syseffsendwindow->w() / float(syseffDW);
+
+
+    int size = int(10 * dScale);
+
+    syseffgroup->resize(int(9 * dScale), int(46 * dScale), int(109 * dScale), int(172 * dScale));
+    syseffname->labelsize(size);
+
+    for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
+        for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
+        {
+            syseffsend[neff1][neff2]->labelsize(size);
+            syseffsend[neff1][neff2]->resize(int((-25 * dScale) + (35 * (neff2)) * dScale), int((66 * dScale) + (neff1 * dScale * 52)), int(35 * dScale), int(30 * dScale));
+        }
+
+    syseffClose->labelsize(int(14 * dScale));
+
+    syseffsendwindow->redraw();} {}
+  }
+  Function {queryRtext()} {} {
+    code {//
+    if (lastqueryW == querywindow->w())
+        return;
+    lastqueryW = querywindow->w();
+
+    float dScale = querywindow->w() / float(queryDW);
+
+    int size14 = int(14 * dScale);
+
+    yesQ->labelsize(size14);
+    noQ->labelsize(size14);
+    cancelQ->labelsize(size14);
+    textQ->labelsize(size14);
+    typeQ->labelsize(int(40 * dScale));
+
+    querywindow->redraw();} {}
+  }
+  Function {msgRtext()} {} {
+    code {//
+    float dScale = message->w() / float(msgDW);
+
+    int size14 = int(14 * dScale);
+
+    words->labelsize(12 * dScale);
+    yesdoit->labelsize(size14);
+    cancel->labelsize(size14);
+    closebutton->labelsize(size14);
+
+    message->redraw();
+    saveWin(synth, message->w(), message->h(),  message->x(),  message->y(), true, "Master-message");} {}
+  }
+  Function {textinRtext()} {} {
+    code {//
+    static int lasttextW = 0;
+    if (lasttextW == textwindow->w())
+        return;
+    lasttextW = textwindow->w();
+
+    float dScale = textwindow->w() / float(textinDW);
+
+    int size14 = int(14 * dScale);
+
+    textLine->labelsize(size14);
+    textLine->textsize(size14);
+    textwindow->redraw();} {}
+  }
   decl {ConfigUI *configui;} {public local
   }
   decl {ParametersUI *paramsui;} {public local
@@ -3275,6 +3333,8 @@ Alan Calvert started the project}
   }
   decl {float panelScale;} {private local
   }
+  decl {bool logenable;} {private local
+  }
   decl {int aboutDW;} {private local
   }
   decl {int aboutDH;} {private local
@@ -3285,6 +3345,8 @@ Alan Calvert started the project}
   }
   decl {int lastqueryW;} {private local
   }
-  decl {bool logenable;} {private local
+  decl {int textinDW;} {private local
+  }
+  decl {int textinDH;} {private local
   }
 }

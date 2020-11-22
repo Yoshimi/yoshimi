@@ -185,6 +185,12 @@ int choice(SynthEngine *synth, string one, string two, string three, string mess
     return synth->getGuiMaster()->query(one, two, three, message);
 }
 
+string input_text(SynthEngine *synth, string label, string text)
+{
+    return synth->getGuiMaster()->setinput(label, text);
+}
+
+
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     static int oldW = 0;

@@ -1256,14 +1256,11 @@ class BankUI {: {public BankProcess_, RootProcess_}
         {   // Rename slot
             if (slotFilled)
             {
-                const char *newname = fl_input("Instrument name:", thisname.c_str());
-                if (newname)
-                {
-                    if (string(newname) == DEFAULT_NAME)
-                        alert(synth, "Can't use name of default sound");
-                    else if (strlen(newname) > 3)
-                        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
-                }
+                string newname = input_text(synth, "Instrument name:", thisname);
+                if (newname == DEFAULT_NAME)
+                    alert(synth, "Can't use name of default sound");
+                else if (newname != thisname)
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
             }
             setread();
         }
@@ -1375,10 +1372,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     if (r_mode == 5 && !thisname.empty())
     {   // Rename bank
-        const char *tmp = fl_input("Bank name:",thisname.c_str());
-        if (tmp)
-            if (strlen(tmp) > 2) // insist on a readable name
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(tmp)));
+        string tmp = input_text(synth, "Bank name:", thisname);
+        if (tmp != thisname)
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(tmp));
         setrootread();
     }
 
@@ -1390,9 +1386,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
             alert(synth, "Bank " + to_string(slot) + " already in use for " + thisname);
             return;
         }
-        const char *dirname;
-        dirname = fl_input("New empty Bank:");
-        if (dirname == NULL)
+        string dirname;
+        dirname = input_text(synth, "New empty Bank:", "");
+        if (dirname == "")
         {
             setrootread();
             return;

@@ -510,10 +510,9 @@ class VectorUI {} {
         label {No Name}
         callback {//
         (void) o; // suppress warning
-        const char *tmp = NULL;
-        tmp = fl_input("Vector name:", loadlabel[BaseChan].c_str());
-        if (tmp != NULL && !string(tmp).empty())
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(string(tmp)));}
+        string tmp = input_text(synth, "Vector name:", loadlabel[BaseChan]);
+        if (tmp != loadlabel[BaseChan])
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(tmp));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -801,8 +800,8 @@ class VectorUI {} {
     code {//
     if (lastvectorW == vectorwindow->w())
         return;
-    lastvectorW = vectorwindow->w();    
-        
+    lastvectorW = vectorwindow->w();
+
     float dW = vectorwindow->w() / vecDW;
     float dH = vectorwindow->h() / vecDH;
     float dScale;
