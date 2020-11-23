@@ -2247,11 +2247,14 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
           class FilterUI
         } {}
       }
+      Fl_Box {} {
+        xywh {6 218 18 18} box THIN_UP_BOX color 237
+      }
       Fl_Check_Button stereo {
         label { Stereo}
         callback {//
 send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-        xywh {8 220 61 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
+        xywh {8 220 61 15} down_box DOWN_BOX color 237 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
       Fl_Button showvoicelist {

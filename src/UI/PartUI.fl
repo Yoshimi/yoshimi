@@ -388,9 +388,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {1023 99 380 170} type Double box NO_BOX hide
+      xywh {794 168 380 170} type Double hide
       class Fl_Group
     } {
+      Fl_Box {} {
+        xywh {80 60 17 17} box THIN_UP_BOX color 237
+      }
       Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
@@ -567,7 +570,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Portamento
           callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable/Disable the portamento} xywh {82 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
+          tooltip {Enable/Disable the portamento} xywh {82 61 17 15} down_box DOWN_BOX color 237 labelsize 11 align 8
           code0 {o->value(part->ctl->portamento.portamento);}
         }
         Fl_Spinner midich {
@@ -2792,9 +2795,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     A_C_display->labelsize(size12);
     A_C_default->labelsize(size12);
     copyright->labelsize(size12);
-    	copyright->textsize(size14);
+        copyright->textsize(size14);
     commentField->labelsize(size12);
-    	commentField->textsize(size14);
+        commentField->textsize(size14);
     instrumentType->labelsize(size11);
         Tundefined->labelsize(size11);
         Tpiano->labelsize(size11);
@@ -2815,9 +2818,10 @@ class PartUI {: {public Fl_Group, PartUI_}
         TsoundEff->labelsize(size11);
 
     humanise->labelsize(size12);
-    	humanise->textsize(size);
+        humanise->textsize(size);
+
     velocityhumanise->labelsize(size12);
-    	velocityhumanise->textsize(size);
+        velocityhumanise->textsize(size);
     editClose->labelsize(size14);
     humanise_display->labelsize(int(16 * dScale));
 

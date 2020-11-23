@@ -269,7 +269,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {157 448 535 440} type Double hide resizable
+      xywh {269 345 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -860,12 +860,15 @@ class PADnoteUI {: {public PresetsUI_}
               code0 {o->value(pars->PRandom);}
               code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
             }
+            Fl_Box {} {
+              xywh {14 248 18 18} box THIN_UP_BOX color 237
+            }
             Fl_Check_Button stereo {
               label { Stereo}
               callback {//
               pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
               send_data(0, PADSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 249 61 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
+              xywh {16 249 61 15} down_box DOWN_BOX color 237 labelsize 11
               code0 {o->value(pars->PStereo);}
             }
             Fl_Dial dpop {
@@ -1294,6 +1297,7 @@ class PADnoteUI {: {public PresetsUI_}
     fixedfreqetdial->labelsize(size);
     detune->labelsize(size);
         detunevalueoutput->labelsize(size);
+            detunevalueoutput->textsize(size);
     octave->labelsize(size);
         octave->textsize(size11);
     detunetype->labelsize(size);
