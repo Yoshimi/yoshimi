@@ -1088,7 +1088,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Random detune of whole part in cents} xywh {12 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
-        code0 {o->value(part->Pfrand);}
+        code1 {o->setValueType(VC_PartHumaniseDetune);//o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
       Fl_Value_Slider velocityhumanise {
@@ -1097,7 +1097,6 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Random velocity attenuation of whole part} xywh {12 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
-        code0 {o->value(part->Pvelrand);}
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
@@ -2439,6 +2438,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
 
     channelATselection = int(fetchData(0, PART::control::channelATset, npart));
+    int tmp = int(fetchData(0, PART::control::humanise, npart));
+    humanise->value(tmp); // will inc number
+    tmp = int(fetchData(0, PART::control::humanvelocity, npart));
+    velocityhumanise->value(tmp); // will inc number
+    
     fetchChannel();
     keyATselection = int(fetchData(0, PART::control::keyATset, npart));
     fetchKey();

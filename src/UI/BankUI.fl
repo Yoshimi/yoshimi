@@ -1336,16 +1336,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             Hide(1);
 
         cbwig->do_callback();
-        /*if (synth->getUniqueId() == 0)
-        {
-            modeselect->show();
-            rootmodeselect->show();
-        }
-        else
-        {
-            modeselect->hide();
-            rootmodeselect->hide();
-        }*/
+
         ShowInst();
         set_bank_slot(); // needed by 'old' menu selector
         refreshinstrumentwindow();

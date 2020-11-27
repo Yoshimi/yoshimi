@@ -1551,6 +1551,10 @@ void GuiThreadMsg::processGuiMessages()
                     guiMaster->checkBuffer();
                     break;
 
+                case GuiThreadMsg::ResizeCheck:
+                    guiMaster->wincheck();
+                    break;
+
                 default:
                     break;
             }

@@ -182,14 +182,21 @@ void *InterChange::sortResultsThread(void)
          * safety issues. It is used mostly for timeouts.
          */
         ++ tick;
-        /*
-        if (!(tick & 8191))
+
+        /*if (!(tick & 8191))
         {
             if (tick & 16383)
                 std::cout << "Tick" << std::endl;
             else
                 std::cout << "Tock" << std::endl;
         }*/
+
+        // approx 50mS but depends on threadmessage process time
+        if ((tick & 0x1ff) == 0)
+        {
+                //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::ResizeCheck, 0);
+                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
+        }
 
         // a false positive here is not actually a problem.
         unsigned char testRead = 0;

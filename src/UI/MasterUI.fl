@@ -44,6 +44,9 @@ decl {\#define PANEL_DUAL_X 530} {public local
 decl {\#define PANEL_DUAL_Y 600} {public local
 }
 
+decl {\#include <FL/Fl_Tooltip.H>} {public local
+}
+
 decl {\#include <string>} {public local
 }
 
@@ -2871,6 +2874,7 @@ o->hide();}
   }
   Function {checkBuffer(void)} {} {
     code {//
+            wincheck();
             read_updates(synth);} {}
   }
   Function {wincheck()} {} {
@@ -2881,6 +2885,22 @@ o->hide();}
     static int lastsyseffW = 0;
     static int lastvirtW = 0;
     static int lastaboutW = 0;
+    static int oldW = 0;
+    /*
+     * Below is a pragmatic method of making tooltips
+     * fairly readable at all screen resolutions.
+     * 1024 is the reference width.
+     */
+        if (oldW != Fl::w())
+        {
+            int setsize = int((10.0f / 1024.0f) * Fl::w());
+            Fl_Tooltip::size(setsize);
+            oldW = Fl::w();
+            std::cout << "tipset " << setsize << "  actual " <<  Fl_Tooltip::size() << std::endl;
+
+            Showmaster(); // ensure it's always completely visible
+        }
+
     if (masterwindow->w() != lastmainW)
     {
         mainRtext();
@@ -2943,9 +2963,8 @@ o->hide();}
         configui->presetsRtext();
 
     presetsui->presetsRtext();
-
-    partui->wincheck();
-    bankui->wincheck();} {}
+    bankui->wincheck();
+    partui->wincheck();} {}
   }
   Function {mainRtext()} {} {
     code {//

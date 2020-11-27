@@ -1250,6 +1250,10 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         xywh {14 43 46 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
+      Fl_Group Vname {
+        label VOICE open
+        xywh {465 6 63 16} labelfont 1 labelsize 12 align 0
+      } {}
     }
   }
   Function {ADvoiceUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
@@ -1822,6 +1826,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    int size14 = int(14 * dScale);
 
    voiceonbutton->labelsize(size14);
+   Vname->labelsize(size12);
 
    amplitudegroup->labelsize(size12);
    voicevolume->labelsize(size);
@@ -2362,10 +2367,6 @@ o->hide();}
         code1 {o->show();}
         class ADvoiceUI
       } {}
-      Fl_Box Vname {
-        label VOICE
-        xywh {444 8 63 17} labelfont 1 labelsize 12
-      }
       Fl_Tabs voiceTabs {
         callback {//
 if (o->value() == g1)
@@ -2934,7 +2935,6 @@ switch (num)
     g7->labelsize(size);
     g8->labelsize(size);
 
-    Vname->labelsize( int(12 * dScale));
     Vclose->labelsize( int(12 * dScale));
 
     Vcopy->labelsize( int(11 * dScale));

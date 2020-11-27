@@ -70,6 +70,7 @@ enum ValueType {
     VC_ADDVoiceDelay,
     VC_PitchBend,
     VC_PartVolume,
+    VC_PartHumaniseDetune,
     VC_PartHumaniseVelocity,
     VC_PanningRandom,
     VC_PanningStd,

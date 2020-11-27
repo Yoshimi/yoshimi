@@ -26,7 +26,6 @@
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_Tooltip.H>
 
 #include <cairo.h>
 #include <cairo-xlib.h>
@@ -53,7 +52,7 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     */
     if (control == MAIN::control::readMainLRrms && part == TOPLEVEL::main && kititem == 1)
     {
-        resizeTrig = true;
+        //resizeTrig = true;
         /*static int count = 0;
         ++count;
         if (count == 30)
@@ -193,23 +192,10 @@ string input_text(SynthEngine *synth, string label, string text)
 
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
-    static int oldW = 0;
     if (resizeTrig)
     {
         resizeTrig = false;
         synth->getGuiMaster()->wincheck();
-    /*
-     * Below is a pragmatic method of making tooltips
-     * fairly readable at all screen resolutions.
-     * 1024 is the reference width.
-     */
-        if (oldW != Fl::w())
-        {
-            Fl_Tooltip::size(int(10.0f / 1024 * Fl::w()));
-            oldW = Fl::w();
-            synth->getGuiMaster()->Showmaster();
-            // ensure it's always completely visible
-        }
     }
 
     /*
@@ -826,6 +812,14 @@ string convert_value(ValueType type, float val)
                 return "-inf dB";
             else
                 return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+        case VC_PartHumaniseDetune:
+            s = "Detune: ";
+            i = (int) val;
+            if (i == 0)
+                return s + "disabled";
+            else
+                return s + "between 0 and " + to_string(i) + " cents";
 
         case VC_PartHumaniseVelocity:
             s = "Attenuation: ";

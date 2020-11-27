@@ -275,6 +275,7 @@ public:
         UpdatePart,
         RefreshCurBank,
         GuiCheck,
+        ResizeCheck,
         NewSynthEngine,
         UNDEFINED = 9999
     };

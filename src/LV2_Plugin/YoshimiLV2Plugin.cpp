@@ -760,7 +760,6 @@ void YoshimiLV2PluginUI::run()
             _plugin->_synth->getRuntime().LogList.pop_front();
         }
         Fl::check();
-
         GuiThreadMsg::processGuiMessages();
 
     }
