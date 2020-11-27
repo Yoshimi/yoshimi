@@ -36,33 +36,8 @@ namespace { // Implementation details...
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
 }
 
-bool resizeTrig;
-
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg, unsigned char request)
 {
-    /*
-    * The following code uses the 30Hz metering timer to set the
-    * resize adjustment that then actually occurs on the following
-    * redraw event.
-    * This sets a *minimum* resize redrawing time so the CPU won't
-    * get overloaded. Other activity may slow it down. The resize
-    * still takes place, it is just the update that is delayed.
-    *
-    * The actual update takes place at the start of read_updates()
-    */
-    if (control == MAIN::control::readMainLRrms && part == TOPLEVEL::main && kititem == 1)
-    {
-        //resizeTrig = true;
-        /*static int count = 0;
-        ++count;
-        if (count == 30)
-            std::cout << "tick" << std::endl;
-        if (count == 60)
-        {
-            std::cout << "tock" << std::endl;
-            count = 0;
-        }*/
-    }
     unsigned char type = 0;
     unsigned char action = TOPLEVEL::action::fromGUI;
     if (request < TOPLEVEL::type::Limits)
@@ -192,18 +167,6 @@ string input_text(SynthEngine *synth, string label, string text)
 
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
-    if (resizeTrig)
-    {
-        resizeTrig = false;
-        synth->getGuiMaster()->wincheck();
-    }
-
-    /*
-     * The above only does significant work if windows are resized.
-     * Normally only one window will actually resize at any time,
-     * although all of them will check to see if they need to.
-     */
-
     CommandBlock getData;
     bool isChanged = false;
     while (synth->interchange.toGUI->read(getData.bytes))

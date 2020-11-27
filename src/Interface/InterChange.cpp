@@ -193,10 +193,7 @@ void *InterChange::sortResultsThread(void)
 
         // approx 50mS but depends on threadmessage process time
         if ((tick & 0x1ff) == 0)
-        {
-                //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::ResizeCheck, 0);
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-        }
 
         // a false positive here is not actually a problem.
         unsigned char testRead = 0;
