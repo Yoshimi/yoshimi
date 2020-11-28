@@ -564,7 +564,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         label {No Entries}
         xywh {70 195 177 0} labelfont 1 labelsize 30 labelcolor 88 textsize 12 hide deactivate
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {25 1 210 35} labelsize 12
       } {
         Fl_Choice searchType {
@@ -1138,7 +1138,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     bankuiwindow->resize(X, Y, W, H);
     bankuiwindow->show();
-    bankRtext();
+    lastbankW = 0;
     bankSeen = true;} {}
   }
   Function {ShowRoot()} {} {
@@ -1155,7 +1155,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     rootuiwindow->resize(X, Y, W, H);
     rootuiwindow->show();
-    rootRtext();
+    lastrootW = 0;
     rootSeen = true;} {}
   }
   Function {ShowSearch()} {} {
@@ -1177,7 +1177,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         unsearched = false;
     }
     searchwin->show();
-    searchRtext();
+    lastsearchW = 0;
     searchSeen = true;} {}
   }
   Function {Hide(int type = 0)} {} {
@@ -1187,21 +1187,25 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case 0:
             saveWin(synth,instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");
             instrumentuiwindow->hide();
+            lastinstrumentW = 0;
             instrumentSeen = false;
             break;
         case 1:
             saveWin(synth, bankuiwindow->w(), bankuiwindow->h(), bankuiwindow->x(),  bankuiwindow->y(), false, "Bank-bank");
             bankuiwindow->hide();
+            lastbankW = 0;
             bankSeen = false;
             break;
         case 2:
             saveWin(synth,rootuiwindow->w(), rootuiwindow->h(),  rootuiwindow->x(),  rootuiwindow->y(), false, "Bank-root");
             rootuiwindow->hide();
+            lastrootW = 0;
             rootSeen = false;
             break;
         case 3:
             saveWin(synth,searchwin->w(), searchwin->h(),  searchwin->x(),  searchwin->y(), false, "Bank-search");
             searchwin->hide();
+            lastsearchW = 0;
             searchSeen = false;
             break;
         default:
@@ -1215,6 +1219,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     unsearched = true;
     searchType->value(1);
     lastinstrumentW = 0;
+    lastbankW = 0;
+    lastrootW = 0;
+    lastsearchW = 0;
     /*if (synth->getRuntime().checksynthengines)
         B_search->activate();
     else
@@ -1484,7 +1491,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {instrumentRtext()} {} {
     code {//
-
     if (lastinstrumentW == instrumentuiwindow->w())
         return;
     lastinstrumentW = instrumentuiwindow->w();
@@ -1546,8 +1552,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {searchRtext()} {} {
     code {//
-    static int lastsearchW = 0;
-
     if (lastsearchW == searchwin->w())
         return;
     lastsearchW = searchwin->w();
@@ -1587,8 +1591,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {bankRtext()} {} {
     code {//
-    static int lastbankW = 0;
-
     if (lastbankW == bankuiwindow->w())
         return;
     lastbankW = bankuiwindow->w();
@@ -1641,8 +1643,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   Function {rootRtext()} {} {
     code {//
-    static int lastrootW = 0;
-
     if (lastrootW == rootuiwindow->w())
         return;
     lastrootW = rootuiwindow->w();
@@ -1807,9 +1807,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
   }
   decl {int rootDW;} {private local
   }
+  decl {int lastrootW;} {private local
+  }
   decl {int rootDH;} {private local
   }
   decl {int bankFrom;} {private local
+  }
+  decl {int lastbankW;} {private local
   }
   decl {int bankDW;} {private local
   }
@@ -1832,6 +1836,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
   decl {int searchDW;} {private local
   }
   decl {int searchDH;} {private local
+  }
+  decl {int lastsearchW;} {private local
   }
   decl {bool searchSeen;} {private local
   }
