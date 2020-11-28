@@ -232,11 +232,12 @@ class PSlider {: {public mwheel_slider}
 
 class Oscilloscope {: {public Fl_Box}
 } {
-  Function {Oscilloscope(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+  Function {Oscilloscope(int x,int y, int w, int h, int frame_, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {//
     oscilSmp=NULL;
     phase=64;
-    oscbase=0;} {}
+    oscbase=0;
+    frame = frame_;} {}
   }
   Function {init(OscilGen *oscilSmp_, SynthEngine *_synth)} {} {
     code {//
@@ -249,8 +250,7 @@ class Oscilloscope {: {public Fl_Box}
     oscilSmp=oscilSmp_;
     oscbase=oscbase_;} {}
   }
-  Function {init(OscilGen *oscilSmp_,int oscbase_,int phase_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscilSmp_,int oscbase_,int phase_, SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
     oscilSmp=oscilSmp_;
@@ -263,7 +263,7 @@ class Oscilloscope {: {public Fl_Box}
     int oy = y();
     int lx = w();
     int ly = h() - 1;
-    fl_line_style(0, int(1 * ly / 190.0f));
+    fl_line_style(0, int(1 * ly / float(frame)));
     float smps[synth->oscilsize];
     if (oscbase == 0)
         oscilSmp->get(smps, -1.0);
@@ -288,27 +288,30 @@ class Oscilloscope {: {public Fl_Box}
     max = -max * 1.05;
 
     // draw
-    if (this->active_r())
-        fl_color(this->parent()->labelcolor());
-    else
-        fl_color(this->parent()->color());
-    int GX = 16;
-    if (lx < GX * 3)
-        GX = -1;
-    for (int i = 1; i < GX; i++)
+    if (frame > 20)
     {
-        int tmp = int(lx / (float)GX * i);
-        fl_line(ox + tmp, oy + 2, ox + tmp, oy + ly - 2);
+        if (this->active_r())
+            fl_color(this->parent()->labelcolor());
+        else
+            fl_color(this->parent()->color());
+        int GX = 16;
+        if (lx < GX * 3)
+            GX = -1;
+        for (int i = 1; i < GX; i++)
+        {
+            int tmp = int(lx / (float)GX * i);
+            fl_line(ox + tmp, oy + 2, ox + tmp, oy + ly - 2);
+        }
+        int GY = 8;
+        if (ly < GY * 3)
+            GY = -1;
+        for (int i = 1; i < GY; i++)
+        {
+            int tmp = int(ly / (float)GY * i);
+            fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
+        }
     }
-    int GY = 8;
-    if (ly < GY * 3)
-        GY = -1;
-    for (int i = 1; i < GY; i++)
-    {
-        int tmp = int(ly / (float)GY * i);
-        fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
-    }
-    fl_line_style(0, int(2 * ly / 190.0f));
+    fl_line_style(0, int(2 * ly / float(frame)));
     // draw the function
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
     if (this->active_r())
@@ -337,6 +340,8 @@ class Oscilloscope {: {public Fl_Box}
   decl {int oscbase;} {private local
   }
   decl {int phase;} {public local
+  }
+  decl {int frame;} {public local
   }
   decl {SynthEngine *synth;} {private local
   }
@@ -455,11 +460,14 @@ class OscilEditor {: {public PresetsUI_}
   Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
+      callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
+OSCseen = false;
+o->hide();}
       xywh {4 48 735 595} type Double hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
-      code2 {waveDW = o->w(); waveDH = o->h();}
-      code3 {o->size_range(waveDW * 9 / 10, waveDH * 9 / 10, 0, 0, 0, 0, 1);}
+      code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
+      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Button applybutton {
         label Apply
@@ -473,7 +481,7 @@ class OscilEditor {: {public PresetsUI_}
       } {
         Fl_Group waveformgroup {
           xywh {10 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
-          code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
+          code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp, synth);}
         } {}
         Fl_Group harmonicgroup {
@@ -532,7 +540,7 @@ class OscilEditor {: {public PresetsUI_}
       } {
         Fl_Group basewave {
           xywh {370 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
-          code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
+          code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp,1, synth);}
         } {}
         Fl_Dial bfslider {
@@ -726,7 +734,7 @@ class OscilEditor {: {public PresetsUI_}
       Fl_Button oscilClose {
         label Close
         callback {//
-        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "Waveform " + to_string(waveType));
+        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
         OSCseen = false;
         osceditUI->hide();
         if ((Fl::event_button() == 3))
@@ -1394,7 +1402,7 @@ class OscilEditor {: {public PresetsUI_}
         waveType = 2;
     else
         waveType = 0;
-    
+
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Waveform " + to_string(waveType));
     if (fetchW < waveDW || fetchH < waveDH)
@@ -1404,7 +1412,7 @@ class OscilEditor {: {public PresetsUI_}
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, waveDW, waveDH);
     osceditUI->resize(fetchX, fetchY, fetchW, fetchH);
-    
+
     osceditUI->show();
     OSCseen = true;} {}
   }
@@ -1412,7 +1420,7 @@ class OscilEditor {: {public PresetsUI_}
   } {
     code {//
     if (OSCseen)
-        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), osceditUI->visible(), "Waveform " + to_string(waveType));
+        saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), true, "Waveform " + to_string(waveType));
     osceditUI->hide();
     delete (osceditUI);
     delete oscilSmp;
@@ -1558,8 +1566,10 @@ class OscilEditor {: {public PresetsUI_}
   }
   Function {waveRtext()} {} {
     code {//
-        float dScale = osceditUI->w() / float(waveDW);
-        
+        float dScale = osceditUI->w() / float(waveDW * 10 / 9);
+        // waveDW factor adjusted because we allow the
+        //  window to be smaller than designed
+
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);
         int size12 = int(12 * dScale);
@@ -1686,7 +1696,7 @@ class OscilEditor {: {public PresetsUI_}
         for (int i= 0; i < MAX_AD_HARMONICS; i++)
         {
             h[i]->size(20 * dScale, 225 * dScale);
-            h[i]->number->labelsize(size12);
+            h[i]->number->labelsize(size11);
         }
 
         osceditUI->redraw();} {}
