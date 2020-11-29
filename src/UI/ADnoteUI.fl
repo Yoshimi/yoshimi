@@ -175,15 +175,14 @@ class ADvoicelistitem {: {public Fl_Group}
           label Edit
           callback {//
               synth->getGuiMaster()->partui->adnoteui->setVoiceTabs(nvoice);
-              synth->getGuiMaster()->partui->adnoteui->fromVoiceList = true;
-              if ((Fl::event_button() == 3)){
-                synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();
-              }}
+              synth->getGuiMaster()->partui->adnoteui->set_voice(true);
+              if ((Fl::event_button() == 3))
+                  synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();}
           tooltip {Right click: also close this} xywh {42 4 40 20} box THIN_UP_BOX labelfont 1 labelsize 12
         }
       }
       Fl_Group enabledpatch {
-        label 1 open
+        label 1
         xywh {4 4 34 18} box UP_BOX color 237 labelfont 1 align 20
         code0 {char tmp[12]; snprintf(tmp, 12, "%d", nvoice + 1); o->label(strdup(tmp));}
       } {}
@@ -2289,29 +2288,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button showvoicepars {
         label {Show Voice Parameters}
         callback {//
-    voicelistitem[nvoice]->refreshlist();
-    int fetchW, fetchH, fetchX, fetchY, fetchO;
-
-    if (!voiceSeen)
-    {
-        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-voice");
-        if (fetchW < voiceDW || fetchH < voiceDH)
-        {
-            fetchW = voiceDW;
-            fetchH = voiceDH;
-        }
-        ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
-        //addVoiceRtext();
-        checkSane(fetchX, fetchY, fetchW, fetchH, voiceDW, voiceDH);
-    }
-
-    ADnoteVoice->redraw();
-    ADnoteVoice->show();
-    lastvoiceW = 0;
-    voiceSeen = true;
-
-
-    synth->getGuiMaster()->partui->adnoteui->fromVoiceList = false;
+    set_voice(false);
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
         tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12
@@ -2802,6 +2779,30 @@ switch (num)
     ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     ADnoteGlobalParameters->show();
     globalSeen = true;} {}
+  }
+  Function {set_voice(bool type)} {} {
+    code {//
+
+    voicelistitem[nvoice]->refreshlist();
+    int fetchW, fetchH, fetchX, fetchY, fetchO;
+
+    if (!voiceSeen)
+    {
+        loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "AddSynth-voice");
+        if (fetchW < voiceDW || fetchH < voiceDH)
+        {
+            fetchW = voiceDW;
+            fetchH = voiceDH;
+        }
+        ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
+        checkSane(fetchX, fetchY, fetchW, fetchH, voiceDW, voiceDH);
+    }
+
+    ADnoteVoice->redraw();
+    ADnoteVoice->show();
+    lastvoiceW = 0;
+    voiceSeen = true;
+    fromVoiceList = type;} {}
   }
   Function {wincheck()} {} {
     code {//
