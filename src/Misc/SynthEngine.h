@@ -76,7 +76,6 @@ class SynthEngine
     private:
         Config Runtime;
         PresetsStore presetsstore;
-        //TextMsgBuffer& textMsgBuffer;
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);

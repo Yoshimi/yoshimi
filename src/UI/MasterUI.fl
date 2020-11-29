@@ -2971,9 +2971,6 @@ o->hide();}
     int w = masterwindow->w();
     int h = masterwindow->h();
 
-    if(masterwindow->x() > Fl::w() - 10 || masterwindow->y() > Fl::h() - 10)
-        masterwindow->position(30, 30);
-
     float dW = w / mainDW;
     float dH = h / mainDH;
     float dScale;
@@ -3103,8 +3100,6 @@ o->hide();}
   }
   Function {panelRtext()} {} {
     code {//
-    //int W =  Fl::w();
-    //int H =  Fl::h();
     int w = panelwindow->w();
     int h = panelwindow->h();
     float dW;
@@ -3212,7 +3207,6 @@ o->hide();}
   Function {syseffRtext()} {} {
     code {//
     float dScale = syseffsendwindow->w() / float(syseffDW);
-
 
     int size = int(10 * dScale);
 

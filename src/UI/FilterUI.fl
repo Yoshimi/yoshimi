@@ -912,7 +912,7 @@ pars=NULL;
     code {//
     /*
      * This is very different from other windows because it is called
-     * via the draw mewthod, not the usual chain.
+     * via the draw method, not the usual chain.
     */
 
     if (lastformantX == formantparswindow->x() && lastformantY == formantparswindow->y() &&lastformantW == formantparswindow->w())

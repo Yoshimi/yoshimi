@@ -158,7 +158,7 @@ class ParametersUI {} {
         fetchH = paramDH;
     }
     checkSane(fetchX, fetchY,fetchW, fetchH, paramDW, paramDH);
-    
+
     Recent->size(fetchW, fetchH);
     Recent->show();
     Loading->hide();
@@ -178,9 +178,6 @@ class ParametersUI {} {
     if (lastParamW == Recent->w())
         return;
     lastParamW = Recent->w();
-
-    if(Recent->x() > Fl::w() - 10 || Recent->y() > Fl::h() - 10)
-        Recent->position(30, 30);
 
     float dScale = Recent->w() / float(paramDW);
 

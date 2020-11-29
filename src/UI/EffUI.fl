@@ -142,7 +142,7 @@ eff = eff_;
             int tmp = (int)(ly / (float)GY * i);
             fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
         }
-        
+
         fl_line_style(0, int(2 * lx / 190.0f));
         // draw the frequency response
         if (active_r())
@@ -2418,10 +2418,6 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {filtRtext()} {} {
     code {//
-
-    if(filterwindow->x() > Fl::w() - 10 || filterwindow->y() > Fl::h() - 10)
-        filterwindow->position(30, 30);
-
     float dW = filterwindow->w() / filtDW;
     float dH = filterwindow->h() / filtDH;
     float dScale;
@@ -2434,7 +2430,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         dScale = 0.2f;
 
     filterclose->labelsize(12 * dScale);
-    ;
+
     fwin_filterui->filterRtext(dScale);
 
     filterwindow->redraw();
