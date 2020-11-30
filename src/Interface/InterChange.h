@@ -138,6 +138,9 @@ class InterChange : private DataText
     private:
         bool commandSendReal(CommandBlock *getData);
 
+        int searchInst;
+        int searchBank;
+        int searchRoot;
         const size_t commandBlockSize = sizeof(CommandBlock);
 };
 

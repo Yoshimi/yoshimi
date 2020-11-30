@@ -118,6 +118,7 @@ bool InterChange::Init()
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;
     }
+    searchInst = searchBank = searchRoot = 0;
     return true;
 
 
@@ -3162,10 +3163,6 @@ void InterChange::commandBank(CommandBlock *getData)
                 textMsgBuffer.push(synth->getBankRef().getname(value_int, kititem, engine));
             else
             {
-                static int inst = 0;
-                static int bank = 0;
-                static int root = 0;
-
                 /*
                  * This version of the call is for building up lists of instruments that match the given type.
                  * It will find the next in the series until the entire bank structure has been scanned.
@@ -3176,22 +3173,22 @@ void InterChange::commandBank(CommandBlock *getData)
                 do {
                     do {
                         do {
-                            if (synth->getBankRef().getType(inst, bank, root) == parameter)
+                            if (synth->getBankRef().getType(searchInst, searchBank, searchRoot) == parameter)
                             {
-                                textMsgBuffer.push(asString(root, 3) + ": " + asString(bank, 3) + ". " + asString(inst + 1, 3) + "  " + synth->getBankRef().getname(inst, bank, root));
-                                ++ inst;
+                                textMsgBuffer.push(asString(searchRoot, 3) + ": " + asString(searchBank, 3) + ". " + asString(searchInst + 1, 3) + "  " + synth->getBankRef().getname(searchInst, searchBank, searchRoot));
+                                ++ searchInst;
                                 return;
                             }
-                            ++inst;
-                        } while (inst < 160);
+                            ++searchInst;
+                        } while (searchInst < MAX_INSTRUMENTS_IN_BANK);
 
-                        inst = 0;
-                        ++bank;
-                    } while (bank < 128);
-                    bank = 0;
-                    ++root;
-                } while (root < 128);
-                root = 0;
+                        searchInst = 0;
+                        ++searchBank;
+                    } while (searchBank < MAX_BANKS_IN_ROOT);
+                    searchBank = 0;
+                    ++searchRoot;
+                } while (searchRoot < MAX_BANK_ROOT_DIRS);
+                searchRoot = 0;
                 textMsgBuffer.push("*");
             }
             break;

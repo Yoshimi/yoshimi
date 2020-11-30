@@ -474,11 +474,11 @@ class PartUI {: {public Fl_Group, PartUI_}
                 break;
             case 107: // k
                 lastkey = -1;
-                instrumentkitlist->show();
+                Showkit();
                 break;
             case 101: // e
                 lastkey = -1;
-                partfx->show();
+                Showefx();
                 break;
             default:
                 divert = false;

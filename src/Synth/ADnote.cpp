@@ -2412,7 +2412,7 @@ void ADnote::computeVoiceOscillator(int nvoice)
 
 void ADnote::ComputeVoiceSpotNoise(int nvoice)
 {
-        static int spot = 0;
+    static int spot = 0;
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpwave_unison[k];

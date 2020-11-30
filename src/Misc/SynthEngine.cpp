@@ -149,7 +149,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     } x;
     //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
-
+    meterDelay = 20;
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
         Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
@@ -2230,12 +2230,11 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 void SynthEngine::fetchMeterData()
 { // overload protection below shouldn't be needed :(
-    static int delay = 20;
     if (!VUready)
         return;
-    if (delay > 0)
+    if (meterDelay > 0)
     {
-        --delay;
+        --meterDelay;
         VUdata.values.vuOutPeakL = 0.0f;
         VUdata.values.vuOutPeakR = 0.0f;
         VUdata.values.vuRmsPeakL = 0.0f;

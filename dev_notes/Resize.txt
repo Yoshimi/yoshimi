@@ -17,46 +17,7 @@ Usually only one window at a time will be changing, so apart from the tests made
 Currently no FLTK file chooser resize. We will be replacing it with our own code.
 
 Completed
-    Console
-    Config
-    Vector
-    PadSynth
-    Subsyth
-    Addsynth
-        Global
-        Voice
-        Voice List
-    Oscilgen
-    Resonance
-    LFOs
-    Envelopes
-    Filters
-        formant window
-    Microtonal
-    Bank
-    Midilearn
-    Virkeyboard
-    Presets
-    Part
-        instrumenteditwindow
-        instrumentkitlist
-        ctlmidi
-        ctlwindow
-        aftertouchcontrol
-        partfx
-    Main
-        master window
-        message window
-        mixer window
-        sys/ins window
-        parameters
-        about
-        choice/alert windows
-
+    Everything except the filer window!
 
 In progress
-    (none)
-
-
-Not started
-    {crickets}
+    nothing
