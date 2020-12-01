@@ -366,7 +366,7 @@ class MasterUI {: {private GuiUpdates}
                 query("", "", "", "Only main instance can start others");
                 return;
             }
-            setInstance->show();
+            startInstance();
             /*string sId = input_text(synth, "Accept next, or enter desired instance id...", "next");
             unsigned int forceId = 0;
             if (sId > "" && sId != "next")
@@ -1040,26 +1040,16 @@ Instance from 1 to 31}
         }
         Fl_Button cancelInst {
           label Cancel
-          callback {//
-          setInstance->hide();}
+          callback {//}
           xywh {209 60 56 22} box PLASTIC_UP_BOX labelfont 1 labelsize 11
         }
         Fl_Button nextInst {
           label Next
-          callback {//
-          send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-          setInstance->hide();}
+          callback {//}
           xywh {93 60 56 22} box PLASTIC_UP_BOX labelfont 1 labelsize 11
         }
         Fl_Input valueInst {
-          callback {//
-          int result = string2uint(o->value());
-          if (result > 1 || result < 32)
-          {
-              send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, result, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-              o->value("");
-              setInstance->hide();
-          }}
+          callback {//}
           xywh {162 60 37 22} textsize 11
         }
       }
@@ -1438,6 +1428,42 @@ o->hide();}
         xywh {20 23 230 25} align 1
       }
     }
+  }
+  Function {startInstance()} {} {
+    code {//
+    cancelInst->value(0);
+    nextInst->value(0);
+    valueInst->value("");
+    setInstance->show();
+    while (setInstance->visible())
+    {
+        if (cancelInst->value())
+        {
+            setInstance->hide();
+            break;
+        }
+        if (nextInst->value())
+        {
+            send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+            setInstance->hide();
+            break;
+        }
+        if (Fl::get_key(FL_Enter))
+        {
+            string test = valueInst->value();
+            if (!test.empty())
+            {
+                int result = stoi(valueInst->value());
+                if (result > 0 && result < 32)
+                {
+                    send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, result, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                    setInstance->hide();
+                    break;
+                }
+            }
+        }
+        Fl::wait();
+    };} {}
   }
   Function {send_data(int action, int control, float value, int type, int part = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
