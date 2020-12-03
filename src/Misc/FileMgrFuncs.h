@@ -331,6 +331,45 @@ inline int listDir(std::list<string>* dirList, const string& dirName)
 }
 
 
+inline void dir2string(string &wanted, string currentDir, string exten)
+{
+    std::list<string> build;
+    wanted = "";
+    uint32_t found = listDir(&build, currentDir);
+    if (found == 0xffffffff)
+        return;
+
+    if (build.size() > 1)
+        build.sort();
+   if(currentDir.back() != '/')
+        currentDir += '/';
+    string line;
+    for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
+    { // get directories
+        if (string(*it).front() != '.') // no hidden dirs
+        {
+            line = currentDir + *it;
+            if (isDirectory(line))
+                wanted += ("Dir: " + *it + "\n");
+        }
+    }
+    for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
+    { // get files
+        if (string(*it).front() != '.') // no hidden files
+        {
+            line = currentDir + *it;
+            if (isRegularFile(line))
+            {
+                if (findExtension(line) == exten)
+                    wanted += (*it + "\n");
+            }
+        }
+    }
+
+    build.clear();
+}
+
+
 inline string saveGzipped(char *data, const string& filename, int compression)
 {
     char options[10];

@@ -5797,39 +5797,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         return Reply::DONE;
     }
 #endif
-
-    if (input.matchnMove(4, "test"))
+    if (input.matchnMove(5, "filer"))
     {
-        list<string>testlist;
-        string testdir = "/home/will/yoshimi-code/banks/chip";
-        uint32_t count = file::listDir(&testlist, testdir);
-        if (count == 0xffffffff)
-        {
-            std::cout << "no such directory" << std::endl;
-            return Reply::DONE;
-        }
-        testlist.sort();
-
-        // safe removal
-        std::list<string>::iterator r_it = testlist.end();
-        while (r_it != testlist.begin())
-        {
-            string name = *--r_it;
-            if (name.substr(0, 2) == ("Re"))
-                r_it = testlist.erase(r_it);
-        }
-
-        for (list<string>::iterator it = testlist.begin(); it != testlist.end(); ++ it)
-        {
-            string name = *it;
-            if (file::isDirectory(testdir + "/" + name))
-            {
-                name += " - Dir";
-            }
-            std::cout << name << std::endl;
-        }
-        std::cout << "total found " << count << std::endl;
-        testlist.clear();
+        string result;
+        file::dir2string(result, "/home/will", ".xiz");
+        std::cout << result << std::endl;
         return Reply::DONE;
     }
 
