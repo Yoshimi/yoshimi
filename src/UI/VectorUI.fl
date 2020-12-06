@@ -79,21 +79,15 @@ class VectorUI {} {
       }
       Fl_Menu_Button options {
         label Options
-        xywh {275 12 74 20} labelsize 12 textsize 12
-        code0 {(void) o; // suppress warning}
-        code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
-        code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
-      } {
-        MenuItem load {
-          label Load
-          callback {//
-          loadVector("");}
-          xywh {0 0 34 20} labelsize 12
-        }
-        MenuItem save {
-          label Save
-          callback {//
-          bool ok = true;
+        callback {int res = o->value();
+switch (res)
+{
+    case 0:
+        loadVector("");;
+        break;
+    case 1:
+    {
+        bool ok = true;
           int count;
           int size;
           string name;
@@ -127,29 +121,26 @@ class VectorUI {} {
           }
 
           if (ok)
-              saveVector();}
-          xywh {10 10 34 20} labelsize 12
-        }
-        MenuItem recenthistory {
-          label Recent
-          callback {//
-          paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
-          paramsui->Show(TOPLEVEL::XML::Vector);}
-          xywh {20 20 34 20} labelsize 12 deactivate
-        }
-        MenuItem clearch {
-          label {Clear Chan}
-          callback {//
-          send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);}
-          xywh {30 30 34 20} labelsize 12
-        }
-        MenuItem clearall {
-          label {Clear All}
-          callback {//
-          send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);}
-          xywh {40 40 34 20} labelsize 12
-        }
-      }
+              saveVector();
+        break;
+    }
+    case 2:
+        paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
+        paramsui->Show(TOPLEVEL::XML::Vector);
+        break;
+    case 3:
+        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
+        break;
+    case 4:
+        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);
+        break;
+}}
+        xywh {275 12 74 20} labelsize 12 textsize 12
+        code0 {(void) o; // suppress warning}
+        code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
+        code2 {o->add("Load");o->add("Save");o->add("Recent");o->add("Clear Ch");o->add("Clear All");}
+        code3 {setRecent(listType.size() > 0);}
+      } {}
       Fl_Group Xgroup {
         label X
         xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
@@ -637,6 +628,14 @@ class VectorUI {} {
             break;
 }} {}
   }
+  Function {setRecent(bool active)} {} {
+    code {//
+    Fl_Menu_Item *m = (Fl_Menu_Item*)options->find_item("Recent");
+    if (active)
+        m->activate();
+    else
+        m->deactivate();} {}
+  }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
     synth = _synth;
@@ -818,11 +817,7 @@ class VectorUI {} {
     setbasechan->labelsize(size12);
     setbasechan->textsize(size12);
     options->labelsize(size12);
-        load->labelsize(size12);
-        save->labelsize(size12);
-        recenthistory->labelsize(size12);
-        clearch->labelsize(size12);
-        clearall->labelsize(size12);
+        options->textsize(size12);
 
     Xgroup->labelsize(size16);
     Xcontrol->labelsize(size12);

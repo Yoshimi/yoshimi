@@ -1929,7 +1929,7 @@ o->hide();}
             {
                 vectorui->setLoadLabelRemote(insert, synth->getRuntime().vectordata.Name[insert]);
                 setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
-                vectorui->recenthistory->activate();
+                vectorui->setRecent(true);
                 refresh_master_ui(5);
             }
             break;
@@ -1944,7 +1944,7 @@ o->hide();}
             else
             {
                 setMasterLabel(findLeafName(name) + " - Vector " + to_string(int(insert) + 1));
-                vectorui->recenthistory->activate();
+                vectorui->setRecent(true);
             }
             break;
 
