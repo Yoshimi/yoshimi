@@ -1500,9 +1500,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {presetsRtext()} {} {
     code {//
-    if(presets->x() > Fl::w() - 10 || presets->y() > Fl::h() - 10)
-        presets->position(30, 30);
-
     if (lastpresetW == presets->w())
         return;
 

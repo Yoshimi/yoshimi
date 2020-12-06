@@ -1146,9 +1146,6 @@ class PADnoteUI {: {public PresetsUI_}
     freqenv->wincheck();
     filterenv->wincheck();
 
-    if(padnotewindow->x() > Fl::w() - 10 || padnotewindow->y() > Fl::h() - 10)
-        padnotewindow->position(30, 30);
-
     if (padnotewindow->w() == lastpadW)
         return;
 

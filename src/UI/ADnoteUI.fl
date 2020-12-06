@@ -1785,8 +1785,6 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
     code {//
    if (oscedit)
    {
-        if(oscedit->osceditUI->x() > Fl::w() - 10 || oscedit->osceditUI->y() > Fl::h() - 10)
-            oscedit->osceditUI->position(30, 30);
        if (oscedit->osceditUI->visible() && lastWaveW != oscedit->osceditUI->w())
        {
            lastWaveW = oscedit->osceditUI->w();

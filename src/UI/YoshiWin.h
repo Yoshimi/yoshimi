@@ -30,8 +30,5 @@ class YoshiWin : public Fl_Double_Window {
   ~YoshiWin();
 
   void resize(int x, int y, int w, int h);
-
- private:
-    ;
 };
 #endif
