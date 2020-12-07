@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -377,7 +377,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {open : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -407,90 +407,26 @@ pars=NULL;
           label FilterType
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::analogType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
+          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
           code1 {o->value(pars->Ptype);}
-        } {
-          MenuItem anlpf {
-            label LPF1
-            xywh {40 40 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anhpf {
-            label HPF1
-            xywh {50 50 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anlpf2 {
-            label LPF2
-            xywh {60 60 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anhpf2 {
-            label HPF2
-            xywh {70 70 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anbpf2 {
-            label BPF2
-            xywh {82 82 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem annf2 {
-            label NF2
-            xywh {94 94 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anpkf2 {
-            label PkF2
-            xywh {104 104 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anlsh2 {
-            label LSh2
-            xywh {114 114 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem anhsh2 {
-            label HSh2
-            xywh {124 124 100 20} labelfont 1 labelsize 10
-          }
-        }
+          code2 {o->add("Low1");o->add("High1");o->add("Low2");o->add("High2");o->add("Band2");o->add("Stop2");o->add("Peak2");o->add("LShelf2");o->add("HShelf2");}
+        } {}
         Fl_Choice svfiltertypechoice {
           label FilterType
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stateVariableType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
+          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
           code1 {o->value(pars->Ptype);}
-        } {
-          MenuItem svlpf {
-            label 1LPF
-            xywh {134 134 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem svhpf {
-            label 1HPF
-            xywh {144 144 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem svbpf {
-            label 1BPF
-            xywh {154 154 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem svnf {
-            label 1NF
-            xywh {164 164 100 20} labelfont 1 labelsize 10
-          }
-        }
+          code2 {o->add("Low");o->add("High");o->add("Band");o->add("Stop");}
+        } {}
         Fl_Choice filtertype {
           label Category
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::baseType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
+          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
           code0 {o->value(pars->Pcategory);}
-        } {
-          MenuItem analog {
-            label Analog
-            xywh {50 50 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem formant {
-            label Formant
-            xywh {60 60 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem stvar {
-            label StVarF
-            xywh {70 70 100 20} labelfont 1 labelsize 10
-          }
-        }
+          code1 {o->add("Analog");o->add("Formant");o->add("StateVar");}
+        } {}
         Fl_Dial cfreqdial {
           label {C.Freq}
           callback {//
@@ -813,8 +749,7 @@ pars=NULL;
         else
             vowel_counter->deactivate();
 
-        vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {selected
-    }
+        vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {}
   }
   Function {refresh()} {} {
     code {//
@@ -877,30 +812,16 @@ pars=NULL;
             gaindial->labelsize(size);
 
             filtertype->labelsize(size);
-            analog->labelsize(size);
-            formant->labelsize(size);
-            stvar->labelsize(size);
-
+                filtertype->textsize(size);
 
             stcounter->labelsize(size);
             stcounter->textsize(size);
 
             analogfiltertypechoice->labelsize(size);
-            anlpf->labelsize(size);
-            anhpf->labelsize(size);
-            anlpf2->labelsize(size);
-            anhpf2->labelsize(size);
-            anbpf2->labelsize(size);
-            annf2->labelsize(size);
-            anpkf2->labelsize(size);
-            anlsh2->labelsize(size);
-            anhsh2->labelsize(size);
+                analogfiltertypechoice->textsize(size);
 
             svfiltertypechoice->labelsize(size);
-            svlpf->labelsize(size);
-            svhpf->labelsize(size);
-            svbpf->labelsize(size);
-            svnf->labelsize(size);
+                svfiltertypechoice->textsize(size);
 
             editbutton->labelsize(size);
             filtC->labelsize(size);
