@@ -196,16 +196,8 @@ switch (res)
               bitSet(Xf, 0);
           send_data(0, VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
-        } {
-          MenuItem X1off {
-            label Off
-            xywh {10 10 34 20} labelsize 12
-          }
-          MenuItem X1vol {
-            label Vol
-            xywh {0 0 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("vol");}
+        } {}
         Fl_Choice Xfeat2 {
           label 2
           callback {//
@@ -219,20 +211,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
-        } {
-          MenuItem X2off {
-            label Off
-            xywh {20 20 34 20} labelsize 12
-          }
-          MenuItem X2pan {
-            label Pan
-            xywh {20 20 34 20} labelsize 12
-          }
-          MenuItem X2panR {
-            label {Pan R}
-            xywh {40 40 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("pan");o->add("panR");}
+        } {}
         Fl_Choice Xfeat3 {
           label 3
           callback {//
@@ -246,20 +226,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
-        } {
-          MenuItem X3off {
-            label Off
-            xywh {30 30 34 20} labelsize 12
-          }
-          MenuItem X3filt {
-            label Filt
-            xywh {30 30 34 20} labelsize 12
-          }
-          MenuItem X3filtR {
-            label {Filt R}
-            xywh {40 40 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("filt");o->add("filtR");}
+        } {}
         Fl_Choice Xfeat4 {
           label 4
           callback {//
@@ -273,20 +241,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
-        } {
-          MenuItem X4off {
-            label Off
-            xywh {40 40 34 20} labelsize 12
-          }
-          MenuItem X4mod {
-            label Mod
-            xywh {50 50 34 20} labelsize 12
-          }
-          MenuItem X4modR {
-            label {Mod R}
-            xywh {40 40 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("mod");o->add("modR");}
+        } {}
       }
       Fl_Spinner Xcontrol {
         label Controller
@@ -379,16 +335,8 @@ switch (res)
               bitSet(Yf, 0);
           send_data(0, VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
-        } {
-          MenuItem Y1off {
-            label Off
-            xywh {50 50 34 20} labelsize 12
-          }
-          MenuItem Y1vol {
-            label Vol
-            xywh {10 10 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("vol");}
+        } {}
         Fl_Choice Yfeat2 {
           label 2
           callback {//
@@ -402,20 +350,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
-        } {
-          MenuItem Y2off {
-            label Off
-            xywh {60 60 34 20} labelsize 12
-          }
-          MenuItem Y2pan {
-            label Pan
-            xywh {30 30 34 20} labelsize 12
-          }
-          MenuItem Y2panR {
-            label {Pan R}
-            xywh {50 50 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("pan");o->add("panR");}
+        } {}
         Fl_Choice Yfeat3 {
           label 3
           callback {//
@@ -429,20 +365,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
           xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
-        } {
-          MenuItem Y3off {
-            label Off
-            xywh {70 70 34 20} labelsize 12
-          }
-          MenuItem Y3filt {
-            label Filt
-            xywh {40 40 34 20} labelsize 12
-          }
-          MenuItem Y3filtR {
-            label {Filt R}
-            xywh {50 50 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("filt");o->add("filtR");}
+        } {}
         Fl_Choice Yfeat4 {
           label 4
           callback {//
@@ -456,20 +380,8 @@ switch (res)
           }
           send_data(0, VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
           xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
-        } {
-          MenuItem Y4off {
-            label Off
-            xywh {80 80 34 20} labelsize 12
-          }
-          MenuItem Y4mod {
-            label Mod
-            xywh {50 50 34 20} labelsize 12
-          }
-          MenuItem Y4modR {
-            label {Mod R}
-            xywh {60 60 34 20} labelsize 12
-          }
-        }
+          code0 {o->add("off");o->add("mod");o->add("modR");}
+        } {}
       }
       Fl_Spinner Ycontrol {
         label Controller
@@ -826,20 +738,13 @@ switch (res)
     XinstR->labelsize(size12);
     Xfeat->labelsize(size12);
     Xfeat1->labelsize(size12);
-        X1off->labelsize(size12);
-        X1vol->labelsize(size12);
+         Xfeat1->textsize(size12);
     Xfeat2->labelsize(size12);
-        X2off->labelsize(size12);
-        X2pan->labelsize(size12);
-        X2panR->labelsize(size12);
+         Xfeat2->textsize(size12);
     Xfeat3->labelsize(size12);
-        X3off->labelsize(size12);
-        X3filt->labelsize(size12);
-        X3filtR->labelsize(size12);
+         Xfeat3->textsize(size12);
     Xfeat4->labelsize(size12);
-        X4off->labelsize(size12);
-        X4mod->labelsize(size12);
-        X4modR->labelsize(size12);
+         Xfeat4->textsize(size12);
 
     Ygroup->labelsize(size16);
     Ycontrol->labelsize(size12);
@@ -848,20 +753,13 @@ switch (res)
     YinstD->labelsize(size12);
     Yfeat->labelsize(size12);
     Yfeat1->labelsize(size12);
-        Y1off->labelsize(size12);
-        Y1vol->labelsize(size12);
+        Yfeat1->textsize(size12);
     Yfeat2->labelsize(size12);
-        Y2off->labelsize(size12);
-        Y2pan->labelsize(size12);
-        Y2panR->labelsize(size12);
+        Yfeat2->textsize(size12);;
     Yfeat3->labelsize(size12);
-        Y3off->labelsize(size12);
-        Y3filt->labelsize(size12);
-        Y3filtR->labelsize(size12);
+        Yfeat3->textsize(size12);
     Yfeat4->labelsize(size12);
-        Y4off->labelsize(size12);
-        Y4mod->labelsize(size12);
-        Y4modR->labelsize(size12);
+        Yfeat4->textsize(size12);
 
     Loaded->labelsize(size12);
     Closevector->labelsize(size12);
