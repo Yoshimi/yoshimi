@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -124,7 +124,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -148,10 +148,10 @@ class MasterUI {open : {private GuiUpdates}
       paramsui = NULL;
       activePart = 0;
       yoshiLog = NULL;
-      queryDW = 0;} {}
+      queryDW = 0;
+      filerpath.clear();} {}
   }
-  Function {~MasterUI()} {open
-  } {
+  Function {~MasterUI()} {} {
     code {//
       aboutwindow->hide();
       delete aboutwindow;
@@ -206,7 +206,7 @@ class MasterUI {open : {private GuiUpdates}
           querywindow->hide();
           delete querywindow;
       }
-      
+
       if (filerwindow)
       {
           filerwindow->hide();
@@ -292,8 +292,7 @@ class MasterUI {open : {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -330,7 +329,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open
+            }}
       xywh {42 469 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -1063,7 +1062,10 @@ Instance from 1 to 31}
       }
       Fl_Button {} {
         label test
-        callback {filerwindow->show();}
+        callback {string testfile = setfiler("/home", ".xiz");
+        //std::cout << "testname " << testfile << std::endl;
+        if(!testfile.empty())
+            do_load_instrument(testfile);}
         xywh {218 45 39 20} labelsize 12
       }
     }
@@ -1441,8 +1443,10 @@ o->hide();}
         xywh {20 23 230 25} align 1
       }
     }
-    Fl_Window filerwindow {open
-      xywh {185 26 545 320} type Double hide resizable
+    Fl_Window filerwindow {
+      callback {//
+        filerclose->do_callback();}
+      xywh {236 77 545 320} type Double hide resizable modal
     } {
       Fl_Input filepath {
         label {Full path to file}
@@ -1453,46 +1457,83 @@ o->hide();}
                 alert(synth, "Not a valid path");
             else
             {
-                filebrowse->clear();
-                fillfiler(o->value());
+                filerpath = string(o->value());
+                fillfiler();
             }
-        }} selected
+        }}
         xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
-        callback {//      
-        std::cout<<"here"<<std::endl;
-        if (!o->value())
+        callback {//
+        if (!filebrowse->value())
             return;
-        std::cout<<"here2"<<std::endl;
-        int result = o->value();
-        if (result < 0)
+        int result = filebrowse->value();
+        if (result < 1)
             return;
-        string line = string(o->text(result));
-        std::cout << "entry " << line << std::endl;}
-        xywh {10 59 445 251} labelsize 12 textsize 12
+        string line = string(filebrowse->text(result));
+        if (line.find("Dir:") != std::string::npos)
+        {
+            filerpath = filerpath + '/' + line.substr(5);
+            filepath->value(filerpath.c_str());
+            fillfiler();
+        }
+        else
+        {
+            fileresult =  filerpath + '/' + line;
+            filerwindow->hide();
+        }}
+        xywh {10 59 445 251} type Select labelsize 12 textsize 12
+      }
+      Fl_Button filerback {
+        label Back
+        callback {if (filerpath == "/")
+    return;
+
+size_t pos = filerpath.rfind('/');
+filerpath = filerpath.substr(0, pos);
+if (filerpath.empty())
+    filerpath = "/";
+filepath->value(filerpath.c_str());
+fillfiler();}
+        xywh {465 59 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
-        callback {filerwindow->hide();}
+        callback {//
+        //filerpath.clear();
+        filerwindow->hide();}
         xywh {465 290 70 20} labelfont 1 labelsize 12
       }
     }
   }
-  Function {fillfiler(string path)} {open
+  Function {setfiler(string path, string extension)} {return_type string
   } {
     code {//
+    if (filerpath.empty())
+    {
+    	filerpath = path;
+        filepath->value(path.c_str());
+    }
+    filerext = extension;
+    fillfiler();
+    filerwindow->show();
+    while (filerwindow->visible())
+        Fl::wait();
+
+    return fileresult;} {}
+  }
+  Function {fillfiler()} {} {
+    code {//
         string tofetch;
-        file::dir2string(tofetch, path, ".xiz");
+        file::dir2string(tofetch, filerpath, filerext);
+        filebrowse->clear();
         if (!tofetch.empty())
         {
-            //std::cout << "here " << tofetch << std::endl;
             while(!tofetch.empty())
             {
-                int pos = tofetch.find("\\n");
-                string next = tofetch.substr(0, pos - 1);
+                size_t pos = tofetch.find("\\n");
+                string next = tofetch.substr(0, pos);
                 filebrowse->add(next.c_str());
-                std::cout<<next<<std::endl;
                 tofetch = tofetch.substr(pos + 1);
             }
         }} {}
@@ -3457,5 +3498,11 @@ o->hide();}
   decl {int textinDW;} {private local
   }
   decl {int textinDH;} {private local
+  }
+  decl {string filerpath;} {private local
+  }
+  decl {string filerext;} {private local
+  }
+  decl {string fileresult;} {private local
   }
 }
