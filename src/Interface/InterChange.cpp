@@ -863,8 +863,20 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             newMsg = true;
             break;
         }
+        case MAIN::control::readLastSeen:
+            break; // do nothing here
         case MAIN::control::loadFileFromList:
             break; // do nothing here
+
+        case MAIN::control::defaultPart: // clear part
+            if (write)
+            {
+                doClearPart(value);
+                synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            break;
+
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
@@ -1339,14 +1351,6 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             }
         break;
 
-        case PART::control::defaultInstrument: // clear part
-            if (write)
-            {
-                doClearPart(npart);
-                synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
-                getData->data.source &= ~TOPLEVEL::action::lowPrio;
-            }
-            break;
         case PART::control::enablePad:
             if (write)
             {
@@ -3027,7 +3031,6 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
 
-
         case MAIN::control::loadInstrumentFromBank:
             synth->partonoffLock(kititem, -1);
             getData->data.source |= TOPLEVEL::action::lowPrio;
@@ -3068,9 +3071,22 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case MAIN::control::saveNamedState: // done elsewhere
             break;
+        case MAIN::control::readLastSeen: // read only
+            value = textMsgBuffer.push(synth->getLastfileAdded(value));
+            break;
         case MAIN::control::loadFileFromList:
             muteQueueWrite(getData);
             getData->data.source = TOPLEVEL::action::noAction;
+            break;
+
+        case MAIN::control::defaultPart: // doClearPart
+            if (write)
+            {
+                synth->partonoffWrite(value_int, -1);
+                getData->data.source = TOPLEVEL::action::lowPrio;
+            }
+            else
+                getData->data.source = TOPLEVEL::action::noAction;
             break;
 
         case MAIN::control::masterReset:
@@ -3643,16 +3659,6 @@ void InterChange::commandPart(CommandBlock *getData)
             part->Peffnum = tmp; // leave it as it was before
             break;
         }
-
-        case PART::control::defaultInstrument: // doClearPart
-            if (write)
-            {
-                synth->partonoffWrite(npart, -1);
-                getData->data.source = TOPLEVEL::action::lowPrio;
-            }
-            else
-                getData->data.source = TOPLEVEL::action::noAction;
-            break;
 
         case PART::control::audioDestination:
             if (synth->partonoffRead(npart) != 1)

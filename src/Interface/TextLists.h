@@ -173,7 +173,8 @@ static std::string toplist [] = {
     "  SHift <n>",              "master key shift semitones (0 no shift)",
     "  DEtune <n>",             "master fine detune",
     "  SOlo [s]",               "channel 'solo' switch type (ROw, COlumn, LOop, TWoway, CHannel {other} off)",
-    "  SOlo CC <n>",             "incoming 'solo' CC number (type must be set first)",
+    "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
+    "  CLear <n>",              "restore instrument n to default settings",
     "end"
 };
 
@@ -257,8 +258,7 @@ static std::string partlist [] = {
     "  (effect) <s>",      "the effect type",
     "  PREset <n>",        "set numbered effect preset to n",
     "    -- ",             "effect dependent controls",
-    "PRogram <s>/[s]<n>",  "loads instrument ID - CLear sets default,",
-    "","Group n selects from group list",
+    "PRogram <s>/[s]<n>",  "loads instrument ID - Group n selects from group list",
     "LAtest",              "Show most recent bank load or save",
     "NAme <s>",            "sets the display name the part can be saved with",
     "TYPe <s>",            "sets the instrument type",

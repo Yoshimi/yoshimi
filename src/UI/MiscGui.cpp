@@ -89,7 +89,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-
     if (action == TOPLEVEL::action::fromMIDI)
         type = type | 1; // faking MIDI from virtual keyboard
     else
@@ -330,12 +329,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (kititem >= NUM_KIT_ITEMS && kititem != UNUSED)
         return; // invalid kit number
-
-    if (kititem == UNUSED && engine == UNUSED && insert == UNUSED && control == PART::control::defaultInstrument) // special case for part clear
-    {
-        synth->getGuiMaster()->returns_update(getData);
-        return;
-    }
 
     if (insert != UNUSED || (control != PART::control::enable && control != PART::control::instrumentName))
     {

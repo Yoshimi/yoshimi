@@ -2480,10 +2480,8 @@ void SynthEngine::addHistory(const string& name, int group)
         return;
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
-    listType.insert(itn, name);
-    itn = listType.begin(); // reinitialize after insertion
-    std::advance(itn, 1); // skip first entry
     listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
+    listType.insert(listType.begin(), name);
     setLastfileAdded(group, name);
 }
 
@@ -3333,7 +3331,10 @@ float SynthEngine::getLimits(CommandBlock *getData)
             def = 115;
             max = 119;
             break;
-
+        case MAIN::control::defaultPart:
+            def = 0;
+            max = Runtime.NumAvailableParts -1;
+            break;
         case MAIN::control::masterReset:
         case MAIN::control::masterResetAndMlearn:
         case MAIN::control::stopSound:

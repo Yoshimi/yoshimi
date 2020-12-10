@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -124,7 +124,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -292,7 +292,8 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -329,7 +330,7 @@ class MasterUI {: {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }}
+            }} open
       xywh {42 469 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -427,7 +428,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem I_load {
             label {&Load External...}
             callback {//
-                string lastname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
+                string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Instrument, MAIN::control::readLastSeen, TOPLEVEL::section::main));
                 if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
@@ -446,7 +447,7 @@ class MasterUI {: {private GuiUpdates}
                     query("", "", "", "Nothing to save!");
                     return;
                 }
-                string newname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
+                string newname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Instrument, MAIN::control::readLastSeen, TOPLEVEL::section::main));
                 if (newname == "" || findLeafName(newname) != synth->part[activePart]->Pname)
                 {
                     newname = synth->part[activePart]->Pname;
@@ -477,7 +478,7 @@ class MasterUI {: {private GuiUpdates}
             label {&Clear}
             callback {//
                 if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
-                send_data(TOPLEVEL::action::forceUpdate, PART::control::defaultInstrument,0, TOPLEVEL::type::Integer, partui->npart);}
+                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart,partui->npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem I_search {
@@ -1062,10 +1063,10 @@ Instance from 1 to 31}
       }
       Fl_Button {} {
         label test
-        callback {string testfile = setfiler("/home", ".xiz");
-        //std::cout << "testname " << testfile << std::endl;
+        callback {//
+        string testfile = setfiler(TOPLEVEL::XML::Instrument);
         if(!testfile.empty())
-            do_load_instrument(testfile);}
+            do_load_instrument(testfile);} selected
         xywh {218 45 39 20} labelsize 12
       }
     }
@@ -1445,7 +1446,7 @@ o->hide();}
     }
     Fl_Window filerwindow {
       callback {//
-        filerclose->do_callback();}
+        filerclose->do_callback();} open
       xywh {236 77 545 320} type Double hide resizable modal
     } {
       Fl_Input filepath {
@@ -1500,21 +1501,40 @@ fillfiler();}
       Fl_Button filerclose {
         label Close
         callback {//
-        //filerpath.clear();
+        fileresult.clear();
         filerwindow->hide();}
         xywh {465 290 70 20} labelfont 1 labelsize 12
       }
     }
   }
-  Function {setfiler(string path, string extension)} {return_type string
+  Function {setfiler(int extension)} {open return_type string
   } {
     code {//
-    if (filerpath.empty())
+    if (extension > TOPLEVEL::XML::MLearn)
+    return ""; // invalid in this contect
+    string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+    string path;
+    if (lastname.empty())
+        path = synth->getRuntime().userHome;
+    else
+    {
+        size_t pos = lastname.rfind('/');
+        path = lastname.substr(0, pos);
+    }
+
+    switch(extension)
+    {
+        case TOPLEVEL::XML::Instrument:
+        filerext = EXTEN::zynInst;
+        filepath->copy_label("Path to Instrument file");
+        break;
+    }
+   // if (filerpath.empty())
     {
     	filerpath = path;
         filepath->value(path.c_str());
     }
-    filerext = extension;
+    //filerext = extension;
     fillfiler();
     filerwindow->show();
     while (filerwindow->visible())
@@ -2102,7 +2122,10 @@ fillfiler();}
             else
                 setMasterLabel(findLeafName(name) + " - State");
             break;
-
+        case MAIN::control::defaultPart:
+            partNew(activePart);
+            updatepanel();
+            break;
         case MAIN::control::masterReset:
             if (newpart == TOPLEVEL::section::main)
             {

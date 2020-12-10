@@ -1809,7 +1809,6 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::minToLastKey:
         case PART::control::maxToLastKey:
         case PART::control::resetMinMaxKey:
-        case PART::control::defaultInstrument:
             def = 0;
             max = 0;
             break;

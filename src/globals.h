@@ -512,10 +512,11 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedScale,
         loadNamedState = 92,
         saveNamedState,
+        readLastSeen,
         loadFileFromList,
+        defaultPart,
         exportPadSynthSamples,
-
-        masterReset = 96,
+        masterReset,
         masterResetAndMlearn,
         openManualPDF = 100,
         startInstance = 104,
@@ -572,7 +573,6 @@ namespace PART // usage PART::control::volume
         effectType,
         effectDestination,
         effectBypass,
-        defaultInstrument = 96,
         padsynthParameters = 104,
         audioDestination = 120,
 

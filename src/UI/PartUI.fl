@@ -2081,9 +2081,6 @@ class PartUI {: {public Fl_Group, PartUI_}
                 bypasseff->value(valBool);
             break;
 
-        case PART::control::defaultInstrument: // now done in master
-            break;
-
 // controllers
         case PART::control::volumeRange:
             volrng->value(valInt);
@@ -2442,7 +2439,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     humanise->value(tmp); // will inc number
     tmp = int(fetchData(0, PART::control::humanvelocity, npart));
     velocityhumanise->value(tmp); // will inc number
-    
+
     fetchChannel();
     keyATselection = int(fetchData(0, PART::control::keyATset, npart));
     fetchKey();

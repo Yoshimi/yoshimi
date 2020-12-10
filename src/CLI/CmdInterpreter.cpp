@@ -5041,11 +5041,11 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             Runtime.Log("Part name is " + synth->part[npart]->Pname);
             return REPLY::done_msg;
         }
-        if (input.matchnMove(2, "clear"))
+        /*if (input.matchnMove(2, "clear"))
         {
-            sendDirect(synth, 0, 0, controlType, PART::control::defaultInstrument, npart, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, tmp);
+            sendDirect(synth, 0, 0, controlType, MAIN::control::defaultPart, npart);
             return REPLY::done_msg;
-        }
+        }*/
         if (!input.isAtEnd()) // force part not channel number
         {
             if (input.matchnMove(1, "group"))
@@ -5701,6 +5701,15 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         else if (!input.matchnMove(1, "default") && controlType == TOPLEVEL::type::Write)
             return REPLY::range_msg;
         return sendNormal(synth, 0, value, controlType, MAIN::control::panLawType, TOPLEVEL::section::main);
+    }
+    if (input.matchnMove(2, "clear"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        int value = string2int(input) -1;
+        if (value < 0)
+            return REPLY::range_msg;
+        return sendNormal(synth, 0, value, controlType, MAIN::control::defaultPart, TOPLEVEL::section::main);
     }
     return REPLY::op_msg;
 }

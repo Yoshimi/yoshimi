@@ -1178,6 +1178,11 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             contstr = "Load Recent" + textMsgBuffer.fetch(value_int);
             break;
 
+        case MAIN::control::defaultPart:
+            showValue = false;
+            contstr = "Part " + to_string(value_int + 1) + " cleared";
+            break;
+
         case MAIN::control::exportPadSynthSamples:
             showValue = false;
             contstr = "PadSynth Samples Save" + textMsgBuffer.fetch(value_int);
@@ -1519,10 +1524,6 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
         /*case PART::control::effectBypass:
             contstr = "Bypass Effect "+ to_string(effNum + 1);
             break;*/
-
-        case PART::control::defaultInstrument: // doClearPart
-            contstr = "Set Default Instrument";
-            break;
 
         case PART::control::audioDestination:
             contstr = "Audio destination ";
