@@ -1064,9 +1064,11 @@ Instance from 1 to 31}
       Fl_Button {} {
         label test
         callback {//
-        string testfile = setfiler(TOPLEVEL::XML::Instrument);
+        string testfile = setfiler("", true, TOPLEVEL::XML::Instrument);
         if(!testfile.empty())
-            do_load_instrument(testfile);} selected
+            do_load_instrument(testfile);
+            
+        std::cout << testfile << std::endl;}
         xywh {218 45 39 20} labelsize 12
       }
     }
@@ -1447,21 +1449,29 @@ o->hide();}
     Fl_Window filerwindow {
       callback {//
         filerclose->do_callback();} open
-      xywh {236 77 545 320} type Double hide resizable modal
+      xywh {236 77 550 350} type Double hide resizable modal
     } {
       Fl_Input filepath {
         label {Full path to file}
         callback {//
         if (Fl::event_key() == FL_Enter)
         {
-            if(!file::isDirectory(o->value()))
-                alert(synth, "Not a valid path");
-            else
+            if (!dosave)
             {
-                filerpath = string(o->value());
-                fillfiler();
+                alert(synth, "Not a valid directory.");
+                return;
             }
-        }}
+            if(!file::isDirectory(o->value()))
+            {
+                if (choice(synth, "", "Yes", "No", "Create new directory") < 2)
+                    return;
+                if (file::createDir(o->value()))
+                    alert(synth, "Unable to create directory here.");
+                
+            }
+            filerpath = string(o->value());
+            fillfiler();
+        }} selected
         xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
@@ -1477,6 +1487,10 @@ o->hide();}
             filerpath = filerpath + '/' + line.substr(5);
             filepath->value(filerpath.c_str());
             fillfiler();
+        }
+        else if (dosave)
+        {
+            filernewname->value(line.c_str());
         }
         else
         {
@@ -1503,13 +1517,40 @@ fillfiler();}
         callback {//
         fileresult.clear();
         filerwindow->hide();}
-        xywh {465 290 70 20} labelfont 1 labelsize 12
+        xywh {465 320 70 20} labelfont 1 labelsize 12
+      }
+      Fl_Group filernamegroup {
+        label Name
+        xywh {55 320 390 22} align 4 hide
+      } {
+        Fl_Button fileruse {
+          label {< Use}
+          callback {//
+    if (filerpath.rfind('/') != filerpath.length())
+        filerpath += "/";
+        
+    filerpath = string(filepath->value());
+    if (filerpath.rfind('/') != filerpath.length())
+    {
+        filerpath += "/";
+        filepath->value(filerpath.c_str());
+    }
+    fileresult = filerpath + string(filernewname->value());
+    filerwindow->hide();}
+          xywh {380 320 60 20} labelfont 1 labelsize 12
+        }
+        Fl_Input filernewname {
+          callback {if (Fl::event_key() == FL_Enter)
+    fileruse->do_callback();}
+          xywh {60 320 310 22} labelsize 12 textsize 12
+        }
       }
     }
   }
-  Function {setfiler(int extension)} {open return_type string
+  Function {setfiler(string name, bool save, int extension)} {open return_type string
   } {
     code {//
+    dosave = save;
     if (extension > TOPLEVEL::XML::MLearn)
     return ""; // invalid in this contect
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
@@ -1521,6 +1562,15 @@ fillfiler();}
         size_t pos = lastname.rfind('/');
         path = lastname.substr(0, pos);
     }
+    
+    if (save)
+    {
+        if (!name.empty())
+            filernewname->value(name.c_str());
+        filernamegroup->show();
+    }
+    else
+        filernamegroup->hide();
 
     switch(extension)
     {
@@ -3527,5 +3577,7 @@ fillfiler();}
   decl {string filerext;} {private local
   }
   decl {string fileresult;} {private local
+  }
+  decl {bool dosave;} {private local
   }
 }
