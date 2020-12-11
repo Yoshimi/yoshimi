@@ -309,7 +309,10 @@ inline uint32_t copyDir(const string& source, const string& destination, char op
     return count | (missing << 16);
 }
 
-
+/*
+ * this fills the given list with all contents removing the
+ * directory management from the callunbg functions.
+ */
 inline int listDir(std::list<string>* dirList, const string& dirName)
 {
     DIR *dir = opendir(dirName.c_str());
@@ -330,7 +333,13 @@ inline int listDir(std::list<string>* dirList, const string& dirName)
     return count;
 }
 
-
+/*
+ * we return the contets as sorted, sequential lists in directories
+ * and file of the required type as a series of leaf names (as the
+ * root directory is already known. The reduces the size of the
+ * string to a manageable size.
+ * Directories are prefixed to make the easier to identify.
+ */
 inline void dir2string(string &wanted, string currentDir, string exten)
 {
     std::list<string> build;
@@ -348,9 +357,11 @@ inline void dir2string(string &wanted, string currentDir, string exten)
     { // get directories
         if (string(*it).front() != '.') // no hidden dirs
         {
-            line = currentDir + *it;
-            if (isDirectory(line))
-                wanted += ("Dir: " + *it + "\n");
+            line = *it;
+            if (line.back() != '/')
+                line += '/';
+            if (isDirectory(currentDir + line))
+                wanted += ("Dir: " + line + "\n");
         }
     }
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)

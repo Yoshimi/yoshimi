@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -124,7 +124,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -292,8 +292,7 @@ class MasterUI {open : {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -330,7 +329,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open
+            }}
       xywh {42 469 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
@@ -429,12 +428,16 @@ class MasterUI {open : {private GuiUpdates}
             label {&Load External...}
             callback {//
                 string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Instrument, MAIN::control::readLastSeen, TOPLEVEL::section::main));
-                if (lastname == "")
+                /*if (lastname == "")
                     lastname = synth->getRuntime().userHome;
                 const char *filename;
                 string exten = "({*" + EXTEN::anyInst + "})";
                 filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
                 if (filename == NULL)
+                    return;
+                */
+                filename = setfiler(lastname, false, TOPLEVEL::XML::Instrument);
+                if (filename.empty())
                     return;
                 do_load_instrument(filename);}
             tooltip {Load an instrument (.xi*) file} xywh {30 30 100 20} labelsize 12
@@ -455,10 +458,14 @@ class MasterUI {open : {private GuiUpdates}
                         return;
                     newname = synth->getRuntime().userHome + newname;
                 }
-                const char *filename;
+                /*const char *filename;
                 string exten = "({*" + EXTEN::anyInst + "})";
                 filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
                 if (filename == NULL)
+                    return;
+                */
+                filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
+                if (filename.empty())
                     return;
                 if (isRegularFile(string(filename)))
                         if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
@@ -1061,16 +1068,6 @@ Instance from 1 to 31}
           xywh {162 60 37 22} textsize 11
         }
       }
-      Fl_Button {} {
-        label test
-        callback {//
-        string testfile = setfiler("", true, TOPLEVEL::XML::Instrument);
-        if(!testfile.empty())
-            do_load_instrument(testfile);
-            
-        std::cout << testfile << std::endl;}
-        xywh {218 45 39 20} labelsize 12
-      }
     }
     comment {line spaces in boxes below are critical} {in_source in_header
     }
@@ -1448,10 +1445,10 @@ o->hide();}
     }
     Fl_Window filerwindow {
       callback {//
-        filerclose->do_callback();} open
+        filerclose->do_callback();}
       xywh {236 77 550 350} type Double hide resizable modal
     } {
-      Fl_Input filepath {
+      Fl_Input fileroldpath {
         label {Full path to file}
         callback {//
         if (Fl::event_key() == FL_Enter)
@@ -1463,15 +1460,19 @@ o->hide();}
             }
             if(!file::isDirectory(o->value()))
             {
-                if (choice(synth, "", "Yes", "No", "Create new directory") < 2)
+                if (choice(synth, "", "Yes", "No", "Create new directory?") < 2)
                     return;
                 if (file::createDir(o->value()))
+                {
                     alert(synth, "Unable to create directory here.");
-                
+                    return;
+                }
             }
             filerpath = string(o->value());
+            if (filerpath.back() != '/')
+                filerpath += '/';
             fillfiler();
-        }} selected
+        }}
         xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
@@ -1482,10 +1483,13 @@ o->hide();}
         if (result < 1)
             return;
         string line = string(filebrowse->text(result));
+
         if (line.find("Dir:") != std::string::npos)
         {
-            filerpath = filerpath + '/' + line.substr(5);
-            filepath->value(filerpath.c_str());
+            if (line.back() !='/')
+                line += '/';
+            filerpath = filerpath + line.substr(5);
+            fileroldpath->value(filerpath.c_str());
             fillfiler();
         }
         else if (dosave)
@@ -1494,7 +1498,7 @@ o->hide();}
         }
         else
         {
-            fileresult =  filerpath + '/' + line;
+            fileresult =  filerpath + line;
             filerwindow->hide();
         }}
         xywh {10 59 445 251} type Select labelsize 12 textsize 12
@@ -1504,11 +1508,11 @@ o->hide();}
         callback {if (filerpath == "/")
     return;
 
-size_t pos = filerpath.rfind('/');
-filerpath = filerpath.substr(0, pos);
+size_t pos = filerpath.rfind('/', filerpath.length() - 2);
+filerpath = filerpath.substr(0, pos +1);
 if (filerpath.empty())
     filerpath = "/";
-filepath->value(filerpath.c_str());
+fileroldpath->value(filerpath.c_str());
 fillfiler();}
         xywh {465 59 70 20} labelfont 1 labelsize 12
       }
@@ -1520,20 +1524,20 @@ fillfiler();}
         xywh {465 320 70 20} labelfont 1 labelsize 12
       }
       Fl_Group filernamegroup {
-        label Name
+        label Name open
         xywh {55 320 390 22} align 4 hide
       } {
         Fl_Button fileruse {
           label {< Use}
           callback {//
-    if (filerpath.rfind('/') != filerpath.length())
-        filerpath += "/";
-        
-    filerpath = string(filepath->value());
-    if (filerpath.rfind('/') != filerpath.length())
+    if (filerpath.back() != '/')
+        filerpath += '/';
+
+    filerpath = string(fileroldpath->value());
+    if (filerpath.back() != '/')
     {
-        filerpath += "/";
-        filepath->value(filerpath.c_str());
+        filerpath += '/';
+        fileroldpath->value(filerpath.c_str());
     }
     fileresult = filerpath + string(filernewname->value());
     filerwindow->hide();}
@@ -1547,7 +1551,7 @@ fillfiler();}
       }
     }
   }
-  Function {setfiler(string name, bool save, int extension)} {open return_type string
+  Function {setfiler(string name, bool save, int extension)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1562,11 +1566,14 @@ fillfiler();}
         size_t pos = lastname.rfind('/');
         path = lastname.substr(0, pos);
     }
-    
+
     if (save)
     {
         if (!name.empty())
-            filernewname->value(name.c_str());
+        {
+            size_t pos = name.rfind('/');
+            filernewname->value(name.substr(pos + 1).c_str());
+        }
         filernamegroup->show();
     }
     else
@@ -1576,15 +1583,14 @@ fillfiler();}
     {
         case TOPLEVEL::XML::Instrument:
         filerext = EXTEN::zynInst;
-        filepath->copy_label("Path to Instrument file");
+        fileroldpath->copy_label("Path to Instrument file");
         break;
     }
-   // if (filerpath.empty())
-    {
-    	filerpath = path;
-        filepath->value(path.c_str());
-    }
-    //filerext = extension;
+    if (path.back() != '/')
+        path += '/';
+    filerpath = path;
+    fileroldpath->value(path.c_str());
+
     fillfiler();
     filerwindow->show();
     while (filerwindow->visible())
