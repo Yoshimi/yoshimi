@@ -3072,7 +3072,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::saveNamedState: // done elsewhere
             break;
         case MAIN::control::readLastSeen: // read only
-            value = textMsgBuffer.push(synth->getLastfileAdded(value));
+            value = textMsgBuffer.push(synth->lastItemSeen(value));
             break;
         case MAIN::control::loadFileFromList:
             muteQueueWrite(getData);

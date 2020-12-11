@@ -2533,11 +2533,9 @@ string SynthEngine::lastItemSeen(int group)
         return "";
 
     vector<string> &listType = *getHistory(group);
-    vector<string>::iterator it = listType.begin();
-    if (it == listType.end())
+    if (listType.empty())
         return "";
-    else
-        return *it;
+    return *listType.begin();
 }
 
 

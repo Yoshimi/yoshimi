@@ -311,7 +311,7 @@ inline uint32_t copyDir(const string& source, const string& destination, char op
 
 /*
  * this fills the given list with all contents removing the
- * directory management from the callunbg functions.
+ * directory management from the calling functions.
  */
 inline int listDir(std::list<string>* dirList, const string& dirName)
 {
@@ -364,19 +364,44 @@ inline void dir2string(string &wanted, string currentDir, string exten)
                 wanted += ("Dir: " + line + "\n");
         }
     }
+    bool instype = ((exten == ".xiz") | (exten == ".xiy")  | (exten == ".xi*"));
+    string last;
+    last.clear();
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
     { // get files
         if (string(*it).front() != '.') // no hidden files
         {
+            string next;
             line = currentDir + *it;
             if (isRegularFile(line))
             {
-                if (findExtension(line) == exten)
-                    wanted += (*it + "\n");
+                next.clear();
+                if (instype)
+                {
+                    if (findExtension(line) == ".xiy" || findExtension(line) == ".xiz")
+                        next = *it;
+                }
+                else
+                {
+                  if (findExtension(line) == exten)
+                      next = *it;
+                }
+                // remove the extension, the source knows what it is
+                // and it must exist to have been found!
+                if (!next.empty())
+                {
+                    size_t pos = next.rfind('.');
+                    next = next.substr(0, pos);
+                    // also remove instrument type duplicates
+                    if (next != last)
+                    {
+                        last = next;
+                        wanted += (next + "\n");
+                    }
+                }
             }
         }
     }
-
     build.clear();
 }
 

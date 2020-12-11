@@ -436,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
                 if (filename == NULL)
                     return;
                 */
-                filename = setfiler(lastname, false, TOPLEVEL::XML::Instrument);
+                string filename = setfiler(lastname, false, TOPLEVEL::XML::Instrument);
                 if (filename.empty())
                     return;
                 do_load_instrument(filename);}
@@ -451,7 +451,7 @@ class MasterUI {: {private GuiUpdates}
                     return;
                 }
                 string newname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Instrument, MAIN::control::readLastSeen, TOPLEVEL::section::main));
-                if (newname == "" || findLeafName(newname) != synth->part[activePart]->Pname)
+                if (newname.empty() || findLeafName(newname) != synth->part[activePart]->Pname)
                 {
                     newname = synth->part[activePart]->Pname;
                     if (newname < "!")
@@ -463,13 +463,26 @@ class MasterUI {: {private GuiUpdates}
                 filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
                 if (filename == NULL)
                     return;
+                if (isRegularFile(string(filename)))
+                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                        return;
                 */
-                filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
+                string filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
                 if (filename.empty())
                     return;
-                if (isRegularFile(string(filename)))
-                        if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                // try to cover all possibilites!
+                int type = fetchData(0, CONFIG::control::savedInstrumentFormat,TOPLEVEL::section::config);
+                if ((type == 3 || type == 1) && isRegularFile(file::setExtension(filename, EXTEN::zynInst)))
+                {
+                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
+                }
+                else if ((type == 3 || type == 2) && isRegularFile(file::setExtension(filename, EXTEN::yoshInst)))
+                {
+                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                        return;
+                }
+
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
                 return;}
             tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
@@ -501,7 +514,7 @@ class MasterUI {: {private GuiUpdates}
           }
         }
         Submenu Parameters {
-          label {&Patch Sets}
+          label {&Patch Sets} open
           xywh {0 0 70 20} labelsize 12
           code0 {(void) o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Patch);}
@@ -516,7 +529,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem P_load {
             label {&Load External...}
             callback {//
-            do_load_master(NULL);}
+            do_load_master("");}
             tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
@@ -1560,14 +1573,17 @@ fillfiler();}
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     if (lastname.empty())
+    {
         path = synth->getRuntime().userHome;
+        filernewname->value("");
+    }
     else
     {
         size_t pos = lastname.rfind('/');
         path = lastname.substr(0, pos);
     }
 
-    if (save)
+    if (true)//save)
     {
         if (!name.empty())
         {
@@ -1584,6 +1600,10 @@ fillfiler();}
         case TOPLEVEL::XML::Instrument:
         filerext = EXTEN::zynInst;
         fileroldpath->copy_label("Path to Instrument file");
+        break;
+        case TOPLEVEL::XML::Patch:
+        filerext = EXTEN::patchset;
+        fileroldpath->copy_label("Path to Patch Set file");
         break;
     }
     if (path.back() != '/')
@@ -2681,50 +2701,30 @@ fillfiler();}
     partui->partgroup->deactivate();
     send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
-  Function {do_load_master(const char* file)} {} {
+  Function {do_load_master(string filename)} {} {
     code {//
-    const char *fname;
-    string lastname = synth->lastItemSeen(TOPLEVEL::XML::Patch);
-    if (lastname == "")
-        lastname = synth->getRuntime().userHome;
-    if (NULL != file)
-        fname = file;
-    else
+    if (filename.empty())
     {
-        string exten = "({*" + EXTEN::patchset + "})";
-        fname = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
-        if (fname == NULL)
-            return;
+    string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Patch, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+    filename = setfiler(lastname, false, TOPLEVEL::XML::Patch);
+    if (filename.empty())
+        return;
     }
-    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
+    send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
-  Function {do_save_master(const char* file = NULL)} {} {
+  Function {do_save_master()} {} {
     code {//
-    const char *fname;
-    string lastname = synth->getLastfileAdded(TOPLEVEL::XML::Patch);
-    if (lastname == "")
-        lastname = synth->getRuntime().userHome;
-    bool result = false;
-    if (file == NULL)
+    string newname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Patch, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+    string filename = setfiler(newname, true, TOPLEVEL::XML::Patch);
+    //std::cout << "file " << filename << std::endl;
+    if (filename.empty())
+        return;
+    if (isRegularFile(file::setExtension(filename, EXTEN::patchset)))
     {
-        string exten = "({*" + EXTEN::patchset + "})";
-        char *tmp = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
-        if (tmp == NULL)
+        if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
             return;
-        tmp = fl_filename_setext(tmp, EXTEN::patchset.c_str());
-        fname = tmp;
-        result = isRegularFile(tmp);
-        if (result)
-        {
-            result = false;
-            if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                return;
-        }
     }
-    else
-        fname = file;
-
-    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(fname)));} {}
+    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//

@@ -73,7 +73,7 @@ class ParametersUI {} {
                 Loading->show();
                 break;
             case TOPLEVEL::XML::Patch:
-                synth->getGuiMaster()->do_load_master(fle.c_str());
+                synth->getGuiMaster()->do_load_master(fle);
                 break;
         }
         Recent->hide();}
