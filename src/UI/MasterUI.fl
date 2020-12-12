@@ -149,7 +149,8 @@ class MasterUI {: {private GuiUpdates}
       activePart = 0;
       yoshiLog = NULL;
       queryDW = 0;
-      filerpath.clear();} {}
+      filerpath.clear();
+      lastfilerW = 0;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -209,6 +210,8 @@ class MasterUI {: {private GuiUpdates}
 
       if (filerwindow)
       {
+          if (filerwindow->visible())
+              saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), true, "Master-filer");
           filerwindow->hide();
           delete filerwindow;
       }
@@ -428,14 +431,6 @@ class MasterUI {: {private GuiUpdates}
             label {&Load External...}
             callback {//
                 string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Instrument, MAIN::control::readLastSeen, TOPLEVEL::section::main));
-                /*if (lastname == "")
-                    lastname = synth->getRuntime().userHome;
-                const char *filename;
-                string exten = "({*" + EXTEN::anyInst + "})";
-                filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
-                if (filename == NULL)
-                    return;
-                */
                 string filename = setfiler(lastname, false, TOPLEVEL::XML::Instrument);
                 if (filename.empty())
                     return;
@@ -458,15 +453,6 @@ class MasterUI {: {private GuiUpdates}
                         return;
                     newname = synth->getRuntime().userHome + newname;
                 }
-                /*const char *filename;
-                string exten = "({*" + EXTEN::anyInst + "})";
-                filename = fl_file_chooser("Save:", exten.c_str(), newname.c_str(), 0);
-                if (filename == NULL)
-                    return;
-                if (isRegularFile(string(filename)))
-                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                        return;
-                */
                 string filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
                 if (filename.empty())
                     return;
@@ -1457,12 +1443,15 @@ o->hide();}
       }
     }
     Fl_Window filerwindow {
+      label Yoshimi
       callback {//
         filerclose->do_callback();}
-      xywh {236 77 550 350} type Double hide resizable modal
+      xywh {236 77 550 350} type Double hide resizable
+      code0 {filerDW = o->w(); filerDH = o->h();}
+      code1 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Input fileroldpath {
-        label {Full path to file}
+        label {file paths}
         callback {//
         if (Fl::event_key() == FL_Enter)
         {
@@ -1533,12 +1522,13 @@ fillfiler();}
         label Close
         callback {//
         fileresult.clear();
-        filerwindow->hide();}
+        filerwindow->hide();
+        saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
         xywh {465 320 70 20} labelfont 1 labelsize 12
       }
       Fl_Group filernamegroup {
-        label Name open
-        xywh {55 320 390 22} align 4 hide
+        label Name
+        xywh {55 320 390 22} labelfont 1 labelsize 12 align 4
       } {
         Fl_Button fileruse {
           label {< Use}
@@ -1559,8 +1549,12 @@ fillfiler();}
         Fl_Input filernewname {
           callback {if (Fl::event_key() == FL_Enter)
     fileruse->do_callback();}
-          xywh {60 320 310 22} labelsize 12 textsize 12
+          xywh {60 320 310 22} labelsize 12 textfont 1 textsize 12
         }
+      }
+      Fl_Text_Display filernone {
+        label {No Entries}
+        xywh {200 210 50 30} box NO_BOX labelfont 1 labelsize 42
       }
     }
   }
@@ -1583,27 +1577,24 @@ fillfiler();}
         path = lastname.substr(0, pos);
     }
 
-    if (true)//save)
+    if (!name.empty())
     {
-        if (!name.empty())
-        {
-            size_t pos = name.rfind('/');
-            filernewname->value(name.substr(pos + 1).c_str());
-        }
-        filernamegroup->show();
+        size_t pos = name.rfind('/');
+        filernewname->value(name.substr(pos + 1).c_str());
     }
-    else
-        filernamegroup->hide();
+
+    lastfilerW = 0;
+    filernamegroup->show();
 
     switch(extension)
     {
         case TOPLEVEL::XML::Instrument:
         filerext = EXTEN::zynInst;
-        fileroldpath->copy_label("Path to Instrument file");
+        fileroldpath->copy_label("Path to Instruments");
         break;
         case TOPLEVEL::XML::Patch:
         filerext = EXTEN::patchset;
-        fileroldpath->copy_label("Path to Patch Set file");
+        fileroldpath->copy_label("Path to Patch Sets");
         break;
     }
     if (path.back() != '/')
@@ -1612,9 +1603,27 @@ fillfiler();}
     fileroldpath->value(path.c_str());
 
     fillfiler();
+
+    int X, Y, W, H, O;
+    loadWin(synth, W, H, X, Y, O, "Master-filer");
+    if (W < filerDW || H < filerDH)
+    {
+        W = filerDW;
+        H = filerDH;
+    }
+    checkSane(X, Y, W, H, filerDW, filerDH);
+    filerwindow->size(W, H);
+
     filerwindow->show();
     while (filerwindow->visible())
+    {
+        if (lastfilerW != filerwindow->w())
+        {
+            filerRtext();
+            lastfilerW = filerwindow->w();
+        }
         Fl::wait();
+    }
 
     return fileresult;} {}
   }
@@ -1623,8 +1632,11 @@ fillfiler();}
         string tofetch;
         file::dir2string(tofetch, filerpath, filerext);
         filebrowse->clear();
-        if (!tofetch.empty())
+        if (tofetch.empty())
+            filernone->show();
+        else
         {
+            filernone->hide();
             while(!tofetch.empty())
             {
                 size_t pos = tofetch.find("\\n");
@@ -1633,6 +1645,25 @@ fillfiler();}
                 tofetch = tofetch.substr(pos + 1);
             }
         }} {}
+  }
+  Function {filerRtext()} {} {
+    code {//
+        float dScale = filerwindow->w() / float(filerDW);
+        int size12 = int(12 * dScale);
+
+        fileroldpath->labelsize(size12);
+            fileroldpath->textsize(size12);
+        filebrowse->textsize(size12);
+        filernamegroup->labelsize(size12);
+            filernewname->textsize(size12);
+        fileruse->labelsize(size12);
+
+        filerback->labelsize(size12);
+        filerclose->labelsize(size12);
+
+        filernone->labelsize(int(42 * dScale));
+
+        filerwindow->redraw();} {}
   }
   Function {startInstance()} {} {
     code {//
@@ -3585,5 +3616,11 @@ fillfiler();}
   decl {string fileresult;} {private local
   }
   decl {bool dosave;} {private local
+  }
+  decl {int filerDW;} {private local
+  }
+  decl {int filerDH;} {private local
+  }
+  decl {int lastfilerW;} {private local
   }
 }

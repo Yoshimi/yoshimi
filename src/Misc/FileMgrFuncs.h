@@ -334,14 +334,18 @@ inline int listDir(std::list<string>* dirList, const string& dirName)
 }
 
 /*
- * we return the contets as sorted, sequential lists in directories
+ * we return the contents as sorted, sequential lists in directories
  * and file of the required type as a series of leaf names (as the
- * root directory is already known. The reduces the size of the
- * string to a manageable size.
- * Directories are prefixed to make the easier to identify.
+ * root directory is already known). This reduces the size of the
+ * string to a manageable length.
+ * Directories are prefixed to make them easier to identify.
  */
-inline void dir2string(string &wanted, string currentDir, string exten)
+inline void dir2string(string &wanted, string currentDir, string exten, int opt = 0)
 {
+    // options
+    // &1 allow hidden dirs
+    // &2 allow hidden files
+    // &4 allow wildcards
     std::list<string> build;
     wanted = "";
     uint32_t found = listDir(&build, currentDir);
@@ -355,7 +359,7 @@ inline void dir2string(string &wanted, string currentDir, string exten)
     string line;
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
     { // get directories
-        if (string(*it).front() != '.') // no hidden dirs
+        if (!(opt & 1) && string(*it).front() != '.') // no hidden dirs
         {
             line = *it;
             if (line.back() != '/')
@@ -369,36 +373,42 @@ inline void dir2string(string &wanted, string currentDir, string exten)
     last.clear();
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
     { // get files
-        if (string(*it).front() != '.') // no hidden files
+        if (!(opt & 2) && string(*it).front() != '.') // no hidden files
         {
             string next;
             line = currentDir + *it;
             if (isRegularFile(line))
             {
                 next.clear();
-                if (instype)
+                if (!(opt & 4))
                 {
-                    if (findExtension(line) == ".xiy" || findExtension(line) == ".xiz")
-                        next = *it;
-                }
-                else
-                {
-                  if (findExtension(line) == exten)
-                      next = *it;
-                }
-                // remove the extension, the source knows what it is
-                // and it must exist to have been found!
-                if (!next.empty())
-                {
-                    size_t pos = next.rfind('.');
-                    next = next.substr(0, pos);
-                    // also remove instrument type duplicates
-                    if (next != last)
+                    if (instype)
                     {
-                        last = next;
-                        wanted += (next + "\n");
+                        if (findExtension(line) == ".xiy" || findExtension(line) == ".xiz")
+                            next = *it;
+                    }
+                    else
+                    {
+                    if (findExtension(line) == exten)
+                        next = *it;
+                    }
+
+                    // remove the extension, the source knows what it is
+                    // and it must exist to have been found!
+                    if (!next.empty())
+                    {
+                        size_t pos = next.rfind('.');
+                        next = next.substr(0, pos);
+                        // also remove instrument type duplicates
+                        if (next != last)
+                        {
+                            last = next;
+                            wanted += (next + "\n");
+                        }
                     }
                 }
+                else
+                    next = *it;
             }
         }
     }
