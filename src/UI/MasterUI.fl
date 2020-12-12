@@ -586,7 +586,7 @@ class MasterUI {: {private GuiUpdates}
             callback {//
                 string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Scale, MAIN::control::readLastSeen, TOPLEVEL::section::main));
 
-                string filename = setfiler(lastname, false, TOPLEVEL::XML::Scale);
+                string filename = setfiler(lastname, true, TOPLEVEL::XML::Scale);
                 if (filename.empty())
                     return;
                 if (isRegularFile(file::setExtension(filename, EXTEN::scale)))
@@ -644,7 +644,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label {&Save...}
             callback {// for Alessandro
             string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::State, MAIN::control::readLastSeen, TOPLEVEL::section::main));
-            string filename = setfiler(lastname, false, TOPLEVEL::XML::State);
+            string filename = setfiler(lastname, true, TOPLEVEL::XML::State);
             if (filename.empty())
                 return;
             if (isRegularFile(file::setExtension(filename, EXTEN::state)))
@@ -1425,8 +1425,9 @@ Alan Calvert started the project}
     }
     Fl_Window textwindow {
       label Yoshimi
-      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false, "Master-textin");
-o->hide();}
+      callback {//
+      saveWin(synth, o->w(), o->h(), o->x(), o->y(), false, "Master-textin");
+      o->hide();}
       xywh {222 50 270 60} type Double hide resizable
       code0 {textinDW = o->w(); textinDH = o->h();}
       code1 {o->size_range(textinDW, textinDH, 0, 0, 0, 0, 1);} modal
@@ -1460,7 +1461,7 @@ o->hide();}
                     return;
                 if (file::createDir(o->value()))
                 {
-                    alert(synth, "Unable to create directory here.");
+                    alert(synth, "Unable to create a directory here.");
                     return;
                 }
             }
@@ -1502,14 +1503,14 @@ o->hide();}
       Fl_Button filerback {
         label Back
         callback {if (filerpath == "/")
-    return;
+            return;
 
-size_t pos = filerpath.rfind('/', filerpath.length() - 2);
-filerpath = filerpath.substr(0, pos +1);
-if (filerpath.empty())
-    filerpath = "/";
-fileroldpath->value(filerpath.c_str());
-fillfiler();}
+        size_t pos = filerpath.rfind('/', filerpath.length() - 2);
+        filerpath = filerpath.substr(0, pos +1);
+        if (filerpath.empty())
+            filerpath = "/";
+        fileroldpath->value(filerpath.c_str());
+        fillfiler();}
         xywh {465 59 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {

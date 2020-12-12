@@ -532,6 +532,7 @@ int Microtonal::loadscl(const string& filename)
     octavesize = nnotes;
     std::swap(octave, tmpoctave);
     synth->setAllPartMaps();
+    synth->addHistory(filename, TOPLEVEL::XML::ScalaTune);
     return nnotes;
 }
 
@@ -656,6 +657,7 @@ int Microtonal::loadkbm(const string& filename)
     PrefNote = tmpNote;
     PrefFreq = tmpPrefFreq;
     synth->setAllPartMaps();
+    synth->addHistory(filename, TOPLEVEL::XML::ScalaMap);
     return tmpMapSize;
 }
 

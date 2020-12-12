@@ -74,6 +74,8 @@ namespace { // Global implementation internal history data
     static vector<string> StateHistory;
     static vector<string> VectorHistory;
     static vector<string> MidiLearnHistory;
+    static vector<string> TuningHistory;
+    static vector<string> KeymapHistory;
 }
 
 
@@ -161,7 +163,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         sysefx[nefx] = NULL;
     fadeAll = 0;
 
-    for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
+    for (int i = 0; i <= TOPLEVEL::XML::ScalaMap; ++i)
         Runtime.historyLock[i] = false;
 
     // seed the shared master random number generator
@@ -479,7 +481,7 @@ void SynthEngine::defaults(void)
     Runtime.panLaw = MAIN::panningType::normal;
     ShutUp();
     Runtime.lastfileseen.clear();
-    for (int i = 0; i <= TOPLEVEL::XML::MLearn; ++i)
+    for (int i = 0; i <= TOPLEVEL::XML::ScalaMap; ++i)
     {
         Runtime.lastfileseen.push_back(Runtime.userHome);
         Runtime.sessionSeen[i] = false;
@@ -2474,10 +2476,18 @@ void SynthEngine::newHistory(string name, int group)
 
 void SynthEngine::addHistory(const string& name, int group)
 {
+    //std::cout << "history name " << name << "  group " << group << std::endl;
     if (Runtime.historyLock[group])
+    {
+        //std::cout << "history locked" << std::endl;
         return;
+    }
     if (findLeafName(name) < "!")
+    {
+        //std::cout << "failed leafname" << std::endl;
         return;
+    }
+
     vector<string> &listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
@@ -2507,6 +2517,13 @@ vector<string> * SynthEngine::getHistory(int group)
             break;
         case TOPLEVEL::XML::MLearn:
             return &MidiLearnHistory;
+            break;
+
+        case TOPLEVEL::XML::ScalaTune:
+            return &TuningHistory;
+            break;
+        case TOPLEVEL::XML::ScalaMap:
+            return &KeymapHistory;
             break;
         default:
             Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
@@ -2600,7 +2617,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
     {
         switch (count)
         {
@@ -2627,6 +2644,15 @@ bool SynthEngine::loadHistory()
             case TOPLEVEL::XML::MLearn:
                 type = "XMZ_MIDILEARN";
                 extension = "xly_file";
+                break;
+
+            case TOPLEVEL::XML::ScalaTune:
+                type = "XMZ_TUNING";
+                extension = "scl_file";
+                break;
+            case TOPLEVEL::XML::ScalaMap:
+                type = "XMZ_KEYMAP";
+                extension = "kbm_file";
                 break;
         }
         if (xml->enterbranch(type))
@@ -2673,7 +2699,7 @@ bool SynthEngine::saveHistory()
         int count;
         string type;
         string extension;
-        for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::MLearn; ++count)
+        for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
         {
             switch (count)
             {
@@ -2700,6 +2726,15 @@ bool SynthEngine::saveHistory()
                 case TOPLEVEL::XML::MLearn:
                     type = "XMZ_MIDILEARN";
                     extension = "xly_file";
+                    break;
+
+                case TOPLEVEL::XML::ScalaTune:
+                    type = "XMZ_TUNING";
+                    extension = "scl_file";
+                    break;
+                case TOPLEVEL::XML::ScalaMap:
+                    type = "XMZ_KEYMAP";
+                    extension = "kbm_file";
                     break;
             }
             vector<string> listType = *getHistory(count);

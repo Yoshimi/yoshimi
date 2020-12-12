@@ -226,12 +226,11 @@ class MicrotonalUI {} {
           Fl_Button importscl {
             label {Import .scl file}
             callback {//
-            string exten = "({*" + EXTEN::scalaTuning + "})";
-            const char *filename = fl_file_chooser("Open:", exten.c_str(), synth->getRuntime().userHome.c_str(), 0);
-            if (filename == NULL)
+            string lastname =  textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::ScalaTune, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+            string filename = setfiler(synth, lastname, false, TOPLEVEL::XML::ScalaTune);
+            if (filename.empty())
                 return;
-
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -351,12 +350,12 @@ class MicrotonalUI {} {
           Fl_Button importkbm {
             label {Import .kbm file}
             callback {//
-            string exten = "({*" + EXTEN::scalaKeymap + "})";
-            const char *filename = fl_file_chooser("Open:", exten.c_str(), synth->getRuntime().userHome.c_str(), 0);
-            if (filename == NULL)
+            string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::ScalaMap, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+            string filename = setfiler(synth, lastname, false, TOPLEVEL::XML::ScalaMap);
+            if (filename.empty())
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(filename)));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
@@ -578,7 +577,7 @@ class MicrotonalUI {} {
         fetchH = scaleDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, scaleDW, scaleDH);
-    
+
     microtonaluiwindow->resize(fetchX, fetchY, fetchW, fetchH);
     lastscaleW = 0;
     lastscaleSeen = true;
