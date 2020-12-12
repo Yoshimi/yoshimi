@@ -236,6 +236,10 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // insert any new lists here
         MLearn, //     learned MIDI CC lists
 
+        // not XML but there for consistency
+        ScalaTune,
+        ScalaMap,
+
         // only file types from here onwards
         Config,
         MasterConfig,

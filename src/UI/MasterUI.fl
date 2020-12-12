@@ -490,11 +490,11 @@ class MasterUI {: {private GuiUpdates}
           MenuItem I_search {
             label {S&earch...}
             callback {//
-        if (!synth->getRuntime().checksynthengines)
+        /*if (!synth->getRuntime().checksynthengines)
         {
             query("", "", "", "'Show engines/types' must be checked in Mixer Panel");
             return;
-        }
+        }*/
         bankui->ShowSearch();}
             xywh {0 0 34 20} labelsize 12
           }
@@ -575,32 +575,26 @@ class MasterUI {: {private GuiUpdates}
           MenuItem S_load {
             label {&Load...}
             callback {//
-    string lastname = synth->lastItemSeen(TOPLEVEL::XML::Scale);
-    if (lastname == "")
-        lastname = synth->getRuntime().userHome;
-    string exten = "({*" + EXTEN::scale + "})";
-    const char *filename = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
-    if (filename != NULL)
-        do_load_scale(string(filename));}
-            xywh {35 35 100 20} labelsize 12
+                string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Scale, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+                filename = setfiler(lastname, false, TOPLEVEL::XML::Scale);
+                if (!filename.empty())
+                    do_load_scale(string(filename));}
+                        xywh {35 35 100 20} labelsize 12
           }
           MenuItem S_save {
             label {&Save...}
             callback {//
-                string lastname = synth->getLastfileAdded(TOPLEVEL::XML::Scale);
-                if (lastname == "")
-                    lastname = synth->getRuntime().userHome;
+                string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Scale, MAIN::control::readLastSeen, TOPLEVEL::section::main));
 
-                char *filename;
-                string exten = "({*" + EXTEN::scale + "})";
-                filename = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
-                if (filename == NULL)
+                string filename = setfiler(lastname, false, TOPLEVEL::XML::Scale);
+                if (filename.empty())
                     return;
-                filename = fl_filename_setext(filename, EXTEN::scale.c_str());
-                if (isRegularFile(string(filename)))
+                if (isRegularFile(file::setExtension(filename, EXTEN::scale)))
+                {
                     if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
                         return;
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));}
+                }
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem RecentScale {
@@ -635,14 +629,11 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem loadState {
             label {&Load...}
             callback {// for Alessandro
-            string lastname = synth->lastItemSeen(TOPLEVEL::XML::State);
-            if (lastname == "")
-                lastname = synth->getRuntime().userHome;
-            string exten = "({*" + EXTEN::state + "})";
-            char *fle = fl_file_chooser("Load:", exten.c_str(), lastname.c_str(), 0);
-            if (fle)
+            string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::State, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+            string filename = setfiler(lastname, false, TOPLEVEL::XML::State);
+            if (!filename.empty())
             {
-                setState(fle);
+                setState(filename);
                 RecentState->activate();
             }
             else
@@ -652,16 +643,19 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
-            string lastname = synth->getLastfileAdded(TOPLEVEL::XML::State);
-            if (lastname == "")
-                lastname = synth->getRuntime().userHome;
-            string exten = "({*" + EXTEN::state + "})";
-            char *fle = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
-            if (fle)
+            string lastname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::State, MAIN::control::readLastSeen, TOPLEVEL::section::main));
+            string filename = setfiler(lastname, false, TOPLEVEL::XML::State);
+            if (filename.empty())
+                return;
+            if (isRegularFile(file::setExtension(filename, EXTEN::state)))
             {
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(fle)));
-                RecentState->activate();
-            }}
+                if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                    return;
+            }
+
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+            RecentState->activate();
+            }
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
           MenuItem Default {
@@ -1562,8 +1556,8 @@ fillfiler();}
   } {
     code {//
     dosave = save;
-    if (extension > TOPLEVEL::XML::MLearn)
-    return ""; // invalid in this contect
+    if (extension > TOPLEVEL::XML::ScalaMap)
+    return ""; // invalid in this context
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     if (lastname.empty())
@@ -1595,6 +1589,22 @@ fillfiler();}
         case TOPLEVEL::XML::Patch:
         filerext = EXTEN::patchset;
         fileroldpath->copy_label("Path to Patch Sets");
+        break;
+        case TOPLEVEL::XML::Scale:
+        filerext = EXTEN::scale;
+        fileroldpath->copy_label("Path to Scales");
+        break;
+        case TOPLEVEL::XML::State:
+        filerext = EXTEN::state;
+        fileroldpath->copy_label("Path to States");
+        break;
+        case TOPLEVEL::XML::ScalaTune:
+        filerext = EXTEN::scalaTuning;
+        fileroldpath->copy_label("Path to Scala tunings");
+        break;
+        case TOPLEVEL::XML::ScalaMap:
+        filerext = EXTEN::scalaKeymap;
+        fileroldpath->copy_label("Path to Scala keymaps");
         break;
     }
     if (path.back() != '/')
@@ -2272,7 +2282,7 @@ fillfiler();}
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
     code {//
-    if (one == "")
+    if (one.empty())
         yesQ->hide();
     else
     {
@@ -2287,7 +2297,7 @@ fillfiler();}
         yesQ->show();
     }
 
-    if (two == "")
+    if (two.empty())
         noQ->hide();
     else
     {
@@ -2301,7 +2311,7 @@ fillfiler();}
         }
         noQ->show();
     }
-    if (three == "")
+    if (three.empty())
     {
         cancelQ->copy_label("OK");
         typeQ->copy_label("!");
@@ -2747,7 +2757,6 @@ fillfiler();}
     code {//
     string newname = textMsgBuffer.fetch(fetchData(TOPLEVEL::XML::Patch, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string filename = setfiler(newname, true, TOPLEVEL::XML::Patch);
-    //std::cout << "file " << filename << std::endl;
     if (filename.empty())
         return;
     if (isRegularFile(file::setExtension(filename, EXTEN::patchset)))
