@@ -41,9 +41,6 @@ decl {\#include <unistd.h>} {public local
 decl {\#include <FL/Fl_Button.H>} {public local
 }
 
-decl {\#include <FL/Fl_File_Chooser.H>} {public local
-}
-
 decl {\#include <FL/Fl_Spinner.H>} {public local
 }
 

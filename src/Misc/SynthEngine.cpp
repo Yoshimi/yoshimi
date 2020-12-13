@@ -74,6 +74,7 @@ namespace { // Global implementation internal history data
     static vector<string> StateHistory;
     static vector<string> VectorHistory;
     static vector<string> MidiLearnHistory;
+    static vector<string> PadHistory;
     static vector<string> TuningHistory;
     static vector<string> KeymapHistory;
 }
@@ -2518,7 +2519,9 @@ vector<string> * SynthEngine::getHistory(int group)
         case TOPLEVEL::XML::MLearn:
             return &MidiLearnHistory;
             break;
-
+        case TOPLEVEL::XML::PadSample:
+            return &PadHistory;
+            break;
         case TOPLEVEL::XML::ScalaTune:
             return &TuningHistory;
             break;
@@ -2646,6 +2649,10 @@ bool SynthEngine::loadHistory()
                 extension = "xly_file";
                 break;
 
+            case TOPLEVEL::XML::PadSample:
+                type = "XMZ_PADSAMPLE";
+                extension = "wav_file";
+                break;
             case TOPLEVEL::XML::ScalaTune:
                 type = "XMZ_TUNING";
                 extension = "scl_file";
@@ -2728,6 +2735,10 @@ bool SynthEngine::saveHistory()
                     extension = "xly_file";
                     break;
 
+                case TOPLEVEL::XML::PadSample:
+                type = "XMZ_PADSAMPLE";
+                extension = "wav_file";
+                break;
                 case TOPLEVEL::XML::ScalaTune:
                     type = "XMZ_TUNING";
                     extension = "scl_file";

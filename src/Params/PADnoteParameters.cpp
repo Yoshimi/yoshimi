@@ -695,14 +695,14 @@ bool PADnoteParameters::export2wav(std::string basefilename)
     else
         type = "RIFX";
 
-    basefilename += "_PADsynth_";
+    basefilename += "--sample-";
     bool isOK = true;
     for (int k = 0; k < PAD_MAX_SAMPLES; ++k)
     {
         if (sample[k].smp == NULL)
             continue;
         char tmpstr[20];
-        snprintf(tmpstr, 20, "_%02d", k + 1);
+        snprintf(tmpstr, 20, "-%02d", k + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
         int nsmps = sample[k].size;
         unsigned int block;

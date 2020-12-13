@@ -34,7 +34,6 @@ This file is derivative of ZynAddSubFX original code
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
-    \#include <FL/Fl_File_Chooser.H>
     \#include <FL/fl_draw.H>
     \#include "Params/PADnoteParameters.h"
     \#include "UI/MiscGui.h"
@@ -1065,12 +1064,10 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button padExport {
         label Export
         callback {//
-        char *filename;
-        filename=fl_file_chooser("Export samples:","(*.wav)",NULL,0);
-        if (filename==NULL)
+        string filename = setfiler(synth, "PadSynth", true, TOPLEVEL::XML::PadSample);
+        if (filename.empty())
             return;
-        fl_filename_setext(filename,"");
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(string(filename)));}
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12 align 128
       }
       Fl_Button applybutton {

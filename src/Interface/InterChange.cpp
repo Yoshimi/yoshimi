@@ -883,7 +883,10 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             synth->partonoffWrite(partnum, -1);
             setpadparams(partnum, kititem);
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
+            {
+                synth->addHistory(text, TOPLEVEL::XML::PadSample);
                 text = "d " + text;
+            }
             else
                 text = " FAILED some samples " + text;
             newMsg = true;

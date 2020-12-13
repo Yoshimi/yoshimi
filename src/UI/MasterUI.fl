@@ -1614,29 +1614,33 @@ Alan Calvert started the project}
     switch(extension)
     {
         case TOPLEVEL::XML::Instrument:
-        filerext = EXTEN::zynInst;
-        fileroldpath->copy_label("Path to Instruments");
-        break;
+            filerext = EXTEN::zynInst;
+            fileroldpath->copy_label("Path to Instruments");
+            break;
         case TOPLEVEL::XML::Patch:
-        filerext = EXTEN::patchset;
-        fileroldpath->copy_label("Path to Patch Sets");
-        break;
+            filerext = EXTEN::patchset;
+            fileroldpath->copy_label("Path to Patch Sets");
+            break;
         case TOPLEVEL::XML::Scale:
-        filerext = EXTEN::scale;
-        fileroldpath->copy_label("Path to Scales");
-        break;
+            filerext = EXTEN::scale;
+            fileroldpath->copy_label("Path to Scales");
+            break;
         case TOPLEVEL::XML::State:
-        filerext = EXTEN::state;
-        fileroldpath->copy_label("Path to States");
-        break;
+            filerext = EXTEN::state;
+            fileroldpath->copy_label("Path to States");
+            break;
+        case TOPLEVEL::XML::PadSample:
+            filerext = EXTEN::MSwave;
+            fileroldpath->copy_label("Path to PadSynth samples");
+            break;
         case TOPLEVEL::XML::ScalaTune:
-        filerext = EXTEN::scalaTuning;
-        fileroldpath->copy_label("Path to Scala tunings");
-        break;
+            filerext = EXTEN::scalaTuning;
+            fileroldpath->copy_label("Path to Scala tunings");
+            break;
         case TOPLEVEL::XML::ScalaMap:
-        filerext = EXTEN::scalaKeymap;
-        fileroldpath->copy_label("Path to Scala keymaps");
-        break;
+            filerext = EXTEN::scalaKeymap;
+            fileroldpath->copy_label("Path to Scala keymaps");
+            break;
     }
     if (path.back() != '/')
         path += '/';
@@ -1681,7 +1685,7 @@ Alan Calvert started the project}
 
         file::dir2string(tofetch, filerpath, filerext, options);
         filebrowse->clear();
-        if (tofetch.empty())
+        if (!dosave && tofetch.empty())
             filernone->show();
         else
         {

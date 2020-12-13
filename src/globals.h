@@ -237,6 +237,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         MLearn, //     learned MIDI CC lists
 
         // not XML but there for consistency
+        PadSample,
         ScalaTune,
         ScalaMap,
 

@@ -32,9 +32,6 @@ This file is a derivative of the ZynAddSubFX original.
 } {selected in_source in_header
 }
 
-decl {\#include <FL/Fl_File_Chooser.H>} {public local
-}
-
 decl {\#include <FL/fl_ask.H>} {public local
 }
 
