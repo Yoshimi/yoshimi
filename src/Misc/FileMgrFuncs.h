@@ -346,6 +346,7 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
     // &1 allow hidden dirs
     // &2 allow hidden files
     // &4 allow wildcards
+    // &8 hide all subdirectories
     std::list<string> build;
     wanted = "";
     uint32_t found = listDir(&build, currentDir);
@@ -357,15 +358,18 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
    if(currentDir.back() != '/')
         currentDir += '/';
     string line;
-    for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
-    { // get directories
-        if (!(opt & 1) && string(*it).front() != '.') // no hidden dirs
-        {
-            line = *it;
-            if (line.back() != '/')
-                line += '/';
-            if (isDirectory(currentDir + line))
-                wanted += ("Dir: " + line + "\n");
+    if (!(opt & 8))
+    {
+        for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
+        { // get directories
+            if ((opt & 1) || string(*it).front() != '.') // no hidden dirs
+            {
+                line = *it;
+                if (line.back() != '/')
+                    line += '/';
+                if (isDirectory(currentDir + line))
+                    wanted += ("Dir: " + line + "\n");
+            }
         }
     }
     bool instype = ((exten == ".xiz") | (exten == ".xiy")  | (exten == ".xi*"));
@@ -373,14 +377,20 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
     last.clear();
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)
     { // get files
-        if (!(opt & 2) && string(*it).front() != '.') // no hidden files
+        if ((opt & 2) || string(*it).front() != '.') // no hidden files
         {
             string next;
             line = currentDir + *it;
             if (isRegularFile(line))
             {
                 next.clear();
-                if (!(opt & 4))
+                if ((opt & 4))
+                {
+                    next = *it;
+                    if (!next.empty())
+                        wanted += (next + "\n");
+                }
+                else
                 {
                     if (instype)
                     {
@@ -407,8 +417,6 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
                         }
                     }
                 }
-                else
-                    next = *it;
             }
         }
     }

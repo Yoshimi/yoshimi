@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -124,7 +124,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {selected : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -579,7 +579,7 @@ class MasterUI {: {private GuiUpdates}
                 filename = setfiler(lastname, false, TOPLEVEL::XML::Scale);
                 if (!filename.empty())
                     do_load_scale(string(filename));}
-                        xywh {35 35 100 20} labelsize 12
+            xywh {35 35 100 20} labelsize 12
           }
           MenuItem S_save {
             label {&Save...}
@@ -654,8 +654,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             }
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
-            RecentState->activate();
-            }
+            RecentState->activate();}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
           MenuItem Default {
@@ -1551,14 +1550,42 @@ Alan Calvert started the project}
         label {No Entries}
         xywh {200 210 50 30} box NO_BOX labelfont 1 labelsize 42
       }
+      Fl_Check_Button filerOpt8 {
+        label {Hide Dirs}
+        callback {//
+    if (o->value() != 0)
+        filerOpt1->deactivate();
+    else
+        filerOpt1->activate();
+    fillfiler();}
+        xywh {490 170 18 18} down_box DOWN_BOX labelsize 12 align 1
+      }
+      Fl_Check_Button filerOpt1 {
+        label {. (dot) Dirs}
+        callback {//
+    fillfiler();}
+        xywh {490 210 18 18} down_box DOWN_BOX labelsize 12 align 1
+      }
+      Fl_Check_Button filerOpt2 {
+        label {. (dot) Files}
+        callback {//
+    fillfiler();}
+        xywh {490 250 18 18} down_box DOWN_BOX labelsize 12 align 1
+      }
+      Fl_Check_Button filerOpt4 {
+        label Wildcards
+        callback {//
+    fillfiler();}
+        xywh {490 290 18 18} down_box DOWN_BOX labelsize 12 align 1 hide deactivate
+      }
     }
   }
   Function {setfiler(string name, bool save, int extension)} {return_type string
   } {
     code {//
     dosave = save;
-    if (extension > TOPLEVEL::XML::ScalaMap)
-    return ""; // invalid in this context
+    if (filerOpt4 && extension > TOPLEVEL::XML::ScalaMap)
+        return ""; // invalid in this context
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     if (lastname.empty())
@@ -1575,7 +1602,14 @@ Alan Calvert started the project}
     if (!name.empty())
     {
         size_t pos = name.rfind('/');
-        filernewname->value(name.substr(pos + 1).c_str());
+        string leaf = name.substr(pos + 1);
+        if (filerOpt4->value() == 0)
+        {
+            pos = leaf.find('.');
+            if (pos != string::npos)
+                leaf = leaf.substr(0, pos);
+        }
+        filernewname->value(leaf.c_str());
     }
 
     lastfilerW = 0;
@@ -1641,7 +1675,15 @@ Alan Calvert started the project}
   Function {fillfiler()} {} {
     code {//
         string tofetch;
-        file::dir2string(tofetch, filerpath, filerext);
+        int options = filerOpt1->value();
+        if (filerOpt2->value() > 0)
+            options |= 2;
+        if (filerOpt4->value() > 0)
+            options |= 4;
+        if (filerOpt8->value() > 0)
+            options |= 8;
+
+        file::dir2string(tofetch, filerpath, filerext, options);
         filebrowse->clear();
         if (tofetch.empty())
             filernone->show();
@@ -1670,6 +1712,12 @@ Alan Calvert started the project}
         fileruse->labelsize(size12);
 
         filerback->labelsize(size12);
+
+        filerOpt8->labelsize(size12);
+        filerOpt1->labelsize(size12);
+        filerOpt2->labelsize(size12);
+        filerOpt4->labelsize(size12);
+
         filerclose->labelsize(size12);
 
         filernone->labelsize(int(42 * dScale));
