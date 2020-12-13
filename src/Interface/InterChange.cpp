@@ -3072,8 +3072,8 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::saveNamedState: // done elsewhere
             break;
         case MAIN::control::readLastSeen: // read only
-            //std::cout << "last seen " << value << std::endl;
             value = textMsgBuffer.push(synth->lastItemSeen(value));
+            //value = textMsgBuffer.push(synth->getLastfileAdded(value));
             break;
         case MAIN::control::loadFileFromList:
             muteQueueWrite(getData);
