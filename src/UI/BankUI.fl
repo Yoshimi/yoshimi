@@ -44,9 +44,6 @@ decl {\#include <FL/Fl_Button.H>} {public local
 decl {\#include <FL/Fl_Spinner.H>} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
@@ -844,9 +841,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button addrootdirbutton {
         label {Add root directory...}
         callback {//
-        const char *dirname;
-        dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
-        if (!dirname)
+        // using 'false' here as we want to test for it
+        // rather than automatically create it.
+        string dirname = setfiler(synth, "", false, TOPLEVEL::XML::Dir);
+        if (dirname.empty())
             return;
         if (!file::isDirectory(dirname))
         {
@@ -1338,20 +1336,18 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     if (r_mode == 7)
     {
-    	const char *dirname;
-        dirname = fl_dir_chooser("Export a bank:",synth->getRuntime().userHome.c_str(), 0);
-        if (dirname)
+        string dirname = setfiler(synth, "", true, TOPLEVEL::XML::Dir);
+        if (!dirname.empty())
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
-   	setrootread();
+        setrootread();
     }
 
     if (r_mode == 6)
     {
-    	const char *dirname;
-        dirname = fl_dir_chooser("Import a new bank:",synth->getRuntime().userHome.c_str(), 0);
-        if (dirname)
+        string dirname = setfiler(synth, "", false, TOPLEVEL::XML::Dir);
+        if (!dirname.empty())
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::importBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
-   	setrootread();
+        setrootread();
     }
 
     if (r_mode == 5 && !thisname.empty())

@@ -29,12 +29,6 @@ This file is derivative of ZynAddSubFX original code.
 decl {\#include <cmath>} {public local
 }
 
-decl {\#include <FL/Fl_File_Chooser.H>} {public local
-}
-
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "Misc/Config.h"} {public local
 }
 
