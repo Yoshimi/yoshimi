@@ -58,3 +58,18 @@ void YoshiWin::resize(int x, int y, int w, int h)
   Fl::add_timeout(0.2, textResize, this);
   // ensure at least one refresh within FLTK update
 }
+
+/*
+ * In the header
+ *
+ * decl {\#include "UI/YoshiWin.h"} {public local
+}
+ * The code below should be placed in the window's callback
+ * and 'windowRtext()' then used to adjust text etc.
+ * every time the window is resized.
+ *
+if (Fl::event() == FL_CLOSE)
+              o->hide();
+          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
+              windowRtext();}
+*/

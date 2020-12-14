@@ -45,7 +45,6 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
-    \#include "UI/YoshiWin.h"
     \#include "Params/Controller.h"} {public global
 }
 

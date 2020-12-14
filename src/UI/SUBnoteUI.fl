@@ -32,8 +32,7 @@ This file is derivative of ZynAddSubFX original code
 } {selected in_source in_header
 }
 
-decl {\#include "UI/MiscGui.h"
-     \#include "UI/YoshiWin.h"} {public local
+decl {\#include "UI/MiscGui.h"} {public local
 }
 
 decl {\#include "UI/WidgetPDial.h"} {public local
@@ -713,7 +712,7 @@ class SUBnoteUI {: {public PresetsUI_}
         fetchH = subDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, subDW, subDH);
-    
+
     SUBparameters->resize(fetchX, fetchY, fetchW, fetchH);
     SUBparameters->show();
     lastsubW = 0;
@@ -725,7 +724,7 @@ class SUBnoteUI {: {public PresetsUI_}
     bandwidthenvelopegroup->wincheck();
     filterenv->wincheck();
     freqenvelopegroup->wincheck();
-    
+
     if (filterui->formantparswindow->visible())
         filterui->formantRtext();
 

@@ -35,9 +35,6 @@ This file is a derivative of the ZynAddSubFX original.
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -1118,7 +1115,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 }} {}
   }
   Function {refresh()} {} {
-    code {//    
+    code {//
     freemodebutton->value(env->Pfreemode);
 
     sustaincounter->value(env->Penvsustain);
@@ -1234,7 +1231,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     }
 
     //envwindow->resize(this->x(),this->y(),this->w(),this->h());
-    
+
     envwindow->show();} {}
   }
   Function {showfree()} {} {

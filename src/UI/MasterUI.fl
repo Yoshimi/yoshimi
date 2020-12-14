@@ -59,9 +59,6 @@ decl {\#include <fstream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "ADnoteUI.h"} {public local
 }
 

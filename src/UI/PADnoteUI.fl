@@ -44,9 +44,6 @@ decl {\#include <FL/Fl_Box.H>
     \#include "FilterUI.h"} {private global
 }
 
-decl {\#include "UI/YoshiWin.h"} {private global
-}
-
 decl {\#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
 }

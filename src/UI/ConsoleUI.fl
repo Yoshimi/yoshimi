@@ -109,21 +109,21 @@ class ConsoleUI {} {
         fetchW = logDW;
         fetchH = logDH;
     }
-    
+
     // can't use checkSane() here w/h are independent
     int maxW = Fl::w() - 5; // wiggle room
     int maxH = Fl::h() - 30; // space for minimal titlebar
-    
+
     if ((fetchX + fetchW) > maxW) // postion
-        fetchX = maxW / 2;        
+        fetchX = maxW / 2;
     if ((fetchY + fetchH) > maxH)
         fetchY = maxH / 2;
-        
+
     if(fetchW > maxW / 2) // sensible max size
         fetchW = maxW / 2;
     if(fetchH > maxH / 2)
         fetchH = maxH / 2;
-    
+
     logConsole->resize(fetchX, fetchY, fetchW, fetchH);
     lastlogW = 0;
     logConsole->show();

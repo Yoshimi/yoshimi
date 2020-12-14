@@ -35,9 +35,6 @@ This file is a derivative of the ZynAddSubFX original
 decl {\#include <iostream>} {public local
 }
 
-decl {\#include "UI/MiscGui.h"} {public local
-}
-
 decl {\#include "UI/YoshiWin.h"} {public local
 }
 
