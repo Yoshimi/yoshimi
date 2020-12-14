@@ -2500,36 +2500,37 @@ void SynthEngine::addHistory(const string& name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
+    //std::cout << "group " << group << std::endl;
     switch(group)
     {
-        case TOPLEVEL::XML::Instrument:
+        case TOPLEVEL::XML::Instrument: // 0
             return &InstrumentHistory;
             break;
-        case TOPLEVEL::XML::Patch:
+        case TOPLEVEL::XML::Patch: // 1
             return &ParamsHistory;
             break;
-        case TOPLEVEL::XML::Presets:
+        case TOPLEVEL::XML::Presets: // 2
             return &PresetHistory;
             break;
-        case TOPLEVEL::XML::Scale:
+        case TOPLEVEL::XML::Scale: // 3
             return &ScaleHistory;
             break;
-        case TOPLEVEL::XML::State:
+        case TOPLEVEL::XML::State: // 4
             return &StateHistory;
             break;
-        case TOPLEVEL::XML::Vector:
+        case TOPLEVEL::XML::Vector: // 5
             return &VectorHistory;
             break;
-        case TOPLEVEL::XML::MLearn:
+        case TOPLEVEL::XML::MLearn: // 6
             return &MidiLearnHistory;
             break;
-        case TOPLEVEL::XML::PadSample:
+        case TOPLEVEL::XML::PadSample: // 7
             return &PadHistory;
             break;
-        case TOPLEVEL::XML::ScalaTune:
+        case TOPLEVEL::XML::ScalaTune: // 8
             return &TuningHistory;
             break;
-        case TOPLEVEL::XML::ScalaMap:
+        case TOPLEVEL::XML::ScalaMap: // 9
             return &KeymapHistory;
             break;
         default:

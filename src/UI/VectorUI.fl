@@ -866,35 +866,19 @@ switch (res)
   }
   Function {loadVector(string fname)} {} {
     code {//
-    if (fname == "")
+    if (fname.empty())
     {
-        string lastname = synth->lastItemSeen(TOPLEVEL::XML::Vector);
-        if (lastname == "")
-            lastname = synth->getRuntime().userHome;
-        char *filename;
-        string exten = "({*" + EXTEN::vector + "})";
-        filename = fl_file_chooser("Open:", exten.c_str(), lastname.c_str(), 0);
-        if (filename == NULL)
+        fname = setfiler(synth, "", false, TOPLEVEL::XML::Vector);
+        if (fname.empty())
             return;
-        fname = string(filename);
     }
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::loadNamedVector, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
-    string lastname = synth->getLastfileAdded(TOPLEVEL::XML::Vector);
-    if (lastname == "")
-        lastname = synth->getRuntime().userHome;
-    const char *file = NULL;
-    string exten = "({*" + EXTEN::vector + "})";
-    file = fl_file_chooser("Save:", exten.c_str(), lastname.c_str(), 0);
-    if (file == NULL)
+    string filename = setfiler(synth, "", true, TOPLEVEL::XML::Vector);
+    if (filename.empty())
         return;
-
-    string filename = setExtension(string(file), "xvy");
-    if (isRegularFile(filename))
-        if (choice(synth, "", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-            return;
     int pos = loadlabel[BaseChan].find("No Name");
     if (pos >=0 && pos < 2)
         Loaded->copy_label(findLeafName(filename).c_str());

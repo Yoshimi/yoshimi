@@ -453,18 +453,6 @@ class MasterUI {: {private GuiUpdates}
          string filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
          if (filename.empty())
              return;
-         // try to cover all possibilites!
-         int type = fetchData(0, CONFIG::control::savedInstrumentFormat,TOPLEVEL::section::config);
-         if ((type == 3 || type == 1) && isRegularFile(file::setExtension(filename, EXTEN::zynInst)))
-         {
-             if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                 return;
-         }
-         else if ((type == 3 || type == 2) && isRegularFile(file::setExtension(filename, EXTEN::yoshInst)))
-         {
-             if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                 return;
-         }
 
          send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
          return;}
@@ -583,11 +571,6 @@ class MasterUI {: {private GuiUpdates}
                 string filename = setfiler("", true, TOPLEVEL::XML::Scale);
                 if (filename.empty())
                     return;
-                if (isRegularFile(file::setExtension(filename, EXTEN::scale)))
-                {
-                    if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                        return;
-                }
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));}
             xywh {25 25 100 20} labelsize 12
           }
@@ -638,12 +621,6 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             callback {// for Alessandro
             string filename = setfiler("", true, TOPLEVEL::XML::State);
             if (filename.empty())
-                return;
-            if (isRegularFile(file::setExtension(filename, EXTEN::state)))
-            {
-                if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                    return;
-            }
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
             RecentState->activate();}
@@ -1651,6 +1628,14 @@ Alan Calvert started the project}
                 filerext = EXTEN::state;
                 fileroldpath->copy_label("Path to States");
                 break;
+            case TOPLEVEL::XML::Vector:
+                filerext = EXTEN::vector;
+                fileroldpath->copy_label("Path to Vectors");
+                break;
+            case TOPLEVEL::XML::MLearn:
+                filerext = EXTEN::mlearn;
+                fileroldpath->copy_label("Path to Midi-Learn files");
+                break;
             case TOPLEVEL::XML::PadSample:
                 filerext = EXTEN::MSwave;
                 fileroldpath->copy_label("Path to PadSynth samples");
@@ -1695,8 +1680,36 @@ Alan Calvert started the project}
         }
         Fl::wait();
     }
-    if (extension == TOPLEVEL::XML::Dir && fileresult.back() != '/')
-        fileresult += '/';
+    if (extension == TOPLEVEL::XML::Dir)
+    {
+        if (fileresult.back() != '/')
+            fileresult += '/';
+    }
+    else if (dosave)
+    {
+        if (extension == TOPLEVEL::XML::Instrument)
+        { // try to cover all possibilites!
+            int type = fetchData(0, CONFIG::control::savedInstrumentFormat,TOPLEVEL::section::config);
+            if ((type == 3 || type == 1) && isRegularFile(fileresult + EXTEN::zynInst))
+            {
+                if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                    fileresult.clear();
+            }
+            else if ((type == 3 || type == 2) && isRegularFile(fileresult + EXTEN::yoshInst))
+            {
+                if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+                    fileresult.clear();
+            }
+        }
+        else if (isRegularFile(fileresult + filerext))
+        {
+            if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
+            {
+                fileresult.clear();
+            }
+        }
+    }
+
     return fileresult;} {}
   }
   Function {fillfiler()} {} {
@@ -2835,11 +2848,6 @@ Alan Calvert started the project}
     string filename = setfiler("", true, TOPLEVEL::XML::Patch);
     if (filename.empty())
         return;
-    if (isRegularFile(file::setExtension(filename, EXTEN::patchset)))
-    {
-        if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-            return;
-    }
     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
   Function {refresh_master_ui(int type)} {} {
