@@ -1441,7 +1441,7 @@ Alan Calvert started the project}
         callback {//
         if (Fl::event_key() == FL_Enter)
         {
-            if (!dosave)
+            if (filerOpt16 || !dosave)
             {
                 alert(synth, "Not a valid directory.");
                 return;
@@ -1519,8 +1519,6 @@ Alan Calvert started the project}
         Fl_Button fileruse {
           label {< Use}
           callback {//
-    if (filerpath.back() != '/')
-        filerpath += '/';
 
     filerpath = string(fileroldpath->value());
     if (filerpath.back() != '/')
@@ -1529,6 +1527,10 @@ Alan Calvert started the project}
         fileroldpath->value(filerpath.c_str());
     }
     fileresult = filerpath + string(filernewname->value());
+    if (fileresult == filerpath)
+        filerclose->do_callback();
+    if (filerOpt16 && fileresult.back() != '/')
+        fileresult += '/';
     filerwindow->hide();}
           xywh {380 320 60 20} labelfont 1 labelsize 12
         }
@@ -1570,6 +1572,12 @@ Alan Calvert started the project}
     fillfiler();}
         xywh {490 290 18 18} down_box DOWN_BOX labelsize 12 align 1 hide deactivate
       }
+      Fl_Check_Button filerOpt16 {
+        label {Hide Files}
+        callback {//
+    ;}
+        xywh {490 96 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
+      }
     }
   }
   Function {setfiler(string name, bool save, int extension)} {return_type string
@@ -1581,66 +1589,83 @@ Alan Calvert started the project}
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     size_t pos = string::npos;
-    if (lastname.empty())
+
+    if (extension == TOPLEVEL::XML::Dir)
     {
         path = synth->getRuntime().userHome;
         filernewname->value("");
+        filerOpt16->value(1);
+        filerOpt8->hide();
+        filerOpt2->hide();
     }
     else
     {
-        pos = lastname.rfind('/');
-        path = lastname.substr(0, pos);
-    }
-
-    if (name.empty() && pos != string::npos)
-    {
-        name = lastname.substr(pos + 1);
-    }
-
-    if (!name.empty())
-    {
-        if (filerOpt4->value() == 0)
+        if (lastname.empty())
         {
-            pos = name.find('.');
-            if (pos != string::npos)
-                name = name.substr(0, pos);
+            path = synth->getRuntime().userHome;
+            filernewname->value("");
         }
-        filernewname->value(name.c_str());
-    }
+        else
+        {
+            pos = lastname.rfind('/');
+            path = lastname.substr(0, pos);
+        }
 
-    lastfilerW = 0;
-    filernamegroup->show();
+        if (name.empty() && pos != string::npos)
+        {
+            name = lastname.substr(pos + 1);
+        }
+        filerOpt16->value(0);
+        filerOpt8->show();
+        filerOpt2->show();
 
-    switch(extension)
-    {
-        case TOPLEVEL::XML::Instrument:
-            filerext = EXTEN::zynInst;
-            fileroldpath->copy_label("Path to Instruments");
-            break;
-        case TOPLEVEL::XML::Patch:
-            filerext = EXTEN::patchset;
-            fileroldpath->copy_label("Path to Patch Sets");
-            break;
-        case TOPLEVEL::XML::Scale:
-            filerext = EXTEN::scale;
-            fileroldpath->copy_label("Path to Scales");
-            break;
-        case TOPLEVEL::XML::State:
-            filerext = EXTEN::state;
-            fileroldpath->copy_label("Path to States");
-            break;
-        case TOPLEVEL::XML::PadSample:
-            filerext = EXTEN::MSwave;
-            fileroldpath->copy_label("Path to PadSynth samples");
-            break;
-        case TOPLEVEL::XML::ScalaTune:
-            filerext = EXTEN::scalaTuning;
-            fileroldpath->copy_label("Path to Scala tunings");
-            break;
-        case TOPLEVEL::XML::ScalaMap:
-            filerext = EXTEN::scalaKeymap;
-            fileroldpath->copy_label("Path to Scala keymaps");
-            break;
+        if (!name.empty())
+        {
+            if (filerOpt4->value() == 0)
+            {
+                pos = name.find('.');
+                if (pos != string::npos)
+                    name = name.substr(0, pos);
+            }
+            filernewname->value(name.c_str());
+        }
+
+        switch(extension)
+        {
+            case TOPLEVEL::XML::Instrument:
+                filerext = EXTEN::zynInst;
+                fileroldpath->copy_label("Path to Instruments");
+                break;
+            case TOPLEVEL::XML::Patch:
+                filerext = EXTEN::patchset;
+                fileroldpath->copy_label("Path to Patch Sets");
+                break;
+            case TOPLEVEL::XML::Presets:
+                filerext = EXTEN::presets;
+                fileroldpath->copy_label("Path to Presets");
+                break;
+
+            case TOPLEVEL::XML::Scale:
+                filerext = EXTEN::scale;
+                fileroldpath->copy_label("Path to Scales");
+                break;
+            case TOPLEVEL::XML::State:
+                filerext = EXTEN::state;
+                fileroldpath->copy_label("Path to States");
+                break;
+            case TOPLEVEL::XML::PadSample:
+                filerext = EXTEN::MSwave;
+                fileroldpath->copy_label("Path to PadSynth samples");
+                break;
+            case TOPLEVEL::XML::ScalaTune:
+                filerext = EXTEN::scalaTuning;
+                fileroldpath->copy_label("Path to Scala tunings");
+                break;
+            case TOPLEVEL::XML::ScalaMap:
+                filerext = EXTEN::scalaKeymap;
+                fileroldpath->copy_label("Path to Scala keymaps");
+                break;
+        }
     }
     if (path.back() != '/')
         path += '/';
@@ -1659,7 +1684,10 @@ Alan Calvert started the project}
     checkSane(X, Y, W, H, filerDW, filerDH);
     filerwindow->size(W, H);
 
+    lastfilerW = 0;
+    filernamegroup->show();
     filerwindow->show();
+
     while (filerwindow->visible())
     {
         if (lastfilerW != filerwindow->w())
@@ -1682,6 +1710,8 @@ Alan Calvert started the project}
             options |= 4;
         if (filerOpt8->value() > 0)
             options |= 8;
+        if (filerOpt16->value() > 0)
+            options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
         filebrowse->clear();

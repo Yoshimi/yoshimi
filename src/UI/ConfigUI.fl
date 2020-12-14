@@ -822,9 +822,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button addpreset {
         label {Add preset directory...}
         callback {//
-                    const char *dirname;
-                    dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
-                    if (!dirname)
+                    string dirname = setfiler(synth, "", true, TOPLEVEL::XML::Dir);
+                    if (dirname.empty())
                         return;
 
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::addPresetRootDir, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));

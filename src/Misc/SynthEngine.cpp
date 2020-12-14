@@ -72,6 +72,7 @@ namespace { // Global implementation internal history data
     static vector<string> ParamsHistory;
     static vector<string> ScaleHistory;
     static vector<string> StateHistory;
+    static vector<string> PresetHistory;
     static vector<string> VectorHistory;
     static vector<string> MidiLearnHistory;
     static vector<string> PadHistory;
@@ -2507,6 +2508,9 @@ vector<string> * SynthEngine::getHistory(int group)
         case TOPLEVEL::XML::Patch:
             return &ParamsHistory;
             break;
+        case TOPLEVEL::XML::Presets:
+            return &PresetHistory;
+            break;
         case TOPLEVEL::XML::Scale:
             return &ScaleHistory;
             break;
@@ -2632,6 +2636,10 @@ bool SynthEngine::loadHistory()
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
                 break;
+            case TOPLEVEL::XML::Presets:
+                type = "XMZ_PRESETS";
+                extension = "xpz_file";
+                break;
             case TOPLEVEL::XML::Scale:
                 type = "XMZ_SCALE";
                 extension = "xsz_file";
@@ -2717,6 +2725,10 @@ bool SynthEngine::saveHistory()
                 case TOPLEVEL::XML::Patch:
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";
+                    break;
+                case TOPLEVEL::XML::Presets:
+                    type = "XMZ_PRESETS";
+                    extension = "xpz_file";
                     break;
                 case TOPLEVEL::XML::Scale:
                     type = "XMZ_SCALE";

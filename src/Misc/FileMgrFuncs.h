@@ -49,6 +49,7 @@ const string yoshInst =      ".xiy";
 const string anyInst =       ".xi*";
 const string patchset =      ".xmz";
 const string state =         ".state";
+const string presets =       ".xpz";
 const string scale =         ".xsz";
 const string scalaTuning =   ".scl";
 const string scalaKeymap =   ".kbm";
@@ -347,6 +348,7 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
     // &2 allow hidden files
     // &4 allow wildcards
     // &8 hide all subdirectories
+    // &16 hide files (just looking for dirs)
     std::list<string> build;
     wanted = "";
     uint32_t found = listDir(&build, currentDir);
@@ -371,6 +373,11 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
                     wanted += ("Dir: " + line + "\n");
             }
         }
+    }
+    if (opt & 16)
+    {
+        build.clear();
+        return;
     }
     bool instype = ((exten == ".xiz") | (exten == ".xiy")  | (exten == ".xi*"));
     string last;

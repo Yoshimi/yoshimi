@@ -132,7 +132,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         return;
     }
 
-    if (synth->getRuntime().xmlType <= TOPLEVEL::XML::Scale || synth->getRuntime().xmlType == TOPLEVEL::XML::Presets)
+    if (synth->getRuntime().xmlType <= TOPLEVEL::XML::Scale)
     {
             beginbranch("BASE_PARAMETERS");
                 addpar("max_midi_parts", NUM_MIDI_CHANNELS);
