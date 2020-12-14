@@ -1528,9 +1528,7 @@ Alan Calvert started the project}
     }
     fileresult = filerpath + string(filernewname->value());
     if (fileresult == filerpath)
-        filerclose->do_callback();
-    if (filerOpt16 && fileresult.back() != '/')
-        fileresult += '/';
+        filerclose->do_callback();;
     filerwindow->hide();}
           xywh {380 320 60 20} labelfont 1 labelsize 12
         }
@@ -1697,7 +1695,8 @@ Alan Calvert started the project}
         }
         Fl::wait();
     }
-
+    if (extension == TOPLEVEL::XML::Dir && fileresult.back() != '/')
+        fileresult += '/';
     return fileresult;} {}
   }
   Function {fillfiler()} {} {
