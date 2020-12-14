@@ -230,6 +230,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     bufferbytes = buffersize * sizeof(float);
 
     oscilsize_f = oscilsize = Runtime.Oscilsize;
+    if (oscilsize < (buffersize / 2))
+    {
+        Runtime.Log("Enforcing oscilsize to half buffersize, "
+                    + asString(oscilsize) + " -> " + asString(buffersize / 2));
+        oscilsize_f = oscilsize = buffersize / 2;
+    }
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     oscil_sample_step_f = oscilsize_f / samplerate_f;
 
@@ -256,14 +262,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     fadeStep = 1.0f / 0.1f / samplerate_f; // 100ms for 0 to 1
     fadeStepShort = 1.0f / 0.005f / samplerate_f; // 5ms for 0 to 1
     ControlStep = 127.0f / 0.2f / samplerate_f; // 200ms for 0 to 127
-
-    if (oscilsize < (buffersize / 2))
-    {
-        Runtime.Log("Enforcing oscilsize to half buffersize, "
-                    + asString(oscilsize) + " -> " + asString(buffersize / 2));
-        oscilsize_f = oscilsize = buffersize / 2;
-        halfoscilsize_f = halfoscilsize = oscilsize / 2;
-    }
 
     if (!(fft = new FFTwrapper(oscilsize)))
     {
