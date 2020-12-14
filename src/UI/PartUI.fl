@@ -2244,6 +2244,10 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlSeen = false;
     ctlmidiSeen = false;
     atSeen = false;
+    lastfxW = 0;
+    lastkitW = 0;
+    lastmidiW = 0;
+    lastatW = 0;
     lastkititem = -1;} {}
   }
   Function {updatecontrollers()} {} {
@@ -2722,11 +2726,6 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {wincheck()} {} {
     code {//
-    static int lastfxW = 0;
-    static int lastkitW = 0;;
-    static int lastmidiW = 0;
-    static int lastatW = 0;
-
     if (instrumenteditwindow->visible())
         editRtext();
 
@@ -3190,5 +3189,13 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {float kitDH;} {public local
   }
   decl {bool kitSeen;} {private local
+  }
+  decl {int lastfxW;} {private local
+  }
+  decl {int lastkitW;} {private local
+  }
+  decl {int lastmidiW;} {private local
+  }
+  decl {int lastatW;} {private local
   }
 }

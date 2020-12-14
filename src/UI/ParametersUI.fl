@@ -103,6 +103,7 @@ class ParametersUI {} {
   Function {ParametersUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
+    lastParamW = 0;
     make_window();} {}
   }
   Function {Show(int _type)} {} {
@@ -179,7 +180,6 @@ class ParametersUI {} {
   }
   Function {paramRtext()} {} {
     code {//
-    static int lastParamW = 0;
     if (lastParamW == Recent->w())
         return;
     lastParamW = Recent->w();
@@ -201,5 +201,7 @@ class ParametersUI {} {
   decl {int paramDW;} {private local
   }
   decl {int paramDH;} {private local
+  }
+  decl {int lastParamW;} {private local
   }
 }

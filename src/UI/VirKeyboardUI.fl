@@ -164,7 +164,7 @@ class VirKeys {: {public Fl_Box}
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {//
     int i;
@@ -326,8 +326,7 @@ class VirKeys {: {public Fl_Box}
   }
 }
 
-class VirKeyboard {open
-} {
+class VirKeyboard {} {
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}

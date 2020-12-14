@@ -72,6 +72,8 @@ class PresetsUI {} {
     synth = _synth;
     p = NULL;
     make_window();
+    copyW = 0;
+    pasteW = 0;
     presetsDW = 265; // these are shared between both
     presetsDH = 430;} {}
   }
@@ -308,7 +310,7 @@ o->hide();}
         H = presetsDH;
     }
     checkSane(X, Y, W, H, presetsDW, presetsDH, true);
-    
+
     copywin->resize(X, Y, W, H);
     pastewin->resize(X, Y, W, H);
     presetsRtext();} {}
@@ -318,9 +320,6 @@ o->hide();}
   }
   Function {presetsRtext()} {} {
     code {//
-    static int copyW = 0;
-    static int pasteW = 0;
-
     if (copywin->visible())
     {
         if (copyW != copywin->w())
@@ -377,5 +376,9 @@ o->hide();}
   decl {int presetsDW;} {private local
   }
   decl {int presetsDH;} {private local
+  }
+  decl {int copyW;} {private local
+  }
+  decl {int pasteW;} {private local
   }
 }

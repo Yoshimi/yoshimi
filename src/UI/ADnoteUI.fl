@@ -2698,6 +2698,7 @@ switch (num)
         resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
         lastlistW = 0;
         listSeen = false;
+        lastResuiW = 0;
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual
@@ -2804,8 +2805,6 @@ switch (num)
   }
   Function {wincheck()} {} {
     code {//
-    static int lastResuiW = 0;
-
     addRtext();
     addVoiceRtext();
 
@@ -3026,6 +3025,8 @@ switch (num)
   decl {bool listSeen;} {public local
   }
   decl {ResonanceUI *resui;} {public local
+  }
+  decl {int lastResuiW;} {private local
   }
   decl {int nvoice;} {public local
   }

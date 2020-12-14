@@ -149,6 +149,15 @@ class MasterUI {: {private GuiUpdates}
       activePart = 0;
       yoshiLog = NULL;
       queryDW = 0;
+
+      lastmainW = 0;
+      lastpanelW = 0;
+      lastmsgW = 0;
+      lastsyseffW = 0;
+      lastvirtW = 0;
+      lastaboutW = 0;
+      oldW = 0;
+
       filerpath.clear();
       lastfilerW = 0;} {}
   }
@@ -3219,13 +3228,6 @@ Alan Calvert started the project}
   }
   Function {wincheck()} {} {
     code {//
-    static int lastmainW = 0;
-    static int lastpanelW = 0;
-    static int lastmsgW = 0;
-    static int lastsyseffW = 0;
-    static int lastvirtW = 0;
-    static int lastaboutW = 0;
-    static int oldW = 0;
     /*
      * Below is a pragmatic method of making tooltips
      * fairly readable at all screen resolutions.
@@ -3715,5 +3717,19 @@ Alan Calvert started the project}
   decl {int filerDH;} {private local
   }
   decl {int lastfilerW;} {private local
+  }
+  decl {int lastmainW} {private local
+  }
+  decl {int lastpanelW} {private local
+  }
+  decl {int lastmsgW} {private local
+  }
+  decl {int lastsyseffW} {private local
+  }
+  decl {int lastvirtW} {private local
+  }
+  decl {int lastaboutW} {private local
+  }
+  decl {int oldW} {private local
   }
 }
