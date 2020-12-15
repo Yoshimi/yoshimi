@@ -223,7 +223,7 @@ class MicrotonalUI {} {
           Fl_Button importscl {
             label {Import .scl file}
             callback {//
-            string filename = setfiler(synth, "", false, TOPLEVEL::XML::ScalaTune);
+            string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaTune);
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
@@ -346,7 +346,7 @@ class MicrotonalUI {} {
           Fl_Button importkbm {
             label {Import .kbm file}
             callback {//
-            string filename = setfiler(synth, "", false, TOPLEVEL::XML::ScalaMap);
+            string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaMap);
             if (filename.empty())
                 return;
 

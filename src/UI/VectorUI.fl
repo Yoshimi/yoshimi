@@ -867,7 +867,7 @@ switch (res)
     code {//
     if (fname.empty())
     {
-        fname = setfiler(synth, "", false, TOPLEVEL::XML::Vector);
+        fname = setfiler(synth,"", "", false, TOPLEVEL::XML::Vector);
         if (fname.empty())
             return;
     }
@@ -875,7 +875,7 @@ switch (res)
   }
   Function {saveVector()} {} {
     code {//
-    string filename = setfiler(synth, "", true, TOPLEVEL::XML::Vector);
+    string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::Vector);
     if (filename.empty())
         return;
     int pos = loadlabel[BaseChan].find("No Name");

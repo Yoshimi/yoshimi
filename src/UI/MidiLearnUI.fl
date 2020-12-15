@@ -399,7 +399,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button load {
         label Load
         callback {//
-        string filename = setfiler(synth, "", false, TOPLEVEL::XML::MLearn);
+        string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::MLearn);
         if (filename.empty())
             return;
         loadMidi(filename);}
@@ -408,7 +408,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       Fl_Button save {
         label Save
         callback {//
-        string filename = setfiler(synth, "", true, TOPLEVEL::XML::MLearn);
+        string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::MLearn);
         if (filename.empty())
             return;
         send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) filename));

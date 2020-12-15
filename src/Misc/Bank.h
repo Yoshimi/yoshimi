@@ -118,7 +118,7 @@ class Bank
         int changeBankName(size_t rootID, size_t bankID, const string& newName);
         bool loadbank(size_t rootID, size_t banknum);
         std::string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
-        std::string importBank(const string& importdir, size_t rootID, unsigned int bankID);
+        std::string importBank(string importdir, size_t rootID, unsigned int bankID);
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(const string& newbankdir, size_t rootID);

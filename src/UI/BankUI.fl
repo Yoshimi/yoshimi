@@ -843,7 +843,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         callback {//
         // using 'false' here as we want to test for it
         // rather than automatically create it.
-        string dirname = setfiler(synth, "", false, TOPLEVEL::XML::Dir);
+        string dirname = setfiler(synth,"", "", false, TOPLEVEL::XML::Dir);
         if (dirname.empty())
             return;
         if (!file::isDirectory(dirname))
@@ -1336,16 +1336,16 @@ class BankUI {: {public BankProcess_, RootProcess_}
 
     if (r_mode == 7)
     {
-        string dirname = setfiler(synth, "", true, TOPLEVEL::XML::Dir);
-        if (!dirname.empty())
+        string dirname = setfiler(synth,"Path for Bank Export", "bank", true, TOPLEVEL::XML::Dir);
+        if (dirname.length() > 2)
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
         setrootread();
     }
 
     if (r_mode == 6)
     {
-        string dirname = setfiler(synth, "", false, TOPLEVEL::XML::Dir);
-        if (!dirname.empty())
+        string dirname = setfiler(synth,"Bank to Import", "", false, TOPLEVEL::XML::Dir);
+        if (dirname.length() > 2)
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::importBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
         setrootread();
     }
@@ -1389,8 +1389,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
 
     if (r_mode == 3 && !thisname.empty())
-    {   // Remove bank and file contents (choices reversed for 'No' priority)
-        if (choice(synth, "", "Yes", "No", "Completely remove " + thisname + "?") > 1)
+    {
+        if (choice(synth, "", "Yes", "No", "Completely clear " + thisname + "?") > 1)
         {
             int clearit = true;
             int count = bank->getBankSize(slot, rt);

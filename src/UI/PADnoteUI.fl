@@ -1061,7 +1061,7 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button padExport {
         label Export
         callback {//
-        string filename = setfiler(synth, "PadSynth", true, TOPLEVEL::XML::PadSample);
+        string filename = setfiler(synth,"", "PadSynth", true, TOPLEVEL::XML::PadSample);
         if (filename.empty())
             return;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}

@@ -121,7 +121,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 
 void alert(SynthEngine *synth, string message);
 int choice(SynthEngine *synth, string one, string two, string three, string message);
-string setfiler(SynthEngine *synth, string name, bool save, int extension);
+string setfiler(SynthEngine *synth, string title, string name, bool save, int extension);
 string input_text(SynthEngine *synth, string label, string text);
 
 string convert_value(ValueType type, float val);

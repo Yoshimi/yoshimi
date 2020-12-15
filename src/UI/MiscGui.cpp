@@ -158,9 +158,9 @@ int choice(SynthEngine *synth, string one, string two, string three, string mess
     return synth->getGuiMaster()->query(one, two, three, message);
 }
 
-string setfiler(SynthEngine *synth, string name, bool save, int extension)
+string setfiler(SynthEngine *synth, string title, string name, bool save, int extension)
 {
-    return synth->getGuiMaster()->setfiler(name, save, extension);
+    return synth->getGuiMaster()->setfiler(title, name, save, extension);
 }
 
 string input_text(SynthEngine *synth, string label, string text)

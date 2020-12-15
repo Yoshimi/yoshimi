@@ -474,7 +474,7 @@ string Bank::exportBank(const string& exportdir, size_t rootID, unsigned int ban
 
 
 // Creates a new bank and copies in the contents of the external one
-string Bank::importBank(const string& importdir, size_t rootID, unsigned int bankID)
+string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 {
     string name = "";
     bool ok = true;
@@ -502,6 +502,8 @@ string Bank::importBank(const string& importdir, size_t rootID, unsigned int ban
         }
         else
         {
+            if (importdir.back() == '/')
+                importdir = importdir.substr(0, importdir.length() - 1);
             string bankname = findLeafName(importdir);
             int repeats = 0;
             string suffix = "";
@@ -688,12 +690,15 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
     // ID file only removed when bank cleared
     if (deleteFile(IDfile))
         chk = 1;
-
+/*
+ * This was dangeous!
+ * Could have deleted shared directories
+ *
     if (chk > 0)
     chk = deleteDir(bankName);
     if (chk == 0)
         return (" FAILED Can't remove " + bankName + ". Unrecognised contents may still exist.");
-
+*/
     roots [rootID].banks.erase(bankID);
     if (rootID == synth->getRuntime().currentRoot && bankID == synth->getRuntime().currentBank)
         setCurrentBankID(0, false);

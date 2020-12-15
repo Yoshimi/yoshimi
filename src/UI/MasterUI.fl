@@ -153,7 +153,7 @@ class MasterUI {: {private GuiUpdates}
       lastsyseffW = 0;
       lastvirtW = 0;
       lastaboutW = 0;
-      oldW = 0;
+      oldH = 0;
 
       filerpath.clear();
       lastfilerW = 0;} {}
@@ -436,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem I_load {
             label {&Load External...}
             callback {//
-                string filename = setfiler("", false, TOPLEVEL::XML::Instrument);
+                string filename = setfiler("", "", false, TOPLEVEL::XML::Instrument);
                 if (filename.empty())
                     return;
                 do_load_instrument(filename);}
@@ -456,7 +456,7 @@ class MasterUI {: {private GuiUpdates}
              query("", "", "", "Nothing to save!");
              return;
          }
-         string filename = setfiler(newname, true, TOPLEVEL::XML::Instrument);
+         string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);
          if (filename.empty())
              return;
 
@@ -566,7 +566,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem S_load {
             label {&Load...}
             callback {//
-                filename = setfiler("", false, TOPLEVEL::XML::Scale);
+                filename = setfiler("", "", false, TOPLEVEL::XML::Scale);
                 if (!filename.empty())
                     do_load_scale(string(filename));}
             xywh {35 35 100 20} labelsize 12
@@ -574,7 +574,7 @@ class MasterUI {: {private GuiUpdates}
           MenuItem S_save {
             label {&Save...}
             callback {//
-                string filename = setfiler("", true, TOPLEVEL::XML::Scale);
+                string filename = setfiler("", "", true, TOPLEVEL::XML::Scale);
                 if (filename.empty())
                     return;
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));}
@@ -612,7 +612,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem loadState {
             label {&Load...}
             callback {// for Alessandro
-            string filename = setfiler("", false, TOPLEVEL::XML::State);
+            string filename = setfiler("", "", false, TOPLEVEL::XML::State);
             if (!filename.empty())
             {
                 setState(filename);
@@ -625,7 +625,7 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
           MenuItem saveState {
             label {&Save...}
             callback {// for Alessandro
-            string filename = setfiler("", true, TOPLEVEL::XML::State);
+            string filename = setfiler("", "", true, TOPLEVEL::XML::State);
             if (filename.empty())
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
@@ -1472,7 +1472,7 @@ Alan Calvert started the project}
             fileresult =  filerpath + line;
             filerwindow->hide();
         }}
-        xywh {10 59 445 251} type Select labelsize 12 textsize 12
+        xywh {10 91 445 251} type Select labelsize 12 textsize 12
       }
       Fl_Button filerback {
         label Back
@@ -1485,7 +1485,7 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler();}
-        xywh {465 59 70 20} labelfont 1 labelsize 12
+        xywh {465 57 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1497,11 +1497,17 @@ Alan Calvert started the project}
       }
       Fl_Group filernamegroup {
         label Name
-        xywh {55 320 390 22} labelfont 1 labelsize 12 align 4
+        xywh {55 57 320 22} labelfont 1 labelsize 12 align 4
       } {
-        Fl_Button fileruse {
-          label {< Use}
-          callback {//
+        Fl_Input filernewname {
+          callback {if (Fl::event_key() == FL_Enter)
+    fileruse->do_callback();}
+          xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
+        }
+      }
+      Fl_Button fileruse {
+        label {< Use}
+        callback {//
 
     filerpath = string(fileroldpath->value());
     if (filerpath.back() != '/')
@@ -1509,21 +1515,16 @@ Alan Calvert started the project}
         filerpath += '/';
         fileroldpath->value(filerpath.c_str());
     }
-    fileresult = filerpath + string(filernewname->value());
-    if (fileresult == filerpath)
-        filerclose->do_callback();;
+    string leaf = string(filernewname->value());
+    if (dosave && leaf.empty())
+    {
+        alert(synth, "Nothing given to save");
+        return;
+    }
+    fileresult = filerpath + leaf;
+
     filerwindow->hide();}
-          xywh {380 320 60 20} labelfont 1 labelsize 12
-        }
-        Fl_Input filernewname {
-          callback {if (Fl::event_key() == FL_Enter)
-    fileruse->do_callback();}
-          xywh {60 320 310 22} labelsize 12 textfont 1 textsize 12
-        }
-      }
-      Fl_Text_Display filernone {
-        label {No Entries}
-        xywh {200 210 50 30} box NO_BOX labelfont 1 labelsize 42
+        xywh {380 57 60 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -1561,7 +1562,7 @@ Alan Calvert started the project}
       }
     }
   }
-  Function {setfiler(string name, bool save, int extension)} {return_type string
+  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1570,9 +1571,16 @@ Alan Calvert started the project}
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     size_t pos = string::npos;
+    fileruse->copy_label("< Use");
+    filernamegroup->show();
 
     if (extension == TOPLEVEL::XML::Dir)
     {
+        if (!dosave)
+        {
+            fileruse->copy_label("^ Use");
+            filernamegroup->hide();
+        }
         path = synth->getRuntime().userHome;
         filernewname->value("");
         filerOpt16->value(1);
@@ -1656,6 +1664,8 @@ Alan Calvert started the project}
                 break;
         }
     }
+    if (!title.empty())
+        fileroldpath->copy_label(title.c_str());
     if (path.back() != '/')
         path += '/';
     filerpath = path;
@@ -1674,7 +1684,7 @@ Alan Calvert started the project}
     filerwindow->size(W, H);
 
     lastfilerW = 0;
-    filernamegroup->show();
+    //filernamegroup->show();
     filerwindow->show();
 
     while (filerwindow->visible())
@@ -1688,8 +1698,16 @@ Alan Calvert started the project}
     }
     if (extension == TOPLEVEL::XML::Dir)
     {
-        if (fileresult.back() != '/')
-            fileresult += '/';
+        if (dosave)
+        {
+            if (string(filernewname->value()).length() < 3)
+                fileresult.clear();
+        }
+        else
+        {
+            if (fileresult.back() != '/')
+                fileresult += '/';
+        }
     }
     else if (dosave)
     {
@@ -1733,18 +1751,12 @@ Alan Calvert started the project}
 
         file::dir2string(tofetch, filerpath, filerext, options);
         filebrowse->clear();
-        if (!dosave && tofetch.empty())
-            filernone->show();
-        else
+        while(!tofetch.empty())
         {
-            filernone->hide();
-            while(!tofetch.empty())
-            {
-                size_t pos = tofetch.find("\\n");
-                string next = tofetch.substr(0, pos);
-                filebrowse->add(next.c_str());
-                tofetch = tofetch.substr(pos + 1);
-            }
+            size_t pos = tofetch.find("\\n");
+            string next = tofetch.substr(0, pos);
+            filebrowse->add(next.c_str());
+            tofetch = tofetch.substr(pos + 1);
         }} {}
   }
   Function {filerRtext()} {} {
@@ -1767,8 +1779,6 @@ Alan Calvert started the project}
         filerOpt4->labelsize(size12);
 
         filerclose->labelsize(size12);
-
-        filernone->labelsize(int(42 * dScale));
 
         filerwindow->redraw();} {}
   }
@@ -2843,7 +2853,7 @@ Alan Calvert started the project}
     code {//
     if (filename.empty())
     {
-        filename = setfiler("", false, TOPLEVEL::XML::Patch);
+        filename = setfiler("", "", false, TOPLEVEL::XML::Patch);
         if (filename.empty())
             return;
     }
@@ -2851,7 +2861,7 @@ Alan Calvert started the project}
   }
   Function {do_save_master()} {} {
     code {//
-    string filename = setfiler("", true, TOPLEVEL::XML::Patch);
+    string filename = setfiler("", "", true, TOPLEVEL::XML::Patch);
     if (filename.empty())
         return;
     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedPatchset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
@@ -3228,13 +3238,13 @@ Alan Calvert started the project}
     /*
      * Below is a pragmatic method of making tooltips
      * fairly readable at all screen resolutions.
-     * 1024 is the reference width.
+     * 768 is the reference height.
      */
-        if (oldW != Fl::w())
+        if (oldH != Fl::h())
         {
-            int setsize = int((10.0f / 1024.0f) * Fl::w());
+            int setsize = int((11.0f / 768.0f) * Fl::h());
             Fl_Tooltip::size(setsize);
-            oldW = Fl::w();
+            oldH = Fl::h();
             std::cout << "tipset " << setsize << "  actual " <<  Fl_Tooltip::size() << std::endl;
 
             Showmaster(); // ensure it's always completely visible
@@ -3727,6 +3737,6 @@ Alan Calvert started the project}
   }
   decl {int lastaboutW} {private local
   }
-  decl {int oldW} {private local
+  decl {int oldH} {private local
   }
 }
