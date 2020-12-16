@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -301,7 +301,8 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1489,7 +1490,7 @@ Alan Calvert started the project}
         xywh {465 57 70 20} labelfont 1 labelsize 12
       }
       Fl_Group faveGroup {
-        label Favourites open
+        label Favourites
         xywh {460 100 80 60} box ENGRAVED_FRAME
       } {}
       Fl_Button faveadd {
@@ -1569,7 +1570,7 @@ Alan Calvert started the project}
         label Wildcards
         callback {//
     fillfiler();}
-        xywh {490 187 18 18} down_box DOWN_BOX labelsize 12 align 1 deactivate
+        xywh {490 187 18 18} down_box DOWN_BOX labelsize 12 align 1 hide deactivate
       }
       Fl_Check_Button filerOpt16 {
         label {Hide Files}
@@ -1590,10 +1591,8 @@ Alan Calvert started the project}
         int result = favebrowse->value();
         if (result < 1)
             return;
-        string line = string(favebrowse->text(result));
-
-        std::cout << line << std::endl;}
-          xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textsize 12
+        string line = string(favebrowse->text(result));}
+          xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
         }
         Fl_Button favecancel {
           label Exit
@@ -1640,7 +1639,7 @@ Alan Calvert started the project}
       }
     }
   }
-  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
+  Function {setfiler(string title, string name, bool save, int extension)} {open return_type string
   } {
     code {//
     dosave = save;
@@ -1660,7 +1659,7 @@ Alan Calvert started the project}
             fileruse->copy_label("^ Use");
             filernamegroup->hide();
         }
-        path = synth->getRuntime().userHome;
+        path = string(favebrowse->text(1));
         filernewname->value("");
         filerOpt16->value(1);
         filerOpt8->hide();
@@ -1670,7 +1669,7 @@ Alan Calvert started the project}
     {
         if (lastname.empty())
         {
-            path = synth->getRuntime().userHome;
+            path = string(favebrowse->text(1));
             filernewname->value("");
         }
         else
@@ -1813,7 +1812,8 @@ Alan Calvert started the project}
         }
     }
     savefavourites();
-    return fileresult;} {}
+    return fileresult;} {selected
+    }
   }
   Function {fillfiler()} {} {
     code {//
@@ -1877,15 +1877,19 @@ Alan Calvert started the project}
     code {//
         float dScale = filerwindow->w() / float(filerDW);
         int size12 = int(12 * dScale);
+        int size14 = int(14 * dScale);
 
         fileroldpath->labelsize(size12);
             fileroldpath->textsize(size12);
         filebrowse->textsize(size12);
         filernamegroup->labelsize(size12);
             filernewname->textsize(size12);
+        faveGroup->labelsize(size14);
         fileruse->labelsize(size12);
 
         filerback->labelsize(size12);
+        faveadd->labelsize(size12);
+        filerfave->labelsize(size12);
 
         filerOpt8->labelsize(size12);
         filerOpt1->labelsize(size12);
@@ -1893,6 +1897,13 @@ Alan Calvert started the project}
         filerOpt4->labelsize(size12);
 
         filerclose->labelsize(size12);
+
+        favename->labelsize(size14);
+        favebrowse->textsize(size12);
+        favecancel->labelsize(size12);
+        favedefault->labelsize(size12);
+        favedelete->labelsize(size12);
+        faveset->labelsize(size12);
 
         filerwindow->redraw();} {}
   }
