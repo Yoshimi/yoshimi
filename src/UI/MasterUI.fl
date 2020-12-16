@@ -1476,7 +1476,8 @@ Alan Calvert started the project}
       }
       Fl_Button filerback {
         label Back
-        callback {if (filerpath == "/")
+        callback {//
+        if (filerpath == "/")
             return;
 
         size_t pos = filerpath.rfind('/', filerpath.length() - 2);
@@ -1486,6 +1487,22 @@ Alan Calvert started the project}
         fileroldpath->value(filerpath.c_str());
         fillfiler();}
         xywh {465 57 70 20} labelfont 1 labelsize 12
+      }
+      Fl_Group faveGroup {
+        label Favourites open
+        xywh {460 100 80 60} box ENGRAVED_FRAME
+      } {}
+      Fl_Button faveadd {
+        label Add
+        callback {//
+    favebrowse->insert(1,fileroldpath->value());}
+        xywh {465 105 70 20} labelfont 1 labelsize 12
+      }
+      Fl_Button filerfave {
+        label Manage
+        callback {//
+        setfavourites();}
+        xywh {465 135 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1534,31 +1551,92 @@ Alan Calvert started the project}
     else
         filerOpt1->activate();
     fillfiler();}
-        xywh {490 170 18 18} down_box DOWN_BOX labelsize 12 align 1
+        xywh {490 222 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt1 {
         label {. (dot) Dirs}
         callback {//
     fillfiler();}
-        xywh {490 210 18 18} down_box DOWN_BOX labelsize 12 align 1
+        xywh {490 259 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt2 {
         label {. (dot) Files}
         callback {//
     fillfiler();}
-        xywh {490 250 18 18} down_box DOWN_BOX labelsize 12 align 1
+        xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt4 {
         label Wildcards
         callback {//
     fillfiler();}
-        xywh {490 290 18 18} down_box DOWN_BOX labelsize 12 align 1 hide deactivate
+        xywh {490 187 18 18} down_box DOWN_BOX labelsize 12 align 1 deactivate
       }
       Fl_Check_Button filerOpt16 {
         label {Hide Files}
         callback {//
     ;}
-        xywh {490 96 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
+        xywh {490 130 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
+      }
+      Fl_Group favourites {
+        xywh {5 48 542 299} box FLAT_BOX hide
+      } {
+        Fl_Group favename {open
+          xywh {10 53 527 28} box ENGRAVED_FRAME
+        } {}
+        Fl_Browser favebrowse {
+          callback {//
+        if (!favebrowse->value())
+            return;
+        int result = favebrowse->value();
+        if (result < 1)
+            return;
+        string line = string(favebrowse->text(result));
+
+        std::cout << line << std::endl;}
+          xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textsize 12
+        }
+        Fl_Button favecancel {
+          label Exit
+          callback {//
+    filernewname->activate();
+    fileruse->activate();
+    filerback->activate();
+    filerfave->activate();
+    filerclose->activate();
+    filebrowse->activate();
+    favourites->hide();}
+          xywh {455 57 70 20} labelfont 1 labelsize 12
+        }
+        Fl_Button favedefault {
+          label Default
+          callback {//
+    size_t pos = favebrowse->value();
+    if (pos > 0)
+        favebrowse->move(1, pos);}
+          xywh {315 57 70 20} labelfont 1 labelsize 12
+        }
+        Fl_Button favedelete {
+          label Delete
+          callback {//
+    size_t pos = favebrowse->value();
+    if (pos > 0)
+        favebrowse->remove(pos);}
+          xywh {166 57 70 20} labelfont 1 labelsize 12
+        }
+        Fl_Button faveset {
+          label Set
+          callback {//
+    size_t pos = favebrowse->value();
+    if (pos > 0)
+    {
+        filerpath = string(favebrowse->text(pos));
+        if (filerpath.back() != '/')
+            filerpath += '/';
+    	fileroldpath->value(filerpath.c_str());
+    }
+    favecancel->do_callback();}
+          xywh {20 57 70 20} labelfont 1 labelsize 12
+        }
       }
     }
   }
@@ -1566,6 +1644,7 @@ Alan Calvert started the project}
   } {
     code {//
     dosave = save;
+    loadfavourites();
     if (filerOpt4 == 0 && extension > TOPLEVEL::XML::ScalaMap)
         return ""; // invalid in this context
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
@@ -1733,7 +1812,7 @@ Alan Calvert started the project}
             }
         }
     }
-
+    savefavourites();
     return fileresult;} {}
   }
   Function {fillfiler()} {} {
@@ -1758,6 +1837,41 @@ Alan Calvert started the project}
             filebrowse->add(next.c_str());
             tofetch = tofetch.substr(pos + 1);
         }} {}
+  }
+  Function {setfavourites()} {} {
+    code {//
+    filernewname->deactivate();
+    fileruse->deactivate();
+    filerback->deactivate();
+    filerfave->deactivate();
+    filerclose->deactivate();
+    filebrowse->deactivate();
+    favourites->show();} {}
+  }
+  Function {loadfavourites()} {} {
+    code {//
+        string favetext = file::loadText(synth->getRuntime().ConfigDir + "/yoshimi-favourites");
+        if (favetext.empty())
+            favetext = synth->getRuntime().userHome;
+        favebrowse->clear();
+        string cr = "\\n";
+        for (int count = 0; count < 20; ++count)
+        {
+            size_t pos = favetext.find(cr);
+            string next = favetext.substr(0, pos);
+            favebrowse->add(next.c_str());
+            favetext = favetext.substr(pos + 1);
+            if (pos == string::npos)
+                break;
+        }} {}
+  }
+  Function {savefavourites()} {} {
+    code {//
+    string favetext;
+    string cr = "\\n";
+    for (int i = 1; i <= favebrowse->size(); ++ i)
+        favetext += (string(favebrowse->text(i)) + cr);
+    file::saveText(favetext, synth->getRuntime().ConfigDir + "/yoshimi-favourites");} {}
   }
   Function {filerRtext()} {} {
     code {//
