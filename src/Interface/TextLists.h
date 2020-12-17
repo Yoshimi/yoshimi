@@ -174,7 +174,7 @@ static std::string toplist [] = {
     "  DEtune <n>",             "master fine detune",
     "  SOlo [s]",               "channel 'solo' switch type (ROw, COlumn, LOop, TWoway, CHannel {other} off)",
     "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
-    "  CLear <n>",              "restore instrument n to default settings",
+    "  CLear <n>",              "restore instrument on part n to default settings",
     "end"
 };
 

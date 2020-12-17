@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -301,8 +301,7 @@ class MasterUI {open : {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1425,27 +1424,29 @@ Alan Calvert started the project}
         callback {//
         if (Fl::event_key() == FL_Enter)
         {
-            if (filerOpt16 || !dosave)
+            string name = string(o->value());
+            if (name.back() != '/')
+                name += "/";
+            if(!file::isDirectory(name))
             {
-                alert(synth, "Not a valid directory.");
-                return;
-            }
-            if(!file::isDirectory(o->value()))
-            {
-                if (choice(synth, "", "Yes", "No", "Create new directory?") < 2)
-                    return;
-                if (file::createDir(o->value()))
+                if (!dosave)
                 {
-                    alert(synth, "Unable to create a directory here.");
+                    alert(synth, "Not a valid path to load from.");
+                    return;
+                }
+                if (choice(synth, "", "Yes", "No", "Add to path?") < 2)
+                    return;
+                if (file::createDir(name))
+                {
+                    alert(synth, "Unable to change a path here.");
                     return;
                 }
             }
-            filerpath = string(o->value());
-            if (filerpath.back() != '/')
-                filerpath += '/';
+            filerpath = name;
+            o->value(name.c_str());
             fillfiler();
         }}
-        xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
+        tooltip {Current path to save to (editable)} xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
         callback {//
@@ -1487,23 +1488,42 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler();}
-        xywh {465 57 70 20} labelfont 1 labelsize 12
+        tooltip {Go up one directory in path} xywh {465 57 70 20} labelfont 1 labelsize 12
       }
       Fl_Group faveGroup {
         label Favourites
-        xywh {460 100 80 60} box ENGRAVED_FRAME
+        xywh {460 100 80 90} box ENGRAVED_FRAME
       } {}
       Fl_Button faveadd {
         label Add
         callback {//
-    favebrowse->insert(1,fileroldpath->value());}
-        xywh {465 105 70 20} labelfont 1 labelsize 12
+    string name = string(fileroldpath->value());
+    if (name.back() != '/')
+        name += "/";
+    if (!file::isDirectory(name))
+    {
+        alert(synth, "Not a valid path");;
+        return;
+    }
+    fileroldpath->value(name.c_str());
+    filerpath = name;
+    favebrowse->insert(1,name.c_str());
+    setfavourites();}
+        tooltip {Add the current path to the favourites list} xywh {465 105 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerfave {
         label Manage
         callback {//
         setfavourites();}
-        xywh {465 135 70 20} labelfont 1 labelsize 12
+        tooltip {Examine, re-order or delete entries} xywh {465 135 70 20} labelfont 1 labelsize 12
+      }
+      Fl_Button filerset {
+        label {Set Path}
+        callback {//
+        fileroldpath->value(favebrowse->text(1));
+        filerpath = string(fileroldpath->value());
+        fillfiler();}
+        tooltip {Set the current path to the favourites default} xywh {465 165 70 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1520,7 +1540,7 @@ Alan Calvert started the project}
         Fl_Input filernewname {
           callback {if (Fl::event_key() == FL_Enter)
     fileruse->do_callback();}
-          xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
+          tooltip {Name of file item to load or save} xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
         }
       }
       Fl_Button fileruse {
@@ -1542,7 +1562,7 @@ Alan Calvert started the project}
     fileresult = filerpath + leaf;
 
     filerwindow->hide();}
-        xywh {380 57 60 20} labelfont 1 labelsize 12
+        tooltip {Apply this name to the path and load/save} xywh {380 57 60 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -1552,19 +1572,19 @@ Alan Calvert started the project}
     else
         filerOpt1->activate();
     fillfiler();}
-        xywh {490 222 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Hide sub directories so that files are easier to see} xywh {490 222 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt1 {
         label {. (dot) Dirs}
         callback {//
     fillfiler();}
-        xywh {490 259 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Show hidden paths} xywh {490 259 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt2 {
         label {. (dot) Files}
         callback {//
     fillfiler();}
-        xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Show hidden files} xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
       Fl_Check_Button filerOpt4 {
         label Wildcards
@@ -1581,7 +1601,7 @@ Alan Calvert started the project}
       Fl_Group favourites {
         xywh {5 48 542 299} box FLAT_BOX hide
       } {
-        Fl_Group favename {open
+        Fl_Group favename {
           xywh {10 53 527 28} box ENGRAVED_FRAME
         } {}
         Fl_Browser favebrowse {
@@ -1604,7 +1624,7 @@ Alan Calvert started the project}
     filerclose->activate();
     filebrowse->activate();
     favourites->hide();}
-          xywh {455 57 70 20} labelfont 1 labelsize 12
+          tooltip {Cancel any selection and return to filer window} xywh {455 57 70 20} labelfont 1 labelsize 12
         }
         Fl_Button favedefault {
           label Default
@@ -1612,7 +1632,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->move(1, pos);}
-          xywh {315 57 70 20} labelfont 1 labelsize 12
+          tooltip {Set selected entry as the default (move to top)} xywh {315 57 70 20} labelfont 1 labelsize 12
         }
         Fl_Button favedelete {
           label Delete
@@ -1620,7 +1640,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->remove(pos);}
-          xywh {166 57 70 20} labelfont 1 labelsize 12
+          tooltip {Remove selected entry} xywh {166 57 70 20} labelfont 1 labelsize 12
         }
         Fl_Button faveset {
           label Set
@@ -1633,13 +1653,14 @@ Alan Calvert started the project}
             filerpath += '/';
     	fileroldpath->value(filerpath.c_str());
     }
+    fillfiler();
     favecancel->do_callback();}
-          xywh {20 57 70 20} labelfont 1 labelsize 12
+          tooltip {Set the current path to the selected entry and exit} xywh {20 57 70 20} labelfont 1 labelsize 12
         }
       }
     }
   }
-  Function {setfiler(string title, string name, bool save, int extension)} {open return_type string
+  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1812,8 +1833,7 @@ Alan Calvert started the project}
         }
     }
     savefavourites();
-    return fileresult;} {selected
-    }
+    return fileresult;} {}
   }
   Function {fillfiler()} {} {
     code {//
@@ -1890,6 +1910,7 @@ Alan Calvert started the project}
         filerback->labelsize(size12);
         faveadd->labelsize(size12);
         filerfave->labelsize(size12);
+        filerset->labelsize(size12);
 
         filerOpt8->labelsize(size12);
         filerOpt1->labelsize(size12);
