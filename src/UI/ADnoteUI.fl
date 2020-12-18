@@ -1248,7 +1248,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
       }
       Fl_Group Vname {
         label VOICE open
-        xywh {465 6 63 16} labelfont 1 labelsize 12 align 0
+        xywh {450 10 63 16} labelfont 1 align 0
       } {}
     }
   }
@@ -1629,6 +1629,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicelistitemgroup->deactivate();
             }
             voiceonbutton->redraw();
+            synth->getGuiMaster()->partui->adnoteui->voiceTabBar->redraw();
             break;
 
         case ADDVOICE::control::enableResonance:
@@ -1820,7 +1821,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    int size14 = int(14 * dScale);
 
    voiceonbutton->labelsize(size14);
-   Vname->labelsize(size12);
+   Vname->labelsize(size14);
 
    amplitudegroup->labelsize(size12);
    voicevolume->labelsize(size);
@@ -2328,7 +2329,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
-      xywh {509 89 760 610} type Double hide resizable
+      xywh {349 91 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
@@ -2367,53 +2368,53 @@ o->hide();}
       Fl_Button g1 {
         label 1
         callback {setVoiceTabs(0, !o->value());}
-        xywh {8 2 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {8 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(1);}
       }
       Fl_Button g2 {
         label 2
         callback {setVoiceTabs(1, !o->value());}
-        xywh {60 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {60 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g3 {
         label 3
         callback {setVoiceTabs(2, !o->value());}
-        xywh {112 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {112 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g4 {
         label {4 }
         callback {setVoiceTabs(3, !o->value());}
-        xywh {164 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {164 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g5 {
         label 5
         callback {setVoiceTabs(4, !o->value());}
-        xywh {216 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {216 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g6 {
         label 6
         callback {setVoiceTabs(5, !o->value());}
-        xywh {268 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {268 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g7 {
         label 7
         callback {setVoiceTabs(6, !o->value());}
-        xywh {320 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {320 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
       Fl_Button g8 {
         label 8
         callback {setVoiceTabs(7, !o->value());}
-        xywh {372 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        xywh {372 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
         code0 {o->value(0);}
       }
-      Fl_Group voiceTabBar {open
-        xywh {4 30 524 5} box PLASTIC_THIN_UP_BOX color 231
+      Fl_Group voiceTabBar {
+        xywh {4 30 524 5} box PLASTIC_THIN_DOWN_BOX color 223
       } {}
     }
     Fl_Window ADnoteVoiceList {
