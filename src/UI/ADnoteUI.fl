@@ -185,8 +185,8 @@ class ADvoicelistitem {: {public Fl_Group}
       } {}
       Fl_Check_Button voiceenabled {
         callback {//
-    bool enab = _SYS_::F2B(o->value());
-    collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            bool enab = _SYS_::F2B(o->value());
+            collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
         xywh {18 7 15 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
@@ -2328,7 +2328,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
-      xywh {373 93 760 610} type Double hide resizable
+      xywh {509 89 760 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
@@ -2339,83 +2339,6 @@ o->hide();}
         code1 {o->show();}
         class ADvoiceUI
       } {}
-      Fl_Tabs voiceTabs {
-        callback {//
-if (o->value() == g1)
-{
-    editVoice(0);
-}
-else if (voiceTabs->value() == g2)
-{
-    editVoice(1);
-}
-else if (voiceTabs->value() == g3)
-{
-    editVoice(2);
-}
-else if (voiceTabs->value() == g4)
-{
-    editVoice(3);
-}
-else if (voiceTabs->value() == g5)
-{
-    editVoice(4);
-}
-else if (voiceTabs->value() == g6)
-{
-    editVoice(5);
-}
-else if (voiceTabs->value() == g7)
-{
-    editVoice(6);
-}
-else if (voiceTabs->value() == g8)
-{
-    editVoice(7);
-}}
-        xywh {5 0 525 30} box PLASTIC_UP_BOX color 40 selection_color 231 labelfont 1 align 4
-      } {
-        Fl_Group g1 {
-          label {   1   }
-          xywh {40 50 40 27} labelfont 1
-          code0 {setTabColour(0);}
-        } {}
-        Fl_Group g2 {
-          label {   2   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(1);}
-        } {}
-        Fl_Group g3 {
-          label {   3   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(2);}
-        } {}
-        Fl_Group g4 {
-          label {   4   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(3);}
-        } {}
-        Fl_Group g5 {
-          label {   5   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(4);}
-        } {}
-        Fl_Group g6 {
-          label {   6   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(5);}
-        } {}
-        Fl_Group g7 {
-          label {   7   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(6);}
-        } {}
-        Fl_Group g8 {
-          label {   8   } open
-          xywh {40 50 40 27} labelfont 1 hide
-          code0 {setTabColour(7);}
-        } {}
-      }
       Fl_Button Vclose {
         label Close
         callback {//
@@ -2441,6 +2364,57 @@ else if (voiceTabs->value() == g8)
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);}
         xywh {585 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
+      Fl_Button g1 {
+        label 1
+        callback {setVoiceTabs(0, !o->value());}
+        xywh {8 2 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(1);}
+      }
+      Fl_Button g2 {
+        label 2
+        callback {setVoiceTabs(1, !o->value());}
+        xywh {60 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g3 {
+        label 3
+        callback {setVoiceTabs(2, !o->value());}
+        xywh {112 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g4 {
+        label {4 }
+        callback {setVoiceTabs(3, !o->value());}
+        xywh {164 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g5 {
+        label 5
+        callback {setVoiceTabs(4, !o->value());}
+        xywh {216 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g6 {
+        label 6
+        callback {setVoiceTabs(5, !o->value());}
+        xywh {268 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g7 {
+        label 7
+        callback {setVoiceTabs(6, !o->value());}
+        xywh {320 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Button g8 {
+        label 8
+        callback {setVoiceTabs(7, !o->value());}
+        xywh {372 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX selection_color 231 labelfont 1
+        code0 {o->value(0);}
+      }
+      Fl_Group voiceTabBar {open
+        xywh {4 30 524 5} box PLASTIC_THIN_UP_BOX color 231
+      } {}
     }
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
@@ -2513,83 +2487,91 @@ o->hide();}
   }
   Function {setVoiceTabs(int num, bool edit = true)} {} {
     code {//
-switch (num)
-{
-    case 0:
-        voiceTabs->value(g1);
-        if (edit)
-            editVoice(0);
-        break;
-    case 1:
-        voiceTabs->value(g2);
-        if (edit)
-            editVoice(1);
-        break;
-    case 2:
-        voiceTabs->value(g3);
-        if (edit)
-            editVoice(2);
-        break;
-    case 3:
-        voiceTabs->value(g4);
-        if (edit)
-            editVoice(3);
-        break;
-    case 4:
-        voiceTabs->value(g5);
-        if (edit)
-            editVoice(4);
-        break;
-    case 5:
-        voiceTabs->value(g6);
-        if (edit)
-            editVoice(5);
-        break;
-    case 6:
-        voiceTabs->value(g7);
-        if (edit)
-            editVoice(6);
-        break;
-    case 7:
-        voiceTabs->value(g8);
-        if (edit)
-            editVoice(7);
-        break;
-}} {}
+    g1->value(0);
+    g2->value(0);
+    g3->value(0);
+    g4->value(0);
+    g5->value(0);
+    g6->value(0);
+    g7->value(0);
+    g8->value(0);
+    switch (num)
+    {
+        case 0:
+            g1->value(1);
+            if (edit)
+                editVoice(0);
+            break;
+        case 1:
+            g2->value(1);
+            if (edit)
+                editVoice(1);
+            break;
+        case 2:
+            g3->value(1);
+            if (edit)
+                editVoice(2);
+            break;
+        case 3:
+            g4->value(1);
+            if (edit)
+                editVoice(3);
+            break;
+        case 4:
+            g5->value(1);
+            if (edit)
+                editVoice(4);
+            break;
+        case 5:
+            g6->value(1);
+            if (edit)
+                editVoice(5);
+            break;
+        case 6:
+            g7->value(1);
+            if (edit)
+                editVoice(6);
+            break;
+        case 7:
+            g8->value(1);
+            if (edit)
+                editVoice(7);
+            break;
+    }} {}
   }
   Function {setTabColour(int num)} {} {
     code {//
-int set = 16;
-if (pars->VoicePar[num].Enabled)
-    set = 0;
+    int set = 16;
+    if (pars->VoicePar[num].Enabled)
+        set = 0;
 
-switch (num)
-{
-    case 0:
-        g1->labelcolor(set);
-        break;
-    case 1:
-         g2->labelcolor(set);
-        break;
-    case 2:
-        g3->labelcolor(set);
-        break;
-    case 3:
-        g4->labelcolor(set);
-        break;
-    case 4:
-        g5->labelcolor(set);
-        break;
-    case 5:
-        g6->labelcolor(set);
-        break;
-    case 6:
-        g7->labelcolor(set);
-        break;
-    case 7:
-        g8->labelcolor(set);
-        break;
-}} {}
+    switch (num)
+    {
+        case 0:
+            g1->labelcolor(set);
+            break;
+        case 1:
+            g2->labelcolor(set);
+            break;
+        case 2:
+            g3->labelcolor(set);
+            break;
+        case 3:
+            g4->labelcolor(set);
+            break;
+        case 4:
+            g5->labelcolor(set);
+            break;
+        case 5:
+            g6->labelcolor(set);
+            break;
+        case 6:
+            g7->labelcolor(set);
+            break;
+        case 7:
+            g8->labelcolor(set);
+            break;
+    }} {}
   }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
@@ -2696,7 +2678,11 @@ switch (num)
         lastlistW = 0;
         listSeen = false;
         lastResuiW = 0;
-        make_window();} {}
+        make_window();
+        for (int i = 0; i < 8; ++i)
+        {
+            setTabColour(i);
+        }} {}
   }
   Function {~ADnoteUI()} {return_type virtual
   } {
