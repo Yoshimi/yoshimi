@@ -552,82 +552,10 @@ o->hide();}
         Fl_Choice bftype {
           label {Base Function}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);}
-          xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textsize 11
-        } {
-          MenuItem bf1 {
-            label Sine
-            xywh {10 10 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf2 {
-            label Triangle
-            xywh {20 20 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf3 {
-            label Pulse
-            xywh {30 30 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf4 {
-            label Saw
-            xywh {40 40 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf5 {
-            label Power
-            xywh {50 50 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf6 {
-            label Gauss
-            xywh {50 50 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf7 {
-            label Diode
-            xywh {60 60 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf8 {
-            label AbsSine
-            xywh {70 70 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf9 {
-            label PulseSine
-            xywh {80 80 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf10 {
-            label StrchSine
-            xywh {90 90 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf11 {
-            label Chirp
-            xywh {100 100 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf12 {
-            label AbsStrSine
-            xywh {102 102 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf13 {
-            label Chebyshev
-            xywh {112 112 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf14 {
-            label Sqr
-            xywh {122 122 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf15 {
-            label Spike
-            xywh {122 132 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf16 {
-            label Circle
-            xywh {122 142 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem bf17 {
-            label HyperpSec
-            xywh {0 0 36 21} labelfont 1 labelsize 11
-          }
-          MenuItem bf18 {
-            label User
-            xywh {122 152 100 20} labelfont 1 labelsize 11 hide
-          }
-        }
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);} open
+          xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 11
+          code0 {o->add("Sine");o->add("triangle");o->add("Pulse");o->add("Saw");o->add("Power");o->add("Gauss");o->add("Diode");o->add("AbsSine");o->add("PulseSine");o->add("StrchSine");o->add("Chirp");o->add("AbsStrSine");o->add("Chebyshev");o->add("Square");o->add("Spike");o->add("Circle");o->add("HyperSec");o->add("User");}
+        } {}
         Fl_Box basename {
           label {Base Function}
           xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
@@ -1584,25 +1512,7 @@ o->hide();}
         rndslider->textsize(size);
 
         bftype->labelsize(size);
-            bf1->labelsize(size11);
-            bf2->labelsize(size11);
-            bf3->labelsize(size11);
-            bf4->labelsize(size11);
-            bf5->labelsize(size11);
-            bf6->labelsize(size11);
-            bf7->labelsize(size11);
-            bf8->labelsize(size11);
-            bf9->labelsize(size11);
-            bf10->labelsize(size11);
-            bf11->labelsize(size11);
-            bf12->labelsize(size11);
-            bf13->labelsize(size11);
-            bf14->labelsize(size11);
-            bf15->labelsize(size11);
-            bf16->labelsize(size11);
-            bf17->labelsize(size11);
-            bf18->labelsize(size11);
-
+            bftype->textsize(size11);
         basename->labelsize(size12);
         parname->labelsize(size11);
             bfparval->textsize(size14);
