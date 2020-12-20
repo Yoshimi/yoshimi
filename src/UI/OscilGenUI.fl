@@ -477,7 +477,7 @@ o->hide();} open
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
-      Fl_Group oscildisplaygroup {
+      Fl_Group oscildisplaygroup {open
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group waveformgroup {
@@ -490,29 +490,17 @@ o->hide();} open
           code0 {OscilSpectrum *spc=new OscilSpectrum(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,0, synth);}
         } {}
-        Fl_Group {} {
+        Fl_Group {} {open
           xywh {246 277 115 25} box ENGRAVED_BOX
           code0 {if (oscil->ADvsPAD) o->hide();}
         } {
           Fl_Choice hrndtype {
             label {H.rnd}
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::harmonicRandomnessType, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Harmonic Amplitude Randomness} xywh {281 282 50 15} down_box BORDER_BOX labelsize 10 textsize 10
-          } {
-            MenuItem hrnnone {
-              label None
-              xywh {60 60 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem hrnpow {
-              label Pow
-              xywh {70 70 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem hrnsin {
-              label Sin
-              xywh {80 80 100 20} labelfont 1 labelsize 10
-            }
-          }
+            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::harmonicRandomnessType, o->value(), TOPLEVEL::type::Integer);} selected
+            tooltip {Harmonic Amplitude Randomness} xywh {281 282 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+            code0 {o->add("None");o->add("Powr");o->add("Sine");}
+          } {}
           Fl_Dial hrnddial {
             callback {//
             send_data(0, OSCILLATOR::control::harmonicAmplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
@@ -553,7 +541,7 @@ o->hide();} open
         Fl_Choice bftype {
           label {Base Function}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);} open
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);}
           xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 11
           code0 {o->add("Sine");o->add("triangle");o->add("Pulse");o->add("Saw");o->add("Power");o->add("Gauss");o->add("Diode");o->add("AbsSine");o->add("PulseSine");o->add("StrchSine");o->add("Chirp");o->add("AbsStrSine");o->add("Chebyshev");o->add("Square");o->add("Spike");o->add("Circle");o->add("HyperSec");o->add("User");}
         } {}
@@ -602,7 +590,7 @@ o->hide();} open
           Fl_Choice bfmodtype {
             label {B.F.Mod.}
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer);} open
+            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
             code0 {o->add("None");o->add("Rev");o->add("Sine");o->add("Powr");}
           } {}
@@ -615,29 +603,9 @@ o->hide();} open
         label {Mag.Type}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::magType, o->value(), TOPLEVEL::type::Integer);}
-        xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textsize 11
-      } {
-        MenuItem maglin {
-          label Linear
-          xywh {0 0 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem mag40 {
-          label {-40dB}
-          xywh {10 10 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem mag60 {
-          label {-60dB}
-          xywh {20 20 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem mag80 {
-          label {-80dB}
-          xywh {30 30 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem mag100 {
-          label {-100dB}
-          xywh {40 40 100 20} labelfont 1 labelsize 11
-        }
-      }
+        xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
+        code0 {o->add("Linear");o->add("-40dB");o->add("-60dB");o->add("-80dB");o->add("-100dB");}
+      } {}
       Fl_Button useasbase {
         label {Use as base}
         callback {//
@@ -845,7 +813,7 @@ o->hide();} open
         Fl_Choice sabutton {
           label {Sp.adj.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer);} open selected
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
           code0 {o->add("None");o->add("Pow");o->add("ThrsD");o->add("ThrsU");}
         } {}
@@ -1474,9 +1442,7 @@ o->hide();} open
 
         applybutton->labelsize(size14);
         hrndtype->labelsize(size);
-            hrnnone->labelsize(size);
-            hrnpow->labelsize(size);
-            hrnsin->labelsize(size);
+            hrndtype->textsize(size);
         oscilname->labelsize(size12);
         rndslider->textsize(size);
 
@@ -1490,11 +1456,7 @@ o->hide();} open
 
         Warning->textsize(size14);
         magtype->labelsize(size11);
-            maglin->labelsize(size11);
-            mag40->labelsize(size11);
-            mag60->labelsize(size11);
-            mag80->labelsize(size11);
-            mag100->labelsize(size11);
+            magtype->textsize(size11);
 
         useasbase->labelsize(size11);
         oscilClose->labelsize(size14);
