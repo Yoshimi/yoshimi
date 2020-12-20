@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -455,20 +455,19 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {open : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
-o->hide();} open
-      xywh {11 26 735 595} type Double resizable
+o->hide();}
+      xywh {11 26 735 595} type Double hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
-      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);} visible
+      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Button applybutton {
         label Apply
@@ -635,13 +634,13 @@ o->hide();} open
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {135 308 150 30} box ENGRAVED_BOX
       } {
         Fl_Choice wshbutton {
           label {Wsh.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer);} open selected
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
           code0 {o->add("None");o->add("Atan");o->add("Asym1");o->add("Powr");o->add("Sine");o->add("Qnts");o->add("Zigzg");o->add("Limt");o->add("LimtU");o->add("");o->add("ILimt");o->add("Clip");o->add("Asym2");o->add("Powr2");o->add("Sgm");}
         } {}
@@ -688,66 +687,10 @@ o->hide();} open
         label Filter
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::filterType, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
-      } {
-        MenuItem filt0 {
-          label None
-          xywh {45 45 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt1 {
-          label LP1
-          xywh {55 55 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt2 {
-          label HP1a
-          xywh {65 65 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt3 {
-          label HP1b
-          xywh {75 75 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt4 {
-          label BP1
-          xywh {85 85 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt5 {
-          label BS1
-          xywh {95 95 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt6 {
-          label LP2
-          xywh {65 65 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt7 {
-          label HP2
-          xywh {75 75 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt8 {
-          label BP2
-          xywh {75 75 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt9 {
-          label BS2
-          xywh {85 85 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt10 {
-          label Cos
-          xywh {85 85 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt11 {
-          label Sin
-          xywh {95 95 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt12 {
-          label LSh
-          xywh {105 105 100 20} labelfont 1 labelsize 10
-        }
-        MenuItem filt13 {
-          label S
-          xywh {115 115 100 20} labelfont 1 labelsize 10
-        }
-      }
-      Fl_Group {} {open
+        tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+        code0 {o->add("None");o->add("LP1");o->add("HP1a");o->add("BP1");o->add("BS1");o->add("LP2");o->add("HP2");o->add("BP2");o->add("BS2");o->add("Cosn");o->add("Sine");o->add("LSh");o->add("S");}
+      } {}
+      Fl_Group {} {
         xywh {594 308 136 30} box ENGRAVED_BOX
       } {
         Fl_Choice sabutton {
@@ -1356,20 +1299,7 @@ o->hide();} open
         autoclearbutton->labelsize(size);
         filterpref->labelsize(size);
         fltbutton->labelsize(size);
-            filt0->labelsize(size);
-            filt1->labelsize(size);
-            filt2->labelsize(size);
-            filt3->labelsize(size);
-            filt4->labelsize(size);
-            filt5->labelsize(size);
-            filt6->labelsize(size);
-            filt7->labelsize(size);
-            filt8->labelsize(size);
-            filt9->labelsize(size);
-            filt10->labelsize(size);
-            filt11->labelsize(size);
-            filt12->labelsize(size);
-            filt13->labelsize(size);
+            fltbutton->textsize(size);
         sabutton->labelsize(size);
             sabutton->textsize(size);
         harmonicshiftcounter->labelsize(size);
