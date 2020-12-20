@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -455,19 +455,20 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {: {public PresetsUI_}
+class OscilEditor {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
-o->hide();}
-      xywh {4 48 735 595} type Double hide resizable
+o->hide();} open
+      xywh {11 26 735 595} type Double resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
-      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
+      code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Button applybutton {
         label Apply
@@ -535,7 +536,7 @@ o->hide();}
         code0 {if (oscil->ADvsPAD) o->hide();}
         class mwheel_val_slider_rev
       }
-      Fl_Group basefuncdisplaygroup {
+      Fl_Group basefuncdisplaygroup {open
         xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group basewave {
@@ -572,7 +573,7 @@ o->hide();}
         Fl_Value_Output bfparval {
           xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1
         }
-        Fl_Group basefuncmodulation {
+        Fl_Group basefuncmodulation {open
           xywh {550 276 169 25} box ENGRAVED_BOX
           code0 {if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::sine)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)) basefuncmodulation->deactivate();}
         } {
@@ -601,26 +602,10 @@ o->hide();}
           Fl_Choice bfmodtype {
             label {B.F.Mod.}
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
-          } {
-            MenuItem bfmnone {
-              label None
-              xywh {50 50 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem bfmrev {
-              label Rev
-              xywh {60 60 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem bfmsine {
-              label Sine
-              xywh {70 70 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem bfmpow {
-              label Pow
-              xywh {80 80 100 20} labelfont 1 labelsize 10
-            }
-          }
+            send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer);} open
+            tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+            code0 {o->add("None");o->add("Rev");o->add("Sine");o->add("Powr");}
+          } {}
         }
       }
       Fl_Output Warning {
@@ -854,32 +839,16 @@ o->hide();}
           xywh {115 115 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {594 308 136 30} box ENGRAVED_BOX
       } {
         Fl_Choice sabutton {
           label {Sp.adj.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
-        } {
-          MenuItem sa0 {
-            label None
-            xywh {55 55 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem sa1 {
-            label Pow
-            xywh {65 65 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem sa2 {
-            label ThrsD
-            xywh {75 75 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem sa3 {
-            label ThrsU
-            xywh {85 85 100 20} labelfont 1 labelsize 10
-          }
-        }
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer);} open selected
+          tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          code0 {o->add("None");o->add("Pow");o->add("ThrsD");o->add("ThrsU");}
+        } {}
         Fl_Dial sadjpar {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustParameter, o->value(), TOPLEVEL::type::Integer);}
@@ -1517,10 +1486,7 @@ o->hide();}
         parname->labelsize(size11);
             bfparval->textsize(size14);
         bfmodtype->labelsize(size);
-            bfmnone->labelsize(size);
-            bfmrev->labelsize(size);
-            bfmsine->labelsize(size);
-            bfmpow->labelsize(size);
+            bfmodtype->textsize(size);
 
         Warning->textsize(size14);
         magtype->labelsize(size11);
@@ -1569,10 +1535,7 @@ o->hide();}
             filt12->labelsize(size);
             filt13->labelsize(size);
         sabutton->labelsize(size);
-            sa0->labelsize(size);
-            sa1->labelsize(size);
-            sa2->labelsize(size);
-            sa3->labelsize(size);
+            sabutton->textsize(size);
         harmonicshiftcounter->labelsize(size);
             harmonicshiftcounter->textsize(size);
         harmonicshiftpre->labelsize(size);
