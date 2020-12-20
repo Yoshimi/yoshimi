@@ -477,7 +477,7 @@ o->hide();} open
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
-      Fl_Group oscildisplaygroup {open
+      Fl_Group oscildisplaygroup {
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group waveformgroup {
@@ -490,7 +490,7 @@ o->hide();} open
           code0 {OscilSpectrum *spc=new OscilSpectrum(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,0, synth);}
         } {}
-        Fl_Group {} {open
+        Fl_Group {} {
           xywh {246 277 115 25} box ENGRAVED_BOX
           code0 {if (oscil->ADvsPAD) o->hide();}
         } {
@@ -524,7 +524,7 @@ o->hide();} open
         code0 {if (oscil->ADvsPAD) o->hide();}
         class mwheel_val_slider_rev
       }
-      Fl_Group basefuncdisplaygroup {open
+      Fl_Group basefuncdisplaygroup {
         xywh {365 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group basewave {
@@ -561,7 +561,7 @@ o->hide();} open
         Fl_Value_Output bfparval {
           xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1
         }
-        Fl_Group basefuncmodulation {open
+        Fl_Group basefuncmodulation {
           xywh {550 276 169 25} box ENGRAVED_BOX
           code0 {if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::sine)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)) basefuncmodulation->deactivate();}
         } {
@@ -635,76 +635,16 @@ o->hide();} open
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {135 308 150 30} box ENGRAVED_BOX
       } {
         Fl_Choice wshbutton {
           label {Wsh.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
-        } {
-          MenuItem ws0 {
-            label None
-            xywh {25 25 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws2 {
-            label Atan
-            xywh {35 35 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws3 {
-            label Asym1
-            xywh {45 45 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws4 {
-            label Pow
-            xywh {55 55 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws5 {
-            label Sine
-            xywh {65 65 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws6 {
-            label Qnts
-            xywh {75 75 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws7 {
-            label Zigzg
-            xywh {85 85 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws8 {
-            label Lmt
-            xywh {95 95 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws9 {
-            label LmtU
-            xywh {105 105 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws10 {
-            label LmtL
-            xywh {115 115 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws11 {
-            label ILmt
-            xywh {127 127 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws12 {
-            label Clip
-            xywh {137 137 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws13 {
-            label Asym2
-            xywh {85 85 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws14 {
-            label Pow2
-            xywh {95 95 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem ws15 {
-            label Sgm
-            xywh {90 90 100 20} labelfont 1 labelsize 10
-          }
-        }
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer);} open selected
+          tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          code0 {o->add("None");o->add("Atan");o->add("Asym1");o->add("Powr");o->add("Sine");o->add("Qnts");o->add("Zigzg");o->add("Limt");o->add("LimtU");o->add("");o->add("ILimt");o->add("Clip");o->add("Asym2");o->add("Powr2");o->add("Sgm");}
+        } {}
         Fl_Dial wshpar {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeParameter, o->value(), TOPLEVEL::type::Integer);}
@@ -870,7 +810,7 @@ o->hide();} open
       Fl_Choice adhrtype {
         label {Adpt.Harm.}
         callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer);} open selected
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer);}
         tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textfont 1 textsize 10
         code0 {o->add("OFF");o->add("ON");o->add("Square");o->add("2xSub");o->add("2xAdd");o->add("3xSub");o->add("3xAdd");o->add("4xSub");o->add("4xAdd");}
       } {}
@@ -899,7 +839,7 @@ o->hide();} open
       Fl_Choice modtype {
         label {Mod.}
         callback {//
-          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationType, o->value(), TOPLEVEL::type::Integer);} open
+          send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationType, o->value(), TOPLEVEL::type::Integer);}
         tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
         code0 {o->add("None");o->add("Rev");o->add("Sine");o->add("Powr");}
       } {}
@@ -1411,21 +1351,7 @@ o->hide();} open
         clearHarm->labelsize(size11);
 
         wshbutton->labelsize(size);
-            ws0->labelsize(size);
-            ws2->labelsize(size);
-            ws3->labelsize(size);
-            ws4->labelsize(size);
-            ws5->labelsize(size);
-            ws6->labelsize(size);
-            ws7->labelsize(size);
-            ws8->labelsize(size);
-            ws9->labelsize(size);
-            ws10->labelsize(size);
-            ws11->labelsize(size);
-            ws12->labelsize(size);
-            ws13->labelsize(size);
-            ws14->labelsize(size);
-            ws15->labelsize(size);
+            wshbutton->textsize(size);
             wsparval->textsize(size12);
         autoclearbutton->labelsize(size);
         filterpref->labelsize(size);
