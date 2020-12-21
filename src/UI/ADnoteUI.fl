@@ -480,29 +480,9 @@ class ADvoiceUI {: {public Fl_Group}
                 callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneType, o->value(), TOPLEVEL::type::Integer);}
                 xywh {540 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
+                code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
                 code1 {o->value(pars->VoicePar[nvoice].PFMDetuneType);}
-              } {
-                MenuItem Mdefault {
-                  label Default
-                  xywh {10 10 36 21} labelfont 1 labelsize 11
-                }
-                MenuItem ML35cents {
-                  label L35cents
-                  xywh {20 20 36 21} labelfont 1 labelsize 11
-                }
-                MenuItem ML10cents {
-                  label L10cents
-                  xywh {30 30 36 21} labelfont 1 labelsize 11
-                }
-                MenuItem ME100cents {
-                  label E100cents
-                  xywh {40 40 36 21} labelfont 1 labelsize 11
-                }
-                MenuItem ME1200cents {
-                  label E1200cents
-                  xywh {50 50 36 21} labelfont 1 labelsize 11
-                }
-              }
+              } {}
               Fl_Check_Button detuneFromBaseOsc {
                 label {Follow voice}
                 callback {send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFromBaseOsc, o->value(), TOPLEVEL::type::Integer);}
@@ -760,29 +740,9 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneType, o->value(), TOPLEVEL::type::Integer);}
               xywh {450 340 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
-            } {
-              MenuItem Vdefault {
-                label Default
-                xywh {0 0 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem VL35cents {
-                label L35cents
-                xywh {10 10 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem VL10cents {
-                label L10cents
-                xywh {20 20 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem VE100cents {
-                label E100cents
-                xywh {30 30 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem VE1200cents {
-                label E1200cents
-                xywh {40 40 36 21} labelfont 1 labelsize 11
-              }
-            }
+            } {}
             Fl_Dial bend {
               label Bend
               callback {//
@@ -824,10 +784,10 @@ send_data(0, ADDVOICE::control::pitchBendOffset, o->value(), TOPLEVEL::type::Int
               class WidgetPDial
             }
           }
-          Fl_Group oscDisplay {open
+          Fl_Group oscDisplay {
             xywh {5 462 527 145}
           } {
-            Fl_Group oscGroup {open
+            Fl_Group oscGroup {
               xywh {5 462 527 145} labelfont 1 labelsize 13 align 17
               code0 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
             } {
@@ -1851,11 +1811,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    detunevalueoutput->labelsize(size);
    	detunevalueoutput->textsize(size);
    FreqDetunetype->labelsize(size);
-       Vdefault->labelsize(size11);
-       VL35cents->labelsize(size11);
-       VL10cents->labelsize(size11);
-       VE100cents->labelsize(size11);
-       VE1200cents->labelsize(size11);
+       FreqDetunetype->textsize(size11);
    bend->labelsize(size);
    Freq440->labelsize(size11);
    fixedfreqetdial->labelsize(size);
@@ -1924,11 +1880,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    detuneFromBaseOsc->labelsize(size11);
    Mod440->labelsize(size11);
    ModDetuneType->labelsize(size);
-       Mdefault->labelsize(size11);
-       ML35cents->labelsize(size11);
-       ML10cents->labelsize(size11);
-       ME100cents->labelsize(size11);
-       ME1200cents->labelsize(size11);
+       ModDetuneType->textsize(size11);
 
    ModFreqEn->labelsize(size);
 
@@ -2077,26 +2029,10 @@ class ADnoteUI {: {public PresetsUI_}
           label {Detune Type}
           callback {//
     send_data(0, ADDSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
-          xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+          xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+          code0 {o->add("L35 cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->GlobalPar.PDetuneType-1);}
-        } {
-          MenuItem L35cents {
-            label L35cents
-            xywh {0 0 36 21} labelfont 1 labelsize 11
-          }
-          MenuItem L10cents {
-            label L10cents
-            xywh {10 10 36 21} labelfont 1 labelsize 11
-          }
-          MenuItem E100cents {
-            label E100cents
-            xywh {20 20 36 21} labelfont 1 labelsize 11
-          }
-          MenuItem E1200cents {
-            label E1200cents
-            xywh {30 30 36 21} labelfont 1 labelsize 11
-          }
-        }
+        } {}
         Fl_Dial relBwidth {
           label relBW
           callback {//
@@ -2867,10 +2803,7 @@ o->hide();}
         octave->textsize(size11);
     relBwidth->labelsize(size);
     detunetype->labelsize(size);
-    L35cents->labelsize(size11);
-    L10cents->labelsize(size11);
-    E100cents->labelsize(size11);
-    E1200cents->labelsize(size11);
+        detunetype->textsize(size11);
 
     coarsedet->labelsize(size);
         coarsedet->textsize(size11);
