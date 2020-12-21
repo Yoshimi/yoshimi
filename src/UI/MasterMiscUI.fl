@@ -542,21 +542,9 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
           callback {//
     send_data(TOPLEVEL::action::muteAndLoop, PART::control::audioDestination, o->value() + 1, TOPLEVEL::type::Integer);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textfont 9 textsize 9
-          code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
-        } {
-          MenuItem main {
-            label Main
-            xywh {5 0 34 20} labelfont 9 labelsize 10
-          }
-          MenuItem part {
-            label Part
-            xywh {5 10 34 20} labelfont 9 labelsize 10
-          }
-          MenuItem both {
-            label Both
-            xywh {5 20 34 20} labelfont 9 labelsize 10
-          }
-        }
+          code0 {o->add("Main");o->add("Part");o->add("Both");}
+          code1 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
+        } {}
       }
       Fl_Check_Button partenabled {
         label 01
@@ -699,9 +687,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     partrcv->labelsize(size);
        partrcv->textsize(size);
     audiosend->labelsize(size);
-        main->labelsize(size);
-        part->labelsize(size);
-        both->labelsize(size);
+        audiosend->textsize(size);
     partenabled->labelsize(int(15 * dScale));} {}
   }
 }

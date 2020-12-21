@@ -599,8 +599,8 @@ class PartUI {: {public Fl_Group, PartUI_}
               legatoMode->labelcolor(FL_BLACK);
           send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Poly, Mono or Legato mode} xywh {82 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-          code0 {int tmp = synth->ReadPartKeyMode(npart);}
-          code1 {if (tmp > 1) o->value(2); else o->value(tmp);}
+          code1 {int tmp = synth->ReadPartKeyMode(npart);}
+          code2 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {
           MenuItem keypoly {
             label Poly
@@ -754,7 +754,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {229 151 670 370} type Double hide resizable
+      xywh {341 129 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
       code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
@@ -815,27 +815,11 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer);}
         tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
-        code0 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
-        code1 {partKitOn = o->value() > 0;}
-        code2 {if (!partKitOn) kitlist->deactivate();}
-      } {
-        MenuItem modeoff {
-          label {     Off}
-          xywh {0 0 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem modemulti {
-          label {    Multi}
-          xywh {10 10 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem modesingle {
-          label {  Single}
-          xywh {20 20 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem modecrossfade {
-          label Crossfade
-          xywh {0 0 34 20} labelfont 1 labelsize 11
-        }
-      }
+        code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade");}
+        code1 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
+        code2 {partKitOn = o->value() > 0;}
+        code3 {if (!partKitOn) kitlist->deactivate();}
+      } {}
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
@@ -2989,10 +2973,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     kitpad->labelsize(size11);
     kitfxnum->labelsize(size11);
     kitMode->labelsize(size11);
-        modeoff->labelsize(size11);
-        modemulti->labelsize(size11);
-        modesingle->labelsize(size11);
-        modecrossfade->labelsize(size11);
+        kitMode->textsize(size11);
 
     drumMode->labelsize(size11);
     kitClose->labelsize(int(12 * dScale));
