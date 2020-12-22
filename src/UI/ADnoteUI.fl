@@ -607,7 +607,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Source
               callback {//
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {667 32 88 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {657 32 98 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -623,34 +623,10 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
-            xywh {535 32 88 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
-            code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
-          } {
-            MenuItem Moff {
-              label OFF
-              xywh {40 40 100 20} labelfont 1
-            }
-            MenuItem Mmorph {
-              label MORPH
-              xywh {50 50 100 20} labelfont 1
-            }
-            MenuItem Mring {
-              label RING
-              xywh {60 60 100 20} labelfont 1
-            }
-            MenuItem Mpm {
-              label PM
-              xywh {70 70 100 20} labelfont 1
-            }
-            MenuItem Mfm {
-              label FM
-              xywh {80 80 100 20} labelfont 1
-            }
-            MenuItem Mpwm {
-              label PWM
-              xywh {90 90 100 20} labelfont 1
-            }
-          }
+            xywh {535 32 88 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textfont 1
+            code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
+            code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
+          } {}
           Fl_Group freqencygrp {
             label FREQUENCY
             xywh {5 280 525 120} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
@@ -1166,30 +1142,14 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
           } {}
           Fl_Choice SoundType {
             callback {//
-              int x = lrint(o->value());
+              int x = int(o->value());
               send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, x, TOPLEVEL::type::Integer);}
-            tooltip {Oscillator Type (sound/noise)} xywh {10 449 70 15} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 10
-            code0 {o->value(pars->VoicePar[nvoice].Type);}
-            code1 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
-            code2 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
-          } {
-            MenuItem Vsound {
-              label Sound
-              xywh {20 20 100 20} labelfont 1 labelsize 11 labelcolor 2
-            }
-            MenuItem Vwhite {
-              label Noise
-              xywh {30 30 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Vpink {
-              label Noise
-              xywh {40 40 100 20} labelfont 1 labelsize 11 labelcolor 5
-            }
-            MenuItem Vspot {
-              label Noise
-              xywh {60 60 100 20} labelfont 1 labelsize 11 labelcolor 6
-            }
-          }
+            tooltip {Oscillator Type (sound/noise)} xywh {10 449 70 15} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 11
+            code0 {o->add("Sound");o->add("White");o->add("Pink");;o->add("Spot");}
+            code1 {o->value(pars->VoicePar[nvoice].Type);}
+            code2 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
+            code3 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
+          } {}
         }
         Fl_Box noiselabel {
           label Noise
@@ -1840,10 +1800,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    ExtOsc->labelsize(size);
        ExtOsc->textsize(size);
    SoundType->labelsize(size);
-   Vsound->labelsize(size11);
-   Vwhite->labelsize(size11);
-   Vpink->labelsize(size11);
-   Vspot->labelsize(size11);
+       SoundType->textsize(size11);
 
    oscParamBox->labelsize(size12);
    UseOsc->labelsize(size);
@@ -1885,12 +1842,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    ModFreqEn->labelsize(size);
 
    ModType->labelsize(size11);
-       Moff->labelsize(size14);
-       Mmorph->labelsize(size14);
-       Mring->labelsize(size14);
-       Mpm->labelsize(size14);
-       Mfm->labelsize(size14);
-       Mpwm->labelsize(size14);
+       ModType->textsize(size14);
 
   ModLocalOsc->labelsize(size12);
   changeFMoscilbutton->labelsize(size);
