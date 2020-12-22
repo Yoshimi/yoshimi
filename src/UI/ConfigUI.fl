@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -54,151 +54,57 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {open
-} {
-  Function {make_window()} {open
-  } {
+class ConfigUI {} {
+  Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {close->do_callback();} open
+      callback {close->do_callback();}
       xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
       code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Tabs configTabs {open
+      Fl_Tabs configTabs {
         xywh {5 5 380 298}
       } {
         Fl_Group mainTab {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12 hide
+          xywh {5 25 382 277} labelsize 12
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
             callback {//
                         send_data(0, CONFIG::control::oscillatorSize, 256 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {250 32 100 20} down_box BORDER_BOX labelsize 12 textsize 12
-            code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
-          } {
-            MenuItem os1 {
-              label 256
-              xywh {35 35 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os2 {
-              label 512
-              xywh {45 45 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os3 {
-              label 1024
-              xywh {45 45 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os4 {
-              label 2048
-              xywh {55 55 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os5 {
-              label 4096
-              xywh {55 55 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os6 {
-              label 8192
-              xywh {65 65 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem os7 {
-              label 16384
-              xywh {75 75 100 20} labelfont 1 labelsize 12
-            }
-          }
+            tooltip {ADSynth Oscillator Size (samples)} xywh {250 32 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");o->add("16384");}
+            code1 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
+          } {}
           Fl_Choice buff_size {
             label {* Internal Buffer Size}
             callback {//
                         send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Number of samples} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textsize 12
-            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
-            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
-          } {
-            MenuItem bs1 {
-              label 16
-              xywh {55 55 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs2 {
-              label 32
-              xywh {45 45 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs3 {
-              label 64
-              xywh {35 35 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs4 {
-              label 128
-              xywh {45 45 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs5 {
-              label 256
-              xywh {55 55 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs6 {
-              label 512
-              xywh {55 55 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs7 {
-              label 1024
-              xywh {65 65 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs8 {
-              label 2048
-              xywh {65 65 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs9 {
-              label 4096
-              xywh {65 65 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem bs10 {
-              label 8192
-              xywh {65 65 100 20} labelfont 1 labelsize 12
-            }
-          }
+            tooltip {Number of samples} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
+            code1 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
+            code2 {if (synth->getIsLV2Plugin()) o->deactivate();}
+          } {}
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
                         send_data(0, CONFIG::control::padSynthInterpolation, o->value(), TOPLEVEL::type::Integer);}
             xywh {250 88 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().Interpolation);}
-          } {
-            MenuItem pi1 {
-              label {Linear(fast)}
-              xywh {0 0 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem pi2 {
-              label {Cubic(slow)}
-              xywh {10 10 100 20} labelfont 1 labelsize 11
-            }
-          }
+            code0 {o->add("Linear(fast)");o->add("Cubic(slow)");}
+            code1 {o->value(synth->getRuntime().Interpolation);}
+          } {}
           Fl_Choice v_keyboard {
             label {Virtual Keyboard Layout}
             callback {//
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
             xywh {250 144 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().VirKeybLayout);}
-          } {
-            MenuItem vk1 {
-              label QWERTY
-              xywh {15 15 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem vk2 {
-              label Dvorak
-              xywh {25 25 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem vk3 {
-              label QWERTZ
-              xywh {35 35 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem vk4 {
-              label AZERTY
-              xywh {45 45 100 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("QWERTY");o->add("Dvorak");o->add("QWERTZ");o->add("AZERTY");}
+            code1 {o->value(synth->getRuntime().VirKeybLayout);}
+          } {}
           Fl_Counter compression {
             label {XML Compression Level}
             callback {//
@@ -212,54 +118,26 @@ class ConfigUI {open
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Some system errors always go to stdout} xywh {200 200 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().toConsole);}
-          } {
-            MenuItem rep1 {
-              label stdout
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem rep2 {
-              label {Console Window}
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("stdout");o->add("Console Window");}
+            code1 {o->value(synth->getRuntime().toConsole);}
+          } {}
           Fl_Choice instrument {
             label {Saved Instrument Format}
             callback {//
                         send_data(0, CONFIG::control::savedInstrumentFormat, o->value() + 1, TOPLEVEL::type::Integer);}
             tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 228 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().instrumentFormat - 1);}
-          } {
-            MenuItem ins1 {
-              label {Legacy (.xiz)}
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem ins2 {
-              label {Yoshimi (.xiy)}
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem ins3 {
-              label {Both (.xiz + .xiy)}
-              xywh {20 20 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("Legacy");o->add("Yoshimi");o->add("Both");}
+            code1 {o->value(synth->getRuntime().instrumentFormat - 1);}
+          } {}
           Fl_Choice PanelLayout {
             label {Mixer Panel Layout}
             callback {//
-    synth->getRuntime().single_row_panel = o->value()  != 0;
-    synth->getGuiMaster()->updatepanel();}
+    int style = 2 - int(o->value());
+    synth->getGuiMaster()->changepanelstyle(style);}
             tooltip {Select single row or compact format} xywh {200 256 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().single_row_panel);}
-          } {
-            MenuItem pl1 {
-              label {2 row x 8 entries}
-              xywh {20 20 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem pl2 {
-              label {1 row x 16 entries}
-              xywh {20 20 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("2 row x 8 entries");o->add("1 row x 16 entries");}
+            code1 {o->value(synth->getRuntime().single_row_panel);}
+          } {}
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
             xywh {41 280 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
@@ -463,8 +341,8 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          label Alsa open
-          xywh {5 25 384 277} labelsize 12
+          label Alsa
+          xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Choice alsaType {
             label {Alsa Connection Type}
@@ -504,7 +382,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           Fl_Choice alsaSamplerate {
             label {Sample Rate}
             callback {//
-    send_data(0, CONFIG::control::alsaSampleRate, o->value(), TOPLEVEL::type::Integer);} selected
+    send_data(0, CONFIG::control::alsaSampleRate, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 199 80 22} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("192000");o->add("96000");o->add("48000");o->add("44100");}
             code1 {o->value(convertSrate(synth->getRuntime().Samplerate));}
@@ -1310,50 +1188,27 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     mainTab->labelsize(size);
     osc_size->labelsize(size);
-    os1->labelsize(size);
-    os2->labelsize(size);
-    os3->labelsize(size);
-    os4->labelsize(size);
-    os5->labelsize(size);
-    os6->labelsize(size);
-    os7->labelsize(size);
+        osc_size->textsize(size);
 
     buff_size->labelsize(size);
-    bs1->labelsize(size);
-    bs2->labelsize(size);
-    bs3->labelsize(size);
-    bs4->labelsize(size);
-    bs5->labelsize(size);
-    bs6->labelsize(size);
-    bs7->labelsize(size);
-    bs8->labelsize(size);
-    bs9->labelsize(size);
-    bs10->labelsize(size);
+        buff_size->textsize(size);
 
     pad_interpol->labelsize(size);
-    pi1->labelsize(size);
-    pi2->labelsize(size);
+        pad_interpol->textsize(size);
 
     v_keyboard->labelsize(size);
-    vk1->labelsize(size);
-    vk2->labelsize(size);
-    vk3->labelsize(size);
-    vk4->labelsize(size);
+        v_keyboard->textsize(size);
 
     compression->labelsize(size);
         compression->textsize(size);
     reports->labelsize(size);
-    rep1->labelsize(size);
-    rep2->labelsize(size);
+        reports->textsize(size);
 
     instrument->labelsize(size);
-    ins1->labelsize(size);
-    ins2->labelsize(size);
-    ins3->labelsize(size);
+        instrument->textsize(size);
 
     PanelLayout->labelsize(size);
-    pl1->labelsize(size);
-    pl2->labelsize(size);
+        PanelLayout->textsize(size);
 
     settingsNote->labelsize(size);
 
