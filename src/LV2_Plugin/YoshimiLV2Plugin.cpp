@@ -389,17 +389,19 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sam
         return NULL;
     }
     Fl::lock();
-    /*
-     * Perform further global initialisation.
-     * For stand-alone the equivalent init happens in main(),
-     * after mainCreateNewInstance() returned successfully.
-     */
-    synth->installBanks();
-    synth->loadHistory();
 
     YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
+    {
+        /*
+        * Perform further global initialisation.
+        * For stand-alone the equivalent init happens in main(),
+        * after mainCreateNewInstance() returned successfully.
+        */
+        synth->installBanks();
+        synth->loadHistory();
         return static_cast<LV2_Handle>(inst);
+    }
     else
     {
         synth->getRuntime().LogError("Failed to create Yoshimi LV2 plugin");
