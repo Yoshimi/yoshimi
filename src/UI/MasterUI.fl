@@ -989,22 +989,10 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
         callback {//
                        send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Relative values when panned to extremes:
-   Per side | Equivalent Mono} xywh {219 340 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
-        code0 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
-      } {
-        MenuItem pancut {
-          label {Cut: 0dB | -6dB}
-          xywh {15 15 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem pannorm {
-          label {Default: +3dB | -3dB}
-          xywh {25 25 100 20} labelfont 1 labelsize 11
-        }
-        MenuItem panboost {
-          label {Boost: +6dB | 0dB}
-          tooltip {Per side + 6dB, Mono 0dB} xywh {35 35 100 20} labelfont 1 labelsize 11
-        }
-      }
+   Per side, Equivalent Mono} xywh {219 340 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
+        code0 {o->add("Cut: 0dB, -6dB");o->add("Default: +3dB, -3dB");o->add("Boost: +6dB, 0dB");}
+        code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
+      } {}
       Fl_Group setInstance {
         xywh {82 27 193 60} box PLASTIC_UP_BOX color 221 hide
       } {
@@ -1148,7 +1136,7 @@ Alan Calvert started the project}
       code0 {syseffDW = 120; syseffDH = 245;}
       code1 {o->size_range(syseffDW, syseffDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Group syseffgroup {open
+      Fl_Group syseffgroup {
         xywh {9 46 109 172} box FLAT_BOX
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
@@ -1208,24 +1196,8 @@ Alan Calvert started the project}
         Panelsmallgroups->value(o->value());
         updatepanel();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
-      } {
-        MenuItem row1 {
-          label {1 to 16}
-          xywh {0 0 34 20} labelsize 12
-        }
-        MenuItem row2 {
-          label {17 to 32}
-          xywh {0 0 34 20} labelsize 12
-        }
-        MenuItem row3 {
-          label {33 to 48}
-          xywh {0 0 34 20} labelsize 12
-        }
-        MenuItem row4 {
-          label {49 to 64}
-          xywh {0 0 34 20} labelsize 12
-        }
-      }
+        code0 {o->add("1 to 16");o->add("17 to 32");o->add("33 to 48");o->add("49 to 64");}
+      } {}
       Fl_Choice Panelsmallgroups {
         label {Part Group}
         callback {//
@@ -1233,16 +1205,8 @@ Alan Calvert started the project}
         Panelgroups->value(o->value());
         updatepanel();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
-      } {
-        MenuItem row1small {
-          label {1 to 16}
-          xywh {10 10 34 20} labelsize 12
-        }
-        MenuItem row2small {
-          label {17 to 32}
-          xywh {10 10 34 20} labelsize 12
-        }
-      }
+        code0 {o->add("1 to 16");o->add("17 to 32");}
+      } {}
       Fl_Spinner CSspinner {
         label CC
         callback {//
@@ -1284,35 +1248,11 @@ Alan Calvert started the project}
         callback {//
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {114 300 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        code0 {o->add("Off");o->add("Row");o->add("Column");o->add("Loop");o->add("TwoWay");o->add("Channel");}
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
         code3 {CS_CC = o->value();}
-      } {
-        MenuItem switchoff {
-          label Off
-          xywh {40 40 34 20} labelsize 12
-        }
-        MenuItem switchrow {
-          label Row
-          xywh {40 40 34 20} labelsize 12
-        }
-        MenuItem switchcolumn {
-          label Column
-          xywh {40 40 34 20} labelsize 12
-        }
-        MenuItem switchloop {
-          label Loop
-          xywh {40 40 34 20} labelsize 12
-        }
-        MenuItem switchtwoway {
-          label TwoWay
-          xywh {40 40 34 20} labelsize 12
-        }
-        MenuItem switchchannel {
-          label Channel
-          xywh {0 0 34 20} labelsize 12
-        }
-      }
+      } {}
       Fl_Button Panelclose {
         label Close
         callback {//
@@ -2789,11 +2729,17 @@ Alan Calvert started the project}
     }
 
     if (partmax == 64)
+    {
         Panelgroups->show();
+        Panelgroups->value(0);
+    }
     else
         Panelgroups->hide();
     if (partmax == 32)
+    {
         Panelsmallgroups->show();
+        Panelsmallgroups->value(0);
+    }
     else
         Panelsmallgroups->hide();
 
@@ -3586,9 +3532,7 @@ Alan Calvert started the project}
         maxparts->textsize(size11);
 
     panning_law->labelsize(size12);
-        pancut->labelsize(size11);
-        pannorm->labelsize(size11);
-        panboost->labelsize(size11);
+        panning_law->textsize(size12);
 
     partui->groupRtext(dScale);
     masterwindow->redraw();} {}
@@ -3658,23 +3602,14 @@ Alan Calvert started the project}
     towide->labelsize(size14);
     todeep->labelsize(size14);
     Panelgroups->labelsize(size12);
-        row1->labelsize(size12);
-        row2->labelsize(size12);
-        row3->labelsize(size12);
-        row4->labelsize(size12);
+        Panelgroups->textsize(size12);
     Panelsmallgroups->labelsize(size12);
-        row1small->labelsize(size12);
-        row2small->labelsize(size12);
+        Panelsmallgroups->textsize(size12);
     CSspinner->labelsize(size12);
         CSspinner->textsize(size12);
     CSpend->labelsize(size12);
     channelswitch->labelsize(size12);
-        switchoff->labelsize(size12);
-        switchrow->labelsize(size12);
-        switchcolumn->labelsize(size12);
-        switchloop->labelsize(size12);
-        switchtwoway->labelsize(size12);
-        switchchannel->labelsize(size12);
+        channelswitch->textsize(size12);
     Panelclose->labelsize(size14);
 
     panelwindow->redraw();} {}
