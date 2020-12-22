@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -54,23 +54,25 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {} {
-  Function {make_window()} {} {
+class ConfigUI {open
+} {
+  Function {make_window()} {open
+  } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {close->do_callback();}
+      callback {close->do_callback();} open
       xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
       code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Tabs configTabs {
+      Fl_Tabs configTabs {open
         xywh {5 5 380 298}
       } {
         Fl_Group mainTab {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
@@ -461,8 +463,8 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          label Alsa
-          xywh {5 25 384 277} labelsize 12 hide
+          label Alsa open
+          xywh {5 25 384 277} labelsize 12
         } {
           Fl_Choice alsaType {
             label {Alsa Connection Type}
@@ -474,20 +476,8 @@ else
 
 send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
             xywh {195 45 120 22} box DOWN_BOX down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-          } {
-            MenuItem as1 {
-              label Fixed
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem as2 {
-              label Search
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem as3 {
-              label External
-              xywh {20 20 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("Fixed");o->add("Search");o->add("External");}
+          } {}
           Fl_Input alsaSource {
             label {Alsa MIDI Source}
             callback {//
@@ -514,27 +504,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           Fl_Choice alsaSamplerate {
             label {Sample Rate}
             callback {//
-    send_data(0, CONFIG::control::alsaSampleRate, convertSrate(o->value()), TOPLEVEL::type::Integer);}
+    send_data(0, CONFIG::control::alsaSampleRate, o->value(), TOPLEVEL::type::Integer);} selected
             xywh {195 199 80 22} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->value(convertSrate(synth->getRuntime().Samplerate));}
-          } {
-            MenuItem ar1 {
-              label 192000
-              xywh {0 0 36 21} labelfont 1 labelsize 12
-            }
-            MenuItem ar2 {
-              label 96000
-              xywh {0 0 36 21} labelfont 1 labelsize 12
-            }
-            MenuItem ar3 {
-              label 48000
-              xywh {0 0 36 21} labelfont 1 labelsize 12
-            }
-            MenuItem ar4 {
-              label 44100
-              xywh {0 0 36 21} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("192000");o->add("96000");o->add("48000");o->add("44100");}
+            code1 {o->value(convertSrate(synth->getRuntime().Samplerate));}
+          } {}
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
             callback {//
@@ -613,23 +587,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         }
                         send_data(0, CONFIG::control::bankRootCC, candidate, TOPLEVEL::type::Integer);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {234 57 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
-            code0 {int bankRoot = synth->getRuntime().midi_bank_root;}
-            code1 {if (bankRoot == 32) o->value(0); else if (bankRoot == 0) o->value(1); else o->value(2);}
-            code2 {oldBank = o->value();}
-          } {
-            MenuItem bankrootlsb {
-              label LSB
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem bankrootusb {
-              label MSB
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem bankrootoff {
-              label Off
-              xywh {10 10 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("LSB");o->add("MSB");o->add("Off");}
+            code1 {int bankRoot = synth->getRuntime().midi_bank_root;}
+            code2 {if (bankRoot == 32) o->value(0); else if (bankRoot == 0) o->value(1); else o->value(2);}
+            code3 {oldBank = o->value();}
+          } {}
           Fl_Choice bankchange {
             label {Bank Change}
             callback {//
@@ -667,22 +629,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         }
                         send_data(0, CONFIG::control::bankCC, candidate, TOPLEVEL::type::Integer);}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textfont 1 textsize 12
-            code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
-            code1 {oldBank = o->value();}
-          } {
-            MenuItem banklsb {
-              label LSB
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem bankusb {
-              label MSB
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-            MenuItem bankoff {
-              label Off
-              xywh {0 0 34 20} labelfont 1 labelsize 12
-            }
-          }
+            code0 {o->add("LSB");o->add("MSB");o->add("Off");}
+            code1 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
+            code2 {oldBank = o->value();}
+          } {}
           Fl_Check_Button progenable {
             label {Enable Program Change}
             callback {//
@@ -698,7 +648,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
-            label {Extended Program Change}
+            label {Extended Program Change CC}
             callback {//
                         Epend->show();}
             xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textfont 1 textsize 12
@@ -1444,9 +1394,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 //
     alsaTab->labelsize(size);
     alsaType->labelsize(size);
-    as1->labelsize(size);
-    as2->labelsize(size);
-    as3->labelsize(size);
+        alsaType->textsize(size);
 
     alsaSource->labelsize(size);
         alsaSource->textsize(size);
@@ -1456,24 +1404,17 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     alsaAudio->labelsize(size);
     alsaSamplerate->labelsize(size);
-    ar1->labelsize(size);
-    ar2->labelsize(size);
-    ar3->labelsize(size);
-    ar4->labelsize(size);
+        alsaSamplerate->textsize(size);
 
     alsaNote->labelsize(size);
 
 //
     midiTab->labelsize(size);
     bankrootchange->labelsize(size);
-    bankrootlsb->labelsize(size);
-    bankrootusb->labelsize(size);
-    bankrootoff->labelsize(size);
+        bankrootchange->textsize(size);
 
     bankchange->labelsize(size);
-    banklsb->labelsize(size);
-    bankusb->labelsize(size);
-    bankoff->labelsize(size);
+        bankchange->textsize(size);
 
     progenable->labelsize(size);
     progpartenable->labelsize(size);
