@@ -217,6 +217,7 @@ class ADnote
 
         // Internal values of the note and of the voices
         float time; // time from the start of the note
+        int Tspot; // spot noise noise interrupt time
 
         RandomGen paramRNG; // A preseeded random number generator, reseeded
                             // with a known seed every time parameters are

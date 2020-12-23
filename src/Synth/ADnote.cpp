@@ -61,6 +61,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     NoteStatus(NOTE_ENABLED),
     ctl(ctl_),
     time(0.0f),
+    Tspot(0),
     forFM(false),
     portamento(portamento_),
     subVoiceNumber(-1),
@@ -2412,21 +2413,20 @@ void ADnote::computeVoiceOscillator(int nvoice)
 
 void ADnote::ComputeVoiceSpotNoise(int nvoice)
 {
-    static int spot = 0;
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpwave_unison[k];
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            if (spot <= 0)
+            if (Tspot <= 0)
             {
                 tw[i] = synth->numRandom() * 6.0f - 3.0f;
-                spot = (synth->randomINT() >> 24);
+                Tspot = (synth->randomINT() >> 24);
             }
             else
             {
                 tw[i] = 0.0f;
-                spot--;
+                Tspot--;
             }
         }
     }

@@ -150,6 +150,7 @@ class MasterUI {: {private GuiUpdates}
       lastmainW = 0;
       lastpanelW = 0;
       lastmsgW = 0;
+      lasttextW = 0;
       lastsyseffW = 0;
       lastvirtW = 0;
       lastaboutW = 0;
@@ -3688,7 +3689,6 @@ Alan Calvert started the project}
   }
   Function {textinRtext()} {} {
     code {//
-    static int lasttextW = 0;
     if (lasttextW == textwindow->w())
         return;
     lasttextW = textwindow->w();
@@ -3791,6 +3791,8 @@ Alan Calvert started the project}
   decl {int textinDW;} {private local
   }
   decl {int textinDH;} {private local
+  }
+  decl {int lasttextW;} {private local
   }
   decl {string filerpath;} {private local
   }

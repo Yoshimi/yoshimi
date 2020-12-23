@@ -283,6 +283,7 @@ class SynthEngine
         void *guiCallbackArg;
 
         int LFOtime; // used by Pcontinous
+        int CHtimer;
         string windowTitle;
         //MusicClient *musicClient;
 

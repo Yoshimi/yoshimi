@@ -145,6 +145,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     guiCallbackArg(NULL),
 #endif
     LFOtime(0),
+    CHtimer(0),
     windowTitle("Yoshimi" + asString(uniqueId))
 {
     union {
@@ -575,8 +576,6 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 {
-    static unsigned int timer = 0;
-
     int switchtype = Runtime.channelSwitchType;
     if (switchtype > MIDI::SoloType::Channel)
         return 2; // unknown
@@ -591,8 +590,8 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
      * loop and twoway are increment counters
      * we assume nobody can repeat a switch press within 60mS!
      */
-            if ((interchange.tick - timer) > 511) // approx 60mS
-                timer = interchange.tick;
+            if ((interchange.tick - CHtimer) > 511) // approx 60mS
+                CHtimer = interchange.tick;
             else
                 return 0; // de-bounced
         }
