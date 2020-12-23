@@ -85,6 +85,7 @@ Bank::Bank(SynthEngine *_synth) :
     BanksInRoots = 0;
 }
 
+extern SynthEngine *firstSynth;
 
 string Bank::getBankFileTitle(size_t root, size_t bank)
 {
@@ -1086,7 +1087,7 @@ void Bank::checkShare(string sourceDir, string destinationDir)
 
 bool Bank::transferDefaultDirs(string bankdirs[])
 {
-    string ourDir = synth->getRuntime().definedBankRoot;
+    string ourDir = firstSynth->getRuntime().definedBankRoot;
     if (!isDirectory(ourDir))
         return false;
     bool found = false;
@@ -1153,7 +1154,7 @@ return found;
 
 void Bank::checkLocalBanks()
 {
-    string localDir = synth->getRuntime().definedBankRoot;
+    string localDir = firstSynth->getRuntime().definedBankRoot;
     if (isDirectory(localDir + "yoshimi/banks")) // yoshi
     {
         //cout << "idx" << i << "  dir " << bankdirs[i] << endl;
@@ -1169,7 +1170,7 @@ void Bank::checkLocalBanks()
 
 void Bank::addDefaultRootDirs(string bankdirs[])
 {
-    string ourDir = synth->getRuntime().definedBankRoot;
+    string ourDir = firstSynth->getRuntime().definedBankRoot;
     int tot = 0;
     int i = 0;
     while (bankdirs[i] != "end")
@@ -1454,7 +1455,7 @@ size_t Bank::addRootDir(const string& newRootDir)
 
 bool Bank::parseBanksFile(XMLwrapper *xml)
 {
-    string localDir = synth->getRuntime().definedBankRoot;
+    string localDir = firstSynth->getRuntime().definedBankRoot;
     /*
      * This list is used in transferDefaultDirs( to find and copy
      * bank lists into $HOME/.local.yoshimi
@@ -1467,6 +1468,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
      * The list is in the order the roots will appear to the user,
      * and the numbering in addDefaultRootDirs is the same.
      */
+
     string bankdirs[] = {
         localDir + "yoshimi/banks",
         "/usr/share/yoshimi/banks",
@@ -1503,7 +1505,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         else
         {
             cout << "generating" << endl;
-            string newRoot = synth->getRuntime().definedBankRoot + "yoshimi/banks";
+            string newRoot = firstSynth->getRuntime().definedBankRoot + "yoshimi/banks";
             generateSingleRoot(newRoot);
         }
         synth->getRuntime().currentRoot = 5;
