@@ -265,7 +265,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {269 345 535 440} type Double hide resizable
+      xywh {199 26 535 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -1026,25 +1026,9 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
               xywh {450 345 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType - 1);}
-            } {
-              MenuItem padL35 {
-                label L35cents
-                xywh {0 0 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem padL10 {
-                label L10cents
-                xywh {10 10 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem padE100 {
-                label E100cents
-                xywh {20 20 36 21} labelfont 1 labelsize 11
-              }
-              MenuItem padE1200 {
-                label E1200cents
-                xywh {30 30 36 21} labelfont 1 labelsize 11
-              }
-            }
+            } {}
             Fl_Counter coarsedet {
               label {Coarse det.}
               callback {//
@@ -1291,10 +1275,7 @@ class PADnoteUI {: {public PresetsUI_}
     octave->labelsize(size);
         octave->textsize(size11);
     detunetype->labelsize(size);
-        padL35->labelsize(size11);
-        padL10->labelsize(size11);
-        padE100->labelsize(size11);
-        padE1200->labelsize(size11);
+        detunetype->textsize(size);
     coarsedet->labelsize(size);
         coarsedet->textsize(size11);
 

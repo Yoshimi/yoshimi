@@ -170,7 +170,7 @@ class SUBnoteUI {: {public PresetsUI_}
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
     o->hide();}
-      xywh {329 460 735 470} type Double hide resizable
+      xywh {354 26 735 470} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
       code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
@@ -343,26 +343,10 @@ class SUBnoteUI {: {public PresetsUI_}
           callback {//
 
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
-          xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+          xywh {655 78 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+          code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->PDetuneType - 1);}
-        } {
-          MenuItem subL35 {
-            label L35cents
-            xywh {0 0 36 21} labelfont 1 labelsize 10
-          }
-          MenuItem subL10 {
-            label L10cents
-            xywh {10 10 36 21} labelfont 1 labelsize 10
-          }
-          MenuItem subE100 {
-            label E100cents
-            xywh {20 20 36 21} labelfont 1 labelsize 10
-          }
-          MenuItem subE1200 {
-            label E1200cents
-            xywh {30 30 36 21} labelfont 1 labelsize 10
-          }
-        }
+        } {}
         Fl_Counter coarsedet {
           label {Coarse Det.}
           callback {//
@@ -779,10 +763,7 @@ class SUBnoteUI {: {public PresetsUI_}
     detunevalueoutput->labelsize(size);
         detunevalueoutput->textsize(size);
     detunetype->labelsize(size);
-        subL35->labelsize(size);
-        subL10->labelsize(size);
-        subE100->labelsize(size);
-        subE1200->labelsize(size);
+        detunetype->textsize(size);
     coarsedet->labelsize(size);
         coarsedet->textsize(size11);
 
