@@ -443,43 +443,11 @@ class SUBnoteUI {: {public PresetsUI_}
         label {Overtone Positions}
         callback {//
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtonePosition, o->value(), TOPLEVEL::type::Integer);}
-        xywh {460 171 87 20} down_box BORDER_BOX labelsize 11 align 2 textsize 11
-        code0 {o->value(pars->POvertoneSpread.type);}
-        code1 {if (_SYS_::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
-      } {
-        MenuItem Sharmonic {
-          label Harmonic
-          xywh {15 15 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Sshiftu {
-          label ShiftU
-          xywh {25 25 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Sshiftl {
-          label ShiftL
-          xywh {35 35 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Spoweru {
-          label PowerU
-          xywh {35 35 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Spowerl {
-          label PowerL
-          xywh {45 45 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Ssine {
-          label Sine
-          xywh {55 55 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Spower {
-          label Power
-          xywh {65 65 34 20} labelfont 1 labelsize 11
-        }
-        MenuItem Sshift {
-          label Shift
-          xywh {35 35 34 20} labelfont 1 labelsize 11
-        }
-      }
+        xywh {460 171 87 20} down_box BORDER_BOX labelsize 11 align 2 textfont 1 textsize 11
+        code0 {o->add("Harmonic");o->add("ShiftU");o->add("ShiftL");o->add("PowerU");o->add("PowerL");o->add("Sine");o->add("Power");o->add("Shift");}
+        code1 {o->value(pars->POvertoneSpread.type);}
+        code2 {if (_SYS_::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
+      } {}
       Fl_Group globalfiltergroup {
         label { FILTER }
         xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
@@ -779,14 +747,7 @@ class SUBnoteUI {: {public PresetsUI_}
     spreadpar2->labelsize(size);
     spreadpar3->labelsize(size);
     spreadtype->labelsize(size11);
-        Sharmonic->labelsize(size11);
-        Sshiftu->labelsize(size11);
-        Sshiftl->labelsize(size11);
-        Spoweru->labelsize(size11);
-        Spowerl->labelsize(size11);
-        Ssine->labelsize(size11);
-        Spower->labelsize(size11);
-        Sshift->labelsize(size11);
+        spreadtype->textsize(size11);
 
     globalfiltergroup->labelsize(size11);
     filtere->labelsize(size);
