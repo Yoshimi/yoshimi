@@ -290,22 +290,10 @@ class PADnoteUI {: {public PresetsUI_}
               label {Base Type}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseType, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 45 75 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
-              code0 {o->value(pars->Php.base.type);}
-            } {
-              MenuItem hbgauss {
-                label Gauss
-                xywh {15 15 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hbsquare {
-                label Square
-                xywh {25 25 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hbdouble {
-                label DoubleExp
-                xywh {35 35 100 20} labelfont 1 labelsize 10
-              }
-            }
+              xywh {15 45 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("Gauss");o->add("Square");o->add("DoubleExp");}
+              code1 {o->value(pars->Php.base.type);}
+            } {}
             Fl_Dial hpbasepar1 {
               label Width
               callback {//
@@ -349,22 +337,10 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Choice hponehalf {
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicSidebands, o->value(), TOPLEVEL::type::Integer);}
-              xywh {10 143 80 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
-              code0 {o->value(pars->Php.onehalf);}
-            } {
-              MenuItem hpfull {
-                label Full
-                xywh {25 25 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hpupper {
-                label {Upper Half}
-                xywh {45 45 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hplower {
-                label {Lower Half}
-                xywh {35 35 100 20} labelfont 1 labelsize 10
-              }
-            }
+              xywh {10 143 80 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("Full");o->add("Upper Half");o->add("Lower Half");}
+              code1 {o->value(pars->Php.onehalf);}
+            } {}
             Fl_Group ampgroup {
               xywh {10 160 80 105} box BORDER_BOX
             } {
@@ -372,26 +348,10 @@ class PADnoteUI {: {public PresetsUI_}
                 label AmpMode
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMode, o->value(), TOPLEVEL::type::Integer);}
-                xywh {15 205 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
-                code0 {o->value(pars->Php.amp.mode);}
-              } {
-                MenuItem hpasum {
-                  label Sum
-                  xywh {60 60 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem hpamult {
-                  label Mult
-                  xywh {70 70 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem hpadiv1 {
-                  label Div1
-                  xywh {80 80 100 20} labelfont 1 labelsize 10
-                }
-                MenuItem hpadiv2 {
-                  label Div2
-                  xywh {90 90 100 20} labelfont 1 labelsize 10
-                }
-              }
+                xywh {15 205 70 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textfont 1 textsize 10
+                code0 {o->add("Sum");o->add("Mult");o->add("Div1");o->add("Div2");}
+                code1 {o->value(pars->Php.amp.mode);}
+              } {}
               Fl_Dial hpamppar1 {
                 label Par1
                 callback {//
@@ -413,27 +373,11 @@ class PADnoteUI {: {public PresetsUI_}
               label AmpMultiplier
               callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
-              code0 {o->value(pars->Php.amp.type);}
-              code1 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
-            } {
-              MenuItem hampoff {
-                label OFF
-                xywh {55 55 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hampgauss {
-                label Gauss
-                xywh {65 65 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hampsine {
-                label Sine
-                xywh {75 75 100 20} labelfont 1 labelsize 10
-              }
-              MenuItem hampflat {
-                label Flat
-                xywh {85 85 100 20} labelfont 1 labelsize 10
-              }
-            }
+              xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              code0 {o->add("Off");o->add("Gauss");o->add("Sine");o->add("Flat");}
+              code1 {o->value(pars->Php.amp.type);}
+              code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
+            } {}
             Fl_Check_Button hpautoscale {
               label Autoscale
               callback {//
@@ -993,31 +937,21 @@ class PADnoteUI {: {public PresetsUI_}
     harmonicstructuregroup->labelsize(size12);
     harmonicprofile->labelsize(size12);
     hpbasetype->labelsize(size);
-        hbgauss->labelsize(size);
-        hbsquare->labelsize(size);
-        hbdouble->labelsize(size);
+        hpbasetype->textsize(size);
     hpbasepar1->labelsize(size);
     hpfreqmult->labelsize(size);
     hpmpar1->labelsize(size);
     hpmfreq->labelsize(size);
     hpwidth->labelsize(size);
     hponehalf->labelsize(size);
-        hpfull->labelsize(size);
-        hpupper->labelsize(size);
-        hplower->labelsize(size);
+        hponehalf->textsize(size);
 
     hpampmode->labelsize(size);
-        hpasum->labelsize(size);
-        hpamult->labelsize(size);
-        hpadiv1->labelsize(size);
-        hpadiv2->labelsize(size);
+        hpampmode->textsize(size);
     hpamppar1->labelsize(size);
     hpamppar2->labelsize(size);
     hpamptype->labelsize(size);
-        hampoff->labelsize(size);
-        hampgauss->labelsize(size);
-        hampsine->labelsize(size);
-        hampflat->labelsize(size);
+        hpamptype->textsize(size);
     hpautoscale->labelsize(size11);
 
     bwdial->labelsize(size);
