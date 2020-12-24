@@ -441,63 +441,19 @@ class PADnoteUI {: {public PresetsUI_}
             label {Bandwidth Scale}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::bandwidthScale, o->value(), TOPLEVEL::type::Integer);}
-            xywh {120 315 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
-            code0 {o->value(pars->Pbwscale);}
-            code1 {if (pars->Pmode!=0) o->deactivate();}
-          } {
-            MenuItem BSnormal {
-              label Normal
-              xywh {95 95 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BSequal {
-              label EqualHz
-              xywh {105 105 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BSquarter {
-              label Quarter
-              xywh {115 115 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BShalf {
-              label Half
-              xywh {125 125 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BS75 {
-              label {75%}
-              xywh {135 135 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BS150 {
-              label {150%}
-              xywh {145 145 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BSdouble {
-              label Double
-              xywh {145 145 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem BSinvhalf {
-              label {Inv.Half}
-              xywh {155 155 100 20} labelfont 1 labelsize 11
-            }
-          }
+            xywh {120 315 80 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            code0 {o->add("Normal");o->add("EqualHz");o->add("Quarter");o->add("Half");o->add("75%");o->add("150%");o->add("Double");o->add("Inv.Half");}
+            code1 {o->value(pars->Pbwscale);}
+            code2 {if (pars->Pmode!=0) o->deactivate();}
+          } {}
           Fl_Choice spectrummode {
             label {Spectrum Mode}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectrumMode, o->value(), TOPLEVEL::type::Integer);}
-            xywh {220 315 90 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
-            code0 {o->value(pars->Pmode);}
-          } {
-            MenuItem SPband {
-              label Bandwidth
-              xywh {105 105 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem SPdesc {
-              label Discrete
-              xywh {125 125 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem SPcont {
-              label Continuous
-              xywh {115 115 100 20} labelfont 1 labelsize 11
-            }
-          }
+            xywh {220 315 90 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            code0 {o->add("Bandwidth");o->add("Discrete");o->add("Continuous");}
+            code1 {o->value(pars->Pmode);}
+          } {}
           Fl_Group hrgroup {
             xywh {315 296 215 50} box ENGRAVED_FRAME
           } {
@@ -959,19 +915,10 @@ class PADnoteUI {: {public PresetsUI_}
         bwcents->textsize(size11);
 
     bwscale->labelsize(size);
-        BSnormal->labelsize(size11);
-        BSequal->labelsize(size11);
-        BSquarter->labelsize(size11);
-        BShalf->labelsize(size11);
-        BS75->labelsize(size11);
-        BS150->labelsize(size11);
-        BSdouble->labelsize(size11);
-        BSinvhalf->labelsize(size11);
+        bwscale->textsize(size);
 
     spectrummode->labelsize(size);
-        SPband->labelsize(size11);
-        SPdesc->labelsize(size11);
-        SPcont->labelsize(size11);
+        spectrummode->textsize(size);
 
     hrpospar1->labelsize(size);
     hrpospar2->labelsize(size);
