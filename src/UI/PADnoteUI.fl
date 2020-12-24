@@ -601,158 +601,34 @@ class PADnoteUI {: {public PresetsUI_}
             label base
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicBase, o->value(), TOPLEVEL::type::Integer);}
-            xywh {375 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
-            code0 {o->value(pars->Pquality.basenote);}
-          } {
-            MenuItem QBc2 {
-              label {C-2}
-              xywh {10 10 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBg2 {
-              label {G-2}
-              xywh {20 20 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBc3 {
-              label {C-3}
-              xywh {20 20 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBg3 {
-              label {G-3}
-              xywh {30 30 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBc4 {
-              label {C-4}
-              xywh {30 30 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBg4 {
-              label {G-4}
-              xywh {40 40 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBc5 {
-              label {C-5}
-              xywh {40 40 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBg5 {
-              label {G-5}
-              xywh {50 50 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QBg6 {
-              label {G-6}
-              xywh {60 60 100 20} labelfont 1 labelsize 12
-            }
-          }
+            xywh {375 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            code0 {o->add("C-2");o->add("G-2");o->add("C-3");o->add("G-3");o->add("C-4");o->add("G-4");o->add("C-5");o->add("G-5");o->add("G-6");}
+            code1 {o->value(pars->Pquality.basenote);}
+          } {}
           Fl_Choice qsmpoct {
             label {smp/oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::samplesPerOctave, o->value(), TOPLEVEL::type::Integer);}
-            xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
-            code0 {o->value(pars->Pquality.smpoct);}
-          } {
-            MenuItem QShalf {
-              label {0.5}
-              xywh {10 10 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QSone {
-              label 1
-              xywh {0 0 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QStwo {
-              label 2
-              xywh {10 10 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QSthree {
-              label 3
-              xywh {20 20 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QSfour {
-              label 4
-              xywh {30 30 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QSsix {
-              label 6
-              xywh {40 40 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QS12 {
-              label 12
-              xywh {50 50 100 20} labelfont 1 labelsize 12
-            }
-          }
+            xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            code0 {o->add("0.5");o->add("1");o->add("2");o->add("3");o->add("4");o->add("6");o->add("12");}
+            code1 {o->value(pars->Pquality.smpoct);}
+          } {}
           Fl_Choice qoct {
             label {no.oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::numberOfOctaves, o->value(), TOPLEVEL::type::Integer);}
-            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
-            code0 {o->value(pars->Pquality.oct);}
-          } {
-            MenuItem QO1 {
-              label 1
-              xywh {10 10 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO2 {
-              label 2
-              xywh {20 20 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO3 {
-              label 3
-              xywh {30 30 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO4 {
-              label 4
-              xywh {40 40 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO5 {
-              label 5
-              xywh {50 50 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO6 {
-              label 6
-              xywh {60 60 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO7 {
-              label 7
-              xywh {70 70 100 20} labelfont 1 labelsize 12
-            }
-            MenuItem QO8 {
-              label 8
-              xywh {80 80 100 20} labelfont 1 labelsize 12
-            }
-          }
+            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            code0 {o->add("1");o->add("2");o->add("3");o->add("4");o->add("5");o->add("6");o->add("7");o->add("8");}
+            code1 {o->value(pars->Pquality.oct);}
+          } {}
           Fl_Choice qsamplesize {
             label {Sample Size}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::sampleSize, o->value(), TOPLEVEL::type::Integer);}
-            xywh {375 195 125 25} down_box BORDER_BOX labelsize 10 align 5 textsize 11
-            code0 {o->value(pars->Pquality.samplesize);}
-          } {
-            MenuItem Q16 {
-              label {16k (Tiny)}
-              xywh {155 155 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q32 {
-              label 32k
-              xywh {165 165 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q64 {
-              label {64k (Small)}
-              xywh {175 175 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q128 {
-              label 128k
-              xywh {185 185 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q256 {
-              label {256k (Normal)}
-              xywh {205 205 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q512 {
-              label 512k
-              xywh {200 200 100 20} labelfont 1 labelsize 11
-            }
-            MenuItem Q1m {
-              label {1M (Big)}
-              xywh {205 205 100 20} labelfont 1 labelsize 11
-            }
-          }
+            xywh {375 195 125 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            code0 {o->add("16k (Tiny)");o->add("32k");o->add("64k (Small)");o->add("128k");o->add("256k");o->add("512k");o->add("1M (Big)");}
+            code1 {o->value(pars->Pquality.samplesize);}
+          } {}
           Fl_Group hprofile {
             xywh {100 45 430 90} box FLAT_BOX color 54 selection_color 218 labelcolor 63
             code0 {PADnoteHarmonicProfile *hpui=new PADnoteHarmonicProfile(o->x(),o->y(),o->w(),o->h(),"");}
@@ -1170,41 +1046,14 @@ class PADnoteUI {: {public PresetsUI_}
         hrpostype->textsize(size11);
 
     qbasenote->labelsize(size11);
-        QBc2->labelsize(size12);
-        QBg2->labelsize(size12);
-        QBc3->labelsize(size12);
-        QBg3->labelsize(size12);
-        QBc4->labelsize(size12);
-        QBg4->labelsize(size12);
-        QBc5->labelsize(size12);
-        QBg5->labelsize(size12);
-        QBg6->labelsize(size12);
+        qbasenote->textsize(size12);
     qsmpoct->labelsize(size11);
-        QShalf->labelsize(size12);
-        QSone->labelsize(size12);
-        QStwo->labelsize(size12);
-        QSthree->labelsize(size12);
-        QSfour->labelsize(size12);
-        QSsix->labelsize(size12);
-        QS12->labelsize(size12);
+        qsmpoct->textsize(size12);
     qoct->labelsize(size11);
-        QO1->labelsize(size12);
-        QO2->labelsize(size12);
-        QO3->labelsize(size12);
-        QO4->labelsize(size12);
-        QO5->labelsize(size12);
-        QO6->labelsize(size12);
-        QO7->labelsize(size12);
-        QO8->labelsize(size12);
+        qoct->textsize(size12);
 
     qsamplesize->labelsize(size);
-        Q16->labelsize(size11);
-        Q32->labelsize(size11);
-        Q64->labelsize(size11);
-        Q128->labelsize(size11);
-        Q256->labelsize(size11);
-        Q512->labelsize(size11);
-        Q1m->labelsize(size11);
+        qsamplesize->textsize(size11);
 
     resonance->labelsize(size12);
     waveform->labelsize(size12);
