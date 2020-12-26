@@ -493,50 +493,18 @@ class SUBnoteUI {: {public PresetsUI_}
           label {Mag.Type}
           callback {//
           send_data (0, SUBSYNTH::control::magType, o->value(), TOPLEVEL::type::Integer);}
-          xywh {590 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
-          code0 {o->value(pars->Phmagtype);}
-        } {
-          MenuItem magLin {
-            label Linear
-            xywh {20 20 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem mag40 {
-            label {-40dB}
-            xywh {30 30 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem mag60 {
-            label {-60dB}
-            xywh {40 40 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem mag80 {
-            label {-80dB}
-            xywh {50 50 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem mag100 {
-            label {-100dB}
-            xywh {60 60 100 20} labelfont 1 labelsize 11
-          }
-        }
+          xywh {590 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textfont 1 textsize 11
+          code0 {o->add("Linear");o->add("-40dB");o->add("-60dB");o->add("-80dB");o->add("-100dB");}
+          code1 {o->value(pars->Phmagtype);}
+        } {}
         Fl_Choice start {
           label Start
           callback {//
           send_data (0, SUBSYNTH::control::startPosition, o->value(), TOPLEVEL::type::Integer);}
-          xywh {670 421 50 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
-          code0 {o->value(pars->Pstart);}
-        } {
-          MenuItem Szero {
-            label Zero
-            xywh {30 30 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Srnd {
-            label RND
-            xywh {40 40 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Smax {
-            label {Max.}
-            xywh {50 50 100 20} labelfont 1 labelsize 11
-          }
-        }
+          xywh {670 421 50 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textfont 1 textsize 11
+          code0 {o->add("Zero");o->add("Rnd");o->add("Max.");}
+          code1 {o->value(pars->Pstart);}
+        } {}
       }
       Fl_Box {} {
         xywh {441 414 16 17} box THIN_UP_BOX color 237
@@ -754,15 +722,9 @@ class SUBnoteUI {: {public PresetsUI_}
     filterstages->labelsize(size);
         filterstages->textsize(size11);
     magtype->labelsize(size);
-        magLin->labelsize(size11);
-        mag40->labelsize(size11);
-        mag60->labelsize(size11);
-        mag80->labelsize(size11);
-        mag100->labelsize(size11);
+        magtype->textsize(size11);
     start->labelsize(size);
-        Szero->labelsize(size11);
-        Srnd->labelsize(size11);
-        Smax->labelsize(size11);
+        start->textsize(size11);
 
     stereo->labelsize(size);
     subClear->labelsize(size11);
