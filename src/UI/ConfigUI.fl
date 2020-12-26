@@ -65,12 +65,79 @@ class ConfigUI {} {
       code2 {confDW = o->w();confDH = o->h();}
       code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Tabs configTabs {
+      Fl_Button Tab1 {
+        label {&Main Settings}
+        callback {mainTab->show();
+patch1->show();
+patch2->hide();
+patch3->hide();
+patch4->hide();
+patch5->hide();
+switchesTab->hide();
+jackTab->hide();
+alsaTab->hide();
+midiTab->hide();}
+        xywh {5 5 91 22} box THIN_UP_FRAME selection_color 47 labelsize 12
+      }
+      Fl_Button Tab2 {
+        label {&Switches}
+        callback {switchesTab->show();
+patch2->show();
+patch1->hide();
+patch3->hide();
+patch4->hide();
+patch5->hide();mainTab->hide();
+jackTab->hide();
+alsaTab->hide();
+midiTab->hide();}
+        xywh {98 5 66 22} box THIN_UP_FRAME selection_color 47 labelsize 12
+      }
+      Fl_Button Tab3 {
+        label {&Jack}
+        callback {jackTab->show();
+patch3->show();
+patch1->hide();
+patch2->hide();
+patch4->hide();
+patch5->hide();mainTab->hide();
+switchesTab->hide();
+alsaTab->hide();
+midiTab->hide();}
+        xywh {166 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12
+      }
+      Fl_Button Tab4 {
+        label {&Alsa}
+        callback {alsaTab->show();
+patch4->show();
+patch1->hide();
+patch2->hide();
+patch3->hide();
+patch5->hide();
+mainTab->hide();
+switchesTab->hide();
+jackTab->hide();
+midiTab->hide();}
+        xywh {206 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12
+      }
+      Fl_Button Tab5 {
+        label {MIDI &CCs}
+        callback {midiTab->show();
+patch5->show();
+patch1->hide();
+patch2->hide();
+patch3->hide();
+patch4->hide();
+mainTab->hide();
+switchesTab->hide();
+jackTab->hide();
+alsaTab->hide();}
+        xywh {246 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12
+      }
+      Fl_Group configTabs {
         xywh {5 5 380 298}
       } {
         Fl_Group mainTab {
-          label {Main settings}
-          xywh {5 25 382 277} labelsize 12
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
@@ -145,8 +212,7 @@ class ConfigUI {} {
           }
         }
         Fl_Group switchesTab {
-          label Switches
-          xywh {5 25 382 277} labelsize 12 hide
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
         } {
           Fl_Check_Button bankHighlight {
             label {Enable Bank Highlight}
@@ -295,8 +361,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           } {}
         }
         Fl_Group jackTab {
-          label Jack
-          xywh {5 25 385 277} labelsize 12 hide
+          xywh {5 25 385 277} box THIN_UP_BOX labelsize 12 hide
         } {
           Fl_Input jackSource {
             label {Jack MIDI Source}
@@ -341,8 +406,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          label Alsa
-          xywh {5 25 384 277} labelsize 12 hide
+          xywh {5 25 384 277} box THIN_UP_BOX labelsize 12
         } {
           Fl_Choice alsaType {
             label {Alsa Connection Type}
@@ -400,7 +464,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           }
         }
         Fl_Group midiTab {
-          label MIDI
           callback {//
                         EPCvalue = synth->getRuntime().midi_upper_voice_C;
                         if (EPCvalue >= 128)
@@ -424,7 +487,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             BankRoot->value(BankRootvalue);
                             BankRoot->activate();
                         }*/}
-          tooltip {MIDI CC preferences} xywh {5 25 381 275} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 381 275} box THIN_UP_BOX labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -626,6 +689,21 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Box patch1 {
+        xywh {6 24 89 3} box FLAT_BOX
+      }
+      Fl_Box patch2 {
+        xywh {98 24 65 3} box FLAT_BOX
+      }
+      Fl_Box patch3 {
+        xywh {166 24 37 3} box FLAT_BOX
+      }
+      Fl_Box patch4 {
+        xywh {206 24 37 3} box FLAT_BOX
+      }
+      Fl_Box patch5 {
+        xywh {246 24 57 3} box FLAT_BOX
       }
     }
     Fl_Window presets {
@@ -943,7 +1021,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             readpresetcfg();
             configSeen = false;
             presetsSeen = false;
-            selectedRootID = -1;} {}
+            selectedRootID = -1;
+            Tab1->do_callback();} {}
   }
   Function {~ConfigUI()} {} {
     code {//
@@ -1186,7 +1265,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     int size = int(dScale * 12);
 
-    mainTab->labelsize(size);
+    Tab1->labelsize(size);
     osc_size->labelsize(size);
         osc_size->textsize(size);
 
@@ -1213,7 +1292,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     settingsNote->labelsize(size);
 
 //
-    switchesTab->labelsize(size);
+    Tab2->labelsize(size);
     bankHighlight->labelsize(size);
     setDefaultState->labelsize(size);
     nonFatal->labelsize(size);
@@ -1236,7 +1315,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     switchesNote->labelsize(size);
 //
-    jackTab->labelsize(size);
+    Tab3->labelsize(size);
     jackSource->labelsize(size);
         jackSource->textsize(size);
     jackMidi->labelsize(size);
@@ -1247,7 +1326,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     jackNote->labelsize(size);
 //
-    alsaTab->labelsize(size);
+    Tab4->labelsize(size);
     alsaType->labelsize(size);
         alsaType->textsize(size);
 
@@ -1264,7 +1343,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     alsaNote->labelsize(size);
 
 //
-    midiTab->labelsize(size);
+    Tab5->labelsize(size);
     bankrootchange->labelsize(size);
         bankrootchange->textsize(size);
 
