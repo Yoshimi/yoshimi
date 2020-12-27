@@ -1197,6 +1197,11 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 setread();
                 doit = false;
             }
+            else if (synth->part[curPart]->info.Ptype == 0)
+            {
+                if (fl_choice("Please set instrument type before saving.", NULL, "Disregard", "Cancel") != 1)
+                    doit = false;
+            }
             else if (slotFilled)
             {
                 if (choice(synth, "", "Yes", "No", "Overwrite the slot no." + to_string(slot + 1) + "?") < 2)

@@ -457,6 +457,11 @@ class MasterUI {: {private GuiUpdates}
              query("", "", "", "Nothing to save!");
              return;
          }
+         if (synth->part[activePart]->info.Ptype == 0)
+         {
+             if (fl_choice("Please set instrument type before saving.", NULL, "Disregard", "Cancel") != 1)
+                 return;
+         }
          string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);
          if (filename.empty())
              return;
