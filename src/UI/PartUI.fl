@@ -989,78 +989,10 @@ class PartUI {: {public Fl_Group, PartUI_}
           label {Type:}
           callback {//
               send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentType, o->value(), TOPLEVEL::type::Integer);}
-          xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textsize 10
-          code0 {o->value(part->info.Ptype);}
-        } {
-          MenuItem Tundefined {
-            label undefined
-            xywh {20 20 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tpiano {
-            label Piano
-            xywh {10 10 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TchromPerc {
-            label {Chromatic Percussion}
-            xywh {20 20 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Torgan {
-            label Organ
-            xywh {30 30 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tguitar {
-            label Guitar
-            xywh {40 40 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tbass {
-            label Bass
-            xywh {50 50 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TsoloStrings {
-            label {Solo Strings}
-            xywh {60 60 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tensemble {
-            label Ensemble
-            xywh {70 70 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tbrass {
-            label Brass
-            xywh {80 80 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Treed {
-            label Reed
-            xywh {90 90 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tpipe {
-            label Pipe
-            xywh {100 100 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TsynthLead {
-            label {Synth Lead}
-            xywh {110 110 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TsynthPad {
-            label {Synth Pad}
-            xywh {120 120 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TsynthEff {
-            label {Synth Effects}
-            xywh {130 130 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tethnic {
-            label Ethnic
-            xywh {140 140 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem Tpercussive {
-            label Percussive
-            xywh {150 150 100 20} labelfont 1 labelsize 11
-          }
-          MenuItem TsoundEff {
-            label {Sound Effects}
-            xywh {160 160 100 20} labelfont 1 labelsize 11
-          }
-        }
+          xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textfont 1 textsize 11
+          code0 {o->add("");o->add("undefined");o->add("Piano");o->add("Chromatic Percussion");o->add("Organ");o->add("Guitar");o->add("Bass");o->add("Solo Strings");o->add("Ensemble");o->add("Brass");o->add("Reed");o->add("Pipe");o->add("Synth Lead");o->add("Synth Pad");o->add("Synth Effects");o->add("Ethnic");o->add("Percussive");o->add("Sound Effects");}
+          code1 {o->value(part->info.Ptype);}
+        } {}
       }
       Fl_Box {} {
         xywh {0 330 268 52} box ENGRAVED_FRAME labelfont 1 align 8
@@ -2782,23 +2714,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     commentField->labelsize(size12);
         commentField->textsize(size14);
     instrumentType->labelsize(size11);
-        Tundefined->labelsize(size11);
-        Tpiano->labelsize(size11);
-        TchromPerc->labelsize(size11);
-        Torgan->labelsize(size11);
-        Tguitar->labelsize(size11);
-        Tbass->labelsize(size11);
-        TsoloStrings->labelsize(size11);
-        Tensemble->labelsize(size11);
-        Tbrass->labelsize(size11);
-        Treed->labelsize(size11);
-        Tpipe->labelsize(size11);
-        TsynthLead->labelsize(size11);
-        TsynthPad->labelsize(size11);
-        TsynthEff->labelsize(size11);
-        Tethnic->labelsize(size11);
-        Tpercussive->labelsize(size11);
-        TsoundEff->labelsize(size11);
+        instrumentType->textsize(size11);
 
     humanise->labelsize(size12);
         humanise->textsize(size);
