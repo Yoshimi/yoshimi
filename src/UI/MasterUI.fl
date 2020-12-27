@@ -340,7 +340,7 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {42 469 385 470} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {827 535 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
     } {
@@ -745,46 +745,10 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label Type
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
-            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 16
-            code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
-          } {
-            MenuItem sys_off {
-              label {No Effect}
-              xywh {10 10 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_1 {
-              label Reverb
-              xywh {20 20 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_2 {
-              label Echo
-              xywh {30 30 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_3 {
-              label Chorus
-              xywh {40 40 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_4 {
-              label Phaser
-              xywh {50 50 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_5 {
-              label AlienWah
-              xywh {60 60 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_6 {
-              label Distortion
-              xywh {70 70 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_7 {
-              label EQ
-              xywh {80 80 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem sys_8 {
-              label DynFilter
-              xywh {90 90 100 20} labelfont 1 labelsize 10
-            }
-          }
+            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 16 textfont 1 textsize 11
+            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Plaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
+            code1 {o->value(synth->sysefx[nsyseff]->geteffect());}
+          } {}
           Fl_Check_Button SysEffOn {
             label On
             callback {//
@@ -830,47 +794,11 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
             label Type
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
-            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
-            code0 {o->value(synth->insefx[ninseff]->geteffect());}
-            code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
-          } {
-            MenuItem ins_off {
-              label {No Effect}
-              xywh {25 25 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_1 {
-              label Reverb
-              xywh {35 35 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_2 {
-              label Echo
-              xywh {45 45 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_3 {
-              label Chorus
-              xywh {55 55 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_4 {
-              label Phaser
-              xywh {60 60 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_5 {
-              label AlienWah
-              xywh {70 70 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_6 {
-              label Distortion
-              xywh {80 80 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_7 {
-              label EQ
-              xywh {90 90 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem ins_8 {
-              label DynFilter
-              xywh {100 100 100 20} labelfont 1 labelsize 10
-            }
-          }
+            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textfont 1 textsize 11
+            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Plaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
+            code1 {o->value(synth->insefx[ninseff]->geteffect());}
+            code2 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
+          } {}
           Fl_Choice inseffpart {
             label {To }
             callback {//
@@ -3489,15 +3417,7 @@ Alan Calvert started the project}
     syseffnocounter->labelsize(size11);
         syseffnocounter->textsize(size11);
     sysefftype->labelsize(size11);
-        sys_off->labelsize(size);
-        sys_1->labelsize(size);
-        sys_2->labelsize(size);
-        sys_3->labelsize(size);
-        sys_4->labelsize(size);
-        sys_5->labelsize(size);
-        sys_6->labelsize(size);
-        sys_7->labelsize(size);
-        sys_8->labelsize(size);
+        sysefftype->textsize(size11);
 
     SysEffOn->labelsize(size11);
     sysEffSend->labelsize(size11);
@@ -3510,16 +3430,7 @@ Alan Calvert started the project}
     inseffnocounter->labelsize(size11);
         inseffnocounter->textsize(size11);
     insefftype->labelsize(size11);
-    insefftype->labelsize(size11);
-        ins_off->labelsize(size);
-        ins_1->labelsize(size);
-        ins_2->labelsize(size);
-        ins_3->labelsize(size);
-        ins_4->labelsize(size);
-        ins_5->labelsize(size);
-        ins_6->labelsize(size);
-        ins_7->labelsize(size);
-        ins_8->labelsize(size);
+        insefftype->textsize(size11);
 
     inseffpart->labelsize(size11);
         inseffpart->textsize(size11);
