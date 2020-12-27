@@ -1055,46 +1055,10 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Choice insefftype {
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11
-        code0 {o->value(part->partefx[ninseff]->geteffect());}
-      } {
-        MenuItem effNone {
-          label {No Effect}
-          xywh {35 35 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effReverb {
-          label Reverb
-          xywh {45 45 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effEcho {
-          label Echo
-          xywh {55 55 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effChorus {
-          label Chorus
-          xywh {65 65 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effPhaser {
-          label Phaser
-          xywh {70 70 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effAlienwah {
-          label AlienWah
-          xywh {80 80 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effDistortion {
-          label Distortion
-          xywh {90 90 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effEQ {
-          label EQ
-          xywh {100 100 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effDynfilter {
-          label DynFilter
-          xywh {110 110 100 20} labelfont 1 labelsize 12
-        }
-      }
+        tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11 textfont 1 textsize 12
+        code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
+        code1 {o->value(part->partefx[ninseff]->geteffect());}
+      } {}
       Fl_Group inseffectuigroup {
         xywh {3 37 380 96} box FLAT_BOX color 48
       } {
@@ -1108,23 +1072,11 @@ class PartUI {: {public Fl_Group, PartUI_}
         label To
         callback {//
         send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12
-        code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
-        code1 {o->value(x);}
-      } {
-        MenuItem effNext {
-          label {Next Effect}
-          xywh {45 45 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effPart {
-          label {Part Out}
-          xywh {55 55 100 20} labelfont 1 labelsize 12
-        }
-        MenuItem effDry {
-          label {Dry Out}
-          xywh {65 65 100 20} labelfont 1 labelsize 12
-        }
-      }
+        xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12 textfont 1 textsize 12
+        code0 {o->add("Next Effect");o->add("Part Out");o->add("Dry Out");}
+        code1 {int x = part->Pefxroute[ninseff]; if (x == 127) x = 1;}
+        code2 {o->value(x);}
+      } {}
       Fl_Button effCopy {
         label C
         callback {//
@@ -2836,20 +2788,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     inseffnocounter->labelsize(size12);
         inseffnocounter->textsize(size12);
     insefftype->labelsize(size12);
-        effNone->labelsize(size12);
-        effReverb->labelsize(size12);
-        effEcho->labelsize(size12);
-        effChorus->labelsize(size12);
-        effPhaser->labelsize(size12);
-        effAlienwah->labelsize(size12);
-        effDistortion->labelsize(size12);
-        effEQ->labelsize(size12);
-        effDynfilter->labelsize(size12);
-
+        insefftype->textsize(size12);
     sendtochoice->labelsize(size12);
-        effNext->labelsize(size12);
-        effPart->labelsize(size12);
-        effDry->labelsize(size12);
+        sendtochoice->textsize(size12);
 
     effCopy->labelsize(size12);
     effPaste->labelsize(size12);
