@@ -374,6 +374,12 @@ class MasterUI {: {private GuiUpdates}
                     fl_alert("Nothing to save!");
                     return;
                 }
+                if (synth->part[activePart]->info.Ptype == 0)
+                {
+                    if (fl_choice("Please set instrument type before saving.", NULL, "Disregard", "Cancel") != 1)
+                        return;
+                }
+
                 string newname = synth->lastItemSeen(TOPLEVEL::XML::Instrument);
                 if (newname == "" || findLeafName(newname) != synth->part[activePart]->Pname)
                 {
