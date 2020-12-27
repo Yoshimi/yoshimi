@@ -459,7 +459,7 @@ class MasterUI {: {private GuiUpdates}
          }
          if (synth->part[activePart]->info.Ptype == 0)
          {
-             if (fl_choice("Please set instrument type before saving.", NULL, "Disregard", "Cancel") != 1)
+             if (choice(synth, "", "Save", "Cancel", "Please set instrument type before saving.\\nCopyright info also recommended.") != 2)
                  return;
          }
          string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);

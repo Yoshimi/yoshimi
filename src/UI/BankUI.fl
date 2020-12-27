@@ -1199,7 +1199,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             else if (synth->part[curPart]->info.Ptype == 0)
             {
-                if (fl_choice("Please set instrument type before saving.", NULL, "Disregard", "Cancel") != 1)
+                if (choice(synth, "", "Save", "Cancel", "Please set instrument type before saving.\\nCopyright info also recommended.") != 2)
                     doit = false;
             }
             else if (slotFilled)
