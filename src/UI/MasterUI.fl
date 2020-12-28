@@ -1351,7 +1351,7 @@ Alan Calvert started the project}
         xywh {10 91 445 251} type Select labelsize 12 textsize 12
       }
       Fl_Button filerback {
-        label Back
+        label Up
         callback {//
         if (filerpath == "/")
             return;
@@ -1362,11 +1362,11 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler();}
-        tooltip {Go up one directory in path} xywh {465 57 70 20} labelfont 1 labelsize 12
+        tooltip {Go up one directory in path} xywh {463 57 78 20} labelfont 1 labelsize 12
       }
       Fl_Group faveGroup {
         label Favourites
-        xywh {460 100 80 90} box ENGRAVED_FRAME
+        xywh {458 100 85 90} box ENGRAVED_FRAME
       } {}
       Fl_Button faveadd {
         label Add
@@ -1383,21 +1383,21 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->insert(1,name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {465 105 70 20} labelfont 1 labelsize 12
+        tooltip {Add the current path to the favourites list} xywh {463 105 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerfave {
-        label Manage
+        label {Show List}
         callback {//
         setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {465 135 70 20} labelfont 1 labelsize 12
+        tooltip {Examine, re-order or delete entries} xywh {463 135 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerset {
-        label {Set Path}
+        label Default
         callback {//
         fileroldpath->value(favebrowse->text(1));
         filerpath = string(fileroldpath->value());
         fillfiler();}
-        tooltip {Set the current path to the favourites default} xywh {465 165 70 20} labelfont 1 labelsize 12
+        tooltip {Set the current path to the favourites default} xywh {463 165 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1405,7 +1405,7 @@ Alan Calvert started the project}
         fileresult.clear();
         filerwindow->hide();
         saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
-        xywh {465 320 70 20} labelfont 1 labelsize 12
+        xywh {463 320 78 20} labelfont 1 labelsize 12
       }
       Fl_Group filernamegroup {
         label Name
@@ -1430,13 +1430,13 @@ Alan Calvert started the project}
     string leaf = string(filernewname->value());
     if (dosave && leaf.empty())
     {
-        alert(synth, "Nothing given to save");
+        alert(synth, "Nothing given to use!");
         return;
     }
     fileresult = filerpath + leaf;
 
     filerwindow->hide();}
-        tooltip {Apply this name to the path and load/save} xywh {380 57 60 20} labelfont 1 labelsize 12
+        tooltip {Apply this name to the path and load/save} xywh {380 57 74 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -1489,7 +1489,7 @@ Alan Calvert started the project}
           xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
         }
         Fl_Button favecancel {
-          label Exit
+          label Back
           callback {//
     filernewname->activate();
     fileruse->activate();
@@ -1501,12 +1501,12 @@ Alan Calvert started the project}
           tooltip {Cancel any selection and return to filer window} xywh {455 57 70 20} labelfont 1 labelsize 12
         }
         Fl_Button favedefault {
-          label Default
+          label {Make Default}
           callback {//
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->move(1, pos);}
-          tooltip {Set selected entry as the default (move to top)} xywh {315 57 70 20} labelfont 1 labelsize 12
+          tooltip {Set selected entry as the default (move to top)} xywh {287 57 110 20} labelfont 1 labelsize 12
         }
         Fl_Button favedelete {
           label Delete
@@ -1514,7 +1514,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->remove(pos);}
-          tooltip {Remove selected entry} xywh {166 57 70 20} labelfont 1 labelsize 12
+          tooltip {Remove selected entry} xywh {156 57 70 20} labelfont 1 labelsize 12
         }
         Fl_Button faveset {
           label Set
@@ -1544,14 +1544,14 @@ Alan Calvert started the project}
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     size_t pos = string::npos;
-    fileruse->copy_label("< Use");
+    fileruse->copy_label("< Add");
     filernamegroup->show();
 
     if (extension == TOPLEVEL::XML::Dir)
     {
         if (!dosave)
         {
-            fileruse->copy_label("^ Use");
+            fileruse->copy_label("^ From");
             filernamegroup->hide();
         }
         path = string(favebrowse->text(1));
@@ -1560,8 +1560,34 @@ Alan Calvert started the project}
         filerOpt8->hide();
         filerOpt2->hide();
     }
+    else if(extension == TOPLEVEL::XML::Bank)
+    {
+        if(!dosave)
+        {
+            fileruse->copy_label("^ Import");
+            path = string(favebrowse->text(1)) + name;
+            filernewname->value("");
+            filernamegroup->hide();
+        }
+        else
+        {
+            fileruse->copy_label("< Export");
+            path = string(favebrowse->text(1));
+            filernewname->value(name.c_str());
+        }
+        filerOpt16->value(1); // hide files
+        filerOpt8->hide(); // hide dirs
+        filerOpt2->hide(); // dot files
+    }
     else
     {
+        if (extension == TOPLEVEL::XML::ScalaTune || extension == TOPLEVEL::XML::ScalaMap)
+            fileruse->copy_label("< Import");
+
+        else if (dosave)
+            fileruse->copy_label("< Save");
+        else
+            fileruse->copy_label("< Load");
         if (lastname.empty())
         {
             path = string(favebrowse->text(1));
@@ -1634,6 +1660,9 @@ Alan Calvert started the project}
             case TOPLEVEL::XML::ScalaMap:
                 filerext = EXTEN::scalaKeymap;
                 fileroldpath->copy_label("Path to Scala keymaps");
+                break;
+            case TOPLEVEL::XML::Bank:
+                fileroldpath->copy_label("Path to Instrument Banks");
                 break;
         }
     }
