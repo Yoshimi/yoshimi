@@ -1320,7 +1320,7 @@ Alan Calvert started the project}
             o->value(name.c_str());
             fillfiler();
         }}
-        tooltip {Current path to save to (editable)} xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
+        tooltip {Current path to use(editable)} xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
         callback {//
@@ -1338,16 +1338,10 @@ Alan Calvert started the project}
             filerpath = filerpath + line.substr(5);
             fileroldpath->value(filerpath.c_str());
             fillfiler();
+            return;
         }
-        else if (dosave)
-        {
-            filernewname->value(line.c_str());
-        }
-        else
-        {
-            fileresult =  filerpath + line;
-            filerwindow->hide();
-        }}
+
+        filernewname->value(line.c_str());}
         xywh {10 91 445 251} type Select labelsize 12 textsize 12
       }
       Fl_Button filerback {
@@ -1366,7 +1360,7 @@ Alan Calvert started the project}
       }
       Fl_Group faveGroup {
         label Favourites
-        xywh {458 100 85 90} box ENGRAVED_FRAME
+        xywh {458 100 85 60} box ENGRAVED_FRAME
       } {}
       Fl_Button faveadd {
         label Add
@@ -1391,18 +1385,10 @@ Alan Calvert started the project}
         setfavourites();}
         tooltip {Examine, re-order or delete entries} xywh {463 135 75 20} labelfont 1 labelsize 12
       }
-      Fl_Button filerset {
-        label Default
-        callback {//
-        fileroldpath->value(favebrowse->text(1));
-        filerpath = string(fileroldpath->value());
-        fillfiler();}
-        tooltip {Set the current path to the favourites default} xywh {463 165 75 20} labelfont 1 labelsize 12
-      }
       Fl_Button filerclose {
         label Close
         callback {//
-        fileresult.clear();
+        filerfound.clear();
         filerwindow->hide();
         saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
         xywh {463 320 78 20} labelfont 1 labelsize 12
@@ -1433,8 +1419,7 @@ Alan Calvert started the project}
         alert(synth, "Nothing given to use!");
         return;
     }
-    fileresult = filerpath + leaf;
-
+    filerfound = filerpath + leaf;
     filerwindow->hide();}
         tooltip {Apply this name to the path and load/save} xywh {380 57 74 20} labelfont 1 labelsize 12
       }
@@ -1460,12 +1445,6 @@ Alan Calvert started the project}
     fillfiler();}
         tooltip {Show hidden files} xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
       }
-      Fl_Check_Button filerOpt4 {
-        label Wildcards
-        callback {//
-    fillfiler();}
-        xywh {490 187 18 18} down_box DOWN_BOX labelsize 12 align 1 hide deactivate
-      }
       Fl_Check_Button filerOpt16 {
         label {Hide Files}
         callback {//
@@ -1485,7 +1464,13 @@ Alan Calvert started the project}
         int result = favebrowse->value();
         if (result < 1)
             return;
-        string line = string(favebrowse->text(result));}
+        string oldline = string(favebrowse->text(lastfave));
+        oldline = oldline.substr(4);
+        favebrowse->text(lastfave, oldline.c_str());
+        string line = string(favebrowse->text(result));
+        line = "@C4 " + line;
+        favebrowse->text(result, line.c_str());
+        lastfave = result;}
           xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
         }
         Fl_Button favecancel {
@@ -1505,7 +1490,10 @@ Alan Calvert started the project}
           callback {//
     size_t pos = favebrowse->value();
     if (pos > 0)
-        favebrowse->move(1, pos);}
+    {
+        favebrowse->move(1, pos);
+        lastfave = 1;
+    }}
           tooltip {Set selected entry as the default (move to top)} xywh {287 57 110 20} labelfont 1 labelsize 12
         }
         Fl_Button favedelete {
@@ -1522,7 +1510,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
     {
-        filerpath = string(favebrowse->text(pos));
+        filerpath = string(favebrowse->text(pos)).substr(4);
         if (filerpath.back() != '/')
             filerpath += '/';
     	fileroldpath->value(filerpath.c_str());
@@ -1539,14 +1527,13 @@ Alan Calvert started the project}
     code {//
     dosave = save;
     loadfavourites();
-    if (filerOpt4 == 0 && extension > TOPLEVEL::XML::ScalaMap)
-        return ""; // invalid in this context
+
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     size_t pos = string::npos;
     fileruse->copy_label("< Add");
     filernamegroup->show();
-
+    string currentfave = string(favebrowse->text(1)).substr(4);
     if (extension == TOPLEVEL::XML::Dir)
     {
         if (!dosave)
@@ -1554,7 +1541,7 @@ Alan Calvert started the project}
             fileruse->copy_label("^ From");
             filernamegroup->hide();
         }
-        path = string(favebrowse->text(1));
+        path = currentfave;
         filernewname->value("");
         filerOpt16->value(1);
         filerOpt8->hide();
@@ -1565,14 +1552,14 @@ Alan Calvert started the project}
         if(!dosave)
         {
             fileruse->copy_label("^ Import");
-            path = string(favebrowse->text(1)) + name;
+            path = currentfave + name;
             filernewname->value("");
             filernamegroup->hide();
         }
         else
         {
             fileruse->copy_label("< Export");
-            path = string(favebrowse->text(1));
+            path = currentfave;
             filernewname->value(name.c_str());
         }
         filerOpt16->value(1); // hide files
@@ -1590,7 +1577,7 @@ Alan Calvert started the project}
             fileruse->copy_label("< Load");
         if (lastname.empty())
         {
-            path = string(favebrowse->text(1));
+            path = currentfave;
             filernewname->value("");
         }
         else
@@ -1609,12 +1596,9 @@ Alan Calvert started the project}
 
         if (!name.empty())
         {
-            if (filerOpt4->value() == 0)
-            {
-                pos = name.find('.');
-                if (pos != string::npos)
-                    name = name.substr(0, pos);
-            }
+            pos = name.find('.');
+            if (pos != string::npos)
+                name = name.substr(0, pos);
             filernewname->value(name.c_str());
         }
 
@@ -1686,7 +1670,6 @@ Alan Calvert started the project}
     filerwindow->size(W, H);
 
     lastfilerW = 0;
-    //filernamegroup->show();
     filerwindow->show();
 
     while (filerwindow->visible())
@@ -1698,17 +1681,17 @@ Alan Calvert started the project}
         }
         Fl::wait();
     }
-    if (extension == TOPLEVEL::XML::Dir)
+    if (extension == TOPLEVEL::XML::Dir || extension == TOPLEVEL::XML::Bank)
     {
         if (dosave)
         {
             if (string(filernewname->value()).length() < 3)
-                fileresult.clear();
+                filerfound.clear();
         }
         else
         {
-            if (fileresult.back() != '/')
-                fileresult += '/';
+            if (filerfound.back() != '/')
+                filerfound += '/';
         }
     }
     else if (dosave)
@@ -1716,27 +1699,27 @@ Alan Calvert started the project}
         if (extension == TOPLEVEL::XML::Instrument)
         { // try to cover all possibilites!
             int type = fetchData(0, CONFIG::control::savedInstrumentFormat,TOPLEVEL::section::config);
-            if ((type == 3 || type == 1) && isRegularFile(fileresult + EXTEN::zynInst))
+            if ((type == 3 || type == 1) && isRegularFile(filerfound + EXTEN::zynInst))
             {
                 if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                    fileresult.clear();
+                    filerfound.clear();
             }
-            else if ((type == 3 || type == 2) && isRegularFile(fileresult + EXTEN::yoshInst))
+            else if ((type == 3 || type == 2) && isRegularFile(filerfound + EXTEN::yoshInst))
             {
                 if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
-                    fileresult.clear();
+                    filerfound.clear();
             }
         }
-        else if (isRegularFile(fileresult + filerext))
+        else if (isRegularFile(filerfound + filerext))
         {
             if (query("", "Yes", "No", "The file exists. \\nOverwrite it?") < 2)
             {
-                fileresult.clear();
+                filerfound.clear();
             }
         }
     }
     savefavourites();
-    return fileresult;} {}
+    return filerfound;} {}
   }
   Function {fillfiler()} {} {
     code {//
@@ -1744,8 +1727,6 @@ Alan Calvert started the project}
         int options = filerOpt1->value();
         if (filerOpt2->value() > 0)
             options |= 2;
-        if (filerOpt4->value() > 0)
-            options |= 4;
         if (filerOpt8->value() > 0)
             options |= 8;
         if (filerOpt16->value() > 0)
@@ -1782,18 +1763,26 @@ Alan Calvert started the project}
         {
             size_t pos = favetext.find(cr);
             string next = favetext.substr(0, pos);
+            if (count == 0)
+                next = "@C4 " + next;
             favebrowse->add(next.c_str());
             favetext = favetext.substr(pos + 1);
             if (pos == string::npos)
                 break;
-        }} {}
+        }
+        lastfave = 1;} {}
   }
   Function {savefavourites()} {} {
     code {//
     string favetext;
     string cr = "\\n";
     for (int i = 1; i <= favebrowse->size(); ++ i)
-        favetext += (string(favebrowse->text(i)) + cr);
+    {
+        string line = string(favebrowse->text(i));
+        if (line.front() == '@')
+            line = line.substr(4);
+        favetext += (line + cr);
+    }
     file::saveText(favetext, synth->getRuntime().ConfigDir + "/yoshimi-favourites");} {}
   }
   Function {filerRtext()} {} {
@@ -1811,14 +1800,11 @@ Alan Calvert started the project}
         fileruse->labelsize(size12);
 
         filerback->labelsize(size12);
-        faveadd->labelsize(size12);
         filerfave->labelsize(size12);
-        filerset->labelsize(size12);
 
         filerOpt8->labelsize(size12);
         filerOpt1->labelsize(size12);
         filerOpt2->labelsize(size12);
-        filerOpt4->labelsize(size12);
 
         filerclose->labelsize(size12);
 
@@ -3743,7 +3729,9 @@ Alan Calvert started the project}
   }
   decl {string filerext;} {private local
   }
-  decl {string fileresult;} {private local
+  decl {string filerfound;} {private local
+  }
+  decl {int lastfave;} {private local
   }
   decl {bool dosave;} {private local
   }
