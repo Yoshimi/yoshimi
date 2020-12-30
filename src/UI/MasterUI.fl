@@ -2005,15 +2005,16 @@ Alan Calvert started the project}
                         case MIDI::CC::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
-                            partui->legatoMode->labelcolor(FL_BLACK);
+                            partui->modepatch->color(29);
                             if (mode > 1)
                             {
                                 partui->keymode->value(2);
                                 if (partui->drumMode->value() != 0)
-                                    partui->legatoMode->labelcolor(FL_RED);
+                                    partui->modepatch->color(91);
                             }
                             else
                                 partui->keymode->value(mode);
+                            partui->modepatch->redraw();
                             break;
                         }
                         case MIDI::CC::filterQ:

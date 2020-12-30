@@ -1144,8 +1144,8 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             callback {//
               int x = int(o->value());
               send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, x, TOPLEVEL::type::Integer);}
-            tooltip {Oscillator Type (sound/noise)} xywh {10 449 70 15} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 11
-            code0 {o->add("Sound");o->add("White");o->add("Pink");;o->add("Spot");}
+            tooltip {Oscillator Type (sound/noise)} xywh {10 449 70 15} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 10
+            code0 {o->add("Sound");o->add("Whit Ns");o->add("Pink Ns");;o->add("Spot Ns");}
             code1 {o->value(pars->VoicePar[nvoice].Type);}
             code2 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
             code3 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
@@ -1800,7 +1800,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    ExtOsc->labelsize(size);
        ExtOsc->textsize(size);
    SoundType->labelsize(size);
-       SoundType->textsize(size11);
+       SoundType->textsize(size);
 
    oscParamBox->labelsize(size12);
    UseOsc->labelsize(size);
