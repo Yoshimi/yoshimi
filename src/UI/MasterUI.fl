@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -302,7 +302,8 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1288,7 +1289,7 @@ Alan Calvert started the project}
     Fl_Window filerwindow {
       label Yoshimi
       callback {//
-        filerclose->do_callback();}
+        filerclose->do_callback();} open
       xywh {236 77 550 350} type Double hide resizable
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
@@ -1394,7 +1395,8 @@ Alan Calvert started the project}
         label Close
         callback {//
         filerfound.clear();
-        filerwindow->hide();
+        filerdone = true;
+        filernewname->value("Exit");
         saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
         xywh {463 320 78 20} labelfont 1 labelsize 12
       }
@@ -1404,28 +1406,24 @@ Alan Calvert started the project}
       } {
         Fl_Input filernewname {
           callback {if (Fl::event_key() == FL_Enter)
-    fileruse->do_callback();}
+          fileruse->do_callback();} selected
           tooltip {Name of file item to load or save} xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
         }
       }
       Fl_Button fileruse {
         label {< Use}
         callback {//
-
-    filerpath = string(fileroldpath->value());
-    if (filerpath.back() != '/')
-    {
-        filerpath += '/';
-        fileroldpath->value(filerpath.c_str());
-    }
-    string leaf = string(filernewname->value());
-    if (dosave && leaf.empty())
-    {
-        alert(synth, "Nothing given to use!");
-        return;
-    }
-    filerfound = filerpath + leaf;
-    filerwindow->hide();}
+        filerpath = string(fileroldpath->value());
+        if (filerpath.back() != '/')
+        {
+            filerpath += '/';
+            fileroldpath->value(filerpath.c_str());
+        }
+        string leaf = string(filernewname->value());
+        if (!dosave || !leaf.empty())
+            filerfound = filerpath + leaf;
+        // error picked up in main loop
+        filerdone = true;}
         tooltip {Apply this name to the path and load/save} xywh {380 57 74 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
@@ -1527,7 +1525,7 @@ Alan Calvert started the project}
       }
     }
   }
-  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
+  Function {setfiler(string title, string name, bool save, int extension)} {open return_type string
   } {
     code {//
     dosave = save;
@@ -1675,9 +1673,9 @@ Alan Calvert started the project}
     filerwindow->size(W, H);
 
     lastfilerW = 0;
+    filerdone = false;
     filerwindow->show();
-
-    while (filerwindow->visible())
+    while (true)
     {
         if (lastfilerW != filerwindow->w())
         {
@@ -1685,7 +1683,26 @@ Alan Calvert started the project}
             lastfilerW = filerwindow->w();
         }
         Fl::wait();
+        if (filerdone && (extension == TOPLEVEL::XML::Dir || extension == TOPLEVEL::XML::Bank))
+        {
+            if (dosave && string(filernewname->value()).empty())
+            {
+                filerdone = false;
+                query("", "", "", "Nothing given to use!");
+            }
+            else
+                break;
+        }
+        else if (filerdone && string(filernewname->value()).empty())
+        {
+            filerdone = false;
+            query("", "", "", "Nothing given to use!");
+        }
+        else if (filerdone)
+        break;
     }
+    filerwindow->hide();
+
     if (extension == TOPLEVEL::XML::Dir || extension == TOPLEVEL::XML::Bank)
     {
         if (dosave)
@@ -3740,6 +3757,8 @@ Alan Calvert started the project}
   decl {int lastfave;} {private local
   }
   decl {bool dosave;} {private local
+  }
+  decl {bool filerdone;} {private local
   }
   decl {int filerDW;} {private local
   }
