@@ -1298,6 +1298,7 @@ Alan Calvert started the project}
         callback {//
         if (Fl::event_key() == FL_Enter)
         {
+            filernewname->value("");
             string name = string(o->value());
             if (name.back() != '/')
                 name += "/";
@@ -1340,8 +1341,12 @@ Alan Calvert started the project}
             fillfiler();
             return;
         }
-
-        filernewname->value(line.c_str());}
+        filernewname->value(line.c_str());
+        if (Fl::event_clicks())
+        {
+            Fl::event_clicks(0);
+            fileruse->do_callback();
+        }}
         xywh {10 91 445 251} type Select labelsize 12 textsize 12
       }
       Fl_Button filerback {
@@ -1349,7 +1354,7 @@ Alan Calvert started the project}
         callback {//
         if (filerpath == "/")
             return;
-
+        filernewname->value("");
         size_t pos = filerpath.rfind('/', filerpath.length() - 2);
         filerpath = filerpath.substr(0, pos +1);
         if (filerpath.empty())
@@ -1394,7 +1399,7 @@ Alan Calvert started the project}
         xywh {463 320 78 20} labelfont 1 labelsize 12
       }
       Fl_Group filernamegroup {
-        label Name
+        label Name open
         xywh {55 57 320 22} labelfont 1 labelsize 12 align 4
       } {
         Fl_Input filernewname {
@@ -1531,7 +1536,7 @@ Alan Calvert started the project}
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
     size_t pos = string::npos;
-    fileruse->copy_label("< Add");
+    fileruse->copy_label("< New Dir");
     filernamegroup->show();
     string currentfave = string(favebrowse->text(1)).substr(4);
     if (extension == TOPLEVEL::XML::Dir)
