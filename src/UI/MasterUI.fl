@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2020, Will Godfrey & others
+Copyright 2014-2021, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -1321,7 +1321,7 @@ Alan Calvert started the project}
             o->value(name.c_str());
             fillfiler();
         }}
-        tooltip {Current path to use(editable)} xywh {10 20 525 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
+        tooltip {Current path to use(editable)} xywh {10 20 530 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Browser filebrowse {
         callback {//
@@ -1347,7 +1347,7 @@ Alan Calvert started the project}
             Fl::event_clicks(0);
             fileruse->do_callback();
         }}
-        xywh {10 91 445 251} type Select labelsize 12 textsize 12
+        xywh {10 98 445 242} type Select labelsize 12 textsize 12
       }
       Fl_Button filerback {
         label Up
@@ -1361,11 +1361,11 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler();}
-        tooltip {Go up one directory in path} xywh {463 57 78 20} labelfont 1 labelsize 12
+        tooltip {Go up one directory in path} xywh {463 53 78 20} labelfont 1 labelsize 12
       }
       Fl_Group faveGroup {
         label Favourites
-        xywh {458 100 85 60} box ENGRAVED_FRAME
+        xywh {458 116 85 60} box ENGRAVED_FRAME
       } {}
       Fl_Button faveadd {
         label Add
@@ -1382,13 +1382,13 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 105 75 20} labelfont 1 labelsize 12
+        tooltip {Add the current path to the favourites list} xywh {463 121 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerfave {
         label {Show List}
         callback {//
         setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {463 135 75 20} labelfont 1 labelsize 12
+        tooltip {Examine, re-order or delete entries} xywh {463 151 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1401,13 +1401,13 @@ Alan Calvert started the project}
       }
       Fl_Group filernamegroup {
         label Name
-        xywh {55 57 320 22} labelfont 1 labelsize 12 align 4
+        xywh {10 50 448 26} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 2
       } {
         Fl_Input filernewname {
           callback {//
       if (Fl::event_key() == FL_Enter)
           fileruse->do_callback();}
-          tooltip {Name of file item to load or save} xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
+          tooltip {Name of file item to load or save} xywh {14 53 362 20} labelsize 12 align 2 textfont 1 textsize 12
         }
       }
       Fl_Button fileruse {
@@ -1424,7 +1424,7 @@ Alan Calvert started the project}
             filerfound = filerpath + leaf;
         // error picked up in main loop
         filerdone = true;}
-        tooltip {Apply this name to the path and load/save} xywh {380 57 74 20} labelfont 1 labelsize 12
+        tooltip {Apply this name to the path and load/save} xywh {380 53 74 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -1454,11 +1454,17 @@ Alan Calvert started the project}
     ;}
         xywh {490 130 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
       }
+      Fl_Group filerframe {open
+        xywh {4 4 542 88} box ENGRAVED_FRAME
+      } {}
+      Fl_Group filershort {open
+        xywh {4 4 542 74} box ENGRAVED_FRAME
+      } {}
       Fl_Group favourites {
-        xywh {5 48 542 299} box FLAT_BOX hide
+        xywh {4 49 542 299} box FLAT_BOX hide
       } {
         Fl_Group favename {
-          xywh {10 53 527 28} box ENGRAVED_FRAME
+          xywh {4 49 542 42} box ENGRAVED_FRAME
         } {}
         Fl_Browser favebrowse {
           callback {//
@@ -1469,7 +1475,7 @@ Alan Calvert started the project}
             return;
         clearfavelist();
         setfavecolour(result);}
-          xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
+          xywh {5 91 540 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
         }
         Fl_Button favecancel {
           label Back
@@ -1481,7 +1487,7 @@ Alan Calvert started the project}
     filerclose->activate();
     filebrowse->activate();
     favourites->hide();}
-          tooltip {Cancel any selection and return to filer window} xywh {455 57 70 20} labelfont 1 labelsize 12
+          tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12
         }
         Fl_Button favedefault {
           label {Make Default}
@@ -1489,7 +1495,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->move(1, pos);}
-          tooltip {Set selected entry as the default (move to top)} xywh {287 57 110 20} labelfont 1 labelsize 12
+          tooltip {Set selected entry as the default (move to top)} xywh {287 61 110 20} labelfont 1 labelsize 12
         }
         Fl_Button favedelete {
           label Delete
@@ -1499,7 +1505,7 @@ Alan Calvert started the project}
     setfavecolour(1);
     if (pos > 0)
         favebrowse->remove(pos);}
-          tooltip {Remove selected entry} xywh {156 57 70 20} labelfont 1 labelsize 12
+          tooltip {Remove selected entry} xywh {156 61 70 20} labelfont 1 labelsize 12
         }
         Fl_Button faveset {
           label Set
@@ -1514,7 +1520,7 @@ Alan Calvert started the project}
     }
     fillfiler();
     favecancel->do_callback();}
-          tooltip {Set the current path to the selected entry and exit} xywh {20 57 70 20} labelfont 1 labelsize 12
+          tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
         }
       }
     }
@@ -1530,6 +1536,8 @@ Alan Calvert started the project}
     size_t pos = string::npos;
     fileruse->copy_label("< New Dir");
     filernamegroup->show();
+    filerframe ->show();
+    filershort->hide();
     string currentfave = string(favebrowse->text(1)).substr(4);
     if (extension == TOPLEVEL::XML::Dir)
     {
@@ -1537,6 +1545,8 @@ Alan Calvert started the project}
         {
             fileruse->copy_label("^ From");
             filernamegroup->hide();
+            filerframe ->hide();
+            filershort->show();
         }
         path = currentfave;
         filernewname->value("");
@@ -1552,6 +1562,8 @@ Alan Calvert started the project}
             path = currentfave + name;
             filernewname->value("");
             filernamegroup->hide();
+            filerframe ->hide();
+            filershort->show();
         }
         else
         {
@@ -1839,6 +1851,7 @@ Alan Calvert started the project}
         fileruse->labelsize(size12);
 
         filerback->labelsize(size12);
+        faveadd->labelsize(size12);
         filerfave->labelsize(size12);
 
         filerOpt8->labelsize(size12);
