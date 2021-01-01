@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -121,7 +121,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -302,8 +302,7 @@ class MasterUI {open : {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1289,7 +1288,7 @@ Alan Calvert started the project}
     Fl_Window filerwindow {
       label Yoshimi
       callback {//
-        filerclose->do_callback();} open
+        filerclose->do_callback();}
       xywh {236 77 550 350} type Double hide resizable
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
@@ -1381,7 +1380,7 @@ Alan Calvert started the project}
     }
     fileroldpath->value(name.c_str());
     filerpath = name;
-    favebrowse->insert(1,name.c_str());
+    favebrowse->add(name.c_str());
     setfavourites();}
         tooltip {Add the current path to the favourites list} xywh {463 105 75 20} labelfont 1 labelsize 12
       }
@@ -1401,12 +1400,13 @@ Alan Calvert started the project}
         xywh {463 320 78 20} labelfont 1 labelsize 12
       }
       Fl_Group filernamegroup {
-        label Name open
+        label Name
         xywh {55 57 320 22} labelfont 1 labelsize 12 align 4
       } {
         Fl_Input filernewname {
-          callback {if (Fl::event_key() == FL_Enter)
-          fileruse->do_callback();} selected
+          callback {//
+      if (Fl::event_key() == FL_Enter)
+          fileruse->do_callback();}
           tooltip {Name of file item to load or save} xywh {60 57 310 20} labelsize 12 textfont 1 textsize 12
         }
       }
@@ -1467,13 +1467,8 @@ Alan Calvert started the project}
         int result = favebrowse->value();
         if (result < 1)
             return;
-        string oldline = string(favebrowse->text(lastfave));
-        oldline = oldline.substr(4);
-        favebrowse->text(lastfave, oldline.c_str());
-        string line = string(favebrowse->text(result));
-        line = "@C4 " + line;
-        favebrowse->text(result, line.c_str());
-        lastfave = result;}
+        clearfavelist();
+        setfavecolour(result);}
           xywh {10 91 534 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
         }
         Fl_Button favecancel {
@@ -1493,16 +1488,15 @@ Alan Calvert started the project}
           callback {//
     size_t pos = favebrowse->value();
     if (pos > 0)
-    {
-        favebrowse->move(1, pos);
-        lastfave = 1;
-    }}
+        favebrowse->move(1, pos);}
           tooltip {Set selected entry as the default (move to top)} xywh {287 57 110 20} labelfont 1 labelsize 12
         }
         Fl_Button favedelete {
           label Delete
           callback {//
+    clearfavelist();
     size_t pos = favebrowse->value();
+    setfavecolour(1);
     if (pos > 0)
         favebrowse->remove(pos);}
           tooltip {Remove selected entry} xywh {156 57 70 20} labelfont 1 labelsize 12
@@ -1513,7 +1507,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
     {
-        filerpath = string(favebrowse->text(pos)).substr(4);
+        filerpath = clearfavecolour(pos);
         if (filerpath.back() != '/')
             filerpath += '/';
     	fileroldpath->value(filerpath.c_str());
@@ -1525,7 +1519,7 @@ Alan Calvert started the project}
       }
     }
   }
-  Function {setfiler(string title, string name, bool save, int extension)} {open return_type string
+  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1785,27 +1779,50 @@ Alan Calvert started the project}
         {
             size_t pos = favetext.find(cr);
             string next = favetext.substr(0, pos);
-            if (count == 0)
-                next = "@C4 " + next;
             favebrowse->add(next.c_str());
             favetext = favetext.substr(pos + 1);
             if (pos == string::npos)
                 break;
         }
-        lastfave = 1;} {}
+        setfavecolour(1);} {}
   }
   Function {savefavourites()} {} {
     code {//
+    clearfavelist();
     string favetext;
     string cr = "\\n";
     for (int i = 1; i <= favebrowse->size(); ++ i)
     {
         string line = string(favebrowse->text(i));
-        if (line.front() == '@')
-            line = line.substr(4);
         favetext += (line + cr);
     }
     file::saveText(favetext, synth->getRuntime().ConfigDir + "/yoshimi-favourites");} {}
+  }
+  Function {clearfavelist()} {} {
+    code {//
+    for (int i = 1; i <= favebrowse->size(); ++ i)
+    {
+        string line = string(favebrowse->text(i));
+        if (line.substr(0, 4) == "@C4 ")
+        {
+            line = line.substr(4);
+            favebrowse->text(i, line.c_str());
+        }
+    }} {}
+  }
+  Function {setfavecolour(int num)} {} {
+    code {//
+    string line = "@C4 " + string(favebrowse->text(num));
+    favebrowse->text(num, line.c_str());} {}
+  }
+  Function {clearfavecolour(int num)} {return_type string
+  } {
+    code {//
+
+        string line = string(favebrowse->text(num));
+        if (line.substr(0, 4) == "@C4 ")
+            line = line.substr(4);
+        return line;} {}
   }
   Function {filerRtext()} {} {
     code {//
@@ -3753,8 +3770,6 @@ Alan Calvert started the project}
   decl {string filerext;} {private local
   }
   decl {string filerfound;} {private local
-  }
-  decl {int lastfave;} {private local
   }
   decl {bool dosave;} {private local
   }
