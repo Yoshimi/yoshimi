@@ -1304,7 +1304,7 @@ Alan Calvert started the project}
                 name += "/";
             if(!file::isDirectory(name))
             {
-                if (!dosave)
+                if (!dosave && extension != TOPLEVEL::XML::Dir && extension != TOPLEVEL::XML::Bank)
                 {
                     alert(synth, "Not a valid path to load from.");
                     return;
@@ -1525,10 +1525,11 @@ Alan Calvert started the project}
       }
     }
   }
-  Function {setfiler(string title, string name, bool save, int extension)} {return_type string
+  Function {setfiler(string title, string name, bool save, int exten)} {return_type string
   } {
     code {//
     dosave = save;
+    extension = exten;
     loadfavourites();
 
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
@@ -3785,6 +3786,8 @@ Alan Calvert started the project}
   decl {string filerfound;} {private local
   }
   decl {bool dosave;} {private local
+  }
+  decl {int extension;} {private local
   }
   decl {bool filerdone;} {private local
   }

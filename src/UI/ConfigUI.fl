@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2020, Will Godfrey
+Copyright 2014 -2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -722,7 +722,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl_Button addpreset {
         label {Add preset directory...}
         callback {//
-                    string dirname = setfiler(synth,"Path for Presets dir", "", true, TOPLEVEL::XML::Dir);
+                    string dirname = setfiler(synth,"Path for Presets dir", "", false, TOPLEVEL::XML::Dir);
                     if (dirname.empty())
                         return;
 
