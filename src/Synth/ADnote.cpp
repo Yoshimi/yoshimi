@@ -5,7 +5,7 @@
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020-2021 Kristian Amlie & Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -434,6 +434,7 @@ void ADnote::construct()
         NoteVoicePar[nvoice].VoiceOut = NULL;
 
         NoteVoicePar[nvoice].FMEnabled = NONE;
+        NoteVoicePar[nvoice].FMringToSide = false;
         NoteVoicePar[nvoice].FMVoice = -1;
         unison_size[nvoice] = 1;
 
@@ -607,7 +608,7 @@ void ADnote::construct()
                     NoteVoicePar[nvoice].FMEnabled = NONE;
                     freqbasedmod[nvoice] = false;
             }
-
+        NoteVoicePar[nvoice].FMringToSide = adpars->VoicePar[nvoice].PFMringToSide;
         NoteVoicePar[nvoice].FMVoice = adpars->VoicePar[nvoice].PFMVoice;
         NoteVoicePar[nvoice].FMFreqEnvelope = NULL;
         NoteVoicePar[nvoice].FMAmpEnvelope = NULL;
@@ -1869,6 +1870,7 @@ void ADnote::applyVoiceOscillatorMorph(int nvoice)
 void ADnote::applyVoiceOscillatorRingModulation(int nvoice)
 {
     float amp;
+    bool isSide = NoteVoicePar[nvoice].FMringToSide;
     if (isgreater(FMnewamplitude[nvoice], 1.0f))
         FMnewamplitude[nvoice] = 1.0f;
     if (isgreater(FMoldamplitude[nvoice], 1.0f))
@@ -1883,10 +1885,11 @@ void ADnote::applyVoiceOscillatorRingModulation(int nvoice)
             amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                        FMnewamplitude[nvoice], i,
                                        synth->sent_buffersize);
-            tw[i] *= mod[i] * amp + (1.0 - amp);
-            // below gives amp mod instead
-            // the audible difference is quite subtle
-            //tw[i] *= (mod[i] + 1.0f) * 0.5 * amp + (1.0 - amp);
+            if (isSide) // sidebands
+                tw[i] *= (mod[i] * amp * 2);
+                //tw[i] *= (mod[i] + 1.0f) * 0.5f * amp + (1.0f - amp);
+            else // ring
+                tw[i] *= mod[i] * amp + (1.0f - amp);
         }
     }
 }

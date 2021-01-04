@@ -1,7 +1,7 @@
 /*
     globals.h - general static definitions
 
-    Copyright 2018-2020, Will Godfrey
+    Copyright 2018-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -727,6 +727,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         enableAmplitudeLFO,
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
+        modRingToSide,
         externalModulator, // -1 local,  'n' voice
 
         detuneFrequency = 32,

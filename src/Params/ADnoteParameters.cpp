@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019 Will Godfrey
-    Copyright 2020 Kristian Amlie, Will Godfrey
+    Copyright 2020-2021 Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -149,6 +149,8 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFilterVelocityScale = 0;
     VoicePar[nvoice].PFilterVelocityScaleFunction = 64;
     VoicePar[nvoice].PFMEnabled = 0;
+    VoicePar[nvoice].PFMEnabled = 0;
+    VoicePar[nvoice].PFMringToSide = false;
     VoicePar[nvoice].PFMFixedFreq = false;
 
     // I use the internal oscillator (-1)
@@ -1083,6 +1085,11 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
         case ADDVOICE::control::modulatorType:
             type |= learnable;
             max = 5;
+            break;
+
+        case ADDVOICE::control::modRingToSide:
+            type |= learnable;
+            max = 1;
             break;
 
         case ADDVOICE::control::externalModulator:

@@ -2,7 +2,7 @@
     InterChange.cpp - General communications
 
     Copyright 2016-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie, Will Godfrey & others
+    Copyright 2020-2021 Kristian Amlie, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -4155,6 +4155,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 pars->VoicePar[nvoice].PFMEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
+            break;
+        case ADDVOICE::control::modRingToSide:
+            if (write)
+                pars->VoicePar[nvoice].PFMringToSide = value_bool;
+            else
+                value = pars->VoicePar[nvoice].PFMringToSide;
             break;
         case ADDVOICE::control::externalModulator:
             if (write)

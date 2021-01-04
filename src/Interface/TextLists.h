@@ -1,7 +1,7 @@
 /*
     TextLists.h
 
-    Copyright 2019-2020, Will Godfrey
+    Copyright 2019-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -441,15 +441,16 @@ static std::string addvoicelist [] = {
 };
 
 static std::string addmodlist [] = {
-    "MOdulator",         "enter Modulator context",
+    "MOdulator",            "enter Modulator context",
     " - catgory - ","",
     "OFF",                  "disable modulator",
     "MORph","",
     "RINg","",
     "PHAse","",
     "FREquency","",
-    "PULse",             "pulse width",
+    "PULse",                "pulse width",
     "","",
+    "SIdeband <s>",         "only sidebands for ring mod (ON, {other})",
     "Volume <n>",           "volume",
     "VElocity <n>",         "velocity sensing sensitivity",
     "Damping <n>",          "higher frequency relative damping",

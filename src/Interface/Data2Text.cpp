@@ -1,7 +1,7 @@
 /*
     Data2Text.cpp - conversion of commandBlock entries to text
 
-    Copyright 2020 Will Godfrey
+    Copyright 2021 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -1881,6 +1881,10 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
                 showValue = false;
                 contstr += addmodnameslist[value_int];
             }
+            break;
+        case ADDVOICE::control::modRingToSide:
+            name = " Ringmod Sidebands only";
+            yesno = true;
             break;
         case ADDVOICE::control::externalModulator:
             if (addValue)

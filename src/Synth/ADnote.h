@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey & others
-    Copyright 2020 Kristian Amlie
+    Copyright 2020-2021 Kristian Amlie & Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -203,6 +203,7 @@ class ADnote
 
             // Modulator parameters
             FMTYPE FMEnabled;
+            bool FMringToSide;
             unsigned char FMFreqFixed;
             int    FMVoice;
             float *VoiceOut; // Voice Output used by other voices if use this as modullator

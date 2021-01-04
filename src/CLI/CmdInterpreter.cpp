@@ -1,7 +1,7 @@
 /*
     CmdInterpreter.cpp
 
-    Copyright 2019 - 2020, Will Godfrey and others.
+    Copyright 2019 - 2021, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -3363,6 +3363,14 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
             else
                 value -= 1;
             cmd = ADDVOICE::control::externalModulator;
+        }
+        if (input.matchnMove(2, "sideband"))
+        {
+            if (readControl(synth, 0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != 2)
+                return REPLY::inactive_msg;
+
+            cmd = ADDVOICE::control::modRingToSide;
+            value = (input.toggle() == 1);
         }
 
         if (input.matchnMove(3, "oscillator"))
