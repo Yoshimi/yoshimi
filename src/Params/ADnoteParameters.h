@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2018, Will Godfrey
-    Copyright 2020 Kristian Amlie, Will Godfrey
+    Copyright 2020-2021 Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -170,6 +170,7 @@ struct ADnoteVoiceParam { // Voice parameters
 
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
+    bool PFMringToSide;        // allow carrier through
     short int     PFMVoice;   // Voice that I use as modullator instead of POscilFM.
                               // It is -1 if I use POscilFM(default).
                               // It may not be equal or bigger than current voice
