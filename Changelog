@@ -1,7 +1,10 @@
-yoshimi 1.7.4
+yoshimi 1.7.4 M
 
-2020-01-05 Will
+2021-1-5 Will
+* Merged in resize branch
+* Corrected date below
 
+2021-1-5 Will
 Temporarily disabled ring mod sideband feature.
 Skipped over missing build numbers.
 Set release version 1.7.4
