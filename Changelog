@@ -1,4 +1,9 @@
-yoshimi 1.7.3
+yoshimi 1.7.4
+
+2020-01-05 Will
+Temporarily disabled ring mod sideband feature.
+Skipped over missing build numbers.
+Set release version 1.7.4
 
 2020-12-27 Will
 Added recommendation to set inst. type when saving.

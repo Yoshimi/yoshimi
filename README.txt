@@ -1,6 +1,6 @@
-V1.7.2
+V1.7.4
 
-A maintenance release.
+Another maintenance release. However it also includes a check when saving instruments. This recommends setting an instrument type. You can ignore this, but it is hoped the reminder will prompt more people to add it.
 
 We welcome all help and feedback.
 We listen and respond to suggestions and problems.
