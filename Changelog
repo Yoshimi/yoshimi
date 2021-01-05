@@ -3,6 +3,7 @@ yoshimi 1.7.4 M
 2021-1-5 Will
 * Merged in resize branch
 * Corrected date below
+* Reinstated Ring mod sideband trial
 
 2021-1-5 Will
 Temporarily disabled ring mod sideband feature.

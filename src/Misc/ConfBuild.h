@@ -2,5 +2,5 @@
     ConfBuild.h
 */
 
-#define BUILD_NUMBER 1878
+#define BUILD_NUMBER 1879
 
