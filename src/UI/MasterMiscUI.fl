@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2020, Will Godfrey
+Copyright 2014-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -689,27 +689,5 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     audiosend->labelsize(size);
         audiosend->textsize(size);
     partenabled->labelsize(int(15 * dScale));} {}
-  }
-}
-
-class ClearMenuBar {: {public Fl_Menu_Bar}
-} {
-  Function {ClearMenuBar(int x, int y, int w, int h) : Fl_Menu_Bar(x,y,w,h)} {
-    comment {Menu bar drawing only the bottom border}
-  } {
-    code {} {}
-  }
-  Function {draw()} {return_type void
-  } {
-    code {//
-    int m = 10; // margin larger than border in any style
-    fl_push_clip(x(),y(),w(),h());
-    fl_draw_box(box(), x() - m, y() - m, w() + 2 * m, h() + m, color());
-    fl_pop_clip();
-    Fl_Boxtype _box = box();
-    // Draw menu like normal, but without a box
-    box(FL_NO_BOX);
-    Fl_Menu_Bar::draw();
-    box(_box);} {}
   }
 }

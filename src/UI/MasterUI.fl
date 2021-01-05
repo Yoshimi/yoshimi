@@ -264,7 +264,6 @@ class MasterUI {: {private GuiUpdates}
       }
       if (starterror.find("Could not") != std::string::npos)
           query("", "", "", starterror);
-
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
       yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
       logenable = fetchData(0, CONFIG::control::reportsDestination, TOPLEVEL::section::config);
@@ -342,22 +341,19 @@ class MasterUI {: {private GuiUpdates}
             }}
       xywh {827 535 385 470} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(mainDW, mainDH, 0, 0, 0, 0, 1);} xclass Yoshimi
+      code1 {masterwindow->size_range(394, 480, 0, 0, 0, 0, 1);}
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
-        xywh {-7 0 395 25} labelsize 12 textsize 12
-        class ClearMenuBar
-      } {
-        Submenu Yoshimi {
-          label {&Yoshimi}
-          xywh {0 0 96 20} labelsize 12
-        } {
-          MenuItem Y_about {
-            label {&About...}
-            callback {//
+        callback {//
+    int found = o->value();
+    //std::cout << "switch found " << found << std::endl;
+    switch (found)
+        {
+        case 1: // about
+            {
             int X, Y, W, H, O;
             loadWin(synth, W, H, X, Y, O, "Master-about");
             if (W < aboutDW || H < aboutDH)
@@ -367,12 +363,10 @@ class MasterUI {: {private GuiUpdates}
             }
             checkSane(X, Y, W, H, aboutDW, aboutDH);
             aboutwindow->resize(X, Y, W, H);
-            aboutwindow->show();}
-            tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
-          }
-          MenuItem newinstanceid {
-            label {&New instance...}
-            callback {//
+            aboutwindow->show();
+            }
+            break;
+        case 2: // new instance
             if (synth->getIsLV2Plugin())
             {
                 query("", "", "", "Start new instances from host");
@@ -384,140 +378,87 @@ class MasterUI {: {private GuiUpdates}
                 return;
             }
             startInstance();
-            /*string sId = input_text(synth, "Accept next, or enter desired instance id...", "next");
-            unsigned int forceId = 0;
-            if (sId > "" && sId != "next")
-                forceId = string2uint(sId);
-            send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, forceId, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-            */}
-            xywh {0 0 31 21} labelsize 12
-          }
-          MenuItem Y_settings {
-            label {&Settings...}
-            callback {configui->Show(synth);}
-            tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
-          }
-          MenuItem Y_reports {
-            label {&Reports...}
-            callback {//
-    if (logenable)
-        yoshiLog->Show(synth);
-    else
-        alert(synth, "Logging configured for std::cout");}
-            xywh {0 0 34 20} labelsize 12
-          }
-          MenuItem Y_manual {
-            label {&View Manual}
-            callback {//
+            break;
+        case 3: // settings
+            configui->Show(synth);
+            break;
+        case 4: // reports
+            if (logenable)
+                yoshiLog->Show(synth);
+            else
+                alert(synth, "Logging configured for std::cout");
+            break;
+        case 5: // manual
             words->copy_label("Searching for the manual.");
-          message->show();
-          message->position(masterwindow->x() + 36, masterwindow->y() + 170);
+            message->show();
+            message->position(masterwindow->x() + 36, masterwindow->y() + 170);
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-            return;}
-            xywh {0 0 34 20} labelsize 12
-          }
-          MenuItem Y_exit {
-            label {E&xit}
-            callback {masterwindow->do_callback();}
-            xywh {10 10 100 20} labelsize 12
-          }
-        }
-        Submenu Instruments {
-          label {&Instruments}
-          xywh {0 0 100 20} labelsize 12
-          code0 {(void) o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Instrument);}
-          code2 {if (listType.size() == 0) RecentInstruments->deactivate(); else RecentInstruments->activate();}
-        } {
-          MenuItem I_show {
-            label {S&how Stored...}
-            callback {bankui->Show();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem I_load {
-            label {&Load External...}
-            callback {//
-                string filename = setfiler("", "", false, TOPLEVEL::XML::Instrument);
-                if (filename.empty())
-                    return;
-                do_load_instrument(filename);}
-            tooltip {Load an instrument (.xi*) file} xywh {30 30 100 20} labelsize 12
-          }
-          MenuItem I_save {
-            label {&Save External...}
-            callback {//
-        /*
-         * Instruments are an exception for saving as we always want
-         * to offer the INTERNAL name first rather than a possibly
-         * confusing external filename.
-         */
-         string newname = synth->part[activePart]->Pname;
-         if (newname == DEFAULT_NAME)
-         {
-             query("", "", "", "Nothing to save!");
-             return;
-         }
-         if (synth->part[activePart]->info.Ptype == 0)
-         {
-             if (choice(synth, "", "Save", "Cancel", "Please set instrument type before saving.\\nCopyright info also recommended.") != 2)
-                 return;
-         }
-         string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);
-         if (filename.empty())
-             return;
+            break;
+        case 6: // exit
+            masterwindow->do_callback();
+            break;
 
-         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
-         return;}
-            tooltip {Save current instrument to an .xi* file} xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem RecentInstruments {
-            label {&Recent Instruments...}
-            callback {//
+        case 7: // section instruments
+            break;
+        case 8: // section instruments
+            break;
+        case 9: // show
+            bankui->Show();
+            break;
+        case 10: // load
+            {
+            string filename = setfiler("", "", false, TOPLEVEL::XML::Instrument);
+            if (!filename.empty())
+                do_load_instrument(filename);
+            }
+            break;
+        case 11: // save
+            {
+            /*
+            * Instruments are an exception for saving as we always want
+            * to offer the INTERNAL name first rather than a possibly
+            * confusing external filename.
+            */
+            string newname = synth->part[activePart]->Pname;
+            if (newname == DEFAULT_NAME)
+            {
+                query("", "", "", "Nothing to save!");
+                return;
+            }
+            if (synth->part[activePart]->info.Ptype == 0)
+            {
+                if (choice(synth, "", "Save", "Cancel", "Please set instrument type before saving.\\nCopyright info also recommended.") != 2)
+                    return;
+            }
+            string filename = setfiler("", newname, true, TOPLEVEL::XML::Instrument);
+            if (!filename.empty())
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedInstrument, activePart, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(filename)));
+            }
+            break;
+        case 12: // recent
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(TOPLEVEL::XML::Instrument);}
-            xywh {10 10 34 21} labelsize 12
-          }
-          MenuItem I_clear {
-            label {&Clear}
-            callback {//
-                if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
-                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart,partui->npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-            xywh {35 35 100 20} labelsize 12
-          }
-          MenuItem I_search {
-            label {S&earch...}
-            callback {//
-        /*if (!synth->getRuntime().checksynthengines)
-        {
-            query("", "", "", "'Show engines/types' must be checked in Mixer Panel");
-            return;
-        }*/
-        bankui->ShowSearch();}
-            xywh {0 0 34 20} labelsize 12
-          }
-        }
-        Submenu Parameters {
-          label {&Patch Sets}
-          xywh {0 0 70 20} labelsize 12
-          code0 {(void) o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Patch);}
-          code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
-        } {
-          MenuItem P_show {
-            label {S&how Patch Banks...}
-            callback {//
-            bankui->Showbank();}
-            xywh {30 30 100 20} labelsize 12
-          }
-          MenuItem P_load {
-            label {&Load External...}
-            callback {//
-            do_load_master("");}
-            tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem Save {
-            label {&Save External...}
-            callback {//
+            paramsui->Show(TOPLEVEL::XML::Instrument);
+            break;
+        case 13: // clear
+            if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
+                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart,partui->npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+            break;
+        case 14: // search
+            bankui->ShowSearch();
+            break;
+
+        case 15: // section parameters
+            break;
+        case 16: // section parameters
+            break;
+        case 17: // show
+            bankui->Showbank();
+            break;
+        case 18: // load
+             do_load_master("");
+            break;
+        case 19: // save
+            {
             bool valid = false;
             for (int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
                 if (synth->part[npart]->Pname != DEFAULT_NAME)
@@ -528,74 +469,92 @@ class MasterUI {: {private GuiUpdates}
             if (valid)
                 do_save_master();
             else
-                query("", "", "", "Nothing to save!");}
-            tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem RecentParams {
-            label {&Recent Sets...}
-            callback {//
+                query("", "", "", "Nothing to save!");
+            }
+            break;
+        case 20: // recent
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(TOPLEVEL::XML::Patch);}
-            xywh {0 0 34 21} labelsize 12
-          }
-        }
-        Submenu Paths {
-          label {Pat&hs}
-          xywh {0 0 65 20} labelsize 12
-        } {
-          MenuItem RootDir {
-            label {&Bank Root Dirs...}
-            callback {//
-            bankui->ShowRoot();}
-            xywh {30 30 100 20} labelsize 12
-          }
-          MenuItem PresetDir {
-            label {&Preset Dirs...}
-            callback {//
-            configui->Showpresets(synth);}
-            xywh {0 0 34 20} labelsize 12
-          }
-        }
-        Submenu Scales {
-          label {&Scales}
-          tooltip {Clear all parameters to default settings} xywh {0 0 60 20} labelsize 12
-          code0 {(void) o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Scale);}
-          code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
-        } {
-          MenuItem S_show {
-            label {S&how Settings...}
-            callback {//
-            microtonalui->showScales();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem S_load {
-            label {&Load...}
-            callback {//
-                filename = setfiler("", "", false, TOPLEVEL::XML::Scale);
-                if (!filename.empty())
-                    do_load_scale(string(filename));}
-            xywh {35 35 100 20} labelsize 12
-          }
-          MenuItem S_save {
-            label {&Save...}
-            callback {//
-                string filename = setfiler("", "", true, TOPLEVEL::XML::Scale);
-                if (filename.empty())
-                    return;
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));}
-            xywh {25 25 100 20} labelsize 12
-          }
-          MenuItem RecentScale {
-            label {&Recent Scales...}
-            callback {//
+            paramsui->Show(TOPLEVEL::XML::Patch);
+            break;
+
+        case 21: // section paths
+            break;
+        case 22: // section paths
+            break;
+        case 23: // root dir
+            bankui->ShowRoot();
+            break;
+        case 24: // preset dir
+            configui->Showpresets(synth);
+            break;
+
+        case 25: // section state
+            break;
+        case 26: // section state
+            break;
+
+        case 27: // load
+            {
+            // for Alessandro
+            string filename = setfiler("", "", false, TOPLEVEL::XML::State);
+            if (!filename.empty())
+            {
+                setState(filename);
+                //RecentState->activate();
+            }
+            else
+                refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));
+            }
+            break;
+        case 28: // save
+            {
+            // for Alessandro
+            string filename = setfiler("", "", true, TOPLEVEL::XML::State);
+            if (filename.empty())
+
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+            //mastermenu[28].activate();
+            }
+            break;
+        case 29: // default
+            {
+            string name = synth->getRuntime().defaultStateName;
+            name += ("-" + to_string(instance));
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));
+
+            }
+            break;
+        case 30: // recent
             paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-paramsui->Show(TOPLEVEL::XML::Scale);}
-            xywh {20 20 34 21} labelsize 12
-          }
-          MenuItem S_clear {
-            label {&Clear}
-            callback {\#
+            paramsui->Show(TOPLEVEL::XML::State);
+            break;
+
+        case 31: // section scales
+            break;
+        case 32: // section scales
+            break;
+        case 33: // show
+            microtonalui->showScales();
+            break;
+        case 34: // load
+            {
+            filename = setfiler("", "", false, TOPLEVEL::XML::Scale);
+            if (!filename.empty())
+                do_load_scale(string(filename));
+            }
+            break;
+        case 35: // save
+            {
+            string filename = setfiler("", "", true, TOPLEVEL::XML::Scale);
+            if (!filename.empty())
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedScale, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+            }
+            break;
+        case 36: // recent
+            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            paramsui->Show(TOPLEVEL::XML::Scale);
+            break;
+        case 37: // clear
             if (query("", "Yes", "No", "Set scales to the defaults?") > 1)
             {
                 synth->microtonal.defaults();
@@ -604,57 +563,43 @@ paramsui->Show(TOPLEVEL::XML::Scale);}
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal, synth);
                 send_data(TOPLEVEL::action::forceUpdate, SCALES::control::clearAll, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::scales);
-            }}
-            xywh {0 0 34 20} labelsize 12
-          }
-        }
-        Submenu State {
-          label {S&tate}
-          xywh {0 0 60 20} labelsize 12
-          code0 {(void) o; // suppress warning}
-          code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::State);}
-          code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
-        } {
-          MenuItem loadState {
-            label {&Load...}
-            callback {// for Alessandro
-            string filename = setfiler("", "", false, TOPLEVEL::XML::State);
-            if (!filename.empty())
-            {
-                setState(filename);
-                RecentState->activate();
             }
-            else
-                refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));}
-            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem saveState {
-            label {&Save...}
-            callback {// for Alessandro
-            string filename = setfiler("", "", true, TOPLEVEL::XML::State);
-            if (filename.empty())
+            break;
+      }}
+        xywh {-7 0 395 25} labelsize 12 textsize 12
+        code0 {//
+        o->add("&Yoshimi  /&About...");
+        o->add("&Yoshimi  /&New Instance");
+        o->add("&Yoshimi  /&Settings...");
+        o->add("&Yoshimi  /&Reports");
+        o->add("&Yoshimi  /&View Manual");
+        o->add("&Yoshimi  /&Exit");
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
-            RecentState->activate();}
-            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-          }
-          MenuItem Default {
-            label {Save as &Default}
-            callback {//
-                string name = synth->getRuntime().defaultStateName;
-                name += ("-" + to_string(instance));
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));}
-            tooltip {Save as default state (if load default checked)} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem RecentState {
-            label {&Recent States...}
-            callback {//
-            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-            paramsui->Show(TOPLEVEL::XML::State);}
-            xywh {10 10 34 21} labelsize 12
-          }
-        }
-      }
+        o->add("&Instrument  /S&how Stored...");
+        o->add("&Instrument  /&Load External...");
+        o->add("&Instrument  /&Save External...");
+        o->add("&Instrument  /&Recent Instruments...");
+        o->add("&Instrument  /&Clear");
+        o->add("&Instrument  /S&earch...");
+
+        o->add("&PatchSet  /&S&how Patch Banks...");
+        o->add("&PatchSet  /&Load External...");
+        o->add("&PatchSet  /&Save External...");
+        o->add("&PatchSet  /&Recent sets...");
+
+        o->add("Pat&h  /&Bank Root Dirs...");
+        o->add("Pat&h  /&Preset Dirs...");
+
+        o->add("&State  /&Load...");
+        o->add("&State  /&Save...");
+        o->add("&State  /&Save As default");
+        o->add("&State  /&Recent States");
+
+        o->add("S&cale/S&how Settings...");
+        o->add("S&cale/&Load...");
+        o->add("S&cale/&Save...");
+        o->add("S&cale/&Recent Scales...");}
+      } {}
       Fl_Group MasterControls {
         label {Master  }
         xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
@@ -2310,7 +2255,7 @@ Alan Calvert started the project}
 
         case MAIN::control::loadInstrumentByName:
             updatepartprogram(kititem);
-            RecentInstruments->activate();
+            //RecentInstruments->activate();
             break;
 
         case MAIN::control::saveNamedInstrument: // save instrument
@@ -2324,7 +2269,7 @@ Alan Calvert started the project}
             {
                 partui->setinstrumentlabel();
                 panellistitem[newpart % NUM_MIDI_CHANNELS]->refresh();
-                RecentInstruments->activate();
+                //RecentInstruments->activate();
             }
             break;
 
@@ -2338,7 +2283,7 @@ Alan Calvert started the project}
             else
             {
                 vectorui->RefreshChans();
-                RecentParams->activate();
+                //RecentParams->activate();
                 setMasterLabel(findLeafName(name));
                 refresh_master_ui(2);
             }
@@ -2355,7 +2300,7 @@ Alan Calvert started the project}
             else
             {
                 setMasterLabel(findLeafName(name));
-                RecentParams->activate();
+                //RecentParams->activate();
                 updatepanel(); // why?
             }
             break;
@@ -2399,7 +2344,7 @@ Alan Calvert started the project}
             }
             else
             {
-                RecentScale->activate();
+                //RecentScale->activate();
                 microtonalui->microtonaluiwindow->hide();
                 microtonalui->make_window();
                 microtonalui->showScales();
@@ -2410,8 +2355,8 @@ Alan Calvert started the project}
             name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
                 query("", "", "", name);
-            else
-                RecentScale->activate();
+            //else
+                //RecentScale->activate();
             break;
 
         case MAIN::control::loadNamedState: // load state
@@ -3431,44 +3376,7 @@ Alan Calvert started the project}
     int size11 = int(11 * dScale);
     int size12 = int(12 * dScale);
 
-    Yoshimi->labelsize(size12);
-        Y_about->labelsize(size12);
-        newinstanceid->labelsize(size12);
-        Y_settings->labelsize(size12);
-        Y_reports->labelsize(size12);
-        Y_manual->labelsize(size12);
-        Y_exit->labelsize(size12);
-
-    Instruments->labelsize(size12);
-        I_show->labelsize(size12);
-        I_load->labelsize(size12);
-        I_save->labelsize(size12);
-        RecentInstruments->labelsize(size12);
-        I_clear->labelsize(size12);
-        I_search->labelsize(size12);
-
-    Parameters->labelsize(size12);
-        P_show->labelsize(size12);
-        P_load->labelsize(size12);
-        Save->labelsize(size12);
-        RecentParams->labelsize(size12);
-
-    Paths->labelsize(size12);
-        RootDir->labelsize(size12);
-        PresetDir->labelsize(size12);
-
-    Scales->labelsize(size12);
-        S_show->labelsize(size12);
-        S_load->labelsize(size12);
-        S_save->labelsize(size12);
-        RecentScale->labelsize(size12);
-        S_clear->labelsize(size12);
-
-    State->labelsize(size12);
-        loadState->labelsize(size12);
-        saveState->labelsize(size12);
-        Default->labelsize(size12);
-        RecentState->labelsize(size12);
+    mastermenu->textsize(size12);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
