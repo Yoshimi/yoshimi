@@ -436,8 +436,13 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
         case 12: // recent
-            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            {
+            int xpos = masterwindow->x() + (masterwindow->w() * 0.15f);
+            if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
+                xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
+            paramsui->Recent->position(xpos,masterwindow->y()+20);
             paramsui->Show(TOPLEVEL::XML::Instrument);
+            }
             break;
         case 13: // clear
             if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
@@ -473,8 +478,13 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
         case 20: // recent
-            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            {
+            int xpos = masterwindow->x() + (masterwindow->w() * 0.35f);
+            if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
+                xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
+            paramsui->Recent->position(xpos,masterwindow->y()+20);
             paramsui->Show(TOPLEVEL::XML::Patch);
+            }
             break;
 
         case 21: // section paths
@@ -498,10 +508,7 @@ class MasterUI {: {private GuiUpdates}
             // for Alessandro
             string filename = setfiler("", "", false, TOPLEVEL::XML::State);
             if (!filename.empty())
-            {
                 setState(filename);
-                //RecentState->activate();
-            }
             else
                 refresh_master_ui(0x80 | (textMsgBuffer.push(" ") << 8));
             }
@@ -513,7 +520,6 @@ class MasterUI {: {private GuiUpdates}
             if (filename.empty())
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
-            //mastermenu[28].activate();
             }
             break;
         case 29: // default
@@ -525,8 +531,14 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
         case 30: // recent
-            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            {
+            int xpos = masterwindow->x() + (masterwindow->w() * 0.616f);
+            if (xpos + paramsui->Recent->w() > masterwindow->x() + masterwindow->w())
+                xpos = masterwindow->x() + masterwindow->w() - paramsui->Recent->w();
+            paramsui->Recent->position(xpos,masterwindow->y()+20);
+
             paramsui->Show(TOPLEVEL::XML::State);
+            }
             break;
 
         case 31: // section scales
@@ -551,7 +563,7 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
         case 36: // recent
-            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+            paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(), masterwindow->y()+20);
             paramsui->Show(TOPLEVEL::XML::Scale);
             break;
         case 37: // clear
