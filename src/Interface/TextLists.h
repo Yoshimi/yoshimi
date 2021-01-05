@@ -450,7 +450,7 @@ static std::string addmodlist [] = {
     "FREquency","",
     "PULse",                "pulse width",
     "","",
-//    "SIdeband <s>",         "only sidebands for ring mod (ON, {other})",
+    "SIdeband <s>",         "only sidebands for ring mod (ON, {other})",
     "Volume <n>",           "volume",
     "VElocity <n>",         "velocity sensing sensitivity",
     "Damping <n>",          "higher frequency relative damping",
