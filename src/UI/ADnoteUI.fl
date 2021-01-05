@@ -644,7 +644,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
         int tmp = 1 -  o->value();
         o->value(tmp);
         send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modRingToSide, tmp, TOPLEVEL::type::Integer);} selected
-            tooltip {Only use sidebands} xywh {635 32 18 18} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX color 237 selection_color 130 labelsize 10 deactivate
+            tooltip {Only use sidebands} xywh {635 32 18 18} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX color 237 selection_color 130 labelsize 10 hide deactivate
             code0 {o->value(pars->VoicePar[nvoice].PFMringToSide);}
           }
           Fl_Group {} {

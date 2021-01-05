@@ -1,0 +1,13 @@
+use  Hex value    Character represented
+\a      07      Alert (Beep, Bell) (added in C89)[1]
+\b      08      Backspace
+\e      1B      Escape character
+\f      0C      Formfeed Page Break
+\n      0A      Newline (Line Feed); see notes below
+\r      0D      Carriage Return
+\t      09      Horizontal Tab
+\v      0B      Vertical Tab
+\\      5C      Backslash
+\'      27      Apostrophe or single quotation mark
+\"      22      Double quotation mark
+\?      3F      Question mark (used to avoid trigraphs)
