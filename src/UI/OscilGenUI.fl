@@ -11,7 +11,7 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2020 Will Godfrey and others.
+Copyright 2016-2021 Will Godfrey and others.
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -519,7 +519,7 @@ o->hide();}
               o->value(0);
 
           send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+        tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
         code0 {if (oscil->ADvsPAD) o->hide();}
         class mwheel_val_slider_rev
       }
@@ -558,7 +558,7 @@ o->hide();}
           xywh {460 285 30 16} box FLAT_BOX labelsize 11
         }
         Fl_Value_Output bfparval {
-          xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1
+          xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1 textfont 1 textsize 12
         }
         Fl_Group basefuncmodulation {
           xywh {550 276 169 25} box ENGRAVED_BOX
@@ -1281,7 +1281,7 @@ o->hide();}
             bftype->textsize(size11);
         basename->labelsize(size12);
         parname->labelsize(size11);
-            bfparval->textsize(size14);
+            bfparval->textsize(size12);
         bfmodtype->labelsize(size);
             bfmodtype->textsize(size);
 
