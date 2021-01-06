@@ -21,7 +21,7 @@ BugFix: GUI not setting kit item names.
 
 2020-10-29 Will
 *Updated docs.
-* Set release as 1.7.3 (mantenance)
+* Set release as 1.7.3 (maintenance)
 
 2020-10-27 Will
 * BugFix: base func mod not enabled for triangle wave.
@@ -247,7 +247,7 @@ BugFix: GUI not setting kit item names.
 2020-6-5 Will
 * Added line in AddNote.cpp ring mod code for amp mod.
   Commented out, but there for trials.
-* General cleanups and removed reduntant code.
+* General cleanups and removed redundant code.
 * BugFix: Request for invalid root reports, but still sets it!
 
 2020-6-4 Will
@@ -427,7 +427,7 @@ BugFix: GUI not setting kit item names.
 * Added Volume to channel aftertouch.
 
 2020-4-2 Will
-* BugFix: MIDI-learn initialsing killing GUI startup warnings.
+* BugFix: MIDI-learn initialising killing GUI startup warnings.
 * Imroved first time startup messages and bank actions.
 
 2020-3-31 Will
@@ -445,7 +445,7 @@ BugFix: GUI not setting kit item names.
   Some tidying yet to do.
 
 2020-3-29 Will
-* Fixed regresssion. Loading MIDIlearn not displaying.
+* Fixed regression. Loading MIDIlearn not displaying.
 * MIDIlearn and Vector added to improved GUI windowing.
 * Mixer, Banks, VertKeyb added to improved GUI windowing.
 * Console, Scales added to improved GUI windowing.
@@ -586,7 +586,7 @@ BugFix: GUI not setting kit item names.
     This appears to have been lost some time ago.
 
 * Completed merge of rebank.
-* Found and removed aditional redundant code.
+* Found and removed additional redundant code.
 
 2020-2-3 Will
 :rebank:  basic structure now in place.
@@ -743,12 +743,12 @@ BugFix: GUI not setting kit item names.
 
 2019-11-29 Will
 * State fully integrated in session management.
-* Jack session almost completly done.
+* Jack session almost completely done.
   Seem to have broken saving :(
 * Temporary fix for Jack session save.
 
 2019-11-28 Will
-* Began state machine for all session managment.
+* Began state machine for all session management.
 * Default state done with lockin prevention.
 
 2019-11-27 Will
@@ -773,7 +773,7 @@ BugFix: GUI not setting kit item names.
   yoshimi.config only has base parameters
   there is a new yoshimi-o.instance file
   no instance files include base parameters
-  no state files include base paramters
+  no state files include base parameters
 * Removed extra redundant config code.
 * Further refinements to startup config.
 * Fixed potential memory leak.
@@ -811,7 +811,7 @@ BugFix: GUI not setting kit item names.
 2019-11-15 Will
 * Applied experimental optinisations to OscilGenUI.
 * Minor correction to CLI info lists.
-* Further small adustment to OscilGenUI.
+* Further small adjustment to OscilGenUI.
   Confirmed OK on Raspberry Pi.
 * Revised CMakeLists.txt NEON changed to RasPi4.
   (it never worked before anyway!)
@@ -833,7 +833,7 @@ BugFix: GUI not setting kit item names.
 
 2019-11-8 Will
 * Mixer Panel format can be changed from config.
-  This alows control form typical 7in displays.
+  This allows control form typical 7in displays.
 * GUI suppress change warning on force exit.
 
 2019-11-7 Will
@@ -1061,7 +1061,7 @@ BugFix: GUI not setting kit item names.
 * Updated docs and metadata.
 
 2019-8-18 Will
-* Implimented formal calls for instrument Engine/Type checks.
+* Implemented formal calls for instrument Engine/Type checks.
 * Implemented CLI access to instrument Engine/Type checks.
 * Updated docs.
 
@@ -1192,7 +1192,7 @@ BugFix: GUI not setting kit item names.
  * Updated /Miscellany/Images.
 
 2019-7-10 Will
-* Implimented formal calls to read current root and bank.
+* Implemented formal calls to read current root and bank.
 * All instrument name bank calls now require root and bank.
   current values no longer assumed.
 * Applied minor buffer size optimisation.
@@ -1250,7 +1250,7 @@ BugFix: GUI not setting kit item names.
   Not MLearn yet and Instruments only 16 parts.
 * Updated NRPN docs.
 * Improved history NRPNs.
-  Easier to use and greater flexibilty.
+  Easier to use and greater flexibility.
 * Updated docs (again!).
 
 2019-6-21 Will
@@ -1300,7 +1300,7 @@ BugFix: GUI not setting kit item names.
 
 2019-6-3 Will
 * Applied modulation patch from Kristian.
-* BugFix: Message list clearing was too agressive.
+* BugFix: Message list clearing was too aggressive.
   This prevented state loads from including mide-learn
   control names.
 * BugFix: Load instrument by name failed for yoshi type.
@@ -1377,10 +1377,10 @@ BugFix: GUI not setting kit item names.
 2019-5-18 Will
 * Low prio and Loopback transferred in Interchange.
   Copied across in CLI and GUI.
-* MIDI, CLI, GUI transfered from type to source.
+* MIDI, CLI, GUI transferred from type to source.
 
 2019-5-17 Will
-* Started transfering Low prio and Loopback
+* Started transferring Low prio and Loopback
   from control block parameter byte to source byte
 
 2019-5-16 Will
@@ -1398,7 +1398,7 @@ BugFix: GUI not setting kit item names.
 * Set release as 1.5.11
 * Added missing Manual :(
 * Set release as 1.5.11.1
-* Merged in Foward commits.
+* Merged in Forward commits.
 * Made Instance control and Spot noise permanent.
 
 2019-5-11 Will
@@ -1561,7 +1561,7 @@ BugFix: GUI not setting kit item names.
 2019-4-6 Will
 * Disable GUI Analog Phaser controls when not set.
 * Revised Gui Layout to make this more obvious.
-* Further adustments - Phase disabled for Analog.
+* Further adjustments - Phase disabled for Analog.
 * Re-ordered controls.
 * L/R also disabled for Analog.
 
@@ -1746,7 +1746,7 @@ BugFix: GUI not setting kit item names.
   faster performance is not portable across CPU types.
   These conversion were all for positive only values so
   there is no +- zero issue and the int+truncf combination
-  is *much* slower than just int, yet does exacly the same.
+  is *much* slower than just int, yet does exactly the same.
 
 2019-1-23 Will
 * Removed all remaining mutex references.
@@ -1758,7 +1758,7 @@ BugFix: GUI not setting kit item names.
   Currently it seems you can only set one command line
   argument. Observed priority is .state .xmz .xiz .xly
   Need to see if this can be made recursive.
-* Minor adustments to startup handover.
+* Minor adjustments to startup handover.
 
 2019-1-20 Will
 * Sending SIGUSR2 to running Yoshimi starts new instance.
@@ -1800,7 +1800,7 @@ BugFix: GUI not setting kit item names.
   by Will while reworking the PRNGs.
 
 2018-12-22 Will
-* Frequency LFO regresion fix from Rob.
+* Frequency LFO regression fix from Rob.
 * Set version as 1.5.10 rc3
 
 2018-12-21 Hermann
@@ -2097,7 +2097,7 @@ BugFix: GUI not setting kit item names.
 2018-9-16 Will
 * Added contributors list to About window.
 * Made some startup entries stdout only.
-* Removed some instance startup dublication.
+* Removed some instance startup duplication.
 * CLI envelope freemode done.
   Some reporting errors and missing checks.
 * Improved CLI filter help list.
@@ -2114,7 +2114,7 @@ BugFix: GUI not setting kit item names.
 
 2018-9-14 Will
 * Refactored CLI internal messaging.
-* Implimented CLI scripts.
+* Implemented CLI scripts.
 
 2018-9-13 Will
 * Set up CLI list entries for formant filter.
@@ -2228,7 +2228,7 @@ BugFix: GUI not setting kit item names.
 * Revised and simplified CLI Mlearn section.
 
 2018-8-24 Will
-* Temporary fix to banks selection anomally
+* Temporary fix to banks selection anomaly
   The whole of bank needs review.
 * More work on CLI part level controls.
 
@@ -2464,13 +2464,13 @@ BugFix: GUI not setting kit item names.
 * Further work on Interchange.cpp
 * CLI Part level mostly converted.
 * Corrected multiple commit/merge failures :(
-* Further adustments to Interchange.cpp
+* Further adjustments to Interchange.cpp
 
 2018-6-22 Will
 * Moved CommandBlock from MiscFuncs'.h to globals.h
 * Set up part level controls enum in globals.h
   Converted actual commands in Interchange.cpp
-* Implimented small optimisation for reads.
+* Implemented small optimisation for reads.
 * Minor doc updates.
 * Completed part controls move in  Interchange.cpp
 
@@ -2478,14 +2478,14 @@ BugFix: GUI not setting kit item names.
 * Instruments can now be swapped between banks and roots.
 * Small doc updates.
 * Created new globals.h file.
-  Transfered definitions from CMakeLists.txt
+  Transferred definitions from CMakeLists.txt
 
 2018-6-13 Will
 * Small optimisation in 'zread'.
   Also shortened read loop usleep time to 10uS.
 
 2018-6-13 Will
-* implimented 'zread' CLI test for command structure.
+* implemented 'zread' CLI test for command structure.
 
 2018-6-11 Will
 * Bugfix: Wasn't reloading solo-twoway.
@@ -2524,12 +2524,12 @@ BugFix: GUI not setting kit item names.
 2018-5-24 Will
 * Revised Config.cpp so instances get base config.
   Previously they had the system defaults.
-* Corrected anomally with loading saved states.
+* Corrected anomaly with loading saved states.
   Loaded the wrong one under some circumstances :(
 * Set version as 1.5.8 rc4
 
 2018-5-23 Will
-* Corrected minor anomally in channel switcher.
+* Corrected minor anomaly in channel switcher.
 * Solo modes except column use blue for highlight.
   This is in the mixer window and easier to identify.
 * Set version as 1.5.8 rc3
@@ -2581,7 +2581,7 @@ BugFix: GUI not setting kit item names.
 
 2018-5-3 Will
 * Added 'recoil' mode to channel switcher (Solo).
-  Incomming CC value:
+  Incoming CC value:
   0         ignore
   1 to 63   decrement active part MOD 16
   64 to 127 increment active part MOD 16
@@ -2690,7 +2690,7 @@ BugFix: GUI not setting kit item names.
 2018-3-16 Will
 * Implemented Tabbed AddSynth Voices.
 * Changed layout as workround for bottom edge bug.
-  Needs sorting for contol knobs anywhere :(
+  Needs sorting for control knobs anywhere :(
 * Set version as 1.5.7 rc4
 
 2018-3-12 Will
@@ -2813,7 +2813,7 @@ BugFix: GUI not setting kit item names.
 * Considerable updates to dev_notes.
 * BugFix: Importing keymap not updating GUI.
 * Further refinements to data read function.
-* Small improvements to master reset behavour.
+* Small improvements to master reset behaviour.
 * More doc updates.
 
 2018-2-3 Will
@@ -2900,7 +2900,7 @@ BugFix: GUI not setting kit item names.
 
 2018-1-4 Will
 * Corrected message for unknown MIDI event.
-  Also now as hex and obeys 'Log incomming events'
+  Also now as hex and obeys 'Log incoming events'
 
 2017-12-31 Will
 * Removed some redundant threadmessage code.
@@ -3061,7 +3061,7 @@ BugFix: GUI not setting kit item names.
 
 2017-11-25 Will
 * Improved protection for channel switch.
-* Implimented CC 68 - Legato pedal.
+* Implemented CC 68 - Legato pedal.
 * BugFix: CC 68 brace in wrong place :(
 
 2017-11-24 Will
@@ -3138,7 +3138,7 @@ BugFix: GUI not setting kit item names.
 * Updated docs.
 
 2017-11-10 Will
-* Code cleanups around incomming MIDI.
+* Code cleanups around incoming MIDI.
 
 2017-11-9 Will
 * GUI copy/paste now threadsafe
@@ -3184,7 +3184,7 @@ BugFix: GUI not setting kit item names.
 2017-10-31 Will
 * Further inprovments to unified root/bank/program.
 * Added 'Root_Bank_Program.txt' to dev_notes.
-* Corrected anomally with GUI bank list entries.
+* Corrected anomaly with GUI bank list entries.
 
 2017-10-30 Will
 * MIDI controllers done for CLI  direct access
@@ -3201,7 +3201,7 @@ BugFix: GUI not setting kit item names.
 * NRPNs can now be completely ignored.
 
 2017-10-26 Will
-* Corrected GUI panel anomally when changing parts.
+* Corrected GUI panel anomaly when changing parts.
 * Started implimenting unified root/bank/program change.
 * Applied mutex lock corrections suggested by 'blubee'.
 * Corrected implied cast in jackengine.
@@ -3326,7 +3326,7 @@ BugFix: GUI not setting kit item names.
 
 2017-9-4 Will
 * Effects transferred to lock free.
-  Noticed long-standing anomally with some dynfilter
+  Noticed long-standing anomaly with some dynfilter
   control only working on release.
 * Filters mostly transferred to lock free.
   Some formant controls not done yet.
@@ -3358,7 +3358,7 @@ BugFix: GUI not setting kit item names.
 * Removed unnecessary mutex lock in Pad apply.
 * Fixed regression 'apply' in GUI oscillator.
 * Oscillator converted to lock-free (phew!)
-  Alse corrected ancient anomally where base
+  Alse corrected ancient anomaly where base
   function wasn't changed with 'Use as base".
 
 2017-8-26 Will
@@ -3375,7 +3375,7 @@ BugFix: GUI not setting kit item names.
 * Preparing PadSynth for conversion.
 
 2017-8-22 Will
-* More speeling chucks :(
+* More spelling chucks :(
 
 2017-8-21 Will
 * Final clean-up.
@@ -3424,7 +3424,7 @@ BugFix: GUI not setting kit item names.
 * Doc updates.
 
 2017-8-11 Will
-* Implimented CLI naming of vectors.
+* Implemented CLI naming of vectors.
 * Corrected some CLI help entries.
 
 2017-8-10 Will
@@ -3454,7 +3454,7 @@ BugFix: GUI not setting kit item names.
 * Fixed regression. LV2 not loading patch sets.
   These are now properly contained, but I forgot to
   update (LV2 only) putalldata :(
-* Patched in Jesper's improved Console scroll behavoir.
+* Patched in Jesper's improved Console scroll behavior.
   New entries now at bottom and always visible unless
   scroll bars moved.
 
@@ -3477,7 +3477,7 @@ BugFix: GUI not setting kit item names.
 
 2017-7-31 Will
 * Improved config save operations & messaging.
-* Minor doc corrections & speeling chocks :)
+* Minor doc corrections & spelling chocks :)
 
 2017-7-30 Will
 * Corrected minor XML LV2 anomaly.
@@ -3735,7 +3735,7 @@ BugFix: GUI not setting kit item names.
 * Reset all controllers now clears the portamento switch.
 * Added SubnoteUI correction from Rob.
 * Minor change to saved Midi-learned files.
-  Supresses artificial top bit when saving, making file more
+  Suppresses artificial top bit when saving, making file more
   understandable, but loading restores it for learn comparisons.
 * More AddSynth Voice & SubSyth switches learnable.
 * Updated docs.
@@ -3767,14 +3767,14 @@ BugFix: GUI not setting kit item names.
   This catches controls that still write direct.
 
 2017-5-2 Will
-* Fixed Gui anomally when loading states with Midi-learn.
+* Fixed Gui anomaly when loading states with Midi-learn.
   The way we fetch Gui updates needs improving greatly.
   Currently we use the VU timer and call across from synth.
 * LV2 state now includes Midi-learn data.
 
 2017-5-1 Will
 * State load now correctly updates main window title.
-* More float -> int range adustments
+* More float -> int range adjustments
   especially Midi-learn limits and conversions.
 
 2017-4-30 Will
@@ -3997,7 +3997,7 @@ BugFix: GUI not setting kit item names.
 
 2017-3-10 Will
 * Monitoring incoming CCs switch now saved in config.
-* Implimented 'Open learned editor window' switch.
+* Implemented 'Open learned editor window' switch.
   Also saved in config.
 
 2017-3-9 Will
@@ -4091,7 +4091,7 @@ BugFix: GUI not setting kit item names.
 * Cli loading vectors updates the Gui.
 
 2017-2-16 Will
-* Improved readline behavour.
+* Improved readline behaviour.
   Still needs more work - sometimes multiple prompt lines!
 * Converted reported Cli numbers to match Gui ones.
   May have missed some :(
@@ -4107,7 +4107,7 @@ BugFix: GUI not setting kit item names.
   This enables us to do conversions section by section.
 * Improved Cli messaging.
 * Re-implemented silent panic stop.
-* Re-implimented soft master reset. Hopefully all OK now.
+* Re-implemented soft master reset. Hopefully all OK now.
 
 2017-2-11 Will
 * Reverted unsafe changes from build 952.
@@ -4910,7 +4910,7 @@ yoshimi 1.4.1
 * Updated docs.
 
 2016-7-28 Will
-* Implimented direct access to effect inserts, but not the actual filter
+* Implemented direct access to effect inserts, but not the actual filter
   (sub) insert in dynfilter.
 * Added 'Effect_Inserts' file to dev_notes.
 * Updated other direct access docs.
@@ -4949,14 +4949,14 @@ yoshimi 1.4.1
 * doc updates, including new file /dev_notes/Direct_Access.txt
 
 2016-6-29 Will
-* Implimented direct access to part controllers and up to Kits.
+* Implemented direct access to part controllers and up to Kits.
 * Updated docs.
 * Completed kit level direct access.
 * Revised some control values.
 
 2016-6-28 Will
 * Adjusted some GUI engine numbers so they all match.
-* Implimented direct access to main and basic part controls.
+* Implemented direct access to main and basic part controls.
 * Bugfix: Ring buffer count was wrong.
 
 2016-6-27 Will
@@ -6180,7 +6180,7 @@ yoshimi 1.3.3
 2015-2-23 Will (vector)
 - First attempt at vector control
   Setting NRPNs and vector CCs seems fine.
-  Only implimented volume control.
+  Only implemented volume control.
   Getting a lot of crashes in use though when changing settings via the gui.
   Panel window only shows 1st 16 parts.
   Part control (rather than channel) works much better.

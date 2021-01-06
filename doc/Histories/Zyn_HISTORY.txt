@@ -86,7 +86,7 @@
       - bugfixes
       
 1.4.1 (8 May 2003)
-      - added single mode to the instrument kit who alows only one item to be played same time
+      - added single mode to the instrument kit who allows only one item to be played same time
       - added "Spectrum Adjust" to the ADsynth oscillator
       - added "drum mode" to the instrument, where all midi keys are mapped to 12tET
       - added a parameter to the "440Hz" which make the freq to varies a bit according to the key pressed (very usefull to toms and other drums)
@@ -172,7 +172,7 @@
       - added VU-Meter      
       - Change the Insertion effect modes behaves (it sounds a bit louder)
       - Added to the project an external program called Spliter that splits the
-	keyboard and alows you to play two instruments same time. You can use this
+	keyboard and allows you to play two instruments same time. You can use this
 	program with ZynAddSubFX or any other synthesizer.
       - Added a new function to OscilGen
 
