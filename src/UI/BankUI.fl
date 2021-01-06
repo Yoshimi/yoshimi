@@ -776,7 +776,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         // using 'false' here as we want to test for it
         // rather than automatically create it.
         string dirname = setfiler(synth,"Path to Bank Root dirs", "", false, TOPLEVEL::XML::Dir);
-        if (dirname.empty())
+        if (dirname.length() < 3)
             return;
         if (!file::isDirectory(dirname))
         {

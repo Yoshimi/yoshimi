@@ -723,7 +723,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         label {Add preset directory...}
         callback {//
                     string dirname = setfiler(synth,"Path for Presets dir", "", false, TOPLEVEL::XML::Dir);
-                    if (dirname.empty())
+                    if (dirname.length() < 3)
                         return;
 
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::addPresetRootDir, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));

@@ -5,6 +5,9 @@ yoshimi 1.7.4 M
 * Oscil phase random now label resizes.
   missed these earlier :(
 * Small AddSynth position adjustments.
+* Suppressed invalid history group warning.
+  called as filer opens but don't know how
+* Stop Preset dirs creating just '/'
 
 2021-1-5 Will
 * Merged in resize branch

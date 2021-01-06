@@ -519,7 +519,7 @@ o->hide();}
               o->value(0);
 
           send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+        tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
         code0 {if (oscil->ADvsPAD) o->hide();}
         class mwheel_val_slider_rev
       }
@@ -1275,7 +1275,8 @@ o->hide();}
         hrndtype->labelsize(size);
             hrndtype->textsize(size);
         oscilname->labelsize(size12);
-        rndslider->textsize(size);
+        rndslider->labelsize(size);
+            rndslider->textsize(size11);
 
         bftype->labelsize(size);
             bftype->textsize(size11);
