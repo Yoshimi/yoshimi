@@ -262,7 +262,7 @@ static std::string partlist [] = {
     "LAtest",              "Show most recent bank load or save",
     "NAme <s>",            "sets the display name the part can be saved with",
     "TYPe <s>",            "sets the instrument type",
-    "COPyright <s>",       "sets the instrument coyright message",
+    "COPyright <s>",       "sets the instrument copyright message",
     "INFo <s>",            "fills the comments info entry",
     "Humanise Pitch [n]",  "adds a small random pitch change at note_on",
     "Humanise Velocity [n]",  "adds a small random velocity change at note_on",
