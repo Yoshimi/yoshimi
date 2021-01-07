@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-1-7 Will
+* Improved GUI sanity check.
+
 2021-1-6 Will
 * Unison Invert made dynamic.
 * Oscil phase random now label resizes.

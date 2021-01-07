@@ -1,7 +1,7 @@
 /*
     MiscGui.h - common link between GUI and synth
 
-    Copyright 2016-2019 Will Godfrey & others
+    Copyright 2016-2021 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -231,11 +231,6 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     int maxW = Fl::w() - 5; // wiggle room
     int maxH = Fl::h() - 30; // space for minimal titlebar
 
-    if ((x + w ) > maxW) // postion
-        x = 5;
-    if ((y + h) > maxH)
-        y = 30;
-
     if ((w / defW) != (h / defH)) // ratio
         w = h / defH * defW; // doesn't matter which one we pick!
 
@@ -248,8 +243,8 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     }
     else
     {
-        adjustW = maxW - 20; // extra clearance for margins
-        adjustH = maxH - 10;
+        adjustW = maxW;
+        adjustH = maxH;
     }
     if (w > maxW || h > maxH) // size
     {
@@ -263,8 +258,21 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         {
             w = h / defH * defW;
         }
-        //std::cout << "w " << w << "  h " << h << std::endl;
     }
+
+    if ((x + w) > maxW) // postion
+    {
+        x = maxW - w;
+        if (x < 5)
+            x = 5;
+    }
+    if ((y + h) > maxH)
+    {
+        y = maxH - h;
+        if (y < 30)
+            y = 30;
+    }
+//    std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
 
 #endif
