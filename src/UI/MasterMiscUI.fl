@@ -306,7 +306,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
         draw_part();
     else
         draw_master();
-    //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);} {}
+    ;} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {

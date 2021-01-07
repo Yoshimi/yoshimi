@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2020 Will Godfrey
+    Copyright 2016-2021 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -94,8 +94,6 @@ class InterChange : private DataText
         int indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectPart(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         std::string formatScales(std::string text);
-
-        unsigned int lockTime;
 
         unsigned int swapRoot1;
         unsigned int swapBank1;

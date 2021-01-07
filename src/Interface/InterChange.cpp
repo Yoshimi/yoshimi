@@ -89,7 +89,6 @@ InterChange::InterChange(SynthEngine *_synth) :
     syncWrite(false),
     lowPrioWrite(false),
     tick(0),
-    lockTime(0),
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
     swapInstrument1(UNUSED)
@@ -100,12 +99,12 @@ InterChange::InterChange(SynthEngine *_synth) :
 bool InterChange::Init()
 {
 #ifndef YOSHIMI_LV2_PLUGIN
-    fromCLI = new ringBuff(256, commandBlockSize);
+    fromCLI = new ringBuff(512, commandBlockSize);
 #endif
     decodeLoopback = new ringBuff(1024, commandBlockSize);
 #ifdef GUI_FLTK
-    fromGUI = new ringBuff(512, commandBlockSize);
-    toGUI = new ringBuff(1024, commandBlockSize);
+    fromGUI = new ringBuff(1024, commandBlockSize);
+    toGUI = new ringBuff(2048, commandBlockSize);
 #endif
     fromMIDI = new ringBuff(1024, commandBlockSize);
 
@@ -195,27 +194,6 @@ void *InterChange::sortResultsThread(void)
         // approx 50mS but depends on threadmessage process time
         if ((tick & 0x1ff) == 0)
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-
-        // a false positive here is not actually a problem.
-        unsigned char testRead = 0;
-        /*
-         * This was a test routine to check for a stuck flag blocking reads.
-         * We need to discover if either of the new flags can become stuck.
-         * They are, in any case, cleared on main resets.
-         */
-        if (lockTime == 0 && testRead != 0)
-        {
-            tick |= 1; // make sure it's not zero
-            lockTime = tick;
-        }
-        else if (lockTime > 0 && testRead == 0)
-            lockTime = 0;
-        else if (lockTime > 0 && (tick - lockTime) > 32766)
-        { // about 4 seconds - may need improving
-
-            std::cout << "stuck read block cleared" << std::endl;
-            lockTime = 0;
-        }
 
         CommandBlock getData;
 
