@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2021, Will J Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -454,6 +455,9 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
 
 void AnalogFilter::filterout(float *smp)
 {
+    for (int i = 0; i < synth->sent_buffersize; ++i)
+            smp[i] += float(1e-20);
+
     if (needsinterpolation)
     {
         memcpy(tmpismp, smp, synth->sent_bufferbytes);
