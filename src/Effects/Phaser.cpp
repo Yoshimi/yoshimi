@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018-2019, Will Godfrey
+    Copyright 2018-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -225,7 +225,7 @@ float Phaser::applyPhase(float x, float g, float fb,
         // This is 1/R. R is being modulated to control filter fc.
         float b    = (Rconst - g) / (d * Rmin);
         float gain = (CFs - b) / (CFs + b);
-        yn1[j] = gain * (x + yn1[j]) - xn1[j];
+        yn1[j] = (gain * (x + yn1[j]) - xn1[j]) + 1e-12; // anti-denormal
 
         // high pass filter:
         // Distortion depends on the high-pass part of the AP stage.
@@ -272,11 +272,11 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
             // Left channel
             tmp = oldl[j];
             oldl[j] = gl * tmp + inl;
-            inl = tmp - gl * oldl[j];
+            inl = (tmp - gl * oldl[j]) + 1e-12; // anti-denormal
             // Right channel
             tmp = oldr[j];
             oldr[j] = gr * tmp + inr;
-            inr = tmp - gr * oldr[j];
+            inr = (tmp - gr * oldr[j]) + 1e-12; // anti-denormal
         }
 
         // Left/Right crossing

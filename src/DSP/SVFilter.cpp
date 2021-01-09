@@ -182,7 +182,7 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
         x.high = par.q_sqrt * smp[i] - x.low - par.q * x.band;
         x.band = par.f * x.high + x.band;
         x.notch = x.high + x.low;
-        smp[i] = *out;
+        smp[i] = (*out);
     }
 }
 

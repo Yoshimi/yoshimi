@@ -432,6 +432,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
             y0 = smp[i] * c[0] + x.c1 * c[1] + y.c1 * d[1];
             y.c1 = y0;
             x.c1 = smp[i];
+            y0 += 1e-12; // anti-denormal
             smp[i] = y0; // out it goes
         }
     }
@@ -444,6 +445,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
             y.c1 = y0;
             x.c2 = x.c1;
             x.c1 = smp[i];
+            y0 += 1e-12; // anti-denormal
             smp[i] = y0; // out it goes
         }
     }

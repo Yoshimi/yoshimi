@@ -1278,6 +1278,7 @@ int Config::SSEcapability(void)
 
 void Config::AntiDenormals(bool set_daz_ftz)
 {
+    return;
     if (synth->getIsLV2Plugin())
     {
         return;// no need to set floating point rules for lv2 - host should control it.
