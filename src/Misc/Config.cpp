@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2020, Will Godfrey & others
+    Copyright 2014-2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -222,7 +222,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    AntiDenormals(true);
+    //AntiDenormals(true); // see note below
     if (!synth->getIsLV2Plugin())
         loadCmdArgs(argc, argv);
     if (!loadConfig())
@@ -285,7 +285,7 @@ bool Config::Setup(int argc, char **argv)
 
 Config::~Config()
 {
-    AntiDenormals(false);
+    //AntiDenormals(false);
 }
 
 
@@ -1275,8 +1275,13 @@ int Config::SSEcapability(void)
     #endif
 }
 
+/*
+ * The code below has been replaced with specific anti-denormal code where needed.
+ * Although the new code is slightly less efficient it is compatible across platforms,
+ * where as the 'daz' processor code is not available on platforms such as ARM.
+ */
 
-void Config::AntiDenormals(bool set_daz_ftz)
+/*void Config::AntiDenormals(bool set_daz_ftz)
 {
     return;
     if (synth->getIsLV2Plugin())
@@ -1301,7 +1306,7 @@ void Config::AntiDenormals(bool set_daz_ftz)
             _mm_setcsr(_mm_getcsr() & ~(0x0030|0x8000|0x0040|0x6000));
         }
     #endif
-}
+}*/
 
 
 /**

@@ -5,7 +5,7 @@
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2020-2021 Kristian Amlie, Will J Godfrey
+    Copyright 2020-2021 Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -247,7 +247,7 @@ void FormantFilter::setfreq_and_q(float frequency, float q_)
 void FormantFilter::filterout(float *smp)
 {
     for (int i = 0; i < synth->sent_buffersize; ++i)
-        smp[i] += float(1e-20);
+        smp[i] += float(1e-20); // anti-denormal
     memcpy(inbuffer, smp, synth->sent_bufferbytes);
     memset(smp, 0, synth->sent_bufferbytes);
 
