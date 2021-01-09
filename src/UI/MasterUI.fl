@@ -517,9 +517,9 @@ class MasterUI {: {private GuiUpdates}
             {
             // for Alessandro
             string filename = setfiler("", "", true, TOPLEVEL::XML::State);
-            if (filename.empty())
+            if (!filename.empty())
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
             }
             break;
         case 29: // default
