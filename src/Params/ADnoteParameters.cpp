@@ -1087,11 +1087,6 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             max = 5;
             break;
 
-        case ADDVOICE::control::modRingToSide:
-            type |= learnable;
-            max = 1;
-            break;
-
         case ADDVOICE::control::externalModulator:
             min = -1;
             def = -1;

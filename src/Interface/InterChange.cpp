@@ -4149,12 +4149,6 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
-        case ADDVOICE::control::modRingToSide:
-            if (write)
-                pars->VoicePar[nvoice].PFMringToSide = value_bool;
-            else
-                value = pars->VoicePar[nvoice].PFMringToSide;
-            break;
         case ADDVOICE::control::externalModulator:
             if (write)
                 pars->VoicePar[nvoice].PFMVoice = value_int;

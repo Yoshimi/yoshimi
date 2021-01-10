@@ -626,15 +626,6 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
             code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {}
-          Fl_Button ringtoside {
-            label S
-            callback {//
-        int tmp = 1 -  o->value();
-        o->value(tmp);
-        send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modRingToSide, tmp, TOPLEVEL::type::Integer);} selected
-            tooltip {Only use sidebands} xywh {635 32 18 18} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_DOWN_BOX color 237 selection_color 130 labelsize 10 hide deactivate
-            code0 {o->value(pars->VoicePar[nvoice].PFMringToSide);}
-          }
           Fl_Group freqencygrp {
             label FREQUENCY
             xywh {5 280 525 120} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
@@ -1234,18 +1225,10 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         case ADDVOICE::control::modulatorType:
             ModType->value((int)value);
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->update_modlabel();
-            ringtoside->deactivate();
             if (value == 0)
                     voiceFMparametersgroup->deactivate();
                 else
                     voiceFMparametersgroup->activate();
-            if (value == 2)
-                ringtoside->activate();
-            ringtoside->redraw();
-            break;
-
-        case ADDVOICE::control::modRingToSide:
-            ringtoside->value(val_bool);
             break;
 
         case ADDVOICE::control::externalModulator:
@@ -1858,10 +1841,6 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
             ExtMod->deactivate();
             ExtModOsc->deactivate();
         }
-        if (pars->VoicePar[nvoice].PFMEnabled == 2)
-            ringtoside->activate();
-        else
-            ringtoside->deactivate();
 
         ADnoteVoiceParameters->show();} {}
   }

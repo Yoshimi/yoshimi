@@ -1883,10 +1883,6 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
                 contstr += addmodnameslist[value_int];
             }
             break;
-        case ADDVOICE::control::modRingToSide:
-            name = " Ringmod Sidebands only";
-            yesno = true;
-            break;
         case ADDVOICE::control::externalModulator:
             if (addValue)
             {
