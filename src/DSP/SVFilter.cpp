@@ -189,8 +189,6 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
 
 void SVFilter::filterout(float *smp)
 {
-    for (int i = 0; i < synth->sent_buffersize; ++i)
-            smp[i] += float(1e-20); // anti-denormal
     if (needsinterpolation)
     {
         memcpy(tmpismp, smp, synth->sent_bufferbytes);
@@ -206,7 +204,7 @@ void SVFilter::filterout(float *smp)
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             float x = (float)i / synth->sent_buffersize_f;
-            smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
+            smp[i] = (float(1e-20) + tmpismp[i]) * (1.0f - x) + smp[i] * x; // includes anti-denormal
         }
         needsinterpolation = 0;
     }

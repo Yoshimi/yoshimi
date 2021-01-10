@@ -429,24 +429,22 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
     if (order == 1)
     {   // First order filter
         for (int i = 0; i < synth->sent_buffersize; ++i)
-        {
-            y0 = smp[i] * c[0] + x.c1 * c[1] + y.c1 * d[1];
+        { // anti-denormal added in here
+            y0 = (smp[i] + float(1e-20)) * c[0] + x.c1 * c[1] + y.c1 * d[1];
             y.c1 = y0;
             x.c1 = smp[i];
-            y0 += 1e-12; // anti-denormal
             smp[i] = y0; // out it goes
         }
     }
     if (order == 2)
     { // Second order filter
         for (int i = 0; i < synth->sent_buffersize; ++i)
-        {
-            y0 = smp[i] * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];
+        { // anti-denormal added in here
+            y0 = (smp[i] + float(1e-20)) * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];
             y.c2 = y.c1;
             y.c1 = y0;
             x.c2 = x.c1;
             x.c1 = smp[i];
-            y0 += 1e-12; // anti-denormal
             smp[i] = y0; // out it goes
         }
     }
@@ -455,10 +453,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
 
 void AnalogFilter::filterout(float *smp)
 {
-    for (int i = 0; i < synth->sent_buffersize; ++i)
-            smp[i] += float(1e-20); // anti-denormal
-
-    if (needsinterpolation)
+     if (needsinterpolation)
     {
         memcpy(tmpismp, smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
