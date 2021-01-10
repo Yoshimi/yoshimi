@@ -729,7 +729,6 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         enableAmplitudeLFO,
 
         modulatorType = 16, // Off, Morph, Ring, PM, FM, PWM
-        modRingToSide,
         externalModulator, // -1 local,  'n' voice
 
         detuneFrequency = 32,

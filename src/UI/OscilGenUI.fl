@@ -542,7 +542,7 @@ o->hide();}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);}
           xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 11
-          code0 {o->add("Sine");o->add("triangle");o->add("Pulse");o->add("Saw");o->add("Power");o->add("Gauss");o->add("Diode");o->add("AbsSine");o->add("PulseSine");o->add("StrchSine");o->add("Chirp");o->add("AbsStrSine");o->add("Chebyshev");o->add("Square");o->add("Spike");o->add("Circle");o->add("HyperSec");o->add("User");}
+          code0 {o->add("Sine");o->add("Triangle");o->add("Pulse");o->add("Saw");o->add("Power");o->add("Gauss");o->add("Diode");o->add("AbsSine");o->add("PulseSine");o->add("StrchSine");o->add("Chirp");o->add("AbsStrSine");o->add("Chebyshev");o->add("Square");o->add("Spike");o->add("Circle");o->add("HyperSec");o->add("User");}
         } {}
         Fl_Box basename {
           label {Base Function}

@@ -1,5 +1,10 @@
 yoshimi 1.7.4 M
 
+2021-1-10 Will
+* Removed ring mod sideband code.
+  Proved to be unnecessary.
+* Fixed spelling errors!
+
 2021-1-7 Will
 * Improved GUI sanity check.
 * Removed some redundant code from Interchange.

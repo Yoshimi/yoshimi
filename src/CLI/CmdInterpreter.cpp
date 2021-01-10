@@ -3366,14 +3366,6 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
                 value -= 1;
             cmd = ADDVOICE::control::externalModulator;
         }
-        if (input.matchnMove(2, "sideband"))
-        {
-            if (readControl(synth, 0, ADDVOICE::control::modulatorType, npart, kitNumber, PART::engine::addVoice1 + voiceNumber) != 2)
-                return REPLY::inactive_msg;
-
-            cmd = ADDVOICE::control::modRingToSide;
-            value = (input.toggle() == 1);
-        }
 
         if (input.matchnMove(3, "oscillator"))
         {

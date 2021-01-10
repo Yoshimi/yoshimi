@@ -517,9 +517,9 @@ class MasterUI {: {private GuiUpdates}
             {
             // for Alessandro
             string filename = setfiler("", "", true, TOPLEVEL::XML::State);
-            if (filename.empty())
+            if (!filename.empty())
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));
             }
             break;
         case 29: // default
@@ -708,7 +708,7 @@ class MasterUI {: {private GuiUpdates}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 16 textfont 1 textsize 11
-            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Plaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
+            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
             code1 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {}
           Fl_Check_Button SysEffOn {
@@ -757,7 +757,7 @@ class MasterUI {: {private GuiUpdates}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
             xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textfont 1 textsize 11
-            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Plaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
+            code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
             code1 {o->value(synth->insefx[ninseff]->geteffect());}
             code2 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           } {}
