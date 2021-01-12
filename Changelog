@@ -1,5 +1,13 @@
 yoshimi 1.7.4 M
 
+2021-1-12 Will
+* Started revision of part effects window.
+  Now uses sanity check
+* GUI part effects dynfilter fully integrated.
+  Nothing now uses YoshiWin, but if the header link
+  is removed from ConsoleUI it fails to compile.
+  I have no idea why!
+
 2021-1-10 Will
 * BugFix: GUI Part effects text not resizing
   when changing effect type
