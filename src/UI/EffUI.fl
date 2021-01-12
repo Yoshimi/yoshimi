@@ -1949,16 +1949,15 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xFilter-dynamic " + to_string(npart));
-    filterwindow->show();
-    if (fetchW > 0 && fetchH > 0)
+    
+    if (fetchW < filtDW || fetchH < filtDH)
     {
-        filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-        filtRtext();
+        fetchW = filtDW;
+        fetchH = filtDH;
     }
-    else
-       filterwindow->position(fetchX, fetchY);
-
-   filterwindow->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);} {}
+    checkSane(fetchX, fetchY, fetchW, fetchH, filtDW, filtDH);
+    filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    filterwindow->show();} {}
   }
   Function {filtRtext()} {} {
     code {//
