@@ -1023,10 +1023,10 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
-      xywh {520 67 385 160} type Double hide resizable
+      xywh {520 67 385 160} type Double resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
-      code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
+      code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -1093,6 +1093,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Close
         callback {//
         saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
+        if(inseffectui->filterwindow != NULL)
+            inseffectui->filterwindow->hide();
         fxSeen = false;
         partfx->hide();
         if ((Fl::event_button() == 3))
@@ -2590,10 +2592,18 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (instrumenteditwindow->visible())
         editRtext();
 
-    if (partfx->visible() && partfx->w() != lastfxW)
+    if (partfx->visible())
     {
-        fxRtext();
-        lastfxW = partfx->w();
+    	if (insefftype->value() == 8) // dynfilter
+    	{
+            if(inseffectui->filterwindow->visible())
+                inseffectui->filtRtext();
+        }
+        if ( partfx->w() != lastfxW)
+        {
+            fxRtext();
+            lastfxW = partfx->w();
+        }
     }
 
 

@@ -41,9 +41,6 @@ decl {\#include <iostream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
-}
-
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -204,10 +201,12 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     code {//
     eff = NULL;
     filterwindow = NULL;
-    fwin_filterui = NULL;} {}
+    fwin_filterui = NULL;
+    lastfiltW = 0;} {}
   }
   Function {~EffUI()} {} {
-    code {effnullwindow->hide();        // delete (effnullwindow);
+    code {//
+        effnullwindow->hide();        // delete (effnullwindow);
         effreverbwindow->hide();        // delete (effreverbwindow);
         effechowindow->hide();          // delete (effechowindow);
         effchoruswindow->hide();        // delete (effchoruswindow);
@@ -219,6 +218,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         if (filterwindow != NULL)
         {
+            if (filterwindow->visible())
+                saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), true, "xFilter-dynamic " + to_string(npart));
             filterwindow->hide();
             delete(filterwindow);
         }} {}
@@ -1075,13 +1076,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     Fl_Window filterwindow {
       label {Filter Parameters for DynFilter Eff.}
       callback {//
-          if (Fl::event() == FL_CLOSE)
-              o->hide();
-          else if (Fl::event() == FL_MOVE || Fl::event() == FL_FULLSCREEN)
-              filtRtext();}
+    filterclose->do_callback();}
       xywh {1109 779 290 110} type Double hide resizable
       code0 {filtDW = o->w(); filtDH = o->h();}
-      class YoshiWin
     } {
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter}
@@ -1091,7 +1088,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       } {}
       Fl_Button filterclose {
         label Close
-        callback {filterwindow->hide();}
+        callback {//
+    saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), false, "xFilter-dynamic " + to_string(npart));
+    filterwindow->hide();}
         xywh {124 86 46 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -1949,7 +1948,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "xFilter-dynamic " + to_string(npart));
-    
+
     if (fetchW < filtDW || fetchH < filtDH)
     {
         fetchW = filtDW;
@@ -1957,10 +1956,15 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, filtDW, filtDH);
     filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    filterwindow->show();} {}
+    filterwindow->show();
+    lastfiltW = 0;} {}
   }
-  Function {filtRtext()} {} {
+  Function {filtRtext()} {open
+  } {
     code {//
+    if (lastfiltW == filterwindow->w())
+        return;
+    lastfiltW = filterwindow->w();
     float dW = filterwindow->w() / filtDW;
     float dH = filterwindow->h() / filtDH;
     float dScale;
@@ -1976,8 +1980,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
     fwin_filterui->filterRtext(dScale);
 
-    filterwindow->redraw();
-    saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), true, "xFilter-dynamic " + to_string(npart));} {}
+    filterwindow->redraw();} {}
   }
   Function {EQbandUpdate()} {} {
     code {//
@@ -2026,5 +2029,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   decl {float filtDW;} {private local
   }
   decl {float filtDH;} {private local
+  }
+  decl {int lastfiltW;} {private local
   }
 }
