@@ -212,7 +212,7 @@ void Reverb::out(float *smps_l, float *smps_r)
     int i;
     for (i = 0; i < synth->sent_buffersize; ++i)
     {
-        inputbuf[i] = (smps_l[i] + smps_r[i]) / 2.0f;
+        inputbuf[i] = float(1e-20) + ((smps_l[i] + smps_r[i]) / 2.0f); // includes anti-denormal
         // Initial delay r
         if (idelay)
         {
