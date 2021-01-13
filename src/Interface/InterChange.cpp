@@ -179,7 +179,7 @@ void *InterChange::sortResultsThread(void)
          * To maintain portability we synthesise a very simple low accuracy
          * timer based on the loop time of this function. As it makes no system
          * calls apart from usleep() it is lightweight and should have no thread
-         * safety issues. It is used mostly for timeouts.
+         * safety issues. It is used mostly for low priority timeouts.
          */
         ++ tick;
 
@@ -190,11 +190,11 @@ void *InterChange::sortResultsThread(void)
             else
                 std::cout << "Tock" << std::endl;
         }*/
-
+#ifdef GUI_FLTK
         // approx 50mS but depends on threadmessage process time
         if ((tick & 0x1ff) == 0)
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-
+#endif
         CommandBlock getData;
 
         /* It is possible that several operations initiated from
