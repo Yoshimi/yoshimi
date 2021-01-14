@@ -1,6 +1,18 @@
 yoshimi 1.7.4 M
 
 2021-1-13 Will
+Revised the following instrument banks:
+    Bass
+    Brass
+    Drums
+    Guitar
+    Organ
+    Reed and Wind
+    Rhodes
+Internal & filenames match
+Instrument type specified
+
+2021-1-13 Will
 * Minor update to GUI.
 * Updates to docs.
 
