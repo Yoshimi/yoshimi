@@ -107,8 +107,8 @@ void Echo::out(float* smpsl, float* smpsr)
     float rdl = rdelay[kr];
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        ldl = ldelay[kl];
-        rdl = rdelay[kr];
+        ldl = ldelay[kl] + float(1e-20); // anti-denormal included
+        rdl = rdelay[kr] + float(1e-20); // anti-denormal included
         l = ldl * (1.0 - lrcross.getValue()) + rdl * lrcross.getValue();
         r = rdl * (1.0 - lrcross.getValue()) + ldl * lrcross.getValue();
         lrcross.advanceValue();
