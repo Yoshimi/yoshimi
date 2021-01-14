@@ -1,7 +1,7 @@
 yoshimi 1.7.4 M
 
-2021-1-13 Will
-Revised the following instrument banks:
+2021-1-14 Will
+*Revised the following instrument banks:
     Bass
     Brass
     Drums
@@ -9,8 +9,10 @@ Revised the following instrument banks:
     Organ
     Reed and Wind
     Rhodes
-Internal & filenames match
-Instrument type specified
+  Internal & filenames match
+  Instrument type specified
+* Made instrument/ban list frames bigger.
+  clicking near edges not always recognised
 
 2021-1-13 Will
 * Minor update to GUI.
