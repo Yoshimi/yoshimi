@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2020 Will Godfrey & others
+    Copyright 2016-2021 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -117,12 +117,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                     }
                     else
                     {
-                        synth->getGuiMaster()->setmessage(UNUSED, false, "Can't learn this control");
+                        alert(synth, "Can't learn this control");
                         synth->getRuntime().Log("Can't MIDI-learn this control");
-                        /* can't use fl_alert here.
-                        * For some reason it goes into a loop on spin boxes
-                        * and runs menus up to their max value.
-                        */
                         type = TOPLEVEL::type::Learnable;
                     }
                 }
@@ -245,7 +241,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
     fl_line_style(FL_SOLID); // probably not needed
-    if (control == TOPLEVEL::control::textMessage) // just show a message
+    if (control == TOPLEVEL::control::textMessage) // just show a non-modal message
     {
         string name = textMsgBuffer.fetch(miscmsg);
         if (name.empty())

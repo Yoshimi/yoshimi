@@ -11,7 +11,7 @@ comment {BankUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2020, Will Godfrey & others
+Copyright 2014-2021, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -314,7 +314,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {Hide(0);}
-      xywh {83 157 780 570} type Double labelsize 12 hide resizable
+      xywh {937 122 780 570} type Double labelsize 12 hide resizable
       code0 {instDW = o->w(), instDH = o->h();}
       code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
@@ -370,10 +370,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         xywh {610 30 162 3} box NO_BOX labelsize 12 align 33
       }
       Fl_Group insgroup {
-        xywh {5 34 772 485} labelsize 12
+        xywh {1 31 779 494} labelsize 12
       } {
         Fl_Group insframe1 {
-          xywh {10 39 150 481} labelsize 12
+          xywh {4 31 158 494} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 0; i < 32; ++i)
             {
@@ -383,7 +383,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }}
         } {}
         Fl_Group insframe2 {
-          xywh {163 39 150 481} labelsize 12
+          xywh {161 31 152 494} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 32; i < 64; ++i)
             {
@@ -393,7 +393,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }}
         } {}
         Fl_Group insframe3 {
-          xywh {316 39 150 481} labelsize 12
+          xywh {316 31 150 494} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 64; i < 96; ++i)
             {
@@ -403,7 +403,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }}
         } {}
         Fl_Group insframe4 {
-          xywh {469 39 150 481} labelsize 12
+          xywh {469 31 150 494} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 96; i < 128; ++i)
             {
@@ -413,7 +413,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }}
         } {}
         Fl_Group insframe5 {
-          xywh {622 39 150 481} color 48 labelsize 12
+          xywh {622 31 156 494} color 48 labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 128; i < 160; ++i)
             {
@@ -580,8 +580,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }
     Fl_Window bankuiwindow {
       label Root
-      callback {Hide(1);}
-      xywh {84 223 780 570} type Double labelsize 12 hide resizable
+      callback {Hide(1);} open
+      xywh {767 130 780 570} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
       code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
@@ -613,11 +613,11 @@ class BankUI {: {public BankProcess_, RootProcess_}
             Hide(1);}}
         tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
       }
-      Fl_Group bankgroup {
-        xywh {5 34 766 491} labelsize 12
+      Fl_Group bankgroup {open
+        xywh {2 30 776 499} labelsize 12
       } {
         Fl_Group {} {
-          xywh {10 39 186 481} labelsize 12
+          xywh {4 30 192 496} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 0; i < 32; ++i)
@@ -629,7 +629,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           }}
         } {}
         Fl_Group {} {
-          xywh {200 39 186 481} labelsize 12
+          xywh {200 31 189 496} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 32; i < 64; ++i)
@@ -641,7 +641,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           }}
         } {}
         Fl_Group {} {
-          xywh {390 39 186 481} labelsize 12
+          xywh {390 30 189 496} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 64; i < 96; ++i)
@@ -653,7 +653,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           }}
         } {}
         Fl_Group {} {
-          xywh {580 39 185 481} labelsize 12
+          xywh {580 30 196 496} labelsize 12
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 96; i < 128; ++i)

@@ -1,5 +1,31 @@
 yoshimi 1.7.4 M
 
+2021-1-15 Will
+*Revised the following instrument banks:
+    Pads
+    Strings
+    Synth
+  Internal & filenames match
+  Instrument type specified
+
+2021-1-14 Will
+*Revised the following instrument banks:
+    Bass
+    Brass
+    Drums
+    Guitar
+    Organ
+    Reed and Wind
+    Rhodes
+  Internal & filenames match
+  Instrument type specified
+* Made instrument/ban list frames bigger.
+  clicking near edges not always recognised
+
+2021-1-13 Will
+* Minor update to GUI.
+* Updates to docs.
+
 2021-1-12 Will
 * Started revision of part effects window.
   Now uses sanity check
