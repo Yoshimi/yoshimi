@@ -1,5 +1,13 @@
 yoshimi 1.7.4 M
 
+2021-1-15 Will
+*Revised the following instrument banks:
+    Pads
+    Strings
+    Synth
+  Internal & filenames match
+  Instrument type specified
+
 2021-1-14 Will
 *Revised the following instrument banks:
     Bass
