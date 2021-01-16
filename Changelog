@@ -1,7 +1,12 @@
 yoshimi 1.7.4 M
 
+2021-1-16 Will
+* Merged in new denormal code.
+* BugFix: attempt to access nonexistent window.
+  DynFilter internal filter window
+
 2021-1-15 Will
-*Revised the following instrument banks:
+* Revised the following instrument banks:
     Pads
     Strings
     Synth
@@ -9,7 +14,7 @@ yoshimi 1.7.4 M
   Instrument type specified
 
 2021-1-14 Will
-*Revised the following instrument banks:
+* Revised the following instrument banks:
     Bass
     Brass
     Drums
