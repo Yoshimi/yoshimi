@@ -1959,8 +1959,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     filterwindow->show();
     lastfiltW = 0;} {}
   }
-  Function {filtRtext()} {open
-  } {
+  Function {filtRtext()} {} {
     code {//
     if (lastfiltW == filterwindow->w())
         return;

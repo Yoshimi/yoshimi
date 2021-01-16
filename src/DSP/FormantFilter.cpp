@@ -252,7 +252,7 @@ void FormantFilter::filterout(float *smp)
     for (int j = 0; j < numformants; ++j)
     {
         for (int k = 0; k < synth->sent_buffersize; ++k)
-            tmpbuf[k] = (inbuffer[k] + float(1e-20)) * outgain; // includes anti-denormal
+            tmpbuf[k] = inbuffer[k] * outgain;
         formant[j]->filterout(tmpbuf);
 
         if (aboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))

@@ -18,10 +18,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
-decl {\#include <set>} {public local
+decl {\#include <set>} {selected public local
 }
 
 decl {\#include <string>} {public local
