@@ -193,5 +193,109 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
     }
 }
 
+inline float quantizedLFOfreqBPM(float value)
+{
+    // The quantizer below will need to be altered if this is ever
+    // changed. Remember that intervals need to be preserved too, not just the
+    // total number of steps, otherwise saved instruments will get incorrect
+    // values.
+    static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS quantizer.");
+
+    // We leave some room at the ends, so the full range is LFO_BPM_STEPS + 2.
+    float tmp = roundf(value*(LFO_BPM_STEPS + 2));
+    if (tmp < 1)
+        tmp = 1;
+    else if (tmp >= LFO_BPM_STEPS + 2)
+        tmp = LFO_BPM_STEPS + 1;
+    return tmp / (LFO_BPM_STEPS + 2);
+}
+
+// The reason we return this as a fraction instead of a straight float is that
+// dividing by three is not possible to preserve perfectly in float, and this
+// can add up to quite a lot of error over many beats.
+inline std::pair<float, float> LFOfreqBPMFraction(float value)
+{
+    // The switch statement below will need to be altered if this is ever
+    // changed. Remember that intervals need to be preserved too, not just the
+    // total number of steps, otherwise saved instruments will get incorrect
+    // values.
+    static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS table.");
+
+    switch ((int)roundf(value * (LFO_BPM_STEPS + 2))) {
+    case 0:
+        // Some room to expand in the future. Fallthrough.
+    case 1:
+        return std::pair<float, float>(1, 16);
+    case 2:
+        return std::pair<float, float>(1, 15);
+    case 3:
+        return std::pair<float, float>(1, 14);
+    case 4:
+        return std::pair<float, float>(1, 13);
+    case 5:
+        return std::pair<float, float>(1, 12);
+    case 6:
+        return std::pair<float, float>(1, 11);
+    case 7:
+        return std::pair<float, float>(1, 10);
+    case 8:
+        return std::pair<float, float>(1, 9);
+    case 9:
+        return std::pair<float, float>(1, 8);
+    case 10:
+        return std::pair<float, float>(1, 7);
+    case 11:
+        return std::pair<float, float>(1, 6);
+    case 12:
+        return std::pair<float, float>(1, 5);
+    case 13:
+        return std::pair<float, float>(1, 4);
+    case 14:
+        return std::pair<float, float>(1, 3);
+    case 15:
+        return std::pair<float, float>(1, 2);
+    case 16:
+        return std::pair<float, float>(2, 3);
+    case 17:
+        return std::pair<float, float>(1, 1);
+    case 18:
+        return std::pair<float, float>(3, 2);
+    case 19:
+        return std::pair<float, float>(2, 1);
+    case 20:
+        return std::pair<float, float>(3, 1);
+    case 21:
+        return std::pair<float, float>(4, 1);
+    case 22:
+        return std::pair<float, float>(5, 1);
+    case 23:
+        return std::pair<float, float>(6, 1);
+    case 24:
+        return std::pair<float, float>(7, 1);
+    case 25:
+        return std::pair<float, float>(8, 1);
+    case 26:
+        return std::pair<float, float>(9, 1);
+    case 27:
+        return std::pair<float, float>(10, 1);
+    case 28:
+        return std::pair<float, float>(11, 1);
+    case 29:
+        return std::pair<float, float>(12, 1);
+    case 30:
+        return std::pair<float, float>(13, 1);
+    case 31:
+        return std::pair<float, float>(14, 1);
+    case 32:
+        return std::pair<float, float>(15, 1);
+    case 34:
+        // Some room to expand in the future. Fallthrough.
+    case 33:
+        return std::pair<float, float>(16, 1);
+    default:
+        return std::pair<float, float>(1, 1);
+    }
+}
+
 }//(End)namespace func
 #endif /*NUMERICFUNCS_H*/

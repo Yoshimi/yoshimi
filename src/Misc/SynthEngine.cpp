@@ -144,8 +144,10 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
 #endif
-    LFOtime(0),
     CHtimer(0),
+    LFOtime(0),
+    songBeat(0.0f),
+    monotonicBeat(0.0f),
     windowTitle("Yoshimi" + asString(uniqueId))
 {
     union {
@@ -2127,8 +2129,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 insefx[nefx]->out(mainL, mainR);
         }
 
-        LFOtime++; // update the LFO's time
-
         // Master volume, and all output fade
         float cStep = ControlStep;
         for (int idx = 0; idx < sent_buffersize; ++idx)
@@ -2224,6 +2224,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
             }
         }
+
+        LFOtime += sent_buffersize; // update the LFO's time
     }
     return sent_buffersize;
 }

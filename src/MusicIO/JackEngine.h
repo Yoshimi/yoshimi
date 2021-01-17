@@ -40,7 +40,7 @@ class SynthEngine;
 class JackEngine : public MusicIO
 {
     public:
-        JackEngine(SynthEngine *_synth);
+        JackEngine(SynthEngine *_synth, BeatTracker *_beatTracker);
         ~JackEngine() { Close(); }
         bool isConnected(void) { return (NULL != jackClient); }
         bool connectServer(std::string server);
@@ -64,6 +64,7 @@ class JackEngine : public MusicIO
         bool processAudio(jack_nframes_t nframes);
         void sendAudio(int framesize, unsigned int offset);
         bool processMidi(jack_nframes_t nframes);
+        void handleBeatValues(jack_nframes_t nframes);
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
@@ -94,6 +95,8 @@ class JackEngine : public MusicIO
             jack_ringbuffer_t *ringBuf;
             pthread_t          pThread;
         } midi;
+
+        float bpm;
 
         unsigned int internalbuff;
 };

@@ -43,6 +43,7 @@ enum ValueType {
     VC_GlobalFineDetune,
     VC_MasterVolume,
     VC_LFOfreq,
+    VC_LFOfreqBPM,
     VC_LFOdepthFreq,
     VC_LFOdepthAmp,
     VC_LFOdepthFilter,
@@ -131,6 +132,7 @@ string custom_value_units(float v, const string& u, int prec=0);
 void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(int group);
+ValueType getLFOFreqType(int bpmEnabled);
 ValueType getFilterFreqType(int type);
 ValueType getFilterFreqTrackType(int offset);
 

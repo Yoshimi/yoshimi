@@ -5536,6 +5536,12 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             else
                 val = pars->Pcontinous;
             break;
+        case LFOINSERT::control::bpm:
+            if (write)
+                pars->setPbpm(_SYS_::F2B(val));
+            else
+                val = pars->Pbpm;
+            break;
         case LFOINSERT::control::frequencyRandomness:
             if (write)
                 pars->setPfreqrand(val);

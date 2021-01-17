@@ -34,6 +34,7 @@ enum midi_drivers { no_midi = 0, jack_midi, alsa_midi};
 
 class SynthEngine;
 class MusicIO;
+class BeatTracker;
 
 struct music_clients
 {
@@ -61,6 +62,7 @@ private:
     midi_drivers midiDrv;
     MusicIO *audioIO;
     MusicIO *midiIO;
+    BeatTracker *beatTracker;
 public:
     MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_drivers _midiDrv);
     ~MusicClient();

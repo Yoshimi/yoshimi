@@ -31,12 +31,17 @@
 
 #include "MusicIO/MusicIO.h"
 
+#define MIDI_CLOCKS_PER_BEAT 24
+#define MIDI_CLOCK_DIVISION 3
+
+#define MIDI_SONGPOS_BEAT_DIVISION 4
+
 class SynthEngine;
 
 class AlsaEngine : public MusicIO
 {
     public:
-        AlsaEngine(SynthEngine *_synth);
+        AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker);
         ~AlsaEngine() { }
 
         bool openAudio(void);
@@ -80,6 +85,9 @@ class AlsaEngine : public MusicIO
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);
 
+        void handleSongPos(float beat);
+        void handleMidiClock();
+
         struct {
             std::string        device;
             snd_pcm_t         *handle;
@@ -98,6 +106,19 @@ class AlsaEngine : public MusicIO
             snd_seq_addr_t     addr;
             int                alsaId;
             pthread_t          pThread;
+
+            // When receiving MIDI clock messages, to avoid precision errors
+            // (MIDI_CLOCKS_PER_BEAT (24) does not cleanly divide 1), store
+            // every third (MIDI_CLOCK_DIVISION) beat here. This is reset only
+            // every third clock ticks or on song repositioning. Note that the
+            // value is not necessarily an exact multiple of
+            // 1/MIDI_CLOCK_DIVISION, but we only ever add
+            // (1/MIDI_CLOCK_DIVISION) beats to it.
+            float             lastDivSongBeat;
+            float             lastDivMonotonicBeat;
+            // Reset to zero every MIDI_CLOCK_DIVISION. This is actually an
+            // integer, but stored as float for calculation purposes.
+            float             clockCount;
         } midi;
 };
 

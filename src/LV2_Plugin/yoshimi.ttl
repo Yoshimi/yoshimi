@@ -7,6 +7,7 @@
 @prefix opts: <http://lv2plug.in/ns/ext/options#> .
 @prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
 @prefix state: <http://lv2plug.in/ns/ext/state#> .
+@prefix time: <http://lv2plug.in/ns/ext/time#> .
 
 <http://yoshimi.sourceforge.net/lv2_plugin_multi>
     a lv2:InstrumentPlugin, lv2:Plugin ;
@@ -41,7 +42,7 @@
     lv2:port [
         a lv2:InputPort, atom:AtomPort ;
         atom:bufferType atom:Sequence ;
-        atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ;
+        atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent>, time:Position ;
         lv2:index 0 ;
         lv2:symbol "events_in" ;
         lv2:name "Events input" ;
@@ -309,7 +310,7 @@
     lv2:port [
         a lv2:InputPort, atom:AtomPort ;
         atom:bufferType atom:Sequence ;
-        atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent> ;
+        atom:supports <http://lv2plug.in/ns/ext/midi#MidiEvent>, time:Position ;
         lv2:index 0 ;
         lv2:symbol "events_in" ;
         lv2:name "Events input" ;

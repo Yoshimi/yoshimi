@@ -35,8 +35,9 @@
 using func::asString;
 
 
-MusicIO::MusicIO(SynthEngine *_synth) :
+MusicIO::MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker) :
     interleaved(NULL),
+    beatTracker(_beatTracker),
     synth(_synth)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
@@ -167,4 +168,143 @@ bail_out:
         interleaved = NULL;
     }
     return false;
+}
+
+BeatTracker::BeatTracker() :
+    songVsMonotonicBeatDiff(0)
+{
+}
+
+BeatTracker::~BeatTracker()
+{
+}
+
+void BeatTracker::adjustMonotonicRounding(std::pair<float, float> *beats)
+{
+    // Try to compensate for rounding errors in monotonic beat. If the
+    // difference is small enough from the song beat, then we assume we have not
+    // repositioned the transport and we derive an exact value of the monotonic
+    // beat from the song beat, instead of adding BPM on every cycle, which
+    // accumulates a lot of error over time.
+    if (fabsf(beats->first + songVsMonotonicBeatDiff - beats->second) < 0.1f)
+        beats->second = beats->first + songVsMonotonicBeatDiff;
+    else
+        songVsMonotonicBeatDiff = beats->second - beats->first;
+}
+
+MultithreadedBeatTracker::MultithreadedBeatTracker()
+{
+    timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+
+    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
+
+    lastTimeUs = clock;
+    lastSongBeat = 0;
+    lastMonotonicBeat = 0;
+    timeUs = clock;
+    songBeat = 0;
+    monotonicBeat = 0;
+    pthread_mutex_init(&mutex, NULL);
+}
+
+MultithreadedBeatTracker::~MultithreadedBeatTracker()
+{
+    pthread_mutex_destroy(&mutex);
+}
+
+std::pair<float, float> MultithreadedBeatTracker::setBeatValues(std::pair<float, float> beats)
+{
+    timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+
+    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
+
+    adjustMonotonicRounding(&beats);
+
+    //--------------------------------
+    pthread_mutex_lock(&mutex);
+
+    lastTimeUs = timeUs;
+
+    if (beats.first >= LFO_BPM_LCM) {
+        beats.first -= LFO_BPM_LCM;
+        lastSongBeat = songBeat - LFO_BPM_LCM;
+    } else
+        lastSongBeat = songBeat;
+
+    if (beats.second >= LFO_BPM_LCM) {
+        beats.second -= LFO_BPM_LCM;
+        lastMonotonicBeat = monotonicBeat - LFO_BPM_LCM;
+    } else
+        lastMonotonicBeat = monotonicBeat;
+
+    timeUs = clock;
+    songBeat = beats.first;
+    monotonicBeat = beats.second;
+
+    pthread_mutex_unlock(&mutex);
+    //--------------------------------
+
+    return beats;
+}
+
+std::pair<float, float> MultithreadedBeatTracker::getBeatValues()
+{
+    timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+
+    uint64_t clock = t.tv_sec * 1000000 + t.tv_nsec / 1000;
+
+    pthread_mutex_lock(&mutex);
+    uint64_t lastTime = lastTimeUs;
+    std::pair<float, float> lastBeats(lastSongBeat, lastMonotonicBeat);
+    uint64_t time = timeUs;
+    std::pair<float, float> beats(songBeat, monotonicBeat);
+    pthread_mutex_unlock(&mutex);
+
+    std::pair<float, float> ret;
+    if (time == lastTime) {
+        if (clock - time > 1000000) {
+            // If no MIDI clock messages have arrived for over a second, revert
+            // to a static 120 BPM. This is just a fallback to prevent
+            // oscillators from stalling completely.
+            ret.first = beats.first + (float)(clock - time) / 1000000.0f * 120.0f / 60.0f;
+            ret.second = beats.second + (float)(clock - time) / 1000000.0f * 120.0f / 60.0f;
+        }
+    } else {
+        // Based on beat and clock from MIDI thread, interpolate and find the
+        // beat for audio thread.
+        float ratio = (float)(clock - lastTime) / (time - lastTime);
+        ret.first = ratio * (beats.first - lastBeats.first) + lastBeats.first;
+        ret.second = ratio * (beats.second - lastBeats.second) + lastBeats.second;
+    }
+
+    return ret;
+}
+
+SinglethreadedBeatTracker::SinglethreadedBeatTracker() :
+    songBeat(0),
+    monotonicBeat(0)
+{
+}
+
+std::pair<float, float> SinglethreadedBeatTracker::setBeatValues(std::pair<float, float> beats)
+{
+    if (beats.first >= LFO_BPM_LCM)
+        beats.first -= LFO_BPM_LCM;
+    if (beats.second >= LFO_BPM_LCM)
+        beats.second -= LFO_BPM_LCM;
+
+    adjustMonotonicRounding(&beats);
+
+    songBeat = beats.first;
+    monotonicBeat = beats.second;
+
+    return beats;
+}
+
+std::pair<float, float> SinglethreadedBeatTracker::getBeatValues()
+{
+    return std::pair<float, float>(songBeat, monotonicBeat);
 }

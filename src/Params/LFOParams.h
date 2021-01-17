@@ -53,6 +53,7 @@ class LFOParams : public Presets
         void setPrandomness(unsigned char n) { Prandomness = n; presetsUpdated(); }
         void setPfreqrand(unsigned char n) { Pfreqrand = n; presetsUpdated(); }
         void setPdelay(unsigned char n) { Pdelay = n; }
+        void setPbpm(unsigned char n) { Pbpm = n; }
         void setPcontinous(unsigned char n) { Pcontinous = n; presetsUpdated(); }
         void setPstretch(unsigned char n) { Pstretch = n; presetsUpdated(); }
 
@@ -65,6 +66,7 @@ class LFOParams : public Presets
         unsigned char Prandomness;
         unsigned char Pfreqrand;
         unsigned char Pdelay;
+        unsigned char Pbpm;
         unsigned char Pcontinous;
         unsigned char Pstretch;
 

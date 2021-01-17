@@ -29,6 +29,7 @@
 #include <cmath>
 
 #include "Params/LFOParams.h"
+#include "Misc/NumericFuncs.h"
 
 //#include <iostream>
 //int LFOParams::time = 0;
@@ -73,6 +74,7 @@ void LFOParams::defaults(void)
     Prandomness = Drandomness;
     Pdelay = Ddelay;
     Pcontinous = Dcontinous;
+    Pbpm = 0;
     Pfreqrand = 0;
     Pstretch = 64;
 }
@@ -89,8 +91,13 @@ void LFOParams::setPfreq(int32_t n)
 
 void LFOParams::add2XML(XMLwrapper *xml)
 {
-    xml->addpar("freqI", PfreqI);
-    xml->addparreal("freq", float(PfreqI) / Fmul2I);
+    float freqF = float(PfreqI) / Fmul2I;
+    if (Pbpm)
+        // Save quantized, so that we can make the scale finer in the future, if
+        // necessary.
+        freqF = func::quantizedLFOfreqBPM(freqF);
+    xml->addpar("freqI", freqF * Fmul2I);
+    xml->addparreal("freq", freqF);
     xml->addpar("intensity", Pintensity);
     xml->addpar("start_phase", Pstartphase);
     xml->addpar("lfo_type", PLFOtype);
@@ -99,6 +106,7 @@ void LFOParams::add2XML(XMLwrapper *xml)
     xml->addpar("delay", Pdelay);
     xml->addpar("stretch", Pstretch);
     xml->addparbool("continous",    Pcontinous);
+    xml->addparbool("bpm", Pbpm);
 }
 
 
@@ -117,6 +125,7 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pdelay = xml->getpar127("delay", Pdelay);
     Pstretch = xml->getpar127("stretch", Pstretch);
     Pcontinous = xml->getparbool("continous", Pcontinous);
+    Pbpm = xml->getparbool("bpm", Pbpm);
     presetsUpdated();
 }
 
@@ -197,6 +206,10 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             type &= ~learnable;
             break;
         case LFOINSERT::control::continuous:
+            max = 1;
+            type &= ~learnable;
+            break;
+        case LFOINSERT::control::bpm:
             max = 1;
             type &= ~learnable;
             break;

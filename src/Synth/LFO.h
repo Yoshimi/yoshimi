@@ -53,6 +53,7 @@ class LFO
         float lfornd;
         float lfofreqrnd;
         float lfoelapsed;
+        float startPhase;
         char lfotype;
         int freqrndenabled;
 
