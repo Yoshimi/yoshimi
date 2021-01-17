@@ -30,11 +30,12 @@
 #include <string>
 
 class SynthEngine;
+class BeatTracker;
 
 class MusicIO
 {
     public:
-        MusicIO(SynthEngine *_synth);
+        MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker);
         virtual ~MusicIO();
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
@@ -57,7 +58,71 @@ class MusicIO
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;
 
+        // The engine which tracks song beats (MIDI driver).
+        BeatTracker *beatTracker;
+
         SynthEngine *synth;
+};
+
+class BeatTracker
+{
+    public:
+        BeatTracker();
+        virtual ~BeatTracker();
+
+        // The pair contains the song beat (relative to song beginning) and
+        // monotonic beat (relative to time origin), respectively, and is used
+        // by subclasses to set the current beat values.
+        //
+        // The setter returns the same values it's given, except that they can
+        // wrap around. Sub classes that call this function should consider
+        // storing the wrapped value in order to preserve precision when the
+        // beat count gets high. The wrapped around value is guaranteed to
+        // divide all possible LFO fractions.
+        virtual std::pair<float, float> setBeatValues(std::pair<float, float> beats) = 0;
+        virtual std::pair<float, float> getBeatValues() = 0;
+
+    protected:
+        void adjustMonotonicRounding(std::pair<float, float> *beats);
+
+    private:
+        float songVsMonotonicBeatDiff;
+};
+
+class MultithreadedBeatTracker : public BeatTracker
+{
+    public:
+        MultithreadedBeatTracker();
+        ~MultithreadedBeatTracker();
+
+        // These two functions are mutually thread safe, even though they
+        // operate on the same data. The first is usually called from the MIDI
+        // thread, the second from the audio thread.
+        std::pair<float, float> setBeatValues(std::pair<float, float> beats);
+        std::pair<float, float> getBeatValues();
+
+    private:
+        // Current and last time and beats of the MIDI clock.
+        volatile uint64_t lastTimeUs;
+        volatile float    lastSongBeat;
+        volatile float    lastMonotonicBeat;
+        volatile uint64_t timeUs;
+        volatile float    songBeat;
+        volatile float    monotonicBeat;
+        pthread_mutex_t   mutex;
+};
+
+class SinglethreadedBeatTracker : public BeatTracker
+{
+    public:
+        SinglethreadedBeatTracker();
+
+        std::pair<float, float> setBeatValues(std::pair<float, float> beats);
+        std::pair<float, float> getBeatValues();
+
+    private:
+        float songBeat;
+        float monotonicBeat;
 };
 
 #endif

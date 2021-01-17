@@ -2766,6 +2766,9 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
         case LFOINSERT::control::continuous:
             contstr = "Cont";
             break;
+        case LFOINSERT::control::bpm:
+            contstr = "BPM";
+            break;
         case LFOINSERT::control::frequencyRandomness:
             contstr = "FreqRand";
             break;

@@ -113,14 +113,19 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
         }
     }
 
+    if (audioDrv == jack_audio && midiDrv == jack_midi)
+        beatTracker = new SinglethreadedBeatTracker;
+    else
+        beatTracker = new MultithreadedBeatTracker;
+
     switch(audioDrv)
     {
         case jack_audio:
-            audioIO = new JackEngine(synth);
+            audioIO = new JackEngine(synth, beatTracker);
             break;
 #if defined(HAVE_ALSA)
         case alsa_audio:
-            audioIO = new AlsaEngine(synth);
+            audioIO = new AlsaEngine(synth, beatTracker);
             break;
 #endif
 
@@ -131,12 +136,21 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     switch(midiDrv)
     {
         case jack_midi:
-            if (audioDrv != jack_audio)
-                midiIO = new JackEngine(synth);
+            if (audioDrv == jack_audio)
+            {
+                midiIO = audioIO;
+            }
+            else
+                midiIO = new JackEngine(synth, beatTracker);
             break;
 #if defined(HAVE_ALSA)
         case alsa_midi:
-            midiIO = new AlsaEngine(synth);
+            if (audioDrv == alsa_audio)
+            {
+                midiIO = audioIO;
+            }
+            else
+                midiIO = new AlsaEngine(synth, beatTracker);
             break;
 #endif
 
@@ -153,7 +167,7 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     }
     if (midiDrv != no_midi)
     {
-        if (!midiIO && audioDrv != jack_audio)
+        if (!midiIO)
         {
             abort();
         }
@@ -166,7 +180,8 @@ MusicClient::~MusicClient()
     Close();
     if (audioIO)
     {
-        delete audioIO;
+        if (audioIO != midiIO)
+            delete audioIO;
         audioIO = 0;
     }
 
@@ -175,6 +190,8 @@ MusicClient::~MusicClient()
         delete midiIO;
         midiIO = 0;
     }
+
+    delete beatTracker;
 
     for (int i = 0; i < NUM_MIDI_PARTS + 1; i++)
     {
@@ -195,10 +212,6 @@ bool MusicClient::Open()
     if (midiIO)
     {
         bMidi = midiIO->openMidi();
-    }
-    else if (audioDrv == jack_audio)
-    {
-        bMidi = audioIO->openMidi();
     }
     if (bAudio && bMidi)
     {
@@ -228,7 +241,7 @@ bool MusicClient::Start()
         bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, "Timer?");
     }
 
-    if (midiIO)
+    if (midiIO && midiIO != audioIO)
     {
         bMidi = midiIO->Start();
     }
@@ -238,7 +251,7 @@ bool MusicClient::Start()
 
 void MusicClient::Close()
 {
-    if (midiIO)
+    if (midiIO && midiIO != audioIO)
     {
         midiIO->Close();
     }

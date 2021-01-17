@@ -118,6 +118,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     int offs = 0;
     uint32_t next_frame = 0;
     uint32_t processed = 0;
+    std::pair<float, float> beats(beatTracker->getBeatValues());
+    bool receivedPos = false;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -134,11 +136,12 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         if (event == NULL)
             continue;
-        if (event->body.size > sizeof(intMidiEvent.data))
-            continue;
 
         if (event->body.type == _midi_event_id)
         {
+            if (event->body.size > sizeof(intMidiEvent.data))
+                continue;
+
             next_frame = event->time.frames;
             if (next_frame >= sample_count)
                 continue;
@@ -173,7 +176,47 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             if (_bFreeWheel != NULL)
                 processMidiMessage(msg);
         }
+        else if (event->body.type == _atom_blank || event->body.type == _atom_object)
+        {
+            LV2_Atom_Object *obj = (LV2_Atom_Object *)&event->body;
+            if (obj->body.otype != _atom_position)
+                continue;
+
+            LV2_Atom *bpb = NULL;
+            LV2_Atom *bar = NULL;
+            LV2_Atom *barBeat = NULL;
+            LV2_Atom *bpm = NULL;
+            lv2_atom_object_get(obj,
+                                _atom_bpb, &bpb,
+                                _atom_bar, &bar,
+                                _atom_bar_beat, &barBeat,
+                                _atom_bpm, &bpm,
+                                NULL);
+            if (bpb && bpb->type == _atom_float
+                && bar && bar->type == _atom_long
+                && barBeat && barBeat->type == _atom_float)
+            {
+                // There is a global beat number in the LV2 time spec, called
+                // "beat", but Carla doesn't seem to deliver this correctly, so
+                // piece it together from bar and barBeat instead.
+                float lv2Bpb = ((LV2_Atom_Float *)bpb)->body;
+                float lv2Bar = ((LV2_Atom_Long *)bar)->body;
+                float lv2BarBeat = ((LV2_Atom_Float *)barBeat)->body;
+                beats.first = lv2Bar * lv2Bpb + lv2BarBeat;
+                receivedPos = true;
+            }
+            if (bpm && bpm->type == _atom_float)
+                _bpm = ((LV2_Atom_Float *)bpm)->body;
+        }
     }
+
+    float bpmInc = (float)sample_count * _bpm / (synth->samplerate_f * 60.f);
+    if (!receivedPos)
+        beats.first += bpmInc;
+    beats.second += bpmInc;
+
+    beatTracker->setBeatValues(beats);
+    synth->setBeatValues(beats.first, beats.second);
 
     if (processed < sample_count)
     {
@@ -255,7 +298,7 @@ void *YoshimiLV2Plugin::idleThread()
 
 
 YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
-    MusicIO(synth),
+    MusicIO(synth, new SinglethreadedBeatTracker),
     _synth(synth),
     _sampleRate(static_cast<uint32_t>(sampleRate)),
     _bufferSize(0),
@@ -265,6 +308,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _midi_event_id(0),
     _bufferPos(0),
     _offsetPos(0),
+    _bpm(120),
     _bFreeWheel(NULL),
     _pIdleThread(0),
     _lv2_desc(desc)
@@ -297,11 +341,19 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID nomBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__nominalBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        _atom_long = _uridMap.map(_uridMap.handle, LV2_ATOM__Long);
+        _atom_float = _uridMap.map(_uridMap.handle, LV2_ATOM__Float);
         _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
         _atom_type_sequence = _uridMap.map(_uridMap.handle, LV2_ATOM__Sequence);
         _atom_state_changed = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_STATE__StateChanged);
         _atom_object = _uridMap.map(_uridMap.handle, LV2_ATOM__Object);
+        _atom_blank = _uridMap.map(_uridMap.handle, LV2_ATOM__Blank);
         _atom_event_transfer = _uridMap.map(_uridMap.handle, LV2_ATOM__eventTransfer);
+        _atom_position = _uridMap.map(_uridMap.handle, LV2_TIME__Position);
+        _atom_bpb = _uridMap.map(_uridMap.handle, LV2_TIME__beatsPerBar);
+        _atom_bar = _uridMap.map(_uridMap.handle, LV2_TIME__bar);
+        _atom_bar_beat = _uridMap.map(_uridMap.handle, LV2_TIME__barBeat);
+        _atom_bpm = _uridMap.map(_uridMap.handle, LV2_TIME__beatsPerMinute);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
@@ -341,6 +393,8 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
         delete _synth;
         _synth = NULL;
     }
+
+    delete beatTracker;
 }
 
 

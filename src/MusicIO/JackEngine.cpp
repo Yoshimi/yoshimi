@@ -34,7 +34,10 @@ using func::asString;
 using func::asHexString;
 
 
-JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
+JackEngine::JackEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
+    MusicIO(_synth, _beatTracker),
+    jackClient(NULL),
+    bpm(120)
 {
     audio.jackSamplerate = 0;
     audio.jackNframes = 0;
@@ -381,9 +384,11 @@ int JackEngine::processCallback(jack_nframes_t nframes)
     bool okaudio = true;
     bool okmidi = true;
 
-    if (midi.port)
+    if (midi.port) {
         // input exists, using jack midi
+        handleBeatValues(nframes);
         okmidi = processMidi(nframes);
+    }
     if (audio.ports[NUM_MIDI_PARTS * 2] && audio.ports[NUM_MIDI_PARTS * 2 + 1])
         // (at least) main outputs exist, using jack audio
         okaudio = processAudio(nframes);
@@ -393,6 +398,9 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
+    std::pair<float, float> beats(beatTracker->getBeatValues());
+    synth->setBeatValues(beats.first, beats.second);
+
     // Part buffers
     for (int port = 0; port < 2 * NUM_MIDI_PARTS; ++port)
     {
@@ -499,6 +507,35 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
         }
     }
     return true;
+}
+
+void JackEngine::handleBeatValues(jack_nframes_t nframes)
+{
+    jack_position_t pos;
+    jack_transport_state_t state = jack_transport_query(jackClient, &pos);
+
+    std::pair<float, float> beats(beatTracker->getBeatValues());
+
+    if (pos.valid & JackPositionBBT)
+        bpm = pos.beats_per_minute;
+
+    float bpmInc = (float)nframes * bpm
+        / ((float)audio.jackSamplerate * 60.0f);
+
+    beats.second += bpmInc;
+
+    if (!(pos.valid & JackPositionBBT) || state == JackTransportStopped)
+        // If stopped, keep oscillating.
+        beats.first += bpmInc;
+    else
+    {
+        // If rolling, sync to exact beat.
+        beats.first = (float)pos.tick / (float)pos.ticks_per_beat;
+        beats.first += pos.beat - 1;
+        beats.first += (pos.bar - 1) * pos.beats_per_bar;
+    }
+
+    beatTracker->setBeatValues(beats);
 }
 
 

@@ -256,7 +256,13 @@ class SynthEngine
             guiCallbackArg = arg;
         }
         void closeGui();
-        int getLFOtime() {return LFOtime;}
+        int64_t getLFOtime() {return LFOtime;}
+        float getSongBeat() {return songBeat;}
+        float getMonotonicBeat() {return monotonicBeat;}
+        void setBeatValues(float song, float monotonic) {
+            songBeat = song;
+            monotonicBeat = monotonic;
+        }
         string makeUniqueName(const string& name);
 
         Bank &getBankRef() {return bank;}
@@ -282,8 +288,12 @@ class SynthEngine
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
 
-        int LFOtime; // used by Pcontinous
         int CHtimer;
+
+        int64_t LFOtime; // used by Pcontinous without Pbpm
+        float songBeat; // used by Pbpm without Pcontinous
+        float monotonicBeat; // used by Pbpm
+
         string windowTitle;
         //MusicClient *musicClient;
 

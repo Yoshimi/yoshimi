@@ -27,6 +27,7 @@
 #include "lv2/lv2plug.in/ns/ext/atom/util.h"
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
 #include "lv2/lv2plug.in/ns/ext/state/state.h"
+#include "lv2/lv2plug.in/ns/ext/time/time.h"
 #include "lv2/lv2plug.in/ns/ext/urid/urid.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 #include "lv2extui.h"
@@ -56,11 +57,19 @@ private:
    LV2_URID _midi_event_id;
    LV2_URID _yoshimi_state_id;
    LV2_URID _atom_string_id;
+   LV2_URID _atom_long;
+   LV2_URID _atom_float;
    LV2_URID _atom_type_chunk;
    LV2_URID _atom_type_sequence;
    LV2_URID _atom_state_changed;
    LV2_URID _atom_object;
+   LV2_URID _atom_blank;
    LV2_URID _atom_event_transfer;
+   LV2_URID _atom_position;
+   LV2_URID _atom_bpb;
+   LV2_URID _atom_bar;
+   LV2_URID _atom_bar_beat;
+   LV2_URID _atom_bpm;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
    sem_t _midiSem;
@@ -69,6 +78,8 @@ private:
        uint32_t time;
        char data[4]; // all events of interest are <= 4bytes
    };
+
+   float _bpm;
 
    float *_bFreeWheel;
 

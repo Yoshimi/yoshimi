@@ -1629,6 +1629,11 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
         value = (input.toggle() == 1);
         cmd = LFOINSERT::control::continuous;
     }
+    else if (input.matchnMove(1, "bpm"))
+    {
+        value = (input.toggle() == 1);
+        cmd = LFOINSERT::control::bpm;
+    }
     else if (input.matchnMove(1, "type"))
     {
         if (controlType == type_read && input.isAtEnd())

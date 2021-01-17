@@ -77,6 +77,11 @@
 #define A_DEF 440.0f
 #define A_MAX 1100.0f
 
+// The number of discrete steps we use for the LFO BPM frequency. Make sure to
+// update LFO_BPM_LCM as well, if this is updated.
+#define LFO_BPM_STEPS 33
+// The Least Common Multiple of all the possible LFO fractions.
+#define LFO_BPM_LCM 720720
 
 #define MIN_OSCIL_SIZE 256 // MAX_AD_HARMONICS * 2
 #define MAX_OSCIL_SIZE 16384
@@ -964,6 +969,7 @@ namespace LFOINSERT // usage LFOINSERT::control::speed
         amplitudeRandomness,
         type, // Sine, Tri, Sqr, R.up, R.dn, E1dn, E2dn
         continuous,
+        bpm,
         frequencyRandomness,
         stretch
     };
