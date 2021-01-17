@@ -30,7 +30,7 @@ decl {\#include <string>} {public local
 decl {\#include "FL/Fl_Text_Display.H"} {public local
 }
 
-decl {\#include "UI/YoshiWin.h"} {public local
+decl {\#include "UI/MiscGui.h"} {public local
 }
 
 decl {using namespace std;} {public local

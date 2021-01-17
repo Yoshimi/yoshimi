@@ -1,5 +1,6 @@
 /*
     YoshiWin.cpp
+    Copyright 2020, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -16,6 +17,11 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 */
+
+/*
+ *
+ * This code is no longer used but is mothballed for future refence
+
 
 #include "YoshiWin.h"
 #include "Misc/NumericFuncs.h"
@@ -58,6 +64,7 @@ void YoshiWin::resize(int x, int y, int w, int h)
   Fl::add_timeout(0.2, textResize, this);
   // ensure at least one refresh within FLTK update
 }
+*/
 
 /*
  * In the header

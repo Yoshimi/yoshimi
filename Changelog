@@ -1,5 +1,9 @@
 yoshimi 1.7.4 M
 
+2021-1-17 Will
+* Cleaned up ConsoleUI
+* Disabled YoshiWin code
+
 2021-1-16 Will
 * Merged in new denormal code.
 * BugFix: attempt to access nonexistent window.
