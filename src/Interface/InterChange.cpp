@@ -192,8 +192,8 @@ void *InterChange::sortResultsThread(void)
         }*/
 #ifdef GUI_FLTK
         // approx 50mS but depends on threadmessage process time
-        if ((tick & 0x1ff) == 0)
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
+        if ((tick & 0x1ff) == 0 && synth->guiMaster)
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
 #endif
         CommandBlock getData;
 
