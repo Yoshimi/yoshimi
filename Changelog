@@ -7,6 +7,7 @@ yoshimi 1.7.4 M
   it had been completely forgotten :(
 * BugFix: no LFO delay.
   lfoelapsed increment too big
+* Further work on handling occasional LV2 crash
 
 2021-1-17 Will
 * Cleaned up ConsoleUI

@@ -147,7 +147,7 @@ class MasterUI {: {private GuiUpdates}
       yoshiLog = NULL;
       queryDW = 0;
 
-      lastmainW = 0;
+      lastmainW = -1;
       lastpanelW = 0;
       lastmsgW = 0;
       lasttextW = 0;
@@ -296,8 +296,9 @@ class MasterUI {: {private GuiUpdates}
     checkSane(fetchX, fetchY, fetchW, fetchH, mainDW, mainDH);
 
     masterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    mainRtext();
     masterwindow->show();
+    lastmainW = 0;
+    mainRtext();
 
     return (fetchO != 0);} {}
   }
@@ -3282,6 +3283,8 @@ Alan Calvert started the project}
   }
   Function {checkBuffer(void)} {} {
     code {//
+            if (lastmainW < 0)
+                return;
             wincheck();
             read_updates(synth);} {}
   }
