@@ -276,7 +276,7 @@ float LFO::lfoout()
             x = fmodf(newBeat * frac.first / frac.second + startPhase, 1.0f);
         }
     } else
-        lfoelapsed += synth->fixed_sample_step_f;
+        lfoelapsed += synth->sent_buffersize_f / synth->samplerate_f;
 
     return out;
 }
