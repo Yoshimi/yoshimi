@@ -400,9 +400,9 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {751 232 805 610} type Double box NO_BOX hide resizable
+      xywh {933 179 805 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
-      class Fl_Group visible
+      class Fl_Group
     } {
       Fl_Box {} {
         xywh {8 71 277 64} box PLASTIC_THIN_UP_BOX color 223
@@ -622,7 +622,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
-            xywh {580 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
+            xywh {580 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textfont 1 textsize 11
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
             code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {}
@@ -818,7 +818,7 @@ Oscillator}
             }
           }
           Fl_Box {} {
-            xywh {205 35 82 35} box THIN_UP_FRAME
+            xywh {205 35 85 35} box THIN_UP_FRAME
           }
           Fl_Check_Button ResonanceEn {
             label Resonance
@@ -827,7 +827,7 @@ Oscillator}
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(0, ADDVOICE::control::enableResonance, enab, TOPLEVEL::type::Integer);}
-            tooltip {Resonance On/Off} xywh {240 50 17 19} down_box DOWN_BOX labelsize 12 align 1
+            tooltip {Resonance On/Off} xywh {238 50 17 19} down_box DOWN_BOX labelsize 12 align 1
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           }
           Fl_Group unisongroup {
@@ -1061,7 +1061,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           }
         }
         Fl_Box {} {
-          xywh {5 35 65 35} box THIN_UP_FRAME
+          xywh {5 35 64 35} box THIN_UP_FRAME
         }
         Fl_Group {} {
           xywh {69 35 136 35} box THIN_UP_FRAME
@@ -1080,7 +1080,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           label {Bypass Global}
           callback {//
 send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Integer);}
-          xywh {470 41 14 14} down_box DOWN_BOX labelsize 12 align 8
+          xywh {450 41 14 14} down_box DOWN_BOX labelsize 12 align 8
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
         Fl_Check_Button FilterEn {
@@ -1718,6 +1718,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
    voiceonbutton->labelsize(size14);
    Vname->labelsize(size14);
 
+   ResonanceEn->labelsize(size11);
    amplitudegroup->labelsize(size12);
    voicevolume->labelsize(size);
    voicevsns->labelsize(size);

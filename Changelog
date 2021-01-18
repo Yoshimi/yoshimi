@@ -1,5 +1,13 @@
 yoshimi 1.7.4 M
 
+2021-1-18 Will
+* Merged in MIDI LFO sync from Kristian.
+* GUI: Small Adsynth voice adjustments.
+* GUI: Voice resonance enable now resizes.
+  it had been completely forgotten :(
+* BugFix: no LFO delay.
+  lfoelapsed increment too big
+
 2021-1-17 Will
 * Cleaned up ConsoleUI
 * Disabled YoshiWin code
