@@ -85,8 +85,8 @@ inline int stringNumInList(const string& toFind, string * theList, size_t min)
                 found = true;
         }
     }
-    while (!found && name != "end");
-    if (name == "end")
+    while (!found && name != "@end");
+    if (name == "@end")
         return -1;
     return count;
 }

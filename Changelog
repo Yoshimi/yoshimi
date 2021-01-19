@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-1-19 Will
+* Improved end of text lists ID.
+
 2021-1-18 Will
 * Merged in MIDI LFO sync from Kristian.
 * GUI: Small Adsynth voice adjustments.

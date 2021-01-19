@@ -1178,7 +1178,7 @@ void Bank::addDefaultRootDirs(string bankdirs[])
     string ourDir = firstSynth->getRuntime().definedBankRoot;
     int tot = 0;
     int i = 0;
-    while (bankdirs[i] != "end")
+    while (bankdirs[i] != "@end")
     {
         if (isDirectory(bankdirs[i]))
         {
@@ -1482,7 +1482,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         "/usr/local/share/zynaddsubfx/banks",
         localDir + "zynaddsubfx/banks",
         extendLocalPath("/banks"),
-        "end"
+        "@end"
     };
 
     bool rootsFound = transferDefaultDirs(bankdirs);

@@ -130,7 +130,7 @@ static std::string basics [] = {
     "  WAIT <n>",    "1 to 1000 mS delay, within script only",
     "..",            "step back one level",
     "/",             "step back to top level",
-    "end"
+    "@end"
 };
 
 static std::string toplist [] = {
@@ -175,7 +175,7 @@ static std::string toplist [] = {
     "  SOlo [s]",               "channel 'solo' switch type (ROw, COlumn, LOop, TWoway, CHannel {other} off)",
     "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
     "  CLear <n>",              "restore instrument on part n to default settings",
-    "end"
+    "@end"
 };
 
 static std::string configlist [] = {
@@ -221,7 +221,7 @@ static std::string configlist [] = {
     "Nrpn [s]",            "incoming NRPN (ON, {other})",
     "Log [s]",             "incoming MIDI CCs (ON, {other})",
     "SHow [s]",            "GUI MIDI learn editor (ON, {other})",
-    "end"
+    "@end"
 };
 
 static std::string banklist [] = {
@@ -235,7 +235,7 @@ static std::string banklist [] = {
 //    "Swap <n1> [n2]",            "Swap current bank with bank n1, (opt. in root n2)",
     "INstrument Rename <n> <s>", "change the name of slot n in the current bank",
     "INstrument SAve <n>",       "save current part's instrument to bank slot n",
-    "end"
+    "@end"
 };
 
 static std::string partlist [] = {
@@ -289,7 +289,7 @@ static std::string partlist [] = {
     "SUBsynth ...",        "enter SubSynth context",
     "PADsynth ...",        "enter PadSynth context",
     "MCOntrol ...",        "enter MIDI controllers context",
-    "end"
+    "@end"
 };
 
 static std::string mcontrollist [] = {
@@ -325,7 +325,7 @@ static std::string mcontrollist [] = {
     "E Cutoff <n>",             "emulate filter cutoff controller",
     "E Q <n>",                  "emulate filter Q controller",
     "E BAndwidth <n>",          "emulate bandwidth controller",
-    "end"
+    "@end"
 };
 
 static std::string commonlist [] = {
@@ -367,7 +367,7 @@ static std::string commonlist [] = {
     "*-voice",                  "not AddVoice",
     "&",                        "AddSynth & PadSynth only",
     "#",                        "SubSynth & PadSynth only",
-    "end"
+    "@end"
 };
 
 static std::string addsynthlist [] = {
@@ -396,7 +396,7 @@ static std::string addsynthlist [] = {
     "FILter ...",               "enter Filter insert context",
     "ENVelope ...",             "enter Envelope insert context",
     "REsonance ...",            "enter Resonance context",
-    "end"
+    "@end"
 };
 
 static std::string addvoicelist [] = {
@@ -437,7 +437,7 @@ static std::string addvoicelist [] = {
     "LFO ...",              "enter LFO insert context",
     "FILter ...",           "enter Filter insert context",
     "ENVelope ...",         "enter Envelope insert context",
-    "end"
+    "@end"
 };
 
 static std::string addmodlist [] = {
@@ -464,11 +464,11 @@ static std::string addmodlist [] = {
     "FIXed <s>",            "set modulator frequency to 440Hz (ON, {other})",
     "SHift <n>",            "oscillator relative phase",
     "WAveform ...",         "enter the oscillator waveform context",
-    "end"
+    "@end"
 };
 
 // need to find a way to avoid this kind of duplication
-static std::string addmodnameslist [] = {"Off", "Morph", "Ring", "Phase", "Frequency", "Pulsewidth", "end"};
+static std::string addmodnameslist [] = {"Off", "Morph", "Ring", "Phase", "Frequency", "Pulsewidth", "@end"};
 
 static std::string subsynthlist [] = {
     "<ON/OFF>",                 "enables/disables the part",
@@ -502,7 +502,7 @@ static std::string subsynthlist [] = {
     "BAnd Scale <n>",           "bandwidth slope v frequency",
     "FILter ...",               "enter Filter insert context",
     "ENVelope ...",             "enter Envelope insert context",
-    "end"
+    "@end"
 };
 
 static std::string padsynthlist [] = {
@@ -564,7 +564,7 @@ static std::string padsynthlist [] = {
     "LFO ...",                  "enter LFO insert context",
     "FILter ...",               "enter Filter insert context",
     "ENVelope ...",             "enter Envelope insert context",
-    "end"
+    "@end"
 };
 
 static std::string  resonancelist [] = {
@@ -578,7 +578,7 @@ static std::string  resonancelist [] = {
     "Smooth",              "reduce range and sharpness of peaks",
     "CLear",               "set all points to mid level",
     "POints [<n1> [n2]]",  "show all or set/read n1 to n2",
-    "end"
+    "@end"
 };
 
 static std::string waveformlist [] = {
@@ -625,7 +625,7 @@ static std::string waveformlist [] = {
     "ADdaptive Level <n>",      "adaptive power",
     "ADdaptive Par <n>",        "adaptive parameter",
     "APply",                    "fix settings (only for PadSynth)",
-    "end"
+    "@end"
 };
 
 static std::string LFOlist [] = {
@@ -646,11 +646,11 @@ static std::string LFOlist [] = {
     "","SIne, TRiangle, SQuare, RUp (ramp up), RDown (ramp down), E1down (exp. 1), E2down (exp. 1)",
     "","SH (sample/hold), RSU (rand square up), RSD (rand square down)",
     "e.g. S FI T RU",     "set filter type ramp up",
-    "end"
+    "@end"
 };
 // TODO need to find a way to safely (and efficiently) combine these
 static std::string LFOtype [] = {
-    "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down (exp. 1)", "E2down (exp. 2)", "SH (sample/hold)", "RSU (rand square up)", "RSD (rand square dn)", "end"
+    "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down (exp. 1)", "E2down (exp. 2)", "SH (sample/hold)", "RSU (rand square up)", "RSD (rand square dn)", "@end"
 };
 
 static std::string filterlist [] = {
@@ -696,7 +696,7 @@ static std::string filterlist [] = {
     "  FFrequency <n>", "center frequency of formant",
     "  FQ <n>",         "bandwidth of formant",
     "  FGain <n>",      "amplitude of formant",
-    "end"
+    "@end"
 };
 
 static std::string envelopelist [] = {
@@ -730,7 +730,7 @@ static std::string envelopelist [] = {
     "Insert <n1> <n2> <n3>", "insert point at n1 with X increment n2, Y value n3",
     "Delete <n>",            "remove point n",
     "Change <n1> <n2> <n3>", "change point n1 to X increment n2, Y value n3",
-    "end"
+    "@end"
 };
 
 static std::string reverblist [] = {
@@ -745,7 +745,7 @@ static std::string reverblist [] = {
     "TYPe <s>",         "reverb type (Random, Freeverb, Bandwidth)",
     "ROOm <n>",         "room size",
     "BANdwidth <n>",    "actual bandwidth (only for bandwidth type)",
-    "end"
+    "@end"
 };
 
 static std::string echolist [] = {
@@ -756,7 +756,7 @@ static std::string echolist [] = {
     "CROssover <n>",    "left-right crossover",
     "FEEdback <n>",     "echo feedback",
     "DAMp <n>",         "feedback damping",
-    "end"
+    "@end"
 };
 
 static std::string choruslist [] = {
@@ -771,7 +771,7 @@ static std::string choruslist [] = {
     "FEEdback <n>",     "chorus feedback",
     "CROssover <n>",    "L/R routing",
     "SUBtract <s>",     "invert output (ON {other})",
-    "end"
+    "@end"
 };
 
 static std::string phaserlist [] = {
@@ -790,7 +790,7 @@ static std::string phaserlist [] = {
     "HYPer <s>",        "hyper ?  (ON {other})",
     "OVErdrive <n>",    "distortion",
     "ANAlog <s>",       "analog emulation (ON {other})",
-    "end"
+    "@end"
 };
 
 static std::string alienwahlist [] = {
@@ -805,7 +805,7 @@ static std::string alienwahlist [] = {
     "DELay <n>",        "LFO delay",
     "CROssover <n>",    "L/R routing",
     "RELative <n>",     "relative phase",
-    "end"
+    "@end"
 };
 
 static std::string distortionlist [] = {
@@ -821,7 +821,7 @@ static std::string distortionlist [] = {
     "HIGh <n>",         "high pass filter",
     "STEreo <s>",       "stereo (ON {other})",
     "FILter <s>",       "filter before distortion",
-    "end"
+    "@end"
 };
 
 static std::string eqlist [] = {
@@ -833,7 +833,7 @@ static std::string eqlist [] = {
     "GAIn <n>",         "makeup gain",
     "Q <n>",            "filter Q",
     "STAges <n>",       "filter stages",
-    "end"
+    "@end"
 };
 
 static std::string dynfilterlist [] = {
@@ -848,10 +848,10 @@ static std::string dynfilterlist [] = {
     "INVert <s>",       "reverse effect of sensitivity (ON {other})",
     "RATe <n>",         "speed of filter change with amplitude",
     "FILter ...",       "enter dynamic filter context",
-    "end"
+    "@end"
 };
 
-static std::string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "end"};
+static std::string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "@end"};
 
 static std::string learnlist [] = {
     "<n>",          "set current line number",
@@ -863,7 +863,7 @@ static std::string learnlist [] = {
     "MAx <n>",      "set maximum percentage",
     "LImit <s>",    "limit instead of compress (ON, {other})",
     "BLock <s>",    "inhibit others on this CC/Chan pair (ON, {other})",
-    "end"
+    "@end"
 };
 
 static std::string vectlist [] = {
@@ -875,7 +875,7 @@ static std::string vectlist [] = {
     "[X/Y] Control <n1> <n2>",  "sets n2 CC to use for X or Y feature n1 (2-4)",
     "OFF",                      "disable vector for this channel",
     "Name <s>",                 "text name for this complete vector",
-    "end"
+    "@end"
 };
 
 static std::string scalelist [] = {
@@ -896,7 +896,7 @@ static std::string scalelist [] = {
     "NAme <s>",           "internal name for this scale",
     "DEscription <s>",    "description of this scale",
     "CLEar",              "clear all settings and revert to standard scale",
-    "end"
+    "@end"
 };
 
 static std::string noteslist [] = { // from 21
@@ -917,7 +917,7 @@ static std::string loadlist [] = {
     "Patchset <s>",     "complete set of instruments from named file",
     "MLearn <s>",       "midi learned list from named file",
     "STate <s>",        "all system settings and patch sets from named file",
-    "end"
+    "@end"
 };
 
 static std::string savelist [] = {
@@ -929,7 +929,7 @@ static std::string savelist [] = {
     "MLearn <s>",       "midi learned list to named file",
     "STate <s>",        "all system settings and patch sets to named file",
     "Config",           "current configuration",
-    "end",
+    "@end",
 };
 
 static std::string listlist [] = {
@@ -946,7 +946,7 @@ static std::string listlist [] = {
     "History [s]",      "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",      "effect types ('all' include preset numbers and names)",
     "PREsets",          "all the presets for the currently selected effect",
-    "end"
+    "@end"
 };
 
 static std::string replies [] = {
@@ -980,7 +980,7 @@ static std::string fx_list [] = {
     "DIstortion",
     "EQ",
     "DYnfilter",
-    "end"
+    "@end"
 };
 
 static std::string type_list [] = {
@@ -1001,7 +1001,7 @@ static std::string type_list [] = {
     "Ethnic",
     "Percussive",
     "Sound Effects",
-    "end"
+    "@end"
 };
 
 static std::string fx_presets [] = {
@@ -1017,25 +1017,25 @@ static std::string fx_presets [] = {
 };
 
 // effect controls
-static std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "end"};
-static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "end"};
-static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "end"};
-static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "end"};
-static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "end"};
-static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "end"};
-static std::string effdistypes [] = {"ATAn", "ASYm1", "POWer", "SINe", "QNTs", "ZIGzag", "LMT", "ULMt", "LLMt", "ILMt", "CLIp", "AS2", "PO2", "SGM", "end"};
+static std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "@end"};
+static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "@end"};
+static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "@end"};
+static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "@end"};
+static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "@end"};
+static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "@end"};
+static std::string effdistypes [] = {"ATAn", "ASYm1", "POWer", "SINe", "QNTs", "ZIGzag", "LMT", "ULMt", "LLMt", "ILMt", "CLIp", "AS2", "PO2", "SGM", "@end"};
 static std::string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
-static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEAk", "LOW shelf", "HIGh shelf", "end"};
-static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "end"};
+static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEAk", "LOW shelf", "HIGh shelf", "@end"};
+static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "@end"};
 
 // common controls
-static std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "end"};
+static std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "@end"};
 
 // waveform controls
 static std::string waveshape [] = {"Sine", "Triangle", "Pulse", "Saw", "Power", "Gauss", "Diode", "AbsSine", "PulseSine", "StretchSine", "Chirp", "AbsStretchSine", "Chebyshev", "Square", "Spike", "Circle", "HyperSec"};
-static std::string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "HYP", "end"};
+static std::string wavebase [] = {"SIN", "TRI", "PUL", "SAW", "POW", "GAU", "DIO", "ABS", "PSI", "SSI", "CHI", "ASI", "CHE", "SQU", "SPI", "CIR", "HYP", "@end"};
 static std::string basetypes [] = {"c2", "g2", "c3", "g3", "c4", "g4", "c5", "g5", "g6"};
-static std::string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "end"};
+static std::string filtertype [] = {"OFF", "LP1", "HPA", "HPB", "BP1", "BS1", "LP2", "HP2", "BP2", "BS2", "COS", "SIN", "LSH", "SGM", "@end"};
 static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA", "4XS", "4XA"};
 
 // misc controls

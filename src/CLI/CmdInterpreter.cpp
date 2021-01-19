@@ -550,7 +550,7 @@ void CmdInterpreter::helpLoop(list<string>& msg, string *commands, int indent, b
     string dent;
     string blanks;
 
-    while (commands[word] != "end")
+    while (commands[word] != "@end")
     {
         left = commands[word];
         if (!single)
@@ -1494,7 +1494,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
         {
             if (input.matchnMove(1, "start"))
                 value = 0;
-            else if (input.matchnMove(1, "end"))
+            else if (input.matchnMove(1, "@end"))
                 value = 1;
             cmd = PART::control::portamentoThresholdType;
         }
@@ -1641,7 +1641,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
         else
         {
             int idx = 0;
-            while (LFOtype [idx] != "end")
+            while (LFOtype [idx] != "@end")
             {
                 if (input.matchnMove(2, LFOtype[idx].c_str()))
                 {
@@ -5454,12 +5454,12 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         if (controlType == TOPLEVEL::type::Write)
         {
             string name = type_list[pos];
-            while (name != "end" && !input.matchnMove(3, name.c_str()))
+            while (name != "@end" && !input.matchnMove(3, name.c_str()))
             {
                 ++ pos;
                 name = type_list[pos];
             }
-            if (name == "end")
+            if (name == "@end")
                 pos = 0; // undefined
         }
         return sendNormal(synth, TOPLEVEL::action::lowPrio, pos, controlType, PART::control::instrumentType, npart);

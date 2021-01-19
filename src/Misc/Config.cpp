@@ -519,11 +519,11 @@ void Config::defaultPresets(void)
         "/usr/share/zynaddsubfx/presets",
         "/usr/local/share/zynaddsubfx/presets",
         */
-        "end"
+        "@end"
     };
     int i = 0;
     int actual = 0;
-    while (presetdirs[i] != "end")
+    while (presetdirs[i] != "@end")
     {
         if (isDirectory(presetdirs[i]))
         {
