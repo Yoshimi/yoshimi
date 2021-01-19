@@ -4,6 +4,8 @@ yoshimi 1.7.4 M
 * Improved end of text lists ID.
 * Revised CLI and Data2text for BPI reporting.
   Setting CLI input as ratio still to do.
+* CLI code for setting ratios in place (disabled)
+  Don't yet know how to convert to actual value
 
 2021-1-18 Will
 * Merged in MIDI LFO sync from Kristian.

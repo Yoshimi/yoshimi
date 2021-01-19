@@ -1615,7 +1615,31 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     cmd = -1;
 
     if (input.matchnMove(1, "rate"))
+    {
         cmd = LFOINSERT::control::speed;
+        bool test = false; // this will be a test for BPM mode
+        if (test)
+        {
+            int num = string2int(input);
+            input.skipChars();
+            int div = string2int(input);
+            if ((num == 3 && div == 2) || (num == 2 && div == 3))
+                //value = ???
+            else
+            {
+                if (num == 1 && (div < 1 || div > 16))
+                    return REPLY::range_msg;
+                else if (div == 1 && (num < 1 || num > 16))
+                    return REPLY::range_msg;
+                if (num > 1 && div > 1)
+                {
+                    synth->getRuntime().Log("Invalid ratio");
+                    return REPLY::done_msg;
+                }
+            //value = ???
+            }
+        }
+    }
     else if (input.matchnMove(1, "intensity"))
         cmd = LFOINSERT::control::depth;
     else if (input.matchnMove(1, "start"))
