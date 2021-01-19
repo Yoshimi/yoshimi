@@ -24,6 +24,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FormatFuncs.h"
+#include "Misc/NumericFuncs.h"
 
 using std::string;
 using std::to_string;
@@ -2741,7 +2742,22 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
     switch (control)
     {
         case LFOINSERT::control::speed:
-            contstr = "Freq";
+            if (getData->data.offset == 1)
+            {
+                float value = getData->data.value;
+                contstr = "BPM ratio ";
+                if (value > 0.98571f) // there should be a better way to do this!
+                    contstr += "Unknown";
+                else
+                {
+                    std::pair<float, float> bpmFrac = func::LFOfreqBPMFraction(value);
+                    string result = (to_string(int(bpmFrac.first)) + "/" + to_string(int(bpmFrac.second)));
+                    contstr += result;
+                }
+                showValue = false;
+            }
+            else
+                contstr = "Freq";
             break;
         case LFOINSERT::control::depth:
             contstr = "Depth";
@@ -2768,6 +2784,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
             break;
         case LFOINSERT::control::bpm:
             contstr = "BPM";
+            yesno = true;
             break;
         case LFOINSERT::control::frequencyRandomness:
             contstr = "FreqRand";

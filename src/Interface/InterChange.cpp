@@ -5495,6 +5495,8 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
     switch (getData->data.control)
     {
         case LFOINSERT::control::speed:
+            if(pars->Pbpm) // set a flag so CLI can read the status
+                getData->data.offset = 1;
             if (write)
                 pars->setPfreq(val * Fmul2I);
             else

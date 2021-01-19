@@ -270,6 +270,8 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
 
         case LFOINSERT::control::bpm:
             bpm->value(value != 0);
+            updateLFOFreqType();
+            updateRandFreq();
             break;
 
         case LFOINSERT::control::frequencyRandomness:
@@ -306,8 +308,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
     code {if (bpm->value() == 0)
     freqrand->activate();
 else
-    freqrand->deactivate();} {
-    }
+    freqrand->deactivate();} {}
   }
   decl {LFOParams *pars;} {private local
   }

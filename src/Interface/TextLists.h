@@ -639,6 +639,7 @@ static std::string LFOlist [] = {
     "Start <n>",        "start position in cycle",
     "Delay <n>",        "time before effect",
     "Expand <n>",       "rate / note pitch",
+    "Bpm <s>",          "sync frequency to MIDI clock (ON, {other})",
     "Continuous <s>",   "(ON, {other})",
     "AR <n>",           "amplitude randomness",
     "FR <n>",           "frequency randomness",
