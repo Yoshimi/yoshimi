@@ -259,6 +259,7 @@ static void *mainGuiThread(void *arg)
                         _synth->getRuntime().LogList.pop_front();
                     }
                 }
+                GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
             }
 #endif
         }

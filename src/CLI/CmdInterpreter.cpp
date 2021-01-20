@@ -1624,7 +1624,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
             input.skipChars();
             int div = string2int(input);
             if ((num == 3 && div == 2) || (num == 2 && div == 3))
-                //value = ???
+                ;//value = ???
             else
             {
                 if (num == 1 && (div < 1 || div > 16))

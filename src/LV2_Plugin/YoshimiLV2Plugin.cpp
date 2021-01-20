@@ -815,6 +815,7 @@ void YoshimiLV2PluginUI::run()
             _masterUI->Log(_plugin->_synth->getRuntime().LogList.front());
             _plugin->_synth->getRuntime().LogList.pop_front();
         }
+        GuiThreadMsg::sendMessage(_plugin->_synth, GuiThreadMsg::GuiCheck, 0);
         Fl::check();
         GuiThreadMsg::processGuiMessages();
 

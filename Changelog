@@ -1,5 +1,10 @@
 yoshimi 1.7.4 M
 
+2021-1-20 Will
+* BugFix: failed to check CLI after code change!
+* Revised timing for GUI updates.
+  Should resolve LV2 crash.
+
 2021-1-19 Will
 * Improved end of text lists ID.
 * Revised CLI and Data2text for BPI reporting.
