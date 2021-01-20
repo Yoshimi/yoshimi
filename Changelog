@@ -7,6 +7,7 @@ yoshimi 1.7.4 M
 * Moved GUI process messages in main to be per instance.
   seems to resolve long-standing VU corruption
 * Unified CLI instrument type lists.
+* GUI unified for instrument type lists.
 
 2021-1-19 Will
 * Improved end of text lists ID.

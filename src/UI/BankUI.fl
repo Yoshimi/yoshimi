@@ -56,6 +56,9 @@ decl {\#include "Misc/Config.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
+decl {\#include "Interface/TextLists.h"} {public local
+}
+
 decl {\#include "MasterUI.h"} {private local
 }
 
@@ -574,13 +577,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
           else
               noEntries->show();}
           xywh {70 15 159 20} down_box BORDER_BOX labelfont 1 labelsize 12 textfont 1 textsize 12
-          code0 {o->add("undefined");o->add("Piano");o->add("Chromatic percussion");o->add("Organ");o->add("Guitar");o->add("Bass");o->add("Solo Strings");o->add("Ensemble");o->add("Brass");o->add("Reed");o->add("Pipe");o->add("Synth Lead");o->add("Synth Pad");o->add("Synth Effects");o->add("Ethnic");o->add("Percussive");o->add("Sound Effects");}
+          code0 {fillSearchChoice();}
         } {}
       }
     }
     Fl_Window bankuiwindow {
       label Root
-      callback {Hide(1);} open
+      callback {Hide(1);}
       xywh {767 130 780 570} type Double labelsize 12 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
@@ -875,6 +878,18 @@ class BankUI {: {public BankProcess_, RootProcess_}
         tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
+  }
+  Function {fillSearchChoice()} {} {
+    code {//
+
+        int i = 0;
+        string entry = type_list[i];
+        while (entry != "@end")
+        {
+            searchType->add(entry.c_str());
+            ++ i;
+            entry = type_list[i];
+        }} {}
   }
   Function {fillBrowser(int group)} {} {
     code {//

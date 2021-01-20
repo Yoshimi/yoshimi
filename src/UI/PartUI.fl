@@ -66,6 +66,9 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
+decl {\#include "Interface/TextLists.h"} {public local
+}
+
 class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
@@ -386,7 +389,7 @@ class PartKitItem {: {public Fl_Group}
 class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {
+    Fl_Window partgroup {open
       xywh {794 168 380 170} type Double hide
       class Fl_Group
     } {
@@ -982,7 +985,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           callback {//
               send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentType, o->value(), TOPLEVEL::type::Integer);}
           xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textfont 1 textsize 11
-          code0 {o->add("");o->add("undefined");o->add("Piano");o->add("Chromatic Percussion");o->add("Organ");o->add("Guitar");o->add("Bass");o->add("Solo Strings");o->add("Ensemble");o->add("Brass");o->add("Reed");o->add("Pipe");o->add("Synth Lead");o->add("Synth Pad");o->add("Synth Effects");o->add("Ethnic");o->add("Percussive");o->add("Sound Effects");}
+          code0 {fillInstrumentType();}
           code1 {o->value(part->info.Ptype);}
         } {}
       }
@@ -2112,6 +2115,18 @@ class PartUI {: {public Fl_Group, PartUI_}
     lastmidiW = 0;
     lastatW = 0;
     lastkititem = -1;} {}
+  }
+  Function {fillInstrumentType()} {} {
+    code {//
+
+        int i = 0;
+        string entry = type_list[i];
+        while (entry != "@end")
+        {
+            instrumentType->add(entry.c_str());
+            ++ i;
+            entry = type_list[i];
+        }} {}
   }
   Function {updatecontrollers()} {} {
     code {//
