@@ -4,6 +4,8 @@ yoshimi 1.7.4 M
 * BugFix: failed to check CLI after code change!
 * Revised timing for GUI updates.
   Should resolve LV2 crash.
+* Moved GUI process messages in main to be per instance.
+  seems to resolve long-standing VU corruption
 
 2021-1-19 Will
 * Improved end of text lists ID.

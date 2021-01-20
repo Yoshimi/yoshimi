@@ -260,6 +260,7 @@ static void *mainGuiThread(void *arg)
                     }
                 }
                 GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
+                GuiThreadMsg::processGuiMessages();
             }
 #endif
         }
@@ -294,7 +295,7 @@ static void *mainGuiThread(void *arg)
                     }
                 }
                 Fl::wait(0.033333);
-                GuiThreadMsg::processGuiMessages();
+                //GuiThreadMsg::processGuiMessages();
             }
             else
 #endif
