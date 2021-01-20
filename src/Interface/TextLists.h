@@ -997,7 +997,7 @@ static std::string type_list [] = {
     "Reed",
     "Pipe",
     "Lead Synth",
-    "Pad Type Synth",
+    "Pad Synth",
     "Synth Effects",
     "Ethnic",
     "Percussive",
@@ -1041,7 +1041,6 @@ static std::string adaptive [] = {"OFF", "ON", "SQU", "2XS", "2XA", "3XS", "3XA"
 
 // misc controls
 static std::string historyGroup [] = {"IN", "PA", "SC", "ST", "VE", "ML"};
-static std::string instrumentGroupType [] = {"UNdefined", "PIano", "CHromatic percussion", "ORgan", "GUitar", "BAss", "SIngle strings", "ENsemble", "BRass", "REed", "ACcustic pipe", "LEad synth", "PAd synth", "SYnth effects", "EThnic", "PErcussive", "SOund effects"};
 
 static std::string subMagType [] = {"Linear", "40dB", "60dB", "80dB", "100dB"};
 static std::string subPadPosition [] = {"harmonic", "ushift", "lshift", "upower", "lpower", "sine", "power", "shift"};

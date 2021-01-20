@@ -2180,15 +2180,20 @@ int CmdInterpreter::commandGroup(Parser& input)
     if (input.isAtEnd())
     {
         synth->getRuntime().Log("\nInstrument Groups");
-        for (int i = 0; i < 17; ++ i)
+        int i = 0;
+        string entry = type_list[i];
+        while (entry != "@end")
         {
-            line = "  " + instrumentGroupType[i];
+            entry = func::stringCaps(entry, 3);
+            line = "  " + func::stringCaps(entry, 3);
             synth->getRuntime().Log(line);
+            ++ i;
+            entry = type_list[i];
         }
         return REPLY::done_msg;
     }
     string name = string{input};
-    value = stringNumInList(name, instrumentGroupType, 2) + 1;
+    value = stringNumInList(name, type_list, 2) + 1;
     //std::cout << value << std::endl;
     if (value < 1)
         return REPLY::range_msg;
