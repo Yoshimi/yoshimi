@@ -8,6 +8,13 @@ yoshimi 1.7.4 M
   seems to resolve long-standing VU corruption
 * Unified CLI instrument type lists.
 * GUI unified for instrument type lists.
+* Instrument types are now extendable.
+  added following types:
+    Bells and Chimes
+    Single Voice
+    Choir
+    Wind (other)
+    Warm Pad
 
 2021-1-19 Will
 * Improved end of text lists ID.

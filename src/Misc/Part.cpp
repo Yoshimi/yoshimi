@@ -42,6 +42,7 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
+#include "Interface/TextLists.h"
 #include "Synth/Resonance.h"
 #include "Misc/Part.h"
 
@@ -1352,7 +1353,8 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
-    xml->addpar("type",info.Ptype);
+    //xml->addpar("type",info.Ptype);
+    xml->addpar("type", type_offset[info.Ptype]);
     xml->endbranch();
     if (Pname == DEFAULT_NAME)
         return;
@@ -1572,7 +1574,18 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             Pname = UNTITLED;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
-        info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
+        //info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
+        int found = xml->getpar("type", 0, -20, 255); // should cover all!
+        int type = 0;
+        int offset = 0;
+        while (offset != 255 && offset != found)
+        {
+            ++type;
+            offset = type_offset[type];
+        }
+        if (type == 255)
+            type = 0; // undefined
+        info.Ptype = type;
         xml->exitbranch();
     }
 

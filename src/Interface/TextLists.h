@@ -987,25 +987,35 @@ static std::string fx_list [] = {
 static std::string type_list [] = {
     "undefined",
     "Piano",
+    "Bells and Chimes",
     "Chromatic Percussion",
     "Organ",
     "Guitar",
     "Bass",
     "Solo Strings",
     "Ensemble",
+    "Single Voice",
+    "Choir",
     "Brass",
     "Reed",
     "Pipe",
+    "Wind (other)",
     "Lead Synth",
     "Pad Synth",
+    "Warm Pad",
     "Synth Effects",
     "Ethnic",
     "Percussive",
     "Sound Effects",
     "@end"
 };
-//static int type_offset [] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 255};
-// the above must match @end and 255 are the recognised terminators
+const int type_offset [] = {0, 1, -3, 2, 3, 4, 5, 6, 7, -1, -2, 8, 9, 10, -5, 11, 12, -4, 13, 14, 15, 16, 255};
+/*
+ * the number of the above entries must match
+ * @end and 255 are the recognised terminators
+ * only add negative numbers for backward compatibility
+ * they will resolve as 'undefined'
+ */
 
 static std::string fx_presets [] = {
     "1, off",
