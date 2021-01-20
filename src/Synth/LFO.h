@@ -29,6 +29,7 @@
 #define LFO_H
 
 #include "Params/LFOParams.h"
+#include "Misc/NumericFuncs.h"
 
 class SynthEngine;
 
@@ -40,6 +41,10 @@ class LFO
         float lfoout(void);
         float amplfoout(void);
     private:
+        std::pair<float, float> getBpmFrac() {
+            return func::LFOfreqBPMFraction((float)lfopars->PfreqI / Fmul2I);
+        }
+
         LFOParams *lfopars;
         Presets::PresetsUpdate lfoUpdate;
         void Recompute(void);
@@ -59,6 +64,9 @@ class LFO
 
         float sampandholdvalue;
         int issampled;
+
+        float prevMonotonicBeat;
+        std::pair<float, float> prevBpmFrac;
 
         SynthEngine *synth;
 };
