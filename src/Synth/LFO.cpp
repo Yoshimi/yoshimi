@@ -54,11 +54,9 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
         else
             startPhase = fmodf(((float)((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
 
-        if (lfopars->Pbpm != 0) {
-            startPhase -= remainderf(synth->getMonotonicBeat() * bpmFrac.first / bpmFrac.second, 1.0f);
-            if (startPhase < 0)
-                startPhase++;
-        }
+        if (lfopars->Pbpm != 0)
+            startPhase = remainderf(startPhase - synth->getMonotonicBeat()
+                                    * bpmFrac.first / bpmFrac.second, 1.0f);
     }
     else if (lfopars->Pbpm == 0)
     { // pre-init phase, synced to other notes
