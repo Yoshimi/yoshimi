@@ -1353,7 +1353,6 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
-    //xml->addpar("type",info.Ptype);
     xml->addpar("type", type_offset[info.Ptype]);
     xml->endbranch();
     if (Pname == DEFAULT_NAME)
@@ -1574,7 +1573,6 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             Pname = UNTITLED;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
-        //info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
         int found = xml->getpar("type", 0, -20, 255); // should cover all!
         int type = 0;
         int offset = 0;
@@ -1583,7 +1581,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             ++type;
             offset = type_offset[type];
         }
-        if (type == 255)
+        if (offset == 255)
             type = 0; // undefined
         info.Ptype = type;
         xml->exitbranch();

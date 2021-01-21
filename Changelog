@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-1-21 Will
+* Small code cleanups
+
 2021-1-20 Will
 * BugFix: failed to check CLI after code change!
 * Revised timing for GUI updates.

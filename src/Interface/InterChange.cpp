@@ -190,11 +190,7 @@ void *InterChange::sortResultsThread(void)
             else
                 std::cout << "Tock" << std::endl;
         }*/
-/*#ifdef GUI_FLTK
-        // approx 50mS but depends on threadmessage process time
-        if ((tick & 0x1ff) == 0 && synth->guiMaster)
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::GuiCheck, 0);
-#endif*/
+
         CommandBlock getData;
 
         /* It is possible that several operations initiated from

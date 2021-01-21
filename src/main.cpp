@@ -295,7 +295,6 @@ static void *mainGuiThread(void *arg)
                     }
                 }
                 Fl::wait(0.033333);
-                //GuiThreadMsg::processGuiMessages();
             }
             else
 #endif
