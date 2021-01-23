@@ -5,7 +5,8 @@ yoshimi 1.7.4 M
     Choir and Voice
     Misc
     Plucked
-
+* Modified main->GUI refreshes.
+  corrects high GUI CPU load from previous change.
 
 2021-1-21 Will
 * Small code cleanups

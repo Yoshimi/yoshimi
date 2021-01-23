@@ -259,8 +259,14 @@ static void *mainGuiThread(void *arg)
                         _synth->getRuntime().LogList.pop_front();
                     }
                 }
-                GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
-                GuiThreadMsg::processGuiMessages();
+                MasterUI *guiMaster = _synth->getGuiMaster(false);
+                if (guiMaster)
+                {
+                    guiMaster->checkBuffer();
+                    Fl::check();
+                }
+                //GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
+                //GuiThreadMsg::processGuiMessages();
             }
 #endif
         }
@@ -294,6 +300,7 @@ static void *mainGuiThread(void *arg)
                         winSplash.hide();
                     }
                 }
+                GuiThreadMsg::processGuiMessages();
                 Fl::wait(0.033333);
             }
             else
