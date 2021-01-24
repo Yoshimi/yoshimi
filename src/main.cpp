@@ -289,7 +289,7 @@ static void *mainGuiThread(void *arg)
                         winSplash.hide();
                     }
                 }
-                GuiThreadMsg::processGuiMessages();
+                //GuiThreadMsg::processGuiMessages();
                 Fl::wait(0.033333);
             }
             else
@@ -344,7 +344,8 @@ int mainCreateNewInstance(unsigned int forceId)
         synth->setWindowTitle(musicClient->midiClientName());
         if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
         {
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+            synth->getGuiMaster()->Init(NULL);
+            //GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
         }
         // not too happy this is possible, maybe gui should be wrapped in a namespace
         if (synth->getRuntime().audioEngine < 1)
@@ -547,7 +548,8 @@ int main(int argc, char *argv[])
     firstSynth->loadHistory();
     firstSynth->installBanks();
 #ifdef GUI_FLTK
-    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+    //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+    firstSynth->getGuiMaster()->Init("yoshi test");
 #endif
 
     //create command line processing thread

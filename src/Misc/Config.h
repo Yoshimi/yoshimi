@@ -274,7 +274,7 @@ public:
         UpdatePaths,
         UpdatePart,
         //RefreshCurBank,
-        GuiCheck,
+        //GuiCheck,
         NewSynthEngine,
         UNDEFINED = 9999
     };

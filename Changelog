@@ -1,6 +1,10 @@
 yoshimi 1.7.4 M
 
 2021-1-23 Will
+* Moved process messages from LV2 and main to misc_gui
+* 1st trial of direct instance start from main.
+
+2021-1-23 Will
 * BugFix: used invalid type offset (-1)
   goes into endless loop
 * Moved console log read from LV2 and main to misc_gui

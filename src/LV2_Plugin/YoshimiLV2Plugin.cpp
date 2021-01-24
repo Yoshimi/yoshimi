@@ -810,9 +810,10 @@ void YoshimiLV2PluginUI::run()
 {
     if (_masterUI != NULL)
     {
-        GuiThreadMsg::sendMessage(_plugin->_synth, GuiThreadMsg::GuiCheck, 0);
+        //GuiThreadMsg::sendMessage(_plugin->_synth, GuiThreadMsg::GuiCheck, 0);
+        _masterUI->checkBuffer();
         Fl::check();
-        GuiThreadMsg::processGuiMessages();
+        //GuiThreadMsg::processGuiMessages();
     }
     else
     {
