@@ -29,7 +29,6 @@
 
 #include "Misc/SynthEngine.h"
 #include "Synth/LFO.h"
-#include "Misc/NumericFuncs.h"
 
 
 LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
@@ -45,8 +44,6 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
 
     RecomputeFreq(); // need incx early
 
-    std::pair<float, float> bpmFrac = func::LFOfreqBPMFraction((float)lfopars->PfreqI / Fmul2I);
-
     if (lfopars->Pcontinous == 0)
     { // pre-init phase
         if (lfopars->Pstartphase == 0)
@@ -54,10 +51,12 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
         else
             startPhase = fmodf(((float)((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
 
-        if (lfopars->Pbpm != 0) {
-            startPhase -= remainderf(synth->getMonotonicBeat() * bpmFrac.first / bpmFrac.second, 1.0f);
-            if (startPhase < 0)
-                startPhase++;
+        if (lfopars->Pbpm != 0)
+        {
+            prevMonotonicBeat = synth->getMonotonicBeat();
+            prevBpmFrac = getBpmFrac();
+            startPhase = remainderf(startPhase - prevMonotonicBeat
+                                    * prevBpmFrac.first / prevBpmFrac.second, 1.0f);
         }
     }
     else if (lfopars->Pbpm == 0)
@@ -267,10 +266,21 @@ float LFO::lfoout()
         }
         else
         {
-            std::pair<float, float> frac = func::LFOfreqBPMFraction((float)lfopars->PfreqI / Fmul2I);
+            std::pair<float, float> frac = getBpmFrac();
             float newBeat;
             if (lfopars->Pcontinous == 0)
+            {
+                if (frac != prevBpmFrac)
+                {
+                    // Since we reset the phase on every cycle, if the BPM
+                    // fraction changes we need to adapt startPhase or we will
+                    // get an abrupt phase change.
+                    startPhase = remainderf(x - prevMonotonicBeat * frac.first / frac.second, 1.0f);
+                    prevBpmFrac = frac;
+                }
                 newBeat = synth->getMonotonicBeat();
+                prevMonotonicBeat = newBeat;
+            }
             else
                 newBeat = synth->getSongBeat();
             x = fmodf(newBeat * frac.first / frac.second + startPhase, 1.0f);
