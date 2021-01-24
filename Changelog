@@ -5,6 +5,7 @@ yoshimi 1.7.4 M
   goes into endless loop
 * Moved console log read from LV2 and main to misc_gui
   also cleaned up code
+* Disabled some redundant threadmessage code.
 
 2021-1-23 Will
 * Revised the following instrument banks:

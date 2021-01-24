@@ -273,7 +273,7 @@ public:
         UpdateConfig,
         UpdatePaths,
         UpdatePart,
-        RefreshCurBank,
+        //RefreshCurBank,
         GuiCheck,
         NewSynthEngine,
         UNDEFINED = 9999
