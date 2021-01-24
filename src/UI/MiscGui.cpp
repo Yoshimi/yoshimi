@@ -168,24 +168,18 @@ string input_text(SynthEngine *synth, string label, string text)
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
-//    bool isChanged = false;
     while (synth->interchange.toGUI->read(getData.bytes))
     {
         Fl::lock();
         decode_updates(synth, &getData);
         Fl::unlock();
-//        isChanged = true;
     }
-    /*
-     * we perform all the updates that have occured in this refresh
-     * period then do just a single FLTK check for 'damage'
-     */
-/*    if (isChanged)
+    // and pull up to 5 entries from log
+    for (int i = 0; !synth->getRuntime().LogList.empty() && i < 5; ++i)
     {
-        Fl::lock();
-        Fl::check();
-        Fl::unlock();
-    }*/
+        synth->getGuiMaster()->Log(synth->getRuntime().LogList.front());
+        synth->getRuntime().LogList.pop_front();
+    }
 }
 
 
@@ -240,7 +234,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
 //        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
 
-    //l_line_style(FL_SOLID); // probably not needed
     if (control == TOPLEVEL::control::textMessage) // just show a non-modal message
     {
         string name = textMsgBuffer.fetch(miscmsg);

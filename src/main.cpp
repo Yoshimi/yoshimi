@@ -250,23 +250,12 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
             if (bShowGui)
             {
-                for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
-                {
-                    MasterUI *guiMaster = _synth->getGuiMaster(false);
-                    if (guiMaster)
-                    {
-                        guiMaster->Log(_synth->getRuntime().LogList.front());
-                        _synth->getRuntime().LogList.pop_front();
-                    }
-                }
                 MasterUI *guiMaster = _synth->getGuiMaster(false);
                 if (guiMaster)
                 {
                     guiMaster->checkBuffer();
                     Fl::check();
                 }
-                //GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
-                //GuiThreadMsg::processGuiMessages();
             }
 #endif
         }
