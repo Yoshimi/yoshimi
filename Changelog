@@ -1,6 +1,10 @@
 yoshimi 1.7.4 M
 
 2021-1-23 Will
+* BugFix: used invalid type offset (-1)
+  goes into endless loop
+
+2021-1-23 Will
 * Revised the following instrument banks:
     Choir and Voice
     Misc

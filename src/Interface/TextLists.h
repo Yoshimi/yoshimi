@@ -1009,12 +1009,13 @@ static std::string type_list [] = {
     "Sound Effects",
     "@end"
 };
-const int type_offset [] = {0, 1, -3, 2, 3, 4, 5, 6, 7, -1, -2, 8, 9, 10, -5, 11, 12, -4, 13, 14, 15, 16, 255};
+const int type_offset [] = {0, 1, -3, 2, 3, 4, 5, 6, 7, -6, -2, 8, 9, 10, -5, 11, 12, -4, 13, 14, 15, 16, 255};
 /*
  * the number of the above entries must match
  * @end and 255 are the recognised terminators
  * only add negative numbers for backward compatibility
  * they will resolve as 'undefined'
+ * note: can't use -1 as ID here
  */
 
 static std::string fx_presets [] = {

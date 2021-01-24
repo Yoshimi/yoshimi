@@ -3157,6 +3157,7 @@ void InterChange::commandBank(CommandBlock *getData)
                 textMsgBuffer.push(synth->getBankRef().getname(value_int, kititem, engine));
             else
             {
+                int offset = type_offset [parameter];
                 /*
                  * This version of the call is for building up lists of instruments that match the given type.
                  * It will find the next in the series until the entire bank structure has been scanned.
@@ -3164,10 +3165,16 @@ void InterChange::commandBank(CommandBlock *getData)
                  * entire list has been scanned, and resets ready for a new set of calls.
                  */
 
+                if (offset == -1)
+                {
+                    synth->getRuntime().Log("caught invalid instrument type (-1)");
+                    textMsgBuffer.push("*");
+                }
+
                 do {
                     do {
                         do {
-                            if (synth->getBankRef().getType(searchInst, searchBank, searchRoot) == parameter)
+                            if (synth->getBankRef().getType(searchInst, searchBank, searchRoot) == offset)
                             {
                                 textMsgBuffer.push(asString(searchRoot, 3) + ": " + asString(searchBank, 3) + ". " + asString(searchInst + 1, 3) + "  " + synth->getBankRef().getname(searchInst, searchBank, searchRoot));
                                 ++ searchInst;
