@@ -1,6 +1,9 @@
 yoshimi 1.7.4 M
 
-2021-1-23 Will
+2021-1-25 Will
+* Swapped masterU wincheck() and read_updates().
+
+2021-1-24 Will
 * Moved process messages from LV2 and main to misc_gui
 * 1st trial of direct instance start from main.
 

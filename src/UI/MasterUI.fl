@@ -3285,8 +3285,8 @@ Alan Calvert started the project}
     code {//
             if (lastmainW < 0)
                 return;
-            wincheck();
-            read_updates(synth);} {}
+            read_updates(synth);
+            wincheck();} {}
   }
   Function {wincheck()} {} {
     code {//
