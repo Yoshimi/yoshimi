@@ -2148,6 +2148,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             break;
         case SUBSYNTH::control::enableBandwidthEnvelope:
             contstr = "Env Enab";
+            yesno = true;
             break;
 
         case SUBSYNTH::control::detuneFrequency:
@@ -2180,6 +2181,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             break;
         case SUBSYNTH::control::enableFrequencyEnvelope:
             contstr = "Env Enab";
+            yesno = true;
             break;
 
         case SUBSYNTH::control::overtoneParameter1:
@@ -2781,6 +2783,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
         }
         case LFOINSERT::control::continuous:
             contstr = "Cont";
+            yesno = true;
             break;
         case LFOINSERT::control::bpm:
             contstr = "BPM";
@@ -2895,6 +2898,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
         }
         case FILTERINSERT::control::frequencyTrackingRange:
             contstr = "Fre Trk Offs";
+            yesno = true;
             break;
         case FILTERINSERT::control::formantSlowness:
             contstr = "Form Fr Sl";
@@ -2941,6 +2945,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
             break;
         case FILTERINSERT::control::negateInput:
             contstr = "Neg Input";
+            yesno = true;
             break;
 
         default:
@@ -3057,9 +3062,11 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 
         case ENVELOPEINSERT::control::forcedRelease:
             contstr = "frcR";
+            yesno = true;
             break;
         case ENVELOPEINSERT::control::linearEnvelope:
             contstr = "L";
+            yesno = true;
             break;
 
         case ENVELOPEINSERT::control::edit:
@@ -3068,6 +3075,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 
         case ENVELOPEINSERT::control::enableFreeMode:
             contstr = "Freemode";
+            yesno = true;
             break;
         case ENVELOPEINSERT::control::points:
             contstr = "Points";
