@@ -180,7 +180,7 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         synth->getGuiMaster()->Log(synth->getRuntime().LogList.front());
         synth->getRuntime().LogList.pop_front();
     }
-    GuiThreadMsg::processGuiMessages();
+    //GuiThreadMsg::processGuiMessages();
 }
 
 

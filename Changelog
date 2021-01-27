@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-1-27 Will
+* Reverted startup to threadmessage style.
+
 2021-1-26 Will
 * Converted logging various switches to report on/off.
 
