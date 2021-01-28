@@ -582,7 +582,6 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         midilearnkititem[i] = NULL;
     make_window();
     setWindowTitle();
-    num = 0;
     learnW = 0;
     learnSeen = false;} {}
   }
@@ -646,15 +645,12 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     maxbox->labelsize(size11);
 
     none->labelsize(int(32 * dScale));
-    int count = collect_readData(synth, 0, MIDILEARN::control::findSize, TOPLEVEL::section::midiLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED,TOPLEVEL::action::lowPrio);
-    if (count > 0)
+    for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
     {
-        for (int i = 0; i < count; ++i)
-        {
-            midilearnkititem[i]->kitRscale(dScale);
-            midilearnkititem[i]->resize(2 * dScale, (21 + i * 20) * dScale, 818 * dScale, 20 * dScale);
-
-        }
+        if (midilearnkititem[i] == NULL)
+            continue;
+        midilearnkititem[i]->kitRscale(dScale);
+        midilearnkititem[i]->resize(2 * dScale, (21 + i * 20) * dScale, 818 * dScale, 20 * dScale);
     }
     midilearnwindow->redraw();} {}
   }
@@ -663,8 +659,6 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   decl {SynthEngine *synth;} {private local
   }
   decl {MidiLearnKitItem *midilearnkititem[MIDI_LEARN_BLOCK];} {private local
-  }
-  decl {int num;} {private local
   }
   decl {int learnDW;} {private local
   }
