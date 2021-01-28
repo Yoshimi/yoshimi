@@ -250,15 +250,15 @@ static void *mainGuiThread(void *arg)
 #ifdef GUI_FLTK
             if (bShowGui)
             {
-                /*MasterUI *guiMaster = _synth->getGuiMaster(false);
+                MasterUI *guiMaster = _synth->getGuiMaster(false);
                 if (guiMaster)
                 {
                     guiMaster->checkBuffer();
                     Fl::check();
-                }*/
-                GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
+                }
+                //GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
                 Fl::check();
-                GuiThreadMsg::processGuiMessages();
+                //GuiThreadMsg::processGuiMessages();
             }
 #endif
         }
@@ -552,7 +552,7 @@ int main(int argc, char *argv[])
     firstSynth->installBanks();
 #ifdef GUI_FLTK
     //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
-    firstSynth->getGuiMaster()->Init("yoshi test");
+    firstSynth->getGuiMaster()->Init(NULL);//"yoshi test");
 #endif
 
     //create command line processing thread
