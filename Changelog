@@ -1,5 +1,9 @@
 yoshimi 1.7.4 M
 
+2021-1-29 Will
+* aftertouch window can be opened from part edit window
+  right click close reopens correct parent.
+
 2021-1-28 Will
 * Another attempt to reosve LV2/Main conflicts.
 

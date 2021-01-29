@@ -389,14 +389,14 @@ class PartKitItem {: {public Fl_Group}
 class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {open
+    Fl_Window partgroup {
       xywh {794 168 380 170} type Double hide
       class Fl_Group
     } {
       Fl_Box {} {
         xywh {80 60 17 17} box THIN_UP_BOX color 237
       }
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -841,18 +841,18 @@ class PartUI {: {public Fl_Group, PartUI_}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 220 395 110} box ENGRAVED_FRAME
+        xywh {0 220 395 104} box ENGRAVED_FRAME
       } {
         Fl_Group ADD {
           label ADDsynth
-          xywh {5 246 100 79} box ENGRAVED_FRAME labelfont 1
+          xywh {5 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable ADsynth} xywh {15 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Box addbox {
@@ -868,20 +868,20 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {15 276 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
         Fl_Group SUB {
           label SUBsynth
-          xywh {105 246 100 79} box ENGRAVED_FRAME labelfont 1
+          xywh {105 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable SUBsynth} xywh {115 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
           Fl_Box subbox {
@@ -897,20 +897,20 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {115 276 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
         Fl_Group PAD {
           label PADsynth
-          xywh {205 246 100 79} box ENGRAVED_FRAME labelfont 1
+          xywh {205 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable PADsynth} xywh {215 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
           Fl_Box padbox {
@@ -926,7 +926,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {215 276 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -937,7 +937,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
+          tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 230 selection_color 220 labelfont 1 align 128
         }
         Fl_Button effects {
           label Effects
@@ -946,7 +946,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1
+          tooltip {Right click: also close this} xywh {310 283 80 35} box PLASTIC_UP_BOX color 230 labelfont 1
         }
       }
       Fl_Group {} {
@@ -990,14 +990,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         } {}
       }
       Fl_Box {} {
-        xywh {0 330 268 52} box ENGRAVED_FRAME labelfont 1 align 8
+        xywh {0 322 268 62} box ENGRAVED_FRAME labelfont 1 align 8
+      }
+      Fl_Text_Display humanise_display {
+        label Humanise
+        xywh {102 342 78 7} box NO_BOX labelfont 1
       }
       Fl_Value_Slider humanise {
         label Detune
         callback {//
 
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Random detune of whole part in cents} xywh {12 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random detune of whole part in cents} xywh {12 342 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseDetune);//o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
@@ -1006,7 +1010,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
 
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Random velocity attenuation of whole part} xywh {12 359 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random velocity attenuation of whole part} xywh {12 363 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
@@ -1017,11 +1021,16 @@ class PartUI {: {public Fl_Group, PartUI_}
                   editSeen = false;
                   lasteditW = 0;
                   instrumenteditwindow->hide();}
-        xywh {294 358 80 21} box THIN_UP_BOX labelfont 1
+        xywh {290 358 86 21} box THIN_UP_BOX labelfont 1
       }
-      Fl_Text_Display humanise_display {
-        label Humanise
-        xywh {288 353 78 7} box NO_BOX labelfont 1 labelsize 16
+      Fl_Button editAT {
+        label Aftertouch
+        callback {//
+                ShowAT();
+                atSeen = 2;
+                if ((Fl::event_button() == 3))
+                    instrumenteditwindow->hide();}
+        xywh {283 328 101 26} box PLASTIC_UP_BOX color 230 labelfont 1
       }
     }
     Fl_Window partfx {
@@ -1388,9 +1397,10 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Aftertouch
         callback {//;
                 ShowAT();
+                atSeen = 1;
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
-        xywh {245 105 130 20}
+        xywh {245 105 130 20} box PLASTIC_THIN_UP_BOX color 230
       }
       Fl_Button ctlclose {
         label Close
@@ -1592,10 +1602,15 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Close
         callback {//
         saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
-        atSeen = false;
-        aftertouchcontrol->hide();
         if ((Fl::event_button() == 3))
-            ctlwindow->show();}
+        {
+            if (atSeen > 1)
+                instrumenteditwindow->show();
+            else
+                ctlwindow->show();
+        }
+        atSeen = 0;
+        aftertouchcontrol->hide();}
         xywh {420 154 50 20} box THIN_UP_BOX
       }
     }
@@ -2543,8 +2558,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     checkSane(fetchX, fetchY, fetchW, fetchH, atDW, atDH);
 
     aftertouchcontrol->resize(fetchX, fetchY, fetchW, fetchH);
-    aftertouchcontrol->show();
-    atSeen = true;} {}
+    aftertouchcontrol->show();} {}
   }
   Function {Showctlmidi()} {} {
     code {//
@@ -2695,8 +2709,9 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     velocityhumanise->labelsize(size12);
         velocityhumanise->textsize(size);
+    editAT->labelsize(size14);
     editClose->labelsize(size14);
-    humanise_display->labelsize(int(16 * dScale));
+    humanise_display->labelsize(size14);
 
     instrumenteditwindow->redraw();} {}
   }
@@ -2936,7 +2951,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         delete padnoteui;
     }
     partgroup->hide();
-    if (atSeen)
+    if (atSeen > 0)
         saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), true, "Part-aftertouch");
     aftertouchcontrol->hide();
     delete aftertouchcontrol;
@@ -3017,7 +3032,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   decl {float atDH;} {public local
   }
-  decl {bool atSeen;} {private local
+  decl {int atSeen;} {private local
   }
   decl {float ctlDW;} {public local
   }
