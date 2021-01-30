@@ -8,6 +8,10 @@ yoshimi 1.7.4 M
     Will_Godfrey_Companion
 * Improved layout of part Edit window.
 
+*Merged improved FLTK widgets from Jesper
+ and adjusted to fit laterst build
+
+
 2021-1-29 Will
 * aftertouch window can be opened from part edit window
   right click close reopens correct parent.

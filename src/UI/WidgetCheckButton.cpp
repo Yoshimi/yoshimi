@@ -146,7 +146,10 @@ void Fl_Light_Button2::draw() {
 int Fl_Light_Button2::handle(int event) {
   switch (event) {
   case FL_RELEASE:
-    if (box()) redraw();
+    if (box())
+        redraw();
+    return Fl_Button::handle(event);
+    break;
   default:
     return Fl_Button::handle(event);
   }

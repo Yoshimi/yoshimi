@@ -77,7 +77,7 @@ pars=NULL;} {}
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {999 442 275 70} type Double color 50 labelfont 1 labelsize 12 hide resizable
+      xywh {916 422 275 70} type Double color 50 labelfont 1 labelsize 12 hide resizable
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
@@ -90,15 +90,16 @@ pars=NULL;} {}
 updateLFOFreqType();
 updateRandFreq();}
           tooltip {Lock LFO frequency to a multiple of the BPM.} xywh {230 5 45 15} down_box DOWN_BOX labelsize 10
+          class Fl_Check_Button2
         }
         Fl_Check_Button continous {
-          class Fl_Check_Button2
           label {Cont.}
           callback {//
           send_data(0, group, LFOINSERT::control::continuous, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Continuous LFO
 
 Run the LFO continuously even when the sound is not playing. If BPM is on, then the LFO phase will be locked to the song position.} xywh {230 20 15 15} down_box DOWN_BOX labelsize 10
+          class Fl_Check_Button2
         }
         Fl_Dial freq {
           label {Freq.}
