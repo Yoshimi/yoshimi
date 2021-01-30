@@ -1,11 +1,19 @@
 yoshimi 1.7.4 M
 
+2021-1-30 Will
+* recoded formatTextLines() in FormatFuncs.h
+  can now handle embedded newlines correctly.
+* Revised the following banks:
+    Will_Godfrey_Collection
+    Will_Godfrey_Companion
+* Improved layout of part Edit window.
+
 2021-1-29 Will
 * aftertouch window can be opened from part edit window
   right click close reopens correct parent.
 
 2021-1-28 Will
-* Another attempt to reosve LV2/Main conflicts.
+* Another attempt to resolve LV2/Main conflicts.
 
 2021-1-27 Will
 * Reverted startup to threadmessage style.

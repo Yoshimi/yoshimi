@@ -396,7 +396,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Box {} {
         xywh {80 60 17 17} box THIN_UP_BOX color 237
       }
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -604,7 +604,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           else
               modepatch->color(29);
           modepatch->redraw();
-          send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);} open
+          send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Poly, Mono or Legato mode} xywh {82 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
           code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
           code1 {int tmp = synth->ReadPartKeyMode(npart);}
@@ -963,7 +963,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             if (Fl::event_state(FL_CTRL))
             param = 1;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer, 255, 255, 255, param);}
-          tooltip {Load default author & copyright\\n+Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
+          tooltip {Load default author & copyright
+ + Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
         }
         Fl_Input copyright {
           callback {//

@@ -2,7 +2,7 @@
     FormatFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2020, Will Godfrey and others.
+    Copyright 2014-2021, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -229,26 +229,44 @@ inline int findSplitPoint(std::string name)
  */
 inline std::string formatTextLines(std::string text, size_t maxLen)
 {
-    size_t lineLen = text.length();
-    if (lineLen < maxLen)
+    size_t totalLen = text.length();
+    if (totalLen < maxLen)
         return text;
-    const char lineEnd = char(10);
-    size_t pos = maxLen;
-    size_t oldPos = 0;
-
-    while (pos < lineLen && pos > oldPos)
+    size_t pos = 0;
+    size_t ref = 0;
+    size_t setLen = totalLen;
+    while (pos < setLen) // split overlong words first
     {
-        pos = text.rfind(' ', pos);
-        if (pos < oldPos)
+        if (text.at(pos) == '\n' || text.at(pos) == ' ')
+            ref = pos;
+        if ((pos - ref) > maxLen)
         {
-            pos = oldPos + maxLen + 1; // inserted char
-            text.insert(pos, 1, lineEnd);
+            text.insert(pos, 1, '\n');
+            ++setLen;
+            ref = pos;
         }
-        else
-            text.replace(pos, 1, 1, lineEnd);
-        oldPos = pos;
-        pos += maxLen + 1; // replaced char
-        lineLen += 1;
+        ++pos;
+    }
+    pos = 0;
+    ref = 0;
+    size_t last = 0;
+    while (pos < totalLen)
+    {
+        if (text.at(pos) == '\n') // skip over existing newlines
+        {
+            ref = pos;
+            ++pos;
+        }
+        size_t found = text.find(' ', pos);
+        if (found >= totalLen)
+            return text;
+        if ((found - ref) >= maxLen)
+        {
+            text.replace(last, 1, 1, '\n');
+            ref = last;
+        }
+        last = found;
+        ++ pos;
     }
     return text;
 }
