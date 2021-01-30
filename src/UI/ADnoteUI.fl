@@ -40,8 +40,9 @@ decl {\#include <FL/Fl_Box.H>
     \#include "UI/WidgetPDial.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetCheckButton.h"
+    \#include "UI/WidgetSpinner.h"
     \#include "FilterUI.h"
-    \#include "PresetsUI.h"} {private global
+    \#include "PresetsUI.h"} {public global
 }
 
 decl {\#include <string>
@@ -847,6 +848,7 @@ Oscillator}
             code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if (pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {
             Fl_Spinner unisonsize {
+              class WidgetSpinner
               label Size
               callback {//
 send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer);}

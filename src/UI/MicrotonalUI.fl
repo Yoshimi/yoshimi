@@ -44,6 +44,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
+    \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetCheckButton.h"
     \#include "Params/Controller.h"} {public global
@@ -97,6 +98,7 @@ class MicrotonalUI {} {
           xywh {336 17 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner centerinvertcounter {
+          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::invertedScaleCenter, o->value(), TOPLEVEL::type::Integer);}
           xywh {339 20 47 20} labelsize 11 align 129 minimum 0 maximum 127 value 0 textfont 1 textsize 12
@@ -119,6 +121,7 @@ class MicrotonalUI {} {
           xywh {191 18 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner anotecounter {
+          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::refNote, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Midi note range: 24 (C1) to 84 (C6)} xywh {192 23 45 17} box FLAT_BOX labelsize 11 align 1 minimum 24 maximum 84 value 69 textfont 1 textsize 11
@@ -202,6 +205,7 @@ class MicrotonalUI {} {
           xywh {318 65 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner scaleShift {
+          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::scaleShift, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Octave base offset} xywh {320 68 47 20} labelsize 10 align 1 minimum -63 maximum 64 value 0 textfont 1 textsize 12
@@ -252,6 +256,7 @@ class MicrotonalUI {} {
             xywh {198 224 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner firstnotecounter {
+            class WidgetSpinner
             callback {//
             int tmp = int (o->value());
             int max = middlenotecounter->value() - 1;
@@ -282,6 +287,7 @@ class MicrotonalUI {} {
             xywh {198 289 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner middlenotecounter {
+            class WidgetSpinner
             callback {//
             int tmp = int(o->value());
             int min = firstnotecounter->value() + 1;
@@ -321,6 +327,7 @@ class MicrotonalUI {} {
             xywh {198 354 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner lastnotecounter {
+            class WidgetSpinner
             callback {//
             int tmp = int(o->value());
             int min = middlenotecounter->value() + 1;

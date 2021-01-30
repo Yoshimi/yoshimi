@@ -51,6 +51,9 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
+decl {\#include "UI/WidgetSpinner.h"} {public local
+}
+
 decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
@@ -454,6 +457,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         class WidgetPDial
       }
       Fl_Spinner midichannel {
+        class WidgetSpinner
         label {MIDI Channel}
         callback {//
         relaseallkeys();

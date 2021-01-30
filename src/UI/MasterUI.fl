@@ -62,6 +62,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetCheckButton.h"} {public local
 }
 
+decl {\#include "UI/WidgetSpinner.h"} {public local
+}
+
 decl {\#include "ADnoteUI.h"} {public local
 }
 
@@ -700,6 +703,7 @@ class MasterUI {: {private GuiUpdates}
           xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
+            class WidgetSpinner
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, o->value() - 1);}
@@ -750,6 +754,7 @@ class MasterUI {: {private GuiUpdates}
           xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
+            class WidgetSpinner
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, o->value() - 1);}
@@ -847,6 +852,7 @@ class MasterUI {: {private GuiUpdates}
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
+        class WidgetSpinner
         label Shift
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
@@ -855,6 +861,7 @@ class MasterUI {: {private GuiUpdates}
         code1 {o->value(synth->Pkeyshift - 64);}
       }
       Fl_Spinner npartcounter {
+        class WidgetSpinner
         label Part
         callback {//
         int nval = o->value() - 1;
@@ -866,6 +873,7 @@ class MasterUI {: {private GuiUpdates}
         code2 {bankui->init(o);}
       }
       Fl_Spinner maxparts {
+        class WidgetSpinner
         label of
         callback {//
         int tmp = o->value();
@@ -1104,6 +1112,7 @@ Alan Calvert started the project}
         code0 {o->add("1 to 16");o->add("17 to 32");}
       } {}
       Fl_Spinner CSspinner {
+        class WidgetSpinner
         label CC
         callback {//
         CSpend->show();}

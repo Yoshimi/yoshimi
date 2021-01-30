@@ -45,6 +45,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
+    \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetCheckButton.h"
     \#include "Params/Controller.h"} {public global
 }
@@ -583,6 +584,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           code0 {o->value(part->ctl->portamento.portamento);}
         }
         Fl_Spinner midich {
+          class WidgetSpinner
           label Midi
           callback {//
           int tmp = ((int)o->value() -1);
@@ -627,6 +629,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
+          class WidgetSpinner
           label {Key Shift}
           callback {//
           send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer);}
@@ -635,6 +638,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           code1 {o->value(part->Pkeyshift - 64);}
         }
         Fl_Spinner partkeylimit {
+          class WidgetSpinner
           label {Key Limit}
           callback {//
           send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
@@ -643,6 +647,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           code1 {o->value(part->Pkeylimit);}
         }
         Fl_Spinner minkcounter {
+          class WidgetSpinner
           label {Min Note}
           callback {//
           int tmp = o->value();
@@ -659,6 +664,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           code1 {o->value(part->Pminkey);}
         }
         Fl_Spinner maxkcounter {
+          class WidgetSpinner
           label {Max Note}
           callback {//
           int tmp = o->value();
@@ -1054,6 +1060,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Spinner inseffnocounter {
+        class WidgetSpinner
         callback {//
                 ninseff = o->value() - 1;
                 insefftype->value(part->partefx[ninseff]->geteffect());

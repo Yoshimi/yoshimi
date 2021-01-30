@@ -38,6 +38,9 @@ decl {\#include "Misc/SynthEngine.h"} {private local
 decl {\#include "UI/WidgetCheckButton.h"} {public global
 }
 
+decl {\#include "UI/WidgetSpinner.h"} {public global
+}
+
 decl {\#include "Misc/Bank.h"} {private local
 }
 
@@ -619,6 +622,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
+            class WidgetSpinner
             label {Extended Program Change CC}
             callback {//
                         Epend->show();}

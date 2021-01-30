@@ -50,6 +50,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetCheckButton.h"} {public local
 }
 
+decl {\#include "UI/WidgetSpinner.h"} {public global
+}
+
 decl {\#include "Misc/Bank.h"} {public local
 }
 
@@ -863,6 +866,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         tooltip {Click to set} xywh {400 239 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
       }
       Fl_Spinner changeIDbutton {
+        class WidgetSpinner
         label {Change ID}
         callback {Pend->show();}
         xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12
