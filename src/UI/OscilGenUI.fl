@@ -50,6 +50,9 @@ decl {\#include <cmath>} {private local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -671,6 +674,7 @@ o->hide();}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
+          class Fl_Check_Button2
           label F
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::filterBeforeWaveshape, o->value(), TOPLEVEL::type::Integer);}
@@ -717,6 +721,7 @@ o->hide();}
           xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
         }
         Fl_Check_Button harmonicshiftpre {
+          class Fl_Check_Button2
           label {Shift 1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::shiftBeforeWaveshapeAndFilter, o->value(), TOPLEVEL::type::Integer);}

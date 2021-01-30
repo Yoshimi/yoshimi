@@ -45,6 +45,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
+    \#include "UI/WidgetCheckButton.h"
     \#include "Params/Controller.h"} {public global
 }
 
@@ -82,6 +83,7 @@ class MicrotonalUI {} {
           xywh {273 18 5 30} box NO_BOX labelfont 1 labelsize 12 align 136 textsize 11
         }
         Fl_Check_Button invertKeys {
+          class Fl_Check_Button2
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::invertScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Turn upside-down the note frequencies} xywh {256 16 19 19} down_box DOWN_BOX color 50 labelfont 1 align 8
@@ -355,6 +357,7 @@ class MicrotonalUI {} {
           }
         }
         Fl_Check_Button mappingenabledbutton {
+          class Fl_Check_Button2
           label ON
           callback {//
           o->show();
@@ -385,6 +388,7 @@ class MicrotonalUI {} {
         xywh {2 13 22 22} box UP_BOX color 237
       }
       Fl_Check_Button enableMicrotonal {
+        class Fl_Check_Button2
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableMicrotonal, o->value(), TOPLEVEL::type::Integer);}
         xywh {4 13 21 22} down_box DOWN_BOX color 50 labelfont 1 align 4

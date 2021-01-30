@@ -47,6 +47,9 @@ decl {\#include <FL/Fl_Spinner.H>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "Misc/Bank.h"} {public local
 }
 
@@ -499,6 +502,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         xywh {468 528 151 42} box ENGRAVED_FRAME labelsize 12
       } {
         Fl_Check_Button enginecheck {
+          class Fl_Check_Button2
           label {Show engines/types}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}

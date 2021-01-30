@@ -53,6 +53,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
@@ -404,6 +407,7 @@ class ResonanceUI {: PresetsUI_
           tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button p1st {
+          class Fl_Check_Button2
           label {Prot.1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer);}
@@ -441,6 +445,7 @@ class ResonanceUI {: PresetsUI_
         }
       }
       Fl_Check_Button enabled {
+        class Fl_Check_Button2
         label Enable
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer);}

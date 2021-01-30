@@ -38,6 +38,9 @@ decl {\#include <iostream>} {public local
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include <FL/Fl_Group.H>} {public local
 }
 
@@ -89,6 +92,7 @@ updateRandFreq();}
           tooltip {Lock LFO frequency to a multiple of the BPM.} xywh {230 5 45 15} down_box DOWN_BOX labelsize 10
         }
         Fl_Check_Button continous {
+          class Fl_Check_Button2
           label {Cont.}
           callback {//
           send_data(0, group, LFOINSERT::control::continuous, o->value(), TOPLEVEL::type::Integer);}

@@ -355,6 +355,7 @@ if (BuildWithFLTK)
         ${FltkUI_sources}
         UI/DynamicTooltip.cpp
         UI/WidgetPDial.cpp
+        UI/WidgetCheckButton.cpp
         UI/WidgetMWSlider.cpp
         UI/YoshiWin.cpp
         UI/MiscGui.cpp

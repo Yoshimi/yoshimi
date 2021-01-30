@@ -38,6 +38,9 @@ decl {\#include <iostream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -524,6 +527,7 @@ pars=NULL;
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Check_Button freqtrackoffset {
+        class Fl_Check_Button2
         label {0 /+}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTrackingRange, o->value(), TOPLEVEL::type::Write);}
@@ -622,6 +626,7 @@ pars=NULL;
             code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           }
           Fl_Check_Button neginput {
+            class Fl_Check_Button2
             label {Neg.Input}
             callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::negateInput, o->value(), TOPLEVEL::type::Write);}

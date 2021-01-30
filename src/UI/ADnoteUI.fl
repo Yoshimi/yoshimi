@@ -39,6 +39,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "UI/MiscGui.h"
     \#include "UI/WidgetPDial.h"
     \#include "UI/WidgetMWSlider.h"
+    \#include "UI/WidgetCheckButton.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
 }
@@ -85,6 +86,7 @@ class ADvoicelistitem {: {public Fl_Group}
           class mwheel_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
+          class Fl_Check_Button2
           callback {//
     bool enab = _SYS_::F2B(o->value());
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
@@ -184,6 +186,7 @@ class ADvoicelistitem {: {public Fl_Group}
         code0 {char tmp[12]; snprintf(tmp, 12, "%d", nvoice + 1); o->label(strdup(tmp));}
       } {}
       Fl_Check_Button voiceenabled {
+        class Fl_Check_Button2
         callback {//
             bool enab = _SYS_::F2B(o->value());
             collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
@@ -430,6 +433,7 @@ class ADvoiceUI {: {public Fl_Group}
                 class EnvelopeUI
               } {}
               Fl_Check_Button ModFreqEn {
+                class Fl_Check_Button2
                 label On
                 callback {//
                     if (o->value() == 0)
@@ -483,6 +487,7 @@ class ADvoiceUI {: {public Fl_Group}
                 code1 {o->value(pars->VoicePar[nvoice].PFMDetuneType);}
               } {}
               Fl_Check_Button detuneFromBaseOsc {
+                class Fl_Check_Button2
                 label {Follow voice}
                 callback {send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFromBaseOsc, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Apply all detuning in the voice oscillator to the modulator as well.} xywh {640 220 95 15} down_box DOWN_BOX labelsize 11
@@ -490,6 +495,7 @@ class ADvoiceUI {: {public Fl_Group}
                 code1 {if (pars->VoicePar[nvoice].PFMFixedFreq) o->deactivate();}
               }
               Fl_Check_Button Mod440 {
+                class Fl_Check_Button2
                 label 440Hz
                 callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs440Hz, o->value(), TOPLEVEL::type::Integer);}
@@ -525,6 +531,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 class EnvelopeUI
               } {}
               Fl_Check_Button ModAmpEn {
+                class Fl_Check_Button2
                 label On
                 callback {//
                     if (o->value() == 0)
@@ -638,6 +645,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               class EnvelopeUI
             } {}
             Fl_Check_Button FreqEn {
+              class Fl_Check_Button2
               label On
               callback {//
                   if (o->value() == 0)
@@ -657,6 +665,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               class LFOUI
             } {}
             Fl_Check_Button FreqLfoEn {
+              class Fl_Check_Button2
               label On
               callback {//
     bool enab = _SYS_::F2B(o->value());
@@ -728,6 +737,7 @@ send_data(0, ADDVOICE::control::pitchBendAdjustment, o->value(), TOPLEVEL::type:
               class WidgetPDial
             }
             Fl_Check_Button Freq440 {
+              class Fl_Check_Button2
               label 440Hz
               callback {//
                   int x = lrint(o->value());
@@ -821,6 +831,7 @@ Oscillator}
             xywh {205 35 85 35} box THIN_UP_FRAME
           }
           Fl_Check_Button ResonanceEn {
+            class Fl_Check_Button2
             label Resonance
             callback {//
     bool enab = _SYS_::F2B(o->value());
@@ -907,6 +918,7 @@ send_data(0, ADDVOICE::control::unisonPhaseRandomise, o->value(), TOPLEVEL::type
             }
           }
           Fl_Check_Button UnisonEn {
+            class Fl_Check_Button2
             label On
             callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->value(), TOPLEVEL::type::Integer);}
@@ -959,6 +971,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             class WidgetPDial
           }
           Fl_Check_Button voicerandompan {
+            class Fl_Check_Button2
             label Rand
             callback {//
         int tmp = o->value();
@@ -979,6 +992,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             class EnvelopeUI
           } {}
           Fl_Check_Button AmpEnvEn {
+            class Fl_Check_Button2
             label On
             callback {//
                 if (o->value() == 0)
@@ -998,6 +1012,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             class LFOUI
           } {}
           Fl_Check_Button AmpLfoEn {
+            class Fl_Check_Button2
             label On
             callback {//
                 if (o->value() == 0)
@@ -1010,6 +1025,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
           }
           Fl_Check_Button VolumeMinus {
+            class Fl_Check_Button2
             label Minus
             callback {//
 send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer);}
@@ -1039,6 +1055,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             class EnvelopeUI
           } {}
           Fl_Check_Button FilterEnvEn {
+            class Fl_Check_Button2
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterEnvelope, o->value(), TOPLEVEL::type::Integer);}
@@ -1053,6 +1070,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             class LFOUI
           } {}
           Fl_Check_Button FilterLfoEn {
+            class Fl_Check_Button2
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterLFO, o->value(), TOPLEVEL::type::Integer);}
@@ -1077,6 +1095,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           }
         }
         Fl_Check_Button bypassfiltercheckbutton {
+          class Fl_Check_Button2
           label {Bypass Global}
           callback {//
 send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Integer);}
@@ -1084,6 +1103,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
         Fl_Check_Button FilterEn {
+          class Fl_Check_Button2
           label On
           callback {//
               bypassfiltercheckbutton->redraw();
@@ -1135,6 +1155,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         }
       }
       Fl_Check_Button voiceonbutton {
+        class Fl_Check_Button2
         label On
         callback {//
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableVoice, o->value(), TOPLEVEL::type::Integer);}
@@ -2009,6 +2030,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           class WidgetPDial
         }
         Fl_Check_Button globalrandompan {
+          class Fl_Check_Button2
           label Rand
           callback {//
         int tmp = o->value();
@@ -2074,6 +2096,7 @@ send_data(0, ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integ
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
+          class Fl_Check_Button2
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());
 send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer);}
@@ -2111,6 +2134,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         xywh {6 218 18 18} box THIN_UP_BOX color 237
       }
       Fl_Check_Button stereo {
+        class Fl_Check_Button2
         label { Stereo}
         callback {//
 send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}

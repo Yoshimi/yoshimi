@@ -48,6 +48,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "UI/WidgetMWSlider.h"
+    \#include "UI/WidgetCheckButton.h"
     \#include "Params/Controller.h"} {public global
 }
 
@@ -166,11 +167,13 @@ class MidiLearnKitItem {: {public Fl_Group}
           }
         }
         Fl_Check_Button compresscheck {
+          class Fl_Check_Button2
           callback {//
           send_data(0, MIDILEARN::control::limit);}
           tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
+          class Fl_Check_Button2
           callback {//
           send_data(0, MIDILEARN::control::block);}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
@@ -208,6 +211,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
       }
       Fl_Check_Button mutecheck {
+        class Fl_Check_Button2
         callback {//
         if (o->value())
             midilearnkititemgroup->deactivate();

@@ -39,6 +39,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "UI/MiscGui.h"
     \#include "PresetsUI.h"
     \#include "UI/WidgetPDial.h"
+    \#include "UI/WidgetCheckButton.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
@@ -379,6 +380,7 @@ class PADnoteUI {: {public PresetsUI_}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {}
             Fl_Check_Button hpautoscale {
+              class Fl_Check_Button2
               label Autoscale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
@@ -588,6 +590,7 @@ class PADnoteUI {: {public PresetsUI_}
               class WidgetPDial
             }
             Fl_Check_Button randompan {
+              class Fl_Check_Button2
               label Rand
               callback {//
         int tmp = o->value();
@@ -604,6 +607,7 @@ class PADnoteUI {: {public PresetsUI_}
               xywh {14 248 18 18} box THIN_UP_BOX color 237
             }
             Fl_Check_Button stereo {
+              class Fl_Check_Button2
               label { Stereo}
               callback {//
               pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
@@ -725,6 +729,7 @@ class PADnoteUI {: {public PresetsUI_}
               class WidgetPDial
             }
             Fl_Check_Button hz440 {
+              class Fl_Check_Button2
               label 440Hz
               callback {//
               int x = (int) o->value();

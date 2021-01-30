@@ -44,6 +44,9 @@ decl {using namespace std;} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "ADnoteUI.h"} {public local
 }
 
@@ -547,6 +550,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         } {}
       }
       Fl_Check_Button partenabled {
+        class Fl_Check_Button2
         label 01
         callback {//
         if (_SYS_::F2B(o->value()))

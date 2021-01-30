@@ -542,6 +542,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button chorusflange {
+        class Fl_Check_Button2
         label Flange
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
@@ -549,6 +550,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         code0 {o->value(eff->geteffectpar(10));}
       }
       Fl_Check_Button chorusp11 {
+        class Fl_Check_Button2
         label Subtract
         callback {//
         send_data(0, 11, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
@@ -657,6 +659,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
+        class Fl_Check_Button2
         label {Sub.}
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
@@ -672,6 +675,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp12 {
+        class Fl_Check_Button2
         label hyper
         callback {//
         send_data(0, 12, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
@@ -687,6 +691,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp14 {
+        class Fl_Check_Button2
         label Analog
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
@@ -882,18 +887,21 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button distp6 {
+        class Fl_Check_Button2
         label {Neg.}
         callback {//
         send_data(0, 6, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {260 55 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp9 {
+        class Fl_Check_Button2
         label {St.}
         callback {//
         send_data(0, 9, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         tooltip Stereo xywh {355 55 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp10 {
+        class Fl_Check_Button2
         label PF
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
@@ -1064,6 +1072,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button dfp8 {
+          class Fl_Check_Button2
           label {Inv.}
           callback {//
           send_data(0, 8, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}

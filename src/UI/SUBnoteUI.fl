@@ -38,6 +38,9 @@ decl {\#include "UI/MiscGui.h"} {public local
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
+decl {\#include "UI/WidgetCheckButton.h"} {public local
+}
+
 decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
@@ -235,6 +238,7 @@ class SUBnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button randompan {
+          class Fl_Check_Button2
           label Rand
           callback {//
         int tmp = o->value();
@@ -263,6 +267,7 @@ class SUBnoteUI {: {public PresetsUI_}
           class EnvelopeUI
         } {}
         Fl_Check_Button freqee {
+          class Fl_Check_Button2
           label On
           callback {//
           if (o->value() == 0)
@@ -302,6 +307,7 @@ class SUBnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button hz440 {
+          class Fl_Check_Button2
           label 440Hz
           callback {//
           int x = (int) o->value();
@@ -376,6 +382,7 @@ class SUBnoteUI {: {public PresetsUI_}
           class EnvelopeUI
         } {}
         Fl_Check_Button bwee {
+          class Fl_Check_Button2
           label On
           callback {//
           if (o->value() == 0)
@@ -467,6 +474,7 @@ class SUBnoteUI {: {public PresetsUI_}
         } {}
       }
       Fl_Check_Button filtere {
+        class Fl_Check_Button2
         label On
         callback {//
         if (o->value() == 0)
@@ -510,6 +518,7 @@ class SUBnoteUI {: {public PresetsUI_}
         xywh {441 414 16 17} box THIN_UP_BOX color 237
       }
       Fl_Check_Button stereo {
+        class Fl_Check_Button2
         label { Stereo}
         callback {//
         send_data (0, SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
