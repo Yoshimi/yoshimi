@@ -862,9 +862,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 case CONFIG::control::savedInstrumentFormat:
                     instrument->value(value_int - 1);
                     break;
-                case CONFIG::control::showEnginesTypes:
-                    synth->getGuiMaster()->updateEngines(value_bool);
-                    break;
+                //case CONFIG::control::showEnginesTypes:
+                    //synth->getGuiMaster()->updateEngines(value_bool);
+                    //break;
 
                 case CONFIG::control::defaultStateStart:
                     setDefaultState->value(value_bool);

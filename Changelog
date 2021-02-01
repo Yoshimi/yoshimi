@@ -1,5 +1,11 @@
 yoshimi 1.7.4 M
 
+2021-2-1 Will
+* BugFix: Panel window not handling part group changes
+* Commented out some redundant routines.
+  These will be removed once sure they are redundant.
+* Small simplification in new checkbox resize.
+
 2021-1-30 Will
 * recoded formatTextLines() in FormatFuncs.h
   can now handle embedded newlines correctly.

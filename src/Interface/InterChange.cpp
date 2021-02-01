@@ -2615,12 +2615,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
-        case CONFIG::control::showEnginesTypes:
-            if (write)
-                 synth->getRuntime().checksynthengines = value_bool;
-            else
-                value = synth->getRuntime().checksynthengines;
-            break;
+        //case CONFIG::control::showEnginesTypes:
+            //if (write)
+                 //synth->getRuntime().checksynthengines = value_bool;
+            //else
+                //value = synth->getRuntime().checksynthengines;
+            //break;
 // switches
         case CONFIG::control::defaultStateStart:
             if (write)

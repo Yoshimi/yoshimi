@@ -323,9 +323,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {Hide(0);}
-      xywh {937 122 780 570} type Double labelsize 12 hide resizable
+      xywh {937 122 780 570} type Double labelsize 12 resizable
       code0 {instDW = o->w(), instDH = o->h();}
-      code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
+      code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);} visible
     } {
       Fl_Choice banklist {
         callback {//
@@ -505,12 +505,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
         xywh {468 528 151 42} box ENGRAVED_FRAME labelsize 12
       } {
         Fl_Check_Button enginecheck {
-          class Fl_Check_Button2
           label {Show engines/types}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
-          xywh {477 531 136 15} down_box DOWN_BOX labelsize 12 hide
-          code0 {o->value(synth->getRuntime().checksynthengines);}
+          //send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
+          xywh {477 531 136 15} down_box DOWN_BOX labelsize 12 hide deactivate
+          code0 {//o->value(synth->getRuntime().checksynthengines);}
+          class Fl_Check_Button2
         }
         Fl_Button addpatch {
           label Add
@@ -866,11 +866,11 @@ class BankUI {: {public BankProcess_, RootProcess_}
         tooltip {Click to set} xywh {400 239 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
       }
       Fl_Spinner changeIDbutton {
-        class WidgetSpinner
         label {Change ID}
         callback {Pend->show();}
         xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12
         code0 {oldrootID = o->value();}
+        class WidgetSpinner
       }
       Fl_Button rootClose {
         label Close

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -127,7 +127,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -703,13 +703,13 @@ class MasterUI {: {private GuiUpdates}
           xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
-            class WidgetSpinner
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
+            class WidgetSpinner
           }
           Fl_Choice sysefftype {
             label Type
@@ -720,7 +720,6 @@ class MasterUI {: {private GuiUpdates}
             code1 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {}
           Fl_Check_Button SysEffOn {
-            class Fl_Check_Button2
             label On
             callback {//
             if (o->value())
@@ -729,6 +728,7 @@ class MasterUI {: {private GuiUpdates}
                     sysefftype->deactivate();
             send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
             xywh {247 129 16 15} down_box DOWN_BOX value 1 labelfont 1 labelsize 11 align 4
+            class Fl_Check_Button2
           }
           Fl_Button sysEffSend {
             label {Send to}
@@ -754,13 +754,13 @@ class MasterUI {: {private GuiUpdates}
           xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
-            class WidgetSpinner
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, o->value() - 1);}
             xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
+            class WidgetSpinner
           }
           Fl_Choice insefftype {
             label Type
@@ -852,16 +852,15 @@ class MasterUI {: {private GuiUpdates}
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
-        class WidgetSpinner
         label Shift
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textfont 1 textsize 12
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
+        class WidgetSpinner
       }
       Fl_Spinner npartcounter {
-        class WidgetSpinner
         label Part
         callback {//
         int nval = o->value() - 1;
@@ -871,9 +870,9 @@ class MasterUI {: {private GuiUpdates}
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
+        class WidgetSpinner
       }
       Fl_Spinner maxparts {
-        class WidgetSpinner
         label of
         callback {//
         int tmp = o->value();
@@ -887,6 +886,7 @@ class MasterUI {: {private GuiUpdates}
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
+        class WidgetSpinner
       }
       Fl_Choice panning_law {
         label {Pan Law}
@@ -1096,29 +1096,32 @@ Alan Calvert started the project}
       Fl_Choice Panelgroups {
         label {Part Group}
         callback {//
-        panelgroup = o->value() * NUM_MIDI_CHANNELS;
-        Panelsmallgroups->value(o->value());
-        updatepanel();}
+        int result = o->value();
+        panelgroup = result * NUM_MIDI_CHANNELS;
+        for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+            panellistitem[i]->refresh();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code0 {o->add("1 to 16");o->add("17 to 32");o->add("33 to 48");o->add("49 to 64");}
+        code1 {o->value(panelgroup / NUM_MIDI_CHANNELS);}
       } {}
       Fl_Choice Panelsmallgroups {
         label {Part Group}
         callback {//
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
-        Panelgroups->value(o->value());
-        updatepanel();}
+        for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+            panellistitem[i]->refresh();}
         xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code0 {o->add("1 to 16");o->add("17 to 32");}
+        code1 {if (panelgroup ==  NUM_MIDI_CHANNELS) o->value(1); else o->value(0);}
       } {}
       Fl_Spinner CSspinner {
-        class WidgetSpinner
         label CC
         callback {//
         CSpend->show();}
         xywh {209 300 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
         code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
+        class WidgetSpinner
       }
       Fl_Button CSpend {
         label Pending
@@ -1398,7 +1401,6 @@ Alan Calvert started the project}
         tooltip {Apply this name to the path and load/save} xywh {380 53 74 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
-        class Fl_Check_Button2
         label {Hide Dirs}
         callback {//
     if (o->value() != 0)
@@ -1407,27 +1409,28 @@ Alan Calvert started the project}
         filerOpt1->activate();
     fillfiler();}
         tooltip {Hide sub directories so that files are easier to see} xywh {490 222 18 18} down_box DOWN_BOX labelsize 12 align 1
+        class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt1 {
-        class Fl_Check_Button2
         label {. (dot) Dirs}
         callback {//
     fillfiler();}
         tooltip {Show hidden paths} xywh {490 259 18 18} down_box DOWN_BOX labelsize 12 align 1
+        class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt2 {
-        class Fl_Check_Button2
         label {. (dot) Files}
         callback {//
     fillfiler();}
         tooltip {Show hidden files} xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
+        class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt16 {
-        class Fl_Check_Button2
         label {Hide Files}
         callback {//
     ;}
         xywh {490 130 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
+        class Fl_Check_Button2
       }
       Fl_Group filerframe {open
         xywh {4 4 542 88} box ENGRAVED_FRAME
@@ -2169,7 +2172,7 @@ Alan Calvert started the project}
                 activePart = value_int;
 
             partNew(activePart);
-            updatepanel();
+            //updatepanel(); // not needed?
             if (openedit)
             {
                 partui->Showedit();
@@ -2331,7 +2334,7 @@ Alan Calvert started the project}
             {
                 setMasterLabel(findLeafName(name));
                 //RecentParams->activate();
-                updatepanel(); // why?
+                //updatepanel(); // why?
             }
             break;
 
@@ -2697,7 +2700,8 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {updatepanel(bool full = false)} {} {
+  Function {updatepanel(bool full = false)} {open
+  } {
     code {//
     for (int npart = 0; npart < partmax; ++npart)
     {
@@ -2709,14 +2713,14 @@ Alan Calvert started the project}
     if (partmax == 64)
     {
         Panelgroups->show();
-        Panelgroups->value(0);
+        //Panelgroups->value(0);
     }
     else
         Panelgroups->hide();
     if (partmax == 32)
     {
         Panelsmallgroups->show();
-        Panelsmallgroups->value(0);
+        //Panelsmallgroups->value(0);
     }
     else
         Panelsmallgroups->hide();
@@ -2747,19 +2751,21 @@ Alan Calvert started the project}
         synth->getRuntime().channelSwitchCC = 128;
         CSspinner->hide();
         CSpend->hide();
+    };
+    panelwindow->changed();} {selected
     }
-    panelwindow->changed();} {}
   }
   Function {updateEngines(bool isOn)} {} {
     code {//
-        bankui->rescan_for_banks();
+        /*bankui->rescan_for_banks();
         bankui->enginecheck->value(isOn);
         if (isOn)
             bankui->B_search->activate();
         else
             bankui->B_search->deactivate();
         partui->checkEngines();
-        updatepanel();} {}
+        updatepanel();*/
+        } {}
   }
   Function {partNew(int _npart)} {} {
     code {//
