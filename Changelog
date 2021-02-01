@@ -6,6 +6,9 @@ yoshimi 1.7.4 M
   These will be removed once sure they are redundant.
 * Small simplification in new checkbox resize.
 
+* Properly integrated adding root paths.
+  still not quite correct for empty dirs
+
 2021-1-30 Will
 * recoded formatTextLines() in FormatFuncs.h
   can now handle embedded newlines correctly.

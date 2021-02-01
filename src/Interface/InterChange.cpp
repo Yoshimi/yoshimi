@@ -1146,6 +1146,30 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             synth->bank.changeRootID(getData->data.engine, value);
             synth->saveBanks();
             break;
+        case BANK::addNamedRoot:
+            if (write) // not realistically readable
+            {
+                if (kititem != UNUSED)
+                {
+                    synth->getBankRef().generateSingleRoot(text, false);
+                    synth->saveBanks();
+                    newMsg = true;
+                }
+                else
+                {
+                    size_t found = synth->getBankRef().addRootDir(text);
+                    if (found)
+                    {
+                        synth->getBankRef().installNewRoot(found, text);
+                        synth->saveBanks();
+                        newMsg = true;
+                    }
+                    else
+                        synth->getRuntime().Log("Can't find path " + string{text});
+                }
+            }
+            break;
+
         case BANK::control::refreshDefaults:
             if (value)
                 synth->bank.checkLocalBanks();

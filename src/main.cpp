@@ -209,7 +209,7 @@ static void *mainGuiThread(void *arg)
     while (firstSynth == NULL); // just wait
 
 #ifdef GUI_FLTK
-    //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
+    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 #endif
     if (firstRuntime->autoInstance)
         newBlock();

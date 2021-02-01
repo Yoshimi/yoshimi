@@ -6037,20 +6037,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     {
         if (input.matchnMove(1, "root"))
         {
-            int found = synth->getBankRef().addRootDir(input);
-            if (!found)
-            {
-                Runtime.Log("Can't find path " + string{input});
-            }
-#ifdef GUI_FLTK
-            else
-            {
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-                Runtime.Log("Added new root ID " + asString(found) + " as " + string{input});
-                synth->saveBanks();
-            }
-#endif
-            return Reply::DONE;
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, BANK::control::addNamedRoot, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(input));
         }
         if (input.matchnMove(1, "bank"))
         {

@@ -1539,7 +1539,7 @@ void GuiThreadMsg::processGuiMessages()
                     guiMaster->updatepanel();
                     break;
 
-                /*case GuiThreadMsg::RefreshCurBank:
+                case GuiThreadMsg::RefreshCurBank:
                     if (msg->data && guiMaster->bankui)
                     {
                         if (msg->index == 1)
@@ -1551,7 +1551,7 @@ void GuiThreadMsg::processGuiMessages()
                         guiMaster->bankui->set_bank_slot();
                         guiMaster->bankui->refreshmainwindow();
                     }
-                    break;*/
+                    break;
 
                 case GuiThreadMsg::GuiCheck:
                     guiMaster->checkBuffer();

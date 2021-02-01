@@ -968,6 +968,13 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             contstr = "Root ID changed " + to_string(engine) + " > " + to_string(value_int);
             break;
 
+        case BANK::control::addNamedRoot:
+            if (kititem != UNUSED)
+                contstr = "Created Bank Root " + name;
+            else
+                contstr = "Link Bank Root " + name;
+            break;
+
         default:
             contstr = "Unrecognised";
             break;

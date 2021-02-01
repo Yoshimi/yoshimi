@@ -788,20 +788,14 @@ class BankUI {: {public BankProcess_, RootProcess_}
         string dirname = setfiler(synth,"Path to Bank Root dirs", "", false, TOPLEVEL::XML::Dir);
         if (dirname.length() < 3)
             return;
+        int newdef = UNUSED;
         if (!file::isDirectory(dirname))
         {
             if (choice(synth, "", "Yes", "No", "Directory is missing, or doesn't have at least \\n one bank with at least one instrument. \\nCreate missing entries?") != 2)
                 return;
-            synth->getBankRef().generateSingleRoot(dirname, false);
-            synth->getGuiMaster()->updatepart();
+            newdef = 0;
         }
-        else
-        {
-            size_t idx = synth->getBankRef().addRootDir(dirname);
-            synth->getBankRef().installNewRoot(idx, dirname);
-        }
-        synth->saveBanks();
-        readbankcfg();
+        send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::addNamedRoot, 0, TOPLEVEL::type::Write, TOPLEVEL::section::bank, newdef, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
         Pend->hide();}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
@@ -923,7 +917,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     //int value_int = getData->data.value;
     unsigned char control = getData->data.control;
-    //unsigned char kititem = getData->data.kit;
+    unsigned char kititem = getData->data.kit;
     //unsigned char engine= getData->data.engine;
     unsigned char insert = getData->data.insert;
 
@@ -998,6 +992,12 @@ class BankUI {: {public BankProcess_, RootProcess_}
         case BANK::control::changeRootId:
             readbankcfg();
             rescan_for_banks();
+            break;
+        case BANK::control::addNamedRoot:
+            readbankcfg();
+            rescan_for_banks();
+            if (kititem != UNUSED)
+                synth->getGuiMaster()->updatepart();
             break;
         case BANK::control::refreshDefaults:
             readbankcfg();
