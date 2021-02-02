@@ -2755,18 +2755,6 @@ Alan Calvert started the project}
     panelwindow->changed();} {selected
     }
   }
-  Function {updateEngines(bool isOn)} {} {
-    code {//
-        /*bankui->rescan_for_banks();
-        bankui->enginecheck->value(isOn);
-        if (isOn)
-            bankui->B_search->activate();
-        else
-            bankui->B_search->deactivate();
-        partui->checkEngines();
-        updatepanel();*/
-        } {}
-  }
   Function {partNew(int _npart)} {} {
     code {//
     int nval = _npart;

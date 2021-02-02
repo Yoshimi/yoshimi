@@ -5084,11 +5084,6 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         {
             if (input.matchnMove(1, "group"))
             {
-                //if (!readControl(synth, 0, CONFIG::control::showEnginesTypes, TOPLEVEL::section::config))
-                //{
-                    //synth->getRuntime().Log("Instrument engine and type info must be enabled");
-                    //return REPLY::done_msg;
-                //}
                 if (instrumentGroup.empty())
                 {
                     Runtime.Log("No list entries, or list not seen");

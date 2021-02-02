@@ -504,14 +504,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Group {} {
         xywh {468 528 151 42} box ENGRAVED_FRAME labelsize 12
       } {
-        Fl_Check_Button enginecheck {
-          label {Show engines/types}
-          callback {//
-          //send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::showEnginesTypes, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config);}
-          xywh {477 531 136 15} down_box DOWN_BOX labelsize 12 hide deactivate
-          code0 {//o->value(synth->getRuntime().checksynthengines);}
-          class Fl_Check_Button2
-        }
         Fl_Button addpatch {
           label Add
           xywh {473 550 47 16} box FLAT_BOX labelsize 12 align 32
@@ -550,8 +542,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         int root = string2int(line.substr(0, 3));
         int bank = string2int(line.substr(5, 3));
         int inst = (string2int(line.substr(10, 3))) - 1;
-         //std::cout << root << "  " << bank << "  " << inst << std::endl;
-         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
+        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
         xywh {12 65 282 374} type Select labelsize 12 textsize 12
       }
       Fl_Button searchClose {
@@ -1171,11 +1162,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     lastinstrumentW = 0;
     lastbankW = 0;
     lastrootW = 0;
-    lastsearchW = 0;
-    /*if (synth->getRuntime().checksynthengines)
-        B_search->activate();
-    else
-        B_search->deactivate();*/} {}
+    lastsearchW = 0;} {}
   }
   Function {process()} {return_type void
   } {

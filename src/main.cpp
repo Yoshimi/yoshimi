@@ -2,7 +2,7 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2020, Will Godfrey & others
+    Copyright 2014-2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General

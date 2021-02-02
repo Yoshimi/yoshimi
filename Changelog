@@ -3,6 +3,10 @@ yoshimi 1.7.4 M
 2021-2-2 Will
 * Another attempt to resolve standalone lock up issue.
 
+* Removed (commented out) engine colour enable code.
+  This is now *required* for other functions.
+  Also updated file dates.
+
 2021-2-1 Will
 * BugFix: Panel window not handling part group changes
 * Commented out some redundant routines.
