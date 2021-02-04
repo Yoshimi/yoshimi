@@ -409,7 +409,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     if (newMsg)
         value = textMsgBuffer.push(text);
-    // TODO need to inmprove message handling for multiple receivers
+    // TODO need to improve message handling for multiple receivers
 
     getData->data.value = float(value);
     if (write)
@@ -1093,7 +1093,6 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                 text = textMsgBuffer.fetch(tmp & NO_MSG);
                 if (tmp > NO_MSG)
                     text = "FAILED: " + text;
-                //std::cout << text << std::endl;
                 guiTo = true;
             }
             else
@@ -1102,6 +1101,56 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             }
             newMsg = true;
             break;
+        case BANK::control::createBank:
+            {
+                bool isOK = true;
+                int newbank = kititem;
+                int rootID = engine;
+                if (rootID == UNUSED)
+                    rootID = synth->getRuntime().currentRoot;
+                /*else if(synth->bank.roots[rootID].banks.empty())
+                {
+                    text = "FAILED: root " + to_string(rootID) + " does not exist";
+                    break;
+                }*/
+                if (newbank == UNUSED)
+                {
+                    isOK = false;
+                    newbank = 5; // offset to avoid zero for as long as possible
+                    for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
+                    {
+                        newbank = (newbank + 5) & 0x7f;
+                        if (synth->getBankRef().getBankName(newbank, rootID).empty())
+                        {
+                            isOK = true;
+                            break;
+                        }
+                    }
+                    if (!isOK)
+                        text = "FAILED: Root " + to_string(rootID) + " has no space";
+                }
+                if (isOK)
+                {
+                    string trytext = synth->bank.getBankName(newbank, rootID);
+                    if (!trytext.empty())
+                    {
+                        text = "FAILED: ID " + to_string(newbank) + " already contains " + trytext;
+                        isOK = false;
+                    }
+
+                    if (isOK && !synth->getBankRef().newIDbank(text, newbank))
+                    {
+                        text = "FAILED Could not create bank " + text + " for ID " + asString(newbank);
+                        isOK = false;
+                    }
+                }
+                if (isOK)
+                    text = "Created " + text + " at ID " + to_string(newbank) + " in root " + to_string(rootID);
+                newMsg = true;
+                guiTo = true;
+            }
+            break;
+
 
         case BANK::control::selectFirstBankToSwap:
             if (engine == UNUSED)

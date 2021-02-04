@@ -617,7 +617,7 @@ bool Bank::newbankfile(const string& newbankdir, size_t rootID)
 {
      if (getRootPath(synth->getRuntime().currentRoot).empty())
     {
-        synth->getRuntime().Log("Current bank root directory not set");
+        //synth->getRuntime().Log("Current bank root directory not set");
         return false;
     }
     string newbankpath = getRootPath(rootID);
@@ -627,11 +627,11 @@ bool Bank::newbankfile(const string& newbankdir, size_t rootID)
     int result = createDir(newbankpath);
     if (result != 0)
     {
-        synth->getRuntime().Log("Failed to create " + newbankpath);
+        //synth->getRuntime().Log("Failed to create " + newbankpath);
         return false;
     }
-    else
-        synth->getRuntime().Log("create " + newbankpath + " succeeded");
+    //else
+        //synth->getRuntime().Log("create " + newbankpath + " succeeded");
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";

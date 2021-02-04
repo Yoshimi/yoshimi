@@ -144,11 +144,11 @@ class PartKitItem {: {public Fl_Group}
         code0 {if (part->kit[n].Penabled == 0) o->deactivate();}
       } {
         Fl_Check_Button mutedcheck {
-          class Fl_Check_Button2
           callback {//
           send_data(0, PART::control::kitItemMute, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {60 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Pmuted);}
+          class Fl_Check_Button2
         }
         Fl_Button labelbutton {
           label {Bass Drum}
@@ -242,12 +242,12 @@ class PartKitItem {: {public Fl_Group}
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
-          class Fl_Check_Button2
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {400 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Padenabled);}
+          class Fl_Check_Button2
         }
         Fl_Button subeditbutton {
           label edit
@@ -259,12 +259,12 @@ class PartKitItem {: {public Fl_Group}
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
-          class Fl_Check_Button2
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {470 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Psubenabled);}
+          class Fl_Check_Button2
         }
         Fl_Button padeditbutton {
           label edit
@@ -276,12 +276,12 @@ class PartKitItem {: {public Fl_Group}
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
-          class Fl_Check_Button2
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
           xywh {540 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
           code0 {o->value(part->kit[n].Ppadenabled);}
+          class Fl_Check_Button2
         }
         Fl_Choice sendtoeffect {
           callback {//
@@ -292,7 +292,6 @@ class PartKitItem {: {public Fl_Group}
         } {}
       }
       Fl_Check_Button enabledcheck {
-        class Fl_Check_Button2
         label 01
         callback {//
         int answer = 1;
@@ -315,6 +314,7 @@ class PartKitItem {: {public Fl_Group}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->hide();}
         code3 {if (o->value() == 0) labelbutton->color(FL_WHITE);}
+        class Fl_Check_Button2
       }
     }
   }
@@ -576,15 +576,14 @@ class PartUI {: {public Fl_Group, PartUI_}
           class WidgetPDial
         }
         Fl_Check_Button enportamento {
-          class Fl_Check_Button2
           label Portamento
           callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Enable/Disable the portamento} xywh {82 61 17 15} down_box DOWN_BOX color 237 labelsize 11 align 8
           code0 {o->value(part->ctl->portamento.portamento);}
+          class Fl_Check_Button2
         }
         Fl_Spinner midich {
-          class WidgetSpinner
           label Midi
           callback {//
           int tmp = ((int)o->value() -1);
@@ -601,6 +600,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
           code0 {o->value(part->Prcvchn + 1);}
           code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
+          class WidgetSpinner
         }
         Fl_Box modepatch {
           label Mode
@@ -629,25 +629,24 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
-          class WidgetSpinner
           label {Key Shift}
           callback {//
           send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer);}
           xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
           code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(part->Pkeyshift - 64);}
+          class WidgetSpinner
         }
         Fl_Spinner partkeylimit {
-          class WidgetSpinner
           label {Key Limit}
           callback {//
           send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
           code0 {o->range(1, POLIPHONY); // enough for one part!}
           code1 {o->value(part->Pkeylimit);}
+          class WidgetSpinner
         }
         Fl_Spinner minkcounter {
-          class WidgetSpinner
           label {Min Note}
           callback {//
           int tmp = o->value();
@@ -662,9 +661,9 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
           code0 {o->range(0.0, 127.0);o->step(1.0);}
           code1 {o->value(part->Pminkey);}
+          class WidgetSpinner
         }
         Fl_Spinner maxkcounter {
-          class WidgetSpinner
           label {Max Note}
           callback {//
           int tmp = o->value();
@@ -679,6 +678,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
           code0 {o->range(0.0, 127.0);o->step(1.0);}
           code1 {o->value(part->Pmaxkey);}
+          class WidgetSpinner
         }
         Fl_Button setmin {
           label Set
@@ -733,7 +733,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {255 134 103 15} box NO_BOX labelsize 11 align 2
       }
       Fl_Check_Button partGroupEnable {
-        class Fl_Check_Button2
         label Enabled
         callback {//;
         if (o->value() != 1)
@@ -759,6 +758,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
+        class Fl_Check_Button2
       }
     }
     Fl_Window instrumentkitlist {
@@ -830,12 +830,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         code3 {if (!partKitOn) kitlist->deactivate();}
       } {}
       Fl_Check_Button drumMode {
-        class Fl_Check_Button2
         label {Drum mode}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(part->Pdrummode);}
+        class Fl_Check_Button2
       }
       Fl_Button kitClose {
         label Close
@@ -856,20 +856,20 @@ class PartUI {: {public Fl_Group, PartUI_}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 220 395 104} box ENGRAVED_FRAME
+        xywh {0 220 395 103} box ENGRAVED_FRAME
       } {
         Fl_Group ADD {
           label ADDsynth
           xywh {5 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
-            class Fl_Check_Button2
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable ADsynth} xywh {15 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
+            class Fl_Check_Button2
           }
           Fl_Box addbox {
             xywh {10 226 89 18} box FLAT_BOX
@@ -893,13 +893,13 @@ class PartUI {: {public Fl_Group, PartUI_}
           xywh {105 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
-            class Fl_Check_Button2
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable SUBsynth} xywh {115 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
+            class Fl_Check_Button2
           }
           Fl_Box subbox {
             xywh {110 226 89 18} box FLAT_BOX
@@ -923,13 +923,13 @@ class PartUI {: {public Fl_Group, PartUI_}
           xywh {205 246 100 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
-            class Fl_Check_Button2
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
             tooltip {enable/disable PADsynth} xywh {215 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
+            class Fl_Check_Button2
           }
           Fl_Box padbox {
             xywh {210 226 89 18} box FLAT_BOX
@@ -1060,7 +1060,6 @@ class PartUI {: {public Fl_Group, PartUI_}
       code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Spinner inseffnocounter {
-        class WidgetSpinner
         callback {//
                 ninseff = o->value() - 1;
                 insefftype->value(part->partefx[ninseff]->geteffect());
@@ -1075,6 +1074,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {20 8 35 22} labelsize 12 maximum 3 textsize 12
         code1 {o->value(ninseff+1);}
+        class WidgetSpinner
       }
       Fl_Choice insefftype {
         callback {//
@@ -1115,12 +1115,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Check_Button bypasseff {
-        class Fl_Check_Button2
         label Bypass
         callback {//
         send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 12
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
+        class Fl_Check_Button2
       }
       Fl_Button effClose {
         label Close
@@ -1210,12 +1210,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         class WidgetPDial
       }
       Fl_Check_Button vol {
-        class Fl_Check_Button2
         label Vol
         callback {//
         send_data(0, PART::control::volumeEnable, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Volume enable} xywh {175 81 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
+        class Fl_Check_Button2
       }
       Fl_Dial panwidth {
         label PanWdth
@@ -1234,12 +1234,12 @@ class PartUI {: {public Fl_Group, PartUI_}
         class WidgetPDial
       }
       Fl_Check_Button expmwh {
-        class Fl_Check_Button2
         label {Exp MWh}
         callback {//
         send_data(0, PART::control::exponentialModWheel, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->modwheel.exponential);}
+        class Fl_Check_Button2
       }
       Fl_Dial bwdpth {
         label BwDpth
@@ -1250,44 +1250,44 @@ class PartUI {: {public Fl_Group, PartUI_}
         class WidgetPDial
       }
       Fl_Check_Button expbw {
-        class Fl_Check_Button2
         label {Exp BW}
         callback {//
         send_data(0, 134, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Exponential BandWidth Controller} xywh {92 15 35 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->bandwidth.exponential);}
+        class Fl_Check_Button2
       }
       Fl_Check_Button expr {
-        class Fl_Check_Button2
         label Expr
         callback {//
         send_data(0, 135, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Expression enable} xywh {175 59 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
+        class Fl_Check_Button2
       }
       Fl_Check_Button fmamp {
-        class Fl_Check_Button2
         label FMamp
         callback {//
         send_data(0, PART::control::FMamplitudeEnable, o->value(), TOPLEVEL::type::Integer);}
         tooltip {FM amplitude enable} xywh {225 59 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
+        class Fl_Check_Button2
       }
       Fl_Check_Button sustain {
-        class Fl_Check_Button2
         label Sustain
         callback {//
         send_data(0, PART::control::sustainPedalEnable, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Sustain pedal enable} xywh {225 81 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
+        class Fl_Check_Button2
       }
       Fl_Check_Button breath {
-        class Fl_Check_Button2
         label Breath
         callback {//
         send_data(0, 141, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Breath Control enable} xywh {225 38 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->PbreathControl == 2);}
+        class Fl_Check_Button2
       }
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
@@ -1366,12 +1366,12 @@ class PartUI {: {public Fl_Group, PartUI_}
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {
-          class Fl_Check_Button2
           label {th.type}
           callback {//
           send_data(0, PART::control::portamentoThresholdType, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
+          class Fl_Check_Button2
         }
         Fl_Dial propta {
           label {Prp.Rate}
@@ -1390,15 +1390,14 @@ class PartUI {: {public Fl_Group, PartUI_}
           class WidgetPDial
         }
         Fl_Check_Button rcv {
-          class Fl_Check_Button2
           label Rcv
           callback {//
           send_data(0, PART::control::receivePortamento, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
           code0 {o->value(part->ctl->portamento.receive);}
+          class Fl_Check_Button2
         }
         Fl_Check_Button proprt {
-          class Fl_Check_Button2
           label {Proprt.}
           callback {//
           if (o->value())
@@ -1416,6 +1415,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if (o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
+          class Fl_Check_Button2
         }
       }
       Fl_Button resetallctl {
@@ -1478,7 +1478,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {55 40 48 20}
       }
       Fl_Check_Button channelfiltercutoff {
-        class Fl_Check_Button2
         label {Filter Cutoff}
         callback {//
                 if (o->value())
@@ -1490,16 +1489,16 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATchannel(PART::aftertouchType::filterCutoff, o->value());}
         tooltip {Between current MIDI setting and max.} xywh {25 65 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelfilterCminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterCutoffDown, o->value());}
         tooltip {Between current MIDI setting and zero} xywh {150 65 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelfilterQ {
-        class Fl_Check_Button2
         label {Filter Q}
         callback {//
                 if (o->value())
@@ -1511,16 +1510,16 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATchannel(PART::aftertouchType::filterQ, o->value());}
         tooltip {Between current MIDI setting and max.} xywh {25 85 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelfilterQminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::filterQdown, o->value());}
         tooltip {Between current MIDI setting and zero} xywh {150 85 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelpitchbend {
-        class Fl_Check_Button2
         label {Pitch Bend}
         callback {//
                 if (o->value())
@@ -1532,27 +1531,28 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATchannel(PART::aftertouchType::pitchBend, o->value());}
         tooltip {Between current pitch wheel position and max.} xywh {25 105 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelpitchBminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATchannel(PART::aftertouchType::pitchBendDown, o->value());}
         tooltip {Between current pitch wheel position and min.} xywh {150 105 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelmodulation {
-        class Fl_Check_Button2
         label Modulation
         callback {//
                 setATchannel(PART::aftertouchType::modulation, o->value());}
         tooltip {Between zero and Add/Pad frequency LFO depth} xywh {25 125 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button channelvolume {
-        class Fl_Check_Button2
         label Volume
         callback {//
                 setATchannel(PART::aftertouchType::volume, o->value());}
         tooltip {Between current part volume and max.} xywh {25 145 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Box ATkey {
         label Key
@@ -1575,7 +1575,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {300 40 48 20}
       }
       Fl_Check_Button polyfiltercutoff {
-        class Fl_Check_Button2
         label {Filter Cutoff}
         callback {//
                 if (o->value())
@@ -1587,16 +1586,16 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATkey(PART::aftertouchType::filterCutoff, o->value());}
         tooltip {Between current MIDI setting and max.} xywh {270 65 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button polyfilterCminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATkey(PART::aftertouchType::filterCutoffDown, o->value());}
         tooltip {Between current MIDI setting and zero} xywh {395 65 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button polyfilterQ {
-        class Fl_Check_Button2
         label {Filter Q}
         callback {//
                 if (o->value())
@@ -1608,16 +1607,16 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATkey(PART::aftertouchType::filterQ, o->value());}
         tooltip {Between current MIDI setting and max.} xywh {270 85 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button polyfilterQminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATkey(PART::aftertouchType::filterQdown, o->value());}
         tooltip {Between current MIDI setting and zero} xywh {395 85 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button polypitchbend {
-        class Fl_Check_Button2
         label {Pitch Bend}
         callback {//
                 if (o->value())
@@ -1629,20 +1628,21 @@ class PartUI {: {public Fl_Group, PartUI_}
                 }
                 setATkey(PART::aftertouchType::pitchBend, o->value());}
         tooltip {Between current pitch wheel position and max.} xywh {270 105 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Check_Button polypitchBminus {
-        class Fl_Check_Button2
         label Down
         callback {//
                 setATkey(PART::aftertouchType::pitchBendDown, o->value());}
         tooltip {Between current pitch wheel position and min.} xywh {395 105 70 15} down_box DOWN_BOX deactivate
+        class Fl_Check_Button2
       }
       Fl_Check_Button polymodulation {
-        class Fl_Check_Button2
         label Modulation
         callback {//
                 setATkey(PART::aftertouchType::modulation, o->value());}
         tooltip {Between zero and Add/Pad frequency LFO depth} xywh {270 125 70 15} down_box DOWN_BOX
+        class Fl_Check_Button2
       }
       Fl_Button atClose {
         label Close

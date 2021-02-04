@@ -6036,33 +6036,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(1, "bank"))
         {
-            int slot;
             int root = readControl(synth, 0, BANK::control::selectRoot, TOPLEVEL::section::bank);
-            bool found = false;
-            for (slot = 0; slot < MAX_BANKS_IN_ROOT; ++slot)
-            {
-                if (synth->getBankRef().getBankName(slot, root).empty())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                Runtime.Log("Current root has no space!");
-                return Reply::DONE;
-            }
-            if (!synth->getBankRef().newIDbank(string{input}, (unsigned int)slot))
-            {
-                Runtime.Log("Could not create bank " + string{input} + " for ID " + asString(slot));
-                return Reply::DONE;
-            }
 
-            Runtime.Log("Created  new bank " + string{input} + " with ID " + asString(slot));
-#ifdef GUI_FLTK
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-#endif
-            return Reply::DONE;
+            return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, BANK::control::createBank, TOPLEVEL::section::bank, UNUSED, root, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(input));
         }
         if (input.matchnMove(2, "yoshimi"))
         {

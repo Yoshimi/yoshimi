@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-2-4 Will
+* Properly integrated adding a new bank.
+
 2021-2-2 Will
 * Another attempt to resolve standalone lock up issue.
 

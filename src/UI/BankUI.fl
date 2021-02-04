@@ -323,9 +323,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {Hide(0);}
-      xywh {937 122 780 570} type Double labelsize 12 resizable
+      xywh {937 122 780 570} type Double labelsize 12 hide resizable
       code0 {instDW = o->w(), instDH = o->h();}
-      code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);} visible
+      code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
       Fl_Choice banklist {
         callback {//
@@ -966,6 +966,13 @@ class BankUI {: {public BankProcess_, RootProcess_}
                     alert(synth, message);
             rescan_for_banks();
             break;
+        case BANK::control::createBank:
+            if (message.find("FAILED") != std::string::npos)
+                if (source == TOPLEVEL::action::fromGUI)
+                    alert(synth, message);
+            readbankcfg();
+            rescan_for_banks();
+            break;
 
         case BANK::control::selectFirstBankToSwap:
             break;
@@ -1315,22 +1322,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         string dirname;
         dirname = input_text(synth, "New empty Bank:", "");
-        if (dirname == "")
-        {
-            setrootread();
-            return;
-        }
-
-        if (!bank->newIDbank(dirname, (unsigned int)slot))
-        {
-            setrootread();
-            alert(synth, "Could not make a new bank directory.");
-            return;
-        }
-        bank->setCurrentBankID(slot);
-        rs[slot]->rootrefresh(bt, rt);
-        rescan_for_banks();
-        set_bank_slot();
+        if (!dirname.empty())
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::createBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::type::Write, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
         setrootread();
         refreshmainwindow();
     }
