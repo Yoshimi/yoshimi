@@ -123,10 +123,6 @@ class PADnote
             Filter *GlobalFilterL;
             Filter *GlobalFilterR;
 
-            float FilterCenterPitch;//octaves
-            float FilterQ;
-            float FilterFreqTracking;
-
             Envelope *FilterEnvelope;
 
             LFO *FilterLfo;

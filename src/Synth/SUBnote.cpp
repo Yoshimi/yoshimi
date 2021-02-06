@@ -135,14 +135,11 @@ SUBnote::SUBnote(const SUBnote &orig) :
     volume(orig.volume),
     oldamplitude(orig.oldamplitude),
     newamplitude(orig.newamplitude),
-    GlobalFilterCenterPitch(orig.GlobalFilterCenterPitch),
-    GlobalFilterFreqTracking(orig.GlobalFilterFreqTracking),
     lfilter(NULL),
     rfilter(NULL),
     ctl(orig.ctl),
     oldpitchwheel(orig.oldpitchwheel),
     oldbandwidth(orig.oldbandwidth),
-    globalfiltercenterq(orig.globalfiltercenterq),
     legatoFade(0.0f), // Silent by default
     legatoFadeStep(0.0f), // Legato disabled
     subNoteChange(pars),
@@ -233,8 +230,6 @@ void SUBnote::legatoFadeOut(const SUBnote &orig)
         *BandWidthEnvelope = *orig.BandWidthEnvelope;
     if (pars->PGlobalFilterEnabled)
     {
-        GlobalFilterCenterPitch = orig.GlobalFilterCenterPitch;
-        GlobalFilterFreqTracking = orig.GlobalFilterFreqTracking;
         *GlobalFilterEnvelope = *orig.GlobalFilterEnvelope;
 
         // Supporting virtual copy assignment would be hairy
@@ -375,21 +370,7 @@ void SUBnote::computeNoteParameters()
     float offset_val = (pars->POffsetHz - 64)/64.0f;
     OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
 
-    // global filter
-    GlobalFilterCenterPitch =
-        pars->GlobalFilter->getfreq()
-        + // center freq
-          (pars->PGlobalFilterVelocityScale / 127.0f * 6.0f)
-        * // velocity sensing
-          (velF(velocity, pars->PGlobalFilterVelocityScaleFunction) - 1);
-
     updatefilterbank();
-
-    if (pars->PGlobalFilterEnabled != 0)
-    {
-        globalfiltercenterq = pars->GlobalFilter->getq();
-        GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
-    }
 }
 
 // Compute the filters coefficients
@@ -694,13 +675,21 @@ void SUBnote::computecurrentparameters(void)
     // Filter
     if (GlobalFilterL != NULL)
     {
-        float globalfilterpitch = GlobalFilterCenterPitch + GlobalFilterEnvelope->envout();
-        float filterfreq = globalfilterpitch + ctl->filtercutoff.relfreq + GlobalFilterFreqTracking;
+        float filterCenterPitch =
+            pars->GlobalFilter->getfreq()
+            + // center freq
+            (pars->PGlobalFilterVelocityScale / 127.0f * 6.0f)
+            * // velocity sensing
+            (velF(velocity, pars->PGlobalFilterVelocityScaleFunction) - 1);
+        float filtercenterq = pars->GlobalFilter->getq();
+        float filterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+        float globalfilterpitch = filterCenterPitch + GlobalFilterEnvelope->envout();
+        float filterfreq = globalfilterpitch + ctl->filtercutoff.relfreq + filterFreqTracking;
         filterfreq = GlobalFilterL->getrealfreq(filterfreq);
 
-        GlobalFilterL->setfreq_and_q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
+        GlobalFilterL->setfreq_and_q(filterfreq, filtercenterq * ctl->filterq.relq);
         if (GlobalFilterR != NULL)
-            GlobalFilterR->setfreq_and_q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
+            GlobalFilterR->setfreq_and_q(filterfreq, filtercenterq * ctl->filterq.relq);
     }
 }
 

@@ -102,9 +102,6 @@ class SUBnote
         float oldamplitude;
         float newamplitude;
 
-        float GlobalFilterCenterPitch; // octaves
-        float GlobalFilterFreqTracking;
-
         struct bpfilter {
             float freq;
             float bw;
@@ -145,7 +142,6 @@ class SUBnote
         Controller *ctl;
         int oldpitchwheel;
         int oldbandwidth;
-        float globalfiltercenterq;
 
         // Legato vars
         float legatoFade;

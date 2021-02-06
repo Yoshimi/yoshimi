@@ -166,10 +166,6 @@ PADnote::PADnote(const PADnote &orig) :
     gpar.Fadein_adjustment = oldgpar.Fadein_adjustment;
     gpar.Punch = oldgpar.Punch;
 
-    gpar.FilterCenterPitch = oldgpar.FilterCenterPitch;
-    gpar.FilterQ = oldgpar.FilterQ;
-    gpar.FilterFreqTracking = oldgpar.FilterFreqTracking;
-
     // These are never null
     gpar.FreqEnvelope = new Envelope(*oldgpar.FreqEnvelope);
     gpar.FreqLfo = new LFO(*oldgpar.FreqLfo);
@@ -353,17 +349,9 @@ void PADnote::computeNoteParameters()
         }
     }
 
-    NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() + // center freq
-            pars->PFilterVelocityScale / 127.0 * 6.0
-            * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
-
     NoteGlobalPar.Volume =
         4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
         * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
-
-    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
 }
 
 
@@ -378,17 +366,25 @@ void PADnote::computecurrentparameters()
         NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
         * NoteGlobalPar.AmpLfo->amplfoout();
 
+    float filterCenterPitch =
+        pars->GlobalFilter->getfreq() + // center freq
+            pars->PFilterVelocityScale / 127.0 * 6.0
+            * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
+
+    float filterQ = pars->GlobalFilter->getq();
+    float filterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+
     globalfilterpitch =
         NoteGlobalPar.FilterEnvelope->envout() + NoteGlobalPar.FilterLfo->lfoout()
-        + NoteGlobalPar.FilterCenterPitch;
+        + filterCenterPitch;
 
     float tmpfilterfreq =
-        globalfilterpitch+ctl->filtercutoff.relfreq + NoteGlobalPar.FilterFreqTracking;
+        globalfilterpitch+ctl->filtercutoff.relfreq + filterFreqTracking;
 
     tmpfilterfreq =
         NoteGlobalPar.GlobalFilterL->getrealfreq(tmpfilterfreq);
 
-    float globalfilterq = NoteGlobalPar.FilterQ * ctl->filterq.relq;
+    float globalfilterq = filterQ * ctl->filterq.relq;
     NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq,globalfilterq);
     NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq,globalfilterq);
 
