@@ -961,6 +961,7 @@ string DataText::resolveBank(CommandBlock *getData, bool)
                 contstr = " Bank " + to_string(kititem) + " is empty.";
             else
                 contstr = " Bank " + to_string(kititem) + " contains " + to_string(value_int) + " instruments";
+            showValue = false;
             break;
 
         case BANK::control::selectFirstBankToSwap:
@@ -984,6 +985,14 @@ string DataText::resolveBank(CommandBlock *getData, bool)
                 contstr = "Created Bank Root " + name;
             else
                 contstr = "Link Bank Root " + name;
+            break;
+
+        case BANK::control::deselectRoot:
+            if (engine == 0)
+                contstr = "Bank Root " + to_string(value_int) + " does not exist";
+            else
+                contstr = "Unlinked Bank Root " + to_string(value_int);
+            showValue = false;
             break;
 
         default:

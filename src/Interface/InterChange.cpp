@@ -1229,6 +1229,14 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                 }
             }
             break;
+        case BANK::deselectRoot:
+            if (write) // not realistically readable
+            {
+                if (synth->getBankRef().removeRoot(value))
+                    getData->data.engine = 0;
+                synth->saveBanks();
+            }
+            break;
 
         case BANK::control::refreshDefaults:
             if (value)

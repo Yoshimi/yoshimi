@@ -6108,18 +6108,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     return Reply{REPLY::range_msg};
                 else
                 {
-                    string rootname = synth->getBankRef().getRootPath(rootID);
-                    if (rootname.empty())
-                        Runtime.Log("Can't find path " + asString(rootID));
-                    else
-                    {
-                        synth->getBankRef().removeRoot(rootID);
-#ifdef GUI_FLTK
-                        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-#endif
-                        Runtime.Log("Un-linked " + rootname);
-                        synth->saveBanks();
-                    }
+                    sendDirect(synth, TOPLEVEL::action::lowPrio, rootID, TOPLEVEL::type::Write,BANK::deselectRoot, TOPLEVEL::section::bank);
                     return Reply::DONE;
                 }
             }

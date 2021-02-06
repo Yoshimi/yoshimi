@@ -1353,14 +1353,18 @@ int Bank::engines_used(size_t rootID, size_t bankID, unsigned int ninstrument)
 }
 
 
-void Bank::removeRoot(size_t rootID)
+bool Bank::removeRoot(size_t rootID)
 {
     if (rootID == synth->getRuntime().currentRoot)
     {
         synth->getRuntime().currentRoot = 0;
     }
+    else if (roots [rootID].path.empty())
+        return true;
     roots.erase(rootID);
+    synth->getRuntime().currentRoot = roots.rbegin()->first;
     setCurrentRootID(synth->getRuntime().currentRoot);
+    return false;
 }
 
 

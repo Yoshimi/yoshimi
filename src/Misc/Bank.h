@@ -123,7 +123,7 @@ class Bank
         bool newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(const string& newbankdir, size_t rootID);
         std::string removebank(unsigned int bankID, size_t rootID = 0xff);
-        void removeRoot(size_t rootID);
+        bool removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
 
         bool setCurrentRootID(size_t newRootID);
