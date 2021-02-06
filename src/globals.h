@@ -326,8 +326,9 @@ namespace BANK // usage BANK::control::
 
         selectBank = 16, // in root, by ID or read ID + name
         renameBank, // or read just the name
-        createBank, // not yet - currently 'add' at top level
+        createBank,
         deleteBank, // not yet - currently 'remove' at top level
+        findBankSize,
         selectFirstBankToSwap,
         selectSecondBankAndSwap,
         importBank, // not yet (currently done in main)

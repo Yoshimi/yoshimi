@@ -6148,19 +6148,15 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                         return Reply{REPLY::range_msg};
                 }
             }
-
-            string filename = synth->getBankRef().getBankName(bankID, rootID);
-            if (filename.empty())
+            int tmp = int(readControl(synth, TOPLEVEL::action::lowPrio, BANK::control::findBankSize, TOPLEVEL::section::bank, bankID, rootID));
+            if (tmp == UNUSED)
             {
                 Runtime.Log("No bank at this location");
                 return Reply::DONE;
             }
-
-            int tmp = synth->getBankRef().getBankSize(bankID, readControl(synth, 0, BANK::control::selectRoot, TOPLEVEL::section::bank));
-            std::cout << "ID " << bankID << "  name " << filename << std::endl;
-            if (tmp)
+            else if (tmp)
             {
-                Runtime.Log("Bank " + filename + " has " + asString(tmp) + " Instruments");
+                Runtime.Log("Bank " + to_string(bankID) + " has " + asString(tmp) + " Instruments");
                 if (!query("Delete bank and all of these", false))
                 {
                     Runtime.Log("Aborted");

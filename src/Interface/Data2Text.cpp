@@ -954,6 +954,14 @@ string DataText::resolveBank(CommandBlock *getData, bool)
         case BANK::control::createBank:
             contstr = name;
             break;
+        case BANK::control::findBankSize:
+            if (value_int == UNUSED)
+                contstr = " Bank " + to_string(kititem) + " does not exist.";
+            else if (value_int == 0)
+                contstr = " Bank " + to_string(kititem) + " is empty.";
+            else
+                contstr = " Bank " + to_string(kititem) + " contains " + to_string(value_int) + " instruments";
+            break;
 
         case BANK::control::selectFirstBankToSwap:
             contstr = "Set Bank ID " + to_string(kititem) + "  Root ID " + to_string(engine) + " for swap";

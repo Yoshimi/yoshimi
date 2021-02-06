@@ -122,8 +122,9 @@ inline string readControlText(SynthEngine *synth,
 
 
 inline void readLimits(SynthEngine *synth,
-                       float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit,
-                       unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char miscmsg)
+                       float value, unsigned char type, unsigned char control, unsigned char part,
+                       unsigned char kit, unsigned char engine, unsigned char insert,
+                       unsigned char parameter, unsigned char miscmsg)
 {
     CommandBlock putData;
 

@@ -1151,6 +1151,17 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             }
             break;
 
+        case BANK::control::deleteBank:
+            break; // not yet!
+
+        case BANK::control::findBankSize:
+            if (engine == UNUSED)
+                engine = synth->getRuntime().currentRoot;
+            if (synth->bank.getBankName(kititem, engine).empty())
+                value = UNUSED;
+            else
+                value = synth->bank.getBankSize(kititem, engine);
+            break;
 
         case BANK::control::selectFirstBankToSwap:
             if (engine == UNUSED)
