@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2019-2020 Will Godfrey and others.
+    Copyright 2019-2021 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -32,6 +32,7 @@
 #include <fstream>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <zlib.h>
 
 #include "globals.h"
@@ -97,6 +98,26 @@ inline void make_legit_pathname(string& fname)
               || c == '.'))
             fname.at(i) = '_';
     }
+}
+
+
+/*
+ * tries to find build time doc directory
+ * currently only used to find the latest user guide
+ */
+inline string localPath(void)
+{
+    char *tmpath;
+    tmpath = (char*) malloc(PATH_MAX);
+    getcwd (tmpath, PATH_MAX);
+    string path = string(tmpath);
+    free(tmpath);
+    size_t found = path.rfind("/");
+    if (found != string::npos)
+        path = path.substr(0, found + 1) + "doc";
+    else
+        path = "";
+    return path;
 }
 
 

@@ -1553,9 +1553,9 @@ void GuiThreadMsg::processGuiMessages()
                     }
                     break;*/
 
-                case GuiThreadMsg::GuiCheck:
+                /*case GuiThreadMsg::GuiCheck:
                     guiMaster->checkBuffer();
-                    break;
+                    break;*/
 
                 default:
                     break;

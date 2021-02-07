@@ -85,6 +85,7 @@ class InterChange : private DataText
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
         void muteQueueWrite(CommandBlock *getData);
+        std::string manualSearch(std::string dir2search, std::string path2match);
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
         int indirectVector(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectMidi(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);

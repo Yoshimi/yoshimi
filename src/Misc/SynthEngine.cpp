@@ -407,7 +407,7 @@ string SynthEngine::manualname(void)
 {
     string manfile = "yoshimi-user-manual-";
     manfile += YOSHIMI_VERSION;
-    manfile = manfile.substr(0, manfile.find(" ")); // remove M suffix
+    manfile = manfile.substr(0, manfile.find(" ")); // remove M or rc suffix
     int pos = 0;
     int count = 0;
     for (unsigned i = 0; i < manfile.length(); ++i)

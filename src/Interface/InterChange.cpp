@@ -50,9 +50,11 @@
     #include "MasterUI.h"
 #endif
 
+using file::localPath;
 using file::findFile;
 using file::isRegularFile;
 using file::createDir;
+using file::listDir;
 using file::isDirectory;
 using file::setExtension;
 using file::findLeafName;
@@ -275,6 +277,31 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
         //std::cout << "here pending" << std:: endl;
         synth->audioOut.store(_SYS_::mute::Pending);
     }
+}
+
+
+std::string InterChange::manualSearch(std::string dir2search, std::string path2match)
+{
+    std::list<string> wanted;
+    listDir(&wanted, dir2search);
+    if (wanted.empty())
+    return "";
+    wanted.sort();
+
+    std::string path = "";
+    std::list<string>::reverse_iterator itr = wanted.rbegin();
+    while (itr != wanted.rend())
+    {
+        std::string tmp = *itr;
+        if (tmp.find(path2match) != std::string::npos)
+        {
+            path = tmp;
+            itr = wanted.rend();
+        }
+        else
+            ++itr;
+    }
+    return path;
 }
 
 
@@ -875,28 +902,49 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::openManualPDF: // display user guide
         {
             std::string manfile = synth->manualname();
-            unsigned int pos = manfile.rfind(".") + 1;
-            int wanted = std::stoi(manfile.substr(pos, 3));
-            int count = wanted + 2;
-            manfile = manfile.substr(0, pos);
+            std::string stub = manfile.substr(0, manfile.rfind("-"));
+
             std::string path = "";
-            while (path == "" && count >= 0) // scan current first, then older versions
+            std::string lastdir = "";
+            std::string found = "";
+            std::string search = "/usr/share/doc/yoshimi";
+            path = manualSearch(search, stub);
+            //std::cout << "path 1 " << path << std::endl;
+            found = path;
+            lastdir = search;
+
+            search = "/usr/local/share/doc/yoshimi";
+            path = manualSearch(search, stub);
+            //std::cout << "path 2 " << path << std::endl;
+            if (path >= found)
             {
-                --count;
-                path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf");
-                if (path == "")
-                path = findFile("/usr/", (manfile + std::to_string(count)).c_str(), "pdf.gz");
-                if (path == "")
-                path = findFile("/home/", (manfile + std::to_string(count)).c_str(), "pdf");
+                found = path;
+                lastdir = search;
             }
-            std::cout << "man " << manfile << "\npath " << path << std::endl;
-            if (path == "")
-                text = "Can't find manual :(";
-            else if (count < wanted)
-                text = "Can't find current manual. Using older one";
-            if (path != "")
+
+            search = localPath();
+            if (!search.empty())
             {
-                std::string command = "xdg-open " + path + "&";
+                path = manualSearch(search, stub);
+                //std::cout << "path 3 " << path << std::endl;
+                if (path >= found)
+                {
+                    found = path;
+                    lastdir = search;
+                }
+            }
+
+            //std::cout << manfile << std::endl;
+            //std::cout << "found " << found << std::endl;
+
+            if (found.empty())
+                text = "Can't find manual :(";
+            else
+            {
+                if (found.substr(0, found.rfind(".")) != manfile)
+                text = "Can't find current manual. Using older one";
+
+                std::string command = "xdg-open " + lastdir + "/" + found + "&";
                 FILE *fp = popen(command.c_str(), "r");
                 if (fp == NULL)
                     text = "Can't find PDF reader :(";

@@ -1,6 +1,9 @@
 yoshimi 1.7.4 M
 
-2021-2-4 Will
+2021-2-7 Will
+* Improved search for user guide.
+
+2021-2-6 Will
 * CLI no longer directly handles bank removal.
 * CLI no longer uses gui thread message for bank root access.
 * Improved handling of missing bank roots.
