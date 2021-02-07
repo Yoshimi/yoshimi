@@ -2,6 +2,7 @@ yoshimi 1.7.4 M
 
 2021-2-7 Will
 * Improved search for user guide.
+* BugFix: new GUI files not copied to LV2 cmake.txt
 
 2021-2-6 Will
 * CLI no longer directly handles bank removal.

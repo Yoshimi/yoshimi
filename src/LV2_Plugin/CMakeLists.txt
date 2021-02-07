@@ -104,6 +104,8 @@ set (FltkUI_sources
     ../UI/DynamicTooltip.cpp
     ../UI/WidgetPDial.cpp
     ../UI/WidgetMWSlider.cpp
+    ../UI/WidgetCheckButton.cpp
+    ../UI/WidgetSpinner.cpp
     ../UI/YoshiWin.cpp
 )
 
