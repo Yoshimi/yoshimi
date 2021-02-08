@@ -981,17 +981,19 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             break;
 
         case BANK::control::addNamedRoot:
-            if (kititem != UNUSED)
+            if (value_int == UNUSED)
+                contstr = name;
+            else if (kititem != UNUSED)
                 contstr = "Created Bank Root " + name;
             else
                 contstr = "Link Bank Root " + name;
             break;
 
         case BANK::control::deselectRoot:
-            if (engine == 0)
-                contstr = "Bank Root " + to_string(value_int) + " does not exist";
+            if (value_int == UNUSED)
+                contstr = "Bank Root " + to_string(kititem) + " does not exist";
             else
-                contstr = "Unlinked Bank Root " + to_string(value_int);
+                contstr = "Unlinked Bank Root " + to_string(kititem);
             showValue = false;
             break;
 

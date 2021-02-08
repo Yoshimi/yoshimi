@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-2-8 Will
+* Revised messaging for bank root add/remove.
+
 2021-2-7 Will
 * Improved search for user guide.
 * BugFix: new GUI files not copied to LV2 cmake.txt

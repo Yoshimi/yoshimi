@@ -6108,7 +6108,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     return Reply{REPLY::range_msg};
                 else
                 {
-                    sendDirect(synth, TOPLEVEL::action::lowPrio, rootID, TOPLEVEL::type::Write,BANK::deselectRoot, TOPLEVEL::section::bank);
+                    sendDirect(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write,BANK::deselectRoot, TOPLEVEL::section::bank, rootID);
                     return Reply::DONE;
                 }
             }

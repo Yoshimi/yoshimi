@@ -337,7 +337,7 @@ namespace BANK // usage BANK::control::
         selectRoot = 32, // by ID - also reads the current one
         changeRootId, // change ID of current root
         addNamedRoot, // link or create if not already there
-        deselectRoot, // not yet - currently remove at top level
+        deselectRoot, // remove reference, but don't touch contents
         installBanks,
         refreshDefaults
     };

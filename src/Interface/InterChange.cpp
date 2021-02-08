@@ -1270,18 +1270,21 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                     {
                         synth->getBankRef().installNewRoot(found, text);
                         synth->saveBanks();
-                        newMsg = true;
                     }
                     else
-                        synth->getRuntime().Log("Can't find path " + string{text});
+                    {
+                        value = UNUSED;
+                        text = "Can't find path " + text;
+                    }
+                    newMsg = true;
                 }
             }
             break;
         case BANK::deselectRoot:
             if (write) // not realistically readable
             {
-                if (synth->getBankRef().removeRoot(value))
-                    getData->data.engine = 0;
+                if (synth->getBankRef().removeRoot(kititem))
+                    value = UNUSED;
                 synth->saveBanks();
             }
             break;
