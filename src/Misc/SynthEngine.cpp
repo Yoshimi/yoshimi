@@ -1401,9 +1401,16 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
  */
 int SynthEngine::SetSystemValue(int type, int value)
 {
+
     list<string> msg;
     string label;
     label = "";
+    bool to_send = false;
+    unsigned char  action = 0;
+    unsigned char  cmd = UNUSED;
+    unsigned char  setpart;
+    //unsigned char  kititem;
+    //unsigned char  engine;
 
     switch (type)
     {
@@ -1568,23 +1575,58 @@ int SynthEngine::SetSystemValue(int type, int value)
             break;
 
         case 85: // active parts
-            if (value == 16 || value == 32 || value == 64)
-            {
-                Runtime.NumAvailableParts = value;
-                Runtime.Log("Available parts set to " + asString(value));
-#ifdef GUI_FLTK
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
-#endif
-            }
+            if (value <= 16)
+                value = 16;
+            else if (value <= 32)
+                value = 32;
             else
-                Runtime.Log("Out of range");
+                value = 64;
+            cmd = MAIN::control::availableParts;
+            setpart = TOPLEVEL::section::main;
+            to_send = true;
             break;
 
         case 86: // obvious!
-            Runtime.saveConfig();
-            Runtime.Log("Config saved");
+            value = 0;
+            cmd = CONFIG::control::saveCurrentConfig;
+            setpart = TOPLEVEL::section::config;
+            action = TOPLEVEL::action::lowPrio;
+            to_send = true;
             break;
+    }
+    if (!to_send)
+        return 0;
 
+    /*
+     * This is only ever called from the MIDI NRPN thread so is safe.
+     * In fact we will probably move it there once all the routines
+     * have been converted.
+     * We fake a CLI message so that we get reporting and GUI update.
+     */
+
+    CommandBlock putData;
+    memset(&putData, 0xff, sizeof(putData));
+    putData.data.value = value;
+    putData.data.type = TOPLEVEL::type::Write;
+    putData.data.source = TOPLEVEL::action::fromCLI | action;
+    putData.data.control = cmd;
+    putData.data.part = setpart;
+    //std::cout << "here type " << type << "  value " << value << std::endl;
+    int tries = 0;
+    bool ok = true;
+    do
+    {
+        ++ tries;
+        ok = interchange.fromMIDI->write(putData.bytes);
+        if (!ok)
+            usleep(1);
+    // we can afford a short delay for buffer to clear
+    }
+    while (!ok && tries < 3);
+    if (!ok)
+    {
+        Runtime.Log("Midi buffer full!");
+        ok = false;
     }
     return 0;
 }

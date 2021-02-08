@@ -9,4 +9,4 @@ There are some occasions where both the CLI and the GUI need a text update at th
 
 An extension of this system is where bit 6 of 'action' is also set. This is used where changes will be made that directly affect the audio thread. For these controls, the audio is first faded down, then muted. The changes are then made (and messages possibly changed/created). When complete, messages are sent and finally the system is unmuted.
 
-In this last case, (both bits set) the command is passed through normally to be actioned. The particular routine then clears bit 6 so before it gets passed on to the returns thread it gets diverted to the indirect routine.
+In this last case, (both bits set) the command is passed through normally to be actioned. The particular routine then clears bit 6 so that before it gets passed on to the returns thread it gets diverted to the indirect routine.

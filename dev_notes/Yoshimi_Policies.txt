@@ -26,7 +26,7 @@ For a start, from bitter experience it is fatally easy to change two variables t
 
 We do however accept some name changes where the orginal name is ambiguous or no longer appropriate.
 
-However, some of these errors are in the identifier names in the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 To change them would break all the instrument files that have been created since then.
+However, some of these errors are in the identifier names in the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 THESE MUST NEVER CHANGE. To change them would break all the instrument files that have been created since then.
 
 
 If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
@@ -61,3 +61,5 @@ The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, so
 FILE COPYRIGHTS
 Always a tricky one :(
 If you're the first person to make a contribution that year, then by all means add a new line (in the same style as the rest) with your name. If your the second person, feel free to add yours. However once the list starts to extend I may make an 'executive' decision and change this to "{first name}, and others" but only after ensuring that all names are in 'Yoshimi_Helpers'. If you think you've been unfairly treated contact me and we'll discuss it.
+
+willgodfrey@musically.me.uk
