@@ -1,11 +1,14 @@
 yoshimi 1.7.4 M
 
+2021-2-9 Will
+* All remaining 'SetSystemValues' made non threadmessage type.
+
 2021-2-8 Will
 * Revised messaging for bank root add/remove.
 * Started changing 'SetSystemValues' to non threadmessage type.
 * Reinstated and updated list in docs 'NRPN_System_Settings.txt
   Corrected control numbers.
-  It hasn't suppored list displays for some time.
+  It hasn't supported list displays for some time.
 
 2021-2-7 Will
 * Improved search for user guide.

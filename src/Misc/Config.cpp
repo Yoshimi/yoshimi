@@ -1521,7 +1521,7 @@ void GuiThreadMsg::processGuiMessages()
             switch(msg->type)
             {
 
-                case GuiThreadMsg::UpdateMaster:
+                /*case GuiThreadMsg::UpdateMaster:
                     guiMaster->refresh_master_ui(msg->index);
                     break;
 
@@ -1530,16 +1530,16 @@ void GuiThreadMsg::processGuiMessages()
                         guiMaster->configui->update_config(msg->index);
                     break;
 
-                /*case GuiThreadMsg::UpdatePaths:
+                case GuiThreadMsg::UpdatePaths:
                     guiMaster->updatepaths(msg->index);
-                    break;*/
+                    break;
 
                 case GuiThreadMsg::UpdatePart:
                     guiMaster->updatepart();
                     guiMaster->updatepanel();
                     break;
 
-                /*case GuiThreadMsg::RefreshCurBank:
+                case GuiThreadMsg::RefreshCurBank:
                     if (msg->data && guiMaster->bankui)
                     {
                         if (msg->index == 1)
@@ -1551,9 +1551,9 @@ void GuiThreadMsg::processGuiMessages()
                         guiMaster->bankui->set_bank_slot();
                         guiMaster->bankui->refreshmainwindow();
                     }
-                    break;*/
+                    break;
 
-                /*case GuiThreadMsg::GuiCheck:
+                case GuiThreadMsg::GuiCheck:
                     guiMaster->checkBuffer();
                     break;*/
 

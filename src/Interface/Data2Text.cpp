@@ -556,6 +556,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
     float value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
+    unsigned char parameter = getData->data.parameter;
     bool write = getData->data.type & TOPLEVEL::type::Write;
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
@@ -635,10 +636,6 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             }
             showValue = false;
             break;
-        /*case CONFIG::control::showEnginesTypes:
-            contstr = "Show Engines & Types";
-            yesno = true;
-            break;*/
         case CONFIG::control::defaultStateStart:
             contstr += "Autoload default state";
             yesno = true;
@@ -824,16 +821,21 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             contstr += "Bank root CC ";
             if (addValue)
             {
-                switch (value_int)
+                if (parameter != UNUSED)
+                    contstr += textMsgBuffer.fetch(parameter);
+                else
                 {
-                    case 0:
-                        contstr += "MSB";
-                        break;
-                    case 32:
-                        contstr += "LSB";
-                        break;
-                    default:
-                        contstr += "OFF";
+                    switch (value_int)
+                    {
+                        case 0:
+                            contstr += "MSB";
+                            break;
+                        case 32:
+                            contstr += "LSB";
+                            break;
+                        default:
+                            contstr += "OFF";
+                    }
                 }
             }
             showValue = false;
@@ -843,16 +845,21 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             contstr += "Bank CC ";
             if (addValue)
             {
-                switch (value_int)
+                if (parameter != UNUSED)
+                    contstr += textMsgBuffer.fetch(parameter);
+                else
                 {
-                    case 0:
-                        contstr += "MSB";
-                        break;
-                    case 32:
-                        contstr += "LSB";
-                        break;
-                    default:
-                        contstr += "OFF";
+                    switch (value_int)
+                    {
+                        case 0:
+                            contstr += "MSB";
+                            break;
+                        case 32:
+                            contstr += "LSB";
+                            break;
+                        default:
+                            contstr += "OFF";
+                    }
                 }
             }
             showValue = false;
@@ -866,7 +873,22 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             yesno = true;
             break;
         case CONFIG::control::extendedProgramChangeCC:
-            contstr += "CC for extended program change";
+            if (addValue)
+            {
+            if (parameter != UNUSED)
+            {
+                string test = textMsgBuffer.fetch(parameter);
+                contstr += ("Extended program change CC in use by "  + test);
+            }
+            else if (value == 128)
+            {
+                contstr += ("Extended program change disabled");
+            }
+            else
+                contstr += "CC for extended program change ";
+            contstr += to_string(value_int);
+            }
+            showValue = false;
             break;
         case CONFIG::control::ignoreResetAllCCs:
             contstr += "Ignore 'reset all CCs'";

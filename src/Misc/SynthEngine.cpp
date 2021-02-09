@@ -1409,30 +1409,26 @@ int SynthEngine::SetSystemValue(int type, int value)
     unsigned char  action = 0;
     unsigned char  cmd = UNUSED;
     unsigned char  setpart;
-    //unsigned char  kititem;
-    //unsigned char  engine;
+    unsigned char  parameter = UNUSED;
 
     switch (type)
     {
         case 2: // master key shift
-            if (value > MAX_KEY_SHIFT + 64)
-                value = MAX_KEY_SHIFT + 64;
-            else if (value < MIN_KEY_SHIFT + 64) // 3 octaves is enough for anybody :)
-                value = MIN_KEY_SHIFT + 64;
-            setPkeyshift(value);
-            setAllPartMaps();
-#ifdef GUI_FLTK
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-#endif
-            Runtime.Log("Master key shift set to " + asString(value - 64));
+            value -=64;
+            if (value > MAX_KEY_SHIFT)
+                value = MAX_KEY_SHIFT;
+            else if (value < MIN_KEY_SHIFT) // 3 octaves is enough for anybody :)
+                value = MIN_KEY_SHIFT;
+            cmd = MAIN::control::keyShift;
+            setpart = TOPLEVEL::section::main;
+            action = TOPLEVEL::action::lowPrio;
+            to_send = true;
             break;
 
         case 7: // master volume
-            setPvolume(value);
-#ifdef GUI_FLTK
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-#endif
-            Runtime.Log("Master volume set to " + asString(value));
+            cmd = MAIN::control::volume;
+            setpart = TOPLEVEL::section::main;
+            to_send = true;
             break;
 
         case 64: // part key shifts
@@ -1451,20 +1447,45 @@ int SynthEngine::SetSystemValue(int type, int value)
         case 77:
         case 78:
         case 79:
-            for (int npart = 0; npart < Runtime.NumAvailableParts; ++ npart)
-                if (partonoffRead(npart) && part[npart]->Prcvchn == (type - 64))
+            {
+                value -= 64;
+                if (value < MIN_KEY_SHIFT)
+                        value = MIN_KEY_SHIFT;
+                    else if (value > MAX_KEY_SHIFT)
+                        value = MAX_KEY_SHIFT;
+
+                CommandBlock putData;
+                memset(&putData, 0xff, sizeof(putData));
+                putData.data.value = value;
+                putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
+                putData.data.source = TOPLEVEL::action::fromCLI | TOPLEVEL::action::lowPrio;
+                putData.data.control = PART::control::keyShift;
+
+                for (int i = 0; i < Runtime.NumAvailableParts; ++ i)
                 {
-                    if (value < MIN_KEY_SHIFT + 64)
-                        value = MIN_KEY_SHIFT + 64;
-                    else if (value > MAX_KEY_SHIFT + 64)
-                        value = MAX_KEY_SHIFT + 64;
-                    part[npart]->Pkeyshift = value;
-                    setPartMap(npart);
-                    Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(value - 64));
-#ifdef GUI_FLTK
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
-#endif
+                    if (partonoffRead(i) && part[i]->Prcvchn == (type - 64))
+                    {
+                        putData.data.part = i;
+                        int tries = 0;
+                        bool ok = true;
+                        do
+                        {
+                            ++ tries;
+                            ok = interchange.fromMIDI->write(putData.bytes);
+                            if (!ok)
+                                usleep(1);
+                        // we can afford a short delay for buffer to clear
+                        }
+                        while (!ok && tries < 3);
+                        if (!ok)
+                        {
+                            Runtime.Log("Midi buffer full!");
+                            ok = false;
+                        }
+                    }
                 }
+            }
+            return 0;
             break;
 
         case 80: // root CC
@@ -1472,106 +1493,63 @@ int SynthEngine::SetSystemValue(int type, int value)
                 value = 128;
             if (value != Runtime.midi_bank_root) // don't mess about if it's the same
             {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
+                // this is not ideal !!!
+                if (value == Runtime.midi_bank_C)
                 {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
-                }
-                else
-                {
-                    Runtime.midi_bank_root = value;
-#ifdef GUI_FLTK
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-#endif
+                    parameter = textMsgBuffer.push("in use by bank CC");
+                    value = 128;
                 }
             }
-            if (value == 128) // but still report the setting
-                Runtime.Log("MIDI Root Change disabled");
-            else if (value > -1)
-                Runtime.Log("Root CC set to " + asString(value));
+            cmd = CONFIG::control::bankRootCC;
+            setpart = TOPLEVEL::section::config;
+            to_send = true;
             break;
 
         case 81: // bank CC
             if (value != 0 && value != 32)
                 value = 128;
-            if (value != Runtime.midi_bank_C)
+            else if (value != Runtime.midi_bank_C) // not already set!
             {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
+                // nor this !
+                if (value == Runtime.midi_bank_root)
                 {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
-                }
-                else
-                {
-                    Runtime.midi_bank_C = value;
-#ifdef GUI_FLTK
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-#endif
+                    parameter = textMsgBuffer.push("in use by bank root CC");
+                    value = 128;
                 }
             }
-            if (value == 0)
-                Runtime.Log("Bank CC set to MSB (0)");
-            else if (value == 32)
-                Runtime.Log("Bank CC set to LSB (32)");
-            else if (value > -1)
-                Runtime.Log("MIDI Bank Change disabled");
+            cmd = CONFIG::control::bankCC;
+            setpart = TOPLEVEL::section::config;
+            to_send = true;
             break;
 
         case 82: // enable program change
             value = (value > 63);
-            if (value)
-                Runtime.Log("MIDI Program Change enabled");
-            else
-                Runtime.Log("MIDI Program Change disabled");
-            if (value != Runtime.EnableProgChange)
-            {
-                Runtime.EnableProgChange = value;
-#ifdef GUI_FLTK
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-#endif
-            }
+            cmd = CONFIG::control::enableProgramChange;
+            setpart = TOPLEVEL::section::config;
+            to_send = true;
             break;
 
         case 83: // enable part on program change
             value = (value > 63);
-            if (value)
-                Runtime.Log("MIDI Program Change will enable part");
-            else
-                Runtime.Log("MIDI Program Change doesn't enable part");
-            if (value != Runtime.enable_part_on_voice_load)
-            {
-                Runtime.enable_part_on_voice_load = value;
-#ifdef GUI_FLTK
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-#endif
-            }
+            cmd = CONFIG::control::instChangeEnablesPart;
+            setpart = TOPLEVEL::section::config;
+            to_send = true;
             break;
 
         case 84: // extended program change CC
             if (value > 119)
                 value = 128;
-            if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
-            {
-                label = Runtime.testCCvalue(value);
-                if (label > "")
+            else
+            { // this is far from ideal !!!
+                string label = Runtime.testCCvalue(value);if (label != "")
                 {
-                    Runtime.Log("CC" + asString(value) + " in use by " + label);
-                    value = -1;
+                    parameter = textMsgBuffer.push(label);;
+                    value = 128;
                 }
-                else
-                {
-                    Runtime.midi_upper_voice_C = value;
-#ifdef GUI_FLTK
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
-#endif
-                }
+                cmd = CONFIG::control::extendedProgramChangeCC;
+                setpart = TOPLEVEL::section::config;
+                to_send = true;
             }
-            if (value == 128) // but still report the setting
-                Runtime.Log("MIDI extended Program Change disabled");
-            else if (value > -1)
-                Runtime.Log("Extended Program Change CC set to " + asString(value));
             break;
 
         case 85: // active parts
@@ -1607,11 +1585,12 @@ int SynthEngine::SetSystemValue(int type, int value)
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = value;
-    putData.data.type = TOPLEVEL::type::Write;
+    putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::fromCLI | action;
     putData.data.control = cmd;
     putData.data.part = setpart;
-    //std::cout << "here type " << type << "  value " << value << std::endl;
+    putData.data.parameter = parameter;
+
     int tries = 0;
     bool ok = true;
     do
@@ -3607,10 +3586,6 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
         case CONFIG::control::savedInstrumentFormat:
             max = 3;
             break;
-        //case CONFIG::control::showEnginesTypes:
-            //max = 1;
-            //break;
-
         case CONFIG::control::defaultStateStart:
             break;
         case CONFIG::control::hideNonFatalErrors:
