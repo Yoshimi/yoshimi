@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -404,7 +404,7 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {933 179 805 610} type Double box NO_BOX hide resizable
+      xywh {329 157 805 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -633,6 +633,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             xywh {580 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textfont 1 textsize 11
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
             code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
+            code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
           } {}
           Fl_Group freqencygrp {
             label FREQUENCY
@@ -848,7 +849,6 @@ Oscillator}
             code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if (pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {
             Fl_Spinner unisonsize {
-              class WidgetSpinner
               label Size
               callback {//
 send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer);}
@@ -856,6 +856,7 @@ send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer)
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
+              class WidgetSpinner
             }
             Fl_Dial UnisonStereo {
               label Stereo
@@ -1165,7 +1166,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         class Fl_Check_Button2
       }
       Fl_Group Vname {
-        label VOICE open
+        label VOICE
         xywh {476 10 63 16} labelfont 1 align 0
       } {}
     }
