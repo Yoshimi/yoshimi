@@ -1204,22 +1204,21 @@ size_t Bank::generateSingleRoot(const string& newRoot, bool clear)
     createDir(newRoot);
 
     // add bank
-    string newBank = "newBank";
-    createDir(newRoot + "/" + newBank);
-    string toSave = newRoot + "/" + newBank + "/" + EXTEN::validBank;
+    string newBank = newRoot + "newBank";
+    createDir(newBank);
+    string toSave = newBank + "/" + EXTEN::validBank;
     saveText(string(YOSHIMI_VERSION), toSave);
-
     // now generate and save an instrument
     int npart = 0;
     string instrumentName = "First Instrument";
     synth->interchange.generateSpecialInstrument(npart, instrumentName);
 
-    string filename = newRoot + "/" + newBank + "/" + "0005-" + instrumentName + EXTEN::zynInst;
+    string filename = newBank + "/" + "0005-" + instrumentName + EXTEN::zynInst;
     synth->part[npart]->saveXML(filename, false);
 
     // set root and tidy up
     size_t idx = addRootDir(newRoot);
-    //cout << idx << endl;
+    //std::cout << "index " << int(idx) <<  "  file " << filename << std::endl;
     if (clear)
         synth->part[npart]->defaultsinstrument();
     return idx;

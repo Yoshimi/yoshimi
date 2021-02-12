@@ -2,6 +2,7 @@ yoshimi 1.7.4 M
 
 2021-2-12 Will
 * Revised GUI for AddSynth Voice.
+* BugFix: Generating new bank root not updating GUI.
 
 2021-2-11 Will
 * Disabled call toe Gui thread messages in UI/MiscGui

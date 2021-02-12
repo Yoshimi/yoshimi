@@ -1261,9 +1261,10 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                 {
                     kititem = synth->getBankRef().generateSingleRoot(text, false);
                     getData->data.kit = kititem;
+                    synth->getBankRef().installNewRoot(kititem, text);
                     synth->saveBanks();
-                    synth->getRuntime().currentRoot = kititem;
-                    synth->getRuntime().currentBank = 5;
+                    //synth->getRuntime().currentRoot = kititem;
+                    //synth->getRuntime().currentBank = 5;
                 }
                 else
                 {
