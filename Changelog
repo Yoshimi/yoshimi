@@ -4,6 +4,8 @@ yoshimi 1.7.4 M
 * Disabled call toe Gui thread messages in UI/MiscGui
   Now redundant
 * BugFix: AddSynthModuator gui state of sync.
+* Further work on completely new bank roots.
+  Still not updating Gui till rebooted.
 
 2021-2-9 Will
 * All remaining 'SetSystemValues' made non threadmessage type.

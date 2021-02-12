@@ -1259,9 +1259,11 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             {
                 if (kititem != UNUSED)
                 {
-                    synth->getBankRef().generateSingleRoot(text, false);
+                    kititem = synth->getBankRef().generateSingleRoot(text, false);
+                    getData->data.kit = kititem;
                     synth->saveBanks();
-                    newMsg = true;
+                    synth->getRuntime().currentRoot = kititem;
+                    synth->getRuntime().currentBank = 5;
                 }
                 else
                 {
@@ -1276,8 +1278,8 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                         value = UNUSED;
                         text = "Can't find path " + text;
                     }
-                    newMsg = true;
                 }
+                newMsg = true;
             }
             break;
         case BANK::deselectRoot:

@@ -992,6 +992,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             rescan_for_banks();
             break;
         case BANK::control::addNamedRoot:
+            std::cout << "root " << int(kititem) << std::endl;
             readbankcfg();
             rescan_for_banks();
             if (kititem != UNUSED)

@@ -153,7 +153,7 @@ class Bank
             {BanksVersion = version;}
         int BanksVersion;
         void checkLocalBanks(void);
-        void generateSingleRoot(const string& newRoot, bool clear = true);
+        size_t generateSingleRoot(const string& newRoot, bool clear = true);
 
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);

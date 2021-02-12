@@ -1197,7 +1197,7 @@ void Bank::addDefaultRootDirs(string bankdirs[])
 }
 
 
-void Bank::generateSingleRoot(const string& newRoot, bool clear)
+size_t Bank::generateSingleRoot(const string& newRoot, bool clear)
 {
     //cout << "generating" << endl;
 
@@ -1220,9 +1220,9 @@ void Bank::generateSingleRoot(const string& newRoot, bool clear)
     // set root and tidy up
     size_t idx = addRootDir(newRoot);
     //cout << idx << endl;
-    changeRootID(idx, 5);
     if (clear)
         synth->part[npart]->defaultsinstrument();
+    return idx;
 }
 
 
@@ -1515,7 +1515,11 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         {
             cout << "generating" << endl;
             string newRoot = firstSynth->getRuntime().definedBankRoot + "yoshimi/banks";
-            generateSingleRoot(newRoot);
+            size_t idx = generateSingleRoot(newRoot);
+            changeRootID(idx, 5);
+            synth->getRuntime().currentRoot = idx;
+            synth->getRuntime().currentBank = 5;
+
         }
         synth->getRuntime().currentRoot = 5;
         synth->getRuntime().banksChecked = true;
