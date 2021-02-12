@@ -424,7 +424,7 @@ class ADvoiceUI {: {public Fl_Group}
           } {
             Fl_Group modfrequency {
               label {Mod FREQUENCY}
-              xywh {580 204 220 161} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
+              xywh {580 204 220 161} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
             } {
               Fl_Group voiceFMfreqenvgroup {
                 label {ADSynth Modulator - Frequency Envelope}
@@ -506,7 +506,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             }
             Fl_Group Modampgrp {
               label {Mod AMPLITUDE}
-              xywh {580 55 220 149} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
+              xywh {580 55 220 149} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
             } {
               Fl_Value_Slider ModVolume {
                 label Vol
@@ -553,12 +553,12 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 class mwheel_val_slider_rev
               }
             }
-            Fl_Group modOscDisplay {
+            Fl_Group modOscDisplay {open
               xywh {580 365 220 200}
             } {
               Fl_Group modoscil {
                 label {                       }
-                xywh {580 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
+                xywh {580 365 220 200} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
               } {
                 Fl_Text_Display ModLocalOsc {
                   label {Local Oscillator}
@@ -771,17 +771,17 @@ send_data(0, ADDVOICE::control::pitchBendOffset, o->value(), TOPLEVEL::type::Int
               class WidgetPDial
             }
           }
-          Fl_Group oscDisplay {
+          Fl_Group oscDisplay {open
             xywh {5 462 570 145}
           } {
-            Fl_Group oscGroup {
+            Fl_Group oscGroup {open
               xywh {5 462 570 145} labelfont 1 labelsize 13 align 17
               code0 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
             } {
               Fl_Group oscParamBox {
                 label {Local
 Oscillator}
-                xywh {5 478 80 128} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
+                xywh {5 478 80 128} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
               } {
                 Fl_Choice UseOsc {
                   label Use
@@ -870,7 +870,7 @@ send_data(0, ADDVOICE::control::unisonStereoSpread, o->value(), TOPLEVEL::type::
               label {Vib.}
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Vibratto xywh {396 422 28 26} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip Vibratto xywh {396 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               class WidgetPDial
             }
@@ -902,7 +902,7 @@ send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::
               label {V.speed}
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoSpeed, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Vibratto Average Speed} xywh {436 422 26 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Vibratto Average Speed} xywh {436 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
               class WidgetPDial
             }
@@ -910,7 +910,7 @@ send_data(0, ADDVOICE::control::unisonVibratoSpeed, o->value(), TOPLEVEL::type::
               label {Ph.rnd}
               callback {//
 send_data(0, ADDVOICE::control::unisonPhaseRandomise, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Phase randomness} xywh {316 422 28 28} box ROUND_UP_BOX labelsize 10 align 9 maximum 127 step 1
+              tooltip {Phase randomness} xywh {316 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_phase_randomness);}
               class WidgetPDial
             }
