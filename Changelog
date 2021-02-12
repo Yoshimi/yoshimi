@@ -1,5 +1,8 @@
 yoshimi 1.7.4 M
 
+2021-2-12 Will
+* Revised GUI for AddSynth Voice.
+
 2021-2-11 Will
 * Disabled call toe Gui thread messages in UI/MiscGui
   Now redundant
