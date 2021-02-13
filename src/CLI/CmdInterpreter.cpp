@@ -5850,16 +5850,27 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             sendDirect(synth, 0, 0, TOPLEVEL::type::Write, TOPLEVEL::control::forceExit, UNUSED);
             return Reply::DONE;
         }
+        bool echo = (synth->getRuntime().toConsole);
         if (currentInstance > 0)
         {
+            if (echo)
+                std::cout << "Can only exit from instance 0" << std::endl;
             Runtime.Log("Can only exit from instance 0", 1);
             return Reply::DONE;
         }
         string message;
         if (Runtime.configChanged)
+        {
+            if (echo)
+                std::cout << "System config has been changed. Still exit N/y?" << std::endl;
             message = "System config has been changed. Still exit";
+        }
         else
+        {
+            if (echo)
+                std::cout << "All data will be lost. Still exit N/y?" << std::endl;
             message = "All data will be lost. Still exit";
+        }
         if (query(message, false))
         {
             // this seems backwards but it *always* saves.

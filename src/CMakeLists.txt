@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2020, Will Godfrey & others
+#   Copyright 2014-2021, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -35,16 +35,16 @@ add_definitions(-Wall)
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
-add_definitions(-Wfatal-errors) # stop on first
-add_definitions(-Werror=format-security)
-add_definitions(-Wextra)
-add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
+#add_definitions(-Wfatal-errors) # stop on first
+#add_definitions(-Werror=format-security)
+#add_definitions(-Wextra)
+#add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "1.7.4 M")
+set (YOSHIMI_VERSION "2.0 prev")
 
-add_definitions (-DMIN_CONFIG_MAJOR=1)
-add_definitions (-DMIN_CONFIG_MINOR=6)
+add_definitions (-DMIN_CONFIG_MAJOR=2)
+add_definitions (-DMIN_CONFIG_MINOR=0)
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 

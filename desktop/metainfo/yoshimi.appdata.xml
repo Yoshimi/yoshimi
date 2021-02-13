@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016-2020 Yoshimi project <willgodfrey@musically.me.uk> -->
+<!-- Copyright 2016-2021 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop">
   <id>yoshimi.desktop</id>
   <metadata_license>CC-BY-4.0</metadata_license>
@@ -16,9 +16,12 @@
     <p>
     In the V1.7.x series ALSA MIDI can search for and connect to all viable sources, almost all controls have been made realtime, both key and channel aftertouch have been implemented and there is now the ability to change the panning law. Refinement continues, both visually and within the code.
     </p>
+    <p>
+    Version 2.0 brings fully resizeable windows, both key and channel aftertouch, MIDI sync for LFOs, and extensions to panning control.
+    </p>
   </description>
   <releases>
-​    <release version="1.7.4" date="2021-01-05" />
+​    <release version="2.0" date="2021-02-15" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>

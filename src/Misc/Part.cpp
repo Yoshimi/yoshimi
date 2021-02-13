@@ -6,7 +6,7 @@
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey
-    Copyright 2020 Kristian Amlie & others
+    Copyright 2021 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -1455,6 +1455,8 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
     if (subset)
     {
         xml->addpar("key_mode", Pkeymode & MIDI_NOT_LEGATO);
+        xml->addpar("channel_aftertouch", PchannelATchoice);
+        xml->addpar("key_aftertouch", PkeyATchoice);
         xml->addpar("random_detune", Pfrand);
         xml->addpar("random_velocity", Pvelrand);
         xml->addparbool("breath_disable", PbreathControl != 2);

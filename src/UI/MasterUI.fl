@@ -3313,9 +3313,10 @@ Alan Calvert started the project}
             int setsize = int((11.0f / 768.0f) * Fl::h());
             Fl_Tooltip::size(setsize);
             oldH = Fl::h();
-            std::cout << "tipset " << setsize << "  actual " <<  Fl_Tooltip::size() << std::endl;
+            //std::cout << "tipset " << setsize << "  actual " <<  Fl_Tooltip::size() << std::endl;
 
-            Showmaster(); // ensure it's always completely visible
+            // line below was creating issues with simple message startup warnings
+            //Showmaster(); // ensure it's always completely visible
         }
 
     if (masterwindow->w() != lastmainW)

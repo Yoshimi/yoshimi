@@ -518,7 +518,7 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
         yoshitoo = true;
 
-//        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major));
+        //synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major) + "  " + filename);
     }
     else
     {

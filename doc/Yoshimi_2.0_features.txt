@@ -1,0 +1,44 @@
+V 2.0 A happy Northern Cardinal
+
+Yes really! Version 2.0 is here.
+
+The most noticable improvement is that all windows are now resizable... individually, up to whatever the window manager allows, and their current sizes and positions are saved. What is more, if you change screen resolutions such that one of them would then be outside the viewable area, there is code to automatically bring it back into view. In the process we have also tidied up some of the windows to make them clearer and more consistent.
+
+Another significant development is MIDI sync for LFOs. When the BPM button is checked, the frequency control becomes a ratio setting between the time code and actual LFO freqency. All LFOs are independent, so you can have one set to (say) 2:1, while another is set to 1:4.
+
+An interesting lesser development is the addition of a few more instrument types, and a revision of all the default instruments (including these types) to make it easier to find ones that you want to use. The new type names are:
+    Bells and Chimes
+    Single Voice
+    Choir
+    Wind (other)
+    Warm Pad
+These are backward compatible in that older Yoshimi versions will see them as 'undefined'. All the entries that have been adjusted were already undefined.
+
+The recently introduced aftertouch feature can now be reached from the part edit window as well as the controllers one. Also both key and channel aftertouch are saved in patch sets, and in Yoshimi type (.xiy) instruments.
+
+A first time enabling of a PadSynth engine will now initialise it, so it immediately produces sound.
+
+The currently set panning law is saved to patchsets, and by inference also to state files. Resets will always revert to the default law.
+
+NRPNs have been brushed up a bit. Some anomalies corrected and some bit-rot repaired.
+
+The command line has not been forgotten, and along with including access to the above extras, some of the wording has been adjusted to better reflect what is happening.
+
+Under the hood:
+Data storage has been brought into line with the XDG specification.
+LV2 performance has been improved.
+Some x86/AMD64 specific calls have be replaced with platform agnostic ones.
+
+The usual crop of bugfixes.
+
+Yoshimi source code is available from either:
+    https://sourceforge.net/projects/yoshimi
+Or:
+    https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+    https://www.freelists.org/archive/yoshimi
+To post, email to:
+    yoshimi@freelists.org

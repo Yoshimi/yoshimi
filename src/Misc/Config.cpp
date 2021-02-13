@@ -450,7 +450,9 @@ bool Config::loadConfig(void)
             }
             if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
             {
-                if (lastXMLmajor < MIN_CONFIG_MAJOR || lastXMLminor < MIN_CONFIG_MINOR)
+                int currentVersion = lastXMLmajor * 10 + lastXMLminor;
+                int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
+                if (currentVersion < storedVersion)
                     oldConfig = true;
                 else
                     oldConfig = false;
