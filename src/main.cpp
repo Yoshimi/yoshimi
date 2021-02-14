@@ -19,20 +19,20 @@
 
 */
 
-#include <sys/mman.h>
+//#include <sys/mman.h>
 #include <iostream>
 #include <string>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <termios.h>
-#include <time.h>
+//#include <time.h>
 
-#include <map>
-#include <list>
+//#include <map>
+//#include <list>
 #include <pthread.h>
-#include <thread>
-#include <semaphore.h>
+//#include <thread>
+//#include <semaphore.h>
 #include <cstdio>
 #include <unistd.h>
 #include <readline/readline.h>

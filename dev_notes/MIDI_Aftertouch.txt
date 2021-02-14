@@ -10,3 +10,5 @@ D0 = DF
 becomes CC 641
 
 This is  translated as CC 129 and implemented as channel aftertouch and for MIDI learn. Pressure value is 'par'.
+
+The reason for these conversions is so that the commands can be handled by the MIDI-learn parser, but ignored by the normal MIDI decoder.

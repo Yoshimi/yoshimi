@@ -67,7 +67,7 @@
 #define MIDI_NOT_LEGATO 3
 #define MIDI_LEGATO 4
 #define NUM_MIDI_CHANNELS 16
-#define MIDI_LEARN_BLOCK 200
+#define MIDI_LEARN_BLOCK 400
 #define MAX_ENVELOPE_POINTS 40
 #define MIN_ENVELOPE_DB -60
 #define MAX_RESONANCE_POINTS 256
@@ -117,6 +117,9 @@
 
 #define DEFAULT_NAME "Simple Sound"
 #define UNTITLED "No Title"
+
+#define DEFAULT_AUDIO alsa_audio
+#define DEFAULT_MIDI alsa_midi
 
 #define FORCED_EXIT 16
 

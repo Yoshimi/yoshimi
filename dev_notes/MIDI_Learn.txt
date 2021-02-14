@@ -81,3 +81,12 @@ The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a 
 0xf1 load list
 0xf2 load numbered item from recent history
 0xf5 save list
+
+
+*** UPDATE ***
+
+Max MIDI-learn lines has been increased to 400.
+
+This has been achieved by inserting a 10mS sleep every 32 lines while updating the GUI. This ensures the message buffer doesn't get overloaded. There was no other reason for the earlier limit. This still comes in at less that 1mS for a full list load.
+
+Time to scan is very difficult to measure. Finding a bunch of  5 controls at the end of a list of 20 usually returned less than 3uS, and very occasionally one at around 8uS. The search is fairly straightforward so presumably ones right at the end of a full list would be worst case around 160uS

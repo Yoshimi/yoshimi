@@ -23,6 +23,7 @@ In progress
     nothing
 
 *** UPDATE ***
+
 All functions are now complete.
 
-We no longer use the VU metering timer as a trigger for resizes. Instead it is the top-lever FLTK one use in 'main' for standalone, and idividual LV2 loops. At the same time, this is now used for reading the ring buffer handling all general GUI updates. As well as being more correct, this has efficiency benefits.
+We no longer use the VU metering timer as a trigger for resizes. Instead it is the top-level FLTK one use in 'main' for standalone, and individual LV2 loops. At the same time, this is now used for reading the ring buffer handling all general GUI updates. As well as being more correct, this has efficiency benefits.

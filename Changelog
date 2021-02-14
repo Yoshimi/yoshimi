@@ -1,5 +1,14 @@
 yoshimi 2.0 prev
 
+2021-2-14 Will
+* Increased MIDI-learn list limit to 400 lines.
+  Added 10mS sleeps every 32 lines on loading.
+  Still less than 1mS for a full list and estimate
+  less than 200uS for actioning ones at the end.
+* Doc updates.
+* Moved audio/mefid defaults from BMakeLists.txt to globals.h
+* Changed both defaults to Alsa.
+
 2021-2-13 Will
 * Aftertouch saved in Yoshi instruments and patchsets.
 * Panning law saved in patchsets and states.

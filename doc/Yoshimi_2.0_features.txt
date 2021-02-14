@@ -22,6 +22,8 @@ The currently set panning law is saved to patchsets, and by inference also to st
 
 NRPNs have been brushed up a bit. Some anomalies corrected and some bit-rot repaired.
 
+Maximum number of MIDI_learn lines has been increased to 400.
+
 The command line has not been forgotten, and along with including access to the above extras, some of the wording has been adjusted to better reflect what is happening.
 
 Under the hood:

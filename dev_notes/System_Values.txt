@@ -2,7 +2,7 @@ This is a means of exposing various controls to NRPNs.
 
 All of the commands produce log output in a manner designed to be compatible with both the GUI reports window and with a CLI readline environment.
 
-To access these, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 (8130). After that send the following Data values. The command with LSB x doesn’t actually use Data LSB, but you still needs to send it.
+To access these, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 (8130). After that send the following Data values.
 
 
 Data MSB    Data LSB            Setting
@@ -15,4 +15,4 @@ Data MSB    Data LSB            Setting
     83        >63         Enable activation of part when program changed
     84        extended    Set CC control Extended program change (>119 disables)
     85        parts       Set number of available parts (16, 32 or 64)
-    86        x           Save all dynamic settings
+    86        0           Save all dynamic settings

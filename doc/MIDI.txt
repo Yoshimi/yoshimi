@@ -31,7 +31,7 @@ Yoshimi responds to the following messages.
 Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
 There is also an option for making Program Change enable a part if it's currently disabled.
 
-Key pressure (aftertouch) is internally translated as CC 642 but currently implemented as channel pressure
+Key pressure (aftertouch) is internally translated as CC 642 but currently implemented as channel pressure.
 
 Channel pressure is internally translated as CC 641 and is accessed by MIDI learn further translated as CC 129.
 
@@ -47,3 +47,6 @@ For more details of bank changes see Banks.txt
 Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
 
 Further details on NRPNs are in Using_NRPNs.txt
+
+*** UPDATE ***
+Key pressure is now recognised uniquely for aftertouch.

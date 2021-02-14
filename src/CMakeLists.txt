@@ -380,10 +380,6 @@ if (ReportNotes)
     add_definitions (-DREPORT_NOTES_ON_OFF)
 endif ()
 
-add_definitions(-DDEFAULT_AUDIO=jack_audio)
-
-add_definitions(-DDEFAULT_MIDI=jack_midi)
-
 if (JackSessionSupport)
     message(STATUS "With jack session support")
     add_definitions(-DJACK_SESSION)

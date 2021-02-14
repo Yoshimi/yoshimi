@@ -1,7 +1,7 @@
 /*
     MidiDecode.cpp
 
-    Copyright 2017-2020 Will Godfrey
+    Copyright 2017-2021 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -26,6 +26,7 @@
 #include <string>
 #include <unistd.h>
 
+//#include <sys/time.h>
 
 #include "Interface/MidiDecode.h"
 #include "Interface/InterChange.h"
@@ -183,9 +184,22 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
      * Some controller values are >= 640 so they will be ignored by
      * later calls, but are passed as 128+ for this call.
      */
+/*
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+*/
     if (synth->midilearn.runMidiLearn(param, ctrl & 0xff, ch, in_place))
         return; // blocking while learning
-
+/*
+    gettimeofday(&tv2, NULL);
+    if (tv1.tv_usec > tv2.tv_usec)
+    {
+        tv2.tv_sec--;
+        tv2.tv_usec += 1000000;
+    }
+    int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+    std::cout << "Delay " << std::to_string(actual) << "uS" << std::endl;
+*/
     /*
     * This is done here instead of in 'setMidi' so MidiLearn
     * handles all 14 bit values the same.

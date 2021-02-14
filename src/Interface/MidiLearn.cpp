@@ -1,7 +1,7 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016-2020 Will Godfrey
+    Copyright 2016-2021 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -32,7 +32,9 @@
 #include <vector>
 #include <string>
 #include <unistd.h>  // for usleep()
-//#include <iostream>
+#include <iostream>
+
+//#include <sys/time.h>
 
 using file::isRegularFile;
 using file::make_legit_filename;
@@ -826,6 +828,10 @@ void MidiLearn::updateGui(int opp)
     int lineNo = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
+/*
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+*/
     while (it != midi_list.end())
     {
         unsigned short int newCC = (it->CC) & MIDI::CC::maxNRPN;
@@ -847,7 +853,19 @@ void MidiLearn::updateGui(int opp)
         }
         ++it;
         ++lineNo;
+        if (lineNo & 32)
+            usleep(10); // allow message list to clear a bit
     }
+/*
+    gettimeofday(&tv2, NULL);
+    if (tv1.tv_usec > tv2.tv_usec)
+    {
+        tv2.tv_sec--;
+        tv2.tv_usec += 1000000;
+    }
+    int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+    std::cout << "Delay " << to_string(actual) << "uS" << std::endl;
+*/
     if (synth->getRuntime().showLearnedCC == true && !midi_list.empty()) // open the gui editing window
     {
         putData.data.control = MIDILEARN::control::sendRefreshRequest;
