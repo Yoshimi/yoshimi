@@ -1,19 +1,20 @@
-V2.0
+Version 2.0
 
 Highlights
-    Fully and independently resizeable windows
-    LFO Midi sync for engines
+    Fully and independently resizeable (and remembered) windows.
+    LFO Midi sync for engines.
 
 
-    More Instrument types available
-    Pan Law setting now saved
-    Aftertouch values now saved
-    Improved CLI descriptions and reporting
+    More Instrument types available - and a request to set them!
+    Pan Law setting now saved.
+    Aftertouch values now saved.
+    Improved CLI descriptions and reporting.
 
-    NRPN updates
-    MIDI-learn increased to 400 lines
-    Data storage XDG compatible
-    Improved LV2 performance
+    NRPN updates.
+    MIDI-learn increased to 400 lines.
+    Data storage XDG compatible.
+    Improved LV2 performance.
+    Documentation updated (New User guide in progress).
 
 Further details in doc/Yoshimi_2.0_features.txt
 
