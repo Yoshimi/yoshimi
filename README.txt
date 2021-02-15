@@ -1,9 +1,21 @@
-V1.7.4
+V2.0
 
-Another maintenance release. However it also includes a check when saving instruments. This recommends setting an instrument type. You can ignore this, but it is hoped the reminder will prompt more people to add it.
+Highlights
+    Fully and independently resizeable windows
+    LFO Midi sync for engines
 
-We welcome all help and feedback.
-We listen and respond to suggestions and problems.
+
+    More Instrument types available
+    Pan Law setting now saved
+    Aftertouch values now saved
+    Improved CLI descriptions and reporting
+
+    NRPN updates
+    MIDI-learn increased to 400 lines
+    Data storage XDG compatible
+    Improved LV2 performance
+
+Further details in doc/Yoshimi_2.0_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

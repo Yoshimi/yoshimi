@@ -19,20 +19,14 @@
 
 */
 
-//#include <sys/mman.h>
 #include <iostream>
 #include <string>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <termios.h>
-//#include <time.h>
-
-//#include <map>
-//#include <list>
 #include <pthread.h>
-//#include <thread>
-//#include <semaphore.h>
+
 #include <cstdio>
 #include <unistd.h>
 #include <readline/readline.h>
@@ -208,9 +202,6 @@ static void *mainGuiThread(void *arg)
 #endif
     while (firstSynth == NULL); // just wait
 
-#ifdef GUI_FLTK
-    //GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
-#endif
     if (firstRuntime->autoInstance)
         newBlock();
     while (firstRuntime->runSynth)
@@ -261,9 +252,6 @@ static void *mainGuiThread(void *arg)
                 }
                 else
                     GuiThreadMsg::processGuiMessages();
-                //GuiThreadMsg::sendMessage(_synth, GuiThreadMsg::GuiCheck, 0);
-                //Fl::check();
-                //GuiThreadMsg::processGuiMessages();
             }
 #endif
         }
@@ -297,7 +285,6 @@ static void *mainGuiThread(void *arg)
                         winSplash.hide();
                     }
                 }
-                //GuiThreadMsg::processGuiMessages();
                 Fl::wait(0.033333);
             }
             else
@@ -351,10 +338,8 @@ int mainCreateNewInstance(unsigned int forceId)
     {
         synth->setWindowTitle(musicClient->midiClientName());
         if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
-        {
-            //synth->getGuiMaster()->Init(NULL);
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
-        }
+
         // not too happy this is possible, maybe gui should be wrapped in a namespace
         if (synth->getRuntime().audioEngine < 1)
             alert(synth, "Yoshimi can't find an available sound system. Running with no Audio");
@@ -452,7 +437,6 @@ int main(int argc, char *argv[])
         while (!Config.empty() && count < 16 && found < 3)
         { // no need to count beyond 16 lines!
             std::string line = func::nextLine(Config);
-            //std::cout << count << "  " << line  << std::endl;
             ++ count;
             if (line.find("enable_splash") != std::string::npos)
             {
@@ -557,7 +541,6 @@ int main(int argc, char *argv[])
     firstSynth->installBanks();
 #ifdef GUI_FLTK
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
-    //firstSynth->getGuiMaster()->Init(NULL);//"yoshi test");
 #endif
 
     //create command line processing thread

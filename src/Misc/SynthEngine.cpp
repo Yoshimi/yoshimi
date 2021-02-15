@@ -154,7 +154,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         uint32_t u32 = 0x11223344;
         uint8_t arr[4];
     } x;
-    //std::cout << "byte " << int(x.arr[0]) << std::endl;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
     meterDelay = 20;
     ctl = new Controller(this);
@@ -978,7 +977,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         if (notinplace)
         {
             if (!ok)
-                name = "Instrument " + name + "missing or corrupted";
+                name = "Instrument " + name + " missing or corrupted";
         }
     }
 
@@ -1710,7 +1709,6 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.vectordata.Xcc2[chan] = MIDI::CC::panning;
             Runtime.vectordata.Xcc4[chan] = MIDI::CC::filterCutoff;
             Runtime.vectordata.Xcc8[chan] = MIDI::CC::modulation;
-            //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
@@ -1724,7 +1722,6 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.vectordata.Ycc2[chan] = MIDI::CC::panning;
                 Runtime.vectordata.Ycc4[chan] = MIDI::CC::filterCutoff;
                 Runtime.vectordata.Ycc8[chan] = MIDI::CC::modulation;
-                //Runtime.Log("Vector " + asString(int(chan) + 1) + " Y CC set to " + asString(par));
             }
             break;
 
@@ -2429,7 +2426,6 @@ bool SynthEngine::installBanks()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
     string bankname = name + ".banks";
-//    Runtime.Log(bankname);
     bool banksGood = false;
     bool newBanks = false;
     if (isRegularFile(bankname))

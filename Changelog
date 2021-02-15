@@ -1,12 +1,18 @@
-yoshimi 2.0 prev
+yoshimi 2.0 rc1
+
+2021-2-15 Will
+* Cleaned out a lot of redundant code.
+  Mostly commented out test print.
+* More doc updates
+* set version as 2.0 rc1.
 
 2021-2-14 Will
 * Increased MIDI-learn list limit to 400 lines.
   Added 10mS sleeps every 32 lines on loading.
-  Still less than 1mS for a full list and estimate
+  Still less than 1S for a full list and estimate
   less than 200uS for actioning ones at the end.
 * Doc updates.
-* Moved audio/mefid defaults from BMakeLists.txt to globals.h
+* Moved audio/midi defaults from CMakeLists.txt to globals.h
 * Changed both defaults to Alsa.
 
 2021-2-13 Will

@@ -269,12 +269,6 @@ private:
 public:
     enum
     {
-        UpdateMaster = 0,
-        UpdateConfig,
-        UpdatePaths,
-        UpdatePart,
-        RefreshCurBank,
-        GuiCheck,
         NewSynthEngine,
         UNDEFINED = 9999
     };

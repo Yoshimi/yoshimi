@@ -284,9 +284,7 @@ bool Config::Setup(int argc, char **argv)
 
 
 Config::~Config()
-{
-    //AntiDenormals(false);
-}
+{;}
 
 
 void Config::flushLog(void)
@@ -311,7 +309,6 @@ void Config::clearPresetsDirlist(void)
 
 bool Config::loadConfig(void)
 {
-    //std::cout << "here load config" << std::endl;
     string cmd;
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
@@ -368,19 +365,11 @@ bool Config::loadConfig(void)
                 }
             }
         }
-        //cout << presetDir << endl;
         definedBankRoot = localDir + "/found/";
         if (!isDirectory(definedBankRoot))
         { // only ever want to do this once
             if (createDir(definedBankRoot))
-            {
                 Log("Failed to create root directory '" + definedBankRoot + "'");
-            }
-            else
-            {
-                ;
-            }
-        //cout << definedBankRoot << endl;
         }
     }
 
@@ -540,7 +529,6 @@ void Config::defaultPresets(void)
 
 bool Config::extractBaseParameters(XMLwrapper *xml)
 {
-    //std::cout << "here load base" << std::endl;
     if (synth->getUniqueId() != 0)
         return true;
 
@@ -609,7 +597,6 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
 
 bool Config::extractConfigData(XMLwrapper *xml)
 {
-    //std::cout << "Session Stage " << sessionStage << std::endl;
     if (!xml)
     {
         Log("extractConfigData on NULL");
@@ -707,9 +694,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
         monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
         showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
     }
-
-    //misc
-    //checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     if (tempRoot == 0)
         tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
 
@@ -1522,43 +1506,6 @@ void GuiThreadMsg::processGuiMessages()
         {
             switch(msg->type)
             {
-
-                /*case GuiThreadMsg::UpdateMaster:
-                    guiMaster->refresh_master_ui(msg->index);
-                    break;
-
-                case GuiThreadMsg::UpdateConfig:
-                    if (guiMaster->configui)
-                        guiMaster->configui->update_config(msg->index);
-                    break;
-
-                case GuiThreadMsg::UpdatePaths:
-                    guiMaster->updatepaths(msg->index);
-                    break;
-
-                case GuiThreadMsg::UpdatePart:
-                    guiMaster->updatepart();
-                    guiMaster->updatepanel();
-                    break;
-
-                case GuiThreadMsg::RefreshCurBank:
-                    if (msg->data && guiMaster->bankui)
-                    {
-                        if (msg->index == 1)
-                        {
-                            // special case for first synth startup
-                            guiMaster->bankui->readbankcfg();
-                            guiMaster->bankui->rescan_for_banks();
-                        }
-                        guiMaster->bankui->set_bank_slot();
-                        guiMaster->bankui->refreshmainwindow();
-                    }
-                    break;
-
-                case GuiThreadMsg::GuiCheck:
-                    guiMaster->checkBuffer();
-                    break;*/
-
                 default:
                     break;
             }
