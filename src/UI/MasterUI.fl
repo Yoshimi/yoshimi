@@ -2767,19 +2767,6 @@ Alan Calvert started the project}
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
     partui->kitRtext(true);
-    string name = synth->part[nval]->Poriginal;
-    if (synth->part[nval]->Pname != name)
-    {
-        std::cout << "original is:" <<  name << std::endl;
-        partui->originalname->show();
-        partui->originaltext->show();
-        partui->originaltext->copy_label(name.c_str());
-    }
-    else
-    {
-        partui->originalname->hide();
-        partui->originaltext->hide();
-    }
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();

@@ -2394,6 +2394,19 @@ class PartUI {: {public Fl_Group, PartUI_}
     fetchChannel();
     keyATselection = int(fetchData(0, PART::control::keyATset, npart));
     fetchKey();
+
+    string name = part->Poriginal;
+    if (!name.empty() && part->Pname != name)
+    {
+        originaltext->copy_label(name.c_str());
+        originalname->show();
+        originaltext->show();
+    }
+    else
+    {
+        originalname->hide();
+        originaltext->hide();
+    }
     partgroup->show();
     lastkey = -1;
     lasteditW = 0;
