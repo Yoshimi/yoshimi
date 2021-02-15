@@ -1537,13 +1537,7 @@ int Part::loadXMLinstrument(string filename)
     int chk = findSplitPoint(Pname);
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
-
     getfromXMLinstrument(xml);
-
-    if (Pname <= "!" || Pname == DEFAULT_NAME)
-        Pname = UNTITLED;
-    else if (Poriginal.empty())
-        Poriginal = Pname;
 
     if (hasYoshi)
     {
@@ -1578,8 +1572,10 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     if (xml->enterbranch("INFO"))
     {
         Poriginal = xml->getparstr("name");
-        if (Poriginal < "!")
-            Poriginal = "";
+        if (Pname.empty()) // it's a patch set or state
+            Pname = Poriginal;
+        else if (Poriginal.empty()) // it's a very old one or from zyn
+            Poriginal = Pname;
 
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
