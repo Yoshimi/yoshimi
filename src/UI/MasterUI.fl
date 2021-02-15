@@ -2767,6 +2767,19 @@ Alan Calvert started the project}
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
     partui->kitRtext(true);
+    string name = synth->part[nval]->Poriginal;
+    if (synth->part[nval]->Pname != name)
+    {
+        std::cout << "original is:" <<  name << std::endl;
+        partui->originalname->show();
+        partui->originaltext->show();
+        partui->originaltext->copy_label(name.c_str());
+    }
+    else
+    {
+        partui->originalname->hide();
+        partui->originaltext->hide();
+    }
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
@@ -2804,7 +2817,6 @@ Alan Calvert started the project}
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
     partui->keymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
-
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);

@@ -1051,6 +1051,14 @@ class PartUI {: {public Fl_Group, PartUI_}
                     instrumenteditwindow->hide();}
         xywh {283 328 101 26} box PLASTIC_UP_BOX color 230 labelfont 1
       }
+      Fl_Text_Display originalname {
+        label {Original Name:}
+        xywh {200 108 1 15} box NO_BOX labelfont 1 labelsize 12 align 4 textsize 11 hide
+      }
+      Fl_Text_Display originaltext {
+        label text
+        xywh {198 108 1 15} box NO_BOX labelfont 1 labelsize 12 labelcolor 4 align 8 textsize 11 hide
+      }
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
@@ -2747,6 +2755,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         copyright->textsize(size14);
     commentField->labelsize(size12);
         commentField->textsize(size14);
+    originalname->labelsize(size12);
+    originaltext->labelsize(size12);
     instrumentType->labelsize(size11);
         instrumentType->textsize(size11);
 
