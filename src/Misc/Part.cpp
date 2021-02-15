@@ -1482,7 +1482,7 @@ bool Part::saveXML(string filename, bool yoshiFormat)
     }
     if (Pname < "!") // this shouldn't be possible
         Pname = UNTITLED;
-    else if (Poriginal.empty())
+    else if (Poriginal.empty() && Pname != UNTITLED)
         Poriginal = Pname;
 
     if (yoshiFormat)
@@ -1572,9 +1572,16 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     if (xml->enterbranch("INFO"))
     {
         Poriginal = xml->getparstr("name");
+        if (Poriginal == DEFAULT_NAME || Poriginal == UNTITLED) // it's a very old one
+            Poriginal = "";
         if (Pname.empty()) // it's a patch set or state
-            Pname = Poriginal;
-        else if (Poriginal.empty()) // it's a very old one or from zyn
+        {
+            if (Poriginal. empty())
+                Pname = DEFAULT_NAME;
+            else
+                Pname = Poriginal;
+        }
+        else if (Poriginal.empty()) // it's one from zyn
             Poriginal = Pname;
 
         info.Pauthor = xml->getparstr("author");
