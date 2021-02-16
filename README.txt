@@ -6,8 +6,10 @@ Highlights
 
 
     More Instrument types available - and a request to set them!
+    Revised default instrument banks
+    Improved handling of instrument names.
     Pan Law setting now saved.
-    Aftertouch values now saved.
+    Aftertouch values now saved
     Improved CLI descriptions and reporting.
 
     NRPN updates.

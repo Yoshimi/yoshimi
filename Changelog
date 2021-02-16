@@ -1,9 +1,15 @@
-yoshimi 2.0 rc1
+yoshimi 2.0 rc2
 
-2021-2-15 Will
+2021-2-16 Will
 * Revised all remaining banks.
   Internal/file names consistent
   Many now properly typed.
+
+* Small improvement to patchset instrument names.
+  Now keeps a copy of the source file leafname
+  stored in the info section.
+* Doc updates.
+* Set version as 2.0 rc2.
 
 2021-2-15 Will
 * Cleaned out a lot of redundant code.

@@ -1355,10 +1355,10 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
     xml->addpar("type", type_offset[info.Ptype]);
+    xml->addparstr("file", Pname);
     xml->endbranch();
     if (Pname == DEFAULT_NAME)
         return;
-
 
     xml->beginbranch("INSTRUMENT_KIT");
     xml->addpar("kit_mode", Pkitmode);
@@ -1571,25 +1571,8 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     string tempname;
     if (xml->enterbranch("INFO"))
     {
-        // The following is surprisingly complex!
         Poriginal = xml->getparstr("name");
-        if (Poriginal == DEFAULT_NAME) // it's a very old one
-            Poriginal = "";
-        if (Pname.empty()) // it's a patch set or state
-        {
-            if (Poriginal. empty())
-                Pname = DEFAULT_NAME;
-            else
-                Pname = Poriginal;
-        }
-        else if (Poriginal.empty()) // it's one from zyn
-            Poriginal = Pname;
-        if (Pname.empty() && Poriginal == UNTITLED)
-        {
-            Pname = UNTITLED;
-            Poriginal = "";
-        }
-        // The next bit isn't much easier!
+        // counting type numbers but checking the *contents* of type_offset()
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         int found = xml->getpar("type", 0, -20, 255); // should cover all!
@@ -1603,6 +1586,27 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         if (offset == 255)
             type = 0; // undefined
         info.Ptype = type;
+
+        // The following is surprisingly complex!
+        if (Pname.empty())
+            Pname = xml->getparstr("file");
+
+        if (Poriginal == DEFAULT_NAME) // it's an old one
+            Poriginal = "";
+        if (Pname.empty()) // it's an older state file
+        {
+            if (Poriginal. empty())
+                Pname = DEFAULT_NAME;
+            else
+                Pname = Poriginal;
+        }
+        else if (Poriginal.empty()) // it's one from zyn
+            Poriginal = Pname;
+        if (Pname.empty() && Poriginal == UNTITLED)
+        {
+            Pname = UNTITLED;
+            Poriginal = "";
+        }
         xml->exitbranch();
     }
 
