@@ -1,6 +1,11 @@
 yoshimi 2.0 rc1
 
 2021-2-15 Will
+* Revised all remaining banks.
+  Internal/file names consistent
+  Many now properly typed.
+
+2021-2-15 Will
 * Cleaned out a lot of redundant code.
   Mostly commented out test print.
 * More doc updates
