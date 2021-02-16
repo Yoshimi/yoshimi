@@ -1571,8 +1571,9 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     string tempname;
     if (xml->enterbranch("INFO"))
     {
+        // The following is surprisingly complex!
         Poriginal = xml->getparstr("name");
-        if (Poriginal == DEFAULT_NAME || Poriginal == UNTITLED) // it's a very old one
+        if (Poriginal == DEFAULT_NAME) // it's a very old one
             Poriginal = "";
         if (Pname.empty()) // it's a patch set or state
         {
@@ -1583,7 +1584,12 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         }
         else if (Poriginal.empty()) // it's one from zyn
             Poriginal = Pname;
-
+        if (Pname.empty() && Poriginal == UNTITLED)
+        {
+            Pname = UNTITLED;
+            Poriginal = "";
+        }
+        // The next bit isn't much easier!
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         int found = xml->getpar("type", 0, -20, 255); // should cover all!
