@@ -164,6 +164,7 @@ void Part::setNoteMap(int keyshift)
 void Part::defaultsinstrument(void)
 {
     Pname = DEFAULT_NAME;
+    std::string   Poriginal = "";
     PyoshiType = 0;
     info.Ptype = 0;
     info.Pauthor.clear();
@@ -1350,7 +1351,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 void Part::add2XMLinstrument(XMLwrapper *xml)
 {
     xml->beginbranch("INFO");
-    xml->addparstr("name", Pname);
+    xml->addparstr("name", Poriginal);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
     xml->addpar("type", type_offset[info.Ptype]);
@@ -1481,6 +1482,8 @@ bool Part::saveXML(string filename, bool yoshiFormat)
     }
     if (Pname < "!") // this shouldn't be possible
         Pname = UNTITLED;
+    else if (Poriginal.empty() && Pname != UNTITLED)
+        Poriginal = Pname;
 
     if (yoshiFormat)
     {
@@ -1530,11 +1533,12 @@ int Part::loadXMLinstrument(string filename)
     }
     defaultsinstrument();
     PyoshiType = xml->information.yoshiType;
-    Pname = findLeafName(filename); // in case there's no internal
+    Pname = findLeafName(filename);
     int chk = findSplitPoint(Pname);
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(xml);
+
     if (hasYoshi)
     {
         Pkeymode = xml->getpar("key_mode", Pkeymode, PART_NORMAL, MIDI_LEGATO);
@@ -1567,12 +1571,25 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     string tempname;
     if (xml->enterbranch("INFO"))
     {
-        tempname = xml->getparstr("name");
-        //synth->getRuntime().Log("name <" + tempname + ">");
-        if (tempname > "!")
-            Pname = tempname;
-        if (Pname <= "!" || Pname == DEFAULT_NAME)
+        // The following is surprisingly complex!
+        Poriginal = xml->getparstr("name");
+        if (Poriginal == DEFAULT_NAME) // it's a very old one
+            Poriginal = "";
+        if (Pname.empty()) // it's a patch set or state
+        {
+            if (Poriginal. empty())
+                Pname = DEFAULT_NAME;
+            else
+                Pname = Poriginal;
+        }
+        else if (Poriginal.empty()) // it's one from zyn
+            Poriginal = Pname;
+        if (Pname.empty() && Poriginal == UNTITLED)
+        {
             Pname = UNTITLED;
+            Poriginal = "";
+        }
+        // The next bit isn't much easier!
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         int found = xml->getpar("type", 0, -20, 255); // should cover all!

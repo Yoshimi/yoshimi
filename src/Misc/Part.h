@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -134,6 +134,7 @@ class Part
         unsigned char Peffnum;
         int           Paudiodest;  // jack output routing
         std::string   Pname;
+        std::string   Poriginal;
 
         struct Info {
             unsigned char Ptype;

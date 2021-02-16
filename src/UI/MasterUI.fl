@@ -2804,7 +2804,6 @@ Alan Calvert started the project}
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
 
     partui->keymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
-
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);

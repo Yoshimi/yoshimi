@@ -1051,6 +1051,14 @@ class PartUI {: {public Fl_Group, PartUI_}
                     instrumenteditwindow->hide();}
         xywh {283 328 101 26} box PLASTIC_UP_BOX color 230 labelfont 1
       }
+      Fl_Text_Display originalname {
+        label {Derived From}
+        xywh {200 108 1 15} box NO_BOX labelfont 1 labelsize 12 align 4 textsize 11 hide
+      }
+      Fl_Text_Display originaltext {
+        label text
+        xywh {198 108 1 15} box NO_BOX labelfont 1 labelsize 12 labelcolor 4 align 8 textsize 11 hide
+      }
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
@@ -2386,6 +2394,19 @@ class PartUI {: {public Fl_Group, PartUI_}
     fetchChannel();
     keyATselection = int(fetchData(0, PART::control::keyATset, npart));
     fetchKey();
+
+    string name = part->Poriginal;
+    if (!name.empty() && part->Pname != name)
+    {
+        originaltext->copy_label(name.c_str());
+        originalname->show();
+        originaltext->show();
+    }
+    else
+    {
+        originalname->hide();
+        originaltext->hide();
+    }
     partgroup->show();
     lastkey = -1;
     lasteditW = 0;
@@ -2747,6 +2768,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         copyright->textsize(size14);
     commentField->labelsize(size12);
         commentField->textsize(size14);
+    originalname->labelsize(size12);
+    originaltext->labelsize(size12);
     instrumentType->labelsize(size11);
         instrumentType->textsize(size11);
 

@@ -926,6 +926,8 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     if (ok)
     {
         ok = setProgram(fname, npart);
+        if (ok && part[npart]->Poriginal == UNTITLED)
+            part[npart]->Poriginal = "";
         if (!ok)
             name = "File " + name + "unrecognised or corrupted";
     }
@@ -974,6 +976,8 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
     else
     {
         ok = setProgram(fname, npart);
+        if (ok && part[npart]->Poriginal == UNTITLED)
+            part[npart]->Poriginal = "";
         if (notinplace)
         {
             if (!ok)
