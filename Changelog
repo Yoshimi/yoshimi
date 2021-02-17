@@ -4,6 +4,7 @@ yoshimi 2.0 rc3
 * Had to revert some bank changes.
   This was resulting in multiple copies with
   slightly different filenames :(
+* Refinements to instrument types.
 
 2021-2-16 Will
 * Revised all remaining banks.
