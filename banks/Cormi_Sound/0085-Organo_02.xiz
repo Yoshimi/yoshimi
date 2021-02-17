@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-major="2" version-minor="0"
+ZynAddSubFX-author="Nasca Octavian Paul"
+Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="2"
+Yoshimi-minor="0 rc2">
+<INFORMATION>
+<par_bool name="ADDsynth_used" value="no" />
+<par_bool name="SUBsynth_used" value="yes" />
+<par_bool name="PADsynth_used" value="no" />
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<INSTRUMENT>
+<INFO>
+<string name="name">Organo_02</string>
+<string name="author">Mirco Cortesi</string>
+<string name="comments">Organ</string>
+<par name="type" value="0" />
+<string name="file">Organo_02</string>
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="0" />
+<par_bool name="kit_crossfade" value="no" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name"></string>
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="no" />
+<par_bool name="sub_enabled" value="yes" />
+<SUB_SYNTH_PARAMETERS>
+<par name="num_stages" value="2" />
+<par name="harmonic_mag_type" value="0" />
+<par name="start" value="1" />
+<HARMONICS>
+<HARMONIC id="0">
+<par name="mag" value="127" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="1">
+<par name="mag" value="67" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="2">
+<par name="mag" value="10" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="4">
+<par name="mag" value="7" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="5">
+<par name="mag" value="65" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="6">
+<par name="mag" value="12" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="9">
+<par name="mag" value="65" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="12">
+<par name="mag" value="12" />
+<par name="relbw" value="64" />
+</HARMONIC>
+<HARMONIC id="15">
+<par name="mag" value="65" />
+<par name="relbw" value="64" />
+</HARMONIC>
+</HARMONICS>
+<AMPLITUDE_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<par name="volume" value="113" />
+<par name="pan_pos" value="66" />
+<par_bool name="random_pan" value="no" />
+<par name="random_width" value="63" />
+<par name="panning" value="66" />
+<par name="velocity_sensing" value="61" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="60" />
+<par name="D_dt" value="62" />
+<par name="R_dt" value="82" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+</AMPLITUDE_ENVELOPE>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="bend_adjust" value="88" />
+<par name="offset_hz" value="64" />
+<par name="detune" value="13001" />
+<par name="coarse_detune" value="0" />
+<par name="overtone_spread_type" value="0" />
+<par name="overtone_spread_par1" value="0" />
+<par name="overtone_spread_par2" value="0" />
+<par name="overtone_spread_par3" value="0" />
+<par name="detune_type" value="1" />
+<par name="bandwidth" value="58" />
+<par name="bandwidth_scale" value="53" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="band_width_envelope_enabled" value="yes" />
+<BANDWIDTH_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="22" />
+<par name="D_dt" value="10" />
+<par name="R_dt" value="56" />
+<par name="A_val" value="80" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="63" />
+</BANDWIDTH_ENVELOPE>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par_bool name="enabled" value="yes" />
+<FILTER>
+<par name="category" value="2" />
+<par name="type" value="1" />
+<par name="freq" value="70" />
+<par name="q" value="59" />
+<par name="stages" value="0" />
+<par name="freq_track" value="64" />
+<par_bool name="freqtrackoffset" value="no" />
+<par name="gain" value="64" />
+</FILTER>
+<par name="filter_velocity_sensing" value="64" />
+<par name="filter_velocity_sensing_amplitude" value="64" />
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="56" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="3" />
+<par name="D_dt" value="68" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="62" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+</FILTER_ENVELOPE>
+</FILTER_PARAMETERS>
+</SUB_SYNTH_PARAMETERS>
+<par_bool name="pad_enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="2" />
+<par name="preset" value="0" />
+<EFFECT_PARAMETERS>
+<par_no id="0">
+<par name="par" value="33" />
+</par_no>
+<par_no id="1">
+<par name="par" value="64" />
+</par_no>
+<par_no id="2">
+<par name="par" value="53" />
+</par_no>
+<par_no id="3">
+<par name="par" value="64" />
+</par_no>
+<par_no id="4">
+<par name="par" value="30" />
+</par_no>
+<par_no id="5">
+<par name="par" value="59" />
+</par_no>
+</EFFECT_PARAMETERS>
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="3" />
+<par name="preset" value="0" />
+<EFFECT_PARAMETERS>
+<par_no id="0">
+<par name="par" value="64" />
+</par_no>
+<par_no id="1">
+<par name="par" value="64" />
+</par_no>
+<par_no id="2">
+<par name="par" value="50" />
+</par_no>
+<par_no id="5">
+<par name="par" value="90" />
+</par_no>
+<par_no id="6">
+<par name="par" value="40" />
+</par_no>
+<par_no id="7">
+<par name="par" value="85" />
+</par_no>
+<par_no id="8">
+<par name="par" value="64" />
+</par_no>
+<par_no id="9">
+<par name="par" value="119" />
+</par_no>
+</EFFECT_PARAMETERS>
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+</INSTRUMENT>
+</ZynAddSubFX-data>

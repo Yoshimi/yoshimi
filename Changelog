@@ -1,4 +1,9 @@
-yoshimi 2.0 rc2
+yoshimi 2.0 rc3
+
+2021-2-17 Will
+* Had to revert some bank changes.
+  This was resulting in multiple copies with
+  slightly different filenames :(
 
 2021-2-16 Will
 * Revised all remaining banks.

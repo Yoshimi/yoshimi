@@ -14,9 +14,9 @@ An interesting lesser development is the addition of a few more instrument types
     Warm Pad
 These are backward compatible in that older Yoshimi versions will see them as 'undefined'. All the entries that have been adjusted were already undefined. At the same time, if you save a newly created instrument you are asked to set the type if it has been left at 'undefined'. It is a request, not a demand - Yoshimi is your friend, not your boss!
 
-All the Default instrument banks have been revised to remove inconsistencies between the internal name and the file leaf name, make numbering sequences more consistent and also to set reasonable types to many of those that were just marked as 'undefined' - also making use of the new type names.
+All the Default instrument banks have been revised to remove inconsistencies between the internal name and the file leaf name, and also to set reasonable types to many of those that were just marked as 'undefined' - also making use of the new type names.
 
-Along with this there is a new way of managing the internal names and the file names. From now on, the internal name will be the one that the instrument was first saved as. Whereas all references to the instrument will be via the filename (or a copy of it). If the filename is changed for any reason, the next time the instrument is loaded, the edit window will have a line: 'Derived from {original name}'. This ensures that with a development it will always be possible to tell where it originally came from, without interfering with repurposing etc.
+Along with this there is a new way of managing the internal names and the file names. From now on, the internal name will be the one that the instrument was first saved as. Whereas all references to the instrument will be via the filename (or a copy of it). If the filename is changed for any reason, the next time the instrument is loaded, the edit window will have a line: 'Derived from {original name}'. This ensures that with further development it will always be possible to tell where it originally came from, without interfering with bank positioning, repurposing etc.
 
 The recently introduced aftertouch feature can now be reached from the part edit window as well as the controllers one. Also both key and channel aftertouch are saved in patch sets, and in Yoshimi type (.xiy) instruments.
 

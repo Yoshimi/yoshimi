@@ -1,0 +1,1334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-major="2" version-minor="0"
+ZynAddSubFX-author="Nasca Octavian Paul"
+Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="2"
+Yoshimi-minor="0 rc2">
+<INFORMATION>
+<par_bool name="ADDsynth_used" value="yes" />
+<par_bool name="SUBsynth_used" value="no" />
+<par_bool name="PADsynth_used" value="no" />
+</INFORMATION>
+<BASE_PARAMETERS>
+<par name="max_midi_parts" value="16" />
+<par name="max_kit_items_per_instrument" value="16" />
+<par name="max_system_effects" value="4" />
+<par name="max_insertion_effects" value="8" />
+<par name="max_instrument_effects" value="3" />
+<par name="max_addsynth_voices" value="8" />
+</BASE_PARAMETERS>
+<INSTRUMENT>
+<INFO>
+<string name="name">Senza_tempo</string>
+<string name="author">Mirco Cortesi</string>
+<string name="comments">Timeless</string>
+<par name="type" value="0" />
+<string name="file">Senza_tempo</string>
+</INFO>
+<INSTRUMENT_KIT>
+<par name="kit_mode" value="0" />
+<par_bool name="kit_crossfade" value="no" />
+<par_bool name="drum_mode" value="no" />
+<INSTRUMENT_KIT_ITEM id="0">
+<par_bool name="enabled" value="yes" />
+<string name="name"></string>
+<par_bool name="muted" value="no" />
+<par name="min_key" value="0" />
+<par name="max_key" value="127" />
+<par name="send_to_instrument_effect" value="0" />
+<par_bool name="add_enabled" value="yes" />
+<ADD_SYNTH_PARAMETERS>
+<par_bool name="stereo" value="yes" />
+<AMPLITUDE_PARAMETERS>
+<par name="volume" value="90" />
+<par name="pan_pos" value="64" />
+<par_bool name="random_pan" value="no" />
+<par name="random_width" value="63" />
+<par name="panning" value="64" />
+<par name="velocity_sensing" value="64" />
+<par name="fadein_adjustment" value="20" />
+<par name="punch_strength" value="50" />
+<par name="punch_time" value="14" />
+<par name="punch_stretch" value="62" />
+<par name="punch_velocity_sensing" value="76" />
+<par name="harmonic_randomness_grouping" value="0" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="64" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="3" />
+<par name="D_dt" value="52" />
+<par name="R_dt" value="120" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+</AMPLITUDE_ENVELOPE>
+<AMPLITUDE_LFO>
+<par name="freqI" value="676372544" />
+<par_real name="freq" value="0.629921019" exact_value="0x3F214281" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="0" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</AMPLITUDE_LFO>
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par name="detune" value="5973" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="1" />
+<par name="bandwidth" value="64" />
+<FREQUENCY_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="3" />
+<par name="env_sustain" value="1" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="50" />
+<par name="D_dt" value="10" />
+<par name="R_dt" value="60" />
+<par name="A_val" value="62" />
+<par name="D_val" value="64" />
+<par name="S_val" value="64" />
+<par name="R_val" value="64" />
+</FREQUENCY_ENVELOPE>
+<FREQUENCY_LFO>
+<par name="freqI" value="591826112" />
+<par_real name="freq" value="0.551181018" exact_value="0x3F0D1A33" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="0" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</FREQUENCY_LFO>
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par name="velocity_sensing_amplitude" value="64" />
+<par name="velocity_sensing" value="64" />
+<FILTER>
+<par name="category" value="0" />
+<par name="type" value="0" />
+<par name="freq" value="80" />
+<par name="q" value="55" />
+<par name="stages" value="0" />
+<par name="freq_track" value="67" />
+<par_bool name="freqtrackoffset" value="no" />
+<par name="gain" value="64" />
+</FILTER>
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="0" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="85" />
+<par name="D_dt" value="127" />
+<par name="R_dt" value="59" />
+<par name="A_val" value="54" />
+<par name="D_val" value="13" />
+<par name="S_val" value="64" />
+<par name="R_val" value="0" />
+</FILTER_ENVELOPE>
+<FILTER_LFO>
+<par name="freqI" value="730059584" />
+<par_real name="freq" value="0.679920971" exact_value="0x3F2E0F4D" />
+<par name="intensity" value="8" />
+<par name="start_phase" value="60" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="19" />
+<par name="stretch" value="66" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</FILTER_LFO>
+</FILTER_PARAMETERS>
+<RESONANCE>
+<par_bool name="enabled" value="yes" />
+<par name="max_db" value="20" />
+<par name="center_freq" value="64" />
+<par name="octaves_freq" value="64" />
+<par_bool name="protect_fundamental_frequency" value="no" />
+<par name="resonance_points" value="256" />
+<RESPOINT id="0">
+<par name="val" value="10" />
+</RESPOINT>
+<RESPOINT id="1">
+<par name="val" value="83" />
+</RESPOINT>
+<RESPOINT id="2">
+<par name="val" value="100" />
+</RESPOINT>
+<RESPOINT id="3">
+<par name="val" value="107" />
+</RESPOINT>
+<RESPOINT id="4">
+<par name="val" value="110" />
+</RESPOINT>
+<RESPOINT id="5">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="6">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="7">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="8">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="9">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="10">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="11">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="12">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="13">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="14">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="15">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="16">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="17">
+<par name="val" value="110" />
+</RESPOINT>
+<RESPOINT id="18">
+<par name="val" value="108" />
+</RESPOINT>
+<RESPOINT id="19">
+<par name="val" value="103" />
+</RESPOINT>
+<RESPOINT id="20">
+<par name="val" value="88" />
+</RESPOINT>
+<RESPOINT id="21">
+<par name="val" value="51" />
+</RESPOINT>
+<RESPOINT id="22">
+<par name="val" value="36" />
+</RESPOINT>
+<RESPOINT id="23">
+<par name="val" value="30" />
+</RESPOINT>
+<RESPOINT id="24">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="25">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="26">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="27">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="28">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="29">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="30">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="31">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="32">
+<par name="val" value="31" />
+</RESPOINT>
+<RESPOINT id="33">
+<par name="val" value="37" />
+</RESPOINT>
+<RESPOINT id="34">
+<par name="val" value="54" />
+</RESPOINT>
+<RESPOINT id="35">
+<par name="val" value="95" />
+</RESPOINT>
+<RESPOINT id="36">
+<par name="val" value="111" />
+</RESPOINT>
+<RESPOINT id="37">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="38">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="39">
+<par name="val" value="112" />
+</RESPOINT>
+<RESPOINT id="40">
+<par name="val" value="95" />
+</RESPOINT>
+<RESPOINT id="41">
+<par name="val" value="55" />
+</RESPOINT>
+<RESPOINT id="42">
+<par name="val" value="38" />
+</RESPOINT>
+<RESPOINT id="43">
+<par name="val" value="32" />
+</RESPOINT>
+<RESPOINT id="44">
+<par name="val" value="29" />
+</RESPOINT>
+<RESPOINT id="45">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="46">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="47">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="48">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="49">
+<par name="val" value="28" />
+</RESPOINT>
+<RESPOINT id="50">
+<par name="val" value="30" />
+</RESPOINT>
+<RESPOINT id="51">
+<par name="val" value="33" />
+</RESPOINT>
+<RESPOINT id="52">
+<par name="val" value="41" />
+</RESPOINT>
+<RESPOINT id="53">
+<par name="val" value="60" />
+</RESPOINT>
+<RESPOINT id="54">
+<par name="val" value="27" />
+</RESPOINT>
+<RESPOINT id="55">
+<par name="val" value="13" />
+</RESPOINT>
+<RESPOINT id="56">
+<par name="val" value="8" />
+</RESPOINT>
+<RESPOINT id="57">
+<par name="val" value="6" />
+</RESPOINT>
+<RESPOINT id="58">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="59">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="60">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="61">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="62">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="63">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="64">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="65">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="66">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="67">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="68">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="69">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="70">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="71">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="72">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="73">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="74">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="75">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="76">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="77">
+<par name="val" value="5" />
+</RESPOINT>
+<RESPOINT id="78">
+<par name="val" value="6" />
+</RESPOINT>
+<RESPOINT id="79">
+<par name="val" value="9" />
+</RESPOINT>
+<RESPOINT id="80">
+<par name="val" value="15" />
+</RESPOINT>
+<RESPOINT id="81">
+<par name="val" value="32" />
+</RESPOINT>
+<RESPOINT id="82">
+<par name="val" value="38" />
+</RESPOINT>
+<RESPOINT id="83">
+<par name="val" value="41" />
+</RESPOINT>
+<RESPOINT id="84">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="85">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="86">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="87">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="88">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="89">
+<par name="val" value="43" />
+</RESPOINT>
+<RESPOINT id="90">
+<par name="val" value="44" />
+</RESPOINT>
+<RESPOINT id="91">
+<par name="val" value="47" />
+</RESPOINT>
+<RESPOINT id="92">
+<par name="val" value="53" />
+</RESPOINT>
+<RESPOINT id="93">
+<par name="val" value="70" />
+</RESPOINT>
+<RESPOINT id="94">
+<par name="val" value="76" />
+</RESPOINT>
+<RESPOINT id="95">
+<par name="val" value="79" />
+</RESPOINT>
+<RESPOINT id="96">
+<par name="val" value="80" />
+</RESPOINT>
+<RESPOINT id="97">
+<par name="val" value="80" />
+</RESPOINT>
+<RESPOINT id="98">
+<par name="val" value="80" />
+</RESPOINT>
+<RESPOINT id="99">
+<par name="val" value="78" />
+</RESPOINT>
+<RESPOINT id="100">
+<par name="val" value="75" />
+</RESPOINT>
+<RESPOINT id="101">
+<par name="val" value="68" />
+</RESPOINT>
+<RESPOINT id="102">
+<par name="val" value="100" />
+</RESPOINT>
+<RESPOINT id="103">
+<par name="val" value="113" />
+</RESPOINT>
+<RESPOINT id="104">
+<par name="val" value="118" />
+</RESPOINT>
+<RESPOINT id="105">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="106">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="107">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="108">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="109">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="110">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="111">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="112">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="113">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="114">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="115">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="116">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="117">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="118">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="119">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="120">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="121">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="122">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="123">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="124">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="125">
+<par name="val" value="119" />
+</RESPOINT>
+<RESPOINT id="126">
+<par name="val" value="116" />
+</RESPOINT>
+<RESPOINT id="127">
+<par name="val" value="108" />
+</RESPOINT>
+<RESPOINT id="128">
+<par name="val" value="87" />
+</RESPOINT>
+<RESPOINT id="129">
+<par name="val" value="79" />
+</RESPOINT>
+<RESPOINT id="130">
+<par name="val" value="76" />
+</RESPOINT>
+<RESPOINT id="131">
+<par name="val" value="74" />
+</RESPOINT>
+<RESPOINT id="132">
+<par name="val" value="72" />
+</RESPOINT>
+<RESPOINT id="133">
+<par name="val" value="67" />
+</RESPOINT>
+<RESPOINT id="134">
+<par name="val" value="56" />
+</RESPOINT>
+<RESPOINT id="135">
+<par name="val" value="29" />
+</RESPOINT>
+<RESPOINT id="136">
+<par name="val" value="19" />
+</RESPOINT>
+<RESPOINT id="137">
+<par name="val" value="15" />
+</RESPOINT>
+<RESPOINT id="138">
+<par name="val" value="13" />
+</RESPOINT>
+<RESPOINT id="139">
+<par name="val" value="13" />
+</RESPOINT>
+<RESPOINT id="140">
+<par name="val" value="13" />
+</RESPOINT>
+<RESPOINT id="141">
+<par name="val" value="13" />
+</RESPOINT>
+<RESPOINT id="142">
+<par name="val" value="15" />
+</RESPOINT>
+<RESPOINT id="143">
+<par name="val" value="18" />
+</RESPOINT>
+<RESPOINT id="144">
+<par name="val" value="26" />
+</RESPOINT>
+<RESPOINT id="145">
+<par name="val" value="29" />
+</RESPOINT>
+<RESPOINT id="146">
+<par name="val" value="30" />
+</RESPOINT>
+<RESPOINT id="147">
+<par name="val" value="31" />
+</RESPOINT>
+<RESPOINT id="148">
+<par name="val" value="31" />
+</RESPOINT>
+<RESPOINT id="149">
+<par name="val" value="32" />
+</RESPOINT>
+<RESPOINT id="150">
+<par name="val" value="35" />
+</RESPOINT>
+<RESPOINT id="151">
+<par name="val" value="41" />
+</RESPOINT>
+<RESPOINT id="152">
+<par name="val" value="56" />
+</RESPOINT>
+<RESPOINT id="153">
+<par name="val" value="93" />
+</RESPOINT>
+<RESPOINT id="154">
+<par name="val" value="108" />
+</RESPOINT>
+<RESPOINT id="155">
+<par name="val" value="114" />
+</RESPOINT>
+<RESPOINT id="156">
+<par name="val" value="116" />
+</RESPOINT>
+<RESPOINT id="157">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="158">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="159">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="160">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="161">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="162">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="163">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="164">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="165">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="166">
+<par name="val" value="116" />
+</RESPOINT>
+<RESPOINT id="167">
+<par name="val" value="113" />
+</RESPOINT>
+<RESPOINT id="168">
+<par name="val" value="107" />
+</RESPOINT>
+<RESPOINT id="169">
+<par name="val" value="91" />
+</RESPOINT>
+<RESPOINT id="170">
+<par name="val" value="85" />
+</RESPOINT>
+<RESPOINT id="171">
+<par name="val" value="83" />
+</RESPOINT>
+<RESPOINT id="172">
+<par name="val" value="82" />
+</RESPOINT>
+<RESPOINT id="173">
+<par name="val" value="82" />
+</RESPOINT>
+<RESPOINT id="174">
+<par name="val" value="82" />
+</RESPOINT>
+<RESPOINT id="175">
+<par name="val" value="82" />
+</RESPOINT>
+<RESPOINT id="176">
+<par name="val" value="84" />
+</RESPOINT>
+<RESPOINT id="177">
+<par name="val" value="87" />
+</RESPOINT>
+<RESPOINT id="178">
+<par name="val" value="96" />
+</RESPOINT>
+<RESPOINT id="179">
+<par name="val" value="99" />
+</RESPOINT>
+<RESPOINT id="180">
+<par name="val" value="100" />
+</RESPOINT>
+<RESPOINT id="181">
+<par name="val" value="100" />
+</RESPOINT>
+<RESPOINT id="182">
+<par name="val" value="98" />
+</RESPOINT>
+<RESPOINT id="183">
+<par name="val" value="92" />
+</RESPOINT>
+<RESPOINT id="184">
+<par name="val" value="78" />
+</RESPOINT>
+<RESPOINT id="185">
+<par name="val" value="75" />
+</RESPOINT>
+<RESPOINT id="186">
+<par name="val" value="81" />
+</RESPOINT>
+<RESPOINT id="187">
+<par name="val" value="104" />
+</RESPOINT>
+<RESPOINT id="188">
+<par name="val" value="113" />
+</RESPOINT>
+<RESPOINT id="189">
+<par name="val" value="116" />
+</RESPOINT>
+<RESPOINT id="190">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="191">
+<par name="val" value="115" />
+</RESPOINT>
+<RESPOINT id="192">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="193">
+<par name="val" value="122" />
+</RESPOINT>
+<RESPOINT id="194">
+<par name="val" value="124" />
+</RESPOINT>
+<RESPOINT id="195">
+<par name="val" value="124" />
+</RESPOINT>
+<RESPOINT id="196">
+<par name="val" value="124" />
+</RESPOINT>
+<RESPOINT id="197">
+<par name="val" value="124" />
+</RESPOINT>
+<RESPOINT id="198">
+<par name="val" value="123" />
+</RESPOINT>
+<RESPOINT id="199">
+<par name="val" value="121" />
+</RESPOINT>
+<RESPOINT id="200">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="201">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="202">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="203">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="204">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="205">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="206">
+<par name="val" value="120" />
+</RESPOINT>
+<RESPOINT id="207">
+<par name="val" value="119" />
+</RESPOINT>
+<RESPOINT id="208">
+<par name="val" value="118" />
+</RESPOINT>
+<RESPOINT id="209">
+<par name="val" value="113" />
+</RESPOINT>
+<RESPOINT id="210">
+<par name="val" value="103" />
+</RESPOINT>
+<RESPOINT id="211">
+<par name="val" value="99" />
+</RESPOINT>
+<RESPOINT id="212">
+<par name="val" value="97" />
+</RESPOINT>
+<RESPOINT id="213">
+<par name="val" value="97" />
+</RESPOINT>
+<RESPOINT id="214">
+<par name="val" value="98" />
+</RESPOINT>
+<RESPOINT id="215">
+<par name="val" value="100" />
+</RESPOINT>
+<RESPOINT id="216">
+<par name="val" value="105" />
+</RESPOINT>
+<RESPOINT id="217">
+<par name="val" value="103" />
+</RESPOINT>
+<RESPOINT id="218">
+<par name="val" value="91" />
+</RESPOINT>
+<RESPOINT id="219">
+<par name="val" value="59" />
+</RESPOINT>
+<RESPOINT id="220">
+<par name="val" value="46" />
+</RESPOINT>
+<RESPOINT id="221">
+<par name="val" value="41" />
+</RESPOINT>
+<RESPOINT id="222">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="223">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="224">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="225">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="226">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="227">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="228">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="229">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="230">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="231">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="232">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="233">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="234">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="235">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="236">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="237">
+<par name="val" value="39" />
+</RESPOINT>
+<RESPOINT id="238">
+<par name="val" value="40" />
+</RESPOINT>
+<RESPOINT id="239">
+<par name="val" value="41" />
+</RESPOINT>
+<RESPOINT id="240">
+<par name="val" value="45" />
+</RESPOINT>
+<RESPOINT id="241">
+<par name="val" value="54" />
+</RESPOINT>
+<RESPOINT id="242">
+<par name="val" value="78" />
+</RESPOINT>
+<RESPOINT id="243">
+<par name="val" value="87" />
+</RESPOINT>
+<RESPOINT id="244">
+<par name="val" value="90" />
+</RESPOINT>
+<RESPOINT id="245">
+<par name="val" value="92" />
+</RESPOINT>
+<RESPOINT id="246">
+<par name="val" value="93" />
+</RESPOINT>
+<RESPOINT id="247">
+<par name="val" value="94" />
+</RESPOINT>
+<RESPOINT id="248">
+<par name="val" value="99" />
+</RESPOINT>
+<RESPOINT id="249">
+<par name="val" value="109" />
+</RESPOINT>
+<RESPOINT id="250">
+<par name="val" value="114" />
+</RESPOINT>
+<RESPOINT id="251">
+<par name="val" value="116" />
+</RESPOINT>
+<RESPOINT id="252">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="253">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="254">
+<par name="val" value="117" />
+</RESPOINT>
+<RESPOINT id="255">
+<par name="val" value="117" />
+</RESPOINT>
+</RESONANCE>
+<VOICE id="0">
+<par_bool name="enabled" value="yes" />
+<par name="type" value="0" />
+<par name="unison_size" value="1" />
+<par name="unison_frequency_spread" value="60" />
+<par name="unison_stereo_spread" value="64" />
+<par name="unison_vibratto" value="64" />
+<par name="unison_vibratto_speed" value="64" />
+<par name="unison_invert_phase" value="0" />
+<par name="unison_phase_randomness" value="127" />
+<par name="delay" value="0" />
+<par_bool name="resonance" value="yes" />
+<par name="input_voice" value="-1" />
+<par name="ext_oscil" value="-1" />
+<par name="ext_fm_oscil" value="-1" />
+<par name="oscil_phase" value="64" />
+<par name="oscil_fm_phase" value="64" />
+<par_bool name="filter_enabled" value="yes" />
+<par_bool name="filter_bypass" value="no" />
+<par name="fm_enabled" value="1" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="127" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="12" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<par name="adaptive_harmonics_par" value="50" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+<BASE_FUNCTION>
+<BF_HARMONIC id="1">
+<par_real name="cos" value="0.198911995" exact_value="0x3E4BAF96" />
+<par_real name="sin" value="        1" exact_value="0x3F800000" />
+</BF_HARMONIC>
+<BF_HARMONIC id="2">
+<par_real name="cos" value="0.403353989" exact_value="0x3ECE846A" />
+<par_real name="sin" value="0.973783016" exact_value="0x3F7949D8" />
+</BF_HARMONIC>
+<BF_HARMONIC id="3">
+<par_real name="cos" value="0.0958331004" exact_value="0x3DC44425" />
+<par_real name="sin" value="0.143424004" exact_value="0x3E12DDBE" />
+</BF_HARMONIC>
+<BF_HARMONIC id="4">
+<par_real name="cos" value="0.474408001" exact_value="0x3EF2E59B" />
+<par_real name="sin" value="0.474408001" exact_value="0x3EF2E59B" />
+</BF_HARMONIC>
+<BF_HARMONIC id="6">
+<par_real name="cos" value="0.113406003" exact_value="0x3DE84168" />
+<par_real name="sin" value="0.0469743013" exact_value="0x3D406820" />
+</BF_HARMONIC>
+<BF_HARMONIC id="7">
+<par_real name="cos" value="0.0164876003" exact_value="0x3C871101" />
+<par_real name="sin" value="0.0828884989" exact_value="0x3DA9C172" />
+</BF_HARMONIC>
+<BF_HARMONIC id="10">
+<par_real name="cos" value="0.000209493999" exact_value="0x395BAB9E" />
+<par_real name="sin" value="-8.67752969e-05" exact_value="0xB8B5FB22" />
+</BF_HARMONIC>
+<BF_HARMONIC id="14">
+<par_real name="cos" value="0.000198412003" exact_value="0x39500CD1" />
+<par_real name="sin" value="0.000479009002" exact_value="0x39FB2380" />
+</BF_HARMONIC>
+<BF_HARMONIC id="15">
+<par_real name="cos" value="1.05767003e-05" exact_value="0x37317295" />
+<par_real name="sin" value="-5.31726e-05" exact_value="0xB85F05A5" />
+</BF_HARMONIC>
+<BF_HARMONIC id="16">
+<par_real name="cos" value="-6.95097018e-12" exact_value="0xACF490C6" />
+<par_real name="sin" value="-0.000159019997" exact_value="0xB926BE9B" />
+</BF_HARMONIC>
+<BF_HARMONIC id="20">
+<par_real name="cos" value="-0.0016974" exact_value="0xBADE7B4B" />
+<par_real name="sin" value="-0.0016974" exact_value="0xBADE7B4B" />
+</BF_HARMONIC>
+<BF_HARMONIC id="21">
+<par_real name="cos" value="0.00750430999" exact_value="0x3BF5E6B7" />
+<par_real name="sin" value="0.0112309996" exact_value="0x3C38023A" />
+</BF_HARMONIC>
+<BF_HARMONIC id="23">
+<par_real name="cos" value="-0.102554999" exact_value="0xBDD2085B" />
+<par_real name="sin" value="-0.0203993991" exact_value="0xBCA71CA4" />
+</BF_HARMONIC>
+<BF_HARMONIC id="28">
+<par_real name="cos" value="0.0734355003" exact_value="0x3D96655A" />
+<par_real name="sin" value="0.0734355003" exact_value="0x3D96655A" />
+</BF_HARMONIC>
+<BF_HARMONIC id="30">
+<par_real name="cos" value="-0.0195681006" exact_value="0xBCA04D48" />
+<par_real name="sin" value="0.047241699" exact_value="0x3D418083" />
+</BF_HARMONIC>
+<BF_HARMONIC id="42">
+<par_real name="cos" value="0.0350692011" exact_value="0x3D0FA4B9" />
+<par_real name="sin" value="0.0145260999" exact_value="0x3C6DFEE1" />
+</BF_HARMONIC>
+<BF_HARMONIC id="45">
+<par_real name="cos" value="0.0118282996" exact_value="0x3C41CB7C" />
+<par_real name="sin" value="-0.0177024007" exact_value="0xBC9104A0" />
+</BF_HARMONIC>
+<BF_HARMONIC id="46">
+<par_real name="cos" value="0.0347993001" exact_value="0x3D0E89B6" />
+<par_real name="sin" value="-0.0840130001" exact_value="0xBDAC0F02" />
+</BF_HARMONIC>
+<BF_HARMONIC id="60">
+<par_real name="cos" value="-0.0750666037" exact_value="0xBD99BC85" />
+<par_real name="sin" value="0.0750666037" exact_value="0x3D99BC85" />
+</BF_HARMONIC>
+<BF_HARMONIC id="70">
+<par_real name="cos" value="0.00107173005" exact_value="0x3A8C794B" />
+<par_real name="sin" value="-0.000443927012" exact_value="0xB9E8BEE0" />
+</BF_HARMONIC>
+<BF_HARMONIC id="90">
+<par_real name="cos" value="-0.0482995994" exact_value="0xBD45D5CD" />
+<par_real name="sin" value="0.0200063996" exact_value="0x3CA3E476" />
+</BF_HARMONIC>
+<BF_HARMONIC id="105">
+<par_real name="cos" value="0.000118892" exact_value="0x38F955A8" />
+<par_real name="sin" value="-0.000597712002" exact_value="0xBA1CAFC6" />
+</BF_HARMONIC>
+<BF_HARMONIC id="112">
+<par_real name="cos" value="-2.65435e-11" exact_value="0xADE97AA6" />
+<par_real name="sin" value="-0.000607243972" exact_value="0xBA1F2F74" />
+</BF_HARMONIC>
+<BF_HARMONIC id="140">
+<par_real name="cos" value="-0.00137936999" exact_value="0xBAB4CBFA" />
+<par_real name="sin" value="-0.00137935998" exact_value="0xBAB4CBA4" />
+</BF_HARMONIC>
+<BF_HARMONIC id="150">
+<par_real name="cos" value="-0.0210922994" exact_value="0xBCACC9C2" />
+<par_real name="sin" value="-0.00873671006" exact_value="0xBC0F246B" />
+</BF_HARMONIC>
+<BF_HARMONIC id="161">
+<par_real name="cos" value="-0.0564929992" exact_value="0xBD676534" />
+<par_real name="sin" value="-0.0112372003" exact_value="0xBC381C3C" />
+</BF_HARMONIC>
+<BF_HARMONIC id="180">
+<par_real name="cos" value="-0.0198177993" exact_value="0xBCA258F0" />
+<par_real name="sin" value="-0.0198177993" exact_value="0xBCA258F0" />
+</BF_HARMONIC>
+<BF_HARMONIC id="210">
+<par_real name="cos" value="-0.00737470016" exact_value="0xBBF1A778" />
+<par_real name="sin" value="0.0178040992" exact_value="0x3C91D9E7" />
+</BF_HARMONIC>
+</BASE_FUNCTION>
+</OSCIL>
+<AMPLITUDE_PARAMETERS>
+<par name="pan_pos" value="64" />
+<par_bool name="random_pan" value="no" />
+<par name="random_width" value="63" />
+<par name="panning" value="64" />
+<par name="volume" value="100" />
+<par_bool name="volume_minus" value="no" />
+<par name="velocity_sensing" value="127" />
+<par_bool name="amp_envelope_enabled" value="yes" />
+<AMPLITUDE_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="114" />
+<par_bool name="forced_release" value="no" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="3" />
+<par name="D_dt" value="50" />
+<par name="R_dt" value="52" />
+<par name="A_val" value="64" />
+<par name="D_val" value="64" />
+<par name="S_val" value="127" />
+<par name="R_val" value="64" />
+</AMPLITUDE_ENVELOPE>
+<par_bool name="amp_lfo_enabled" value="no" />
+</AMPLITUDE_PARAMETERS>
+<FREQUENCY_PARAMETERS>
+<par_bool name="fixed_freq" value="no" />
+<par name="fixed_freq_et" value="0" />
+<par name="bend_adjust" value="88" />
+<par name="offset_hz" value="64" />
+<par name="detune" value="8192" />
+<par name="coarse_detune" value="0" />
+<par name="detune_type" value="0" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="freq_lfo_enabled" value="no" />
+</FREQUENCY_PARAMETERS>
+<FILTER_PARAMETERS>
+<par name="velocity_sensing_amplitude" value="0" />
+<par name="velocity_sensing" value="64" />
+<FILTER>
+<par name="category" value="2" />
+<par name="type" value="0" />
+<par name="freq" value="52" />
+<par name="q" value="58" />
+<par name="stages" value="0" />
+<par name="freq_track" value="37" />
+<par_bool name="freqtrackoffset" value="no" />
+<par name="gain" value="65" />
+</FILTER>
+<par_bool name="filter_envelope_enabled" value="yes" />
+<FILTER_ENVELOPE>
+<par_bool name="free_mode" value="no" />
+<par name="env_points" value="4" />
+<par name="env_sustain" value="2" />
+<par name="env_stretch" value="102" />
+<par_bool name="forced_release" value="yes" />
+<par_bool name="linear_envelope" value="no" />
+<par name="A_dt" value="97" />
+<par name="D_dt" value="80" />
+<par name="R_dt" value="106" />
+<par name="A_val" value="90" />
+<par name="D_val" value="40" />
+<par name="S_val" value="64" />
+<par name="R_val" value="1" />
+</FILTER_ENVELOPE>
+<par_bool name="filter_lfo_enabled" value="yes" />
+<FILTER_LFO>
+<par name="freqI" value="422733216" />
+<par_real name="freq" value="0.393700987" exact_value="0x3EC9932D" />
+<par name="intensity" value="0" />
+<par name="start_phase" value="64" />
+<par name="lfo_type" value="0" />
+<par name="randomness_amplitude" value="0" />
+<par name="randomness_frequency" value="0" />
+<par name="delay" value="68" />
+<par name="stretch" value="64" />
+<par_bool name="continous" value="no" />
+<par_bool name="bpm" value="no" />
+</FILTER_LFO>
+</FILTER_PARAMETERS>
+<FM_PARAMETERS>
+<par name="input_voice" value="-1" />
+<par name="volume" value="60" />
+<par name="volume_damp" value="64" />
+<par name="velocity_sensing" value="64" />
+<par_bool name="amp_envelope_enabled" value="no" />
+<MODULATOR>
+<par_bool name="detune_from_base_osc" value="yes" />
+<par name="detune" value="8192" />
+<par name="coarse_detune" value="2048" />
+<par name="detune_type" value="3" />
+<par_bool name="freq_envelope_enabled" value="no" />
+<par_bool name="fixed_freq" value="no" />
+<OSCIL>
+<par name="harmonic_mag_type" value="0" />
+<par name="base_function" value="0" />
+<par name="base_function_par" value="64" />
+<par name="base_function_modulation" value="0" />
+<par name="base_function_modulation_par1" value="64" />
+<par name="base_function_modulation_par2" value="64" />
+<par name="base_function_modulation_par3" value="32" />
+<par name="modulation" value="0" />
+<par name="modulation_par1" value="64" />
+<par name="modulation_par2" value="64" />
+<par name="modulation_par3" value="32" />
+<par name="wave_shaping" value="64" />
+<par name="wave_shaping_function" value="0" />
+<par name="filter_type" value="0" />
+<par name="filter_par1" value="64" />
+<par name="filter_par2" value="64" />
+<par name="filter_before_wave_shaping" value="0" />
+<par name="spectrum_adjust_type" value="0" />
+<par name="spectrum_adjust_par" value="64" />
+<par name="rand" value="64" />
+<par name="amp_rand_type" value="0" />
+<par name="amp_rand_power" value="64" />
+<par name="harmonic_shift" value="0" />
+<par_bool name="harmonic_shift_first" value="no" />
+<par name="adaptive_harmonics" value="0" />
+<par name="adaptive_harmonics_base_frequency" value="128" />
+<par name="adaptive_harmonics_power" value="100" />
+<par name="adaptive_harmonics_par" value="50" />
+<HARMONICS>
+<HARMONIC id="1">
+<par name="mag" value="127" />
+<par name="phase" value="64" />
+</HARMONIC>
+</HARMONICS>
+</OSCIL>
+</MODULATOR>
+</FM_PARAMETERS>
+</VOICE>
+<VOICE id="1">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="2">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="3">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="4">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="5">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="6">
+<par_bool name="enabled" value="no" />
+</VOICE>
+<VOICE id="7">
+<par_bool name="enabled" value="no" />
+</VOICE>
+</ADD_SYNTH_PARAMETERS>
+<par_bool name="sub_enabled" value="no" />
+<par_bool name="pad_enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="1">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="2">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="3">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="4">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="5">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="6">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="7">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="8">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="9">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="10">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="11">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="12">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="13">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="14">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+<INSTRUMENT_KIT_ITEM id="15">
+<par_bool name="enabled" value="no" />
+</INSTRUMENT_KIT_ITEM>
+</INSTRUMENT_KIT>
+<INSTRUMENT_EFFECTS>
+<INSTRUMENT_EFFECT id="0">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="1">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+<INSTRUMENT_EFFECT id="2">
+<EFFECT>
+<par name="type" value="0" />
+</EFFECT>
+<par name="route" value="0" />
+<par_bool name="bypass" value="no" />
+</INSTRUMENT_EFFECT>
+</INSTRUMENT_EFFECTS>
+</INSTRUMENT>
+</ZynAddSubFX-data>
