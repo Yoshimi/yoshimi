@@ -12,6 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2014-2021, Will Godfrey & others
+Copyright 2014-2021, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,9 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.
-
-} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -127,10 +126,60 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
+class FilerLine {: {public Fl_Group}
+} {
+  Function {make_window()} {} {
+    Fl_Window filerline {
+      xywh {522 305 440 20} type Double color 7 hide
+      class Fl_Group
+    } {
+      Fl_Group dirIcon {
+        xywh {2 2 18 14} box PLASTIC_THIN_UP_BOX color 183
+      } {
+        Fl_Group {} {
+          xywh {4 4 18 16} box PLASTIC_THIN_UP_BOX color 183
+        } {
+          Fl_Group {} {
+            xywh {6 8 14 1} box DOWN_BOX color 181
+          } {}
+        }
+      }
+      Fl_Group name {
+        label {a name}
+        xywh {24 2 416 16} color 7 labelsize 12 align 0
+      } {}
+    }
+  }
+  Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+    code {n = 0;} {}
+  }
+  Function {init(SynthEngine *synth_, int n_)} {} {
+    code {//
+std::cout << "here" << std::endl;
+    synth = synth_;
+    n = n_;
+    make_window();
+    show();
+    end();} {}
+  }
+  decl {int n;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+  Function {~FilerLine()} {} {
+    code {filerline->hide();
+delete (filerline);} {}
+  }
+}
+
 class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
+      filerline[0] = NULL;
+      filerline[1] = NULL;
+      filerline[2] = NULL;
+      filerline[3] = NULL;
       synth = _synth;
       presetsui = NULL;
       ninseff = 0;
@@ -1663,6 +1712,7 @@ Alan Calvert started the project}
     lastfilerW = 0;
     filerdone = false;
     filerwindow->show();
+    filerline[0]->show();
     while (true)
     {
         if (lastfilerW != filerwindow->w())
@@ -1750,7 +1800,12 @@ Alan Calvert started the project}
             string next = tofetch.substr(0, pos);
             filebrowse->add(next.c_str());
             tofetch = tofetch.substr(pos + 1);
-        }} {}
+        }
+
+        filerline[0] = new FilerLine(0, 0, 440, 20, "");
+        filerline[0]->init(synth, 0);
+        filerline[0]->name->copy_label("Does this work?");
+        filerwindow->add(filerline[0]);} {}
   }
   Function {setfavourites()} {} {
     code {//
@@ -1848,7 +1903,8 @@ Alan Calvert started the project}
         favedefault->labelsize(size12);
         favedelete->labelsize(size12);
         faveset->labelsize(size12);
-
+        filerline[0]->resize(12 * dScale, 76 * dScale, 440 * dScale, 20 * dScale);
+        filerline[0]->name->labelsize(size12);
         filerwindow->redraw();} {}
   }
   Function {startInstance()} {} {
@@ -2703,8 +2759,7 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {updatepanel(bool full = false)} {open
-  } {
+  Function {updatepanel(bool full = false)} {} {
     code {//
     for (int npart = 0; npart < partmax; ++npart)
     {
@@ -3746,5 +3801,7 @@ Alan Calvert started the project}
   decl {int lastaboutW} {private local
   }
   decl {int oldH} {private local
+  }
+  decl {FilerLine *filerline[4];} {private local
   }
 }
