@@ -128,8 +128,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 
 class FilerLine {open : {public Fl_Group}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window filerline {
       xywh {522 305 440 20} type Double color 7 hide
       class Fl_Group
@@ -152,22 +151,20 @@ class FilerLine {open : {public Fl_Group}
       }
     }
   }
-  Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {n = 0;} {}
   }
-  Function {init(SynthEngine *synth_, int n_, bool isDir_)} {open
+  Function {init(SynthEngine *synth_, int n_)} {open
   } {
     code {//
-    std::cout << "init " << n << std::endl;
+    
     synth = synth_;
     n = n_;
-    isDir = isDir_;
+    atEnd = true;
     make_window();
     show();
-    if (!isDir)
-        dirIcon->hide();
-    end();} {selected
-    }
+    end();} {}
   }
   decl {int n;} {private local
   }
@@ -177,18 +174,21 @@ class FilerLine {open : {public Fl_Group}
     code {filerline->hide();
 delete (filerline);} {}
   }
-  decl {bool isDir;} {private local
+  decl {bool atEnd;} {public local
   }
 }
 
 class MasterUI {open : {private GuiUpdates}
 } {
-  Function {MasterUI(SynthEngine *_synth)} {} {
+  Function {MasterUI(SynthEngine *_synth)} {open
+  } {
     code {//
-      filerline[0] = NULL;
-      filerline[1] = NULL;
-      filerline[2] = NULL;
-      filerline[3] = NULL;
+      for (int i = 0; i < 500; ++i)
+      {
+          filerline[i] = new FilerLine(0, 0, 440, 20, "");
+          filerline[i]->init(synth, i);
+      }
+
       synth = _synth;
       presetsui = NULL;
       ninseff = 0;
@@ -1721,7 +1721,6 @@ Alan Calvert started the project}
     lastfilerW = 0;
     filerdone = false;
     filerwindow->show();
-    filerline[0]->show();
     while (true)
     {
         if (lastfilerW != filerwindow->w())
@@ -1811,16 +1810,20 @@ Alan Calvert started the project}
             filebrowse->add(next.c_str());
             tofetch = tofetch.substr(pos + 1);
         }
-        if (!filerline[0])
-            filerline[0] = new FilerLine(0, 0, 440, 20, "");
-        filerline[0]->init(synth, 0, true);
+        filerline[0]->dirIcon->show();
         filerline[0]->name->copy_label("Does this work?");
+        filerline[0]->atEnd = false;
         filerwindow->add(filerline[0]);
-        if (!filerline[1])
-            filerline[1] = new FilerLine(0, 0, 440, 20, "");
-        filerline[1]->init(synth, 1, false);
+        
+        filerline[1]->dirIcon->hide();
         filerline[1]->name->copy_label("Seems OK");
-        filerwindow->add(filerline[1]);} {}
+        filerline[1]->atEnd = false;
+        filerwindow->add(filerline[1]);
+        
+        filerline[2]->dirIcon->show();
+        filerline[2]->name->copy_label("And there is a lot more too");
+        filerline[2]->atEnd = false;
+        filerwindow->add(filerline[2]);} {}
   }
   Function {setfavourites()} {} {
     code {//
@@ -1919,11 +1922,15 @@ Alan Calvert started the project}
         favedefault->labelsize(size12);
         favedelete->labelsize(size12);
         faveset->labelsize(size12);
-        filerline[0]->resize(12 * dScale, 76 * dScale, 440 * dScale, 20 * dScale);
-        filerline[0]->name->labelsize(size12);
-        filerline[1]->resize(12 * dScale, 96 * dScale, 440 * dScale, 20 * dScale);
-        filerline[1]->name->labelsize(size12);
-        filerwindow->redraw();} {}
+        for (int i = 0; i < 500; ++i)
+        {
+            if (filerline[i]->atEnd)
+                break;
+            filerline[i]->resize(12 * dScale, ((i * 20) + 76) * dScale, 440 * dScale, 20 * dScale);
+            filerline[i]->name->labelsize(size12);
+        }
+        filerwindow->redraw();} {selected
+    }
   }
   Function {startInstance()} {} {
     code {//
@@ -3820,6 +3827,6 @@ Alan Calvert started the project}
   }
   decl {int oldH} {private local
   }
-  decl {FilerLine *filerline[4];} {private local
+  decl {FilerLine *filerline[500];} {private local
   }
 }
