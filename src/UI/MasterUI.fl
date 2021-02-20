@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -126,9 +126,10 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class FilerLine {: {public Fl_Group}
+class FilerLine {open : {public Fl_Group}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window filerline {
       xywh {522 305 440 20} type Double color 7 hide
       class Fl_Group
@@ -144,23 +145,29 @@ class FilerLine {: {public Fl_Group}
           } {}
         }
       }
-      Fl_Group name {
+      Fl_Button name {
         label {a name}
-        xywh {24 2 416 16} color 7 labelsize 12 align 0
-      } {}
+        callback {std::cout << "pressed " << n << std::endl;}
+        xywh {24 2 416 16} box NO_BOX color 7 labelsize 12 align 20
+      }
     }
   }
   Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n = 0;} {}
   }
-  Function {init(SynthEngine *synth_, int n_)} {} {
+  Function {init(SynthEngine *synth_, int n_, bool isDir_)} {open
+  } {
     code {//
-std::cout << "here" << std::endl;
+    std::cout << "init " << n << std::endl;
     synth = synth_;
     n = n_;
+    isDir = isDir_;
     make_window();
     show();
-    end();} {}
+    if (!isDir)
+        dirIcon->hide();
+    end();} {selected
+    }
   }
   decl {int n;} {private local
   }
@@ -170,9 +177,11 @@ std::cout << "here" << std::endl;
     code {filerline->hide();
 delete (filerline);} {}
   }
+  decl {bool isDir;} {private local
+  }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1781,7 +1790,8 @@ Alan Calvert started the project}
     savefavourites();
     return filerfound;} {}
   }
-  Function {fillfiler()} {} {
+  Function {fillfiler()} {open
+  } {
     code {//
         string tofetch;
         int options = filerOpt1->value();
@@ -1801,11 +1811,16 @@ Alan Calvert started the project}
             filebrowse->add(next.c_str());
             tofetch = tofetch.substr(pos + 1);
         }
-
-        filerline[0] = new FilerLine(0, 0, 440, 20, "");
-        filerline[0]->init(synth, 0);
+        if (!filerline[0])
+            filerline[0] = new FilerLine(0, 0, 440, 20, "");
+        filerline[0]->init(synth, 0, true);
         filerline[0]->name->copy_label("Does this work?");
-        filerwindow->add(filerline[0]);} {}
+        filerwindow->add(filerline[0]);
+        if (!filerline[1])
+            filerline[1] = new FilerLine(0, 0, 440, 20, "");
+        filerline[1]->init(synth, 1, false);
+        filerline[1]->name->copy_label("Seems OK");
+        filerwindow->add(filerline[1]);} {}
   }
   Function {setfavourites()} {} {
     code {//
@@ -1873,7 +1888,8 @@ Alan Calvert started the project}
             line = line.substr(4);
         return line;} {}
   }
-  Function {filerRtext()} {} {
+  Function {filerRtext()} {open
+  } {
     code {//
         float dScale = filerwindow->w() / float(filerDW);
         int size12 = int(12 * dScale);
@@ -1905,6 +1921,8 @@ Alan Calvert started the project}
         faveset->labelsize(size12);
         filerline[0]->resize(12 * dScale, 76 * dScale, 440 * dScale, 20 * dScale);
         filerline[0]->name->labelsize(size12);
+        filerline[1]->resize(12 * dScale, 96 * dScale, 440 * dScale, 20 * dScale);
+        filerline[1]->name->labelsize(size12);
         filerwindow->redraw();} {}
   }
   Function {startInstance()} {} {
