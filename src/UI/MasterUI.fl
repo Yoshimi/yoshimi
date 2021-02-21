@@ -126,7 +126,10 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-class FilerLine {open : {public Fl_Group}
+decl {int lineitem;} {public local
+}
+
+class FilerLine {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window filerline {
@@ -146,22 +149,20 @@ class FilerLine {open : {public Fl_Group}
       }
       Fl_Button name {
         label {a name}
-        callback {std::cout << "pressed " << n << std::endl;}
-        xywh {24 2 416 16} box NO_BOX color 7 labelsize 12 align 20
+        callback {//std::cout << "pressed " << n << std::endl;
+lineitem = n;}
+        xywh {24 2 390 16} box NO_BOX color 7 labelsize 12 align 20
       }
     }
   }
-  Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n = 0;} {}
   }
-  Function {init(SynthEngine *synth_, int n_)} {open
-  } {
+  Function {init(SynthEngine *synth_, int n_)} {} {
     code {//
-    
+
     synth = synth_;
     n = n_;
-    atEnd = true;
     make_window();
     show();
     end();} {}
@@ -171,22 +172,20 @@ class FilerLine {open : {public Fl_Group}
   decl {SynthEngine *synth;} {private local
   }
   Function {~FilerLine()} {} {
-    code {filerline->hide();
-delete (filerline);} {}
-  }
-  decl {bool atEnd;} {public local
+    code {//
+    filerline->hide();
+    delete (filerline);} {}
   }
 }
 
 class MasterUI {open : {private GuiUpdates}
 } {
-  Function {MasterUI(SynthEngine *_synth)} {open
-  } {
+  Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
-      for (int i = 0; i < 500; ++i)
+      for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
       {
-          filerline[i] = new FilerLine(0, 0, 440, 20, "");
-          filerline[i]->init(synth, i);
+          filerline[i] = NULL;//new FilerLine(0, 0, 440, 20, "");
+          //filerline[i]->init(synth, i);
       }
 
       synth = _synth;
@@ -292,7 +291,8 @@ class MasterUI {open : {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init(const char *_label)} {open
+  } {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -1562,9 +1562,12 @@ Alan Calvert started the project}
           tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
         }
       }
+      Fl_Scroll filerlist {open
+        xywh {10 96 444 244} type VERTICAL
+      } {}
     }
   }
-  Function {setfiler(string title, string name, bool save, int exten)} {return_type string
+  Function {setfiler(string title, string name, bool save, int exten)} {open return_type string
   } {
     code {//
     dosave = save;
@@ -1721,6 +1724,7 @@ Alan Calvert started the project}
     lastfilerW = 0;
     filerdone = false;
     filerwindow->show();
+    lineitem = -1;
     while (true)
     {
         if (lastfilerW != filerwindow->w())
@@ -1729,6 +1733,11 @@ Alan Calvert started the project}
             lastfilerW = filerwindow->w();
         }
         Fl::wait();
+        if (lineitem > -1)
+        {
+            filerselect(lineitem);
+            lineitem = -1;
+        }
         if (filerdone && (extension == TOPLEVEL::XML::Dir || extension == TOPLEVEL::XML::Bank))
         {
             if (dosave && string(filernewname->value()).empty())
@@ -1802,28 +1811,45 @@ Alan Calvert started the project}
             options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
-        filebrowse->clear();
+        //filebrowse->clear();
+        filebrowse->hide();
+        
+        filerlist->clear();
+        for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+            filerline[i] = NULL;
+        int lineno = 0;
         while(!tofetch.empty())
         {
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
-            filebrowse->add(next.c_str());
+            //filebrowse->add(next.c_str());
+            
+            filerline[lineno] = new FilerLine(0, 0, 390, 20);
+            filerline[lineno]->init(synth,lineno);
+
+            if (next.find("Dir:") != std::string::npos)
+            {
+                next = next.substr(5);
+                filerline[lineno]->dirIcon->show();
+            }
+            else
+                filerline[lineno]->dirIcon->hide();
+            
+            filerline[lineno]->name->copy_label(next.c_str());
+            filerlist->add(filerline[lineno]);
+            ++lineno;
+            
+            
             tofetch = tofetch.substr(pos + 1);
         }
-        filerline[0]->dirIcon->show();
-        filerline[0]->name->copy_label("Does this work?");
-        filerline[0]->atEnd = false;
-        filerwindow->add(filerline[0]);
-        
-        filerline[1]->dirIcon->hide();
-        filerline[1]->name->copy_label("Seems OK");
-        filerline[1]->atEnd = false;
-        filerwindow->add(filerline[1]);
-        
-        filerline[2]->dirIcon->show();
-        filerline[2]->name->copy_label("And there is a lot more too");
-        filerline[2]->atEnd = false;
-        filerwindow->add(filerline[2]);} {}
+        filerRtext();} {}
+  }
+  Function {filerselect(int item)} {open
+  } {
+    code {//
+    string text = string(filerline[item]->name->label());
+    std::cout << "Line " << item << " " << text << std::endl;} {selected
+    }
   }
   Function {setfavourites()} {} {
     code {//
@@ -1891,8 +1917,7 @@ Alan Calvert started the project}
             line = line.substr(4);
         return line;} {}
   }
-  Function {filerRtext()} {open
-  } {
+  Function {filerRtext()} {} {
     code {//
         float dScale = filerwindow->w() / float(filerDW);
         int size12 = int(12 * dScale);
@@ -1922,15 +1947,14 @@ Alan Calvert started the project}
         favedefault->labelsize(size12);
         favedelete->labelsize(size12);
         faveset->labelsize(size12);
-        for (int i = 0; i < 500; ++i)
+        for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
         {
-            if (filerline[i]->atEnd)
+            if (!filerline[i])
                 break;
             filerline[i]->resize(12 * dScale, ((i * 20) + 76) * dScale, 440 * dScale, 20 * dScale);
             filerline[i]->name->labelsize(size12);
         }
-        filerwindow->redraw();} {selected
-    }
+        filerwindow->redraw();} {}
   }
   Function {startInstance()} {} {
     code {//
@@ -3827,6 +3851,6 @@ Alan Calvert started the project}
   }
   decl {int oldH} {private local
   }
-  decl {FilerLine *filerline[500];} {private local
+  decl {FilerLine *filerline[MIDI_LEARN_BLOCK];} {private local
   }
 }
