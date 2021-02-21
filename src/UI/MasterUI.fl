@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -137,10 +137,10 @@ class FilerLine {: {public Fl_Group}
       class Fl_Group
     } {
       Fl_Group dirIcon {
-        xywh {2 2 18 14} box PLASTIC_THIN_UP_BOX color 183
+        xywh {0 0 18 14} box PLASTIC_THIN_UP_BOX color 183
       } {
         Fl_Group {} {
-          xywh {4 4 18 16} box PLASTIC_THIN_UP_BOX color 183
+          xywh {2 2 18 16} box PLASTIC_THIN_UP_BOX color 183
         } {
           Fl_Group {} {
             xywh {6 8 14 1} box DOWN_BOX color 181
@@ -178,7 +178,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -291,8 +291,7 @@ class MasterUI {open : {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {open
-  } {
+  Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
@@ -1358,32 +1357,6 @@ Alan Calvert started the project}
         }}
         tooltip {Current path to use(editable)} xywh {10 20 530 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
-      Fl_Browser filebrowse {
-        callback {//
-        if (!filebrowse->value())
-            return;
-        int result = filebrowse->value();
-        if (result < 1)
-            return;
-        string line = string(filebrowse->text(result));
-
-        if (line.find("Dir:") != std::string::npos)
-        {
-            if (line.back() !='/')
-                line += '/';
-            filerpath = filerpath + line.substr(5);
-            fileroldpath->value(filerpath.c_str());
-            fillfiler();
-            return;
-        }
-        filernewname->value(line.c_str());
-        if (Fl::event_clicks())
-        {
-            Fl::event_clicks(0);
-            fileruse->do_callback();
-        }}
-        xywh {10 98 445 242} type Select labelsize 12 textsize 12
-      }
       Fl_Button filerback {
         label Up
         callback {//
@@ -1524,7 +1497,7 @@ Alan Calvert started the project}
     filerback->activate();
     filerfave->activate();
     filerclose->activate();
-    filebrowse->activate();
+    filerlist->show();
     favourites->hide();}
           tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12
         }
@@ -1563,11 +1536,11 @@ Alan Calvert started the project}
         }
       }
       Fl_Scroll filerlist {open
-        xywh {10 96 444 244} type VERTICAL
+        xywh {10 96 444 244} type VERTICAL color 7
       } {}
     }
   }
-  Function {setfiler(string title, string name, bool save, int exten)} {open return_type string
+  Function {setfiler(string title, string name, bool save, int exten)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1798,8 +1771,7 @@ Alan Calvert started the project}
     savefavourites();
     return filerfound;} {}
   }
-  Function {fillfiler()} {open
-  } {
+  Function {fillfiler()} {} {
     code {//
         string tofetch;
         int options = filerOpt1->value();
@@ -1811,19 +1783,17 @@ Alan Calvert started the project}
             options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
-        //filebrowse->clear();
-        filebrowse->hide();
-        
+
         filerlist->clear();
         for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
             filerline[i] = NULL;
-        int lineno = 0;
+        lineno = 0;
+        //std::cout << "*** list start ***" << std::endl;
         while(!tofetch.empty())
         {
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
-            //filebrowse->add(next.c_str());
-            
+
             filerline[lineno] = new FilerLine(0, 0, 390, 20);
             filerline[lineno]->init(synth,lineno);
 
@@ -1834,22 +1804,39 @@ Alan Calvert started the project}
             }
             else
                 filerline[lineno]->dirIcon->hide();
-            
+            //std::cout << "name >" << next << "<" << std::endl;
             filerline[lineno]->name->copy_label(next.c_str());
             filerlist->add(filerline[lineno]);
             ++lineno;
-            
-            
+
+
             tofetch = tofetch.substr(pos + 1);
         }
-        filerRtext();} {}
+        filerlist->end();
+        filerlist->scroll_to(-10,-10);
+        filerRtext();
+        //std::cout << "list end " << lineno << std::endl;} {}
   }
-  Function {filerselect(int item)} {open
-  } {
+  Function {filerselect(int item)} {} {
     code {//
-    string text = string(filerline[item]->name->label());
-    std::cout << "Line " << item << " " << text << std::endl;} {selected
-    }
+        string line = string(filerline[item]->name->label());
+        if (filerline[item]->dirIcon->visible())
+        {
+            //std::cout << "in dir" << std::endl;
+            if (line.back() !='/')
+                line += '/';
+            filerpath = filerpath + line;//.substr(5);
+            fileroldpath->value(filerpath.c_str());
+            fillfiler();
+            return;
+        }
+        //std::cout << "files" << std::endl;
+        filernewname->value(line.c_str());
+        if (Fl::event_clicks())
+        {
+            Fl::event_clicks(0);
+            fileruse->do_callback();
+        }} {}
   }
   Function {setfavourites()} {} {
     code {//
@@ -1858,7 +1845,7 @@ Alan Calvert started the project}
     filerback->deactivate();
     filerfave->deactivate();
     filerclose->deactivate();
-    filebrowse->deactivate();
+    filerlist->hide();
     favourites->show();} {}
   }
   Function {loadfavourites()} {} {
@@ -1925,7 +1912,6 @@ Alan Calvert started the project}
 
         fileroldpath->labelsize(size12);
             fileroldpath->textsize(size12);
-        filebrowse->textsize(size12);
         filernamegroup->labelsize(size12);
             filernewname->textsize(size12);
         faveGroup->labelsize(size14);
@@ -1947,11 +1933,9 @@ Alan Calvert started the project}
         favedefault->labelsize(size12);
         favedelete->labelsize(size12);
         faveset->labelsize(size12);
-        for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+        for (int i = 0; i < lineno; ++i)
         {
-            if (!filerline[i])
-                break;
-            filerline[i]->resize(12 * dScale, ((i * 20) + 76) * dScale, 440 * dScale, 20 * dScale);
+            filerline[i]->resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
             filerline[i]->name->labelsize(size12);
         }
         filerwindow->redraw();} {}
@@ -3852,5 +3836,7 @@ Alan Calvert started the project}
   decl {int oldH} {private local
   }
   decl {FilerLine *filerline[MIDI_LEARN_BLOCK];} {private local
+  }
+  decl {int lineno;} {private local
   }
 }
