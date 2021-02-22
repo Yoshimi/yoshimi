@@ -1,5 +1,8 @@
 yoshimi 2.0 rc3
 
+2021-2-19 Will
+* A few more instrument type changes.
+
 2021-2-17 Will
 * Had to revert some bank changes.
   This was resulting in multiple copies with
