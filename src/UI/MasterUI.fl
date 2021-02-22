@@ -129,22 +129,25 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {int lineitem;} {public local
 }
 
-class FilerLine {: {public Fl_Group}
+class FilerLine {open : {public Fl_Group}
 } {
-  Function {make_window()} {} {
-    Fl_Window filerline {
-      xywh {522 305 440 20} type Double color 7 hide
-      class Fl_Group
+  Function {make_window()} {open
+  } {
+    Fl_Window filerline {open
+      xywh {522 305 440 20} type Double color 7
+      class Fl_Group visible
     } {
       Fl_Group dirIcon {
-        xywh {0 0 18 14} box PLASTIC_THIN_UP_BOX color 183
+        xywh {0 0 20 20} box FLAT_BOX color 7
       } {
-        Fl_Group {} {
-          xywh {2 2 18 16} box PLASTIC_THIN_UP_BOX color 183
-        } {
-          Fl_Group {} {
-            xywh {6 8 14 1} box DOWN_BOX color 181
-          } {}
+        Fl_Box {} {
+          xywh {1 1 18 15} box PLASTIC_THIN_UP_BOX color 183
+        }
+        Fl_Box {} {
+          xywh {3 4 18 16} box PLASTIC_THIN_UP_BOX color 183
+        }
+        Fl_Box {} {
+          xywh {5 7 14 1} box DOWN_BOX selection_color 181
         }
       }
       Fl_Button name {
