@@ -129,16 +129,31 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {int lineitem;} {public local
 }
 
-class FilerLine {open : {public Fl_Group}
+class FilerLine {: {public Fl_Group}
 } {
-  Function {make_window()} {open
-  } {
-    Fl_Window filerline {open
-      xywh {522 305 440 20} type Double color 7
-      class Fl_Group visible
+  Function {make_window()} {} {
+    Fl_Window filerline {
+      xywh {522 305 440 20} type Double color 7 hide
+      class Fl_Group
     } {
+      Fl_Group fileIcon {
+        xywh {0 0 23 30} box FLAT_BOX color 7
+      } {
+        Fl_Box outer_box {
+          xywh {3 0 16 20} box GTK_THIN_UP_BOX color 174 labeltype NO_LABEL
+        }
+        Fl_Box inner_box {
+          xywh {5 2 12 16} box GTK_THIN_DOWN_BOX color 174 labeltype NO_LABEL
+        }
+        Fl_Box line1 {
+          xywh {7 7 8 2} box FLAT_BOX color 124
+        }
+        Fl_Box line2 {
+          xywh {7 11 8 2} box FLAT_BOX color 124
+        }
+      }
       Fl_Group dirIcon {
-        xywh {0 0 20 20} box FLAT_BOX color 7
+        xywh {0 0 21 20} box FLAT_BOX color 7 hide
       } {
         Fl_Box {} {
           xywh {1 1 18 15} box PLASTIC_THIN_UP_BOX color 183
@@ -151,10 +166,14 @@ class FilerLine {open : {public Fl_Group}
         }
       }
       Fl_Button name {
-        label {a name}
+        callback {//std::cout << "pressed " << n << std::endl;
+//lineitem = n;}
+        xywh {25 0 415 21} box NO_BOX color 7 labelsize 12 align 20
+      }
+      Fl_Button nametop {
         callback {//std::cout << "pressed " << n << std::endl;
 lineitem = n;}
-        xywh {24 2 390 16} box NO_BOX color 7 labelsize 12 align 20
+        xywh {0 1 420 18} box NO_BOX
       }
     }
   }
@@ -1804,9 +1823,13 @@ Alan Calvert started the project}
             {
                 next = next.substr(5);
                 filerline[lineno]->dirIcon->show();
+                filerline[lineno]->fileIcon->hide();
             }
             else
+            {
                 filerline[lineno]->dirIcon->hide();
+                filerline[lineno]->fileIcon->show();
+            }
             //std::cout << "name >" << next << "<" << std::endl;
             filerline[lineno]->name->copy_label(next.c_str());
             filerlist->add(filerline[lineno]);
