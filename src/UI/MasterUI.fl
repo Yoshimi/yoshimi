@@ -1577,7 +1577,7 @@ Alan Calvert started the project}
     string path;
     type_name = "";
     size_t pos = string::npos;
-    fileruse->position(464, 53);
+    fileruseX = 464;
     fileruse->copy_label("< New Dir");
     filernamegroup->show();
     filerframe ->show();
@@ -1587,7 +1587,7 @@ Alan Calvert started the project}
     {
         if (!dosave)
         {
-            fileruse->position(234, 53);
+            fileruseX = 234;
             fileruse->copy_label("^ From");
             filernamegroup->hide();
             filerframe ->hide();
@@ -1603,7 +1603,7 @@ Alan Calvert started the project}
     {
         if(!dosave)
         {
-            fileruse->position(234, 53);
+            fileruseX = 234;
             fileruse->copy_label("^ Import");
             path = currentfave + name;
             filernewname->value("");
@@ -1962,6 +1962,7 @@ Alan Calvert started the project}
         filernamegroup->labelsize(size12);
             filernewname->textsize(size12);
         faveGroup->labelsize(size14);
+        fileruse->position(fileruseX * dScale, 53 * dScale);
         fileruse->labelsize(size12);
 
         filerback->labelsize(size12);
@@ -3882,6 +3883,8 @@ Alan Calvert started the project}
   decl {int lastaboutW} {private local
   }
   decl {int oldH} {private local
+  }
+  decl {int fileruseX;} {private local
   }
   decl {FilerLine *filerline[MIDI_LEARN_BLOCK];} {private local
   }
