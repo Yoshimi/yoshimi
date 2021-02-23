@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -146,10 +146,14 @@ class FilerLine {: {public Fl_Group}
           xywh {5 2 12 16} box GTK_THIN_DOWN_BOX color 174 labeltype NO_LABEL
         }
         Fl_Box line1 {
-          xywh {7 7 8 2} box FLAT_BOX color 124
+          xywh {7 5 8 2} box FLAT_BOX color 124
         }
         Fl_Box line2 {
-          xywh {7 11 8 2} box FLAT_BOX color 124
+          xywh {7 9 8 2} box FLAT_BOX color 124
+        }
+        Fl_Box type {
+          label xiz
+          xywh {4 6 15 17} labelsize 4
         }
       }
       Fl_Group dirIcon {
@@ -200,7 +204,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1375,9 +1379,9 @@ Alan Calvert started the project}
             }
             filerpath = name;
             o->value(name.c_str());
-            fillfiler();
+            fillfiler(type_name);
         }}
-        tooltip {Current path to use(editable)} xywh {10 20 530 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
+        tooltip {Current path to use(editable)} xywh {10 20 448 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
       }
       Fl_Button filerback {
         label Up
@@ -1390,8 +1394,8 @@ Alan Calvert started the project}
         if (filerpath.empty())
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
-        fillfiler();}
-        tooltip {Go up one directory in path} xywh {463 53 78 20} labelfont 1 labelsize 12
+        fillfiler(type_name);}
+        tooltip {Go up one directory in path} xywh {463 21 78 24} labelfont 1 labelsize 12
       }
       Fl_Group faveGroup {
         label Favourites
@@ -1431,13 +1435,13 @@ Alan Calvert started the project}
       }
       Fl_Group filernamegroup {
         label Name
-        xywh {10 50 448 26} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 2
+        xywh {10 50 533 26} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 2
       } {
         Fl_Input filernewname {
           callback {//
       if (Fl::event_key() == FL_Enter)
           fileruse->do_callback();}
-          tooltip {Name of file item to load or save} xywh {14 53 362 20} labelsize 12 align 2 textfont 1 textsize 12
+          tooltip {Name of file item to load or save} xywh {14 53 444 20} labelsize 12 align 2 textfont 1 textsize 12
         }
       }
       Fl_Button fileruse {
@@ -1454,7 +1458,7 @@ Alan Calvert started the project}
             filerfound = filerpath + leaf;
         // error picked up in main loop
         filerdone = true;}
-        tooltip {Apply this name to the path and load/save} xywh {380 53 74 20} labelfont 1 labelsize 12
+        tooltip {Apply this name to the path and load/save} xywh {464 53 74 20} labelfont 1 labelsize 12
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -1463,22 +1467,22 @@ Alan Calvert started the project}
         filerOpt1->deactivate();
     else
         filerOpt1->activate();
-    fillfiler();}
-        tooltip {Hide sub directories so that files are easier to see} xywh {490 222 18 18} down_box DOWN_BOX labelsize 12 align 1
+    fillfiler(type_name);}
+        tooltip {Hide sub directories so that files are easier to see} xywh {490 204 18 18} down_box DOWN_BOX labelsize 12 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt1 {
         label {. (dot) Dirs}
         callback {//
-    fillfiler();}
-        tooltip {Show hidden paths} xywh {490 259 18 18} down_box DOWN_BOX labelsize 12 align 1
+    fillfiler(type_name);}
+        tooltip {Show hidden paths} xywh {490 244 18 18} down_box DOWN_BOX labelsize 12 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt2 {
         label {. (dot) Files}
         callback {//
-    fillfiler();}
-        tooltip {Show hidden files} xywh {490 295 18 18} down_box DOWN_BOX labelsize 12 align 1
+    fillfiler(type_name);}
+        tooltip {Show hidden files} xywh {490 284 18 18} down_box DOWN_BOX labelsize 12 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt16 {
@@ -1552,7 +1556,7 @@ Alan Calvert started the project}
             filerpath += '/';
     	fileroldpath->value(filerpath.c_str());
     }
-    fillfiler();
+    fillfiler(type_name);
     favecancel->do_callback();}
           tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
         }
@@ -1562,7 +1566,7 @@ Alan Calvert started the project}
       } {}
     }
   }
-  Function {setfiler(string title, string name, bool save, int exten)} {return_type string
+  Function {setfiler(string title, string name, bool save, int exten)} {open return_type string
   } {
     code {//
     dosave = save;
@@ -1571,7 +1575,9 @@ Alan Calvert started the project}
 
     string lastname = textMsgBuffer.fetch(fetchData(extension, MAIN::control::readLastSeen, TOPLEVEL::section::main));
     string path;
+    type_name = "";
     size_t pos = string::npos;
+    fileruse->position(464, 53);
     fileruse->copy_label("< New Dir");
     filernamegroup->show();
     filerframe ->show();
@@ -1581,6 +1587,7 @@ Alan Calvert started the project}
     {
         if (!dosave)
         {
+            fileruse->position(234, 53);
             fileruse->copy_label("^ From");
             filernamegroup->hide();
             filerframe ->hide();
@@ -1596,6 +1603,7 @@ Alan Calvert started the project}
     {
         if(!dosave)
         {
+            fileruse->position(234, 53);
             fileruse->copy_label("^ Import");
             path = currentfave + name;
             filernewname->value("");
@@ -1654,43 +1662,53 @@ Alan Calvert started the project}
             case TOPLEVEL::XML::Instrument:
                 filerext = EXTEN::zynInst;
                 fileroldpath->copy_label("Path to Instruments");
+                type_name = "xiz";
                 break;
             case TOPLEVEL::XML::Patch:
                 filerext = EXTEN::patchset;
                 fileroldpath->copy_label("Path to Patch Sets");
+                type_name = "xmz";
                 break;
             case TOPLEVEL::XML::Presets:
                 filerext = EXTEN::presets;
                 fileroldpath->copy_label("Path to Presets");
+                type_name = "xpz";
                 break;
 
             case TOPLEVEL::XML::Scale:
                 filerext = EXTEN::scale;
                 fileroldpath->copy_label("Path to Scales");
+                type_name = "xsz";
                 break;
             case TOPLEVEL::XML::State:
                 filerext = EXTEN::state;
                 fileroldpath->copy_label("Path to States");
+                type_name = "state";
                 break;
             case TOPLEVEL::XML::Vector:
                 filerext = EXTEN::vector;
                 fileroldpath->copy_label("Path to Vectors");
+                type_name = "xvy";
                 break;
             case TOPLEVEL::XML::MLearn:
                 filerext = EXTEN::mlearn;
                 fileroldpath->copy_label("Path to Midi-Learn files");
+                type_name = "xly";
                 break;
             case TOPLEVEL::XML::PadSample:
                 filerext = EXTEN::MSwave;
                 fileroldpath->copy_label("Path to PadSynth samples");
+                type_name = "wav";
                 break;
             case TOPLEVEL::XML::ScalaTune:
                 filerext = EXTEN::scalaTuning;
                 fileroldpath->copy_label("Path to Scala tunings");
+                type_name = "scl";
                 break;
             case TOPLEVEL::XML::ScalaMap:
                 filerext = EXTEN::scalaKeymap;
                 fileroldpath->copy_label("Path to Scala keymaps");
+                type_name = "kbm";
                 break;
             case TOPLEVEL::XML::Bank:
                 fileroldpath->copy_label("Path to Instrument Banks");
@@ -1704,7 +1722,7 @@ Alan Calvert started the project}
     filerpath = path;
     fileroldpath->value(path.c_str());
 
-    fillfiler();
+    fillfiler(type_name);
 
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Master-filer");
@@ -1791,9 +1809,10 @@ Alan Calvert started the project}
         }
     }
     savefavourites();
-    return filerfound;} {}
+    return filerfound;} {selected
+    }
   }
-  Function {fillfiler()} {} {
+  Function {fillfiler(string type_name)} {} {
     code {//
         string tofetch;
         int options = filerOpt1->value();
@@ -1829,6 +1848,8 @@ Alan Calvert started the project}
             {
                 filerline[lineno]->dirIcon->hide();
                 filerline[lineno]->fileIcon->show();
+                //std::cout << "type >" << type_name << "<" << std::endl;
+                filerline[lineno]->type->copy_label(type_name.c_str());
             }
             //std::cout << "name >" << next << "<" << std::endl;
             filerline[lineno]->name->copy_label(next.c_str());
@@ -1851,9 +1872,9 @@ Alan Calvert started the project}
             //std::cout << "in dir" << std::endl;
             if (line.back() !='/')
                 line += '/';
-            filerpath = filerpath + line;//.substr(5);
+            filerpath = filerpath + line;
             fileroldpath->value(filerpath.c_str());
-            fillfiler();
+            fillfiler(type_name);
             return;
         }
         //std::cout << "files" << std::endl;
@@ -1963,6 +1984,7 @@ Alan Calvert started the project}
         {
             filerline[i]->resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
             filerline[i]->name->labelsize(size12);
+            filerline[i]->type->labelsize(int(4 * dScale));
         }
         filerwindow->redraw();} {}
   }
@@ -3864,5 +3886,7 @@ Alan Calvert started the project}
   decl {FilerLine *filerline[MIDI_LEARN_BLOCK];} {private local
   }
   decl {int lineno;} {private local
+  }
+  decl {string type_name;} {private local
   }
 }

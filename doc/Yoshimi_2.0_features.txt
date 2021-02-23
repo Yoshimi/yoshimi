@@ -4,7 +4,7 @@ Yes really! Version 2.0 is here.
 
 The most noticable improvement is that all windows are now resizable... individually, up to whatever the window manager allows, and their current sizes and positions are saved. What is more, if you change screen resolutions such that one of them would then be outside the viewable area, there is code to automatically bring it back into view. In the process we have also tidied up some of the windows to make them clearer and more consistent.
 
-To maintain style consistency we have devised our own file browser - a sort of cross between GTK and KDE. This has the added beneft that *all* file handling now goes though a single header file.
+To maintain style consistency we have devised our own file browser - a sort of cross between GTK and KDE. This has the added beneft that *all* file handling now goes though a single header file. This is the most recent addition, and may change in future releases based on user feedback.
 
 Another significant development is MIDI sync for LFOs. When the new BPM button is checked, the frequency control becomes a ratio setting between the time code and actual LFO freqency. All LFOs are independent, so you can have one set to (say) 2:1, while another is set to 1:4.
 
