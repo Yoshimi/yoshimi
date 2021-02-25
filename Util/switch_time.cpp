@@ -1,5 +1,9 @@
 /*
-   timings
+   Test timing for bigh switch statements
+
+   g++ -Wall -O3 /home/will/yoshimi-code/Util/switch_time.cpp -o /home/will/yoshimi-code/Util/switch_time
+
+   try with and without O3 optimisation!
 */
 
 #include <stdio.h>
@@ -548,6 +552,7 @@ int main()
     cout << "\n last" << endl;
     e = packed(78);
     f = sparse(8509);
+    cout << "\n\n a-f" << a << " "  << b << " "  << c << " "  << d << " "  << e << " "  << f << endl;
     return 0;
     // results are not used
     // just there to fool compiler

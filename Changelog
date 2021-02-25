@@ -1,4 +1,10 @@
-yoshimi 2.0 rc4
+yoshimi 2.0 rc5
+
+2021-2-25 Will (additional)
+* Fixed regression: Named instrument load shows time again.
+* Swapped order of filerfave and fileradd
+* Doc updates
+* Set version as 2.0 rc5
 
 2021-2-25 Will
 * Now includes new filer updates and additions.

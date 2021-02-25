@@ -1,4 +1,4 @@
-BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should run with gui warning as well, or better still loop back to try alsa.
+BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should continue run with no audio and gui warning as well, or better still loop back to try alsa.
 
 BUG! stand-alone GUI freezes and no further system changes if new instance started while instrument change in progress.
 
@@ -14,14 +14,16 @@ CLI waveform (in voice) changes don't update GUI unless waveform window is open 
 
 Requested: auto 'apply' timer for padsynth.
 
-Expand MIDI-learn to include:
-    learn groups (paging)
-    GUI view by group but CLI and running search only by CC & chan
-
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
 
-Consider enabling and disabling tooltips.
+
+In controllers provide dropdown menu for choice of modulation (LFO) function.
+    Off
+    Amplitude
+    Filter
+    Frequency * (default)
+
 
 RPNs (channel based)
 

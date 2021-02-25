@@ -4,9 +4,12 @@ Yes really! Version 2.0 is here.
 
 The most noticable improvement is that all windows are now resizable... individually, up to whatever the window manager allows, and their current sizes and positions are saved. What is more, if you change screen resolutions such that one of them would then be outside the viewable area, there is code to automatically bring it back into view. In the process we have also tidied up some of the windows to make them clearer and more consistent.
 
-To maintain style consistency we have devised our own file browser - a sort of cross between GTK and KDE. This has the added beneft that *all* file handling now goes though a single header file. This is the most recent addition, and may change in future releases based on user feedback.
+
+To maintain style and resize consistency we have devised our own file browser - a sort of cross between GTK and KDE. This has the added beneft that *all* file handling now goes though a single header file. This is the most recent addition, and may change in future releases based on user feedback.
+
 
 Another significant development is MIDI sync for LFOs. When the new BPM button is checked, the frequency control becomes a ratio setting between the time code and actual LFO freqency. All LFOs are independent, so you can have one set to (say) 2:1, while another is set to 1:4.
+
 
 An interesting lesser development is the addition of a few more instrument types, to make it easier to find ones that you want to use. The new type names are:
     Bells and Chimes
@@ -16,17 +19,21 @@ An interesting lesser development is the addition of a few more instrument types
     Warm Pad
 These are backward compatible in that older Yoshimi versions will see them as 'undefined'. All the entries that have been adjusted were already undefined. At the same time, if you save a newly created instrument you are asked to set the type if it has been left at 'undefined'. It is a request, not a demand - Yoshimi is your friend, not your boss!
 
-All the Default instrument banks have been revised to remove inconsistencies between the internal name and the file leaf name, and also to set reasonable types to many of those that were just marked as 'undefined' - also making use of the new type names.
-
 Along with this there is a new way of managing the internal names and the file names. From now on, the internal name will be the one that the instrument was first saved as. Whereas all other references to the instrument will be via the filename (or a copy of it). If the filename is changed for any reason, the next time the instrument is loaded, the 'Edit' window will have a line: 'Derived from {original name}'. This ensures that with further development it will always be possible to tell where it originally came from, without interfering with bank positioning, repurposing etc.
 
-Most importantly, none of this affects the sound, nor the bank positions, so your existing projects will sound just the same.
+All the Default instrument banks have been revised to remove inconsistencies between the internal name and the file leaf name, and also to set reasonable types to many of those that were just marked as 'undefined' - also making use of the new type names.
+
+Most importantly, none of this affects the sound, nor the bank positions, so your existing projects will sound just the same. Also, this is just the defaults in /usr (or /usr/local) none of your copies will be touched (although you may want to re-copy or adjust them youself).
+
 
 The recently introduced aftertouch feature can now be reached from the part edit window as well as the controllers one. Also both key and channel aftertouch are saved in patch sets, and in Yoshimi type (.xiy) instruments. You can sometimes get slightly odd results if enabling/disabling options while aftertouch is engaged (i.e. key pressed hard), but apparently this is quite common across other systems.
 
+
 The currently set panning law is saved to patchsets, and by inference also to state files. Resets will always revert to the default law. It is always worth switching Yoshimi to mono from time to time to hear what effect this is having.
 
+
 The maximum number of MIDI_learn lines has been increased to 400. The estimated time to load a file with all 400 entries is still less than 1 second, and the time for an incoming CC to match the very last entry is estimated to be appoximately 160uS (based in tests with 65 lines set). The number of lines is larger than the number of CCs available (disregarding NRPNs) but keep in mind you can have several lines receiving the same CC but performing different actions.
+
 
 NRPNs have been brushed up a bit. Some anomalies corrected and some bit-rot repaired.
 
@@ -36,10 +43,10 @@ Much of the supplied documentation has been revised - including developer notes.
 
 Under the hood:
 Data storage has been brought into line with the XDG specification.
-LV2 performance has been improved. Peviously the DSP load was significantly higher than stand-alone.
+LV2 performance has been improved. Previously the DSP load was significantly higher than stand-alone.
 Some x86/AMD64 specific calls (such as anti-denormals) have be replaced with platform agnostic ones.
 
-The usual crop of bugfixes.
+Bugfixes!
 
 As usual, we welcome all suggestions and assistance - especially regarding documentation!
 

@@ -905,6 +905,9 @@ int SynthEngine::setRootBank(int root, int banknum, bool notinplace)
 
 int SynthEngine::setProgramByName(CommandBlock *getData)
 {
+    struct timeval tv1, tv2;
+    if (Runtime.showTimes)
+        gettimeofday(&tv1, NULL);
     int msgID = NO_MSG;
     bool ok = true;
     int npart = int(getData->data.kit);
@@ -930,6 +933,18 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
             part[npart]->Poriginal = "";
         if (!ok)
             name = "File " + name + "unrecognised or corrupted";
+    }
+
+    if (ok && Runtime.showTimes)
+    {
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+        }
+        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
+        name += ("  Time " + to_string(actual) + "mS");
     }
 
     msgID = textMsgBuffer.push(name);

@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -204,7 +204,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1401,6 +1401,12 @@ Alan Calvert started the project}
         label Favourites
         xywh {458 116 85 60} box ENGRAVED_FRAME
       } {}
+      Fl_Button filerfave {
+        label {Show List}
+        callback {//
+        setfavourites();}
+        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} labelfont 1 labelsize 12
+      }
       Fl_Button faveadd {
         label Add
         callback {//
@@ -1416,13 +1422,7 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 121 75 20} labelfont 1 labelsize 12
-      }
-      Fl_Button filerfave {
-        label {Show List}
-        callback {//
-        setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {463 151 75 20} labelfont 1 labelsize 12
+        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} labelfont 1 labelsize 12
       }
       Fl_Button filerclose {
         label Close
@@ -1492,10 +1492,10 @@ Alan Calvert started the project}
         xywh {490 130 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
         class Fl_Check_Button2
       }
-      Fl_Group filerframe {open
+      Fl_Group filerframe {
         xywh {4 4 542 88} box ENGRAVED_FRAME
       } {}
-      Fl_Group filershort {open
+      Fl_Group filershort {
         xywh {4 4 542 74} box ENGRAVED_FRAME
       } {}
       Fl_Group favourites {
@@ -1561,12 +1561,12 @@ Alan Calvert started the project}
           tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
         }
       }
-      Fl_Scroll filerlist {open
+      Fl_Scroll filerlist {
         xywh {10 96 444 244} type VERTICAL color 7
       } {}
     }
   }
-  Function {setfiler(string title, string name, bool save, int exten)} {open return_type string
+  Function {setfiler(string title, string name, bool save, int exten)} {return_type string
   } {
     code {//
     dosave = save;
@@ -1809,8 +1809,7 @@ Alan Calvert started the project}
         }
     }
     savefavourites();
-    return filerfound;} {selected
-    }
+    return filerfound;} {}
   }
   Function {fillfiler(string type_name)} {} {
     code {//

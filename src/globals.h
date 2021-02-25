@@ -138,6 +138,14 @@ namespace _SYS_
  * for many of the following, where they are in groups the
  * group order must not change, but the actual values can
  * and new entries can be added between the group ends
+ *
+ * *** WARNIBG ***
+ *
+ * The above is no longer completely true!
+ * Controller numbers in particular must not change as
+ * these will be recorded in MIDI-learn files. The same
+ * applies to voice numbers in 'engine' - use existing
+ * gaps for new controls instead.
  */
 
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
