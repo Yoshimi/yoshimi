@@ -12,11 +12,16 @@ Effect change warning for dynfilter insert not yet done.
 
 CLI waveform (in voice) changes don't update GUI unless waveform window is open too.
 
-Requested: auto 'apply' timer for padsynth.
-
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
 
+
+
+Requested: auto 'apply' timer for padsynth.
+
+In filer show actual extension (xiz/xiy)
+
+Make dir selection double-click
 
 In controllers provide dropdown menu for choice of modulation (LFO) function.
     Off

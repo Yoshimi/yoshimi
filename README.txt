@@ -9,7 +9,8 @@ Highlights
     Improved handling of instrument names.
     Aftertouch values now saved
     Pan Law setting now saved.
-    MIDI-learn increased to 400 lines.
+    MIDI-learn entries increased to 400 lines.
+    Maximum delay time in CLI scripts increased to 30 seconds.
 
     NRPN updates.
     Improved CLI descriptions and reporting.

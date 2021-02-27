@@ -1617,26 +1617,31 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     if (input.matchnMove(1, "rate"))
     {
         cmd = LFOINSERT::control::speed;
-        bool test = false; // this will be a test for BPM mode
-        if (test)
+        if (controlType == type_read && input.isAtEnd())
+            value = 0;
+
+        else
         {
-            int num = string2int(input);
-            input.skipChars();
-            int div = string2int(input);
-            if ((num == 3 && div == 2) || (num == 2 && div == 3))
-                ;//value = ???
-            else
+            if (readControl(synth, 0, LFOINSERT::bpm, npart, kitNumber, engine, TOPLEVEL::insert::LFOgroup, group))
             {
-                if (num == 1 && (div < 1 || div > 16))
-                    return REPLY::range_msg;
-                else if (div == 1 && (num < 1 || num > 16))
-                    return REPLY::range_msg;
-                if (num > 1 && div > 1)
+                int num = string2int(input);
+                input.skipChars();
+                if (input.isAtEnd())
                 {
-                    synth->getRuntime().Log("Invalid ratio");
+                    synth->getRuntime().Log("BPM mode requires two values between 1 and 16");
                     return REPLY::done_msg;
                 }
-            //value = ???
+                int div = string2int(input);
+                value = func::BPMfractionLFOfreq(num, div);
+            }
+            else
+            {
+                value = string2float(input);
+                if (value < 0 || value > 1)
+                {
+                    synth->getRuntime().Log("frequency requires a value between 0.0 and 1.0");
+                    return REPLY::done_msg;
+                }
             }
         }
     }
@@ -5765,14 +5770,17 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename)
     const char DELIM_NEWLINE ='\n';
     while (std::getline(reader, line, DELIM_NEWLINE))
     {
+        //std::cout << "line >" << line << "<" << std::endl;
         scriptParser.initWithExternalBuffer(line);
-
         if (scriptParser.isTooLarge())
         {
             Runtime.Log("*** Error: line " + to_string(lineNo) + " too long");
-            continue;
+            return Reply(REPLY::failed_msg);
         }
         ++ lineNo;
+        if (line.empty())
+            continue; // skip empty line but count it.
+
         scriptParser.skipSpace();
         if (scriptParser.peek() == '#' || iscntrl((unsigned char) scriptParser.peek()))
         {   // skip comment lines
@@ -5785,14 +5793,19 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename)
         }
         if (scriptParser.matchnMove(4, "wait"))
         {
-            int tmp = string2int(scriptParser);
-            if (tmp < 1)
-                tmp = 1;
-            else if (tmp > 1000)
-                tmp = 1000;
-            Runtime.Log("Waiting " + std::to_string(tmp) + "mS");
-            usleep((tmp - 1) * 1000);
-            // total processing may add up to another 1 mS
+            int mSec = string2int(scriptParser);
+            if (mSec < 2)
+                mSec = 2;
+            else if (mSec > 30000)
+                mSec = 30000;
+            mSec -= 1; //allow for internal time
+            Runtime.Log("Waiting " + std::to_string(mSec) + "mS");
+            if (mSec > 1000)
+            {
+                sleep (mSec / 1000);
+                mSec = mSec % 1000;
+            }
+            usleep(mSec * 1000);
         }
         else
         {

@@ -2798,15 +2798,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
             if (getData->data.offset == 1)
             {
                 float value = getData->data.value;
-                contstr = "BPM ratio ";
-                if (value > 0.98571f) // there should be a better way to do this!
-                    contstr += "Unknown";
-                else
-                {
-                    std::pair<float, float> bpmFrac = func::LFOfreqBPMFraction(value);
-                    string result = (to_string(int(bpmFrac.first)) + "/" + to_string(int(bpmFrac.second)));
-                    contstr += result;
-                }
+                contstr = "BPM ratio " + LFObpm[int(roundf(value * (LFO_BPM_STEPS + 2)))];
                 showValue = false;
             }
             else

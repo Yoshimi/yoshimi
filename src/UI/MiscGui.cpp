@@ -571,8 +571,13 @@ static string freqBPMStr(float val)
     // total number of steps, otherwise saved instruments will get incorrect
     // values.
     static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS table.");
+    return LFObpm[int(roundf(val * (LFO_BPM_STEPS + 2)))];
+    /*
+     * switch replaced by call into Interface/TextLists.h
+     * so it is now unifed with CLI response - Will.
+     */
 
-    switch ((int)roundf(val * (LFO_BPM_STEPS + 2))) {
+    /*switch ((int)roundf(val * (LFO_BPM_STEPS + 2))) {
     case 0:
         // Some room to expand in the future. Fallthrough.
     case 1:
@@ -645,7 +650,7 @@ static string freqBPMStr(float val)
         return string("16/1 BPM");
     default:
         return string("Unknown BPM");
-    }
+    }*/
 }
 
 string convert_value(ValueType type, float val)

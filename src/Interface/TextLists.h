@@ -630,28 +630,35 @@ static std::string waveformlist [] = {
 
 static std::string LFOlist [] = {
     " - catgory -","",
-    "AMplitude",          "amplitude type",
-    "FRequency",          "frequency type",
-    "FIlter",             "filter type",
+    "AMplitude",             "amplitude type",
+    "FRequency",             "frequency type",
+    "FIlter",                "filter type",
     " - control -","",
-    "Rate <n>",         "frequency",
-    "Intensity <n>",    "depth",
-    "Start <n>",        "start position in cycle",
-    "Delay <n>",        "time before effect",
-    "Expand <n>",       "rate / note pitch",
-    "Bpm <s>",          "sync frequency to MIDI clock (ON, {other})",
-    "Continuous <s>",   "(ON, {other})",
-    "AR <n>",           "amplitude randomness",
-    "FR <n>",           "frequency randomness",
-    "Type <s>",         "LFO oscillator shape",
+    "Rate [<n>][<n1> <n2>]", "frequency or BPM [1 16] to [16 1], [2 3], [3 2]",
+    "Intensity <n>",         "depth",
+    "Start <n>",             "start position in cycle",
+    "Delay <n>",             "time before effect",
+    "Expand <n>",            "rate / note pitch",
+    "Bpm <s>",               "sync frequency to MIDI clock (ON, {other})",
+    "Continuous <s>",        "(ON, {other})",
+    "AR <n>",                "amplitude randomness",
+    "FR <n>",                "frequency randomness",
+    "Type <s>",              "LFO oscillator shape",
     "","SIne, TRiangle, SQuare, RUp (ramp up), RDown (ramp down), E1down (exp. 1), E2down (exp. 1)",
     "","SH (sample/hold), RSU (rand square up), RSD (rand square down)",
-    "e.g. S FI T RU",     "set filter type ramp up",
+    "e.g. S FI T RU",        "set filter type ramp up",
     "@end"
 };
 // TODO need to find a way to safely (and efficiently) combine these
 static std::string LFOtype [] = {
     "SIne", "TRiangle", "SQuare", "RUp (ramp up)", "RDown (ramp down)", "E1down (exp. 1)", "E2down (exp. 2)", "SH (sample/hold)", "RSU (rand square up)", "RSD (rand square dn)", "@end"
+};
+
+static std::string LFObpm [] = {
+"1/16 BPM", // space for expansion
+"1/16 BPM", "1/15 BPM", "1/14 BPM", "1/13 BPM", "1/12 BPM", "1/11 BPM", "1/10 BPM", "1/9 BPM", "1/8 BPM", "1/7 BPM", "1/6 BPM", "1/5 BPM", "1/4 BPM", "1/3 BPM", "1/2 BPM", "2/3 BPM", "1/1 BPM", "3/2 BPM", "2/1 BPM", "3/1 BPM", "4/1 BPM", "5/1 BPM", "6/1 BPM", "7/1 BPM", "8/1 BPM", "9/1 BPM", "10/1 BPM", "11/1 BPM", "12/1 BPM", "13/1 BPM", "14/1 BPM", "15/1 BPM", "16/1 BPM",
+"16/1 BPM", // space for expansion
+"Unknown BPM",
 };
 
 static std::string filterlist [] = {

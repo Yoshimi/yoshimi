@@ -32,14 +32,17 @@ The recently introduced aftertouch feature can now be reached from the part edit
 The currently set panning law is saved to patchsets, and by inference also to state files. Resets will always revert to the default law. It is always worth switching Yoshimi to mono from time to time to hear what effect this is having.
 
 
-The maximum number of MIDI_learn lines has been increased to 400. The estimated time to load a file with all 400 entries is still less than 1 second, and the time for an incoming CC to match the very last entry is estimated to be appoximately 160uS (based in tests with 65 lines set). The number of lines is larger than the number of CCs available (disregarding NRPNs) but keep in mind you can have several lines receiving the same CC but performing different actions.
+The maximum number of MIDI_learn control entries has been increased to 400. The estimated time to load a file with all 400 entries is still less than 1 second, and the time for an incoming CC to match the very last entry is estimated to be appoximately 160uS (based in tests with 65 entries set). The number of entries is greater than the number of CCs available (disregarding NRPNs) but keep in mind you can have several entries receiving the same CC but performing different actions.
+
+
+CLI scripts can include a delay between commands. This so you can be sure things like PadSynth changes and instrument loads have fully initialised before being accessed by the next command. This used to be limited to 1 second, which is normally more than enough. However there are some exceptional situtations that can take several seconds. Therefore we've increased the limit to 30 seconds. These are still entered as milliseconds, so to delay 15 seconds enter: wait 15000
 
 
 NRPNs have been brushed up a bit. Some anomalies corrected and some bit-rot repaired.
 
-The command line has not been forgotten, and along with including access to the above extras, some of the wording has been adjusted to better reflect what is happening.
+The command line has not been forgotten, and along with including access to some of the above extras, some of the wording has been adjusted to better reflect what is happening.
 
-Much of the supplied documentation has been revised - including developer notes. There is also a new user guide being written that will include all these changes. In the meantime clicking on the manual entry in the dropdown list will open the V 1.7.4 one (after a notification).
+Much of the supplied documentation has been revised - including developer notes. There is also a new user guide being written that will include all these changes. In the meantime clicking on the manual entry in the dropdown menu will open the V 1.7.4 one (after a notification).
 
 Under the hood:
 Data storage has been brought into line with the XDG specification.

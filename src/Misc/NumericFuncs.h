@@ -2,7 +2,7 @@
     NumericFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2020, Will Godfrey
+    Copyright 2014-2021, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -295,6 +295,40 @@ inline std::pair<float, float> LFOfreqBPMFraction(float value)
     default:
         return std::pair<float, float>(1, 1);
     }
+}
+
+// This conversion was written for CLI input.
+// It may be useful elsewhere.
+inline float BPMfractionLFOfreq(int num, int div)
+{
+    static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS table.");
+
+    int res = 0;
+
+    // these checks could probably be improved!
+    if (num < 1)
+        num = 1;
+    else if (num > 16)
+        num = 16;
+    if (div < 1)
+        div = 1;
+    else if (div > 16)
+        div = 16;
+
+    if (num == 3 && div == 2)
+            res = 18;
+    else if(num == 2 && div == 3)
+        res = 16;
+    else if (num == 1)
+    {
+        if (div == 1)
+            res = 17;
+        else
+            res = 17 - div;
+    }
+    else if (div == 1)
+        res = 17 + num;
+    return (res / float(LFO_BPM_STEPS + 2));
 }
 
 }//(End)namespace func
