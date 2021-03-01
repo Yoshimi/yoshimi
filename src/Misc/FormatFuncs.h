@@ -273,7 +273,7 @@ inline std::string formatTextLines(std::string text, size_t maxLen)
 
 
 inline std::string nextLine(std::string& list) // this is destructive
-{
+{ // currently only used in main
     size_t pos = list.find('\n');
     std::string line = "";
     if (pos == std::string::npos)

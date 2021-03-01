@@ -1,5 +1,5 @@
 /*
-   Test timing for bigh switch statements
+   Test timing for big switch statements
 
    g++ -Wall -O3 /home/will/yoshimi-code/Util/switch_time.cpp -o /home/will/yoshimi-code/Util/switch_time
 

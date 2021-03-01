@@ -1632,6 +1632,13 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
                     return REPLY::done_msg;
                 }
                 int div = string2int(input);
+                if (num > 3 && div > 3)
+                {
+                    synth->getRuntime().Log("Cannot have both values greater than 3");
+                    return REPLY::done_msg;
+                }
+                else if (num == div)
+                    num = div = 1;
                 value = func::BPMfractionLFOfreq(num, div);
             }
             else

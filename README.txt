@@ -2,7 +2,7 @@ Version 2.0
 
 Highlights
     Fully and independently resizeable (and remembered) windows.
-    LFO Midi sync for engines.
+    Midi sync for engine LFOs.
 
     More Instrument types available - and a request to set them!
     Revised default instrument banks

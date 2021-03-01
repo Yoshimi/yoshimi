@@ -1,9 +1,16 @@
-yoshimi 2.0 rc6
+yoshimi 2.0
+
+2021-3-1 Will
+* Master window stays in view with resolution changes.
+* Added extra error check in CLI BPM ratio entry.
+* Added extra comments in various files.
+* Final doc updates.
+* Set release version 2.0
 
 2021-2-27 Will
 * Enabled LFO BPM ratios in CLI.
 * Unified CLI and GUI BPM reporting.
-* Allow delay in scripts up to 30 seconds.
+* Allowed delay in scripts up to 30 seconds.
 * Made filer window location independent of source.
 
 2021-2-25 Will (additional)

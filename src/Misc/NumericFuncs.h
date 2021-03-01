@@ -32,13 +32,13 @@ namespace func {
 
 template<class T>
 inline T limit(T val, T min, T max)
-{
+{ // currently doesn't seem to be used
     return val < min ? min : (val > max ? max : val);
 }
 
 
 inline void invSignal(float *sig, size_t len)
-{
+{ // only used by phaser effect
     for (size_t i = 0; i < len; ++i)
         sig[i] *= -1.0f;
 }
@@ -80,7 +80,7 @@ inline unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned i
 
 
 inline unsigned int bitFindHigh(unsigned int value)
-{
+{ // return the highest bit currently set
     if (value == 0)
         return 0xff;
 
@@ -107,13 +107,13 @@ inline void bitClear(unsigned int& value, unsigned int bit)
 
 
 inline void bitClearHigh(unsigned int& value)
-{
+{ // clear the current highest bit
     bitClear(value, bitFindHigh(value));
 }
 
 
 inline void bitClearAbove(unsigned int& value, int bitLevel)
-{
+{ // clear all bits above the designated one
     unsigned int mask = (0xffffffff << bitLevel);
     value = (value & ~mask);
 }
