@@ -542,25 +542,25 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button chorusflange {
-        class Fl_Check_Button2
         label Flange
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
         xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 230 labelfont 1 labelsize 10 hide deactivate
         code0 {o->value(eff->geteffectpar(10));}
+        class Fl_Check_Button2
       }
       Fl_Check_Button chorusp11 {
-        class Fl_Check_Button2
         label Subtract
         callback {//
         send_data(0, 11, o->value(), EFFECT::type::chorus, TOPLEVEL::type::Integer);}
         tooltip {inverts the output} xywh {232 13 83 16} box THIN_UP_BOX down_box DOWN_BOX color 230 labelsize 11
+        class Fl_Check_Button2
       }
     }
   }
   Function {make_phaser_window()} {} {
     Fl_Window effphaserwindow {
-      xywh {910 251 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      xywh {461 237 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
       class Fl_Group
     } {
       Fl_Text_Display phasername {
@@ -659,11 +659,11 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
-        class Fl_Check_Button2
         label {Sub.}
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         tooltip {inverts output} xywh {354 42 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
+        class Fl_Check_Button2
       }
       Fl_Dial phaserp11 {
         label Phase
@@ -675,11 +675,11 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp12 {
-        class Fl_Check_Button2
         label hyper
         callback {//
         send_data(0, 12, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         tooltip {hyper-sine} xywh {354 26 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
+        class Fl_Check_Button2
       }
       Fl_Dial phaserp13 {
         label dist
@@ -691,11 +691,11 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button phaserp14 {
-        class Fl_Check_Button2
         label Analog
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), EFFECT::type::phaser, TOPLEVEL::type::Integer);}
         tooltip {Emulates FET} xywh {354 10 17 15} down_box DOWN_BOX labelsize 11 align 4
+        class Fl_Check_Button2
       }
     }
   }
@@ -887,25 +887,25 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         class WidgetPDial
       }
       Fl_Check_Button distp6 {
-        class Fl_Check_Button2
         label {Neg.}
         callback {//
         send_data(0, 6, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {260 55 15 15} down_box DOWN_BOX labelsize 11 align 2
+        class Fl_Check_Button2
       }
       Fl_Check_Button distp9 {
-        class Fl_Check_Button2
         label {St.}
         callback {//
         send_data(0, 9, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         tooltip Stereo xywh {355 55 15 15} down_box DOWN_BOX labelsize 11 align 2
+        class Fl_Check_Button2
       }
       Fl_Check_Button distp10 {
-        class Fl_Check_Button2
         label PF
         callback {//
         send_data(0, 10, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         tooltip {Applies the filters(before or after) the distortion} xywh {355 38 15 15} down_box DOWN_BOX labelsize 11 align 1
+        class Fl_Check_Button2
       }
     }
   }
@@ -1072,11 +1072,11 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button dfp8 {
-          class Fl_Check_Button2
           label {Inv.}
           callback {//
           send_data(0, 8, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
           tooltip {enable for filter frequency to lower with higher input amplitude} xywh {352 55 15 15} down_box DOWN_BOX labelsize 11 align 2
+          class Fl_Check_Button2
         }
       }
     }
@@ -1311,14 +1311,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     if (value_int != 0)
                     {
                         phaserp9->deactivate();
-                        //phaserp11->deactivate();
+                        phaserp7->deactivate();
                         phaserp12->activate();
                         phaserp13->activate();
                     }
                     else
                     {
                         phaserp9->activate();
-                        //phaserp11->activate();
+                        phaserp7->activate();
                         phaserp12->deactivate();
                         phaserp13->deactivate();
                     }

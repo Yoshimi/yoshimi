@@ -29,6 +29,7 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
+#include "Interface/TextLists.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"

@@ -1,4 +1,16 @@
-yoshimi 2.0
+yoshimi 2.0 M
+
+2021-3-3 Will
+* Added TextLists.h to Interchange.cpp
+  Fixes potential issue with GCC 10.2.0
+* Reapplied filer window location independence.
+  Got lost somehow :(
+* Phaser feedback control deactivated when analog.
+  It does nothing in that mode.
+* Set correct type to Companion/Hoover.
+* Reinstated Resonance to Companion/Hollow Ghost Ensemble.
+  Don't know how this got lost - makes a big difference!
+* Added Surf to Companion.
 
 2021-3-1 Will
 * Master window stays in view with resolution changes.

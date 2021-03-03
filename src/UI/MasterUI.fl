@@ -1732,7 +1732,7 @@ Alan Calvert started the project}
         H = filerDH;
     }
     checkSane(X, Y, W, H, filerDW, filerDH);
-    filerwindow->size(W, H);
+    filerwindow->resize(X, Y, W, H);
 
     lastfilerW = 0;
     filerdone = false;
