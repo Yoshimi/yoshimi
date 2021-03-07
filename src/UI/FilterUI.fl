@@ -383,8 +383,9 @@ return Fl_Box::handle(event);} {}
 class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
-    code {synth = NULL;
-pars=NULL;
+    code {//
+        synth = NULL;
+        pars=NULL;
         velsnsamp=NULL;
         velsns=NULL;
         nvowel = 0;
@@ -426,17 +427,29 @@ pars=NULL;
           label Category
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::baseType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
+          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code0 {o->value(pars->Pcategory);}
-          code1 {o->add("Analog");o->add("Formant");o->add("StateVar");}
-        } {}
+        } {
+          MenuItem analog {
+            label Analog
+            xywh {55 55 100 20} labelfont 1 labelsize 10
+          }
+          MenuItem formant {
+            label Formant
+            xywh {65 65 100 20} labelfont 1 labelsize 10
+          }
+          MenuItem stvar {
+            label StVarF
+            xywh {75 75 100 20} labelfont 1 labelsize 10
+          }
+        }
         Fl_Dial cfreqdial {
           label {C.Freq}
           callback {//
           send_data(0, FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(getFilterFreqType(filtertype->value()));}
-          code1 {o->value(pars->Pfreq);}
+          code0 {o->value(pars->Pfreq);}
+          code1 {o->setValueType(getFilterFreqType(filtertype->value()));}
           class WidgetPDial
         }
         Fl_Dial qdial {
@@ -527,11 +540,11 @@ pars=NULL;
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Check_Button freqtrackoffset {
-        class Fl_Check_Button2
         label {0 /+}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTrackingRange, o->value(), TOPLEVEL::type::Write);}
         tooltip {Set frequency tracking range to 0%-200%} xywh {238 10 33 16} down_box DOWN_BOX labelsize 10 align 24
+        class Fl_Check_Button2
       }
     }
   }
@@ -626,12 +639,12 @@ pars=NULL;
             code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           }
           Fl_Check_Button neginput {
-            class Fl_Check_Button2
             label {Neg.Input}
             callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::negateInput, o->value(), TOPLEVEL::type::Write);}
             tooltip {Negate the input from LFO/envelopes/etc.} xywh {625 132 60 20} down_box DOWN_BOX labelsize 10
             code0 {o->value(pars->Psequencereversed);}
+            class Fl_Check_Button2
           }
           Fl_Dial strchdial {
             label Strch
@@ -817,7 +830,9 @@ pars=NULL;
             gaindial->labelsize(size);
 
             filtertype->labelsize(size);
-                filtertype->textsize(size);
+            analog->labelsize(size);
+            formant->labelsize(size);
+            stvar->labelsize(size);
 
             stcounter->labelsize(size);
             stcounter->textsize(size);
@@ -960,6 +975,7 @@ pars=NULL;
 
         case FILTERINSERT::control::baseType:
             filtertype->value(value_int);
+            cfreqdial->setValueType(getFilterFreqType(value_int));
             updateVCforQ();
             refresh();
             break;
@@ -1086,10 +1102,15 @@ pars=NULL;
     }
     else
         vsnsdial->value(*velsns);
-    switchcategory(pars->Pcategory);
+    //switchcategory(pars->Pcategory);
+    analogfiltertypechoice->value(0);
+    analogfiltertypechoice->do_callback();
+    svfiltertypechoice->value(0);
+    svfiltertypechoice->do_callback();
     stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
     formantparswindow->label(this->label());
-    update_formant_window();} {}
+    update_formant_window();
+    refresh();} {}
   }
   Function {switchcategory(int newcat)} {} {
     code {if (pars->Pcategory != newcat)

@@ -23,7 +23,7 @@ Yoshimi-minor="0 M">
 <string name="author">Will J Godfrey
 GPL V2 or later</string>
 <string name="comments">A subtle variation on Ghost Ensemble with the
-addition of resonance on both Add and Sub synths.</string>
+addition of resonance on both Add and Pad synths.</string>
 <par name="type" value="12" />
 <string name="file">Hollow Ghost Ensemble</string>
 </INFO>
