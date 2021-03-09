@@ -427,22 +427,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label Category
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::baseType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
+          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
           code0 {o->value(pars->Pcategory);}
-        } {
-          MenuItem analog {
-            label Analog
-            xywh {55 55 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem formant {
-            label Formant
-            xywh {65 65 100 20} labelfont 1 labelsize 10
-          }
-          MenuItem stvar {
-            label StVarF
-            xywh {75 75 100 20} labelfont 1 labelsize 10
-          }
-        }
+          code1 {o->add("analog");o->add("formant");o->add("StVarF");}
+        } {}
         Fl_Dial cfreqdial {
           label {C.Freq}
           callback {//
@@ -830,9 +818,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             gaindial->labelsize(size);
 
             filtertype->labelsize(size);
-            analog->labelsize(size);
-            formant->labelsize(size);
-            stvar->labelsize(size);
+                filtertype->textsize(size);
 
             stcounter->labelsize(size);
             stcounter->textsize(size);
@@ -1103,6 +1089,9 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     else
         vsnsdial->value(*velsns);
     //switchcategory(pars->Pcategory);
+    cfreqdial->setValueType(getFilterFreqType(pars->Pcategory));
+    updateVCforQ();
+
     analogfiltertypechoice->value(0);
     analogfiltertypechoice->do_callback();
     svfiltertypechoice->value(0);

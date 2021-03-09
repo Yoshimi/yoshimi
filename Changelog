@@ -1,5 +1,8 @@
 yoshimi 2.0 M
 
+2021-3-9 Will
+* Completed GUI filter frequency correction.
+
 2021-3-7 Will
 * BugFix: GUI Filter frequency not showing correct value.
 * Added 3 new instruments to Companion bank.
