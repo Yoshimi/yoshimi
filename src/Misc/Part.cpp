@@ -145,6 +145,7 @@ void Part::defaults(void)
     PbreathControl = 2;
     Peffnum = 0;
     setDestination(1);
+    Poriginal = "";
     busy = false;
     defaultsinstrument();
     ctl->resetall();
