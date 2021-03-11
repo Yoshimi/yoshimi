@@ -64,15 +64,14 @@ namespace {
 
 
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
     oldl(NULL),
     oldr(NULL),
     xn1l(NULL),
     xn1r(NULL),
     yn1l(NULL),
-    yn1r(NULL),
-    synth(_synth)
+    yn1r(NULL)
 {
     analog_setup();
     setpreset(Ppreset);

@@ -43,11 +43,10 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
 };
 
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
     oldl(NULL),
-    oldr(NULL),
-    synth(_synth)
+    oldr(NULL)
 {
     setpreset(Ppreset);
     cleanup();

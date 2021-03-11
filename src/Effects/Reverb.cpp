@@ -68,7 +68,7 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
 // todo: EarlyReflections, Prdelay, Perbalance
 
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     // defaults
 //    Pvolume(48),
     Ptime(64),
@@ -88,7 +88,8 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     idelay(NULL),
     lpf(NULL),
     hpf(NULL), // no filter
-    synth(_synth)
+    lpffr(0, synth->samplerate),
+    hpffr(0, synth->samplerate)
 {
     setvolume(48);
     inputbuf = (float*)fftwf_malloc(synth->bufferbytes);

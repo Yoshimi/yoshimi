@@ -56,9 +56,9 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
 
 
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
-    synth(_synth)
+    fb(0, _synth->samplerate)
 {
     dlk = drk = 0;
     maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth->samplerate_f);

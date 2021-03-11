@@ -2,6 +2,7 @@
     SynthHelper.h
 
     Copyright 2011, Alan Calvert
+    Copyright 2021, Kristian Amlie
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -22,8 +23,150 @@
 
 #include <cmath>
 
+#define DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS 50.0f
+
 namespace synth {
 
+
+// Provides a convenient way to interpolate between samples. You provide a
+// starting value, and each time you provide new value, it will start
+// interpolating between the values. It takes into account new values that
+// appear while an interpolation is happening.
+template <typename T>
+class InterpolatedValue
+{
+    public:
+        InterpolatedValue(T startValue, int sampleRate_)
+            : oldValue(startValue)
+            , newValue(startValue)
+            , targetValue(startValue)
+            , sampleRate(sampleRate_)
+        {
+            setInterpolationLength(DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS);
+        }
+
+        void setInterpolationLength(float msecs)
+        {
+            float samples = msecs / 1000.0f * sampleRate;
+            // Round up so we are as smooth as possible.
+            interpolationLength = ceilf(samples);
+            interpolationPos = interpolationLength;
+        }
+
+        bool isInterpolating() const
+        {
+            return interpolationPos < interpolationLength;
+        }
+
+        void setTargetValue(T value)
+        {
+            targetValue = value;
+            if (!isInterpolating() && targetValue != newValue)
+            {
+                newValue = value;
+                interpolationPos = 0;
+            }
+        }
+
+       // The value interpolated from.
+        T getOldValue() const
+        {
+            return oldValue;
+        }
+
+       // The value interpolated to (not necessarily the same as the last set
+       // target point).
+        T getNewValue() const
+        {
+            return newValue;
+        }
+
+        T getTargetValue() const
+        {
+            return targetValue;
+        }
+
+        float factor() const
+        {
+            return (float)interpolationPos / (float)interpolationLength;
+        }
+
+        T getValue() const
+        {
+            return getOldValue() * (1.0f - factor()) + getNewValue() * factor();
+        }
+
+        T getAndAdvanceValue()
+        {
+            T v = getValue();
+            advanceValue();
+            return v;
+        }
+
+        void advanceValue()
+        {
+            if (interpolationPos >= interpolationLength)
+                return;
+
+            if (++interpolationPos < interpolationLength)
+                return;
+
+            oldValue = newValue;
+            if (targetValue != newValue)
+            {
+                newValue = targetValue;
+                interpolationPos = 0;
+            }
+        }
+
+        void advanceValue(int samples)
+        {
+            if (interpolationPos + samples < interpolationLength)
+                interpolationPos += samples;
+            else if (interpolationPos + samples >= interpolationLength * 2)
+            {
+                oldValue = newValue = targetValue;
+                interpolationPos = interpolationLength;
+            }
+            else
+            {
+                oldValue = newValue;
+                newValue = targetValue;
+                interpolationPos += samples - interpolationLength;
+            }
+        }
+
+    private:
+        T oldValue;
+        T newValue;
+        T targetValue;
+
+        int interpolationLength;
+        int interpolationPos;
+
+    protected:
+        int sampleRate;
+};
+
+// Default-initialized variant of InterpolatedValue. Use only if you must (for
+// example in an array), normally it is better to use the fully initialized
+// one. If you use this, then you should call setSampleRate immediately after
+// construction.
+template <typename T>
+class InterpolatedValueDfl : public InterpolatedValue<T>
+{
+    public:
+        InterpolatedValueDfl()
+            : InterpolatedValue<T>(0, 44100)
+        {
+        }
+
+        void setSampleRate(int sampleRate)
+        {
+            this->sampleRate = sampleRate;
+            this->setInterpolationLength(DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS);
+        }
+};
 
 
 inline bool aboveAmplitudeThreshold(float a, float b)

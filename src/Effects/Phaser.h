@@ -114,8 +114,6 @@ class Phaser : public Effect
 
         void NormalPhase(float *smpsl, float *smpsr);
         float applyPhase(float x, float g, float *old);
-
-        SynthEngine *synth;
 };
 
 class Phaserlimit

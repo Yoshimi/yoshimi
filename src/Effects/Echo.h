@@ -62,17 +62,17 @@ class Echo : public Effect
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        InterpolatedParameter fb, hidamp;
+        synth::InterpolatedValue<float> fb, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);
         float *ldelay;
         float *rdelay;
+        int maxdelay;
         float  oldl, oldr; // pt. lpf
 
-        int kl, kr;
-
-        SynthEngine *synth;
+        int realposl, realposr;
+        synth::InterpolatedValue<int> lxfade, rxfade;
 };
 
 class Echolimit

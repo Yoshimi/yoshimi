@@ -52,7 +52,7 @@ namespace { // Implementation details...
 
 
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pvolume(50),
     Pdrive(90),
     Plevel(64),
@@ -62,7 +62,9 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     Phpf(0),
     Pstereo(1),
     Pprefiltering(0),
-    synth(_synth)
+    level(0, synth->samplerate),
+    lpffr(0, synth->samplerate),
+    hpffr(0, synth->samplerate)
 {
     level.setTargetValue(Plevel / 127.0f);
     lpfl = new AnalogFilter(2, 22000, 1, 0, synth);

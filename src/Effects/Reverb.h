@@ -105,11 +105,9 @@ class Reverb : public Effect
         float *idelay;
         AnalogFilter *lpf;  // filters
         AnalogFilter *hpf;
-        InterpolatedParameter lpffr;
-        InterpolatedParameter hpffr;
+        synth::InterpolatedValue<float> lpffr;
+        synth::InterpolatedValue<float> hpffr;
         float *inputbuf;
-
-        SynthEngine *synth;
 };
 
 class Revlimit

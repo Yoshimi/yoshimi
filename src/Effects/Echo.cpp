@@ -43,13 +43,16 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
     };
 
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pdelay(60),
     Plrdelay(100),
+    fb(1, _synth->samplerate),
+    hidamp(1, _synth->samplerate),
     lrdelay(0),
     ldelay(NULL),
     rdelay(NULL),
-    synth(_synth)
+    lxfade(1, _synth->samplerate_f),
+    rxfade(1, _synth->samplerate_f)
 {
     setvolume(50);
     setfb(40);
@@ -57,6 +60,10 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
     Pchanged = false;
+    maxdelay = 5 * synth->samplerate;
+    ldelay = new float[maxdelay];
+    rdelay = new float[maxdelay];
+    realposl = realposr = 1;
     cleanup();
 }
 
@@ -80,22 +87,12 @@ void Echo::cleanup(void)
 // Initialize the delays
 void Echo::initdelays(void)
 {
-    // todo: make this adjust insted of destroy old delays
-    kl = kr = 0;
     dl = delay - lrdelay;
     if (dl < 1)
         dl = 1;
     dr = delay + lrdelay;
     if (dr < 1)
         dr = 1;
-
-    if (ldelay != NULL)
-        delete [] ldelay;
-    if (rdelay != NULL)
-        delete [] rdelay;
-    ldelay = new float[dl];
-    rdelay = new float[dr];
-    cleanup();
 }
 
 
@@ -103,12 +100,47 @@ void Echo::initdelays(void)
 void Echo::out(float* smpsl, float* smpsr)
 {
     float l, r;
-    float ldl = ldelay[kl];
-    float rdl = rdelay[kr];
+    float ldl;
+    float rdl;
+
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        ldl = ldelay[kl] + float(1e-20); // anti-denormal included
-        rdl = rdelay[kr] + float(1e-20); // anti-denormal included
+        lxfade.setTargetValue(dl);
+        rxfade.setTargetValue(dr);
+
+        int targetpos;
+
+        targetpos = realposl - lxfade.getNewValue();
+        if (targetpos < 0)
+            targetpos += maxdelay;
+        ldl = ldelay[targetpos];
+
+        targetpos = realposr - rxfade.getNewValue();
+        if (targetpos < 0)
+            targetpos += maxdelay;
+        rdl = rdelay[targetpos];
+
+        if (lxfade.isInterpolating())
+        {
+            targetpos = realposl - lxfade.getOldValue();
+            if (targetpos < 0)
+                targetpos += maxdelay;
+
+            ldl = ldelay[targetpos] * (1.0f - lxfade.factor()) + ldl * lxfade.factor();
+        }
+
+        if (rxfade.isInterpolating())
+        {
+            targetpos = realposr - rxfade.getOldValue();
+            if (targetpos < 0)
+                targetpos += maxdelay;
+
+            rdl = rdelay[targetpos] * (1.0f - rxfade.factor()) + rdl * rxfade.factor();
+        }
+
+        ldl += float(1e-20); // anti-denormal included
+        rdl += float(1e-20); // anti-denormal included
+
         l = ldl * (1.0 - lrcross.getValue()) + rdl * lrcross.getValue();
         r = rdl * (1.0 - lrcross.getValue()) + ldl * lrcross.getValue();
         lrcross.advanceValue();
@@ -123,16 +155,19 @@ void Echo::out(float* smpsl, float* smpsr)
         fb.advanceValue();
 
         // LowPass Filter
-        ldelay[kl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
-        rdelay[kr] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
+        ldelay[realposl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
+        rdelay[realposl] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
         hidamp.advanceValue();
         oldl = ldl;
         oldr = rdl;
 
-        if (++kl >= dl)
-            kl = 0;
-        if (++kr >= dr)
-            kr = 0;
+        if (++realposl >= maxdelay)
+            realposl = 0;
+        if (++realposr >= maxdelay)
+            realposr = 0;
+
+        lxfade.advanceValue();
+        rxfade.advanceValue();
     }
 }
 

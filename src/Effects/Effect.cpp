@@ -23,77 +23,26 @@
     This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
+#include "Misc/SynthEngine.h"
 #include "Effects/Effect.h"
 #include "Misc/NumericFuncs.h"
 
-#define DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS 10.0f
-
 using func::setAllPan;
 
-float InterpolatedParameter::sampleRate = 0;
-
-InterpolatedParameter::InterpolatedParameter() :
-    targetValue(0.5f),
-    currentValue(0.5f),
-    samplesLeft(0)
-{
-    setInterpolationLength(DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS);
-}
-
-void InterpolatedParameter::setSampleRate(float sampleRate)
-{
-    InterpolatedParameter::sampleRate = sampleRate;
-}
-
-void InterpolatedParameter::setInterpolationLength(float msecs)
-{
-    float samples = msecs / 1000.0f * sampleRate;
-    // Round up so we are as smooth as possible.
-    samplesToInterpolate = ceilf(samples);
-}
-
-void InterpolatedParameter::setTargetValue(float value)
-{
-    targetValue = value;
-    samplesLeft = samplesToInterpolate;
-}
-
-float InterpolatedParameter::getAndAdvanceValue()
-{
-    float ret = currentValue;
-    advanceValue();
-    return ret;
-}
-
-void InterpolatedParameter::advanceValue()
-{
-    if (samplesLeft > 1) {
-        currentValue = currentValue + (targetValue - currentValue) / samplesLeft;
-        samplesLeft--;
-    } else {
-        currentValue = targetValue;
-        samplesLeft = 0;
-    }
-}
-
-void InterpolatedParameter::advanceValue(int samples)
-{
-    if (samplesLeft > 1 && samples < samplesLeft) {
-        currentValue = currentValue + (targetValue - currentValue) / samplesLeft * (float)samples;
-        samplesLeft -= samples;
-    } else {
-        currentValue = targetValue;
-        samplesLeft = 0;
-    }
-}
-
 Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
-               FilterParams *filterpars_, unsigned char Ppreset_) :
+               FilterParams *filterpars_, unsigned char Ppreset_,
+               SynthEngine *synth_) :
     Ppreset(Ppreset_),
     efxoutl(efxoutl_),
     efxoutr(efxoutr_),
+    outvolume(0.5f, synth_->samplerate),
+    volume(0.5f, synth_->samplerate),
     filterpars(filterpars_),
-    insertion(insertion_)
+    insertion(insertion_),
+    pangainL(0.5f, synth_->samplerate),
+    pangainR(0.5f, synth_->samplerate),
+    lrcross(0.5f, synth_->samplerate),
+    synth(synth_)
 {
     setpanning(64);
     setlrcross(40);

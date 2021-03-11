@@ -32,8 +32,7 @@ using func::rap2dB;
 
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    synth(_synth)
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth)
 {
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
@@ -44,6 +43,9 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
         filter[i].Pstages = 0;
         filter[i].l = new AnalogFilter(6, 1000.0, 1.0, 0, synth);
         filter[i].r = new AnalogFilter(6, 1000.0, 1.0, 0, synth);
+        filter[i].freq.setSampleRate(synth->samplerate);
+        filter[i].gain.setSampleRate(synth->samplerate);
+        filter[i].q.setSampleRate(synth->samplerate);
     }
     // default values
     setvolume(50);

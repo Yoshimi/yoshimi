@@ -43,15 +43,14 @@ static const char presets[NUM_PRESETS][PRESET_SIZE] = {
 };
 
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
+    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0, _synth),
     lfo(_synth),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
     Pampsmooth(60),
     filterl(NULL),
-    filterr(NULL),
-    synth(_synth)
+    filterr(NULL)
 {
     setvolume(110);
     setpreset(Ppreset);

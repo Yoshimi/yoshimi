@@ -67,8 +67,6 @@ class DynamicFilter : public Effect
 
         Filter *filterl, *filterr;
         float ms1, ms2, ms3, ms4; // mean squares
-
-        SynthEngine *synth;
 };
 
 class Dynamlimit
