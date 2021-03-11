@@ -68,11 +68,11 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {159 158 390 330} type Double hide resizable
+      xywh {159 158 390 330} type Double resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
-      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
+      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Button Tab1 {
         label {&Main Settings}
@@ -224,15 +224,14 @@ alsaTab->hide();}
           xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
         } {
           Fl_Check_Button bankHighlight {
-            class Fl_Check_Button2
             label {Enable Bank Highlight}
             callback {//
                         send_data(0, CONFIG::control::enableHighlight, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Show the last patch fetched from or saved to a bank} xywh {190 40 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().bankHighlight);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button setDefaultState {
-            class Fl_Check_Button2
             label {* Start With Default State}
             callback {//
                         send_data(0, CONFIG::control::defaultStateStart, o->value(), TOPLEVEL::type::Integer);}
@@ -240,52 +239,52 @@ alsaTab->hide();}
 or when that loads it will revert to the previous value} xywh {190 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button nonFatal {
-            class Fl_Check_Button2
             label {Hide Non Fatal Errors}
             callback {//
                         send_data(0, CONFIG::control::hideNonFatalErrors, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button showSplash {
-            class Fl_Check_Button2
             label {Show Splash Screen}
             callback {//
                         send_data(0, CONFIG::control::showSplash, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button logTimes {
-            class Fl_Check_Button2
             label {Log Load times}
             callback {//
                         send_data(0, CONFIG::control::logInstrumentLoadTimes, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showTimes);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button logXML {
-            class Fl_Check_Button2
             label {Log XML Headers}
             callback {//
                         send_data(0, CONFIG::control::logXMLheaders, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button saveAllXML {
-            class Fl_Check_Button2
             label {Include all data in XML files}
             callback {//
                         send_data(0, CONFIG::control::saveAllXMLdata, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().xmlmax);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button enableGUI {
-            class Fl_Check_Button2
             label {* Enable GUI}
             callback {//
                         int tmp = o->value();
@@ -299,84 +298,85 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             tooltip {Enable starting with this graphical  interface} xywh {190 180 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button enableCLI {
-            class Fl_Check_Button2
             label {* Enable CLI}
             callback {//
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Enable starting with interactive command line interface} xywh {190 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCli);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button enableAuto {
-            class Fl_Check_Button2
             label {Enable Auto Instance}
             callback {//
                         send_data(0, CONFIG::control::enableAutoInstance, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Allow main instance to start all those open when last closed.} xywh {190 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button singleMaster {
-            class Fl_Check_Button2
             label {* Enable Single Master}
             callback {//
           send_data(0, CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Redirect new start from desktop to create new instance instead.} xywh {190 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
             code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
+            class Fl_Check_Button2
           }
           Fl_Text_Display historyLocks {
             label {History Locks}
             xywh {278 110 50 1} box NO_BOX labelsize 12 align 129 textsize 12
           }
           Fl_Check_Button H_instrument {
-            class Fl_Check_Button2
             label Instrument
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Instrument);}
             xywh {240 120 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Check_Button H_patchset {
-            class Fl_Check_Button2
             label {Patch Set}
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Patch);}
             xywh {240 140 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Check_Button H_scale {
-            class Fl_Check_Button2
             label Scale
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Scale);}
             xywh {240 160 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Check_Button H_state {
-            class Fl_Check_Button2
             label State
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::State);}
             xywh {240 180 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Check_Button H_vector {
-            class Fl_Check_Button2
             label Vector
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Vector);}
             xywh {240 200 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Check_Button H_mlearn {
-            class Fl_Check_Button2
             label {Midi Learn}
             callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::MLearn);}
             xywh {240 220 27 25} down_box DOWN_BOX labelsize 12 align 8
             code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+            class Fl_Check_Button2
           }
           Fl_Box switchesNote {
             label {* Changing these settings requires a restart}
@@ -398,12 +398,12 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             code0 {o->value(synth->getRuntime().jackMidiDevice.c_str());}
           }
           Fl_Check_Button jackMidi {
-            class Fl_Check_Button2
             label {Set as preferred MIDI}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::jackPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
+            class Fl_Check_Button2
           }
           Fl_Input jackServer {
             label {Jack Server}
@@ -414,20 +414,20 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             code0 {o->value(synth->getRuntime().jackServer.c_str());}
           }
           Fl_Check_Button jackAudio {
-            class Fl_Check_Button2
             label {Set as preferred audio}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::jackPreferredAudio, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button connectJackAudio {
-            class Fl_Check_Button2
             label {Autoconnect audio}
             callback {//
                         send_data(0, CONFIG::control::jackAutoConnectAudio, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 233 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().connectJackaudio);}
+            class Fl_Check_Button2
           }
           Fl_Box jackNote {
             label {Changing settings requires a restart}
@@ -458,12 +458,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code0 {o->value(synth->getRuntime().alsaMidiDevice.c_str());}
           }
           Fl_Check_Button alsaMidi {
-            class Fl_Check_Button2
             label {Set as preferred MIDI}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredMidi, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 110 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
+            class Fl_Check_Button2
           }
           Fl_Input alsaDevice {
             label {Alsa Audio Device}
@@ -482,12 +482,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code1 {o->value(convertSrate(synth->getRuntime().Samplerate));}
           } {}
           Fl_Check_Button alsaAudio {
-            class Fl_Check_Button2
             label {Set as preferred audio}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::alsaPreferredAudio, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
+            class Fl_Check_Button2
           }
           Fl_Box alsaNote {
             label {Changing settings requires a restart}
@@ -606,29 +606,29 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code2 {oldBank = o->value();}
           } {}
           Fl_Check_Button progenable {
-            class Fl_Check_Button2
             label {Enable Program Change}
             callback {//
                         send_data(0, CONFIG::control::enableProgramChange, o->value(), TOPLEVEL::type::Integer);}
             tooltip {MIDI program change enable/disable} xywh {234 110 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button progpartenable {
-            class Fl_Check_Button2
             label {Enable Part On Program Change}
             callback {//
                         send_data(0, CONFIG::control::instChangeEnablesPart, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
+            class Fl_Check_Button2
           }
           Fl_Spinner EPCspinner {
-            class WidgetSpinner
             label {Extended Program Change CC}
             callback {//
                         Epend->show();}
             xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textfont 1 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
+            class WidgetSpinner
           }
           Fl_Button Epend {
             label Pending
@@ -656,7 +656,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button Epcheck {
-            class Fl_Check_Button2
             label {Enable Extended Program Change}
             callback {// for some weird reason this *must* be the last item in the group
                         if (o->value() == 0)
@@ -677,38 +676,39 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             xywh {234 160 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
+            class Fl_Check_Button2
           }
           Fl_Check_Button enableNRPN {
-            class Fl_Check_Button2
             label {Enable Incoming NRPNs}
             callback {//
                         send_data(0, CONFIG::control::enableNRPNs, o->value(), TOPLEVEL::type::Integer);}
             xywh {234 210 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_NRPN);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button ignoreReset {
-            class Fl_Check_Button2
             label {Ignore Reset all CCs}
             callback {//
                         send_data(0, CONFIG::control::ignoreResetAllCCs, o->value(), TOPLEVEL::type::Integer);}
             xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button midiMon {
-            class Fl_Check_Button2
             label {Log Incoming Events}
             callback {//
                         send_data(0, CONFIG::control::logIncomingCCs, o->value(), TOPLEVEL::type::Integer);}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
+            class Fl_Check_Button2
           }
           Fl_Check_Button midiLearned {
-            class Fl_Check_Button2
             label {Show Learn Editor}
             callback {//
                         send_data(0, CONFIG::control::showLearnEditor, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showLearnedCC);}
+            class Fl_Check_Button2
           }
         }
       }
@@ -806,7 +806,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     code {//
             type |= TOPLEVEL::type::Write;
             if (part == UNUSED)
-                part = TOPLEVEL::section::config;
+                part = TOPLEVEL::section::config;;
             collect_data(synth, value, action, type, control, part, kit, engine, insert, par, UNUSED, miscmsg);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float

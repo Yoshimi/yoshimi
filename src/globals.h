@@ -249,12 +249,11 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     enum XML : unsigned char { // file and history types
         Instrument = 0, // individual externally sourced Instruments
         Patch, //      full instrument Patch Sets
-        Presets, //    parts of instruments or effects
         Scale, //      complete Microtonal settings
         State, //      entire system State
         Vector, //     per channel Vector settings
-        // insert any new lists here
         MLearn, //     learned MIDI CC lists
+        Presets, //    parts of instruments or effects
 
         // not XML but there for consistency
         PadSample,

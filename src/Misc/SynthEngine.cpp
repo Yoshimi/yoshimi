@@ -2541,21 +2541,22 @@ vector<string> * SynthEngine::getHistory(int group)
         case TOPLEVEL::XML::Patch: // 1
             return &ParamsHistory;
             break;
-        case TOPLEVEL::XML::Presets: // 2
-            return &PresetHistory;
-            break;
-        case TOPLEVEL::XML::Scale: // 3
+        case TOPLEVEL::XML::Scale: // 2
             return &ScaleHistory;
             break;
-        case TOPLEVEL::XML::State: // 4
+        case TOPLEVEL::XML::State: // 3
             return &StateHistory;
             break;
-        case TOPLEVEL::XML::Vector: // 5
+        case TOPLEVEL::XML::Vector: // 4
             return &VectorHistory;
             break;
-        case TOPLEVEL::XML::MLearn: // 6
+        case TOPLEVEL::XML::MLearn: // 5
             return &MidiLearnHistory;
             break;
+        case TOPLEVEL::XML::Presets: // 6
+            return &PresetHistory;
+            break;
+
         case TOPLEVEL::XML::PadSample: // 7
             return &PadHistory;
             break;
@@ -2567,8 +2568,8 @@ vector<string> * SynthEngine::getHistory(int group)
             break;
         default:
             // can't identify what is calling this.
-            // It's connected with opening the filer
-            //Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
+            // It's connected with opening the filer on presets
+            Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
             return &ParamsHistory;
     }
 }
@@ -2671,10 +2672,6 @@ bool SynthEngine::loadHistory()
                 type = "XMZ_PATCH_SETS";
                 extension = "xmz_file";
                 break;
-            case TOPLEVEL::XML::Presets:
-                type = "XMZ_PRESETS";
-                extension = "xpz_file";
-                break;
             case TOPLEVEL::XML::Scale:
                 type = "XMZ_SCALE";
                 extension = "xsz_file";
@@ -2690,6 +2687,10 @@ bool SynthEngine::loadHistory()
             case TOPLEVEL::XML::MLearn:
                 type = "XMZ_MIDILEARN";
                 extension = "xly_file";
+                break;
+            case TOPLEVEL::XML::Presets:
+                type = "XMZ_PRESETS";
+                extension = "xpz_file";
                 break;
 
             case TOPLEVEL::XML::PadSample:
@@ -2761,10 +2762,6 @@ bool SynthEngine::saveHistory()
                     type = "XMZ_PATCH_SETS";
                     extension = "xmz_file";
                     break;
-                case TOPLEVEL::XML::Presets:
-                    type = "XMZ_PRESETS";
-                    extension = "xpz_file";
-                    break;
                 case TOPLEVEL::XML::Scale:
                     type = "XMZ_SCALE";
                     extension = "xsz_file";
@@ -2780,6 +2777,10 @@ bool SynthEngine::saveHistory()
                 case TOPLEVEL::XML::MLearn:
                     type = "XMZ_MIDILEARN";
                     extension = "xly_file";
+                    break;
+                case TOPLEVEL::XML::Presets:
+                    type = "XMZ_PRESETS";
+                    extension = "xpz_file";
                     break;
 
                 case TOPLEVEL::XML::PadSample:
