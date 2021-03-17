@@ -1,5 +1,8 @@
 yoshimi 2.0 M
 
+2021-3-17 Will
+* A few spelling checks in the Gui.
+
 2021-3-11 Will
 * BugFix: crash when locking midilearn history from GUI.
   Caused by placement of presets in the XML list.

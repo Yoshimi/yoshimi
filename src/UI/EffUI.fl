@@ -249,14 +249,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {115 13 90 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textfont 1 textsize 10 textcolor 7
-        code0 {o->add("Cathedral 1");o->add("Cathedral 2");o->add("Cathedral 3");o->add("Hall 1");o->add("Hall 2");o->add("Room 1");o->add("Room 2");o->add("Basement");o->add("Tunnel");o->add("Echoed 1");o->add("Echoed 2");o->add("very Long 1");o->add("Very Long 2");}
+        code0 {o->add("Cathedral 1");o->add("Cathedral 2");o->add("Cathedral 3");o->add("Hall 1");o->add("Hall 2");o->add("Room 1");o->add("Room 2");o->add("Basement");o->add("Tunnel");o->add("Echoed 1");o->add("Echoed 2");o->add("Very Long 1");o->add("Very Long 2");}
       } {}
       Fl_Choice revp10 {
         label Type
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), EFFECT::type::reverb, TOPLEVEL::type::Integer);}
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textfont 1 textsize 10 textcolor 7
-        code0 {o->add("Random");o->add("freeverb");o->add("bandwidth");}
+        code0 {o->add("Random");o->add("Freeverb");o->add("Bandwidth");}
       } {}
       Fl_Dial revp0 {
         label Vol
@@ -372,7 +372,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::echo, TOPLEVEL::type::Integer);}
         xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textfont 1 textsize 10 textcolor 7
-        code0 {o->add("Echo 1");o->add("Echo 2");o->add("Echo 3");o->add("Echo 4");o->add("Simple Echo");o->add("Caynyon");o->add("Panning Echo 1");o->add("Panning Echo 2");o->add("Feedback Echo 3");}
+        code0 {o->add("Echo 1");o->add("Echo 2");o->add("Echo 3");o->add("Echo 4");o->add("Simple Echo");o->add("Canyon");o->add("Panning Echo 1");o->add("Panning Echo 2");o->add("Feedback Echo 3");}
       } {}
       Fl_Dial echop0 {
         label Vol
@@ -815,7 +815,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), EFFECT::type::distortion, TOPLEVEL::type::Integer);}
         xywh {139 13 96 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textfont 1 textsize 10 textcolor 7
-        code0 {o->add("Overdrive 1");o->add("Overdrive 2");o->add("Exciter 1");o->add("Exciter 2");o->add("Guitar Amp");o->add("Quantisize");}
+        code0 {o->add("Overdrive 1");o->add("Overdrive 2");o->add("Exciter 1");o->add("Exciter 2");o->add("Guitar Amp");o->add("Quantize");}
       } {}
       Fl_Choice distp5 {
         label Type
