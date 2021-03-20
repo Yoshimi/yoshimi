@@ -241,6 +241,7 @@ float LFO::lfoout()
     float lfodelay = lfopars->Pdelay / 127.0f * 4.0f; // 0..4 sec
     if (lfoelapsed >= lfodelay)
     {
+        float oldx = x;
         if (lfopars->Pbpm == 0)
         {
             float incxMult = incx * synth->sent_buffersize_f;
@@ -256,13 +257,7 @@ float LFO::lfoout()
                 tmp = (tmp > 1.0f) ? 1.0f : tmp;
                 x += incxMult * tmp;
             }
-            if (x >= 1)
-            {
-                x = fmodf(x, 1.0f);
-                amp1 = amp2;
-                amp2 = (1 - lfornd) + lfornd * synth->numRandom();
-                computenextincrnd();
-            }
+            x = fmodf(x, 1.0f);
         }
         else
         {
@@ -284,6 +279,13 @@ float LFO::lfoout()
             else
                 newBeat = synth->getSongBeat();
             x = fmodf(newBeat * frac.first / frac.second + startPhase, 1.0f);
+        }
+
+        if (oldx >= 0.5f && x < 0.5f)
+        {
+            amp1 = amp2;
+            amp2 = (1 - lfornd) + lfornd * synth->numRandom();
+            computenextincrnd();
         }
     } else
         lfoelapsed += synth->sent_buffersize_f / synth->samplerate_f;
