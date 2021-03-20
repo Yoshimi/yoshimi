@@ -3,6 +3,9 @@ yoshimi 2.0 M
 2021-3-20 Will
 * BugFix: GUI out of sync on MIDI-learned mod type change.
 
+* BugFix: Right click on mixer Edit using wrong part entry.
+* Added 'Scaffold Pole' to Companion bank.
+
 2021-3-17 Will
 * A few spelling checks in the Gui.
 
