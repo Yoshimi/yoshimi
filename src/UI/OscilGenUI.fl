@@ -692,7 +692,7 @@ o->hide();}
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::filterType, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
-        code0 {o->add("None");o->add("LP1");o->add("HP1a");o->add("BP1");o->add("BS1");o->add("LP2");o->add("HP2");o->add("BP2");o->add("BS2");o->add("Cosn");o->add("Sine");o->add("LSh");o->add("S");}
+        code0 {o->add("None");o->add("LP1");o->add("HP1a");o->add("HP1b");o->add("BP1");o->add("BS1");o->add("LP2");o->add("HP2");o->add("BP2");o->add("BS2");o->add("Cosn");o->add("Sine");o->add("LSh");o->add("S");}
       } {}
       Fl_Group {} {
         xywh {594 308 136 30} box ENGRAVED_BOX
