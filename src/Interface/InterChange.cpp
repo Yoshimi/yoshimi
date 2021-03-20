@@ -4248,7 +4248,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
         case ADDVOICE::control::modulatorType:
             if (write)
+            {
                 pars->VoicePar[nvoice].PFMEnabled = value_int;
+                getData->data.value = value_int; // we have to do this otherwise GUI goes out of sync
+            }
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
