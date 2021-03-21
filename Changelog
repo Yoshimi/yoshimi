@@ -1,5 +1,9 @@
 yoshimi 2.0 M
 
+2021-3-21 Will
+* Made CLI wavform filter type show text to match input.
+  Was previously confusingly numeric output.
+
 2021-3-20 Will
 * BugFix: GUI out of sync on MIDI-learned mod type change.
 
