@@ -1088,33 +1088,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     }
     else
         vsnsdial->value(*velsns);
-    //switchcategory(pars->Pcategory);
     cfreqdial->setValueType(getFilterFreqType(pars->Pcategory));
     updateVCforQ();
 
     analogfiltertypechoice->value(0);
-    analogfiltertypechoice->do_callback();
     svfiltertypechoice->value(0);
-    svfiltertypechoice->do_callback();
     stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
     formantparswindow->label(this->label());
-    update_formant_window();
     refresh();} {}
-  }
-  Function {switchcategory(int newcat)} {} {
-    code {if (pars->Pcategory != newcat)
-        {
-            pars->Pgain = 64;
-            gaindial->value(64);
-            analogfiltertypechoice->value(0);
-            analogfiltertypechoice->do_callback();
-            svfiltertypechoice->value(0);
-            svfiltertypechoice->do_callback();
-        }
-        pars->Pcategory=newcat;
-        // Adjust GUI value conversion
-        cfreqdial->setValueType(getFilterFreqType(filtertype->value()));
-        refresh();} {}
   }
   Function {updateVCforQ()} {return_type void
   } {
