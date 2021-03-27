@@ -2057,6 +2057,7 @@ Alan Calvert started the project}
     code {//
     float value = getData->data.value;
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
+    bool force = getData->data.source & TOPLEVEL::action::forceUpdate;
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2212,7 +2213,7 @@ Alan Calvert started the project}
     {
         if (insert == TOPLEVEL::insert::systemEffectSend)
         {
-            if (!wasFromHere)
+            if (!wasFromHere || force == true)
                 syseffsend[engine][control]->value(value);
         }
         else

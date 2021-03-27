@@ -2907,7 +2907,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
             switch (value_int)
             {
                 case 0:
-                    contstr += "Anlog";
+                    contstr += "Analog";
                     break;
                 case 1:
                     contstr += "Form";
