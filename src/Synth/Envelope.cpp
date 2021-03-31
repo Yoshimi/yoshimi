@@ -80,16 +80,8 @@ void Envelope::recomputePoints()
 
     envstretch = powf(440.0f / basefreq, _envpars->Penvstretch / 64.0f);
 
-    float bufferdt = synth->fixed_sample_step_f;
-
     for (int i = 0; i < MAX_ENVELOPE_POINTS; ++i)
     {
-        float tmp = _envpars->getdt(i) / 1000.0f * envstretch;
-        if (tmp > bufferdt)
-            envdt[i] = bufferdt / tmp;
-        else
-            envdt[i] = 2.0f; // any value larger than 1
-
         switch (mode)
         {
             case 2:
@@ -115,8 +107,6 @@ void Envelope::recomputePoints()
                 envval[i] = _envpars->Penvval[i] / 127.0f;
         }
     }
-
-    envdt[0] = 1.0f;
 }
 
 // Envelope Output
@@ -137,16 +127,22 @@ float Envelope::envout(void)
         return envoutval;
     }
 
+    float bufferdt = synth->sent_buffersize_f / synth->samplerate_f;
+
     if (keyreleased && forcedrelase)
     {   // do the forced release
         int tmp = (envsustain < 0) ? (envpoints - 1) : (envsustain + 1);
         // if there is no sustain point, use the last point for release
 
-        if (envdt[tmp] <0.00000001f)
+        float envdt = bufferdt * 1000.0f / (_envpars->getdt(tmp) * envstretch);
+        if (envdt >= 1.0f)
+            envdt = 2.0f; // any value larger than 1
+
+        if (envdt <0.00000001f)
             out = envval[tmp];
         else
             out = envoutval + (envval[tmp] - envoutval) * t;
-        t += envdt[tmp] * envstretch;
+        t += envdt * envstretch;
 
         if (t >= 1.0f)
         {
@@ -158,13 +154,18 @@ float Envelope::envout(void)
         }
         return out;
     }
-    if (envdt[currentpoint] >= 1.0f)
+
+    float envdt = bufferdt * 1000.0f / (_envpars->getdt(currentpoint) * envstretch);
+    if (envdt >= 1.0f)
+        envdt = 2.0f; // any value larger than 1
+
+    if (envdt >= 1.0f)
         out = envval[currentpoint];
     else
         out = envval[currentpoint - 1] + (envval[currentpoint]
               - envval[currentpoint - 1]) * t;
 
-    t += envdt[currentpoint];
+    t += envdt;
     if (t >= 1.0f)
     {
         if (currentpoint >= envpoints - 1)
@@ -195,7 +196,12 @@ float Envelope::envout_dB(void)
         float v2 = dB2rap(envval[1]);
         out = v1 + (v2 - v1) * t;
 
-        t += envdt[1];
+        float bufferdt = synth->sent_buffersize_f / synth->samplerate_f;
+        float envdt = bufferdt * 1000.0f / (_envpars->getdt(1) * envstretch);
+        if (envdt >= 1.0f)
+            envdt = 2.0f; // any value larger than 1
+
+        t += envdt;
         if (t >= 1.0f)
         {
             t = 0.0f;

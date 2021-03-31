@@ -48,7 +48,6 @@ class Envelope
         Presets::PresetsUpdate envUpdate;
         int envpoints;
         int envsustain;   // "-1" means disabled
-        float envdt[MAX_ENVELOPE_POINTS];  // milliseconds
         float envval[MAX_ENVELOPE_POINTS]; // [0.0 .. 1.0]
         float envstretch;
         int linearenvelope;
