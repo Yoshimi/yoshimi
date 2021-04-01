@@ -68,11 +68,11 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {159 158 390 330} type Double resizable
+      xywh {159 158 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
-      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);} visible
+      code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Button Tab1 {
         label {&Main Settings}
@@ -160,10 +160,10 @@ alsaTab->hide();}
             label {* Internal Buffer Size}
             callback {//
                         send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Number of samples} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
             code1 {o->value(func::bitFindHigh(synth->getRuntime().Buffersize) - 4);}
-            code2 {if (synth->getIsLV2Plugin()) o->deactivate();}
+            code2 {//if (synth->getIsLV2Plugin()) o->deactivate();}
           } {}
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}

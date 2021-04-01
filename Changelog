@@ -1,5 +1,9 @@
 yoshimi 2.0 M
 
+2021-4-1 Will
+* Reenabled buffer size setting for LV2.
+  Also tooltip warning about buffersize V sound changes.
+
 2021-3-27 Will
 * BugFix: Filter correction (2021-3-9) altered settings.
   When window opened wrote values instead of reading.
