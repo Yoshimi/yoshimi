@@ -1,5 +1,10 @@
 yoshimi 2.0 M
 
+2021-4-3 Will
+* BugFix clearing part not clearing original name.
+* BugFix: history locks not marking config changed.
+* Re-enable CLI part level current instrument clear.
+
 2021-4-1 Will
 * Reenabled buffer size setting for LV2.
   Also tooltip warning about buffersize V sound changes.

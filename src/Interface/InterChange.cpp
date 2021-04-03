@@ -1406,7 +1406,10 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
         case CONFIG::control::historyLock:
         {
             if (write)
+            {
                 synth->setHistoryLock(kititem, value);
+                synth->getRuntime().configChanged = true;
+            }
             else
                 value = synth->getHistoryLock(kititem);
             break;
