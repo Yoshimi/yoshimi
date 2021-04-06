@@ -1,5 +1,10 @@
 yoshimi 2.0 M
 
+2021-4-6 Will
+* BugFix: Crash on oversize filer directory listing.
+  This is a provisional fix, increasing max size to
+  1000 entries, and ignoring any over that count.
+
 2021-4-3 Will
 * BugFix clearing part not clearing original name.
 * BugFix: history locks not marking config changed.
