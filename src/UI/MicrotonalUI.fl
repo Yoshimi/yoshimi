@@ -11,7 +11,7 @@ comment {Microtonal.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2020, Will Godfrey
+Copyright 2016-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -84,11 +84,11 @@ class MicrotonalUI {} {
           xywh {273 18 5 30} box NO_BOX labelfont 1 labelsize 12 align 136 textsize 11
         }
         Fl_Check_Button invertKeys {
-          class Fl_Check_Button2
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::invertScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Turn upside-down the note frequencies} xywh {256 16 19 19} down_box DOWN_BOX color 50 labelfont 1 align 8
           code0 {o->value(microtonal->Pinvertupdown);}
+          class Fl_Check_Button2
         }
         Fl_Box {} {
           xywh {335 17 56 27} box THIN_UP_BOX color 237
@@ -98,12 +98,12 @@ class MicrotonalUI {} {
           xywh {336 17 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner centerinvertcounter {
-          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::invertedScaleCenter, o->value(), TOPLEVEL::type::Integer);}
           xywh {339 20 47 20} labelsize 11 align 129 minimum 0 maximum 127 value 0 textfont 1 textsize 12
           code0 {o->value(microtonal->Pinvertupdowncenter);}
           code1 {if (microtonal->Pinvertupdown==0) o->deactivate();}
+          class WidgetSpinner
         }
       }
       Fl_Group {} {
@@ -121,11 +121,11 @@ class MicrotonalUI {} {
           xywh {191 18 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner anotecounter {
-          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::refNote, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Midi note range: 24 (C1) to 84 (C6)} xywh {192 23 45 17} box FLAT_BOX labelsize 11 align 1 minimum 24 maximum 84 value 69 textfont 1 textsize 11
           code0 {o->value(microtonal->PrefNote);}
+          class WidgetSpinner
         }
         Fl_Value_Input afreqinput {
           label {Freq.}
@@ -205,11 +205,11 @@ class MicrotonalUI {} {
           xywh {318 65 50 8} box NO_BOX labelsize 11
         }
         Fl_Spinner scaleShift {
-          class WidgetSpinner
           callback {//
           send_data(0, SCALES::control::scaleShift, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Octave base offset} xywh {320 68 47 20} labelsize 10 align 1 minimum -63 maximum 64 value 0 textfont 1 textsize 12
           code0 {o->value(microtonal->Pscaleshift-64);}
+          class WidgetSpinner
         }
         Fl_Group Tuning {
           label {Tunings:}
@@ -256,7 +256,6 @@ class MicrotonalUI {} {
             xywh {198 224 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner firstnotecounter {
-            class WidgetSpinner
             callback {//
             int tmp = int (o->value());
             int max = middlenotecounter->value() - 1;
@@ -274,6 +273,7 @@ class MicrotonalUI {} {
             tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 11 align 1 minimum 0 maximum 125 textfont 1 textsize 11
             code0 {oldFirst = microtonal->Pfirstkey;}
             code1 {o->value(oldFirst);}
+            class WidgetSpinner
           }
           Fl_Box {} {
             xywh {199 290 50 25} box THIN_UP_BOX color 237
@@ -287,7 +287,6 @@ class MicrotonalUI {} {
             xywh {198 289 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner middlenotecounter {
-            class WidgetSpinner
             callback {//
             int tmp = int(o->value());
             int min = firstnotecounter->value() + 1;
@@ -314,6 +313,7 @@ class MicrotonalUI {} {
             tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 align 1 maximum 126 value 60 textfont 1 textsize 11
             code0 {oldMid = microtonal->Pmiddlenote;}
             code1 {o->value(oldMid);}
+            class WidgetSpinner
           }
           Fl_Box {} {
             xywh {199 354 50 25} box THIN_UP_BOX color 237
@@ -327,7 +327,6 @@ class MicrotonalUI {} {
             xywh {198 354 50 8} box NO_BOX labelsize 11
           }
           Fl_Spinner lastnotecounter {
-            class WidgetSpinner
             callback {//
             int tmp = int(o->value());
             int min = middlenotecounter->value() + 1;
@@ -345,6 +344,7 @@ class MicrotonalUI {} {
             tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 11 align 1 minimum 2 maximum 127 value 127 textfont 1 textsize 11
             code0 {oldLast = microtonal->Plastkey;}
             code1 {o->value(oldLast);}
+            class WidgetSpinner
           }
           Fl_Value_Output mapsizeoutput {
             label {Map Size}
@@ -364,7 +364,6 @@ class MicrotonalUI {} {
           }
         }
         Fl_Check_Button mappingenabledbutton {
-          class Fl_Check_Button2
           label ON
           callback {//
           o->show();
@@ -373,6 +372,7 @@ class MicrotonalUI {} {
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
+          class Fl_Check_Button2
         }
         Fl_Button applybutton {
           label Retune
@@ -395,11 +395,11 @@ class MicrotonalUI {} {
         xywh {2 13 22 22} box UP_BOX color 237
       }
       Fl_Check_Button enableMicrotonal {
-        class Fl_Check_Button2
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableMicrotonal, o->value(), TOPLEVEL::type::Integer);}
         xywh {4 13 21 22} down_box DOWN_BOX color 50 labelfont 1 align 4
         code0 {o->value(microtonal->Penabled);}
+        class Fl_Check_Button2
       }
       Fl_Button scaleClose {
         label Close
@@ -506,7 +506,7 @@ class MicrotonalUI {} {
                     firstnotecounter->value(engine);
                     middlenotecounter->value(insert);
                     lastnotecounter->value(parameter);
-                    afreqinput->value(fetchData(0, 0, 232));
+                    afreqinput->value(fetchData(0, SCALES::control::refFrequency, TOPLEVEL::section::scales));
                 }
             }
             else if (wasFromUs)
