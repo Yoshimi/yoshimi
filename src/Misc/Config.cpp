@@ -222,9 +222,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    //AntiDenormals(true); // see note below
-    if (!synth->getIsLV2Plugin())
-        loadCmdArgs(argc, argv);
     if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
@@ -241,6 +238,7 @@ bool Config::Setup(int argc, char **argv)
         return true;
     }
 
+    loadCmdArgs(argc, argv);
     switch (audioEngine)
     {
         case alsa_audio:
@@ -309,7 +307,6 @@ void Config::clearPresetsDirlist(void)
 
 bool Config::loadConfig(void)
 {
-    string cmd;
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
     {
