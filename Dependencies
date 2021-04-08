@@ -32,3 +32,6 @@ Optional alternative to glibc, part of build-essential
     musl
 
 This also requires argp-standalone which is not available from debian and must be built from source.
+
+Note:
+    argp-standalone is also needed for BSD builds.

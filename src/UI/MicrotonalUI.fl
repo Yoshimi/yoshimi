@@ -73,7 +73,8 @@ class MicrotonalUI {} {
         xywh {254 14 22 22} box UP_BOX color 237
       }
       Fl_Group {} {
-        tooltip {Center where the note's freqs. are turned upside-down} xywh {248 2 156 48} box ENGRAVED_FRAME
+        tooltip {Center where the note's freqs. are inverted
+(not when keymapped)} xywh {248 2 156 48} box ENGRAVED_FRAME
       } {
         Fl_Text_Display invertlabel {
           label Invert

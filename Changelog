@@ -1,5 +1,11 @@
 yoshimi 2.0 M
 
+2021-4-8 Will
+* defined our own max size used only by manual search.
+  PATH_MAX not fully portable, and ill defined.
+* Improved tooltip in Scales - inverted centre.
+* Moved loadCmdArgs( below LV2 exit.
+
 2021-4-7 Will
 BugFix: Importing keymap not updating GUI Ref. Freq.
 

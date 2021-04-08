@@ -105,11 +105,18 @@ inline void make_legit_pathname(string& fname)
  * tries to find build time doc directory
  * currently only used to find the latest user guide
  */
+#define OUR_PATH_MAX 2048
+/*
+ * PATH_MAX is a poorly defined constant, and not very
+ * portable. As this function is only used for a single
+ * tightly defined purpose we set a value to replace it
+ * that should be safe for any reasonable architecture.
+ */
 inline string localPath(void)
 {
     char *tmpath;
-    tmpath = (char*) malloc(PATH_MAX);
-    getcwd (tmpath, PATH_MAX);
+    tmpath = (char*) malloc(OUR_PATH_MAX);
+    getcwd (tmpath, OUR_PATH_MAX);
     string path = string(tmpath);
     free(tmpath);
     size_t found = path.rfind("/");
