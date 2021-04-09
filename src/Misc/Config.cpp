@@ -197,10 +197,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     bRuntimeSetupCompleted(false),
     exitType(EXIT_SUCCESS)
 {
-    if (synth->getIsLV2Plugin())
-    {
-        rtprio = 4; // To force internal threads below LV2 host
-    }
     //else
         //fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
@@ -216,12 +212,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
      */
 
     std::cerr.precision(4);
-    bRuntimeSetupCompleted = Setup(argc, argv);
-}
 
-
-bool Config::Setup(int argc, char **argv)
-{
     if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
@@ -229,15 +220,22 @@ bool Config::Setup(int argc, char **argv)
         Log("\n\n" + message + "\n");
     }
 
+    if (synth->getIsLV2Plugin())
+    {
+        rtprio = 4; // To force internal threads below LV2 host
+        bRuntimeSetupCompleted = true;
     /* NOTE: we must not do any further init involving the SynthEngine here,
      * since this code is invoked from within the SynthEngine-ctor.
      */
-    if (synth->getIsLV2Plugin())
-    {
-        //skip further setup, which is irrelevant for lv2 plugin instance.
-        return true;
+        return;
     }
 
+    bRuntimeSetupCompleted = Setup(argc, argv);
+}
+
+
+bool Config::Setup(int argc, char **argv)
+{
     loadCmdArgs(argc, argv);
     switch (audioEngine)
     {

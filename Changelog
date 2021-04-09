@@ -1,5 +1,9 @@
 yoshimi 2.0 M
 
+2021-4-9 Will
+* Rationalised Config startup sequence.
+  LV2 now exits as early as possible.
+
 2021-4-8 Will
 * defined our own max size used only by manual search.
   PATH_MAX not fully portable, and ill defined.
