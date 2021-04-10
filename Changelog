@@ -1,6 +1,9 @@
 yoshimi 2.0 M
 
 2021-4-9 Will
+* Applied provisional fix for LV2 argp issue.
+
+2021-4-9 Will
 * Rationalised Config startup sequence.
   LV2 now exits as early as possible.
 

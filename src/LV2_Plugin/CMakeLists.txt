@@ -2,7 +2,7 @@
 #   CMakeLists.txt (LV2)
 #
 #   Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
-#   Copyright 2018-2020 Will Godfrey & others
+#   Copyright 2018-2021 Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -20,6 +20,8 @@
 file (GLOB yoshimi_lv2_plugin_files
         YoshimiLV2Plugin.cpp
         YoshimiLV2Plugin.h
+        Config.cpp
+        Config.h
         lv2extui.h
         lv2extprg.h)
 file (GLOB yoshimi_dsp_files
@@ -37,7 +39,7 @@ file (GLOB yoshimi_effects_files
     ../Effects/Phaser.h  ../Effects/Reverb.h  ../Effects/EQ.h
     ../Effects/Distorsion.h  ../Effects/DynamicFilter.h)
 file (GLOB yoshimi_misc_files
-    ../Misc/Config.cpp ../Misc/Config.h ../ConfBuild.h
+    #../Misc/Config.cpp ../Misc/Config.h ../ConfBuild.h
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
