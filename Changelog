@@ -1,5 +1,11 @@
 yoshimi 2.0 M
 
+2021-4-11 Will
+* Suppressed missing argp warning in LV2 Config.cpp
+* Small cleanups in masterUI
+* Added Forced key exit if any window has focus.
+  Ctrl + Alt + 'H'
+
 2021-4-9 Will
 * Applied provisional fix for LV2 argp issue.
 

@@ -135,7 +135,7 @@ decl {int lineitem;} {public local
 class FilerLine {: {public Fl_Group}
 } {
   Function {make_window()} {} {
-    Fl_Window filerline {
+    Fl_Window filerlist {
       xywh {522 305 440 20} type Double color 7 hide
       class Fl_Group
     } {
@@ -202,8 +202,8 @@ lineitem = n;}
   }
   Function {~FilerLine()} {} {
     code {//
-    filerline->hide();
-    delete (filerline);} {}
+    filerlist->hide();
+    delete (filerlist);} {}
   }
 }
 
@@ -212,7 +212,7 @@ class MasterUI {: {private GuiUpdates}
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
       for (int i = 0; i < FILER_SIZE; ++i)
-          filerline[i] = NULL;
+          filerlist[i] = NULL;
 
       synth = _synth;
       presetsui = NULL;
@@ -1523,7 +1523,7 @@ Alan Calvert started the project}
     filerback->activate();
     filerfave->activate();
     filerclose->activate();
-    filerlist->show();
+    filerscroll->show();
     favourites->hide();}
           tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12
         }
@@ -1561,7 +1561,7 @@ Alan Calvert started the project}
           tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
         }
       }
-      Fl_Scroll filerlist {
+      Fl_Scroll filerscroll {
         xywh {10 96 444 244} type VERTICAL color 7
       } {}
     }
@@ -1824,7 +1824,7 @@ Alan Calvert started the project}
 
         file::dir2string(tofetch, filerpath, filerext, options);
 
-        filerlist->clear();
+        filerscroll->clear();
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
         while(!tofetch.empty())
@@ -1832,46 +1832,37 @@ Alan Calvert started the project}
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
 
-            filerline[lineno] = new FilerLine(0, 0, 390, 20);
-            filerline[lineno]->init(synth,lineno);
+            filerlist[lineno] = new FilerLine(0, 0, 390, 20);
+            filerlist[lineno]->init(synth,lineno);
 
             if (next.find("Dir:") != std::string::npos)
             {
                 next = next.substr(5);
-                filerline[lineno]->dirIcon->show();
-                filerline[lineno]->fileIcon->hide();
+                filerlist[lineno]->dirIcon->show();
+                filerlist[lineno]->fileIcon->hide();
             }
             else
             {
-                filerline[lineno]->dirIcon->hide();
-                filerline[lineno]->fileIcon->show();
+                filerlist[lineno]->dirIcon->hide();
+                filerlist[lineno]->fileIcon->show();
                 //std::cout << "type >" << type_name << "<" << std::endl;
-                filerline[lineno]->type->copy_label(type_name.c_str());
+                filerlist[lineno]->type->copy_label(type_name.c_str());
             }
             //std::cout << "name >" << next << "<" << std::endl;
-            filerline[lineno]->name->copy_label(next.c_str());
-            filerlist->add(filerline[lineno]);
+            filerlist[lineno]->name->copy_label(next.c_str());
+            filerscroll->add(filerlist[lineno]);
             ++lineno;
-
-
             tofetch = tofetch.substr(pos + 1);
         }
-        filerlist->end();
-        filerlist->scroll_to(-10,-10);
-        int count = lineno;
-        while (count < FILER_SIZE && filerline[count] != NULL)
-        {
-            filerline[count] = NULL;
-            ++count;
-        }
-        //std::cout << "overcount " << count - lineno << std::endl;
+        filerscroll->end();
+        filerscroll->scroll_to(-10,-10);
         filerRtext();
         //std::cout << "list end " << lineno << std::endl;} {}
   }
   Function {filerselect(int item)} {} {
     code {//
-        string line = string(filerline[item]->name->label());
-        if (filerline[item]->dirIcon->visible())
+        string line = string(filerlist[item]->name->label());
+        if (filerlist[item]->dirIcon->visible())
         {
             //std::cout << "in dir" << std::endl;
             if (line.back() !='/')
@@ -1896,7 +1887,7 @@ Alan Calvert started the project}
     filerback->deactivate();
     filerfave->deactivate();
     filerclose->deactivate();
-    filerlist->hide();
+    filerscroll->hide();
     favourites->show();} {}
   }
   Function {loadfavourites()} {} {
@@ -1987,9 +1978,9 @@ Alan Calvert started the project}
         faveset->labelsize(size12);
         for (int i = 0; i < lineno; ++i)
         {
-            filerline[i]->resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
-            filerline[i]->name->labelsize(size12);
-            filerline[i]->type->labelsize(int(4 * dScale));
+            filerlist[i]->resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
+            filerlist[i]->name->labelsize(size12);
+            filerlist[i]->type->labelsize(int(4 * dScale));
         }
         filerwindow->redraw();} {}
   }
@@ -3891,7 +3882,7 @@ Alan Calvert started the project}
   }
   decl {int fileruseX;} {private local
   }
-  decl {FilerLine *filerline[FILER_SIZE];} {private local
+  decl {FilerLine *filerlist[FILER_SIZE];} {private local
   }
   decl {int lineno;} {private local
   }

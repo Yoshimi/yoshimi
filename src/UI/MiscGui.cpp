@@ -164,7 +164,7 @@ string input_text(SynthEngine *synth, string label, string text)
     return synth->getGuiMaster()->setinput(label, text);
 }
 
-
+static int keycheck = 0;
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
@@ -180,7 +180,22 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         synth->getGuiMaster()->Log(synth->getRuntime().LogList.front());
         synth->getRuntime().LogList.pop_front();
     }
-    //GuiThreadMsg::processGuiMessages();
+    // direct key actions
+    if (Fl::event_ctrl() && Fl::event_alt() && keycheck == 0)
+    {
+        if (Fl::event_key('H') && !synth->getIsLV2Plugin()) // immediate shutdown
+        {
+            synth->getGuiMaster()->masterwindow->do_callback();
+        }
+        else if (Fl::event_key('R')) // resize to fit
+        {
+            std::cout << "placeholder" << std::endl;
+        }
+        keycheck = 90;
+
+    }
+    else if (keycheck > 0)
+        --keycheck;
 }
 
 
