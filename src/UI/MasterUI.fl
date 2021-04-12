@@ -43,7 +43,7 @@ decl {\#define PANEL_DUAL_X 530} {public local
 decl {\#define PANEL_DUAL_Y 600} {public local
 }
 
-decl {\#define FILER_SIZE 1000} {public local
+decl {\#define FILER_SIZE 1500} {public local
 }
 
 decl {\#include <FL/Fl_Tooltip.H>} {public local
@@ -187,16 +187,37 @@ lineitem = n;}
   Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n = 0;} {}
   }
-  Function {init(SynthEngine *synth_, int n_)} {} {
+  Function {init(SynthEngine *synth_, int n_, bool isDir_, string typeName_, string title_)} {} {
     code {//
 
     synth = synth_;
     n = n_;
+    isDir = isDir_;
+    typeName = typeName_;
+    title = title_;
     make_window();
+    if (isDir)
+    {
+        dirIcon->show();
+        fileIcon->hide();
+    }
+    else
+    {
+        dirIcon->hide();
+        fileIcon->show();
+        type->copy_label(typeName.c_str());
+        name->copy_label(title.c_str());
+    }
     show();
     end();} {}
   }
   decl {int n;} {private local
+  }
+  decl {bool isDir;} {private local
+  }
+  decl {string typeName;} {private local
+  }
+  decl {string title;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }
@@ -1831,23 +1852,14 @@ Alan Calvert started the project}
         {
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
-
+            bool isDir = false;
             filerlist[lineno] = new FilerLine(0, 0, 390, 20);
-            filerlist[lineno]->init(synth,lineno);
-
             if (next.find("Dir:") != std::string::npos)
             {
                 next = next.substr(5);
-                filerlist[lineno]->dirIcon->show();
-                filerlist[lineno]->fileIcon->hide();
+                isDir = true;
             }
-            else
-            {
-                filerlist[lineno]->dirIcon->hide();
-                filerlist[lineno]->fileIcon->show();
-                //std::cout << "type >" << type_name << "<" << std::endl;
-                filerlist[lineno]->type->copy_label(type_name.c_str());
-            }
+            filerlist[lineno]->init(synth,lineno, isDir, type_name, next);
             //std::cout << "name >" << next << "<" << std::endl;
             filerlist[lineno]->name->copy_label(next.c_str());
             filerscroll->add(filerlist[lineno]);

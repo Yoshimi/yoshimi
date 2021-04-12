@@ -1,5 +1,8 @@
 yoshimi 2.0 M
 
+2021-4-12 Will
+* Further refinements to GUI filer
+
 2021-4-11 Will
 * Suppressed missing argp warning in LV2 Config.cpp
 * Small cleanups in masterUI
