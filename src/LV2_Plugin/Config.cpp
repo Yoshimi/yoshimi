@@ -68,43 +68,7 @@ using func::string2int;
 unsigned char panLaw = 1;
 
 namespace { // constants used in the implementation
-/*    char prog_doc[] =
-        "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
-        "Copyright 2002-2009 Nasca Octavian Paul and others, "
-        "Copyright 2009-2011 Alan Calvert, "
-        "Copyright 2012-2013 Jeremy Jongepier and others, "
-        "Copyright 2014-2019 Will Godfrey and others";
-    const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
-    const char* argp_program_version = argline.c_str();
-*/
     string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
-
-/*    static struct argp_option cmd_options[] = {
-        {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
-        {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
-        {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
-        {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
-        {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
-        {"gui",               'I',  NULL,         0,  "enable gui", 0},
-        {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
-        {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
-        {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
-        {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
-        {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
-        {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
-        {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
-        {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
-        {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
-        {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
-        {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
-        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
-        {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
-        #if defined(JACK_SESSION)
-            {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
-            {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
-        #endif
-        { 0, 0, 0, 0, 0, 0}
-    };*/
 }
 
 bool         Config::showSplash = true;
@@ -198,20 +162,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 {
     (void)argc;
     (void)**argv;
-    //else
-        //fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
-                               // the heffalump. We need lrintf() to round
-                               // toward zero.
-    //^^^^^^^^^^^^^^^ This call is not needed aymore (at least for lv2 plugin)
-    //as all calls to lrintf() are replaced with (int)truncf()
-    //which befaves exactly the same when flag FE_TOWARDZERO is set
-
-    /*
-     * The above is now all completely redundant as we use
-     * a simple int(n). The values are all positive so there
-     * is no issue with +- zero.
-     */
-
     std::cerr.precision(4);
 
     if (!loadConfig())
@@ -221,63 +171,10 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
         Log("\n\n" + message + "\n");
     }
 
-    //if (synth->getIsLV2Plugin())
-    {
-        rtprio = 4; // To force internal threads below LV2 host
-        bRuntimeSetupCompleted = true;
-    /* NOTE: we must not do any further init involving the SynthEngine here,
-     * since this code is invoked from within the SynthEngine-ctor.
-     */
-        return;
-    }
-
-    //bRuntimeSetupCompleted = Setup(argc, argv);
+    rtprio = 4; // To force internal threads below LV2 host
+    bRuntimeSetupCompleted = true;
+    return;
 }
-
-
-/*bool Config::Setup(int argc, char **argv)
-{
-    loadCmdArgs(argc, argv);
-    switch (audioEngine)
-    {
-        case alsa_audio:
-            audioDevice = string(alsaAudioDevice);
-            break;
-
-        case jack_audio:
-            audioDevice = string(jackServer);
-            break;
-        case no_audio:
-        default:
-            audioDevice.clear();
-            break;
-    }
-    if (!audioDevice.size())
-        audioDevice = "default";
-    switch (midiEngine)
-    {
-        case jack_midi:
-            midiDevice = string(jackMidiDevice);
-            break;
-
-        case alsa_midi:
-            midiDevice = string(alsaMidiDevice);
-            break;
-
-        case no_midi:
-        default:
-            midiDevice.clear();
-            break;
-    }
-    if (!midiDevice.size())
-        midiDevice = "";
-    Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
-    Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-
-    if (!jUuid.empty())
-        jackSessionUuid = jUuid;
-    return true;
-}*/
 
 
 Config::~Config()

@@ -47,7 +47,6 @@ class Config
     public:
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
-        bool Setup(int argc, char **argv);
         void StartupReport(const string& clientName);
         void Announce(void);
         void Usage(void);

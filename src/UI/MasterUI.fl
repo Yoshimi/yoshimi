@@ -3440,10 +3440,45 @@ Alan Calvert started the project}
   }
   Function {checkBuffer(void)} {} {
     code {//
-            if (lastmainW < 0)
+            if (lastmainW < 0) // not ready yet!
                 return;
             read_updates(synth);
             wincheck();} {}
+  }
+  Function {rescaleMain(void)} {} {
+    code {//
+            if (lastmainW < 0) // not ready yet!
+                return;
+            float ratio = Fl::w() / float(1024); // reference width
+            if (ratio < 1.0f)
+                ratio = 1.0f;
+
+
+            int x, y, w, h;
+            if (syseffSeen)
+            {
+                x = syseffsendwindow->x();
+                y = syseffsendwindow->y();
+                w = syseffDW * ratio;
+                h = syseffDH * ratio;
+                if ((x + w) > Fl::w())
+                    x = Fl::w() - w;
+                if ((y + h) > Fl::h())
+                    y = Fl::h() - h;
+                syseffsendwindow->resize(x, y, w, h);
+            }
+
+            // we always check the main window last
+            x = masterwindow->x();
+            y = masterwindow->y();
+            w = mainDW * ratio;
+            h = mainDH * ratio;
+            if ((x + w) > Fl::w())
+                x = Fl::w() - w;
+            if ((y + h) > Fl::h())
+                y = Fl::h() - h;
+            masterwindow->resize(x, y, w, h);
+            std::cout << "Screen ratio " << ratio << std::endl;} {}
   }
   Function {wincheck()} {} {
     code {//

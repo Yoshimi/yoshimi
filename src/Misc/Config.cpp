@@ -219,17 +219,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
         TextMsgBuffer::instance().push(message);
         Log("\n\n" + message + "\n");
     }
-
-    if (synth->getIsLV2Plugin())
-    {
-        rtprio = 4; // To force internal threads below LV2 host
-        bRuntimeSetupCompleted = true;
-    /* NOTE: we must not do any further init involving the SynthEngine here,
-     * since this code is invoked from within the SynthEngine-ctor.
-     */
-        return;
-    }
-
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 

@@ -189,10 +189,9 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         }
         else if (Fl::event_key('R')) // resize to fit
         {
-            std::cout << "placeholder" << std::endl;
+            synth->getGuiMaster()->rescaleMain();
         }
-        keycheck = 90;
-
+        keycheck = 90; // we need this to stop a stream of repeats
     }
     else if (keycheck > 0)
         --keycheck;

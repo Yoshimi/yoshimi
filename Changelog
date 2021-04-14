@@ -1,5 +1,10 @@
 yoshimi 2.0 M
 
+2021-4-14 Will
+* LV2 config cleanups.
+* Started per instance key only rescale to screen size.
+  Ctrl + Alt + 'R'
+
 2021-4-12 Will
 * Further refinements to GUI filer
 
