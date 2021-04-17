@@ -90,7 +90,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "2");
-        mxmlElementSetAttr(root, "version-minor", "0");
+        mxmlElementSetAttr(root, "version-minor", "4");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
     }
