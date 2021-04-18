@@ -1,0 +1,24 @@
+V 2.0.1
+
+This has no new features. It's another maintenance release with a smattering of small improvements, along with bugfixes.
+
+In the GUI, analog filters that are set to Low1 or High1 now have the Q dial deactivated. Single pole filters don't have Q, and this control seeming to not work was confusing some users.
+
+There are a few new instrument patches.
+Stick Hit in Drums.
+Scaffold Pole, Sharp Sweep Synth, Sharp Sweep Multi, Surf in Companion.
+
+
+As usual, we welcome all suggestions and assistance - especially regarding documentation!
+
+Yoshimi source code is available from either:
+    https://sourceforge.net/projects/yoshimi
+Or:
+    https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+    https://www.freelists.org/archive/yoshimi
+To post, email to:
+    yoshimi@freelists.org

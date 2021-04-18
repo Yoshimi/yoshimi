@@ -195,7 +195,10 @@ inline string findExtension(const string& name)
     size_t point = name.rfind('.');
     if (point == string::npos)
         return "";
-    return name.substr(point);
+    string exten = name.substr(point);
+    if (exten.find('/') != string::npos)
+        return ""; // not acceptible as an extension!
+    return exten;
 }
 
 

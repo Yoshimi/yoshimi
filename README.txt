@@ -1,24 +1,6 @@
-Version 2.0
+Version 2.0.1
 
-Highlights
-    Fully and independently resizeable (and remembered) windows.
-    Midi sync for engine LFOs.
-
-    More Instrument types available - and a request to set them!
-    Revised default instrument banks
-    Improved handling of instrument names.
-    Aftertouch values now saved
-    Pan Law setting now saved.
-    MIDI-learn entries increased to 400 lines.
-    Maximum delay time in CLI scripts increased to 30 seconds.
-
-    NRPN updates.
-    Improved CLI descriptions and reporting.
-    Documentation updated (New User guide in progress).
-    Data storage XDG compatible.
-    Improved LV2 performance.
-
-Further details in doc/Yoshimi_2.0_features.txt
+This release is just a clean-up with various bugfixes and minor improvements.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

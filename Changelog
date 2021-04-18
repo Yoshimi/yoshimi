@@ -1,4 +1,10 @@
-yoshimi 2.0 M
+yoshimi 2.0.1
+
+2021-4-18 Will
+* Filter Q dial deactivated if analog and < Low2
+* Corrected reporting Zyn comatibility of Yoshi files.
+  We sometimes had V3.0 quoted, but are really only 2.4
+* Set release version 2.0.1
 
 2021-4-17 Will
 * Added Stick Hit patch the Drums.

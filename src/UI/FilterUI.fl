@@ -761,13 +761,9 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     code {//
         update_formant_window();
         formantfiltergraph->redraw();
-
-        if (pars->Pcategory == 0)
-            svfiltertypechoice->value(pars->Ptype);
-        if (pars->Pcategory == 2)
-            analogfiltertypechoice->value(pars->Ptype);
-
-        filtertype->value(pars->Pcategory);
+        int categ = pars->Pcategory;
+        int parstype = pars->Ptype;
+        filtertype->value(categ);
         cfreqdial->value(pars->Pfreq);
         freqtrackoffset->value(pars->Pfreqtrackoffset);
         freqtrdial->setValueType(getFilterFreqTrackType(freqtrackoffset->value()));
@@ -775,19 +771,21 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         freqtrdial->value(pars->Pfreqtrack);
         gaindial->value(pars->Pgain);
         stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
-        int categ = pars->Pcategory;
 
-        if (categ == 0 || categ == 2)
+        qdial->activate();
+        if (categ != 1)
         {
             if (categ == 0)
             {
-                analogfiltertypechoice->value(pars->Ptype);
+                analogfiltertypechoice->value(parstype);
                 analogfiltertypechoice->show();
                 svfiltertypechoice->hide();
+                if (parstype < 2)
+                    qdial->deactivate();
             }
             else
             {
-                svfiltertypechoice->value(pars->Ptype);
+                svfiltertypechoice->value(parstype);
                 svfiltertypechoice->show();
                 analogfiltertypechoice->hide();
             }
@@ -921,6 +919,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
            synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
     }
 
+    qdial->activate();
     switch(control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -968,6 +967,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::analogType:
             analogfiltertypechoice->value(value_int);
+            if (value_int < 2)
+                qdial->deactivate();
             updateVCforQ();
             break;
 

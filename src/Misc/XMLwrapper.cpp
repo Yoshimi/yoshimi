@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2020, Will Godfrey
+    Copyright 2014-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -39,6 +39,7 @@
 using file::saveText;
 using file::loadGzipped;
 using file::saveGzipped;
+using file::findExtension;
 using func::string2int;
 using func::string2float;
 using func::asLongString;
@@ -535,9 +536,17 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     }
     else
         synth->getRuntime().lastXMLminor = 0;
+    string exten = findExtension(filename);
+    if (exten.length() != 4 && exten != ".state")
+        return true; // we don't want config stuff
 
     if (synth->getRuntime().logXMLheaders)
     {
+        if (yoshitoo && xml_version.major > 2)
+        { // we were giving the wrong value :(
+            xml_version.major = 2;
+            xml_version.minor = 4;
+        }
         if (zynfile)
             synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
         if (yoshitoo)
