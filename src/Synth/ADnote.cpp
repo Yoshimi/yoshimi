@@ -1590,13 +1590,17 @@ float ADnote::getVoiceBaseFreq(int nvoice)
     if (subVoiceNumber == -1)
         detune += NoteGlobalPar.Detune / 100.0f;
 
-    // Fixed frequency is disabled for sub voices. We get the basefreq from the
-    // parent.
-    if (!NoteVoicePar[nvoice].fixedfreq || subVoiceNumber != -1)
+    if (!NoteVoicePar[nvoice].fixedfreq)
         return basefreq * powf(2.0f, detune / 12.0f);
     else // fixed freq is enabled
     {
-        float fixedfreq = 440.0f;
+        float fixedfreq;
+        if (subVoiceNumber != -1)
+            // Fixed frequency is not used in sub voices. We get the basefreq
+            // from the parent.
+            fixedfreq = basefreq;
+        else
+            fixedfreq = 440.0f;
         int fixedfreqET = NoteVoicePar[nvoice].fixedfreqET;
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
