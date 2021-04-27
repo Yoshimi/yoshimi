@@ -1,5 +1,10 @@
 yoshimi 2.0.1
 
+2021-4-27 Will
+* Bugfix: Lost CLI startup load options.
+  config test moved to wrong location.
+* Re-applied history cleanups.
+
 2021-4-18 Will
 * Filter Q dial deactivated if analog and < Low2
 * Corrected reporting Zyn comatibility of Yoshi files.

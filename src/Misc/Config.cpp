@@ -212,13 +212,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
      */
 
     std::cerr.precision(4);
-
-    if (!loadConfig())
-    {
-        string message = "Could not load config. Using default values.";
-        TextMsgBuffer::instance().push(message);
-        Log("\n\n" + message + "\n");
-    }
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 
@@ -226,6 +219,14 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 bool Config::Setup(int argc, char **argv)
 {
     loadCmdArgs(argc, argv);
+
+    if (!loadConfig())
+    {
+        string message = "Could not load config. Using default values.";
+        TextMsgBuffer::instance().push(message);
+        Log("\n\n" + message + "\n");
+    }
+
     switch (audioEngine)
     {
         case alsa_audio:
