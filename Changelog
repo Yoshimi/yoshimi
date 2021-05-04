@@ -1,5 +1,10 @@
 yoshimi 2.0.1
 
+2021-5-4 Will
+* BugFix: CLI PadSynth waveform fails if voiceNumber > 0.
+  Forcing voiceNumber to 0 fixes this,
+  but shouldn't be needed, and is incovenient for users.
+
 2021-4-27 Will
 * Bugfix: Lost CLI startup load options.
   config test moved to wrong location.

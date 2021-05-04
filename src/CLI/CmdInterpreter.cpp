@@ -5218,6 +5218,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "padsynth"))
     {
         bitSet(context, LEVEL::PadSynth);
+        voiceNumber = 0; // TODO find out what *realy* causes this to screw up!
         insertType = TOPLEVEL::insertType::amplitude;
         return padSynth(input, controlType);
     }
