@@ -116,7 +116,9 @@ CmdInterpreter::CmdInterpreter() :
     nFXpreset{0},
     nFXeqBand{0},
     nFX{0},
+    filterSequenceSize{1},
     filterVowelNumber{0},
+    filterNumberOfFormants{1},
     filterFormantNumber{0},
     chan{0},
     axis{0},
@@ -430,7 +432,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     }
     else if (bitTest(context, LEVEL::Filter))
     {
-        int baseType = readControl(synth, 0, FILTERINSERT::control::baseType, npart, kitNumber, engine, TOPLEVEL::insert::filterGroup);
+        int baseType = readControl(synth, 0, FILTERINSERT::control::baseType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
         result += ", Filter ";
         switch (baseType)
         {
@@ -438,6 +440,8 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += "analog";
                 break;
             case 1:
+                filterSequenceSize = readControl(synth, 0, FILTERINSERT::control::sequenceSize, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
+                filterNumberOfFormants = readControl(synth, 0, FILTERINSERT::control::numberOfFormants, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
                 result += "formant V";
                 result += std::to_string(filterVowelNumber);
                 result += " F";
@@ -1837,7 +1841,10 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(input);
-                filterVowelNumber = string2int(input);
+                int number = string2int(input);
+                if (number < 0 || number >= filterSequenceSize)
+                    return REPLY::range_msg;
+                filterVowelNumber = number;
                 filterFormantNumber = 0;
                 return REPLY::done_msg;
             }
@@ -1857,7 +1864,10 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
             {
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                filterFormantNumber = string2int(input);
+                int number = string2int(input);
+                if (number < 0 || number >= filterNumberOfFormants)
+                    return REPLY::range_msg;
+                filterFormantNumber = number;
                 return REPLY::done_msg;
             }
             else
@@ -5936,6 +5946,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     {
         input.skip(2);
         input.skipSpace();
+        if (bitFindHigh(context) == LEVEL::Filter)
+        {
+            filterVowelNumber = 0;
+            filterFormantNumber = 0;
+        }
+
         /*
          * kit mode is a pseudo context level so the code
          * below emulates normal 'back' actions

@@ -131,7 +131,9 @@ class CmdInterpreter
         int nFXeqBand;
         int nFX;
 
+        int filterSequenceSize;
         int filterVowelNumber;
+        int filterNumberOfFormants;
         int filterFormantNumber;
 
         int chan;

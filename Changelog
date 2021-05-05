@@ -1,5 +1,11 @@
 yoshimi 2.0.1
 
+2021-5-5 Will
+* Further bugfixes in CLI filter controls.
+ For AddSynth, filter category only shown for the
+ Voice 1 and the formant filter didn't recognise
+ size limits.
+
 2021-5-4 Will
 * BugFix: CLI PadSynth waveform fails if voiceNumber > 0.
   Forcing voiceNumber to 0 fixes this,

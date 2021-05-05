@@ -1,0 +1,9 @@
+The easiest way to understand the formants/vowels is to imagine at the first that each vowel contains a single formant.
+
+In that case each vowel consist in sequence of band-pass filters (with Q/frequency/amplitude). These vowels are arranged on a line and the space between them is controlled by the "Strch" (lower right). This sequence could be used to create some simple words and the current position in that line is controlled by the filter LFO/Envelope.
+
+So for example, you can define two vowels like: "vowel_1" which has the formant at 1000Hz and the "vowel_2" with the formant at 2000Hz which will define a simple raising envelope. You should get a sliding bandpass filter between these (eg: you get a bandpass filter which rises in the frequency from 1000Hz to 2000Hz).
+
+If you define a second formant (you set "Num formants") to 2, each vowel will get another formant. The sound is processed using the first formant (like in the above example) and is added to the sound processed using the second formant. The formants are bandpass filters in parallel.
+
+I preferred for a vowel to have several formant (raher than the other way around) because I've arranged the data according to the high level of abstraction (that the vowel contains several formants).
