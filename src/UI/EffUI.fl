@@ -751,6 +751,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         int butt = 3;
         send_data(0, butt, o->value(), EFFECT::type::alienWah, TOPLEVEL::type::Integer);}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial awp5 {
@@ -1033,6 +1034,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         int butt = 3;
         send_data(0, butt, o->value(), EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
         tooltip {LFO Randomness} xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial dfp5 {
