@@ -1,4 +1,11 @@
-yoshimi 2.0.1
+yoshimi 2.0.1 M
+
+2021-5-6 Will
+* Replaced ringbuffer with improved code from Rainer
+  and applied his other fixes.
+* Added small adjustment to MiscGui.cpp
+* Removed Ringbuffer.cpp stub and adjusted cmake files.
+* Adjusted copyright notices.
 
 2021-5-5 Will
 * Further bugfixes in CLI filter controls.

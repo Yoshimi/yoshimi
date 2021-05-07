@@ -26,7 +26,7 @@ For a start, from bitter experience it is fatally easy to change two variables t
 
 We do however accept some name changes where the orginal name is ambiguous or no longer appropriate.
 
-However, some of these errors are in the identifier names in the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 THESE MUST NEVER CHANGE. To change them would break all the instrument files that have been created since then.
+Some of these errors are in the identifier names in the saved XML files, and have been there since ZynAddSubFX Version 2.2.1 THESE MUST NEVER CHANGE. To change them would break all the instrument files that have been created since then.
 
 
 If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
@@ -56,7 +56,7 @@ Alternatively, please send me a brief description to include when I next update.
 ACKNOWLEDGEMENTS
 The ones that appear in the GUI 'About->More' lists are those who have either made very significant improvements, or have consistently helpled in various ways. Some them go back to the start of the Yoshimi fork.
 
-The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, some of which may only have made a few small suggestsion or bug reports.
+The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, some of which may only have made a few small suggestions or bug reports.
 
 FILE COPYRIGHTS
 Always a tricky one :(

@@ -203,7 +203,7 @@ class Part
         float *tmpoutl;
         float *tmpoutr;
         float oldfreq; // for portamento
-        int partMuted;
+//        int partMuted;  // **** RHL ****
         bool killallnotes;
 
         // MonoMem stuff

@@ -294,7 +294,7 @@ set (Interface_Sources
     Interface/Data2Text.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
-    Interface/RingBuffer.cpp
+    Interface/RingBuffer.h
     Interface/TextLists.h
 )
 

@@ -3,6 +3,8 @@
 
     Copyright 2019, Will Godfrey.
 
+    Copyright 2021, Rainer Hans Liffers
+
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
     Public License as published by the Free Software Foundation, either
@@ -228,7 +230,7 @@ inline int sendNormal(SynthEngine *synth,
     }
     putData.data.source = action;
     putData.data.type = type;
-    if (synth->interchange.fromCLI->write(putData.bytes))
+    if (synth->interchange.fromCLI.write(putData.bytes))
     {
         synth->getRuntime().finishedCLI = false;
     }
@@ -362,7 +364,7 @@ inline int sendDirect(SynthEngine *synth,
         action |= (parameter & TOPLEVEL::action::muteAndLoop); // transfer low prio and loopback
     putData.data.source = action;
 
-    if (synth->interchange.fromCLI->write(putData.bytes))
+    if (synth->interchange.fromCLI.write(putData.bytes))
     {
         synth->getRuntime().finishedCLI = false;
     }

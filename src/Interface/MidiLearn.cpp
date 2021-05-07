@@ -1,7 +1,8 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016-2021 Will Godfrey
+    Copyright 2016-2020, Will Godfrey
+    Copyright 2021, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -205,7 +206,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
         do
         {
             ++ tries;
-            ok = synth->interchange.fromMIDI->write(putData->bytes);
+            ok = synth->interchange.fromMIDI.write(putData->bytes);
             if (!ok)
                 usleep(1);
         // we can afford a short delay for buffer to clear
@@ -779,7 +780,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
     bool ok = false;
     do
     {
-        ok = synth->interchange.toGUI->write(putData->bytes);
+        ok = synth->interchange.toGUI.write(putData->bytes);
         ++tries;
         if (!ok)
                 usleep(1);

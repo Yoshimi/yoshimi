@@ -27,7 +27,7 @@
 #include <math.h>
 
 #include "Misc/SynthEngine.h"
-#include "OscilParameters.h"
+#include "Params/OscilParameters.h" // **** RHL ****
 
 OscilParameters::OscilParameters(SynthEngine *_synth) :
     Presets(_synth),

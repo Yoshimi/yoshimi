@@ -5,7 +5,9 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2021, Will Godfrey & others
+    Copyright 2014-2020, Will Godfrey & others
+
+    Copyright 2021, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -1489,7 +1491,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                         do
                         {
                             ++ tries;
-                            ok = interchange.fromMIDI->write(putData.bytes);
+                            ok = interchange.fromMIDI.write(putData.bytes);
                             if (!ok)
                                 usleep(1);
                         // we can afford a short delay for buffer to clear
@@ -1614,7 +1616,7 @@ int SynthEngine::SetSystemValue(int type, int value)
     do
     {
         ++ tries;
-        ok = interchange.fromMIDI->write(putData.bytes);
+        ok = interchange.fromMIDI.write(putData.bytes);
         if (!ok)
             usleep(1);
     // we can afford a short delay for buffer to clear

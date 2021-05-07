@@ -1,7 +1,8 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016-2021 Will Godfrey
+    Copyright 2016-2020 Will Godfrey
+    Copyright 2021,  Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -41,10 +42,20 @@ extern std::string singlePath;
 extern int startInstance;
 
 
+/* compile time function log2 as per
+   https://hbfs.wordpress.com/2016/03/22/log2-with-c-metaprogramming          */
+static constexpr size_t log2
+                        (const size_t n)
+ {
+  return ((n < 2) ? 0 : 1 + log2 (n / 2));
+ }
+
+
 class InterChange : private DataText
 {
 
     private:
+        static constexpr size_t commandBlockSize = sizeof (CommandBlock);
         SynthEngine *synth;
 
     public:
@@ -54,14 +65,16 @@ class InterChange : private DataText
 
         CommandBlock commandData;
 #ifndef YOSHIMI_LV2_PLUGIN
-        ringBuff *fromCLI;
+        RingBuffer <9, log2 (commandBlockSize)> fromCLI;
 #endif
-        ringBuff *decodeLoopback;
-        ringBuff *fromGUI;
-        ringBuff *toGUI;
-        ringBuff *fromMIDI;
-        ringBuff *returnsBuffer;
-        ringBuff *muteQueue;
+        RingBuffer <10, log2 (commandBlockSize)> decodeLoopback;
+#ifdef GUI_FLTK
+        RingBuffer <10, log2 (commandBlockSize)> fromGUI;
+        RingBuffer <11, log2 (commandBlockSize)> toGUI;
+#endif
+        RingBuffer <10, log2 (commandBlockSize)> fromMIDI;
+        RingBuffer <10, log2 (commandBlockSize)> returnsBuffer;
+        RingBuffer <4, log2 (commandBlockSize)> muteQueue;
 
         void generateSpecialInstrument(int npart, std::string name);
         void mediate(void);
@@ -140,7 +153,6 @@ class InterChange : private DataText
         int searchInst;
         int searchBank;
         int searchRoot;
-        const size_t commandBlockSize = sizeof(CommandBlock);
 };
 
 #endif

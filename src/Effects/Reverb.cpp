@@ -74,8 +74,8 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     Ptime(64),
     Pidelay(40),
     Pidelayfb(0),
-    Prdelay(0),
-    Perbalance(64),
+//    Prdelay(0), // **** RHL ****
+//    Perbalance(64), // **** RHL ****
     Plpf(127),
     Phpf(0),
     Plohidamp(80),

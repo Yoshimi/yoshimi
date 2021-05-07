@@ -2,7 +2,7 @@
 #   CMakeLists.txt (LV2)
 #
 #   Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
-#   Copyright 2018-2021 Will Godfrey & others
+#   Copyright 2018-2021, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -48,7 +48,7 @@ file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
     ../Interface/Data2Text.cpp ../Interface/Data2text.h
-    ../Interface/RingBuffer.cpp
+    ../Interface/RingBuffer.h
     ../Interface/MidiLearn.cpp ../Interface/MidiLearn.h
     ../UI/MiscGui.cpp ../UI/MiscGui.h)
 file (GLOB yoshimi_params_files

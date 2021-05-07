@@ -1,7 +1,8 @@
 /*
     MidiDecode.cpp
 
-    Copyright 2017-2021 Will Godfrey
+    Copyright 2017-2020, Will Godfrey
+    Copyright 2021, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -538,7 +539,7 @@ bool MidiDecode::nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, uns
         else
             return true; // not an error but undefined
     }
-    synth->interchange.fromMIDI->write(putData.bytes);
+    synth->interchange.fromMIDI.write(putData.bytes);
     return true;
 }
 

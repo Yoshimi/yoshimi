@@ -140,7 +140,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.type = type;
     putData.data.source = action;
     //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " offset " << int(offset) << " msg " << int(miscmsg) << endl;
-    if (!synth->interchange.fromGUI->write(putData.bytes))
+    if (!synth->interchange.fromGUI.write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }
 
@@ -168,7 +168,7 @@ string input_text(SynthEngine *synth, string label, string text)
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
-    while (synth->interchange.toGUI->read(getData.bytes))
+    while (synth->interchange.toGUI.read(getData.bytes))
     {
         Fl::lock();
         decode_updates(synth, &getData);
