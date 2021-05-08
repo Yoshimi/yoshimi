@@ -1827,6 +1827,11 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(input);
+                if (filterVowelNumber >= value)
+                {
+                    filterVowelNumber = value -1; // bring back into range
+                    filterFormantNumber = 0; // zero as size unknown
+                }
                 cmd = FILTERINSERT::control::sequenceSize;
             }
             else if (input.matchnMove(2, "count"))
@@ -1834,6 +1839,8 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(input);
+                if (filterFormantNumber >= value)
+                    filterFormantNumber = value -1; // bring back into range
                 cmd = FILTERINSERT::control::numberOfFormants;
             }
             else if (input.matchnMove(2, "vowel"))
