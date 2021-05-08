@@ -1717,6 +1717,7 @@ void InterChange::mediate()
         int effpar = synth->getRuntime().effectChange;
         if (effpar > 0xffff)
         {
+#ifdef GUI_FLTK
             CommandBlock effData;
             memset(&effData.bytes, 255, sizeof(effData));
             unsigned char npart = effpar & 0xff;
@@ -1741,6 +1742,7 @@ void InterChange::mediate()
             effData.data.part = npart;
             effData.data.engine = effnum;
             toGUI.write(effData.bytes);
+#endif
             synth->getRuntime().effectChange = UNUSED;
         } // end of temporary fix
 
