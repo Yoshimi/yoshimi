@@ -773,6 +773,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
 
 void MidiLearn::writeToGui(CommandBlock *putData)
 {
+#ifdef GUI_FLTK
     if (!synth->getRuntime().showGui)
         return;
     putData->data.part = TOPLEVEL::section::midiLearn;
@@ -790,6 +791,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
 
     if (!ok)
         synth->getRuntime().Log("toGui buffer full!", 2);
+#endif
 }
 
 
