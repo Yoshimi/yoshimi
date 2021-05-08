@@ -5782,7 +5782,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 }
 
 
-Reply CmdInterpreter::processSrcriptFile(const string& filename)
+Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
 {
     if (filename <= "!")
         return Reply::what("Exec");
@@ -5796,7 +5796,8 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename)
     }
 
     cli::Parser scriptParser;
-    context = LEVEL::Top; // start from top level
+    if (toplevel)
+        context = LEVEL::Top; // start from top level
 
     string line;
     int lineNo = 0;
@@ -6029,10 +6030,10 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         return Reply{commandList(input)};
     }
 
+    if (input.matchnMove(4, "runlocal"))
+        return processSrcriptFile(input, false);
     if (input.matchnMove(3, "run"))
-    {
         return processSrcriptFile(input);
-    }
 
     if (input.matchnMove(1, "set"))
     {

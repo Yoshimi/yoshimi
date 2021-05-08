@@ -126,8 +126,9 @@ static std::string basics [] = {
     "STop",          "all sound off",
     "RESet [s]",     "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
     "EXit [s]",      "tidy up and close Yoshimi (if 'y'), 'FOrce' instant exit regardless",
-    "RUN <s>",       "execute named command script",
-    "  WAIT <n>",    "1 to 1000 mS delay, within script only",
+    "RUN <s>",       "execute named command script forcing top level start",
+    "RUNLocal <s>",  "execute named command script from current context level",
+    "  WAIT <n>",    "1mS to 30,000mS delay, within script only",
     "..",            "step back one level",
     "/",             "step back to top level",
     "@end"

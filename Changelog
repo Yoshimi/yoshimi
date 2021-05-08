@@ -3,6 +3,8 @@ yoshimi 2.0.1 M
 2021-5-8 Will
 * Made small range check in CLI formant filter.
 
+* Added CLI option to start scripts from any level.
+
 2021-5-6 Will
 * Replaced ringbuffer with improved code from Rainer
   and applied his other fixes.
