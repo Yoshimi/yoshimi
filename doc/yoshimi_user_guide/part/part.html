@@ -14,16 +14,47 @@
     <img src="images/section.png" alt="Mixer Panel Window" class="image">
     <p>
     The first control is the part number you are currently looking at, and
-     alongside this selection is an entry to decide the number of parts. These are rows of 16, and can be 16 (the default), 32 and 64. Initially the higher numbered ones take the same Channel as the matching default ones. The is especially useful for <a href="../vector/vector.html">Vector control</a> where a 'column' of up to four parts can linked and controlled by a MIDI joystick, or similar.
+     alongside this selection is an entry to decide the number of parts. These are rows of 16, and can be 16 (the default), 32 and 64. Initially the higher numbered ones take the same <em>channel</em> as the matching default ones. The is especially useful for <a href="../vector/vector.html">Vector control</a> where a 'column' of up to four parts can linked and controlled by a MIDI joystick, or similar.
      </p>
      <p>
-     On the same line you then have what is both a shortcut button to open the window for the current selected bank and (with a right-click) an editable field for the instrument name, and finally, an <em>Edit</em> button for detailed part editing.
+     On the same line you then have what is both a shortcut button to open the window for the current selected bank and (with a right-click) an editable field for the part's current instrument name. Finally, there is an <a href="#edit">Edit</a> button for detailed part editing.
     </p>
-    MORE TEXT
     <p>
-     Nomally the controllers button opens the <a href="controllers.html">MIDI Controllers</a> window. However a right click on it will instead open a window for the <a href="controllers.html#midiccs">MIDI CCs</a> window (shown at the foot of the same page).
+    Below the part number is the MIDI channel it will respond to, and alongside this is the playing mode. This can be Polyphonic, Monophonic or Legato. Legato is not available if <em>Drum Mode</em> has been set in the <a href="#kit">Part Kit</a> editing window, and temporarily reverts to Poly with a red warning background.
+    <br><br>
+    Just underneath these are the switches to enable or disable the entire part, and to set whether <em>Portamento</em> between notes is allowed.
+    </p>
+    <p>
+    The four controls to the right set the respective levels for the entire part.
+    <br><br>
+    <b>Vel. Sens.</b> This sets the velocity sensitivity to incoming MIDI messages.
+    <br><br>
+    <b>Vel. Offs.</b> Velocity offset sets the point at which Yoshimi starts to actually respond.
+    <br><br>
+    <b>Pan</b> Is a normal panning control for the part and is directly linked to the one in the mixer.
+    <br><br>
+    <b>Volume</b> This is also directly linked to the mixer control for overall part volume.
+    </p>
+    <p>
+     Nomally the <b>Controllers</b> button opens the <a href="controllers.html">MIDI Controllers</a> window. However a right click on it will instead open a window for the <a href="controllers.html#midiccs">MIDI CCs</a> window (shown at the foot of the same page).
+     <br><br>
+     The <b>Pan Law</b> menu selects one of three common panning behaviours. The default is close a constant power output. The first number refers to the apparent level of the side it is panned to, and the other number is the equivalent output when switched to MONO.
      </p>
-     MORE TEXT
+     <p>
+     Underneath 'Controllers' are the key range controls.
+     <br><br>
+     <b>Min Note</b> sets the lowest MIDI key this part will respond to. The <em>Set</em> button alongside sets this to the last note played.
+     <br><br>
+     <b>Max Note</b> sets the highest MIDI key this part will respond to. The <em>Set</em> button alongside sets this to the last note played.
+     <br><br>
+     <b>R</b> resets both the lowest and highest keys to their default values.
+     <br><br>
+     <b>Key Shift</b> provides up to three octaves of key shift in semitone steps.
+     <br><br>
+     <b>Key Limit</b> sets the maximum number of concurrent notes for this part.
+     <br><br>
+     The four controls at bottom right set the amount of this part that will be sent to each of the <em>System</em> effects.
+     </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <img src="images/mixer.png" alt="Mixer Panel Window" class="double" style="float: right;">
     <p>
@@ -57,7 +88,7 @@
     <br><br>
     <b>Part Group</b> If more than 16 parts are selected this will let you switch the view to which 'row' you want to manage.
     <br><br>
-    <b>Solo</b> Provides a menu for the five different Solo actions.
+    <b>Solo</b> Provides a menu for the five different Solo actions. Note that <em>Column</em> mode only works if you have at least 32 parts set, and is much more useful if it is set to 64 parts.
     <br><br>
     <b>CC</b> The controller that Solo responds to.
     <br><br>
@@ -97,7 +128,7 @@
     <br><br>
     <b>Velocity</b> (Humanise) With this control you can set a random whole part attenuation.
     <br><br>
-    <b>Aftertouch</b> Opens the Aftertouch editing window.
+    <b>Aftertouch</b> Opens the <a href="#aftertouch">Aftertouch</a> editing window.
     </p>
     <a href="#top" class="up">Back to top</a>
     <img src="../images/boundry.png" alt="divider" class="wideline">
@@ -175,10 +206,6 @@
     <br><br>
     The normal range is from the CC value at the time the key was pressed up to the maximum for that control. If 'Down' is set as well, the effect will be in the reverse direction. i.e. down to the control's minimum value.
     </p>
-    ..
-    <br>
-    ..
-    <br>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <a href="../add/add.html">Next</a> (AddSynth Engine)
     <a href="#edit" class="up">Back to 'Edit'</a>
