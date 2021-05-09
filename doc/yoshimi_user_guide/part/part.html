@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ Parts</title>
+    <link rel="stylesheet" type="text/css" href="../files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="../index.html">Index</a>
+    </nav>
+    <a id="top"></a>
+    <h2 style="text-align: center">Parts and Channels</h2>
+    <img src="images/section.png" alt="Mixer Panel Window" class="image">
+    <p>
+    The first control is the part number you are currently looking at, and
+     alongside this selection is an entry to decide the number of parts. These are rows of 16, and can be 16 (the default), 32 and 64. Initially the higher numbered ones take the same Channel as the matching default ones. The is especially useful for <a href="../vector/vector.html">Vector control</a> where a 'column' of up to four parts can linked and controlled by a MIDI joystick, or similar.
+     </p>
+     <p>
+     On the same line you then have what is both a shortcut button to open the window for the current selected bank and (with a right-click) an editable field for the instrument name, and finally, an <em>Edit</em> button for detailed part editing.
+    </p>
+    MORE TEXT
+    <p>
+     Nomally the controllers button opens the <a href="controllers.html">MIDI Controllers</a> window. However a right click on it will instead open a window for the <a href="controllers.html#midiccs">MIDI CCs</a> window (shown at the foot of the same page).
+     </p>
+     MORE TEXT
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <img src="images/mixer.png" alt="Mixer Panel Window" class="double" style="float: right;">
+    <p>
+    Yoshimi can operate simultaneously across all 16 MIDI channels, so it makes sense to be able to see all of these together, hence the mixer panel shown to the right. The part that is accessible in the main window is shown highlighted in this panel.
+    </p>
+    <p>
+    This window gives a view of what is happening overall, and allows you to select instrument patches, change volume and panning, as well as selecting the incoming MIDI channel.
+    If using Jack Audio you also have the ability to decide the audio destination from here.
+    <p>
+    If more than 16 parts have been enabled, a new menu appears to the left of <em>Solo</em>, to enable you to select which row of 16 that you want to manage. This cut-down image shows both multiple columns, i.e. more than 16 parts, and Solo in the process of being set up.
+    <img src="images/solo.png" alt="solo section" class="double" style="float: right;">
+    </p>
+    <h3>Mixer controls</h3>
+    (Chanel strips)
+    <br><br>
+    <b>Check box</b> Clicking on this will turn the part on or off. If turing it on it will also make it the currently selected one.
+    <br><br>
+    <b>Instrument</b> (name) As well as showing the name and which engines are used (from the colours) clicking on this will make it the currently selected one, and open the instrument bank window.
+    <br><br>
+    <b>Volume</b> Changes the part's volume but doesn't make it the current one. Alongside are the left and right VU meters.
+    <br><br>
+    <b>Panning</b> Changes the stereo position of this part. Doesn't make it current.
+    <br><br>
+    <b>Ch</b> (MIDI channel) Provides a menu for selecting the channel to listen to. Doesn't make the part current.
+    <br><br>
+    <b>Main</b> (audio destination) Only when using Jack Audio, allows you to send audio to the main pair, the part ones only or to both. Doesn't make the part current.
+    <br><br>
+    <b>Edit</b> Makes the part the current one. A right click also opens the part's <em>Edit</em> window.
+    <br><br>
+    (Bottom row)
+    <br><br>
+    <b>Part Group</b> If more than 16 parts are selected this will let you switch the view to which 'row' you want to manage.
+    <br><br>
+    <b>Solo</b> Provides a menu for the five different Solo actions.
+    <br><br>
+    <b>CC</b> The controller that Solo responds to.
+    <br><br>
+    <b>Change to</b> (display format) This gives you the choice of one row of sixteen, or two rows of eight parts.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <a id="edit"></a>
+    <p>
+    <img src="images/edit.png" alt="Part Edit Window" class="image">
+    The <em>Edit</em> button mentioned above opens this window for full access to all part editing.
+    Enabling and disabling the engines is done from here, along with access to them via the respective 'Edit' buttons.
+
+    <h3>Editor controls</h3>
+    <b>Default</b> Clicking on this button will fill the copyright field with a saved entry (if it exists), while holding down <em>Ctrl</em> at the same time will save the currently contents of the field as the default.
+    <br><br>
+    <b>Author and Copyright</b> (text entry) A free text field for you to enter whatever copyright infomation you like.
+    <br><br>
+    <b>Comments</b> (text entry) A field for additional comments, such as how the instrument can be modified, where it sounds best etc.
+    <br><br>
+    <b>Enabled</b> (AddSynth) Makes this engine active or inactive.
+    <br><br>
+    <b>Edit</b> (AddSynth) Opens the AddSynth global editing window.
+    <br><br>
+    <b>Enabled</b> (SubSynth Makes this engine active or inactive.
+    <br><br>
+    <b>Edit</b> (SubSynth) Opens the SubSynth editing window.
+    <br><br>
+    <b>Enabled</b> (PadSynth) Makes this engine active or inactive. A first-time enabling will temporarily stop sound from that part, as the PadSynth wavetable has to be created.
+    <br><br>
+    <b>Edit</b> (PadSynth) Opens the PadSynth editing window.
+    <br><br>
+    <b>Kit Edit</b> Opens the part's kit mode window.
+    <br><br>
+    <b>Effects</b> Opens the Effects window for editing.
+    <br><br>
+    <b>Detune</b> (Humanise) This controls enables you to set a small random detune of the entire part.
+    <br><br>
+    <b>Velocity</b> (Humanise) With this control you can set a random whole part attenuation.
+    <br><br>
+    <b>Aftertouch</b> Opens the Aftertouch editing window.
+    </p>
+    <a href="#top" class="up">Back to top</a>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <a id="kit"></a>
+    <p>
+    <img src="images/kit.png" alt="Part Kit Window" class="image">
+    Part kits can consist of up to 16 kit items, each with its own key range and full set of engines.
+    <h3>Kit controls</h3>
+    (kit item strips)
+    <br><br>
+    <b>No.</b> (checkbox) This enables or disables the kit item. It silences the part while doing so as it has to change the total number of engines for that part.
+    <br><br>
+    <b>Mute</b> Silences this kit item. It has no effect on any other items, or the part overall.
+    <br><br>
+    <b>Name</b> Each item can be named independently
+    <br><br>
+    <b>Min key</b> The minimum MIDI key number this item with respond to.
+    <br><br>
+    <b>m</b> Use the last pressed key to set the minimum key number.
+    <br><br>
+    <b>R</b> Reset the key range.
+    <br><br>
+    <b>M</b> Use the last pressed key to set the maximum key number.
+    <br><br>
+    <b>Max key</b> The maximum key number for this kit item.
+    <br><br>
+    <b>On</b> (AddSynth) Enables or disables the item's AddSynth Engine.
+    <br><br>
+    <b>Edit</b> (AddSynth) Opens the AddSynth editing window for this item.
+    <br><br>
+    <b>On</b> (SubSynth) Enables or disables the item's SubSynth Engine.
+    <br><br>
+    <b>Edit</b> (SubSynth) Opens the SubSynth editing window for this item.
+    <br><br>
+    <b>On</b> (PadSynth) Enables or disables the item's PadSynth Engine. A first time enabling, will also silence the part as it has to generate a new wavetable.
+    <br><br>
+    <b>Edit</b> (PadSynth) Opens the PadSynth editing window for this item.
+    <br><br>
+    <b>FX.r.</b> Sets which of the part's three effects will be applied this item.
+    <br><br>
+    (bottom row)
+    <br><br>
+    <b>Mode</b> This menu selects which kit mode that is used.
+    <div class="tab">
+    <em>Multi</em> - All kit items will sound over their full key range.
+    <br>
+    <em>Single</em> - Only the item that has the lowest min. key will sound over any overlapping ones. Beyond its highest note, the next one with the lowest min. will sound etc.
+    <br>
+    <em>Crossfade</em> - Pairs of items will fade from one to the other if they overlap, without affecting any others.
+    </div>
+    <br>
+    <b>Drum mode</b> This blocks various pitch modifying controls for this part (such as Key shift, Legato).
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/effects.png" alt="Effects window" class="image">
+    <h3>Effects</h3>
+    This is the part level window which selects, contains and manages the individual
+    <a href="../effects/effects.html">Effects</a> and their routing.
+    <br><br>
+    The spinbox selects which of three part effects you are managing.
+    <br><br>
+    The menu choses the effect, which will then appear an the area below.
+    <br><br>
+    The last menu determines the routing of the effects. By default they daisy chain, but you can have them going to the <em>Part</em> output or <em>Dry</em> output instead <span class="warn">Explain!</span>
+    <br><br>
+    At the bottom of this window is a button to allow you to disable this effect without losing the settings, or altering the routing for the other effects in the chain.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <a id="aftertouch"></a>
+    <p>
+    <h3>Aftertouch</h3>
+    <img src="images/aftertouch.png" alt="Aftertouch window" class="image">
+    Each part can have independent Channel, and Key aftertouch. The controls shown are in parallel to the incoming CCs so you should not use the incoming CC at the same time as aftertouch, otherwise the results can be quite confusing. You can have several of the controls working at the same time, but not on both channel and key at the same time.
+    <br><br>
+    The normal range is from the CC value at the time the key was pressed up to the maximum for that control. If 'Down' is set as well, the effect will be in the reverse direction. i.e. down to the control's minimum value.
+    </p>
+    ..
+    <br>
+    ..
+    <br>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <a href="../add/add.html">Next</a> (AddSynth Engine)
+    <a href="#edit" class="up">Back to 'Edit'</a>
+    <br>
+    <a href="../sub/sub.html">SubSynth Engine</a>
+    <a href="#kit" class="up">Back to 'Kit'</a>
+    <br>
+    <a href="../pad/pad.html">PadSynth Engine</a>
+    <a href="#top" class="up">Back to top</a>
+  </body>
+</html>

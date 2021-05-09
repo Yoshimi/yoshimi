@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ AddSynth Voice</title>
+    <link rel="stylesheet" type="text/css" href="../files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="../index.html">Index</a>
+    </nav>
+    <a id="top"></a>
+    <h2 style="text-align: center">AddSynth Voice</h2>
+    <img src="images/voice.png" alt="addsynth voice window" class="image">
+    <p>
+    Once again you have a set of the standardised inserts that are used across all engines, described in the following sections.
+    </p>
+    <a href="../volume/volume.html">Volume and Panning</a>
+    <br>
+    <a href="../filter/filter.html">Filter Type and Style</a>
+    <br>
+    <a href="../envelope/envelope.html">Envelope</a>
+    <br>
+    <a href="../lfo/lfo.html">LFO</a>
+    <p>
+    There is a row of eight tabs along the top. These select the particular voice you want to manage, and its modulator section. The tab colour changes to cyan to indicate it is the selected one. Voices that are active always show their tab <em>number</em> as black so you can see at a glance which ones have been enabled.
+    </p>
+    <p>The <b>On</b> button enables or disables the entire voice, including it's modulator. Also, with the exception of Volume/Panning all the inserts can be switched on or off.
+    <h3>Local Controls</h3>
+    (voice)
+    <br><br>
+    <b>Delay</b> Individual voices can be delayed againt the overall note on point. However if one is delayed beyond the note release point it will never sound.
+    <br><br>
+    <b>Resonance</b> This determines whether overall resonance is applied to a particular voice.
+    <br><br>
+    <b>Bypass Global</b> Only use the filter block for the voice, otherwise it is applied with but before the global one.
+    <br><br>
+    <b>Minus</b> This inverts the phase of the entire voice so it will tend to subtract from the others.
+    <br><br>
+    <b>Bend</b> Modifies the range of an income pitch bend for just this voice.
+    <br><br>
+    <b>Offset</b> Shifts the overall position of pitch bend for this voice.
+    <br><br>
+    <b>440Hz</b> This fixes the frequency to 'A' regardless of the key pressed. However, see below.
+    <br><br>
+    <b>Eq.T</b> (Equal Temperament Variation) If this is greater than zero it modifies the effect of the 440Hz checkbox. The A4 key remains at 440Hz, but the frequency of the other keys vary according to the key pressed. When set to the middle of the value range (64), the step size is exactly like the classical equal temperament, i.e. one note step for one semi tone and 12 steps will double the frequency.
+    <br><br>
+    Equal Temperament Variation is useful for sounds that are inharmonic, but which still depend on frequency. For example, with a very short envelope which quickly drops the volume to zero, Equal Temperament Variation can create bell-like attack sounds which change with frequency, but which don't get unnaturally high or low as you go up and down the keyboard.
+    <br><br>
+    <b>Detune, Octave, Detune Type</b> and <b>Coarse Detune</b> all behave in the same way as the global ones but only for this specific voice.
+    <br><br>
+    <b>Unison</b> (on) This behaves rather like an insert and enables the voice to be split into chorus-like subvoices.
+    <p class="tab">
+    <b>Size</b> Defines the number of subvoices. Between 3 and 5 is a common setting.
+    <br><br>
+    <b>Frequency Spread</b> Sets detune amounts of the subvoices from from the nominal pitch.
+    <br><br>
+    <b>Ph.rnd</b> Gives a variable amount of randomisation of the phases of the subvoices.
+    <br><br>
+    <b>Stereo</b> Gives a variable Stereo spread to the subvoices.
+    <br><br>
+    <b>Vib.</b> Sets the amount of vibratto to be applied to the whole unison.
+    <br><br>
+    <b>V.speed</b> Set the <em>average</em> vibratto speed of the subvoices.
+    </p>
+    <b>Invert</b> This inverts the phase of some of the subvoices, depending on the number of them and the amount set here. The more there are, the less noticable the effect.
+    <br><br>
+    <b>Source</b> (voice) Each voice can be fully independent or can share the main features of any lower numbered voice. Voice 1 is obviously the lowest numbered so this control is deactivated.
+    <br><br>
+    <b>Sound</b> Switches between using an oscillator, or one of three noise types. White, Pink and Spot. The last one is random bursts of white noise.
+    <br><br>
+    <b>Use</b> (local oscillator) This enables a voice to choose just the oscillator waveform from a lower numbered voice.
+    <br><br>
+    <b>Waveform</b> This button gives access to a highly detailed <a href="../wave/wave.html">waveshape</a> editor.
+    <br><br>
+    <b>Phase</b> Gives an offset to the relative phase of this voice.
+    <br><br>
+    (modulator)
+    <br><br>
+    This has an independednt subset of the inserts to the associated voice.
+    <br><br>
+    <b>Type</b> This enables any of five modulator types.
+    <br><br>
+    <b>Source</b> Local uses just this modulator's controls, or you can select any lower numbered whole <em>voice</em> as a mono source but with this modulator's further controls.
+    <br><br>
+    <b>Vol</b> The relative volume of the modulator oscillator, compared with the voice.
+    <br><br>
+    <b>V.Sns</b> Velocity sensing level. Max is disabled.
+    <br><br>
+    <b>F.Damp</b> Degree of high frequency damping.
+    <br><br>
+    <b>Follow Voice</b> If checked, Voice detunes are applied first, and the modulator ones are the relative to those values.
+    <br><br>
+    <b>440Hz</b> Fixes the modulator to 440Hz, but doesn't apply Eq.T. ??
+    <br><br>
+    <b>Detune, Octave, Detune Type</b> and <b>Coarse Detune</b> As per the voice, but just for the modulator.
+    <br><br>
+    <b>Waveform</b> Opens the waveshape editor for the modulator.
+    <br><br>
+    <b>Use</b> (local oscillator) This enables the modulator to choose the oscillator waveform from a lower numbered modulator.
+    <br><br>
+    <b>Phase</b> Relative phase of the modulator against its voice.
+    </p>
+    <a href="#top" class="up">Back to top</a>
+  </body>
+</html>

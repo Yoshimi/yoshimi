@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ Settings</title>
+    <link rel="stylesheet" type="text/css" href="../files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="../index.html">Index</a>
+    </nav>
+    <a id="top"></a>
+    <h2 style="text-align: center">Settings</h2>
+    <img src="images/settings.png" alt="Main Settings tab" class="image">
+    <p>
+    Some of these settings don't apply when running as an LV2 plugin, and mostly these are either hidden completely or shown as inactive.
+    <h3>Main Settings</h3>
+
+    <b>AddSynth Oscillator Size</b> The bigger this is the better the quality. However that is at the cost of CPU loading.
+    <br><br>
+    <b>Internal Buffer Size</b> Lower values will give lower latency and more accurate resolution, but at the cost of CPU loading. We recommend you keep this as low as possible without getting Xruns.
+    <br><br>
+    <b>PADsynth Interpolation</b> For those with good hearing at high pitches, setting this to 'Cubic' will give very slightly better results, but it is slower to operate.
+    <br><br>
+    <b>Virtual Keyboard Layout</b> You can have various standard layouts, when using the virtual keyboard, and this lets you select the most common.
+    <br><br>
+    <b>XML Compression Level</b> The degree of compression applied to saved data. Zero is useful for creating files readable in a text editor when checking for problems.
+    <br><br>
+    <b>Send Reports to:</b> Various text messages are created when Yoshimi is running. These can either be sent to a GUI <em>Console</em> window or to the standard command line output.
+    <br><br>
+    <b>Saved Instrument Format</b> Yoshimi instrument files can be saved to the original ZynAddSubFX format, the new extended Yoshimi format, or to both of them.
+    <br><br>
+    <b>Mixer Panel Layout</b> Depending of how you like to lay out your desktop you may want the default single row of 16 parts, or the more compact two rows of 8.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <img src="images/switches.png" alt="Switches tab" class="image">
+    <p>
+    <h3>Switches</h3>
+    <b>Enable Bank Highlight</b> This will highlight the last Instrument loaded from or saved to a bank. The highight is retained through later bank changes, so you can still find the last one you handled. It will be lost though if you load an external file or patchset.
+    <br><br>
+    <b>Start With Default State</b> If a default state has been set this will be loaded on all startups and main resets.
+    <br><br>
+    <b>Hide Non Fatal Errors</b> Suppresses reporting of errors that aren't serious. This is especially useful for CLI users.
+    <br><br>
+    <b>Show Splash Screen</b> Enables or disables showing the startup splash screen. If disabled, then a very small message window is shown briefly so you know Yoshini has started.
+    <br><br>
+    <b>Log Load Times</b> Reports the time it took for an instrument to load, regardless of whether it was loaded externally, from a bank, or via MIDI. This helps you time dynamic loading in a running project.
+    <br><br>
+    <b>Log XML Headers</b> Reports an instrument's version number on loading. Both the ZynAddsubFX and Yoshimi numbers are displayed depending on whether it is an unedited original, a modifed one or generated in Yoshimi from the start.
+    <br><br>
+    <b>Include all data in XML files</b> Originally, some data was not stored in ZynAddSubFX instruments. This meant there were sometimes subtle differences in the sound each time the instrument was loaded. This switch ensures all date is stored.
+    <br><br>
+    <b>Enable GUI</b>
+    <br>
+    <b>Enable CLI</b>
+    These two switches detirmine which interfaces are active. You can deselect both, but in that case the only form of access to Yoshimi will be via MIDI.
+    <br><br>
+    <b>Enable Auto Instance</b> If this is enabled, then when you start Yoshimi, all instances that were open when it was last saved will be re-opened.
+    <br><br>
+    <b>Enable Single Master</b> If this is set, and you try to start a second copy of Yoshimi, then instead you will get a new instance from the running one.
+    </p>
+    <p>
+    <h3>History Locks</h3>
+    All of these recent file lists can be locked so that their respective entries will not be moved or changed when you load or save new files of that type.
+    This is useful when using MIDI NRPNs to load files numerically via a remote keyboard/controller.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <img src="images/jack.png" alt="Jack tab" class="image">
+    <p>
+    <h3>Jack</h3>
+    <b>Jack MIDI Source</b> This can be set if you know the name of a source you want to connect to, but usually it is left empty and connection made from the sender.
+    <br><br>
+    <b>Set as preferred MIDI</b> As described, sets this for MIDI input (disabling Alsa MIDI).
+    <br><br>
+    <b>Jack Server</b> It is possible to set a specific server if there is more than one active, but this is most unusual, so it is nomally left as 'default'
+    <br><br>
+    <b>Set as prefered audio</b> Sets Jack for aoudio output, disabling access to Alsa audio
+    <br><br>
+    <b>Autoconnect audio</b> Connects to the current audio server when Yoshimi is started.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <img src="images/alsa.png" alt="Alsa tab" class="image">
+    <p>
+    <h3>Alsa</h3>
+    <b>Alsa Connection Type</b> By default sets 'Search' and will accept input from any Alsa sources it can find. Alternatively it can be set as 'Fixed, when you can use the option below. Finally it can be switched off, and connectin is then made externally.
+    <br><br>
+    <b>Alsa MIDI Source</b> Used to set a comma separated list of sources you want to connect to.
+    <br><br>
+    <b>Set as preferred MIDI</b> Enables Alsa MIDI, disabling Jack input.
+    <br><br>
+    <b>Alsa Audio Device</b> The Alsa audio destination you want to connect to. If you don't set this Alsa will take over and set most of these parameters to 'safe' values.
+    <br><br>
+    <b>Set as preferred audio</b> Enables Alsa audio output, disabling connection to Jack.
+    <br><br>
+    <b>Sample Rate</b> Specific to Alsa, only a limited range of rates are supported - all the usual ones for high quality audio.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <img src="images/midi.png" alt="MIDI tab" class="image">
+    <p>
+    <h3>MIDI</h3>
+    <b>Bank Root Change</b>
+    <b>Bank Change</b>
+    This pair of controls detirmine how Yoshimi responds to MIDI bank changes. Normally the <em>Bank Root</em> will be MSB (CC0) and <em>Bank</em> will be LSB (CC32), however some older hardware has these reversed. Also some devices send spurious changes, so not only can you swap them, you can also completely disable acting on them.
+    <br><br>
+    <b>Enable Program Change</b> Detirmines whether you want to allow Progam/Instrument changes via MIDI.
+    <br><br>
+    <b>Enable Part On Program Change</b> Having this set will activate a part if it is not active when it receives a program change message.
+    <br><br>
+    <b>Enable Extended Program Change</b> This lets you set a specific CC that will then perform program changes on the upper 32 instruments in a bank.
+    <br><br>
+    <b>Extended Program Change CC</b> The is the actual CC to use for extended program changes. The value sent should be the Instrument number minus 128.
+    <br><br>
+    <b>Enable Incoming NRPNs</b> Enables/Disables receiving NRPNs, but doesn't affect Vectors or MIDI Learn which are always available.
+    <br><br>
+    <b>Ignore Reset all CCs</b> Some devices send this command at inconvenient times, so, you can disable acting on it.
+    <br><br>
+    <b>Log Incoming Events</b> Reports the CC being received. Useful when your'e not sure what (if anything) is being sent.
+    <br><br>
+    <b>Show learn Editor</b> If set, then on learning a control, or loading a state file that has learned entries, the <em>MIDI Learn</em> editing window will be opened.
+    </p>
+    <img src="../images/boundry.png" alt="divider" class="wideline">
+    <a href="#top" class="up">Back to top</a>
+    <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
+  </body>
+</html>

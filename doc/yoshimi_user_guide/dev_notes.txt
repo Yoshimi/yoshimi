@@ -1,0 +1,41 @@
+Yoshimi User Guide Sources notes 6/5/2021
+
+This is the complete user guide project for Yoshimi version 2.0
+and later.
+
+It is intended to be as platform and browser agnostic as possible, and uses
+only standard HTML, CSS and .png images.
+
+From the user viewpoint (as this is a guide) it must be light weight, easy
+to navigate, with multiple obvious cross references and remain as
+responsive as possible, so please do not add any animations, javascript or
+other such extensions.
+
+Contributors are also asked to maintain a writing style consistent with
+existing content.
+
+As far as possible, all of the sections are self-contained in their own
+directories, but sharing a common CSS style sheet. Currently some sections
+are little more than placeholders.
+
+The background colour has been chosen to give good contrast with the text
+and all images without the glare of pure white.
+
+Where we want an unconditional hard division between upper and lower parts
+of a page we use an 'invisible' full width thin image as below. This is
+simple to implement and works regardless of page size and format. It is
+transparent. A hidden line doesn't have the same isolating effect.
+
+<img src="../images/boundry.png" alt="divider" class="wideline">
+
+
+Numbering: Descriptive values that are less than ten use words.
+e.g.
+There are eight effects and we show number 3
+You can have up to four rows of parts. The first row is numbered 1 to 16.
+There are up to 160 instruments in a bank, in four columns of 32.
+
+Finally,  to help with starting new pages, there is:
+'basic_example_page/example.html'
+
+

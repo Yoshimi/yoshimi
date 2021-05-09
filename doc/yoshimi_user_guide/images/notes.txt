@@ -1,0 +1,4 @@
+
+boundry.png is used to produce a full width very thin line forcing a separation between text and images above this from those below.
+
+patch.png, path.png, scale.png, state.png, yoshimi.png are all padded on either side with a transparency, so that they remain at the same scale as instrument.png (which is the widest).

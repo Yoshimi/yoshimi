@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ Main Window</title>
+    <link rel="stylesheet" type="text/css" href="files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="index.html">Index</a>
+      <a href="starting/starting.html" style="float: right;">Getting Started</a>
+    </nav>
+    <a id="top"></a>
+    <h2 style="text-align: center">The Main Window</h2>
+    <p>
+    This is the starting point for all work with Yoshimi. Referring to the image on the index page, we describe the controls and navigation routes.
+    </p>
+    <p>
+    Along the top is a fairly standard menu bar. Either clicking on one of the names, or holding down 'Alt' at the some time as pressing the key for the underscored letter will get you directly to that menu which will then open, closing any others that might already be open. This again is standard behaviour.
+    <br>
+    All of these are shown below as they would appear when selected.
+    </p>
+    <img src="images/yoshimi.png" alt="Yoshimi Menu" class="small">
+    <h3>Yoshimi</h3>
+    <b>About</b> This opens a small window with details about Yoshimi and the current version. It also has a button that will then show a list of the main contributors over the years.
+    <br><br>
+    <b>New Instance</b> You can run multiple independent instances of Yoshimi, and this creates an overlay (covering four of the top buttons) to enable you to do so. There is a button to just start the next one available, or you can start a specific numbered one.
+    <br><br>
+    <b>Settings</b> This opens the <a href="config/config.html">Settings</a> window which is tabbed with all the main configuration controls.
+    <br><br>
+    <b>Reports</b> opens a window showing all the latest commands and/or error messages. This is only available if the messages are directed here within <em>settings</em> and not to the terminal output. Fatal error messages will always go to the terminal.
+    <br><br>
+    <b>View Manual</b> Opens this manual in your default browser. If for some reason the manual is missing, it will try to find an older one, which will then probably be opened in a PDF viewer.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/instrument.png" alt="Instrument Menu" class="small">
+    <h3>Instrument</h3>
+    <b>Show Stored</b> This will open a window on the currently selected <a href="bank/bank.html#bank">Bank</a> of instruments. A selection from this will be loaded to the current part.
+    <br><br>
+    <b>Load External</b> You can use this to load an instrument from outside Yoshimi, using the filer (which will be opened for loading). Again this will go to the current part.
+    <br><br>
+    <b>Save External</b> Instead of loading from an external source, this will save to one, again opening a filer window to do it.
+    <br><br>
+    <b>Recent Instruments</b> Yoshimi keeps a list of up to 25 recently seen external instruments, and this opens a window you can select them from. The one you selected will then be placed at the top of the list.
+    <br><br>
+    <b>Clear</b> Returns the current part to the basic 'Simple Sound', clearing any effects directly associated with this part.
+    <br><br>
+    <b>Search</b> Opens the instrument <a href="bank/search.html">Search</a> window for loading an instrument by its type classification from any bank at all.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/patch.png" alt="Patch Set Menu" class="small">
+    <h3>PatchSet</h3>
+    <b>Show Patch Banks</b> This opens a window on the currently selected <a href="bank/bank.html#root">Bank Root</a>. Clicking on one of the entries will open that instrument bank.
+    <br><br>
+    <b>Load External</b> This will open a filer window for loading a complete set of instrument patches.
+    <br><br>
+    <b>Save External</b> The current patch set can be saved anywhere on the file system via the filer window that will open.
+    <br><br>
+    <b>Recent Sets</b> Returns the list of up to 25 patch sets most recently seen.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/path.png" alt="Path Menu" class="small">
+    <h3>Path</h3>
+    <b>Bank Root Dirs</b> You can manage the order and MIDI IDs of individual bank roots in the <a href="bank/bank.html#path">Root Path</a> window this opens, as well as create new empty ones.
+    <br><br>
+    <b>Preset Dirs</b> This opens a window that allows you to manage the directories used for storing Copy/Paste <a href="preset/preset.html">Presets</a>. You can create new ones, set the current one or remove them.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/state.png" alt="State Menu" class="small">
+    <h3>State</h3>
+    <b>Load</b> Opens a filer window to install a previously saved entire Yoshimi machine state.
+    <br><br>
+    <b>Save</b> Opens a filer window to save the current Yoshimi state.
+    <br><br>
+    <b>Save As Default</b> This will make the current Yoshimi state the one that is loaded when starting up, provided <em>Start With Default State</em> has been set in 'Switches' before saving it.
+    <br><br>
+    <b>Recent States</b> Shows a list of up to 25 stored state files, but doesn't include the default one.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/scale.png" alt="Scale Menu" class="small">
+    <h3>Scale</h3>
+    <b>Show settings</b> This opens a window for editing <a href="scale/scale.html">Microtonal Scales</a>
+    <br><br>
+    <b>Load</b> Opens a window for loading combined scale and keymap files.
+    <br><br>
+    <b>Save</b> Saves the currently set complete microtonal scale file.
+    <br><br>
+    <b>Recent Scales</b> Lists up to 25 recently seen scales.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    As you can see, the majority of the menu entries are links that open other windows to perform the associated function.
+    <a href="#top" class="up">Back to top</a>
+    </p>
+    <p>
+    <a id="buttons"></a>
+    Below these are the <em>top level</em> buttons and controls. referring to the main window...
+    <br><br>
+    <b>Stop</b> is the usual panic button. It cancels all sounding notes. However, while it does so extremely fast, it is actually a rapid fade down. This is so there isn't a sharp 'edge' that would be quite unpleasant if you are monitoring on headphones and might be damaging to some audio systems.
+    <br><br>
+    <b>Mixer Panel</b> simply opens the mixer window, described later in <a href="part/part.html">Part</a>.
+    <br><br>
+    <b>Vectors</b> also opens another window, this time for combined control of up to four parts.
+    <br><br>
+    <b>Reset</b> Stops all sound (as above) and also clears almost all settings, taking you back to the startup condition. The one exception is <em>Midi Learn</em>. If you want to clear this as well, you have to hold down the <em>Ctrl</em> key at the same time.
+    <br><br>
+    <b>Virtual keyboard</b> opens the window displaying this in the same way as a first time startup.
+    <br><br>
+    <b>Midi Learn</b> opens the window for loading, saving and editing these learned controls.
+    <br><br>
+    <b>Detune</b> provides a very fine detune of the entire synth so you can match the pitch to any other synth or sound source you might be using.
+    <br><br>
+    <b>Volume</b> is the master volume control for the main audio output pair. It doesn't affect any individual part outputs you might have set (if using Jack audio).
+    <br><br>
+    <b>S</b> This button switches between stereo and mono - when the color changes to red and the letter becomes an 'M'. It only affects the output pair, and is never saved. It switches virtually silently and is very useful for checking how the music would sound on a mono system.
+    <br><br>
+    <b>Shift</b> allows you to step the overall key up or down in semitone steps as much as three octaves.
+    </P>
+    <p>
+    Next there is a short tabbed insert. By default this shows the <em>System</em> effects. These are applied to the whole of the main Left/Right audio outputs and immediately below it is the currently selected one. These are described in <a href="effects/effects.html">Effects.</a>
+    </p>
+    <img src="images/system.png" alt="The System Effects Insert" class="image">
+    <p>
+    The spinbox selects the effect being managed. You can have up to four of these, and the menu selects which actual effect will be used.
+    <br><br>
+    The <em>On</em> checkbox allows you to temporarily disable the effect (this setting is not saved). This is necessary, as if you set it back to 'No Effect' all settings you may have changed will be lost.
+    <br><br>
+    After this there is the <em>Send To</em> button. This opens a small window so that you can cascade varying amounts of the effects if you want to.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/insertion.png" alt="Insertion Effects" class="image">
+    This shows just the <em>Insertion</em> effects tab. The actual effects are, of course, the same.
+    <br><br>
+    Here, you can have up to eight effects, and they can be sent to any individual part or the main outputs. Again, you have a menu to select the wanted effect.
+    <br><br>
+    There is no need of an <em>On</em> checkbox because you can disable an effect simply by setting its destination to 'off'.
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    Most of the lower half of this window is associated with the <a href="part/part.html">Part</a> context, and is described in detail there. At the very bottom is the Left/Right VU display for the main audio output.
+    </p>
+    ..
+    <br>
+    ..
+    <br>
+    <a href="#buttons" class="up">Back to buttons</a>
+    <br>
+    <a href="bank/bank.html">Next</a> (Instrument Banks)
+    <a href="#top" class="up">Back to top</a>
+    <br><br>
+
+  </body>
+</html>
