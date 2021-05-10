@@ -16,7 +16,61 @@
     The controls affect the way incoming MIDI Continuous Controllers (CCs) behave, both their range of control and in some cases, the type of control.
     </p>
     <p>
-    TEXT
+    (general group)
+    <br><br>
+    <b>Exp MWh</b> (Exponential Modulation) Changes the Mod Wheel behaviour to an exponential form.
+    <br><br>
+    <b>ModWh</b> (Modulation Wheel) The control range of the Mod Wheel.
+    <br><br>
+    <b>Exp BW</b> (Exponential Bandwidth) Changes the Bandwitdh behaviour to an exponential form.
+    <br><br>
+    <b>BWDpth</b> (Bandwidth Range) The control range of incoming bandwidth messages.
+    <br><br>
+    <b>PWheel Rng</b> The control range of the Pitch Wheel (double arrows are x10).
+    <br><br>
+    <b>Breath</b> Enable Breath control.
+    <br><br>
+    <b>PanWdth</b> The control range of incoming Panning messages.
+    <br><br>
+    <b>FltQ</b> The control range of incoming Filter Q messages.
+    <br><br>
+    <b>FltCut</b> The control range of incoming Filter Cutoff messages.
+    <br><br>
+    <b>Vol Rng</b> (Volume Range) The control range of incoming volume messages.
+    <br><br>
+    <b>Expr</b> Enable Expression control.
+    <br><br>
+    <b>FMamp</b> Enable Enable FM Amplitude control.
+    <br><br>
+    <b>Vol</b> Enable Volume control.
+    <br><br>
+    <b>Sustain</b> Enable the Sustain pedal.
+    <br><br>
+    (Resonance)
+    <br><br>
+    <b>CFdpth</b> The control range of incoming Center Frequency messages.
+    <br><br>
+    <b>BWdpth</b> The control range of incoming Bandwidth messages.
+    <br>
+    <a href="#top" class="up">Back to top</a>
+    <br><br>
+    (Portamento)
+    <br><br>
+    <b>Rcv</b> Enable Portamento control.
+    <br><br>
+    <b>Thresh</b> The minimum or maximim (depending on th.type) difference between notes for portamento to start or finish.
+    <br><br>
+    <b>Prp.Rate</b> The distance required before changing from non-proportional to propotional (if enabled).
+    <br><br>
+    <b>Proprt</b> Enable proportional Portamento.
+    <br><br>
+    <b>time</b> Portamento sweep time.
+    <br><br>
+    <b>t.dn/up</b> Portamento up/down time ratio.
+    <br><br>
+    <b>th.type</b> Portamanto type (whether 'up to' or 'starting from').
+    <br><br>
+    <b>Prp.Dpth</b> The amount Proportional diverges from non-proportional portamento.
     </p>
     <b>Reset all controllers</b> As its name suggests, this simply returns all the above controls to their default values.
     <br><br>
@@ -26,12 +80,8 @@
     <h2 style="text-align: center">MIDI CCs</h2>
     <img src="images/midiCCs.png" alt="midi window" class="image">
     <p>
-    These are five of the most commonly used CCs sent by external systems. This window not only tracks their current postions (so you can see when they are being changed) but you can also directly set the values from here. Additionally the controls can be MIDI-learned. As an example a foot pedal can be diverted to change the filter cutoff setting instead, or even as well as changing volume.
+    These are five of the most commonly used CCs sent by external systems. This window not only tracks their current postions (so you can see when they are being changed) but you can also directly set the values from here. Additionally the controls can be MIDI-learned.<br>As an example a foot pedal can be diverted to change the filter cutoff setting instead, or even as well as changing volume.
     </p>
-    <img src="../images/boundry.png" alt="divider" class="wideline">
-    <br>
-    <a href="#midiccs" class="up">Back to MIDI CCs</a>
-    <br>
     <a href="#top" class="up">Back to top</a>
   </body>
 </html>

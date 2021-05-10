@@ -2,6 +2,9 @@ yoshimi 2.0.1 M
 
 2021-5-10 Will
 * Tidied up Limits code.
+  Included missed 'magic' numbers Rainer saw.
+
+* Completed Midi Controls in user guide.
 
 2021-5-9 Will
 * Added new user guide to repository in 'doc'
