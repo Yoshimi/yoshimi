@@ -6437,7 +6437,6 @@ void InterChange::testLimits(CommandBlock *getData)
 // more work needed here :(
 float InterChange::returnLimits(CommandBlock *getData)
 {
-    // intermediate bits of type are preserved so we know the source
     // bit 5 set is used to denote midi learnable
     // bit 7 set denotes the value is used as an integer
 
@@ -6450,9 +6449,9 @@ float InterChange::returnLimits(CommandBlock *getData)
     int miscmsg = (int) getData->data.miscmsg;
 
     float value = getData->data.value;
-    int request = int(getData->data.type & TOPLEVEL::type::Default); // catches Adj, Min, Max, Def
 
-    getData->data.type &= 0x1f; //  clear top bits
+    getData->data.type &= TOPLEVEL::type::Default; // clear all flags
+    int request = getData->data.type; // catches Adj, Min, Max, Def
     getData->data.type |= TOPLEVEL::type::Integer; // default is integer & not learnable
 
     if (npart == TOPLEVEL::section::config)

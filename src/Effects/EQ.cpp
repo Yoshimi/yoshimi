@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2018-2019, Will Godfrey
+    Copyright 2018-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -275,7 +275,7 @@ float EQlimit::getlimits(CommandBlock *getData)
 {
     int value = getData->data.value;
     int control = getData->data.control;
-    int request = getData->data.type & 3; // clear upper bits
+    int request = getData->data.type & TOPLEVEL::type::Default; // clear flags
 
     int min = 0;
     int max = 127;
