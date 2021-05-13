@@ -21,15 +21,37 @@
     <a href="../envelope/envelope.html">Envelope</a>
     <br>
     <a href="../lfo/lfo.html">LFO</a>
-    <br><br>
+    </p>
+    <p>
+    <h3>Local Controls</h3>
     Very obvious is the scrollable row of sliders. These represent 64 harmonic bands, the upper row being the amplitude, and the lower row the bandwidth. At minimum bandwith the harmonics are close to sinewaves, and at maximum they are very obviously noise.
     <br><br>
-    The <b>Bandwidth</b> control (top centre) sets the overall range and the <b>Bandwidth Scale</b> changes the frequency scaling of this range that is applied. so you can have quite narrow LF bands with wide HF ones, or vice-versa.
+    The <b>Bandwidth</b> control (top centre) sets the overall range and the <b>Bandwidth&nbsp;Scale</b> changes the frequency scaling of this range that is applied. You can have quite narrow LF bands with wide HF ones, vice-versa or anywhere between the two.
+    <br><br>
+    <b>Octave,&ensp;Bend,&ensp;Offset,&ensp;440Hz,&ensp;Eq.T,&ensp;Detune,&ensp;Detune&nbsp;Type,&ensp;Coarse&nbsp;Det.</b>
     <br>
-    local controls
-    <br>
-    ..
-    <br>
+    These all work in exactly the same way as the ones in AddSynth, but are quite independent.
+    <br><br>
+    (overtones)
+    <br><br>
+    <b>Overtones&nbsp;Position</b> This sets the type of of overtone variation. For <em>Harmonic</em> there is no control, so the other paramaters are inactive. Similarly Par&nbsp;2 does nothing for <em>Shift</em> so is disabled for that variation.
+    <br><br>
+    <b>Par 1</b> spreads the harmonics according to the 'position' type.
+    <br><br>
+    <b>Par 2</b> provides a further variation on the harmonics spread.
+    <br><br>
+    <b>ForceH</b> This moves the shifted harmonics by a variable amount towards to the nearest actual multiple of the fundamental.
+    <br><br>
+    (bottom row)
+    <br><br>
+    <b>Stereo</b> enables a stereo output rather than mono
+    <br><br>
+    <b>Filter Stages</b> This sets the number of stages of the <em>harmonic</em> filters, not the filter insert above.
+    <br><br>
+    <b>Mag. Type</b> defines the magnitude of the harmonic filter controls.
+    <br><br>
+    <b>Start</b> sets where in the cycle that note starts from.
+    </p>
     <a href="../pad/pad.html">Next</a> (PadSynth Engine)
   </body>
 </html>

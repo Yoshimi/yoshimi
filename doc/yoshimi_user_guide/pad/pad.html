@@ -16,20 +16,77 @@
     <p>
     The PadSynth engine has two tabbed views in a single window. You will normally be shown the harmonic structure, the envelopes one (as it's name suggests) consisting mostly of envelope and LFO inserts.
     </p>
-
     <p>
+    <h3>Harmonic Structure</h3>
+    (left side)
+    <div class="tab">
+    <B>Base Type</b>
+    <br><br>
+    <b>Width</b>
+    <br><br>
+    <b>FreqMlt</b>
+    <br><br>
+    <b>Str</b>
+    <br><br>
+    <b>SFreq</b>
+    <br><br>
+    <b>Size</b>
+    <br><br>
+    <b>AmpMultiplier</b>
+    <br><br>
+    <b>AmpMode</b>
+    <br><br>
+    <b>Par1</b>
+    <br><br>
+    <b>Par2</b>
+    <br><br>
+    <b>AutoScale</b>
+    </div>
+    <br>
+    (right side)
+    <div class="tab">
+    <b>base</b>
+    <br><br>
+    <b>smp/oct</b>
+    <br><br>
+    <b>no.oct</b>
+    <br><br>
+    <b>Sample Size</b>
+    <br><br>
     There is a button to give access to an overall <a href="../resonance/resonance.html">Resonance</a> that can be applied to the engine.
+
+    Below this is a <a href="../wave/wave.html">Waveform</a> button which gives access to a highly detailed waveshape editor.
+    </div>
     </p>
     <p>
-    Below this is a <a href="../wave/wave.html">Waveform</a> button which gives access to a highly detailed waveshape editor.
+    (bottom)
+    <div class="tab">
+    <b>Bandwidth</b>
+    <br><br>
+    <b>Bandwidth Scale</b>
+    <br><br>
+    <b>Spectrum Mode</b>
+    <br><br>
+    <b>Overtones Position</b>
+    <br><br>
+    <b>Par1</b>
+    <br><br>
+    <b>Par2</b>
+    <br><br>
+    <b>ForceH</b>
+    </div>
+    <br>
+    If any of these controls are alterered it will be necessary to click on the <em>Apply</em> button as the wavetable has to be rebuilt.
     </p>
-
-    ..
-    <br>
-    local controls
-    <br>
-    ..
-    <br>
-    <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
+    <p>
+    <h3>Envelopes and LFOs</h3>
+    <div class="tab">
+    Once again we have all the standard inserts. There are also the local controls found in AddSynth abd SubSynth. None of these affect the wavetable itself, so there is no need for the apply button here.
+    </div>
+    </p>
+    <p>
+    The <b>Export</b> button that appears at the bottom of both of these views take you to a filer window for exporting the complete wavetable with the total number of samples you have currently set. These don't include the controls in the envelopes window.
+    </p>
+    <a href="../effects/effects.html">Next</a> Effects
   </body>
 </html>

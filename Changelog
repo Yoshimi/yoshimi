@@ -4,6 +4,8 @@ yoshimi 2.0.1 M
 * Sub/Pad overtone par2 disabled if position is Shift.
   Avoids user confusion. The control not used here.
 
+* Completed User Guide SubSynth. Started PadSynth.
+
 2021-5-10 Will
 * Tidied up Limits code.
   Included missed 'magic' numbers Rainer saw.
