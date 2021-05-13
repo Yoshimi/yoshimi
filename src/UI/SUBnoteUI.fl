@@ -11,7 +11,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2020, Will Godfrey & others
+Copyright 2015-2021, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -453,7 +453,7 @@ class SUBnoteUI {: {public PresetsUI_}
         xywh {460 171 87 20} down_box BORDER_BOX labelsize 11 align 2 textfont 1 textsize 11
         code0 {o->add("Harmonic");o->add("ShiftU");o->add("ShiftL");o->add("PowerU");o->add("PowerL");o->add("Sine");o->add("Power");o->add("Shift");}
         code1 {o->value(pars->POvertoneSpread.type);}
-        code2 {if (_SYS_::F2B(o->value())) spreadGroup->activate(); else spreadGroup->deactivate();}
+        code2 {if (int(o->value()) > 0) {spreadGroup->activate(); if (int(o->value()) < 7) spreadpar2->activate(); else spreadpar2->deactivate();} else spreadGroup->deactivate();}
       } {}
       Fl_Group globalfiltergroup {
         label { FILTER }
@@ -867,7 +867,13 @@ class SUBnoteUI {: {public PresetsUI_}
         case SUBSYNTH::control::overtonePosition:
             spreadtype->value((int) value);
             if (spreadtype->value() > 0)
+            {
                 spreadGroup->activate();
+                if (spreadtype->value() < 7)
+                    spreadpar2->activate();
+                else
+                    spreadpar2->deactivate();
+            }
             else
                 spreadGroup->deactivate();
             break;

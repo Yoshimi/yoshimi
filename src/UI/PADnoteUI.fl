@@ -11,7 +11,7 @@ comment {PADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2020, Will Godfrey
+Copyright 2015-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -380,12 +380,12 @@ class PADnoteUI {: {public PresetsUI_}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {}
             Fl_Check_Button hpautoscale {
-              class Fl_Check_Button2
               label Autoscale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
               xywh {10 270 74 15} down_box DOWN_BOX labelsize 11
               code0 {o->value(pars->Php.autoscale);}
+              class Fl_Check_Button2
             }
           }
           Fl_Group {} {
@@ -492,7 +492,7 @@ class PADnoteUI {: {public PresetsUI_}
             xywh {370 315 85 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
             code0 {o->add("Harmonic");o->add("ShiftU");o->add("ShiftL");o->add("PowerU");o->add("PowerL");o->add("Sine");o->add("Power");o->add("Shift");}
             code1 {o->value(pars->Phrpos.type);}
-            code2 {if (_SYS_::F2B(o->value())) hrgroup->activate(); else hrgroup->deactivate();}
+            code2 {if (int(o->value()) > 0) {hrgroup->activate(); if (int(o->value() < 7)) hrpospar2->activate(); else hrpospar2->deactivate();} else hrgroup->deactivate();}
           } {}
           Fl_Group overtonepos {
             xywh {5 350 570 45} box FLAT_BOX color 54 selection_color 218 labelcolor 63
@@ -590,7 +590,6 @@ class PADnoteUI {: {public PresetsUI_}
               class WidgetPDial
             }
             Fl_Check_Button randompan {
-              class Fl_Check_Button2
               label Rand
               callback {//
         int tmp = o->value();
@@ -602,18 +601,19 @@ class PADnoteUI {: {public PresetsUI_}
               tooltip {Enable random panning} xywh {205 51 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
               code0 {o->value(pars->PRandom);}
               code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
+              class Fl_Check_Button2
             }
             Fl_Box {} {
               xywh {14 248 18 18} box THIN_UP_BOX color 237
             }
             Fl_Check_Button stereo {
-              class Fl_Check_Button2
               label { Stereo}
               callback {//
               pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
               send_data(0, PADSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
               xywh {16 249 61 15} down_box DOWN_BOX color 237 labelsize 11
               code0 {o->value(pars->PStereo);}
+              class Fl_Check_Button2
             }
             Fl_Dial dpop {
               label {D.Pop}
@@ -729,13 +729,13 @@ class PADnoteUI {: {public PresetsUI_}
               class WidgetPDial
             }
             Fl_Check_Button hz440 {
-              class Fl_Check_Button2
               label 440Hz
               callback {//
               int x = (int) o->value();
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseFrequencyAs440Hz, x, TOPLEVEL::type::Integer);}
               tooltip {set the base frequency to 440Hz} xywh {410 284 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
+              class Fl_Check_Button2
             }
             Fl_Dial fixedfreqetdial {
               label {Eq.T.}
@@ -1123,7 +1123,13 @@ class PADnoteUI {: {public PresetsUI_}
         case PADSYNTH::control::overtonePosition:
             hrpostype->value(lrint(value));
             if (hrpostype->value() > 0)
+            {
                 hrgroup->activate();
+                if (hrpostype->value() < 7)
+                    hrpospar2->activate();
+                else
+                    hrpospar2->deactivate();
+            }
             else
                 hrgroup->deactivate();
             overtonepos->redraw();
