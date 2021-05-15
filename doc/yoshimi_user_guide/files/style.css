@@ -1,6 +1,6 @@
 body {
     background-color: #fff3df;
-    min-width: 450px;
+    min-width: 476px;
     width: 95%;
     margin: auto;
     #margin-top: 0.5em;
@@ -54,7 +54,7 @@ a:link {
     width: 20%;
 }
 
-@media (max-width: 550px) {
+@media (max-width: 644px) {
   .image {
     float: left;
     width: 98%;

@@ -1015,7 +1015,7 @@ o->hide();}
                 break;
 
             case OSCILLATOR::control::clearHarmonicShift:
-                harmonicshiftcounter->value(0);
+                harmonicshiftcounter->value(127);
                 break;
 
             case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
@@ -1048,7 +1048,9 @@ o->hide();}
                     h[i]->mag->value(0);
                     h[i]->phase->value(0);
                 }
-                h[0]->mag->value(0);
+                h[0]->mag->value(-63);
+                // This is somewhat counter-intuitive.
+                // The sliders don't behave the same way as the code!
                 break;
 
             case OSCILLATOR::control::convertToSine:
