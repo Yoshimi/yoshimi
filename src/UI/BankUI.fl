@@ -752,7 +752,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window rootuiwindow {
       label {Bank Root Paths}
       callback {Hide(2);}
-      xywh {88 54 465 295} type Double labelsize 12 hide resizable
+      xywh {88 54 460 270} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
       code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
       code2 {rootDW = o->w(); rootDH = o->h();}
@@ -802,7 +802,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         activatebutton_rootdir(false);
         rescan_for_banks();
         Pend->hide();}
-        xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+        xywh {94 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
         code0 {o->deactivate();}
       }
       Fl_Button makedefaultrootdirbutton {
@@ -816,7 +816,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         activatebutton_rootdir(false);
         Pend->hide();}
-        xywh {180 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+        xywh {178 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
         code0 {o->deactivate();}
       }
       Fl_Button showdefaultrootdirbutton {
@@ -830,7 +830,14 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;}
-        tooltip {Right click: also close this} xywh {265 225 75 35} box THIN_UP_BOX labelsize 12 align 128
+        tooltip {Right click: also close this} xywh {262 225 75 35} box THIN_UP_BOX labelsize 12 align 128
+      }
+      Fl_Spinner changeIDbutton {
+        label {New ID}
+        callback {Pend->show();}
+        xywh {344 240 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12 deactivate
+        code0 {oldrootID = o->value();}
+        class WidgetSpinner
       }
       Fl_Button Pend {
         label Pending
@@ -848,14 +855,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         oldrootID = tmp;
         activatebutton_rootdir(false);
         o->hide();}
-        tooltip {Click to set} xywh {400 239 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
-      }
-      Fl_Spinner changeIDbutton {
-        label {Change ID}
-        callback {Pend->show();}
-        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12
-        code0 {oldrootID = o->value();}
-        class WidgetSpinner
+        tooltip {Click to set} xywh {340 220 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
       }
       Fl_Button rootClose {
         label Close
@@ -868,7 +868,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         else
             rootFrom = 0;
         Hide(2);}
-        tooltip {Right click: also reopen previous} xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {402 225 51 35} box THIN_UP_BOX labelsize 12
       }
     }
   }

@@ -1,5 +1,8 @@
 yoshimi 2.0.1 M
 
+2021-5-16 Will
+* Small refinement to GUI Bank Root Paths window.
+
 2021-5-15 Will
 * Bugfix: GUI 1st slider wrong on waveform clear.
 * Further work on User Guide waveform.
