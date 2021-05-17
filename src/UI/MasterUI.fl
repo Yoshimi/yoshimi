@@ -1848,7 +1848,7 @@ Alan Calvert started the project}
         filerscroll->clear();
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
-        while(!tofetch.empty())
+        while(!tofetch.empty() && lineno < FILER_SIZE)
         {
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);

@@ -554,7 +554,7 @@ inline char * loadGzipped(const string& _filename, string * report)
 }
 
 /*
- * This is used for text files, preseving individual lines. These can
+ * This is used for text files, preserving individual lines. These can
  * then be split up by the receiving functions without needing a file
  * handle, or any knowledge of the file system.
  */
@@ -566,14 +566,25 @@ inline string loadText(const string& filename)
 
     string text = "";
     char line [1024];
-    // no Yoshimi text lines should get anywhere near this!
+    // no Yoshimi input text lines should get anywhere near this!
     while (!feof(readfile))
     {
+        line[0] = 0;
         if (fgets(line , 1024 , readfile))
-            text += string(line);
+        {
+            size_t end = strlen(line);
+            line[end] = 0; // ensure at least 1
+            while (line[end] < '!' && end != 0)
+            {
+                line[end] = 0; // remove MS line end and spaces
+                --end;
+            }
+            line[end+1] = '\n';
+            if (line[0] >= ' ') // we never want blank lines
+                text += string(line);
+        }
     }
     fclose (readfile);
-    text.erase(text.find_last_not_of(" \n\r\t")+1);
     return text;
 }
 

@@ -472,12 +472,9 @@ int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t m
     do {
         line[0] = 0;
         C_lineInText(text, point, line, maxlen);
-        if (line[0] == 0)
-        {
-            line[0] = '!'; // turn blank lines into comments
-            line[1] = 0; // we sould probably eliminate them when loading!
-        }
     } while (line[0] == '!');
+    if (line[0] < ' ')
+        return -5;
     return 0;
 }
 

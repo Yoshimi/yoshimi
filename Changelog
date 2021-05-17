@@ -1,5 +1,9 @@
 yoshimi 2.0.1 M
 
+2021-5-17 Will
+* BugFix: lockup importing corrupt scala files.
+  Also adjusted fileMgr for odd text line ends.
+
 2021-5-16 Will
 * Small refinement to GUI Bank Root Paths window.
 
