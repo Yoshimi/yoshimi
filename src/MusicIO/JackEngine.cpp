@@ -398,9 +398,6 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
-    std::pair<float, float> beats(beatTracker->getBeatValues());
-    synth->setBeatValues(beats.first, beats.second);
-
     // Part buffers
     for (int port = 0; port < 2 * NUM_MIDI_PARTS; ++port)
     {
@@ -429,9 +426,11 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         return false;
     }
 
+    std::pair<float, float> beats(beatTracker->getBeatValues());
     int framesize;
-    if (nframes < internalbuff)
+    if (nframes <= internalbuff)
     {
+        synth->setBeatValues(beats.first, beats.second);
         framesize = sizeof(float) * nframes;
         synth->MasterAudio(zynLeft, zynRight, nframes);
         sendAudio(framesize, 0);
@@ -441,8 +440,10 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         framesize = sizeof(float) * internalbuff;
         for (unsigned int pos = 0; pos < nframes; pos += internalbuff)
         {
-        synth->MasterAudio(zynLeft, zynRight, internalbuff);
-        sendAudio(framesize, pos);
+            float bpmInc = (float)pos * bpm / (audio.jackSamplerate * 60.0f);
+            synth->setBeatValues(beats.first + bpmInc, beats.second + bpmInc);
+            synth->MasterAudio(zynLeft, zynRight, internalbuff);
+            sendAudio(framesize, pos);
         }
     }
     return true;

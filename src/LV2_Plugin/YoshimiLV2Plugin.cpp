@@ -119,7 +119,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     uint32_t next_frame = 0;
     uint32_t processed = 0;
     std::pair<float, float> beats(beatTracker->getBeatValues());
-    bool receivedPos = false;
+    uint32_t beatsAt = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -160,6 +160,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 offs = next_frame;
                 while (to_process - mastered > 0)
                 {
+                    float bpmInc = (float)(processed + mastered - beatsAt) * _bpm / (synth->samplerate_f * 60.f);
+                    synth->setBeatValues(beats.first + bpmInc, beats.second + bpmInc);
                     int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
                     for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
                     {
@@ -192,6 +194,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                                 _atom_bar_beat, &barBeat,
                                 _atom_bpm, &bpm,
                                 NULL);
+
+            if (bpm && bpm->type == _atom_float)
+                _bpm = ((LV2_Atom_Float *)bpm)->body;
+
+            uint32_t frame = event->time.frames;
+            float bpmInc = (float)(frame - processed) * _bpm / (synth->samplerate_f * 60.f);
+
             if (bpb && bpb->type == _atom_float
                 && bar && bar->type == _atom_long
                 && barBeat && barBeat->type == _atom_float)
@@ -203,20 +212,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 float lv2Bar = ((LV2_Atom_Long *)bar)->body;
                 float lv2BarBeat = ((LV2_Atom_Float *)barBeat)->body;
                 beats.first = lv2Bar * lv2Bpb + lv2BarBeat;
-                receivedPos = true;
             }
-            if (bpm && bpm->type == _atom_float)
-                _bpm = ((LV2_Atom_Float *)bpm)->body;
+            else
+                beats.first += bpmInc;
+            beats.second += bpmInc;
+            beatsAt = frame;
         }
     }
-
-    float bpmInc = (float)sample_count * _bpm / (synth->samplerate_f * 60.f);
-    if (!receivedPos)
-        beats.first += bpmInc;
-    beats.second += bpmInc;
-
-    beatTracker->setBeatValues(beats);
-    synth->setBeatValues(beats.first, beats.second);
 
     if (processed < sample_count)
     {
@@ -225,6 +227,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         offs = next_frame;
         while (to_process - mastered > 0)
         {
+            float bpmInc = (float)(processed + mastered - beatsAt) * _bpm / (synth->samplerate_f * 60.f);
+            synth->setBeatValues(beats.first + bpmInc, beats.second + bpmInc);
             int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
             for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
             {
@@ -236,6 +240,11 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
+
+    float bpmInc = (float)(sample_count - beatsAt) * _bpm / (synth->samplerate_f * 60.f);
+    beats.first += bpmInc;
+    beats.second += bpmInc;
+    beatTracker->setBeatValues(beats);
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
