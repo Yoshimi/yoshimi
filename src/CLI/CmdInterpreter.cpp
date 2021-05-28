@@ -5560,7 +5560,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     }
 
-    if (input.matchnMove(4, "note"))
+    if (input.matchnMove(4, "tone"))
     {
 
         if (controlType != TOPLEVEL::type::Write)

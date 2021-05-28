@@ -4,6 +4,10 @@ yoshimi 2.0.1 M
 * Implemented reseeding from CLI.
 * Implemented Note On/Off from CLI.
 
+* Changed 'Note' to 'Tone' to avoid contention.
+  Note is used at part level, and expected in a
+  short form, but could still be typed in full.
+
 2021-5-17 Will
 * BugFix: lockup importing corrupt scala files.
   Also adjusted fileMgr for odd text line ends.
