@@ -1111,6 +1111,11 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             }
             break;
 
+        case MAIN::control::reseed:
+            showValue = false;
+            contstr += "reseeded to " + to_string(value_int);
+            break;
+
         case MAIN::control::soloType:
             showValue = false;
             contstr = "Chan 'solo' Switch ";

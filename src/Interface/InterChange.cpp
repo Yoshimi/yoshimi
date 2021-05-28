@@ -2174,6 +2174,8 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned int char1 = getData->data.engine;
     unsigned char miscmsg = getData->data.miscmsg;
 
+    //std::cout << "here MIDI " << control << "  " << value_int << "  " << int(chan) << "  " << int(char1) << std::endl;
+
     if (control == MIDI::control::controller && char1 >= 0x80)
         char1 |= 0x200; // for 'specials'
 
@@ -2980,6 +2982,11 @@ void InterChange::commandMain(CommandBlock *getData)
                 synth->masterMono = value;
             else
                 value = synth->masterMono;
+            break;
+
+        case MAIN::control::reseed:
+            synth->reseed(int(value));
+            // std::cout << "rnd " << synth->randomINT() << std::endl;
             break;
 
         case MAIN::control::soloType:
@@ -6708,7 +6715,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             default:
                 def = 64;
         }
-        std::cout << "here " << int(def) << std::endl;
+        //std::cout << "here " << int(def) << std::endl;
 
 
         switch (request)

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2020, Will Godfrey & others
+    Copyright 2014-2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -301,6 +301,7 @@ class SynthEngine
     public:
         float numRandom()   { return prng.numRandom(); }
         uint32_t randomINT(){ return prng.randomINT(); }   // random number in the range 0...INT_MAX
+        void reseed(int value) { prng.init(value); }
 };
 
 #endif

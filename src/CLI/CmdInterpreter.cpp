@@ -5560,6 +5560,48 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     }
 
+    if (input.matchnMove(4, "note"))
+    {
+
+        if (controlType != TOPLEVEL::type::Write)
+            return REPLY::available_msg;
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+
+        int chan = string2int(input) - 1;
+        input.skipChars();
+        if (chan < 0 || chan > 15)
+            return REPLY::range_msg;
+
+        int pitch = string2int(input);
+        input.skipChars();
+        if (pitch < 0 || pitch > 127)
+            return REPLY::range_msg;
+
+        int velocity = string2int(input);
+        int control;
+        if (velocity > 0 && velocity <= 127)
+            control = MIDI::noteOn;
+        else
+            control = MIDI::noteOff;
+
+        sendDirect(synth, 0, velocity, controlType, control, TOPLEVEL::midiIn, chan, pitch);
+        return REPLY::done_msg;
+    }
+
+    if (input.matchnMove(4, "seed"))
+    {
+        if (controlType != TOPLEVEL::type::Write)
+            return REPLY::available_msg;
+        int seed = string2int(input);
+        if (seed < 0)
+            seed = 0;
+        else if (seed > 0xffffff)
+            seed = 0xffffff;
+        sendDirect(synth, 0, seed, controlType | TOPLEVEL::type::Integer, MAIN::control::reseed, TOPLEVEL::main);
+        return REPLY::done_msg;
+    }
+
     switch (bitFindHigh(context))
     {
         case LEVEL::Config:

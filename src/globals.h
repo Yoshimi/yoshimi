@@ -518,6 +518,7 @@ namespace MAIN // usage MAIN::control::volume
         panLawType,
         detune = 32,
         keyShift = 35,
+        reseed = 40,
         soloType = 48,
         soloCC,
 

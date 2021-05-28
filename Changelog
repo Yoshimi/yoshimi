@@ -1,5 +1,9 @@
 yoshimi 2.0.1 M
 
+2021-5-28 Will
+* Implemented reseeding from CLI.
+* Implemented Note On/Off from CLI.
+
 2021-5-17 Will
 * BugFix: lockup importing corrupt scala files.
   Also adjusted fileMgr for odd text line ends.
