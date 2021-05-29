@@ -33,6 +33,7 @@
 #include <readline/history.h>
 #include <algorithm>
 #include <iterator>
+#include <atomic>
 #include <map>
 #include <list>
 #include <vector>
@@ -52,6 +53,10 @@
 
 // global variable; see SynthEngine.cpp and main.cpp
 extern SynthEngine *firstSynth;
+
+// used to hold back shutdown when running sound generation for test
+extern std::atomic <bool> waitForTest;
+
 
 // these two are both zero and repesented by an enum entry
 const unsigned char type_read = TOPLEVEL::type::Adjust;
@@ -5567,16 +5572,21 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
 {
     bitSet(context, LEVEL::Test);
-    if  (input.matchnMove(2, "test"))
+    if (input.matchnMove(2, "test"))
     {
         // just consume; we are already in the test context
     }
-    if  (input.matchnMove(2, "execute"))
+    if (controlType == TOPLEVEL::type::Write && input.matchnMove(2, "execute"))
     {
         sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
+        do usleep(2000); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
+        while (synth->audioOut != _SYS_::mute::Idle);
+        // NOTE: the following initiates a shutdown
+        waitForTest = true;
+        synth->getRuntime().runSynth = false;
         usleep(2000);
         getTestInvoker().performSoundCalculation(*synth);
-        return REPLY::done_msg;
+        return REPLY::exit_msg;
     }
     
     std::cout << "TODO: commandTest" << std::endl;

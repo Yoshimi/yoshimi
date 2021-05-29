@@ -87,7 +87,6 @@ class TestInvoker
         {
             BufferHolder buffer;
             allocate(buffer);
-            awaitMute(synth);
             synth.reseed(0);
             cout << "TEST::Launch"<<endl;
             //////////////////////TODO maybe open output file
@@ -107,20 +106,6 @@ class TestInvoker
 
 
     private:
-        /* wait for a preceding stop command to reach the Synth,
-         * and for the Synth to fade down and kill all running notes.
-         * See InterChange::sortResultsThread and the corresponding
-         * switch(sound)... in SynthEngine::MasterAudio
-         */
-        void awaitMute(SynthEngine& synth)
-        {
-            while (synth.audioOut.load() != _SYS_::mute::Idle)
-            {
-                usleep(2000); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
-            }
-        }
-
-
         void allocate(BufferHolder& buffer)
         {
             size_t size = 2 * (NUM_MIDI_PARTS + 1)

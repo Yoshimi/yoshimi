@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <pthread.h>
+#include <atomic>
 
 #include <cstdio>
 #include <unistd.h>
@@ -51,6 +52,9 @@
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
+
+// used by automated test launched via CLI
+std::atomic <bool> waitForTest{false};
 
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
@@ -563,6 +567,14 @@ int main(int argc, char *argv[])
     if (ret == (void *)1)
     {
         goto bail_out;
+    }
+    if (waitForTest && cmdThr)
+    {
+        pthread_join(cmdThr, &ret);
+        if (ret == (void *)1)
+        {
+            goto bail_out;
+        }
     }
     bExitSuccess = true;
 
