@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <memory>
+#include <ctime>
 
 #include "Misc/SynthEngine.h"
 
@@ -34,6 +35,26 @@ using std::endl;
 using std::string;
 
 namespace { // local implementation details
+
+    class StopWatch
+    {
+        timespec start;
+    public:
+        StopWatch()
+        {
+            clock_gettime(CLOCK_REALTIME, &start);
+        }
+        
+        size_t getNanosSinceStart()
+        {
+            timespec now;
+            clock_gettime(CLOCK_REALTIME, &now);
+            
+            return (now.tv_nsec - start.tv_nsec)
+                 + (now.tv_sec  - start.tv_sec) * 1000*1000*1000;
+        }
+    };
+
 }//(End)implementation details
 
 
@@ -70,12 +91,18 @@ class TestInvoker
             synth.reseed(0);
             cout << "TEST::Launch"<<endl;
             //////////////////////TODO maybe open output file
-            //////////////////////TODO capture start time
+            smpCnt = 0;
+            StopWatch timer;
             for (uint i=0; i<repetitions; ++i)
                 pullSound(synth, buffer);
             //////////////////////TODO capture end time
             //////////////////////TODO calculated overall time
-            cout << "TEST::Complete"<<endl;
+            size_t runtime = timer.getNanosSinceStart();
+            double speed = double(runtime) / smpCnt;
+            cout << "TEST::Complete"
+                 << " runtime "<<runtime<<" ns"
+                 << " speed "<<speed<<" ns/Sample"
+                 << endl;
         }
 
 
