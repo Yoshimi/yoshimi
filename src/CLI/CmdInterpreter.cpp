@@ -42,6 +42,7 @@
 #include "CLI/CmdInterpreter.h"
 #include "Effects/EffectMgr.h"
 #include "CLI/Parser.h"
+#include "Misc/TestInvoker.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
@@ -104,6 +105,7 @@ CmdInterpreter::CmdInterpreter() :
     synth{nullptr},
     instrumentGroup{},
     textMsgBuffer{TextMsgBuffer::instance()},
+    testInvoker{},
 
     context{LEVEL::Top},
     npart{0},
@@ -123,8 +125,12 @@ CmdInterpreter::CmdInterpreter() :
     chan{0},
     axis{0},
     mline{0}
-{
+{ }
+
+CmdInterpreter::~CmdInterpreter()
+{ /* destructors invoked here */
 }
+
 
 void CmdInterpreter::defaults()
 {
@@ -158,6 +164,14 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
         currentInstance = newID;
     }
     defaults();
+}
+
+
+TestInvoker& CmdInterpreter::getTestInvoker()
+{
+    if (!testInvoker)
+        testInvoker.reset(new TestInvoker());
+    return *testInvoker;
 }
 
 
@@ -5561,7 +5575,7 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     {
         sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
         usleep(2000);
-        testInvoker.performSoundCalculation(*synth);
+        getTestInvoker().performSoundCalculation(*synth);
         return REPLY::done_msg;
     }
     

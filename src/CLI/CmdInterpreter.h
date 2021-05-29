@@ -22,13 +22,14 @@
 #define CMDINTERPRETER_H
 
 #include <string>
+#include <memory>
 #include <list>
 
 #include "Misc/SynthEngine.h"
-#include "Misc/TestInvoker.h"
 #include "Interface/TextLists.h"
 
 class TextMsgBuffer;
+class TestInvoker;
 
 
 
@@ -66,6 +67,7 @@ class CmdInterpreter
 {
     public:
         CmdInterpreter();
+       ~CmdInterpreter();
 
         std::string buildStatus(bool showPartDetails);
         Reply cmdIfaceProcessCommand(Parser& input);
@@ -114,7 +116,9 @@ class CmdInterpreter
     private:
         std::list<std::string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
-        TestInvoker testInvoker;
+
+        std::unique_ptr<TestInvoker> testInvoker;
+        TestInvoker& getTestInvoker();
 
 
 
