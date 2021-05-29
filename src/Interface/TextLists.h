@@ -968,7 +968,7 @@ static std::string testlist [] = {
     "Duration [n]",     "overall duration for the test sound",
     "Repetitions [n]",  "number of complete test cycles to play (minimum 1)",
     "Target [s]",       "path to target file to write sound data (empty: /dev/null)",
-    "Invoke",           "actually trigger the test. Stops all other sound output.",
+    "Execute",          "actually trigger the test. Stops all other sound output.",
     "@end"
 };
 

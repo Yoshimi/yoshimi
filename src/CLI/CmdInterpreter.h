@@ -25,6 +25,7 @@
 #include <list>
 
 #include "Misc/SynthEngine.h"
+#include "Misc/TestInvoker.h"
 #include "Interface/TextLists.h"
 
 class TextMsgBuffer;
@@ -113,6 +114,7 @@ class CmdInterpreter
     private:
         std::list<std::string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
+        TestInvoker testInvoker;
 
 
 

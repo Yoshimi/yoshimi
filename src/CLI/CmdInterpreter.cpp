@@ -5553,9 +5553,16 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
 {
     bitSet(context, LEVEL::Test);
-    if  (input.matchnMove(1, "test"))
+    if  (input.matchnMove(2, "test"))
     {
         // just consume; we are already in the test context
+    }
+    if  (input.matchnMove(2, "execute"))
+    {
+        sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
+        usleep(2000);
+        testInvoker.performSoundCalculation(*synth);
+        return REPLY::done_msg;
     }
     
     std::cout << "TODO: commandTest" << std::endl;
