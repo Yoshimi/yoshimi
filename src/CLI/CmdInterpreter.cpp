@@ -171,6 +171,10 @@ string CmdInterpreter::buildStatus(bool showPartDetails)
     {
         return buildPartStatus(showPartDetails);
     }
+    if (bitTest(context, LEVEL::Test))
+    {
+        return buildTestStatus();
+    }
 
     string result = "";
 
@@ -509,6 +513,14 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
 }
 
 
+string CmdInterpreter::buildTestStatus()
+{
+    string result = " TEST";
+    //////////////////////////////TODO show test params
+    return result;
+}
+
+
 bool CmdInterpreter::query(string text, bool priority)
 {
     char *line = NULL;
@@ -717,6 +729,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::config;
         else if (bitTest(local, LEVEL::Learn))
             listnum = LISTS::mlearn;
+        else if (bitTest(local, LEVEL::Test))
+            listnum = LISTS::test;
     }
     if (listnum == -1)
         listnum = LISTS::all;
@@ -865,6 +879,11 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
         case LISTS::mlearn:
             msg.push_back("Mlearn:");
             helpLoop(msg, learnlist, 2);
+            break;
+        case LISTS::test:
+            msg.push_back("Test:");
+            msg.push_back("Settings for automated testing...");
+            helpLoop(msg, testlist, 2);
             break;
     }
 
@@ -5530,6 +5549,20 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 }
 
 
+/* Special operations used by the Yoshimi-testsuite for automated acceptance tests */
+int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
+{
+    bitSet(context, LEVEL::Test);
+    if  (input.matchnMove(1, "test"))
+    {
+        // just consume; we are already in the test context
+    }
+    
+    std::cout << "TODO: commandTest" << std::endl;
+    return REPLY::op_msg; //"Which Operation?"
+}
+
+
 int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
@@ -5655,6 +5688,9 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         case LEVEL::Learn:
             return commandMlearn(input, controlType);
             break;
+        case LEVEL::Test:
+            return commandTest(input, controlType);
+            break;
     }
 
     if (input.matchnMove(3, "mono"))
@@ -5712,6 +5748,12 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         context = LEVEL::Top;
         return commandMlearn(input, controlType);
+    }
+
+    if (input.matchnMove(2, "test"))
+    {
+        context = LEVEL::Top;
+        return commandTest(input, controlType);
     }
 
     if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && input.matchnMove(3, "system"))

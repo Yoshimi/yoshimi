@@ -56,6 +56,7 @@ namespace LEVEL{
         LFO, // amp/freq/filt
         Filter, // params only (slightly confused with env)
         Envelope, // amp/freq/filt/ (Sub only) band
+        Test, // special ops for Yoshimi-testsuite
     };
 }
 
@@ -116,7 +117,8 @@ namespace LISTS {
     list,
     bank,
     config,
-    mlearn
+    mlearn,
+    test,
     };
 }
 
@@ -956,6 +958,17 @@ static std::string listlist [] = {
     "History [s]",      "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",      "effect types ('all' include preset numbers and names)",
     "PREsets",          "all the presets for the currently selected effect",
+    "@end"
+};
+
+static std::string testlist [] = {
+    "Note [n]",         "midi note to play for test",
+    "Velocity [n]",     "velocity to use for note on/off",
+    "Holdtime [n]",     "milliseconds to play sound before note off",
+    "Duration [n]",     "overall duration for the test sound",
+    "Repetitions [n]",  "number of complete test cycles to play (minimum 1)",
+    "Target [s]",       "path to target file to write sound data (empty: /dev/null)",
+    "Invoke",           "actually trigger the test. Stops all other sound output.",
     "@end"
 };
 

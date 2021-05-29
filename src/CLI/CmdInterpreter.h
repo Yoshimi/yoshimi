@@ -75,6 +75,7 @@ class CmdInterpreter
     private:
         std::string buildAllFXStatus();
         std::string buildPartStatus(bool showPartDetails);
+        std::string buildTestStatus();
 
         void defaults();
         void resetInstance(unsigned int newInstance);
@@ -105,6 +106,7 @@ class CmdInterpreter
         int modulator(Parser& input, unsigned char controlType);
         int waveform(Parser& input, unsigned char controlType);
         int commandPart(Parser& input, unsigned char controlType);
+        int commandTest(Parser& input, unsigned char controlType);
         int commandReadnSet(Parser& input, unsigned char controlType);
         Reply processSrcriptFile(const string& filename, bool toplevel = true);
 
