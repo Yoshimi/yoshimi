@@ -25,6 +25,7 @@
 #include <string>
 #include <unistd.h>
 #include <iostream>
+#include <vector>
 #include <memory>
 #include <ctime>
 
@@ -55,7 +56,65 @@ namespace { // local implementation details
         }
     };
 
+
+    class OutputFile
+    {
+        std::vector<float> buffer;
+        std::fstream file;
+
+    public:
+        /* disabled output; discard all data */
+        OutputFile()
+        { }
+
+        /* open file and allocate buffer to collect sound */
+        OutputFile(string targetFilename, size_t maxSamples) :
+            buffer{},
+            file{targetFilename, ios_base::out | ios_base::trunc | ios_base::binary}
+        {
+            if (not isActive())
+                throw std::runtime_error(string{"Failure to open file '"}+targetFilename+"' for writing");
+            buffer.reserve(maxSamples);
+        }
+
+        OutputFile(OutputFile&) = delete;
+        OutputFile(OutputFile&&) = default;
+        OutputFile& operator=(OutputFile&) = delete;
+        OutputFile& operator=(OutputFile&&) = delete;
+
+
+        bool isActive() const
+        {
+            return file.is_open() and file.good();
+        }
+
+        explicit operator bool() const
+        {
+            return isActive();
+        }
+
+
+        void maybeWrite()
+        {
+            if (not isActive()) return;
+            
+            char* rawData = reinterpret_cast<char*>(buffer.data());
+            size_t numBytes = buffer.size() * sizeof(float);
+            file.write(rawData, numBytes);
+        }
+
+        void interleave(size_t numSamples, float* samplesL, float* samplesR)
+        {
+            for (size_t i=0; i<numSamples; ++i)
+            {
+                buffer.push_back(*(samplesL+i));
+                buffer.push_back(*(samplesR+i));
+            }
+        }
+    };
+
 }//(End)implementation details
+
 
 
 class TestInvoker
@@ -66,9 +125,10 @@ class TestInvoker
     uint repetitions;
     size_t chunksize;
     size_t smpCnt;
+    string targetFilename;
 
     using BufferHolder = std::unique_ptr<float[]>;
-    
+
     public:
         TestInvoker() :
             chan{0},
@@ -76,7 +136,8 @@ class TestInvoker
             duration{1.0},    // 1sec
             repetitions{1},
             chunksize{128},
-            smpCnt{0}
+            smpCnt{0},
+            targetFilename{"test-out.raw"}
         { }
 
 
@@ -86,22 +147,22 @@ class TestInvoker
         void performSoundCalculation(SynthEngine& synth)
         {
             BufferHolder buffer;
+            OutputFile output = prepareOutput(synth.samplerate);
             allocate(buffer);
             synth.reseed(0);
             cout << "TEST::Launch"<<endl;
-            //////////////////////TODO maybe open output file
             smpCnt = 0;
             StopWatch timer;
             for (uint i=0; i<repetitions; ++i)
-                pullSound(synth, buffer);
-            //////////////////////TODO capture end time
-            //////////////////////TODO calculated overall time
+                pullSound(synth, buffer, output);
+
             size_t runtime = timer.getNanosSinceStart();
             double speed = double(runtime) / smpCnt;
             cout << "TEST::Complete"
                  << " runtime "<<runtime<<" ns"
                  << " speed "<<speed<<" ns/Sample"
                  << endl;
+            output.maybeWrite();
         }
 
 
@@ -114,8 +175,19 @@ class TestInvoker
         }
 
 
+        OutputFile prepareOutput(unsigned int samplerate)
+        {
+            if (0 == targetFilename.size())
+                return OutputFile{}; // discard output
 
-        void pullSound(SynthEngine& synth, BufferHolder& buffer)
+            size_t chunkCnt = size_t(ceil(duration * samplerate / chunksize));
+            size_t maxSamples = 2 * repetitions * chunkCnt * chunksize;
+            return OutputFile{targetFilename, maxSamples};
+        }
+
+
+
+        void pullSound(SynthEngine& synth, BufferHolder& buffer, OutputFile& output)
         {
             float* buffL[NUM_MIDI_PARTS + 1];
             float* buffR[NUM_MIDI_PARTS + 1];
@@ -131,7 +203,11 @@ class TestInvoker
             // calculate sound data
             synth.NoteOn(chan, pitch, 64);  //////TODO velocity
             for (size_t i=0; i<buffCnt; ++i)
-                smpCnt += synth.MasterAudio(buffL,buffR, chunksize);
+            {
+                size_t numSamples = synth.MasterAudio(buffL,buffR, chunksize);
+                smpCnt += numSamples;
+                output.interleave(numSamples, buffL[NUM_MIDI_PARTS],buffR[NUM_MIDI_PARTS]);
+            }
             synth.NoteOff(chan, pitch);
         }
 };
