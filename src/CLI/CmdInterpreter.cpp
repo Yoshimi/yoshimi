@@ -5578,13 +5578,18 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     }
     if (controlType == TOPLEVEL::type::Write && input.matchnMove(2, "execute"))
     {
+        size_t wait_at_least_one_cycle = ceil(1.1 * (synth->buffersize_f / synth->samplerate_f) * 1000*1000);
+
         sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
-        do usleep(2000); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
+        do usleep(wait_at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
         while (synth->audioOut != _SYS_::mute::Idle);
+
         // NOTE: the following initiates a shutdown
         waitForTest = true;
         synth->getRuntime().runSynth = false;
-        usleep(2000);
+        usleep(wait_at_least_one_cycle);
+
+        // Launch computation for automated acceptance test
         getTestInvoker().performSoundCalculation(*synth);
         return REPLY::exit_msg;
     }

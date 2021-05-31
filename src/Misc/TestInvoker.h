@@ -122,7 +122,9 @@ class TestInvoker
     int chan;
     int pitch;
     float duration;
-    uint repetitions;
+    float holdtime;
+    int repetitions;
+    int pitchscalestep;
     size_t chunksize;
     size_t smpCnt;
     string targetFilename;
@@ -134,7 +136,9 @@ class TestInvoker
             chan{0},
             pitch{60},        // C4
             duration{1.0},    // 1sec
-            repetitions{1},
+            holdtime{0.8},
+            repetitions{4},
+            pitchscalestep{4},// move major third upwards
             chunksize{128},
             smpCnt{0},
             targetFilename{"test-out.raw"}
@@ -150,11 +154,11 @@ class TestInvoker
             OutputFile output = prepareOutput(synth.samplerate);
             allocate(buffer);
             synth.reseed(0);
+
             cout << "TEST::Launch"<<endl;
             smpCnt = 0;
             StopWatch timer;
-            for (uint i=0; i<repetitions; ++i)
-                pullSound(synth, buffer, output);
+            pullSound(synth, buffer, output);
 
             size_t runtime = timer.getNanosSinceStart();
             double speed = double(runtime) / smpCnt;
@@ -191,24 +195,37 @@ class TestInvoker
         {
             float* buffL[NUM_MIDI_PARTS + 1];
             float* buffR[NUM_MIDI_PARTS + 1];
-            for (uint i=0; i<=NUM_MIDI_PARTS; ++i)
+            for (int i=0; i<=NUM_MIDI_PARTS; ++i)
             {
                 buffL[i] = & buffer[(2*i  ) * chunksize];
                 buffR[i] = & buffer[(2*i+1) * chunksize];
             }
             
             // find out how much buffer cycles are required to get the desired note play time
-            size_t buffCnt = rintf(duration * synth.samplerate / chunksize);
+            size_t turnCnt = ceilf(duration * synth.samplerate / chunksize);
+            size_t holdCnt = ceilf(holdtime * synth.samplerate / chunksize);
+            holdCnt = std::min(holdCnt,turnCnt);
             
             // calculate sound data
-            synth.NoteOn(chan, pitch, 64);  //////TODO velocity
-            for (size_t i=0; i<buffCnt; ++i)
+            for (int tone=0; tone<repetitions; ++tone)
             {
-                size_t numSamples = synth.MasterAudio(buffL,buffR, chunksize);
-                smpCnt += numSamples;
-                output.interleave(numSamples, buffL[NUM_MIDI_PARTS],buffR[NUM_MIDI_PARTS]);
+                int midiNote = pitch + tone*pitchscalestep;
+                midiNote = midiNote % 128;  // possibly wrap around
+                synth.NoteOn(chan, midiNote, 64);  //////TODO velocity
+                for (size_t i=0; i<holdCnt; ++i)
+                    computeCycle(synth,buffL,buffR,output);
+                synth.NoteOff(chan, midiNote);
+                for (size_t i=0; i < (turnCnt-holdCnt); ++i)
+                    computeCycle(synth,buffL,buffR,output);
+                synth.ShutUp();
             }
-            synth.NoteOff(chan, pitch);
+        }
+
+        void computeCycle(SynthEngine& synth, float** buffL, float** buffR, OutputFile& output)
+        {
+            size_t numSamples = synth.MasterAudio(buffL,buffR, chunksize);
+            smpCnt += numSamples;
+            output.interleave(numSamples, buffL[NUM_MIDI_PARTS],buffR[NUM_MIDI_PARTS]);
         }
 };
 
