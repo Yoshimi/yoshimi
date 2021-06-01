@@ -1,5 +1,8 @@
 yoshimi 2.0.1 M
 
+2021-6-1 Will
+* Merged in user guide updates from Lorenzo
+
 2021-5-28 Will
 * Implemented reseeding from CLI.
 * Implemented Note On/Off from CLI.
