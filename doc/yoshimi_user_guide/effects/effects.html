@@ -11,8 +11,57 @@
     </nav>
     <h2 style="text-align: center">Effects</h2>
     <p>
+      Effects can be applied to single instruments or as master effects.<br>
+      For any effect, if you select a preset and then change parameters this dropdown will become blue to remind you the preset has changed.<br>
+      Note that for some effects, the D/W (Dry/Wet) parameter when editing the effect for a single instrument becomes a Vol (Volume) parameter when applied as Master effects. These are controlled from the <a href=../main.html>Main</a> window.
+    </p>
+    <h3>Reverb</h3>
+    <p>
     <img src="images/reverb.png" alt="Reverb window" class="image">
-    TEXT
+    <ul>
+      <li>
+    <b>Preset</b>: select a default preset and sets paramters accordingly.<br>
+
+  </li>
+  <li>
+    <b>Type</b>: This selects the reverb type:<br>
+    - <i>freeverb</i> (default) is the well-knnown freeverb reverb type.<br>
+    - <i>bandwidth</i> has the same parameters for the comb and allpass filters, but it applies a unison beforethe LPF/HPF. The unison’s bandwidth can be set using BW. <span class="warn">this should be explained better (taken from the PDF user guide)</span><br>
+    <i>random</i> will randomize comb and allpass each time the type or roomsize is being changed <span class="warn">??</span>
+  </li>
+  <li>
+    <b>R.S.</b>: Room Size (%)
+  </li>
+    <li>
+      <b>D/W</b>: Dry/Wet balance. If completely to the left only the dry sinal (no reverb) will be heard
+    </li>
+    <li>
+      <b>Pan</b>: The left/right panning (panorama) for the effect (% left/center/right)
+    </li>
+<li>
+  <b>Time</b>: Reverberation time (in seconds)
+</li>
+<li>
+  <b>I.del</b>: Initial delay (also known as pre-delay) (milliseconds)
+</li>
+<li>
+  <b>I.delfb</b>: Initial delay feedback (%)
+</li>
+<li>
+  <b>BW</b> Bandwidth (cents, only available for type <i>bandwidth</i>)
+</li>
+<li>
+  <b>E/R</b>: <span class="warn">Early reflections ?? (never seems to be active though...)</span>
+</li>
+<li>
+  <b>LPF</b>: Low Pass Filter. This will cut frequencies <i>above</i> the selected value (Hertz)
+</li>
+<li>
+  <b>HPF</b>: High Pass Filter.  This will cut frequencies <i>below</i> the selected value (Hertz)
+</li>
+<li>
+  <b>Damp</b>: Amount of damping of low frequencies (%)
+</li>
     </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <p>
