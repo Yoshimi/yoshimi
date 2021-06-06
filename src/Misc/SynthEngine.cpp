@@ -48,6 +48,9 @@
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/XMLwrapper.h"
+#include "Synth/OscilGen.h"
+#include "Params/ADnoteParameters.h"
+#include "Params/PADnoteParameters.h"
 
 using file::isRegularFile;
 using file::setExtension;
@@ -519,6 +522,30 @@ void SynthEngine::setAllPartMaps(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
 }
+
+
+/* for automated testing: brings all existing pseudo random generators
+ * within this SyntEngine into a reproducible state, based on given seed */
+void SynthEngine::reseed(int value)
+{
+    prng.init(value);
+    for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+        if (part[p])
+            for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+            {
+                Part::Kititem& kitItem = part[p]->kit[i];
+                if (kitItem.adpars)
+                    for (int v = 0; v < NUM_VOICES; ++v)
+                    {
+                        kitItem.adpars->VoicePar[v].OscilSmp->reseed(randomINT());
+                        kitItem.adpars->VoicePar[v].FMSmp->reseed(randomINT());
+                    }
+                if (kitItem.padpars)
+                    kitItem.padpars->oscilgen->reseed(randomINT());
+            }
+    Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(value));
+}
+
 
 // Note On Messages
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)

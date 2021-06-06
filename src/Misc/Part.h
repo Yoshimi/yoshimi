@@ -81,7 +81,8 @@ class Part
         Controller *ctl;
 
         // part's kit
-        struct {
+        struct Kititem
+        {
             std::string   Pname;
             unsigned char Penabled;
             unsigned char Pmuted;
@@ -94,7 +95,8 @@ class Part
             ADnoteParameters  *adpars;
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
-        } kit[NUM_KIT_ITEMS];
+        };
+        Kititem kit[NUM_KIT_ITEMS];
 
         // Part parameters
         void enforcekeylimit(void);
