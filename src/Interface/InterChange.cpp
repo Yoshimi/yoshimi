@@ -2998,13 +2998,13 @@ void InterChange::commandMain(CommandBlock *getData)
                 switch (value_int)
                 {
                     case MIDI::SoloType::Disabled:
+                        for (int i = 0; i < NUM_MIDI_PARTS; ++i)
+                            synth->part[i]->Prcvchn = (i & (NUM_MIDI_CHANNELS - 1));
                         break;
 
                     case MIDI::SoloType::Row:
                         for (int i = 1; i < NUM_MIDI_CHANNELS; ++i)
-                        {
                             synth->part[i]->Prcvchn = NUM_MIDI_CHANNELS;
-                        }
                         synth->part[0]->Prcvchn = 0;
                         break;
 

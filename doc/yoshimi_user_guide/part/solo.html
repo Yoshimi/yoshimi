@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ Solo</title>
+    <link rel="stylesheet" type="text/css" href="../files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="../index.html">Index</a>
+    </nav>
+    <!--<a id="top"></a>-->
+    <h2 style="text-align: center">Solo</h2>
+    <p>
+    Solo allows you to switch silently from one instrument to another retaining the note-off and tail of the previous one. There are five different forms provided by the menu.
+    <br>
+    With all of these you set the mode first (from the menu), then enter the <i>control</i> CC you want to respond to. Finaly, to activate it you click on the <em>pending</em> button that will have appeared.
+    <br><br>
+    <b>Row</b> This normally only operates on parts 1 to 16, setting them all to channel 1, but with only part 1 receiving note-on messages. From then on sending the control CC with data values between 1 and 16 will set that part only to receive new notes. All other values will be ignored. The exception is where <a href="../vector/vector.html">Vectors</a> have been set on any parts, in which case the entire vector will become fully operational when its base channel number is sent.
+    <br><br>
+    <b>Column</b> This mode only works if you have at least 32 parts set, and is much more useful if you set 64 parts.
+    <br><br>
+    <b>Loop</b> This is similar to <em>row</em> mode, but in this case a control value greater than zero will cause the next part in sequence to be the receiving one. After 16 it loops round to part 1 again. Zero is ignored.
+    <br><br>
+    <b>TwoWay</b> This is a variation of <em>loop</em> mode, where a control value of less than 64 but greater than zero will step backwards, and from part 1 looping round to 16. Again, zero is ignored.
+    <br><br>
+    <b>Channel</b> This mode is very different to the rest. A control CC value of greater than 63 will result in only parts that are set to that CCs channel being able to receive fresh notes (of the possible 64 parts). However if the control CC is then seen from a different channel, parts set to <em>this</em> channel will be the only ones receiving new notes. Finally, if any channel sends the control CC with a value less than 64, everything will be returned to normal.
+    </p>
+    <p>
+    <b>Note</b>
+    <br>
+    &emsp;If you switch to a part that has not been enabled, then you will still get the note-off for the previous one, but new notes will be discarded until you switch to an active part.
+    <br><br>
+    &emsp; On setting Solo off, all parts will return to their default channels.
+    </p>
+    <!--<a href="#top" class="up">Back to top</a>-->
+  </body>
+</html>
