@@ -18,7 +18,7 @@
     <br><br>
     <b>Row</b> This normally only operates on parts 1 to 16, setting them all to channel 1, but with only part 1 receiving note-on messages. From then on sending the control CC with data values between 1 and 16 will set that part only to receive new notes. All other values will be ignored. The exception is where <a href="../vector/vector.html">Vectors</a> have been set on any parts, in which case the entire vector will become fully operational when its base channel number is sent.
     <br><br>
-    <b>Column</b> This mode only works if you have at least 32 parts set, and is much more useful if you set 64 parts.
+    <b>Column</b> This mode only works if you have at least 32 parts set, and is much more useful if you set 64 parts, as it selects one from each row to receive note-on messages. For incoming channel 1 you would set the contol CC value to 1, 17, 33, 49. For incoming channel 7 it would be 7, 23, 39, 55. Each of these are completely independent so you effectively have 16 four part solos.
     <br><br>
     <b>Loop</b> This is similar to <em>row</em> mode, but in this case a control value greater than zero will cause the next part in sequence to be the receiving one. After 16 it loops round to part 1 again. Zero is ignored.
     <br><br>
@@ -27,11 +27,12 @@
     <b>Channel</b> This mode is very different to the rest. A control CC value of greater than 63 will result in only parts that are set to that CCs channel being able to receive fresh notes (of the possible 64 parts). However if the control CC is then seen from a different channel, parts set to <em>this</em> channel will be the only ones receiving new notes. Finally, if any channel sends the control CC with a value less than 64, everything will be returned to normal.
     </p>
     <p>
+    On setting Solo off, all parts will return to their default channels, and will be able to receive note-on messages.
+    <br><br>
     <b>Note</b>
     <br>
     &emsp;If you switch to a part that has not been enabled, then you will still get the note-off for the previous one, but new notes will be discarded until you switch to an active part.
-    <br><br>
-    &emsp; On setting Solo off, all parts will return to their default channels.
+
     </p>
     <!--<a href="#top" class="up">Back to top</a>-->
   </body>
