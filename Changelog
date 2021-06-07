@@ -1,5 +1,9 @@
 yoshimi 2.0.1 M
 
+2021-6-7 Will
+* MIDI learn guide almost complete.
+* Small corrections to Vectors.
+
 2021-6-6 Will
 * BugFix: solo not restoring chanels when turned off.
 * User Guide solo mostly done.
