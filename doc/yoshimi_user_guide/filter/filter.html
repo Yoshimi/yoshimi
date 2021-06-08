@@ -12,20 +12,44 @@
     <h2 style="text-align: center">Filter Types</h2>
     <img src="images/filter.png" alt="Filter Window" class="image">
     <p>
-    These controls are identical across all engines.
+    These controls are identical across all engines and also available in the DynFilter effect (see <a href="../effects/effects.html">Effects</a>)
     </p>
-
-    ..
-    <br>
-    ..
-    <br>
+    <ul>
+      <li>
+          <b>Category</b>: Filter category: Analog, Formant or State Variable (StateVar)
+      </li>
+      <li>
+          <b>St.</b>: Filter stages (1 to 5)
+      </li>
+      <li>
+          <b>Filter Type or Edit</b> This depends on the selected filter category. For Analog and StateVar various filters can be selected. For Formant a windows enabling to graphically edit the formants is opened
+      </li>
+      <li>
+          <b>C.freq/BS.pos</b>: Centre Frequency for Analog and SateVar. Base position of the vowel sequence for Formant
+      </li>
+      <li>
+        <b>Q</b>: Q factor for the filter
+      </li>
+      <li>
+        <b>V.SensA.</b>: Velocity sensing. How much the filter is influenced by (MIDI) velocity of the note
+      </li>
+      <li>
+        <b>V.Sns.</b>: Velocity sensing function
+      </li>
+      <li>
+        <b>Gain</b>: Filter output gain
+      </li>
+      <li>
+        <b>freq.tr.</b>: Amunt of frequency tracking for the filter. If this is positive (rightmost) higher note frequencies will shift the filte cutoff frequency higher. Default range is -100% to 98% unless the checkbox above ('0 / +') is selected: in this case the range is 0% to 200%
+      </li>
+  </ul>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <h3 style="text-align: center">The Formant Filter</h3>
     <img src="images/formant.png" alt="Formant Window" class="image">
     <p>
     When the formant window is selected, the <em>FilterType</em> list is covered with an Edit button, and clicking on this opens the window shown. These controls are <em>additional</em> to the others and adjust individual formants and their vowels.
     </p>
-    ..
+    TODO
     <br>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>
