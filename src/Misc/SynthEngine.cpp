@@ -1857,9 +1857,7 @@ void SynthEngine::resetAll(bool andML)
     ClearNRPNs();
     if (Runtime.loadDefaultState)
     {
-        string filename = Runtime.defaultStateName;
-        if (this != firstSynth)
-            filename += ("-" + to_string(this->getUniqueId()));
+        string filename = Runtime.defaultStateName + ("-" + to_string(this->getUniqueId()));
         if (isRegularFile(filename + ".state"))
         {
             Runtime.StateFile = filename;
