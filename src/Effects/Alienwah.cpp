@@ -126,6 +126,7 @@ void Alienwah::cleanup(void)
         oldr[i] = complex<float>(0.0f, 0.0f);
     }
     oldk = 0;
+    lfo.resetState();
 }
 
 

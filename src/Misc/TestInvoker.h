@@ -153,7 +153,7 @@ class TestInvoker
             BufferHolder buffer;
             OutputFile output = prepareOutput(synth.samplerate);
             allocate(buffer);
-            synth.reseed(0);
+            synth.setReproducibleState(0);
 
             cout << "TEST::Launch"<<endl;
             smpCnt = 0;
@@ -209,6 +209,7 @@ class TestInvoker
             // calculate sound data
             for (int tone=0; tone<repetitions; ++tone)
             {
+                synth.ShutUp();
                 int midiNote = pitch + tone*pitchscalestep;
                 midiNote = midiNote % 128;  // possibly wrap around
                 synth.NoteOn(chan, midiNote, 64);  //////TODO velocity
@@ -217,7 +218,6 @@ class TestInvoker
                 synth.NoteOff(chan, midiNote);
                 for (size_t i=0; i < (turnCnt-holdCnt); ++i)
                     computeCycle(synth,buffL,buffR,output);
-                synth.ShutUp();
             }
         }
 

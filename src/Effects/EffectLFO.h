@@ -33,7 +33,8 @@ class EffectLFO
         EffectLFO(SynthEngine *_synth);
         ~EffectLFO();
         void effectlfoout(float *outl, float *outr);
-        void updateparams(void);
+        void updateparams();
+        void resetState();
         unsigned char Pfreq;
         unsigned char Prandomness;
         unsigned char PLFOtype;

@@ -949,7 +949,7 @@ void OscilGen::shiftharmonics(void)
  * used for each call to get() to reset the harmonicPrng. Since NoteON happens at random times,
  * after playing more than one note the relation between SynthEngine::prng and OscilGen::basePrng
  * is essentially random.
- * Note: reseed(int) is also used for automated testing, see SynthEngine::reseed(int) */
+ * Note: reseed(int) is also used for automated testing, see SynthEngine::setReproducibleState(int) */
 void OscilGen::reseed(int value)
 {
     basePrng.init(value);

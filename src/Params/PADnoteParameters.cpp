@@ -179,7 +179,7 @@ void PADnoteParameters::deletesamples(void)
 }
 
 
-// Get the harmonic profile (i.e. the frequency distributio of a single harmonic)
+// Get the harmonic profile (i.e. the frequency distribution of a single harmonic)
 float PADnoteParameters::getprofile(float *smp, int size)
 {
     for (int i = 0; i < size; ++i)
@@ -544,6 +544,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
         float realfreq = getNhr(nh) * basefreq;
 
         ///sa fac aici interpolarea si sa am grija daca frecv descresc
+        //[Romanian, from original Author] "do the interpolation here and be careful if they decrease frequency"
 
         if (realfreq > synth->samplerate_f * 0.49999f)
             break;

@@ -122,6 +122,7 @@ void DynamicFilter::cleanup(void)
 {
     reinitfilter();
     ms1 = ms2 = ms3 = ms4 = 0.0f;
+    lfo.resetState();
 }
 
 

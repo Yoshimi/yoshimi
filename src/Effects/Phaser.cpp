@@ -311,6 +311,7 @@ void Phaser::cleanup(void)
     memset(xn1r, 0, sizeof(float)*Pstages);
     memset(yn1l, 0, sizeof(float)*Pstages);
     memset(yn1r, 0, sizeof(float)*Pstages);
+    lfo.resetState();
 }
 
 

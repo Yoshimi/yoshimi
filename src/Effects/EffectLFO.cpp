@@ -51,8 +51,20 @@ EffectLFO::~EffectLFO()
 }
 
 
+/* Reset operational state to reproducible values, without changing parameters.
+ * Relevant for automated testing. */
+void EffectLFO::resetState()
+{
+    xr = xl = 0.0f;
+    ampl1 = synth->numRandom();
+    ampl2 = synth->numRandom();
+    ampr1 = synth->numRandom();
+    ampr2 = synth->numRandom();
+}
+
+
 // Update the changed parameters
-void EffectLFO::updateparams(void)
+void EffectLFO::updateparams()
 {
     float lfofreq = (powf(2.0f, Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
     incx = fabsf(lfofreq) * synth->fixed_sample_step_f;

@@ -217,7 +217,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 v2 = 1.0f;
             }
             if (nefx == 1 || nefx==2)
-                v2 *= v2; // for Reverb and Echo, the wet function is not liniar
+                v2 *= v2; // for Reverb and Echo, the wet function is not linear
 
             if (dryonly)
             {

@@ -134,6 +134,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     halfsamplerate_f(samplerate / 2),
     buffersize(512),
     buffersize_f(buffersize),
+    bufferbytes(buffersize*sizeof(float)),
     oscilsize(1024),
     oscilsize_f(oscilsize),
     halfoscilsize(oscilsize / 2),
@@ -525,25 +526,36 @@ void SynthEngine::setAllPartMaps(void)
 
 
 /* for automated testing: brings all existing pseudo random generators
- * within this SyntEngine into a reproducible state, based on given seed */
-void SynthEngine::reseed(int value)
+ * within this SyntEngine into a reproducible state, based on given seed;
+ * also resets long lived procedural state and rebuilds PAD wavetables */
+void SynthEngine::setReproducibleState(int seed)
 {
-    prng.init(value);
+    LFOtime = 0;
+    monotonicBeat = songBeat = 0.0f;
+    prng.init(seed);
     for (int p = 0; p < NUM_MIDI_PARTS; ++p)
-        if (part[p])
+        if (part[p] and part[p]->Penabled)
             for (int i = 0; i < NUM_KIT_ITEMS; ++i)
             {
                 Part::Kititem& kitItem = part[p]->kit[i];
-                if (kitItem.adpars)
+                if (!kitItem.Penabled) continue; // reseed only enabled items
+                if (kitItem.adpars and kitItem.Padenabled)
                     for (int v = 0; v < NUM_VOICES; ++v)
                     {
+                        if (!kitItem.adpars->VoicePar[v].Enabled) continue;
                         kitItem.adpars->VoicePar[v].OscilSmp->reseed(randomINT());
                         kitItem.adpars->VoicePar[v].FMSmp->reseed(randomINT());
                     }
-                if (kitItem.padpars)
-                    kitItem.padpars->oscilgen->reseed(randomINT());
+                if (kitItem.padpars and kitItem.Ppadenabled)
+                    {
+                        part[p]->busy = true;
+                        kitItem.padpars->oscilgen->reseed(randomINT());
+                        // rebuild PADSynth wavetable with new randseed
+                        kitItem.padpars->applyparameters();
+                        part[p]->busy = false;
+                    }
             }
-    Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(value));
+    Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(seed));
 }
 
 

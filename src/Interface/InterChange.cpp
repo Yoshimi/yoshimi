@@ -2990,7 +2990,7 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case MAIN::control::reseed:
-            synth->reseed(int(value));
+            synth->setReproducibleState(int(value));
             // std::cout << "rnd " << synth->randomINT() << std::endl;
             break;
 
