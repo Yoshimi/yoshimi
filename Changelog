@@ -1,5 +1,8 @@
 yoshimi 2.0.1 M
 
+2021-6-13 Will
+* Selecting directory from filer now needs double click.
+
 2021-6-11 Will
 * BugFix: first synth not seeing default state on resets.
 

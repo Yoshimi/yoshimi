@@ -1879,9 +1879,13 @@ Alan Calvert started the project}
             //std::cout << "in dir" << std::endl;
             if (line.back() !='/')
                 line += '/';
-            filerpath = filerpath + line;
-            fileroldpath->value(filerpath.c_str());
-            fillfiler(type_name);
+            if (Fl::event_clicks())
+            {
+                Fl::event_clicks(0);
+                filerpath = filerpath + line;
+                fileroldpath->value(filerpath.c_str());
+                fillfiler(type_name);
+            }
             return;
         }
         //std::cout << "files" << std::endl;
