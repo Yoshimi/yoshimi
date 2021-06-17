@@ -1,6 +1,6 @@
-Version 2.0.1
+Version 2.0.2
 
-This release is just a clean-up with various bugfixes and minor improvements.
+This release contains the new (part complete) User guide. It also has various bugfixes and minor improvements.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

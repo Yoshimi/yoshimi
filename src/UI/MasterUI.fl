@@ -500,7 +500,7 @@ class MasterUI {: {private GuiUpdates}
                 alert(synth, "Logging configured for std::cout");
             break;
         case 5: // manual
-            if (query("", "Yes", "No", "A new manual is being written, so we temporarily include the one for V 1.7.4\\n Do you wish to see this?") > 1)
+//            if (query("", "Yes", "No", "A new manual is being written, so we temporarily include the one for V 1.7.4\\n Do you wish to see this?") > 1)
             {
                 words->copy_label("Searching for the manual.");
                 message->show();

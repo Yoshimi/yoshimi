@@ -1,4 +1,9 @@
-yoshimi 2.0.1 M
+yoshimi 2.0.2
+
+2021-6-17 Will
+* Manual now points to correct version.
+* Prepared for minor release.
+* Set release version to 2.0.2
 
 2021-6-14 Will
 * Moved examples directory into doc.

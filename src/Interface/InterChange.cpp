@@ -218,7 +218,8 @@ std::string InterChange::manualSearch(std::string dir2search, std::string path2m
     while (itr != wanted.rend())
     {
         std::string tmp = *itr;
-        if (tmp.find(path2match) != std::string::npos)
+        // some installs have a missing third digit so we trap it
+        if (tmp.find(path2match) != std::string::npos && tmp.rfind("2.0.pdf") == std::string::npos)
         {
             path = tmp;
             itr = wanted.rend();
@@ -827,11 +828,13 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             std::string found = "";
             std::string search = "/usr/share/doc/yoshimi";
             path = manualSearch(search, stub);
+            //std::cout << "name1 " << path << std::endl;
             found = path;
             lastdir = search;
 
             search = "/usr/local/share/doc/yoshimi";
             path = manualSearch(search, stub);
+            //std::cout << "name2 " << path << std::endl;
             if (path >= found)
             {
                 found = path;
@@ -842,6 +845,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             if (!search.empty())
             {
                 path = manualSearch(search, stub);
+                //std::cout << "name3 " << path << std::endl;
                 if (path >= found)
                 {
                     found = path;

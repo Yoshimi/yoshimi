@@ -1,13 +1,8 @@
-V 2.0.1
+V 2.0.2
 
-This has no new features. It's another maintenance release with a smattering of small improvements, along with bugfixes.
+In this release (in the 'doc' directory) we include a new user guide that is currently under development. This is entirely standard HTML and should be easier for general bowsing and reminders. The original PDF version is still available, but is now in the process of also being updated, and is titled "Yoshimi Advanced Reference Manual"
 
-In the GUI, analog filters that are set to Low1 or High1 now have the Q dial deactivated. Single pole filters don't have Q, and this control seeming to not work was confusing some users.
-
-There are a few new instrument patches.
-Stick Hit in Drums.
-Scaffold Pole, Sharp Sweep Synth, Sharp Sweep Multi, Surf in Companion.
-
+There are also a few more small improvements, along with bugfixes.
 
 As usual, we welcome all suggestions and assistance - especially regarding documentation!
 
