@@ -1,5 +1,9 @@
 yoshimi 2.0.2
 
+2021-6-19 Will
+* Filer now correctly sets default path in favorites.
+* Small doc cleanups.
+
 2021-6-17 Will
 * Manual now points to correct version.
 * Prepared for minor release.

@@ -131,6 +131,7 @@ namespace _SYS_
 
     enum mute {Idle, Pending, Fading, Active, Complete, Request, Immediate};
 
+    // session types and stages
     enum type {Normal, Default, JackFirst, JackSecond, StartupFirst, StartupSecond, InProgram, RestoreConf};
 }
 

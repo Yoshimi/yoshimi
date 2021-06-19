@@ -30,7 +30,6 @@
 #include <errno.h>
 #include <cmath>
 #include <string>
-#include <argp.h>
 #include <libgen.h>
 #include <limits.h>
 

@@ -1571,12 +1571,13 @@ Alan Calvert started the project}
           callback {//
     size_t pos = favebrowse->value();
     if (pos > 0)
-    {
         filerpath = clearfavecolour(pos);
-        if (filerpath.back() != '/')
-            filerpath += '/';
-    	fileroldpath->value(filerpath.c_str());
-    }
+    else
+       filerpath = clearfavecolour(1);
+
+    if (filerpath.back() != '/')
+        filerpath += '/';
+    fileroldpath->value(filerpath.c_str());
     fillfiler(type_name);
     favecancel->do_callback();}
           tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
