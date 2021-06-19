@@ -284,14 +284,14 @@ class PADnoteUI {: {public PresetsUI_}
           xywh {0 20 580 385} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
-            xywh {5 30 90 260} box ENGRAVED_FRAME
+            xywh {5 25 90 270} box ENGRAVED_FRAME
             code0 {if (pars->Pmode!=0) o->deactivate();}
           } {
             Fl_Choice hpbasetype {
               label {Base Type}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseType, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 45 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {15 42 75 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Gauss");o->add("Square");o->add("DoubleExp");}
               code1 {o->value(pars->Php.base.type);}
             } {}
@@ -299,7 +299,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Width
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
-              xywh {20 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.base.par1);}
               class WidgetPDial
             }
@@ -307,7 +307,7 @@ class PADnoteUI {: {public PresetsUI_}
               label FreqMlt
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::frequencyMultiplier, o->value(), TOPLEVEL::type::Integer);}
-              xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
               class WidgetPDial
             }
@@ -315,7 +315,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Str
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.par1);}
               class WidgetPDial
             }
@@ -323,7 +323,7 @@ class PADnoteUI {: {public PresetsUI_}
               label SFreq
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorFrequency, o->value(), TOPLEVEL::type::Integer);}
-              xywh {40 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.freq);}
               class WidgetPDial
             }
@@ -331,25 +331,26 @@ class PADnoteUI {: {public PresetsUI_}
               label Size
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::size, o->value(), TOPLEVEL::type::Integer);}
-              xywh {65 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.width);}
               class WidgetPDial
             }
             Fl_Choice hponehalf {
+              label Profile
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicSidebands, o->value(), TOPLEVEL::type::Integer);}
-              xywh {10 143 80 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {10 147 80 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Full");o->add("Upper Half");o->add("Lower Half");}
               code1 {o->value(pars->Php.onehalf);}
             } {}
             Fl_Group ampgroup {
-              xywh {10 160 80 105} box BORDER_BOX
+              xywh {10 164 80 105} box BORDER_BOX
             } {
               Fl_Choice hpampmode {
                 label AmpMode
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMode, o->value(), TOPLEVEL::type::Integer);}
-                xywh {15 205 70 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textfont 1 textsize 10
+                xywh {15 209 70 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
                 code0 {o->add("Sum");o->add("Mult");o->add("Div1");o->add("Div2");}
                 code1 {o->value(pars->Php.amp.mode);}
               } {}
@@ -357,7 +358,7 @@ class PADnoteUI {: {public PresetsUI_}
                 label Par1
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralWidth, o->value(), TOPLEVEL::type::Integer);}
-                xywh {15 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+                xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par1);}
                 class WidgetPDial
               }
@@ -365,7 +366,7 @@ class PADnoteUI {: {public PresetsUI_}
                 label Par2
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralAmplitude, o->value(), TOPLEVEL::type::Integer);}
-                xywh {55 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+                xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par2);}
                 class WidgetPDial
               }
@@ -374,7 +375,7 @@ class PADnoteUI {: {public PresetsUI_}
               label AmpMultiplier
               callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
-              xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {15 179 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("Off");o->add("Gauss");o->add("Sine");o->add("Flat");}
               code1 {o->value(pars->Php.amp.type);}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
@@ -383,7 +384,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Autoscale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
-              xywh {10 270 74 15} down_box DOWN_BOX labelsize 11
+              xywh {10 274 74 15} down_box DOWN_BOX labelsize 11
               code0 {o->value(pars->Php.autoscale);}
               class Fl_Check_Button2
             }

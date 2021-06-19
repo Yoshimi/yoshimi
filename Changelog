@@ -3,6 +3,8 @@ yoshimi 2.0.2
 2021-6-19 Will
 * Filer now correctly sets default path in favorites.
 * Small doc cleanups.
+* Improved PadSynth Base Type layout.
+  Profile menu named.
 
 2021-6-17 Will
 * Manual now points to correct version.
