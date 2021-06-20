@@ -1,5 +1,9 @@
 yoshimi 2.0.2
 
+2021-6-20 Will
+* Small improvement to vector and midi learn in guide.
+* Completed Resonance in guide.
+
 2021-6-19 Will
 * Filer now correctly sets default path in favorites.
 * Small doc cleanups.

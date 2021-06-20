@@ -24,22 +24,23 @@
     In the example shown, you can see that learned controls are displayed as lines of settings, followed by a description of what is actually being managed. All controls are then editable, with the exception of NRPN numbers.
     <br><br>
     (controls)
-    <div class="tab">
+    <ul>
+    <li>
     <b>Mute</b> This completely disables this line only. Bear in mind that if it had been blocking later lines, that will no longer be the case.
-    <br><br>
+    </li><li>
     <b>CC</b> The incoming CC to respond to. In the case of NRPNs this is presented as two hexadecimal 7bit values.
-    <br><br>
+    </li><li>
     <b>Chan</b> The incoming channel to recognise. The last entry in the menu allows all channels to be effective for this line.
-    <br><br>
+    </li><li>
     <b>Min</b> The minimum control value to accept as a percentage of the input.
-    <br><br>
+    </li><li>
     <b>Max</b> The maximum control value to accept as a percentage of the input. If Max is less than Min, the control action is reversed.
-    <br><br>
+    </li><li>
     <b>Limit</b> Normally Min and Max compress the incoming value to the range set, however if Limit is set then the range is unchanged, but values outside will be set to these limits. If min is <em>equal</em> to max this becomes a switch point and values either side will be treated as 0% or 100%.
-    <br><br>
+    </li><li>
     <b>Block</b> This will block any further lines from receiving this <em>exact</em> CC/channel pair. This includes all other Yoshimi controls except <a href="../vector/vector.html">Vectors</a>.
-    </div>
-    <br>
+    </li>
+    </ul>
     To clear an individual line hold down the <em>Ctrl</em> key and click on the description field of the one you want to remove.
     <br><br>
     Note:
@@ -48,15 +49,17 @@
     </p>
     <p>
     (buttons)
-    <div class="tab">
+    <ul>
+    <li>
     <b>Load</b> Opens a window for loading a complete list of learned lines.
-    <br><br>
+    </li><li>
     <b>Save</b> Opens a window for saving the current list of learned lines.
-    <br><br>
+    </li><li>
     <b>Recent</b> Opens a small window for selecting recently seen lists.
-    <br><br>
+    </li><li>
     <b>Clear</b> Deletes the entire current list.
-    </div>
+    </li>
+    </ul>
     </p>
     <p>
     For any given CC, MIDI learn takes priority over the <a href="../part/solo.html"> Solo</a> feature, but is itself over-ridden by <a href="../vector/vector.html">Vectors</a>

@@ -12,19 +12,58 @@
     <h2 style="text-align: center">Resonance</h2>
     <img src="images/resonance.png" alt="Resonance window" class="image">
     <p>
-    TEXT
+    Yoshimi emulates resonance by varying the amplitude over a given frequency range with a graph of 256 evenly spaced reference points, irrespective of the note played. The horizontal centreline represents 0dB, so values above this are amplification, and those below are attenuation.
+    <br><br>
+    Once enabled, there are two ways you can set up a resonance graph. You can either 'draw' it with the mouse pointer, or you can use one of the random buttons, then maybe redraw parts that you're not happy with.
+    <br><br>
+    If drawing, you will see the frequency and amplitude of the point where the mouse is in the <b>kHz</b> and <b>dB</b> displays below the graph (slightly right of centre). You will almost certainly want to use one of the interpolations to get a smooth graph.
     </p>
-
-    ..
+    <p>
+    <ul>
+    <li>
+    <b>Enable</b> Activates the resonance feature and its graph.
+    </li>
+    <li>
+    <b>Prot. 1st</b> (protect first) Ensures that the amplitude of the fundamental of a note doesn't get changed by the graph.
+    </li>
+    <li>
+    <b>Max dB</b> Sets the range of amplification/attenuation.
+    </li>
+    <li>
+    <b>C.f.</b> The center frequency of the resonance graph.
+    </li>
+    <li>
+    <b>Oct.</b> The number of octaves covered.
+    </li>
+    <li>
+    <b>InterpPk S</b> Interpolate peak levels for a smooth overall graph.
+    </li>
+    <li>
+    <b>InterpPk L</b> Interpolate peak levels for a linear slope beween peaks.
+    </li>
+    <li>
+    <b>Clear</b> Set the graph to a flat line, so no resonance.
+    </li>
     <br>
-    ..
+    <li>
+    <b>kHz</b> Indicates the frequency component of the mouse position in the graph. The scale of this control is set by the octave setting.
+    </li>
+    <li>
+    <b>dB</b> Indicates the amplitude component of the mouse position in the graph. The scale of this control is set by the Max. dB setting.
+    </li>
     <br>
-    ..
-    <br>
-    ..
-    <br>
-    ..
-    <br>
+    <li>
+    <b>Smooth</b> This is not like smooth interpolation but can be used to progressively even out and reduce the amplitude of the graph.
+    </li>
+    <li>
+    <b>Rnd1</b> Sets a coarse randomised graph.
+    </li><li>
+    <b>Rnd2</b> Sets a more detailed randomised graph.
+    </li>
+    <li>
+    <b>Rnd3</b> Sets a highly detailed randomised graph.
+    </li>
+    </ul>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>
 </html>
