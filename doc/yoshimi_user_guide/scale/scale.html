@@ -13,20 +13,75 @@
     <h2 style="text-align: center">Microtonal Scales</h2>
     <img src="images/pietro.png" alt="scale windows" class="image">
     <p>
-    TEXT
+    Yoshimi fully supports the Scala microtonal scale and keymap standard and can import these files directly. These are combined with Yoshimi specific tuning controls and then saved and reloaded in our own XML format.
     </p>
-    ..
-    <br>
-    <a id="middle"></a>
     <p>
-    TEXT
+    (controls)
+    <ul>
+    <li>
+    <b>Enable</b> Activates the whole of microtonality.
+    </li>
+    <li>
+    <b>Ref. Freq.</b> The actual frequency of 'Ref. Note'. Usually 440Hz.
+    </li>
+    <li>
+    <b>Ref. Note</b> The MIDI value for the reference note. Usually 69 (A4).
+    </li>
+    <li>
+    <b>Invert Keys</b> Reverses the incoming MIDI note numbers. i.e. Note 0 becomes note 127 and vice-versa.
+    </li>
+    <li>
+    <b>Center</b> Sets the actual reversal point if the keys are inverted. Usually 60 (C4).
+    </li>
+    <li>
+    <b>Shift</b> Changes the octave start position. The effective shift (per key) is then dependent on both the scale and the keymap.
+    </li>
+    </ul>
+    <ul>
+    <li>
+    <b>ON</b> (keymap) Enables key mapping.
+    </li>
+    <li>
+    <b>First note</b> The lowest note in the mapping. Lower values are ignored.
+    </li>
+    <li>
+    <b>Middle note</b> The mapping centre point. Represents the actual octave start point.
+    </li>
+    <li>
+    <b>Last note</b> The highest note in the mapping. Higher values are ignored.
+    </li>
+    </ul>
+    <ul>
+    <li>
+    <b>Import .scl file</b> Imports all the tuning elements of a scale.
+    </li>
+    <li>
+    <b>Import .kbm file</b> Imports the keymapping for a scale.
+    </li>
+    <li>
+    <b>Retune</b> When changing either the tunings or the keyboard map you must click on this button to fix the changes.
+    </li>
+    </ul>
+
     </p>
-    <img src="../images/boundry.png" alt="divider" class="wideline">
     <p>
-    ..
+    (text fields)
+    <ul>
+    <li>
+    <b>Name</b> The name for this scale.
+    </li>
+    <li>
+    <b>Description</b> An optional description of the scale.
+    </li>
+    <li>
+    <b>Tunings</b> Lines of tunings either in cents as floating point numbers, or ratios such as 5/4. The number of lines detirmines the notes per octave (as displayed below).
+    </li>
+    <li>
+    <b>Keyboard Map</b> The mapping of the tunings to actual keys. They can be in any order. Two keys can have the same tunings, and an 'x' denotes the key not being used at all. The map size (shown below) is set by the number of lines and can be quite different to the tunings.
+    </li>
+    </ul>
     </p>
-    <!--<a href="#middle" class="up">Back to middle</a>
-    <br>
-    <a href="#top" class="up">Back to top</a>-->
+    <p>
+    </p>
   </body>
 </html>

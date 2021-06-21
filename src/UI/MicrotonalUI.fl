@@ -65,7 +65,7 @@ class MicrotonalUI {} {
     Fl_Window microtonaluiwindow {
       label Scales
       callback {scaleClose->do_callback();}
-      xywh {612 332 410 485} type Double hide resizable
+      xywh {364 315 410 485} type Double hide resizable
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
     } {
@@ -214,7 +214,7 @@ class MicrotonalUI {} {
         }
         Fl_Group Tuning {
           label {Tunings:}
-          xywh {7 144 190 300} box ENGRAVED_FRAME labelfont 1 labelsize 11
+          xywh {7 144 190 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 5
         } {
           Fl_Input tuningsinput {
             tooltip {You must retune if you change this.} xywh {10 147 182 258} type Multiline labelfont 1 labelsize 11 align 5 when 2
@@ -237,8 +237,8 @@ class MicrotonalUI {} {
             tooltip {Inport Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10
           }
         }
-        Fl_Group keymappinggroup {
-          label {Keyboard Mapping:}
+        Fl_Group Keymap {
+          label {Keyboard Map:}
           xywh {195 144 206 300} box ENGRAVED_FRAME labelfont 1 labelsize 11
         } {
           Fl_Input mappinginput {
@@ -372,7 +372,7 @@ class MicrotonalUI {} {
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
-          code1 {if (microtonal->Pmappingenabled==0) keymappinggroup->deactivate();}
+          code1 {if (microtonal->Pmappingenabled==0) Keymap->deactivate();}
           class Fl_Check_Button2
         }
         Fl_Button applybutton {
@@ -469,9 +469,9 @@ class MicrotonalUI {} {
             mappingenabledbutton->value(value_bool);
             checkInvert();
             if (value_bool)
-                keymappinggroup->activate();
+                Keymap->activate();
             else
-                keymappinggroup->deactivate();
+                Keymap->deactivate();
             break;
         case SCALES::control::lowKey:
             firstnotecounter->value(value_int);
@@ -626,7 +626,7 @@ class MicrotonalUI {} {
     tuningsinput->textsize(size14);
     octavesizeoutput->textsize(size14);
     importscl->labelsize(size);
-    keymappinggroup->labelsize(11);
+    Keymap->labelsize(size11);
     mappinginput->textsize(size14);
     first1->labelsize(size11);
     first2->labelsize(size11);
