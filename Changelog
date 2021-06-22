@@ -1,6 +1,11 @@
 yoshimi 2.0.2
 
 2021-6-21 Will
+* Waveform in guide mostly done.
+  There is a lot of detail missing.
+  It was never   doccumented :(
+
+2021-6-21 Will
 * BugFix: GUI scale kemap label not resizing.
 * Completed Scales in guide.
 

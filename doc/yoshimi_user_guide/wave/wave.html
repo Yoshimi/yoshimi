@@ -12,7 +12,7 @@
     <h2 style="text-align: center">Add/Pad Waveforms</h2>
     <img src="images/wave.png" alt="Waveform window" class="image">
     <p>
-    This waveform editor is used for both AddSynth and PadSynth.
+    This waveform editor is used for both AddSynth and PadSynth. There are quite a lot of controls that are highly specialised. Unfortunately, we inherited very little documentation for these.
     </p>
     <p>
     At the top there are a pair of graphic views. On the left is the complete oscillator with all filters and harmonic effects applied, and on the right the basic wave it is derived from.
@@ -23,51 +23,43 @@
     <br><br>
     Note: PadSynth doesn't have the <em>Phase or Harmonic Randomness</em> controls. Instead it has the <em>Apply</em> button.
     <h3>Controls</h3>
-    <b>Mag. Type</b> (Magnification Type) This controls the amount of effect the harmonic sliders have on the waveform. Higher negative values giving less range but finer control.
-    <br><br>
-    <b>Phase Randomness</b>
-    <br><br>
-    <b>Harmonic Randomness</b>
-    <br><br>
-    <b>Base Function</b>
-    <br><br>
-    <b>Par.</b> (for base function)
-    <br><br>
-    <b>B.F.Mod</b> (base Function Modulator)
-    <br><br>
-    <b>Use as base</b>
-    <br><br>
-    <b>Wsh</b>
-    <br><br>
-    <b>Filter</b> (harmonics filter)
-    <br><br>
-    <b>Mod.</b> (harmonics modulator)
-    <br><br>
-    <b>Sp. adj.</b> (Spectrum Adustment)
-    <br><br>
-    The bank of sliders controls 128 individual harmonics. The top row being amplitude, and the bottom row, relative phase.
-    <br><br>
-    <b>Harmonic Shift</b>
-    <br><br>
-    <b>Adpt. Harm</b>
-    <br><br>
-    <b>Clear</b>
-    <br><br>
-    <b>Sine</b>
-    <br><br>
-    <b></b>
-    <br><br>
+    <div class="tab">
+    The bank of sliders control 128 individual harmonics. The top row being amplitude, and the bottom row, relative phase.
+    </br><br>
+    <b>Mag. Type</b> (magnification type) This controls the amount of effect the harmonic sliders have on the waveform. Higher negative values giving less range but finer control.
+    </br><br>
+    <b>Phase Randomness</b> Provides a small random variation to the overal phase. Only really noticable with multiple voices.
+    </br><br>
+    <b>Harmonic Randomness</b> Provides a small amplitude randomness to each harmonic.
+    </br><br>
+    <b>Base Function</b> Decides the basic waveshape. This is applied <i>per harmonic</i> so, for example, a square wave can become a complex stepped wave.
+    </br><br>
+    <b>Par.</b> (for base function). This modifies the actual mathematical formula. For example, with the control anti-clockwise the 'power' wave is logarythmic and in the other direction, is exponential.
+    </br><br>
+    <b>B.F.Mod</b> (base function modulator) This sets the type and enables the three modulation controls for the base function. These change the modulation formula in ways we don't currently understand.
+    </br><br>
+    <b>Use as base</b> Turns the entire oscilator into a user base function.
+    </br><br>
+    <b>Wsh</b> (waveshape) Modifies the overall waveshape dependent on its parameter setting.
+    </br><br>
+    <b>Filter</b> (harmonics filter) Various filter types applied to the waveshape. The first parameter is the filter degree and the second one seems to be the Q factor.
+    </br><br>
+    <b>F</b> (first) If checked, this moves the filter ahead of the waveshaping (if it's used).
+    </br><br>
+    <b>Mod.</b> (harmonics modulator) This sets the type and enables the three modulation controls for the overall waveform. These change the modulation formula in ways we don't currently understand.
+    </br><br>
+    <b>Sp. adj.</b> (spectrum adustment) This provides three different types of adjustment of the frequency spectrum of the overall waveform. The control varies the degree of change.
+    </br><br>
+    <b>Harmonic Shift</b> Changes the harminc position in ways we don't understand.
+    </br><br>
+    <b>Shift 1st</b> Moves this function ahead of both Waveshaping and filtering.
+    </br><br>
+    <b>Adpt. Harm</b> (adaptive harmonics) Changes the positions and amplitudes of the harmonics. The best way to understand the relationship between the slider and two parameter knobs is to watch the oscillator specrum display (top left) while adjusting them.
+    </br><br>
+    <b>Clear</b> Returns the main harmoncs sliders to their default positions.
+    </br><br>
+    <b>Sine</b> Coverts the the base function to a sine wave, proding the same final result by setting all the harmonics to the equivalent amplitudes and phases.
+    </div>
     </p>
-    ..
-    <br>
-    ..
-    <br>
-    ..
-    <br>
-    ..
-    <br>
-    ..
-    <br>
-    <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>
 </html>

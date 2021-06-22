@@ -674,11 +674,11 @@ o->hide();}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
-          class Fl_Check_Button2
           label F
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::filterBeforeWaveshape, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Apply the filter before the waveshaping} xywh {415 313 20 20} down_box DOWN_BOX labelsize 10 align 24
+          class Fl_Check_Button2
         }
         Fl_Dial filtervalue2 {
           callback {//
@@ -721,11 +721,11 @@ o->hide();}
           xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
         }
         Fl_Check_Button harmonicshiftpre {
-          class Fl_Check_Button2
           label {Shift 1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::shiftBeforeWaveshapeAndFilter, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {668 383 56 20} down_box DOWN_BOX labelsize 10 align 24
+          class Fl_Check_Button2
         }
       }
       Fl_Group adaptiveGroup {
@@ -759,7 +759,7 @@ o->hide();}
         label {Adpt.Harm.}
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textfont 1 textsize 10
+        tooltip {The type of the adaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textfont 1 textsize 10
         code0 {o->add("OFF");o->add("ON");o->add("Square");o->add("2xSub");o->add("2xAdd");o->add("3xSub");o->add("3xAdd");o->add("4xSub");o->add("4xAdd");}
       } {}
       Fl_Group modulationGroup {
