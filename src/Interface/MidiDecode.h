@@ -22,7 +22,6 @@
 #ifndef MIDIDECODE_H
 #define MIDIDECODE_H
 
-#include <jack/ringbuffer.h>
 #include <list>
 #include <string>
 

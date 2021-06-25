@@ -92,7 +92,8 @@ class JackEngine : public MusicIO
 
         struct {
             jack_port_t*       port;
-            jack_ringbuffer_t *ringBuf;
+            //jack_ringbuffer_t *ringBuf;
+            size_t             *ringBuf;
             pthread_t          pThread;
         } midi;
 

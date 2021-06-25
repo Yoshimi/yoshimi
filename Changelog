@@ -1,6 +1,12 @@
 yoshimi 2.0.2
 
-2021-6-21 Will
+2021-6-25 Will
+* BugFix: headers still including jack/ringbuffer.
+  Only appears in jack engine midi struct but
+  doesn't seem to do anything!
+  Replaced with uint_t
+
+2021-6-22 Will
 * Waveform in guide mostly done.
   There is a lot of detail missing.
   It was never   doccumented :(

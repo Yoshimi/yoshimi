@@ -31,7 +31,6 @@
 #include <limits.h>
 #include <cstdlib>
 #include <semaphore.h>
-#include <jack/ringbuffer.h>
 #include <string>
 #include <vector>
 #include <list>

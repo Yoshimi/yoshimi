@@ -23,8 +23,6 @@
 #ifndef INTERCH_H
 #define INTERCH_H
 
-#include <jack/ringbuffer.h>
-
 #include "globals.h"
 #include "Interface/Data2Text.h"
 #include "Interface/RingBuffer.h"
