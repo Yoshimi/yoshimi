@@ -24,10 +24,7 @@
 #define JACK_ENGINE_H
 
 #include <string>
-#include <pthread.h>
-#include <semaphore.h>
 #include <jack/jack.h>
-//#include <jack/ringbuffer.h>
 
 #if defined(JACK_SESSION)
     #include <jack/session.h>
@@ -74,7 +71,6 @@ class JackEngine : public MusicIO
 #if defined(JACK_SESSION)
             static void _jsessionCallback(jack_session_event_t *event, void *arg);
             void jsessionCallback(jack_session_event_t *event);
-            jack_session_event_t *lastevent;
 #endif
 
 #if defined(JACK_LATENCY)
@@ -82,24 +78,20 @@ class JackEngine : public MusicIO
             void latencyCallback(jack_latency_callback_mode_t mode);
 #endif
 
-        jack_client_t      *jackClient;
-        struct {
+        struct JackAudio
+        {
             unsigned int  jackSamplerate;
             unsigned int  jackNframes;
             jack_port_t  *ports[2*NUM_MIDI_PARTS+2];
             float        *portBuffs[2*NUM_MIDI_PARTS+2];
-        } audio;
+        };
 
-        struct {
-            jack_port_t*       port;
-            //jack_ringbuffer_t *ringBuf;
-            size_t             *ringBuf;
-            pthread_t          pThread;
-        } midi;
-
-        float bpm;
+        jack_client_t *jackClient;
+        JackAudio      audio;
+        jack_port_t   *midiPort;
 
         unsigned int internalbuff;
-};
 
-#endif
+        float bpm;
+};
+#endif /*JACK_ENGINE_H*/

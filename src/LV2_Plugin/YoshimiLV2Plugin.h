@@ -36,7 +36,6 @@
 #include <sys/types.h>
 #include <string>
 #include <vector>
-#include <semaphore.h>
 
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
@@ -72,7 +71,6 @@ private:
    LV2_URID _atom_bpm;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
-   sem_t _midiSem;
 
    struct midi_event {
        uint32_t time;

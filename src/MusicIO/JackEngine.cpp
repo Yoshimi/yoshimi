@@ -37,6 +37,7 @@ using func::asHexString;
 JackEngine::JackEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
     MusicIO(_synth, _beatTracker),
     jackClient(NULL),
+    internalbuff(0),
     bpm(120)
 {
     audio.jackSamplerate = 0;
@@ -46,7 +47,7 @@ JackEngine::JackEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
         audio.ports[i] = NULL;
         audio.portBuffs[i] = NULL;
     }
-    midi.port = NULL;
+    midiPort = NULL;
 }
 
 
@@ -181,7 +182,7 @@ bool JackEngine::Start(void)
       && !synth->getRuntime().midiDevice.empty()
       && synth->getRuntime().midiDevice != "default")
     {
-        if (jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midi.port)))
+        if (jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midiPort)))
         {
             synth->getRuntime().Log("Didn't find jack MIDI source '"
             + synth->getRuntime().midiDevice + "'", 1);
@@ -212,11 +213,11 @@ void JackEngine::Close(void)
                 jack_port_unregister(jackClient, audio.ports[chan]);
             audio.ports[chan] = NULL;
         }
-        if (NULL != midi.port)
+        if (NULL != midiPort)
         {
-            if ((chk = jack_port_unregister(jackClient, midi.port)))
+            if ((chk = jack_port_unregister(jackClient, midiPort)))
                 synth->getRuntime().Log("Failed to close jack client, status: " + asString(chk));
-            midi.port = NULL;
+            midiPort = NULL;
         }
         chk = jack_deactivate(jackClient);
         if (chk)
@@ -299,17 +300,17 @@ bool JackEngine::openMidi(void)
     }
 
     const char *port_name = "midi in";
-    midi.port = jack_port_register(jackClient, port_name,
+    midiPort = jack_port_register(jackClient, port_name,
                                    JACK_DEFAULT_MIDI_TYPE,
                                    JackPortIsInput, 0);
-    if (!midi.port)
+    if (!midiPort)
     {
         synth->getRuntime().Log("Failed to register jack midi port");
         return false;
     }
 
-    std::cout << "client " << jackClient<< "  device " << synth->getRuntime().midiDevice << "  port " << jack_port_name(midi.port) << std::endl;
-    if (jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midi.port)))
+    std::cout << "client " << jackClient<< "  device " << synth->getRuntime().midiDevice << "  port " << jack_port_name(midiPort) << std::endl;
+    if (jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midiPort)))
         {
             synth->getRuntime().Log("Didn't find jack MIDI source '"
             + synth->getRuntime().midiDevice + "'");
@@ -384,7 +385,7 @@ int JackEngine::processCallback(jack_nframes_t nframes)
     bool okaudio = true;
     bool okmidi = true;
 
-    if (midi.port) {
+    if (midiPort) {
         // input exists, using jack midi
         handleBeatValues(nframes);
         okmidi = processMidi(nframes);
@@ -485,7 +486,7 @@ void JackEngine::sendAudio(int framesize, unsigned int offset)
 
 bool JackEngine::processMidi(jack_nframes_t nframes)
 {
-    void *portBuf = jack_port_get_buffer(midi.port, nframes);
+    void *portBuf = jack_port_get_buffer(midiPort, nframes);
     if (!portBuf)
     {
         synth->getRuntime().Log("Bad midi jack_port_get_buffer");
