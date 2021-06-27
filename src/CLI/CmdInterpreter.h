@@ -29,9 +29,10 @@
 #include "Interface/TextLists.h"
 
 class TextMsgBuffer;
-class TestInvoker;
 
-
+namespace test {
+    class TestInvoker;
+}
 
 namespace cli {
 
@@ -117,8 +118,8 @@ class CmdInterpreter
         std::list<std::string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
 
-        std::unique_ptr<TestInvoker> testInvoker;
-        TestInvoker& getTestInvoker();
+        std::unique_ptr<test::TestInvoker> testInvoker;
+        test::TestInvoker& getTestInvoker();
 
 
 

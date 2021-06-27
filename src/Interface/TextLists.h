@@ -157,6 +157,7 @@ static std::string toplist [] = {
     "  MLearn ...",             "enter editor context level",
     "  Bank ...",               "enter context level",
     "  COnfig ...",             "enter context level",
+    "  TESt ...",               "launch test calculations (for developers)",
     "  YOshimi <n>",            "read current instance or change to n",
     "  MONo <s>",               "main output mono/stereo (ON = mono, {other})",
     "  SYStem effects [n]",     "enter effects context level",
@@ -962,13 +963,16 @@ static std::string listlist [] = {
 };
 
 static std::string testlist [] = {
-    "Note [n]",         "midi note to play for test",
-    "Velocity [n]",     "velocity to use for note on/off",
-    "Holdtime [n]",     "milliseconds to play sound before note off",
-    "Duration [n]",     "overall duration for the test sound",
-    "Repetitions [n]",  "number of complete test cycles to play (minimum 1)",
-    "Target [s]",       "path to target file to write sound data (empty: /dev/null)",
-    "Execute",          "actually trigger the test. Stops all other sound output.",
+    "NOte [n]",         "midi note to play for test",
+    "CHannel [n]",      "midi channel to use for the test note",
+    "VElocity [n]",     "velocity to use for note on/off",
+    "DUration [n]",     "overall duration for the test sound",
+    "HOldfraction [n]", "fraction of the duration to play sound before note off",
+    "REpetitions [n]",  "number of complete test cycles to play (minimum 1)",
+    "SCalestep [n]",    "semi-tones to move up/down when repeating a test note",
+    "BUffersize [n]",   "number of samples per Synth-call < global buffsize (=default)",
+    "TArget [s]",       "target file path to write sound data (empty: /dev/null)",
+    "EXEcute",          "actually trigger the test. Stops all other sound output.",
     "@end"
 };
 

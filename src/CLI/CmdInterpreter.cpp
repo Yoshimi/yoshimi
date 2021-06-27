@@ -80,6 +80,8 @@ using func::string2int;
 using func::string2int127;
 using func::string2float;
 
+using cli::readControl;
+
 
 /*
  * There are two routes that 'write' commands can take.
@@ -172,10 +174,10 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
 }
 
 
-TestInvoker& CmdInterpreter::getTestInvoker()
+test::TestInvoker& CmdInterpreter::getTestInvoker()
 {
     if (!testInvoker)
-        testInvoker.reset(new TestInvoker());
+        testInvoker.reset(new test::TestInvoker());
     return *testInvoker;
 }
 
@@ -534,9 +536,9 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
 
 string CmdInterpreter::buildTestStatus()
 {
-    string result = " TEST";
-    //////////////////////////////TODO show test params
-    return result;
+    int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+    // render compact form when status is part of prompt
+    return getTestInvoker().showTestParams(expose == 2);
 }
 
 
@@ -5576,7 +5578,13 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     {
         // just consume; we are already in the test context
     }
-    if (controlType == TOPLEVEL::type::Write && input.matchnMove(2, "execute"))
+
+    string response;
+    if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))
+        synth->getRuntime().Log(response);
+
+    // proceed to launch the test invocation and then cause termination of Yoshimi
+    if (controlType == TOPLEVEL::type::Write && input.matchnMove(3, "execute"))
     {
         size_t wait_at_least_one_cycle = ceil(1.1 * (synth->buffersize_f / synth->samplerate_f) * 1000*1000);
 
@@ -5593,9 +5601,10 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
         getTestInvoker().performSoundCalculation(*synth);
         return REPLY::exit_msg;
     }
-    
-    std::cout << "TODO: commandTest" << std::endl;
-    return REPLY::op_msg; //"Which Operation?"
+    else if (!input.isAtEnd())
+        return REPLY::op_msg; //"Which Operation?"
+
+    return REPLY::done_msg;
 }
 
 
@@ -5786,7 +5795,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return commandMlearn(input, controlType);
     }
 
-    if (input.matchnMove(2, "test"))
+    if (input.matchnMove(3, "test"))
     {
         context = LEVEL::Top;
         return commandTest(input, controlType);
@@ -6162,6 +6171,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         else
             return Reply::what("set");
     }
+    // special shortcut when in Test context: 'execute' directly launches test
+    if (bitFindHigh(context) == LEVEL::Test  && input.matchWord(3, "EXEcute"))
+        return Reply{commandReadnSet(input, TOPLEVEL::type::Write)};
 
     if (input.matchnMove(1, "read") || input.matchnMove(1, "get"))
     {
