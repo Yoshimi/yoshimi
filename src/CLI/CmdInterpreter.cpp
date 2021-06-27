@@ -1376,7 +1376,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             partno = TOPLEVEL::section::insertEffects;
         else
             partno = TOPLEVEL::section::systemEffects;
-        return sendNormal(synth, 0, nFXpreset, controlType, 16, partno,  EFFECT::type::none + nFXtype, nFX);
+        return sendNormal(synth, 0, nFXpreset, controlType, EFFECT::control::preset, partno,  EFFECT::type::none + nFXtype, nFX);
     }
     return REPLY::op_msg;
 }

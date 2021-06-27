@@ -91,7 +91,5 @@ class JackEngine : public MusicIO
         jack_port_t   *midiPort;
 
         unsigned int internalbuff;
-
-        float bpm;
 };
 #endif /*JACK_ENGINE_H*/

@@ -766,6 +766,7 @@ static std::string echolist [] = {
     "CROssover <n>",    "left-right crossover",
     "FEEdback <n>",     "echo feedback",
     "DAMp <n>",         "feedback damping",
+    "BPM <s>",          "delay BPM sync (ON {other})",
     "@end"
 };
 
@@ -781,6 +782,8 @@ static std::string choruslist [] = {
     "FEEdback <n>",     "chorus feedback",
     "CROssover <n>",    "L/R routing",
     "SUBtract <s>",     "invert output (ON {other})",
+    "BPM <s>",          "LFO BPM sync (ON {other})",
+    "STArt <n>",        "LFO BPM phase start",
     "@end"
 };
 
@@ -800,6 +803,8 @@ static std::string phaserlist [] = {
     "HYPer <s>",        "hyper ?  (ON {other})",
     "OVErdrive <n>",    "distortion",
     "ANAlog <s>",       "analog emulation (ON {other})",
+    "BPM <s>",          "LFO BPM sync (ON {other})",
+    "STArt <n>",        "LFO BPM phase start",
     "@end"
 };
 
@@ -815,6 +820,8 @@ static std::string alienwahlist [] = {
     "DELay <n>",        "LFO delay",
     "CROssover <n>",    "L/R routing",
     "RELative <n>",     "relative phase",
+    "BPM <s>",          "LFO BPM sync (ON {other})",
+    "STArt <n>",        "LFO BPM phase start",
     "@end"
 };
 
@@ -858,6 +865,8 @@ static std::string dynfilterlist [] = {
     "INVert <s>",       "reverse effect of sensitivity (ON {other})",
     "RATe <n>",         "speed of filter change with amplitude",
     "FILter ...",       "enter dynamic filter context",
+    "BPM <s>",          "LFO BPM sync (ON {other})",
+    "STArt <n>",        "LFO BPM phase start",
     "@end"
 };
 

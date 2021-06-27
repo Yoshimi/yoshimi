@@ -167,9 +167,7 @@ void DynamicFilter::reinitfilter(void)
 
 void DynamicFilter::setpreset(unsigned char npreset)
 {
-
-
-if (npreset < 0xf)
+    if (npreset < 0xf)
     {
         if (npreset >= NUM_PRESETS)
             npreset = NUM_PRESETS - 1;
@@ -269,6 +267,9 @@ if (npreset < 0xf)
         if (insertion == 0)
             changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
                                                   // system effect
+        // All presets use no BPM syncing.
+        changepar(EFFECT::control::bpm, 0);
+
         Ppreset = npreset;
         reinitfilter();
     }
@@ -340,6 +341,14 @@ void DynamicFilter::changepar(int npar, unsigned char value)
             Pampsmooth = value;
             setampsns(Pampsns);
             break;
+
+        case EFFECT::control::bpm:
+            lfo.Pbpm = value;
+            break;
+
+        case EFFECT::control::bpmStart:
+            lfo.PbpmStart = value;
+            break;
     }
     Pchanged = true;
 }
@@ -360,6 +369,8 @@ unsigned char DynamicFilter::getpar(int npar)
         case 7:  return Pampsns;
         case 8:  return Pampsnsinv;
         case 9:  return Pampsmooth;
+        case EFFECT::control::bpm: return lfo.Pbpm;
+        case EFFECT::control::bpmStart: return lfo.PbpmStart;
         default: break;
     }
     return 0;
@@ -407,7 +418,13 @@ float Dynamlimit::getlimits(CommandBlock *getData)
             break;
         case 9:
             break;
-        case 16:
+        case EFFECT::control::bpm:
+            max = 1;
+            canLearn = 0;
+            break;
+        case EFFECT::control::bpmStart:
+            break;
+        case EFFECT::control::preset:
             max = 4;
             canLearn = 0;
             break;

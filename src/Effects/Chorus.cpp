@@ -204,6 +204,8 @@ void Chorus::setpreset(unsigned char npreset)
             npreset = NUM_PRESETS - 1;
         for (int n = 0; n < PRESET_SIZE; ++n)
             changepar(n, presets[npreset][n]);
+        // All presets use no BPM syncing.
+        changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
     }
     else
@@ -270,6 +272,12 @@ void Chorus::changepar(int npar, unsigned char value)
         case 11:
             Poutsub = (value > 1) ? 1 : value;
             break;
+        case EFFECT::control::bpm:
+            lfo.Pbpm = value;
+            break;
+        case EFFECT::control::bpmStart:
+            lfo.PbpmStart = value;
+            break;
         default:
             Pchanged = false;
     }
@@ -293,6 +301,8 @@ unsigned char Chorus::getpar(int npar)
         case 9:  return Plrcross;
         case 10: return Pflangemode;
         case 11: return Poutsub;
+        case EFFECT::control::bpm: return lfo.Pbpm;
+        case EFFECT::control::bpmStart: return lfo.PbpmStart;
         default: return 0;
     }
 }
@@ -341,7 +351,13 @@ float Choruslimit::getlimits(CommandBlock *getData)
             max = 1;
             canLearn = 0;
             break;
-        case 16:
+        case EFFECT::control::bpm:
+            max = 1;
+            canLearn = 0;
+            break;
+        case EFFECT::control::bpmStart:
+            break;
+        case EFFECT::control::preset:
             max = 9;
             canLearn = 0;
             break;

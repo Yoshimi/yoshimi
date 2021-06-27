@@ -24,6 +24,7 @@
 
 */
 
+#include "Misc/NumericFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 #include <iostream>
@@ -87,6 +88,36 @@ void Echo::cleanup(void)
 // Initialize the delays
 void Echo::initdelays(void)
 {
+    if (Pbpm)
+    {
+        int olddelay = delay;
+
+        std::pair<float, float> frac = func::LFOfreqBPMFraction((float)Pdelay / 127.0f);
+        delay = roundf(60.0f * synth->samplerate_f * frac.first / (synth->getBPM() * frac.second));
+        if (delay > maxdelay)
+            delay = maxdelay;
+
+        if (!synth->isBPMAccurate())
+        {
+            // If we don't have an accurate BPM source, we may have
+            // fluctuations. Reject delay changes less than a certain amount to
+            // prevent Echo artifacts.
+
+            float ratio;
+            if (delay > olddelay)
+                ratio = (float)delay / (float)olddelay;
+            else
+                ratio = (float)olddelay / (float)delay;
+            if (ratio < ECHO_INACCURATE_BPM_THRESHOLD)
+                delay = olddelay;
+        }
+    }
+    else
+    {
+        delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
+        delay += 1; // 0 .. 1.5 sec
+    }
+
     dl = delay - lrdelay;
     if (dl < 1)
         dl = 1;
@@ -102,6 +133,9 @@ void Echo::out(float* smpsl, float* smpsr)
     float l, r;
     float ldl;
     float rdl;
+
+    if (Pbpm)
+        initdelays();
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
@@ -195,8 +229,6 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
-    delay += 1; // 0 .. 1.5 sec
     initdelays();
 }
 
@@ -237,6 +269,8 @@ void Echo::setpreset(unsigned char npreset)
             changepar(n, presets[npreset][n]);
         if (insertion)
             changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        // All presets use no BPM syncing.
+        changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
     }
     else
@@ -290,6 +324,11 @@ void Echo::changepar(int npar, unsigned char value)
         case 6:
             sethidamp(value);
             break;
+
+        case EFFECT::control::bpm:
+            Pbpm = value;
+            break;
+
         default:
             Pchanged = false;
     }
@@ -308,6 +347,7 @@ unsigned char Echo::getpar(int npar)
         case 4: return Plrcross;
         case 5: return Pfb;
         case 6: return Phidamp;
+        case EFFECT::control::bpm: return Pbpm;
         default: break;
     }
     return 0; // in case of bogus parameter number
@@ -345,7 +385,11 @@ float Echolimit::getlimits(CommandBlock *getData)
             break;
         case 6:
             break;
-        case 16:
+        case EFFECT::control::bpm:
+            max = 1;
+            canLearn = 0;
+            break;
+        case EFFECT::control::preset:
             max = 8;
             canLearn = 0;
             break;

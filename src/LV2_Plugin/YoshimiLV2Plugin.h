@@ -77,8 +77,6 @@ private:
        char data[4]; // all events of interest are <= 4bytes
    };
 
-   float _bpm;
-
    float *_bFreeWheel;
 
    pthread_t _pIdleThread;

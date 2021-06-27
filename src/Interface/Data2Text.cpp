@@ -3303,12 +3303,16 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::echo:
             effname = " Echo ";
-            controlType = echolist[control * 2];
+            if (ref > 6) // there is no 7-16 in the list names
+                ref -= 10;
+            controlType = echolist[ref * 2];
             break;
         case EFFECT::type::chorus:
         {
             effname = " Chorus ";
-            if (ref > 9) // there is no 10 in the list names
+            if (ref > 10) // there is no 11-16 in the list names
+                ref -= 6;
+            else if (ref > 9) // there is no 10 in the list names
                 ref --;
             controlType = choruslist[ref * 2];
             if (addValue == true && offset > 0)
@@ -3334,7 +3338,9 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::phaser:
             effname = " Phaser ";
-            controlType = phaserlist[control * 2];
+            if (ref > 14) // there is no 15-16 in the list names
+                ref -= 2;
+            controlType = phaserlist[ref * 2];
             if (addValue == true && offset > 0)
             {
                 switch (control)
@@ -3360,7 +3366,9 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             break;
         case EFFECT::type::alienWah:
             effname = " AlienWah ";
-            controlType = alienwahlist[control * 2];
+            if (ref > 10) // there is no 11-16 in the list names
+                ref -= 6;
+            controlType = alienwahlist[ref * 2];
             if (control == 4 && addValue == true  && offset > 0)
             {
                 showValue = false;
@@ -3432,7 +3440,9 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::dynFilter:
             effname = " DynFilter ";
-            controlType = dynfilterlist[control * 2];
+            if (ref > 10) // there is no 11-16 in the list names
+                ref -= 6;
+            controlType = dynfilterlist[ref * 2];
             if (addValue == true && offset > 0)
             {
                 if (control == 4)
@@ -3459,7 +3469,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             contstr = " Unrecognised";
     }
     //std::cout << "control " << int(control) << std::endl;
-    if (control == 16 && kititem != EFFECT::type::eq)
+    if (control == EFFECT::control::preset && kititem != EFFECT::type::eq)
     {
         contstr = " Preset " + to_string (value + 1);
         showValue = false;

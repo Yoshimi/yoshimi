@@ -36,6 +36,9 @@
 
 #define MIDI_SONGPOS_BEAT_DIVISION 4
 
+#define ALSA_MIDI_BPM_MEDIAN_WINDOW 48
+#define ALSA_MIDI_BPM_MEDIAN_AVERAGE_WINDOW 20
+
 class SynthEngine;
 
 class AlsaEngine : public MusicIO
@@ -119,6 +122,10 @@ class AlsaEngine : public MusicIO
             // Reset to zero every MIDI_CLOCK_DIVISION. This is actually an
             // integer, but stored as float for calculation purposes.
             float             clockCount;
+
+            float             prevBpms[ALSA_MIDI_BPM_MEDIAN_WINDOW];
+            int               prevBpmsPos;
+            int64_t           prevClockUs;
         } midi;
 };
 

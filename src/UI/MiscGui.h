@@ -105,6 +105,7 @@ enum ValueType {
     VC_FXChorusDelay,
     VC_FXlfoStereo,
     VC_FXlfofreq,
+    VC_FXlfofreqBPM,
     VC_FXdefaultDW,
     VC_FXEQfreq,
     VC_FXEQq,
