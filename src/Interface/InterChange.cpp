@@ -754,6 +754,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             vectorClear(NUM_MIDI_CHANNELS);
             if (synth->loadStateAndUpdate(text))
             {
+                text = setExtension(text, EXTEN::state);
                 string name = synth->getRuntime().ConfigDir + "/yoshimi";
                 name += ("-" + to_string(synth->getUniqueId()));
                 name += ".state";

@@ -2406,6 +2406,7 @@ void SynthEngine::ShutUp(void)
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
     defaults();
+    //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
     Runtime.stateChanged = true;
     bool result = Runtime.restoreSessionData(filename);

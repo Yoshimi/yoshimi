@@ -1,4 +1,7 @@
-yoshimi 2.0.2
+yoshimi 2.0.2M
+
+2021-6-29 Will
+* BugFix: Loading state not adding to history.
 
 2021-6-25 Will
 * BugFix: headers still including jack/ringbuffer.
