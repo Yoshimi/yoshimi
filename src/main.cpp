@@ -343,12 +343,6 @@ int mainCreateNewInstance(unsigned int forceId)
         synth->setWindowTitle(musicClient->midiClientName());
         if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
-
-        // not too happy this is possible, maybe gui should be wrapped in a namespace
-        if (synth->getRuntime().audioEngine < 1)
-            alert(synth, "Yoshimi can't find an available sound system. Running with no Audio");
-        if (synth->getRuntime().midiEngine < 1)
-            alert(synth, "Yoshimi can't find an input system. Running with no MIDI");
     }
     else
         synth->getRuntime().toConsole = false;
@@ -484,8 +478,8 @@ int main(int argc, char *argv[])
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
 
-    pthread_t thr;
-    pthread_attr_t attr;
+    pthread_t threadGui;
+    pthread_attr_t pthreadAttr;
     sem_t semGui;
 
     if (mainCreateNewInstance(0) == -1)
@@ -506,15 +500,15 @@ int main(int argc, char *argv[])
     }
     if (sem_init(&semGui, 0, 0) == 0)
     {
-        if (pthread_attr_init(&attr) == 0)
+        if (pthread_attr_init(&pthreadAttr) == 0)
         {
-            if (pthread_create(&thr, &attr, mainGuiThread, (void *)&semGui) == 0)
+            if (pthread_create(&threadGui, &pthreadAttr, mainGuiThread, (void *)&semGui) == 0)
             {
 #ifdef GUI_FLTK
                 guiStarted = true;
 #endif
             }
-            pthread_attr_destroy(&attr);
+            pthread_attr_destroy(&pthreadAttr);
         }
     }
 #ifdef GUI_FLTK
@@ -548,29 +542,32 @@ int main(int argc, char *argv[])
 #endif
 
     //create command line processing thread
-    pthread_t cmdThr;
+    pthread_t threadCmd;
 
     if (bShowCmdLine)
     {
-        if (pthread_attr_init(&attr) == 0)
+        if (pthread_attr_init(&pthreadAttr) == 0)
         {
-            if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+            if (pthread_create(&threadCmd, &pthreadAttr, commandThread, (void *)firstSynth) == 0)
             {
                 ;
             }
-            pthread_attr_destroy(&attr);
+            pthread_attr_destroy(&pthreadAttr);
         }
     }
 
     void *ret;
-    pthread_join(thr, &ret);
+    pthread_join(threadGui, &ret);
     if (ret == (void *)1)
     {
         goto bail_out;
     }
-    if (waitForTest && cmdThr)
-    {
-        pthread_join(cmdThr, &ret);
+    if (waitForTest && threadCmd)
+    {   // CLI about to launch TestRunner for automated test
+        MusicClient* music = synthInstances[firstSynth];
+        if (music) music->Close(); // causes esp. JackClient to detach
+
+        pthread_join(threadCmd, &ret);
         if (ret == (void *)1)
         {
             goto bail_out;
