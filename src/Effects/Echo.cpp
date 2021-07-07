@@ -66,6 +66,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     rdelay = new float[maxdelay];
     realposl = realposr = 1;
     cleanup();
+    initdelays();
 }
 
 
@@ -79,8 +80,8 @@ Echo::~Echo()
 // Cleanup the effect
 void Echo::cleanup(void)
 {
-    memset(ldelay, 0, dl * sizeof(float));
-    memset(rdelay, 0, dr * sizeof(float));
+    memset(ldelay, 0, maxdelay * sizeof(float));
+    memset(rdelay, 0, maxdelay * sizeof(float));
     oldl = oldr = 0.0f;
 }
 
