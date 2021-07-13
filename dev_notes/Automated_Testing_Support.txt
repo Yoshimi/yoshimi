@@ -1,0 +1,192 @@
+
+Ideally, Yoshimi should reliably always behave the same as ever, allowing musicians to learn handling
+the subtleties of a given voice. A carefully balanced MIDI score should not be blown out of proportions
+due to some development work in the Yoshimi code base. To help keeping that level of compatibility,
+since 2021 Yoshimi offers some support for automated testing.
+
+A major obstacle to overcome for acceptance testing is non-determinism: when playing Yoshimi,
+the sound will feel vivid, since every note will be subtly different. However, since this randomness
+is based on a Pseudo Random Number Generator (PRNG) with very long sequence, in fact all of the
+computations are deterministic, once we start from a well defined seed and initial state. One
+single isolated note can thus be reproduced up to the last bit. However, as soon as you send
+yet another MIDI note while sound is being calculated, because this second note essentially
+starts at a random point in time, the calculations proceed from an non-predictable state
+and turn over to complete randomness.
+
+Based on these observations, Yoshimi provides a dedicated test invoker component accessible through
+the CLI. Once triggered, this test invoker will terminate the regular sound production, similar as
+when shutting down the Yoshimi application. The SynthEngine will then be re-seeded and ephemeral
+processing state will be cleared out. After these preparations, a sequence of test notes will be
+calculated by directly invoking the SynthEngine functions, synchronously. After completion,
+the Yoshimi application will terminate, unconditionally discarding any unsaved state.
+
+For a typical automated test case, Yoshimi would be started, possibly with a state file.
+A CLI script would then be piped into STDIN, to set up the parts, instruments and settings
+to be covered by this test, and finally the test calculation would be launched. By default,
+the resulting sound bits will be discarded, just capturing the calculation time. However,
+it is possible to dump this calculated sound into a RAW sound file, which can be opened by
+many sound processing applications and libraries, when providing the correct parameters
+of the produced sound: 32-bit floating point little-endian, two channels interleaved,
+and the actual sampling rate (e.g. 48kHz). If we store such a calculated sound as baseline,
+and then repeat the calculation and subtract the baseline sample by sample, the result should
+be total silence. When detecting any residual sound, we can listen to that sound and determine
+if the difference is sonic (=bad) or just noisy (-> maybe acceptable). And we can measure the
+volume level (or RMS) of the difference to get a clue how large the musical impact might be.
+
+Within the CLI, there is a special test context that can be entered with "set test".
+The following parameters of the test are exposed for set / get / min / max / default commands:
+
+    "NOte [n]"
+        MIDI note number of the first test note, default: 60 == C4
+
+    "CHannel [n]"
+        MIDI channel number 1-based (1..16), default channel 1
+        It depends on the actual part configuration which part(s) will be activated,
+        the test invoker just passes this number (minus 1) to the NoteOn() function.
+
+    "VElocity [n]"
+        likewise, this value (0..127) is just passed to the NoteOn() function, default 64.
+
+    "DUration [n]"
+        Overall duration of the sound in seconds, default 1.0
+        Can be fractional, minimum 0.01f (10 milliseconds). From this duration value,
+        the exact number of samples is calculated and then rounded up to the next full
+        buffersize / "chunksize", to determine how often the MasterAudio() function will
+        be invoked. After these calls, SynthEngine::shutUp() will be invoked to clear all
+        sounding notes and intermediary buffers.
+
+    "HOldfraction [n]"
+        Fraction of the duration time for actually holding the note, default 0.8 (80%).
+        The resulting time is likewise rounded up to the next buffersize. After passing
+        the corresponding number of MasterAudio() calls, the NoteOff() function is invoked,
+        thus turning the active parts into note release state. All other processing, like e.g.
+        reverb continues until reaching the full duration time.
+
+    "REpetitions [n]"
+        The test invoker can produce several isolated notes in sequence, default is 4.
+        After each note, SynthEngine::shutUp() is invoked to avoid carrying the calculation
+        state from one note into the following note; this call also clears out the buffers
+        of global effects, so the next note starts with pristine state. However, the
+        timing measurement only covers the NoteOn, NoteOff and MasterAudio() calls while
+        excluding the time spent in shutUp(), since the goal is to capture the performance
+        of regular sound processing.
+
+    "SCalestep [n]",
+        Move up/down by this number of semi tones before repeating, default is 4 (major third).
+        This allows to cover the whole sonic range with a sequence of test tones; if the note
+        number reaches the end of the allowed MIDI note range, it "bounces" and the series
+        continues in reversed direction.
+
+    "BUffersize [n]"
+        Actual number of samples to request from MasterAudio(), default is the global buffsize,
+        which is defined by the Yoshimi settings, rsp. by the Jack or LV2 server. Note that
+        SynthEngine::MasterAudio() will ignore values larger than this current global buffersize.
+        Some settings behave different depending on the buffersize, and some sounds can be
+        notably different, especially when passing very small values -- which can be
+        investigated and documented through this test setting.
+
+    "TArget [s]"
+        File path to write sound data, default is empty, which means to discard calculated data.
+        Yoshimi attempts to open a RAW sound file at the given location; if missing, the extension
+        ".raw" will be added. Warning: an existing file will be overwritten without further notice!
+        While calculating, the sound samples are just interleaved and copied into a buffer in memory.
+        This buffer will be dumped into the actual file after finishing the actual test and thus
+        outside of the timing measurement.
+
+    "EXEcute"
+        Shut down regular Yoshimi operation, re-seed the SynthEngine, launch test and then exit.
+
+All these values can be changed by "set <setting> [newval]". If [newval] is omitted,
+the default value for this setting will be used instead. This default value can be inspected
+by "default <setting>".
+
+Basically the "execute" command also needs to be given as "set execute".
+However, as convenience shortcut, it is also possible to append the "execute" at the end
+of another "set" command within the test context. Moreover, when in test context, the
+"execute" command is also recognised as free standing command (without "set")
+
+
+After re-seeding, also the PAD-Synth wavetables need to be rebuilt, since they might use harmonic
+randomisation. Depending on the PAD size setting and the complexity of the instrument, this may
+require a considerable amount of time. These preparations attempt to establish well defined starting
+conditions, while retaining loaded instruments and and specific settings done via CLI to prepare
+the test. This preparation is done in the function SynthEngine::setReproducibleState(int seed).
+This function resets the continuous LFO time and beat settings, and then re-seeds the master
+PRNG of the synthEngine with the given value. Moreover, it visits all parts and instructs all
+existing OscilGen instances to draw a seed value from the global PRNG to reseed their local
+basePrng, and also to draw and store a randseed for the local harmonicPrng. This randseed
+is used on each NoteOn to re-seed the harmonicPrnc. Moreover, the serReproducibleState()
+also triggers the rebuilding of PAD-Synth wavetables, which will also draw further random
+values from the master PRNG.
+
+Output Markers: The test invoker will send some markers and data to the Log,
+which typically (depending on the Yoshimi settings) can be captured on STDOUT:
+
+TEST::Prepare
+    The regular sound processing has been shut down, and the invoking CLI has waited for
+    the SynthEngine to reach muted state. Moreover, Memory for the working buffers has
+    been successfully allocated and the output file is open for writing.
+    Next step will be invoking SynthEngine::setReproduibleState()
+
+TEST::Launch
+    Start of the actual sound calculations to test, which can be a sequence of notes
+
+TEST::Complete runtime ##.# ns speed ##.# ns/Sample
+    Test completed successfully, yielding the indicated timings.
+    Next step will be possibly to write the sound data file, and then
+    the Yoshimi application will terminate, discarding all settings.
+
+
+
+Example for using this test feature from the Unix shell:
+
+
+/path/to/yoshimi <<ENDSCRIPT >mytest.log
+set part 1 instrument 36
+/
+set test target test-out
+execute
+ENDSCRIPT
+
+
+This test will overwrite the file test-out.raw with the produced sound
+and write something similar to the following example into "mytest.log":
+
+Yoshimi 2.x.y is starting
+March is Little Endian
+Card Format is Signed Little Endian 32 Bit 18 Channel
+Yoshimi 2.x.y
+Clientname: yoshimi
+Audio: alsa -> 'default'
+Midi: alsa -> 'No MIDI sources seen'
+Oscilsize: 512
+Samplerate: 48000
+Period size: 256
+
+Yay! We're up and running :-)
+/usr/share/yoshimi/banks
+
+Found 943 instruments in 25 banks
+Root 2. Bank set to 42 "Ichthyo"
+yoshimi> set part 1 instrument 36
+Main Part Number 1
+Main Part 1 loaded 0036-Harm.Princip
+GUI refreshed
+@ p1+, (Multi)
+yoshimi> /
+@ Top
+yoshimi> set test target test-out
+Target RAW-filename set to: "test-out.raw"
+@ TEST: exec 4 notes start (C4) step 4 up to (C5) on Ch.1 each 1.0s (hold 80%) buffer=256 write "test-out.raw"
+yoshimi> execute
+Main Sound Stopped
+TEST::Prepare
+SynthEngine(0): reseeded with 0
+TEST::Launch
+TEST::Complete runtime 119753064.0 ns speed 622.1 ns/Sample
+EXIT
+
+Goodbye - Play again soon?
+
+
+

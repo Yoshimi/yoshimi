@@ -114,6 +114,17 @@ inline std::string asLongString(float n)
 }
 
 
+inline std::string asCompactString(float n)
+{
+   std::ostringstream oss;
+   oss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+   oss.precision(1);
+   oss.width(1);
+   oss << n;
+   return oss.str();
+}
+
+
 inline std::string asHexString(int x)
 {
    std::ostringstream oss;
@@ -133,6 +144,17 @@ inline std::string asHexString(unsigned int x)
    if (res.length() & 1)
        return "0"+res;
    return res;
+}
+
+
+inline std::string asMidiNoteString(unsigned char n)
+{
+    static std::string note[] = {
+        "C","C#","D","D#","E","F","F#","G","G#","A","B","B#"
+    };
+    int octave = -1 + n/12;
+    int key   = n % 12;
+    return "("+note[key]+asString(octave)+")";
 }
 
 

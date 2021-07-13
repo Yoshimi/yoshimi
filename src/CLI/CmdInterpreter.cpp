@@ -33,6 +33,7 @@
 #include <readline/history.h>
 #include <algorithm>
 #include <iterator>
+#include <atomic>
 #include <map>
 #include <list>
 #include <vector>
@@ -42,6 +43,7 @@
 #include "CLI/CmdInterpreter.h"
 #include "Effects/EffectMgr.h"
 #include "CLI/Parser.h"
+#include "Misc/TestInvoker.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
@@ -51,6 +53,10 @@
 
 // global variable; see SynthEngine.cpp and main.cpp
 extern SynthEngine *firstSynth;
+
+// used to hold back shutdown when running sound generation for test
+extern std::atomic <bool> waitForTest;
+
 
 // these two are both zero and repesented by an enum entry
 const unsigned char type_read = TOPLEVEL::type::Adjust;
@@ -73,6 +79,8 @@ using func::asString;
 using func::string2int;
 using func::string2int127;
 using func::string2float;
+
+using cli::readControl;
 
 
 /*
@@ -104,6 +112,7 @@ CmdInterpreter::CmdInterpreter() :
     synth{nullptr},
     instrumentGroup{},
     textMsgBuffer{TextMsgBuffer::instance()},
+    testInvoker{},
 
     context{LEVEL::Top},
     npart{0},
@@ -123,8 +132,12 @@ CmdInterpreter::CmdInterpreter() :
     chan{0},
     axis{0},
     mline{0}
-{
+{ }
+
+CmdInterpreter::~CmdInterpreter()
+{ /* destructors invoked here */
 }
+
 
 void CmdInterpreter::defaults()
 {
@@ -161,6 +174,14 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
 }
 
 
+test::TestInvoker& CmdInterpreter::getTestInvoker()
+{
+    if (!testInvoker)
+        testInvoker.reset(new test::TestInvoker());
+    return *testInvoker;
+}
+
+
 string CmdInterpreter::buildStatus(bool showPartDetails)
 {
     if (bitTest(context, LEVEL::AllFX))
@@ -170,6 +191,10 @@ string CmdInterpreter::buildStatus(bool showPartDetails)
     if (bitTest(context, LEVEL::Part))
     {
         return buildPartStatus(showPartDetails);
+    }
+    if (bitTest(context, LEVEL::Test))
+    {
+        return buildTestStatus();
     }
 
     string result = "";
@@ -509,6 +534,14 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
 }
 
 
+string CmdInterpreter::buildTestStatus()
+{
+    int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
+    // render compact form when status is part of prompt
+    return getTestInvoker().showTestParams(expose == 2);
+}
+
+
 bool CmdInterpreter::query(string text, bool priority)
 {
     char *line = NULL;
@@ -717,6 +750,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::config;
         else if (bitTest(local, LEVEL::Learn))
             listnum = LISTS::mlearn;
+        else if (bitTest(local, LEVEL::Test))
+            listnum = LISTS::test;
     }
     if (listnum == -1)
         listnum = LISTS::all;
@@ -865,6 +900,11 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
         case LISTS::mlearn:
             msg.push_back("Mlearn:");
             helpLoop(msg, learnlist, 2);
+            break;
+        case LISTS::test:
+            msg.push_back("Test:");
+            msg.push_back("Settings for automated testing...");
+            helpLoop(msg, testlist, 2);
             break;
     }
 
@@ -5530,6 +5570,44 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 }
 
 
+/* Special operations used by the Yoshimi-testsuite for automated acceptance tests */
+int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
+{
+    bitSet(context, LEVEL::Test);
+    if (input.matchnMove(2, "test"))
+    {
+        // just consume; we are already in the test context
+    }
+
+    string response;
+    if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))
+        synth->getRuntime().Log(response);
+
+    // proceed to launch the test invocation and then cause termination of Yoshimi
+    if (controlType == TOPLEVEL::type::Write && input.matchnMove(3, "execute"))
+    {
+        size_t wait_at_least_one_cycle = ceil(1.1 * (synth->buffersize_f / synth->samplerate_f) * 1000*1000);
+
+        sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
+        do usleep(wait_at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
+        while (synth->audioOut != _SYS_::mute::Idle);
+
+        // NOTE: the following initiates a shutdown
+        waitForTest = true;
+        synth->getRuntime().runSynth = false;
+        usleep(wait_at_least_one_cycle);
+
+        // Launch computation for automated acceptance test
+        getTestInvoker().performSoundCalculation(*synth);
+        return REPLY::exit_msg;
+    }
+    else if (!input.isAtEnd())
+        return REPLY::op_msg; //"Which Operation?"
+
+    return REPLY::done_msg;
+}
+
+
 int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
@@ -5655,6 +5733,9 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         case LEVEL::Learn:
             return commandMlearn(input, controlType);
             break;
+        case LEVEL::Test:
+            return commandTest(input, controlType);
+            break;
     }
 
     if (input.matchnMove(3, "mono"))
@@ -5712,6 +5793,12 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         context = LEVEL::Top;
         return commandMlearn(input, controlType);
+    }
+
+    if (input.matchnMove(3, "test"))
+    {
+        context = LEVEL::Top;
+        return commandTest(input, controlType);
     }
 
     if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && input.matchnMove(3, "system"))
@@ -6084,6 +6171,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         else
             return Reply::what("set");
     }
+    // special shortcut when in Test context: 'execute' directly launches test
+    if (bitFindHigh(context) == LEVEL::Test  && input.matchWord(3, "EXEcute"))
+        return Reply{commandReadnSet(input, TOPLEVEL::type::Write)};
 
     if (input.matchnMove(1, "read") || input.matchnMove(1, "get"))
     {

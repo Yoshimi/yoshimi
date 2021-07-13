@@ -68,9 +68,10 @@ class OscilGen : private WaveShapeSamples
         void defaults(void);
         void convert2sine();
 
-        // Make a new random seed for Amplitude Randomness -
-        //   should be called every noteon event
-        void newrandseed() { randseed = prng.randomINT() + INT_MAX/2; }
+        // Draw a new random seed for randomisation of harmonics - called every noteon event
+        void newrandseed() { randseed = basePrng.randomINT() + INT_MAX/2; }
+        void resetHarmonicPrng() { harmonicPrng.init(randseed); }
+        void reseed(int value);
 
     private:
         OscilParameters *params;
@@ -160,7 +161,7 @@ class OscilGen : private WaveShapeSamples
 
         uint32_t randseed;
 
-        RandomGen prng;
+        RandomGen basePrng;
         RandomGen harmonicPrng;
 };
 

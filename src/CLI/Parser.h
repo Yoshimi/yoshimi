@@ -305,6 +305,7 @@ class Parser
         bool isdigit() { return point && ::isdigit((unsigned char) *point); }
         bool isspace() { return point && ::isspace((unsigned char) *point); }
         bool isprint() { return point && ::isprint((unsigned char) *point); }
+        bool isalnum() { return point && ::isalnum((unsigned char) *point); }
         bool iscntrl() { return point && ::iscntrl((unsigned char) *point); }
 };
 

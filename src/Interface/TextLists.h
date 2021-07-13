@@ -56,6 +56,7 @@ namespace LEVEL{
         LFO, // amp/freq/filt
         Filter, // params only (slightly confused with env)
         Envelope, // amp/freq/filt/ (Sub only) band
+        Test, // special ops for Yoshimi-testsuite
     };
 }
 
@@ -116,7 +117,8 @@ namespace LISTS {
     list,
     bank,
     config,
-    mlearn
+    mlearn,
+    test,
     };
 }
 
@@ -155,6 +157,7 @@ static std::string toplist [] = {
     "  MLearn ...",             "enter editor context level",
     "  Bank ...",               "enter context level",
     "  COnfig ...",             "enter context level",
+    "  TESt ...",               "launch test calculations (for developers)",
     "  YOshimi <n>",            "read current instance or change to n",
     "  MONo <s>",               "main output mono/stereo (ON = mono, {other})",
     "  SYStem effects [n]",     "enter effects context level",
@@ -965,6 +968,20 @@ static std::string listlist [] = {
     "History [s]",      "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",      "effect types ('all' include preset numbers and names)",
     "PREsets",          "all the presets for the currently selected effect",
+    "@end"
+};
+
+static std::string testlist [] = {
+    "NOte [n]",         "midi note to play for test",
+    "CHannel [n]",      "midi channel to use for the test note",
+    "VElocity [n]",     "velocity to use for note on/off",
+    "DUration [n]",     "overall duration for the test sound",
+    "HOldfraction [n]", "fraction of the duration to play sound before note off",
+    "REpetitions [n]",  "number of complete test cycles to play (minimum 1)",
+    "SCalestep [n]",    "semi-tones to move up/down when repeating a test note",
+    "BUffersize [n]",   "number of samples per Synth-call < global buffsize (=default)",
+    "TArget [s]",       "target file path to write sound data (empty: /dev/null)",
+    "EXEcute",          "actually trigger the test. Stops all other sound output.",
     "@end"
 };
 

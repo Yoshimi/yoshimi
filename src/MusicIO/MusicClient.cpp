@@ -86,7 +86,7 @@ void *MusicClient::timerThread_fn(void *arg)
     MusicClient *nmc = (MusicClient *)arg;
     useconds_t sleepInterval = (useconds_t)(1000000.0f * (double)nmc->synth->getRuntime().Buffersize / nmc->synth->getRuntime().Samplerate);//(double)NMC_SRATE);
     nmc->timerWorking = true;
-    while (nmc->timerWorking)
+    while (nmc->timerWorking && nmc->synth->getRuntime().runSynth)
     {
         nmc->synth->MasterAudio(nmc->buffersL, nmc->buffersR);
         usleep(sleepInterval);
@@ -278,7 +278,7 @@ unsigned int MusicClient::getSamplerate()
     {
         return audioIO->getSamplerate();
     }
-    return NMC_SRATE;
+    return synth->getRuntime().Samplerate;
 }
 
 

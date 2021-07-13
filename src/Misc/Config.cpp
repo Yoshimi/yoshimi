@@ -100,6 +100,7 @@ namespace { // constants used in the implementation
         {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
         {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
         {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
+        {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
         #if defined(JACK_SESSION)
             {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
             {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
@@ -1434,6 +1435,14 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             }
             break;
 
+        case 13:
+            settings->configChanged = true;
+            settings->engineChanged = true;
+            settings->midiChanged = true;
+            settings->audioEngine = no_audio;
+            settings->midiEngine  = no_midi;
+            break;
+
 #if defined(JACK_SESSION)
         case 'u':
             if (arg)
@@ -1485,7 +1494,14 @@ void GuiThreadMsg::processGuiMessages()
             if (!guiMaster)
                 std::cerr << "Error starting Main UI!" << std::endl;
             else
+            {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+
+                if (synth->getRuntime().audioEngine < 1)
+                    alert(synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
+                if (synth->getRuntime().midiEngine < 1)
+                    alert(synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+            }
         }
         else if (guiMaster)
         {

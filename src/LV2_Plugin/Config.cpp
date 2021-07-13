@@ -1217,166 +1217,6 @@ LinuxSampler src/common/Features.cpp, licensed thus -
 **/
 
 
-/*static error_t parse_cmds (int key, char *arg, struct argp_state *state)
-{
-    Config *settings = (Config*)state->input;
-    if (arg && arg[0] == 0x3d)
-        ++ arg;
-    int num;
-
-    switch (key)
-    {
-        case 'N': settings->nameTag = string(arg); break;
-
-        case 'l': settings->paramsLoad = string(arg); break;
-
-        case 'L': settings->instrumentLoad = string(arg); break;
-
-        case 'M':settings->midiLearnLoad = string(arg);break;
-
-        case 'A':
-            settings->configChanged = true;
-            settings->engineChanged = true;
-            settings->audioEngine = alsa_audio;
-            if (arg)
-                settings->audioDevice = string(arg);
-            else
-                settings->audioDevice = settings->alsaAudioDevice;
-            break;
-
-        case 'a':
-            settings->configChanged = true;
-            settings->midiChanged = true;
-            settings->midiEngine = alsa_midi;
-            if (arg)
-                settings->midiDevice = string(arg);
-            else
-                settings->midiDevice = string(settings->alsaMidiDevice);
-            break;
-
-        case 'b':
-            settings->configChanged = true;
-            settings->bufferChanged = true;
-            settings->Buffersize = string2int(string(arg));
-            break;
-
-        case 'D':
-            if (arg)
-                settings->rootDefine = string(arg);
-            break;
-
-        case 'c':
-            settings->configChanged = true;
-            settings->cliChanged = true;
-            settings->showCli = false;
-            break;
-
-        case 'C':
-            settings->configChanged = true;
-            settings->cliChanged = true;
-            settings->showCli = true;
-            break;
-
-        case 'i':
-            settings->configChanged = true;
-            settings->guiChanged = true;
-            settings->showGui = false;
-            break;
-
-        case 'I':
-            settings->configChanged = true;
-            settings->guiChanged = true;
-            settings->showGui = true;
-            break;
-
-        case 'J':
-            settings->configChanged = true;
-            settings->engineChanged = true;
-            settings->audioEngine = jack_audio;
-            if (arg)
-                settings->audioDevice = string(arg);
-            break;
-
-        case 'j':
-            settings->configChanged = true;
-            settings->midiChanged = true;
-            settings->midiEngine = jack_midi;
-            if (arg)
-                settings->midiDevice = string(arg);
-            else
-                settings->midiDevice = string(settings->jackMidiDevice);
-            break;
-
-        case 'k':
-            settings->startJack = true;
-            break;
-
-        case 'K':
-            settings->configChanged = true;
-            settings->connectJackChanged = true;
-            settings->connectJackaudio = true;
-            break;
-
-        case 'o':
-            settings->configChanged = true;
-            settings->oscilChanged = true;
-            settings->Oscilsize = string2int(string(arg));
-            break;
-
-        case 'R':
-            settings->configChanged = true;
-            settings->rateChanged = true;
-            num = (string2int(string(arg)) / 48 ) * 48;
-            if (num < 48000 || num > 192000)
-                num = 44100; // play safe
-            settings->Samplerate = num;
-            break;
-
-        case 'S':
-            if (arg)
-            {
-                settings->sessionStage = _SYS_::type::StartupFirst;
-                settings->configChanged = true;
-                settings->StateFile = string(arg);
-            }
-            break;
-
-#if defined(JACK_SESSION)
-        case 'u':
-            if (arg)
-            {
-                settings->sessionStage = _SYS_::type::JackFirst;
-                settings->configChanged = true;
-                settings->StateFile = setExtension(string(arg), EXTEN::state);
-            }
-            break;
-
-        case 'U':
-                if (arg)
-                    jUuid = string(arg);
-        break;
-#endif
-
-        case ARGP_KEY_ARG:
-        case ARGP_KEY_END:
-            break;
-
-        default:
-            return error_t(ARGP_ERR_UNKNOWN);
-    }
-    return error_t(0);
-}
-
-
-static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
-
-
-void Config::loadCmdArgs(int argc, char **argv)
-{
-    argp_parse(&cmd_argp, argc, argv, 0, 0, this);
-    if (jackSessionUuid.size() && jackSessionFile.size())
-        restoreJackSession = true;
-}*/
 
 #ifdef GUI_FLTK
 void GuiThreadMsg::processGuiMessages()
@@ -1392,7 +1232,14 @@ void GuiThreadMsg::processGuiMessages()
             if (!guiMaster)
                 std::cerr << "Error starting Main UI!" << std::endl;
             else
+            {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+
+                if (synth->getRuntime().audioEngine < 1)
+                    alert(synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
+                if (synth->getRuntime().midiEngine < 1)
+                    alert(synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+            }
         }
         else if (guiMaster)
         {

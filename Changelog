@@ -1,5 +1,8 @@
 yoshimi 2.0.2M
 
+2021-7-1 Hermann
+* New Feature: support for automated tests via CLI.
+
 2021-6-29 Will
 * BugFix: Loading state not adding to history.
 

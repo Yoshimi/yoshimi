@@ -48,7 +48,9 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth, Oscil
     fft(fft_),
     oscilupdate(params),
     res(res_),
-    randseed(1)
+    randseed(1),
+    basePrng{},
+    harmonicPrng{}
 {
     FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);
     if (!tmpsmps)
@@ -940,13 +942,28 @@ void OscilGen::shiftharmonics(void)
 }
 
 
+/* Brings the pseudo random generators within this OscilGen instance into a reproducible state.
+ * The basePrng is (re)seeded through this function, called from prepare() and thus when a new
+ * OscilGen instance is created, or when resetting to defaults prior to loading a preset.
+ * With each NoteON, a new randseed is drawn from this basePrng, and that local randseed is
+ * used for each call to get() to reset the harmonicPrng. Since NoteON happens at random times,
+ * after playing more than one note the relation between SynthEngine::prng and OscilGen::basePrng
+ * is essentially random.
+ * Note: reseed(int) is also used for automated testing, see SynthEngine::setReproducibleState(int) */
+void OscilGen::reseed(int value)
+{
+    basePrng.init(value);
+    newrandseed();
+    resetHarmonicPrng();
+}
+
+
+
 // Prepare the Oscillator
 void OscilGen::prepare(void)
 {
-    // with each NoteON, reseed local rand gen from global PRNG
-    // Since NoteON happens at random times, this actually injects entropy,
-    // because it is essentially random at which cycle position the global PRNG is just now
-    prng.init(synth->randomINT() + INT_MAX/2);
+    // reseed local PRNGs from SynthEngine PRNG
+    reseed(synth->randomINT() + INT_MAX/2);
 
     changebasefunction();
 
@@ -1182,12 +1199,6 @@ void OscilGen::get(float *smps, float freqHz)
 // Get the oscillator function
 void OscilGen::get(float *smps, float freqHz, int resonance)
 {
-    int nyquist;
-
-    // randseed was drawn in ADnote::ADnote()
-    // see also comment at top of OscilGen::prepare()
-    harmonicPrng.init(randseed);
-
     if (oldbasepar != params->Pbasefuncpar
         || oldbasefunc != params->Pcurrentbasefunc
         || oldhmagtype != params->Phmagtype
@@ -1225,9 +1236,13 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
     if (oscilupdate.checkUpdated())
         prepare();
 
+    // start harmonic randomisation from local randseed, drawn in ADnote::ADnote()
+    // see also comment at OscilGen::reseed()
+    resetHarmonicPrng();
+
     memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
-    nyquist = int(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    int nyquist = int(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (params->ADvsPAD)
         nyquist = synth->halfoscilsize;
     if (nyquist > synth->halfoscilsize)
@@ -1344,7 +1359,7 @@ int OscilGen::getPhase()
         return 0;
 
     int outpos;
-    outpos = (prng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (params->Prand - 64.0f) / 64.0f;
+    outpos = (basePrng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (params->Prand - 64.0f) / 64.0f;
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
     return outpos;
 }
