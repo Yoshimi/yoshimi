@@ -50,6 +50,12 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
     midi.lastDivSongBeat = 0;
     midi.lastDivMonotonicBeat = 0;
     midi.clockCount = 0;
+
+    for (int i = 0; i < ALSA_MIDI_BPM_MEDIAN_WINDOW; i++)
+        midi.prevBpms[i] = 120;
+    midi.prevBpmsPos = 0;
+    midi.prevClockUs = 0;
+
     little_endian = synth->getRuntime().isLittleEndian;
 }
 
@@ -125,6 +131,8 @@ std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
 
 bool AlsaEngine::openMidi(void)
 {
+    synth->setBPMAccurate(false);
+
     const char* port_name = "input";
     int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK) != 0)
@@ -496,8 +504,8 @@ void *AlsaEngine::AudioThread(void)
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     while (synth->getRuntime().runSynth)
     {
-        std::pair<float, float> beats(beatTracker->getBeatValues());
-        synth->setBeatValues(beats.first, beats.second);
+        BeatTracker::BeatValues beats(beatTracker->getBeatValues());
+        synth->setBeatValues(beats.songBeat, beats.monotonicBeat, beats.bpm);
 
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
@@ -811,19 +819,63 @@ void AlsaEngine::handleSongPos(float beat)
 
 void AlsaEngine::handleMidiClock()
 {
+    timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
+
+    float bpm = 1000000.0f * 60.0f / float((clock - midi.prevClockUs) * MIDI_CLOCKS_PER_BEAT);
+    if (++midi.prevBpmsPos >= ALSA_MIDI_BPM_MEDIAN_WINDOW)
+        midi.prevBpmsPos = 0;
+    midi.prevBpms[midi.prevBpmsPos] = bpm;
+
+    float tmpBpms[ALSA_MIDI_BPM_MEDIAN_WINDOW];
+    memcpy(tmpBpms, midi.prevBpms+midi.prevBpmsPos, (ALSA_MIDI_BPM_MEDIAN_WINDOW - midi.prevBpmsPos)
+           * sizeof(*midi.prevBpms));
+    memcpy(tmpBpms + ALSA_MIDI_BPM_MEDIAN_WINDOW - midi.prevBpmsPos, midi.prevBpms, midi.prevBpmsPos
+           * sizeof(*midi.prevBpms));
+
+    // To avoid fluctuations in the BPM value due to clock inaccuracies, sort
+    // all the most recent bpm values, and take the average of the middle part
+    // (an average median). For this, we use Bubble sort, but we only need to
+    // sort the half that we use.
+    for (int i = 0; i < (ALSA_MIDI_BPM_MEDIAN_WINDOW+ALSA_MIDI_BPM_MEDIAN_AVERAGE_WINDOW)/2; i++)
+    {
+        for (int j = i+1; j < ALSA_MIDI_BPM_MEDIAN_WINDOW; j++)
+        {
+            if (tmpBpms[i] > tmpBpms[j])
+            {
+                float tmp = tmpBpms[i];
+                tmpBpms[i] = tmpBpms[j];
+                tmpBpms[j] = tmp;
+            }
+        }
+    }
+    bpm = 0;
+    for (int i = (ALSA_MIDI_BPM_MEDIAN_WINDOW - ALSA_MIDI_BPM_MEDIAN_AVERAGE_WINDOW) / 2;
+         i < (ALSA_MIDI_BPM_MEDIAN_WINDOW + ALSA_MIDI_BPM_MEDIAN_AVERAGE_WINDOW) / 2; i++)
+        bpm += tmpBpms[i];
+    bpm /= (float)ALSA_MIDI_BPM_MEDIAN_AVERAGE_WINDOW;
+
+    midi.prevClockUs = clock;
+
     midi.clockCount++;
 
     float inc = midi.clockCount / (float)MIDI_CLOCKS_PER_BEAT;
 
-    std::pair<float, float> beats(midi.lastDivSongBeat + inc, midi.lastDivMonotonicBeat + inc);
+    BeatTracker::BeatValues beats
+    {
+        midi.lastDivSongBeat + inc,
+        midi.lastDivMonotonicBeat + inc,
+        bpm
+    };
 
     beats = beatTracker->setBeatValues(beats);
 
     if (midi.clockCount >= MIDI_CLOCK_DIVISION) {
         // Possibly preserve wrapped around beat values, if we are on the start
         // of a clock division.
-        midi.lastDivSongBeat = beats.first;
-        midi.lastDivMonotonicBeat = beats.second;
+        midi.lastDivSongBeat = beats.songBeat;
+        midi.lastDivMonotonicBeat = beats.monotonicBeat;
         midi.clockCount = 0;
     }
 }

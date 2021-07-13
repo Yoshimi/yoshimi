@@ -30,6 +30,12 @@
 
 #include "Effects/Effect.h"
 
+// The ratio which, when exceeded, causes the echo effect to update its internal
+// delay. If not exceeded, the delay remains constant even if the BPM
+// changes. This is to combat fluctuations in inaccurate BPM sources, such as
+// ALSA. Must be a number above 1.0f.
+#define ECHO_INACCURATE_BPM_THRESHOLD 1.02f
+
 class SynthEngine;
 
 class Echo : public Effect
@@ -54,6 +60,7 @@ class Echo : public Effect
         unsigned char Plrdelay; // 4 L/R delay difference
         unsigned char Pfb;      // 6 Feedback
         unsigned char Phidamp;  // 7 Dampening of the Echo
+        bool Pbpm;
 
         void setvolume(unsigned char Pvolume_);
         void setdelay(unsigned char Pdelay_);
@@ -62,17 +69,19 @@ class Echo : public Effect
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        InterpolatedParameter fb, hidamp;
+        synth::InterpolatedValue<float> fb, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);
         float *ldelay;
         float *rdelay;
+        int maxdelay;
         float  oldl, oldr; // pt. lpf
 
-        int kl, kr;
+        float prevBeat; // Used to calculate BPM.
 
-        SynthEngine *synth;
+        int realposl, realposr;
+        synth::InterpolatedValue<int> lxfade, rxfade;
 };
 
 class Echolimit

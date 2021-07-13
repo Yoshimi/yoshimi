@@ -64,15 +64,14 @@ namespace {
 
 
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
     oldl(NULL),
     oldr(NULL),
     xn1l(NULL),
     xn1r(NULL),
     yn1l(NULL),
-    yn1r(NULL),
-    synth(_synth)
+    yn1r(NULL)
 {
     analog_setup();
     setpreset(Ppreset);
@@ -400,6 +399,8 @@ void Phaser::setpreset(unsigned char npreset)
             npreset = NUM_PRESETS - 1;
         for (int n = 0; n < PRESET_SIZE; ++n)
             changepar(n, presets[npreset][n]);
+        // All presets use no BPM syncing.
+        changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
     }
     else
@@ -489,6 +490,14 @@ void Phaser::changepar(int npar, unsigned char value)
         case 14:
             Panalog = value;
             break;
+
+        case EFFECT::control::bpm:
+            lfo.Pbpm = value;
+            break;
+
+        case EFFECT::control::bpmStart:
+            lfo.PbpmStart = value;
+            break;
     }
     Pchanged = true;
 }
@@ -516,6 +525,8 @@ unsigned char Phaser::getpar(int npar)
         case 12: return Phyper;
         case 13: return Pdistortion;
         case 14: return Panalog;
+        case EFFECT::control::bpm: return lfo.Pbpm;
+        case EFFECT::control::bpmStart: return lfo.PbpmStart;
         default: break;
     }
     return 0;
@@ -577,7 +588,13 @@ float Phaserlimit::getlimits(CommandBlock *getData)
             max = 1;
             canLearn = 0;
             break;
-        case 16:
+        case EFFECT::control::bpm:
+            max = 1;
+            canLearn = 0;
+            break;
+        case EFFECT::control::bpmStart:
+            break;
+        case EFFECT::control::preset:
             max = 11;
             canLearn = 0;
             break;

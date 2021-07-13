@@ -43,7 +43,6 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
-    InterpolatedParameter::setSampleRate(synth->samplerate_f);
     defaults();
 }
 
@@ -248,8 +247,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
-    // No interpolation for system effect currently (direct target value).
-    return (!efx) ? 1.0f : efx->outvolume.getTargetValue();
+    return (!efx) ? 1.0f : efx->outvolume.getValue();
 }
 
 

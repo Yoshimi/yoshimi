@@ -28,42 +28,14 @@
 #define EFFECT_H
 
 #include "Params/FilterParams.h"
-
-class InterpolatedParameter
-{
-    public:
-        InterpolatedParameter();
-        static void setSampleRate(float sampleRate);
-        void setInterpolationLength(float msecs);
-        void setTargetValue(float value);
-        float getValue() const
-        {
-            return currentValue;
-        }
-        float getTargetValue() const
-        {
-            return targetValue;
-        }
-        // Get value and advance to the next sample.
-        float getAndAdvanceValue();
-        // Advance to next sample(s) without getting value.
-        void advanceValue();
-        void advanceValue(int samples);
-
-    private:
-        static float sampleRate;
-
-        float targetValue;
-        float currentValue;
-        float samplesLeft;
-        float samplesToInterpolate;
-};
+#include "Misc/SynthHelper.h"
 
 class Effect
 {
     public:
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
-               FilterParams *filterpars_, unsigned char Ppreset_);
+               FilterParams *filterpars_, unsigned char Ppreset_,
+               SynthEngine *synth_);
         virtual ~Effect() { };
 
         virtual void setpreset(unsigned char npreset) = 0;
@@ -76,8 +48,8 @@ class Effect
         unsigned char Ppreset; // Currentl preset
         float *const efxoutl;
         float *const efxoutr;
-        InterpolatedParameter outvolume;
-        InterpolatedParameter volume;
+        synth::InterpolatedValue<float> outvolume;
+        synth::InterpolatedValue<float> volume;
         FilterParams *filterpars;
 
     protected:
@@ -86,10 +58,12 @@ class Effect
 
         bool  insertion;
         char  Ppanning;
-        InterpolatedParameter pangainL;
-        InterpolatedParameter pangainR;
+        synth::InterpolatedValue<float> pangainL;
+        synth::InterpolatedValue<float> pangainR;
         char  Plrcross; // L/R mix
-        InterpolatedParameter lrcross;
+        synth::InterpolatedValue<float> lrcross;
+
+        SynthEngine *synth;
 };
 
 #endif

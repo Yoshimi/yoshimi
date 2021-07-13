@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 
+#include "Misc/NumericFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectLFO.h"
 
@@ -32,6 +33,7 @@ EffectLFO::EffectLFO(SynthEngine *_synth) :
     Prandomness(0),
     PLFOtype(0),
     Pstereo(64),
+    Pbpm(0),
     xl(0.0f),
     xr(0.0f),
     ampl1(_synth->numRandom()),
@@ -65,7 +67,10 @@ void EffectLFO::updateparams(void)
     if (PLFOtype > 1)
         PLFOtype = 1; // this has to be updated if more lfo's are added
     lfotype = PLFOtype;
-    xr = fmodf(xl + (Pstereo - 64.0f) / 127.0f + 1.0f, 1.0f);
+    xdelta = fmodf((Pstereo - 64.0f) / 127.0f + 1.0f, 1.0f);
+    xr = xl + xdelta;
+    if (xr > 1.0f)
+        xr -= 1.0f;
 }
 
 
@@ -100,24 +105,52 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
     out = getlfoshape(xl);
     if (lfotype == 0 || lfotype == 1)
         out *= (ampl1 + xl * (ampl2 - ampl1));
-    xl += incx;
-    if (xl > 1.0f)
-    {
-        xl -= 1.0f;
-        ampl1 = ampl2;
-        ampl2 = (1.0f - lfornd) + lfornd * synth->numRandom();
-    }
     *outl = (out + 1.0f) * 0.5f;
 
     out = getlfoshape(xr);
     if (lfotype == 0 || lfotype == 1)
         out *= (ampr1 + xr * (ampr2 - ampr1));
-    xr += incx;
-    if (xr > 1.0f)
-    {
-        xr -= 1.0f;
-        ampr1 = ampr2;
-        ampr2 = (1.0f - lfornd) + lfornd * synth->numRandom();
-    }
     *outr = (out + 1.0f) * 0.5f;
+
+    if (Pbpm)
+    {
+        std::pair<float, float> frac = func::LFOfreqBPMFraction((float)Pfreq / 127.0f);
+        float oldx = xl;
+        xl = fmodf((float)PbpmStart / 127.0f +
+                   synth->getSongBeat() * frac.first / frac.second,
+                   1.0f);
+        if (xl < 0.5 && oldx >= 0.5)
+        {
+            ampl1 = ampl2;
+            ampl2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+        }
+
+        oldx = xr;
+        xr = xl + xdelta;
+        if (xr > 1.0f)
+            xr -= 1.0f;
+        if (xr < 0.5 && oldx >= 0.5)
+        {
+            ampr1 = ampr2;
+            ampr2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+        }
+    }
+    else
+    {
+        xl += incx;
+        if (xl > 1.0f)
+        {
+            xl -= 1.0f;
+            ampl1 = ampl2;
+            ampl2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+        }
+
+        xr += incx;
+        if (xr > 1.0f)
+        {
+            xr -= 1.0f;
+            ampr1 = ampr2;
+            ampr2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+        }
+    }
 }

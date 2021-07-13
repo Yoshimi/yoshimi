@@ -67,6 +67,13 @@ class MusicIO
 class BeatTracker
 {
     public:
+        struct BeatValues {
+            float songBeat;
+            float monotonicBeat;
+            float bpm;
+        };
+
+    public:
         BeatTracker();
         virtual ~BeatTracker();
 
@@ -79,11 +86,11 @@ class BeatTracker
         // storing the wrapped value in order to preserve precision when the
         // beat count gets high. The wrapped around value is guaranteed to
         // divide all possible LFO fractions.
-        virtual std::pair<float, float> setBeatValues(std::pair<float, float> beats) = 0;
-        virtual std::pair<float, float> getBeatValues() = 0;
+        virtual BeatValues setBeatValues(BeatValues beats) = 0;
+        virtual BeatValues getBeatValues() = 0;
 
     protected:
-        void adjustMonotonicRounding(std::pair<float, float> *beats);
+        void adjustMonotonicRounding(BeatValues *beats);
 
     private:
         float songVsMonotonicBeatDiff;
@@ -98,8 +105,8 @@ class MultithreadedBeatTracker : public BeatTracker
         // These two functions are mutually thread safe, even though they
         // operate on the same data. The first is usually called from the MIDI
         // thread, the second from the audio thread.
-        std::pair<float, float> setBeatValues(std::pair<float, float> beats);
-        std::pair<float, float> getBeatValues();
+        BeatValues setBeatValues(BeatValues beats);
+        BeatValues getBeatValues();
 
     private:
         // Current and last time and beats of the MIDI clock.
@@ -109,6 +116,7 @@ class MultithreadedBeatTracker : public BeatTracker
         volatile uint64_t timeUs;
         volatile float    songBeat;
         volatile float    monotonicBeat;
+        volatile float    bpm;
         pthread_mutex_t   mutex;
 };
 
@@ -117,12 +125,11 @@ class SinglethreadedBeatTracker : public BeatTracker
     public:
         SinglethreadedBeatTracker();
 
-        std::pair<float, float> setBeatValues(std::pair<float, float> beats);
-        std::pair<float, float> getBeatValues();
+        BeatValues setBeatValues(BeatValues beats);
+        BeatValues getBeatValues();
 
     private:
-        float songBeat;
-        float monotonicBeat;
+        BeatValues beats;
 };
 
 #endif

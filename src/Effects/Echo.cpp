@@ -24,6 +24,7 @@
 
 */
 
+#include "Misc/NumericFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 #include <iostream>
@@ -43,13 +44,16 @@ static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
     };
 
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pdelay(60),
     Plrdelay(100),
+    fb(1, _synth->samplerate),
+    hidamp(1, _synth->samplerate),
     lrdelay(0),
     ldelay(NULL),
     rdelay(NULL),
-    synth(_synth)
+    lxfade(1, _synth->samplerate_f),
+    rxfade(1, _synth->samplerate_f)
 {
     setvolume(50);
     setfb(40);
@@ -57,7 +61,12 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
     Pchanged = false;
+    maxdelay = 5 * synth->samplerate;
+    ldelay = new float[maxdelay];
+    rdelay = new float[maxdelay];
+    realposl = realposr = 1;
     cleanup();
+    initdelays();
 }
 
 
@@ -71,8 +80,8 @@ Echo::~Echo()
 // Cleanup the effect
 void Echo::cleanup(void)
 {
-    memset(ldelay, 0, dl * sizeof(float));
-    memset(rdelay, 0, dr * sizeof(float));
+    memset(ldelay, 0, maxdelay * sizeof(float));
+    memset(rdelay, 0, maxdelay * sizeof(float));
     oldl = oldr = 0.0f;
 }
 
@@ -80,22 +89,42 @@ void Echo::cleanup(void)
 // Initialize the delays
 void Echo::initdelays(void)
 {
-    // todo: make this adjust insted of destroy old delays
-    kl = kr = 0;
+    if (Pbpm)
+    {
+        int olddelay = delay;
+
+        std::pair<float, float> frac = func::LFOfreqBPMFraction((float)Pdelay / 127.0f);
+        delay = roundf(60.0f * synth->samplerate_f * frac.first / (synth->getBPM() * frac.second));
+        if (delay > maxdelay)
+            delay = maxdelay;
+
+        if (!synth->isBPMAccurate())
+        {
+            // If we don't have an accurate BPM source, we may have
+            // fluctuations. Reject delay changes less than a certain amount to
+            // prevent Echo artifacts.
+
+            float ratio;
+            if (delay > olddelay)
+                ratio = (float)delay / (float)olddelay;
+            else
+                ratio = (float)olddelay / (float)delay;
+            if (ratio < ECHO_INACCURATE_BPM_THRESHOLD)
+                delay = olddelay;
+        }
+    }
+    else
+    {
+        delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
+        delay += 1; // 0 .. 1.5 sec
+    }
+
     dl = delay - lrdelay;
     if (dl < 1)
         dl = 1;
     dr = delay + lrdelay;
     if (dr < 1)
         dr = 1;
-
-    if (ldelay != NULL)
-        delete [] ldelay;
-    if (rdelay != NULL)
-        delete [] rdelay;
-    ldelay = new float[dl];
-    rdelay = new float[dr];
-    cleanup();
 }
 
 
@@ -103,12 +132,50 @@ void Echo::initdelays(void)
 void Echo::out(float* smpsl, float* smpsr)
 {
     float l, r;
-    float ldl = ldelay[kl];
-    float rdl = rdelay[kr];
+    float ldl;
+    float rdl;
+
+    if (Pbpm)
+        initdelays();
+
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        ldl = ldelay[kl] + float(1e-20); // anti-denormal included
-        rdl = rdelay[kr] + float(1e-20); // anti-denormal included
+        lxfade.setTargetValue(dl);
+        rxfade.setTargetValue(dr);
+
+        int targetpos;
+
+        targetpos = realposl - lxfade.getNewValue();
+        if (targetpos < 0)
+            targetpos += maxdelay;
+        ldl = ldelay[targetpos];
+
+        targetpos = realposr - rxfade.getNewValue();
+        if (targetpos < 0)
+            targetpos += maxdelay;
+        rdl = rdelay[targetpos];
+
+        if (lxfade.isInterpolating())
+        {
+            targetpos = realposl - lxfade.getOldValue();
+            if (targetpos < 0)
+                targetpos += maxdelay;
+
+            ldl = ldelay[targetpos] * (1.0f - lxfade.factor()) + ldl * lxfade.factor();
+        }
+
+        if (rxfade.isInterpolating())
+        {
+            targetpos = realposr - rxfade.getOldValue();
+            if (targetpos < 0)
+                targetpos += maxdelay;
+
+            rdl = rdelay[targetpos] * (1.0f - rxfade.factor()) + rdl * rxfade.factor();
+        }
+
+        ldl += float(1e-20); // anti-denormal included
+        rdl += float(1e-20); // anti-denormal included
+
         l = ldl * (1.0 - lrcross.getValue()) + rdl * lrcross.getValue();
         r = rdl * (1.0 - lrcross.getValue()) + ldl * lrcross.getValue();
         lrcross.advanceValue();
@@ -123,16 +190,19 @@ void Echo::out(float* smpsl, float* smpsr)
         fb.advanceValue();
 
         // LowPass Filter
-        ldelay[kl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
-        rdelay[kr] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
+        ldelay[realposl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
+        rdelay[realposl] = rdl = rdl * hidamp.getValue() + oldr * (1.0f - hidamp.getValue());
         hidamp.advanceValue();
         oldl = ldl;
         oldr = rdl;
 
-        if (++kl >= dl)
-            kl = 0;
-        if (++kr >= dr)
-            kr = 0;
+        if (++realposl >= maxdelay)
+            realposl = 0;
+        if (++realposr >= maxdelay)
+            realposr = 0;
+
+        lxfade.advanceValue();
+        rxfade.advanceValue();
     }
 }
 
@@ -160,8 +230,6 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
-    delay += 1; // 0 .. 1.5 sec
     initdelays();
 }
 
@@ -202,6 +270,8 @@ void Echo::setpreset(unsigned char npreset)
             changepar(n, presets[npreset][n]);
         if (insertion)
             changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        // All presets use no BPM syncing.
+        changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
     }
     else
@@ -255,6 +325,11 @@ void Echo::changepar(int npar, unsigned char value)
         case 6:
             sethidamp(value);
             break;
+
+        case EFFECT::control::bpm:
+            Pbpm = value;
+            break;
+
         default:
             Pchanged = false;
     }
@@ -273,6 +348,7 @@ unsigned char Echo::getpar(int npar)
         case 4: return Plrcross;
         case 5: return Pfb;
         case 6: return Phidamp;
+        case EFFECT::control::bpm: return Pbpm;
         default: break;
     }
     return 0; // in case of bogus parameter number
@@ -310,7 +386,11 @@ float Echolimit::getlimits(CommandBlock *getData)
             break;
         case 6:
             break;
-        case 16:
+        case EFFECT::control::bpm:
+            max = 1;
+            canLearn = 0;
+            break;
+        case EFFECT::control::preset:
             max = 8;
             canLearn = 0;
             break;

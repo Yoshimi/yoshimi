@@ -55,8 +55,10 @@ LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
         {
             prevMonotonicBeat = synth->getMonotonicBeat();
             prevBpmFrac = getBpmFrac();
-            startPhase = remainderf(startPhase - prevMonotonicBeat
-                                    * prevBpmFrac.first / prevBpmFrac.second, 1.0f);
+            startPhase = fmodf(startPhase - prevMonotonicBeat
+                               * prevBpmFrac.first / prevBpmFrac.second, 1.0f);
+            if (startPhase < 0)
+                startPhase += 1.0f;
         }
     }
     else if (lfopars->Pbpm == 0)
@@ -270,7 +272,9 @@ float LFO::lfoout()
                     // Since we reset the phase on every cycle, if the BPM
                     // fraction changes we need to adapt startPhase or we will
                     // get an abrupt phase change.
-                    startPhase = remainderf(x - prevMonotonicBeat * frac.first / frac.second, 1.0f);
+                    startPhase = fmodf(x - prevMonotonicBeat * frac.first / frac.second, 1.0f);
+                    if (startPhase < 0)
+                        startPhase += 1.0f;
                     prevBpmFrac = frac;
                 }
                 newBeat = synth->getMonotonicBeat();

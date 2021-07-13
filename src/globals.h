@@ -1063,6 +1063,8 @@ namespace EFFECT // usage EFFECT::type::none
         panning, // band for EQ
         frequency, // time reverb, delay echo, L/R-mix dist, Not EQ
         preset = 16, // not EQ
+        bpm,
+        bpmStart,
         changed = 129 // not EQ
     };
 

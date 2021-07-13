@@ -1133,6 +1133,9 @@ string convert_value(ValueType type, float val)
             f = (powf(2.0f, (int)val / 127.0f * 10.0f) - 1.0f) * 0.03f;
             return variable_prec_units(f, "Hz", 3);
 
+        case VC_FXlfofreqBPM:
+            return freqBPMStr(val / 127.0f);
+
         case VC_FXChorusDepth:
             f = powf(8.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
             return variable_prec_units(f, "ms", 2, true);

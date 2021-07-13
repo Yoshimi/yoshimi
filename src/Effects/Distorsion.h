@@ -63,17 +63,15 @@ class Distorsion : public Effect, WaveShapeSamples
         void setlpf(unsigned char Plpf_);
         void sethpf(unsigned char Phpf_);
 
-        InterpolatedParameter level;
+        synth::InterpolatedValue<float> level;
 
         // Real Parameters
         AnalogFilter *lpfl;
         AnalogFilter *lpfr;
         AnalogFilter *hpfl;
         AnalogFilter *hpfr;
-        InterpolatedParameter lpffr;
-        InterpolatedParameter hpffr;
-
-        SynthEngine *synth;
+        synth::InterpolatedValue<float> lpffr;
+        synth::InterpolatedValue<float> hpffr;
 };
 
 class Distlimit

@@ -73,8 +73,6 @@ class Alienwah : public Effect
         complex<float> oldclfol, oldclfor;
         int oldk;
 
-        SynthEngine *synth;
-
 };
 
 class Alienlimit

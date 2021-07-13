@@ -67,7 +67,7 @@ class Chorus : public Effect
         // Internal Values
         float depth;
         float delay;
-        InterpolatedParameter fb;
+        synth::InterpolatedValue<float> fb;
         float dl1;
         float dl2;
         float dr1;
@@ -84,8 +84,6 @@ class Chorus : public Effect
         int dlhi2;
         float dllo;
         float mdel;
-
-        SynthEngine *synth;
 };
 class Choruslimit
 {
