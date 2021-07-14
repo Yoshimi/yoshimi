@@ -595,7 +595,7 @@ static std::string waveformlist [] = {
     "GAUss","",
     "DIOde","",
     "ABSsine","",
-    "PULsesine","",
+    "PSIne","",
     "STRetchsine","",
     "CHIrp","",
     "ASIne","",

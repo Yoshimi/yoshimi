@@ -1,5 +1,12 @@
 yoshimi 2.0.2M
 
+2021-7-14 Will
+* Merged in Effects BPM control from Kristian.
+* Adjusted to CLI waveform list.
+* Added (disabled) command block reporting in
+  Interchange->resolveReplies()
+* Started work on User Guide Envelopes and LFOs.
+
 2021-7-1 Hermann
 * New Feature: support for automated tests via CLI.
 

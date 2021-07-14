@@ -1621,6 +1621,13 @@ float InterChange::readAllData(CommandBlock *getData)
 
 void InterChange::resolveReplies(CommandBlock *getData)
 {
+    if (false)
+    {
+        std::cout << "\nType " << int(getData->data.type) << " Action " << int(getData->data.source) << " Control " << int(getData->data.control) << " Value " << getData->data.value
+        << "\nPart " << int(getData->data.part) << " Kit " << int(getData->data.kit) << " Engine " << int(getData->data.engine)
+        << "\nInsert " << int(getData->data.insert) << " Parameter " << int(getData->data.parameter) << " Offset " << int(getData->data.offset)
+        << "\nMiscMsg " << int(getData->data.miscmsg) << " Spare1 " << int(getData->data.spare1) << " Spare0 " << int(getData->data.spare0) << std::endl;
+    }
     unsigned char source = getData->data.source & TOPLEVEL::action::noAction;
     // making sure there are no stray top bits.
     if (source == TOPLEVEL::action::noAction)
