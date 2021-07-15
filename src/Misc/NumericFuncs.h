@@ -26,6 +26,7 @@
 #include <cmath>
 #include <cstddef>
 #include "globals.h"
+#include "Interface/TextLists.h"
 
 namespace func {
 
@@ -191,6 +192,16 @@ inline void setAllPan(float position, float& left, float& right, unsigned char c
             left = 0.7;
             right = 0.7;
     }
+}
+
+inline std::string bpm2text( float val)
+{
+    // The text list referenced below will need to be altered if this is ever
+    // changed. Remember that intervals need to be preserved too, not just the
+    // total number of steps, otherwise saved instruments will get incorrect
+    // values.
+    static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS table.");
+    return LFObpm[int(roundf(val * (LFO_BPM_STEPS + 2)))];
 }
 
 inline float quantizedLFOfreqBPM(float value)

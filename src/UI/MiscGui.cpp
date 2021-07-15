@@ -21,6 +21,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Misc/NumericFuncs.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
 
@@ -30,6 +31,7 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
+using func::bpm2text;
 
 namespace { // Implementation details...
 
@@ -584,94 +586,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
 }
 
-static string freqBPMStr(float val)
-{
-    // The switch statement below will need to be altered if this is ever
-    // changed. Remember that intervals need to be preserved too, not just the
-    // total number of steps, otherwise saved instruments will get incorrect
-    // values.
-    static_assert(LFO_BPM_STEPS == 33, "Need to adjust LFO_BPM_STEPS table.");
-    return LFObpm[int(roundf(val * (LFO_BPM_STEPS + 2)))];
-    /*
-     * switch replaced by call into Interface/TextLists.h
-     * so it is now unifed with CLI response - Will.
-     */
+// static string freqBPMStr(float val)
+// This has been moved as bpm2text in Misc/NumericFuncs.h with other BPM shared functions
 
-    /*switch ((int)roundf(val * (LFO_BPM_STEPS + 2))) {
-    case 0:
-        // Some room to expand in the future. Fallthrough.
-    case 1:
-        return string("1/16 BPM");
-    case 2:
-        return string("1/15 BPM");
-    case 3:
-        return string("1/14 BPM");
-    case 4:
-        return string("1/13 BPM");
-    case 5:
-        return string("1/12 BPM");
-    case 6:
-        return string("1/11 BPM");
-    case 7:
-        return string("1/10 BPM");
-    case 8:
-        return string("1/9 BPM");
-    case 9:
-        return string("1/8 BPM");
-    case 10:
-        return string("1/7 BPM");
-    case 11:
-        return string("1/6 BPM");
-    case 12:
-        return string("1/5 BPM");
-    case 13:
-        return string("1/4 BPM");
-    case 14:
-        return string("1/3 BPM");
-    case 15:
-        return string("1/2 BPM");
-    case 16:
-        return string("2/3 BPM");
-    case 17:
-        return string("1/1 BPM");
-    case 18:
-        return string("3/2 BPM");
-    case 19:
-        return string("2/1 BPM");
-    case 20:
-        return string("3/1 BPM");
-    case 21:
-        return string("4/1 BPM");
-    case 22:
-        return string("5/1 BPM");
-    case 23:
-        return string("6/1 BPM");
-    case 24:
-        return string("7/1 BPM");
-    case 25:
-        return string("8/1 BPM");
-    case 26:
-        return string("9/1 BPM");
-    case 27:
-        return string("10/1 BPM");
-    case 28:
-        return string("11/1 BPM");
-    case 29:
-        return string("12/1 BPM");
-    case 30:
-        return string("13/1 BPM");
-    case 31:
-        return string("14/1 BPM");
-    case 32:
-        return string("15/1 BPM");
-    case 34:
-        // Some room to expand in the future. Fallthrough.
-    case 33:
-        return string("16/1 BPM");
-    default:
-        return string("Unknown BPM");
-    }*/
-}
 
 string convert_value(ValueType type, float val)
 {
@@ -718,7 +635,7 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "Hz", 3);
 
         case VC_LFOfreqBPM:
-            return freqBPMStr(val);
+            return bpm2text(val);
 
         case VC_LFOdepthFreq: // frequency LFO
             f=powf(2.0f,(int)val/127.0f*11.0f)-1.0f;
@@ -1134,7 +1051,7 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "Hz", 3);
 
         case VC_FXlfofreqBPM:
-            return freqBPMStr(val / 127.0f);
+            return bpm2text(val / 127.0f);
 
         case VC_FXChorusDepth:
             f = powf(8.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms

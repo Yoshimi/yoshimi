@@ -4,6 +4,8 @@ yoshimi 2.0.2M
 * Implemented Effects BPM control for CLI.
 * Updated Effects in new user guide.
 
+* Refined and unified BPM reporting.
+
 2021-7-14 Will
 * Merged in Effects BPM control from Kristian.
 * Adjusted to CLI waveform list.

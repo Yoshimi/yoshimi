@@ -31,6 +31,7 @@ using std::to_string;
 
 using func::string2int;
 using func::stringCaps;
+using func::bpm2text;
 
 DataText::DataText() :
     synth(nullptr),
@@ -2806,10 +2807,10 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
     switch (control)
     {
         case LFOINSERT::control::speed:
-            if (getData->data.offset == 1)
+            if (getData->data.offset == 1 && addValue == true)
             {
                 float value = getData->data.value;
-                contstr = "BPM ratio " + LFObpm[int(roundf(value * (LFO_BPM_STEPS + 2)))];
+                contstr += bpm2text(value);
                 showValue = false;
             }
             else
@@ -3271,6 +3272,8 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         contstr = ""; //" Control " + to_string(control + 1);
     string controlType = "";
     int ref = control; // we frequently modify this
+    bool isBPM = (ref == 2 && offset == 1);
+    //std::cout << "isbpm " << int(isBPM) << std::endl;
     switch (kititem)
     {
         case EFFECT::type::none:
@@ -3306,6 +3309,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             if (ref > 6) // there is no 7-16 in the list names
                 ref -= 10;
             controlType = echolist[ref * 2];
+            if (addValue & isBPM)
+            {
+                showValue = false;
+                contstr += (" " + bpm2text(float(value) / 127.0f));
+            }
             break;
         case EFFECT::type::chorus:
         {
@@ -3332,6 +3340,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                         contstr += " - on";
                     else
                         contstr+= " - off";
+                }
+                else if (addValue & isBPM)
+                {
+                    showValue = false;
+                    contstr += (" " + bpm2text(float(value) / 127.0f));
                 }
             }
             break;
@@ -3362,6 +3375,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                         contstr = " - off";
                         break;
                 }
+                if (addValue & isBPM)
+                {
+                    showValue = false;
+                    contstr += (" " + bpm2text(float(value) / 127.0f));
+                }
             }
             break;
         case EFFECT::type::alienWah:
@@ -3376,6 +3394,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                     contstr = " Triangle";
                 else
                     contstr = " Sine";
+            }
+            if (addValue & isBPM)
+            {
+                showValue = false;
+                contstr += (" " + bpm2text(float(value) / 127.0f));
             }
             break;
         case EFFECT::type::distortion:
@@ -3461,6 +3484,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                     else
                         contstr+= " - off";
                 }
+            }
+            if (addValue & isBPM)
+            {
+                showValue = false;
+                contstr += (" " + bpm2text(float(value) / 127.0f));
             }
             break;
 

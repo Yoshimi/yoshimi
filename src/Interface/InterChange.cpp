@@ -6341,6 +6341,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         return;
     }
 
+    if (eff->geteffectpar(EFFECT::control::bpm) == 1)
+        getData->data.offset = 1; // mark this for reporting in Data2Text
 
     if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
