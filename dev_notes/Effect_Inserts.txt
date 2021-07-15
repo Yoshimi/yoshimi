@@ -30,6 +30,7 @@ Echo
 6   Damping
 
 16 Preset number (0-8)
+17  BPM
 
 
 Chorus
@@ -47,6 +48,7 @@ Chorus
 11  Subtract output (0-1)
 
 16  Preset number (0-9)
+17  BPM
 
 
 Phaser
@@ -67,6 +69,7 @@ Phaser
 14  Analog (0-1)
 
 16  Preset number (0-11)
+17  BPM
 
 
 AlienWah
@@ -83,6 +86,7 @@ AlienWah
 10  Phase
 
 16  Preset number (0-3)
+17  BPM
 
 
 Distortion
@@ -92,7 +96,7 @@ Distortion
 3   Drive
 4   Output level
 5   Type (0-13)
-6   Nagative (0-1)
+6   Negative (0-1)
 7   Low pass filter
 8   High pass filter
 9   Stereo (0/1)
@@ -126,3 +130,4 @@ DynFilter
 9   Rate that amplitude changes filter
 
 16  Preset number (0-4)
+17  BPM

@@ -1067,15 +1067,15 @@ static std::string fx_presets [] = {
 
 // effect controls
 static std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "@end"};
-static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM",  "@end"};
-static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none11", "SUB", "@end"};
-static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "@end"};
-static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "@end"};
+static std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM", "none7", "none8", "none9", "none10", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
+static std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none10", "SUB", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
+static std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "none15", "none16", "BPM", "@end"};
+static std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
 static std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV", "LOW", "HIG", "STE", "FIL", "@end"};
 static std::string effdistypes [] = {"ATAn", "ASYm1", "POWer", "SINe", "QNTs", "ZIGzag", "LMT", "ULMt", "LLMt", "ILMt", "CLIp", "AS2", "PO2", "SGM", "@end"};
 static std::string effeq [] = {"LEV", "BAN", "FIL", "FRE", "GAI", "Q", "STA"};
 static std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEAk", "LOW shelf", "HIGh shelf", "@end"};
-static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "@end"};
+static std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
 
 // common controls
 static std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "@end"};

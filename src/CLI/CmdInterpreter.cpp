@@ -1061,6 +1061,13 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     int par = nFX;
     int value;
     string dest = "";
+    int effClass;
+    if (bitTest(context, LEVEL::Part))
+        effClass = npart;
+    else if (bitTest(context, LEVEL::InsFX))
+        effClass = TOPLEVEL::section::insertEffects;
+    else
+        effClass = TOPLEVEL::section::systemEffects;
 
     if (bitTest(context, LEVEL::Part))
     {
@@ -1199,11 +1206,30 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             }
             case 2:
                 selected = stringNumInList(name, effecho, 3);
+                if (selected == EFFECT::control::frequency && value == -1)
+                {
+                    input.skipChars();
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
+                    if (value < 0)
+                        return REPLY::done_msg; // error already reported
+                }
+                else if (selected == EFFECT::control::bpm && value == -1)
+                {
+                    input.skipChars();
+                    value = (input.toggle() == 1);
+                }
                 break;
             case 3:
             {
                 selected = stringNumInList(name, effchorus, 3);
-                if (selected == 4 && value == -1) // filtershape
+                if (selected == EFFECT::control::frequency && value == -1)
+                {
+                    input.skipChars();
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
+                    if (value < 0)
+                        return REPLY::done_msg; // error already reported
+                }
+                else if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1217,12 +1243,24 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     input.skipChars();
                     value = (input.toggle() == 1);
                 }
+                else if (selected == EFFECT::control::bpm && value == -1)
+                {
+                    input.skipChars();
+                    value = (input.toggle() == 1);
+                }
                 break;
             }
             case 4:
             {
                 selected = stringNumInList(name, effphaser, 3);
-                if (selected == 4 && value == -1) // filtershape
+                if (selected == EFFECT::control::frequency && value == -1)
+                {
+                    input.skipChars();
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
+                    if (value < 0)
+                        return REPLY::done_msg; // error already reported
+                }
+                else if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1236,12 +1274,24 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     input.skipChars();
                     value = (input.toggle() == 1);
                 }
+                else if (selected == EFFECT::control::bpm && value == -1)
+                {
+                    input.skipChars();
+                    value = (input.toggle() == 1);
+                }
                 break;
             }
             case 5:
             {
                 selected = stringNumInList(name, effalienwah, 3);
-                if (selected == 4 && value == -1) // filtershape
+                if (selected == EFFECT::control::frequency && value == -1)
+                {
+                    input.skipChars();
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
+                    if (value < 0)
+                        return REPLY::done_msg; // error already reported
+                }
+                else if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1249,6 +1299,11 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     else if (input.matchnMove(1, "triangle"))
                         value = 1;
                     else return REPLY::value_msg;
+                }
+                else if (selected == EFFECT::control::bpm && value == -1)
+                {
+                    input.skipChars();
+                    value = (input.toggle() == 1);
                 }
                 break;
             }
@@ -1302,7 +1357,14 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             case 8:
             {
                 selected = stringNumInList(name, effdynamicfilter, 3);
-                if (selected == 4 && value == -1) // filtershape
+                if (selected == EFFECT::control::frequency && value == -1)
+                {
+                    input.skipChars();
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
+                    if (value < 0)
+                        return REPLY::done_msg; // error already reported
+                }
+                else if (selected == 4 && value == -1) // filtershape
                 {
                     input.skipChars();
                     if (input.matchnMove(1, "sine"))
@@ -1321,6 +1383,11 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     bitSet(context, LEVEL::Filter);
                     return REPLY::done_msg;
                 }
+                else if (selected == EFFECT::control::bpm && value == -1)
+                {
+                    input.skipChars();
+                    value = (input.toggle() == 1);
+                }
             }
         }
         if (selected > -1)
@@ -1331,12 +1398,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 value = string2int(input);
             }
             //std::cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << std::endl;
-            if (bitTest(context, LEVEL::Part))
-                return sendNormal(synth, 0, value, controlType, selected, npart, EFFECT::type::none + nFXtype, nFX);
-            else if (bitTest(context, LEVEL::InsFX))
-                return sendNormal(synth, 0, value, controlType, selected, TOPLEVEL::section::insertEffects, EFFECT::type::none + nFXtype, nFX);
-            else
-                return sendNormal(synth, 0, value, controlType, selected, TOPLEVEL::section::systemEffects, EFFECT::type::none + nFXtype, nFX);
+            return sendNormal(synth, 0, value, controlType, selected, effClass, EFFECT::type::none + nFXtype, nFX);
         }
         // Continue cos it's not for us.
     }
@@ -1666,34 +1728,9 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
 
         else
         {
-            if (readControl(synth, 0, LFOINSERT::bpm, npart, kitNumber, engine, TOPLEVEL::insert::LFOgroup, group))
-            {
-                int num = string2int(input);
-                input.skipChars();
-                if (input.isAtEnd())
-                {
-                    synth->getRuntime().Log("BPM mode requires two values between 1 and 16");
-                    return REPLY::done_msg;
-                }
-                int div = string2int(input);
-                if (num > 3 && div > 3)
-                {
-                    synth->getRuntime().Log("Cannot have both values greater than 3");
-                    return REPLY::done_msg;
-                }
-                else if (num == div)
-                    num = div = 1;
-                value = func::BPMfractionLFOfreq(num, div);
-            }
-            else
-            {
-                value = string2float(input);
-                if (value < 0 || value > 1)
-                {
-                    synth->getRuntime().Log("frequency requires a value between 0.0 and 1.0");
-                    return REPLY::done_msg;
-                }
-            }
+            value = freqBPMset(input, readControl(synth, 0, LFOINSERT::bpm, npart, kitNumber, engine, TOPLEVEL::insert::LFOgroup, group), 1);
+            if (value < 0)
+                return REPLY::done_msg; // error already reported
         }
     }
     else if (input.matchnMove(1, "intensity"))
@@ -1745,6 +1782,41 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     if (value == -1)
         value = string2float(input);
     return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine, TOPLEVEL::insert::LFOgroup, group);
+}
+
+
+float CmdInterpreter::freqBPMset(Parser& input, bool isBPM, int max)
+{
+    float value;
+    if (isBPM)
+    {
+        int num = string2int(input);
+        input.skipChars();
+        if (input.isAtEnd())
+        {
+            synth->getRuntime().Log("BPM mode requires two values between 1 and 16");
+            value = -1;
+        }
+        int div = string2int(input);
+        if (num > 3 && div > 3)
+        {
+            synth->getRuntime().Log("Cannot have both values greater than 3");
+            value = -1;
+        }
+        else if (num == div)
+            num = div = 1;
+        value = func::BPMfractionLFOfreq(num, div) * max;
+    }
+    else
+    {
+        value = string2float(input);
+        if (value < 0 || value > max)
+        {
+            synth->getRuntime().Log("Frequency requires a value between 0.0 and " + to_string(max));
+            value = -1;
+        }
+    }
+    return value;
 }
 
 

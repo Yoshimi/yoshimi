@@ -93,6 +93,7 @@ class CmdInterpreter
         int effects(Parser& input, unsigned char controlType);
         int midiControllers(Parser& input, unsigned char controlType);
         int LFOselect(Parser& input, unsigned char controlType);
+        float freqBPMset(Parser& input, bool isBPM, int max = 127);
         int filterSelect(Parser& input, unsigned char controlType);
         int envelopeSelect(Parser& input, unsigned char controlType);
         int commandGroup(Parser& input);
