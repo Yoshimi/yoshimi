@@ -367,7 +367,7 @@ inline int listDir(std::list<string>* dirList, const string& dirName)
 
 /*
  * we return the contents as sorted, sequential lists in directories
- * and file of the required type as a series of leaf names (as the
+ * and files of the required type as a series of leaf names (as the
  * root directory is already known). This reduces the size of the
  * string to a manageable length.
  * Directories are prefixed to make them easier to identify.

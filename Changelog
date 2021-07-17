@@ -1,5 +1,11 @@
 yoshimi 2.0.2M
 
+2021-7-17 Will
+* Initialised LearnBlock in MIDIlearn.
+* Capitalised some GUI filter/effects control names.
+* Corrected spelling in User Guide.
+  Also made small additions and adjustments.
+
 2021-7-15 Will
 * Implemented Effects BPM control for CLI.
 * Updated Effects in new user guide.

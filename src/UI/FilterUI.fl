@@ -11,7 +11,7 @@ comment {FilterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016-2020 Will Godfrey
+Copyright 2016-2021 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -404,7 +404,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {               Filter Params}
+        label {             Filter Params}
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -450,7 +450,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
-          label {freq.tr.}
+          label {Freq.tr.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write);}
           tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -475,7 +475,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           class WidgetPDial
         }
         Fl_Dial gaindial {
-          label gain
+          label Gain
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write);}
           tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -528,7 +528,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Check_Button freqtrackoffset {
-        label {0 /+}
+        label { 0 /+}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTrackingRange, o->value(), TOPLEVEL::type::Write);}
         tooltip {Set frequency tracking range to 0%-200%} xywh {238 10 33 16} down_box DOWN_BOX labelsize 10 align 24
@@ -576,7 +576,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             xywh {490 105 95 50} box ENGRAVED_FRAME
           } {
             Fl_Dial formant_freq_dial {
-              label freq
+              label Freq
               callback {//
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -590,7 +590,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
               class WidgetPDial
             }
             Fl_Dial formant_amp_dial {
-              label amp
+              label Amp
               callback {//
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1

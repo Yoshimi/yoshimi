@@ -45,26 +45,26 @@ class MidiLearn : private DataText
         CommandBlock commandData;
 
         struct Control{
-            unsigned char type;
-            unsigned char control;
-            unsigned char part;
-            unsigned char kit;
-            unsigned char engine;
-            unsigned char insert;
-            unsigned char parameter;
-            unsigned char miscmsg;
+            unsigned char type = 0;
+            unsigned char control = 0;
+            unsigned char part = 0;
+            unsigned char kit = 0;
+            unsigned char engine = 0;
+            unsigned char insert = 0;
+            unsigned char parameter = 0;
+            unsigned char miscmsg = 0;
         };
 
         Control data;
 
         struct LearnBlock{
-            unsigned short int CC;
-            unsigned char chan;
-            unsigned char min_in;
-            unsigned char max_in;
-            unsigned char status; // up to here must be specified on input
-            int min_out; // defined programmatically
-            int max_out; // defined programmatically
+            unsigned short int CC = 0;
+            unsigned char chan = 0;
+            unsigned char min_in = 0;
+            unsigned char max_in = 0;
+            unsigned char status = 0; // up to here must be specified on input
+            int min_out = 0; // defined programmatically
+            int max_out = 0; // defined programmatically
             Control data; // controller to learn
         };
         bool learning;
