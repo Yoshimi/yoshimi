@@ -40,65 +40,67 @@
         <b>Gain</b> Filter output gain
       </li>
       <li>
-        <b>Freq.tr.</b> Amount of frequency tracking for the filter. If this is positive (rightmost) higher note frequencies will shift the filte cutoff frequency higher. Default range is -100% to 98% unless the checkbox above ('0 / +') is selected: in this case the range is 0% to 198%
+        <b>Freq.tr.</b> Amount of frequency tracking for the filter. If this is positive (rightmost) higher note frequencies will shift the filter cutoff frequency higher. Default range is -100% to 98% unless the checkbox above ('0 / +') is selected: in this case the range is 0% to 198%
       </li>
   </ul>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <h3 style="text-align: center">The Formant Filter</h3>
     <img src="images/formant.png" alt="Formant Window" class="image">
     <p>
-    When the formant window is selected, the <em>FilterType</em> list is covered with an Edit button, and clicking on this opens the window shown. These controls are <em>additional</em> to the others and adjust individual formants and their vowels.
+    When the formant window is selected, the <em>FilterType</em> list is covered with an Edit button, and clicking on this opens the window shown. These controls are <em>additional</em> to the others and adjust individual formants and the vowels they are contained in.  Also, remember that the formant filter interacts with the filter envelope.
+    <br><br>
+    For a deep understanding of formant filtering there is a highly detailed Wikipedia article <a href="https://en.wikipedia.org/wiki/Formant">Here</a>.
     </p>
     <p>
     <ul>
       <li>
-        <b>Formants</b>
+        <b>Formants</b> The number of active formants.
       </li>
       <li>
-        <b>Fr.</b>
+        <b>Fr.Sl</b> (formant slowness) The rate at which one formant morphs to the next.
       </li>
       <li>
-        <b>Vw.Cl</b>
+        <b>Vw.Cl</b> (vowel clearness) The rate at which vowels transition.
       </li>
       <li>
-        <b>Vowel no.</b>
+        <b>Vowel no.</b> The vowel being edited.
       </li>
       <li>
-        <b>Formant</b>
+        <b>Formant</b> The formant being edited.
       </li>
       <li>
-        <b>Freq</b>
+        <b>Freq</b> The frequency of the current formant.
       </li>
       <li>
-        <b>Q</b>
+        <b>Q</b> The current formant's Q factor.
       </li>
       <li>
-        <b>Amp</b>
+        <b>Amp</b> The amplitude of the current formant.
       </li>
       <li>
-        <b>Seq.Size</b>
+        <b>Seq.Size</b> (sequence size) The number of active vowels.
       </li>
       <li>
-        <b>S.Pos.</b>
+        <b>S.Pos.</b> (sequence position) The order of the vowels.
       </li>
       <li>
-        <b>Vowel</b>
+        <b>Vowel</b> The vowel number at the sequence position shown.
       </li>
       <li>
-        <b>Strch</b>
+        <b>Strch</b> (stretch) Changes the time of the overall sequence.
       </li>
       <li>
-        <b>Neg.Input</b>
+        <b>Neg.Input</b> Inverts the input from the Envelope and/or LFO.
       </li>
       <li>
-        <b>C.f.</b>
+        <b>C.f.</b> (centre frequency) The centre point of the complete filter.
       </li>
       <li>
-        <b>Oct.</b>
+        <b>Oct.</b> (octaves) The pitch range of the complete filter.
       </li>
     </ul>
     </p>
-    TODO graph
+    TODO graph behaviour
     <br>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>

@@ -1,5 +1,8 @@
 yoshimi 2.0.2M
 
+2021-7-18 Will
+* User guide formant filter done except graph usage.
+
 2021-7-17 Will
 * Initialised LearnBlock in MIDIlearn.
 * Capitalised some GUI filter/effects control names.
