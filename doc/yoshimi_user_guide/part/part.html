@@ -195,11 +195,11 @@
     <br><br>
     The last menu determines the routing of the effects.
     <br>
-    - <em>Next Effect</em> (default): will send the output of the effect to the next one in the chain.
+    - <em>Next Effect</em> (default): will send the output of the effect (added to the incoming signal) to the next one in the chain.
     <br>
-    - <em>Part Out</em>: makes the current effect the last one in the chain, effectivly ignoring any other following effect.
+    - <em>Part Out</em>: makes the current effect the last one in the chain, effectively ignoring any other following effects.
     <br>
-    - <em>Dry Out</em>: This will send the effect output directly where part effects are added together. If an effect is set to Dry Out and then bypassed the signal will not pass to the next effect. <span class="warn">Explain dry out better!</span>
+    - <em>Dry Out</em>: This will send the incoming signal component directly where part effects are added together, so it won't be passed on to later effects. However, the output of the effect itself <em>is</em> passed on to later ones. Consequently, if this effect is bypassed it also effectively bypasses all later ones.
     <br><br>
     At the bottom of this window is a button to allow you to disable this effect without losing the settings, or altering the routing for the other effects in the chain.
     </p>

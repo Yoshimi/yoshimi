@@ -1,0 +1,33 @@
+
+    FL_Button - A mouse button; use Fl_Button + n for mouse button n.
+    FL_BackSpace - The backspace key.
+    FL_Tab - The tab key.
+    FL_Enter - The enter key.
+    FL_Pause - The pause key.
+    FL_Scroll_Lock - The scroll lock key.
+    FL_Escape - The escape key.
+    FL_Home - The home key.
+    FL_Left - The left arrow key.
+    FL_Up - The up arrow key.
+    FL_Right - The right arrow key.
+    FL_Down - The down arrow key.
+    FL_Page_Up - The page-up key.
+    FL_Page_Down - The page-down key.
+    FL_End - The end key.
+    FL_Print - The print (or print-screen) key.
+    FL_Insert - The insert key.
+    FL_Menu - The menu key.
+    FL_Num_Lock - The num lock key.
+    FL_KP - One of the keypad numbers; use FL_KP + n for number n.
+    FL_KP_Enter - The enter key on the keypad.
+    FL_F - One of the function keys; use FL_F + n for function key n.
+    FL_Shift_L - The lefthand shift key.
+    FL_Shift_R - The righthand shift key.
+    FL_Control_L - The lefthand control key.
+    FL_Control_R - The righthand control key.
+    FL_Caps_Lock - The caps lock key.
+    FL_Meta_L - The left meta/Windows key.
+    FL_Meta_R - The right meta/Windows key.
+    FL_Alt_L - The left alt key.
+    FL_Alt_R - The right alt key.
+    FL_Delete - The delete key.
