@@ -58,7 +58,7 @@
     </tr>
     <tr>
       <td>64</td>
-      <td>Sustain Predal</td>
+      <td>Sustain Pedal</td>
     </tr>
     <tr>
       <td>65</td>
@@ -74,7 +74,7 @@
     </tr>
     <tr>
       <td>74</td>
-      <td>Finter Cutoff</td>
+      <td>Filter Cutoff</td>
     </tr>
     <tr>
       <td>75</td>
@@ -121,6 +121,7 @@
       <td>All Notes Off</td>
     </tr>
     </table>
+    <a href="#top" class="up">Back to top</a>
     </p>
     <a id="nrpn"></a>
     <p>
@@ -456,7 +457,7 @@
       5 - LFO Stereo Difference<br>
       6 - LFO Depth<br>
       7 - Filter Amplitude<br>
-      8 - Fitler Amplitude Rate Change<br>
+      8 - Filter Amplitude Rate Change<br>
       9 - Invert the signal (0 - 1) no/yes
     </div>
     <br>
@@ -482,8 +483,26 @@
       13+N*5 - Band's filter Q (bandwidth or resonance)<br>
       14+N*5 - reserved
     </div>
-    Where N represent the band being adjusted (starting from zero).
+    Where N represent the band being adjusted (starting from zero)
+    <br><br>
+    <b>Direct Part Control</b>
+    <div class="tab">
+       0 - Part number (this must be set first)<br>
+       1 - Program Change (0 - 127)<br>
+       2 - controller number (0 - 15)<br>
+       3 - controller value (0 - 127)<br>
+       4 - Channel number
+       <div class="tab">
+          (0 - 15) select for all messages<br>
+          (16 - 31) select for note off only<br>
+          (32 - 47) mute<br>
+       </div>
+       5 * - Audio destination (0 - 2) main/part/both<br>
+       64 * - Key shift (28 - 100) gives -36 to +36
+    </div>
+    * requires part to be enabled
     </p>
+
     <a href="#nrpn" class="up">Back to NRPN types</a>
     <br>
     <a href="#data" class="up">Back to NRPN Data values</a>

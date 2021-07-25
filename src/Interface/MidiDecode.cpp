@@ -571,24 +571,26 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
         case 2: // Set controller number
             synth->getRuntime().vectordata.Controller = par;
             synth->getRuntime().dataL = par;
+            //std::cout << "cont no " << int(par) << std::endl;
             break;
 
         case 3: // Set controller value
             setMidiController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par, false);
+            //std::cout << "cont val " << int(par) << std::endl;
             break;
 
         case 4: // Set part's channel number
             putData.data.value = par;
-            putData.data.control = 5;
+            putData.data.control = PART::control::midiChannel;
             putData.data.part = synth->getRuntime().vectordata.Part;
             break;
 
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
             putData.data.value = par;
-            putData.data.control = 120;
+            putData.data.control = PART::control::audioDestination;
             putData.data.part = synth->getRuntime().vectordata.Part;
-            putData.data.parameter = 192;
+            //putData.data.parameter = 192; // this doesn't seem necessary
             break;
 
         case 64: // key shift
@@ -598,7 +600,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
             else if (par > MAX_KEY_SHIFT)
                 par = MAX_KEY_SHIFT;
             putData.data.value = par;
-            putData.data.control = 35;
+            putData.data.control = PART::control::keyShift;
             putData.data.part = synth->getRuntime().vectordata.Part;
             break;
         default:

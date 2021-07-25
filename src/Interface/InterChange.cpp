@@ -6206,6 +6206,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
+    //std::cout << "Itype " << int(type) << "  val " << value << "  cont " << int(control) << "  part " << int(npart) << "  effnum " << int(effnum) << "  insert " << int(insert) << std::endl;
 
     int value_int = lrint(value);
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);

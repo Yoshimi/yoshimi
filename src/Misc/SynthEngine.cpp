@@ -820,19 +820,21 @@ void SynthEngine::SetZynControls(bool in_place)
     unsigned char efftype = (parnum & 0x60);
     Runtime.dataL = 0xff; // use once then clear it out
 
+    //std::cout << "isSys " << int(group == 36) << "  num " << int(effnum) << "  par " << int(parnum) << "  val " << int(value) << std::endl;
+
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
     putData.data.value = value;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
-    // TODO the next line is wrong, it should really be
-    // handled by MIDI
-    putData.data.source |= TOPLEVEL::action::fromCLI;
+    putData.data.source = TOPLEVEL::action::fromMIDI | TOPLEVEL::action::forceUpdate;
 
     if (group == 0x24)
     {
         putData.data.part = TOPLEVEL::section::systemEffects;
         if (efftype == 0x40)
-            putData.data.control = 1;
+        {
+            putData.data.control = EFFECT::sysIns::effectType;
+        }
         //else if (efftype == 0x60) // not done yet
             //putData.data.control = 2;
         else
@@ -856,6 +858,9 @@ void SynthEngine::SetZynControls(bool in_place)
         }
     }
     putData.data.engine = effnum;
+
+    //if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == 1))
+        //control = EFFECT::sysIns::effectType;
 
     if (in_place)
         interchange.commandEffects(&putData);
