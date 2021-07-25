@@ -1,5 +1,9 @@
 yoshimi 2.0.2M
 
+2021-7-25 Will
+* Small cleanups and doc updates.
+* Started CCs/NRPNs on user guide.
+
 2021-7-21 Will
 * Further updates to User guide
 * Added FLTK_event_keys.txt to dev_notes

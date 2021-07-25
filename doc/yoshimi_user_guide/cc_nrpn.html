@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html><html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Yoshimi User Manual ~ MIDI CCs and NRPNs</title>
+    <link rel="stylesheet" type="text/css" href="files/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="index.html">Index</a>
+    </nav>
+    <a id="top"></a>
+    <h2 style="text-align: center">MIDI CCs and NRPNs</h2>
+    <p>
+    <h3>CCs (Continuous Controllers) directly supported by Yoshimi</h3>
+    <table>
+    <tr>
+      <th>CC</th>
+      <th>Function</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>Bank Change MSB</td>
+      <td>(bank root, interchangeable with CC 32)</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Mod Wheel</td>
+    </tr>
+      <td>2</td>
+      <td>Breath</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>NRPN data MSB</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Volume</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Panning</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Expression</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>Bank Change LSB</td>
+      <td>(bank, interchangeable with CC 0)</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>NRPN data LSB</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td>Sustain Predal</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>Portamento</td>
+    </tr>
+    <tr>
+      <td>68</td>
+      <td>Legato Pedal</td>
+    </tr>
+    <tr>
+      <td>71</td>
+      <td>Filter Q</td>
+    </tr>
+    <tr>
+      <td>74</td>
+      <td>Finter Cutoff</td>
+    </tr>
+    <tr>
+      <td>75</td>
+      <td>Bandwidth</td>
+    </tr>
+    <tr>
+      <td>76</td>
+      <td>FM Amplitude</td>
+    </tr>
+    <tr>
+      <td>77</td>
+      <td>Resonance Center Frequency</td>
+    </tr>
+    <tr>
+      <td>78</td>
+      <td>Resonance Bandwidth</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>NRPN Data Increment</td>
+    </tr>
+    <tr>
+      <td>97</td>
+      <td>NRPN Data Decrement</td>
+    </tr>
+    <tr>
+      <td>98</td>
+      <td>NRPN LSB</td>
+    </tr>
+    <tr>
+      <td>99</td>
+      <td>NRPN MSB</td>
+    </tr>
+    <tr>
+      <td>120</td>
+      <td>All Sound Off</td>
+    </tr>
+    <tr>
+      <td>121</td>
+      <td>Reset All Controllers</td>
+    </tr>
+    <tr>
+      <td>123&emsp;</td>
+      <td>All Notes Off</td>
+    </tr>
+    </table>
+    </p>
+    <a id="nrpn"></a>
+    <p>
+    <h3>NRPNs (Non Registered Parameter Numbers) directly supported by Yoshimi</h3>
+    <table>
+    <tr>
+      <th>NRPN MSB&emsp;</th>
+      <th>NRPN LSB&emsp;</th>
+      <th>Function</th>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0 - 4</td>
+      <td>System Effect Number</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0 - 8</td>
+      <td>Insertion Effect Number</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td>0</td>
+      <td>Direct Part Control</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td>1</td>
+      <td>Vector Control</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td>2</td>
+      <td>System Settings</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>0</td>
+      <td>Load Instrument From History</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>1</td>
+      <td>Load Patchset From History</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>2</td>
+      <td>Load Scale From History</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>3</td>
+      <td>Load State From History</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>4</td>
+      <td>Load Vector From History</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>5</td>
+      <td>Load MIDI Learn List From History</td>
+    </tr>
+    </table>
+    <br>
+    The following don't currently use data bytes, so these can be omitted with some sequencers.
+    <table><tr>
+      <th>NRPN MSB&emsp;</th>
+      <th>NRPN LSB&emsp;</th>
+      <th>Function</th>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>0</td>
+      <td>Solo Disabled</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>1</td>
+      <td>Solo Row type</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>2</td>
+      <td>Solo Column type</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>3</td>
+      <td>Solo Loop type</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>4</td>
+      <td>Solo Two Way type</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>5</td>
+      <td>Solo Channel type</td>
+    </tr>
+    <tr>
+      <td>66</td>
+      <td>0 - 119</td>
+      <td>Solo type's controller</td>
+    </tr>
+    <tr>
+      <td>68</td>
+      <td>68</td>
+      <td>Normal shutdown, exit 0</td>
+    </tr>
+    <tr>
+      <td>68</td>
+      <td>69</td>
+      <td>Fast shutdown, exit 16 (does not check or save settings)</td>
+    </tr>
+    </table>
+    </p>
+    <a id="data"></a>
+    <p>
+    <h3>NRPN Data Values</h3>
+    <b>System Settings</b>
+    <table>
+    <tr>
+      <th>Data MSB&emsp;</th>
+      <th>Data LSB&emsp;</th>
+      <th>Function&emsp;</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>28 - 100</td>
+      <td>Master key shift</td>
+      <td>shift = LSB - 64</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td> 0 - 127</td>
+      <td>Master volume</td>
+    </tr>
+    <tr>
+      <td>64 - 79</td>
+      <td>28 - 100</td>
+      <td>Channel key shift</td>
+      <td>channel = MSB - 64, shift = LSB - 64</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>0 - 127</td>
+      <td>Enable program change</td>
+      <td>less than 64 disables</td>
+    </tr>
+    <tr>
+      <td>83</td>
+      <td>0 - 127</td>
+      <td>Enable activation of part when program changed</td>
+      <td>&emsp;less than 64 disables</td>
+    </tr>
+    <tr>
+      <td>84</td>
+      <td>0 - 120</td>
+      <td>Set CC control for extended program change</td>
+      <td>greater than 119 disables</td>
+    </tr>
+    <tr>
+      <td>85</td>
+      <td>16, 32, 64</td>
+      <td>Set the number of available parts</td>
+    </tr>
+    <tr>
+      <td>86</td>
+      <td>0</td>
+      <td>Save all dynamic settings</td>
+    </tr>
+    </table>
+    </p>
+    <p>
+    <b>System / Insertion Effects</b>
+    <br><br>
+    If <b>Data MSB</b> bit 6 is set (MSB >= 64) then LSB decides the effect type:
+    <div class="tab">
+      0 - Off
+      <br>
+      1 - Reverb
+      <br>
+      2 - Echo
+      <br>
+      3 - Chorus
+      <br>
+      4 - Phaser
+      <br>
+      5 - AlienWah
+      <br>
+      6 - Distortion
+      <br>
+      7 - EQ
+      <br>
+      8 - DynFilter
+    </div>
+    This must be done before making a parameter change (unless already set).
+    <br><br>
+    For Insertion effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then LSB decides the part that the effect will be set to:
+    <div class="tab">
+      0 to highest active part.
+      <br>
+      126 - Master Output
+      <br>
+      127 - Off
+    </div>
+    This must be done before making a parameter change to insertion effects (unless already set).
+    <br><br>
+    Otherwise <b>Data MSB</b> decides which parameter of the currently selected effect will be changed and <b>Data LSB</b> sets the actual value. This will be in the range 0 - 127 unless noted otherwise.
+    <br><br>
+    The parameters for each effect type are as follows:
+    <br><br>
+    <b>Reverb</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - Reverb Time<br>
+      3 - Initial Delay<br>
+      4 - Initial Delay Feedback<br>
+      5 - reserved<br>
+      6 - reserved<br>
+      7 - Low Pass<br>
+      8 - High Pass<br>
+      9 - High Frequency Damping (64 - 127) 64 = no damping<br>
+     10 - Reverb Type (0 - 1) Random/Freeverb <span class="warn">bandwidth?</span><br>
+     11 - Room Size)
+    </div>
+    <b>Echo</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - Delay<br>
+      3 - Delay between left and right<br>
+      4 - Left/Right Crossing<br>
+      5 - Feedback<br>
+      6 - High Frequency Damp
+    </div>
+    <b>Chorus</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - LFO Frequency<br>
+      3 - LFO Randomness<br>
+      4 - LFO Type (0 - 1) Sine/Triangle<br>
+      5 - LFO Stereo Difference<br>
+      6 - LFO Depth<br>
+      7 - Delay<br>
+      8 - Feedback<br>
+      9 - Left/Right Crossing<br>
+     10 - reserved<br>
+     11 - Mode (0 - 1) Add/Subtract
+    </div>
+    <b>Phaser</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - LFO Frequency<br>
+      3 - LFO Randomness<br>
+      4 - LFO Type (0 - 1) Sine/Triangle<br>
+      5 - LFO Stereo Difference<br>
+      6 - LFO Depth<br>
+      7 - Feedback<br>
+      8 - Number of stages (0 - 11)<br>
+      9 - Let/Right Crossing<br>
+     10 - Mode (0 - 1) Add/Subtract<br>
+     11 - Phase
+    </div>
+    <b>AlienWah</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - LFO Frequency<br>
+      3 - LFO Randomness<br>
+      4 - LFO Type (0 - 1) Sine/Triangle<br>
+      5 - LFO Stereo Difference<br>
+      6 - LFO Depth<br>
+      7 - Feedback<br>
+      8 - Delay (0 - 100)<br>
+      9 - Left/Right Crossing<br>
+     10 - Phase
+    </div>
+    <b>Distortion</b>
+    <div class="tab">
+      0 - Volume or Dry/Wet<br>
+      1 - Pan<br>
+      2 - Left/Right Crossing<br>
+      3 - Drive<br>
+      4 - Level<br>
+      5 - Type (0 - 13)<br>
+      <div class="tab">
+        Atan<br>
+        Asym 1<br>
+        Power 1<br>
+        Sine<br>
+        Quants<br>
+        Zigzag<br>
+        Limit<br>
+        LimitU<br>
+        LimitL<br>
+        Ilimit<br>
+        Clip<br>
+        Asym 2<br>
+        Power 2<br>
+        Sigm
+      </div>
+      6 - Invert the signal (0 - 1) no/yes<br>
+      7 - Low Pass<br>
+      8 - High Pass<br>
+      9 - Mode (0 - 1) mono/stereo
+    </div>
+    <b>DyneFilter</b>
+    <div class="tab">
+      0 - Volume<br>
+      1 - Pan<br>
+      2 - LFO Frequency<br>
+      3 - LFO Randomness<br>
+      4 - LFO Type (0 - 1) Sine/Triangle<br><
+      5 - LFO Stereo Difference<br>
+      6 - LFO Depth<br>
+      7 - Filter Amplitude<br>
+      8 - Fitler Amplitude Rate Change<br>
+      9 - Invert the signal (0 - 1) no/yes
+    </div>
+    <br>
+    <b>EQ</b> This effect is an exception.
+    <div class="tab">
+       0 - Gain<br>
+       The others change individual EQ bands using the following formulae:<br>
+      10+N*5 - Band's filter type (0 - 9)<br>
+      <div class="tab">
+        Off<br>
+        Lp1<br>
+        Hp1<br>
+        Lp2<br>
+        Hp2<br>
+        Bp2<br>
+        N2<br>
+        Pk<br>
+        LSh<br>
+        HSh<br>
+      </div>
+      11+N*5 - Band's filter frequency<br>
+      12+N*5 - Band's filter gain<br>
+      13+N*5 - Band's filter Q (bandwidth or resonance)<br>
+      14+N*5 - reserved
+    </div>
+    Where N represent the band being adjusted (starting from zero).
+    </p>
+    <a href="#nrpn" class="up">Back to NRPN types</a>
+    <br>
+    <a href="#data" class="up">Back to NRPN Data values</a>
+    <br>
+    <a href="#top" class="up">Back to top</a>
+  </body>
+</html>

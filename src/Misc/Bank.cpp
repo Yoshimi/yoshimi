@@ -1049,7 +1049,7 @@ void Bank::updateShare(string bankdirs[], string localDir, string shareID)
     string destinationDir = localDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
     if (!isDirectory(destinationDir))
         return;
-    cout << bankdirs[1] << endl;
+    //cout << bankdirs[1] << endl;
     if (isDirectory(bankdirs[1] + next))
         checkShare(bankdirs[1] + next, destinationDir);
 

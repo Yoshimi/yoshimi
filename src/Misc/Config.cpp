@@ -74,11 +74,11 @@ namespace { // constants used in the implementation
         "Copyright 2002-2009 Nasca Octavian Paul and others, "
         "Copyright 2009-2011 Alan Calvert, "
         "Copyright 2012-2013 Jeremy Jongepier and others, "
-        "Copyright 2014-2019 Will Godfrey and others";
+        "Copyright 2014-2021 Will Godfrey and others";
     const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
     const char* argp_program_version = argline.c_str();
 
-    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
+    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
 
     static struct argp_option cmd_options[] = {
         {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
@@ -328,7 +328,7 @@ bool Config::loadConfig(void)
     baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
     int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
-    yoshimi += ("-" + asString(thisInstance));
+    //std::cout << "\nsession >" << defaultSession << "<\n" << std::endl;
     if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early

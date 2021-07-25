@@ -43,7 +43,7 @@ decl {\#define PANEL_DUAL_X 530} {public local
 decl {\#define PANEL_DUAL_Y 600} {public local
 }
 
-decl {\#define FILER_SIZE 1500} {public local
+decl {\#define FILER_SIZE 5000} {public local
 }
 
 decl {\#include <FL/Fl_Tooltip.H>} {public local

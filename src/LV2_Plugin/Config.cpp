@@ -67,7 +67,7 @@ using func::string2int;
 unsigned char panLaw = 1;
 
 namespace { // constants used in the implementation
-    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi.state'";
+    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
 }
 
 bool         Config::showSplash = true;
