@@ -245,71 +245,6 @@
     <a id="data"></a>
     <p>
     <h3>NRPN Data Values</h3>
-    <b>System Settings</b>
-    <table>
-    <tr>
-      <th>Data MSB&emsp;</th>
-      <th>Data LSB&emsp;</th>
-      <th>Function&emsp;</th>
-      <th>Notes</th>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>28 - 100</td>
-      <td>Master key shift</td>
-      <td>shift = LSB - 64</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td> 0 - 127</td>
-      <td>Master volume</td>
-    </tr>
-    <tr>
-      <td>64 - 79</td>
-      <td>28 - 100</td>
-      <td>Channel key shift</td>
-      <td>channel = MSB - 64, shift = LSB - 64</td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>82</td>
-      <td>0 - 127</td>
-      <td>Enable program change</td>
-      <td>less than 64 disables</td>
-    </tr>
-    <tr>
-      <td>83</td>
-      <td>0 - 127</td>
-      <td>Enable activation of part when program changed</td>
-      <td>&emsp;less than 64 disables</td>
-    </tr>
-    <tr>
-      <td>84</td>
-      <td>0 - 120</td>
-      <td>Set CC control for extended program change</td>
-      <td>greater than 119 disables</td>
-    </tr>
-    <tr>
-      <td>85</td>
-      <td>16, 32, 64</td>
-      <td>Set the number of available parts</td>
-    </tr>
-    <tr>
-      <td>86</td>
-      <td>0</td>
-      <td>Save all dynamic settings</td>
-    </tr>
-    </table>
-    </p>
     <p>
     <b>System / Insertion Effects</b>
     <br><br>
@@ -361,7 +296,7 @@
       7 - Low Pass<br>
       8 - High Pass<br>
       9 - High Frequency Damping (64 - 127) 64 = no damping<br>
-     10 - Reverb Type (0 - 1) Random/Freeverb <span class="warn">bandwidth?</span><br>
+     10 - Reverb Type (0 - 2) Random/Freeverb/Bandwidth?<br>
      11 - Room Size)
     </div>
     <b>Echo</b>
@@ -373,6 +308,7 @@
       4 - Left/Right Crossing<br>
       5 - Feedback<br>
       6 - High Frequency Damp
+     17 - BPM Mode for delay (0 - 1) off/on
     </div>
     <b>Chorus</b>
     <div class="tab">
@@ -388,6 +324,7 @@
       9 - Left/Right Crossing<br>
      10 - reserved<br>
      11 - Mode (0 - 1) Add/Subtract
+     17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>Phaser</b>
     <div class="tab">
@@ -403,6 +340,7 @@
       9 - Let/Right Crossing<br>
      10 - Mode (0 - 1) Add/Subtract<br>
      11 - Phase
+     17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>AlienWah</b>
     <div class="tab">
@@ -417,6 +355,7 @@
       8 - Delay (0 - 100)<br>
       9 - Left/Right Crossing<br>
      10 - Phase
+     17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>Distortion</b>
     <div class="tab">
@@ -459,6 +398,7 @@
       7 - Filter Amplitude<br>
       8 - Filter Amplitude Rate Change<br>
       9 - Invert the signal (0 - 1) no/yes
+      17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <br>
     <b>EQ</b> This effect is an exception.
@@ -466,6 +406,7 @@
        0 - Gain<br>
        The others change individual EQ bands using the following formulae:<br>
       10+N*5 - Band's filter type (0 - 9)<br>
+      <div class="tab">
       <div class="tab">
         Off<br>
         Lp1<br>
@@ -478,18 +419,23 @@
         LSh<br>
         HSh<br>
       </div>
+      </div>
       11+N*5 - Band's filter frequency<br>
       12+N*5 - Band's filter gain<br>
       13+N*5 - Band's filter Q (bandwidth or resonance)<br>
       14+N*5 - reserved
     </div>
-    Where N represent the band being adjusted (starting from zero)
+    Where N represents the band being adjusted (starting from zero)<br>
+    <a href="#nrpn" class="up">Back to NRPN types</a><br>
+    <a href="#data">Back to NRPN Data values</a>
+    <a href="#top" class="up">Back to top</a>
+    <a id="direct"></a>
     <br><br>
     <b>Direct Part Control</b>
     <div class="tab">
        0 - Part number (this must be set first)<br>
        1 - Program Change (0 - 127)<br>
-       2 - controller number (0 - 15)<br>
+       2 - controller number (0 - 119)<br>
        3 - controller value (0 - 127)<br>
        4 - Channel number
        <div class="tab">
@@ -500,12 +446,176 @@
        5 * - Audio destination (0 - 2) main/part/both<br>
        64 * - Key shift (28 - 100) gives -36 to +36
     </div>
-    * requires part to be enabled
-    </p>
-
-    <a href="#nrpn" class="up">Back to NRPN types</a>
+    * requires the part to be enabled
+    <a id="vector"></a>
+    <br><br>
+    <b>Vector Control</b>
     <br>
-    <a href="#data" class="up">Back to NRPN Data values</a>
+    <b>Data MSB</b> Options:
+    <div class="tab">
+       0 - X sweep CC<br>
+       1 - Y sweep CC<br>
+       2 - Enable X features<br>
+       3 - Enable Y features
+    </div>
+    <br>
+    <b>Data LSB</b> Features:
+    <div class="tab">
+      1 = fixed as Volume<br>
+      2 = default is Pan<br>
+      4 = default is Filter Cutoff (Brightness)<br>
+      8 = default is Mod Wheel<br><br>
+     18 = Reversed Pan<br>
+     36 = Reversed Filter Cutoff<br>
+     72 = Reversed Mod Wheel
+    </div>
+    <br>
+    Setting the sweep CC for X enables vector control. It also sets, but doesn't enable the default X features.<br>
+
+    Setting the sweep CC for Y sets, but doesn't enable the default Y features.<br>
+
+    If you don't enable any features not a lot will happen! The numbers are chosen so they can be combined. So, 5 would be Volume + Brightness and 19 would be Volume + Reversed Pan
+    <br><br>
+    <b>Additional Settings</b>
+    <table>
+    <tr>
+      <th>MSB</th>
+      <th>LSB</th>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>x1 instrument ID</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>x2 instrument ID</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>y1 instrument ID</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>y2 instrument ID</td>
+    </tr>
+    </table>
+    IDs are instruments from the current bank.
+    <br><br>
+    <table>
+    <tr>
+      <th>MSB</th>
+      <th>LSB</th>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Alternate CC for X feature 2</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Alternate CC for X feature 4</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Alternate CC for X feature 8</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Alternate CC for Y feature 2</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Alternate CC for Y feature 4</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Alternate CC for Y feature 8</td>
+    </tr>
+    </table>
+
+    These additional controls for changing the actual feature actions are unique to NRPNs. They are not available to either the GUI or the CLI.
+    </p>
+    <p>
+    <b>System Settings</b>
+    <table>
+    <tr>
+      <th>Data MSB&emsp;</th>
+      <th>Data LSB&emsp;</th>
+      <th>Function&emsp;</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>28 - 100</td>
+      <td>Master key shift</td>
+      <td>shift = LSB - 64</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td> 0 - 127</td>
+      <td>Master volume</td>
+    </tr>
+    <tr>
+      <td>64 - 79</td>
+      <td>28 - 100</td>
+      <td>Channel key shift</td>
+      <td>channel = MSB - 64, shift = LSB - 64</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td>0, 32, 127</td>
+      <td>CC for Root path</td>
+      <td>127 disables</td>
+    </tr>
+    <tr>
+      <td>81</td>
+      <td>32, 0, 127</td>
+      <td>CC for Bank path</td>
+      <td>127 disables</td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>0 - 127</td>
+      <td>Enable program change</td>
+      <td>less than 64 disables</td>
+    </tr>
+    <tr>
+      <td>83</td>
+      <td>0 - 127</td>
+      <td>Enable activation of part when program changed</td>
+      <td>&emsp;less than 64 disables</td>
+    </tr>
+    <tr>
+      <td>84</td>
+      <td>0 - 120</td>
+      <td>Set CC control for extended program change</td>
+      <td>greater than 119 disables</td>
+    </tr>
+    <tr>
+      <td>85</td>
+      <td>16, 32, 64</td>
+      <td>Set the number of available parts</td>
+    </tr>
+    <tr>
+      <td>86</td>
+      <td>0</td>
+      <td>Save all dynamic settings</td>
+    </tr>
+    </table>
+    </p>
+    <p>
+    <b>Loading from History Lists</b>
+    <br><br>
+    For all of these, the Data LSB is the list index number in the range 0 - 24. However, if there aren't that many in the list, for entries that don't exist an error will be reported.
+    <br><br>
+    For instruments, the Data MSB is the part number to load to. If a value greater than 63 is given, the instrument will be loaded to the last part number seen by the NRPN system. If none were see, the command will be ignored.
+    <br><br>
+    For Vectors, the Data MSB in the base channel to install it on. If a value greater than 15 is set, it will be loaded to the base channel it was originally saved from.
+    <br><br>
+    For all of the others Data MSB should be set to zero.
+    </p>
+    <a href="#direct">Back to Direct Part</a><a href="#nrpn" class="up">Back to NRPN types</a>
+    <br>
+    <a href="#vector">Back to Vectors</a><a href="#data" class="up">Back to NRPN Data values</a>
     <br>
     <a href="#top" class="up">Back to top</a>
   </body>
