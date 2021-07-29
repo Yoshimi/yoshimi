@@ -505,7 +505,7 @@ class MasterUI {: {private GuiUpdates}
                 words->copy_label("Searching for the manual.");
                 message->show();
                 message->position(masterwindow->x() + 36, masterwindow->y() + 170);
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::openManualPDF, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::openManual, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
             }
             break;
         case 6: // exit
@@ -2591,7 +2591,7 @@ Alan Calvert started the project}
             setMasterLabel("");
             break;
 
-        case MAIN::control::openManualPDF:
+        case MAIN::control::openManual:
             message->hide();
             if (miscmsg != NO_MSG)
                 query("", "", "", textMsgBuffer.fetch(miscmsg));

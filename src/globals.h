@@ -544,7 +544,7 @@ namespace MAIN // usage MAIN::control::volume
         exportPadSynthSamples,
         masterReset,
         masterResetAndMlearn,
-        openManualPDF = 100,
+        openManual = 100,
         startInstance = 104,
         stopInstance,
         stopSound = 128,

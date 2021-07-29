@@ -219,7 +219,12 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    loadCmdArgs(argc, argv);
+    static bool torun = true;
+    if (torun) // only the first synth can read args
+    {
+        torun = false;
+        loadCmdArgs(argc, argv);
+    }
 
     if (!loadConfig())
     {

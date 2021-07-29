@@ -1255,9 +1255,9 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             contstr = "Reset All including MIDI-learn";
             break;
 
-        case MAIN::control::openManualPDF:
+        case MAIN::control::openManual:
             showValue = false;
-            contstr = "Open manual in PDF reader " + textMsgBuffer.fetch(value_int);
+            contstr = "Open manual in reader " + textMsgBuffer.fetch(value_int);
             break;
 
         case MAIN::control::startInstance:

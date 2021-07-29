@@ -297,7 +297,8 @@
       8 - High Pass<br>
       9 - High Frequency Damping (64 - 127) 64 = no damping<br>
      10 - Reverb Type (0 - 2) Random/Freeverb/Bandwidth?<br>
-     11 - Room Size)
+     11 - Room Size)<br>
+     16 - Preset (0 - 12)
     </div>
     <b>Echo</b>
     <div class="tab">
@@ -307,7 +308,8 @@
       3 - Delay between left and right<br>
       4 - Left/Right Crossing<br>
       5 - Feedback<br>
-      6 - High Frequency Damp
+      6 - High Frequency Damp<br>
+     16 - Preset (0 - 8)<br>
      17 - BPM Mode for delay (0 - 1) off/on
     </div>
     <b>Chorus</b>
@@ -323,7 +325,8 @@
       8 - Feedback<br>
       9 - Left/Right Crossing<br>
      10 - reserved<br>
-     11 - Mode (0 - 1) Add/Subtract
+     11 - Mode (0 - 1) Add/Subtract<br>
+     16 - Preset (0 - 9)<br>
      17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>Phaser</b>
@@ -339,7 +342,11 @@
       8 - Number of stages (0 - 11)<br>
       9 - Let/Right Crossing<br>
      10 - Mode (0 - 1) Add/Subtract<br>
-     11 - Phase
+     11 - Phase<br>
+     12 - Hypersine (0 - 1) off/on<br>
+     13 - Distortion<br>
+     14 - Analog (0 - 1) off/on<br>
+     16 - Preset (0 - 11)<br>
      17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>AlienWah</b>
@@ -354,7 +361,8 @@
       7 - Feedback<br>
       8 - Delay (0 - 100)<br>
       9 - Left/Right Crossing<br>
-     10 - Phase
+     10 - Phase<br>
+     16 - Preset (0 - 3)<br>
      17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <b>Distortion</b>
@@ -385,6 +393,8 @@
       7 - Low Pass<br>
       8 - High Pass<br>
       9 - Mode (0 - 1) mono/stereo
+     10 - PreFilter (0 - 1) distortion first/filter first<br>
+     16 - Preset (0 - 5)
     </div>
     <b>DyneFilter</b>
     <div class="tab">
@@ -397,11 +407,12 @@
       6 - LFO Depth<br>
       7 - Filter Amplitude<br>
       8 - Filter Amplitude Rate Change<br>
-      9 - Invert the signal (0 - 1) no/yes
+      9 - Invert the signal (0 - 1) no/yes<br>
+      16 - Preset (0 - 4)<br>
       17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <br>
-    <b>EQ</b> This effect is an exception.
+    <b>EQ</b> This effect is an exception, also it has no presets.
     <div class="tab">
        0 - Gain<br>
        The others change individual EQ bands using the following formulae:<br>
@@ -437,7 +448,7 @@
        1 - Program Change (0 - 127)<br>
        2 - controller number (0 - 119)<br>
        3 - controller value (0 - 127)<br>
-       4 - Channel number
+       4 - Channel number for this part
        <div class="tab">
           (0 - 15) select for all messages<br>
           (16 - 31) select for note off only<br>
@@ -605,11 +616,11 @@
     <p>
     <b>Loading from History Lists</b>
     <br><br>
-    For all of these, the Data LSB is the list index number in the range 0 - 24. However, if there aren't that many in the list, for entries that don't exist an error will be reported.
+    For all of these, the Data LSB is the list index number in the range 0 - 24. However, if there aren't that many entries in the list, for those that don't exist an error will be reported.
     <br><br>
     For instruments, the Data MSB is the part number to load to. If a value greater than 63 is given, the instrument will be loaded to the last part number seen by the NRPN system. If none were see, the command will be ignored.
     <br><br>
-    For Vectors, the Data MSB in the base channel to install it on. If a value greater than 15 is set, it will be loaded to the base channel it was originally saved from.
+    For Vectors, the Data MSB is the base channel to install it on. If a value greater than 15 is set, it will be loaded to the base channel it was originally saved from.
     <br><br>
     For all of the others Data MSB should be set to zero.
     </p>

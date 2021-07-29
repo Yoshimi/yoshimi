@@ -1,7 +1,16 @@
-yoshimi 2.0.2M
+yoshimi 2.0.2 M
+
+2021-7-29 Will
+* Updated PDF manual.
+* Added links for new manual.
+  Currently disabled.
+* Updates to new user manual.
+* Added version text to numeric value.
+  Not currently in use.
 
 2021-7-26 Will
 * Completed user guide CCs/NRPNs
+* Started CLI user guide section.
 
 2021-7-25 Will
 * Small cleanups and doc updates.

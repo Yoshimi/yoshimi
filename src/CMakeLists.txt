@@ -524,6 +524,11 @@ add_custom_target (showversion
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+configure_file(${CMAKE_SOURCE_DIR}/version.txt
+            ${CMAKE_SOURCE_DIR}/../doc/yoshimi_user_guide/files/yoshimi_user_guide_version
+            COPYONLY
+)
+
 # clean sweep
 add_custom_target (distclean
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/*.log

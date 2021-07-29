@@ -37,6 +37,14 @@
 
 #include "globals.h"
 
+#define OUR_PATH_MAX 2048
+/*
+ * PATH_MAX is a poorly defined constant, and not very
+ * portable. As this function is only used for a single
+ * tightly defined purpose we set a value to replace it
+ * that should be safe for any reasonable architecture.
+ */
+
 namespace EXTEN {
 
 using std::string;
@@ -105,13 +113,6 @@ inline void make_legit_pathname(string& fname)
  * tries to find build time doc directory
  * currently only used to find the latest user guide
  */
-#define OUR_PATH_MAX 2048
-/*
- * PATH_MAX is a poorly defined constant, and not very
- * portable. As this function is only used for a single
- * tightly defined purpose we set a value to replace it
- * that should be safe for any reasonable architecture.
- */
 inline string localPath(void)
 {
     char *tmpath;
@@ -127,14 +128,17 @@ inline string localPath(void)
     return path;
 }
 
-
-inline bool isRegularFile(const string& chkpath)
+/*
+ * this now returns the last modified time which can
+ * never be zero so can represent 'true'
+ */
+inline size_t isRegularFile(const string& chkpath)
 {
     struct stat st;
     if (!stat(chkpath.c_str(), &st))
         if (S_ISREG(st.st_mode))
-            return true;
-    return false;
+            return st.st_mtime;
+    return 0;
 }
 
 
@@ -165,7 +169,7 @@ inline string findFile(const string& path, const string& filename, string extens
     FILE *fp = popen(command.c_str(), "r");
     if (fp == NULL)
         return "";
-    char line[1024];
+    char line[OUR_PATH_MAX];
     fscanf(fp,"%[^\n]", line);
     pclose(fp);
 
@@ -178,7 +182,6 @@ inline string findFile(const string& path, const string& filename, string extens
         return line;
     return "";
 }
-
 
 inline string findLeafName(const string& name)
 {
@@ -565,12 +568,12 @@ inline string loadText(const string& filename)
         return "";
 
     string text = "";
-    char line [1024];
+    char line [OUR_PATH_MAX];
     // no Yoshimi input text lines should get anywhere near this!
     while (!feof(readfile))
     {
         line[0] = 0;
-        if (fgets(line , 1024 , readfile))
+        if (fgets(line , OUR_PATH_MAX , readfile))
         {
             size_t end = strlen(line);
             line[end] = 0; // ensure at least 1

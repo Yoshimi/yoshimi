@@ -204,6 +204,49 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
     }
 }
 
+bool InterChange::findManual(string& found)
+{
+    // selects the newest version of the manual
+    FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
+    pclose(fp);
+    // There is a variable delay between writing to /tmp
+    // and the result being available.
+    int count = 0;
+    while (count < 1000 && !isRegularFile("/tmp/found_yoshimi_user_guide"))
+    {
+        usleep(1000);
+        ++ count;
+    }
+    //std::cout << "delay " << count << "mS" << std::endl;
+    string namelist = file::loadText("/tmp/found_yoshimi_user_guide");
+    if (namelist.empty())
+        return false;
+
+    size_t next = 0;
+    size_t lastversion = 0;
+    string name = "";
+    while (next != string::npos)
+    {
+        next = namelist.find("\n");
+        if (next != string::npos)
+        {
+            name = namelist.substr(0, next);
+            size_t current = isRegularFile(name);
+            if (current > lastversion)
+            {
+                lastversion = current;
+                found = name;
+            }
+            namelist = namelist.substr( next +1);
+        }
+    }
+
+    if (lastversion > 0)
+        return true;
+
+    return false;
+}
+
 
 std::string InterChange::manualSearch(std::string dir2search, std::string path2match)
 {
@@ -819,14 +862,34 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::masterResetAndMlearn:
             synth->resetAll(1);
             break;
-        case MAIN::control::openManualPDF: // display user guide
+        case MAIN::control::openManual: // display user guide
         {
+            // first try html version
+
+            string found = "";
+            if (false)//findManual(found))
+            {
+                size_t pos = found.rfind("files/yoshimi_user_guide_version");
+                found = found.substr(0, pos);
+                found += "/index.html";
+
+                //std::cout << "found " << found << std::endl;
+                FILE *fp = popen(("xdg-open " + found + " &").c_str(), "r");
+                if (fp == NULL)
+                    text = "Can't find Browser. Trying for old PDF";
+                else
+                    pclose(fp);
+                break;
+            }
+
+            // fall back to older PDF version
+
             std::string manfile = synth->manualname();
             std::string stub = manfile.substr(0, manfile.rfind("-"));
 
             std::string path = "";
             std::string lastdir = "";
-            std::string found = "";
+            //std::string found = "";
             std::string search = "/usr/share/doc/yoshimi";
             path = manualSearch(search, stub);
             //std::cout << "name1 " << path << std::endl;
@@ -865,7 +928,8 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 FILE *fp = popen(command.c_str(), "r");
                 if (fp == NULL)
                     text = "Can't find PDF reader :(";
-                pclose(fp);
+                else
+                    pclose(fp);
             }
             newMsg = true;
             break;
