@@ -18,7 +18,7 @@
     <br><br>
     <b>Row</b> This normally only operates on parts 1 to 16, setting them all to channel 1, but with only part 1 receiving note-on messages. From then on sending the control CC with data values between 1 and 16 will set that part only to receive new notes. All other values will be ignored. The exception is where <a href="../vector/vector.html">Vectors</a> have been set on any parts, in which case the entire vector will become fully operational when its base channel number is sent.
     <br><br>
-    <b>Column</b> This mode only works if you have at least 32 parts set, and is much more useful if you set 64 parts, as it selects one from each row to receive note-on messages. For incoming channel 1 you would set the contol CC value to 1, 17, 33, 49. For incoming channel 7 it would be 7, 23, 39, 55. Each of these are completely independent so you effectively have 16 four part solos.
+    <b>Column</b> This mode only works if you have at least 32 parts set, and is much more useful if you set 64 parts, as it selects one from each row to receive note-on messages. For incoming channel 1 you would set the control CC value to 1, 17, 33, 49. For incoming channel 7 it would be 7, 23, 39, 55. Each of these are completely independent so you effectively have 16 four part solos.
     <br><br>
     <b>Loop</b> This is similar to <em>row</em> mode, but in this case a control value greater than zero will cause the next part in sequence to be the receiving one. After 16 it loops round to part 1 again. Zero is ignored.
     <br><br>
