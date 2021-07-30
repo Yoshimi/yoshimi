@@ -15,5 +15,107 @@
     Yoshimi supplies a command line interface (CLI) that can perform any action that is available in the graphical interface (GUI). The CLI closely follows the GUi with respect to context levels.
     However, some control names are changed to enable shorter abbreviations the be used.
     </p>
+    <p>
+    With Yoshimi installed, open a terminal window and type 'yoshimi' to start. Unless you have disabled the GUI this will also show, but the prompt you will see will be something like the following:
+    <div class = "code">
+Yoshimi 2.1.0 is starting
+Using jack_audio for audio and alsa_midi for midi
+Alsa midi priority is 39
+Yoshimi 2.1.0 M
+Build Number 2008
+Clientname: yoshimi
+Audio: jack -&gt 'default'
+Midi: alsa -&gt 'Hua Xing:0, Komplete Audio 6:0'
+Oscilsize: 512
+Samplerate: 48000
+Period size: 64
+
+Yay! We're up and running :-)
+
+Found 7284 instruments in 201 banks
+Root 9. Bank set to 115 "The_Mysterious_Bank"
+GUI refreshed
+yoshimi>
+    </div>
+    A minor annoyance is that the GUI will take input focus, so you will have to click in the terminal window again to make further commands.
+    </p>
+    <p>
+    There are a number of commands that can be set at the time you start Yoshimi, and before starting you can view these with:
+    <div class = "code">
+music@devuan:~$ yoshimi --help
+    </div>
+    This doesn't actually start Yoshimi itself, but as you can see there are a lot of options available, and many of these can be stacked when you do start, such as:
+    <div class = "code">
+    yoshimi -b=128 -i -j
+    </div>
+    In this example we are setting the buffer size to 128 frames, disabling the GUI and setting MIDI input to Jack.<br>The full list of options is:
+    <div class = "code">
+music@devuan:~$ yoshimi --help
+Yoshimi 2.0.2 M is starting
+Usage: yoshimi [OPTION...]
+            Yoshimi 2.0.2 M, a derivative of ZynAddSubFX - Copyright 2002-2009
+            Nasca Octavian Paul and others, Copyright 2009-2011 Alan Calvert,
+            Copyright 2012-2013 Jeremy Jongepier and others, Copyright
+            2014-2021 Will Godfrey and others
+
+  -a, --alsa-midi[=&ltdevice&gt] use alsa midi input
+  -A, --alsa-audio[=&ltdevice&gt]   use alsa audio output
+  -b, --buffersize=&ltsize&gt    set internal buffer size
+  -c, --no-cmdline           disable command line interface
+  -C, --cmdline              enable command line interface
+  -D, --define-root=&ltpath&gt   define path to new bank root
+  -i, --no-gui               disable gui
+  -I, --gui                  enable gui
+  -j, --jack-midi[=&ltdevice&gt] use jack midi input
+  -J, --jack-audio[=&ltserver&gt]   use jack audio output
+  -k, --autostart-jack       auto start jack server
+  -K, --auto-connect         auto connect jack audio
+  -l, --load=&ltfile&gt          load .xmz file
+  -L, --load-instrument=&ltfile&gt   load .xiz file
+  -M, --load-midilearn=&ltfile&gt   load .xly file
+      --null                 use Null-backend without audio/midi
+  -N, --name-tag=&lttag&gt       add tag to clientname
+  -o, --oscilsize=&ltsize&gt     set AddSynth oscilator size
+  -R, --samplerate=&ltrate&gt    set alsa audio sample rate
+  -S, --state[=&ltfile&gt]       load saved state, defaults to
+                             '$HOME/.config/yoshimi/yoshimi-0.state'
+  -u, --jack-session-file=&ltfile&gt   load named jack session file
+  -U, --jack-session-uuid=&ltuuid&gt   jack session uuid
+  -?, --help                 Give this help list
+      --usage                Give a short usage message
+
+Mandatory or optional arguments to long options are also mandatory or optional
+for any corresponding short options.
+music@devuan:~$
+    </div>
+    Once running in the CLI you will be at the top level and entering just a '?' will list all the available commands and also the names of the available contests. If reporting is set for the CLI this will be paged as shown below.
+    <div class = "code">
+yoshimi> ?
+Commands:
+  ?  Help                     show commands
+  List                        list current settings
+  STop                        all sound off
+  RESet [s]                   return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')
+  EXit [s]                    tidy up and close Yoshimi (if 'y'), 'FOrce' instant exit regardless
+  RUN &lts&gt                     execute named command script forcing top level start
+  RUNLocal &lts&gt                execute named command script from current context level
+    WAIT &ltn&gt                  1mS to 30,000mS delay, within script only
+  ..                          step back one level
+  /                           step back to top level
+
+  Part [n1]   ...             - part operations
+  VEctor [n1] ...             - vector operations
+  SCale       ...             - scale (microtonal) operations
+  MLearn [n1] ...             - MIDI learn operations
+  COnfig      ...             - configuration settings
+q=quit /=search PgUp/PgDown=scroll (line 1 of 65)
+    </div>
+    Quitting the pager will return you to the prompt. Notice it now shows the current context level.
+    <div class = "code">
+@ Top
+yoshimi&gt
+    </div>
+    </p>
+    More to do
   </body>
 </html>

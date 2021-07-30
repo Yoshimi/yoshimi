@@ -41,6 +41,13 @@ a:link {
     width: 40%;
 }
 
+.code {
+    margin-left: 2em;
+    font-family: courier;
+    font-size: 0.9em;
+    white-space:pre-wrap;
+}
+
 .double {
     width: 49.5%;
 }
