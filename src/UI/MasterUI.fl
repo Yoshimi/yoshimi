@@ -274,11 +274,6 @@ class MasterUI {: {private GuiUpdates}
       aboutwindow->hide();
       delete aboutwindow;
 
-      if (logenable)
-          saveWin(synth, yoshiLog->logConsole->w(), yoshiLog->logConsole->h(), yoshiLog->logConsole->x(), yoshiLog->logConsole->y(), true, "System-log");
-      else
-          setVisible(synth, false, "System-log");
-
       syseffsendwindow->hide();
       if (syseffSeen)
           saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), true, "Master-systemeffectsend");
@@ -3344,15 +3339,10 @@ Alan Calvert started the project}
     code {//
     logenable = isConsole;
     if (logenable)
-    {
-        setVisible(synth, true, "System-log");
         yoshiLog->Show(synth);
-    }
-    else
-    {
-        setVisible(synth, false, "System-log");
-        yoshiLog->logConsole->hide();
-    }} {}
+    else if (yoshiLog->logConsole->visible())
+        yoshiLog->Hide(synth);
+    } {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -3413,10 +3403,10 @@ Alan Calvert started the project}
     else
         configui->configwindow->hide();
 
-    if (lastSeen(synth, "System-log"))
+    if (lastSeen(synth, "System-log") & 1)
         yoshiLog->Show(synth);
-    else
-        yoshiLog->logConsole->hide();
+    else if (yoshiLog->logConsole->visible())
+        yoshiLog->Hide(synth);
 
     if (lastSeen(synth, "Vector"))
         vectorui->Show(synth);

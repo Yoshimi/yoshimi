@@ -145,6 +145,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     instrumentFormat(1),
     EnableProgChange(1), // default will be inverted
     toConsole(0),
+    consoleTextSize(12),
     hideErrors(0),
     showTimes(0),
     logXMLheaders(0),
@@ -628,6 +629,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
             Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
         single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
         toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
+        consoleTextSize = xml->getpar("console_text_size", consoleTextSize, 11, 100);
         hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
         showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
         logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
@@ -754,6 +756,7 @@ void Config::addConfigXML(XMLwrapper *xml)
 
     xml->addpar("single_row_panel", single_row_panel);
     xml->addpar("reports_destination", toConsole);
+    xml->addpar("console_text_size", consoleTextSize);
     xml->addpar("hide_system_errors", hideErrors);
     xml->addpar("report_load_times", showTimes);
     xml->addpar("report_XMLheaders", logXMLheaders);

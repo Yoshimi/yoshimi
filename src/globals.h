@@ -279,6 +279,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         virtualKeyboardLayout,
         XMLcompressionLevel,
         reportsDestination,
+        logTextSize,
         savedInstrumentFormat,
         defaultStateStart = 16,
         hideNonFatalErrors,

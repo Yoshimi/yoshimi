@@ -63,12 +63,13 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {} {
+class ConfigUI {open
+} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {159 158 390 330} type Double hide resizable
+      xywh {691 66 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -146,7 +147,7 @@ alsaTab->hide();}
         xywh {5 5 380 298}
       } {
         Fl_Group mainTab {
-          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12
         } {
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
@@ -177,7 +178,7 @@ alsaTab->hide();}
             label {Virtual Keyboard Layout}
             callback {//
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
-            xywh {250 144 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {250 116 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("QWERTY");o->add("Dvorak");o->add("QWERTZ");o->add("AZERTY");}
             code1 {o->value(synth->getRuntime().VirKeybLayout);}
           } {}
@@ -185,7 +186,7 @@ alsaTab->hide();}
             label {XML Compression Level}
             callback {//
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 172 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 144 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -193,10 +194,19 @@ alsaTab->hide();}
             label {Send reports to:}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Some system errors always go to stdout} xywh {200 200 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Some system errors always go to stdout} xywh {200 172 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("stdout");o->add("Console Window");}
             code1 {o->value(synth->getRuntime().toConsole);}
           } {}
+          Fl_Counter logText {
+            label {Console Text Size}
+            callback {//
+                        send_data(0, CONFIG::control::logTextSize, o->value(), TOPLEVEL::type::Integer);
+                        synth->getGuiMaster()->yoshiLog->setLogText(o->value());}
+            xywh {284 200 65 20} type Simple labelsize 12 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12
+            code1 {o->value(synth->getRuntime().consoleTextSize);}
+            code2 {if (synth->getRuntime().toConsole) o->activate(); else o->deactivate();}
+          }
           Fl_Choice instrument {
             label {Saved Instrument Format}
             callback {//
@@ -435,7 +445,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
           }
         }
         Fl_Group alsaTab {
-          xywh {5 25 384 277} box THIN_UP_BOX labelsize 12
+          xywh {5 25 384 277} box THIN_UP_BOX labelsize 12 hide
         } {
           Fl_Choice alsaType {
             label {Alsa Connection Type}
@@ -856,8 +866,17 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     compression->value(value_int);
                     break;
                 case CONFIG::control::reportsDestination:
-                    reports->value(value_bool);
+                    if(!wasFromHere)
+                        reports->value(value_bool);
                     synth->getGuiMaster()->setLogging(value_bool);
+                    if (value_bool)
+                        logText->activate();
+                    else
+                        logText->deactivate();;
+                    break;
+                case CONFIG::control::logTextSize:
+                    logText->value(value_int);
+                    //synth->getGuiMaster()->yoshiLog->logConsole->setLogText(value_int);
                     break;
                 case CONFIG::control::savedInstrumentFormat:
                     instrument->value(value_int - 1);
@@ -1318,6 +1337,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         compression->textsize(size);
     reports->labelsize(size);
         reports->textsize(size);
+    logText->labelsize(size);
+        logText->textsize(size);
 
     instrument->labelsize(size);
         instrument->textsize(size);

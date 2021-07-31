@@ -2723,6 +2723,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().toConsole;
             break;
+        case CONFIG::control::logTextSize:
+            if (write)
+                 synth->getRuntime().consoleTextSize = value_int;
+            else
+                value = synth->getRuntime().consoleTextSize;
+            break;
         case CONFIG::control::savedInstrumentFormat:
             if (write)
                  synth->getRuntime().instrumentFormat = value_int;

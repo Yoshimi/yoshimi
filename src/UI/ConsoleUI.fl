@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2015-2020, Will Godfrey
+Copyright 2015-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -21,7 +21,7 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {in_source in_header
 }
 
-decl {\#include <set>} {selected public local
+decl {\#include <set>} {public local
 }
 
 decl {\#include <string>} {public local
@@ -59,12 +59,12 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   }
 }
 
-class ConsoleUI {} {
+class ConsoleUI {open
+} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {//
-    saveWin(synth, o->w(), o->h(), o->x(), o->y(), true, "System-log");
     o->hide();}
       xywh {397 70 385 185} type Double color 54 selection_color 36 labelsize 13 align 0 when 1 hide resizable
       code0 {logDW = 385;logDH = 185;}
@@ -76,17 +76,31 @@ class ConsoleUI {} {
       }
     }
   }
-  Function {ConsoleUI(SynthEngine *_synth)} {} {
+  Function {ConsoleUI(SynthEngine *_synth)} {open
+  } {
     code {//
     synth = _synth;
     bufsize = 8192;
     make_window();
     txtbuf = new Fl_Text_Buffer(bufsize);
     lastlogW = 0;
-    logText->buffer(txtbuf);} {}
+    textSize = 12;
+    logText->buffer(txtbuf);
+    setLogText(synth->getRuntime().consoleTextSize);} {selected
+    }
   }
   Function {~ConsoleUI()} {} {
     code {//
+      if (logConsole->visible())
+      {
+          saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), 1, "System-log");
+      }
+      else
+      {
+           int fetchW, fetchH, fetchX, fetchY, fetchO;
+           loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "System-log");
+           saveWin(synth, fetchW, fetchH, fetchX, fetchY, 0, "System-log");
+      }
       logConsole->hide();
       delete logConsole;} {}
   }
@@ -103,7 +117,6 @@ class ConsoleUI {} {
     code {//
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "System-log");
-
     if (fetchW < logDW || fetchH < logDH)
     {
         fetchW = logDW;
@@ -119,34 +132,45 @@ class ConsoleUI {} {
     if ((fetchY + fetchH) > maxH)
         fetchY = maxH / 2;
 
-    if(fetchW > maxW / 2) // sensible max size
-        fetchW = maxW / 2;
-    if(fetchH > maxH / 2)
+    if(fetchW > maxW)
+        fetchW = maxW;
+    if(fetchH > maxH / 2) // sensible max height
         fetchH = maxH / 2;
 
     logConsole->resize(fetchX, fetchY, fetchW, fetchH);
     lastlogW = 0;
-    logConsole->show();
-    consoleRtext();} {}
+    logConsole->show();} {}
+  }
+  Function {Hide(SynthEngine *synth)} {} {
+    code {//
+
+      if (logConsole->visible())
+      {
+          saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), 0, "System-log");
+      }
+      else
+      {
+           int fetchW, fetchH, fetchX, fetchY, fetchO;
+           loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "System-log");
+           saveWin(synth, fetchW, fetchH, fetchX, fetchY, 0, "System-log");
+      }
+
+      logConsole->hide();} {}
+  }
+  Function {setLogText(int size)} {} {
+    code {//
+
+            lastlogW = 0;
+            textSize = size;} {}
   }
   Function {consoleRtext()} {} {
     code {//
     if (lastlogW == logConsole->w())
         return;
-
     lastlogW = logConsole->w();
 
-    float dW = logConsole->w() / logDW;
-    float dH =  logConsole->h() / logDH;
-    float dScale;
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
-
-    logText->textsize(int(dScale * 13));
+    saveWin(synth, logConsole->w(), logConsole->h(), logConsole->x(), logConsole->y(), 1, "System-log");
+    logText->textsize(textSize);
     logConsole->redraw();} {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
@@ -159,6 +183,8 @@ class ConsoleUI {} {
   }
   decl {SynthEngine *synth;} {private local
   }
-  decl {int lastlogW;} {private local
+  decl {int lastlogW;} {public local
+  }
+  decl {int textSize;} {private local
   }
 }

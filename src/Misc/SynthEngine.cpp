@@ -3644,6 +3644,11 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
         case CONFIG::control::reportsDestination:
             break;
+        case CONFIG::control::logTextSize:
+            def = 12;
+            min = 11;
+            max = 100;
+            break;
         case CONFIG::control::savedInstrumentFormat:
             max = 3;
             break;

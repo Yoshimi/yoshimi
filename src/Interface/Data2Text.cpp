@@ -612,14 +612,17 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             if (addValue)
             {
                 if (value_bool)
-                    contstr += "console window";
+                    contstr += "Console window";
                 else
                     contstr += "stdout";
             }
             showValue = false;
             break;
+        case CONFIG::control::logTextSize:
+            contstr = "Console text size";
+            break;
         case CONFIG::control::savedInstrumentFormat:
-            contstr = "Saved Instrument Format ";
+            contstr = "Saved instrument format ";
             if (addValue)
             {
                 switch (value_int)
@@ -674,11 +677,11 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             yesno = true;
             break;
         case CONFIG::control::enableAutoInstance:
-            contstr += "Enable Auto Instance";
+            contstr += "Enable auto instance";
             yesno = true;
             break;
         case CONFIG::control::enableHighlight:
-            contstr += "Enable Bank Highlight";
+            contstr += "Enable bank highlight";
             yesno = true;
             break;
         case CONFIG::control::historyLock:

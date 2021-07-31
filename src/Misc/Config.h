@@ -138,6 +138,7 @@ class Config
         unsigned char instrumentFormat;
         int           EnableProgChange;
         bool          toConsole;
+        int           consoleTextSize;
         bool          hideErrors;
         bool          showTimes;
         bool          logXMLheaders;
