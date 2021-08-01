@@ -5,6 +5,10 @@ yoshimi 2.0.2 M
   text size independent of dimensions.
 * Updated user guide.
 
+* Reverted part of config change from 2021-7-25
+  One line error.
+* Added more comments in misc funcs.
+
 2021-7-30 Will
 * Added filer images to new user guide.
   also many spelling corrections :(

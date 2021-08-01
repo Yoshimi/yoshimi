@@ -208,7 +208,10 @@ inline unsigned int string2uint(std::string str)
     return intval;
 }
 
-
+/*
+ * turns the 1st count mumber to upper case
+ * all the rest to lower case
+ */
 inline string stringCaps(std::string str, int count)
 {
     int idx = 0;

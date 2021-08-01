@@ -66,9 +66,11 @@ inline int version2value(void)
 {
     /*
      * expected text string format
-     * <n.n.n> [text}
+     * <n.n.n> [text]
      * to
      * <nn.nn.nn> [text]
+     *
+     * result = nnnnnn
      */
     char tofind[] = YOSHIMI_VERSION;
     std::string digits = "";

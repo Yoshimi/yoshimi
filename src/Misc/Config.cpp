@@ -334,6 +334,7 @@ bool Config::loadConfig(void)
     baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
     int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
+    yoshimi += ("-" + asString(thisInstance));
     //std::cout << "\nsession >" << defaultSession << "<\n" << std::endl;
     if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
