@@ -37,10 +37,10 @@ Root 9. Bank set to 115 "The_Mysterious_Bank"
 GUI refreshed
 yoshimi>
     </div>
-    A minor annoyance is that the GUI will take input focus, so you will have to click in the terminal window again to make further commands.
+    A minor annoyance is that the GUI will take input focus as it opens, so you will have to click in the terminal window again to make further commands.
     </p>
     <p>
-    There are a number of commands that can be set at the time you start Yoshimi, and before starting you can view these with:
+    There are a number of commands that can be set at the time you start Yoshimi. Before starting you can view these with:
     <div class = "code">
 music@devuan:~$ yoshimi --help
     </div>
@@ -115,6 +115,9 @@ q=quit /=search PgUp/PgDown=scroll (line 1 of 65)
 @ Top
 yoshimi&gt
     </div>
+    <a href="#top" class="up">Back to top</a>
+    <a id="vector"></a>
+    <h3>Examples</h3>
      When entering the query on other context levels you will normally get the first few top level ones as a reminder these are available from <em>any</em> level. Other than that you will only see the commands (and deeper contexts) appropriate to that level. However, you can also specifically query a context from <em>any</em> point , in which case you will see the list for that one only, without changing your current position.
     <div class = "code">
 @ p1+, Sub
@@ -132,33 +135,55 @@ Vector:
 @ p1+, Sub
 yoshimi&gt
     </div>
+    Another very useful command is <em>list</em> The command by itself just shows what lists are available. A full example is shown below.
+    <div class = "code">
+@ Top
+yoshimi&gt list mlearn
+Midi learned:
+Line 1  CC 7  Chan 1  Part 1 Effect Send 1
+Line 2  CC 81  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 1 Amplitude
+Line 3  CC 82  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 3 Amplitude
+Line 4  CC 83  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 2 Amplitude
+Line 5  CC 84  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 4 Amplitude
+Line 6  CC 85  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 6 Amplitude
+Line 7  CC 86  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 8 Amplitude
+Line 8  CC 87  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 10 Amplitude
+Line 9  CC 88  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 12 Amplitude
+Line 10  CC 94  Chan 1  Main Master Mono/Stereo
+
+@ Top
+yoshimi&gt
+    </div>
+    As a general rule <em>?</em> tells you what you can do and <em>list</em> tells you what has been set.
+    <br><br>
     Many context levels have defaults that kick in if you don't add additional information. The most obvious being the <em>Part</em> level with just:
     <div class = "code">
+@ Top
 yoshimi&gt set part
 @ Part 1+
 yoshimi&gt
     </div>
     You not only see that it is on part 1 but the '+' indicates it's enabled. There are lots of hints like this. Also any context with numeric settings can be changed simply with the number:
     <div class = "code">
+@ Part 1+
 yoshimi&gt set 5
 @ Part 5
 yoshimi&gt
     </div>
-    Note part 5 has not yet been enabled.
+    Note that part 5 has no '+' so is not enabled.
     <br><br>
-    Many actions will stack if the respective context levels are active:
+    Many actions will stack if all the required context levels are active:
     <div class = "code">
 @ Part 5
 yoshimi&gt s 1 add voice wave
 @ p1+, A+, V1+ Sine
 yoshimi&gt
     </div>
-    Here we used the minimum abbreviation for 'set'. You will also see that not only have we jumped right up into the waveform context of Addsynth Voice 1, but that the current waveform is 'Sine' and all the earlier labels are now compressed to the minimum so that the line doesn't get ridiculously long.
-    <div class = "code">
-    </div>
-    <div class = "code">
-    </div>
+    Here we used the minimum abbreviation for '<em>set</em>'. You will also see that not only have we jumped right up into the waveform context of Addsynth Voice 1, but that the current waveform is 'Sine' and all the earlier labels are now compressed so that the line doesn't get ridiculously long.
+    <br><br>
+    The prompt can become 'stale' if there is a lot of activity from the GUI or via MIDI, but can be refreshed simply by hitting the '<em>return</em>' key, although it may be best to return to top level if you are not actively working.
     </p>
-    More to do
+    <a href="#vector">Back to Examples</a>
+    <a href="#top" class="up">Back to top</a>
   </body>
 </html>
