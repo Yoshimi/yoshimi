@@ -16,7 +16,7 @@
     However, some control names are changed to enable shorter abbreviations the be used.
     </p>
     <p>
-    With Yoshimi installed, open a terminal window and type 'yoshimi' to start. Unless you have disabled the GUI this will also show, but the prompt you will see will be something like the following:
+    With Yoshimi installed, open a terminal window and type 'yoshimi' to start. Unless you have disabled the GUI it will also show, but the prompt you will see will be something like the following:
     <div class = "code">
 Yoshimi 2.1.0 is starting
 Using jack_audio for audio and alsa_midi for midi
@@ -88,9 +88,9 @@ Mandatory or optional arguments to long options are also mandatory or optional
 for any corresponding short options.
 music@devuan:~$
     </div>
-    Once running in the CLI you will be at the top level and entering just a '?' will list all the available commands and also the names of the available contests. If reporting is set for the CLI this will be paged as shown below.
+    Once running in the CLI you will be at the top level and entering just a '?' will list all the available commands and also the names of the available contexts. If reporting is set for the CLI this will be paged as shown below.
     <div class = "code">
-yoshimi> ?
+yoshimi&gt ?
 Commands:
   ?  Help                     show commands
   List                        list current settings
@@ -110,10 +110,53 @@ Commands:
   COnfig      ...             - configuration settings
 q=quit /=search PgUp/PgDown=scroll (line 1 of 65)
     </div>
-    Quitting the pager will return you to the prompt. Notice it now shows the current context level.
+    Quitting this pager will return you to the prompt. Notice it now shows the current context level.
     <div class = "code">
 @ Top
 yoshimi&gt
+    </div>
+     When entering the query on other context levels you will normally get the first few top level ones as a reminder these are available from <em>any</em> level. Other than that you will only see the commands (and deeper contexts) appropriate to that level. However, you can also specifically query a context from <em>any</em> point , in which case you will see the list for that one only, without changing your current position.
+    <div class = "code">
+@ p1+, Sub
+yoshimi&gt ? vector
+Vector:
+  &ltn&gt                         set current base channel
+  [X/Y] CC &ltn&gt                CC n is used for X or Y axis sweep
+  [X/Y] Features &ltn&gt [s]      sets X or Y features 1-4 (ON, Reverse, {other})
+  [X] PRogram &ltl/r&gt &ltn&gt       X program change ID for LEFT or RIGHT part
+  [Y] PRogram &ltd/u&gt &ltn&gt       Y program change ID for DOWN or UP part
+  [X/Y] Control &ltn1&gt &ltn2&gt     sets n2 CC to use for X or Y feature n1 (2-4)
+  OFF                         disable vector for this channel
+  Name &lts&gt                    text name for this complete vector
+
+@ p1+, Sub
+yoshimi&gt
+    </div>
+    Many context levels have defaults that kick in if you don't add additional information. The most obvious being the <em>Part</em> level with just:
+    <div class = "code">
+yoshimi&gt set part
+@ Part 1+
+yoshimi&gt
+    </div>
+    You not only see that it is on part 1 but the '+' indicates it's enabled. There are lots of hints like this. Also any context with numeric settings can be changed simply with the number:
+    <div class = "code">
+yoshimi&gt set 5
+@ Part 5
+yoshimi&gt
+    </div>
+    Note part 5 has not yet been enabled.
+    <br><br>
+    Many actions will stack if the respective context levels are active:
+    <div class = "code">
+@ Part 5
+yoshimi&gt s 1 add voice wave
+@ p1+, A+, V1+ Sine
+yoshimi&gt
+    </div>
+    Here we used the minimum abbreviation for 'set'. You will also see that not only have we jumped right up into the waveform context of Addsynth Voice 1, but that the current waveform is 'Sine' and all the earlier labels are now compressed to the minimum so that the line doesn't get ridiculously long.
+    <div class = "code">
+    </div>
+    <div class = "code">
     </div>
     </p>
     More to do

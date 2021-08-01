@@ -2,4 +2,4 @@
     ConfBuild.h
 */
 
-#define BUILD_NUMBER 2010
+#define BUILD_NUMBER 2011

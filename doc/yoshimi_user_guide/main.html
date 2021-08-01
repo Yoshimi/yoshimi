@@ -122,21 +122,28 @@
     <br><br>
     <b>Shift</b> allows you to step the overall key up or down in semitone steps as much as three octaves.
     </P>
-    <p>
-    Next there is a short tabbed insert. By default this shows the <em>System</em> effects. These are applied to the whole of the main Left/Right audio outputs and immediately below it is the currently selected one. These are described in <a href="effects/effects.html">Effects.</a>
-    </p>
     <img src="images/system.png" alt="The System Effects Insert" class="image">
+    <p>
+    Next there is a short tabbed insert. By default this shows the <em>System</em> effects. These are applied to the whole of the main Left/Right audio outputs and immediately below it is the currently selected one. These are described in <a href="effects/effects.html">Effects.</a> The source for system effects is shown at the bottom of the main window, and is the output from <a href="part/part.html">Parts</a>.
+    </p>
     <p>
     The spinbox selects the effect being managed. You can have up to four of these, and the menu selects which actual effect will be used.
     <br><br>
     The <em>On</em> checkbox allows you to temporarily disable the effect (this setting is not saved). This is necessary, as if you set it back to 'No Effect' all settings you may have changed will be lost.
-    <br><br>
+    </p>
+    <img src="images/boundry.png" alt="divider" class="wideline">
+    <p>
+    <img src="images/syseffsend.png" alt="The System Effects Send window" class="tiny">
     After this there is the <em>Send To</em> button. This opens a small window so that you can cascade varying amounts of the effects if you want to.
+    <br><br>
+    This provides the ability to form very complex effect chains. With all controls at zero, each effect passes its output direct to the main L/R pair, but if (for example) you set the control marked <b>1-&gt3</b> about halfway, that effect will be combined with the normal input to effect 3 as well as being sent out directly.
+    <br><br>
+    Similarly, this combined effect can then be passed on to effect 4 with the <b>3-&gt4</b> control, and effect 4 could also be getting some from effect 2 via <b>2-&gt4</b>.
     </p>
     <img src="images/boundry.png" alt="divider" class="wideline">
     <p>
     <img src="images/insertion.png" alt="Insertion Effects" class="image">
-    This shows just the <em>Insertion</em> effects tab. The actual effects are, of course, the same.
+    This next view shows just the <em>Insertion</em> effects tab. The actual effects are, of course, the same.
     <br><br>
     Here, you can have up to eight effects, and they can be sent to any individual part or the main outputs. Again, you have a menu to select the wanted effect.
     <br><br>

@@ -28,7 +28,7 @@
     <br><br>
     <b>Send Reports to:</b> Various text messages are created when Yoshimi is running. These can either be sent to a GUI <em>Console</em> window or to the standard command line output.
     <br><br>
-    <b>Console Text Size</b>The font size used by the console is set independently of the window dimensions so that you can view varying amounts of text.
+    <b>Console Text Size</b>The font size used by the console is set independently of the window dimensions so that you can view varying amounts of text at whatever size is most convenient.
     <br><br>
     <b>Saved Instrument Format</b> Yoshimi instrument files can be saved to the original ZynAddSubFX format, the new extended Yoshimi format, or to both of them.
     <br><br>
@@ -50,7 +50,7 @@
     <br><br>
     <b>Log XML Headers</b> Reports an instrument's version number on loading. Both the ZynAddsubFX and Yoshimi numbers are displayed depending on whether it is an unedited original, a modified one or generated in Yoshimi from the start.
     <br><br>
-    <b>Include all data in XML files</b> Originally, some data was not stored in ZynAddSubFX instruments. This meant there were sometimes subtle differences in the sound each time the instrument was loaded. This switch ensures all date is stored.
+    <b>Include all data in XML files</b> Originally, some data was not stored in ZynAddSubFX instruments. This meant there were sometimes subtle differences in the sound each time the instrument was loaded. This switch ensures all data is stored.
     <br><br>
     <b>Enable GUI</b>
     <br>
@@ -59,12 +59,12 @@
     <br><br>
     <b>Enable Auto Instance</b> If this is enabled, then when you start Yoshimi, all instances that were open when it was last saved will be re-opened.
     <br><br>
-    <b>Enable Single Master</b> If this is set, and you try to start a second copy of Yoshimi, then instead you will get a new instance from the running one.
+    <b>Enable Single Master</b> If this is set, and you try to start a second copy of Yoshimi, then instead you will get a new instance from the running one. This is more efficient and makes better use of Yoshimi's resources.
     </p>
     <p>
     <h3>History Locks</h3>
-    All of these recent file lists can be locked so that their respective entries will not be moved or changed when you load or save new files of that type.
-    This is useful when using MIDI NRPNs to load files numerically via a remote keyboard/controller.
+    All of the recent file lists can be locked so that their respective entries will not be moved or changed when you load or save new files of that type.
+    This is particularly useful when using MIDI NRPNs to load files numerically via a remote keyboard/controller. It also makes loading frequently used files via the CLI more convenient.
     </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <img src="images/jack.png" alt="Jack tab" class="image">
@@ -104,13 +104,13 @@
     <b>Bank Change</b>
     This pair of controls determine how Yoshimi responds to MIDI bank changes. Normally the <em>Bank Root</em> will be MSB (CC0) and <em>Bank</em> will be LSB (CC32), however some older hardware has these reversed. Also some devices send spurious changes, so not only can you swap them, you can also completely disable acting on them.
     <br><br>
-    <b>Enable Program Change</b> Determines whether you want to allow Program/Instrument changes via MIDI.
+    <b>Enable Program Change</b> Determines whether you want to allow Program/Instrument changes via MIDI from <a href="../bank/bank.html">banks</a>.
     <br><br>
     <b>Enable Part On Program Change</b> Having this set will activate a part if it is not active when it receives a program change message.
     <br><br>
     <b>Enable Extended Program Change</b> This lets you set a specific CC that will then perform program changes on the upper 32 instruments in a bank.
     <br><br>
-    <b>Extended Program Change CC</b> The is the actual CC to use for extended program changes. The value sent should be the Instrument number minus 128.
+    <b>Extended Program Change CC</b> The is the actual CC to use for extended program changes. The value sent should be the slot number of the wanted Instrument minus 128.
     <br><br>
     <b>Enable Incoming NRPNs</b> Enables/Disables receiving NRPNs, but doesn't affect Vectors or MIDI Learn which are always available.
     <br><br>
