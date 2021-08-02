@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -43,9 +43,6 @@ decl {\#define PANEL_DUAL_X 530} {public local
 decl {\#define PANEL_DUAL_Y 600} {public local
 }
 
-decl {\#define FILER_SIZE 5000} {public local
-}
-
 decl {\#include <FL/Fl_Tooltip.H>} {public local
 }
 
@@ -53,6 +50,9 @@ decl {\#include <string>} {public local
 }
 
 decl {\#include <iostream>} {public local
+}
+
+decl {\#include <vector>} {public local
 }
 
 decl {\#include <fstream>} {public local
@@ -228,13 +228,10 @@ lineitem = n;}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
-      for (int i = 0; i < FILER_SIZE; ++i)
-          filerlist[i] = NULL;
-
       synth = _synth;
       presetsui = NULL;
       ninseff = 0;
@@ -269,7 +266,8 @@ class MasterUI {: {private GuiUpdates}
       filerpath.clear();
       lastfilerW = 0;} {}
   }
-  Function {~MasterUI()} {} {
+  Function {~MasterUI()} {open
+  } {
     code {//
       aboutwindow->hide();
       delete aboutwindow;
@@ -322,6 +320,12 @@ class MasterUI {: {private GuiUpdates}
 
       if (filerwindow)
       {
+          if (!filerlist.empty())
+          {
+              for (size_t i = 0; i < filerlist.size(); i++)
+                  delete(filerlist[i]);
+              filerlist.clear();
+          }
           if (filerwindow->visible())
               saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), true, "Master-filer");
           filerwindow->hide();
@@ -1828,7 +1832,8 @@ Alan Calvert started the project}
     savefavourites();
     return filerfound;} {}
   }
-  Function {fillfiler(string type_name)} {} {
+  Function {fillfiler(string type_name)} {open
+  } {
     code {//
         string tofetch;
         int options = filerOpt1->value();
@@ -1840,16 +1845,22 @@ Alan Calvert started the project}
             options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
-
+        if (!filerlist.empty())
+        {
+            for (size_t i = 0; i < filerlist.size(); i++)
+                delete(filerlist[i]);
+            filerlist.clear();
+        }
         filerscroll->clear();
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
-        while(!tofetch.empty() && lineno < FILER_SIZE)
+        while(!tofetch.empty())
         {
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
             bool isDir = false;
-            filerlist[lineno] = new FilerLine(0, 0, 390, 20);
+            FilerLine *newline = new FilerLine(0, 0, 390, 20);
+            filerlist.push_back(newline);
             if (next.find("Dir:") != std::string::npos)
             {
                 next = next.substr(5);
@@ -1865,7 +1876,8 @@ Alan Calvert started the project}
         filerscroll->end();
         filerscroll->scroll_to(-10,-10);
         filerRtext();
-        //std::cout << "list end " << lineno << std::endl;} {}
+        //std::cout << "list end " << lineno << std::endl;} {selected
+    }
   }
   Function {filerselect(int item)} {} {
     code {//
@@ -3341,8 +3353,7 @@ Alan Calvert started the project}
     if (logenable)
         yoshiLog->Show(synth);
     else if (yoshiLog->logConsole->visible())
-        yoshiLog->Hide(synth);
-    } {}
+        yoshiLog->Hide(synth);} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
@@ -3924,7 +3935,7 @@ Alan Calvert started the project}
   }
   decl {int fileruseX;} {private local
   }
-  decl {FilerLine *filerlist[FILER_SIZE];} {private local
+  decl {vector <FilerLine*> filerlist;} {private local
   }
   decl {int lineno;} {private local
   }
