@@ -23,7 +23,7 @@
     <b>Depth</b> The amplitude variation applied
     </li>
     <li>
-    <b>Start</b> (phase) The LFO position when the note starts
+    <b>Start</b> (phase) The LFO position when the note starts. This is locked to the incoming MIDI clock if both BPM and continuous are set
     </li>
     <li>
     <b>Delay</b> Time delay before the LFO comes in to effect
@@ -35,13 +35,13 @@
     <b>Rand Freq.</b> Degree of 'humanising' variation of LFO frequency
     </li>
     <li>
-    <b>Str.</b> (stretch) Anticlockwise LFO is faster on lower pitch notes and vice-versa <span class="warn">When BPM?</span>
+    <b>Str.</b> (stretch) Anticlockwise LFO is faster on lower pitch notes and vice-versa. If BPM is set the control does nothing
     </li>
     <li>
     <b>BPM</b> When checked locks the delay control to the incoming MIDI clock
     </li>
     <li>
-    <b>Cont.</b> Normally the LFO starts and stops with the notes, but when checked the LFO is free running independent of whether any notes are sounding. <span class="warn">When BPM?</span>
+    <b>Cont.</b> Normally the LFO starts and stops with the notes, but when checked the LFO is free running independent of whether any notes are sounding, unless BPM mode is set
     </li>
     <li>
     <b>Type</b> The shape of the LFO waveform

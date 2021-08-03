@@ -13,11 +13,14 @@
     </nav>
     <h2 style="text-align: center">Effects</h2>
     <p>
-        Effects can be applied to single instruments or as master effects.
+        Effects can be applied to single instruments or as Master System/Insertion effects.
         <br>
         Most effects have a <b>Preset</b> dropdown which allows you to select some 'factory' preset.
         <br> For any effect, if you select a preset and then change controls this dropdown will become blue to remind you the preset has changed.
-        <br> Note that for some effects, the D/W (Dry/Wet) control when editing the effect for a single instrument becomes a Vol (Volume) control when applied as Master effects. These are controlled from the <a href=../main.html>Main</a> window. In this section we always refer to D/W.
+        <br><br>
+        Note:
+        <br>
+        &emsp;With the exception of the EQ effect, the D/W (Dry/Wet) control becomes a Vol (Volume) control when applied as a Master System effect. These are controlled from the <a href=../main.html#system>Main</a> window. In this section we always refer to D/W.
     </p>
 
     <!-- REVERB -->
@@ -33,10 +36,10 @@
         </li>
         <li>
             <b>Type</b> This selects the reverb type:
+            <br> - <i>random</i> will reset all the filters on selection and each time the roomsize is changed.
             <br> - <i>freeverb</i> (default) is the well-known freeverb reverb type.
-            <br> - <i>bandwidth</i> has the same controls for the comb and allpass filters, but it applies a unison before the LPF/HPF. The unison’s bandwidth can be set using BW. <span class="warn">this should be explained better (taken from the PDF user guide)</span>
-            <br>
-            <i>random</i> will randomize comb and allpass each time the type or roomsize is being changed <span class="warn">??</span>
+            <br> - <i>bandwidth</i> applies a unison before the LPF/HPF filters
+
         </li>
         <li>
             <b>R.S.</b> Room Size (%)
@@ -57,7 +60,7 @@
             <b>I.delfb</b> Initial delay feedback
         </li>
         <li>
-            <b>BW</b> Bandwidth - only available for type <i>bandwidth</i>
+            <b>BW</b> Bandwidth -  Changes the unison 'spread' for the <i>bandwidth</i> type
         </li>
         <li>
             <b>E/R</b> <i>[not yet implemented]</i> Early reflections
@@ -383,10 +386,10 @@
             <b>LfoD</b> LFO Depth
         </li>
         <li>
-            <b>A.S.</b> Amplitude Sensing. Defines how much the amplitude influences the effect <span class="warn">check</span>
+            <b>A.S.</b> Amplitude Sensing. Changes the behaviour of the filter dependent on the incoming amplitude
         </li>
         <li>
-            <b>A.M.</b> Amplitude Measurement, i.e. how the RMS value of the amplitude is measured. The higher the value the slower the filter will react
+            <b>A.M.</b> Amplitude Measurement, i.e. how the RMS value of the amplitude is calculated. The higher the value the slower the filter will react
         </li>
         <li>
             <b>Inv.</b> Invert (negate) the absolute RMS value effectively lowering the filter frequency
