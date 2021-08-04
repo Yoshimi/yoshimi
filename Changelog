@@ -3,6 +3,11 @@ yoshimi 2.0.2 M
 2021-8-4 Will
 * User guide more detail and cross links.
 
+* Various Doc updates.
+* Made string to int conversion safe.
+* Activated search for new manual.
+* Developed way to auto update manual version.
+
 2021-8-3 Will
 * User guide corrections and improvements.
 

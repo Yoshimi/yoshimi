@@ -74,7 +74,7 @@ inline int version2value(void)
      */
     char tofind[] = YOSHIMI_VERSION;
     std::string digits = "";
-    std::string num = "";
+    std::string num = "0";
     for (size_t i = 0; i < strlen(tofind); ++i)
     {
         if (tofind[i] >= '0' && tofind[i] <= '9')

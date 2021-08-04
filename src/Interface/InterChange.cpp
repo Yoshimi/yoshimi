@@ -867,7 +867,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             // first try html version
 
             string found = "";
-            if (false)//findManual(found))
+            if (findManual(found))
             {
                 size_t pos = found.rfind("files/yoshimi_user_guide_version");
                 found = found.substr(0, pos);

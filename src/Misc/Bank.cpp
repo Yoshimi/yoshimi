@@ -69,6 +69,7 @@ using file::saveText;
 using func::asString;
 using func::string2int;
 using func::findSplitPoint;
+using func::isDigits;
 
 using std::to_string;
 using std::string;
@@ -537,7 +538,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                         int slash = nextfile.rfind("/") + 1;
                         int hyphen = nextfile.rfind("-");
                         if (hyphen > slash && (hyphen - slash) <= 4)
-                            pos = stoi(nextfile.substr(slash, hyphen)) - 1;
+                            pos = string2int(nextfile.substr(slash, hyphen)) -1;
 
                         if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile, 0))
                             missing = true;

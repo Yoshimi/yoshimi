@@ -2029,15 +2029,18 @@ Alan Calvert started the project}
         }
         if (Fl::get_key(FL_Enter))
         {
-            string test = valueInst->value();
-            if (!test.empty())
+            string testval = valueInst->value();
+            if (!testval.empty())
             {
-                int result = stoi(valueInst->value());
-                if (result > 0 && result < 32)
+                if (func::isDigits(testval))
                 {
-                    send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, result, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-                    setInstance->hide();
-                    break;
+                    int result = stoi(testval);
+                    if (result > 0 && result < 32)
+                    {
+                        send_data(TOPLEVEL::action::lowPrio, MAIN::control::startInstance, result, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                        setInstance->hide();
+                        break;
+                    }
                 }
             }
         }

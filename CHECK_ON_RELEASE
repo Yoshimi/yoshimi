@@ -1,6 +1,9 @@
 
 Ensure all new files have been added to commit!!!
 
+Before the commit run the python file /home/will/yoshimi-code/update_guide_version.py
+This will ensure the guide has the correct version number.
+
 /src/CMakeLists.txt
     Ensure version number is correct.
     Disable extra compiler tests.

@@ -27,9 +27,7 @@
 #include <sstream>
 #include <cstring>
 
-
 namespace func {
-
 
 inline std::string asString(int n)
 {
@@ -176,6 +174,16 @@ inline double string2double(std::string str)
     return dval;
 }
 
+
+inline bool isDigits(std::string str)
+{
+    if (str.empty())
+        return false;
+    char c = str.at(0);
+    if (c < '0' or c > '9')
+        return false;
+    return true;
+}
 
 inline int string2int(std::string str)
 {

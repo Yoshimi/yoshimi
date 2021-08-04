@@ -26,9 +26,11 @@
 
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
+#include "Misc/FormatFuncs.h"
 
 using file::saveText;
 using file::loadText;
+using func::string2int;
 
 enum ValueType {
     VC_plainValue,
@@ -174,28 +176,28 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
         }
         else
         {
-            x = stoi(values.substr(0, pos));
+            x = string2int(values.substr(0, pos));
             if (x < 4)
                 x = 4;
 
-            y = stoi(values.substr(pos));
+            y = string2int(values.substr(pos));
             if (y < 10)
                 y = 10;
 
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
-            w = stoi(values.substr(pos));
+            w = string2int(values.substr(pos));
 
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
-            h = stoi(values.substr(pos));
+            h = string2int(values.substr(pos));
 
             pos = values.find(' ', pos + 1);
             if (pos == string::npos)
                 return;
-            o = stoi(values.substr(pos));
+            o = string2int(values.substr(pos));
             //std::cout << "x " << x << "   y " << y  << "   w " << w << "   h " << h <<  "   o " << o << "  " << filename << std::endl;
         }
     }
@@ -210,7 +212,7 @@ inline int lastSeen(SynthEngine *synth, std::string filename)
     if (pos == string::npos)
         return false;
     ++pos;
-    return stoi(values.substr(pos));
+    return string2int(values.substr(pos));
 }
 
 inline void setVisible(SynthEngine *synth, bool v, std::string filename)
@@ -221,7 +223,7 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
     if (pos == string::npos)
         return;
     ++ pos;
-    bool vis = stoi(values.substr(pos));
+    bool vis = string2int(values.substr(pos));
     if (vis == v)
         return;
     values.replace(pos, 1, std::to_string(v));
