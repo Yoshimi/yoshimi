@@ -12,9 +12,10 @@
     <h2 style="text-align: center">Filter Types</h2>
     <img src="images/filter.png" alt="Filter Window" class="image">
     <p>
-    These controls are identical across all engines and also available in the DynFilter effect (see <a href="../effects/effects.html">Effects</a>)
+    These controls are identical across all engines and also available in the <a href="../effects/effects.html#dynfilter">DynFilter</a> effect.
     </p>
-    <ul>
+    <p>
+      <ul>
       <li>
           <b>Category</b> Filter category: Analog, Formant or State Variable (StateVar)
       </li>
@@ -42,7 +43,8 @@
       <li>
         <b>Freq.tr.</b> Amount of frequency tracking for the filter. If this is positive (rightmost) higher note frequencies will shift the filter cutoff frequency higher. Default range is -100% to 98% unless the checkbox above ('0 / +') is selected: in this case the range is 0% to 198%
       </li>
-  </ul>
+    </ul>
+    </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <h3 style="text-align: center">The Formant Filter</h3>
     <img src="images/formant.png" alt="Formant Window" class="image">
@@ -69,7 +71,7 @@
         <b>Formant</b> The formant being edited.
       </li>
       <li>
-        <b>Freq</b> The frequency of the current formant.
+        <b>Freq</b> The frequency of the current formant. Uniquely this has no default value, and will be set randomly at the time the filter is first set.
       </li>
       <li>
         <b>Q</b> The current formant's Q factor.
@@ -100,8 +102,20 @@
       </li>
     </ul>
     </p>
-    TODO graph behaviour
-    <br>
+    <p>
+    <h4>The Formant Graph</h4>
+    You can control some of the parameters by placing the mouse pointer over the yellow lines representing each formant. While making changes, the respective controls will move accordingly.
+    <br><br>
+    Holding down either <em>left</em> or <em>right</em> mouse buttons and moving the mouse sideways will change the formant's center frequency.
+    <br><br>
+    Moving vertically while holding down the <em>left</em> button will change the amplitude. Alternatively holding down the <em>right</em> button changes the formant's Q factor.
+    <br><br>
+    Anywhere on the graph, the <em>scroll-wheel</em> changes the octave range, and holding <em>Shift</em> at the same time changes the center frequency.
+    <br><br>
+    If your mouse has extra buttons on the sides (many haven't) these can be used to switch between the formants instead of moving the mouse across to the next one.
+    <br><br>
+    This is especially useful for controling most of the formant features one-handed, quickly, while also playing on a keyboard.
+    </p>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>
 </html>

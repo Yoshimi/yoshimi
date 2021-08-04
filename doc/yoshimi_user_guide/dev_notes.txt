@@ -15,8 +15,7 @@ Contributors are also asked to maintain a writing style consistent with
 existing content.
 
 As far as possible, all of the sections are self-contained in their own
-directories, but sharing a common CSS style sheet. Currently some sections
-are little more than placeholders.
+directories, but sharing a common CSS style sheet.
 
 The background colour has been chosen to give good contrast with the text
 and all images without the glare of pure white.

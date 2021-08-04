@@ -19,29 +19,29 @@
     <p>
     <ul>
     <li>
-    <b>A.val</b> (attack target value - amplitude only)
+    <b>A.val</b> Attack target value - amplitude only
     </li>
     <li>
-    <b>A.dt</b> (attack time)
+    <b>A.dt</b> Attack time
     </li>
     <li>
-    <b>D.val</b> (decay target value - filter only)
+    <b>D.val</b> Decay target value - filter only
     </li>
-    <b>D.dt</b> (decay time - not frequency or bandwidth)
+    <b>D.dt</b> Decay time - not frequency or bandwidth
     <li>
-    <b>R.dt</b> (release time)
-    </li>
-    <li>
-    <b>R.val</b> (release target value - not amplitude)
+    <b>R.dt</b> Release time
     </li>
     <li>
-    <b>Stretch</b>
+    <b>R.val</b> Release target value - not amplitude
     </li>
     <li>
-    <b>L</b> (linear - amplitude only)
+    <b>Stretch</b> Anticlockwise envelope is shorter on lower pitch notes and vice-versa
     </li>
     <li>
-    <b>frcR</b> (forced release)
+    <b>L</b> Linear - amplitude only
+    </li>
+    <li>
+    <b>frcR</b> Forced release
     </li>
     </ul>
     The 'E' button opens the graphical window showing the overall envelope shape, where it is then possible to set <em>freemode</em>.
@@ -50,9 +50,32 @@
     <img src="images/freemode.png" alt="freemode window" class="image">
     <h3>Freemode</h3>
     <p>
-    This window shows a <em>freemode</em> enabled envelope. This is where all the normal controls have been assigned to fully editable points. Not only that, but you can add points up to a maximum of 40. This allows you to develop extremely detailed and expressive envelopes.
+    This window shows a <em>freemode</em> enabled envelope. This is where all the normal controls have been assigned to fully editable target points. Not only that, but you can add points up to a maximum of 40. This allows you to develop extremely detailed and expressive envelopes.
     <br>
     The yellow vertical is the sustain/release point, and you can have new points both sides of it.
+    <ul>
+    <li>
+    <b>Freemode</b> Enables or disable freemode behaviour
+    </li>
+    <li>
+    <b>Add point</b> Creates a new point before the highlighted one (there must be one highlighted)
+    </li>
+    <li>
+    <b>Delete point</b> Removes the highlighted point. There is a minimum of 3.
+    </li>
+    <li>
+    <b>Sust</b> (sustain) The point that is to be regarded as the sustain point. Zero gives no sustain.
+    </li>
+    <li>
+    <b>Str</b> (stretch)
+    </li>
+    <li>
+    <b>L</b> (linear)
+    </li>
+    <li>
+    <b>fcR</b> (forced release)
+    </li>
+    </ul>
     </p>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>
