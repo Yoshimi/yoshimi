@@ -874,62 +874,82 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 found += "/index.html";
 
                 //std::cout << "found " << found << std::endl;
+                getData->data.control = TOPLEVEL::control::textMessage;
+                getData->data.miscmsg = textMsgBuffer.push("Found manual, looking for browser");
+                returnsBuffer.write(getData->bytes);
                 FILE *fp = popen(("xdg-open " + found + " &").c_str(), "r");
                 if (fp == NULL)
-                    text = "Can't find Browser. Trying for old PDF";
+                {
+                    getData->data.miscmsg = textMsgBuffer.push("Can't find Browser. Trying for old PDF");
+                    returnsBuffer.write(getData->bytes);
+                    found = "";
+                }
                 else
                     pclose(fp);
-                break;
             }
 
-            // fall back to older PDF version
-
-            std::string manfile = synth->manualname();
-            std::string stub = manfile.substr(0, manfile.rfind("-"));
-
-            std::string path = "";
-            std::string lastdir = "";
-            //std::string found = "";
-            std::string search = "/usr/share/doc/yoshimi";
-            path = manualSearch(search, stub);
-            //std::cout << "name1 " << path << std::endl;
-            found = path;
-            lastdir = search;
-
-            search = "/usr/local/share/doc/yoshimi";
-            path = manualSearch(search, stub);
-            //std::cout << "name2 " << path << std::endl;
-            if (path >= found)
+            if (found.empty())
             {
+                // fall back to older PDF version
+
+                std::string manfile = synth->manualname();
+                std::string stub = manfile.substr(0, manfile.rfind("-"));
+
+                std::string path = "";
+                std::string lastdir = "";
+                std::string search = "/usr/share/doc/yoshimi";
+                path = manualSearch(search, stub);
+                //std::cout << "name1 " << path << std::endl;
                 found = path;
                 lastdir = search;
-            }
 
-            search = localPath();
-            if (!search.empty())
-            {
+                search = "/usr/local/share/doc/yoshimi";
                 path = manualSearch(search, stub);
-                //std::cout << "name3 " << path << std::endl;
+                //std::cout << "name2 " << path << std::endl;
                 if (path >= found)
                 {
                     found = path;
                     lastdir = search;
                 }
-            }
 
-            if (found.empty())
-                text = "Can't find manual :(";
-            else
-            {
-                if (found.substr(0, found.rfind(".")) != manfile)
-                text = "Can't find current manual. Using older one";
+                search = localPath();
+                if (!search.empty())
+                {
+                    path = manualSearch(search, stub);
+                    //std::cout << "name3 " << path << std::endl;
+                    if (path >= found)
+                    {
+                        found = path;
+                        lastdir = search;
+                    }
+                }
 
+                if (found.empty())
+                {
+                    getData->data.miscmsg = textMsgBuffer.push("Can't find PDF manual :(");
+                    returnsBuffer.write(getData->bytes);
+                }
+                else
+                {
+                    if (found.substr(0, found.rfind(".")) != manfile)
+                    getData->data.miscmsg = textMsgBuffer.push("Can't find last PDF. Looking for older one");
+                    returnsBuffer.write(getData->bytes);
+                }
                 std::string command = "xdg-open " + lastdir + "/" + found + "&";
                 FILE *fp = popen(command.c_str(), "r");
                 if (fp == NULL)
-                    text = "Can't find PDF reader :(";
+                {
+                    getData->data.miscmsg = textMsgBuffer.push("Can't find PDF reader :(");
+                    returnsBuffer.write(getData->bytes);
+                    found = "";
+                }
                 else
                     pclose(fp);
+            }
+            if (!found.empty())
+            {
+                getData->data.miscmsg = NO_MSG;
+                returnsBuffer.write(getData->bytes);
             }
             newMsg = true;
             break;
