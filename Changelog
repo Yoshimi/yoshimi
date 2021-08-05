@@ -2,6 +2,8 @@ yoshimi 2.0.2 M
 
 2021-8-5 Will
 * Improved reporting when loading manual.
+* NRPN send system effect No. to No. now works!
+  Undated manual accordingly.
 
 2021-8-4 Will
 * User guide more detail and cross links.

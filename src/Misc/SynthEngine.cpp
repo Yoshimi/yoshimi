@@ -809,6 +809,7 @@ void SynthEngine::SetZynControls(bool in_place)
      * Data MSB param to change
      * if | 64 LSB sets eff type
      * for insert effect only | 96 LSB sets destination
+     * for system only &3 sets destination LSB value
      *
      * Data LSB param value
      */
@@ -828,22 +829,25 @@ void SynthEngine::SetZynControls(bool in_place)
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::fromMIDI | TOPLEVEL::action::forceUpdate;
 
-    if (group == 0x24)
+    if (group == 0x24) // sys
     {
         putData.data.part = TOPLEVEL::section::systemEffects;
         if (efftype == 0x40)
         {
             putData.data.control = EFFECT::sysIns::effectType;
         }
-        //else if (efftype == 0x60) // not done yet
-            //putData.data.control = 2;
+        else if (efftype == 0x60) // send eff to
+        {
+            putData.data.control = (parnum & 3);
+            putData.data.insert = 16;
+        }
         else
         {
             putData.data.kit = EFFECT::type::none + sysefx[effnum]->geteffect();
             putData.data.control = parnum;
         }
     }
-    else
+    else // ins
     {
         putData.data.part = TOPLEVEL::section::insertEffects;
         //std::cout << "efftype " << int(efftype) << std::endl;
