@@ -13,6 +13,9 @@
     <h2 style="text-align: center">MIDI CCs and NRPNs</h2>
     <p>
     <h3>CCs (Continuous Controllers) directly supported by Yoshimi</h3>
+
+    Unless stated otherwise, <b>LSB</b> range is 0 to 127.
+    <br><br>
     <table>
     <tr>
       <th>CC</th>
@@ -126,6 +129,8 @@
     <a id="nrpn"></a>
     <p>
     <h3>NRPNs (Non Registered Parameter Numbers) directly supported by Yoshimi</h3>
+    Unless stated otherwise, <b> Data LSB</b> range is 0 to 127.
+    <br><br>
     <table>
     <tr>
       <th>NRPN MSB&emsp;</th>
@@ -189,7 +194,8 @@
     </tr>
     </table>
     <br>
-    The following don't currently use data bytes, so these can be omitted with some sequencers.
+    The following don't currently use data bytes. Some sequencers allow them to be omitted.
+    <br><br>
     <table><tr>
       <th>NRPN MSB&emsp;</th>
       <th>NRPN LSB&emsp;</th>
@@ -270,9 +276,9 @@
     </div>
     This must be done before making a parameter change (unless already set).
     <br><br>
-    For System effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then it sends the designated system effect to  system effect 2 - 4, represented by 96 to 99. LSB then sets the amount of the effect to pass on.
+    For System effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then it sends the designated system effect to  system effect 2 - 4, represented by MSB 96 to 99. LSB then sets the amount of the effect to pass on.
     <br><br>
-    For Insertion effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then LSB decides the part that the effect will be set to:
+    For Insertion effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then LSB decides the part that the effect will be sent to:
     <div class="tab">
       0 to highest active part.
       <br>
@@ -404,7 +410,7 @@
       1 - Pan<br>
       2 - LFO Frequency<br>
       3 - LFO Randomness<br>
-      4 - LFO Type (0 - 1) Sine/Triangle<br><
+      4 - LFO Type (0 - 1) Sine/Triangle<br>
       5 - LFO Stereo Difference<br>
       6 - LFO Depth<br>
       7 - Filter Amplitude<br>
@@ -414,7 +420,7 @@
       17 - BPM Mode for frequency (0 - 1) off/on
     </div>
     <br>
-    <b>EQ</b> This effect is an exception, also it has no presets.
+    <b>EQ</b> This effect is an exception in the way it's managed. It also has no presets.
     <div class="tab">
        0 - Gain<br>
        The others change individual EQ bands using the following formulae:<br>
@@ -445,11 +451,14 @@
     <a id="direct"></a>
     <br><br>
     <b>Direct Part Control</b>
+    <br>
+    <b>Data MSB</b> is the control to be managed, and <b>LSB</b> the value to set.
+    <br><br>
     <div class="tab">
        0 - Part number (this must be set first)<br>
-       1 - Program Change (0 - 127)<br>
+       1 - Program Change<br>
        2 - controller number (0 - 119)<br>
-       3 - controller value (0 - 127)<br>
+       3 - controller value<br>
        4 - Channel number for this part
        <div class="tab">
           (0 - 15) select for all messages<br>
@@ -564,7 +573,7 @@
     </tr>
     <tr>
       <td>7</td>
-      <td> 0 - 127</td>
+      <td> </td>
       <td>Master volume</td>
     </tr>
     <tr>
@@ -587,19 +596,19 @@
     </tr>
     <tr>
       <td>82</td>
-      <td>0 - 127</td>
+      <td> </td>
       <td>Enable program change</td>
       <td>less than 64 disables</td>
     </tr>
     <tr>
       <td>83</td>
-      <td>0 - 127</td>
+      <td> </td>
       <td>Enable activation of part when program changed</td>
       <td>&emsp;less than 64 disables</td>
     </tr>
     <tr>
       <td>84</td>
-      <td>0 - 120</td>
+      <td> </td>
       <td>Set CC control for extended program change</td>
       <td>greater than 119 disables</td>
     </tr>

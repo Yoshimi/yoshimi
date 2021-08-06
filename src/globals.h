@@ -503,6 +503,8 @@ namespace SCALES // usage SCALES::control::refFrequency
         keyboardMap,
         importScl = 48,
         importKbm,
+        exportScl, // not yet
+        exportKbm, // not yet
         name = 64,
         comment,
         retune = 80, // GUI only
