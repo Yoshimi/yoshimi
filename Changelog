@@ -2,6 +2,10 @@ yoshimi 2.0.2 M
 
 2021-8-7 Will
 * Added an appendix to guide.
+* Added a MIDI note lit generator in Utils.
+* Removed now redundant similar information from docs.
+* Removed PDF version of guide.
+  The on-line copy is now referred to.
 
 2021-8-6 Will
 * Improved manual's CC/NRPN descriptions.

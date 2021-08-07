@@ -12,6 +12,10 @@ The file 'splashdefault.png' is the oldest released screen - it was created befo
 You will need to give the full filepath for both "MakeSplash.sh" and your image file.
 
 
+midiListgen.cpp
+This is the source file to build a program that generates an HTML formatted list of MIDI note names, numbers and frequencies. It is highly accurate and was used to generate the list used in the guide.
+
+
 switch_time.cpp
 This is a source file used to test the behaviour of large switch statements. The difference is significant, and more noticable on slower single core processors. Compiling with all optimisations on makes and even greater difference.
 
