@@ -1845,8 +1845,8 @@ Alan Calvert started the project}
             options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
-        filerlist.clear();
-        filerscroll->clear();
+        filerlist.clear();        // Note: must come first; dtor of FL_Group automatically
+        filerscroll->clear();     //       detaches child widgets from the FL_Scroll
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
         while(!tofetch.empty())
