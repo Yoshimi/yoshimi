@@ -1,5 +1,8 @@
 yoshimi 2.0.2 M
 
+2021-8-8 Will
+* Util cleanups.
+
 2021-8-7 Will
 * Added an appendix to guide.
 * Added a MIDI note lit generator in Utils.

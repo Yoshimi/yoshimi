@@ -28,31 +28,32 @@
 
 using namespace std;
 
-std::string asLongString(double n)
+std::string asLongString(double n, size_t digits)
 {
-   std::ostringstream oss;
-   oss.precision(6);
-   oss.width(6);
-   oss << n;
-   std::string value = oss.str();
-   value = std::regex_replace(value, std::regex("^ +"), "");
-   //if (value.length() < 5)
-   if (value.find('.') == std::string::npos)
-       value += '.';
-   while (value.length() < 7)
-       value += '0';
-   return value;
+    std::ostringstream oss;
+    oss.precision(digits);
+    oss.width(digits);
+    oss << n;
+    std::string value = oss.str();
+    value = std::regex_replace(value, std::regex("^ +"), "");
+
+    if (value.find('.') == std::string::npos)
+        value += '.';
+    while (value.length() <= digits)
+        value += '0';
+    return value;
 }
 
 
 int main(void)
-{
-    double twelf = 12.0;
+{ // we use doubles for greatest accuracy then reduce the result.
+  // this minimises accumulated errors from repeated multiplication
+    double twelfth = 12.0;
     double two = 2.0;
     double multiplier;
-    multiplier = pow(two, 1/twelf);
-    //std::cout.precision(10);
-    //std::cout << "res " << multiplier << std::endl;
+    multiplier = pow(two, 1 / twelfth);
+    std::cout.precision(10);
+    std::cout << "twelfth root of two = " << multiplier << std::endl;
 
     static std::string names [] = {
     "A", "#", "B", "C", "#", "D", "#", "E", "F", "#", "G", "#"
@@ -60,7 +61,7 @@ int main(void)
     int stringcount = 0;
     int octave = 0;
     double result = 27.5;
-    //std::cout.precision(6);
+    int precision = 6;
     std::string currentNote;
     std::string fullString;
     std::vector <std::string> ourlist;
@@ -74,7 +75,7 @@ int main(void)
         ++ stringcount;
         if (stringcount >= 12)
             stringcount = 0;
-        fullString = "        <td>" + currentNote + "</td><td>" + std::to_string(i) + "</td><td>" + asLongString(result) + "</td>";
+        fullString = "        <td>" + currentNote + "</td><td>" + std::to_string(i) + "</td><td>" + asLongString(result, precision) + "</td>";
         ourlist.push_back("      </tr>");
         ourlist.push_back(fullString);
         ourlist.push_back("      <tr align=\"center\">");
