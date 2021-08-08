@@ -52,7 +52,7 @@ decl {\#include <string>} {public local
 decl {\#include <iostream>} {public local
 }
 
-decl {\#include <vector>} {public local
+decl {\#include <deque>} {public local
 }
 
 decl {\#include <fstream>} {public local
@@ -187,6 +187,11 @@ lineitem = n;}
   Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n = 0;} {}
   }
+  decl {FilerLine(FilerLine const&) =delete;} {public}
+  decl {FilerLine(FilerLine&&) =delete;} {public}
+  decl {FilerLine& operator=(FilerLine const&) =delete;} {public}
+  decl {FilerLine& operator=(FilerLine&&) =delete;} {public}
+
   Function {init(SynthEngine *synth_, int n_, bool isDir_, string typeName_, string title_)} {} {
     code {//
 
@@ -320,12 +325,7 @@ class MasterUI {open : {private GuiUpdates}
 
       if (filerwindow)
       {
-          if (!filerlist.empty())
-          {
-              for (size_t i = 0; i < filerlist.size(); i++)
-                  delete(filerlist[i]);
-              filerlist.clear();
-          }
+          filerlist.clear();
           if (filerwindow->visible())
               saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), true, "Master-filer");
           filerwindow->hide();
@@ -1845,12 +1845,7 @@ Alan Calvert started the project}
             options |= 16;
 
         file::dir2string(tofetch, filerpath, filerext, options);
-        if (!filerlist.empty())
-        {
-            for (size_t i = 0; i < filerlist.size(); i++)
-                delete(filerlist[i]);
-            filerlist.clear();
-        }
+        filerlist.clear();
         filerscroll->clear();
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
@@ -1859,17 +1854,16 @@ Alan Calvert started the project}
             size_t pos = tofetch.find("\\n");
             string next = tofetch.substr(0, pos);
             bool isDir = false;
-            FilerLine *newline = new FilerLine(0, 0, 390, 20);
-            filerlist.push_back(newline);
+            filerlist.emplace_back(0, 0, 390, 20);
             if (next.find("Dir:") != std::string::npos)
             {
                 next = next.substr(5);
                 isDir = true;
             }
-            filerlist[lineno]->init(synth,lineno, isDir, type_name, next);
+            filerlist.back().init(synth,lineno, isDir, type_name, next);
             //std::cout << "name >" << next << "<" << std::endl;
-            filerlist[lineno]->name->copy_label(next.c_str());
-            filerscroll->add(filerlist[lineno]);
+            filerlist.back().name->copy_label(next.c_str());
+            filerscroll->add(&filerlist.back());
             ++lineno;
             tofetch = tofetch.substr(pos + 1);
         }
@@ -1881,8 +1875,8 @@ Alan Calvert started the project}
   }
   Function {filerselect(int item)} {} {
     code {//
-        string line = string(filerlist[item]->name->label());
-        if (filerlist[item]->dirIcon->visible())
+        string line = string(filerlist[item].name->label());
+        if (filerlist[item].dirIcon->visible())
         {
             //std::cout << "in dir" << std::endl;
             if (line.back() !='/')
@@ -2002,9 +1996,9 @@ Alan Calvert started the project}
         faveset->labelsize(size12);
         for (int i = 0; i < lineno; ++i)
         {
-            filerlist[i]->resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
-            filerlist[i]->name->labelsize(size12);
-            filerlist[i]->type->labelsize(int(4 * dScale));
+            filerlist[i].resize(int(10 * dScale), int(((i * 20) + 96) * dScale), int(440 * dScale), int(20 * dScale));
+            filerlist[i].name->labelsize(size12);
+            filerlist[i].type->labelsize(int(4 * dScale));
         }
         filerwindow->redraw();} {}
   }
@@ -3938,7 +3932,7 @@ Alan Calvert started the project}
   }
   decl {int fileruseX;} {private local
   }
-  decl {vector <FilerLine*> filerlist;} {private local
+  decl {deque<FilerLine> filerlist;} {private local
   }
   decl {int lineno;} {private local
   }
