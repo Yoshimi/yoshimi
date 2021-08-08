@@ -135,8 +135,7 @@ void Echo::out(float* smpsl, float* smpsr)
     float ldl;
     float rdl;
 
-    if (Pbpm)
-        initdelays();
+    initdelays();
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
@@ -230,7 +229,6 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    initdelays();
 }
 
 
@@ -242,7 +240,6 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
     if (Plrdelay < 64.0f)
         tmp = -tmp;
     lrdelay = (int)tmp;
-    initdelays();
 }
 
 

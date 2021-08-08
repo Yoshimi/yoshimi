@@ -51,6 +51,7 @@ enum ValueType {
     VC_LFOdepthFilter,
     VC_LFOdelay,
     VC_LFOstartphase,
+    VC_LFOstartphaseRand,
     VC_EnvelopeDT,
     VC_EnvelopeFreqVal,
     VC_EnvelopeFilterVal,
