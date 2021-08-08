@@ -654,12 +654,13 @@ string convert_value(ValueType type, float val)
             f = ((int)val) / 127.0f * 4.0f + 0.005f;
             return(custom_value_units(f,"s",2));
 
-        case VC_LFOstartphase:
+        case VC_LFOstartphaseRand:
             if ((int)val == 0)
                 return("random");
-            else
-                return(custom_value_units(((int)val - 64.0f) / 127.0f
-                                      * 360.0f, "°"));
+            // fallthrough
+        case VC_LFOstartphase:
+            return(custom_value_units(((int)val - 64.0f) / 127.0f
+                                  * 360.0f, "°"));
         case VC_EnvelopeDT:
             // unfortunately converttofree() is not called in time for us to
             // be able to use env->getdt(), so we have to compute ourselves

@@ -88,7 +88,7 @@ pars=NULL;} {}
           label BPM
           callback {send_data(0, group, LFOINSERT::control::bpm, o->value(), TOPLEVEL::type::Integer);
 updateLFOFreqType();
-updateRandFreq();}
+updateBpmControls();}
           tooltip {Lock LFO frequency to a multiple of the BPM.} xywh {230 5 45 15} down_box DOWN_BOX labelsize 10
           class Fl_Check_Button2
         }
@@ -132,7 +132,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           callback {//
           send_data(0, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(VC_LFOstartphase);}
+          code0 {o->setValueType(pars->Pbpm ? VC_LFOstartphase : VC_LFOstartphaseRand);}
           class WidgetPDial
         }
         Fl_Choice LFOtype {
@@ -199,7 +199,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
     LFOtype->value(pars->PLFOtype);
 
     updateLFOFreqType();
-    updateRandFreq();} {}
+    updateBpmControls();} {}
   }
   Function {lfoRtext(float dScale)} {} {
     code {//
@@ -276,7 +276,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         case LFOINSERT::control::bpm:
             bpm->value(value != 0);
             updateLFOFreqType();
-            updateRandFreq();
+            updateBpmControls();
             break;
 
         case LFOINSERT::control::frequencyRandomness:
@@ -308,12 +308,20 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
   } {
     code {freq->setValueType(getLFOFreqType(bpm->value()));} {}
   }
-  Function {updateRandFreq()} {return_type void
+  Function {updateBpmControls()} {return_type void
   } {
     code {if (bpm->value() == 0)
+{
     freqrand->activate();
+    stretch->activate();
+    startphase->setValueType(VC_LFOstartphaseRand);
+}
 else
-    freqrand->deactivate();} {}
+{
+    freqrand->deactivate();
+    stretch->deactivate();
+    startphase->setValueType(VC_LFOstartphase);
+}} {}
   }
   decl {LFOParams *pars;} {private local
   }
