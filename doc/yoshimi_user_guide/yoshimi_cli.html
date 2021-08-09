@@ -23,8 +23,8 @@ Alsa midi priority is 39
 Yoshimi 2.1.0 M
 Build Number 2008
 Clientname: yoshimi
-Audio: jack -&gt 'default'
-Midi: alsa -&gt 'Hua Xing:0, Komplete Audio 6:0'
+Audio: jack -&gt; 'default'
+Midi: alsa -&gt; 'Hua Xing:0, Komplete Audio 6:0'
 Oscilsize: 512
 Samplerate: 48000
 Period size: 64
@@ -52,29 +52,29 @@ Usage: yoshimi [OPTION...]
             Copyright 2012-2013 Jeremy Jongepier and others, Copyright
             2014-2021 Will Godfrey and others
 
-  -a, --alsa-midi[=&ltdevice&gt] use alsa midi input
-  -A, --alsa-audio[=&ltdevice&gt]   use alsa audio output
-  -b, --buffersize=&ltsize&gt    set internal buffer size
+  -a, --alsa-midi[=&lt;device&gt;] use alsa midi input
+  -A, --alsa-audio[=&lt;device&gt;]   use alsa audio output
+  -b, --buffersize=&lt;size&gt;    set internal buffer size
   -c, --no-cmdline           disable command line interface
   -C, --cmdline              enable command line interface
-  -D, --define-root=&ltpath&gt   define path to new bank root
+  -D, --define-root=&lt;path&gt;   define path to new bank root
   -i, --no-gui               disable gui
   -I, --gui                  enable gui
-  -j, --jack-midi[=&ltdevice&gt] use jack midi input
-  -J, --jack-audio[=&ltserver&gt]   use jack audio output
+  -j, --jack-midi[=&lt;device&gt;] use jack midi input
+  -J, --jack-audio[=&lt;server&gt;]   use jack audio output
   -k, --autostart-jack       auto start jack server
   -K, --auto-connect         auto connect jack audio
-  -l, --load=&ltfile&gt          load .xmz file
-  -L, --load-instrument=&ltfile&gt   load .xiz file
-  -M, --load-midilearn=&ltfile&gt   load .xly file
+  -l, --load=&lt;file&gt;          load .xmz file
+  -L, --load-instrument=&lt;file&gt;   load .xiz file
+  -M, --load-midilearn=&lt;file&gt;   load .xly file
       --null                 use Null-backend without audio/midi
-  -N, --name-tag=&lttag&gt       add tag to clientname
-  -o, --oscilsize=&ltsize&gt     set AddSynth oscilator size
-  -R, --samplerate=&ltrate&gt    set alsa audio sample rate
-  -S, --state[=&ltfile&gt]       load saved state, defaults to
+  -N, --name-tag=&lt;tag&gt;       add tag to clientname
+  -o, --oscilsize=&lt;size&gt;     set AddSynth oscilator size
+  -R, --samplerate=&lt;rate&gt;    set alsa audio sample rate
+  -S, --state[=&lt;file&gt;]       load saved state, defaults to
                              '$HOME/.config/yoshimi/yoshimi-0.state'
-  -u, --jack-session-file=&ltfile&gt   load named jack session file
-  -U, --jack-session-uuid=&ltuuid&gt   jack session uuid
+  -u, --jack-session-file=&lt;file&gt;   load named jack session file
+  -U, --jack-session-uuid=&lt;uuid&gt;   jack session uuid
   -?, --help                 Give this help list
       --usage                Give a short usage message
 
@@ -86,20 +86,20 @@ music@devuan:~$
     <div class = "code">
     yoshimi -b=128 -i -j
     </div>
-    In this example we are setting the buffer size to 128 frames, disabling the GUI and setting MIDI input to Jack.
+    In the above example we are setting the buffer size to 128 frames, disabling the GUI and setting MIDI input to Jack.
     <br><br>
     Once running in the CLI you will be at the top level. Entering '<b>help</b>', or just a '<b>?</B>' will list all the available commands and also the names of the available contexts. If reporting is set for the CLI this will be paged as shown below.
     <div class = "code">
-yoshimi&gt ?
+yoshimi&gt; ?
 Commands:
   ?  Help                     show commands
   List                        list current settings
   STop                        all sound off
   RESet [s]                   return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')
   EXit [s]                    tidy up and close Yoshimi (if 'y'), 'FOrce' instant exit regardless
-  RUN &lts&gt                     execute named command script forcing top level start
-  RUNLocal &lts&gt                execute named command script from current context level
-    WAIT &ltn&gt                  1mS to 30,000mS delay, within script only
+  RUN &lt;s&gt;                     execute named command script forcing top level start
+  RUNLocal &lt;s&gt;                execute named command script from current context level
+    WAIT &lt;n&gt;                  1mS to 30,000mS delay, within script only
   ..                          step back one level
   /                           step back to top level
 
@@ -113,32 +113,33 @@ q=quit /=search PgUp/PgDown=scroll (line 1 of 65)
     Quitting this pager will return you to the prompt. Notice it now shows the current context level.
     <div class = "code">
 @ Top
-yoshimi&gt
+yoshimi&gt;
     </div>
+    Notice the odd capitalisation. This indicates the minimum abbreviation for the respective controls. Be aware that the same command doesn't always have the same minimum in other contexts.<br>
     <a href="#top" class="up">Back to top</a>
     <a id="vector"></a>
     <h3>Examples</h3>
      When entering the query on other context levels you will normally get the first few top level ones as a reminder these are available from <em>any</em> level. Other than that you will only see the commands (and deeper contexts) appropriate to that level. However, you can also specifically query a context from <em>any</em> point , in which case you will see the list for that one only, without changing your current position.
     <div class = "code">
 @ p1+, Sub
-yoshimi&gt ? vector
+yoshimi&gt; ? vector
 Vector:
-  &ltn&gt                         set current base channel
-  [X/Y] CC &ltn&gt                CC n is used for X or Y axis sweep
-  [X/Y] Features &ltn&gt [s]      sets X or Y features 1-4 (ON, Reverse, {other})
-  [X] PRogram &ltl/r&gt &ltn&gt       X program change ID for LEFT or RIGHT part
-  [Y] PRogram &ltd/u&gt &ltn&gt       Y program change ID for DOWN or UP part
-  [X/Y] Control &ltn1&gt &ltn2&gt     sets n2 CC to use for X or Y feature n1 (2-4)
+  &lt;n&gt;                         set current base channel
+  [X/Y] CC &lt;n&gt;                CC n is used for X or Y axis sweep
+  [X/Y] Features &lt;n&gt; [s]      sets X or Y features 1-4 (ON, Reverse, {other})
+  [X] PRogram &lt;l/r&gt; &lt;n&gt;       X program change ID for LEFT or RIGHT part
+  [Y] PRogram &lt;d/u&gt; &lt;n&gt;       Y program change ID for DOWN or UP part
+  [X/Y] Control &lt;n1&gt; &lt;n2&gt;     sets n2 CC to use for X or Y feature n1 (2-4)
   OFF                         disable vector for this channel
-  Name &lts&gt                    text name for this complete vector
+  Name &lt;s&gt;                    text name for this complete vector
 
 @ p1+, Sub
-yoshimi&gt
+yoshimi&gt;
     </div>
     Another very useful command is '<b>list</b>' (or '<b>l</b>'). The command by itself just shows what lists are available. A full example listing the current MIDI learned CCs is shown below.
     <div class = "code">
 @ Top
-yoshimi&gt l mlearn
+yoshimi&gt; l mlearn
 Midi learned:
 Line 1  CC 7  Chan 1  Part 1 Effect Send 1
 Line 2  CC 81  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 1 Amplitude
@@ -152,34 +153,70 @@ Line 9  CC 88  Chan 1  Part 1 Kit 1 Add Voice 1 Harmonic 12 Amplitude
 Line 10  CC 94  Chan 1  Main Master Mono/Stereo
 
 @ Top
-yoshimi&gt
+yoshimi&gt;
     </div>
     As a general rule '<b>?</b>' tells you what you can do and '<b>l</b>' tells you what has been set.
     <br><br>
     Many context levels have defaults that kick in if you don't add additional information. The most obvious being the <em>Part</em> level with just:
     <div class = "code">
 @ Top
-yoshimi&gt set part
+yoshimi&gt; set part
 @ Part 1+
-yoshimi&gt
+yoshimi&gt;
     </div>
     You not only see that it is on part 1 but the '+' indicates it's enabled. There are lots of hints like this. Also any context with numeric settings can be changed simply with the number:
     <div class = "code">
 @ Part 1+
-yoshimi&gt set 5
+yoshimi&gt; set 5
 @ Part 5
-yoshimi&gt
+yoshimi&gt;
     </div>
     Note that part 5 has no '+' so is not enabled.
     <br><br>
     Many actions will stack if all the required context levels are active:
     <div class = "code">
 @ Part 5
-yoshimi&gt s 1 add voice wave
+yoshimi&gt; s 1 add voice wave
 @ p1+, A+, V1+ Sine
-yoshimi&gt
+yoshimi&gt;
     </div>
     Here we used the minimum abbreviation for '<em>set</em>'. You will also see that not only have we jumped right up into the waveform context of Addsynth Voice 1, but that the current waveform is 'Sine' and all the earlier labels are now compressed so that the line doesn't get ridiculously long.
+    <br><br>
+    Other useful commands are:
+    <ul>
+      <li>
+      <b>Read</b> The current value of the control.
+      </li>
+      <li>
+      <b>MINimum</b> The minimum value.
+      </li>
+      <li>
+      <b>MAXimum</b> The maximum value.
+      </li>
+      <li>
+      <b>DEFault</b> The default value.
+      </li>
+    </ul>
+    Here is another sequence of commands:
+    <div class = "code">
+@ Top
+yoshimi> s sys ec
+System Effect 1 set to Echo
+@ Sys eff 1 ECho-1
+yoshimi> r del
+System Effect 1 Echo Delay Value 35.000000
+@ Sys eff 1 ECho-1
+yoshimi> s del 40
+System Effect 1 Echo Delay Value 40.000000
+@ Sys eff 1 ECho-1?
+yoshimi>  max del
+Max 127 - learnable
+@ Sys eff 1 ECho-1?
+yoshimi>
+    </div>
+    Notice the '?' when you change the delay value. This is a warning that although the effect started with preset 1, you have now changed it. If you change either the preset or the effect itself, that setting will be lost.
+    <br><br>
+    Calling for the maximum also gave you the information that the control could be MIDI-learned.
     <br><br>
     The prompt can become 'stale' if there is a lot of activity from the GUI or via MIDI, but can be refreshed simply by hitting the '<em>return</em>' key, although it may be best to return to top level if you are not actively working.
     </p>
