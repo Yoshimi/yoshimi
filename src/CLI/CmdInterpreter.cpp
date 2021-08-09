@@ -1774,7 +1774,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     }
     else if (input.matchnMove(2, "ar"))
         cmd = LFOINSERT::control::amplitudeRandomness;
-    else if (input.matchnMove(2, "fr"))
+    else if (input.matchnMove(2, "rr"))
         cmd = LFOINSERT::control::frequencyRandomness;
 
     //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(group) << std::endl;

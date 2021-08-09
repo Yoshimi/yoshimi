@@ -1,5 +1,8 @@
 yoshimi 2.0.2 M
 
+2021-8-9 Will
+* Changed FR to RR in CLI LFO to resolve contention.
+
 2021-8-8 Will
 * Util cleanups.
 

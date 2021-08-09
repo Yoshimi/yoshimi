@@ -647,7 +647,7 @@ static std::string LFOlist [] = {
     "Bpm <s>",               "sync frequency to MIDI clock (ON, {other})",
     "Continuous <s>",        "(ON, {other})",
     "AR <n>",                "amplitude randomness",
-    "FR <n>",                "frequency randomness",
+    "RR <n>",                "frequency randomness",
     "Type <s>",              "LFO oscillator shape",
     "","SIne, TRiangle, SQuare, RUp (ramp up), RDown (ramp down), E1down (exp. 1), E2down (exp. 1)",
     "","SH (sample/hold), RSU (rand square up), RSD (rand square down)",
