@@ -25,6 +25,8 @@ Some of these will pull in other ones.
 Other distros may have slightly different names or version numbers, and may even have these installed by default. If in doubt try looking for just the main part of the name, but with the -dev extension where appropriate.
 
 
+For experienced builders:
+
 Optional alterative instead of libncurses5-dev only needed for wide (unicode) character recognition. Note the 'w'!
     libncursesw5-dev
 

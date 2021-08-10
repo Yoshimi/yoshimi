@@ -1,7 +1,10 @@
-Yoshimi User Guide notes 6/5/2021
+Yoshimi User Guide notes 10/8/2021
+
+WARNINNG!
 
 DO NOT EDIT index.html
 It is generated  from /indexref.html with the current version number added.
+
 
 This is the complete user guide for Yoshimi version 2.0
 and later.

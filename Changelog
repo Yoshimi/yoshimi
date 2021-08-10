@@ -1,5 +1,9 @@
 yoshimi 2.0.2 M
 
+2021-8-10 Will
+* Further Guide updates and improvements.
+  Also some doc cleanups.
+
 2021-8-9 Will
 * Changed FR to RR in CLI LFO to resolve contention.
 * Various guide updates and wc3 compliance checks.
