@@ -49,6 +49,8 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
+#define BANKS_VERSION 1
+
 using file::make_legit_filename;
 using file::isRegularFile;
 using file::isDirectory;
@@ -1450,7 +1452,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     {
         if (xml->enterbranch("INFORMATION"))
         {
-            writeVersion(xml->getpar("Banks_Version", 1, 1, 9));
+            writeVersion(xml->getpar("Banks_Version", BANKS_VERSION, 1, 99));
             xml->exitbranch();
         }
         if (xml->enterbranch("BANKLIST"))
