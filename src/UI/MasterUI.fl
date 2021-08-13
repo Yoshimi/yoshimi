@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -187,11 +187,14 @@ lineitem = n;}
   Function {FilerLine(int x, int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n = 0;} {}
   }
-  decl {FilerLine(FilerLine const&) =delete;} {public}
-  decl {FilerLine(FilerLine&&) =delete;} {public}
-  decl {FilerLine& operator=(FilerLine const&) =delete;} {public}
-  decl {FilerLine& operator=(FilerLine&&) =delete;} {public}
-
+  decl {FilerLine(FilerLine const&) =delete;} {public local
+  }
+  decl {FilerLine(FilerLine&&) =delete;} {public local
+  }
+  decl {FilerLine& operator=(FilerLine const&) =delete;} {public local
+  }
+  decl {FilerLine& operator=(FilerLine&&) =delete;} {public local
+  }
   Function {init(SynthEngine *synth_, int n_, bool isDir_, string typeName_, string title_)} {} {
     code {//
 
@@ -233,7 +236,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -271,8 +274,7 @@ class MasterUI {open : {private GuiUpdates}
       filerpath.clear();
       lastfilerW = 0;} {}
   }
-  Function {~MasterUI()} {open
-  } {
+  Function {~MasterUI()} {} {
     code {//
       aboutwindow->hide();
       delete aboutwindow;
@@ -341,7 +343,7 @@ class MasterUI {open : {private GuiUpdates}
     code {//
       instance = synth->getUniqueId();
       file::createDir(synth->getRuntime().ConfigDir + "/windows");
-      panelType = 1;
+      panelType = 5;
       msgSeen = false;
       syseffSeen = false;
       partmax = synth->getRuntime().NumAvailableParts;
@@ -378,6 +380,11 @@ class MasterUI {open : {private GuiUpdates}
       logenable = fetchData(0, CONFIG::control::reportsDestination, TOPLEVEL::section::config);
       if (!foundWindows)
       {
+          // fake previously seen.
+          saveWin(synth, 0, 0, masterwindow->x() + masterwindow->w() + 16, masterwindow->y(), true, "Midi-virtualkeyboard");
+          virkeyboard->ShowKbd();
+          panelwindow->resize(masterwindow->x(), masterwindow->y(), PANEL_SINGLE_X, PANEL_SINGLE_Y);
+          saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
           string msg = "As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.";
           setmessage(UNUSED, true, msg, "Close");
       }
@@ -1832,8 +1839,7 @@ Alan Calvert started the project}
     savefavourites();
     return filerfound;} {}
   }
-  Function {fillfiler(string type_name)} {open
-  } {
+  Function {fillfiler(string type_name)} {} {
     code {//
         string tofetch;
         int options = filerOpt1->value();
@@ -1870,8 +1876,7 @@ Alan Calvert started the project}
         filerscroll->end();
         filerscroll->scroll_to(-10,-10);
         filerRtext();
-        //std::cout << "list end " << lineno << std::endl;} {selected
-    }
+        //std::cout << "list end " << lineno << std::endl;} {}
   }
   Function {filerselect(int item)} {} {
     code {//
@@ -2813,7 +2818,7 @@ Alan Calvert started the project}
     if (fetchO == 0)
         fetchO = 1; // it's never been seen so set the default
 
-    // assune default sizes
+    // assume default sizes
     int defW = (PANEL_SINGLE_X * 9) / 10;
     int defH = (PANEL_SINGLE_Y * 9) / 10;
 
