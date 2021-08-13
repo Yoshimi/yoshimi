@@ -1,6 +1,10 @@
 yoshimi 2.0.2 M
 
-2021-8-10 Will
+2021-8-13 Will
+* Expanded EQ Band, Type, Stages labels.
+  Why were they ever abbreviated?
+
+2021-8-12 Will
 * Doc updates.
 * Changed Banks ID placeholder.
   May be using it soon.
