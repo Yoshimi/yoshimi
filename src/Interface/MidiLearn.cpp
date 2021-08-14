@@ -39,7 +39,6 @@
 
 using file::isRegularFile;
 using file::make_legit_filename;
-using file::make_legit_pathname;
 using file::setExtension;
 
 using func::asString;
@@ -892,7 +891,6 @@ bool MidiLearn::saveList(const string& name)
     }
 
     string file = setExtension(name, EXTEN::mlearn);
-    make_legit_pathname(file);
 
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     XMLwrapper *xml = new XMLwrapper(synth, true);
@@ -972,7 +970,6 @@ bool MidiLearn::loadList(const string& name)
         return false;
     }
     string file = setExtension(name, EXTEN::mlearn);
-    make_legit_pathname(file);
     if (!isRegularFile(file))
     {
         synth->getRuntime().Log("Can't find " + file);
