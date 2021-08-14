@@ -193,14 +193,16 @@
     <br><br>
     The menu chooses the effect, which will then appear in the area below.
     <br><br>
-    The last menu determines the routing of the effects.
+    The last menu determines the routing of the effects:
+    <div class="tab">
     <br>
-    - <em>Next Effect</em> (default): will send the output of the effect (added to the incoming signal) to the next one in the chain.
-    <br>
-    - <em>Part Out</em>: makes the current effect the last one in the chain, effectively ignoring any other following effects.
-    <br>
-    - <em>Dry Out</em>: This will send the incoming signal component directly where part effects are added together, so it won't be passed on to later effects. However, the output of the effect itself <em>is</em> passed on to later ones. Consequently, if this effect is bypassed it also effectively bypasses all later ones.
+    <em>Next Effect</em> (default): will send the output of the effect (added to the incoming signal) to the next one in the chain.
     <br><br>
+    <em>Part Out</em>: makes the current effect the last one in the chain, effectively ignoring any other following effects.
+    <br><br>
+    <em>Dry Out</em>: This will send the incoming signal component directly where part effects are added together, so it won't be passed on to later effects. However, the output of the effect itself <em>is</em> passed on to later ones. Consequently, if this effect is bypassed it also effectively bypasses all later ones.
+    </div>
+    <br>
     At the bottom of this window is the <em>bypass</em> button to allow you to disable this effect without losing the settings, or altering the routing for the other effects in the chain.
     </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
@@ -211,6 +213,10 @@
     Each part can have independent Channel, and Key aftertouch. The controls shown operate in parallel to the incoming CCs so you should not use the incoming CC at the same time as aftertouch, otherwise the results can be quite confusing. You can have several of the controls working at the same time, but not on both channel and key at the same time.
     <br><br>
     The normal range is from the CC value at the time the key was pressed up to the maximum for that control. If 'Down' is set as well, the effect will be in the reverse direction. i.e. down to the control's minimum value.
+    <br><br>
+    <b>Note</b>
+    <br>
+    &emsp;If two parts such as, part 1 and part 5 are receiving the same MIDI channel, they can still have quite different aftertouch settings.
     </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <a href="../add/add.html">Next</a> (AddSynth Engine)
