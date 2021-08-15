@@ -57,7 +57,7 @@ using file::setExtension;
 using file::findLeafName;
 using file::createEmptyFile;
 using file::deleteFile;
-using file::make_legit_pathname;
+using file::make_legit_filename;
 
 using func::dB2rap;
 using func::bitTest;
@@ -2892,7 +2892,6 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name
         return actualBase;
     }
     string file = setExtension(name, EXTEN::vector);
-    make_legit_pathname(file);
     if (!isRegularFile(file))
     {
         Runtime.Log("Can't find " + file, 2);
@@ -3038,7 +3037,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name
         return textMsgBuffer.push("No vector data on this channel");
 
     string file = setExtension(name, EXTEN::vector);
-    make_legit_pathname(file);
+    make_legit_filename(file);
 
     Runtime.xmlType = TOPLEVEL::XML::Vector;
     XMLwrapper *xml = new XMLwrapper(this, true);

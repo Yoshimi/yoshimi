@@ -48,7 +48,7 @@ typedef struct _InstrumentEntry
     _InstrumentEntry()
         :name(""),
          filename(""),
-         type(0),
+         type(-1),
          used(false),
          PADsynth_used(0),
          ADDsynth_used(0),

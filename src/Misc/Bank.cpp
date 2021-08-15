@@ -1000,10 +1000,10 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.used = true;
     instrRef.name = name;
     instrRef.filename = filename;
-    instrRef.PADsynth_used = false;
-    instrRef.ADDsynth_used = false;
-    instrRef.SUBsynth_used = false;
-    instrRef.yoshiType = false;
+    instrRef.PADsynth_used = 0;
+    instrRef.ADDsynth_used = 0;
+    instrRef.SUBsynth_used = 0;
+    instrRef.yoshiType = -1;
 
     // see which engines are used
     if (synth->getRuntime().checksynthengines)
@@ -1018,10 +1018,10 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         delete xml;
 
         instrRef.type = type;
-        instrRef.ADDsynth_used = (names & 1) > 0;
-        instrRef.SUBsynth_used = (names & 2) > 0;
-        instrRef.PADsynth_used = (names & 4) > 0;
-        instrRef.yoshiType = (names & 8) > 0;
+        instrRef.ADDsynth_used = (names & 1);
+        instrRef.SUBsynth_used = (names & 2) >> 1;
+        instrRef.PADsynth_used = (names & 4) >> 2;
+        instrRef.yoshiType = (names & 8) >> 3;
     }
     return 0;
 }
