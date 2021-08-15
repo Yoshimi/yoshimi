@@ -2,6 +2,8 @@ yoshimi 2.0.2 M
 
 2021-8-15 Will
 * Some small code cleanups.
+* Added NRPN control to send part to system effects.
+* Updated guide.
 
 2021-8-14 Will
 * Bugfix: MIDI_Learn not loading/saving files.

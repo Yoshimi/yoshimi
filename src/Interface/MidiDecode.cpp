@@ -548,6 +548,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
 {
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
+    bool partSet = false;
 
     switch (dHigh)
     {
@@ -562,35 +563,56 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
                 synth->getRuntime().dataL = 0x80;
                 synth->getRuntime().dataH = 0x80;
             }
+            partSet = true;
             break;
 
         case 1: // Program Change
             setMidiProgram(synth->getRuntime().vectordata.Part | 0x80, par);
+            partSet = true;
             break;
 
         case 2: // Set controller number
             synth->getRuntime().vectordata.Controller = par;
             synth->getRuntime().dataL = par;
+            partSet = true;
             //std::cout << "cont no " << int(par) << std::endl;
             break;
 
         case 3: // Set controller value
             setMidiController(synth->getRuntime().vectordata.Part | 0x80, synth->getRuntime().vectordata.Controller, par, false);
+            partSet = true;
             //std::cout << "cont val " << int(par) << std::endl;
             break;
 
         case 4: // Set part's channel number
             putData.data.value = par;
             putData.data.control = PART::control::midiChannel;
-            putData.data.part = synth->getRuntime().vectordata.Part;
             break;
 
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
+            {
+                putData.data.value = par;
+                putData.data.control = PART::control::audioDestination;
+                //putData.data.parameter = 192; // this doesn't seem necessary
+            }
+            break;
+
+        case 8:
+            putData.data.control = PART::control::partToSystemEffect1;
             putData.data.value = par;
-            putData.data.control = PART::control::audioDestination;
-            putData.data.part = synth->getRuntime().vectordata.Part;
-            //putData.data.parameter = 192; // this doesn't seem necessary
+            break;
+        case 9:
+            putData.data.control = PART::control::partToSystemEffect2;
+            putData.data.value = par;
+            break;
+        case 10:
+            putData.data.control = PART::control::partToSystemEffect3;
+            putData.data.value = par;
+            break;
+        case 11:
+            putData.data.control = PART::control::partToSystemEffect4;
+            putData.data.value = par;
             break;
 
         case 64: // key shift
@@ -601,7 +623,6 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
                 par = MAX_KEY_SHIFT;
             putData.data.value = par;
             putData.data.control = PART::control::keyShift;
-            putData.data.part = synth->getRuntime().vectordata.Part;
             break;
         default:
             return;
@@ -609,6 +630,9 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     }
     if (dHigh < 4)
         return;
+    if (!partSet)
+        putData.data.part = synth->getRuntime().vectordata.Part;
+
     //std::cout << "part " << int(putData.data.part) << "  Chan " << int(par) << std::endl;
     putData.data.type = TOPLEVEL::type::Write | TOPLEVEL::type::Integer;
     putData.data.source = TOPLEVEL::action::toAll;
