@@ -1,6 +1,12 @@
-Version 2.0.2
+Version 2.1.0 rc1
 
-This release contains the new (part complete) User guide. It also has various bugfixes and minor improvements.
+This release contains the complete new User Guide.
+
+Midi Sync has been extended to Effects, where relevant.
+
+NRPNs for Effects have been extended.
+
+There is a means of testing for unintended changes to the final sound.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

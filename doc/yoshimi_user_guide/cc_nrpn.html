@@ -276,7 +276,7 @@
     </div>
     This must be done before making a parameter change (unless already set).
     <br><br>
-    For System effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then it sends the designated system effect to  system effect 2 - 4, represented by MSB 96 to 99. LSB then sets the amount of the effect to pass on.
+    For System effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then it sends the designated system effect to  system effect 2 - 4, represented by MSB 96 to 98. The actual range depends on which effect you are sending from. You can't send one to itself, or a lower numbered one. LSB then sets the amount of the effect to pass on.
     <br><br>
     For Insertion effects, if <b>Data MSB</b> bit 5 is also set (MSB >= 96) then LSB decides the part that the effect will be sent to:
     <div class="tab">

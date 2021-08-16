@@ -1,10 +1,7 @@
 
 Ensure all new files have been added to commit!!!
 
-If new instruments have been added to banks, increment the
-value of BANKS_VERSION in Misc/Bank.cpp
-
-Before the commit run the python file /home/will/yoshimi-code/update_guide_version.py
+Before the commit (but after build) run the python file /home/will/yoshimi-code/update_guide_version.py
 This will ensure the guide has the correct version number.
 
 /src/CMakeLists.txt
