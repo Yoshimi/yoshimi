@@ -14,13 +14,15 @@
     <img src="images/padharmonic.png" alt="PadSynth Harmonics Window" class="double">
     <img src="images/padenvelope.png" alt="PadSynth Envelopes Window" class="double">
     <p>
-    The PadSynth engine has two tabbed views in a single window. You will normally be shown the harmonic structure, the envelopes one (as it's name suggests) consisting mostly of envelope and LFO inserts.
+    The PadSynth engine was designed by Paul Nasca and to the best of our knowledge there is no comparable type generally available. It uses a waveform oscillator that is virtually identical to the one used by AddSynth. Some complex mathematics is then applied to manipulate the overall spectrum. Finally this is converted to a set of fixed perfectly looping wavetables. As a result none of the previous controls are real-time. However, it is the wavetables that are called for actual sound generation after passing through the usual envelope controls (which are real-time).
+    <br><br>
+    There are two tabbed views in a single window. You will normally be shown the harmonic structure, the envelopes one (as it's name suggests) consisting mostly of envelope and LFO inserts.
     </p>
     <p>
     <h3>Harmonic Structure</h3>
     (left side)
     <br><br>
-    The way some of these controls operate is rather obscure. While making dramatic changes to the visual aspect of the harmonic profile, the effect on the sound is often quite subtle. Unfortunately, we inherited very little documentation for these.
+    The way some of these controls operate is rather obscure. While making dramatic changes to the visual aspect of the harmonic profile, the effect on the sound is often quite subtle. Unfortunately, it is difficult to describe their operation without deep understanding of the mathematics involved.
     <br><br>
     <div class="tab">
     <B>Base Type</b> Base shape of the harmonic: Gauss, Square or Double Explonential
