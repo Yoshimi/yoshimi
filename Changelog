@@ -1,5 +1,9 @@
 yoshimi 2.1.0 rc1
 
+2021-8-201Will
+* Made guide headers HTML5 compliant.
+* Applied corrections and style improvements from John.
+
 2021-8-20 Will
 * No code changes (so no version update).
 * Revision of complete New User Guide.

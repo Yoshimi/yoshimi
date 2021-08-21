@@ -39,6 +39,7 @@ a:link {
 .image {
     float: right;
     width: 40%;
+    padding-left: 15px;
 }
 
 .code {
@@ -48,6 +49,11 @@ a:link {
     white-space:pre-wrap;
 }
 
+.right-half {
+    float: right;
+    width: 49.5%;
+    padding-left: 15px;
+}
 .double {
     width: 49.5%;
 }
@@ -59,28 +65,38 @@ a:link {
 .small {
     float: right;
     width: 20%;
+    padding-left: 15px;
 }
 
 .tiny {
     float: right;
     width: 12%;
+    padding-left: 15px;
 }
 
 @media (max-width: 644px) {
   .image {
     float: left;
     width: 98%;
+    padding-left: 5px;
+  }
+  .right-half {
+    width: 98%;
+    padding-right: 5px;
   }
   .double {
       width: 98%;
+      padding-left: 5px;
+      padding-right: 5px;
   }
   .triple {
       width: 98%;
   }
-
   .small {
     width: 50%;
-
+    padding-top: 10px;
+  }
   .tiny {
-    width: 40%;
+    width: 20%;
+  }
 }
