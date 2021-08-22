@@ -27,6 +27,7 @@
 #include <termios.h>
 #include <pthread.h>
 #include <atomic>
+#include <thread>
 
 #include <cstdio>
 #include <unistd.h>
@@ -412,6 +413,14 @@ std::string runCommand(std::string command, bool clean)
     return std::string(returnLine);
 }
 
+
+void manualSearch()
+{
+    FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
+    pclose(fp);
+}
+
+
 int main(int argc, char *argv[])
 {
     /*
@@ -471,7 +480,7 @@ int main(int argc, char *argv[])
 
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
-
+    std::thread first(manualSearch);
     std::cout << "Yoshimi " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
     globalArgc = argc;
     globalArgv = argv;

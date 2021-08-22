@@ -1,6 +1,12 @@
 yoshimi 2.1.0 rc1
 
-2021-8-201Will
+2021-8-22 Will
+* Last minute bugfix :(
+  If HTML manual couldn't be found it went into
+  loop fetching old pdf one and opening pdf reader
+  so commented out pdf section.
+
+2021-8-21 Will
 * Made guide headers HTML5 compliant.
 * Applied corrections and style improvements from John.
 

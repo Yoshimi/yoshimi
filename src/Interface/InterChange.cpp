@@ -207,7 +207,8 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
 bool InterChange::findManual(string& found)
 {
     // selects the newest version of the manual
-    FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
+    /*
+     FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
     pclose(fp);
     // There is a variable delay between writing to /tmp
     // and the result being available.
@@ -218,6 +219,7 @@ bool InterChange::findManual(string& found)
         ++ count;
     }
     //std::cout << "delay " << count << "mS" << std::endl;
+    */
     string namelist = file::loadText("/tmp/found_yoshimi_user_guide");
     if (namelist.empty())
         return false;
@@ -875,12 +877,13 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
 
                 //std::cout << "found " << found << std::endl;
                 getData->data.control = TOPLEVEL::control::textMessage;
-                getData->data.miscmsg = textMsgBuffer.push("Found manual, looking for browser");
+                //getData->data.miscmsg = textMsgBuffer.push("Found manual, looking for browser");
                 returnsBuffer.write(getData->bytes);
                 FILE *fp = popen(("xdg-open " + found + " &").c_str(), "r");
                 if (fp == NULL)
                 {
-                    getData->data.miscmsg = textMsgBuffer.push("Can't find Browser. Trying for old PDF");
+                    //getData->data.miscmsg = textMsgBuffer.push("Can't find Browser. Trying for old PDF");
+                    getData->data.miscmsg = textMsgBuffer.push("Can't find Browser :(");
                     returnsBuffer.write(getData->bytes);
                     found = "";
                 }
@@ -889,7 +892,10 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             }
 
             if (found.empty())
-            {
+                text = "Can't find manual :(";
+            newMsg = true;
+            break;
+            /*
                 // fall back to older PDF version
 
                 std::string manfile = synth->manualname();
@@ -953,6 +959,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             }
             newMsg = true;
             break;
+            */
         }
         case MAIN::control::startInstance:
             if (synth == firstSynth)
