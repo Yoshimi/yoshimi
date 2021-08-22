@@ -6,6 +6,8 @@ yoshimi 2.1.0 rc1
   loop fetching old pdf one and opening pdf reader
   so commented out pdf section.
 
+* Added LV2 correction.
+
 2021-8-21 Will
 * Made guide headers HTML5 compliant.
 * Applied corrections and style improvements from John.

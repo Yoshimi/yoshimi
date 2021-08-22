@@ -207,11 +207,14 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
 bool InterChange::findManual(string& found)
 {
     // selects the newest version of the manual
-    /*
-     FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
-    pclose(fp);
+    // belt and braces in case file gets deleted while running
+    if (!isRegularFile("/tmp/found_yoshimi_user_guide"))
+    {
+        FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
+        pclose(fp);
     // There is a variable delay between writing to /tmp
     // and the result being available.
+    }
     int count = 0;
     while (count < 1000 && !isRegularFile("/tmp/found_yoshimi_user_guide"))
     {
@@ -219,7 +222,7 @@ bool InterChange::findManual(string& found)
         ++ count;
     }
     //std::cout << "delay " << count << "mS" << std::endl;
-    */
+
     string namelist = file::loadText("/tmp/found_yoshimi_user_guide");
     if (namelist.empty())
         return false;
