@@ -20,11 +20,11 @@
     Version 2.0 brings fully resizeable windows, both key and channel aftertouch, MIDI sync for LFOs, and extensions to panning control.
     </p>
     <p>
-    Version 2.1.0 extends MIDI sync for Effests where relevants, and extensions to NRPNs. There is also an new HTMP User Guide.
+    Version 2.1.0 extends MIDI sync for Effects where relevant, and extensions to NRPNs. There is also an new HTML User Guide.
     </p>
   </description>
   <releases>
-​    <release version="2.1.0 rc1" date="2021-08-15" />
+​    <release version="2.1.0" date="2021-08-23" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>

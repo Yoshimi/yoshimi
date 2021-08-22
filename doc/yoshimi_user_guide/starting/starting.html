@@ -16,6 +16,16 @@
     <p>
     If all has gone well, clicking on one of the keys should immediately produce sound, and if there was a MIDI keyboard plugged in that should also have been recognised and be playable. The virtual and real keyboards work quite independently, although things can get a bit confused if both are on the same note!
     </p>
+    <p>
+    If the VU meters are showing activity but there is no sound output, this may actually be as simple as the system volume control being switched off or set to zero.
+    <br><br>
+    Failing that, you should look at the Jack and Alsa tabs in Settings. On a first time start you should see Alsa being set for both MIDI and audio. If neither Jack nor Alsa has audio selection checked, set the one you want, save settings, close and restart Yoshimi. If the problem persists, then either there isn't a valid audio backend, or something else is blocking Yoshimi.
+    </p>
+    <p>
+    The commonest problem with current Linux installations is interference from Pulse Audio. This will grab all sound devices and block anything else from reaching them. There is a program, <i>pavucontrol</i>, that can be used to disable connection to individual devices, thus freeing them up for your use. Alternatively, for a dedicated music machine it may be better to delete the Pulse Audio sound server.
+    <br><br>
+    While Pulse Audio works well in a mixed desktop environment it is comparatively slow and not suitable for dedicated quality audio generation where time, i.e. latency, is critical.
+    </p>
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <img src="images/virtual.png" alt="Keyboard layout" class="image">
     <p>

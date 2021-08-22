@@ -1,4 +1,4 @@
-Version 2.1.0 rc1
+Version 2.1.0
 
 This release contains the complete new User Guide.
 
