@@ -27,6 +27,7 @@
 #include <cfloat>
 #include <bitset>
 #include <unistd.h>
+#include <thread>
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
@@ -71,11 +72,21 @@ using func::nearestPowerOf2;
 
 using func::asString;
 
-
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 extern SynthEngine *firstSynth;
 
 int startInstance = 0;
+
+
+const string manCheckList = "/tmp/found_yoshimi_user_guide";
+static void manualCheck()
+{
+    const string fullCmd = "find / -type f -name 'yoshimi_user_guide_version' 1>" + manCheckList + " 2>/dev/null";
+    FILE *fp = popen(fullCmd.c_str(), "w");
+    if (fp)
+        pclose(fp);
+    //std::cout << "Manual checked" << std::endl;
+}
 
 
 InterChange::InterChange(SynthEngine *_synth) :
@@ -97,6 +108,18 @@ InterChange::InterChange(SynthEngine *_synth) :
     swapBank1(UNUSED),
     swapInstrument1(UNUSED)
 {
+    /*
+     * We run this tiny low prio thread so that the manual
+     * locations are already stored before anyone wants to
+     * see it. This makes viewing it quicker.
+     */
+    static bool manseen = false;
+    if (!manseen)
+    {
+        std::thread toCheck (manualCheck);
+        toCheck.detach();
+        manseen = true;
+    }
 }
 
 
@@ -204,18 +227,17 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
     }
 }
 
+// selects the newest version of the manual
 bool InterChange::findManual(string& found)
 {
-    // selects the newest version of the manual
-    // belt and braces in case file gets deleted while running
-    if (!isRegularFile("/tmp/found_yoshimi_user_guide"))
+    // in case tmp file gets deleted while running
+    if (!isRegularFile(manCheckList))
     {
-        FILE *fp = popen("find / -type f -name 'yoshimi_user_guide_version' 1>/tmp/found_yoshimi_user_guide 2>/dev/null", "w");
-        pclose(fp);
+        manualCheck();
         // There is a variable delay between writing to /tmp
         // and the result being available.
         int count = 0;
-        while (count < 1000 && !isRegularFile("/tmp/found_yoshimi_user_guide"))
+        while (count < 1000 && !isRegularFile(manCheckList))
         {
             usleep(1000);
             ++ count;
@@ -223,7 +245,7 @@ bool InterChange::findManual(string& found)
         //std::cout << "delay " << count << "mS" << std::endl;
     }
 
-    string namelist = file::loadText("/tmp/found_yoshimi_user_guide");
+    string namelist = file::loadText(manCheckList);
     if (namelist.empty())
         return false;
 
