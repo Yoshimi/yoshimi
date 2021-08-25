@@ -77,15 +77,37 @@ extern SynthEngine *firstSynth;
 
 int startInstance = 0;
 
-
-const string manCheckList = "/tmp/found_yoshimi_user_guide";
+static string manfound = "";
 static void manualCheck()
 {
-    const string fullCmd = "find / -type f -name 'yoshimi_user_guide_version' 1>" + manCheckList + " 2>/dev/null";
-    FILE *fp = popen(fullCmd.c_str(), "w");
-    if (fp)
-        pclose(fp);
-    //std::cout << "Manual checked" << std::endl;
+    string namelist = "";
+    if(!file::cmd2string("find / -type f -name 'yoshimi_user_guide_version' 2>/dev/null", namelist))
+        return;
+
+    size_t next = 0;
+    size_t lastversion = 0;
+    string found = "";
+    string name = "";
+    while (next != string::npos)
+    {
+        next = namelist.find("\n");
+        if (next != string::npos)
+        {
+            name = namelist.substr(0, next);
+
+            // check it's there and the most recent
+            size_t current = isRegularFile(name);
+            if (current > lastversion)
+            {
+                lastversion = current;
+                found = name;
+            }
+            namelist = namelist.substr( next +1);
+        }
+    }
+    //std::cout << " man " << found << std::endl;
+    if (lastversion > 0)
+        manfound = found;
 }
 
 
@@ -109,11 +131,11 @@ InterChange::InterChange(SynthEngine *_synth) :
     swapInstrument1(UNUSED)
 {
     /*
-     * We run this tiny low prio thread so that the manual
-     * locations are already stored before anyone wants to
-     * see it. This makes viewing it quicker.
+     * We run this low prio thread so that the manual
+     * is already found before anyone wants to see it.
+     * This makes viewing it quicker.
      */
-    static bool manseen = false;
+    static bool manseen = false; // only check first instance
     if (!manseen)
     {
         std::thread toCheck (manualCheck);
@@ -225,53 +247,6 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
         //std::cout << "here pending" << std:: endl;
         synth->audioOut.store(_SYS_::mute::Pending);
     }
-}
-
-// selects the newest version of the manual
-bool InterChange::findManual(string& found)
-{
-    // in case tmp file gets deleted while running
-    if (!isRegularFile(manCheckList))
-    {
-        manualCheck();
-        // There is a variable delay between writing to /tmp
-        // and the result being available.
-        int count = 0;
-        while (count < 1000 && !isRegularFile(manCheckList))
-        {
-            usleep(1000);
-            ++ count;
-        }
-        //std::cout << "delay " << count << "mS" << std::endl;
-    }
-
-    string namelist = file::loadText(manCheckList);
-    if (namelist.empty())
-        return false;
-
-    size_t next = 0;
-    size_t lastversion = 0;
-    string name = "";
-    while (next != string::npos)
-    {
-        next = namelist.find("\n");
-        if (next != string::npos)
-        {
-            name = namelist.substr(0, next);
-            size_t current = isRegularFile(name);
-            if (current > lastversion)
-            {
-                lastversion = current;
-                found = name;
-            }
-            namelist = namelist.substr( next +1);
-        }
-    }
-
-    if (lastversion > 0)
-        return true;
-
-    return false;
 }
 
 
@@ -893,29 +868,25 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         {
             // first try html version
             text = "";
-            string found = "";
             getData->data.control = TOPLEVEL::control::textMessage;
-            if (findManual(found))
+            string found = manfound;
+            if (!found.empty())
             {
                 size_t pos = found.rfind("files/yoshimi_user_guide_version");
                 found = found.substr(0, pos);
-                found += "/index.html";
-                FILE *fp = popen(("xdg-open " + found + " &").c_str(), "r");
-                if (fp == NULL)
+                found = "xdg-open " + found + "index.html &";
+                //std::cout << found <<std::endl;
+                if (!file::cmd2string(found))
                 {
                     found = "";
                     text = "Found Manual but can't find Browser :(";
                 }
-                else
-                    pclose(fp);
             }
             else
                 text = "Can't find manual :(";
-            newMsg = true;
-            break;
-            /*
-                // fall back to older PDF version
 
+            if (found.empty())
+            {    // fall back to older PDF version
                 std::string manfile = synth->manualname();
                 std::string stub = manfile.substr(0, manfile.rfind("-"));
 
@@ -960,24 +931,22 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                     returnsBuffer.write(getData->bytes);
                 }
                 std::string command = "xdg-open " + lastdir + "/" + found + "&";
-                FILE *fp = popen(command.c_str(), "r");
-                if (fp == NULL)
+                if (!file::cmd2string(command))
                 {
                     getData->data.miscmsg = textMsgBuffer.push("Can't find PDF reader :(");
                     returnsBuffer.write(getData->bytes);
                     found = "";
                 }
-                else
-                    pclose(fp);
             }
             if (!found.empty())
             {
+                text = "";
                 getData->data.miscmsg = NO_MSG;
                 returnsBuffer.write(getData->bytes);
             }
             newMsg = true;
             break;
-            */
+
         }
         case MAIN::control::startInstance:
             if (synth == firstSynth)

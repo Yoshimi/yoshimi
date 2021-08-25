@@ -394,22 +394,12 @@ void *commandThread(void *) // silence warning (was *arg = NULL)
     return 0;
 }
 
-std::string runCommand(std::string command, bool clean)
+std::string runCommand(std::string command)
 {
-    const int lineLen = 63;
-    char returnLine[lineLen + 1];
-    FILE *fp = popen(command.c_str(), "r");
-    fgets(returnLine, lineLen, fp);
-    pclose(fp);
-    if (clean)
-    {
-        for (int i = 0; i < lineLen; ++ i)
-        {
-            if (returnLine[i] == ':')
-                returnLine[i] = '0';
-        }
-    }
-    return std::string(returnLine);
+    string returnLine = "";
+    file::cmd2string(command, returnLine);
+    //std::cout << returnLine << std::endl;
+    return returnLine;
 }
 
 int main(int argc, char *argv[])
@@ -453,11 +443,11 @@ int main(int argc, char *argv[])
 
     if (isSingleMaster)
     {
-        std::string firstText = runCommand("pgrep -o -x yoshimi", false);
-        int firstpid = std::stoi(firstText);
-        int firstTime = std::stoi(runCommand("ps -o etime= -p " + firstText, true));
-        int secondTime = std::stoi(runCommand("ps -o etime= -p " + std::to_string(getpid()), true));
 
+        std::string firstText = runCommand("pgrep -o -x yoshimi");
+        int firstpid = std::stoi(firstText);
+        int firstTime = std::stoi(runCommand("ps -o etimes= -p " + firstText));
+        int secondTime = std::stoi(runCommand("ps -o etimes= -p " + std::to_string(getpid())));
         if ((firstTime - secondTime) > 0)
         {
                 kill(firstpid, SIGUSR2); // send message to 1st instance

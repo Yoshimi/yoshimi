@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <cstring>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -151,6 +152,40 @@ inline bool isDirectory(const string& chkpath)
             return true;
     }
     return false;
+}
+
+/* performs specific OS command
+ * optionally returning a multi-line response
+ */
+
+inline bool cmd2string(std::string cmd)
+{
+    FILE* fp = popen(cmd.c_str(), "r");
+    if(fp)
+    {
+        pclose(fp);
+        return true;
+    }
+    return false;
+}
+
+inline bool cmd2string(std::string cmd, string& result)
+{
+    bool isok = false;
+    FILE* fp = popen(cmd.c_str(), "r");
+    if(fp)
+    {
+        std::vector<char> buffer(4096);
+        std::size_t n = fread(buffer.data(), 1, buffer.size(), fp);
+        if(n && n < buffer.size())
+        {
+            buffer.data()[n] = 0;
+            result = buffer.data();
+        }
+        pclose(fp);
+        isok = true;
+    }
+    return isok;
 }
 
 

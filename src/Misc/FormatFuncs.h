@@ -193,6 +193,14 @@ inline int string2int(std::string str)
     return intval;
 }
 
+inline int string2long(std::string str)
+{
+    std::istringstream machine(str);
+    long longval;
+    machine >> longval;
+    return longval;
+}
+
 
 /* ensures MIDI compatible numbers without errors */
 inline int string2int127(std::string str)
