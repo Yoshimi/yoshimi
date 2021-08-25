@@ -1325,7 +1325,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
     Config *settings = (Config*)state->input;
     if (arg && arg[0] == 0x3d)
         ++ arg;
-    int num;
 
     switch (key)
     {
@@ -1427,13 +1426,15 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'R':
+        {
             settings->configChanged = true;
             settings->rateChanged = true;
-            num = (string2int(string(arg)) / 48 ) * 48;
+            int num = (string2int(string(arg)) / 48 ) * 48;
             if (num < 48000 || num > 192000)
                 num = 44100; // play safe
             settings->Samplerate = num;
             break;
+        }
 
         case 'S':
             if (arg)

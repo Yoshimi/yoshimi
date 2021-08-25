@@ -26,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <list>
 
 namespace func {
 
@@ -228,7 +229,7 @@ inline unsigned int string2uint(std::string str)
  * turns the 1st count mumber to upper case
  * all the rest to lower case
  */
-inline string stringCaps(std::string str, int count)
+inline std::string stringCaps(std::string str, int count)
 {
     int idx = 0;
     char c;

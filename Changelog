@@ -6,6 +6,9 @@ yoshimi 2.1.0 M
 * Moved all popen commands to FileMgrFuncs.h
 * Improved single master detection.
 
+* Started separating startup options from Config.cpp
+  Currently disabled.
+
 2021-8-24 Will
 * Slight speed up for user guide search.
 

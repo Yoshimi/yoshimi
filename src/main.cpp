@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <string>
+#include <list>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,6 +34,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "Misc/CmdOptions.h"
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
@@ -454,6 +456,12 @@ int main(int argc, char *argv[])
                 return 0; // exit quietly
         }
     }
+    /*
+    std::list<std::string> allArgs;
+    CmdOptions(argc, argv, allArgs);
+    for (std::list<string>::iterator it = allArgs.begin(); it != allArgs.end(); ++it)
+        std::cout << *it << std::endl;
+    */
 #ifdef GUI_FLTK
     bool guiStarted = false;
     time(&old_father_time);
