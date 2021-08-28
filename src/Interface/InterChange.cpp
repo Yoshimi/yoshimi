@@ -77,40 +77,6 @@ extern SynthEngine *firstSynth;
 
 int startInstance = 0;
 
-static string manfound = "";
-static void manualCheck()
-{
-    string namelist = "";
-    if(!file::cmd2string("find / -type f -name 'yoshimi_user_guide_version' 2>/dev/null", namelist))
-        return;
-
-    size_t next = 0;
-    size_t lastversion = 0;
-    string found = "";
-    string name = "";
-    while (next != string::npos)
-    {
-        next = namelist.find("\n");
-        if (next != string::npos)
-        {
-            name = namelist.substr(0, next);
-
-            // check it's there and the most recent
-            size_t current = isRegularFile(name);
-            if (current > lastversion)
-            {
-                lastversion = current;
-                found = name;
-            }
-            namelist = namelist.substr( next +1);
-        }
-    }
-    //std::cout << " man " << found << std::endl;
-    if (lastversion > 0)
-        manfound = found;
-}
-
-
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
 #ifndef YOSHIMI_LV2_PLUGIN
@@ -130,18 +96,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     swapBank1(UNUSED),
     swapInstrument1(UNUSED)
 {
-    /*
-     * We run this low prio thread so that the manual
-     * is already found before anyone wants to see it.
-     * This makes viewing it quicker.
-     */
-    static bool manseen = false; // only check first instance
-    if (!manseen)
-    {
-        std::thread toCheck (manualCheck);
-        toCheck.detach();
-        manseen = true;
-    }
+    ;
 }
 
 
@@ -222,7 +177,7 @@ void *InterChange::sortResultsThread(void)
             else
                 resolveReplies(&getData);
         }
-        usleep(80); // actually gives around 120 uS
+            usleep(80); // actually gives around 120 uS
     }
     return NULL;
 }
@@ -247,6 +202,46 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
         //std::cout << "here pending" << std:: endl;
         synth->audioOut.store(_SYS_::mute::Pending);
     }
+}
+
+
+std::string InterChange::findHtmlManual(void)
+{
+    string namestring = "doc/yoshimi/yoshimi_user_guide/files/yoshimi_user_guide_version";
+    string namelist = "";
+    if (isRegularFile("/usr/share/" + namestring))
+        namelist += ("/usr/share/" + namestring + "\n");
+    if (isRegularFile("/usr/local/share/" + namestring))
+        namelist += ("/usr/local/share/" + namestring + "\n");
+    if (namelist.empty())
+    {
+        if(!file::cmd2string("find /home/ -type f -name 'yoshimi_user_guide_version' 2>/dev/null", namelist))
+            return "";
+    }
+    std::cout << namelist << std::endl;
+
+    size_t next = 0;
+    size_t lastversion = 0;
+    string found = "";
+    string name = "";
+    while (next != string::npos)
+    {
+        next = namelist.find("\n");
+        if (next != string::npos)
+        {
+            name = namelist.substr(0, next);
+
+            // check it's there and the most recent
+            size_t current = isRegularFile(name);
+            if (current > lastversion)
+            {
+                lastversion = current;
+                found = name;
+            }
+            namelist = namelist.substr( next +1);
+        }
+    }
+    return found;
 }
 
 
@@ -869,18 +864,13 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             // first try html version
             text = "";
             getData->data.control = TOPLEVEL::control::textMessage;
-            string found = manfound;
+            string found  = findHtmlManual();
             if (!found.empty())
             {
+
                 size_t pos = found.rfind("files/yoshimi_user_guide_version");
                 found = found.substr(0, pos);
-                found = "xdg-open " + found + "index.html &";
-                //std::cout << found <<std::endl;
-                if (!file::cmd2string(found))
-                {
-                    found = "";
-                    text = "Found Manual but can't find Browser :(";
-                }
+                file::cmd2string("xdg-open " + found + "index.html &");
             }
             else
                 text = "Can't find manual :(";

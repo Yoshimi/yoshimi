@@ -1,4 +1,4 @@
-BUG: Crash loading MIDI-Learn files from CLI startup.
+BUG: When loading MIDI-Learn files from CLI startup, sometimes doesn't display text of first line.
 
 BUG! If jack is selected for audio but there are no physical ports Yoshimi quits with CLI warning - should continue run with no audio and gui warning as well, or better still loop back to try alsa.
 
