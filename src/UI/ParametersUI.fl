@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014 - 2020, Will Godfrey
+Copyright 2014 - 2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -147,16 +147,13 @@ class ParametersUI {} {
     const int colwidths[] = { 64, 128, 0 };
     BrowseRecent->column_widths(colwidths);
     BrowseRecent->column_char('	');
-    unsigned int offset = 0;
-    
+
     if (listType.empty())
         emptytext->show();
     else
     {
         emptytext->hide();
-        if (listType.size() > MAX_HISTORY)
-            offset = listType.size() -MAX_HISTORY;
-        for (vector<string>::iterator it = listType.begin(); it != listType.end() - offset; ++it)
+        for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
         {
             name = *it;
             name_start = name.rfind("/");

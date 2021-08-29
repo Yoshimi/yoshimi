@@ -1,5 +1,8 @@
 yoshimi 2.1.0 M
 
+2021-8-29 Will
+* Cleaned up history vector implementation.
+
 2021-8-28 Will
 * Reverted manual code to minimise load time.
 

@@ -975,28 +975,20 @@ void CmdInterpreter::historyList(int listnum)
 }
 
 
-string CmdInterpreter::historySelect(int listnum, int selection)
+string CmdInterpreter::historySelect(int listnum, size_t selection)
 {
     vector<string> listType = *synth->getHistory(listnum - 1);
-    if (listType.size()== 0)
+    if (listType.size() == 0)
     {
         synth->getRuntime().Log("No saved entries");
         return "";
     }
-    else
+    else if (selection >= listType.size())
     {
-        vector<string>::iterator it = listType.begin();
-        int itemNo = 0;
-        while (it != listType.end() && itemNo != selection)
-        {
-            ++ it;
-            ++ itemNo;
-        }
-        if (it != listType.end())
-            return *it;
+        synth->getRuntime().Log("No such entry");
+        return "";
     }
-    synth->getRuntime().Log("No such entry");
-    return "";
+    return listType[selection];
 }
 
 

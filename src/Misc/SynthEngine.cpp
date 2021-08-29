@@ -2575,6 +2575,8 @@ void SynthEngine::addHistory(const string& name, int group)
     vector<string>::iterator itn = listType.begin();
     listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
     listType.insert(listType.begin(), name);
+    while(listType.size() > MAX_HISTORY)
+        listType.pop_back();
     setLastfileAdded(group, name);
 }
 
@@ -2756,7 +2758,7 @@ bool SynthEngine::loadHistory()
                 break;
         }
         if (xml->enterbranch(type))
-        { // should never exceed max history as size trimmed on save
+        { // should never exceed max history
             Runtime.historyLock[count] = xml->getparbool("lock_status", false);
             hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
             for (int i = 0; i < hist_size; ++i)
@@ -2848,14 +2850,11 @@ bool SynthEngine::saveHistory()
             vector<string> listType = *getHistory(count);
             if (listType.size())
             {
-                unsigned int offset = 0;
                 int x = 0;
                 xml->beginbranch(type);
                     xml->addparbool("lock_status", Runtime.historyLock[count]);
                     xml->addpar("history_size", listType.size());
-                    if (listType.size() > MAX_HISTORY)
-                        offset = listType.size() - MAX_HISTORY;
-                    for (vector<string>::iterator it = listType.begin(); it != listType.end() - offset; ++it)
+                    for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
                     {
                         xml->beginbranch("XMZ_FILE", x);
                             xml->addparstr(extension, *it);

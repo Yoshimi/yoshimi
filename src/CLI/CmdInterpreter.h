@@ -1,7 +1,7 @@
 /*
     CmdInterpreter.h
 
-    Copyright 2019, Will Godfrey.
+    Copyright 2019 - 2021, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -86,7 +86,7 @@ class CmdInterpreter
         bool query(std::string text, bool priority);
         void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
         char helpList(Parser& input, unsigned int local);
-        std::string historySelect(int listnum, int selection);
+        std::string historySelect(int listnum, size_t selection);
         void historyList(int listnum);
         void listCurrentParts(Parser& input, std::list<std::string>& msg_buf);
         int effectsList(Parser& input, bool presets = false);
