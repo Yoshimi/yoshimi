@@ -100,8 +100,6 @@ class SynthEngine
         void setHistoryLock(int group, bool status);
         bool getHistoryLock(int group);
         string lastItemSeen(int group);
-        void setLastfileAdded(int group, string name);
-        string getLastfileAdded(int group);
         bool loadHistory(void);
         bool saveHistory(void);
         unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);

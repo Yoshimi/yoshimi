@@ -83,6 +83,8 @@ namespace { // Global implementation internal history data
     static vector<string> PadHistory;
     static vector<string> TuningHistory;
     static vector<string> KeymapHistory;
+
+    static vector<string> historyLastSeen(TOPLEVEL::XML::ScalaMap, "");
 }
 
 
@@ -2560,14 +2562,17 @@ void SynthEngine::newHistory(string name, int group)
 void SynthEngine::addHistory(const string& name, int group)
 {
     //std::cout << "history name " << name << "  group " << group << std::endl;
-    if (Runtime.historyLock[group])
-    {
-        //std::cout << "history locked" << std::endl;
-        return;
-    }
     if (findLeafName(name) < "!")
     {
         //std::cout << "failed leafname" << std::endl;
+        return;
+    }
+
+    historyLastSeen.at(group) = name;
+
+    if (Runtime.historyLock[group])
+    {
+        //std::cout << "history locked" << std::endl;
         return;
     }
 
@@ -2577,7 +2582,6 @@ void SynthEngine::addHistory(const string& name, int group)
     listType.insert(listType.begin(), name);
     while(listType.size() > MAX_HISTORY)
         listType.pop_back();
-    setLastfileAdded(group, name);
 }
 
 
@@ -2642,42 +2646,7 @@ string SynthEngine::lastItemSeen(int group)
 {
     if (group == TOPLEVEL::XML::Instrument && Runtime.sessionSeen[group] == false)
         return "";
-
-    vector<string> &listType = *getHistory(group);
-    if (listType.empty())
-        return "";
-    return *listType.begin();
-}
-
-
-void SynthEngine::setLastfileAdded(int group, string name)
-{
-    if (name == "")
-        name = Runtime.userHome;
-    list<string>::iterator it = Runtime.lastfileseen.begin();
-    int count = 0;
-    while (count < group && it != Runtime.lastfileseen.end())
-    {
-        ++it;
-        ++count;
-    }
-    if (it != Runtime.lastfileseen.end())
-        *it = name;
-}
-
-
-string SynthEngine::getLastfileAdded(int group)
-{
-    list<string>::iterator it = Runtime.lastfileseen.begin();
-    int count = 0;
-    while (count < group && it != Runtime.lastfileseen.end())
-    {
-        ++it;
-        ++count;
-    }
-    if (it == Runtime.lastfileseen.end())
-        return "";
-    return *it;
+    return historyLastSeen.at(group);
 }
 
 
@@ -2711,7 +2680,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
+    for (count = TOPLEVEL::XML::Instrument; count < TOPLEVEL::XML::ScalaMap; ++count)
     {
         switch (count)
         {
@@ -2775,7 +2744,14 @@ bool SynthEngine::loadHistory()
                         newHistory(filetype, count);
                     xml->exitbranch();
                 }
+
             }
+            string tryRecent = xml->getparstr("most_recent");
+            std::cout << "new >" << tryRecent << "<" << std::endl;
+            if (tryRecent.empty())
+                historyLastSeen.at(count) = getHistory(count)->at(0);
+            else
+                historyLastSeen.at(count) = tryRecent;
             xml->exitbranch();
         }
     }
@@ -2835,9 +2811,9 @@ bool SynthEngine::saveHistory()
                     break;
 
                 case TOPLEVEL::XML::PadSample:
-                type = "XMZ_PADSAMPLE";
-                extension = "wav_file";
-                break;
+                    type = "XMZ_PADSAMPLE";
+                    extension = "wav_file";
+                    break;
                 case TOPLEVEL::XML::ScalaTune:
                     type = "XMZ_TUNING";
                     extension = "scl_file";
@@ -2861,6 +2837,7 @@ bool SynthEngine::saveHistory()
                         xml->endbranch();
                         ++x;
                     }
+                    xml->addparstr("most_recent", historyLastSeen.at(count));
                 xml->endbranch();
             }
         }

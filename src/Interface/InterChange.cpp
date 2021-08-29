@@ -2333,7 +2333,6 @@ void InterChange::commandVector(CommandBlock *getData)
     if (control == VECTOR::control::erase)
     {
         vectorClear(chan);
-        synth->setLastfileAdded(TOPLEVEL::XML::Vector, "");
         return;
     }
     if (write)

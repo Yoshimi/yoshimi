@@ -409,7 +409,6 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     if (control == MIDILEARN::control::clearAll)
     {
         midi_list.clear();
-        synth->setLastfileAdded(TOPLEVEL::XML::MLearn, "");
         updateGui();
         synth->getRuntime().Log("List cleared");
         return;
