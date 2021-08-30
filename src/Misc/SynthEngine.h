@@ -77,7 +77,7 @@ class SynthEngine
         PresetsStore presetsstore;
     public:
         TextMsgBuffer& textMsgBuffer;
-        SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
+        SynthEngine(std::list<string>& allArgs, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
 

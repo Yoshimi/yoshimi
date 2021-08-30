@@ -62,8 +62,7 @@ std::atomic <bool> waitForTest{false};
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId);
 Config *firstRuntime = NULL;
-static int globalArgc = 0;
-static char **globalArgv = NULL;
+static std::list<std::string> globalAllArgs;
 bool isSingleMaster = false;
 bool bShowGui = true;
 bool bShowCmdLine = true;
@@ -312,7 +311,7 @@ int mainCreateNewInstance(unsigned int forceId)
 {
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
-    SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
+    SynthEngine *synth = new SynthEngine(globalAllArgs, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();
@@ -456,12 +455,14 @@ int main(int argc, char *argv[])
                 return 0; // exit quietly
         }
     }
-    /*
+
     std::list<std::string> allArgs;
-    CmdOptions(argc, argv, allArgs);
-    for (std::list<string>::iterator it = allArgs.begin(); it != allArgs.end(); ++it)
-        std::cout << *it << std::endl;
-    */
+
+    int gui;
+    int cmd;
+    CmdOptions(argc, argv, allArgs, gui, cmd);
+    globalAllArgs = allArgs;
+
 #ifdef GUI_FLTK
     bool guiStarted = false;
     time(&old_father_time);
@@ -472,8 +473,7 @@ int main(int argc, char *argv[])
     tcgetattr(0, &oldTerm);
 
     std::cout << "Yoshimi " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
-    globalArgc = argc;
-    globalArgv = argv;
+
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
 
@@ -555,9 +555,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    void *ret;
-    pthread_join(threadGui, &ret);
-    if (ret == (void *)1)
+    void *res;
+    pthread_join(threadGui, &res);
+    if (res == (void *)1)
     {
         goto bail_out;
     }
@@ -566,8 +566,8 @@ int main(int argc, char *argv[])
         MusicClient* music = synthInstances[firstSynth];
         if (music) music->Close(); // causes esp. JackClient to detach
 
-        pthread_join(threadCmd, &ret);
-        if (ret == (void *)1)
+        pthread_join(threadCmd, &res);
+        if (res == (void *)1)
         {
             goto bail_out;
         }

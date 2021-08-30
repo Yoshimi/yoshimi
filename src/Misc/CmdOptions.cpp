@@ -78,13 +78,16 @@ namespace { // constants used in the implementation
 }
 
 
-
-CmdOptions::CmdOptions(int argc, char **argv, std::list<string> &allArgs)
+CmdOptions::CmdOptions(int argc, char **argv, std::list<string> &allArgs, int &guin, int &cmdn) :
+    gui(0),
+    cmd(0)
 {
     //std::cout << "In CmdOptions" << std::endl;
 
     loadCmdArgs(argc, argv);
     allArgs = settings;
+    guin = gui;
+    cmdn = cmd;
     return;
 }
 
@@ -94,7 +97,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
     CmdOptions *base = (CmdOptions*)state->input;
     if (arg && arg[0] == 0x3d)
         ++ arg;
-
+    base->gui = base->cmd = 0;
     switch (key)
     {
         case 'N': base->settings.push_back("N:" + string(arg)); break;
@@ -116,15 +119,31 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'b': base->settings.push_back("b:" + string(arg)); break;
-        case 'c': base->settings.push_back("c:"); break;
-        case 'C': base->settings.push_back("C:"); break;
+        case 'c':
+            base->settings.push_back("c:");
+            base->cmd = -1;
+            break;
+
+        case 'C':
+            base->settings.push_back("C:");
+            base->cmd = 1;
+            break;
+
         case 'D':
             if (arg)
                 base->settings.push_back("D:" + string(arg));
             break;
 
-        case 'i': base->settings.push_back("i:"); break;
-        case 'I': base->settings.push_back("I:"); break;
+        case 'i':
+            base->settings.push_back("i:");
+            base->gui = -1;
+            break;
+
+        case 'I':
+            base->settings.push_back("I:");
+            base->gui = 1;
+            break;
+
         case 'J':
             if (arg)
                 base->settings.push_back("J:" + string(arg));
@@ -140,6 +159,21 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 base->settings.push_back("S:" + string(arg));
             break;
+
+        case 13:base->settings.push_back("@:"); break;
+
+#if defined(JACK_SESSION)
+        case 'u':
+            if (arg)
+                base->settings.push_back("u:" + string(arg));
+            break;
+
+        case 'U':
+            if (arg)
+                base->settings.push_back("U:" + string(arg));
+            break;
+#endif
+
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;
@@ -149,11 +183,10 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
     return error_t(0);
 }
 
+
 static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
 
 void CmdOptions::loadCmdArgs(int argc, char **argv)
 {
     argp_parse(&cmd_argp, argc, argv, 0, 0, this);
-    //if (jackSessionUuid.size() && jackSessionFile.size())
-        //restoreJackSession = true;
 }

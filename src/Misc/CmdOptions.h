@@ -34,8 +34,10 @@ using std::string;
 class CmdOptions
 {
     public:
-        CmdOptions(int argc, char **argv, std::list<string> &allArgs);
+        CmdOptions(int argc, char **argv, std::list<string> &allArgs, int &guin, int &cmdn);
         std::list<string> settings;
+        int gui;
+        int cmd;
 
     private:
         void loadCmdArgs(int argc, char **argv);
