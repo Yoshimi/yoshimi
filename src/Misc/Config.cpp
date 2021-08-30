@@ -30,7 +30,6 @@
 #include <errno.h>
 #include <cmath>
 #include <string>
-#include <argp.h>
 #include <libgen.h>
 #include <limits.h>
 
@@ -68,46 +67,8 @@ using func::string2int;
 
 unsigned char panLaw = 1;
 
-namespace { // constants used in the implementation
-    char prog_doc[] =
-        "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
-        "Copyright 2002-2009 Nasca Octavian Paul and others, "
-        "Copyright 2009-2011 Alan Calvert, "
-        "Copyright 2012-2013 Jeremy Jongepier and others, "
-        "Copyright 2014-2021 Will Godfrey and others";
-    const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
-    const char* argp_program_version = argline.c_str();
-
-    string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
-
-    static struct argp_option cmd_options[] = {
-        {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output", 0},
-        {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input", 0},
-        {"define-root",       'D',  "<path>",     0,  "define path to new bank root" , 0},
-        {"buffersize",        'b',  "<size>",     0,  "set internal buffer size", 0 },
-        {"no-gui",            'i',  NULL,         0,  "disable gui", 0},
-        {"gui",               'I',  NULL,         0,  "enable gui", 0},
-        {"no-cmdline",        'c',  NULL,         0,  "disable command line interface", 0},
-        {"cmdline",           'C',  NULL,         0,  "enable command line interface", 0},
-        {"jack-audio",        'J',  "<server>",   1,  "use jack audio output", 0},
-        {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
-        {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
-        {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
-        {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
-        {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
-        {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
-        {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
-        {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
-        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
-        {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
-        {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
-        #if defined(JACK_SESSION)
-            {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
-            {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file", 0},
-        #endif
-        { 0, 0, 0, 0, 0, 0}
-    };
-}
+const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
+const char* argp_program_version = argline.c_str();
 
 bool         Config::showSplash = true;
 bool         Config::autoInstance = false;
@@ -116,7 +77,7 @@ int          Config::showCLIcontext = 1;
 
 string jUuid = "";
 
-Config::Config(SynthEngine *_synth, int argc, char **argv) :
+Config::Config(SynthEngine *_synth, std::list<string>& allArgs) :
     stateChanged(false),
     restoreJackSession(false),
     oldConfig(false),
@@ -214,17 +175,17 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
      */
 
     std::cerr.precision(4);
-    bRuntimeSetupCompleted = Setup(argc, argv);
+    bRuntimeSetupCompleted = Setup(allArgs);
 }
 
 
-bool Config::Setup(int argc, char **argv)
+bool Config::Setup(std::list<string>& allArgs)
 {
     static bool torun = true;
     if (torun) // only the first synth can read args
     {
+        applyOptions(this, allArgs);
         torun = false;
-        loadCmdArgs(argc, argv);
     }
 
     if (!loadConfig())
@@ -233,6 +194,9 @@ bool Config::Setup(int argc, char **argv)
         TextMsgBuffer::instance().push(message);
         Log("\n\n" + message + "\n");
     }
+    //skip further setup, which is irrelevant for lv2 plugin instance.
+    if (synth->getIsLV2Plugin())
+        return true;
 
     switch (audioEngine)
     {
@@ -1320,38 +1284,34 @@ LinuxSampler src/common/Features.cpp, licensed thus -
 **/
 
 
-static error_t parse_cmds (int key, char *arg, struct argp_state *state)
+void Config::applyOptions(Config* settings, std::list<string>& allArgs)
 {
-    Config *settings = (Config*)state->input;
-    if (arg && arg[0] == 0x3d)
-        ++ arg;
-
-    switch (key)
+    if (allArgs.empty())
+        return;
+    for (std::list<string>::iterator it = allArgs.begin(); it != allArgs.end(); ++it)
     {
-        case 'N': settings->nameTag = string(arg); break;
-
-        case 'l': settings->paramsLoad = string(arg); break;
-
-        case 'L': settings->instrumentLoad = string(arg); break;
-
-        case 'M':settings->midiLearnLoad = string(arg);break;
-
-        case 'A':
-            settings->configChanged = true;
-            settings->engineChanged = true;
-            settings->audioEngine = alsa_audio;
-            if (arg)
-                settings->audioDevice = string(arg);
-            else
-                settings->audioDevice = settings->alsaAudioDevice;
+        string line = *it;
+        size_t pos = line.find(":");
+        char cmd = line.at(0);
+        line = line.substr(pos +1);
+        switch (cmd)
+        {
+            case 'A':
+                settings->configChanged = true;
+                settings->engineChanged = true;
+                settings->audioEngine = alsa_audio;
+                if (!line.empty())
+                    settings->audioDevice = line;
+                else
+                    settings->audioDevice = settings->alsaAudioDevice;
             break;
 
         case 'a':
             settings->configChanged = true;
             settings->midiChanged = true;
             settings->midiEngine = alsa_midi;
-            if (arg)
-                settings->midiDevice = string(arg);
+            if (!line.empty())
+                settings->midiDevice = line;
             else
                 settings->midiDevice = string(settings->alsaMidiDevice);
             break;
@@ -1359,12 +1319,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'b':
             settings->configChanged = true;
             settings->bufferChanged = true;
-            settings->Buffersize = string2int(string(arg));
-            break;
-
-        case 'D':
-            if (arg)
-                settings->rootDefine = string(arg);
+            settings->Buffersize = string2int(line);
+            std::cout << "B "<< line << std::endl;
             break;
 
         case 'c':
@@ -1377,6 +1333,11 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->configChanged = true;
             settings->cliChanged = true;
             settings->showCli = true;
+            break;
+
+        case 'D':
+            if (!line.empty())
+                settings->rootDefine = line;
             break;
 
         case 'i':
@@ -1395,22 +1356,18 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->configChanged = true;
             settings->engineChanged = true;
             settings->audioEngine = jack_audio;
-            if (arg)
-                settings->audioDevice = string(arg);
+            if (!line.empty())
+                settings->audioDevice = line;
             break;
 
         case 'j':
             settings->configChanged = true;
             settings->midiChanged = true;
             settings->midiEngine = jack_midi;
-            if (arg)
-                settings->midiDevice = string(arg);
+            if (!line.empty())
+                settings->midiDevice = line;
             else
                 settings->midiDevice = string(settings->jackMidiDevice);
-            break;
-
-        case 'k':
-            settings->startJack = true;
             break;
 
         case 'K':
@@ -1419,17 +1376,29 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->connectJackaudio = true;
             break;
 
+        case 'k':
+            settings->startJack = true;
+            break;
+
+        case 'l': settings->paramsLoad = line; break;
+
+        case 'L': settings->instrumentLoad = line; break;
+
+        case 'M':settings->midiLearnLoad = line; break;
+
+        case 'N': settings->nameTag = line; break;
+
         case 'o':
             settings->configChanged = true;
             settings->oscilChanged = true;
-            settings->Oscilsize = string2int(string(arg));
+            settings->Oscilsize = string2int(line);
             break;
 
         case 'R':
         {
             settings->configChanged = true;
             settings->rateChanged = true;
-            int num = (string2int(string(arg)) / 48 ) * 48;
+            int num = (string2int(line) / 48 ) * 48;
             if (num < 48000 || num > 192000)
                 num = 44100; // play safe
             settings->Samplerate = num;
@@ -1437,58 +1406,42 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         }
 
         case 'S':
-            if (arg)
+            if (!line.empty())
             {
                 settings->sessionStage = _SYS_::type::StartupFirst;
                 settings->configChanged = true;
-                settings->StateFile = string(arg);
+                settings->StateFile = line;
             }
             break;
 
-        case 13:
+        case 'u':
+            if (!line.empty())
+            {
+                settings->sessionStage = _SYS_::type::JackFirst;
+                settings->configChanged = true;
+                settings->StateFile = setExtension(line, EXTEN::state);
+            }
+            break;
+
+        case 'U':
+            if (!line.empty())
+                jUuid = line;
+            break;
+
+        case '@':
             settings->configChanged = true;
             settings->engineChanged = true;
             settings->midiChanged = true;
             settings->audioEngine = no_audio;
             settings->midiEngine  = no_midi;
             break;
-
-#if defined(JACK_SESSION)
-        case 'u':
-            if (arg)
-            {
-                settings->sessionStage = _SYS_::type::JackFirst;
-                settings->configChanged = true;
-                settings->StateFile = setExtension(string(arg), EXTEN::state);
-            }
-            break;
-
-        case 'U':
-                if (arg)
-                    jUuid = string(arg);
-        break;
-#endif
-
-        case ARGP_KEY_ARG:
-        case ARGP_KEY_END:
-            break;
-
-        default:
-            return error_t(ARGP_ERR_UNKNOWN);
+        }
+        //std::cout << cmd << " line " << line << std::endl;
     }
-    return error_t(0);
-}
-
-
-static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc, 0, 0, 0, 0};
-
-
-void Config::loadCmdArgs(int argc, char **argv)
-{
-    argp_parse(&cmd_argp, argc, argv, 0, 0, this);
     if (jackSessionUuid.size() && jackSessionFile.size())
         restoreJackSession = true;
 }
+
 
 #ifdef GUI_FLTK
 void GuiThreadMsg::processGuiMessages()
