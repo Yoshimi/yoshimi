@@ -77,9 +77,9 @@ namespace { // Global implementation internal history data
     static vector<string> ParamsHistory;
     static vector<string> ScaleHistory;
     static vector<string> StateHistory;
-    static vector<string> PresetHistory;
     static vector<string> VectorHistory;
     static vector<string> MidiLearnHistory;
+    static vector<string> PresetHistory;
     static vector<string> PadHistory;
     static vector<string> TuningHistory;
     static vector<string> KeymapHistory;
@@ -2567,6 +2567,8 @@ void SynthEngine::addHistory(const string& name, int group)
         //std::cout << "failed leafname" << std::endl;
         return;
     }
+    if (group > TOPLEVEL::XML::ScalaMap)
+        return; // last seen not stored for these.
 
     historyLastSeen.at(group) = name;
 
@@ -2644,8 +2646,11 @@ bool SynthEngine::getHistoryLock(int group)
 
 string SynthEngine::lastItemSeen(int group)
 {
+    if (group > TOPLEVEL::XML::ScalaMap)
+        return ""; // last seen not stored for these.
     if (group == TOPLEVEL::XML::Instrument && Runtime.sessionSeen[group] == false)
         return "";
+
     return historyLastSeen.at(group);
 }
 
@@ -2747,7 +2752,7 @@ bool SynthEngine::loadHistory()
 
             }
             string tryRecent = xml->getparstr("most_recent");
-            std::cout << "new >" << tryRecent << "<" << std::endl;
+            //std::cout << "new >" << tryRecent << "<" << std::endl;
             if (tryRecent.empty())
                 historyLastSeen.at(count) = getHistory(count)->at(0);
             else
