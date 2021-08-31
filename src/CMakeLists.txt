@@ -541,6 +541,7 @@ add_custom_target (distclean
     COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -f
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/LV2_Plugin/Makefile
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/LV2_Plugin/cmake_install.cmake
+    COMMAND rm -f ${CMAKE_SOURCE_DIR}/LV2_Plugin/ -type d -name CMakeFiles | xargs -r rm -rff
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
