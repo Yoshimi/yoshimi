@@ -446,7 +446,8 @@ bool YoshimiLV2Plugin::init()
 
 LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
-    SynthEngine *synth = new SynthEngine(0, NULL, true);
+    std::list<string> dummy;
+    SynthEngine *synth = new SynthEngine(dummy, true);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
     {
         delete synth;
