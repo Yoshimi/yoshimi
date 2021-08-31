@@ -20,8 +20,6 @@
 file (GLOB yoshimi_lv2_plugin_files
         YoshimiLV2Plugin.cpp
         YoshimiLV2Plugin.h
-        Config.cpp
-        Config.h
         lv2extui.h
         lv2extprg.h)
 file (GLOB yoshimi_dsp_files
@@ -39,7 +37,7 @@ file (GLOB yoshimi_effects_files
     ../Effects/Phaser.h  ../Effects/Reverb.h  ../Effects/EQ.h
     ../Effects/Distorsion.h  ../Effects/DynamicFilter.h)
 file (GLOB yoshimi_misc_files
-    #../Misc/Config.cpp ../Misc/Config.h ../ConfBuild.h
+    ../Misc/Config.cpp ../Misc/Config.h ../Misc/ConfBuild.h
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
