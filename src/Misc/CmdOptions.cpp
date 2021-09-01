@@ -18,20 +18,12 @@
 
 */
 
-#include <sys/types.h>
-#include <iostream>
 #include <list>
-#include <fenv.h>
 #include <errno.h>
-#include <cmath>
 #include <string>
 #include <argp.h>
-#include <libgen.h>
-#include <limits.h>
 
 #include "Misc/FileMgrFuncs.h"
-#include "Misc/NumericFuncs.h"
-#include "Misc/FormatFuncs.h"
 #include "Misc/CmdOptions.h"
 
 using file::setExtension;
@@ -43,8 +35,6 @@ namespace { // constants used in the implementation
         "Copyright 2009-2011 Alan Calvert, "
         "Copyright 2012-2013 Jeremy Jongepier and others, "
         "Copyright 2014-2021 Will Godfrey and others";
-    const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
-    const char* argp_program_version = argline.c_str();
 
     string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
 
@@ -82,8 +72,6 @@ CmdOptions::CmdOptions(int argc, char **argv, std::list<string> &allArgs, int &g
     gui(0),
     cmd(0)
 {
-    //std::cout << "In CmdOptions" << std::endl;
-
     loadCmdArgs(argc, argv);
     allArgs = settings;
     guin = gui;

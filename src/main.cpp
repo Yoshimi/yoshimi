@@ -22,26 +22,18 @@
 #include <iostream>
 #include <string>
 #include <list>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <termios.h>
 #include <pthread.h>
 #include <atomic>
 
-#include <cstdio>
-#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "Misc/CmdOptions.h"
-#include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
 #include "CLI/CmdInterface.h"
-#include "Interface/InterChange.h"
 #include "Misc/FileMgrFuncs.h"
-#include "Misc/FormatFuncs.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"

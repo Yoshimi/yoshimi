@@ -21,10 +21,7 @@
 #ifndef CMDOPTIONS_H
 #define CMDOPTIONS_H
 
-#include <csignal>
-#include <cstring>
 #include <string>
-#include <deque>
 #include <list>
 
 #include "globals.h"

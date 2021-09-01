@@ -67,9 +67,6 @@ using func::string2int;
 
 unsigned char panLaw = 1;
 
-const string argline = "Yoshimi " + (string) YOSHIMI_VERSION;
-const char* argp_program_version = argline.c_str();
-
 bool         Config::showSplash = true;
 bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
@@ -862,10 +859,7 @@ void Config::StartupReport(const string& clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
     if (fullInfo)
-    {
-        Log(argline);
-        Log("Build Number " + std::to_string(BUILD_NUMBER), 1);
-    }
+        Log("Build Number " + std::to_string(BUILD_NUMBER));
     Log("Clientname: " + clientName);
     string report = "Audio: ";
     switch (audioEngine)
