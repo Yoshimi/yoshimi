@@ -1,5 +1,10 @@
 yoshimi 2.1.0 M
 
+2010-9-3 Will
+* Merged in revisedArgs
+* Code cleanups.
+  No changes to logic.
+
 2021-8-30 Will
 * BugFix: crash when trying to import bank.
   last seen code not trapping out of range values.

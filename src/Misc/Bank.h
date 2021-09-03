@@ -108,21 +108,21 @@ class Bank
 
         int engines_used(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(size_t rootID, size_t bankID, unsigned int ninstrument);
-        std::string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
+        string clearslot(unsigned int ninstrument, size_t rootID, size_t bankID);
         bool savetoslot(size_t rootID, size_t bankID, int ninstrument, int npart);
-        std::string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
-        std::string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
+        string swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t bank2, size_t root1, size_t root2);
+        string swapbanks(unsigned int firstID, unsigned int secondID, size_t firstRoot, size_t secondRoot);
         string getBankName(int bankID, size_t rootID);
         bool isDuplicateBankName(size_t rootID, const string& name);
         int getBankSize(int bankID, size_t rootID);
         int changeBankName(size_t rootID, size_t bankID, const string& newName);
         bool loadbank(size_t rootID, size_t banknum);
-        std::string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
-        std::string importBank(string importdir, size_t rootID, unsigned int bankID);
+        string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
+        string importBank(string importdir, size_t rootID, unsigned int bankID);
         bool isDuplicate(size_t rootID, size_t bankID, int pos, const string filename);
         bool newIDbank(const string& newbankdir, unsigned int bankID, size_t rootID = 0xff);
         bool newbankfile(const string& newbankdir, size_t rootID);
-        std::string removebank(unsigned int bankID, size_t rootID = 0xff);
+        string removebank(unsigned int bankID, size_t rootID = 0xff);
         bool removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
 

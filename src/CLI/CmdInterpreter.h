@@ -28,6 +28,9 @@
 #include "Misc/SynthEngine.h"
 #include "Interface/TextLists.h"
 
+using std::string;
+using std::list;
+
 class TextMsgBuffer;
 
 namespace test {
@@ -41,9 +44,9 @@ struct Reply
 {
     // note these are immutable
     const int code;
-    const std::string msg;
+    const string msg;
 
-    Reply(int c, std::string m ="") :
+    Reply(int c, string m ="") :
         code{c},
         msg{m}
     { }
@@ -55,7 +58,7 @@ struct Reply
     // some frequently used shortcuts
     static Reply DONE;
 
-    static Reply what(std::string question)
+    static Reply what(string question)
     {
         return Reply{REPLY::what_msg, question};
     }
@@ -70,25 +73,25 @@ class CmdInterpreter
         CmdInterpreter();
        ~CmdInterpreter();
 
-        std::string buildStatus(bool showPartDetails);
+        string buildStatus(bool showPartDetails);
         Reply cmdIfaceProcessCommand(Parser& input);
 
         unsigned int currentInstance;
         SynthEngine *synth;
 
     private:
-        std::string buildAllFXStatus();
-        std::string buildPartStatus(bool showPartDetails);
-        std::string buildTestStatus();
+        string buildAllFXStatus();
+        string buildPartStatus(bool showPartDetails);
+        string buildTestStatus();
 
         void defaults();
         void resetInstance(unsigned int newInstance);
-        bool query(std::string text, bool priority);
-        void helpLoop(std::list<std::string>& msg, std::string *commands, int indent, bool single = false);
+        bool query(string text, bool priority);
+        void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
         char helpList(Parser& input, unsigned int local);
-        std::string historySelect(int listnum, size_t selection);
+        string historySelect(int listnum, size_t selection);
         void historyList(int listnum);
-        void listCurrentParts(Parser& input, std::list<std::string>& msg_buf);
+        void listCurrentParts(Parser& input, list<string>& msg_buf);
         int effectsList(Parser& input, bool presets = false);
         int effects(Parser& input, unsigned char controlType);
         int midiControllers(Parser& input, unsigned char controlType);
@@ -116,7 +119,7 @@ class CmdInterpreter
         Reply processSrcriptFile(const string& filename, bool toplevel = true);
 
     private:
-        std::list<std::string>  instrumentGroup;
+        list<string>  instrumentGroup;
         TextMsgBuffer& textMsgBuffer;
 
         std::unique_ptr<test::TestInvoker> testInvoker;

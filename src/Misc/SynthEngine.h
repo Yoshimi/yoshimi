@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 #include "Misc/RandomGen.h"
 #include "Misc/Microtonal.h"

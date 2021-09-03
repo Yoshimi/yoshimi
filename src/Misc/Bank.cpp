@@ -73,6 +73,7 @@ using func::string2int;
 using func::findSplitPoint;
 using func::isDigits;
 
+using std::list;
 using std::to_string;
 using std::string;
 using std::cout;
@@ -332,11 +333,11 @@ int Bank::getBankSize(int bankID, size_t rootID)
 
 int Bank::changeBankName(size_t rootID, size_t bankID, const string& newName)
 {
-    std::string filename = newName;
-    std::string oldName = getBankName(bankID, rootID);
+    string filename = newName;
+    string oldName = getBankName(bankID, rootID);
     make_legit_filename(filename);
-    std::string newfilepath = getRootPath(synth->getRuntime().currentRoot) + "/" + filename;
-    std::string reply = "";
+    string newfilepath = getRootPath(synth->getRuntime().currentRoot) + "/" + filename;
+    string reply = "";
     bool failed = false;
     if (!renameDir(getBankPath(synth->getRuntime().currentRoot,bankID), newfilepath))
     {
@@ -370,7 +371,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
     string chkpath;
     string candidate;
-    std::list<string> thisBank;
+    list<string> thisBank;
     uint32_t found = listDir(&thisBank, bankdirname);
     if (found == 0xffffffff)
     {
@@ -496,7 +497,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
 
     if (ok)
     {
-        std::list<string> thisBank;
+        list<string> thisBank;
         uint32_t found = listDir(&thisBank, importdir);
         if (found == 0xffffffff)
         {
@@ -721,7 +722,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
                 message = " Can't write to " + getname(n2, bank2, root2);
             }
             else
-                message = std::to_string(n2) + " " + getname(n2, bank2, root2);
+                message = to_string(n2) + " " + getname(n2, bank2, root2);
             getInstrumentReference(root1, bank1, n1) = getInstrumentReference(root2, bank2, n2);
             getInstrumentReference(root2, bank2, n2).clear();
         }
@@ -733,7 +734,7 @@ string Bank::swapslot(unsigned int n1, unsigned int n2, size_t bank1, size_t ban
                 message = " Can't write to " + getname(n1, bank1, root1);
             }
             else
-                message = std::to_string(n2) + " " + getname(n1, bank1, root1);
+                message = to_string(n2) + " " + getname(n1, bank1, root1);
             getInstrumentReference(root2, bank2, n2) = getInstrumentReference(root1, bank1, n1);
             getInstrumentReference(root1, bank1, n1).clear();
         }
@@ -830,10 +831,10 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         {
             // due to possible identical names we need to go via a temp file
 
-            //std::cout << "first " << firstBankPath << std::endl;
-            //std::cout << "second " << secondBankPath << std::endl;
-            //std::cout << "newfirst " << newfirstBankPath << std::endl;
-            //std::cout << "newsecond " << newsecondBankPath << std::endl;
+            //cout << "first " << firstBankPath << endl;
+            //cout << "second " << secondBankPath << endl;
+            //cout << "newfirst " << newfirstBankPath << endl;
+            //cout << "newsecond " << newsecondBankPath << endl;
             deleteDir(tempBankPath); // just to be sure
             if (!renameDir(firstBankPath, tempBankPath))
             {
@@ -936,7 +937,7 @@ bool Bank::isValidBank(string chkdir)
     if (!isDirectory(chkdir))
         return false;
     // check if directory contains an instrument or EXTEN::validBank
-    std::list<string> tryBank;
+    list<string> tryBank;
     uint32_t tried = listDir(&tryBank, chkdir);
     if (tried == 0xffffffff)
     {
@@ -1114,7 +1115,7 @@ bool Bank::transferDefaultDirs(string bankdirs[])
 bool Bank::transferOneDir(string bankdirs[], int baseNumber, int listNumber)
 {
     bool found = false;
-    std::list<string> thisBankDir;
+    list<string> thisBankDir;
     uint32_t copyList = listDir(& thisBankDir, bankdirs[listNumber]);
     if (copyList > 0 && copyList < 0xffffffff)
     {
@@ -1547,7 +1548,7 @@ bool Bank::installRoots(void)
 
 bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
 {
-    std::list<string> thisRoot;
+    list<string> thisRoot;
     uint32_t found = listDir(&thisRoot, rootdir);
     if (found == 0xffffffff)
     { // should never see this!

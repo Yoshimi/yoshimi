@@ -64,8 +64,11 @@ const unsigned char type_read = TOPLEVEL::type::Adjust;
 namespace cli {
 
 using std::string;
+using std::to_string;
 using std::vector;
 using std::list;
+using std::cout;
+using std::endl;
 
 using file::loadText;
 
@@ -167,7 +170,7 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
-        synth->getRuntime().Log("Instance " + std::to_string(currentInstance) + " not found. Set to " + std::to_string(newID), 1);
+        synth->getRuntime().Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), 1);
         currentInstance = newID;
     }
     defaults();
@@ -232,7 +235,7 @@ string CmdInterpreter::buildAllFXStatus()
     int ctl = EFFECT::sysIns::effectType;
     if (bitTest(context, LEVEL::Part))
     {
-        result = " p" + std::to_string(int(npart) + 1);
+        result = " p" + to_string(int(npart) + 1);
         if (readControl(synth, 0, PART::control::enable, npart))
             result += "+";
         ctl = PART::control::effectType;
@@ -282,7 +285,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
         if (kitMode == PART::kitType::Off)
             result = " Part ";
     }
-    result += std::to_string(int(npart) + 1);
+    result += to_string(int(npart) + 1);
     if (readControl(synth, 0, PART::control::enable, npart))
         result += "+";
     if (kitMode != PART::kitType::Off)
@@ -322,7 +325,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
         }
         if (inKitEditor)
         {
-            result += std::to_string(kitNumber + 1);
+            result += to_string(kitNumber + 1);
             if (readControl(synth, 0, PART::control::enableKitLine, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup))
                 result += "+";
         }
@@ -373,13 +376,13 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += ", Voice ";
             else
                 result += ", V";
-            result += std::to_string(voiceNumber + 1);
+            result += to_string(voiceNumber + 1);
             int voiceFromNumber = readControl(synth, 0, ADDVOICE::control::voiceOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
             if (voiceFromNumber > -1)
-                result += (">" +std::to_string(voiceFromNumber + 1));
+                result += (">" +to_string(voiceFromNumber + 1));
             voiceFromNumber = readControl(synth, 0, ADDVOICE::control::externalOscillator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
             if (voiceFromNumber > -1)
-                result += (">V" +std::to_string(voiceFromNumber + 1));
+                result += (">V" +to_string(voiceFromNumber + 1));
             if (readControl(synth, 0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber))
                 result += "+";
 
@@ -398,12 +401,12 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
 
                     int modulatorFromVoiceNumber = readControl(synth, 0, ADDVOICE::control::externalModulator, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                     if (modulatorFromVoiceNumber > -1)
-                        result += (">V" + std::to_string(modulatorFromVoiceNumber + 1));
+                        result += (">V" + to_string(modulatorFromVoiceNumber + 1));
                     else
                     {
                         int modulatorFromNumber = readControl(synth, 0, ADDVOICE::control::modulatorOscillatorSource, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
                         if (modulatorFromNumber > -1)
-                            result += (">" + std::to_string(modulatorFromNumber + 1));
+                            result += (">" + to_string(modulatorFromNumber + 1));
                     }
                 }
                 else
@@ -468,9 +471,9 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 filterSequenceSize = readControl(synth, 0, FILTERINSERT::control::sequenceSize, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
                 filterNumberOfFormants = readControl(synth, 0, FILTERINSERT::control::numberOfFormants, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
                 result += "formant V";
-                result += std::to_string(filterVowelNumber);
+                result += to_string(filterVowelNumber);
                 result += " F";
-                result += std::to_string(filterFormantNumber);
+                result += to_string(filterFormantNumber);
                 break;
             case 2:
                 result += "state var";
@@ -916,7 +919,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
 
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        std::cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
+        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)" << endl;
 
     synth->cliOutput(msg, LINES);
     return REPLY::exit_msg;
@@ -964,7 +967,7 @@ void CmdInterpreter::historyList(int listnum)
             }
             int itemNo = 0;
             for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
-                msg.push_back(std::to_string(itemNo + 1) + "  " + *it);
+                msg.push_back(to_string(itemNo + 1) + "  " + *it);
             found = true;
         }
     }
@@ -1146,7 +1149,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     }
     if (effType)
     {
-        //std::cout << "nfx " << nFX << std::endl;
+        //cout << "nfx " << nFX << endl;
         nFXpreset = 0; // always set this on type change
         if (bitTest(context, LEVEL::Part))
         {
@@ -1389,7 +1392,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 input.skipChars();
                 value = string2int(input);
             }
-            //std::cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << std::endl;
+            //cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << endl;
             return sendNormal(synth, 0, value, controlType, selected, effClass, EFFECT::type::none + nFXtype, nFX);
         }
         // Continue cos it's not for us.
@@ -1769,7 +1772,7 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "rr"))
         cmd = LFOINSERT::control::frequencyRandomness;
 
-    //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(group) << std::endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(group) << endl;
 
     if (value == -1)
         value = string2float(input);
@@ -1906,7 +1909,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     if (cmd == -1)
     {
         int baseType = readControl(synth, 0, FILTERINSERT::control::baseType, thisPart, kit, engine, TOPLEVEL::insert::filterGroup);
-        //std::cout << "baseType " << baseType << std::endl;
+        //cout << "baseType " << baseType << endl;
         if (baseType == 1) // formant
         {
             if (input.matchnMove(1, "invert"))
@@ -1968,7 +1971,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                     return REPLY::value_msg;
                 input.skipChars();
                 int position = string2int(input);
-                //std::cout << "val " << value << "  pos " << position << std::endl;
+                //cout << "val " << value << "  pos " << position << endl;
                 return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
             }
             else if (input.matchnMove(2, "formant"))
@@ -2058,7 +2061,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         }
     }
 
-    //std::cout << ">> base cmd " << int(cmd) << "  part " << int(thisPart) << "  kit " << int(kit) << "  engine " << int(engine) << "  parameter " << int(param) << std::endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(thisPart) << "  kit " << int(kit) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
 
     if (value == -1)
         value = string2float(input);
@@ -2301,7 +2304,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
         value = string2float(input);
     }
 
-    //std::cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << std::endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << endl;
 
     return sendNormal(synth, 0, string2float(input), controlType, cmd, npart, kitNumber, engine, insert, insertType, offset);
 }
@@ -2327,7 +2330,7 @@ int CmdInterpreter::commandGroup(Parser& input)
     }
     string name = string{input};
     value = stringNumInList(name, type_list, 2) + 1;
-    //std::cout << value << std::endl;
+    //cout << value << endl;
     if (value < 1)
         return REPLY::range_msg;
     synth->getRuntime().Log("\n" + type_list[int(value - 1)] + " Instruments");
@@ -2477,7 +2480,7 @@ int CmdInterpreter::commandList(Parser& input)
     helpLoop(msg, listlist, 2);
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        std::cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)\n";
+        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)" << endl;
     synth->cliOutput(msg, LINES);
     return REPLY::done_msg;
 }
@@ -2502,7 +2505,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                     for (int voice = 0; voice < NUM_VOICES; ++voice)
                     {
                         if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
-                            found += (" " + std::to_string(voice + 1));
+                            found += (" " + to_string(voice + 1));
                     }
                     if (found > "")
                         name += ("Voices" + found + " ");
@@ -2523,7 +2526,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
             name = "";
             if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
             {
-                name = "  " + std::to_string(item) + " ";
+                name = "  " + to_string(item) + " ";
                 {
                 if (readControl(synth, 0, PART::control::kitItemMute, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
                     name += "Quiet";
@@ -2537,7 +2540,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                             name += "  ";
                         else if (min < 100)
                             name += " ";
-                        name += std::to_string(min);
+                        name += to_string(min);
                         name += "  Max ";
                         int max = int(readControl(synth, 0, PART::control::maxNote, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup));
                         if (max < 10)
@@ -2545,7 +2548,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                         else if (max < 100)
                             name += " ";
 
-                        name += (std::to_string(max) + "  ");
+                        name += (to_string(max) + "  ");
                         string text = readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup);
                         if (text > "")
                             name += text;
@@ -2561,7 +2564,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                             for (int voice = 0; voice < NUM_VOICES; ++voice)
                             {
                                 if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
-                                found += (" " + std::to_string(voice + 1));
+                                found += (" " + to_string(voice + 1));
                             }
                             if (found > "")
                                 name += ("Voices" + found + " ");
@@ -2596,7 +2599,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                 name += "+";
             else
                 name += " ";
-            name += std::to_string(partno + 1);
+            name += to_string(partno + 1);
             dest = readControl(synth, 0, PART::control::audioDestination, TOPLEVEL::section::part1 + partno);
             if (partno >= avail)
                 name += " - " + text;
@@ -2612,7 +2615,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                 int ch = int(readControl(synth, 0, PART::control::midiChannel, TOPLEVEL::section::part1 + partno) + 1);
                 if (ch < 10)
                     name += " ";
-                name += std::to_string(ch);
+                name += to_string(ch);
                 if (full)
                 {
                     name += "  key Min ";
@@ -2621,14 +2624,14 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                         name += "  ";
                     else if (min < 100)
                         name += " ";
-                    name += std::to_string(min);
+                    name += to_string(min);
                     name += "  Max ";
                     int max = int(readControl(synth, 0, PART::control::maxNote, TOPLEVEL::section::part1 + partno));
                     if (max < 10)
                         name += "  ";
                     else if (max < 100)
                         name += " ";
-                    name += std::to_string(max);
+                    name += to_string(max);
                     name += "  Shift ";
                     int shift = int(readControl(synth, TOPLEVEL::action::lowPrio, PART::control::keyShift, TOPLEVEL::section::part1 + partno));
                     if (shift >= 10)
@@ -2637,7 +2640,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                         name += "  ";
                     else if (shift >= -10)
                         name += " ";
-                    name += std::to_string(shift);
+                    name += to_string(shift);
 
                 }
                 name +=  ("  " + text);
@@ -2719,7 +2722,7 @@ int CmdInterpreter::commandMlearn(Parser& input, unsigned char controlType)
         if (tmp == 0)
             Runtime.Log("No learned lines");
         else
-            Runtime.Log("Line " + std::to_string(mline + 1) + " Not found");
+            Runtime.Log("Line " + to_string(mline + 1) + " Not found");
         mline = 0;
         return (REPLY::done_msg);
     }
@@ -4357,7 +4360,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
 
     if (cmd != -1)
     {
-        //std::cout << "control " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(PART::engine::subSynth) << std::endl;
+        //cout << "control " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(PART::engine::subSynth) << endl;
         if (value == -1)
         {
             if (input.lineEnd(controlType))
@@ -5177,7 +5180,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                     kitNumber = tmp;
                     voiceNumber = 0;// to avoid confusion
                 }
-                Runtime.Log("Kit item number " + std::to_string(kitNumber + 1));
+                Runtime.Log("Kit item number " + to_string(kitNumber + 1));
                 return REPLY::done_msg;
             }
         }
@@ -5236,7 +5239,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                     return REPLY::range_msg;
                 -- value;
 
-                std::list<string>:: iterator it = instrumentGroup.begin();
+                list<string>:: iterator it = instrumentGroup.begin();
                 size_t lineNo = 0;
                 while (lineNo < value && it != instrumentGroup.end())
                 {
@@ -5684,7 +5687,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     getData.data.kit = 0;
     getData.data.engine = 135;
     getData.data.insert = UNUSED;
-    std::cout << synth->unifiedpresets.findSectionName(&getData) << std::endl;*/
+    cout << synth->unifiedpresets.findSectionName(&getData) << endl;*/
 
 
     if (input.matchnMove(2, "yoshimi"))
@@ -5692,7 +5695,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         if (controlType != TOPLEVEL::type::Write)
         {
             //Runtime.Log("Instance " + asString(currentInstance), 1);
-            Runtime.Log("Instance " + std::to_string(synth->getUniqueId()));
+            Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return REPLY::done_msg;
         }
         if (input.lineEnd(controlType))
@@ -5997,7 +6000,7 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
     const char DELIM_NEWLINE ='\n';
     while (std::getline(reader, line, DELIM_NEWLINE))
     {
-        //std::cout << "line >" << line << "<" << std::endl;
+        //cout << "line >" << line << "<" << endl;
         scriptParser.initWithExternalBuffer(line);
         if (scriptParser.isTooLarge())
         {
@@ -6015,7 +6018,7 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
         }
         if (scriptParser.matchnMove(3, "run"))
         {
-            Runtime.Log("*** Error: scripts are not recursive @ line " + std::to_string(lineNo) + " ***");
+            Runtime.Log("*** Error: scripts are not recursive @ line " + to_string(lineNo) + " ***");
             return Reply(REPLY::failed_msg);
         }
         if (scriptParser.matchnMove(4, "wait"))
@@ -6026,7 +6029,7 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
             else if (mSec > 30000)
                 mSec = 30000;
             mSec -= 1; //allow for internal time
-            Runtime.Log("Waiting " + std::to_string(mSec) + "mS");
+            Runtime.Log("Waiting " + to_string(mSec) + "mS");
             if (mSec > 1000)
             {
                 sleep (mSec / 1000);
@@ -6040,7 +6043,7 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
             Reply reply = cmdIfaceProcessCommand(scriptParser);
             if (reply.code > REPLY::done_msg)
             {
-                Runtime.Log("*** Error: " + replies[reply.code] + " @ line " + std::to_string(lineNo) + ": " + line + " ***");
+                Runtime.Log("*** Error: " + replies[reply.code] + " @ line " + to_string(lineNo) + ": " + line + " ***");
                 return Reply(REPLY::failed_msg);
             }
         }
@@ -6066,12 +6069,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 #ifdef REPORT_NOTES_ON_OFF
     if (input.matchnMove(3, "report")) // note test
     {
-        std::cout << "note on sent " << Runtime.noteOnSent << std::endl;
-        std::cout << "note on seen " << Runtime.noteOnSeen << std::endl;
-        std::cout << "note off sent " << Runtime.noteOffSent << std::endl;
-        std::cout << "note off seen " << Runtime.noteOffSeen << std::endl;
-        std::cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << std::endl;
-        std::cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << std::endl;
+        cout << "note on sent " << Runtime.noteOnSent << endl;
+        cout << "note on seen " << Runtime.noteOnSeen << endl;
+        cout << "note off sent " << Runtime.noteOffSent << endl;
+        cout << "note off seen " << Runtime.noteOffSeen << endl;
+        cout << "notes hanging sent " << Runtime.noteOnSent - Runtime.noteOffSent << endl;
+        cout << "notes hanging seen " << Runtime.noteOnSeen - Runtime.noteOffSeen << endl;
         return Reply::DONE;
     }
 #endif
@@ -6079,7 +6082,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     {
         string result;
         file::dir2string(result, "/home/will", ".xiz");
-        std::cout << result << std::endl;
+        cout << result << endl;
         return Reply::DONE;
     }
 
@@ -6094,7 +6097,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         if (currentInstance > 0)
         {
             if (echo)
-                std::cout << "Can only exit from instance 0" << std::endl;
+                cout << "Can only exit from instance 0" << endl;
             Runtime.Log("Can only exit from instance 0", 1);
             return Reply::DONE;
         }
@@ -6102,13 +6105,13 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         if (Runtime.configChanged)
         {
             if (echo)
-                std::cout << "System config has been changed. Still exit N/y?" << std::endl;
+                cout << "System config has been changed. Still exit N/y?" << endl;
             message = "System config has been changed. Still exit";
         }
         else
         {
             if (echo)
-                std::cout << "All data will be lost. Still exit N/y?" << std::endl;
+                cout << "All data will be lost. Still exit N/y?" << endl;
             message = "All data will be lost. Still exit";
         }
         if (query(message, false))
@@ -6727,7 +6730,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
          * reduces the effect of the processing overhead outside the call loop itself.
          */
 
-        std::cout << "here zread" << std::endl;
+        cout << "here zread" << endl;
 
         // repeats, control, part, kit, engine, insert, parameter, miscmsg
         float result;
@@ -6798,8 +6801,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             tv2.tv_usec += 1000000;
             }
         float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-        std::cout << "result " << result << std::endl;
-        std::cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << std::endl;
+        cout << "result " << result << endl;
+        cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << endl;
         return REPLY::done_msg;
     }
 

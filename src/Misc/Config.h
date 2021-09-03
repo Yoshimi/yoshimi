@@ -38,6 +38,7 @@
 #include "globals.h"
 
 using std::string;
+using std::list;
 
 class XMLwrapper;
 class SynthEngine;
@@ -45,9 +46,9 @@ class SynthEngine;
 class Config
 {
     public:
-        Config(SynthEngine *_synth, std::list<string>& allArgs);
+        Config(SynthEngine *_synth, list<string>& allArgs);
         ~Config();
-        bool Setup(std::list<string>& allArgs);
+        bool Setup(list<string>& allArgs);
         void StartupReport(const string& clientName);
         void Announce(void);
         void Usage(void);
@@ -130,7 +131,7 @@ class Config
         int           sessionStage;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
-        std::list<string> lastfileseen;
+        list<string> lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::ScalaMap + 1];
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         bool          checksynthengines;
@@ -211,7 +212,7 @@ class Config
             bool Enabled[NUM_MIDI_CHANNELS];
         }vectordata;
 
-        std::list<string> LogList;
+        list<string> LogList;
 
         /*
          * These replace local memory allocations that
@@ -228,7 +229,7 @@ class Config
         float *genMixr;
 
     private:
-        void applyOptions(Config*settings, std::list<string>& allArgs);
+        void applyOptions(Config*settings, list<string>& allArgs);
         void defaultPresets(void);
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
