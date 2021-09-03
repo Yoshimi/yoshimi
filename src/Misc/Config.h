@@ -88,6 +88,7 @@ class Config
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;
+        int           load2part;
         string        midiLearnLoad;
         string        rootDefine;
         bool          stateChanged;

@@ -52,7 +52,7 @@ namespace { // constants used in the implementation
         {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
         {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
         {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
-        {"load-instrument",   'L',  "<file>",     0,  "load .xiz file", 0},
+        {"load-instrument",   'L',  "<file>[@part]",     0,  "load .xiz file (to specified part)", 0},
         {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
         {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
         {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},

@@ -342,9 +342,11 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (Runtime.instrumentLoad.size())
     {
         string feli = Runtime.instrumentLoad;
-        int loadtopart = 0;
-        if (part[loadtopart]->loadXMLinstrument(feli))
+        if (part[Runtime.load2part]->loadXMLinstrument(feli))
+        {
+            part[Runtime.load2part]->Penabled = 1;
             Runtime.Log("Instrument file " + feli + " loaded");
+        }
         else
         {
             Runtime.Log("Failed to load instrument file " + feli);

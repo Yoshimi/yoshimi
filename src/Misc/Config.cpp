@@ -1376,7 +1376,25 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
 
         case 'l': settings->paramsLoad = line; break;
 
-        case 'L': settings->instrumentLoad = line; break;
+        case 'L':
+        {
+            unsigned int partLoad = 0;
+            size_t pos = line.rfind("@");
+            // this provides a way to specify which part to load to
+            if (pos != string::npos)
+            {
+                if (line.length() - pos <= 3)
+                {
+                    partLoad = (stoi("0" + line.substr(pos + 1))) - 1;
+                }
+                if (partLoad >= 64)
+                    partLoad = 0;
+                line = line.substr(0, pos);
+            }
+            settings->load2part = partLoad;
+            settings->instrumentLoad = line;
+            break;
+        }
 
         case 'M':settings->midiLearnLoad = line; break;
 
@@ -1430,6 +1448,7 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             settings->midiEngine  = no_midi;
             break;
         }
+
         //std::cout << cmd << " line " << line << std::endl;
     }
     if (jackSessionUuid.size() && jackSessionFile.size())
