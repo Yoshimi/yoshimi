@@ -1,5 +1,8 @@
 yoshimi 2.1.0 M
 
+2010-9-4 Will
+* Revised Config.cpp to streamline and improve readability.
+
 2010-9-3 Will
 * Merged in revisedArgs
 * Code cleanups.

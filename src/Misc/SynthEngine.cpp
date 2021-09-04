@@ -125,7 +125,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, bool _isLV2Plugin, unsigned
     midilearn(this),
     mididecode(this),
     //unifiedpresets(this),
-    Runtime(this, allArgs),
+    Runtime(this, allArgs, isLV2Plugin),
     presetsstore(this),
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),

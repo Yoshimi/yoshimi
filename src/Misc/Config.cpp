@@ -53,6 +53,9 @@
 #endif
 #include "ConfBuild.h"
 
+using std::cout;
+using std::endl;
+
 using file::isRegularFile;
 using file::createDir;
 using file::copyDir;
@@ -74,7 +77,7 @@ int          Config::showCLIcontext = 1;
 
 string jUuid = "";
 
-Config::Config(SynthEngine *_synth, std::list<string>& allArgs) :
+Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin) :
     stateChanged(false),
     restoreJackSession(false),
     oldConfig(false),
@@ -125,7 +128,7 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs) :
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
-    midi_bank_C(32),
+    midi_bank_C(32),   // 128 is used as 'disabled'
     midi_upper_voice_C(128),
     enable_part_on_voice_load(1),
     enable_NRPN(true),
@@ -157,44 +160,37 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs) :
     bRuntimeSetupCompleted(false),
     exitType(EXIT_SUCCESS)
 {
-    //else
-        //fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
-                               // the heffalump. We need lrintf() to round
-                               // toward zero.
-    //^^^^^^^^^^^^^^^ This call is not needed aymore (at least for lv2 plugin)
-    //as all calls to lrintf() are replaced with (int)truncf()
-    //which befaves exactly the same when flag FE_TOWARDZERO is set
-
-    /*
-     * The above is now all completely redundant as we use
-     * a simple int(n). The values are all positive so there
-     * is no issue with +- zero.
-     */
-
     std::cerr.precision(4);
-    bRuntimeSetupCompleted = Setup(allArgs);
-}
 
+    if (isLV2Plugin)
+    {
+        //Log("LV2 only");
+        if (!loadConfig())
+            Log("\n\nCould not load config. Using default values.\n");
+        bRuntimeSetupCompleted = true;
+        //skip further setup, which is irrelevant for lv2 plugin instance.
+        return;
+    }
 
-bool Config::Setup(std::list<string>& allArgs)
-{
+    //Log("Standalone Only");
     static bool torun = true;
-    if (torun) // only the first synth can read args
+    if (torun) // only the first stand-alone synth can read args
     {
         applyOptions(this, allArgs);
         torun = false;
     }
-
     if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
-        TextMsgBuffer::instance().push(message);
+        TextMsgBuffer::instance().push(message); // needed for CLI
         Log("\n\n" + message + "\n");
     }
-    //skip further setup, which is irrelevant for lv2 plugin instance.
-    if (synth->getIsLV2Plugin())
-        return true;
+    bRuntimeSetupCompleted = Setup();
+}
 
+
+bool Config::Setup(void)
+{
     switch (audioEngine)
     {
         case alsa_audio:
@@ -247,7 +243,7 @@ void Config::flushLog(void)
     {
         while (LogList.size())
         {
-            std::cout << LogList.front() << std::endl;
+            cout << LogList.front() << endl;
             LogList.pop_front();
         }
     }
@@ -293,10 +289,14 @@ bool Config::loadConfig(void)
     string yoshimi = "/" + string(YOSHIMI);
 
     baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
+
     int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
     yoshimi += ("-" + asString(thisInstance));
-    //std::cout << "\nsession >" << defaultSession << "<\n" << std::endl;
+    //cout << "\nsession >" << defaultSession << "<\n" << endl;
+
+    ConfigFile = ConfigDir + yoshimi + EXTEN::instance;
+
     if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
@@ -325,13 +325,9 @@ bool Config::loadConfig(void)
             if (createDir(definedBankRoot))
                 Log("Failed to create root directory '" + definedBankRoot + "'");
         }
-    }
 
-    ConfigFile = ConfigDir + yoshimi;
-
-    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
-    {
-        string newInstance0 = ConfigDir + yoshimi + EXTEN::instance;
+        // conversion for old location
+        string newInstance0 = ConfigFile;
         if (isRegularFile(baseConfig) && !isRegularFile(newInstance0), 0)
         {
             file::copyFile(baseConfig, newInstance0, 0);
@@ -346,7 +342,6 @@ bool Config::loadConfig(void)
             }
         }
     }
-    ConfigFile += EXTEN::instance;
 
     if (!isRegularFile(baseConfig))
     {
@@ -403,7 +398,7 @@ bool Config::loadConfig(void)
         }
     }
 
-    //std::cout << "Session Stage " << sessionStage << std::endl;
+    //cout << "Session Stage " << sessionStage << endl;
 
     if (sessionStage == _SYS_::type::RestoreConf)
         return true;
@@ -664,7 +659,7 @@ bool Config::saveConfig(bool master)
     bool result = false;
     if (master)
     {
-        //std::cout << "saving master" << std::endl;
+        //cout << "saving master" << endl;
         xmlType = TOPLEVEL::XML::MasterConfig;
         XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
@@ -844,10 +839,10 @@ void Config::Log(const string& msg, char tostderr)
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
     else if (!(tostderr & 1))
-        std::cout << msg << std::endl; // normal log
+        cout << msg << endl; // normal log
 
     else
-        std::cerr << msg << std::endl; // error log
+        std::cerr << msg << endl; // error log
 }
 
 void Config::LogError(const string &msg)
@@ -1213,6 +1208,9 @@ int Config::SSEcapability(void)
         return ((edx & 0x02000000 /*SSE*/) | (edx & 0x04000000 /*SSE2*/)) >> 25;
     #endif
 }
+/*
+SSEcapability() draws gratefully on the work of others.
+*/
 
 /*
  * The code below has been replaced with specific anti-denormal code where needed.
@@ -1246,37 +1244,6 @@ int Config::SSEcapability(void)
         }
     #endif
 }*/
-
-
-/**
-SSEcapability() and AntiDenormals() draw gratefully on the work of others,
-including:
-
-Jens M Andreasen, LAD, <http://lists.linuxaudio.org/pipermail/linux-audio-dev/2009-August/024707.html>).
-
-LinuxSampler src/common/Features.cpp, licensed thus -
-
- *   LinuxSampler - modular, streaming capable sampler                     *
- *                                                                         *
- *   Copyright (C) 2003, 2004 by Benno Senoner and Christian Schoenebeck   *
- *   Copyright (C) 2005 - 2008 Christian Schoenebeck                       *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the Free Software           *
- *   Foundation, Inc., 59 Temple Place, Suite 330, Boston,                 *
- *   MA  02111-1307  USA                                                   *
-**/
-
 
 void Config::applyOptions(Config* settings, std::list<string>& allArgs)
 {
@@ -1314,7 +1281,7 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             settings->configChanged = true;
             settings->bufferChanged = true;
             settings->Buffersize = string2int(line);
-            std::cout << "B "<< line << std::endl;
+            cout << "B "<< line << endl;
             break;
 
         case 'c':
@@ -1449,7 +1416,7 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
         }
 
-        //std::cout << cmd << " line " << line << std::endl;
+        //cout << cmd << " line " << line << endl;
     }
     if (jackSessionUuid.size() && jackSessionFile.size())
         restoreJackSession = true;
@@ -1468,7 +1435,7 @@ void GuiThreadMsg::processGuiMessages()
         {
             // This *defines* guiMaster
             if (!guiMaster)
-                std::cerr << "Error starting Main UI!" << std::endl;
+                std::cerr << "Error starting Main UI!" << endl;
             else
             {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());

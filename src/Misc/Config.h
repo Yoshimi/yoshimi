@@ -46,9 +46,9 @@ class SynthEngine;
 class Config
 {
     public:
-        Config(SynthEngine *_synth, list<string>& allArgs);
+        Config(SynthEngine *_synth, list<string>& allArgs, bool isLV2Plugin);
         ~Config();
-        bool Setup(list<string>& allArgs);
+        bool Setup(void);
         void StartupReport(const string& clientName);
         void Announce(void);
         void Usage(void);
