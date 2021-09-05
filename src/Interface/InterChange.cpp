@@ -1712,7 +1712,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
 
     if (source != TOPLEVEL::action::fromMIDI)
-        synth->getRuntime().Log(resolveAll(synth, getData, true));
+        synth->getRuntime().Log(resolveAll(synth, getData, _SYS_::LogNotSerious));
 
     if (source == TOPLEVEL::action::fromCLI)
         synth->getRuntime().finishedCLI = true;

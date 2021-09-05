@@ -56,7 +56,7 @@ bool JackEngine::connectServer(std::string server)
     {
         if (!openJackClient(server) && tries < 2)
         {
-            synth->getRuntime().Log("Failed to open jack client, trying again", 1);
+            synth->getRuntime().Log("Failed to open jack client, trying again", _SYS_::LogError);
             usleep(3333);
         }
     }
@@ -184,7 +184,7 @@ bool JackEngine::Start(void)
         if (jack_connect(jackClient, synth->getRuntime().midiDevice.c_str(), jack_port_name(midiPort)))
         {
             synth->getRuntime().Log("Didn't find jack MIDI source '"
-            + synth->getRuntime().midiDevice + "'", 1);
+            + synth->getRuntime().midiDevice + "'", _SYS_::LogError);
             synth->getRuntime().midiDevice = "";
         }
     }*/
@@ -544,7 +544,7 @@ void JackEngine::handleBeatValues(jack_nframes_t nframes)
 
 int JackEngine::_xrunCallback(void *arg)
 {
-    ((JackEngine *)arg)->synth->getRuntime().Log("xrun reported", 2);
+    ((JackEngine *)arg)->synth->getRuntime().Log("xrun reported", _SYS_::LogNotSerious);
     return 0;
 }
 

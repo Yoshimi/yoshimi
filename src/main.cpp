@@ -308,26 +308,26 @@ int mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     instanceID = synth->getUniqueId();
     if (!synth)
-    {
+    { // this has to be a direct call - no synth for log!
         std::cerr << "Failed to allocate SynthEngine" << std::endl;
         goto bail_out;
     }
 
     if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
-        synth->getRuntime().Log("Failed to instantiate MusicClient");
+        synth->getRuntime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
         goto bail_out;
     }
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
-        synth->getRuntime().Log("SynthEngine init failed");
+        synth->getRuntime().Log("SynthEngine init failed",_SYS_::LogError);
         goto bail_out;
     }
 
     if (!musicClient->Start())
     {
-        synth->getRuntime().Log("Failed to start MusicIO");
+        synth->getRuntime().Log("Failed to start MusicIO",_SYS_::LogError);
         goto bail_out;
     }
 #ifdef GUI_FLTK
@@ -365,7 +365,7 @@ int mainCreateNewInstance(unsigned int forceId)
 
 bail_out:
     synth->getRuntime().runSynth = false;
-    synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
+    synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
     if (musicClient)
     {
         musicClient->Close();
@@ -514,17 +514,17 @@ int main(int argc, char *argv[])
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGUSR1 handler failed");
+        firstRuntime->Log("Setting SIGUSR1 handler failed",_SYS_::LogError);
     if (sigaction(SIGUSR2, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGUSR2 handler failed");
+        firstRuntime->Log("Setting SIGUSR2 handler failed",_SYS_::LogError);
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGINT handler failed");
+        firstRuntime->Log("Setting SIGINT handler failed",_SYS_::LogError);
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGHUP handler failed");
+        firstRuntime->Log("Setting SIGHUP handler failed",_SYS_::LogError);
     if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGTERM handler failed");
+        firstRuntime->Log("Setting SIGTERM handler failed",_SYS_::LogError);
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGQUIT handler failed");
+        firstRuntime->Log("Setting SIGQUIT handler failed",_SYS_::LogError);
     // following moved here for faster first synth startup
     firstSynth->loadHistory();
     firstSynth->installBanks();
@@ -546,6 +546,11 @@ int main(int argc, char *argv[])
             pthread_attr_destroy(&pthreadAttr);
         }
     }
+
+//firstRuntime->Log("test normal msg");
+//firstRuntime->Log("test not serious",_SYS_::LogNotSerious);
+//firstRuntime->Log("test error msg",_SYS_::LogError);
+//firstRuntime->Log("test not serious error",_SYS_::LogNotSerious | _SYS_::LogError);
 
     void *res;
     pthread_join(threadGui, &res);
@@ -576,7 +581,7 @@ bail_out:
         _synth->getRuntime().runSynth = false;
         if (!bExitSuccess)
         {
-            _synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
+            _synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
         }
 
         if (_client)

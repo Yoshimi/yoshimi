@@ -166,7 +166,7 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
     std::string report = "";
     char *xmldata = loadGzipped(filename, &report);
     if (report != "")
-        synth->getRuntime().Log(report, 2);
+        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
         return;
 
@@ -315,7 +315,7 @@ bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
     {
         if (!saveText(xmldata, filename))
         {
-            synth->getRuntime().Log("XML: Failed to save xml file " + filename + " for save", 2);
+            synth->getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -326,7 +326,7 @@ bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
         std::string result = saveGzipped(xmldata, filename, compression);
         if (result > "")
         {
-            synth->getRuntime().Log(result,2);
+            synth->getRuntime().Log(result, _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -481,17 +481,17 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     std::string report = "";
     char *xmldata = loadGzipped(filename, &report);
     if (report != "")
-        synth->getRuntime().Log(report, 2);
+        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
     if (xmldata == NULL)
     {
-        synth->getRuntime().Log("XML: Could not load xml file: " + filename, 2);
+        synth->getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
          return false;
     }
     root = tree = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
-        synth->getRuntime().Log("XML: File " + filename + " is not XML", 2);
+        synth->getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
         return false;
     }
     root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
@@ -503,7 +503,7 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
 
     if (!root)
     {
-        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", 2);
+        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
         return false;
     }
     node = root;
@@ -768,7 +768,7 @@ void XMLwrapper::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", 2);
+        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
         return;
     }
     stackpos++;
@@ -780,7 +780,7 @@ mxml_node_t *XMLwrapper::pop(void)
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", 2);
+        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     mxml_node_t *node = parentstack[stackpos];
@@ -794,7 +794,7 @@ mxml_node_t *XMLwrapper::peek(void)
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", 2);
+        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     return parentstack[stackpos];

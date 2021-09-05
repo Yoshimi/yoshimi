@@ -170,7 +170,7 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {
-        synth->getRuntime().Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), 1);
+        synth->getRuntime().Log("Instance " + to_string(currentInstance) + " not found. Set to " + to_string(newID), _SYS_::LogError);
         currentInstance = newID;
     }
     defaults();
@@ -5694,7 +5694,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         if (controlType != TOPLEVEL::type::Write)
         {
-            //Runtime.Log("Instance " + asString(currentInstance), 1);
+            //Runtime.Log("Instance " + asString(currentInstance), _SYS_::LogError);
             Runtime.Log("Instance " + to_string(synth->getUniqueId()));
             return REPLY::done_msg;
         }
@@ -5841,7 +5841,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
                 name = " enabled";
             else
                 name = " disabled";
-            Runtime.Log("Current part " + asString(npart + 1) + name, 1);
+            Runtime.Log("Current part " + asString(npart + 1) + name, _SYS_::LogError);
             return REPLY::done_msg;
         }*/
         context = LEVEL::Top;
@@ -6098,7 +6098,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         {
             if (echo)
                 cout << "Can only exit from instance 0" << endl;
-            Runtime.Log("Can only exit from instance 0", 1);
+            Runtime.Log("Can only exit from instance 0", _SYS_::LogError);
             return Reply::DONE;
         }
         string message;

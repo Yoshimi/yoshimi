@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2020, Will Godfrey & others
+    Copyright 2014-2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -52,7 +52,7 @@ class Config
         void StartupReport(const string& clientName);
         void Announce(void);
         void Usage(void);
-        void Log(const string& msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
+        void Log(const string& msg, char tostderr = _SYS_::LogNormal);
     void LogError(const string& msg);
         void flushLog(void);
 

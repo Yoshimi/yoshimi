@@ -788,7 +788,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
     while (!ok && tries < 3);
 
     if (!ok)
-        synth->getRuntime().Log("toGui buffer full!", 2);
+        synth->getRuntime().Log("toGui buffer full!", _SYS_::LogNotSerious | _SYS_::LogError);
 #endif
 }
 

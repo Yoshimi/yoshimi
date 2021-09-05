@@ -815,7 +815,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         {
             if (!renameDir(firstBankPath, (getRootPath(secondRoot) + "/" + firstname)))
             {
-                synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), 2);
+                synth->getRuntime().Log("move to " + to_string(secondRoot) + ": " + string(strerror(errno)), _SYS_::LogNotSerious);
                 return (" FAILED Can't move from root " + to_string(firstRoot) + " to " + to_string(secondRoot));
             }
         }
@@ -823,7 +823,7 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         {
             if (!renameDir(secondBankPath, (getRootPath(firstRoot) + "/" + secondname)))
             {
-                synth->getRuntime().Log("move to " + to_string(firstRoot) + ": " + string(strerror(errno)), 2);
+                synth->getRuntime().Log("move to " + to_string(firstRoot) + ": " + string(strerror(errno)), _SYS_::LogNotSerious);
                 return (" FAILED Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot));
             }
         }
@@ -838,20 +838,20 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
             deleteDir(tempBankPath); // just to be sure
             if (!renameDir(firstBankPath, tempBankPath))
             {
-                synth->getRuntime().Log("failed move to temp dir", 2);
+                synth->getRuntime().Log("failed move to temp dir", _SYS_::LogNotSerious);
                 return(" FAILED Can't move from root " + to_string(firstRoot) + " to temp dir");
             }
 
             if (!renameDir(secondBankPath,newsecondBankPath))
             {
-                synth->getRuntime().Log("failed move to " + to_string(firstRoot), 2);
+                synth->getRuntime().Log("failed move to " + to_string(firstRoot), _SYS_::LogNotSerious);
                 return(" FAILED Can't move from root " + to_string(secondRoot) + " to " + to_string(firstRoot));
             }
 
 
             if (!renameDir(tempBankPath, newfirstBankPath))
             {
-                synth->getRuntime().Log("failed move to " + to_string(secondRoot), 2);
+                synth->getRuntime().Log("failed move to " + to_string(secondRoot), _SYS_::LogNotSerious);
                 return (" FAILED Can't move from temp dir to " + to_string(secondRoot));
             }
         }

@@ -133,6 +133,11 @@ namespace _SYS_
 
     // session types and stages
     enum type {Normal, Default, JackFirst, JackSecond, StartupFirst, StartupSecond, InProgram, RestoreConf};
+
+    // Log types
+    const char LogNormal = 0;
+    const char LogError = 1;
+    const char LogNotSerious = 2;
 }
 
 /*

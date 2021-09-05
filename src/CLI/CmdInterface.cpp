@@ -122,7 +122,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                 string status = interpreter.buildStatus(true);
                 if (status == "" )
                     status = " Top";
-                Log("@" + status, 1);
+                Log("@" + status, _SYS_::LogError);
             }
             else if (expose == 2)
                 prompt += interpreter.buildStatus(true);

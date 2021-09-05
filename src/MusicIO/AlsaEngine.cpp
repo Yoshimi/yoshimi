@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2019, Will Godfrey & others
+    Copyright 2014-2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -360,7 +360,7 @@ bool AlsaEngine::prepHwparams(void)
     else
         formattxt += "Big";
 
-    synth->getRuntime().Log("March is " + formattxt + " Endian", 2);
+    synth->getRuntime().Log("March is " + formattxt + " Endian", _SYS_::LogNotSerious);
 
     if (card_signed)
         formattxt = "Signed ";
@@ -403,7 +403,7 @@ bool AlsaEngine::prepHwparams(void)
     if (ask_buffersize != audio.period_size)
     {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
-                    + ", Alsa dictates " + asString((unsigned int)audio.period_size), 2);
+                    + ", Alsa dictates " + asString((unsigned int)audio.period_size), _SYS_::LogNotSerious);
         synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;

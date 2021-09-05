@@ -91,7 +91,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
 
         default: // wot, more?
             if (synth->getRuntime().monitorCCin)
-                synth->getRuntime().Log("Unsupported event: 0x" + asHexString(int(par0)));
+                synth->getRuntime().Log("Unsupported event: 0x" + asHexString(int(par0)), _SYS_::LogNotSerious);
             break;
     }
 }
@@ -491,7 +491,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
 
     if (nHigh != 64 && nLow < 0x7f)
     {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + " " + asHexString(nLow) +" We don't know you!");
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + " " + asHexString(nLow) +" We don't know you!", _SYS_::LogNotSerious);
         // done this way to ensure we see both bytes even if nHigh is zero
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;

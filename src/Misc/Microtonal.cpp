@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2019, Will Godfrey
+    Copyright 2017-2021, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-
-    Modified May 2019
 */
 
 #include <cmath>
@@ -817,7 +815,7 @@ bool Microtonal::loadXML(const string& filename)
     XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)
     {
-        synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper", 1);
+        synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper", _SYS_::LogError);
         return false;
     }
     if (!xml->loadXMLfile(filename))
@@ -827,7 +825,7 @@ bool Microtonal::loadXML(const string& filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        synth->getRuntime().Log(filename + " is not a scale file", 1);
+        synth->getRuntime().Log(filename + " is not a scale file", _SYS_::LogError);
         delete xml;
         return false;
     }

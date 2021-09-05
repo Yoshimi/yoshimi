@@ -70,7 +70,7 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
                 _synth->getRuntime().runSynth = true; //reset to true
                 _synth->getRuntime().audioEngine = it->audioDrv;
                 _synth->getRuntime().midiEngine = it->midiDrv;
-                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi", 1);
+                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi", _SYS_::LogError);
                 return client;
             }
             delete client;

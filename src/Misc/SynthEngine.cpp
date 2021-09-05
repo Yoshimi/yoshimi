@@ -2871,25 +2871,25 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name
     unsigned char actualBase = NO_MSG; // error!
     if (name.empty())
     {
-        Runtime.Log("No filename", 2);
+        Runtime.Log("No filename", _SYS_::LogNotSerious);
         return actualBase;
     }
     string file = setExtension(name, EXTEN::vector);
     if (!isRegularFile(file))
     {
-        Runtime.Log("Can't find " + file, 2);
+        Runtime.Log("Can't find " + file, _SYS_::LogNotSerious);
         return actualBase;
     }
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (!xml)
     {
-        Runtime.Log("Load Vector failed XMLwrapper allocation", 2);
+        Runtime.Log("Load Vector failed XMLwrapper allocation", _SYS_::LogNotSerious);
         return actualBase;
     }
     xml->loadXMLfile(file);
     if (!xml->enterbranch("VECTOR"))
     {
-            Runtime. Log("Extract Data, no VECTOR branch", 2);
+            Runtime. Log("Extract Data, no VECTOR branch", _SYS_::LogNotSerious);
     }
     else
     {
@@ -3035,7 +3035,7 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name
 
     if (!xml->saveXMLfile(file))
     {
-        Runtime.Log("Failed to save data to " + file, 2);
+        Runtime.Log("Failed to save data to " + file, _SYS_::LogNotSerious);
         result = textMsgBuffer.push("FAIL");
     }
     delete xml;
@@ -3223,7 +3223,7 @@ bool SynthEngine::loadXML(const string& filename)
     XMLwrapper *xml = new XMLwrapper(this, true);
     if (NULL == xml)
     {
-        Runtime.Log("Failed to init xml tree", 2);
+        Runtime.Log("Failed to init xml tree", _SYS_::LogNotSerious);
         return false;
     }
     if (!xml->loadXMLfile(filename))

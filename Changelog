@@ -1,5 +1,9 @@
 yoshimi 2.1.0 M
 
+2010-9-5 Will
+* Replaced logging type numbers with labels.
+* Added (commented out) test massages in main.cpp.
+
 2010-9-4 Will
 * Revised Config.cpp to streamline and improve readability.
 

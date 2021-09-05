@@ -467,7 +467,7 @@ void Config::defaultPresets(void)
     {
         if (isDirectory(presetdirs[i]))
         {
-            Log(presetdirs[i], 2);
+            Log(presetdirs[i], _SYS_::LogNotSerious);
             presetsDirlist[actual] = presetdirs[i];
             ++actual;
         }
@@ -664,7 +664,7 @@ bool Config::saveConfig(bool master)
         XMLwrapper *xml = new XMLwrapper(synth, true);
         if (!xml)
         {
-            Log("saveConfig failed xml allocation", 2);
+            Log("saveConfig failed xml allocation", _SYS_::LogNotSerious);
             return result;
         }
         string resConfigFile = baseConfig;
@@ -675,7 +675,7 @@ bool Config::saveConfig(bool master)
             result = true;
         }
         else
-            Log("Failed to save master config to " + resConfigFile, 2);
+            Log("Failed to save master config to " + resConfigFile, _SYS_::LogNotSerious);
 
         delete xml;
     }
@@ -683,7 +683,7 @@ bool Config::saveConfig(bool master)
     XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
-        Log("saveConfig failed xml allocation", 2);
+        Log("saveConfig failed xml allocation", _SYS_::LogNotSerious);
         return result;
     }
     addConfigXML(xml);
@@ -695,7 +695,7 @@ bool Config::saveConfig(bool master)
         result = true;
     }
     else
-        Log("Failed to save instance to " + resConfigFile, 2);
+        Log("Failed to save instance to " + resConfigFile, _SYS_::LogNotSerious);
 
     delete xml;
     return result;
@@ -761,7 +761,7 @@ bool Config::saveSessionData(string savefile)
     XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
     {
-        Log("saveSessionData failed xml allocation", 3);
+        Log("saveSessionData failed xml allocation", _SYS_::LogNotSerious | _SYS_::LogError);
         return false;
     }
     bool ok = true;
@@ -769,11 +769,11 @@ bool Config::saveSessionData(string savefile)
     synth->add2XML(xml);
     synth->midilearn.insertMidiListData(xml);
     if (xml->saveXMLfile(savefile))
-        Log("Session data saved to " + savefile, 2);
+        Log("Session data saved to " + savefile, _SYS_::LogNotSerious);
     else
     {
         ok = false;
-        Log("Failed to save session data to " + savefile, 2);
+        Log("Failed to save session data to " + savefile, _SYS_::LogNotSerious);
     }
     if (xml)
         delete xml;
@@ -790,17 +790,17 @@ bool Config::restoreSessionData(string sessionfile)
         sessionfile = setExtension(sessionfile, EXTEN::state);
     if (!sessionfile.size() || !isRegularFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available", 2);
+        Log("Session file " + sessionfile + " not available", _SYS_::LogNotSerious);
         goto end_game;
     }
     if (!(xml = new XMLwrapper(synth, true)))
     {
-        Log("Failed to init xml for restoreState", 3);
+        Log("Failed to init xml for restoreState", _SYS_::LogNotSerious | _SYS_::LogError);
         goto end_game;
     }
     if (!xml->loadXMLfile(sessionfile))
     {
-        Log("Failed to load xml file " + sessionfile, 2);
+        Log("Failed to load xml file " + sessionfile, _SYS_::LogNotSerious);
         goto end_game;
     }
 
@@ -824,7 +824,6 @@ bool Config::restoreSessionData(string sessionfile)
             // handles possibly undefined window
         }
 
-
 end_game:
     if (xml)
         delete xml;
@@ -834,21 +833,25 @@ end_game:
 
 void Config::Log(const string& msg, char tostderr)
 {
-    if ((tostderr & 2) && hideErrors)
+    if ((tostderr & _SYS_::LogNotSerious) && hideErrors)
         return;
-    if (showGui && !(tostderr & 1) && toConsole)
-        LogList.push_back(msg);
-    else if (!(tostderr & 1))
-        cout << msg << endl; // normal log
-
+    else if(!(tostderr & _SYS_::LogError))
+    {
+        if (showGui && toConsole)
+            LogList.push_back(msg);
+        else
+            cout << msg << endl;
+    }
     else
         std::cerr << msg << endl; // error log
 }
 
+
 void Config::LogError(const string &msg)
 {
-    Log("[ERROR] " + msg, 1);
+    std::cerr << "[ERROR] " << msg << endl;
 }
+
 
 void Config::StartupReport(const string& clientName)
 {
@@ -871,7 +874,7 @@ void Config::StartupReport(const string& clientName)
             report += "nada";
     }
     report += (" -> '" + audioDevice + "'");
-    Log(report, 2);
+    Log(report, _SYS_::LogNotSerious);
     report = "Midi: ";
     switch (midiEngine)
     {
@@ -889,12 +892,12 @@ void Config::StartupReport(const string& clientName)
     if (!midiDevice.size())
         midiDevice = "default";
     report += (" -> '" + midiDevice + "'");
-    Log(report, 2);
+    Log(report, _SYS_::LogNotSerious);
     if (fullInfo)
     {
-        Log("Oscilsize: " + asString(synth->oscilsize), 2);
-        Log("Samplerate: " + asString(synth->samplerate), 2);
-        Log("Period size: " + asString(synth->buffersize), 2);
+        Log("Oscilsize: " + asString(synth->oscilsize), _SYS_::LogNotSerious);
+        Log("Samplerate: " + asString(synth->samplerate), _SYS_::LogNotSerious);
+        Log("Period size: " + asString(synth->buffersize), _SYS_::LogNotSerious);
     }
 }
 
@@ -925,7 +928,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 {
                     Log("Failed to set SCHED_FIFO policy in thread attribute "
                                 + string(strerror(errno))
-                                + " (" + asString(chk) + ")", 1);
+                                + " (" + asString(chk) + ")", _SYS_::LogError);
                     schedfifo = false;
                     continue;
                 }
@@ -933,7 +936,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 {
                     Log("Failed to set inherit scheduler thread attribute "
                                 + string(strerror(errno)) + " ("
-                                + asString(chk) + ")", 1);
+                                + asString(chk) + ")", _SYS_::LogError);
                     schedfifo = false;
                     continue;
                 }
@@ -941,12 +944,12 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 int prio = rtprio - priodec;
                 if (prio < 1)
                     prio = 1;
-                Log(name + " priority is " + std::to_string(prio), 1);
+                Log(name + " priority is " + std::to_string(prio), _SYS_::LogError);
                 prio_params.sched_priority = prio;
                 if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
                 {
                     Log("Failed to set thread priority attribute ("
-                                + asString(chk) + ")  ", 3);
+                                + asString(chk) + ")  ", _SYS_::LogNotSerious | _SYS_::LogError);
                     schedfifo = false;
                     continue;
                 }
@@ -965,17 +968,17 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
             break;
         }
         else
-            Log("Failed to initialise thread attributes " + asString(chk), 1);
+            Log("Failed to initialise thread attributes " + asString(chk), _SYS_::LogError);
 
         if (schedfifo)
         {
             Log("Failed to start thread (sched_fifo) " + asString(chk)
-                + "  " + string(strerror(errno)), 1);
+                + "  " + string(strerror(errno)), _SYS_::LogError);
             schedfifo = false;
             continue;
         }
         Log("Failed to start thread (sched_other) " + asString(chk)
-            + "  " + string(strerror(errno)), 1);
+            + "  " + string(strerror(errno)), _SYS_::LogError);
         outcome = false;
         break;
     }
@@ -1023,7 +1026,7 @@ void Config::signalCheck(void)
 
 void Config::setInterruptActive(void)
 {
-    Log("Interrupt received", 1);
+    Log("Interrupt received", _SYS_::LogError);
     __sync_or_and_fetch(&sigIntActive, 0xFF);
 }
 
