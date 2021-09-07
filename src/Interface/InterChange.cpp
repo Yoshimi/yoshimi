@@ -1557,6 +1557,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             if (parameter == 0) // load
             {
                 text = loadText(name); // TODO provide failure warning
+                text = func::formatTextLines(text, 54);
                 part->info.Pauthor = text;
                 guiTo = true;
             }

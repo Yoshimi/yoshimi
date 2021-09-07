@@ -276,40 +276,51 @@ inline std::string formatTextLines(std::string text, size_t maxLen)
         return text;
     size_t pos = 0;
     size_t ref = 0;
-    size_t setLen = totalLen;
-    while (pos < setLen) // split overlong words first
+    while (pos < totalLen) // split overlong words first
     {
-        if (text.at(pos) == '\n' || text.at(pos) == ' ')
+        if (text.at(pos) < '!')
+        {
+            ++ pos;
             ref = pos;
+        }
         if ((pos - ref) > maxLen)
         {
             text.insert(pos, 1, '\n');
-            ++setLen;
+            ++ totalLen;
+            ++ pos;
             ref = pos;
         }
         ++pos;
     }
+
     pos = 0;
     ref = 0;
-    size_t last = 0;
-    while (pos < totalLen)
+    size_t lastSpace = 0;
+    while (pos < text.length())
     {
-        if (text.at(pos) == '\n') // skip over existing newlines
+        if (text.at(pos) == '\n') // skip over existing line ends
         {
+            ++ pos;
             ref = pos;
-            ++pos;
+            lastSpace = 0;
         }
-        size_t found = text.find(' ', pos);
-        if (found >= totalLen)
-            return text;
-        if ((found - ref) >= maxLen)
+        else if (text.at(pos) == ' ')
+            lastSpace = pos;
+        if ((pos - ref) >= maxLen)
         {
-            text.replace(last, 1, 1, '\n');
-            ref = last;
+            if (lastSpace == 0)
+                pos = text.length();
+            else
+            {
+                text.at(lastSpace)= '\n';
+                ref = lastSpace;
+                lastSpace = 0;
+            }
         }
-        last = found;
         ++ pos;
     }
+    while (text.at(text.length() - 1) < '!') // tidy up
+        text.pop_back();
     return text;
 }
 

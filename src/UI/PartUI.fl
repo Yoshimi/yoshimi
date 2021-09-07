@@ -997,7 +997,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {5 123 385 91} type Multiline color 26 labelsize 12 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
-          code1 {o->value(func::formatTextLines(part->info.Pcomments, 58).c_str());}
+          code1 {o->value(part->info.Pcomments.c_str());}
         }
         Fl_Choice instrumentType {
           label {Type:}
@@ -2140,10 +2140,12 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::instrumentCopyright:
-            copyright->value(func::formatTextLines(text, 58).c_str());
+            copyright->value("");
+            copyright->value(text.c_str());
             break;
         case PART::control::instrumentComments:
-            commentField->value(func::formatTextLines(text, 58).c_str());
+            commentField->value("");
+            commentField->value(text.c_str());
             break;
         case PART::control::instrumentName:
             if (!kitType)

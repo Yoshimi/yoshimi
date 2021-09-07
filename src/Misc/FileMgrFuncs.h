@@ -608,19 +608,20 @@ inline string loadText(const string& filename)
     // no Yoshimi input text lines should get anywhere near this!
     while (!feof(readfile))
     {
-        line[0] = 0;
+        string rawline = "";
         if (fgets(line , OUR_PATH_MAX , readfile))
         {
-            size_t end = strlen(line);
-            line[end] = 0; // ensure at least 1
-            while (line[end] < '!' && end != 0)
+            rawline = string(line);
+            while (rawline.length() > 0 && rawline[0] < '!')
+                rawline.erase(0, 1);
+            if(rawline.length() > 0)
             {
-                line[end] = 0; // remove MS line end and spaces
-                --end;
+                while (rawline.length() > 0 && rawline[rawline.length() - 1] < ' ')
+                {
+                    rawline.pop_back();
+                }
+                text += (rawline + '\n');
             }
-            line[end+1] = '\n';
-            if (line[0] >= ' ') // we never want blank lines
-                text += string(line);
         }
     }
     fclose (readfile);
