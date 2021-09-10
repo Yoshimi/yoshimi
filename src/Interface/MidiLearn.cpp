@@ -890,7 +890,7 @@ bool MidiLearn::saveList(const string& name)
     }
 
     string file = setExtension(name, EXTEN::mlearn);
-    make_legit_filename(file);
+//    make_legit_filename(file);
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
     XMLwrapper *xml = new XMLwrapper(synth, true);
     if (!xml)
