@@ -341,7 +341,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Button B_search {
         label Search
         callback {//
-        ShowSearch();}
+        if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
+            alert(synth, "Active part disabled");
+        else
+            ShowSearch();}
         tooltip {Select instrument from list, by type} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 align 128
       }
       Fl_Button insRoots {
@@ -542,7 +545,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
         int root = string2int(line.substr(0, 3));
         int bank = string2int(line.substr(5, 3));
         int inst = (string2int(line.substr(10, 3))) - 1;
-        send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
+        if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
+            alert(synth, "Active part disabled");
+        else
+            send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, inst, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart, bank, root);}
         xywh {12 65 282 374} type Select labelsize 12 textsize 12
       }
       Fl_Button searchClose {
@@ -1184,7 +1190,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bool slotFilled = (thisname > "!");
         if ((what == 1 || what == 3) && mode == 1 && slotFilled)
         {
-            if (synth->getGuiMaster()->activePart == UNUSED)
+            if (!fetchData(0, PART::control::enable, synth->getGuiMaster()->activePart))
             {
                 alert(synth, "Active part disabled");
                 return;

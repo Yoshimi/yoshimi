@@ -1439,7 +1439,22 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
             break;
     }
     msg_buf.push_back("  Preferred audio " + label);
-    msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
+    switch (Runtime.alsaMidiType)
+    {
+        case 2:
+            label = "External";
+            break;
+
+        case 1:
+            label = "Search";
+            break;
+
+        default:
+            label = "Fixed";
+            break;
+    }
+    msg_buf.push_back("  ALSA MIDI connection " + label);
+    msg_buf.push_back("  ALSA MIDI source " + Runtime.alsaMidiDevice);
     msg_buf.push_back("  ALSA audio " + Runtime.alsaAudioDevice);
     msg_buf.push_back("  JACK MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  JACK server " + Runtime.jackServer);

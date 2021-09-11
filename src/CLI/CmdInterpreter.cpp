@@ -5112,8 +5112,13 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     int tmp = -1;
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
+    bool partIsOn = readControl(synth, 0, PART::control::enable, npart);
+
     if (input.matchnMove(2, "bypass"))
     {
+        if (!partIsOn)
+            return REPLY::inactive_msg;
+
         int effnum = string2int(input);
         if (effnum < 1 || effnum > NUM_PART_EFX)
             return REPLY::range_msg;
@@ -5133,6 +5138,9 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     {
         if (input.matchnMove(2, "effects") || input.matchnMove(2, "efx"))
         {
+            if (!partIsOn)
+            return REPLY::inactive_msg;
+
             context = LEVEL::Top;
             bitSet(context, LEVEL::AllFX);
             bitSet(context, LEVEL::Part);
@@ -5187,15 +5195,15 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     }
 
     int enable = input.toggle();
-    if (enable != -1)
+    if (enable > -1)
     {
-        if (!inKitEditor)
+        if (!inKitEditor) // part enable
         {
             int result = sendNormal(synth, 0, enable, controlType, PART::control::enable, npart);
             if (input.lineEnd(controlType))
                 return result;
         }
-        else if (readControl(synth, 0, PART::control::enable, npart))
+        else if (partIsOn) // kit item enable
         {
             if (enable >= 0)
             {
@@ -5208,6 +5216,8 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             }
         }
     }
+    if (!partIsOn) // part must be enabled for all further operations.
+        return REPLY::inactive_msg;
 
     if (input.matchnMove(2, "clear"))
     {
@@ -5963,15 +5973,21 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
             value = MAIN::panningType::boost;
         else if (!input.matchnMove(1, "default") && controlType == TOPLEVEL::type::Write)
             return REPLY::range_msg;
+
         return sendNormal(synth, 0, value, controlType, MAIN::control::panLawType, TOPLEVEL::section::main);
     }
     if (input.matchnMove(2, "clear"))
     {
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
+
         int value = string2int(input) -1;
         if (value < 0)
             return REPLY::range_msg;
+
+        if (!readControl(synth, 0, PART::control::enable, value))
+            return REPLY::inactive_msg;
+
         return sendNormal(synth, 0, value, controlType, MAIN::control::defaultPart, TOPLEVEL::section::main);
     }
     return REPLY::op_msg;
@@ -6215,14 +6231,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (input.matchnMove(1, "list"))
     {
         if (input.matchnMove(1, "group"))
-        {
-            //if (!readControl(synth, 0, CONFIG::control::showEnginesTypes, TOPLEVEL::section::config))
-            //{
-                //synth->getRuntime().Log("Instrument engine and type info must be enabled");
-                //return REPLY::done_msg;
-            //}
             return Reply{commandGroup(input)};
-        }
         return Reply{commandList(input)};
     }
 
@@ -6701,6 +6710,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if (input.matchnMove(1, "instrument"))
         {
+            if (!readControl(synth, 0, PART::control::enable, npart))
+            return REPLY::inactive_msg;
+
             if (readControlText(synth, TOPLEVEL::action::lowPrio, PART::control::instrumentName, TOPLEVEL::section::part1 + npart) == DEFAULT_NAME)
             {
                 Runtime.Log("Nothing to save!");

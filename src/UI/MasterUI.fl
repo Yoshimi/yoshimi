@@ -539,6 +539,11 @@ class MasterUI {: {private GuiUpdates}
             * to offer the INTERNAL name first rather than a possibly
             * confusing external filename.
             */
+            if (!fetchData(0, PART::control::enable, activePart))
+            {
+                alert(synth, "Active part disabled");
+                return;
+            }
             string newname = synth->part[activePart]->Pname;
             if (newname == DEFAULT_NAME)
             {
@@ -565,10 +570,20 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
         case 13: // clear
+        if (!fetchData(0, PART::control::enable, activePart))
+            {
+                alert(synth, "Active part disabled");
+                return;
+            }
             if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart,partui->npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
             break;
         case 14: // search
+        if (!fetchData(0, PART::control::enable, activePart))
+            {
+                alert(synth, "Active part disabled");
+                return;
+            }
             bankui->ShowSearch();
             break;
 
