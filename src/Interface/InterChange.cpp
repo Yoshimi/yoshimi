@@ -218,7 +218,7 @@ std::string InterChange::findHtmlManual(void)
         if(!file::cmd2string("find /home/ -type f -name 'yoshimi_user_guide_version' 2>/dev/null", namelist))
             return "";
     }
-    std::cout << namelist << std::endl;
+    //std::cout << namelist << std::endl;
 
     size_t next = 0;
     size_t lastversion = 0;

@@ -1,5 +1,9 @@
 yoshimi 2.1.0 M
 
+2010-9-14 Will
+* Commented out CLI test message in interchange.
+* Updated build dependencies.
+
 2010-9-11 Will
 * BugFix: Crash when trying to clear or save inactive part.
 * Added missing ALSA connection type to config list report.
