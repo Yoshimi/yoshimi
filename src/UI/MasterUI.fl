@@ -1553,6 +1553,11 @@ Alan Calvert started the project}
         int result = favebrowse->value();
         if (result < 1)
             return;
+        if (Fl::event_clicks())
+        {
+            Fl::event_clicks(0);
+            faveset->do_callback();
+        }
         clearfavelist();
         setfavecolour(result);}
           xywh {5 91 540 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12

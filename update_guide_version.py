@@ -3,6 +3,10 @@
 def scanfile(f):
     ID = f.readline()
     f.close()
+    ID = ID.strip()
+    pos = ID.find(' ')
+    if (pos > 0):
+        ID = ID[:pos]
     doc = open("indexref.html","r")
     newdoc = open("doc/yoshimi_user_guide/index.html","w")
     line = "start"
@@ -13,7 +17,7 @@ def scanfile(f):
         line = doc.readline()
         if line:
             if line.find(tofind) > 0:
-                newdoc.write('    '+tofind+ID.strip()+'</h1>\n')
+                newdoc.write('    '+tofind+ID+'</h1>\n')
             else:
                 newdoc.write(line)
 

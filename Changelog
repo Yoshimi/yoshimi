@@ -1,5 +1,10 @@
 yoshimi 2.1.0 M
 
+2010-9-15 Will
+* Double click in filer favourite paths window sets it directly.
+* Updated User Guide.
+* update_guide_version.py no longer adds M/rc{n} suffixes.
+
 2010-9-14 Will
 * Commented out CLI test message in interchange.
 * Updated build dependencies.
