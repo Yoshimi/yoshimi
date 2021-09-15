@@ -2112,7 +2112,9 @@ Alan Calvert started the project}
     int chan = kititem & 0x3f;
     bool isSingle = kititem >= 0x40;
     int mask = NUM_MIDI_CHANNELS - 1;
-
+    string name;
+    if (miscmsg != NO_MSG)
+        name = textMsgBuffer.fetch(miscmsg);
     if (newpart == TOPLEVEL::section::midiIn)
     {
         if (engine == MIDI::CC::volume && partui->part->ctl->volume.receive == 0)
@@ -2336,7 +2338,7 @@ Alan Calvert started the project}
         }
         return;
     }
-    string name;
+
     switch(control)
     {
         case MAIN::control::volume:
@@ -2425,12 +2427,10 @@ Alan Calvert started the project}
             updatepanel();
             break;
         case MAIN::control::exportBank:
-            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
                 query("", "", "", name);
             break;
         case MAIN::control::importBank: // import bank
-            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere)
             {
                 if (name.find("FAILED") == 1)
@@ -2448,7 +2448,6 @@ Alan Calvert started the project}
             bankui->rescan_for_banks();
             break;
         case MAIN::control::deleteBank: // delete bank and contents
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2475,7 +2474,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedInstrument: // save instrument
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2490,7 +2488,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedPatchset: // load patchset
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2507,7 +2504,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedPatchset: // save patch set
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2522,7 +2518,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedVector: // load vector
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2538,7 +2533,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedVector: // save vector
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2552,7 +2546,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedScale: // load scales
-            name = textMsgBuffer.fetch(miscmsg);
             if (name.find("FAILED") == 1)
             {
                 if (wasFromHere)
@@ -2568,7 +2561,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedScale: // save scales
-            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
                 query("", "", "", name);
             //else
@@ -2576,7 +2568,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadNamedState: // load state
-            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
             {
                 query("", "", "", name);
@@ -2590,7 +2581,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::saveNamedState: // save state
-            name = textMsgBuffer.fetch(miscmsg);
             if (wasFromHere && name.find("FAILED") == 1)
                 query("", "", "", name);
             else

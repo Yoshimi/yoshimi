@@ -5,6 +5,8 @@ yoshimi 2.1.0 M
 * Updated User Guide.
 * update_guide_version.py no longer adds M/rc{n} suffixes.
 
+*BugFix: textmsg leak loading instruments.
+
 2010-9-14 Will
 * Commented out CLI test message in interchange.
 * Updated build dependencies.
