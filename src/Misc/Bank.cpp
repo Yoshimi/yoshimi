@@ -1701,6 +1701,25 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
             {
                 xml->beginbranch("bank_id", it->first);
                 xml->addparstr("dirname", it->second.dirname);
+                BankEntry &bank = roots [i].banks [it->first];
+                size_t pos = 0;
+
+                while (pos < MAX_INSTRUMENTS_IN_BANK)
+                {
+                    if (bank.instruments [pos].used)
+                    {
+                        xml->beginbranch("instrument_id", pos);
+                        xml->addpar("type", bank.instruments [pos].type);
+                        xml->addparbool("ADDsynth", bank.instruments [pos].ADDsynth_used);
+                        xml->addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
+                        xml->addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
+                        xml->addparbool("Yoshimi", bank.instruments [pos].yoshiType);
+                        xml->addparstr("name", bank.instruments [pos].filename);
+                        //std::cout << bank.instruments [pos].filename << std::endl;
+                        xml->endbranch();
+                    }
+                    ++pos;
+                }
                 xml->endbranch();
             }
 
