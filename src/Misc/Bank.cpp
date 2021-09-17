@@ -970,17 +970,18 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
             pos = -1; // force it to find a new free position
         }
     }
-    else if (pos >= MAX_INSTRUMENTS_IN_BANK)
+    else //if (pos >= MAX_INSTRUMENTS_IN_BANK)
         pos = -1;
 
     if (pos < 0)
     {
 
-        if (!bank.instruments.empty() && bank.instruments.size() > MAX_INSTRUMENTS_IN_BANK)
+        /*if (!bank.instruments.empty() && bank.instruments.size() > MAX_INSTRUMENTS_IN_BANK)
         {
             pos = bank.instruments.rbegin()->first + 1;
         }
-        else
+        else*/
+        if (!bank.instruments.empty() && bank.instruments.size() < MAX_INSTRUMENTS_IN_BANK)
         {
             pos = MAX_INSTRUMENTS_IN_BANK-1;
             while (!emptyslot(rootID, bankID, pos))
@@ -1192,10 +1193,13 @@ size_t Bank::generateSingleRoot(const string& newRoot, bool clear)
 
 size_t Bank::getNewRootIndex()
 {
+    size_t pos = 1;
     if (roots.empty())
-        return 1;
-
-    return roots.rbegin()->first + 1;
+        return pos;
+    while (roots.count(pos) != 0)
+        ++ pos;
+    return pos;
+    //return roots.rbegin()->first + 1;
 }
 
 
@@ -1233,8 +1237,8 @@ size_t Bank::getNewBankIndex(size_t rootID)
     {
         idStep = roots [rootID].bankIdStep;
     }
-
-    return roots [rootID].banks.rbegin()->first + idStep;
+    return idStep;
+    //return roots [rootID].banks.rbegin()->first + idStep;
 }
 
 
@@ -1322,7 +1326,8 @@ bool Bank::removeRoot(size_t rootID)
     else if (roots [rootID].path.empty())
         return true;
     roots.erase(rootID);
-    synth->getRuntime().currentRoot = roots.rbegin()->first;
+    synth->getRuntime().currentRoot = roots.begin()->first;
+    //synth->getRuntime().currentRoot = roots.rbegin()->first;
     setCurrentRootID(synth->getRuntime().currentRoot);
     return false;
 }
