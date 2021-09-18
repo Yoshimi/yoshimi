@@ -28,6 +28,7 @@
 #define BANK_H
 
 #include "Misc/Part.h"
+#include "Misc/FormatFuncs.h"
 
 #include <string>
 #include <map>
@@ -156,6 +157,19 @@ class Bank
         size_t generateSingleRoot(const string& newRoot, bool clear = true);
 
     private:
+
+        inline void splitNumFromName(int &num, string &name)
+        {
+            int chk = func::findSplitPoint(name);
+            if (chk > 0)
+            {
+                num = func::string2int(name.substr(0, chk)) - 1;
+
+                // remove "NNNN-" from instrument name
+                name = name.substr(chk + 1);
+            }
+        }
+
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
              // add an instrument to the bank, if pos is -1 try to find a position
              // returns true if the instrument was added

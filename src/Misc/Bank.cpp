@@ -49,7 +49,7 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
-#define BANKS_VERSION 1
+const int BANKS_VERSION = -1;
 
 using file::make_legit_filename;
 using file::isRegularFile;
@@ -84,7 +84,7 @@ Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
     synth(_synth)
 {
-    BanksVersion = 2;
+    BanksVersion = -1;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
 }
@@ -395,21 +395,11 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
             if (exten == EXTEN::zynInst && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
                 continue; // don't want .xiz if there is .xiy
 
-            int chk = findSplitPoint(candidate);
-            if (chk > 0)
-            {
-                int instnum = string2int(candidate.substr(0, chk));
-
-                // remove "NNNN-" and extension for instrument name
-                string instname = candidate.substr(chk + 1, candidate.size() - exten.size() - chk - 1);
-                addtobank(rootID, banknum, instnum - 1, candidate, instname);
-            }
-            else
-            {
-                // not numbered so just extension to remove
-                string instname = candidate.substr(0, candidate.size() -  exten.size());
-                addtobank(rootID, banknum, -1, candidate, instname);
-            }
+            // remove extension
+            string instname = candidate.substr(0, candidate.size() -  exten.size());
+            int instnum = -1;
+            splitNumFromName(instnum, instname);
+            addtobank(rootID, banknum, instnum, candidate, instname);
             InstrumentsInBanks += 1;
         }
     }
@@ -527,35 +517,32 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
                 int count = 0;
                 int total = 0;
                 bool missing = false;
-                string exportfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
+                string externfile = getRootPath(rootID) + "/" + getBankName(bankID, rootID);
                 for (list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++ it)
                 {
                     string nextfile = *it;
                     if (nextfile.rfind(EXTEN::validBank) != string::npos)
                         continue; // new version will be generated
-                    ++total;
-                    if (nextfile.rfind(EXTEN::yoshInst) != string::npos || nextfile.rfind(EXTEN::zynInst) != string::npos)
-                    {
-                        ++count;
-                        int pos = -1; // default for un-numbered
-                        int slash = nextfile.rfind("/") + 1;
-                        int hyphen = nextfile.rfind("-");
-                        if (hyphen > slash && (hyphen - slash) <= 4)
-                            pos = string2int(nextfile.substr(slash, hyphen)) -1;
 
-                        if (copyFile(importdir + "/" + nextfile, exportfile + "/" + nextfile, 0))
+                    string exten = file::findExtension(nextfile);
+                    if (exten == EXTEN::yoshInst || exten == EXTEN::zynInst)
+                    {
+                        if (copyFile(importdir + "/" + nextfile, externfile + "/" + nextfile, 0))
                             missing = true;
-                        string stub;
-                        if (pos >= -1)
-                            stub = findLeafName(nextfile).substr(hyphen + 1);
-                        else
-                            stub = findLeafName(nextfile);
-                        if (!isDuplicate(rootID, bankID, pos, nextfile))
+                        // remove extension
+                        string instname = nextfile.substr(0, nextfile.size() -  exten.size());
+                        int instnum = -2; // no number prefix
+                        splitNumFromName(instnum, instname);
+                        if (instnum == -1) //  we don't accept a displayed prefix of zero
+                            instnum = MAX_INSTRUMENTS_IN_BANK -1;
+                        if (!isDuplicate(rootID, bankID, instnum, nextfile))
                         {
-                            if (addtobank(rootID, bankID, pos, nextfile, stub))
+                            if (addtobank(rootID, bankID, instnum, nextfile, instname))
                                 missing = true;
                         }
+                        ++count;
                     }
+                    ++total;
                 }
                 name = importdir;
                 if (count == 0)
@@ -686,7 +673,10 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
 
     // ID file only removed when bank cleared
     if (deleteFile(IDfile))
+    {
         chk = 1;
+        deleteDir(bankName);
+    }
 
     roots [rootID].banks.erase(bankID);
     if (rootID == synth->getRuntime().currentRoot && bankID == synth->getRuntime().currentBank)
@@ -970,17 +960,11 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
             pos = -1; // force it to find a new free position
         }
     }
-    else //if (pos >= MAX_INSTRUMENTS_IN_BANK)
+    else
         pos = -1;
 
     if (pos < 0)
     {
-
-        /*if (!bank.instruments.empty() && bank.instruments.size() > MAX_INSTRUMENTS_IN_BANK)
-        {
-            pos = bank.instruments.rbegin()->first + 1;
-        }
-        else*/
         if (!bank.instruments.empty() && bank.instruments.size() < MAX_INSTRUMENTS_IN_BANK)
         {
             pos = MAX_INSTRUMENTS_IN_BANK-1;
@@ -1199,7 +1183,6 @@ size_t Bank::getNewRootIndex()
     while (roots.count(pos) != 0)
         ++ pos;
     return pos;
-    //return roots.rbegin()->first + 1;
 }
 
 
@@ -1238,7 +1221,6 @@ size_t Bank::getNewBankIndex(size_t rootID)
         idStep = roots [rootID].bankIdStep;
     }
     return idStep;
-    //return roots [rootID].banks.rbegin()->first + idStep;
 }
 
 
@@ -1327,7 +1309,6 @@ bool Bank::removeRoot(size_t rootID)
         return true;
     roots.erase(rootID);
     synth->getRuntime().currentRoot = roots.begin()->first;
-    //synth->getRuntime().currentRoot = roots.rbegin()->first;
     setCurrentRootID(synth->getRuntime().currentRoot);
     return false;
 }
@@ -1457,8 +1438,8 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     if (xml)
     {
         if (xml->enterbranch("INFORMATION"))
-        {
-            writeVersion(xml->getpar("Banks_Version", BANKS_VERSION, 1, 99));
+        { // going negative to catch all previous versions and to be backward compatible
+            writeVersion(xml->getpar("Banks_Version", 0, -99, 0));
             xml->exitbranch();
         }
         if (xml->enterbranch("BANKLIST"))
@@ -1507,6 +1488,24 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
                         {
                             string bankDirname = xml->getparstr("dirname");
                             roots[i].banks[k].dirname = bankDirname;
+                            BankEntry &bank = roots [i].banks [k];
+                            size_t pos = 0;
+                            while (pos < MAX_INSTRUMENTS_IN_BANK)
+                            {
+                                if (xml->enterbranch("instrument_id", pos))
+                                {
+                                    bank.instruments[pos].used = xml->getparbool("isUsed", false);
+                                    bank.instruments[pos].name = xml->getparstr("listname");
+                                    bank.instruments[pos].filename = xml->getparstr("filename");
+                                    bank.instruments[pos].type = xml->getpar("type",0 , -50, 100);
+                                    bank.instruments[pos].ADDsynth_used = xml->getparbool("ADDsynth", false);
+                                    bank.instruments[pos].SUBsynth_used = xml->getparbool("SUBsynth", false);
+                                    bank.instruments[pos].PADsynth_used = xml->getparbool("PADsynth", false);
+                                    bank.instruments[pos].yoshiType = xml->getparbool("Yoshimi", false);
+                                    xml->exitbranch();
+                                }
+                                ++pos;
+                            }
                             xml->exitbranch();
                         }
                     }
@@ -1606,8 +1605,16 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
                 if (roots[rootID].banks[id].dirname == trybank)
                 {
                     banksSet[id] = true;
-                    roots [rootID].banks [id].dirname = trybank;
-                    loadbank(rootID, id);
+
+                    if (BanksVersion < 0)
+                    {
+                        ; // it's all done!
+                    }
+                    else
+                    {
+                        roots [rootID].banks [id].dirname = trybank;
+                        loadbank(rootID, id);
+                    }
                     b_it = thisRoot.erase(b_it);
                     ++banksFound;
                     break;
@@ -1688,6 +1695,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
 
 void Bank::saveToConfigFile(XMLwrapper *xml)
 {
+    writeVersion(BANKS_VERSION); // set current format
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
     {
         if (roots.count(i) > 0 && !roots [i].path.empty())
@@ -1709,12 +1717,14 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
                     if (bank.instruments [pos].used)
                     {
                         xml->beginbranch("instrument_id", pos);
+                        xml->addparbool("isUsed", bank.instruments [pos].used);
+                        xml->addparstr("listname", bank.instruments [pos].name);
+                        xml->addparstr("filename", bank.instruments [pos].filename);
                         xml->addpar("type", bank.instruments [pos].type);
                         xml->addparbool("ADDsynth", bank.instruments [pos].ADDsynth_used);
                         xml->addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
                         xml->addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
                         xml->addparbool("Yoshimi", bank.instruments [pos].yoshiType);
-                        xml->addparstr("name", bank.instruments [pos].filename);
                         //std::cout << bank.instruments [pos].filename << std::endl;
                         xml->endbranch();
                     }
