@@ -177,7 +177,6 @@ class Bank
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         bool isValidBank(string chkdir);
 
-        //string dirname;
         const string defaultinsname;
         SynthEngine *synth;
 

@@ -985,9 +985,9 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
                 string prefix = "0000" + to_string(pos);
                 prefix = prefix.substr(prefix.size() - 4);
                 string newfile = prefix + "-" + name;
-                std::cout << "old " << filename << "  new " << newfile << std::endl;
+                //cout << "old " << filename << "  new " << newfile << endl;
                 renameFile(filename, newfile);
-                std::cout << "change " << filename << std::endl;
+                //cout << "change " << filename << endl;
             }
         }
     }
@@ -1619,10 +1619,8 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
                 {
                     banksSet[id] = true;
 
-                    if (BanksVersion < 0)
-                    {
-                        ; // it's all done!
-                    }
+                    if (BanksVersion < 0) // all we need to do!
+                        InstrumentsInBanks += getBankSize(id, rootID);
                     else
                     {
                         roots [rootID].banks [id].dirname = trybank;
