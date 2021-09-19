@@ -62,6 +62,7 @@ using file::copyDir;
 using file::copyFile;
 using file::renameFile;
 using file::deleteFile;
+using file::countDir;
 using file::findLeafName;
 using file::setExtension;
 using file::extendLocalPath;
@@ -568,7 +569,7 @@ string Bank::importBank(string importdir, size_t rootID, unsigned int bankID)
     if (!ok)
         name = " FAILED " + name;
     else if (!partial)
-        name = " ed" + name;
+        name = "ed " + name;
     return name;
 }
 
@@ -681,6 +682,9 @@ string Bank::removebank(unsigned int bankID, size_t rootID)
     roots [rootID].banks.erase(bankID);
     if (rootID == synth->getRuntime().currentRoot && bankID == synth->getRuntime().currentBank)
         setCurrentBankID(0, false);
+    int remainder = countDir(bankName);
+    if (remainder > 0)
+        return(" FAILED Bank " + bankName + " unlinked but " + to_string(remainder) + " unrecognised objects still exist.");
     return ("d " + bankName);
 }
 
@@ -975,6 +979,15 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
                 {
                     break;
                 }
+            }
+            if (pos >= 0)
+            {
+                string prefix = "0000" + to_string(pos);
+                prefix = prefix.substr(prefix.size() - 4);
+                string newfile = prefix + "-" + name;
+                std::cout << "old " << filename << "  new " << newfile << std::endl;
+                renameFile(filename, newfile);
+                std::cout << "change " << filename << std::endl;
             }
         }
     }

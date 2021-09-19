@@ -404,6 +404,33 @@ inline int listDir(std::list<string>* dirList, const string& dirName)
     return count;
 }
 
+
+/*
+ * Counts all the objects within the directory.
+ */
+
+inline int countDir(const std::string dirName)
+{
+    DIR *dir = opendir(dirName.c_str());
+    if (dir == NULL)
+        return -1;
+    struct dirent *fn;
+    int count = 0;
+    char dir1[2] = {'.', 0};
+    char dir2[3] = {'.', '.', 0};
+    while ((fn = readdir(dir)))
+    {
+        if (fn->d_type == DT_DIR)
+        {
+            if(fn->d_name != dir1 && fn->d_name != dir2)
+                ++ count;
+        }
+    }
+    closedir(dir);
+    return count;
+}
+
+
 /*
  * we return the contents as sorted, sequential lists in directories
  * and files of the required type as a series of leaf names (as the
