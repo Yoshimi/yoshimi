@@ -358,15 +358,112 @@ int Bank::changeBankName(size_t rootID, size_t bankID, const string& newName)
 }
 
 
+void Bank::checkbank(size_t rootID, size_t banknum)
+{
+    string bankdirname = getBankPath(rootID, banknum);
+
+    if (bankdirname.empty())
+    {
+        return;
+    }
+
+    string chkpath;
+    list<string> thisBank;
+    uint32_t found = listDir(&thisBank, bankdirname);
+    if (found == 0xffffffff)
+    {
+        synth->getRuntime().Log("Failed to open bank directory " + bankdirname);
+        thisBank.clear();
+        return;
+    }
+    if (found == 0)
+    {
+        roots [rootID].banks.erase(banknum);
+        thisBank.clear();
+        return;
+    }
+
+    string path = getBankPath(rootID, banknum) + "/";
+    // clear missing/removed entries
+    for (int pos = 0; pos < MAX_INSTRUMENTS_IN_BANK; ++pos)
+    {
+        if (!emptyslot(rootID, banknum, pos))
+        {
+            string chkpath = path + getInstrumentReference(rootID, banknum, pos).filename;
+            if (!isRegularFile(chkpath))
+            {
+                std::cout << chkpath << std::endl;
+                getInstrumentReference(rootID, banknum, pos).clear();
+            }
+        }
+    }
+
+    for (list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++it)
+    {
+        string candidate = *it;
+
+        if (candidate.size() <= EXTEN::zynInst.size()) // at least a single char filename
+            *it = "";
+        else
+        {
+            chkpath = bankdirname + "/" + candidate;
+            if (!isRegularFile(chkpath))
+                *it = "";
+            else
+            {
+                string exten = file::findExtension(chkpath);
+                if (exten != EXTEN::yoshInst && exten != EXTEN::zynInst)
+                    *it = "";
+                else
+                {
+                    string instname = candidate.substr(0, candidate.size() -  exten.size());
+                    int instnum = -1;
+                    splitNumFromName(instnum, instname);
+                    if (instnum >= 0 && !emptyslot(rootID, banknum, instnum)) // a recognised location
+                    {
+                        int othernum = -1;
+                        string othername = roots [rootID].banks [banknum].instruments [instnum].filename;
+                        othername = othername.substr(0, othername.size() - exten.size());
+                        splitNumFromName(othernum, othername);
+                        if (instname == othername)
+                        {
+                            if (exten == EXTEN::yoshInst) // yoshiType takes priority
+                                getInstrumentReference(rootID, banknum, instnum).yoshiType = true;
+                            *it = "";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    string candidate;
+    for (list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++it)
+    {
+        candidate = *it;
+
+        if (!candidate.empty())
+        {
+            // remove extension
+            string exten = file::findExtension(chkpath);
+            string instname = candidate.substr(0, candidate.size() -  exten.size());
+            int instnum = -1;
+            splitNumFromName(instnum, instname);
+            addtobank(rootID, banknum, instnum, candidate, instname);
+        }
+    }
+
+    thisBank.clear();
+}
+
+
 // Makes current a bank directory
 bool Bank::loadbank(size_t rootID, size_t banknum)
 {
     string bankdirname = getBankPath(rootID, banknum);
 
     if (bankdirname.empty())
-    {
         return false;
-    }
 
     roots [rootID].banks [banknum].instruments.clear();
 
@@ -385,24 +482,26 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     for (list<string>::iterator it = thisBank.begin(); it != thisBank.end(); ++ it)
     {
         candidate = *it;
-        if (candidate.size() <= (EXTEN::zynInst.size() + 2)) // actually a 3 char filename!
+        if (candidate.size() <= (EXTEN::zynInst.size())) // at least a 1 char filename!
             continue;
-        chkpath = bankdirname + candidate;
-        if (isRegularFile(chkpath))
-        {
-            string exten = file::findExtension(chkpath);
-            if (exten != EXTEN::yoshInst && exten != EXTEN::zynInst)
-                continue;
-            if (exten == EXTEN::zynInst && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
-                continue; // don't want .xiz if there is .xiy
 
-            // remove extension
-            string instname = candidate.substr(0, candidate.size() -  exten.size());
-            int instnum = -1;
-            splitNumFromName(instnum, instname);
-            addtobank(rootID, banknum, instnum, candidate, instname);
-            InstrumentsInBanks += 1;
-        }
+        chkpath = bankdirname + candidate;
+        if (!isRegularFile(chkpath))
+            continue;
+
+        string exten = file::findExtension(chkpath);
+        if (exten != EXTEN::yoshInst && exten != EXTEN::zynInst)
+            continue;
+
+        if (exten == EXTEN::zynInst && isRegularFile(setExtension(chkpath, EXTEN::yoshInst)))
+            continue; // don't want .xiz if there is .xiy
+
+        // remove extension
+        string instname = candidate.substr(0, candidate.size() -  exten.size());
+        int instnum = -1;
+        splitNumFromName(instnum, instname);
+        addtobank(rootID, banknum, instnum, candidate, instname);
+        InstrumentsInBanks += 1;
     }
     thisBank.clear();
     return true;
@@ -953,14 +1052,22 @@ bool Bank::isValidBank(string chkdir)
 }
 
 
-bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
+bool Bank::addtobank(size_t rootID, size_t bankID, int pos, string filename, const string name)
 {
     BankEntry &bank = roots [rootID].banks [bankID];
+    string exten = file::findExtension(filename);
 
     if (pos >= 0 && pos < MAX_INSTRUMENTS_IN_BANK)
     {
         if (bank.instruments [pos].used)
         {
+            string oldName = getname(pos, bankID, rootID);
+            if (name == oldName)// overwrite?
+            {
+                if (exten == EXTEN::yoshInst) // yoshiType takes priority
+                    getInstrumentReference(rootID, bankID, pos).yoshiType = true;
+                return 0; // no actual insertion necessary
+            }
             pos = -1; // force it to find a new free position
         }
     }
@@ -969,25 +1076,24 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
 
     if (pos < 0)
     {
-        if (!bank.instruments.empty() && bank.instruments.size() < MAX_INSTRUMENTS_IN_BANK)
+        // why did we have the following test?
+        //if (!bank.instruments.empty() && bank.instruments.size() < MAX_INSTRUMENTS_IN_BANK)
         {
-            pos = MAX_INSTRUMENTS_IN_BANK-1;
+            pos = MAX_INSTRUMENTS_IN_BANK - 1;
             while (!emptyslot(rootID, bankID, pos))
             {
                 pos -= 1;
                 if (pos < 0)
-                {
-                    break;
-                }
+                    break; // bank is full :(
             }
             if (pos >= 0)
             {
-                string prefix = "0000" + to_string(pos);
+                string bankdirname = getBankPath(rootID, bankID) + "/";
+                string prefix = "0000" + to_string(pos + 1);
                 prefix = prefix.substr(prefix.size() - 4);
-                string newfile = prefix + "-" + name;
-                //cout << "old " << filename << "  new " << newfile << endl;
-                renameFile(filename, newfile);
-                //cout << "change " << filename << endl;
+                string newfile = prefix + "-" + name + exten;
+                if (renameFile(bankdirname + filename, bankdirname + newfile))
+                    filename = newfile;
             }
         }
     }
@@ -1002,7 +1108,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.PADsynth_used = 0;
     instrRef.ADDsynth_used = 0;
     instrRef.SUBsynth_used = 0;
-    instrRef.yoshiType = -1;
+    instrRef.yoshiType = 0;
 
     // see which engines are used
     if (synth->getRuntime().checksynthengines)
@@ -1020,7 +1126,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         instrRef.ADDsynth_used = (names & 1);
         instrRef.SUBsynth_used = (names & 2) >> 1;
         instrRef.PADsynth_used = (names & 4) >> 2;
-        instrRef.yoshiType = (names & 8) >> 3;
+        instrRef.yoshiType = (exten == EXTEN::yoshInst);
     }
     return 0;
 }
@@ -1620,7 +1726,10 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
                     banksSet[id] = true;
 
                     if (BanksVersion < 0) // all we need to do!
+                    {
+                        checkbank(rootID, id);
                         InstrumentsInBanks += getBankSize(id, rootID);
+                    }
                     else
                     {
                         roots [rootID].banks [id].dirname = trybank;

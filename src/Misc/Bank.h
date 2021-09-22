@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2020 Will Godfrey & others
+    Copyright 2014-2021 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -117,6 +117,7 @@ class Bank
         bool isDuplicateBankName(size_t rootID, const string& name);
         int getBankSize(int bankID, size_t rootID);
         int changeBankName(size_t rootID, size_t bankID, const string& newName);
+        void checkbank(size_t rootID, size_t banknum);
         bool loadbank(size_t rootID, size_t banknum);
         string exportBank(const string& exportdir, size_t rootID, unsigned int bankID);
         string importBank(string importdir, size_t rootID, unsigned int bankID);
