@@ -93,6 +93,8 @@ float Chorus::getdelay(float xlfo)
 // Apply the effect
 void Chorus::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     const float one = 1.0f;
     dl1 = dl2;
     dr1 = dr2;
@@ -193,7 +195,7 @@ void Chorus::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
     outvolume.setTargetValue(Pvolume / 127.0f);
-    volume.setTargetValue((!insertion) ? 1.0f : outvolume.getValue());
+    volume.setTargetValue((!insertion) ? 1.0f : outvolume.getTargetValue());
 }
 
 

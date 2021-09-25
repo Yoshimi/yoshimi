@@ -130,6 +130,8 @@ Phaser::~Phaser()
 // Effect output
 void Phaser::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     if (Panalog)
         AnalogPhase(smpsl, smpsr);
     else

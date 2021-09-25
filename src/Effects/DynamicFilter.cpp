@@ -71,6 +71,8 @@ DynamicFilter::~DynamicFilter()
 // Apply the effect
 void DynamicFilter::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     if (filterpars->changed)
     {
         filterpars->changed = false;

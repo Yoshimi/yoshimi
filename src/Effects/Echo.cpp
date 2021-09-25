@@ -135,6 +135,8 @@ void Echo::out(float* smpsl, float* smpsr)
     float ldl;
     float rdl;
 
+    outvolume.advanceValue(synth->sent_buffersize);
+
     initdelays();
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
