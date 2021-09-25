@@ -68,6 +68,8 @@ Alienwah::~Alienwah()
 // Apply the effect
 void Alienwah::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
             smpsl[i] += float(1e-20); // anti-denormal

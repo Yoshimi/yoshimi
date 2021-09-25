@@ -70,6 +70,8 @@ void EQ::cleanup(void)
 // Effect output
 void EQ::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     memcpy(efxoutl, smpsl, synth->sent_bufferbytes);
     memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
     for (int i = 0; i < synth->sent_buffersize; ++i)

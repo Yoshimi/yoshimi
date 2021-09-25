@@ -129,6 +129,8 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 // Effect output
 void Distorsion::out(float *smpsl, float *smpsr)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     float inputdrive = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
     if (Pnegate)
         inputdrive *= -1.0f;

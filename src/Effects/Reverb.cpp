@@ -208,8 +208,11 @@ void Reverb::processmono(int ch, float *output)
 // Effect output
 void Reverb::out(float *smps_l, float *smps_r)
 {
+    outvolume.advanceValue(synth->sent_buffersize);
+
     if (!Pvolume && insertion)
         return;
+
     int i;
     for (i = 0; i < synth->sent_buffersize; ++i)
     {
