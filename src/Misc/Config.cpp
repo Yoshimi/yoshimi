@@ -101,7 +101,6 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     loadDefaultState(false),
     sessionStage(_SYS_::type::Normal),
     Interpolation(0),
-    checksynthengines(1),
     xmlType(0),
     instrumentFormat(1),
     EnableProgChange(1), // default will be inverted
@@ -747,7 +746,7 @@ void Config::addConfigXML(XMLwrapper *xml)
     xml->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xml->addparbool("monitor-incoming_CCs", monitorCCin);
     xml->addparbool("open_editor_on_learned_CC",showLearnedCC);
-    xml->addpar("check_pad_synth", checksynthengines);
+    xml->addpar("check_pad_synth", 1); // for backward compatibility
     xml->addpar("root_current_ID", synth->ReadBankRoot());
     xml->addpar("bank_current_ID", synth->ReadBank());
     xml->endbranch(); // CONFIGURATION

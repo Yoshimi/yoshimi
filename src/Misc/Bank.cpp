@@ -1110,24 +1110,20 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, string filename, con
     instrRef.SUBsynth_used = 0;
     instrRef.yoshiType = 0;
 
-    // see which engines are used
-    if (synth->getRuntime().checksynthengines)
-    {
-        string checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::yoshInst);
-        if (!isRegularFile(checkfile))
-            checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
-        unsigned int names = 0;
-        int type = 0;
-        XMLwrapper *xml = new XMLwrapper(synth, true, false);
-        xml->checkfileinformation(checkfile, names, type);
-        delete xml;
+    string checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::yoshInst);
+    if (!isRegularFile(checkfile))
+        checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
+    unsigned int names = 0;
+    int type = 0;
+    XMLwrapper *xml = new XMLwrapper(synth, true, false);
+    xml->checkfileinformation(checkfile, names, type);
+    delete xml;
 
-        instrRef.type = type;
-        instrRef.ADDsynth_used = (names & 1);
-        instrRef.SUBsynth_used = (names & 2) >> 1;
-        instrRef.PADsynth_used = (names & 4) >> 2;
-        instrRef.yoshiType = (exten == EXTEN::yoshInst);
-    }
+    instrRef.type = type;
+    instrRef.ADDsynth_used = (names & 1);
+    instrRef.SUBsynth_used = (names & 2) >> 1;
+    instrRef.PADsynth_used = (names & 4) >> 2;
+    instrRef.yoshiType = (exten == EXTEN::yoshInst);
     return 0;
 }
 

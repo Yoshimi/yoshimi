@@ -135,7 +135,6 @@ class Config
         list<string> lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::ScalaMap + 1];
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
-        bool          checksynthengines;
         int           xmlType;
         unsigned char instrumentFormat;
         int           EnableProgChange;

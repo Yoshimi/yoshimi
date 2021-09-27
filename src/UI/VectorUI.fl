@@ -3,7 +3,7 @@ version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {
-Copyright 2016-2020, Will Godfrey
+Copyright 2016-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -834,17 +834,15 @@ switch (res)
   } {
     code {//
     unsigned int engine = 0;
-    if (synth->getRuntime().checksynthengines)
+
+    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-        {
-            if (synth->part[npart]->kit[i].Padenabled)
-                engine |= 1;
-            if (synth->part[npart]->kit[i].Psubenabled)
-                engine |= 2;
-            if (synth->part[npart]->kit[i].Ppadenabled)
-                engine |= 4;
-        }
+        if (synth->part[npart]->kit[i].Padenabled)
+            engine |= 1;
+        if (synth->part[npart]->kit[i].Psubenabled)
+            engine |= 2;
+        if (synth->part[npart]->kit[i].Ppadenabled)
+            engine |= 4;
     }
     return engine;} {}
   }

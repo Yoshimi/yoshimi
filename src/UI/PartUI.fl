@@ -2421,36 +2421,35 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (instrumentName == "")
         instrumentName = part->Pname;
     partname = instrumentName; // this needs improving
-    if (synth->getRuntime().checksynthengines)
+
+    if (adsynenabledcheck->value())
+        addbox->color(ADD_COLOUR);
+    else
+        addbox->color(BASE_COLOUR);
+    ADD->damage(1);
+    if (subsynenabledcheck->value())
+        subbox->color(SUB_COLOUR);
+    else
+        subbox->color(BASE_COLOUR);
+    SUB->damage(1);
+    if (padsynenabledcheck->value())
+        padbox->color(PAD_COLOUR);
+    else
+        padbox->color(BASE_COLOUR);
+    PAD->damage(1);
+    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        if (adsynenabledcheck->value())
-            addbox->color(ADD_COLOUR);
-        else
-            addbox->color(BASE_COLOUR);
-        ADD->damage(1);
-        if (subsynenabledcheck->value())
-            subbox->color(SUB_COLOUR);
-        else
-            subbox->color(BASE_COLOUR);
-        SUB->damage(1);
-        if (padsynenabledcheck->value())
-            padbox->color(PAD_COLOUR);
-        else
-            padbox->color(BASE_COLOUR);
-        PAD->damage(1);
-        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-        {
-            if (partkititem[i]->enabledcheck->value())
-            { // nested so we don't access non existent
-                if (partkititem[i]->mutedcheck->value() == 0)
-                {
-                    engine |= partkititem[i]->adcheck->value();
-                    engine |= (partkititem[i]->subcheck->value() << 1);
-                    engine |= (partkititem[i]->padcheck->value() << 2);
-                }
+        if (partkititem[i]->enabledcheck->value())
+        { // nested so we don't access non existent
+            if (partkititem[i]->mutedcheck->value() == 0)
+            {
+                engine |= partkititem[i]->adcheck->value();
+                engine |= (partkititem[i]->subcheck->value() << 1);
+                engine |= (partkititem[i]->padcheck->value() << 2);
             }
         }
     }
+
     if (engine & 1) // addsynth
         instrumentaddbox->color(ADD_COLOUR);
     else
@@ -2541,17 +2540,15 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {setinstrumentlabel(string text = "")} {} {
     code {//
     engine = 0;
-    if (synth->getRuntime().checksynthengines)
+
+    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-        {
-            if (part->kit[i].Padenabled)
-                engine |= 1;
-            if (part->kit[i].Psubenabled)
-                engine |= 2;
-            if (part->kit[i].Ppadenabled)
-                engine |= 4;
-        }
+        if (part->kit[i].Padenabled)
+            engine |= 1;
+        if (part->kit[i].Psubenabled)
+            engine |= 2;
+        if (part->kit[i].Ppadenabled)
+            engine |= 4;
     }
     if (engine & 1)
         instrumentaddbox->color(ADD_COLOUR);

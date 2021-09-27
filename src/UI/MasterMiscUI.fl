@@ -654,17 +654,15 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
   } {
     code {//
     unsigned int engine = 0;
-    if (synth->getRuntime().checksynthengines)
+
+    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-        {
-            if (synth->part[npart]->kit[i].Padenabled)
-                engine |= 1;
-            if (synth->part[npart]->kit[i].Psubenabled)
-                engine |= 2;
-            if (synth->part[npart]->kit[i].Ppadenabled)
-                engine |= 4;
-        }
+        if (synth->part[npart]->kit[i].Padenabled)
+            engine |= 1;
+        if (synth->part[npart]->kit[i].Psubenabled)
+            engine |= 2;
+        if (synth->part[npart]->kit[i].Ppadenabled)
+            engine |= 4;
     }
     return engine;} {}
   }

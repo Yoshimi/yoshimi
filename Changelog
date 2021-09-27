@@ -1,5 +1,8 @@
 yoshimi 2.1.0 M
 
+2010-9-27 Will
+* Removed redundant references the checksynthengines
+
 2010-9-23 Will
 * Merged in latest banks updates
 * Updated build number
