@@ -49,7 +49,7 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
-const int BANKS_VERSION = -1;
+const int BANKS_VERSION = 10;
 
 using file::make_legit_filename;
 using file::isRegularFile;
@@ -85,7 +85,7 @@ Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
     synth(_synth)
 {
-    BanksVersion = -1;
+    BanksVersion = 10;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
 }
@@ -1554,7 +1554,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     {
         if (xml->enterbranch("INFORMATION"))
         { // going negative to catch all previous versions and to be backward compatible
-            writeVersion(xml->getpar("Banks_Version", 0, -99, 0));
+            writeVersion(xml->getpar("Banks_Version", 0, 0, 999));
             xml->exitbranch();
         }
         if (xml->enterbranch("BANKLIST"))
@@ -1721,7 +1721,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
                 {
                     banksSet[id] = true;
 
-                    if (BanksVersion < 0) // all we need to do!
+                    if (BanksVersion > 9) // all we need to do!
                     {
                         checkbank(rootID, id);
                         InstrumentsInBanks += getBankSize(id, rootID);

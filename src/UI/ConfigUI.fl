@@ -63,8 +63,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {extern SynthEngine *firstSynth;} {private local
 }
 
-class ConfigUI {open
-} {
+class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
@@ -623,19 +622,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             code0 {o->value(synth->getRuntime().EnableProgChange);}
             class Fl_Check_Button2
           }
-          Fl_Check_Button progpartenable {
-            label {Enable Part On Program Change}
-            callback {//
-                        send_data(0, CONFIG::control::instChangeEnablesPart, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
-            class Fl_Check_Button2
-          }
           Fl_Spinner EPCspinner {
             label {Extended Program Change CC}
             callback {//
                         Epend->show();}
-            xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textfont 1 textsize 12
+            xywh {235 180 50 18} labelsize 12 minimum 0 maximum 119 value 110 textfont 1 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
             class WidgetSpinner
@@ -1032,9 +1023,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 case CONFIG::control::enableProgramChange:
                     progenable->value(value_bool);
                     break;
-                case CONFIG::control::instChangeEnablesPart:
-                    progpartenable->value(value_bool);
-                    break;
                 case CONFIG::control::extendedProgramChangeCC:
                     if (value_int > 119)
                     {
@@ -1236,7 +1224,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             break;
                     }
                     progenable->value(synth->getRuntime().EnableProgChange);
-                    progpartenable->value(synth->getRuntime().enable_part_on_voice_load);
 
                     tmp = synth->getRuntime().midi_upper_voice_C;
                     if (tmp == 128)
@@ -1408,7 +1395,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         bankchange->textsize(size);
 
     progenable->labelsize(size);
-    progpartenable->labelsize(size);
     EPCspinner->labelsize(size);
         EPCspinner->textsize(size);
     Epend->labelsize(size);

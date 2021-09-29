@@ -1011,7 +1011,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     {
         Runtime.sessionSeen[TOPLEVEL::XML::Instrument] = true;
         addHistory(setExtension(fname, EXTEN::zynInst), TOPLEVEL::XML::Instrument);
-        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+        partonoffLock(npart, 1);
     }
     return msgID;
 }
@@ -1076,7 +1076,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
         partonoffLock(npart, 2); // as it was
     }
     else
-        partonoffLock(npart, 2 - Runtime.enable_part_on_voice_load); // always on if enabled
+        partonoffLock(npart, 1);
     return msgID;
 }
 
@@ -1394,13 +1394,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
         msg_buf.push_back("  MIDI Bank CC " + asString(Runtime.midi_bank_C));
 
     if (Runtime.EnableProgChange)
-    {
         msg_buf.push_back("  MIDI Program Change on");
-        if (Runtime.enable_part_on_voice_load)
-            msg_buf.push_back("  MIDI Program Change enables part");
-        else
-            msg_buf.push_back("  MIDI Program Change doesn't enable part");
-    }
     else
         msg_buf.push_back("  MIDI program change off");
 
@@ -1612,13 +1606,6 @@ int SynthEngine::SetSystemValue(int type, int value)
         case 82: // enable program change
             value = (value > 63);
             cmd = CONFIG::control::enableProgramChange;
-            setpart = TOPLEVEL::section::config;
-            to_send = true;
-            break;
-
-        case 83: // enable part on program change
-            value = (value > 63);
-            cmd = CONFIG::control::instChangeEnablesPart;
             setpart = TOPLEVEL::section::config;
             to_send = true;
             break;
@@ -3727,9 +3714,6 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             max = 119;
             break;
         case CONFIG::control::enableProgramChange:
-            break;
-        case CONFIG::control::instChangeEnablesPart:
-            def = 1;
             break;
         case CONFIG::control::extendedProgramChangeCC: // runtime midi checked elsewhere
             def = 110;

@@ -2960,12 +2960,6 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().EnableProgChange;
             break;
-        case CONFIG::control::instChangeEnablesPart:
-            if (write)
-                synth->getRuntime().enable_part_on_voice_load = value_bool;
-            else
-                value = synth->getRuntime().enable_part_on_voice_load;
-            break;
         case CONFIG::control::extendedProgramChangeCC:
             if (write)
             {

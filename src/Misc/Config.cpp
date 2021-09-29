@@ -129,7 +129,6 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),   // 128 is used as 'disabled'
     midi_upper_voice_C(128),
-    enable_part_on_voice_load(1),
     enable_NRPN(true),
     ignoreResetCCs(false),
     monitorCCin(false),
@@ -636,7 +635,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
         midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
         midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
         EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
-        enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
         instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
         enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
         ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
@@ -740,7 +738,7 @@ void Config::addConfigXML(XMLwrapper *xml)
     xml->addpar("midi_bank_C", midi_bank_C);
     xml->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xml->addpar("ignore_program_change", (1 - EnableProgChange));
-    xml->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
+    xml->addpar("enable_part_on_voice_load", 1); // for backward compatibility
     xml->addpar("saved_instrument_format", instrumentFormat);
     xml->addparbool("enable_incoming_NRPNs", enable_NRPN);
     xml->addpar("ignore_reset_all_CCs",ignoreResetCCs);

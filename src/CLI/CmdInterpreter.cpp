@@ -3323,11 +3323,6 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         command = CONFIG::control::enableProgramChange;
         value = (input.toggle() == 1);
     }
-    else if (input.matchnMove(2, "activate"))
-    {
-        command = CONFIG::control::instChangeEnablesPart;
-        value = (input.toggle() == 1);
-    }
     else if (input.matchnMove(3, "extend"))
     {
         command = CONFIG::control::extendedProgramChangeCC;

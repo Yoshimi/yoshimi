@@ -872,10 +872,6 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             contstr += "Enable program change";
             yesno = true;
             break;
-        case CONFIG::control::instChangeEnablesPart:
-            contstr += "Program change enables part";
-            yesno = true;
-            break;
         case CONFIG::control::extendedProgramChangeCC:
             if (addValue)
             {

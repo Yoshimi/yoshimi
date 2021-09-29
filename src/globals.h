@@ -320,7 +320,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         bankRootCC = 65,
         bankCC = 67,
         enableProgramChange,
-        instChangeEnablesPart,
         extendedProgramChangeCC = 71,
         ignoreResetAllCCs,
         logIncomingCCs,
