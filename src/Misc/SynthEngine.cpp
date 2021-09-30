@@ -495,7 +495,7 @@ void SynthEngine::defaults(void)
     Runtime.lastfileseen.clear();
     for (int i = 0; i <= TOPLEVEL::XML::ScalaMap; ++i)
     {
-        Runtime.lastfileseen.push_back(Runtime.userHome);
+        Runtime.lastfileseen.push_back(file::userHome());
         Runtime.sessionSeen[i] = false;
     }
 

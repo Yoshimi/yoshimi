@@ -80,7 +80,6 @@ class Config
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 
-        string        userHome;
         string        ConfigDir;
         string        localDir;
         string        defaultStateName;

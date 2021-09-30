@@ -39,10 +39,10 @@
 
 #include "globals.h"
 
-#define OUR_PATH_MAX 2048
+#define OUR_PATH_MAX 4096
 /*
  * PATH_MAX is a poorly defined constant, and not very
- * portable. As this function is only used for a single
+ * portable. As this function is only used for a simple
  * tightly defined purpose we set a value to replace it
  * that should be safe for any reasonable architecture.
  */
@@ -75,7 +75,6 @@ namespace file {
 
 using std::string;
 using std::stringstream;
-
 
 // make a filename legal
 inline void make_legit_filename(string& fname)
@@ -155,6 +154,18 @@ inline bool isDirectory(const string& chkpath)
     return false;
 }
 
+inline string userHome(void)
+{
+    string home = string(getenv("HOME"));
+    if (home.empty() || !isDirectory(home))
+    {
+        home = string("/tmp");
+        //Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
+    }
+return home + '/';
+}
+
+
 /* performs specific OS command
  * optionally returning a multi-line response
  */
@@ -176,7 +187,7 @@ inline bool cmd2string(std::string cmd, string& result)
     FILE* fp = popen(cmd.c_str(), "r");
     if(fp)
     {
-        std::vector<char> buffer(4096);
+        std::vector<char> buffer(OUR_PATH_MAX);
         std::size_t n = fread(buffer.data(), 1, buffer.size(), fp);
         if(n && n < buffer.size())
         {

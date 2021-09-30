@@ -1937,7 +1937,7 @@ Alan Calvert started the project}
     code {//
         string favetext = file::loadText(synth->getRuntime().ConfigDir + "/yoshimi-favourites");
         if (favetext.empty())
-            favetext = synth->getRuntime().userHome;
+            favetext = file::userHome();
         favebrowse->clear();
         string cr = "\\n";
         for (int count = 0; count < 20; ++count)

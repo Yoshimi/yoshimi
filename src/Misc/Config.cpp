@@ -257,14 +257,7 @@ void Config::clearPresetsDirlist(void)
 
 bool Config::loadConfig(void)
 {
-    string homedir = string(getenv("HOME"));
-    if (homedir.empty() || !isDirectory(homedir))
-    {
-        homedir = string("/tmp");
-        Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
-    }
-    userHome = homedir + '/';
-    localDir = userHome + ".local/share/yoshimi";
+    localDir = file::userHome() + ".local/share/yoshimi";
     if (!isDirectory(localDir))
     {
         if (createDir(localDir))
@@ -273,7 +266,7 @@ bool Config::loadConfig(void)
             return false;
         }
     }
-    ConfigDir = userHome + string(EXTEN::config) + "/" + YOSHIMI;
+    ConfigDir = file::userHome() + string(EXTEN::config) + "/" + YOSHIMI;
     defaultStateName = ConfigDir + "/yoshimi";
 
     if (!isDirectory(ConfigDir))
