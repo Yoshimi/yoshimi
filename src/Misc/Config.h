@@ -81,7 +81,6 @@ class Config
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 
         string        ConfigDir;
-        string        localDir;
         string        defaultStateName;
         string        defaultSession;
         string        ConfigFile;
@@ -251,7 +250,6 @@ class Config
         friend class YoshimiLV2Plugin;
 
     public:
-        string definedBankRoot;
         int exitType;
 };
 

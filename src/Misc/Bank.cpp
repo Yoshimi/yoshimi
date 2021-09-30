@@ -313,8 +313,8 @@ bool Bank::isDuplicateBankName(size_t rootID, const string& name)
         string check = getBankName(i,rootID);
         if (check > "" && check == name)
             return true;
-        if (check > "")
-            cout << check << endl;
+        //if (check > "")
+            //cout << check << endl;
     }
     return false;
 }
@@ -392,7 +392,7 @@ void Bank::checkbank(size_t rootID, size_t banknum)
             string chkpath = path + getInstrumentReference(rootID, banknum, pos).filename;
             if (!isRegularFile(chkpath))
             {
-                std::cout << chkpath << std::endl;
+                //cout << chkpath << endl;
                 getInstrumentReference(rootID, banknum, pos).clear();
             }
         }
@@ -1146,11 +1146,11 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 }
 
 
-void Bank::updateShare(string bankdirs[], string localDir, string shareID)
+void Bank::updateShare(string bankdirs[], string baseDir, string shareID)
 {
     saveText(to_string(BUILD_NUMBER), shareID);
     string next = "/Will_Godfrey_Companion";
-    string destinationDir = localDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
+    string destinationDir = baseDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
     if (!isDirectory(destinationDir))
         return;
     //cout << bankdirs[1] << endl;
@@ -1170,7 +1170,7 @@ void Bank::checkShare(string sourceDir, string destinationDir)
 
 bool Bank::transferDefaultDirs(string bankdirs[])
 {
-    string ourDir = firstSynth->getRuntime().definedBankRoot;
+    string ourDir = file::localDir() + "/found/";
     if (!isDirectory(ourDir))
         return false;
     bool found = false;
@@ -1236,17 +1236,17 @@ return found;
 
 void Bank::checkLocalBanks()
 {
-    string localDir = firstSynth->getRuntime().definedBankRoot;
-    if (isDirectory(localDir + "yoshimi/banks")) // yoshi
-        addRootDir(localDir + "yoshimi/banks");
+    string checkDir = file::localDir() + "/found/";
+    if (isDirectory(checkDir + "yoshimi/banks")) // yoshi
+        addRootDir(checkDir + "yoshimi/banks");
 
-    if (isDirectory(localDir + "zynaddsubfx/banks"))
-        addRootDir(localDir + "zynaddsubfx/banks"); // zyn
+    if (isDirectory(checkDir + "zynaddsubfx/banks"))
+        addRootDir(checkDir + "zynaddsubfx/banks"); // zyn
 }
 
 void Bank::addDefaultRootDirs(string bankdirs[])
 {
-    string ourDir = firstSynth->getRuntime().definedBankRoot;
+    string ourDir = file::localDir() + "/found/";
     int tot = 0;
     int i = 0;
     while (bankdirs[i] != "@end")
@@ -1520,7 +1520,7 @@ size_t Bank::addRootDir(const string& newRootDir)
 
 bool Bank::parseBanksFile(XMLwrapper *xml)
 {
-    string localDir = firstSynth->getRuntime().definedBankRoot;
+    string baseDir = file::localDir() + "/found/";
     /*
      * This list is used in transferDefaultDirs( to find and copy
      * bank lists into $HOME/.local.yoshimi
@@ -1535,12 +1535,12 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
      */
 
     string bankdirs[] = {
-        localDir + "yoshimi/banks",
+        baseDir + "yoshimi/banks",
         "/usr/share/yoshimi/banks",
         "/usr/local/share/yoshimi/banks",
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
-        localDir + "zynaddsubfx/banks",
+        baseDir + "zynaddsubfx/banks",
         extendLocalPath("/banks"),
         "@end"
     };
@@ -1569,8 +1569,8 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
             addDefaultRootDirs(bankdirs);
         else
         {
-            cout << "generating" << endl;
-            string newRoot = firstSynth->getRuntime().definedBankRoot + "yoshimi/banks";
+            //cout << "generating" << endl;
+            string newRoot = file::localDir() + "/found/" + "yoshimi/banks";
             size_t idx = generateSingleRoot(newRoot);
             changeRootID(idx, 5);
             synth->getRuntime().currentRoot = idx;
@@ -1638,11 +1638,11 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     }
     installRoots();
 
-    if (isDirectory(localDir))
+    if (isDirectory(baseDir))
     {
-        string shareID = localDir + "version";
+        string shareID = baseDir + "version";
         if (loadText(shareID) != to_string(BUILD_NUMBER))
-            updateShare(bankdirs, localDir, shareID);
+            updateShare(bankdirs, baseDir, shareID);
     }
     return newRoots;
 }
@@ -1793,7 +1793,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
         {
             if (roots [rootID].banks [id].dirname.empty())
             {
-                cout << "Removed unnamed bank " << id << "  in root " << rootID << endl;
+                //cout << "Removed unnamed bank " << id << "  in root " << rootID << endl;
                 roots [rootID].banks.erase(id);
             }
             else if (!banksSet[id])
@@ -1841,7 +1841,7 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
                         xml->addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
                         xml->addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
                         xml->addparbool("Yoshimi", bank.instruments [pos].yoshiType);
-                        //std::cout << bank.instruments [pos].filename << std::endl;
+                        //cout << bank.instruments [pos].filename << endl;
                         xml->endbranch();
                     }
                     ++pos;

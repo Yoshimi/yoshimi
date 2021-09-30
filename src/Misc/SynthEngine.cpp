@@ -2661,7 +2661,7 @@ string SynthEngine::lastItemSeen(int group)
 
 bool SynthEngine::loadHistory()
 {
-    string historyname = Runtime.localDir  + "/recent";
+    string historyname = file::localDir()  + "/recent";
     if (!isRegularFile(historyname))
     {   // recover old version
         historyname = Runtime.ConfigDir + '/' + string(YOSHIMI) + ".history";
@@ -2772,7 +2772,7 @@ bool SynthEngine::loadHistory()
 
 bool SynthEngine::saveHistory()
 {
-    string historyname = Runtime.localDir  + "/recent";
+    string historyname = file::localDir()  + "/recent";
     Runtime.xmlType = TOPLEVEL::XML::History;
 
     XMLwrapper *xml = new XMLwrapper(this, true);

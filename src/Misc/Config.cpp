@@ -257,14 +257,12 @@ void Config::clearPresetsDirlist(void)
 
 bool Config::loadConfig(void)
 {
-    localDir = file::userHome() + ".local/share/yoshimi";
-    if (!isDirectory(localDir))
+    if (file::userHome() == "/tmp")
+        Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
+    if (file::localDir().empty())
     {
-        if (createDir(localDir))
-        {
-            Log("Failed to create local yoshimi directory.");
-            return false;
-        }
+        Log("Failed to create local yoshimi directory.");
+        return false;
     }
     ConfigDir = file::userHome() + string(EXTEN::config) + "/" + YOSHIMI;
     defaultStateName = ConfigDir + "/yoshimi";
@@ -292,7 +290,7 @@ bool Config::loadConfig(void)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
 
-        presetDir = localDir + "/presets";
+        presetDir = file::localDir() + "/presets";
         if (!isDirectory(presetDir))
         { // only ever want to do this once
             if (createDir(presetDir))
@@ -310,11 +308,10 @@ bool Config::loadConfig(void)
                 }
             }
         }
-        definedBankRoot = localDir + "/found/";
-        if (!isDirectory(definedBankRoot))
+        if (!isDirectory(file::localDir() + "/found/"))
         { // only ever want to do this once
-            if (createDir(definedBankRoot))
-                Log("Failed to create root directory '" + definedBankRoot + "'");
+            if (createDir(file::localDir() + "/found/"))
+                Log("Failed to create root directory for local banks");
         }
 
         // conversion for old location

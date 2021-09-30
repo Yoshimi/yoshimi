@@ -154,18 +154,6 @@ inline bool isDirectory(const string& chkpath)
     return false;
 }
 
-inline string userHome(void)
-{
-    string home = string(getenv("HOME"));
-    if (home.empty() || !isDirectory(home))
-    {
-        home = string("/tmp");
-        //Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
-    }
-return home + '/';
-}
-
-
 /* performs specific OS command
  * optionally returning a multi-line response
  */
@@ -762,6 +750,24 @@ inline string extendLocalPath(const string& leaf)
     return path.substr(0, next) + leaf;
 }
 
+inline string userHome(void)
+{
+    string home = string(getenv("HOME"));
+    if (home.empty() || !isDirectory(home))
+        home = string("/tmp");
+return home + '/';
+}
+
+inline string localDir(void)
+{
+    string local = userHome() + ".local/share/yoshimi";
+    if (!isDirectory(local))
+    {
+        if (createDir(local))
+            return "";
+    }
+    return local;
+}
 
 }//(End)namespace file
 #endif /*FILEMGR_H*/
