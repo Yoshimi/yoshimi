@@ -193,6 +193,7 @@ class Bank
 
         size_t getNewRootIndex();
         size_t getNewBankIndex(size_t rootID);
+        string foundLocal;
 };
 
 #endif /*BANK_H*/

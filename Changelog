@@ -5,7 +5,8 @@ yoshimi 2.1.0 M
   from config.cpp
 * Moved localDir definition to FileMgrFuncs.cpp
   from config.cpp
-  Also renamled confusing duplicate names in bank.cpp
+  Also renamed confusing duplicate names in bank.cpp
+* Rationalised string manipulation in bank.cpp
 
 2010-9-29 Will
 * Removed controls to enable part on program change.

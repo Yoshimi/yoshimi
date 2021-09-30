@@ -88,6 +88,7 @@ Bank::Bank(SynthEngine *_synth) :
     BanksVersion = 10;
     InstrumentsInBanks = 0,
     BanksInRoots = 0;
+    foundLocal = file::localDir() + "/found/";
 }
 
 extern SynthEngine *firstSynth;
@@ -1170,17 +1171,16 @@ void Bank::checkShare(string sourceDir, string destinationDir)
 
 bool Bank::transferDefaultDirs(string bankdirs[])
 {
-    string ourDir = file::localDir() + "/found/";
-    if (!isDirectory(ourDir))
+    if (!isDirectory(foundLocal))
         return false;
     bool found = false;
     // always want these
-    if (isDirectory(ourDir + "yoshimi"))
+    if (isDirectory(foundLocal + "yoshimi"))
         found = true;
     else
     {
-        createDir(ourDir + "yoshimi");
-        createDir(ourDir + "yoshimi/banks");
+        createDir(foundLocal + "yoshimi");
+        createDir(foundLocal + "yoshimi/banks");
         if (isDirectory(bankdirs[6]))
             if (transferOneDir(bankdirs, 0, 6))
                 found = true;
@@ -1194,14 +1194,14 @@ bool Bank::transferDefaultDirs(string bankdirs[])
     }
 
     //might not have these
-    if (isDirectory(ourDir + "zynaddsubfx"))
+    if (isDirectory(foundLocal + "zynaddsubfx"))
         found = true;
     else
     {
         if (isDirectory(bankdirs[3]) || isDirectory(bankdirs[4]))
         {
-            createDir(ourDir + "zynaddsubfx");
-            createDir(ourDir + "zynaddsubfx/banks");
+            createDir(foundLocal + "zynaddsubfx");
+            createDir(foundLocal + "zynaddsubfx/banks");
             if (transferOneDir(bankdirs, 5, 3))
                 found = true;
             if (transferOneDir(bankdirs, 5, 4))
@@ -1236,17 +1236,15 @@ return found;
 
 void Bank::checkLocalBanks()
 {
-    string checkDir = file::localDir() + "/found/";
-    if (isDirectory(checkDir + "yoshimi/banks")) // yoshi
-        addRootDir(checkDir + "yoshimi/banks");
+    if (isDirectory(foundLocal + "yoshimi/banks")) // yoshi
+        addRootDir(foundLocal + "yoshimi/banks");
 
-    if (isDirectory(checkDir + "zynaddsubfx/banks"))
-        addRootDir(checkDir + "zynaddsubfx/banks"); // zyn
+    if (isDirectory(foundLocal + "zynaddsubfx/banks"))
+        addRootDir(foundLocal + "zynaddsubfx/banks"); // zyn
 }
 
 void Bank::addDefaultRootDirs(string bankdirs[])
 {
-    string ourDir = file::localDir() + "/found/";
     int tot = 0;
     int i = 0;
     while (bankdirs[i] != "@end")
@@ -1520,7 +1518,6 @@ size_t Bank::addRootDir(const string& newRootDir)
 
 bool Bank::parseBanksFile(XMLwrapper *xml)
 {
-    string baseDir = file::localDir() + "/found/";
     /*
      * This list is used in transferDefaultDirs( to find and copy
      * bank lists into $HOME/.local.yoshimi
@@ -1535,12 +1532,12 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
      */
 
     string bankdirs[] = {
-        baseDir + "yoshimi/banks",
+        foundLocal + "yoshimi/banks",
         "/usr/share/yoshimi/banks",
         "/usr/local/share/yoshimi/banks",
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
-        baseDir + "zynaddsubfx/banks",
+        foundLocal + "zynaddsubfx/banks",
         extendLocalPath("/banks"),
         "@end"
     };
@@ -1570,7 +1567,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         else
         {
             //cout << "generating" << endl;
-            string newRoot = file::localDir() + "/found/" + "yoshimi/banks";
+            string newRoot = foundLocal + "yoshimi/banks";
             size_t idx = generateSingleRoot(newRoot);
             changeRootID(idx, 5);
             synth->getRuntime().currentRoot = idx;
@@ -1638,11 +1635,11 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     }
     installRoots();
 
-    if (isDirectory(baseDir))
+    if (isDirectory(foundLocal))
     {
-        string shareID = baseDir + "version";
+        string shareID = foundLocal + "version";
         if (loadText(shareID) != to_string(BUILD_NUMBER))
-            updateShare(bankdirs, baseDir, shareID);
+            updateShare(bankdirs, foundLocal, shareID);
     }
     return newRoots;
 }
