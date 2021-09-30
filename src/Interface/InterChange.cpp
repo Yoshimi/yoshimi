@@ -795,7 +795,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             if (synth->loadStateAndUpdate(text))
             {
                 text = setExtension(text, EXTEN::state);
-                string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                string name = file::configDir() + "/yoshimi";
                 name += ("-" + to_string(synth->getUniqueId()));
                 name += ".state";
                 if ((text != name)) // never include default state
@@ -812,7 +812,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             string filename = setExtension(text, EXTEN::state);
             if (synth->saveState(filename))
             {
-                string name = synth->getRuntime().ConfigDir + "/yoshimi";
+                string name = file::configDir() + "/yoshimi";
                 name += ("-" + to_string(synth->getUniqueId()));
                 name += ".state";
                 if ((text != name)) // never include default state
@@ -1553,7 +1553,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         case PART::control::defaultInstrumentCopyright:
-            std::string name = synth->getRuntime().ConfigDir + "/copyright.txt";
+            std::string name = file::configDir() + "/copyright.txt";
             if (parameter == 0) // load
             {
                 text = loadText(name); // TODO provide failure warning

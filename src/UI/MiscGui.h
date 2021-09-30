@@ -155,14 +155,14 @@ inline void saveWin(SynthEngine *synth, int w, int h, int x, int y, int o, std::
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
     std::string values =  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(w) + " " + std::to_string(h) + " " + std::to_string(o);
     //std::cout << values << std::endl;
-    saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    saveText(values, file::configDir() + "/windows/" + ID + filename);
 }
 
 inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
-    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
-    //std::cout << synth->getRuntime().ConfigDir << "/windows/" << ID << filename << std::endl;
+    std::string values = loadText(file::configDir() + "/windows/" + ID + filename);
+    //std::cout << file::configDir() << "/windows/" << ID << filename << std::endl;
     w = h = o = 0;
     if (values == "")
     {
@@ -207,7 +207,7 @@ inline void loadWin(SynthEngine *synth, int& w, int& h, int& x, int& y, int& o, 
 inline int lastSeen(SynthEngine *synth, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
-    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    std::string values = loadText(file::configDir() + "/windows/" + ID + filename);
     //std::cout << values << " " << filename << std::endl;
     size_t pos = values.rfind(' ');
     if (pos == string::npos)
@@ -219,7 +219,7 @@ inline int lastSeen(SynthEngine *synth, std::string filename)
 inline void setVisible(SynthEngine *synth, bool v, std::string filename)
 {
     std::string ID = std::to_string(synth->getUniqueId()) + "-";
-    std::string values = loadText(synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    std::string values = loadText(file::configDir() + "/windows/" + ID + filename);
     size_t pos = values.rfind(' ');
     if (pos == string::npos)
         return;
@@ -229,7 +229,7 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
         return;
     values.replace(pos, 1, std::to_string(v));
     //std::cout << v << " " << values << " " << filename << std::endl;
-    saveText(values, synth->getRuntime().ConfigDir + "/windows/" + ID + filename);
+    saveText(values, file::configDir() + "/windows/" + ID + filename);
 }
 
 inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false)

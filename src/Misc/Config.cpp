@@ -264,27 +264,24 @@ bool Config::loadConfig(void)
         Log("Failed to create local yoshimi directory.");
         return false;
     }
-    ConfigDir = file::userHome() + string(EXTEN::config) + "/" + YOSHIMI;
-    defaultStateName = ConfigDir + "/yoshimi";
+    string foundConfig = file::configDir();
+    defaultStateName = foundConfig + "/yoshimi";
 
-    if (!isDirectory(ConfigDir))
+    if (file::configDir().empty())
     {
-        if (createDir(ConfigDir))
-        {
-            Log("Failed to create config directory '" + ConfigDir + "'");
-            return false;
-        }
+        Log("Failed to create config directory '" + file::userHome() + "'");
+        return false;
     }
     string yoshimi = "/" + string(YOSHIMI);
 
-    baseConfig = ConfigDir + yoshimi + string(EXTEN::config);
+    baseConfig = foundConfig + yoshimi + string(EXTEN::config);
 
     int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
     yoshimi += ("-" + asString(thisInstance));
     //cout << "\nsession >" << defaultSession << "<\n" << endl;
 
-    ConfigFile = ConfigDir + yoshimi + EXTEN::instance;
+    ConfigFile = foundConfig + yoshimi + EXTEN::instance;
 
     if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {

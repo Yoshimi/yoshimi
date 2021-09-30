@@ -764,9 +764,20 @@ inline string localDir(void)
     if (!isDirectory(local))
     {
         if (createDir(local))
-            return "";
+            local = "";
     }
     return local;
+}
+
+inline string configDir(void)
+{
+    string config = userHome() + string(EXTEN::config) + "/" + YOSHIMI;
+    if (!isDirectory(config))
+    {
+        if (createDir(config))
+            config = "";
+    }
+    return config;
 }
 
 }//(End)namespace file

@@ -2498,7 +2498,7 @@ bool SynthEngine::saveMicrotonal(const string& fname)
 
 bool SynthEngine::installBanks()
 {
-    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    string name = file::configDir() + '/' + YOSHIMI;
     string bankname = name + ".banks";
     bool banksGood = false;
     bool newBanks = false;
@@ -2529,7 +2529,7 @@ bool SynthEngine::installBanks()
 
 bool SynthEngine::saveBanks()
 {
-    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    string name = file::configDir() + '/' + YOSHIMI;
     string bankname = name + ".banks";
     Runtime.xmlType = TOPLEVEL::XML::Bank;
 
@@ -2664,7 +2664,7 @@ bool SynthEngine::loadHistory()
     string historyname = file::localDir()  + "/recent";
     if (!isRegularFile(historyname))
     {   // recover old version
-        historyname = Runtime.ConfigDir + '/' + string(YOSHIMI) + ".history";
+        historyname = file::configDir() + '/' + string(YOSHIMI) + ".history";
         if (!isRegularFile(historyname))
         {
             Runtime.Log("Missing recent history file");

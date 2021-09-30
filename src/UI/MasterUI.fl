@@ -342,7 +342,7 @@ class MasterUI {: {private GuiUpdates}
   Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
-      file::createDir(synth->getRuntime().ConfigDir + "/windows");
+      file::createDir(file::configDir() + "/windows");
       panelType = 5;
       msgSeen = false;
       syseffSeen = false;
@@ -1935,7 +1935,7 @@ Alan Calvert started the project}
   }
   Function {loadfavourites()} {} {
     code {//
-        string favetext = file::loadText(synth->getRuntime().ConfigDir + "/yoshimi-favourites");
+        string favetext = file::loadText(file::configDir() + "/yoshimi-favourites");
         if (favetext.empty())
             favetext = file::userHome();
         favebrowse->clear();
@@ -1961,7 +1961,7 @@ Alan Calvert started the project}
         string line = string(favebrowse->text(i));
         favetext += (line + cr);
     }
-    file::saveText(favetext, synth->getRuntime().ConfigDir + "/yoshimi-favourites");} {}
+    file::saveText(favetext, file::configDir() + "/yoshimi-favourites");} {}
   }
   Function {clearfavelist()} {} {
     code {//
