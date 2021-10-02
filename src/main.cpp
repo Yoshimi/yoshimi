@@ -303,7 +303,7 @@ int mainCreateNewInstance(unsigned int forceId)
 {
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
-    SynthEngine *synth = new SynthEngine(globalAllArgs, false, forceId);
+    SynthEngine *synth = new SynthEngine(globalAllArgs, LV2PluginTypeNone, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();
