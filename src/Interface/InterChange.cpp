@@ -3284,7 +3284,7 @@ void InterChange::commandBank(CommandBlock *getData)
                 if (offset == -1)
                 {
                     synth->getRuntime().Log("caught invalid instrument type (-1)");
-                    textMsgBuffer.push("*");
+                    textMsgBuffer.push("@end");
                 }
 
                 do {
@@ -3306,7 +3306,7 @@ void InterChange::commandBank(CommandBlock *getData)
                     ++searchRoot;
                 } while (searchRoot < MAX_BANK_ROOT_DIRS);
                 searchRoot = 0;
-                textMsgBuffer.push("*");
+                textMsgBuffer.push("@end");
             }
             break;
         }

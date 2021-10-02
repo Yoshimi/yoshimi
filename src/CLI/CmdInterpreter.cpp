@@ -2349,7 +2349,7 @@ int CmdInterpreter::commandGroup(Parser& input)
     do {
         ++ count;
         line = textMsgBuffer.fetch(readControl(synth, 0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, value - 1));
-        if (line != "*")
+        if (line != "@end")
         {
             instrumentGroup.push_back(line);
             if (!full && line.length() > 16)
@@ -2357,7 +2357,7 @@ int CmdInterpreter::commandGroup(Parser& input)
             line = to_string(count) + "| " + line; // replace with line count
             msg.push_back(line);
         }
-    } while (line != "*");
+    } while (line != "@end");
     synth->cliOutput(msg, LINES);
     return REPLY::done_msg;
 }

@@ -896,9 +896,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
           do
           {
               line = textMsgBuffer.fetch(fetchData(0, BANK::control::findInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, group));
-              if (line !="*")
+              if (line !="@end")
                   searchbrowse->add(line.c_str());
-          } while (line != "*");} {}
+          } while (line != "@end");} {}
   }
   Function {send_data(int action, int control, float value, int type, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//

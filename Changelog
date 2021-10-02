@@ -1,6 +1,12 @@
 yoshimi 2.1.0 M
 
-2010-9-30 Will
+2021-10-2 Will
+* Corrected wrong years here!
+* Changed search list terminator from "*" to "@end"
+  Makes it easier to see and consistent with
+  other lists terminators
+
+2021-9-30 Will
 * Moved userDir definition to FileMgrFuncs.cpp
   from config.cpp
 * Moved localDir definition to FileMgrFuncs.cpp
@@ -10,49 +16,49 @@ yoshimi 2.1.0 M
 * Moved configDir definition to FileMgrFuncs.cpp
   from config.cpp
 
-2010-9-29 Will
+2021-9-29 Will
 * Removed controls to enable part on program change.
   It was only relevant to MIDI and always on regardless.
 * Made new bank version numbers positive
   starting from 10 to clear trial versions.
 
-2010-9-27 Will
+2021-9-27 Will
 * Removed redundant references the checksynthengines
 
-2010-9-23 Will
+2021-9-23 Will
 * Merged in latest banks updates
 * Updated build number
 
-2010-9-15 Will
+2021-9-15 Will
 * Double click in filer favourite paths window sets it directly.
 * Updated User Guide.
 * update_guide_version.py no longer adds M/rc{n} suffixes.
 
 *BugFix: textmsg leak loading instruments.
 
-2010-9-14 Will
+2021-9-14 Will
 * Commented out CLI test message in interchange.
 * Updated build dependencies.
 
-2010-9-11 Will
+2021-9-11 Will
 * BugFix: Crash when trying to clear or save inactive part.
 * Added missing ALSA connection type to config list report.
 
-2010-9-10 Will
+2021-9-10 Will
 * Commented out legit filename test in MidiLearn.cpp
   This was falsely adjusting valid filenames.
 
-2010-9-7 Will
+2021-9-7 Will
 * BugFix: Corrupted instrument Copyright and Comments entries.
 
-2010-9-5 Will
+2021-9-5 Will
 * Replaced logging type numbers with labels.
 * Added (commented out) test massages in main.cpp.
 
-2010-9-4 Will
+2021-9-4 Will
 * Revised Config.cpp to streamline and improve readability.
 
-2010-9-3 Will
+2021-9-3 Will
 * Merged in revisedArgs
 * Code cleanups.
   No changes to logic.
