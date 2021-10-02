@@ -116,16 +116,16 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 }
 
 
-SynthEngine::SynthEngine(std::list<string>& allArgs, bool _isLV2Plugin, unsigned int forceId) :
+SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
-    isLV2Plugin(_isLV2Plugin),
+    lv2PluginType(_lv2PluginType),
     needsSaving(false),
     bank(this),
     interchange(this),
     midilearn(this),
     mididecode(this),
     //unifiedpresets(this),
-    Runtime(this, allArgs, isLV2Plugin),
+    Runtime(this, allArgs, getIsLV2Plugin()),
     presetsstore(this),
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
@@ -3357,7 +3357,7 @@ MasterUI *SynthEngine::getGuiMaster(bool createGui)
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
-    if (stopSynth && !isLV2Plugin)
+    if (stopSynth && !getIsLV2Plugin())
         Runtime.runSynth = false;
 #ifdef GUI_FLTK
     if (guiClosedCallback != NULL)
