@@ -1053,55 +1053,69 @@ bool Bank::isValidBank(string chkdir)
 }
 
 
-bool Bank::addtobank(size_t rootID, size_t bankID, int pos, string filename, const string name)
+bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, const string name)
 {
+    if (_pos < 0 || _pos >= MAX_INSTRUMENTS_IN_BANK)
+        return -1; //invalid location
+
+    int pos = _pos;
+    string filename = _filename;
+
+    //cout << "add root " << rootID << "  bank " << bankID << "\nname "<< name << "  file " << filename << endl;
+
     BankEntry &bank = roots [rootID].banks [bankID];
     string exten = file::findExtension(filename);
 
-    if (pos >= 0 && pos < MAX_INSTRUMENTS_IN_BANK)
+    if (bank.instruments [pos].used)
     {
-        if (bank.instruments [pos].used)
+        string oldName = getname(pos, bankID, rootID);
+        /*
+            * We test the internal name. The file name could have been
+            * changed, but if the internal one is changed it is most
+            * likely to be a modified instrument.
+            */
+        if (name == oldName) // duplicate
         {
-            string oldName = getname(pos, bankID, rootID);
-            if (name == oldName)// overwrite?
-            {
-                if (exten == EXTEN::yoshInst) // yoshiType takes priority
-                    getInstrumentReference(rootID, bankID, pos).yoshiType = true;
-                return 0; // no actual insertion necessary
-            }
-            pos = -1; // force it to find a new free position
+            //cout << "duplicate " << name << endl;
+            if (exten == EXTEN::yoshInst) // yoshiType takes priority
+                getInstrumentReference(rootID, bankID, pos).yoshiType = true;
+            return 0; // no actual insertion necessary
         }
+        pos = -1; // location occupied so find a new free position
     }
-    else
-        pos = -1;
 
+    bool wanted = (pos >=0);
     if (pos < 0)
     {
-        // why did we have the following test?
-        //if (!bank.instruments.empty() && bank.instruments.size() < MAX_INSTRUMENTS_IN_BANK)
+        pos = MAX_INSTRUMENTS_IN_BANK;
+        while (pos > 0 && !wanted)
         {
-            pos = MAX_INSTRUMENTS_IN_BANK - 1;
-            while (!emptyslot(rootID, bankID, pos))
+            --pos;
+            if (emptyslot(rootID, bankID, pos))
+                wanted = true;
+            else if (name == getname(pos, bankID, rootID))
             {
-                pos -= 1;
-                if (pos < 0)
-                    break; // bank is full :(
-            }
-            if (pos >= 0)
-            {
-                string bankdirname = getBankPath(rootID, bankID) + "/";
-                string prefix = "0000" + to_string(pos + 1);
-                prefix = prefix.substr(prefix.size() - 4);
-                string newfile = prefix + "-" + name + exten;
-                if (renameFile(bankdirname + filename, bankdirname + newfile))
-                    filename = newfile;
+                //cout << name << " already placed" << endl;
+                pos = -1;
             }
         }
     }
-    if (pos < 0)
-        return -1; // the bank is full
+    if (!wanted)
+        return -1; // duplicated or the bank is full
+    string bankdirname = getBankPath(rootID, bankID) + "/";
+    string prefix = "0000" + to_string(pos + 1);
+    prefix = prefix.substr(prefix.size() - 4);
+    string newfile = prefix + "-" + name + exten;
+    /*
+     * If we are repositioning this file because it has the same
+     * ID as an existing one but is in a non-writable location
+     * we store its original filename while showing an offset ID.
+     * If the location is writable we move the file.
+     */
+    if (renameFile(bankdirname + filename, bankdirname + newfile))
+        filename = newfile;
 
-    deletefrombank(rootID, bankID, pos);
+    deletefrombank(rootID, bankID, pos); // is this actually needed?
     InstrumentEntry &instrRef = getInstrumentReference(rootID, bankID, pos);
     instrRef.used = true;
     instrRef.name = name;

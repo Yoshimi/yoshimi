@@ -1,6 +1,10 @@
 yoshimi 2.1.0 M
 
 2021-10-2 Will
+* Further improvements to bank management
+  Mostly addtobank() and orphan/duplicate files
+
+2021-10-2 Will
 * Corrected wrong years here!
 * Changed search list terminator from "*" to "@end"
   Makes it easier to see and consistent with
