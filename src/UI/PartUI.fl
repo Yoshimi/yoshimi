@@ -856,7 +856,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 220 395 103} box ENGRAVED_FRAME
+        xywh {0 220 395 103} box ENGRAVED_BOX
       } {
         Fl_Group ADD {
           label ADDsynth
@@ -2745,16 +2745,22 @@ class PartUI {: {public Fl_Group, PartUI_}
     int size11 = int(11 * dScale);
     int size12 = int(12 * dScale);
     int size14 = int(14 * dScale);
+    int boxY = int(227 * dScale);
+    int boxWidth = int(89 * dScale);
+    int boxHeight = int(18 * dScale);
 
     ADD->labelsize(size14);
+    addbox->resize(int(10 * dScale), boxY, boxWidth, boxHeight);
     adsynenabledcheck->labelsize(size11);
     adeditbutton->labelsize(size14);
 
     SUB->labelsize(size14);
+    subbox->resize(int(110 * dScale), boxY, boxWidth, boxHeight);
     subsynenabledcheck->labelsize(size11);
     subeditbutton->labelsize(size14);
 
     PAD->labelsize(size14);
+    padbox->resize(int(210 * dScale), boxY, boxWidth, boxHeight);
     padsynenabledcheck->labelsize(size11);
     padeditbutton->labelsize(size14);
 

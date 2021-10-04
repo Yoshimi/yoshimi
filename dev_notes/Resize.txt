@@ -1,4 +1,4 @@
-FLTK manges window resizes itself, but not text or some user drawn graphics. Our resize code fills in these elements.
+FLTK manages window resizes itself, but not text or some user drawn graphics. Our resize code fills in these elements.
 
 It closely follows the context idea that the rest of Yoshimi uses. The way this operates is as follows.
 

@@ -1,19 +1,8 @@
 ---- Installing yoshimi ----
 
-Before doing this, check the "Dependencies" file and make sure you have all of the entries in place.
+Before doing this, check the "Dependencies" file and make sure you have all of the entries in place. You will need to do this as the root user.
 
-It's a CMake build.  For 'quick & dirty' simply cd to the src directory, then
-    ccmake .
-    cmake .
-    make
-    sudo make install
-which builds an executable called yoshimi, installed by default in
-    /usr/local/bin
-
-If you have a multi-core processor, and know how many cores there are you can speed up compiling by entering
-    make -j{n}
-where {n} is the number of cores.
-
+It's a normal CMake build.
 
 ---- Sample instructions to compile/build using ccmake on Linux, outside-source-tree -----
 
@@ -52,7 +41,11 @@ Run ccmake:
 
 Note the two dots!
 
-Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there are any missing pre-requisite libraries and/or softwares (dependencies), it should prompt you with such info.  You can install such dependencies and try these ccmake configuration steps again.
+Within ccmake, type 'c' (without the quotes) to generate a default configuration.
+
+At this point, unless you have specific requirements we suggest you use the 'down' arrow to move the cursor to 'BuildForThisCPU' then hit 'Return'. This will optimise for your machine.
+
+Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there are any missing pre-requisite libraries and/or software (dependencies), it should prompt you with such info.  You can install such dependencies and try these ccmake configuration steps again.
 
 When ccmake configuration is complete, there should be a new option displayed: 'g' to generate (the make-related files) and exit.
 
@@ -62,23 +55,28 @@ Next is to compile (build) the application:
 
    make
 
+If you have a multi-core processor, and know how many cores there are you can speed up compiling by entering:
+
+    make -j{n}
+where {n} is the number of cores.
+
 When compilation is completed successfully, install it (as root) with:
 
    make install
 
-Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions.  In this case banks and presets will remain in the yoshimi directory.
+By default the yoshimi image is then copied to /usr/local/bin
+
+Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions.  In this case banks and presets will only be in the yoshimi directory.
 
 For more fine tuned building see INSTALL_CUSTOM
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the default for both audio and midi.  However, if this is not available Yoshimi will try for Alsa.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
-
+Yoshimi builds with both Jack and Alsa audio and midi options.  Alsa is the default for both audio and midi.  However, if this is not available Yoshimi will try for Jack.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
 
 ---- Instrument banks ----
 
 Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories and includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
-
 
 ---- Help ----
 

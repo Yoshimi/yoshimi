@@ -109,13 +109,13 @@ of another "set" command within the test context. Moreover, when in test context
 After re-seeding, also the PAD-Synth wavetables need to be rebuilt, since they might use harmonic
 randomisation. Depending on the PAD size setting and the complexity of the instrument, this may
 require a considerable amount of time. These preparations attempt to establish well defined starting
-conditions, while retaining loaded instruments and and specific settings done via CLI to prepare
+conditions, while retaining loaded instruments and any specific settings done via CLI to prepare
 the test. This preparation is done in the function SynthEngine::setReproducibleState(int seed).
 This function resets the continuous LFO time and beat settings, and then re-seeds the master
 PRNG of the synthEngine with the given value. Moreover, it visits all parts and instructs all
 existing OscilGen instances to draw a seed value from the global PRNG to reseed their local
 basePrng, and also to draw and store a randseed for the local harmonicPrng. This randseed
-is used on each NoteOn to re-seed the harmonicPrnc. Moreover, the serReproducibleState()
+is used on each NoteOn to re-seed the harmonicPrnc. Moreover, the setReproducibleState()
 also triggers the rebuilding of PAD-Synth wavetables, which will also draw further random
 values from the master PRNG.
 

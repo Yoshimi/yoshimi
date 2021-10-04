@@ -8,7 +8,7 @@ The first of these are the build choices. If these are all off, a basic all-purp
 
 However, if you know the details of your machine architecture, switch the appropriate one on. Many current desktops as well as laptops are 64 bit Intel ones, so for one of these you would select 'BuildForCore2_X86_64', whereas for the raspberry PI V3 you would chose 'BuildForNEON'.
 
-Alternatively 'BuildForThisCPU' will try to find the best fit for your particular machine. However, it should be noted that if your compiler is an older version of GCC this option will fail the latest Raspberry Pi hardware.
+Alternatively 'BuildForThisCPU' will try to find the best fit for your particular machine.
 
 After these, there are the actual compiler flags that will be used. These should only be changed if there is some specific feature you want enabled or disabled. You select as before by moving the cursor, but this time pressing 'Return' enters a line editor and you move sideways to reach the item you want to change, typing in the new flag, or removing the unwanted one. Pressing 'Return' again puts you back in selection mode.
 

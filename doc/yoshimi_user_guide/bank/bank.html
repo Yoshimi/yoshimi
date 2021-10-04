@@ -13,11 +13,11 @@
     <p>
     Pre-designed instrument patches are immediately available in <em>banks</em>. These in turn are contained within a bank <em>root</em>. These bank roots are themselves contained in a root <em>path</em>. The entire structure bearing a direct relationship to MIDI Program Change, Bank LSB and Bank MSB controllers. For normal work that gives up to 128 Instruments in 128 banks in 128 Roots. Yoshimi actually has an extra 32 Instruments in each bank which are only accessible to MIDI using a custom extended program change control.
     <br><br>
-    Note that Yoshimi uses MIDI numbers, starting from 1 for program (instrument) changes, and 0 for banks and roots.
+    Note that Yoshimi uses the standard MIDI numbers, starting from 1 for program (instrument) changes, and 0 for banks and roots.
     <br><br>
     As well as instrument files themselves, a bank will have a hidden ID file <em>.bankdir</em>. This serves two purposes. It speeds up bank searches. If this is present there is no need to positively identify at least one instrument. It also contains the version number from the last time it was updated.
     <br><br>
-    We advise against making any changes to the bank structure through any external means (such as a desktop filer) as this is likely to invalidate Yoshimi's records and cause it to perform a complete bank reset. This would almost certainly change all the MIDI numbers, breaking any previous projects.
+    We advise against making any changes to the bank structure through any external means (such as a desktop filer) as it is possible to invalidate Yoshimi's records and cause it to perform a complete bank reset. This in turn could change all the MIDI numbers, breaking any previous projects.
     </p>
     <img src="images/instruments.png" alt="An instrument bank" class="image">
     <a id="bank"></a>
@@ -28,12 +28,12 @@
     The menu is quick to use when changing banks, but doesn't give you the flexibility of using the buttons for bank roots and root paths. In particular, a right hand mouse click on these buttons will close this window while opening the wanted one, and a right-click on the <b>Close</b> button (bottom right) will return you to where you came from.
     </p>
     <p>
-    Below this is a table of all the instruments in the current bank, with coloured backgrounds indicating what engine types are being used. In order, these are AddSynth, SubSynth, PadSynth. Clicking on one of these will load the instrument into the currently selected part, and highlight it in the bank, so you can easily see where it came from. If selected with a right-click it will also close the window.
+    Below this is a table of all the instruments in the current bank, with coloured backgrounds indicating what engine types are being used. In order, these are AddSynth, SubSynth, PadSynth <em>(a reminder is shown at the bottom of the window)</em>. Clicking on one of these will load the instrument into the currently selected part, and highlight it in the bank, so you can easily see where it came from. If selected with a right-click it will also close the window.
     </p>
     <p>
     The buttons on the bottom row determine what action is to be performed when clicking on an instrument. The square 'LEDs' show which is the currently active one, and by default it will be <b>Select</b>.
     <br><br>
-    For these buttons, you make your choice <em>before clicking</em> on an entry, and regardless of whether the action is successful or not, it will always return to 'Select' Also, the next four buttons will only work where you have filesystem write permission, as they all make actual file changes.
+    With these buttons, you set the operation you want to perform <em>before</em> clicking on an entry, and regardless of whether the action is successful or not, it will always return to 'Select' Also, the next four buttons will only work where you have filesystem write permission, as they all make actual file changes.
     <br><br>
     <b>Rename</b> When chosen, clicking on an instrument entry a small editable window will be opened with the existing name. Changing this will change the name here and the actual filename. It will <em>not</em> change the current part.
     <br><br>
