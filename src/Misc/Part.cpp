@@ -201,6 +201,7 @@ void Part::defaultsinstrument(void)
         partefx[nefx]->defaults();
         Pefxroute[nefx] = 0; // route to next effect
     }
+    Peffnum = 0;
 }
 
 
