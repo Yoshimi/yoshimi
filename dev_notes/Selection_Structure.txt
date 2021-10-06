@@ -3,25 +3,7 @@ Yoshimi very heavily uses switch statements, some of which are truly massive. Th
 
 The development has been very much an incremental process, initially with numerical entries and large gaps to create grouping, allow for changes, and give a clearer idea of the various structures.
 
-The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that were not yet available formally. Although this is now done, the actual values are being left as they are until (at least) the next release. This is further complicated by the fact that MIDI-lear references some of these numbers, and people will have saved such files. Therefore many of these will not remain fixed.
-
-
-The traditonal impression of these switches is that they perform a lot of if-then tests, but with modern compilers this is only true of small case groups, after that they make lookup tables which are considerably faster.
-
-If the structure is big enough and dense enough the compiler will instead fill the spaces with NOPs and turn the whole thing into a jump table. This is means the code for any case can then be reached in exactly three machine instructions (two in the case of an ARM processor)
-
-A left shift to turn incoming switch values into pointer sized steps.
-
-An offset fetch from the jump table.
-
-A branch to the required code.
-
-ARM processors can make the first two into a single instruction.
-
-"Util/switch_time.cpp" is a copy of the source file for a program originally used to test the above hypothesis. The timing is slightly longer than it should be because various minimal calulations had to be put in to prevent the compiler optimising everything out in the 'packed' function :)
-
-
-Currently most of Yoshimi's data elements can be read in less than 20nS on a processor running at 3.1G - and many of the switches aren't dense enough for conversion to jump tables.
+The intention was then to collapse all the gaps to give more efficient switch statements. However in the intervening time several CLI users have been using the direct access method to reach controls that were not yet available formally. Although this is now done, the actual values are being left as they are until (at least) the next release. This is further complicated by the fact that MIDI-learn references some of these numbers, and people will have saved such files. Therefore many of these will now remain fixed.
 
 However, now that command structure is pretty much settled, the numbers have been changed to global, yet isolated and meaningful names.
 
@@ -43,10 +25,7 @@ switch (control)
 ...
 ...
 
-Once we can remove the gaps all switches will become jump tables, and selection of any entry will take exactly the same (very short) time. Under these circumstances, the more cases you can pack into a single switch, the more efficient the entire process gets.
-
 The use of namespaces combined with typed enumerators not only gives clear compartmentalised  identifiers, but also gives isolation between sections, protecting against name clashes. It is also still compatible with integers and unsigned chars without needing typecasting. This is important, as all these are passed through ring buffers using the central CommandBlock structure - which is now also defined here.
-
 
 Another point worth mentioning is that Yoshimi has different priorities for access to the structure based on the following reasoning:
 
@@ -57,8 +36,7 @@ Don't handle data that's not actually wanted.
 Limits and defaults are static so can be read directly at any time with a cut-down version of the overall structure.
 e.g. all part level volume controls have the same max, min, and default, so no need to test part and kit numbers.
 
-
-Other reads may be wanted in bulk from time to time (such as updating a GUI when a new patch set is loaded) so should be as fast as possible, but at the same time must wait briefly if a parameter is being changed. The downside is that the checks for this nearly double the access time, but it is still pretty slick. I think the oscillator window has the most controls - just under 200, so that means currently the whole lot can be fetched in less that 8uS, and that will improve.
+Other reads may be wanted in bulk from time to time (such as updating a GUI when a new patch set is loaded) so should be as fast as possible, but at the same time must wait briefly if a parameter is being changed.
 
 Writes are the only thing that can make dynamic reads wait. This ensures these reads will *always* be seeing valid data.
 

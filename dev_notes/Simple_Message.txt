@@ -8,7 +8,7 @@ int TextMsgBuffer::push( string )
 
 string TextMsgBuffer::fetch( int )
 
-These calls are accessible to all parts of Yoshimi and provide a simple asynchonous means of passing text between threads and functions via just the integer ID.
+These calls are accessible to all parts of Yoshimi and provide a simple asynchronous means of passing text between threads and functions via just the integer ID.
 
 TextMsgBuffer::clear() is only intended to be used internally on major resets and just adds a bit of insurance that there are no orphaned messages.
 
@@ -18,7 +18,7 @@ There is a maximum of 254 possible entries at any one time, but it's unlikely th
 
 The ID 255 (which has the global ID of NO_MSG) is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)
 
-If you push an empty string you'll get back NO_MSG, and popping NO_MSG will of course return an empty string.
+If you push an empty string you'll get back NO_MSG, and fetching NO_MSG will of course return an empty string.
 
 
 

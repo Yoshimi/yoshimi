@@ -1,5 +1,9 @@
 yoshimi 2.1.1 rc1
 
+2021-10-6 Will
+* Updates in doc and dev_notes
+* Additional comments in globals.h and interchange.cpp
+
 2021-10-5 Will
 BugFix: Not resetting part effect number to zero
   when loading a new instrument or clearing one.

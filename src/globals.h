@@ -239,7 +239,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         harmonicAmplitude,
         harmonicPhaseBandwidth, // this should also be split in two
         resonanceGroup,
-        resonanceGraphInsert,
+        resonanceGraphInsert, // 9
         systemEffectSend = 16,
         partEffectSelect,
         kitGroup = 32

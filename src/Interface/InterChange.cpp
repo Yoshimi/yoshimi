@@ -3295,6 +3295,9 @@ void InterChange::commandBank(CommandBlock *getData)
                                 textMsgBuffer.push(asString(searchRoot, 3) + ": " + asString(searchBank, 3) + ". " + asString(searchInst + 1, 3) + "  " + synth->getBankRef().getname(searchInst, searchBank, searchRoot));
                                 ++ searchInst;
                                 return;
+                                /*
+                                 * notice this exit point!
+                                 */
                             }
                             ++searchInst;
                         } while (searchInst < MAX_INSTRUMENTS_IN_BANK);
