@@ -622,11 +622,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button partcontrollers {
           label Controllers
           callback {//
-          if (Fl::event_button() != 3)
-              Showctl();
-          else
-              Showctlmidi();}
-          tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {8 81 139 25} box PLASTIC_UP_BOX color 228 labelsize 12
+          Showctl();}
+          tooltip {MIDI Controller range settings} xywh {2 82 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
+        }
+        Fl_Button midiCCs {
+          label {Midi CCs}
+          callback {//
+          Showctlmidi();}
+          tooltip {Emulates common MIDI CCs} xywh {96 82 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
           label {Key Shift}
@@ -2992,6 +2995,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     keymode->textsize(size11);
     modepatch->labelsize(size11);
     partcontrollers->labelsize(size12);
+    midiCCs->labelsize(size12);
     partkeyshift->labelsize(size);
         partkeyshift->textsize(size11);
     partkeylimit->labelsize(size);
