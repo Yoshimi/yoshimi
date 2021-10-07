@@ -324,6 +324,10 @@ class TestInvoker
             synth.getRuntime().Log(string{"TEST::Complete"}
                                   +" runtime "+asCompactString(runtime)+" ns"
                                   +" speed "+asCompactString(speed)+" ns/Sample"
+                                  +" samples "+asString(smpCnt)
+                                  +" notes "+asString(repetitions)
+                                  +" buffer "+asString(chunksize)
+                                  +" rate "+asString(synth.samplerate)
                                   );
             output.maybeWrite();
         }
