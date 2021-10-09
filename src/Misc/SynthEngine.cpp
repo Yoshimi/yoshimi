@@ -3022,7 +3022,6 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name
         return textMsgBuffer.push("No vector data on this channel");
 
     string file = setExtension(name, EXTEN::vector);
-    make_legit_filename(file);
 
     Runtime.xmlType = TOPLEVEL::XML::Vector;
     XMLwrapper *xml = new XMLwrapper(this, true);
