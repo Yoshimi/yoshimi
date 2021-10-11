@@ -1,0 +1,32 @@
+Version 2.1.1
+
+This is a relatively minor update.
+
+The most noticeable feature is a new button in the main window for access to the MIDI CCs window. This was always possible, but required a *right* click on the Controllers button. Lots of people never knew it was available! Not only can these controls be used when you don't have a MIDI source connected, but they can also be learned and combined with others for greater expression.
+
+We've also improved instrument bank management. This gives a faster startup (particularly with very large banks and roots) and greater protection against outside influences. A setup with approximately 7500 instrument in 200 banks that used to take nearly 5 seconds to get to the main window, now takes much less than a second.
+
+There is a mechanism that properly separates out instruments in banks that have the same numeric prefix, but different names. Also two that have different filenames but the same prefix (and are in fact the same) are treated as just the one. This situation typically occured when banks were merged in the past with a mixture of spaces and underscores in the filenames.
+
+We've removed the switch for disabling 'Enable part on program change'. It was only relevant to MIDI and nobody could think of a circumstance where they'd want to select a program via MIDI but not have it active. If you *did* want to silence a channel, CC7 (volume) would do so, and if it was just a specific part, there is an NRPN that can do it.
+
+A double-click on a path in the filer favourites view will now select it and return you to the main filer window.
+
+Finding the user guide is now virtually instant. The only delay is opening your web browser to view it.
+There are also improvements to the User Guide, adding extra information and clarifying some of what was already there.
+
+Various entries in the doc directory have been updated.
+
+A few more obscure bugs have been fixed.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

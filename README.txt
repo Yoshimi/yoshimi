@@ -1,12 +1,14 @@
-Version 2.1.0
+Version 2.1.1
 
-This release contains the complete new User Guide.
+This is a relatively minor update.
 
-Midi Sync has been extended to Effects, where relevant.
+Controllers and MIDI CCs windows now have separate buttons in the main window.
 
-NRPNs for Effects have been extended.
+Instrument bank improvements give faster startup.
 
-There is a means of testing for unintended changes to the final sound.
+The switch for disabling 'Enable part on program change' has been removed.
+
+Further details in /doc/Yoshimi_2.1.1_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

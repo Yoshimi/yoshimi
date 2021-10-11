@@ -6,7 +6,7 @@ Unlike the actual defaults, these will be editable. They are also kept up to dat
 
 This still happens for existing users, but these roots will not be shown in the roots list. Instead there will be a message informing you of this, and inviting you to add them to the Path, not add them, or ask again later.
 
-For all users if banks get added or removed by external means this will be reported, and the associated bank roots updated in the master file accordingly *without* disrupting any other banks and roots. Prevously if new banks were seen as added externally the bank structure was regenerated, resulting in bank IDs changing - this could break old MIDI files that performed bank changes.
+For all users if banks get added or removed by external means this will be reported, and the associated bank roots updated in the master file accordingly *without* disrupting any other banks and roots. Previously if new banks were seen as added externally the bank structure was regenerated, resulting in bank IDs changing - this could break old MIDI files that performed bank changes.
 
 
 There is a really strange anomaly where phantom empty banks sometimes get added to the first and/or the last bank root in the list. These are always at bank ID 0 - which should be impossible!
