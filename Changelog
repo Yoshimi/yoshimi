@@ -1,4 +1,8 @@
-yoshimi 2.1.1
+yoshimi 2.1.1.1
+
+2021-10-12 Will
+* BugFix:  Not recognising no FLTK on first time start
+* Set bugfix release 2.1.1.1
 
 2021-10-11 Will
 * Final updates to user guide and docs

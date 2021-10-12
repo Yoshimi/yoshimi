@@ -41,7 +41,7 @@ add_definitions(-Wall)
 #add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.1.1")
+set (YOSHIMI_VERSION "2.1.1.1")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=0)

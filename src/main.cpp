@@ -122,7 +122,7 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-static void *mainGuiThread(void *arg)
+static void *mainThread(void *arg)
 {
     sem_post((sem_t *)arg);
     map<SynthEngine *, MusicClient *>::iterator it;
@@ -409,7 +409,9 @@ int main(int argc, char *argv[])
     if (Config.empty())
     {
         std::cout << "Not there" << std::endl;
+#ifdef GUI_FLTK
         showSplash = true;
+#endif
     }
     else
     {
@@ -454,9 +456,9 @@ int main(int argc, char *argv[])
     int cmd;
     CmdOptions(argc, argv, allArgs, gui, cmd);
     globalAllArgs = allArgs;
+    bool mainThreadStarted = false;
 
 #ifdef GUI_FLTK
-    bool guiStarted = false;
     time(&old_father_time);
     here_and_now = old_father_time;
 #endif
@@ -469,9 +471,9 @@ int main(int argc, char *argv[])
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
 
-    pthread_t threadGui;
+    pthread_t threadMainLoop;
     pthread_attr_t pthreadAttr;
-    sem_t semGui;
+    sem_t semMain;
 
     if (mainCreateNewInstance(0) == -1)
     {
@@ -489,28 +491,24 @@ int main(int argc, char *argv[])
 
         std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< std::endl;
     }
-    if (sem_init(&semGui, 0, 0) == 0)
+    if (sem_init(&semMain, 0, 0) == 0)
     {
         if (pthread_attr_init(&pthreadAttr) == 0)
         {
-            if (pthread_create(&threadGui, &pthreadAttr, mainGuiThread, (void *)&semGui) == 0)
-            {
-#ifdef GUI_FLTK
-                guiStarted = true;
-#endif
-            }
+            if (pthread_create(&threadMainLoop, &pthreadAttr, mainThread, (void *)&semMain) == 0)
+                mainThreadStarted = true;
             pthread_attr_destroy(&pthreadAttr);
         }
     }
-#ifdef GUI_FLTK
-    if (!guiStarted)
+
+    if (!mainThreadStarted)
     {
-        std::cout << "Yoshimi can't start main gui loop!" << std::endl;
+        std::cout << "Yoshimi can't start main loop!" << std::endl;
         goto bail_out;
     }
-    sem_wait(&semGui);
-    sem_destroy(&semGui);
-#endif
+    sem_wait(&semMain);
+    sem_destroy(&semMain);
+
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
@@ -553,7 +551,7 @@ int main(int argc, char *argv[])
 //firstRuntime->Log("test not serious error",_SYS_::LogNotSerious | _SYS_::LogError);
 
     void *res;
-    pthread_join(threadGui, &res);
+    pthread_join(threadMainLoop, &res);
     if (res == (void *)1)
     {
         goto bail_out;
