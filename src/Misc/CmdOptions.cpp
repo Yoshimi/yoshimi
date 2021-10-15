@@ -132,6 +132,13 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             base->gui = 1;
             break;
 
+        case 'j':
+            if (arg)
+                base->settings.push_back("j:" + string(arg));
+            else
+                base->settings.push_back("j:");
+            break;
+
         case 'J':
             if (arg)
                 base->settings.push_back("J:" + string(arg));

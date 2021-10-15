@@ -1,4 +1,7 @@
-yoshimi 2.1.1.1
+yoshimi 2.1.1 M
+
+2021-10-15 Will
+* BugFix: Missing jack midi entry in CmdOptions.cpp
 
 2021-10-12 Will
 * BugFix:  Not recognising no FLTK on first time start
