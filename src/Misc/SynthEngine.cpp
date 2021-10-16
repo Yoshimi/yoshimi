@@ -163,7 +163,6 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
         uint8_t arr[4];
     } x;
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
-    meterDelay = 20;
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
         Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
@@ -2326,16 +2325,6 @@ void SynthEngine::fetchMeterData()
 { // overload protection below shouldn't be needed :(
     if (!VUready)
         return;
-    if (meterDelay > 0)
-    {
-        --meterDelay;
-        VUdata.values.vuOutPeakL = 0.0f;
-        VUdata.values.vuOutPeakR = 0.0f;
-        VUdata.values.vuRmsPeakL = 0.0f;
-        VUdata.values.vuRmsPeakR = 0.0f;
-        VUready = true;
-        return;
-    }
     float fade;
     float root;
     int buffsize;
@@ -2367,7 +2356,7 @@ void SynthEngine::fetchMeterData()
 
     fade = VUdata.values.vuOutPeakR * 0.92f;// mult;
     if (fade >= 1.0f) // overload protection
-        fade = 00.f;
+        fade = 0.0f;
     if (VUcopy.values.vuOutPeakR > 1.8f) // overload protection
         VUcopy.values.vuOutPeakR = fade;
     else
@@ -2739,28 +2728,32 @@ bool SynthEngine::loadHistory()
         { // should never exceed max history
             Runtime.historyLock[count] = xml->getparbool("lock_status", false);
             hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
-            for (int i = 0; i < hist_size; ++i)
+            if (hist_size > 0)
             {
-                if (xml->enterbranch("XMZ_FILE", i))
+                for (int i = 0; i < hist_size; ++i)
                 {
-                    filetype = xml->getparstr(extension);
-                    if (extension == "xiz_file" && !isRegularFile(filetype))
+                    if (xml->enterbranch("XMZ_FILE", i))
                     {
-                        if (filetype.rfind(EXTEN::zynInst) != string::npos)
-                            filetype = setExtension(filetype, EXTEN::yoshInst);
+                        filetype = xml->getparstr(extension);
+                        if (extension == "xiz_file" && !isRegularFile(filetype))
+                        {
+                            if (filetype.rfind(EXTEN::zynInst) != string::npos)
+                                filetype = setExtension(filetype, EXTEN::yoshInst);
+                        }
+                        if (filetype.size() && isRegularFile(filetype))
+                            newHistory(filetype, count);
+                        xml->exitbranch();
                     }
-                    if (filetype.size() && isRegularFile(filetype))
-                        newHistory(filetype, count);
-                    xml->exitbranch();
+
                 }
 
+                string tryRecent = xml->getparstr("most_recent");
+                //std::cout << "new >" << tryRecent << "<" << std::endl;
+                if (tryRecent.empty())
+                    historyLastSeen.at(count) = getHistory(count)->at(0);
+                else
+                    historyLastSeen.at(count) = tryRecent;
             }
-            string tryRecent = xml->getparstr("most_recent");
-            //std::cout << "new >" << tryRecent << "<" << std::endl;
-            if (tryRecent.empty())
-                historyLastSeen.at(count) = getHistory(count)->at(0);
-            else
-                historyLastSeen.at(count) = tryRecent;
             xml->exitbranch();
         }
     }

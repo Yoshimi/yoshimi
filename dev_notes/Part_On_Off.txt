@@ -1,6 +1,6 @@
 This control has a degree of intelligence built in.
 
-If a part on, then sending 0 will switch it off and sending 1 will switch it back on. These are absolute actions used mostly when doing resets, state and patch set loads etc.
+If a part is on, then sending 0 will switch it off and sending 1 will switch it back on. These are absolute actions used mostly when doing resets, state and patch set loads etc.
 
 If you send -1 when it was on, it will again switch it off. However if it was already off, sending -1 will set the internal counter to -1. Yet another -1 will set -2 etc. Anything less than 1 is regarded as off. If you later send 2 the counter will be stepped up again. In this way, if several routines switch a part off it will only be switched back on again when all of them switch in on.
 

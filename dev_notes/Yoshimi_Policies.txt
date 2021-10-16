@@ -54,7 +54,7 @@ Lines without '*' are continuations/extra info keeping the line length short, an
 Alternatively, please send me a brief description to include when I next update.
 
 ACKNOWLEDGEMENTS
-The ones that appear in the GUI 'About->More' lists are those who have either made very significant improvements, or have consistently helpled in various ways. Some them go back to the start of the Yoshimi fork.
+The ones that appear in the GUI 'About->More' lists are those who have either made very significant improvements, or have consistently helped in various ways. Some them go back to the start of the Yoshimi fork.
 
 The list in the 'Yoshimi_Helpers' file in 'docs' is of everyone I know about, some of which may only have made a few small suggestions or bug reports.
 

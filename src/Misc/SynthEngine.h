@@ -245,7 +245,6 @@ class SynthEngine
         VUtransfer VUpeak, VUcopy, VUdata;
         unsigned int VUcount;
         bool VUready;
-        int meterDelay;
         void fetchMeterData(void);
 
         inline LV2PluginType getLV2PluginType() {return lv2PluginType;}

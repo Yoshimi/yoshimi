@@ -236,7 +236,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -3528,10 +3528,13 @@ Alan Calvert started the project}
     if (yoshiLog->logConsole->visible())
         yoshiLog->consoleRtext();
 
-    if (panelwindow->visible() && panelwindow->w() != lastpanelW)
+    if (panelwindow->visible())
     {
-        panelRtext();
-        lastpanelW = panelwindow->w();
+        if (panelwindow->w() != lastpanelW)
+        {
+            panelRtext();
+            lastpanelW = panelwindow->w();
+        }
     }
 
     if (message->visible() && message->w() != lastmsgW)
