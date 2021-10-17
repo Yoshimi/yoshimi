@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -254,7 +254,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
             }} {}
   }
-  Function {draw_part(int npart)} {} {
+  Function {draw_part()} {} {
     code {//
     int ox = x()+2;
     int oy = y()+2;
@@ -315,11 +315,10 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
   }
   Function {draw()} {} {
     code {//
-    if (npart>=0)
-        draw_part(npart + *plgroup);
+    if (npart >= 0)
+        draw_part();
     else
-        draw_master();
-    ;} {}
+        draw_master();} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
