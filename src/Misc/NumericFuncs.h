@@ -3,6 +3,7 @@
 
     Copyright 2010, Alan Calvert
     Copyright 2014-2021, Will Godfrey and others
+    Copyright 2021, Hermann Vosseler
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -47,21 +48,6 @@ inline void invSignal(float *sig, size_t len)
 }
 
 
-inline float dB2rap(float dB) {
-#if defined(HAVE_EXP10F)
-    return exp10f((dB) / 20.0f);
-#else
-    return powf(10.0, (dB) / 20.0f);
-#endif
-}
-
-
-inline float rap2dB(float rap)
-{
-    return 20.0f * log10f(rap);
-}
-
-
 inline int version2value(void)
 {
     /*
@@ -91,6 +77,76 @@ inline int version2value(void)
     }
     return std::stoi(num);
 }
+
+
+/* === Helper for exponential with constant base == */
+/*
+ * Yoshimi code used the generic power function at various places just to compute the exponential
+ * for a fixed (and even integral) base. This can be optimised, since b^x = exp(ln(b)*x); and in fact,
+ * modern optimisers apply this rewriting with --fast-math. But unfortunately these rewritings differ
+ * slightly (esp. regarding to SSE), which leads to slightly different sample (float numbers) being
+ * computed on different Compilers/Platforms.
+ * For sake of reproducibility / acceptance testing we thus apply this optimisation explicitly,
+ * using inline front-end functions, and storing the precomputed logarithm of the base in a static var.
+ */
+namespace {
+    template<unsigned int base, bool fraction=false>
+    struct PowerFunction
+    {
+        static constexpr float LN_BASE = log(fraction? 1.0/base : double(base));
+
+        static float invoke(float exponent)
+        {
+            return expf(LN_BASE * exponent);
+        }
+    };
+}
+
+/* compute base^exponent for a fixed integral base */
+template<unsigned int base>
+inline float power(float exponent)
+{
+    return PowerFunction<base>::invoke(exponent);
+}
+
+/* compute 1/base^exponent for a fixed integral base */
+template<unsigned int base>
+inline float powFrac(float exponent)
+{
+    return PowerFunction<base,true>::invoke(exponent);
+}
+
+
+/* Amplitude factor for volume attenuation in deciBel, 0dB .. -60dB
+ * The given parameter maps 0 to 0dB ... 1 to -60dB, but can be
+ * outside of this range and even negative (then increasing volume).
+ * Remark: original code used powf(0.1, volDecibel), which yields different values
+ * depending on cleverness of the optimiser and available SSE instructions.
+ *
+ * Explanation: Volume uses dB scale, with dB = 60*param
+ * Volume is a Power measurement, and Amplitude^2 ~ Power = 10^-dB/10
+ * Thus: sqrt(10^-dB/10) = 10^(-1*(60*param)/(10*2))
+ *                       = 10^(log10(1/10)*3*param) = 0.1^(3*param)
+ */
+inline float dB60(float param) { return powFrac<10>(3.0f * param); }
+inline float dB40(float param) { return powFrac<10>(2.0f * param); }
+inline float dB80(float param) { return powFrac<10>(4.0f * param); }
+
+
+inline float dB2rap(float dB) {
+#if defined(HAVE_EXP10F)
+    return exp10f((dB) / 20.0f);
+#else
+    return power<10>((dB) / 20.0f);     /////////TODO sort out / combine with the dbXX functions in SynthHelper
+#endif
+}
+
+
+inline float rap2dB(float rap)
+{
+    return 20.0f * log10f(rap);
+}
+
 
 
 // no more than 32 bit please!
