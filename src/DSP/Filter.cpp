@@ -27,6 +27,7 @@
 #include "Misc/NumericFuncs.h"
 
 using func::dB2rap;
+using func::power;
 
 
 Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
@@ -117,7 +118,7 @@ void Filter::setq(float q_)
 float Filter::getrealfreq(float freqpitch)
 {
     if (category == 0 || category == 2)
-        return powf(2.0f, freqpitch + 9.96578428f); // log2(1000)=9.95748
+        return power<2>(freqpitch + 9.96578428f); // log2(1000)=9.95748
     else
         return freqpitch;
 }

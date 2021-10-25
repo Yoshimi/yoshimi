@@ -30,6 +30,7 @@
 #include "Effects/Echo.h"
 #include <iostream>
 
+using func::power;
 using func::powFrac;
 
 static const int PRESET_SIZE = 7;
@@ -241,7 +242,7 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 {
     float tmp;
     Plrdelay = Plrdelay_;
-    tmp = (powf(2.0f, fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
+    tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
     if (Plrdelay < 64.0f)
         tmp = -tmp;
     lrdelay = (int)tmp;

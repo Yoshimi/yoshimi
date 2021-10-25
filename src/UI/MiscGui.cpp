@@ -32,6 +32,7 @@
 #include <cairo-xlib.h>
 
 using func::bpm2text;
+using func::power;
 
 namespace { // Implementation details...
 
@@ -631,14 +632,14 @@ string convert_value(ValueType type, float val)
             return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
 
         case VC_LFOfreq:
-            f = (powf(2.0f, val * 10.0f) - 1.0f) / 12.0f;
+            f = (power<2>(val * 10.0f) - 1.0f) / 12.0f;
             return variable_prec_units(f, "Hz", 3);
 
         case VC_LFOfreqBPM:
             return bpm2text(val);
 
         case VC_LFOdepthFreq: // frequency LFO
-            f=powf(2.0f,(int)val/127.0f*11.0f)-1.0f;
+            f=power<2>((int)val/127.0f*11.0f)-1.0f;
             return variable_prec_units(f, "cents", 2);
 
         case VC_LFOdepthAmp: // amplitude LFO
@@ -664,14 +665,14 @@ string convert_value(ValueType type, float val)
         case VC_EnvelopeDT:
             // unfortunately converttofree() is not called in time for us to
             // be able to use env->getdt(), so we have to compute ourselves
-            f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
+            f = (power<2>(((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
             if (f >= 1000)
                 return variable_prec_units(f/1000.0f, "s", 2);
             else
                 return variable_prec_units(f, "ms", 2);
 
         case VC_EnvelopeFreqVal:
-            f=(powf(2.0f, 6.0f * fabsf((int)val - 64.0f) / 64.0f) -1.0f) * 100.0f;
+            f=(power<2>(6.0f * fabsf((int)val - 64.0f) / 64.0f) -1.0f) * 100.0f;
             if ((int)val<64) f = -f;
             return variable_prec_units(f, "cents", 2);
 
@@ -690,18 +691,18 @@ string convert_value(ValueType type, float val)
             return variable_prec_units(f, "dB", 2);
 
         case VC_EnvelopeBandwidthVal:
-	    f = powf(2.0f, 10.0f * ((int)val - 64) / 64.0f);
+	    f = power<2>(10.0f * ((int)val - 64) / 64.0f);
             return variable_prec_units(f, "x", 4);
 
         case VC_FilterFreq0: // AnalogFilter
-            f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            f=power<2>((val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
             if (f >= 1000.0f)
                 return variable_prec_units(f/1000.0f, "kHz", 2);
             else
                 return variable_prec_units(f, "Hz", 2);
 
         case VC_FilterFreq2: // SVFilter
-            f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            f=power<2>((val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
             // We have to adjust the freq because of this line
             // in method SVFilter::computefiltercoefs() (file SVFilter.cpp)
             //
@@ -730,8 +731,8 @@ string convert_value(ValueType type, float val)
 
         case VC_FilterVelocityAmp:
             val = (int)val / 127.0 * -6.0; // formant offset value
-            f = powf(2.0f,val + log(1000.0f)/log(2.0f)); // getrealfreq
-            f = log(f/1000.0f)/log(powf(2.0f,1.0f/12.0f))*100.0f; // in cents
+            f = power<2>(val + log(1000.0f)/log(2.0f)); // getrealfreq
+            f = log(f/1000.0f)/log(power<2>(1.0f/12.0f))*100.0f; // in cents
             return custom_value_units(f-0.5, "cents") +
                    "\n(Formant offset: " + custom_value_units(val, "x stretch)",2);
 
@@ -750,7 +751,7 @@ string convert_value(ValueType type, float val)
             return(s);
 
         case VC_FormFilterClearness:
-            f = powf(10.0f, (val - 32.0f) / 48.0f);
+            f = power<10>((val - 32.0f) / 48.0f);
             return custom_value_units(f, " switch rate",2);
 
         case VC_FormFilterSlowness:
@@ -824,7 +825,7 @@ string convert_value(ValueType type, float val)
 
         case VC_EnvStretch:
             s.clear();
-            f = powf(2.0f,(int)val/64.0f);
+            f = power<2>((int)val/64.0f);
             s += custom_value_units((int)val/127.0f*100.0f+0.05f,"%",1);
             if ((int)val!=0)
             {
@@ -837,7 +838,7 @@ string convert_value(ValueType type, float val)
             s.clear();
             i = val;
             i = (i == 0) ? 1 : (i); // val == 0 is not allowed
-            f = powf(2.0f,(i-64.0)/63.0f);
+            f = power<2>((i-64.0)/63.0f);
             s += custom_value_units((i-64.0f)/63.0f*100.0f,"%");
             if (i != 64)
             {
@@ -853,13 +854,13 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),"Hz",2));
 
         case VC_FixedFreqET:
-            f = powf(2.0f, (lrint(val) - 1) / 63.0f) - 1.0f;
+            f = power<2>((lrint(val) - 1) / 63.0f) - 1.0f;
             if (lrint(val) <= 1) /* 0 and 1 are both fixed */
                 return "Fixed";
             else if (lrint(val) <= 64)
-                return custom_value_units(powf(2.0f,f),"x /octave up",2);
+                return custom_value_units(power<2>(f),"x /octave up",2);
             else
-                return custom_value_units(powf(3.0f,f),"x /octave up",2);
+                return custom_value_units(power<3>(f),"x /octave up",2);
 
         case VC_FilterGain:
             f = ((int)val / 64.0f -1.0f) * 30.0f; // -30..30dB
@@ -874,7 +875,7 @@ string convert_value(ValueType type, float val)
                 s += "Velocity sensing disabled.";
                 return(s);
             }
-            f = powf(8.0f, (64.0f - (float)i) / 64.0f);
+            f = power<8>((64.0f - (float)i) / 64.0f);
             // Max dB range for vel=1 compared to vel=127
             s += "Velocity Dynamic Range ";
             f = -20.0f * logf(powf((1.0f / 127.0f), f)) / log(10.0f);
@@ -885,7 +886,7 @@ string convert_value(ValueType type, float val)
 
         case VC_BandWidth:
             f = powf((int)val / 1000.0f, 1.1f);
-            f = powf(10.0f, f * 4.0f) * 0.25f;
+            f = power<10>(f * 4.0f) * 0.25f;
             return variable_prec_units(f, "cents", 2);
 
         case VC_SubBandwidth:
@@ -893,11 +894,11 @@ string convert_value(ValueType type, float val)
                Considering the variability of the synthesis depending
                on number of filter stages, it seems accurate enough.
              */
-	    f = powf(10.0f, (val - 127.0f) / 127.0f * 4.0f) * 4800;
+	    f = power<10>((val - 127.0f) / 127.0f * 4.0f) * 4800;
             return variable_prec_units(f, "cents", 3);
 
         case VC_SubBandwidthRel:
-	    f = powf(100.0f, val / 64.0f);
+	    f = power<100>(val / 64.0f);
             return variable_prec_units(f, "x", 3);
 
         case VC_SubHarmonicMagnitude:
@@ -908,7 +909,7 @@ string convert_value(ValueType type, float val)
                 return "Constant";
 	    f = val / 64.0f * 3.0f;
             return "Factor (100,10k): " +
-                variable_prec_units(powf(10,f), "", 4) + ", " +
+                variable_prec_units(power<10>(f), "", 4) + ", " +
                 variable_prec_units(powf(0.1,f), "x", 4);
 
         case VC_FilterVelocitySense: // this is also shown graphically
@@ -945,7 +946,7 @@ string convert_value(ValueType type, float val)
             s.clear();
             // ToDo: It would be nice to calculate the ratio between left
             // and right. We would need to know the delay time however...
-            f = (powf(2.0f, fabsf((int)val-64.0f)/64.0f*9.0f)-1.0); // ms
+            f = (power<2>(fabsf((int)val-64.0f)/64.0f*9.0f)-1.0); // ms
             if ((int)val < 64)
             {
                 s+="left +"+custom_value_units(f+0.05,"ms",1)+" / ";
@@ -985,7 +986,7 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f,"dB",1));
 
         case VC_FXReverbTime:
-            f = powf(60.0f, (int)val / 127.0f) - 0.97f; // s
+            f = power<60>((int)val / 127.0f) - 0.97f; // s
             return variable_prec_units(f, "s", 2, true);
 
         case VC_FXReverbIDelay:
@@ -1048,18 +1049,18 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f,"dB",1));
 
         case VC_FXlfofreq:
-            f = (powf(2.0f, (int)val / 127.0f * 10.0f) - 1.0f) * 0.03f;
+            f = (power<2>((int)val / 127.0f * 10.0f) - 1.0f) * 0.03f;
             return variable_prec_units(f, "Hz", 3);
 
         case VC_FXlfofreqBPM:
             return bpm2text(val / 127.0f);
 
         case VC_FXChorusDepth:
-            f = powf(8.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            f = power<8>(((int)val / 127.0f) * 2.0f) -1.0f; //ms
             return variable_prec_units(f, "ms", 2, true);
 
         case VC_FXChorusDelay:
-            f = powf(10.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            f = power<10>(((int)val / 127.0f) * 2.0f) -1.0f; //ms
             return variable_prec_units(f, "ms", 2, true);
 
         case VC_FXdefaultFb:
@@ -1095,14 +1096,14 @@ string convert_value(ValueType type, float val)
             return(s);
 
         case VC_FXEQfreq:
-            f = 600.0f * powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            f = 600.0f * power<30>(((int)val - 64.0f) / 64.0f);
             if (f >= 1000)
                 return variable_prec_units(f/1000.f, "kHz", 2);
             else
                 return variable_prec_units(f, "Hz", 2, true);
 
         case VC_FXEQq:
-            f = powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            f = power<30>(((int)val - 64.0f) / 64.0f);
             return variable_prec_units(f, "", 3, true);
 
         case VC_FXEQgain:
@@ -1205,7 +1206,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
     {
     case VC_FilterVelocitySense:
     {
-        p = powf(8.0f,(64.0f-(int)val)/64.0f);
+        p = power<8>((64.0f-(int)val)/64.0f);
 
         /* Grid */
         grid(x0,y0,_w,_h, 4);
@@ -1231,7 +1232,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
     }
     case VC_FormFilterClearness:
     {
-        p = powf(10.0f, (val - 32.0f) / 48.0f); //clearness param
+        p = power<10>((val - 32.0f) / 48.0f); //clearness param
         grid(x0,y0,_w,_h,10);
         fl_color(FL_BLUE);
         fl_begin_line();
@@ -1337,7 +1338,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
 
             cairo_set_source_rgb(cr, 1, 0, 0);
             cairo_set_line_width(cr, 1.5);
-            cairo_move_to(cr, x0, cy - ry * log10(powf(50, p)));
+            cairo_move_to(cr, x0, cy - ry * log10(power<50>(p)));
             cairo_line_to(cr, x0 + _w, cy - ry * log10(powf(0.05, p)));
             cairo_stroke(cr);
 
@@ -1363,7 +1364,7 @@ string variable_prec_units(float v, const string& u, int maxPrec, bool roundup)
     }
     if (roundup)
     {
-        v += 5 * powf(10,-(digits + 1));
+        v += 5 * power<10>(-(digits + 1));
     }
     return custom_value_units(v, u, digits);
 }

@@ -35,6 +35,7 @@ using namespace std;
 #include "Misc/SynthHelper.h"
 #include "Effects/Reverb.h"
 
+using func::power;
 using func::powFrac;
 
 static const int PRESET_SIZE = 13;
@@ -299,7 +300,7 @@ void Reverb::setvolume(unsigned char Pvolume_)
 void Reverb::settime(unsigned char Ptime_)
 {
     Ptime = Ptime_;
-    float t = powf(60.0f, Ptime / 127.0f) - 0.97f;
+    float t = power<60>(Ptime / 127.0f) - 0.97f;
     for (int i = 0; i < REV_COMBS * 2; ++i)
         combfb[i] = -expf((float)comblen[i] / synth->samplerate_f * logf(0.001f) / t);
         // the feedback is negative because it removes the DC
@@ -480,7 +481,7 @@ void Reverb::setroomsize(unsigned char Proomsize_)
     roomsize = (this->Proomsize - 64.0f) / 64.0f;
     if (roomsize > 0.0f)
         roomsize *= 2.0f;
-    roomsize = powf(10.0f, roomsize);
+    roomsize = power<10>(roomsize);
     rs = sqrtf(roomsize);
     settype(Ptype);
 }

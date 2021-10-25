@@ -58,7 +58,8 @@ decl {\#include "Misc/SynthHelper.h"
 
 decl {\#include "Misc/NumericFuncs.h"
     using func::dB2rap;
-    using func::rap2dB;} {private local
+    using func::rap2dB;
+    using func::power;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -1033,7 +1034,7 @@ class PADnoteUI {: {public PresetsUI_}
         case PADSYNTH::control::bandwidth:
             bwdial->value(value);
             result = powf(value / 1000.0f, 1.1f);
-            result = powf(10.0f, result * 4.0f) * 0.25f;
+            result = power<10>(result * 4.0f) * 0.25f;
             bwcents->value(result);
             cbwidget->do_callback();
             break;

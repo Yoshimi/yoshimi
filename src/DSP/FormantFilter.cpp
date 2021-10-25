@@ -33,6 +33,7 @@
 using synth::aboveAmplitudeThreshold;
 using synth::interpolateAmplitude;
 using func::powFrac;
+using func::power;
 using func::dB2rap;
 
 
@@ -212,7 +213,7 @@ void FormantFilter::updateCurrentParameters()
 
     formantslowness = powf(1.0f - (pars->Pformantslowness / 128.0f), 3.0f);
 
-    vowelclearness = powf(10.0f, (pars->Pvowelclearness - 32.0f) / 48.0f);
+    vowelclearness = power<10>((pars->Pvowelclearness - 32.0f) / 48.0f);
 
     sequencestretch = powFrac<10>((pars->Psequencestretch - 32.0f) / 48.0f);
     if (pars->Psequencereversed)

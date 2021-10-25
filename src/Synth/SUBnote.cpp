@@ -337,16 +337,16 @@ void SUBnote::computeNoteFreq()
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
             float tmp =
-                (midinote - 69.0f) / 12.0f * powf(2.0f, (((fixedfreqET - 1) / 63.0f) - 1.0f));
+                (midinote - 69.0f) / 12.0f * power<2>((((fixedfreqET - 1) / 63.0f) - 1.0f));
             if (fixedfreqET <= 64)
-                notefreq *= powf(2.0f, tmp);
+                notefreq *= power<2>(tmp);
             else
-                notefreq *= powf(3.0f, tmp);
+                notefreq *= power<3>(tmp);
         }
     }
 
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
-    notefreq *= powf(2.0f, detune / 1200.0f); // detune
+    notefreq *= power<2>(detune / 1200.0f); // detune
 //    notefreq*=ctl->pitchwheel.relfreq;//pitch wheel
 }
 
@@ -586,7 +586,7 @@ void SUBnote::computeallfiltercoefs()
     if (FreqEnvelope != NULL)
     {
         envfreq = FreqEnvelope->envout() / 1200;
-        envfreq = powf(2.0f, envfreq);
+        envfreq = power<2>(envfreq);
     }
 
     envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
@@ -603,7 +603,7 @@ void SUBnote::computeallfiltercoefs()
     if (BandWidthEnvelope != NULL)
     {
         envbw = BandWidthEnvelope->envout();
-        envbw = powf(2.0f, envbw);
+        envbw = power<2>(envbw);
     }
     envbw *= ctl->bandwidth.relbw; // bandwidth controller
 
@@ -887,13 +887,13 @@ void SUBnote::updatefilterbank(void)
         overtone_rolloff[n] = computerolloff(freq);
 
         // the bandwidth is not absolute(Hz); it is relative to frequency
-        float bw = powf(10.0f, (pars->Pbandwidth - 127.0f) / 127.0f * 4.0f) * numstages;
+        float bw = power<10>((pars->Pbandwidth - 127.0f) / 127.0f * 4.0f) * numstages;
 
         // Bandwidth Scale
         bw *= powf(1000.0f / freq, (pars->Pbwscale - 64.0f) / 64.0f * 3.0f);
 
         // Relative BandWidth
-        bw *= powf(100.0f, (pars->Phrelbw[pos[n]] - 64.0f) / 64.0f);
+        bw *= power<100>((pars->Phrelbw[pos[n]] - 64.0f) / 64.0f);
 
         if (bw > 25.0f)
             bw = 25.0f;

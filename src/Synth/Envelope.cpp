@@ -30,6 +30,7 @@
 
 using func::dB2rap;
 using func::rap2dB;
+using func::power;
 
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth):
@@ -90,7 +91,7 @@ void Envelope::recomputePoints()
 
             case 3:
                 envval[i] =
-                    (powf(2.0f, 6.0f * fabsf(_envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
+                    (power<2>(6.0f * fabsf(_envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
                 if (_envpars->Penvval[i] < 64)
                     envval[i] = -envval[i];
                 break;

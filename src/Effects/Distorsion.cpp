@@ -30,6 +30,7 @@
 #include "Misc/NumericFuncs.h"
 
 using func::dB2rap;
+using func::power;
 using func::powFrac;
 
 
@@ -133,7 +134,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
 {
     outvolume.advanceValue(synth->sent_buffersize);
 
-    float inputdrive = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
+    float inputdrive = power<5>((Pdrive - 32.0f) / 127.0f);
     if (Pnegate)
         inputdrive *= -1.0f;
 

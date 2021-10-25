@@ -35,6 +35,7 @@ using namespace std;
 #include "Misc/SynthHelper.h"
 #include "Params/Controller.h"
 
+using func::power;
 using func::powFrac;
 
 
@@ -127,7 +128,7 @@ void Controller::setpitchwheel(int value)
     pitchwheel.data = value;
     float cents = value / 8192.0f;
     cents *= pitchwheel.bendrange;
-    pitchwheel.relfreq = powf(2.0f, cents / 1200.0f);
+    pitchwheel.relfreq = power<2>(cents / 1200.0f);
     // original comment
     //fprintf(stderr,"%ld %ld -> %.3f\n",pitchwheel.bendrange,pitchwheel.data,pitchwheel.relfreq);fflush(stderr);
 }
@@ -160,7 +161,7 @@ void Controller::setfiltercutoff(int value)
 void Controller::setfilterq(int value)
 {
     filterq.data = value;
-    filterq.relq = powf(30.0f, (value - 64.0f) / 64.0f * (filterq.depth / 64.0f));
+    filterq.relq = power<30>((value - 64.0f) / 64.0f * (filterq.depth / 64.0f));
 }
 
 
@@ -169,7 +170,7 @@ void Controller::setbandwidth(int value)
     bandwidth.data = value;
     if (!bandwidth.exponential)
     {
-        float tmp = powf(25.0f, powf(bandwidth.depth / 127.0f, 1.5f)) - 1.0f;
+        float tmp = power<25>(powf(bandwidth.depth / 127.0f, 1.5f)) - 1.0f;
         if (value < 64 && bandwidth.depth >= 64)
             tmp = 1.0f;
         bandwidth.relbw = (value / 64.0f - 1.0f) * tmp + 1.0f;
@@ -178,7 +179,7 @@ void Controller::setbandwidth(int value)
     }
     else
     {
-        bandwidth.relbw = powf(25.0f, (value - 64.0f) / 64.0f * (bandwidth.depth / 64.0f));
+        bandwidth.relbw = power<25>((value - 64.0f) / 64.0f * (bandwidth.depth / 64.0f));
     }
 }
 
@@ -188,7 +189,7 @@ void Controller::setmodwheel(int value)
     modwheel.data = value;
     if (!modwheel.exponential)
     {
-        float tmp = powf(25.0f, powf(modwheel.depth / 127.0f, 1.5f) * 2.0f) / 25.0f;
+        float tmp = power<25>(powf(modwheel.depth / 127.0f, 1.5f) * 2.0f) / 25.0f;
         if (value < 64 && modwheel.depth >= 64)
             tmp = 1.0f;
         modwheel.relmod = (value / 64.0f - 1.0f) * tmp + 1.0f;
@@ -196,7 +197,7 @@ void Controller::setmodwheel(int value)
             modwheel.relmod = 0.0f;
     }
     else
-        modwheel.relmod = powf(25.0f, (value - 64.0f) / 64.0f * (modwheel.depth / 80.0f));
+        modwheel.relmod = power<25>((value - 64.0f) / 64.0f * (modwheel.depth / 80.0f));
 }
 
 
@@ -253,7 +254,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
             return 0;
     }
 
-    float portamentotime = powf(100.0f, portamento.time / 127.0f) / 50.0f; // portamento time in seconds
+    float portamentotime = power<100>(portamento.time / 127.0f) / 50.0f; // portamento time in seconds
 
     if (portamento.proportional)
     {
@@ -292,7 +293,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
                           ? portamento.origfreqrap
                           : 1.0 / portamento.origfreqrap ;
 
-    float thresholdrap = powf(2.0f, portamento.pitchthresh / 12.0f);
+    float thresholdrap = power<2>(portamento.pitchthresh / 12.0f);
     if (portamento.pitchthreshtype == 0 && (tmprap - 0.00001f) > thresholdrap)
         return 0;
     if (portamento.pitchthreshtype == 1 && (tmprap + 0.00001f) < thresholdrap)
@@ -322,7 +323,7 @@ void Controller::updateportamento(void)
 void Controller::setresonancecenter(int value)
 {
     resonancecenter.data = value;
-    resonancecenter.relcenter = powf(3.0f, (value - 64.0f) / 64.0f * (resonancecenter.depth / 64.0f));
+    resonancecenter.relcenter = power<3>((value - 64.0f) / 64.0f * (resonancecenter.depth / 64.0f));
 }
 
 

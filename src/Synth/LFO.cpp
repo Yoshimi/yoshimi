@@ -31,6 +31,7 @@
 #include "Misc/SynthHelper.h"
 #include "Synth/LFO.h"
 
+using func::power;
 using func::powFrac;
 
 
@@ -110,7 +111,7 @@ inline void LFO::Recompute(void)
             break; // in octave
 
         default:
-            lfointensity = powf(2.0f, lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
+            lfointensity = power<2>(lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
             break;
     }
 
@@ -319,5 +320,5 @@ void LFO::computenextincrnd(void)
     if (!freqrndenabled)
         return;
     incrnd = nextincrnd;
-    nextincrnd = powFrac<2>(lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);
+    nextincrnd = powFrac<2>(lfofreqrnd) + synth->numRandom() * (power<2>(lfofreqrnd) - 1.0f);
 }

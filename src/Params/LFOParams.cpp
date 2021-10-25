@@ -31,8 +31,8 @@
 #include "Params/LFOParams.h"
 #include "Misc/NumericFuncs.h"
 
-//#include <iostream>
-//int LFOParams::time = 0;
+using func::power;
+
 
 LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
                      unsigned char Pstartphase_, unsigned char PLFOtype_,
@@ -84,7 +84,7 @@ void LFOParams::setPfreq(int32_t n)
 {
 
     PfreqI = n;
-    Pfreq = (powf(2.0f, (float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
+    Pfreq = (power<2>((float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
     presetsUpdated();
 }
 

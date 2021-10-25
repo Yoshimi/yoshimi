@@ -30,6 +30,8 @@
 #include "Misc/NumericFuncs.h"
 
 using func::setAllPan;
+using func::power;
+
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
@@ -215,8 +217,7 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
 void SUBnoteParameters::updateFrequencyMultipliers(void)
 {
     float par1 = POvertoneSpread.par1 / 255.0f;
-    float par1pow = powf(10.0f,
-            -(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);
+    float par1pow = power<10>(-(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);
     float par2 = POvertoneSpread.par2 / 255.0f;
     float par3 = 1.0f - POvertoneSpread.par3 / 255.0f;
     float result;

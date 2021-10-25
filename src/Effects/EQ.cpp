@@ -25,11 +25,11 @@
 */
 
 #include "Misc/NumericFuncs.h"
-#include "Misc/SynthHelper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
 
 using func::rap2dB;
+using func::power;
 using func::powFrac;
 
 
@@ -191,7 +191,7 @@ void EQ::changepar(int npar, unsigned char value)
 
         case 1:
             filter[nb].Pfreq = value;
-            tmp = 600.0f * powf(30.0f, (value - 64.0f) / 64.0f);
+            tmp = 600.0f * power<30>((value - 64.0f) / 64.0f);
             filter[nb].freq.setTargetValue(tmp);
             break;
 
@@ -203,7 +203,7 @@ void EQ::changepar(int npar, unsigned char value)
 
         case 3:
             filter[nb].Pq = value;
-            tmp = powf(30.0f, (value - 64.0f) / 64.0f);
+            tmp = power<30>((value - 64.0f) / 64.0f);
             filter[nb].q.setTargetValue(tmp);
             break;
 

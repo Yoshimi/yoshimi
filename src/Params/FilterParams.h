@@ -69,7 +69,7 @@ class FilterParams : public Presets
         float getformantamp(unsigned char amp)
             { return func::dB80(1.0f - amp / 127.0f); }
         float getformantq(unsigned char q)
-            { return powf(25.0f, (q - 32.0f) / 64.0f); }
+            { return func::power<25>((q - 32.0f) / 64.0f); }
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)

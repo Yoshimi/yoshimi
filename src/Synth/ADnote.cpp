@@ -37,11 +37,13 @@
 #include "Params/ADnoteParameters.h"
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
 #include "globals.h"
 
 using func::dB60;
+using func::power;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -414,9 +416,9 @@ void ADnote::construct()
         NoteGlobalPar.Punch.Enabled = 1;
         NoteGlobalPar.Punch.t = 1.0f; //start from 1.0 and to 0.0
         NoteGlobalPar.Punch.initialvalue =
-            ((powf(10.0f, 1.5f * adpars->GlobalPar.PPunchStrength / 127.0f) - 1.0f)
+            ((power<10>(1.5f * adpars->GlobalPar.PPunchStrength / 127.0f) - 1.0f)
              * velF(velocity, adpars->GlobalPar.PPunchVelocitySensing));
-        float time = powf(10.0f, 3.0f * adpars->GlobalPar.PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
+        float time = power<10>(3.0f * adpars->GlobalPar.PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
         float stretch = powf(440.0f / basefreq, adpars->GlobalPar.PPunchStretch / 64.0f);
         NoteGlobalPar.Punch.dt = 1.0f / (time * synth->samplerate_f * stretch);
     }
@@ -1356,7 +1358,7 @@ void ADnote::computeNoteParameters(void)
         unison_stereo_spread[nvoice] =
             adpars->VoicePar[nvoice].Unison_stereo_spread / 127.0f;
         float unison_spread = adpars->getUnisonFrequencySpreadCents(nvoice);
-        float unison_real_spread = powf(2.0f, (unison_spread * 0.5f) / 1200.0f);
+        float unison_real_spread = power<2>((unison_spread * 0.5f) / 1200.0f);
         float unison_vibratto_a = adpars->VoicePar[nvoice].Unison_vibratto / 127.0f;                                  //0.0 .. 1.0
 
         int true_unison = unison >> is_pwm;
@@ -1394,7 +1396,7 @@ void ADnote::computeNoteParameters(void)
                             (unison_values[k] - (max + min) * 0.5f) / diff;
                             // the lowest value will be -1 and the highest will be 1
                         unison_base_freq_rap[nvoice][k] =
-                            powf(2.0f, (unison_spread * unison_values[k]) / 1200.0f);
+                            power<2>((unison_spread * unison_values[k]) / 1200.0f);
                     }
                 }
         }
@@ -1420,11 +1422,11 @@ void ADnote::computeNoteParameters(void)
 
             float increments_per_second = 1 / synth->fixed_sample_step_f;
             const float vib_speed = adpars->VoicePar[nvoice].Unison_vibratto_speed / 127.0f;
-            float vibratto_base_period  = 0.25f * powf(2.0f, (1.0f - vib_speed) * 4.0f);
+            float vibratto_base_period  = 0.25f * power<2>((1.0f - vib_speed) * 4.0f);
             for (int k = 0; k < unison; ++k)
             {
                 // make period to vary randomly from 50% to 200% vibratto base period
-                float vibratto_period = vibratto_base_period * powf(2.0f, paramRNG.numRandom() * 2.0f - 1.0f);
+                float vibratto_period = vibratto_base_period * power<2>(paramRNG.numRandom() * 2.0f - 1.0f);
                 float m = 4.0f / (vibratto_period * increments_per_second);
                 if (unison_vibratto[nvoice].step[k] < 0.0f)
                     m = -m;
@@ -1483,7 +1485,7 @@ float ADnote::getFMVoiceBaseFreq(int nvoice)
     float freq;
 
     if (NoteVoicePar[nvoice].FMFreqFixed)
-        return 440.0f * powf(2.0f, detune / 12.0f);
+        return 440.0f * power<2>(detune / 12.0f);
 
     if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc)
         freq = getVoiceBaseFreq(nvoice);
@@ -1494,7 +1496,7 @@ float ADnote::getFMVoiceBaseFreq(int nvoice)
             detune += NoteGlobalPar.Detune / 100.0f;
     }
 
-    return freq * powf(2.0f, detune / 12.0f);
+    return freq * power<2>(detune / 12.0f);
 }
 
 
@@ -1591,7 +1593,7 @@ float ADnote::getVoiceBaseFreq(int nvoice)
         detune += NoteGlobalPar.Detune / 100.0f;
 
     if (!NoteVoicePar[nvoice].fixedfreq)
-        return basefreq * powf(2.0f, detune / 12.0f);
+        return basefreq * power<2>(detune / 12.0f);
     else // fixed freq is enabled
     {
         float fixedfreq;
@@ -1604,13 +1606,13 @@ float ADnote::getVoiceBaseFreq(int nvoice)
         int fixedfreqET = NoteVoicePar[nvoice].fixedfreqET;
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
-            float tmp = (midinote - 69.0f) / 12.0f * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
+            float tmp = (midinote - 69.0f) / 12.0f * (power<2>((fixedfreqET - 1) / 63.0f) - 1.0f);
             if (fixedfreqET <= 64)
-                fixedfreq *= powf(2.0f, tmp);
+                fixedfreq *= power<2>(tmp);
             else
-                fixedfreq *= powf(3.0f, tmp);
+                fixedfreq *= power<3>(tmp);
         }
-        return fixedfreq * powf(2.0f, detune / 12.0f);
+        return fixedfreq * power<2>(detune / 12.0f);
     }
 }
 
@@ -1721,7 +1723,7 @@ void ADnote::computeWorkingParameters(void)
             }
 
             float nonoffsetfreq = getVoiceBaseFreq(nvoice)
-                              * powf(2.0f, (voicepitch + globalpitch) / 12.0f);
+                              * power<2>((voicepitch + globalpitch) / 12.0f);
             nonoffsetfreq *= portamentofreqrap;
             float voicefreq = nonoffsetfreq + NoteVoicePar[nvoice].OffsetHz;
             voicepitch += log2f(voicefreq / nonoffsetfreq) * 12.0f;
@@ -1753,16 +1755,16 @@ void ADnote::computeWorkingParameters(void)
                 if (NoteVoicePar[nvoice].FMFreqFixed) {
                     // Apply FM detuning since base frequency is 440Hz.
                     FMrelativepitch += NoteVoicePar[nvoice].FMDetune / 100.0f;
-                    FMfreq = powf(2.0f, FMrelativepitch / 12.0f) * 440.0f;
+                    FMfreq = power<2>(FMrelativepitch / 12.0f) * 440.0f;
                 } else if (NoteVoicePar[nvoice].FMDetuneFromBaseOsc) {
                     // Apply FM detuning since base frequency is from main voice.
                     FMrelativepitch += NoteVoicePar[nvoice].FMDetune / 100.0f;
-                    FMfreq = powf(2.0f, FMrelativepitch / 12.0f) * voicefreq;
+                    FMfreq = power<2>(FMrelativepitch / 12.0f) * voicefreq;
                 } else {
                     // No need to apply FM detuning, since getFMVoiceBaseFreq()
                     // takes it into account.
                     FMfreq = getFMVoiceBaseFreq(nvoice) *
-                        powf(2.0f, (basevoicepitch + globalpitch + FMrelativepitch) / 12.0f);
+                        power<2>((basevoicepitch + globalpitch + FMrelativepitch) / 12.0f);
                     FMfreq *= portamentofreqrap;
                 }
                 setfreqFM(nvoice, FMfreq, FMpitch);

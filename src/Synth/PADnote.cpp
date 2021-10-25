@@ -39,6 +39,7 @@
 #include "Misc/NumericFuncs.h"
 
 using func::dB60;
+using func::power;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -78,9 +79,9 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         NoteGlobalPar.Punch.Enabled = 1;
         NoteGlobalPar.Punch.t = 1.0f; // start from 1.0 and to 0.0
         NoteGlobalPar.Punch.initialvalue =
-            (powf(10.0f, 1.5f * pars->PPunchStrength / 127.0f) - 1.0f)
+            (power<10>(1.5f * pars->PPunchStrength / 127.0f) - 1.0f)
                     * velF(velocity, pars->PPunchVelocitySensing);
-        float time = powf(10.0f, 3.0f * pars->PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
+        float time = power<10>(3.0f * pars->PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
         float stretch = powf(440.0f / freq, pars->PPunchStretch / 64.0f);
         NoteGlobalPar.Punch.dt = 1.0f / (time * synth->samplerate_f * stretch);
     }
@@ -286,11 +287,11 @@ void PADnote::setBaseFreq(float basefreq_)
         if (fixedfreqET != 0)
         {   // if the frequency varies according the keyboard note
             float tmp = (midinote - 69.0f) / 12.0f
-                              * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
+                              * (power<2>((fixedfreqET - 1) / 63.0f) - 1.0f);
             if (fixedfreqET <= 64)
-                basefreq *= powf(2.0f, tmp);
+                basefreq *= power<2>(tmp);
             else
-                basefreq *= powf(3.0f, tmp);
+                basefreq *= power<3>(tmp);
         }
     }
 }
@@ -333,7 +334,7 @@ void PADnote::computeNoteParameters()
     NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
 
     // find out the closest note
-    float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0f));
+    float logfreq = logf(basefreq * power<2>(NoteGlobalPar.Detune / 1200.0f));
     float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
     nsample = 0;
     for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
@@ -400,7 +401,7 @@ void PADnote::computecurrentparameters()
         }
     }
 
-    realfreq = basefreq * portamentofreqrap * powf(2.0f, globalpitch / 12.0)
+    realfreq = basefreq * portamentofreqrap * power<2>(globalpitch / 12.0)
                * powf(ctl->pitchwheel.relfreq, BendAdjust) + OffsetHz;
 }
 
