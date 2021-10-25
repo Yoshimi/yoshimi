@@ -32,13 +32,14 @@
 #include "DSP/FFTwrapper.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
+#include "Synth/SUBnote.h"
 #include "Synth/Envelope.h"
 #include "DSP/Filter.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
-#include "Synth/SUBnote.h"
 #include "Misc/NumericFuncs.h"
 
+using func::dB60;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -359,7 +360,7 @@ void SUBnote::computeNoteFreq()
 
 void SUBnote::computeNoteParameters()
 {
-    volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
+    volume = dB60(1.0f - pars->PVolume / 96.0f); // -60 dB .. +19.375 dB  /////TODO: ADD and PAD apply a Factor 4.0(+12dB), SUB doesn't. Why??
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
 
     int BendAdj = pars->PBendAdjust - 64;

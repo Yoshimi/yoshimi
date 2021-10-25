@@ -2411,14 +2411,14 @@ void SynthEngine::setPkeyshift(int Pkeyshift_)
 void SynthEngine::setPsysefxvol(int Ppart, int Pefx, char Pvol)
 {
     Psysefxvol[Pefx][Ppart] = Pvol;
-    sysefxvol[Pefx][Ppart]  = powf(0.1f, (1.0f - Pvol / 96.0f) * 2.0f);
+    sysefxvol[Pefx][Ppart]  = func::dB40(1.0f - Pvol / 96.0f);  // Pvol=0..127 => -40dB .. +12.9166dB
 }
 
 
 void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
 {
     Psysefxsend[Pefxfrom][Pefxto] = Pvol;
-    sysefxsend[Pefxfrom][Pefxto]  = powf(0.1f, (1.0f - Pvol / 96.0f) * 2.0f);
+    sysefxsend[Pefxfrom][Pefxto]  = func::dB40(1.0f - Pvol / 96.0f);
 }
 
 void SynthEngine::setPaudiodest(int value)

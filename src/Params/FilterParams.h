@@ -29,6 +29,7 @@
 #define FILTER_PARAMS_H
 
 #include "Params/Presets.h"
+#include "Misc/NumericFuncs.h"
 #include "globals.h"
 
 #include <cmath>
@@ -66,7 +67,7 @@ class FilterParams : public Presets
         float getformantfreq(unsigned char freq) // Transforms a parameter to
             { return getfreqx(freq / 127.0f); }  // the real value
         float getformantamp(unsigned char amp)
-            { return powf(0.1f, (1.0f - amp / 127.0f) * 4.0f); }
+            { return func::dB80(1.0f - amp / 127.0f); }
         float getformantq(unsigned char q)
             { return powf(25.0f, (q - 32.0f) / 64.0f); }
 

@@ -29,15 +29,16 @@
 #include "Misc/Config.h"
 #include "Params/PADnoteParameters.h"
 #include "Params/Controller.h"
+#include "Synth/PADnote.h"
 #include "Synth/Envelope.h"
 #include "Synth/LFO.h"
 #include "DSP/Filter.h"
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
-#include "Synth/PADnote.h"
 #include "Misc/NumericFuncs.h"
 
+using func::dB60;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -350,7 +351,7 @@ void PADnote::computeNoteParameters()
     }
 
     NoteGlobalPar.Volume =
-        4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
+        4.0f * dB60(1.0f - pars->PVolume / 96.0f)          // -60 dB .. +19.375 dB  /////TODO: why Factor 4.0 == +12dB boost?
         * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
 }
 

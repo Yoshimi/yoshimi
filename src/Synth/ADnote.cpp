@@ -37,11 +37,11 @@
 #include "Params/ADnoteParameters.h"
 #include "Params/Controller.h"
 #include "Misc/SynthEngine.h"
-#include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
 #include "globals.h"
 
+using func::dB60;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -1165,7 +1165,7 @@ void ADnote::computeNoteParameters(void)
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
     NoteGlobalPar.Volume =
-        4.0f * powf(0.1f, 3.0f * (1.0f - adpars->GlobalPar.PVolume / 96.0f))  //-60 dB .. 0 dB
+        4.0f * dB60(1.0f - adpars->GlobalPar.PVolume / 96.0f)          // -60 dB .. +19.375 dB  /////TODO: why Factor 4.0 == +12dB boost?
         * velF(velocity, adpars->GlobalPar.PAmpVelocityScaleFunction); // velocity sensing
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -1279,7 +1279,7 @@ void ADnote::computeNoteParameters(void)
             NoteVoicePar[nvoice].Volume = 0.0f;
         else
             NoteVoicePar[nvoice].Volume =
-                powf(0.1f, 3.0f * (1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)) // -60 dB .. 0 dB
+                dB60(1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)                // -60 dB .. 0 dB
                 * velF(velocity, adpars->VoicePar[nvoice].PAmpVelocityScaleFunction); // velocity
 
         if (adpars->VoicePar[nvoice].PVolumeminus)
