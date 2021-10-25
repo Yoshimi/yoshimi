@@ -25,9 +25,12 @@
 */
 
 #include "Misc/NumericFuncs.h"
+#include "Misc/SynthHelper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 #include <iostream>
+
+using func::powFrac;
 
 static const int PRESET_SIZE = 7;
 static const int NUM_PRESETS = 9;
@@ -214,7 +217,7 @@ void Echo::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        outvolume.setTargetValue(4.0f * powFrac<100>(1.0f - Pvolume / 127.0f));
         volume.setTargetValue(1.0f);
     }
     else

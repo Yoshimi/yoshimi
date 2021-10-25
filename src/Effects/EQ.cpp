@@ -24,11 +24,13 @@
 
 */
 
+#include "Misc/NumericFuncs.h"
+#include "Misc/SynthHelper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
-#include "Misc/NumericFuncs.h"
 
 using func::rap2dB;
+using func::powFrac;
 
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
@@ -126,7 +128,7 @@ void EQ::out(float *smpsl, float *smpsr)
 void EQ::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    float tmp = powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
+    float tmp = 10.0f * powFrac<200>(1.0f - Pvolume / 127.0f);
     outvolume.setTargetValue(tmp);
     volume.setTargetValue((!insertion) ? 1.0f : tmp);
 }

@@ -40,6 +40,8 @@
 #include "Misc/NumericFuncs.h"
 
 using func::dB60;
+using func::power;
+using func::powFrac;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -47,16 +49,6 @@ using synth::aboveAmplitudeThreshold;
 
 using func::setRandomPan;
 
-// These have little reason to exist, as GCC actually performs constant folding
-// on logf even on -O0 and Clang (currently, as of 9.0.1) constant-folds these
-// on -O1 and above. These used to be members of SUBnote initialized on note
-// construction. Thankfully constant folding would still occur, but it wasn't
-// ideal. Older compilers might generate library calls, so there might still be
-// some justification for this.
-const float LOG_0_01 = logf(0.01f);
-const float LOG_0_001 = logf(0.001f);
-const float LOG_0_0001 = logf(0.0001f);
-const float LOG_0_00001 = logf(0.00001f);
 
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float basefreq_,
@@ -857,23 +849,24 @@ float SUBnote::getHgain(int harmonic)
     switch (pars->Phmagtype)
     {
         case 1:
-            hgain = expf(hmagnew * LOG_0_01);
+            hgain = powFrac<100>(hmagnew);
             break;
 
         case 2:
-            hgain = expf(hmagnew * LOG_0_001);
+            hgain = powFrac<1000>(hmagnew);
             break;
 
         case 3:
-            hgain = expf(hmagnew * LOG_0_0001);
+            hgain = powFrac<10000>(hmagnew);
             break;
 
         case 4:
-            hgain = expf(hmagnew * LOG_0_00001);
+            hgain = powFrac<100000>(hmagnew);
             break;
 
         default:
             hgain = 1.0f - hmagnew;
+            break;
     }
 
     return hgain;

@@ -32,7 +32,10 @@ using namespace std;
 #include "DSP/Unison.h"
 #include "DSP/AnalogFilter.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Effects/Reverb.h"
+
+using func::powFrac;
 
 static const int PRESET_SIZE = 13;
 static const int NUM_PRESETS = 13;
@@ -279,7 +282,7 @@ void Reverb::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (!insertion)
     {
-        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        outvolume.setTargetValue(4.0f * powFrac<100>(1.0f - Pvolume / 127.0f));
         volume.setTargetValue(1.0f);
     }
     else

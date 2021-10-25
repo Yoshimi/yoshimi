@@ -25,10 +25,12 @@
 */
 
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Effects/Distorsion.h"
 #include "Misc/NumericFuncs.h"
 
 using func::dB2rap;
+using func::powFrac;
 
 
 namespace { // Implementation details...
@@ -184,7 +186,7 @@ void Distorsion::setvolume(unsigned char Pvolume_)
     float tmp = Pvolume / 127.0f;
     if (insertion == 0)
     {
-        outvolume.setTargetValue(powf(0.01f, (1.0f - tmp)) * 4.0f);
+        outvolume.setTargetValue(4.0f * powFrac<100>(1.0f - tmp));
         volume.setTargetValue(1.0f);
     }
     else

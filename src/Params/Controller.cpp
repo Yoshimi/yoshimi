@@ -32,7 +32,11 @@ using namespace std;
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Params/Controller.h"
+
+using func::powFrac;
+
 
 Controller::Controller(SynthEngine *_synth):
     synth(_synth)
@@ -272,13 +276,13 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
     {
         if (portamento.updowntimestretch == 127)
             return 0;
-        portamentotime *= powf(0.1f, (portamento.updowntimestretch - 64) / 63.0f);
+        portamentotime *= powFrac<10>((portamento.updowntimestretch - 64) / 63.0f);
     }
     if (portamento.updowntimestretch < 64 && newfreq > oldfreq)
     {
         if (portamento.updowntimestretch == 0)
             return 0;
-        portamentotime *= powf(0.1f, (64.0f - portamento.updowntimestretch) / 64.0f);
+        portamentotime *= powFrac<10>((64.0f - portamento.updowntimestretch) / 64.0f);
     }
 
     portamento.dx = synth->fixed_sample_step_f / portamentotime;
@@ -322,10 +326,15 @@ void Controller::setresonancecenter(int value)
 }
 
 
+namespace {
+    static const float LN_BASE1_5 = log(1.5);
+    inline float power1_5(float exponent) { return expf(LN_BASE1_5 * exponent); } // 1.5^exponent
+}
+
 void Controller::setresonancebw(int value)
 {
     resonancebandwidth.data = value;
-    resonancebandwidth.relbw = powf(1.5f, (value - 64.0f) / 64.0f * (resonancebandwidth.depth / 127.0f));
+    resonancebandwidth.relbw = power1_5((value - 64.0f) / 64.0f * (resonancebandwidth.depth / 127.0f));
 }
 
 
