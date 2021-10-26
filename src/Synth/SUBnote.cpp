@@ -580,8 +580,8 @@ float SUBnote::computerolloff(float freq)
     if (freq <= lower_limit || freq >= upper_limit)
         return 0.0f;
     if (freq <= lower_limit + lower_width)
-        return (1.0f - cosf(M_PI * (freq - lower_limit) / lower_width)) / 2.0f;
-    return (1.0f - cosf(M_PI * (freq - upper_limit) / upper_width)) / 2.0f;
+        return (1.0f - cosf(PI * (freq - lower_limit) / lower_width)) / 2.0f;
+    return (1.0f - cosf(PI * (freq - upper_limit) / upper_width)) / 2.0f;
 }
 
 void SUBnote::computeallfiltercoefs()

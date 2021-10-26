@@ -175,6 +175,10 @@ bool JackEngine::Start(void)
      * Shows identical results but doesn't connect.
      * Original 1.4.1 version also fails - it used to work.
      */
+     /* pre V 1.3.0 was this:
+     if (Runtime.midiEngine  == jack_midi and jack_connect(jackClient,Runtime.midiDevice.c_str(),jack_port_name(midi.port)))
+         Runtime.Log("Didn't find jack MIDI source '" + Runtime.midiDevice + "'");
+    */
 
     // style-wise I think the next bit is the wrong place
     /*if (synth->getRuntime().midiEngine  == jack_midi

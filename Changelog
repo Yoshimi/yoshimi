@@ -1,5 +1,9 @@
 yoshimi 2.1.1 M
 
+2021-10-26 Will
+* Rationalised some PI calculation variations.
+* Added old (commented out) jack MIDI check.
+
 2021-10-17 Will
 * Reverted VU changes
 

@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Coyright 2020, Will Godfrey & others
+    Coyright 2020 - 2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -194,7 +194,7 @@ void WidgetPDial::draw()
     } else {
         cairo_set_source_rgb(cr,0.4,0.4,0.4);
     }
-    cairo_arc(cr,0,0,dh,0,2*M_PI);
+    cairo_arc(cr,0,0,dh,0,2*PI);
     cairo_fill(cr);
     cairo_pattern_t* pat;
     //drawing the inner circle:
@@ -202,14 +202,14 @@ void WidgetPDial::draw()
     cairo_pattern_add_color_stop_rgba (pat, 0, 0.8*186.0/255, 0.8*198.0/255, 0.8*211.0/255, 1);
     cairo_pattern_add_color_stop_rgba (pat, 1, 231.0/255, 235.0/255, 239.0/255, 1);
     cairo_set_source (cr, pat);
-    cairo_arc(cr,0,0,d*rCout,0,2*M_PI);
+    cairo_arc(cr,0,0,d*rCout,0,2*PI);
     cairo_fill(cr);
     //drawing the outer circle:
     pat = cairo_pattern_create_radial(2.0/35*d,6.0/35*d,2.0/35*d,0,0,d*rCint);
     cairo_pattern_add_color_stop_rgba (pat, 0, 231.0/255, 235.0/255, 239.0/255, 1);
     cairo_pattern_add_color_stop_rgba (pat, 1, 186.0/255, 198.0/255, 211.0/255, 1);
     cairo_set_source (cr, pat);
-    cairo_arc(cr,0,0,d*rCint,0,2*M_PI);
+    cairo_arc(cr,0,0,d*rCint,0,2*PI);
     cairo_fill(cr);
     //drawing the "light" circle:
     int linewidth = int(2.0f * sx / 30);
@@ -223,7 +223,7 @@ void WidgetPDial::draw()
     }
     cairo_set_line_width (cr, linewidth);
     cairo_new_sub_path(cr);
-    cairo_arc(cr,0,0,d*rGear,0.75*M_PI,+val*1.5*M_PI+0.75*M_PI);
+    cairo_arc(cr,0,0,d*rGear,0.75*PI,+val*1.5*PI+0.75*PI);
     cairo_stroke(cr);
     //drawing the hand:
     if (active_r())
@@ -232,7 +232,7 @@ void WidgetPDial::draw()
     } else {
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);
     }
-    cairo_rotate(cr,val*3/2*M_PI+0.25*M_PI);
+    cairo_rotate(cr,val*3/2*PI+0.25*PI);
     cairo_set_line_width (cr, linewidth);
     cairo_move_to(cr,0,0);
     cairo_line_to(cr,0,d*rHand);
