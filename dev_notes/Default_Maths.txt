@@ -1,0 +1,24 @@
+There are four significant constants set in globals.h
+At the time of writing there still is no standard consistent across platforms so please use these in all new calculations.
+
+#define PI 3.1415926536f
+#define LOG_2 0.693147181f
+
+The above were always defined right back to Zyn 2.2.1
+We've kept the values the same to ensure consistency.
+
+#define TWOPI 6.28318530718f
+#define HALFPI 1.57079632679f
+
+These were introduced in Yoshimi 1.2.2
+Throughout Yoshimi these had been computed in different ways, and it was thought this, along with unknown compiler optimisations could give varying results.
+Typically:
+2 * {some calculation} * PI
+{some calculation} * 2 * PI
+PI * 2.0f
+
+{some calculation} * PI / 2
+PI * {some calculation} / 2.0f
+
+Currently there are three remaining in Analogfitler.cpp
+We were leaving these until we can properly test the effect of unifying them with the rest.

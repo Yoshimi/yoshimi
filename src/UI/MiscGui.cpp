@@ -709,7 +709,7 @@ string convert_value(ValueType type, float val)
             //
             // Using factor 4.0 instead of the usual 2.0*PI leads to a
             // different effective cut-off freq, which we will be showing
-            f *= 4.0 / (TWOPI);
+            f *= 4.0 / TWOPI;
             if (f >= 1000.0f)
                 return variable_prec_units(f/1000.0f, "kHz", 2);
             else

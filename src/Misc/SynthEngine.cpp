@@ -2749,9 +2749,7 @@ bool SynthEngine::loadHistory()
 
                 string tryRecent = xml->getparstr("most_recent");
                 //std::cout << "new >" << tryRecent << "<" << std::endl;
-                if (tryRecent.empty())
-                    historyLastSeen.at(count) = getHistory(count)->at(0);
-                else
+                if (!tryRecent.empty())
                     historyLastSeen.at(count) = tryRecent;
             }
             xml->exitbranch();
