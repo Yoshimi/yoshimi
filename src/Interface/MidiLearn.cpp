@@ -1046,6 +1046,10 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.data.insert = xml->getpar255("Insert", 0);
                 entry.data.parameter = xml->getpar255("Parameter", 0);
                 entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
+
+                CommandBlock allData;
+                TextData::encodeAll(xml->getparstr("Command_Name"), allData);
+
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;

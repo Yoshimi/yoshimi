@@ -27,15 +27,17 @@
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
+#include "Interface/Text2Data.h"
 
 class XMLwrapper;
 class SynthEngine;
 class DataText;
+class TextData;
 
 using std::string;
 using std::list;
 
-class MidiLearn : private DataText
+class MidiLearn : private DataText, TextData
 {
     public:
         MidiLearn(SynthEngine *_synth);

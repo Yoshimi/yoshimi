@@ -293,6 +293,7 @@ set (Misc_sources
 set (Interface_Sources
     Interface/InterChange.cpp
     Interface/Data2Text.cpp
+    Interface/Text2Data.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/RingBuffer.h
