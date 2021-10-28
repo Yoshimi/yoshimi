@@ -3434,6 +3434,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
         case MAIN::control::mono:
             def = 0; // off
             max = 1;
+            type |= learnable;
             break;
 
         case MAIN::control::soloType:

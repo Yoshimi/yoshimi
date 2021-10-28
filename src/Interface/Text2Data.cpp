@@ -32,9 +32,12 @@ using std::string;
 using std::cout;
 using std::endl;
 
-void TextData::log(std::string text)
+void TextData::log(std::string &line, std::string text)
 {
     oursynth->getRuntime().Log("Error: " + text);
+    // we may later decide to print the string before emptying it
+
+    line = "";
 }
 
 void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock &allData)
@@ -44,7 +47,7 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
     strip (source);
     if (source.empty())
     {
-        log("empty Command String");
+        log(source, "empty Command String");
         return;
     }
     //cout << ">" << source << endl;
@@ -53,7 +56,8 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
     size_t pos = source.find("Main");
     if (pos != string::npos)
     {
-        encodeMain(source.substr(pos + 4), allData);
+        nextWord(source);
+        encodeMain(source, allData);
         return;
     }
 
@@ -90,7 +94,8 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
         encodePart(source.substr(pos + 4), allData);
         return;
     }
-    log("bad Command String");
+    log(source, "bad Command String");
+
 }
 
 
@@ -122,6 +127,27 @@ void TextData::encodeMain(std::string source, CommandBlock &allData)
     strip (source);
     cout << ">" << source << endl;
     allData.data.part = TOPLEVEL::section::main;
+    size_t pos = source.find("Master");
+    if (pos != string::npos)
+    {
+        nextWord(source);
+        pos = source.find("Mono/Stereo");
+        if (pos != string::npos)
+        {
+            nextWord(source);
+            allData.data.control = MAIN::control::mono;
+            return;
+        }
+    }
+    pos = source.find("Volume");
+    if (pos != string::npos)
+    {
+        nextWord(source);
+        allData.data.control = MAIN::control::volume;
+        return;
+    }
+
+    cout << "main overflow >" << source << endl;
 }
 
 
@@ -131,11 +157,11 @@ void TextData::encodePart(std::string source, CommandBlock &allData)
     unsigned char npart = UNUSED;
     if (isdigit(source[0]))
     {
-        npart = stoi(source);
-        cout << "part " << int(npart) << endl;
+        npart = stoi(source) - 1;
+        //cout << "part " << int(npart) << endl;
         if (npart >= NUM_MIDI_PARTS)
         {
-            log("part number out of range");
+            log(source, "part number out of range");
             return;
         }
         allData.data.part = (TOPLEVEL::section::part1 + npart);
@@ -148,21 +174,61 @@ void TextData::encodePart(std::string source, CommandBlock &allData)
             return;
         }
     }
-    cout << ">" << source << endl;
+    cout << "part overflow >" << source << endl;
 }
 
 
 void TextData::encodeEffects(std::string source, CommandBlock &allData)
 {
+    size_t pos;
     if (isdigit(source[0]))
     {
-        unsigned char effnum = stoi(source); // need to find number ranges
+        unsigned char effnum = stoi(source) - 1; // need to find number ranges
         allData.data.engine = effnum;
         //cout << "effnum " << int(effnum) << endl;
         nextWord(source);
 
-        if (source == "" || source == "Bypass")
-            return;
+        if (allData.data.part < NUM_MIDI_PARTS)
+        {
+            pos = source.find("Bypass");
+            if (pos != string::npos)
+            {
+                nextWord(source);
+                allData.data.control = PART::control::effectBypass;
+                allData.data.insert = TOPLEVEL::insert::partEffectSelect;
+                return;
+            }
+            pos = source.find("Send");
+            if (pos != string::npos)
+            {
+                nextWord(source);
+                if (isdigit(source[0]))
+                {
+                    unsigned char sendto = stoi(source) - 1;
+                    allData.data.control = PART::control::partToSystemEffect1 + sendto;
+                    nextWord(source);
+                    return;
+                }
+            }
+        }
+        if (allData.data.part == TOPLEVEL::section::systemEffects)
+        {
+            bool test = (source == "");
+            if (!test)
+            {
+                test = (source.find("Enable") != string::npos);
+                if (!test)
+                    test = isdigit(source[0]);
+
+            }
+            if (test)
+            {
+                if (!isdigit(source[0]))
+                    nextWord(source); // a number might be a value for later
+                allData.data.control = EFFECT::sysIns::effectEnable;
+                return;
+            }
+        }
 
         unsigned char efftype = 0;
         bool found = false;
@@ -182,12 +248,12 @@ void TextData::encodeEffects(std::string source, CommandBlock &allData)
         } while (!found && test != "@end");
         if (efftype >= EFFECT::type::count - EFFECT::type::none)
         {
-            log("effect type out of range");
+            log(source, "effect type out of range");
             return;
         }
         allData.data.kit = efftype + EFFECT::type::none;
         cout << "effnum " << int(effnum) << "  efftype " << int(efftype + EFFECT::type::none) << endl;
         // now need to do actual control
     }
-    cout << ">" << source << endl;
+    cout << "effects overflow >" << source << endl;
 }

@@ -36,7 +36,7 @@ class TextData
 
     private:
         SynthEngine *oursynth;
-        void log(std::string text);
+        void log(std::string &line, std::string text);
         void strip(std::string &line);
         void nextWord(std::string &line);
         void encodeMain(std::string source, CommandBlock &allData);

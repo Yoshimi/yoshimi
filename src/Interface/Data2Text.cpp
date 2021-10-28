@@ -3226,6 +3226,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             }
             if (control == EFFECT::sysIns::effectEnable)
             {
+                contstr += " Enable";
                 if (addValue)
                 {
                     showValue = false;
