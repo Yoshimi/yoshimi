@@ -107,6 +107,7 @@ float EffectLFO::getlfoshape(float x)
             // updated (to allow more lfotypes)
         default:
             out = cosf(x * TWOPI); // EffectLFO_SINE
+            break;
     }
     return out;
 }

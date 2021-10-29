@@ -30,7 +30,7 @@
 #include "Misc/NumericFuncs.h"
 #include "Params/FilterParams.h"
 
-using func::rap2dB;
+using func::asDecibel;
 using func::power;
 
 
@@ -266,7 +266,7 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
     for (int i = 0; i < nfreqs; ++i)
     {
         if (freqs[i] > 0.000000001f)
-            freqs[i] = rap2dB(freqs[i]) + getgain();
+            freqs[i] = asDecibel(freqs[i]) + getgain();
         else
             freqs[i] = -90.0f;
     }

@@ -1172,6 +1172,7 @@ void custom_graph_dimensions(ValueType vt, int& w, int& h)
     default:
         w = 0;
         h = 0;
+        break;
     }
 }
 

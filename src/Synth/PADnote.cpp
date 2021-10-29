@@ -38,7 +38,7 @@
 #include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB60;
+using func::decibel;
 using func::power;
 using synth::velF;
 using synth::getDetune;
@@ -74,6 +74,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     NoteGlobalPar.Fadein_adjustment =
             pars->Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
     NoteGlobalPar.Fadein_adjustment *= NoteGlobalPar.Fadein_adjustment;
+
     if (pars->PPunchStrength != 0)
     {
         NoteGlobalPar.Punch.Enabled = 1;
@@ -125,7 +126,6 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     if (parameters->sample[nsample].smp == NULL)
     {
         NoteStatus = NOTE_DISABLED;
-        return;
     }
 }
 
@@ -146,6 +146,7 @@ PADnote::PADnote(const PADnote &orig) :
     released(orig.released),
     nsample(orig.nsample),
     portamento(orig.portamento),
+    midinote(orig.midinote),
     ctl(orig.ctl),
     globaloldamplitude(orig.globaloldamplitude),
     globalnewamplitude(orig.globalnewamplitude),
@@ -352,7 +353,8 @@ void PADnote::computeNoteParameters()
     }
 
     NoteGlobalPar.Volume =
-        4.0f * dB60(1.0f - pars->PVolume / 96.0f)          // -60 dB .. +19.375 dB  /////TODO: why Factor 4.0 == +12dB boost?
+        4.0f                                               // +12dB boost (similar on ADDnote, while SUBnote only boosts +6dB)
+        * decibel<-60>(1.0f - pars->PVolume / 96.0f)       // -60 dB .. +19.375 dB
         * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
 }
 

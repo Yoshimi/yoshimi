@@ -39,9 +39,9 @@
 #include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB60;
 using func::power;
 using func::powFrac;
+using func::decibel;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -130,6 +130,8 @@ SUBnote::SUBnote(const SUBnote &orig) :
     newamplitude(orig.newamplitude),
     lfilter(NULL),
     rfilter(NULL),
+    tmpsmp(NULL),
+    tmprnd(NULL),
     ctl(orig.ctl),
     oldpitchwheel(orig.oldpitchwheel),
     oldbandwidth(orig.oldbandwidth),
@@ -347,13 +349,13 @@ void SUBnote::computeNoteFreq()
 
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
     notefreq *= power<2>(detune / 1200.0f); // detune
-//    notefreq*=ctl->pitchwheel.relfreq;//pitch wheel
 }
 
 void SUBnote::computeNoteParameters()
 {
-    volume = dB60(1.0f - pars->PVolume / 96.0f); // -60 dB .. +19.375 dB  /////TODO: ADD and PAD apply a Factor 4.0(+12dB), SUB doesn't. Why??
-    volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
+    volume = 2.0f                                         // +6dB boost (note ADDnote and PADnote apply a +12dB boost)
+           * decibel<-60>(1.0f - pars->PVolume / 96.0f)   // -60 dB .. +19.375 dB
+           * velF(velocity, pars->PAmpVelocityScaleFunction);
 
     int BendAdj = pars->PBendAdjust - 64;
     if (BendAdj % 24 == 0)
@@ -643,27 +645,15 @@ void SUBnote::computeallfiltercoefs()
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
-    // disabled till we know what we are doing!
-    /*for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
-    {
-        int changed = pars->PfilterChanged[n];
-        if (changed)
-        {
-            if (changed == 6) // magnitude
-                ;
-            else if (changed == 7) // bandwidth
-                ;
-            cout << "Filter changed " << changed << endl;
-            pars->PfilterChanged[n] = 0;
-        }
-    }*/
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data
         || oldbandwidth != ctl->bandwidth.data
         || portamento != 0)
         computeallfiltercoefs();
-    newamplitude = volume * AmpEnvelope->envout_dB() * 2.0f;
+
+    // Envelope
+    newamplitude = volume * AmpEnvelope->envout_dB();
 
     // Filter
     if (GlobalFilterL != NULL)
@@ -931,6 +921,4 @@ void SUBnote::updatefilterbank(void)
     if (reduceamp < 0.001f)
         reduceamp = 1.0f;
     volume /= reduceamp;
-
 }
-

@@ -237,6 +237,7 @@ float LFO::lfoout()
 
         default:
             out = cosf(x * TWOPI); // LFO_SINE
+            break;
     }
 
     if (lfotype == 0 || lfotype == 1)

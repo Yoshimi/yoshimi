@@ -32,9 +32,9 @@
 
 using synth::aboveAmplitudeThreshold;
 using synth::interpolateAmplitude;
+using func::decibel;
 using func::powFrac;
 using func::power;
-using func::dB2rap;
 
 
 FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
@@ -219,7 +219,7 @@ void FormantFilter::updateCurrentParameters()
     if (pars->Psequencereversed)
         sequencestretch *= -1.0f;
 
-    outgain = dB2rap(pars->getgain());
+    outgain = decibel(pars->getgain());
 
     Qfactor = pars->getq();
 }

@@ -42,8 +42,8 @@
 
 #include "globals.h"
 
-using func::dB60;
 using func::power;
+using func::decibel;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -117,6 +117,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
     ctl(orig.ctl),
     NoteGlobalPar(orig.NoteGlobalPar),
     time(orig.time), // This is incremented, but never actually used for some reason
+    Tspot(orig.Tspot),
     paramRNG(orig.paramRNG),
     paramSeed(orig.paramSeed),
     detuneFromParent(orig.detuneFromParent),
@@ -611,6 +612,7 @@ void ADnote::construct()
                 default:
                     NoteVoicePar[nvoice].FMEnabled = NONE;
                     freqbasedmod[nvoice] = false;
+                    break;
             }
         NoteVoicePar[nvoice].FMringToSide = adpars->VoicePar[nvoice].PFMringToSide;
         NoteVoicePar[nvoice].FMVoice = adpars->VoicePar[nvoice].PFMVoice;
@@ -1167,7 +1169,8 @@ void ADnote::computeNoteParameters(void)
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
     NoteGlobalPar.Volume =
-        4.0f * dB60(1.0f - adpars->GlobalPar.PVolume / 96.0f)          // -60 dB .. +19.375 dB  /////TODO: why Factor 4.0 == +12dB boost?
+        4.0f                                                           // +12dB boost (similar on PADnote, while SUBnote only boosts +6dB)
+        * decibel<-60>(1.0f - adpars->GlobalPar.PVolume / 96.0f)       // -60 dB .. +19.375 dB
         * velF(velocity, adpars->GlobalPar.PAmpVelocityScaleFunction); // velocity sensing
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -1270,6 +1273,7 @@ void ADnote::computeNoteParameters(void)
                     fmvoldamp = 1.0f;
                 NoteVoicePar[nvoice].FMVolume =
                     adpars->VoicePar[nvoice].PFMVolume / 127.0f * fmvoldamp;
+                break;
         }
 
         // Voice's modulator velocity sensing
@@ -1281,7 +1285,7 @@ void ADnote::computeNoteParameters(void)
             NoteVoicePar[nvoice].Volume = 0.0f;
         else
             NoteVoicePar[nvoice].Volume =
-                dB60(1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)                // -60 dB .. 0 dB
+                decibel<-60>(1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)        // -60 dB .. 0 dB
                 * velF(velocity, adpars->VoicePar[nvoice].PAmpVelocityScaleFunction); // velocity
 
         if (adpars->VoicePar[nvoice].PVolumeminus)
@@ -1399,6 +1403,7 @@ void ADnote::computeNoteParameters(void)
                             power<2>((unison_spread * unison_values[k]) / 1200.0f);
                     }
                 }
+                break;
         }
         if (is_pwm)
             for (int i = true_unison - 1; i >= 0; i--)
@@ -2248,8 +2253,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice)
 
 void ADnote::computeVoiceOscillatorForFMFrequencyModulation(int nvoice)
 {
-    // See computeVoiceModulatorForFMFrequencyModulation for details on how this
-    // works.
+    // See computeVoiceModulatorForFMFrequencyModulation for details on how this works.
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpwave_unison[k];
@@ -2403,6 +2407,7 @@ void ADnote::computeVoiceOscillator(int nvoice)
                 break;
             default:
                 ComputeVoiceSpotNoise(nvoice); // spot noise
+                break;
         }
     }
 
@@ -2813,5 +2818,3 @@ void ADnote::releasekey(void)
     if (NoteStatus == NOTE_KEEPALIVE)
         NoteStatus = NOTE_ENABLED;
 }
-
-// for future reference ... re replacing pow(x, y) by exp(y * log(x))

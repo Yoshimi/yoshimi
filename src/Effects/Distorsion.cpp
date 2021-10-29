@@ -29,9 +29,9 @@
 #include "Effects/Distorsion.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
 using func::power;
 using func::powFrac;
+using func::decibel;
 
 
 namespace { // Implementation details...
@@ -166,7 +166,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        float lvl = dB2rap(60.0f * level.getAndAdvanceValue() - 40.0f);
+        float lvl = decibel<-40>(1.0f - 1.5f * level.getAndAdvanceValue());
         float lout = efxoutl[i];
         float rout = efxoutr[i];
         float l = lout * (1.0f - lrcross.getValue()) + rout * lrcross.getValue();

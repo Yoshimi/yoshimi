@@ -34,6 +34,9 @@
 
 #include <cmath>
 
+using func::power;
+using func::decibel;
+
 class XMLwrapper;
 class SynthEngine;
 
@@ -67,9 +70,9 @@ class FilterParams : public Presets
         float getformantfreq(unsigned char freq) // Transforms a parameter to
             { return getfreqx(freq / 127.0f); }  // the real value
         float getformantamp(unsigned char amp)
-            { return func::dB80(1.0f - amp / 127.0f); }
+            { return decibel<-80>(1.0f - amp / 127.0f); }
         float getformantq(unsigned char q)
-            { return func::power<25>((q - 32.0f) / 64.0f); }
+            { return power<25>((q - 32.0f) / 64.0f); }
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)

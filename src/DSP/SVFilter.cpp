@@ -30,8 +30,6 @@
 #include "DSP/SVFilter.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
-
 
 SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
                    unsigned char Fstages, SynthEngine *_synth) :

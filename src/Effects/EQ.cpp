@@ -28,9 +28,9 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
 
-using func::rap2dB;
 using func::power;
 using func::powFrac;
+using func::asDecibel;
 
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
@@ -166,6 +166,7 @@ void EQ::changepar(int npar, unsigned char value)
             break;
         case 1:
             Pband = value;
+            break;
     }
     if (npar < 10)
         return;
@@ -273,7 +274,7 @@ float EQ::getfreqresponse(float freq)
         resp *= filter[i].l->H(freq);
     }
     // Only for UI purposes, use target value.
-    return rap2dB(resp * outvolume.getTargetValue());
+    return asDecibel(resp * outvolume.getTargetValue());
 }
 
 

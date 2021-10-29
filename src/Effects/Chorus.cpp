@@ -287,6 +287,7 @@ void Chorus::changepar(int npar, unsigned char value)
             break;
         default:
             Pchanged = false;
+            break;
     }
 }
 

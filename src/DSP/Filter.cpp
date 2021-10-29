@@ -26,7 +26,7 @@
 #include "DSP/Filter.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
+using func::decibel;
 using func::power;
 
 
@@ -73,7 +73,7 @@ void Filter::updateCurrentParameters()
             break;
 
         case 2:
-            filter->outgain = dB2rap(pars->getgain());
+            filter->outgain = decibel(pars->getgain());
             if (filter->outgain > 1.0f)
                 filter->outgain = sqrtf(filter->outgain);
             break;
@@ -83,7 +83,7 @@ void Filter::updateCurrentParameters()
             if (Ftype >= 6 && Ftype <= 8)
                 filter->setgain(pars->getgain());
             else
-                filter->outgain = dB2rap(pars->getgain());
+                filter->outgain = decibel(pars->getgain());
             break;
     }
 }

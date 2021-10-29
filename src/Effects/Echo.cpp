@@ -335,6 +335,7 @@ void Echo::changepar(int npar, unsigned char value)
 
         default:
             Pchanged = false;
+            break;
     }
 }
 

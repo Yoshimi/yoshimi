@@ -57,8 +57,8 @@ decl {\#include "Misc/SynthHelper.h"
 }
 
 decl {\#include "Misc/NumericFuncs.h"
-    using func::dB2rap;
-    using func::rap2dB;
+    using func::decibel;
+    using func::asDecibel;
     using func::power;} {private local
 }
 
@@ -244,8 +244,8 @@ this->pars=pars;} {}
         for (int i = 0; i < lx; i++)
         {
             float x = spectrum[i];
-            if (x > dB2rap(-maxdb))
-                x = rap2dB(x) / maxdb + 1;
+            if (x > decibel(-maxdb))
+                x = asDecibel(x) / maxdb + 1;
             else
                 continue;
             int yy = (int)(x * ly);

@@ -30,7 +30,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
+using func::decibel;
 
 
 AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth) :
@@ -148,7 +148,7 @@ void AnalogFilter::computefiltercoefs(void)
     {
         case 0: // LPF 1 pole
             if (zerocoefs == 0)
-                tmp = expf(-2.0f * PI * freq / synth->samplerate_f);
+                tmp = expf(-TWOPI * freq / synth->samplerate_f);
             else
                 tmp = 0.0f;
             c[0] = 1.0f - tmp;
@@ -161,7 +161,7 @@ void AnalogFilter::computefiltercoefs(void)
 
         case 1: // HPF 1 pole
             if (zerocoefs == 0)
-                tmp = expf(-2.0f * PI * freq / synth->samplerate_f);
+                tmp = expf(-TWOPI * freq / synth->samplerate_f);
             else
                 tmp = 0.0f;
             c[0] = (1.0f + tmp) / 2.0f;
@@ -387,7 +387,7 @@ void AnalogFilter::settype(int type_)
 
 void AnalogFilter::setgain(float dBgain)
 {
-    gain = dB2rap(dBgain);
+    gain = decibel(dBgain);
     computefiltercoefs();
 }
 
