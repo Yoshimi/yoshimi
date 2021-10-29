@@ -39,10 +39,18 @@ class TextData
         void log(std::string &line, std::string text);
         void strip(std::string &line);
         void nextWord(std::string &line);
+        bool findAndStep(std::string &line, std::string text);
         int findListEntry(std::string &line, int step, std::string list []);
 
-        void encodeMain(std::string source, CommandBlock &allData);
-        void encodePart(std::string source, CommandBlock &allData);
-        void encodeEffects(std::string source, CommandBlock &allData);
+        void encodeMain(std::string &source, CommandBlock &allData);
+        void encodePart(std::string &source, CommandBlock &allData);
+
+        void encodeEffects(std::string &source, CommandBlock &allData);
+
+        void encodeAddSynth(std::string &source, CommandBlock &allData);
+        void encodeAddVoice(std::string &source, CommandBlock &allData);
+        void encodeSubSynth(std::string &source, CommandBlock &allData);
+        void encodePadSynth(std::string &source, CommandBlock &allData);
+
 };
 #endif // TEXTDATA_H

@@ -45,45 +45,31 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
     //cout << ">" << source << endl;
     memset(&allData.bytes, 255, sizeof(allData));
 
-    size_t pos = source.find("Main");
-    if (pos != string::npos)
+    if (findAndStep(source, "Main"))
     {
-        nextWord(source);
         encodeMain(source, allData);
         return;
     }
 
-    pos = source.find("System");
-    if (pos != string::npos)
+    if (findAndStep(source, "System"))
     {
         allData.data.part = (TOPLEVEL::section::systemEffects);
-        nextWord(source);
-        pos = source.find("Effect");
-        if (pos != string::npos)
-        {
-            nextWord(source);
+        if (findAndStep(source, "Effect"))
             encodeEffects(source, allData);
-        }
         return;
     }
 
-    pos = source.find("Insert");
-    if (pos != string::npos)
+    if (findAndStep(source, "Insert"))
     {
         allData.data.part = (TOPLEVEL::section::insertEffects);
-        nextWord(source);
-        pos = source.find("Effect");
-        if (pos != string::npos)
-        {
-            nextWord(source);
+        if (findAndStep(source, "Effect"))
             encodeEffects(source, allData);
-        }return;
+        return;
     }
 
-    pos = source.find("Part");
-    if (pos != string::npos)
+    if (findAndStep(source, "Part"))
     {
-        encodePart(source.substr(pos + 4), allData);
+        encodePart(source, allData);
         return;
     }
     log(source, "bad Command String");
@@ -122,6 +108,16 @@ void TextData::nextWord(std::string &line)
     strip(line);
 }
 
+bool TextData::findAndStep(std::string &line, std::string text)
+{
+    size_t pos = line.find(text);
+    if (pos != string::npos)
+    {
+        nextWord(line);
+        return true;
+    }
+    return false;
+}
 
 int TextData::findListEntry(std::string &line, int step, std::string list [])
 {
@@ -133,12 +129,8 @@ int TextData::findListEntry(std::string &line, int step, std::string list [])
         size_t split = test.find(" ");
         if (split != string::npos)
             test = test.substr(0, split);
-        if (line.find(test) != string::npos)
-        {
-            nextWord(line);
-            found = true;
-        }
-        else
+        found = findAndStep(line, test);
+        if (!found)
             count += step;
 
     } while (!found && test != "@end");
@@ -148,27 +140,22 @@ int TextData::findListEntry(std::string &line, int step, std::string list [])
 }
 
 
-void TextData::encodeMain(std::string source, CommandBlock &allData)
+void TextData::encodeMain(std::string &source, CommandBlock &allData)
 {
     strip (source);
     //cout << ">" << source << endl;
     allData.data.part = TOPLEVEL::section::main;
-    size_t pos = source.find("Master");
-    if (pos != string::npos)
+    if (findAndStep(source, "Master"))
     {
-        nextWord(source);
-        pos = source.find("Mono/Stereo");
-        if (pos != string::npos)
+        if (findAndStep(source, "Mono/Stereo"))
         {
             nextWord(source);
             allData.data.control = MAIN::control::mono;
             return;
         }
     }
-    pos = source.find("Volume");
-    if (pos != string::npos)
+    if (findAndStep(source, "Volume"))
     {
-        nextWord(source);
         allData.data.control = MAIN::control::volume;
         return;
     }
@@ -177,7 +164,7 @@ void TextData::encodeMain(std::string source, CommandBlock &allData)
 }
 
 
-void TextData::encodePart(std::string source, CommandBlock &allData)
+void TextData::encodePart(std::string &source, CommandBlock &allData)
 {
     strip (source);
     unsigned char npart = UNUSED;
@@ -192,25 +179,59 @@ void TextData::encodePart(std::string source, CommandBlock &allData)
         }
         allData.data.part = (TOPLEVEL::section::part1 + npart);
         nextWord(source);
-        size_t pos = source.find("Effect");
-        if (pos != string::npos)
+        if (findAndStep(source, "Effect"))
         {
-            nextWord(source);
             encodeEffects(source, allData);
             return;
         }
+    }
+    unsigned char kitnum = UNUSED;
+    if (findAndStep(source, "Kit"))
+    {
+        if (isdigit(source[0]))
+        {
+            kitnum = stoi(source) - 1;
+            if (kitnum >= NUM_KIT_ITEMS)
+            {
+                log(source, "kit number out of range");
+                return;
+            }
+            nextWord(source);
+            allData.data.kit = kitnum;
+        }
+    }
+
+    if (findAndStep(source, "AddSynth"))
+    {
+        encodeAddSynth(source, allData);
+        return;
+    }
+    if (findAndStep(source, "Add"))
+    {
+        if (findAndStep(source, "Voice"))
+        {
+            encodeAddVoice(source, allData);
+            return;
+        }
+    }
+    if (findAndStep(source, "SubSynth"))
+    {
+        encodeSubSynth(source, allData);
+        return;
+    }
+    if (findAndStep(source, "PadSynth"))
+    {
+        encodePadSynth(source, allData);
+        return;
     }
     cout << "part overflow >" << source << endl;
 }
 
 
-void TextData::encodeEffects(std::string source, CommandBlock &allData)
+void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 {
-    size_t pos;
-    pos = source.find("Send");
-    if (pos != string::npos)
+    if (findAndStep(source, "Send"))
     {
-        nextWord(source);
         if (isdigit(source[0]))
         {
             unsigned char sendto = stoi(source) - 1;
@@ -228,10 +249,8 @@ void TextData::encodeEffects(std::string source, CommandBlock &allData)
 
         if (allData.data.part < NUM_MIDI_PARTS)
         {
-            pos = source.find("Bypass");
-            if (pos != string::npos)
+            if (findAndStep(source, "Bypass"))
             {
-                nextWord(source);
                 allData.data.control = PART::control::effectBypass;
                 allData.data.insert = TOPLEVEL::insert::partEffectSelect;
                 return;
@@ -318,4 +337,29 @@ void TextData::encodeEffects(std::string source, CommandBlock &allData)
         return;
     }
     cout << "effects overflow >" << source << endl;
+}
+
+
+void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
+{
+
+    cout << "addsynth overflow >" << source << endl;
+}
+
+
+void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
+{
+    cout << "addvoice overflow >" << source << endl;
+}
+
+
+void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
+{
+    cout << "subsynth overflow >" << source << endl;
+}
+
+
+void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
+{
+    cout << "padsynth overflow >" << source << endl;
 }
