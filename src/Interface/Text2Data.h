@@ -39,6 +39,8 @@ class TextData
         void log(std::string &line, std::string text);
         void strip(std::string &line);
         void nextWord(std::string &line);
+        int findListEntry(std::string &line, int step, std::string list []);
+
         void encodeMain(std::string source, CommandBlock &allData);
         void encodePart(std::string source, CommandBlock &allData);
         void encodeEffects(std::string source, CommandBlock &allData);

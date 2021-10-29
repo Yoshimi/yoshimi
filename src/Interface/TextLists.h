@@ -834,7 +834,7 @@ static std::string distortionlist [] = {
     "DRIve <n>",        "input level",
     "OUTput <n>",       "output balance",
     "WAVe <s>",         "function waveshape",
-    "","(ATAn, ASYm1, POWer, SINe, QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
+    "-","(ATAn, ASYm1, POWer, SINe, QNTs, ZIGzag, LMT, ULMt, LLMt, ILMt, CLIp, AS2, PO2, SGM)",
     "INVert <s>",       "invert ?  (ON {other})",
     "LOW <n>",          "low pass filter",
     "HIGh <n>",         "high pass filter",
@@ -847,7 +847,7 @@ static std::string eqlist [] = {
     "LEVel <n>",        "intensity",
     "BANd <n>",         "EQ band number for following controls",
     "FILter <s>",       "filter type",
-    "","(LP1, HP1, LP2, HP2, NOT, PEA, LOW, HIG)",
+    "-","(LP1, HP1, LP2, HP2, NOT, PEA, LOW, HIG)",
     "FREquency <n>",    "cutoff/band frequency",
     "GAIn <n>",         "makeup gain",
     "Q <n>",            "filter Q",
@@ -1045,11 +1045,13 @@ static std::string type_list [] = {
 };
 const int type_offset [] = {0, 1, -3, 2, 3, 4, 5, 6, 7, -6, -2, 8, 9, 10, -5, 11, 12, -4, 13, 14, 15, 16, 255};
 /*
- * the number of the above entries must match
+ * The number of the above 2 entries must match
  * @end and 255 are the recognised terminators
- * only add negative numbers for backward compatibility
- * they will resolve as 'undefined'
- * note: can't use -1 as ID here
+ * The list order is the display order
+ * Only add negative numbers (for backward compatibility)
+ * On old synth versions they will resolve as 'undefined'
+ *
+ * Note: can't use -1 as ID
  */
 
 static std::string fx_presets [] = {

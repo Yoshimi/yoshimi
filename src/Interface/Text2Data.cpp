@@ -32,14 +32,6 @@ using std::string;
 using std::cout;
 using std::endl;
 
-void TextData::log(std::string &line, std::string text)
-{
-    oursynth->getRuntime().Log("Error: " + text);
-    // we may later decide to print the string before emptying it
-
-    line = "";
-}
-
 void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock &allData)
 {
     oursynth = _synth;
@@ -99,6 +91,15 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
 }
 
 
+void TextData::log(std::string &line, std::string text)
+{
+    oursynth->getRuntime().Log("Error: " + text);
+    // we may later decide to print the string before emptying it
+
+    line = "";
+}
+
+
 void TextData::strip(std::string &line)
 {
     size_t pos = line.find_first_not_of(" ");
@@ -122,10 +123,35 @@ void TextData::nextWord(std::string &line)
 }
 
 
+int TextData::findListEntry(std::string &line, int step, std::string list [])
+{
+    int count = 0;
+    bool found = false;
+    std::string test;
+    do {
+        test = func::stringCaps(list [count], 1);
+        size_t split = test.find(" ");
+        if (split != string::npos)
+            test = test.substr(0, split);
+        if (line.find(test) != string::npos)
+        {
+            nextWord(line);
+            found = true;
+        }
+        else
+            count += step;
+
+    } while (!found && test != "@end");
+    if (count > 0)
+        count = count / step; // gives actual list position
+    return count;
+}
+
+
 void TextData::encodeMain(std::string source, CommandBlock &allData)
 {
     strip (source);
-    cout << ">" << source << endl;
+    //cout << ">" << source << endl;
     allData.data.part = TOPLEVEL::section::main;
     size_t pos = source.find("Master");
     if (pos != string::npos)
@@ -181,6 +207,18 @@ void TextData::encodePart(std::string source, CommandBlock &allData)
 void TextData::encodeEffects(std::string source, CommandBlock &allData)
 {
     size_t pos;
+    pos = source.find("Send");
+    if (pos != string::npos)
+    {
+        nextWord(source);
+        if (isdigit(source[0]))
+        {
+            unsigned char sendto = stoi(source) - 1;
+            allData.data.control = PART::control::partToSystemEffect1 + sendto;
+            nextWord(source);
+            return;
+        }
+    }
     if (isdigit(source[0]))
     {
         unsigned char effnum = stoi(source) - 1; // need to find number ranges
@@ -197,18 +235,6 @@ void TextData::encodeEffects(std::string source, CommandBlock &allData)
                 allData.data.control = PART::control::effectBypass;
                 allData.data.insert = TOPLEVEL::insert::partEffectSelect;
                 return;
-            }
-            pos = source.find("Send");
-            if (pos != string::npos)
-            {
-                nextWord(source);
-                if (isdigit(source[0]))
-                {
-                    unsigned char sendto = stoi(source) - 1;
-                    allData.data.control = PART::control::partToSystemEffect1 + sendto;
-                    nextWord(source);
-                    return;
-                }
             }
         }
         if (allData.data.part == TOPLEVEL::section::systemEffects)
@@ -230,30 +256,66 @@ void TextData::encodeEffects(std::string source, CommandBlock &allData)
             }
         }
 
-        unsigned char efftype = 0;
-        bool found = false;
-        //cout << source << endl;
-        std::string test;
-        do {
-            test = func::stringCaps(fx_list [efftype], 1);
-            //cout << test << endl;
-            if (source.find(test) != string::npos)
-            {
-                nextWord(source);
-                found = true;
-            }
-            else
-                ++ efftype;
-
-        } while (!found && test != "@end");
+        unsigned char efftype = findListEntry(source, 1, fx_list);
         if (efftype >= EFFECT::type::count - EFFECT::type::none)
         {
             log(source, "effect type out of range");
             return;
         }
+        int effpos = efftype + EFFECT::type::none;
         allData.data.kit = efftype + EFFECT::type::none;
-        cout << "effnum " << int(effnum) << "  efftype " << int(efftype + EFFECT::type::none) << endl;
+
         // now need to do actual control
+        unsigned char result = UNUSED;
+        switch (effpos)
+        {
+            case EFFECT::type::reverb:
+                result = findListEntry(source, 2, reverblist);
+                if (result > 4) // no 5 or 6
+                    result += 2;
+                break;
+            case EFFECT::type::echo:
+                result = findListEntry(source, 2, echolist);
+                if (result == 7) // skip unused numbers
+                    result = EFFECT::control::bpm;
+                break;
+            case EFFECT::type::chorus:
+                result = findListEntry(source, 2, choruslist);
+                if (result >= 11) // skip unused numbers
+                    result = result - 11 + EFFECT::control::bpm;
+                break;
+            case EFFECT::type::phaser:
+                result = findListEntry(source, 2, phaserlist);
+                if (result >= 15) // skip unused numbers
+                    result = result - 15 + EFFECT::control::bpm;
+                break;
+            case EFFECT::type::alienWah:
+                result = findListEntry(source, 2, alienwahlist);
+                if (result >= 11) // skip unused numbers
+                    result = result - 11 + EFFECT::control::bpm;
+                break;
+            case EFFECT::type::distortion:
+                result = findListEntry(source, 2, distortionlist);
+                if (result > 5) // extra line
+                    result -= 1;
+                break;
+            case EFFECT::type::eq:
+                result = findListEntry(source, 2, eqlist);
+                if (result > 2) // extra line
+                    result -= 1;
+                break;
+            case EFFECT::type::dynFilter:
+                result = findListEntry(source, 2, dynfilterlist);
+                if (result >= 11) // skip unused numbers
+                    result = result - 11 + EFFECT::control::bpm;
+                break;
+            default:
+                log(source, "effect control out of range");
+                return;
+        }
+        //cout << "effnum " << int(effnum) << "  efftype " << int(efftype + EFFECT::type::none) << "  control " << int(result) << endl;
+        allData.data.control = result;
+        return;
     }
     cout << "effects overflow >" << source << endl;
 }
