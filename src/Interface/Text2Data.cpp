@@ -34,6 +34,8 @@ using std::endl;
 
 void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock &allData)
 {
+    memset(&allData.bytes, 255, sizeof(allData));
+
     oursynth = _synth;
     string source = _source;
     strip (source);
@@ -42,38 +44,29 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
         log(source, "empty Command String");
         return;
     }
-    //cout << ">" << source << endl;
-    memset(&allData.bytes, 255, sizeof(allData));
+    encodeLoop(source, allData);
 
-    if (findAndStep(source, "Main"))
-    {
-        encodeMain(source, allData);
-        return;
+    /*
+     * If we later decide to be able to set and read values
+     * this is where the code should go in order to catch
+     * all of the subroutines.
+     * encodeAll should then have a return value for reads
+     *
+     * MIDI-learn will not use this
+     */
+
+    /*size_t pos = source.find("Value");
+    if (pos == string::npos)
+    { // done directly - we don't know 'source' is tidy
+        source = source.substr(pos);
+        nextWord(source);
+        if (isdigit(source[0]))
+        {
+            allData.data.value = strtof(source.c_str(), NULL);
+        }
     }
-
-    if (findAndStep(source, "System"))
-    {
-        allData.data.part = (TOPLEVEL::section::systemEffects);
-        if (findAndStep(source, "Effect"))
-            encodeEffects(source, allData);
-        return;
-    }
-
-    if (findAndStep(source, "Insert"))
-    {
-        allData.data.part = (TOPLEVEL::section::insertEffects);
-        if (findAndStep(source, "Effect"))
-            encodeEffects(source, allData);
-        return;
-    }
-
-    if (findAndStep(source, "Part"))
-    {
-        encodePart(source, allData);
-        return;
-    }
-    log(source, "bad Command String");
-
+    else
+        return allData.data.value;*/
 }
 
 
@@ -113,6 +106,7 @@ bool TextData::findAndStep(std::string &line, std::string text)
     size_t pos = line.find(text);
     if (pos != string::npos)
     {
+        line.substr(pos, text.length());
         nextWord(line);
         return true;
     }
@@ -139,6 +133,38 @@ int TextData::findListEntry(std::string &line, int step, std::string list [])
     return count;
 }
 
+void TextData::encodeLoop(std::string source, CommandBlock &allData)
+{
+    if (findAndStep(source, "Main"))
+    {
+        encodeMain(source, allData);
+        return;
+    }
+
+    if (findAndStep(source, "System"))
+    {
+        allData.data.part = (TOPLEVEL::section::systemEffects);
+        if (findAndStep(source, "Effect"))
+            encodeEffects(source, allData);
+        return;
+    }
+
+    if (findAndStep(source, "Insert"))
+    {
+        allData.data.part = (TOPLEVEL::section::insertEffects);
+        if (findAndStep(source, "Effect"))
+            encodeEffects(source, allData);
+        return;
+    }
+
+    if (findAndStep(source, "Part"))
+    {
+        encodePart(source, allData);
+        return;
+    }
+    log(source, "bad Command String");
+}
+
 
 void TextData::encodeMain(std::string &source, CommandBlock &allData)
 {
@@ -149,7 +175,6 @@ void TextData::encodeMain(std::string &source, CommandBlock &allData)
     {
         if (findAndStep(source, "Mono/Stereo"))
         {
-            nextWord(source);
             allData.data.control = MAIN::control::mono;
             return;
         }
@@ -200,6 +225,16 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
             allData.data.kit = kitnum;
         }
     }
+    if (findAndStep(source, "Controller"))
+    {
+        encodeController(source, allData);
+        return;
+    }
+    if (findAndStep(source, "MIDI"))
+    {
+        encodeMidi(source, allData);
+        return;
+    }
 
     if (findAndStep(source, "AddSynth"))
     {
@@ -225,6 +260,141 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         return;
     }
     cout << "part overflow >" << source << endl;
+}
+
+
+void TextData::encodeController(std::string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source,"Vol"))
+    {
+        if (findAndStep(source,"Range"))
+            ctl = PART::control::volumeRange;
+        else if (findAndStep(source,"Enable"))
+            ctl = PART::control::volumeEnable;
+    }
+    else if (findAndStep(source,"Pan Width"))
+    {
+        ctl = PART::control::panningWidth;
+    }
+    else if (findAndStep(source,"Mod Wheel Range"))
+    {
+        ctl = PART::control::modWheelDepth;
+    }
+    else if (findAndStep(source,"Exponent"))
+    {
+        if (findAndStep(source,"Mod Wheel"))
+        {
+            ctl = PART::control::exponentialModWheel;
+        }
+        else if (findAndStep(source,"Bandwidth"))
+            ctl = PART::control::exponentialBandwidth;
+    }
+    else if (findAndStep(source,"Bandwidth Range"))
+    {
+        ctl = PART::control::bandwidthDepth;
+    }
+    else if (findAndStep(source,"Expression Enable"))
+    {
+        ctl = PART::control::expressionEnable;
+    }
+    else if (findAndStep(source,"FM Amp Enable"))
+    {
+        ctl = PART::control::FMamplitudeEnable;
+    }
+    else if (findAndStep(source,"Sustain Ped Enable"))
+    {
+        ctl = PART::control::sustainPedalEnable;
+    }
+    else if (findAndStep(source,"Pitch Wheel Range"))
+    {
+        ctl = PART::control::pitchWheelRange;
+    }
+    else if (findAndStep(source,"Filter"))
+    {
+        if (findAndStep(source,"Q Range"))
+        {
+            ctl = PART::control::filterQdepth;
+        }
+        else if (findAndStep(source,"Cutoff Range"))
+        {
+            ctl = PART::control::filterCutoffDepth;
+        }
+    }
+    else if (findAndStep(source,"Breath Control"))
+    {
+        ctl = PART::control::breathControlEnable;
+    }
+    else if (findAndStep(source,"Res"))
+    {
+        if (findAndStep(source,"Cent Freq Range"))
+        {
+            ctl = PART::control::resonanceCenterFrequencyDepth;
+        }
+        else if (findAndStep(source,"Band Range"))
+        {
+            ctl = PART::control::resonanceBandwidthDepth;
+        }
+    }
+    else if (findAndStep(source,"Receive"))
+        ctl = PART::control::receivePortamento;
+    else if (findAndStep(source,"Time"))
+    {
+        if (findAndStep(source,"Stretch"))
+            ctl = PART::control::portamentoTimeStretch;
+        else
+            ctl = PART::control::portamentoTime;
+    }
+    else if (findAndStep(source,"Threshold Gate"))
+    {
+        if (findAndStep(source,"Type"))
+            ctl = PART::control::portamentoThresholdType;
+        else
+            ctl = PART::control::portamentoThreshold;
+    }
+    else if (findAndStep(source,"Prop"))
+    {
+        if (findAndStep(source,"Enable"))
+            ctl = PART::control::enableProportionalPortamento;
+        else if (findAndStep(source,"Rate"))
+            ctl = PART::control::proportionalPortamentoRate;
+        else if (findAndStep(source,"depth"))
+            ctl = PART::control::proportionalPortamentoDepth;
+    }
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
+    cout << "controller overflow >" << source << endl;
+}
+
+
+void TextData::encodeMidi(std::string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source,"Modulation"))
+        ctl = PART::control::midiModWheel;
+    else if (findAndStep(source,"Expression"))
+        ctl = PART::control::midiExpression;
+    else if (findAndStep(source,"Filter"))
+    {
+        if (findAndStep(source,"Q"))
+            ctl = PART::control::midiFilterQ;
+        else if (findAndStep(source,"Cutoff"))
+            ctl = PART::control::midiFilterCutoff;
+    }
+    else if (findAndStep(source,"Bandwidth"))
+        ctl = PART::control::midiBandwidth;
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
+    cout << "midi overflow >" << source << endl;
 }
 
 
