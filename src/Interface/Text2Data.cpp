@@ -23,21 +23,23 @@
 
 #include "Interface/Text2Data.h"
 #include "Interface/TextLists.h"
+#include "Interface/InterChange.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/NumericFuncs.h"
 
 using std::string;
+using std::to_string;
 using std::cout;
 using std::endl;
 
-void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock &allData)
+void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock &allData)
 {
     memset(&allData.bytes, 255, sizeof(allData));
 
     oursynth = _synth;
-    string source = _source;
+    string source = sentCommand;
     strip (source);
     if (source.empty())
     {
@@ -50,23 +52,31 @@ void TextData::encodeAll(SynthEngine *_synth, std::string _source, CommandBlock 
      * If we later decide to be able to set and read values
      * this is where the code should go in order to catch
      * all of the subroutines.
-     * encodeAll should then have a return value for reads
      *
      * MIDI-learn will not use this
      */
 
     /*size_t pos = source.find("Value");
-    if (pos == string::npos)
+    if (pos != string::npos)
     { // done directly - we don't know 'source' is tidy
         source = source.substr(pos);
         nextWord(source);
         if (isdigit(source[0]))
         {
             allData.data.value = strtof(source.c_str(), NULL);
+            // need a ring buffer to write allData CommandBlock
         }
+        else
+            log (source, "no value to write given");
     }
     else
-        return allData.data.value;*/
+    {
+        // return the supplied allData CommandBlock
+        // and/or the supplied string
+        allData.data.type = 0;
+        allData.data.value = oursynth->interchange.readAllData(&allData);
+        sentCommand += (" Value >" + to_string(allData.data.value));
+    }*/
 }
 
 
@@ -99,6 +109,16 @@ void TextData::nextWord(std::string &line)
     }
     line = line.substr(pos);
     strip(line);
+}
+
+
+bool TextData::findChar(string &line, unsigned char &value)
+{
+    if (!isdigit(line[0]))
+        return false;
+    value = stoi(line) - 1;
+    nextWord(line);
+    return true;
 }
 
 bool TextData::findAndStep(std::string &line, std::string text)
@@ -193,9 +213,8 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
 {
     strip (source);
     unsigned char npart = UNUSED;
-    if (isdigit(source[0]))
+    if (findChar(source, npart))
     {
-        npart = stoi(source) - 1;
         //cout << "part " << int(npart) << endl;
         if (npart >= NUM_MIDI_PARTS)
         {
@@ -203,26 +222,63 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
             return;
         }
         allData.data.part = (TOPLEVEL::section::part1 + npart);
-        nextWord(source);
         if (findAndStep(source, "Effect"))
         {
             encodeEffects(source, allData);
             return;
         }
     }
+    else
+        return; // must have a part number!
+
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Vel"))
+    {
+        if (findAndStep(source, "Sens"))
+            ctl = PART::control::velocitySense;
+        else if (findAndStep(source, "Offset"))
+            ctl = PART::control::velocityOffset;
+    }
+    else if (findAndStep(source, "Panning"))
+        ctl = PART::control::panning;
+    else if (findAndStep(source, "Volume"))
+        ctl = PART::control::volume;
+    else if (findAndStep(source, "Humanise"))
+    {
+        if (findAndStep(source, "Pitch"))
+            ctl = PART::control::humanise;
+        else if (findAndStep(source, "Velocity"))
+            ctl = PART::control::humanvelocity;
+    }
+    else if (findAndStep(source, "Portamento Enable"))
+        ctl = PART::control::portamento;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
     unsigned char kitnum = UNUSED;
     if (findAndStep(source, "Kit"))
     {
-        if (isdigit(source[0]))
+        if (findChar(source, kitnum))
         {
-            kitnum = stoi(source) - 1;
             if (kitnum >= NUM_KIT_ITEMS)
             {
                 log(source, "kit number out of range");
                 return;
             }
-            nextWord(source);
             allData.data.kit = kitnum;
+            //cout << "kitnum " << int(kitnum) << endl;
+        }
+        unsigned char kitctl = UNUSED;
+        if (findAndStep(source, "Mute"))
+            kitctl = PART::control::kitItemMute;
+        // we may add other controls later
+        if (kitctl < UNUSED)
+        {
+            allData.data.control = ctl;
+            return;
         }
     }
     if (findAndStep(source, "Controller"))
@@ -402,20 +458,18 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 {
     if (findAndStep(source, "Send"))
     {
-        if (isdigit(source[0]))
+        unsigned char sendto = UNUSED;
+        if (findChar(source, sendto))
         {
-            unsigned char sendto = stoi(source) - 1;
             allData.data.control = PART::control::partToSystemEffect1 + sendto;
-            nextWord(source);
             return;
         }
     }
-    if (isdigit(source[0]))
+    unsigned char effnum = UNUSED;
+    if (findChar(source, effnum)) // need to find number ranges
     {
-        unsigned char effnum = stoi(source) - 1; // need to find number ranges
         allData.data.engine = effnum;
         //cout << "effnum " << int(effnum) << endl;
-        nextWord(source);
 
         if (allData.data.part < NUM_MIDI_PARTS)
         {
@@ -512,6 +566,14 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
 void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 {
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Enable"))
+        ctl = PART::control::enableAdd;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
 
     cout << "addsynth overflow >" << source << endl;
 }
@@ -519,17 +581,44 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 
 void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 {
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Enable"))
+        ctl = ADDVOICE::control::enableVoice;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
     cout << "addvoice overflow >" << source << endl;
 }
 
 
 void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 {
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Enable"))
+        ctl = PART::control::enableSub;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
     cout << "subsynth overflow >" << source << endl;
 }
 
 
 void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 {
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Enable"))
+        ctl = PART::control::enablePad;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
     cout << "padsynth overflow >" << source << endl;
 }

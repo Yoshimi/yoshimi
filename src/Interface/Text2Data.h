@@ -26,33 +26,36 @@
 
 #include "globals.h"
 
+using std::string;
+
 class SynthEngine;
 class TextMsgBuffer;
 
 class TextData
 {
     public:
-        void encodeAll(SynthEngine *_synth, std::string _source, CommandBlock &allData);
+        void encodeAll(SynthEngine *_synth, string &sendCommand, CommandBlock &allData);
 
     private:
         SynthEngine *oursynth;
-        void log(std::string &line, std::string text);
-        void strip(std::string &line);
-        void nextWord(std::string &line);
-        bool findAndStep(std::string &line, std::string text);
-        int findListEntry(std::string &line, int step, std::string list []);
-        void encodeLoop(std::string source, CommandBlock &allData);
-        void encodeMain(std::string &source, CommandBlock &allData);
-        void encodePart(std::string &source, CommandBlock &allData);
-        void encodeController(std::string &source, CommandBlock &allData);
-        void encodeMidi(std::string &source, CommandBlock &allData);
+        void log(string &line, string text);
+        void strip(string &line);
+        void nextWord(string &line);
+        bool findChar(string &line, unsigned char &value);
+        bool findAndStep(string &line, string text);
+        int findListEntry(string &line, int step, string list []);
+        void encodeLoop(string source, CommandBlock &allData);
+        void encodeMain(string &source, CommandBlock &allData);
+        void encodePart(string &source, CommandBlock &allData);
+        void encodeController(string &source, CommandBlock &allData);
+        void encodeMidi(string &source, CommandBlock &allData);
 
-        void encodeEffects(std::string &source, CommandBlock &allData);
+        void encodeEffects(string &source, CommandBlock &allData);
 
-        void encodeAddSynth(std::string &source, CommandBlock &allData);
-        void encodeAddVoice(std::string &source, CommandBlock &allData);
-        void encodeSubSynth(std::string &source, CommandBlock &allData);
-        void encodePadSynth(std::string &source, CommandBlock &allData);
+        void encodeAddSynth(string &source, CommandBlock &allData);
+        void encodeAddVoice(string &source, CommandBlock &allData);
+        void encodeSubSynth(string &source, CommandBlock &allData);
+        void encodePadSynth(string &source, CommandBlock &allData);
 
 };
 #endif // TEXTDATA_H

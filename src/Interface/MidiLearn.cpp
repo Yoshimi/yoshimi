@@ -1048,7 +1048,9 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
 
                 CommandBlock allData;
-                TextData::encodeAll(synth, xml->getparstr("Command_Name"), allData);
+                string test = xml->getparstr("Command_Name");
+                TextData::encodeAll(synth, test, allData);
+                //std::cout << "test " << allData.data.value << std::endl;
 
                 xml->exitbranch();
             xml->exitbranch();
