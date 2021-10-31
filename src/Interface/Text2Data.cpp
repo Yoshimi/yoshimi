@@ -157,6 +157,9 @@ int TextData::findListEntry(std::string &line, int step, std::string list [])
 
 void TextData::encodeLoop(std::string source, CommandBlock &allData)
 {
+    /* NOTE
+     * subsections must *always* come before local controls!
+     */
     if (findAndStep(source, "Main"))
     {
         encodeMain(source, allData);
@@ -233,33 +236,6 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
     else
         return; // must have a part number!
 
-    unsigned char ctl = UNUSED;
-    if (findAndStep(source, "Vel"))
-    {
-        if (findAndStep(source, "Sens"))
-            ctl = PART::control::velocitySense;
-        else if (findAndStep(source, "Offset"))
-            ctl = PART::control::velocityOffset;
-    }
-    else if (findAndStep(source, "Panning"))
-        ctl = PART::control::panning;
-    else if (findAndStep(source, "Volume"))
-        ctl = PART::control::volume;
-    else if (findAndStep(source, "Humanise"))
-    {
-        if (findAndStep(source, "Pitch"))
-            ctl = PART::control::humanise;
-        else if (findAndStep(source, "Velocity"))
-            ctl = PART::control::humanvelocity;
-    }
-    else if (findAndStep(source, "Portamento Enable"))
-        ctl = PART::control::portamento;
-    if (ctl < UNUSED)
-    {
-        allData.data.control = ctl;
-        return;
-    }
-
     unsigned char kitnum = UNUSED;
     if (findAndStep(source, "Kit"))
     {
@@ -317,6 +293,34 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         encodePadSynth(source, allData);
         return;
     }
+
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Vel"))
+    {
+        if (findAndStep(source, "Sens"))
+            ctl = PART::control::velocitySense;
+        else if (findAndStep(source, "Offset"))
+            ctl = PART::control::velocityOffset;
+    }
+    else if (findAndStep(source, "Panning"))
+        ctl = PART::control::panning;
+    else if (findAndStep(source, "Volume"))
+        ctl = PART::control::volume;
+    else if (findAndStep(source, "Humanise"))
+    {
+        if (findAndStep(source, "Pitch"))
+            ctl = PART::control::humanise;
+        else if (findAndStep(source, "Velocity"))
+            ctl = PART::control::humanvelocity;
+    }
+    else if (findAndStep(source, "Portamento Enable"))
+        ctl = PART::control::portamento;
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
     cout << "part overflow >" << source << endl;
 }
 
@@ -598,9 +602,30 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 
 void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 {
+    allData.data.engine = PART::engine::subSynth;
+
+    /*
+     * Amp Env
+     * Band Env
+     * Freq Env
+     * Filt
+     * Filt Env
+     */
+
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enableSub;
+    else if (findAndStep(source, "Stereo"))
+        ctl = SUBSYNTH::control::stereo;
+    else if (findAndStep(source, "Overtones"))
+    {
+        if (findAndStep(source, "Par 1"))
+            ctl = SUBSYNTH::control::overtoneParameter1;
+        else if (findAndStep(source, "Par 2"))
+            ctl = SUBSYNTH::control::overtoneParameter2;
+        else if (findAndStep(source, "Force H"))
+            ctl = SUBSYNTH::control::overtoneForceHarmonics;
+    }
     else if (findAndStep(source, "Harmonic"))
     { // has to be before anything starting with Amplitude or Bandwidth
         unsigned char harmonicNum = UNUSED;
@@ -609,7 +634,6 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
             log (source, "no harmonic number");
             return;
         }
-        cout << "Num " << int(harmonicNum) << endl;
         if (findAndStep(source, "Amplitude"))
         {
             allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
@@ -626,6 +650,18 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
             return;
         }
     }
+
+    /*
+    "Bandwidth" section
+        "B.Width" section
+    "Frequency Env Enable"
+    "Freq" section
+    "Filter" section
+    "Filt" section
+    */
+
+
+
     else if (findAndStep(source, "Amplitude"))
     {
         if (findAndStep(source, "Volume"))
