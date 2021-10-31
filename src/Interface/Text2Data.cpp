@@ -48,6 +48,8 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     }
     encodeLoop(source, allData);
 
+    std::cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  offset " << int(allData.data.offset) << endl;
+
     /*
      * If we later decide to be able to set and read values
      * this is where the code should go in order to catch
@@ -112,7 +114,7 @@ void TextData::nextWord(std::string &line)
 }
 
 
-bool TextData::findChar(string &line, unsigned char &value)
+bool TextData::findCharNum(string &line, unsigned char &value)
 {
     if (!isdigit(line[0]))
         return false;
@@ -213,7 +215,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
 {
     strip (source);
     unsigned char npart = UNUSED;
-    if (findChar(source, npart))
+    if (findCharNum(source, npart))
     {
         //cout << "part " << int(npart) << endl;
         if (npart >= NUM_MIDI_PARTS)
@@ -261,7 +263,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
     unsigned char kitnum = UNUSED;
     if (findAndStep(source, "Kit"))
     {
-        if (findChar(source, kitnum))
+        if (findCharNum(source, kitnum))
         {
             if (kitnum >= NUM_KIT_ITEMS)
             {
@@ -277,7 +279,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         // we may add other controls later
         if (kitctl < UNUSED)
         {
-            allData.data.control = ctl;
+            allData.data.control = kitctl;
             return;
         }
     }
@@ -459,14 +461,14 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
     if (findAndStep(source, "Send"))
     {
         unsigned char sendto = UNUSED;
-        if (findChar(source, sendto))
+        if (findCharNum(source, sendto))
         {
             allData.data.control = PART::control::partToSystemEffect1 + sendto;
             return;
         }
     }
     unsigned char effnum = UNUSED;
-    if (findChar(source, effnum)) // need to find number ranges
+    if (findCharNum(source, effnum)) // need to find number ranges
     {
         allData.data.engine = effnum;
         //cout << "effnum " << int(effnum) << endl;
@@ -599,6 +601,42 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enableSub;
+    else if (findAndStep(source, "Harmonic"))
+    { // has to be before anything starting with Amplitude or Bandwidth
+        unsigned char harmonicNum = UNUSED;
+        if (!findCharNum(source, harmonicNum))
+        {
+            log (source, "no harmonic number");
+            return;
+        }
+        cout << "Num " << int(harmonicNum) << endl;
+        if (findAndStep(source, "Amplitude"))
+        {
+            allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            ctl = harmonicNum;
+        }
+        else if (findAndStep(source, "Bandwidth"))
+        {
+            allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            ctl = harmonicNum;
+        }
+        if (ctl < UNUSED)
+        {
+            allData.data.control = ctl;
+            return;
+        }
+    }
+    else if (findAndStep(source, "Amplitude"))
+    {
+        if (findAndStep(source, "Volume"))
+            ctl = SUBSYNTH::control::volume;
+        else if (findAndStep(source, "Vel Sens"))
+            ctl = SUBSYNTH::control::velocitySense;
+        else if (findAndStep(source, "Panning"))
+            ctl = SUBSYNTH::control::panning;
+        else if (findAndStep(source, "Random Width"))
+            ctl = SUBSYNTH::control::randomWidth;
+    }
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;
@@ -614,6 +652,7 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enablePad;
+
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;

@@ -41,7 +41,7 @@ class TextData
         void log(string &line, string text);
         void strip(string &line);
         void nextWord(string &line);
-        bool findChar(string &line, unsigned char &value);
+        bool findCharNum(string &line, unsigned char &value);
         bool findAndStep(string &line, string text);
         int findListEntry(string &line, int step, string list []);
         void encodeLoop(string source, CommandBlock &allData);
