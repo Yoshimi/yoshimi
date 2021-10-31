@@ -128,7 +128,8 @@ bool TextData::findAndStep(std::string &line, std::string text)
     size_t pos = line.find(text);
     if (pos != string::npos)
     {
-        line.substr(pos, text.length());
+        pos += text.length();
+        line = line.substr(pos);
         nextWord(line);
         return true;
     }
@@ -275,10 +276,17 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         encodeAddSynth(source, allData);
         return;
     }
-    if (findAndStep(source, "Add"))
+    if (findAndStep(source, "Add Voice"))
     {
-        if (findAndStep(source, "Voice"))
+        unsigned char voiceNum = UNUSED;
+        if (findCharNum(source, voiceNum))
         {
+            if (voiceNum >= NUM_VOICES)
+            {
+                log(source, "voice number out of range");
+                return;
+            }
+            allData.data.engine = PART::engine::addVoice1+voiceNum;
             encodeAddVoice(source, allData);
             return;
         }
@@ -572,6 +580,8 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
 void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 {
+    allData.data.engine = PART::engine::addSynth;
+
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enableAdd;
@@ -604,19 +614,18 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 {
     allData.data.engine = PART::engine::subSynth;
 
-    /*
-     * Amp Env
-     * Band Env
-     * Freq Env
-     * Filt
-     * Filt Env
-     */
-
     unsigned char ctl = UNUSED;
-    if (findAndStep(source, "Enable"))
+    if (findAndStep(source, "Filter"))
+    {
+        if (findAndStep(source, "Enable"))
+            ctl = SUBSYNTH::control::enableFilter;
+        // filter controls here
+    }
+    else if (findAndStep(source, "Enable"))
         ctl = PART::control::enableSub;
     else if (findAndStep(source, "Stereo"))
         ctl = SUBSYNTH::control::stereo;
+
     else if (findAndStep(source, "Overtones"))
     {
         if (findAndStep(source, "Par 1"))
@@ -641,7 +650,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
         }
         else if (findAndStep(source, "Bandwidth"))
         {
-            allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            allData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
             ctl = harmonicNum;
         }
         if (ctl < UNUSED)
@@ -650,17 +659,37 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
             return;
         }
     }
+    else if (findAndStep(source, "Bandwidth"))
+    {
+        if (findAndStep(source, "Env Enab"))
+            ctl = SUBSYNTH::control::enableBandwidthEnvelope;
+        else if (findAndStep(source, "Band Scale"))
+            ctl = SUBSYNTH::control::bandwidthScale;
+        else
+            ctl = SUBSYNTH::control::bandwidth;
+    }
+    else if (findAndStep(source, "Frequency"))
+    {
+        if (findAndStep(source, "Env Enab"))
+            ctl = SUBSYNTH::control::enableFrequencyEnvelope;
+        else if (findAndStep(source, "Octave"))
+            ctl = SUBSYNTH::control::octave;
+        else if (findAndStep(source, "Bend Adj"))
+            ctl = SUBSYNTH::control::pitchBendAdjustment;
+        else if (findAndStep(source, "Offset Hz"))
+            ctl = SUBSYNTH::control::pitchBendOffset;
+        else if (findAndStep(source, "Eq T"))
+            ctl = SUBSYNTH::control::equalTemperVariation;
+        else if (findAndStep(source, "Detune"))
+            ctl = SUBSYNTH::control::detuneFrequency;
+    }
+
 
     /*
-    "Bandwidth" section
-        "B.Width" section
-    "Frequency Env Enable"
-    "Freq" section
-    "Filter" section
-    "Filt" section
+    "B.Width" envelope section
+    "Freq" envelope section
+    "Filt" envelope section
     */
-
-
 
     else if (findAndStep(source, "Amplitude"))
     {
@@ -685,6 +714,8 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 
 void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 {
+    allData.data.engine = PART::engine::padSynth;
+
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enablePad;
