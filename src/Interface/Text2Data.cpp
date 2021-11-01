@@ -126,7 +126,7 @@ bool TextData::findCharNum(string &line, unsigned char &value)
 bool TextData::findAndStep(std::string &line, std::string text)
 {
     size_t pos = line.find(text);
-    if (pos != string::npos)
+    if (pos != string::npos && pos < 3) // allow leading spaces
     {
         pos += text.length();
         line = line.substr(pos);
@@ -406,30 +406,33 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
             ctl = PART::control::resonanceBandwidthDepth;
         }
     }
-    else if (findAndStep(source,"Receive"))
-        ctl = PART::control::receivePortamento;
-    else if (findAndStep(source,"Time"))
+    else if (findAndStep(source,"Portamento"))
     {
-        if (findAndStep(source,"Stretch"))
-            ctl = PART::control::portamentoTimeStretch;
-        else
-            ctl = PART::control::portamentoTime;
-    }
-    else if (findAndStep(source,"Threshold Gate"))
-    {
-        if (findAndStep(source,"Type"))
-            ctl = PART::control::portamentoThresholdType;
-        else
-            ctl = PART::control::portamentoThreshold;
-    }
-    else if (findAndStep(source,"Prop"))
-    {
-        if (findAndStep(source,"Enable"))
-            ctl = PART::control::enableProportionalPortamento;
-        else if (findAndStep(source,"Rate"))
-            ctl = PART::control::proportionalPortamentoRate;
-        else if (findAndStep(source,"depth"))
-            ctl = PART::control::proportionalPortamentoDepth;
+        if (findAndStep(source,"Receive"))
+            ctl = PART::control::receivePortamento;
+        else if (findAndStep(source,"Time"))
+        {
+            if (findAndStep(source,"Stretch"))
+                ctl = PART::control::portamentoTimeStretch;
+            else
+                ctl = PART::control::portamentoTime;
+        }
+        else if (findAndStep(source,"Threshold Gate"))
+        {
+            if (findAndStep(source,"Type"))
+                ctl = PART::control::portamentoThresholdType;
+            else
+                ctl = PART::control::portamentoThreshold;
+        }
+        else if (findAndStep(source,"Prop"))
+        {
+            if (findAndStep(source,"Enable"))
+                ctl = PART::control::enableProportionalPortamento;
+            else if (findAndStep(source,"Rate"))
+                ctl = PART::control::proportionalPortamentoRate;
+            else if (findAndStep(source,"depth"))
+                ctl = PART::control::proportionalPortamentoDepth;
+        }
     }
     if (ctl < UNUSED)
     {
@@ -719,6 +722,84 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enablePad;
+
+    else if (findAndStep(source, "Harmonic Base"))
+    {
+        if (findAndStep(source, "Width"))
+            ctl =PADSYNTH::control::baseWidth;
+        else if (findAndStep(source, "Freq Mult"))
+            ctl =PADSYNTH::control::frequencyMultiplier;
+        else if (findAndStep(source, "Str"))
+            ctl =PADSYNTH::control::modulatorStretch;
+        else if (findAndStep(source, "Freq"))
+            ctl =PADSYNTH::control::modulatorFrequency;
+        else if (findAndStep(source, "Size"))
+            ctl =PADSYNTH::control::size;
+        else if (findAndStep(source, "Amp Par 1"))
+            ctl =PADSYNTH::control::spectralWidth;
+        else if (findAndStep(source, "Amp Par 2"))
+            ctl =PADSYNTH::control::spectralAmplitude;
+    }
+    else if (findAndStep(source, "Overtones"))
+    {
+        if (findAndStep(source, "Overt Par 1"))
+            ctl =PADSYNTH::control::overtoneParameter1;
+        else if (findAndStep(source, "Overt Par 2"))
+            ctl =PADSYNTH::control::overtoneParameter2;
+        else if (findAndStep(source, "Force H"))
+            ctl =PADSYNTH::control::overtoneForceHarmonics;
+    }
+
+    else if (findAndStep(source, "Bandwidth Bandwidth"))
+            ctl =PADSYNTH::control::bandwidth;
+
+    else if (findAndStep(source, "Changes Applied"))
+            ctl =PADSYNTH::control::applyChanges;
+
+    // envelopes
+    else if (findAndStep(source, "Amplitude"))
+    {
+        if (findAndStep(source, "Volume"))
+            ctl =PADSYNTH::control::volume;
+        else if (findAndStep(source, "Vel Sens"))
+            ctl =PADSYNTH::control::velocitySense;
+        else if (findAndStep(source, "Panning"))
+            ctl =PADSYNTH::control::panning;
+        else if (findAndStep(source, "Random Pan"))
+            ctl =PADSYNTH::control::enableRandomPan;
+        else if (findAndStep(source, "Random Width"))
+            ctl =PADSYNTH::control::randomWidth;
+    }
+    else if (findAndStep(source, "Punch"))
+    {
+        if (findAndStep(source, "Strngth"))
+            ctl =PADSYNTH::control::punchStrength;
+        else if (findAndStep(source, "Time"))
+            ctl =PADSYNTH::control::punchDuration;
+        else if (findAndStep(source, "Strtch"))
+            ctl =PADSYNTH::control::punchStretch;
+        else if (findAndStep(source, "Vel"))
+            ctl =PADSYNTH::control::punchVelocity;
+    }
+    else if (findAndStep(source, "Stereo"))
+            ctl =PADSYNTH::control::stereo;
+    else if (findAndStep(source, "De Pop"))
+            ctl =PADSYNTH::control::dePop;
+    else if (findAndStep(source, "Frequency"))
+    {
+        if (findAndStep(source, "Bend Adj"))
+            ctl =PADSYNTH::control::pitchBendAdjustment;
+        else if (findAndStep(source, "Offset Hz"))
+            ctl =PADSYNTH::control::pitchBendOffset;
+        else if (findAndStep(source, "440Hz"))
+            ctl =PADSYNTH::control::baseFrequencyAs440Hz;
+        else if (findAndStep(source, "Detune"))
+            ctl =PADSYNTH::control::detuneFrequency;
+        else if (findAndStep(source, "Eq T"))
+            ctl =PADSYNTH::control::equalTemperVariation;
+        else if (findAndStep(source, "Octave"))
+            ctl =PADSYNTH::control::octave;
+    }
 
     if (ctl < UNUSED)
     {

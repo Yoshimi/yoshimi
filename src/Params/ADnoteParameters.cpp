@@ -956,6 +956,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case ADDSYNTH::control::randomWidth:
+                type |= learnable;
                 def = 63;
                 max = 63;
                 break;

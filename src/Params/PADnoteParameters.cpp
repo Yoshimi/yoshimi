@@ -1043,11 +1043,13 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::randomWidth:
+            type |= learnable;
             def = 63;
             max = 63;
             break;
 
         case PADSYNTH::control::bandwidth:
+            type |= learnable;
             def = 500;
             max = 1000;
             break;
