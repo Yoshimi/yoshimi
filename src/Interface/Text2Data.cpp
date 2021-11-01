@@ -588,6 +588,46 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enableAdd;
+
+    else if (findAndStep(source, "amplitude"))
+    {
+        if (findAndStep(source, "Volume"))
+            ctl = ADDSYNTH::control::volume;
+        else if (findAndStep(source, "Vel Sens"))
+            ctl = ADDSYNTH::control::velocitySense;
+        else if (findAndStep(source, "Panning"))
+            ctl = ADDSYNTH::control::panning;
+    }
+
+    else if (findAndStep(source, "Random Width"))
+        ctl = ADDSYNTH::control::randomWidth;
+    else if (findAndStep(source, "Stereo"))
+        ctl = ADDSYNTH::control::stereo;
+    else if (findAndStep(source, "De Pop"))
+        ctl = ADDSYNTH::control::dePop;
+
+    else if (findAndStep(source, "Punch"))
+    {
+        if (findAndStep(source, "Strngth"))
+            ctl = ADDSYNTH::control::punchStrength;
+        else if (findAndStep(source, "Time"))
+            ctl = ADDSYNTH::control::punchDuration;
+        else if (findAndStep(source, "Strtch"))
+            ctl = ADDSYNTH::control::punchStretch;
+        else if (findAndStep(source, "Vel"))
+            ctl = ADDSYNTH::control::punchVelocity;
+    }
+
+    else if (findAndStep(source, "Frequency"))
+    {
+        if (findAndStep(source, "Detune"))
+            ctl = ADDSYNTH::control::detuneFrequency;
+        else if (findAndStep(source, "Octave"))
+            ctl = ADDSYNTH::control::octave;
+        else if (findAndStep(source, "Rel B Wdth"))
+            ctl = ADDSYNTH::control::relativeBandwidth;
+    }
+
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;

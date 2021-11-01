@@ -999,20 +999,26 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case ADDSYNTH::control::dePop:
+                type |= learnable;
                 def = FADEIN_ADJUSTMENT_SCALE;
+                break;
 
-            case ADDSYNTH::control::punchStrength: // just ensures it doesn't get caught by default
+            case ADDSYNTH::control::punchStrength:
+                type |= learnable;
                 break;
 
             case ADDSYNTH::control::punchDuration:
+                type |= learnable;
                 def = 60;
                 break;
 
             case ADDSYNTH::control::punchStretch:
+                type |= learnable;
                 def = 64;
                 break;
 
             case ADDSYNTH::control::punchVelocity:
+                type |= learnable;
                 def = 72;
                 break;
 
