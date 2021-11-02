@@ -1190,6 +1190,7 @@ float ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case ADDVOICE::control::enableUnison:
+            type |= learnable;
             max = 1;
             break;
 

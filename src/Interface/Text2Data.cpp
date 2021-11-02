@@ -641,8 +641,82 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 {
     unsigned char ctl = UNUSED;
+
+
     if (findAndStep(source, "Enable"))
         ctl = ADDVOICE::control::enableVoice;
+    else if (findAndStep(source, "Amp Env"))
+    {
+        ;//ctl = ADDVOICE::control::; envelope controls
+    }
+    else if (findAndStep(source, "Amp LFO"))
+    {
+        ;//ctl = ADDVOICE::control::; lfo controls
+    }
+    else if (findAndStep(source, "Amplitude"))
+    {
+        if (findAndStep(source, "Enable Env"))
+            ctl = ADDVOICE::control::enableAmplitudeEnvelope;
+        else if (findAndStep(source, "Enable LFO"))
+            ctl = ADDVOICE::control::enableAmplitudeLFO;
+    }
+    else if (findAndStep(source, "Filt Env"))
+    {
+        ;//ctl = ADDVOICE::control::; envelope controls
+    }
+    else if (findAndStep(source, "Filt LFO"))
+    {
+        ;//ctl = ADDVOICE::control::; lfo controls
+    }
+    else if (findAndStep(source, "Filter"))
+    {
+        if (findAndStep(source, "Enable Env"))
+            ctl = ADDVOICE::control::enableFilterEnvelope;
+        else if (findAndStep(source, "Enable LFO"))
+            ctl = ADDVOICE::control::enableFilterLFO;
+        else if (findAndStep(source, "Enable"))
+            ctl = ADDVOICE::control::enableFilter;
+        else
+        {
+            ;// filter controls
+        }
+    }
+    // Filt Env
+    else if (findAndStep(source, "Freq Env"))
+    {
+        ;//ctl = ADDVOICE::control::; envelope controls
+    }
+    else if (findAndStep(source, "Freq LFO"))
+    {
+        ;//ctl = ADDVOICE::control::; lfo controls
+    }
+    else if (findAndStep(source, "Frequency"))
+    {
+        if (findAndStep(source, "Enable Env"))
+            ctl = ADDVOICE::control::enableFrequencyEnvelope;
+        else if (findAndStep(source, "Enable LFO"))
+            ctl = ADDVOICE::control::enableFrequencyLFO;
+    }
+    else if (findAndStep(source, "Unison"))
+    {
+        if (findAndStep(source, "Enable"))
+            ctl = ADDVOICE::control::enableUnison;
+    }
+
+    else if (findAndStep(source, "Modulator"))
+    {
+        if (findAndStep(source, "Amp"))
+        {
+            if (findAndStep(source, "Enable Env"))
+                ctl = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
+        }
+        else if (findAndStep(source, "Freq"))
+        {
+            if (findAndStep(source, "Enable Env"))
+                ctl = ADDVOICE::control::enableModulatorFrequencyEnvelope;
+        }
+    }
+
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;
