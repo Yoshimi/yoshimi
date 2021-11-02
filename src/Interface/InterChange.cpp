@@ -511,7 +511,7 @@ int InterChange::indirectMidi(CommandBlock *getData, SynthEngine *synth, unsigne
     text += textMsgBuffer.fetch(msgID & NO_MSG);
     newMsg = true;
     getData->data.source = TOPLEVEL::action::toAll;
-    // everyone will want to knopw about these!
+    // everyone will want to know about these!
     guiTo = true;
     return value;
 }
@@ -5154,9 +5154,14 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case PADSYNTH::control::applyChanges:
             if (write)
-            {
-                synth->partonoffWrite(npart, -1);
-                getData->data.source = TOPLEVEL::action::lowPrio;
+            { // this control is 'expensive' only used if necessary
+                if (value_bool)
+                {
+                    synth->partonoffWrite(npart, -1);
+                    getData->data.source = TOPLEVEL::action::lowPrio;
+                }
+                else
+                    getData->data.source = TOPLEVEL::action::noAction;
             }
             break;
 

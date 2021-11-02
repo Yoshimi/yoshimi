@@ -154,7 +154,6 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
             value = minOut +((maxOut - minOut) * value / 127.0f);
         else if (minOut != 0) // it's just a shift
             value += minOut;
-
         CommandBlock putData;
         putData.data.value = value;
         putData.data.type = TOPLEVEL::type::Write | (foundEntry.data.type & TOPLEVEL::type::Integer);

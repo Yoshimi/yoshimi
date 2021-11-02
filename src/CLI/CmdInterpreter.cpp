@@ -4762,7 +4762,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "apply"))
     {
-        value = 0; // dummy
+        value = 1;
         cmd = PADSYNTH::control::applyChanges;
     }
 

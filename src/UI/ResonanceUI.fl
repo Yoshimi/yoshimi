@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {ResonanceUI.h} {not_in_source in_header
@@ -407,12 +407,12 @@ class ResonanceUI {: PresetsUI_
           tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button p1st {
-          class Fl_Check_Button2
           label {Prot.1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX labelsize 12
           code0 {o->value(respar->Pprotectthefundamental);}
+          class Fl_Check_Button2
         }
         Fl_Text_Display interpk {
           label InterpPk
@@ -445,17 +445,17 @@ class ResonanceUI {: PresetsUI_
         }
       }
       Fl_Check_Button enabled {
-        class Fl_Check_Button2
         label Enable
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer);}
         xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {o->value(respar->Penabled);}
+        class Fl_Check_Button2
       }
       Fl_Button applybutton {
         label Apply
         callback {//
-              send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 0, TOPLEVEL::type::Integer);}
+              send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
         xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button resClose {

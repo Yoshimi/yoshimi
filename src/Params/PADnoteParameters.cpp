@@ -1210,9 +1210,9 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::applyChanges:
-            min = 0;
+            type |= learnable;
             def = 0;
-            max = 0;
+            max = 1;
             break;
 
         case PADSYNTH::control::stereo:
