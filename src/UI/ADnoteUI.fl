@@ -1184,6 +1184,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     collect_data(synth, value, action, type, control, npart, kititem, nvoice + PART::engine::addVoice1);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
+
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -1232,7 +1233,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableAmplitudeEnvelope:
             AmpEnvEn->value(val_bool);
-            if (value == 0)
+            if (val_bool == 0)
                     voiceampenvgroup->deactivate();
                 else
                     voiceampenvgroup->activate();
@@ -1240,7 +1241,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableAmplitudeLFO:
             AmpLfoEn->value(val_bool);
-            if (value == 0)
+            if (val_bool == 0)
                     voiceamplfogroup->deactivate();
                 else
                     voiceamplfogroup->activate();
@@ -1316,7 +1317,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableFrequencyEnvelope:
             FreqEn->value(val_bool);
-            if (value == 0)
+            if (val_bool == 0)
                 voicefreqenvgroup->deactivate();
             else
                 voicefreqenvgroup->activate();
@@ -1324,7 +1325,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableFrequencyLFO:
             FreqLfoEn->value(val_bool);
-             if (value == 0)
+             if (val_bool == 0)
                  voicefreqlfogroup->deactivate();
              else
                  voicefreqlfogroup->activate();
@@ -1353,7 +1354,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::unisonSize:
             {
-                tmp = (int) value;
+                tmp = int(value);
                 unisonsize->value(tmp);
                 int colr = FL_BLACK;
                 int i = 0;
@@ -1377,16 +1378,14 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             break;
 
         case ADDVOICE::control::enableUnison:
-            tmp = (int) value;
-            UnisonEn->value(tmp);
-            if (tmp == 0)
+            UnisonEn->value(val_bool);
+            if (val_bool == 0)
             {
                 unisonsize->value(2);
                 unisongroup->deactivate();
             }
             else
             {
-                tmp = lrint(unisonsize->value());
                 unisongroup->activate();
                 int colr = FL_BLACK;
                 int i = -1;
@@ -1395,7 +1394,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                     ++i;
                     if (pars->ADnote_unison_sizes[i] == 0)
                         break;
-                    if (pars->ADnote_unison_sizes[i] == tmp)
+                    if (pars->ADnote_unison_sizes[i] == int(unisonsize->value()))
                     {
                         colr = FL_RED;
                         break;
@@ -1494,7 +1493,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::enableModulatorFrequencyEnvelope:
             ModFreqEn->value(val_bool);
-            if (value == 0)
+            if (val_bool == 0)
                 voiceFMfreqenvgroup->deactivate();
             else
                 voiceFMfreqenvgroup->activate();
