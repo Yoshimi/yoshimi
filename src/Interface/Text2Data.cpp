@@ -696,6 +696,16 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
             ctl = ADDVOICE::control::enableFrequencyEnvelope;
         else if (findAndStep(source, "Enable LFO"))
             ctl = ADDVOICE::control::enableFrequencyLFO;
+        else if (findAndStep(source, "Bend Adj"))
+            ctl = ADDVOICE::control::pitchBendAdjustment;
+        else if (findAndStep(source, "Offset Hz"))
+            ctl = ADDVOICE::control::pitchBendOffset;
+        else if (findAndStep(source, "Eq T"))
+            ctl = ADDVOICE::control::equalTemperVariation;
+        else if (findAndStep(source, "Detune"))
+            ctl = ADDVOICE::control::detuneFrequency;
+        else if (findAndStep(source, "Octave"))
+            ctl = ADDVOICE::control::octave;
     }
     else if (findAndStep(source, "Unison"))
     {
