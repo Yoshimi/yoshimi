@@ -701,20 +701,51 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
     {
         if (findAndStep(source, "Enable"))
             ctl = ADDVOICE::control::enableUnison;
+        else if (findAndStep(source, "Freq Spread"))
+            ctl = ADDVOICE::control::unisonFrequencySpread;
+        else if (findAndStep(source, "Phase Rnd"))
+            ctl = ADDVOICE::control::unisonPhaseRandomise;
+        else if (findAndStep(source, "Stereo"))
+            ctl = ADDVOICE::control::unisonStereoSpread;
+        else if (findAndStep(source, "Vibrato"))
+            ctl = ADDVOICE::control::unisonVibratoDepth;
+        else if (findAndStep(source, "Vib Speed"))
+            ctl = ADDVOICE::control::unisonVibratoSpeed;
     }
 
     else if (findAndStep(source, "Modulator"))
     {
-        if (findAndStep(source, "Amp"))
+        if (findAndStep(source, "Amp Env"))
+        {
+            ; // amp envelope controls
+        }
+        if (findAndStep(source, "Freq Env"))
+        {
+            ; // freq envelope controls
+        }
+        else if (findAndStep(source, "Amp"))
         {
             if (findAndStep(source, "Enable Env"))
                 ctl = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
+            else if (findAndStep(source, "Volume"))
+                ctl = ADDVOICE::control::modulatorAmplitude;
+            else if (findAndStep(source, "V Sense"))
+                ctl = ADDVOICE::control::modulatorVelocitySense;
+            else if (findAndStep(source, "F Damp"))
+                ctl = ADDVOICE::control::modulatorHFdamping;
         }
         else if (findAndStep(source, "Freq"))
         {
             if (findAndStep(source, "Enable Env"))
                 ctl = ADDVOICE::control::enableModulatorFrequencyEnvelope;
+            else if (findAndStep(source, "Octave"))
+                ctl = ADDVOICE::control::modulatorOctave;
+            else // detune frequency
+                ctl = ADDVOICE::control::modulatorDetuneFrequency;
         }
+
+        else if (findAndStep(source, "Osc Phase"))
+            ctl = ADDVOICE::control::modulatorOscillatorPhase;
     }
 
     if (ctl < UNUSED)
