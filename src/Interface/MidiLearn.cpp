@@ -992,6 +992,7 @@ bool MidiLearn::loadList(const string& name)
 
 bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
 {
+    midi_list.clear();
     if (!xml->enterbranch("MIDILEARN"))
     {
         if (full)
