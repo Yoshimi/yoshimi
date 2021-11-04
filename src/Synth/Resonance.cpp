@@ -288,6 +288,7 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
     int max = 1;
     int def = 0;
     type |= TOPLEVEL::type::Integer;
+    unsigned char learnable = TOPLEVEL::type::Learnable;
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
@@ -321,21 +322,25 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
     switch (control)
     {
         case RESONANCE::control::maxDb:
+            type |= learnable;
             min = 1;
             max = 90;
             def = 20;
             break;
         case RESONANCE::control::centerFrequency:
+            type |= learnable;
             max = 127;
             def = 64;
             break;
         case RESONANCE::control::octaves:
+            type |= learnable;
             max = 127;
             def = 64;
             break;
         case RESONANCE::control::enableResonance:
             break;
         case RESONANCE::control::randomType:
+            type |= learnable;
             max = 2;
             break;
         case RESONANCE::control::interpolatePeaks:

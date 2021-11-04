@@ -2514,7 +2514,7 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
     string eng_name;
     if (engine == PART::engine::padSynth)
     {
-        eng_name = " Padsysnth";
+        eng_name = " PadSynth";
         if (write)
             isPad = " - Need to Apply";
     }

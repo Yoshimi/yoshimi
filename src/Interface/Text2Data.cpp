@@ -587,11 +587,16 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 {
     allData.data.engine = PART::engine::addSynth;
-
     unsigned char ctl = UNUSED;
+
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enableAdd;
 
+    else if (findAndStep(source, "Resonance"))
+    {
+        encodeResonance(source, allData);
+        return;
+    }
     else if (findAndStep(source, "amplitude"))
     {
         if (findAndStep(source, "Volume"))
@@ -645,9 +650,19 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 {
     unsigned char ctl = UNUSED;
 
-
     if (findAndStep(source, "Enable"))
         ctl = ADDVOICE::control::enableVoice;
+
+    else if (findAndStep(source, "Resonance"))
+    {
+        encodeResonance(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Oscillator") || findAndStep(source, "Base") || findAndStep(source, "Harm Mods"))
+    {
+        encodeWaveform(source, allData);
+        return;
+    }
     else if (findAndStep(source, "Amp Env"))
     {
         allData.data.parameter = TOPLEVEL::insertType::amplitude;
@@ -742,6 +757,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
     else if (findAndStep(source, "Modulator"))
     {
         allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
+
         if (findAndStep(source, "Amp Env"))
         {
             allData.data.parameter = TOPLEVEL::insertType::amplitude;
@@ -792,8 +808,8 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 {
     allData.data.engine = PART::engine::subSynth;
-
     unsigned char ctl = UNUSED;
+
     if (findAndStep(source, "Filter"))
     {
         if (findAndStep(source, "Enable"))
@@ -894,11 +910,21 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 {
     allData.data.engine = PART::engine::padSynth;
-
     unsigned char ctl = UNUSED;
+
     if (findAndStep(source, "Enable"))
         ctl = PART::control::enablePad;
 
+    else if (findAndStep(source, "Resonance"))
+    {
+        encodeResonance(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Oscillator") || findAndStep(source, "Base") || findAndStep(source, "Harm Mods"))
+    {
+        encodeWaveform(source, allData);
+        return;
+    }
     else if (findAndStep(source, "Harmonic Base"))
     {
         if (findAndStep(source, "Width"))
