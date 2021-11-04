@@ -48,7 +48,7 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     }
     encodeLoop(source, allData);
 
-    std::cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  offset " << int(allData.data.offset) << endl;
+    cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  offset " << int(allData.data.offset) << endl;
 
     /*
      * If we later decide to be able to set and read values
@@ -276,7 +276,8 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         encodeAddSynth(source, allData);
         return;
     }
-    if (findAndStep(source, "Add Voice"))
+
+    if (findAndStep(source, "Add Voice") || findAndStep(source, "Adsynth Voice"))
     {
         unsigned char voiceNum = UNUSED;
         if (findCharNum(source, voiceNum))
@@ -332,6 +333,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
     cout << "part overflow >" << source << endl;
 }
 
+// ----------------------------
 
 void TextData::encodeController(std::string &source, CommandBlock &allData)
 {
@@ -580,6 +582,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
     cout << "effects overflow >" << source << endl;
 }
 
+// ----------------------------
 
 void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 {
@@ -647,11 +650,15 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         ctl = ADDVOICE::control::enableVoice;
     else if (findAndStep(source, "Amp Env"))
     {
-        ;//ctl = ADDVOICE::control::; envelope controls
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeEnvelope(source, allData);
+        return;
     }
     else if (findAndStep(source, "Amp LFO"))
     {
-        ;//ctl = ADDVOICE::control::; lfo controls
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeLFO(source, allData);
+        return;
     }
     else if (findAndStep(source, "Amplitude"))
     {
@@ -662,11 +669,15 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
     }
     else if (findAndStep(source, "Filt Env"))
     {
-        ;//ctl = ADDVOICE::control::; envelope controls
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeEnvelope(source, allData);
+        return;
     }
     else if (findAndStep(source, "Filt LFO"))
     {
-        ;//ctl = ADDVOICE::control::; lfo controls
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeLFO(source, allData);
+        return;
     }
     else if (findAndStep(source, "Filter"))
     {
@@ -678,17 +689,22 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
             ctl = ADDVOICE::control::enableFilter;
         else
         {
-            ;// filter controls
+            encodeFilter(source, allData);
+        return;
         }
     }
-    // Filt Env
+    // Freq Env
     else if (findAndStep(source, "Freq Env"))
     {
-        ;//ctl = ADDVOICE::control::; envelope controls
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeEnvelope(source, allData);
+        return;
     }
     else if (findAndStep(source, "Freq LFO"))
     {
-        ;//ctl = ADDVOICE::control::; lfo controls
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeLFO(source, allData);
+        return;
     }
     else if (findAndStep(source, "Frequency"))
     {
@@ -725,13 +741,18 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Modulator"))
     {
+        allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
         if (findAndStep(source, "Amp Env"))
         {
-            ; // amp envelope controls
+            allData.data.parameter = TOPLEVEL::insertType::amplitude;
+            encodeEnvelope(source, allData);
+            return;
         }
         if (findAndStep(source, "Freq Env"))
         {
-            ; // freq envelope controls
+            allData.data.parameter = TOPLEVEL::insertType::frequency;
+            encodeEnvelope(source, allData);
+            return;
         }
         else if (findAndStep(source, "Amp"))
         {
@@ -963,4 +984,79 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     }
 
     cout << "padsynth overflow >" << source << endl;
+}
+
+// ----------------------------
+
+void TextData::encodeWaveform(string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    allData.data.insert = TOPLEVEL::insert::oscillatorGroup;
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+    cout << "waveform overflow >" << source << endl;
+}
+
+
+void TextData::encodeResonance(string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    allData.data.insert = TOPLEVEL::insert::resonanceGroup;
+     // this might be changed for graph inserts
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+    cout << "resonance overflow >" << source << endl;
+}
+
+// ----------------------------
+
+void TextData::encodeLFO(string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    allData.data.insert = TOPLEVEL::insert::LFOgroup;
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+    cout << "lfo overflow >" << source << endl;
+}
+
+
+void TextData::encodeEnvelope(string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    allData.data.insert = TOPLEVEL::insert::envelopeGroup;
+    // this might be changed for freemode points
+
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+    cout << "envelope overflow >" << source << endl;
+}
+
+
+void TextData::encodeFilter(string &source, CommandBlock &allData)
+{
+    unsigned char ctl = UNUSED;
+    allData.data.insert = TOPLEVEL::insert::filterGroup;
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+    cout << "filter overflow >" << source << endl;
 }

@@ -45,17 +45,25 @@ class TextData
         bool findAndStep(string &line, string text);
         int findListEntry(string &line, int step, string list []);
         void encodeLoop(string source, CommandBlock &allData);
+
         void encodeMain(string &source, CommandBlock &allData);
         void encodePart(string &source, CommandBlock &allData);
+
         void encodeController(string &source, CommandBlock &allData);
         void encodeMidi(string &source, CommandBlock &allData);
-
         void encodeEffects(string &source, CommandBlock &allData);
 
         void encodeAddSynth(string &source, CommandBlock &allData);
         void encodeAddVoice(string &source, CommandBlock &allData);
         void encodeSubSynth(string &source, CommandBlock &allData);
         void encodePadSynth(string &source, CommandBlock &allData);
+
+        void encodeWaveform(string &source, CommandBlock &allData);
+        void encodeResonance(string &source, CommandBlock &allData);
+
+        void encodeLFO(string &source, CommandBlock &allData);
+        void encodeEnvelope(string &source, CommandBlock &allData);
+        void encodeFilter(string &source, CommandBlock &allData);
 
 };
 #endif // TEXTDATA_H
