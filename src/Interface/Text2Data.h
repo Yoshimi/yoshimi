@@ -42,7 +42,7 @@ class TextData
         void strip(string &line);
         void nextWord(string &line);
         bool findCharNum(string &line, unsigned char &value);
-        bool findAndStep(string &line, string text);
+        bool findAndStep(string &line, string text, bool step = true);
         int findListEntry(string &line, int step, string list []);
         void encodeLoop(string source, CommandBlock &allData);
 

@@ -123,14 +123,17 @@ bool TextData::findCharNum(string &line, unsigned char &value)
     return true;
 }
 
-bool TextData::findAndStep(std::string &line, std::string text)
+bool TextData::findAndStep(std::string &line, std::string text, bool step)
 {
     size_t pos = line.find(text);
     if (pos != string::npos && pos < 3) // allow leading spaces
     {
-        pos += text.length();
-        line = line.substr(pos);
-        nextWord(line);
+        if (step)
+        {
+            pos += text.length();
+            line = line.substr(pos);
+            nextWord(line);
+        }
         return true;
     }
     return false;
@@ -658,11 +661,12 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         encodeResonance(source, allData);
         return;
     }
-    else if (findAndStep(source, "Oscillator") || findAndStep(source, "Base") || findAndStep(source, "Harm Mods"))
+    else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false))
     {
         encodeWaveform(source, allData);
         return;
     }
+
     else if (findAndStep(source, "Amp Env"))
     {
         allData.data.parameter = TOPLEVEL::insertType::amplitude;
@@ -920,7 +924,7 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
         encodeResonance(source, allData);
         return;
     }
-    else if (findAndStep(source, "Oscillator") || findAndStep(source, "Base") || findAndStep(source, "Harm Mods"))
+    else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false))
     {
         encodeWaveform(source, allData);
         return;
@@ -941,6 +945,11 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
             ctl =PADSYNTH::control::spectralWidth;
         else if (findAndStep(source, "Amp Par 2"))
             ctl =PADSYNTH::control::spectralAmplitude;
+    }
+    else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false) || findAndStep(source, "Harmonic", false))
+    { // must come after harmonic base
+        encodeWaveform(source, allData);
+        return;
     }
     else if (findAndStep(source, "Overtones"))
     {
