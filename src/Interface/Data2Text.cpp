@@ -3062,7 +3062,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
             env = " Filt";
             break;
         case TOPLEVEL::insertType::bandwidth:
-            env = " B.Width";
+            env = " Band";
             break;
     }
 

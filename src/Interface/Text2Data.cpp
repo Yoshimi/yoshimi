@@ -600,6 +600,47 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         encodeResonance(source, allData);
         return;
     }
+    else if (findAndStep(source, "Amp Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Amp LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeLFO(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filt Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filt LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeLFO(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filter"))
+    {
+        encodeFilter(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeLFO(source, allData);
+        return;
+    }
     else if (findAndStep(source, "amplitude"))
     {
         if (findAndStep(source, "Volume"))
@@ -709,7 +750,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         else
         {
             encodeFilter(source, allData);
-        return;
+            return;
         }
     }
     // Freq Env
@@ -814,11 +855,35 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     allData.data.engine = PART::engine::subSynth;
     unsigned char ctl = UNUSED;
 
+    if (findAndStep(source, "Amp Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filt Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Band Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::bandwidth;
+        encodeEnvelope(source, allData);
+        return;
+    }
+
     if (findAndStep(source, "Filter"))
     {
-        if (findAndStep(source, "Enable"))
-            ctl = SUBSYNTH::control::enableFilter;
-        // filter controls here
+        encodeFilter(source, allData);
+        return;
     }
     else if (findAndStep(source, "Enable"))
         ctl = PART::control::enableSub;
@@ -883,13 +948,6 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
             ctl = SUBSYNTH::control::detuneFrequency;
     }
 
-
-    /*
-    "B.Width" envelope section
-    "Freq" envelope section
-    "Filt" envelope section
-    */
-
     else if (findAndStep(source, "Amplitude"))
     {
         if (findAndStep(source, "Volume"))
@@ -927,6 +985,47 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false))
     {
         encodeWaveform(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Amp Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Amp LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::amplitude;
+        encodeLFO(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filt Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filt LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::filter;
+        encodeLFO(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Filter"))
+    {
+        encodeFilter(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq Env"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeEnvelope(source, allData);
+        return;
+    }
+    else if (findAndStep(source, "Freq LFO"))
+    {
+        allData.data.parameter = TOPLEVEL::insertType::frequency;
+        encodeLFO(source, allData);
         return;
     }
     else if (findAndStep(source, "Harmonic Base"))
