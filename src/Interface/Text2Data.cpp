@@ -1157,6 +1157,21 @@ void TextData::encodeLFO(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::LFOgroup;
 
+    if (findAndStep(source, "FreqRand")) // must be before Freq
+        ctl = LFOINSERT::control::frequencyRandomness;
+    else if (findAndStep(source, "Freq"))
+        ctl = LFOINSERT::control::speed;
+    else if (findAndStep(source, "Depth"))
+        ctl = LFOINSERT::control::depth;
+    else if (findAndStep(source, "Start"))
+        ctl = LFOINSERT::control::start;
+    else if (findAndStep(source, "Delay"))
+        ctl = LFOINSERT::control::delay;
+    else if (findAndStep(source, "AmpRand"))
+        ctl = LFOINSERT::control::amplitudeRandomness;
+    else if (findAndStep(source, "Stretch"))
+        ctl = LFOINSERT::control::stretch;
+
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;
@@ -1172,6 +1187,22 @@ void TextData::encodeEnvelope(string &source, CommandBlock &allData)
     allData.data.insert = TOPLEVEL::insert::envelopeGroup;
     // this might be changed for freemode points
 
+    if (findAndStep(source, "A val"))
+        ctl = ENVELOPEINSERT::control::attackLevel;
+    else if (findAndStep(source, "A dt"))
+        ctl = ENVELOPEINSERT::control::attackTime;
+    else if (findAndStep(source, "D val"))
+        ctl = ENVELOPEINSERT::control::decayLevel;
+    else if (findAndStep(source, "S val"))
+        ctl = ENVELOPEINSERT::control::sustainLevel;
+    else if (findAndStep(source, "D dt"))
+        ctl = ENVELOPEINSERT::control::decayTime;
+    else if (findAndStep(source, "R val"))
+        ctl = ENVELOPEINSERT::control::releaseLevel;
+    else if (findAndStep(source, "R dt"))
+        ctl =ENVELOPEINSERT::control::releaseTime;
+    else if (findAndStep(source, "Stretch"))
+        ctl = ENVELOPEINSERT::control::stretch;
 
     if (ctl < UNUSED)
     {
@@ -1186,6 +1217,19 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
 {
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::filterGroup;
+
+    if (findAndStep(source, "C_Freq"))
+        ctl = FILTERINSERT::control::centerFrequency;
+    if (findAndStep(source, "Q"))
+        ctl = FILTERINSERT::control::Q;
+    if (findAndStep(source, "VsensA"))
+        ctl = FILTERINSERT::control::velocityCurve;
+    if (findAndStep(source, "Vsens"))
+        ctl = FILTERINSERT::control::velocitySensitivity;
+    if (findAndStep(source, "gain"))
+        ctl = FILTERINSERT::control::gain;
+    if (findAndStep(source, "FreqTrk"))
+        ctl = FILTERINSERT::control::frequencyTracking;
 
     if (ctl < UNUSED)
     {
