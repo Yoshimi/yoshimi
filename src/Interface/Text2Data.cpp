@@ -280,7 +280,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         return;
     }
 
-    if (findAndStep(source, "Add Voice") || findAndStep(source, "Adsynth Voice"))
+    if (findAndStep(source, "Add Voice") || findAndStep(source, "Adsynth Voice") || findAndStep(source, "addvoice"))
     {
         unsigned char voiceNum = UNUSED;
         if (findCharNum(source, voiceNum))
@@ -702,7 +702,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         encodeResonance(source, allData);
         return;
     }
-    else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false))
+    else if (findAndStep(source, "Oscillator", false) || findAndStep(source, "Base", false) || findAndStep(source, "Harm Mods", false) || findAndStep(source, "Harmonic", false))
     {
         encodeWaveform(source, allData);
         return;

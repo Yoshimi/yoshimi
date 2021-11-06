@@ -3176,7 +3176,27 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
 
-        return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
+        //return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
+        name += " DynFilter ~ Filter ";
+        switch (control)
+        {
+            case 0:
+                name += "C Freq";
+                break;
+            case 1:
+                name += "Q";
+                break;
+            case 5:
+                name += "gain";
+                break;
+            case 2:
+                name += "FreqTrk";
+                break;
+            default:
+                name += "unrecognised";
+                break;
+        }
+        return name;
     }
 
     name += " Effect " + to_string(effnum + 1);
