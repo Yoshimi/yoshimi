@@ -1127,6 +1127,71 @@ void TextData::encodeWaveform(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::oscillatorGroup;
 
+    if (findAndStep(source, "Harmonic"))
+    {
+        if (findCharNum(source, ctl))
+            allData.data.control = ctl;
+        else
+        {
+            log(source, " no harmonic number");
+            return;
+        }
+
+        if (findAndStep(source, "Amplitude"))
+            allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+        else if (findAndStep(source, "Phase"))
+            allData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+        else
+            log(source, " no harmonic type");
+    }
+    else if (findAndStep(source, "Oscillator"))
+    {
+        if (findAndStep(source, "Random"))
+            ctl = OSCILLATOR::control::phaseRandomness;
+        else if (findAndStep(source, "Harm Rnd"))
+            ctl = OSCILLATOR::control::harmonicAmplitudeRandomness;
+    }
+    else if (findAndStep(source, "Harm Mods"))
+    {
+        if (findAndStep(source, "Adapt Param"))
+            ctl = OSCILLATOR::control::adaptiveHarmonicsParameter;
+        else if (findAndStep(source, "Adapt Base Freq"))
+            ctl = OSCILLATOR::control::adaptiveHarmonicsBase;
+        else if (findAndStep(source, "Adapt Power"))
+            ctl = OSCILLATOR::control::adaptiveHarmonicsPower;
+    }
+    else if (findAndStep(source, "Base Mods"))
+    {
+        if (findAndStep(source, "Osc"))
+        {
+            if (findAndStep(source, "Filt Par 1"))
+                ctl = OSCILLATOR::control::filterParameter1;
+            else if (findAndStep(source, "Filt Par 2"))
+                ctl = OSCILLATOR::control::filterParameter2;
+            else if (findAndStep(source, "Mod Par 1"))
+                ctl = OSCILLATOR::control::modulationParameter1;
+            else if (findAndStep(source, "Mod Par 2"))
+                ctl = OSCILLATOR::control::modulationParameter2;
+            else if (findAndStep(source, "Mod Par 3"))
+                ctl = OSCILLATOR::control::modulationParameter3;
+            else if (findAndStep(source, "Spect Par"))
+                ctl = OSCILLATOR::control::spectrumAdjustParameter;
+        }
+        else if (findAndStep(source, "Waveshape Par"))
+            ctl = OSCILLATOR::control::waveshapeParameter;
+    }
+    else if (findAndStep(source, "Base Funct"))
+    {
+        if (findAndStep(source, "Par"))
+            ctl = OSCILLATOR::control::baseFunctionParameter;
+        else if (findAndStep(source, "Mod Par 1"))
+            ctl = OSCILLATOR::control::baseModulationParameter1;
+        else if (findAndStep(source, "Mod Par 2"))
+            ctl = OSCILLATOR::control::baseModulationParameter2;
+        else if (findAndStep(source, "Mod Par 3"))
+            ctl = OSCILLATOR::control::baseModulationParameter3;
+    }
+
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;
@@ -1141,6 +1206,15 @@ void TextData::encodeResonance(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::resonanceGroup;
      // this might be changed for graph inserts
+
+    if (findAndStep(source, "Max dB"))
+        ctl = RESONANCE::control::maxDb;
+    if (findAndStep(source, "Center Freq"))
+        ctl = RESONANCE::control::centerFrequency;
+    if (findAndStep(source, "Octaves"))
+        ctl = RESONANCE::control::octaves;
+    if (findAndStep(source, "Random"))
+        ctl = RESONANCE::control::randomType;
 
     if (ctl < UNUSED)
     {
