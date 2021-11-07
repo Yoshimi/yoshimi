@@ -253,6 +253,8 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
             allData.data.kit = kitnum;
             //cout << "kitnum " << int(kitnum) << endl;
         }
+
+        allData.data.insert = TOPLEVEL::insert::kitGroup;
         unsigned char kitctl = UNUSED;
         if (findAndStep(source, "Mute"))
             kitctl = PART::control::kitItemMute;
