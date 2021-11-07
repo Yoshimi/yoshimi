@@ -48,7 +48,7 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     }
     encodeLoop(source, allData);
 
-    cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  offset " << int(allData.data.offset) << endl;
+    cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  Offset " << int(allData.data.offset) << endl;
 
     /*
      * If we later decide to be able to set and read values
@@ -1294,16 +1294,59 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
 
     if (findAndStep(source, "C_Freq"))
         ctl = FILTERINSERT::control::centerFrequency;
-    if (findAndStep(source, "Q"))
+    else if (findAndStep(source, "Q"))
         ctl = FILTERINSERT::control::Q;
-    if (findAndStep(source, "VsensA"))
+    else if (findAndStep(source, "VsensA"))
         ctl = FILTERINSERT::control::velocityCurve;
-    if (findAndStep(source, "Vsens"))
+    else if (findAndStep(source, "Vsens"))
         ctl = FILTERINSERT::control::velocitySensitivity;
-    if (findAndStep(source, "gain"))
+    else if (findAndStep(source, "gain"))
         ctl = FILTERINSERT::control::gain;
-    if (findAndStep(source, "FreqTrk"))
+    else if (findAndStep(source, "FreqTrk"))
         ctl = FILTERINSERT::control::frequencyTracking;
+
+    else if (findAndStep(source, "Form"))
+    {
+        if (findAndStep(source, "Fr Sl"))
+            ctl = FILTERINSERT::control::formantSlowness;
+        else if (findAndStep(source, "Vw Cl"))
+            ctl = FILTERINSERT::control::formantClearness;
+        else if (findAndStep(source, "Stretch"))
+            ctl = FILTERINSERT::control::formantStretch;
+        else if (findAndStep(source, "Cent Freq"))
+            ctl = FILTERINSERT::control::formantCenter;
+        else if (findAndStep(source, "Octave"))
+            ctl = FILTERINSERT::control::formantOctave;
+    }
+
+    else if (findAndStep(source, "Vowel"))
+    {
+        unsigned char Vnum = UNUSED - 1; // special cases
+        unsigned char Fnum = UNUSED - 1; // actually have printed zeros
+        if (findCharNum(source, Vnum))
+            allData.data.offset = Vnum + 1;
+        else
+        {
+            log(source, "no vowel number");
+            return;
+        }
+        if (findAndStep(source, "Formant"))
+        {
+            if (findCharNum(source, Fnum))
+                allData.data.parameter = Fnum + 1;
+            else
+            {
+                log(source, "no formant number");
+                return;
+            }
+            if (findAndStep(source, "Form Freq"))
+                ctl = FILTERINSERT::control::formantFrequency;
+            else if (findAndStep(source, "Form Q"))
+                ctl = FILTERINSERT::control::formantQ;
+            else if (findAndStep(source, "Form Amp"))
+                ctl = FILTERINSERT::control::formantAmplitude;
+            }
+    }
 
     if (ctl < UNUSED)
     {
