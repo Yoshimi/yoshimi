@@ -492,7 +492,12 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
     {
         allData.data.engine = effnum;
         //cout << "effnum " << int(effnum) << endl;
-
+        if (findAndStep(source, "DynFilter ~ Filter"))
+        {
+            allData.data.kit = EFFECT::type::dynFilter;
+            encodeFilter(source, allData);
+            return;
+        }
         if (allData.data.part < NUM_MIDI_PARTS)
         {
             if (findAndStep(source, "Bypass"))
@@ -1292,7 +1297,7 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::filterGroup;
 
-    if (findAndStep(source, "C_Freq"))
+    if (findAndStep(source, "C_Freq") || findAndStep(source, "C Freq"))
         ctl = FILTERINSERT::control::centerFrequency;
     else if (findAndStep(source, "Q"))
         ctl = FILTERINSERT::control::Q;
