@@ -54,6 +54,7 @@ class MidiLearn : private DataText, TextData
             unsigned char engine = 0;
             unsigned char insert = 0;
             unsigned char parameter = 0;
+            unsigned char offset = 0;
             unsigned char miscmsg = 0;
         };
 

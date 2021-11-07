@@ -2869,7 +2869,7 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
-    int nvowel = getData->data.miscmsg;
+    int nvowel = getData->data.offset;
 
     string name;
 
@@ -3176,7 +3176,6 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
 
-        //return (name + " DynFilter ~ Filter Internal Control " + to_string(control));
         name += " DynFilter ~ Filter ";
         switch (control)
         {

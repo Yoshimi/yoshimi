@@ -165,6 +165,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
         putData.data.engine = foundEntry.data.engine;
         putData.data.insert = foundEntry.data.insert;
         putData.data.parameter = foundEntry.data.parameter;
+        putData.data.offset = foundEntry.data.offset;
         putData.data.miscmsg = foundEntry.data.miscmsg;
         if (writeMidi(&putData, in_place))
         {
@@ -396,6 +397,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
+    unsigned char offset = getData->data.offset;
     unsigned char par2 = getData->data.miscmsg;
 
     if (control == MIDILEARN::control::sendRefreshRequest)
@@ -609,6 +611,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
         putData.data.engine = engine;
         putData.data.insert = insert;
         putData.data.parameter = parameter;
+        putData.data.offset = offset;
         it->CC = kit;
         it->chan = engine;
         it->min_in = insert;
@@ -675,8 +678,8 @@ string MidiLearn::findName(list<LearnBlock>::iterator it)
     putData.data.engine = it->data.engine;
     putData.data.insert = it->data.insert;
     putData.data.parameter = it->data.parameter;
-    putData.data.offset = UNUSED;
-    string name = resolveAll(synth, &putData, false);;
+    putData.data.offset = it->data.offset;
+    string name = resolveAll(synth, &putData, false);
     return name;
 }
 
@@ -732,6 +735,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     entry.data.engine = learnTransferBlock.data.engine;
     entry.data.insert = learnTransferBlock.data.insert;
     entry.data.parameter = learnTransferBlock.data.parameter;
+    entry.data.offset = learnTransferBlock.data.offset;
     entry.data.miscmsg = learnTransferBlock.data.miscmsg;
 
     list<LearnBlock>::iterator it;
@@ -948,7 +952,7 @@ bool MidiLearn::insertMidiListData(XMLwrapper *xml)
                 xml->addpar("Engine", it->data.engine);
                 xml->addpar("Insert", it->data.insert);
                 xml->addpar("Parameter", it->data.parameter);
-                xml->addpar("Secondary_Parameter", it->data.miscmsg);
+                xml->addpar("Secondary_Parameter", it->data.offset);
                 xml->addparstr("Command_Name",findName(it).c_str());
                 xml->endbranch();
             xml->endbranch();
@@ -1045,7 +1049,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.data.engine = xml->getpar255("Engine", 0);
                 entry.data.insert = xml->getpar255("Insert", 0);
                 entry.data.parameter = xml->getpar255("Parameter", 0);
-                entry.data.miscmsg = xml->getpar255("Secondary_Parameter", 0);
+                entry.data.offset = xml->getpar255("Secondary_Parameter", 0);
 
                 CommandBlock allData;
                 string test = xml->getparstr("Command_Name");
