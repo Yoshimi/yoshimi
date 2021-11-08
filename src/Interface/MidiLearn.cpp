@@ -20,6 +20,8 @@
 
 */
 
+#define newml YES
+
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
@@ -1052,7 +1054,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.data.insert = xml->getpar255("Insert", 0);
                 entry.data.parameter = xml->getpar255("Parameter", 0);
                 entry.data.offset = xml->getpar255("Secondary_Parameter", 0);
-
+#ifdef newml
                 CommandBlock allData;
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
@@ -1074,8 +1076,15 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 if (allData.data.offset != entry.data.offset)
                     cout << " unmatched offset Old " << int(entry.data.offset) << " > " << int(allData.data.offset);
                 cout << endl;
-                //std::cout << "test " << allData.data.value << std::endl;
 
+                entry.data.control = allData.data.control;
+                entry.data.part = allData.data.part;
+                entry.data.kit = allData.data.kit;
+                entry.data.engine = allData.data.engine;
+                entry.data.insert = allData.data.insert;
+                entry.data.parameter = allData.data.parameter;
+                entry.data.offset = allData.data.offset;
+#endif
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;

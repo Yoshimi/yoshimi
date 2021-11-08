@@ -328,8 +328,10 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
             ctl = PART::control::humanise;
         else if (findAndStep(source, "Velocity"))
             ctl = PART::control::humanvelocity;
+        else
+            ctl = PART::control::humanise; // old single control version
     }
-    else if (findAndStep(source, "Portamento Enable"))
+    else if (findAndStep(source, "Portamento Enable") || findAndStep(source, "Portamento"))
         ctl = PART::control::portamento;
     if (ctl < UNUSED)
     {
@@ -356,7 +358,7 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
     {
         ctl = PART::control::panningWidth;
     }
-    else if (findAndStep(source,"Mod Wheel Range"))
+    else if (findAndStep(source,"Mod Wheel Range") || findAndStep(source,"Mod Wheel Depth"))
     {
         ctl = PART::control::modWheelDepth;
     }
@@ -369,7 +371,7 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
         else if (findAndStep(source,"Bandwidth"))
             ctl = PART::control::exponentialBandwidth;
     }
-    else if (findAndStep(source,"Bandwidth Range"))
+    else if (findAndStep(source,"Bandwidth Range") || findAndStep(source,"Bandwidth depth"))
     {
         ctl = PART::control::bandwidthDepth;
     }
@@ -391,11 +393,11 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
     }
     else if (findAndStep(source,"Filter"))
     {
-        if (findAndStep(source,"Q Range"))
+        if (findAndStep(source,"Q Range") || findAndStep(source,"Q Depth"))
         {
             ctl = PART::control::filterQdepth;
         }
-        else if (findAndStep(source,"Cutoff Range"))
+        else if (findAndStep(source,"Cutoff Range") || findAndStep(source,"Cutoff Depth"))
         {
             ctl = PART::control::filterCutoffDepth;
         }
@@ -410,7 +412,7 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
         {
             ctl = PART::control::resonanceCenterFrequencyDepth;
         }
-        else if (findAndStep(source,"Band Range"))
+        else if (findAndStep(source,"Band Range") || findAndStep(source,"Band Depth"))
         {
             ctl = PART::control::resonanceBandwidthDepth;
         }
@@ -504,7 +506,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         }
         if (allData.data.part < NUM_MIDI_PARTS)
         {
-            if (findAndStep(source, "Bypass"))
+            if (findAndStep(source, "Bypass") || findAndStep(source, "bypassed"))
             {
                 allData.data.control = PART::control::effectBypass;
                 allData.data.insert = TOPLEVEL::insert::partEffectSelect;
