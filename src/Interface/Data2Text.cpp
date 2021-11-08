@@ -2885,22 +2885,22 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
-            contstr = "C_Freq";
+            contstr = "Cent Freq";
             break;
         case FILTERINSERT::control::Q:
             contstr = "Q";
             break;
         case FILTERINSERT::control::frequencyTracking:
-            contstr = "FreqTrk";
+            contstr = "Freq Track";
             break;
         case FILTERINSERT::control::velocitySensitivity:
-            contstr = "VsensA";
+            contstr = "Vel Sens";
             break;
         case FILTERINSERT::control::velocityCurve:
-            contstr = "Vsens";
+            contstr = "Vel Sens Curve";
             break;
         case FILTERINSERT::control::gain:
-            contstr = "gain";
+            contstr = "Gain";
             break;
         case FILTERINSERT::control::stages:
             showValue = false;
@@ -3186,7 +3186,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 name += "Q";
                 break;
             case 5:
-                name += "gain";
+                name += "Gain";
                 break;
             case 2:
                 name += "FreqTrk";

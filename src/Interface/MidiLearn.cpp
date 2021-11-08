@@ -43,6 +43,8 @@ using file::setExtension;
 
 using func::asString;
 using func::asHexString;
+using std::cout;
+using std::endl;
 using std::to_string;
 using std::string;
 using std::vector;
@@ -1054,6 +1056,24 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 CommandBlock allData;
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
+                if (ID == 0)
+                    cout << endl;
+                cout << "line " << (ID + 1);
+                if (allData.data.control != entry.data.control)
+                    cout << " unmatched control Old " << int(entry.data.control) << " > New " << int(allData.data.control);
+                if (allData.data.part != entry.data.part)
+                    cout << " unmatched part Old " << int(entry.data.part) << " > New " << int(allData.data.part);
+                if (allData.data.kit != entry.data.kit)
+                    cout << " unmatched kit Old " << int(entry.data.kit) << " > New " << int(allData.data.kit);
+                if (allData.data.engine != entry.data.engine)
+                    cout << " unmatched engine Old " << int(entry.data.engine) << " > New " << int(allData.data.engine);
+                if (allData.data.insert != entry.data.insert)
+                    cout << " unmatched insert Old " << int(entry.data.insert) << " > New " << int(allData.data.insert);
+                if (allData.data.parameter != entry.data.parameter)
+                    cout << " unmatched parameter Old " << int(entry.data.parameter) << " > New " << int(allData.data.parameter);
+                if (allData.data.offset != entry.data.offset)
+                    cout << " unmatched offset Old " << int(entry.data.offset) << " > " << int(allData.data.offset);
+                cout << endl;
                 //std::cout << "test " << allData.data.value << std::endl;
 
                 xml->exitbranch();

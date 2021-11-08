@@ -48,7 +48,7 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     }
     encodeLoop(source, allData);
 
-    cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  Offset " << int(allData.data.offset) << endl;
+    //cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  Offset " << int(allData.data.offset) << endl;
 
     /*
      * If we later decide to be able to set and read values
@@ -250,17 +250,19 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
                 log(source, "kit number out of range");
                 return;
             }
+
             allData.data.kit = kitnum;
             //cout << "kitnum " << int(kitnum) << endl;
         }
 
-        allData.data.insert = TOPLEVEL::insert::kitGroup;
+        //allData.data.insert = TOPLEVEL::insert::kitGroup;
         unsigned char kitctl = UNUSED;
         if (findAndStep(source, "Mute"))
             kitctl = PART::control::kitItemMute;
         // we may add other controls later
         if (kitctl < UNUSED)
         {
+            allData.data.insert = TOPLEVEL::insert::kitGroup;
             allData.data.control = kitctl;
             return;
         }
@@ -596,13 +598,17 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
 void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 {
+    if (findAndStep(source, "Enable"))
+    {
+        if (allData.data.kit != UNUSED)
+            allData.data.insert = TOPLEVEL::insert::kitGroup;
+        allData.data.control = PART::control::enableAdd;
+        return;
+    }
     allData.data.engine = PART::engine::addSynth;
     unsigned char ctl = UNUSED;
 
-    if (findAndStep(source, "Enable"))
-        ctl = PART::control::enableAdd;
-
-    else if (findAndStep(source, "Resonance"))
+    if (findAndStep(source, "Resonance"))
     {
         encodeResonance(source, allData);
         return;
@@ -648,7 +654,7 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         encodeLFO(source, allData);
         return;
     }
-    else if (findAndStep(source, "amplitude"))
+    else if (findAndStep(source, "Amplitude"))
     {
         if (findAndStep(source, "Volume"))
             ctl = ADDSYNTH::control::volume;
@@ -808,16 +814,16 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Modulator"))
     {
-        allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
-
         if (findAndStep(source, "Amp Env"))
         {
+            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
             allData.data.parameter = TOPLEVEL::insertType::amplitude;
             encodeEnvelope(source, allData);
             return;
         }
         if (findAndStep(source, "Freq Env"))
         {
+            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
             allData.data.parameter = TOPLEVEL::insertType::frequency;
             encodeEnvelope(source, allData);
             return;
@@ -846,6 +852,14 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         else if (findAndStep(source, "Osc Phase"))
             ctl = ADDVOICE::control::modulatorOscillatorPhase;
     }
+    else if (findAndStep(source, "Volume"))
+        ctl = ADDVOICE::control::volume;
+    else if (findAndStep(source, "Vel Sens"))
+        ctl = ADDVOICE::control::velocitySense;
+    else if (findAndStep(source, "Panning"))
+        ctl = ADDVOICE::control::panning;
+    else if (findAndStep(source, "Random Width"))
+        ctl = ADDVOICE::control::randomWidth;
 
     if (ctl < UNUSED)
     {
@@ -859,6 +873,14 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 
 void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 {
+    if (findAndStep(source, "Enable"))
+    {
+        if (allData.data.kit != UNUSED)
+            allData.data.insert = TOPLEVEL::insert::kitGroup;
+        allData.data.control = PART::control::enableSub;
+        return;
+    }
+
     allData.data.engine = PART::engine::subSynth;
     unsigned char ctl = UNUSED;
 
@@ -892,8 +914,6 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
         encodeFilter(source, allData);
         return;
     }
-    else if (findAndStep(source, "Enable"))
-        ctl = PART::control::enableSub;
     else if (findAndStep(source, "Stereo"))
         ctl = SUBSYNTH::control::stereo;
 
@@ -978,13 +998,19 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 
 void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 {
+    if (findAndStep(source, "Enable"))
+    {
+        if (allData.data.kit != UNUSED)
+            allData.data.insert = TOPLEVEL::insert::kitGroup;
+        allData.data.control = PART::control::enablePad;
+        return;
+    }
+
+
     allData.data.engine = PART::engine::padSynth;
     unsigned char ctl = UNUSED;
 
-    if (findAndStep(source, "Enable"))
-        ctl = PART::control::enablePad;
-
-    else if (findAndStep(source, "Resonance"))
+    if (findAndStep(source, "Resonance"))
     {
         encodeResonance(source, allData);
         return;
@@ -1303,13 +1329,13 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
         ctl = FILTERINSERT::control::centerFrequency;
     else if (findAndStep(source, "Q"))
         ctl = FILTERINSERT::control::Q;
-    else if (findAndStep(source, "VsensA"))
-        ctl = FILTERINSERT::control::velocityCurve;
-    else if (findAndStep(source, "Vsens"))
+    else if (findAndStep(source, "VsensA") || findAndStep(source, "Vel Sens"))
         ctl = FILTERINSERT::control::velocitySensitivity;
-    else if (findAndStep(source, "gain"))
+    else if (findAndStep(source, "Vsens") || findAndStep(source, "Vel Sens Curve"))
+        ctl = FILTERINSERT::control::velocityCurve;
+    else if (findAndStep(source, "ain")) // missing G/g deliberate
         ctl = FILTERINSERT::control::gain;
-    else if (findAndStep(source, "FreqTrk"))
+    else if (findAndStep(source, "Freq Track") || findAndStep(source, "FreqTrk"))
         ctl = FILTERINSERT::control::frequencyTracking;
 
     else if (findAndStep(source, "Form"))
