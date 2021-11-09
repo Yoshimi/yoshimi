@@ -2024,21 +2024,18 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         getData->data.value = part->busy;
         return false;
     }
-    if (kititem != UNUSED && kititem != 0 && engine != UNUSED && control != 8 && part->kit[kititem].Penabled == false)
-        return false; // attempt to access not enabled kititem
-
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
-            return false;
-
         commandPart(getData);
         return true;
     }
 
-    if (kititem > 0 && kititem != UNUSED && part->Pkitmode == 0)
+    if (kititem > 0 && kititem != UNUSED)
     {
-        return false;
+        if (part->Pkitmode == 0)
+            return false;
+        else if (!part->kit[kititem].Penabled)
+            return false;
     }
 
     if (engine == PART::engine::addSynth)
@@ -3357,6 +3354,22 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+    if (part->Pkitmode == 0)
+    {
+        kitType = false;
+        if (control != PART::control::kitMode && kititem != UNUSED)
+        {
+            getData->data.source = TOPLEVEL::action::noAction;
+            synth->getRuntime().Log("Not in kit mode");
+        }
+    }
+    else if (control != PART::control::enableKitLine && !part->kit[kititem].Penabled && kititem < UNUSED)
+    {
+        getData->data.source = TOPLEVEL::action::noAction;
+        synth->getRuntime().Log("Kit item " +  to_string(kititem + 1) + " not enabled");
+        return;
+    }
+
     unsigned char effNum = part->Peffnum;
     if (!kitType)
         kititem = 0;

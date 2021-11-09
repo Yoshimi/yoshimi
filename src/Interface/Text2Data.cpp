@@ -43,6 +43,8 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     strip (source);
     if (source.empty())
     {
+        allData.data.control = TOPLEVEL::control::unrecognised;
+        allData.data.source = TOPLEVEL::action::noAction;
         log(source, "empty Command String");
         return;
     }
@@ -191,6 +193,9 @@ void TextData::encodeLoop(std::string source, CommandBlock &allData)
         encodePart(source, allData);
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     log(source, "bad Command String");
 }
 
@@ -214,6 +219,8 @@ void TextData::encodeMain(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "main overflow >" << source << endl;
 }
 
@@ -338,7 +345,8 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
-
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "part overflow >" << source << endl;
 }
 
@@ -451,6 +459,8 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "controller overflow >" << source << endl;
 }
 
@@ -478,6 +488,8 @@ void TextData::encodeMidi(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "midi overflow >" << source << endl;
 }
 
@@ -593,6 +605,9 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         allData.data.control = result;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "effects overflow >" << source << endl;
 }
 
@@ -701,6 +716,8 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "addsynth overflow >" << source << endl;
 }
 
@@ -869,6 +886,8 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "addvoice overflow >" << source << endl;
 }
 
@@ -994,6 +1013,8 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "subsynth overflow >" << source << endl;
 }
 
@@ -1152,6 +1173,8 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
         return;
     }
 
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "padsynth overflow >" << source << endl;
 }
 
@@ -1232,6 +1255,9 @@ void TextData::encodeWaveform(string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "waveform overflow >" << source << endl;
 }
 
@@ -1256,6 +1282,9 @@ void TextData::encodeResonance(string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "resonance overflow >" << source << endl;
 }
 
@@ -1286,6 +1315,9 @@ void TextData::encodeLFO(string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "lfo overflow >" << source << endl;
 }
 
@@ -1318,6 +1350,9 @@ void TextData::encodeEnvelope(string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "envelope overflow >" << source << endl;
 }
 
@@ -1327,7 +1362,7 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::filterGroup;
 
-    if (findAndStep(source, "C_Freq") || findAndStep(source, "C Freq"))
+    if (findAndStep(source, "C_Freq") || findAndStep(source, "C Freq") || findAndStep(source, "Cent Freq"))
         ctl = FILTERINSERT::control::centerFrequency;
     else if (findAndStep(source, "Q"))
         ctl = FILTERINSERT::control::Q;
@@ -1388,5 +1423,8 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
         allData.data.control = ctl;
         return;
     }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
     cout << "filter overflow >" << source << endl;
 }

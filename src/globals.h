@@ -215,7 +215,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         /*
          * the following values must never appear in any other sections
          */
-        textMessage = 254, // FE
+        unrecognised = 253, // FD
+        textMessage,
         forceExit // this is effective from *any* section!
     };
 

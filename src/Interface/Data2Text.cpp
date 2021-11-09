@@ -138,24 +138,24 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
         return "Invalid kit " + to_string(int(kititem) + 1);
 
-    Part *part;
-    part = synth->part[npart];
+    //Part *part;
+    //part = synth->part[npart];
 
-    if (kititem > 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        return "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
+    //if (kititem > 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
+        //return "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
+        /*if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
             return  "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
-        else
+        else*/
         {
             commandName = resolvePart(getData, addValue);
             return withValue(commandName, type, showValue, addValue, value);
         }
     }
-    if (kititem > 0 && part->Pkitmode == 0)
-        return "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+    //if (kititem > 0 && part->Pkitmode == 0)
+        //return "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
 
     if (engine == PART::engine::padSynth)
     {
