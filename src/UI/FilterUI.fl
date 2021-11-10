@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
@@ -486,10 +486,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Counter stcounter {
           label {St.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value() - 1, TOPLEVEL::type::Write);
-
-// stages has been fixed at 5 (current max stages) until a programatic
-// way can be found to set max to this value}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value() - 1, TOPLEVEL::type::Write);}
           tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {78 10 31 15} type Simple labelsize 10 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10
         }
       }
@@ -902,6 +899,11 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     unsigned char part = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char eng = getData->data.engine;
+    unsigned char param =  getData->data.parameter;
+    unsigned char offset =  getData->data.offset;
+
+    bool isCurrent =  (param == nformant && offset == nvowel);
+
     int value_int = lrint(value);
 
     bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
@@ -990,18 +992,27 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             break;
 
         case FILTERINSERT::control::formantFrequency:
-            formant_freq_dial->value(value);
-            formantfiltergraph->redraw();
+            if (isCurrent)
+            {
+                formant_freq_dial->value(value);
+                formantfiltergraph->redraw();
+            }
             break;
 
         case FILTERINSERT::control::formantQ:
-            formant_q_dial->value(value);
-            formantfiltergraph->redraw();
+            if (isCurrent)
+            {
+                formant_q_dial->value(value);
+                formantfiltergraph->redraw();
+            }
             break;
 
         case FILTERINSERT::control::formantAmplitude:
-            formant_amp_dial->value(value);
-            formantfiltergraph->redraw();
+            if (isCurrent)
+            {
+                formant_amp_dial->value(value);
+                formantfiltergraph->redraw();
+            }
             break;
 
         case FILTERINSERT::control::formantStretch:

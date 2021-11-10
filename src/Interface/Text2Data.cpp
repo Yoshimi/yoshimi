@@ -1377,9 +1377,9 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Form"))
     {
-        if (findAndStep(source, "Fr Sl"))
+        if (findAndStep(source, "Morph") || findAndStep(source, "Fr Sl"))
             ctl = FILTERINSERT::control::formantSlowness;
-        else if (findAndStep(source, "Vw Cl"))
+        else if (findAndStep(source, "Lucidity") || findAndStep(source, "Vw Cl"))
             ctl = FILTERINSERT::control::formantClearness;
         else if (findAndStep(source, "Stretch"))
             ctl = FILTERINSERT::control::formantStretch;

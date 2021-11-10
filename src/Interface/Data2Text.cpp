@@ -2951,14 +2951,14 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
             break;
         }
         case FILTERINSERT::control::frequencyTrackingRange:
-            contstr = "Fre Trk Offs";
+            contstr = "Freq Track Offs";
             yesno = true;
             break;
         case FILTERINSERT::control::formantSlowness:
-            contstr = "Form Fr Sl";
+            contstr = "Form Morph";
             break;
         case FILTERINSERT::control::formantClearness:
-            contstr = "Form Vw Cl";
+            contstr = "Form Lucidity";
             break;
         case FILTERINSERT::control::formantFrequency:
             contstr = "Form Freq";
