@@ -20,7 +20,7 @@
 
 */
 
-//#define newml YES
+#define newml YES
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"

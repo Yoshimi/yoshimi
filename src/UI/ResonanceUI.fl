@@ -11,7 +11,7 @@ comment {ResonanceUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2015-2020, Will Godfrey
+Copyright 2015-2021, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -316,7 +316,7 @@ class ResonanceUI {: PresetsUI_
         }
         Fl_Value_Output dbvalue {
           label dB
-          xywh {435 282 40 18} labelsize 12 align 8 minimum -150 maximum 150 textfont 1 textsize 12
+          xywh {435 283 40 18} labelsize 12 align 8 minimum -150 maximum 150 textfont 1 textsize 12
           code0 {o->step(0.1, 1);}
           code1 {//this widget must be before the calling widgets}
         }
@@ -336,7 +336,7 @@ class ResonanceUI {: PresetsUI_
           label Smooth
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::smoothGraph, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Smooth the resonance function} xywh {507 282 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
+          tooltip {Smooth the resonance function} xywh {507 283 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
         }
         Fl_Value_Output maxdbvo {
           label {Max dB}
@@ -351,7 +351,7 @@ class ResonanceUI {: PresetsUI_
               o->value(20);
 
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer);}
-          xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
+          xywh {77 283 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
           code0 {o->value(respar->PmaxdB);}
           class mwheel_slider_rev
         }
@@ -384,30 +384,36 @@ class ResonanceUI {: PresetsUI_
               o->value(64);
 
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::octaves, o->value(), TOPLEVEL::type::Integer);}
-          xywh {243 282 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
+          xywh {243 283 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
           code0 {o->value(respar->Poctavesfreq);}
           class mwheel_slider_rev
+        }
+        Fl_Box {} {
+          xywh {580 262 48 41} box THIN_UP_BOX color 237
         }
         Fl_Button rnd1 {
           label Rnd1
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 0, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 264 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 264 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
         }
         Fl_Button rnd2 {
           label Rnd2
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 1, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 277 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
         }
         Fl_Button rnd3 {
           label Rnd3
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 2, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 290 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
+        }
+        Fl_Box {} {
+          xywh {104 263 18 18} box THIN_UP_BOX color 237
         }
         Fl_Check_Button p1st {
-          label {Prot.1st}
+          label { Prot.1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX labelsize 12
@@ -419,7 +425,7 @@ class ResonanceUI {: PresetsUI_
           xywh {364 280 62 0} box NO_BOX labelsize 12 align 33 textsize 12
         }
         Fl_Box {} {
-          tooltip {Interpolate the peaks (left button smooth, right button linear)} xywh {359 264 72 36} box THIN_DOWN_FRAME
+          tooltip {Interpolate the peaks (left button smooth, right button linear)} xywh {359 264 72 37} box THIN_DOWN_FRAME
         }
         Fl_Button sbutton {
           label S
@@ -444,8 +450,11 @@ class ResonanceUI {: PresetsUI_
           xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
         }
       }
+      Fl_Box {} {
+        xywh {4 263 18 18} box THIN_UP_BOX color 237
+      }
       Fl_Check_Button enabled {
-        label Enable
+        label { Enable}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer);}
         xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12

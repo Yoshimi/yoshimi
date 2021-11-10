@@ -338,6 +338,7 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
             def = 64;
             break;
         case RESONANCE::control::enableResonance:
+            type |= learnable;
             break;
         case RESONANCE::control::randomType:
             type |= learnable;
@@ -346,6 +347,7 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
         case RESONANCE::control::interpolatePeaks:
             break;
         case RESONANCE::control::protectFundamental:
+            type |= learnable;
             break;
         case RESONANCE::control::clearGraph:
             max = 0;
