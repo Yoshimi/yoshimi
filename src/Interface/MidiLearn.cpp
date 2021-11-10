@@ -159,18 +159,13 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
         else if (minOut != 0) // it's just a shift
             value += minOut;
         CommandBlock putData;
+
+        memcpy(putData.bytes, foundEntry.frame.bytes, sizeof(CommandBlock));
         putData.data.value = value;
         putData.data.type = TOPLEVEL::type::Write | (foundEntry.frame.data.type & TOPLEVEL::type::Integer);
         // write command from midi with original integer / float type
         putData.data.source = TOPLEVEL::action::toAll;
-        putData.data.control = foundEntry.frame.data.control;
-        putData.data.part = foundEntry.frame.data.part;
-        putData.data.kit = foundEntry.frame.data.kit;
-        putData.data.engine = foundEntry.frame.data.engine;
-        putData.data.insert = foundEntry.frame.data.insert;
-        putData.data.parameter = foundEntry.frame.data.parameter;
-        putData.data.offset = foundEntry.frame.data.offset;
-        putData.data.miscmsg = foundEntry.frame.data.miscmsg;
+
         if (writeMidi(&putData, in_place))
         {
             if (firstLine && !in_place) // not in_place
@@ -672,17 +667,9 @@ void MidiLearn::generalOperations(CommandBlock *getData)
 string MidiLearn::findName(list<LearnBlock>::iterator it)
 {
     CommandBlock putData;
+    memcpy(putData.bytes, it->frame.bytes, sizeof(CommandBlock));
     putData.data.value = 0;
     putData.data.source = 0;
-
-    putData.data.type = it->frame.data.type;
-    putData.data.control = it->frame.data.control;
-    putData.data.part = it->frame.data.part;
-    putData.data.kit = it->frame.data.kit;
-    putData.data.engine = it->frame.data.engine;
-    putData.data.insert = it->frame.data.insert;
-    putData.data.parameter = it->frame.data.parameter;
-    putData.data.offset = it->frame.data.offset;
     string name = resolveAll(synth, &putData, false);
     return name;
 }
@@ -732,7 +719,6 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
 
     memcpy(entry.frame.bytes, learnTransferBlock.bytes, sizeof(CommandBlock));
     entry.frame.data.type = type;
-
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     int lineNo = 0;
@@ -780,7 +766,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
         ok = synth->interchange.toGUI.write(putData->bytes);
         ++tries;
         if (!ok)
-                usleep(1);
+                usleep(100);
         // we can afford a short delay for buffer to clear
     }
     while (!ok && tries < 3);
