@@ -47,6 +47,7 @@ class TextData
         void encodeLoop(string source, CommandBlock &allData);
 
         void encodeMain(string &source, CommandBlock &allData);
+        void encodeScale(string &source, CommandBlock &allData);
         void encodePart(string &source, CommandBlock &allData);
 
         void encodeController(string &source, CommandBlock &allData);

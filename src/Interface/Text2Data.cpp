@@ -188,6 +188,12 @@ void TextData::encodeLoop(std::string source, CommandBlock &allData)
         return;
     }
 
+    if (findAndStep(source, "Scales"))
+    {
+        encodeScale(source, allData);
+        return;
+    }
+
     if (findAndStep(source, "Part"))
     {
         encodePart(source, allData);
@@ -224,6 +230,48 @@ void TextData::encodeMain(std::string &source, CommandBlock &allData)
     cout << "main overflow >" << source << endl;
 }
 
+
+void TextData::encodeScale(std::string &source, CommandBlock &allData)
+{
+    strip (source);
+    allData.data.part = TOPLEVEL::section::scales;
+
+    unsigned char ctl = UNUSED;
+    if (findAndStep(source, "Enable"))
+    {
+        if (findAndStep(source, "Microtonal"))
+            ctl = SCALES::control::enableMicrotonal;
+        else if (findAndStep(source, "Keyboard Mapping"))
+            ctl = SCALES::control::enableKeyboardMap;
+    }
+    else if (findAndStep(source, "Ref note"))
+        ctl = SCALES::control::refNote;
+    else if (findAndStep(source, "Invert Keys"))
+        ctl = SCALES::control::invertScale;
+    else if (findAndStep(source, "Key Center"))
+        ctl = SCALES::control::invertedScaleCenter;
+    else if (findAndStep(source, "Scale Shift"))
+        ctl = SCALES::control::scaleShift;
+    else if (findAndStep(source, "Keyboard"))
+    {
+        if (findAndStep(source, "First Note"))
+            ctl = SCALES::control::lowKey;
+        else if (findAndStep(source, "Middle Note"))
+            ctl = SCALES::control::middleKey;
+        else if (findAndStep(source, "Last Note"))
+            ctl = SCALES::control::highKey;
+    }
+
+    if (ctl < UNUSED)
+    {
+        allData.data.control = ctl;
+        return;
+    }
+
+    allData.data.control = TOPLEVEL::control::unrecognised;
+    allData.data.source = TOPLEVEL::action::noAction;
+    cout << "scale overflow >" << source << endl;
+}
 
 void TextData::encodePart(std::string &source, CommandBlock &allData)
 {
