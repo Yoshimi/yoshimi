@@ -1777,8 +1777,21 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
     string name = "";
     if (control <= ADDSYNTH::control::panning)
         name = " Amplitude ";
-    else if (control >= ADDSYNTH::control::detuneFrequency && control <= ADDSYNTH::control::relativeBandwidth)
-        name = "Frequency ";
+    else
+    {
+        switch (control)
+        {
+            case ADDSYNTH::control::detuneFrequency:
+            case ADDSYNTH::control::octave:
+            case ADDSYNTH::control::detuneType:
+            case ADDSYNTH::control::coarseDetune:
+            case ADDSYNTH::control::relativeBandwidth:
+                name = "Frequency ";
+                break;
+            default:
+                break;
+        }
+    }
 
     string contstr = "";
 
@@ -1871,69 +1884,42 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
     else
         nvoice = engine - PART::engine::addVoice1;
 
-    string name = "";
-    switch (control & 0xf0)
-    {
-        case ADDVOICE::control::modulatorType:
-            name = " Modulator ";
-            break;
-        case ADDVOICE::control::detuneFrequency:
-            name = " Frequency ";
-            break;
-        case ADDVOICE::control::unisonFrequencySpread:
-            name = " Unison ";
-            break;
-        case ADDVOICE::control::bypassGlobalFilter:
-            name = " Filter ";
-            yesno = true;
-            break;
-        case ADDVOICE::control::modulatorAmplitude:
-            name = " Modulator Amp ";
-            break;
-        case ADDVOICE::control::modulatorDetuneFrequency:
-            name = " Modulator Freq ";
-            break;
-        case ADDVOICE::control::modulatorOscillatorPhase:
-            name = " Modulator Osc";
-            break;
-    }
-
     string contstr = "";
 
     switch (control)
     {
         case ADDVOICE::control::volume:
-            contstr = " Volume";
+            contstr = "Volume";
             break;
         case ADDVOICE::control::velocitySense:
-            contstr = " Vel Sens";
+            contstr = "Vel Sens";
             break;
         case ADDVOICE::control::panning:
-            contstr = " Panning";
+            contstr = "Panning";
             break;
         case ADDVOICE::control::enableRandomPan:
-            contstr = " Random Pan";
+            contstr = "Random Pan";
             yesno = true;
             break;
         case ADDVOICE::control::randomWidth:
-            contstr = " Random Width";
+            contstr = "Random Width";
             break;
 
         case ADDVOICE::control::invertPhase:
-            contstr = " Minus";
+            contstr = "Minus";
             yesno = true;
             break;
         case ADDVOICE::control::enableAmplitudeEnvelope:
-            contstr = " Amplitude Enable Env";
+            contstr = "Amplitude Enable Env";
             yesno = true;
             break;
         case ADDVOICE::control::enableAmplitudeLFO:
-            contstr = " Amplitude Enable LFO";
+            contstr = "Amplitude Enable LFO";
             yesno = true;
             break;
 
         case ADDVOICE::control::modulatorType:
-            contstr = "Type ";
+            contstr = "Modulator Type ";
             if (addValue)
             {
                 showValue = false;
@@ -1947,7 +1933,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
                 if (value_int < 0)
                     contstr = "Local";
                 else
-                    contstr = "Source Voice " + to_string(value_int + 1);
+                    contstr = "Modulator Source Voice " + to_string(value_int + 1);
             }
             break;
 
@@ -1958,180 +1944,181 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
                 if (value_int < 0)
                     contstr = "Local";
                 else
-                    contstr = " Source " + to_string(value_int + 1);
+                    contstr = "Source " + to_string(value_int + 1);
             }
             break;
 
         case ADDVOICE::control::detuneFrequency:
-            contstr = "Detune";
+            contstr = "Frequency Detune";
             break;
         case ADDVOICE::control::equalTemperVariation:
-            contstr = "Eq T";
+            contstr = "Frequency Eq T";
             break;
         case ADDVOICE::control::baseFrequencyAs440Hz:
-            contstr = "440Hz";
+            contstr = "Frequency 440Hz";
             yesno = true;
             break;
         case ADDVOICE::control::octave:
-            contstr = "Octave";
+            contstr = "Frequency Octave";
             break;
         case ADDVOICE::control::detuneType:
-            contstr = "Det type ";
+            contstr = "Frequency Det type ";
             showValue = false;
             if (addValue)
                 contstr += stringCaps(detuneType [int(value)], 1);
             break;
         case ADDVOICE::control::coarseDetune:
-            contstr = "Coarse Det";
+            contstr = "Frequency Coarse Det";
             break;
         case ADDVOICE::control::pitchBendAdjustment:
-            contstr = "Bend Adj";
+            contstr = "Frequency Bend Adj";
             break;
         case ADDVOICE::control::pitchBendOffset:
-            contstr = "Offset Hz";
+            contstr = "Frequency Offset Hz";
             break;
         case ADDVOICE::control::enableFrequencyEnvelope:
-            contstr = "Enable Env";
+            contstr = "Frequency Enable Env";
             yesno = true;
             break;
         case ADDVOICE::control::enableFrequencyLFO:
-            contstr = "Enable LFO";
+            contstr = "Frequency Enable LFO";
             yesno = true;
             break;
 
         case ADDVOICE::control::unisonFrequencySpread:
-            contstr = "Freq Spread";
+            contstr = "Unison Freq Spread";
             break;
         case ADDVOICE::control::unisonPhaseRandomise:
-            contstr = "Phase Rnd";
+            contstr = "Unison Phase Rnd";
             break;
         case ADDVOICE::control::unisonStereoSpread:
-            contstr = "Stereo";
+            contstr = "Unison Stereo";
             break;
         case ADDVOICE::control::unisonVibratoDepth:
-            contstr = "Vibrato";
+            contstr = "Unison Vibrato";
             break;
         case ADDVOICE::control::unisonVibratoSpeed:
-            contstr = "Vib Speed";
+            contstr = "Unison Vib Speed";
             break;
         case ADDVOICE::control::unisonSize:
-            contstr = "Size";
+            contstr = "Unison Size";
             break;
         case ADDVOICE::control::unisonPhaseInvert:
             showValue = false;
-            contstr = "Invert " + unisonPhase[value_int];
+            contstr = "Unison Invert " + unisonPhase[value_int];
             break;
         case ADDVOICE::control::enableUnison:
-            contstr = "Enable";
+            contstr = "Unison Enable";
             yesno = true;
             break;
 
         case ADDVOICE::control::bypassGlobalFilter:
-            contstr = "Bypass Global";
+            contstr = "Filter Bypass Global";
             yesno = true;
             break;
         case ADDVOICE::control::enableFilter:
-            contstr = "Enable";
+            contstr = "Filter Enable";
             yesno = true;
             break;
         case ADDVOICE::control::enableFilterEnvelope:
-            contstr = "Enable Env";
+            contstr = "Filter Enable Env";
             yesno = true;
             break;
         case ADDVOICE::control::enableFilterLFO:
-            contstr = "Enable LFO";
+            contstr = "Filter Enable LFO";
             yesno = true;
             break;
 
         case ADDVOICE::control::modulatorAmplitude:
-            contstr = "Volume";
+            contstr = "Modulator Amp Volume";
             break;
         case ADDVOICE::control::modulatorVelocitySense:
-            contstr = "V Sense";
+            contstr = "Modulator Amp V Sense";
             break;
         case ADDVOICE::control::modulatorHFdamping:
-            contstr = "F Damp";
+            contstr = "Modulator Amp F Damp";
             break;
         case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
-            contstr = "Enable Env";
+            contstr = "Modulator Amp Enable Env";
             yesno = true;
             break;
 
         case ADDVOICE::control::modulatorDetuneFrequency:
+            contstr = "Modulator Freq";
             break;
         case ADDVOICE::control::modulatorFrequencyAs440Hz:
-            contstr = "440Hz";
+            contstr = "Modulator Freq 440Hz";
             yesno = true;
             break;
         case ADDVOICE::control::modulatorDetuneFromBaseOsc:
-            contstr = "Follow voice";
+            contstr = "Modulator Freq Follow voice";
             yesno = true;
             break;
         case ADDVOICE::control::modulatorOctave:
-            contstr = "Octave";
+            contstr = "Modulator Freq Octave";
             break;
         case ADDVOICE::control::modulatorDetuneType:
-            contstr = "Det type ";
+            contstr = "Modulator Freq Det type ";
             showValue = false;
             if (addValue)
                 contstr += detuneType [int(value)];
             break;
         case ADDVOICE::control::modulatorCoarseDetune:
-            contstr = "Coarse Det";
+            contstr = "Modulator Freq Coarse Det";
             break;
         case ADDVOICE::control::enableModulatorFrequencyEnvelope: // local, external
-            contstr = "Enable Env";
+            contstr = "Modulator Freq Enable Env";
             yesno = true;
             break;
 
         case ADDVOICE::control::modulatorOscillatorPhase:
-            contstr = " Phase";
+            contstr = "Modulator Osc Phase";
             break;
         case ADDVOICE::control::modulatorOscillatorSource:
             if (addValue)
             {
                 showValue = false;
                 if (value_int < 0)
-                    contstr = " Internal";
+                    contstr = "Modulator Internal";
                 else
-                    contstr = " from " + to_string(value_int + 1);
+                    contstr = "Modulator Osc from " + to_string(value_int + 1);
             }
             break;
 
         case ADDVOICE::control::delay:
-            contstr = " Delay";
+            contstr = "Delay";
             break;
         case ADDVOICE::control::enableVoice:
-            contstr = " Enable";
+            contstr = "Enable";
             yesno = true;
             break;
         case ADDVOICE::control::enableResonance:
-            contstr = " Resonance Enable";
+            contstr = "Resonance Enable";
             yesno = true;
             break;
         case ADDVOICE::control::voiceOscillatorPhase:
-            contstr = " Osc Phase";
+            contstr = "Osc Phase";
             break;
         case ADDVOICE::control::voiceOscillatorSource:
             if (addValue)
             {
                 showValue = false;
                 if (value_int < 0)
-                    contstr = " Internal";
+                    contstr = "Internal";
                 else
-                    contstr = " from " + to_string(value_int + 1);
+                    contstr = "from " + to_string(value_int + 1);
             }
             break;
         case ADDVOICE::control::soundType:
-            contstr = " Sound type";
+            contstr = "Sound type";
             break;
 
         default:
             showValue = false;
-            contstr = " Unrecognised";
+            contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + " " + contstr);
 }
 
 
