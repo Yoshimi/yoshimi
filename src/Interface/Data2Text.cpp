@@ -2263,28 +2263,6 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     int value_int = int(value);
-    string name = "";
-    switch (control & 0x70)
-    {
-        case PADSYNTH::control::volume:
-            name = " Amplitude ";
-            break;
-        case PADSYNTH::control::bandwidth:
-            name = " Bandwidth ";
-            break;
-        case PADSYNTH::control::detuneFrequency:
-            name = " Frequency ";
-            break;
-        case PADSYNTH::control::overtoneParameter1:
-            name = " Overtones ";
-            break;
-        case PADSYNTH::control::baseWidth:
-            name = " Harmonic Base ";
-            break;
-        case PADSYNTH::control::harmonicBase:
-            name = " Harmonic Samples ";
-            break;
-    }
 
     string contstr = "";
     switch (control)
@@ -2304,16 +2282,6 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             break;
         case PADSYNTH::control::randomWidth:
             contstr = "Random Width";
-            break;
-
-        case PADSYNTH::control::bandwidth:
-            contstr = "Bandwidth";
-            break;
-        case PADSYNTH::control::bandwidthScale:
-            contstr = "Band Scale";
-            break;
-        case PADSYNTH::control::spectrumMode:
-            contstr = "Spect Mode";
             break;
 
         case PADSYNTH::control::detuneFrequency:
@@ -2345,21 +2313,69 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::pitchBendOffset:
             contstr = "Offset Hz";
             break;
+        case PADSYNTH::control::stereo:
+            contstr = "Stereo";
+            yesno = true;
+            break;
+        case PADSYNTH::control::dePop:
+            contstr = "De Pop";
+            break;
+        case PADSYNTH::control::punchStrength:
+            contstr = "Punch Strngth";
+            break;
+        case PADSYNTH::control::punchDuration:
+            contstr = "Punch Time";
+            break;
+        case PADSYNTH::control::punchStretch:
+            contstr = "Punch Strtch";
+            break;
+        case PADSYNTH::control::punchVelocity:
+            contstr = "Punch Vel";
+            break;
 
+            case PADSYNTH::control::applyChanges:
+            showValue = false;
+            contstr = "Changes Applied";
+            break;
+    }
+    if (!contstr.empty())
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
+
+    switch (control)
+    {
         case PADSYNTH::control::overtoneParameter1:
-            contstr = "Overt Par 1";
+            contstr = "Overtones Par 1";
             break;
         case PADSYNTH::control::overtoneParameter2:
-            contstr = "Overt Par 2";
+            contstr = "Overtones Par 2";
             break;
         case PADSYNTH::control::overtoneForceHarmonics:
-            contstr = "Force H";
+            contstr = "Overtones Force H";
             break;
         case PADSYNTH::control::overtonePosition:
             contstr = "Position " + subPadPosition[value_int];
             showValue = false;
             break;
 
+        case PADSYNTH::control::bandwidth:
+            contstr = "Bandwidth";
+            break;
+        case PADSYNTH::control::bandwidthScale:
+            contstr = "Bandwidth Scale";
+            break;
+        case PADSYNTH::control::spectrumMode:
+            contstr = "Spectrum Mode";
+            break;
+    }
+    if (!contstr.empty())
+    {
+        if (write)
+            contstr += " - Need to Apply";
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
+    }
+
+    switch (control)
+    {
         case PADSYNTH::control::baseWidth:
             contstr = "Width";
             break;
@@ -2393,11 +2409,21 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::amplitudeMode:
             contstr = "Amp Mode";
             break;
-        case PADSYNTH::control::autoscale:
+        case PADSYNTH::control::autoscale: //
             contstr = "Autoscale";
             yesno = true;
             break;
+    }
+    if (!contstr.empty())
+    {
+        contstr = "Harmonic Base " + contstr;
+        if (write)
+            contstr += " - Need to Apply";
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
+    }
 
+    switch (control)
+    {
         case PADSYNTH::control::harmonicBase:
             contstr = "Base";
             break;
@@ -2410,42 +2436,15 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::sampleSize:
             break;
 
-        case PADSYNTH::control::applyChanges:
-            showValue = false;
-            contstr = "Changes Applied";
-            break;
-
-        case PADSYNTH::control::stereo:
-            contstr = "Stereo";
-            yesno = true;
-            break;
-
-        case PADSYNTH::control::dePop:
-            contstr = "De Pop";
-            break;
-        case PADSYNTH::control::punchStrength:
-            contstr = "Punch Strngth";
-            break;
-        case PADSYNTH::control::punchDuration:
-            contstr = "Punch Time";
-            break;
-        case PADSYNTH::control::punchStretch:
-            contstr = "Punch Strtch";
-            break;
-        case PADSYNTH::control::punchVelocity:
-            contstr = "Punch Vel";
-            break;
-
         default:
             showValue = false;
             contstr = "Unrecognised";
     }
-
-    string isPad = "";
-
-    if (write && ((control >= PADSYNTH::control::bandwidth && control <= PADSYNTH::control::spectrumMode) || (control >= PADSYNTH::control::overtoneParameter1 && control <= PADSYNTH::control::sampleSize)))
-        isPad += " - Need to Apply";
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
+    if (contstr != "Unrecognised")
+        contstr = "Harmonic Samples " + contstr;
+    if (write && contstr != "Unrecognised")
+        contstr += " - Need to Apply";
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
 }
 
 

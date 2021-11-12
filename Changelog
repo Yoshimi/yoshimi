@@ -1,5 +1,9 @@
 yoshimi 2.1.1 M
 
+2021-11-12 Will
+* All Dat2Text engines now independent of numeric positions.
+* Unified control names for MIDI learn.
+
 2021-11-11 Will
 * BugFix: Data2Text making assumptions about control numbers.
 

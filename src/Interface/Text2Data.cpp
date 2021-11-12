@@ -1173,34 +1173,45 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     }
     else if (findAndStep(source, "Overtones"))
     {
-        if (findAndStep(source, "Overt Par 1"))
+        findAndStep(source, "Overt"); // throw it away
+        if (findAndStep(source, "Par 1"))
             ctl =PADSYNTH::control::overtoneParameter1;
-        else if (findAndStep(source, "Overt Par 2"))
+        else if (findAndStep(source, "Par 2"))
             ctl =PADSYNTH::control::overtoneParameter2;
         else if (findAndStep(source, "Force H"))
             ctl =PADSYNTH::control::overtoneForceHarmonics;
     }
 
-    else if (findAndStep(source, "Bandwidth Bandwidth"))
+    else if (findAndStep(source, "Bandwidth"))
+    {
+        if (findAndStep(source, "Scale"))
+            ; // not yet
+        else if(findAndStep(source, "Spectrum Mode")) // old form
+            ; // not yet
+        else
+        {
+            findAndStep(source, "Bandwidth"); //throw it away (old form)
             ctl =PADSYNTH::control::bandwidth;
+        }
+    }
+    else if(findAndStep(source, "Spectrum Mode")) // new form
+        ; // not yet
 
     else if (findAndStep(source, "Changes Applied"))
-            ctl =PADSYNTH::control::applyChanges;
+        ctl =PADSYNTH::control::applyChanges;
 
-    // envelopes
-    else if (findAndStep(source, "Amplitude"))
-    {
-        if (findAndStep(source, "Volume"))
-            ctl =PADSYNTH::control::volume;
-        else if (findAndStep(source, "Vel Sens"))
-            ctl =PADSYNTH::control::velocitySense;
-        else if (findAndStep(source, "Panning"))
-            ctl =PADSYNTH::control::panning;
-        else if (findAndStep(source, "Random Pan"))
-            ctl =PADSYNTH::control::enableRandomPan;
-        else if (findAndStep(source, "Random Width"))
-            ctl =PADSYNTH::control::randomWidth;
-    }
+    findAndStep(source, "Amplitude"); // throw it away for the next few
+    if (findAndStep(source, "Volume"))
+        ctl =PADSYNTH::control::volume;
+    else if (findAndStep(source, "Vel Sens"))
+        ctl =PADSYNTH::control::velocitySense;
+    else if (findAndStep(source, "Panning"))
+        ctl =PADSYNTH::control::panning;
+    else if (findAndStep(source, "Random Pan"))
+        ctl =PADSYNTH::control::enableRandomPan;
+    else if (findAndStep(source, "Random Width"))
+        ctl =PADSYNTH::control::randomWidth;
+
     else if (findAndStep(source, "Punch"))
     {
         if (findAndStep(source, "Strngth"))
@@ -1216,21 +1227,20 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
             ctl =PADSYNTH::control::stereo;
     else if (findAndStep(source, "De Pop"))
             ctl =PADSYNTH::control::dePop;
-    else if (findAndStep(source, "Frequency"))
-    {
-        if (findAndStep(source, "Bend Adj"))
-            ctl =PADSYNTH::control::pitchBendAdjustment;
-        else if (findAndStep(source, "Offset Hz"))
-            ctl =PADSYNTH::control::pitchBendOffset;
-        else if (findAndStep(source, "440Hz"))
-            ctl =PADSYNTH::control::baseFrequencyAs440Hz;
-        else if (findAndStep(source, "Detune"))
-            ctl =PADSYNTH::control::detuneFrequency;
-        else if (findAndStep(source, "Eq T"))
-            ctl =PADSYNTH::control::equalTemperVariation;
-        else if (findAndStep(source, "Octave"))
-            ctl =PADSYNTH::control::octave;
-    }
+
+    findAndStep(source, "Frequency"); // throw it away for the next few
+    if (findAndStep(source, "Bend Adj"))
+        ctl =PADSYNTH::control::pitchBendAdjustment;
+    else if (findAndStep(source, "Offset Hz"))
+        ctl =PADSYNTH::control::pitchBendOffset;
+    else if (findAndStep(source, "440Hz"))
+        ctl =PADSYNTH::control::baseFrequencyAs440Hz;
+    else if (findAndStep(source, "Detune"))
+        ctl =PADSYNTH::control::detuneFrequency;
+    else if (findAndStep(source, "Eq T"))
+        ctl =PADSYNTH::control::equalTemperVariation;
+    else if (findAndStep(source, "Octave"))
+        ctl =PADSYNTH::control::octave;
 
     if (ctl < UNUSED)
     {
