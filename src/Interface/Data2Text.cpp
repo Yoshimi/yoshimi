@@ -2126,24 +2126,6 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
     }
 
     string name = "";
-    switch (control & 0x70)
-    {
-        case SUBSYNTH::control::volume:
-            name = " Amplitude ";
-            break;
-        case SUBSYNTH::control::bandwidth:
-            name = " Bandwidth ";
-            break;
-        case SUBSYNTH::control::detuneFrequency:
-            name = " Frequency ";
-            break;
-        case SUBSYNTH::control::overtoneParameter1:
-            name = " Overtones ";
-            break;
-        case SUBSYNTH::control::enableFilter:
-            name = " Filter ";
-            break;
-    }
 
     string contstr = "";
     switch (control)
@@ -2166,13 +2148,13 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             break;
 
         case SUBSYNTH::control::bandwidth:
-            contstr = "";
+            contstr = "Bandwidth"; // it's the actual bandwidth control
             break;
         case SUBSYNTH::control::bandwidthScale:
-            contstr = "Band Scale";
+            contstr = "Bandwidth Band Scale";
             break;
         case SUBSYNTH::control::enableBandwidthEnvelope:
-            contstr = "Env Enab";
+            contstr = "Bandwidth Env Enab";
             yesno = true;
             break;
 
@@ -2205,26 +2187,26 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Offset Hz";
             break;
         case SUBSYNTH::control::enableFrequencyEnvelope:
-            contstr = "Env Enab";
+            contstr = "Frequency Env Enab";
             yesno = true;
             break;
 
         case SUBSYNTH::control::overtoneParameter1:
-            contstr = "Par 1";
+            contstr = "Overtones Par 1";
             break;
         case SUBSYNTH::control::overtoneParameter2:
-            contstr = "Par 2";
+            contstr = "Overtones Par 2";
             break;
         case SUBSYNTH::control::overtoneForceHarmonics:
-            contstr = "Force H";
+            contstr = "Overtones Force H";
             break;
         case SUBSYNTH::control::overtonePosition:
-            contstr = "Position " + subPadPosition[value_int];
+            contstr = "Overtones Position " + subPadPosition[value_int];
             showValue = false;
             break;
 
         case SUBSYNTH::control::enableFilter:
-            contstr = "Enable";
+            contstr = "Filter Enable";
             yesno = true;
             break;
 
@@ -2267,7 +2249,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + contstr);
 }
 
 

@@ -829,7 +829,48 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
             return;
         }
     }
-    // Freq Env
+
+    else if (findAndStep(source, "Modulator"))
+    {
+        if (findAndStep(source, "Amp Env"))
+        {
+            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
+            allData.data.parameter = TOPLEVEL::insertType::amplitude;
+            encodeEnvelope(source, allData);
+            return;
+        }
+        if (findAndStep(source, "Freq Env"))
+        {
+            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
+            allData.data.parameter = TOPLEVEL::insertType::frequency;
+            encodeEnvelope(source, allData);
+            return;
+        }
+        else if (findAndStep(source, "Amp"))
+        {
+            if (findAndStep(source, "Enable Env"))
+                ctl = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
+            else if (findAndStep(source, "Volume"))
+                ctl = ADDVOICE::control::modulatorAmplitude;
+            else if (findAndStep(source, "V Sense"))
+                ctl = ADDVOICE::control::modulatorVelocitySense;
+            else if (findAndStep(source, "F Damp"))
+                ctl = ADDVOICE::control::modulatorHFdamping;
+        }
+        else if (findAndStep(source, "Freq"))
+        {
+            if (findAndStep(source, "Enable Env"))
+                ctl = ADDVOICE::control::enableModulatorFrequencyEnvelope;
+            else if (findAndStep(source, "Octave"))
+                ctl = ADDVOICE::control::modulatorOctave;
+            else // detune frequency
+                ctl = ADDVOICE::control::modulatorDetuneFrequency;
+        }
+
+        else if (findAndStep(source, "Osc Phase"))
+            ctl = ADDVOICE::control::modulatorOscillatorPhase;
+    }
+
     else if (findAndStep(source, "Freq Env"))
     {
         allData.data.parameter = TOPLEVEL::insertType::frequency;
@@ -885,46 +926,6 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
             ctl = ADDVOICE::control::unisonVibratoSpeed;
     }
 
-    else if (findAndStep(source, "Modulator"))
-    {
-        if (findAndStep(source, "Amp Env"))
-        {
-            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
-            allData.data.parameter = TOPLEVEL::insertType::amplitude;
-            encodeEnvelope(source, allData);
-            return;
-        }
-        if (findAndStep(source, "Freq Env"))
-        {
-            allData.data.engine += (PART::engine::addMod1 - PART::engine::addVoice1);
-            allData.data.parameter = TOPLEVEL::insertType::frequency;
-            encodeEnvelope(source, allData);
-            return;
-        }
-        else if (findAndStep(source, "Amp"))
-        {
-            if (findAndStep(source, "Enable Env"))
-                ctl = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
-            else if (findAndStep(source, "Volume"))
-                ctl = ADDVOICE::control::modulatorAmplitude;
-            else if (findAndStep(source, "V Sense"))
-                ctl = ADDVOICE::control::modulatorVelocitySense;
-            else if (findAndStep(source, "F Damp"))
-                ctl = ADDVOICE::control::modulatorHFdamping;
-        }
-        else if (findAndStep(source, "Freq"))
-        {
-            if (findAndStep(source, "Enable Env"))
-                ctl = ADDVOICE::control::enableModulatorFrequencyEnvelope;
-            else if (findAndStep(source, "Octave"))
-                ctl = ADDVOICE::control::modulatorOctave;
-            else // detune frequency
-                ctl = ADDVOICE::control::modulatorDetuneFrequency;
-        }
-
-        else if (findAndStep(source, "Osc Phase"))
-            ctl = ADDVOICE::control::modulatorOscillatorPhase;
-    }
     else if (findAndStep(source, "Volume"))
         ctl = ADDVOICE::control::volume;
     else if (findAndStep(source, "Vel Sens"))
@@ -986,8 +987,15 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 
     if (findAndStep(source, "Filter"))
     {
-        encodeFilter(source, allData);
-        return;
+        if (findAndStep(source, "Enable"))
+        {
+            ctl = SUBSYNTH::control::enableFilter;
+        }
+        else
+        {
+            encodeFilter(source, allData);
+            return;
+        }
     }
     else if (findAndStep(source, "Stereo"))
         ctl = SUBSYNTH::control::stereo;
@@ -1037,30 +1045,33 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     else if (findAndStep(source, "Frequency"))
     {
         if (findAndStep(source, "Env Enab"))
+        {
             ctl = SUBSYNTH::control::enableFrequencyEnvelope;
-        else if (findAndStep(source, "Octave"))
-            ctl = SUBSYNTH::control::octave;
-        else if (findAndStep(source, "Bend Adj"))
-            ctl = SUBSYNTH::control::pitchBendAdjustment;
-        else if (findAndStep(source, "Offset Hz"))
-            ctl = SUBSYNTH::control::pitchBendOffset;
-        else if (findAndStep(source, "Eq T"))
-            ctl = SUBSYNTH::control::equalTemperVariation;
-        else if (findAndStep(source, "Detune"))
-            ctl = SUBSYNTH::control::detuneFrequency;
+            allData.data.control = ctl;
+            return;
+        }
+        // throw away for the next few
     }
+    else if (findAndStep(source, "Octave"))
+        ctl = SUBSYNTH::control::octave;
+    else if (findAndStep(source, "Bend Adj"))
+        ctl = SUBSYNTH::control::pitchBendAdjustment;
+    else if (findAndStep(source, "Offset Hz"))
+        ctl = SUBSYNTH::control::pitchBendOffset;
+    else if (findAndStep(source, "Eq T"))
+        ctl = SUBSYNTH::control::equalTemperVariation;
+    else if (findAndStep(source, "Detune"))
+        ctl = SUBSYNTH::control::detuneFrequency;
 
-    else if (findAndStep(source, "Amplitude"))
-    {
-        if (findAndStep(source, "Volume"))
-            ctl = SUBSYNTH::control::volume;
-        else if (findAndStep(source, "Vel Sens"))
-            ctl = SUBSYNTH::control::velocitySense;
-        else if (findAndStep(source, "Panning"))
-            ctl = SUBSYNTH::control::panning;
-        else if (findAndStep(source, "Random Width"))
-            ctl = SUBSYNTH::control::randomWidth;
-    }
+    findAndStep(source, "Amplitude"); // throw away for next few
+    if (findAndStep(source, "Volume"))
+        ctl = SUBSYNTH::control::volume;
+    else if (findAndStep(source, "Vel Sens"))
+        ctl = SUBSYNTH::control::velocitySense;
+    else if (findAndStep(source, "Panning"))
+        ctl = SUBSYNTH::control::panning;
+    else if (findAndStep(source, "Random Width"))
+        ctl = SUBSYNTH::control::randomWidth;
     if (ctl < UNUSED)
     {
         allData.data.control = ctl;
