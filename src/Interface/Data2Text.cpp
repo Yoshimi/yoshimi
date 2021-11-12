@@ -138,24 +138,11 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     if (kititem >= NUM_KIT_ITEMS && kititem < UNUSED)
         return "Invalid kit " + to_string(int(kititem) + 1);
 
-    //Part *part;
-    //part = synth->part[npart];
-
-    //if (kititem > 0 && engine != UNUSED && control != PART::control::enable && part->kit[kititem].Penabled == false)
-        //return "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
-
     if (kititem == UNUSED || insert == TOPLEVEL::insert::kitGroup)
     {
-        /*if (control != PART::control::kitMode && kititem != UNUSED && part->Pkitmode == 0)
-            return  "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
-        else*/
-        {
-            commandName = resolvePart(getData, addValue);
-            return withValue(commandName, type, showValue, addValue, value);
-        }
+        commandName = resolvePart(getData, addValue);
+        return withValue(commandName, type, showValue, addValue, value);
     }
-    //if (kititem > 0 && part->Pkitmode == 0)
-        //return "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
 
     if (engine == PART::engine::padSynth)
     {
@@ -306,12 +293,6 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
     string contstr = "";
     switch (control)
     {
-        //case 0:
-            //contstr = "Base Channel"; // local to source
-            //break;
-        //case 1:
-            //contstr = "Options";
-            //break;
         case VECTOR::control::name:
             showValue = false;
             contstr = "Name " + textMsgBuffer.fetch(value_int);
@@ -512,7 +493,13 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 
     }
 
-    if (value < 1 && control >= SCALES::control::tuning && control <= SCALES::control::importKbm)
+    if (value < 1 &&
+        (
+           control == SCALES::control::tuning
+        || control == SCALES::control::keyboardMap
+        || control == SCALES::control::importScl
+        || control == SCALES::control::importKbm
+        ))
     { // errors :@(
         switch (value)
         {
@@ -1377,27 +1364,20 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
     else
         kitnum = " ";
 
-    string name = "";
-    if (control >= PART::control::volumeRange && control <= PART::control::receivePortamento)
-    {
-        name = "Controller ";
-        if (control >= PART::control::portamentoTime)
-            name += "Portamento ";
-    }
-    else if (control >= PART::control::midiModWheel && control <= PART::control::midiBandwidth)
-        name = "MIDI ";
-    else if (kititem != UNUSED)
+    string group = "";
+
+    if (kititem != UNUSED)
     {
         switch (engine)
         {
             case PART::engine::addSynth:
-                name = "AddSynth ";
+                group = "AddSynth ";
                 break;
             case PART::engine::subSynth:
-                name = "SubSynth ";
+                group = "SubSynth ";
                 break;
             case PART::engine::padSynth:
-                name = "PadSynth ";
+                group = "PadSynth ";
                 break;
         }
     }
@@ -1605,7 +1585,51 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             }
             break;
 
-        case PART::control::volumeRange:
+        case PART::control::instrumentCopyright:
+            showValue = false;
+            contstr = "Copyright: " + textMsgBuffer.fetch(value_int);
+            break;
+        case PART::control::instrumentComments:
+            showValue = false;
+            contstr = "Comment: " + textMsgBuffer.fetch(value_int);
+            break;
+        case PART::control::instrumentName:
+            showValue = false;
+            contstr = "Name is: " + textMsgBuffer.fetch(value_int);
+            break;
+        case PART::control::instrumentType:
+            showValue = false;
+            contstr = "Type is: " + type_list[value_int];
+            break;
+        case PART::control::defaultInstrumentCopyright:
+            showValue = false;
+            contstr = "Copyright ";
+            if (parameter == 0)
+                contstr += "load:\n";
+            else
+                contstr += "save:\n";
+            contstr += textMsgBuffer.fetch(value_int);
+            break;
+        case PART::control::resetAllControllers:
+            showValue = false;
+            contstr = "Cleared controllers";
+            break;
+
+        case PART::control::partBusy:
+            showValue = false;
+            if (value_bool)
+                contstr = "is busy";
+            else
+                contstr = "is free";
+            break;
+
+    }
+    if (!contstr.empty())
+        return ("Part " + to_string(npart + 1) + kitnum + group + contstr);
+
+    switch (control)
+    {
+            case PART::control::volumeRange:
             contstr = "Vol Range"; // not the *actual* volume
             break;
         case PART::control::volumeEnable:
@@ -1694,8 +1718,14 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Receive";
             yesno = true;
             break;
+    }
+    if (!contstr.empty())
+        return ("Part " + to_string(npart + 1) + kitnum + "Controller " + contstr);
 
-        case PART::control::midiModWheel:
+    string name = "MIDI ";
+    switch (control)
+    {
+            case PART::control::midiModWheel:
             contstr = "Modulation";
             break;
         case PART::control::midiBreath:
@@ -1719,51 +1749,21 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
         case PART::control::midiBandwidth:
             contstr = "Bandwidth";
             break;
-
-        case PART::control::instrumentCopyright:
-            showValue = false;
-            contstr = "Copyright: " + textMsgBuffer.fetch(value_int);
+        case PART::control::midiFMamp:
+            contstr = "FM Amp";
             break;
-        case PART::control::instrumentComments:
-            showValue = false;
-            contstr = "Comment: " + textMsgBuffer.fetch(value_int);
+        case PART::control::midiResonanceCenter:
+            contstr = "Resonance Cent";
             break;
-        case PART::control::instrumentName:
-            showValue = false;
-            contstr = "Name is: " + textMsgBuffer.fetch(value_int);
-            break;
-        case PART::control::instrumentType:
-            showValue = false;
-            contstr = "Type is: " + type_list[value_int];
-            break;
-        case PART::control::defaultInstrumentCopyright:
-            showValue = false;
-            contstr = "Copyright ";
-            if (parameter == 0)
-                contstr += "load:\n";
-            else
-                contstr += "save:\n";
-            contstr += textMsgBuffer.fetch(value_int);
-            break;
-        case PART::control::resetAllControllers:
-            showValue = false;
-            contstr = "Cleared controllers";
-            break;
-
-        case PART::control::partBusy:
-            showValue = false;
-            if (value_bool)
-                contstr = "is busy";
-            else
-                contstr = "is free";
+        case PART::control::midiResonanceBandwidth:
+            contstr = "Resonance Band";
             break;
 
         default:
             showValue = false;
+            name = "";
             contstr = "Unrecognised";
-
     }
-
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
