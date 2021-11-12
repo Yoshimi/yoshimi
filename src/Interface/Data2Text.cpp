@@ -1774,24 +1774,6 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    string name = "";
-    if (control <= ADDSYNTH::control::panning)
-        name = " Amplitude ";
-    else
-    {
-        switch (control)
-        {
-            case ADDSYNTH::control::detuneFrequency:
-            case ADDSYNTH::control::octave:
-            case ADDSYNTH::control::detuneType:
-            case ADDSYNTH::control::coarseDetune:
-            case ADDSYNTH::control::relativeBandwidth:
-                name = "Frequency ";
-                break;
-            default:
-                break;
-        }
-    }
 
     string contstr = "";
 
@@ -1865,7 +1847,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + contstr);
 }
 
 
@@ -1910,11 +1892,11 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             yesno = true;
             break;
         case ADDVOICE::control::enableAmplitudeEnvelope:
-            contstr = "Amplitude Enable Env";
+            contstr = "Amp Enable Env";
             yesno = true;
             break;
         case ADDVOICE::control::enableAmplitudeLFO:
-            contstr = "Amplitude Enable LFO";
+            contstr = "Amp Enable LFO";
             yesno = true;
             break;
 
@@ -1949,39 +1931,39 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
 
         case ADDVOICE::control::detuneFrequency:
-            contstr = "Frequency Detune";
+            contstr = "Detune";
             break;
         case ADDVOICE::control::equalTemperVariation:
-            contstr = "Frequency Eq T";
+            contstr = "Eq T";
             break;
         case ADDVOICE::control::baseFrequencyAs440Hz:
-            contstr = "Frequency 440Hz";
+            contstr = "440Hz";
             yesno = true;
             break;
         case ADDVOICE::control::octave:
-            contstr = "Frequency Octave";
+            contstr = "Octave";
             break;
         case ADDVOICE::control::detuneType:
-            contstr = "Frequency Det type ";
+            contstr = "Det type ";
             showValue = false;
             if (addValue)
                 contstr += stringCaps(detuneType [int(value)], 1);
             break;
         case ADDVOICE::control::coarseDetune:
-            contstr = "Frequency Coarse Det";
+            contstr = "Coarse Det";
             break;
         case ADDVOICE::control::pitchBendAdjustment:
-            contstr = "Frequency Bend Adj";
+            contstr = "Bend Adj";
             break;
         case ADDVOICE::control::pitchBendOffset:
-            contstr = "Frequency Offset Hz";
+            contstr = "Offset Hz";
             break;
         case ADDVOICE::control::enableFrequencyEnvelope:
-            contstr = "Frequency Enable Env";
+            contstr = "Freq Enable Env";
             yesno = true;
             break;
         case ADDVOICE::control::enableFrequencyLFO:
-            contstr = "Frequency Enable LFO";
+            contstr = "Freq Enable LFO";
             yesno = true;
             break;
 

@@ -719,16 +719,14 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         encodeLFO(source, allData);
         return;
     }
-    else if (findAndStep(source, "Amplitude"))
-    {
-        if (findAndStep(source, "Volume"))
-            ctl = ADDSYNTH::control::volume;
-        else if (findAndStep(source, "Vel Sens"))
-            ctl = ADDSYNTH::control::velocitySense;
-        else if (findAndStep(source, "Panning"))
-            ctl = ADDSYNTH::control::panning;
-    }
-
+    findAndStep(source, "Amplitude") // we just throw this away
+        ;
+    if (findAndStep(source, "Volume"))
+        ctl = ADDSYNTH::control::volume;
+    else if (findAndStep(source, "Vel Sens"))
+        ctl = ADDSYNTH::control::velocitySense;
+    else if (findAndStep(source, "Panning"))
+        ctl = ADDSYNTH::control::panning;
     else if (findAndStep(source, "Random Width"))
         ctl = ADDSYNTH::control::randomWidth;
     else if (findAndStep(source, "Stereo"))
@@ -748,15 +746,13 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
             ctl = ADDSYNTH::control::punchVelocity;
     }
 
-    else if (findAndStep(source, "Frequency"))
-    {
-        if (findAndStep(source, "Detune"))
-            ctl = ADDSYNTH::control::detuneFrequency;
-        else if (findAndStep(source, "Octave"))
-            ctl = ADDSYNTH::control::octave;
-        else if (findAndStep(source, "Rel B Wdth"))
-            ctl = ADDSYNTH::control::relativeBandwidth;
-    }
+    findAndStep(source, "Frequency"); // throw this away too
+    if (findAndStep(source, "Detune"))
+        ctl = ADDSYNTH::control::detuneFrequency;
+    else if (findAndStep(source, "Octave"))
+        ctl = ADDSYNTH::control::octave;
+    else if (findAndStep(source, "Rel B Wdth"))
+        ctl = ADDSYNTH::control::relativeBandwidth;
 
     if (ctl < UNUSED)
     {
@@ -800,7 +796,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         encodeLFO(source, allData);
         return;
     }
-    else if (findAndStep(source, "Amplitude"))
+    if (findAndStep(source, "Amp"))
     {
         if (findAndStep(source, "Enable Env"))
             ctl = ADDVOICE::control::enableAmplitudeEnvelope;
@@ -846,23 +842,33 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         encodeLFO(source, allData);
         return;
     }
-    else if (findAndStep(source, "Frequency"))
+    else if (findAndStep(source, "Freq"))
     {
         if (findAndStep(source, "Enable Env"))
+        {
             ctl = ADDVOICE::control::enableFrequencyEnvelope;
+            allData.data.control = ctl;
+            return;
+        }
         else if (findAndStep(source, "Enable LFO"))
+        {
             ctl = ADDVOICE::control::enableFrequencyLFO;
-        else if (findAndStep(source, "Bend Adj"))
-            ctl = ADDVOICE::control::pitchBendAdjustment;
-        else if (findAndStep(source, "Offset Hz"))
-            ctl = ADDVOICE::control::pitchBendOffset;
-        else if (findAndStep(source, "Eq T"))
-            ctl = ADDVOICE::control::equalTemperVariation;
-        else if (findAndStep(source, "Detune"))
-            ctl = ADDVOICE::control::detuneFrequency;
-        else if (findAndStep(source, "Octave"))
-            ctl = ADDVOICE::control::octave;
+            allData.data.control = ctl;
+            return;
+        }
+        // throw away for next few
     }
+    if (findAndStep(source, "Bend Adj"))
+        ctl = ADDVOICE::control::pitchBendAdjustment;
+    else if (findAndStep(source, "Offset Hz"))
+        ctl = ADDVOICE::control::pitchBendOffset;
+    else if (findAndStep(source, "Eq T"))
+        ctl = ADDVOICE::control::equalTemperVariation;
+    else if (findAndStep(source, "Detune"))
+        ctl = ADDVOICE::control::detuneFrequency;
+    else if (findAndStep(source, "Octave"))
+        ctl = ADDVOICE::control::octave;
+
     else if (findAndStep(source, "Unison"))
     {
         if (findAndStep(source, "Enable"))
