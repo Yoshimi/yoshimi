@@ -84,7 +84,7 @@ namespace { // Global implementation internal history data
     static vector<string> TuningHistory;
     static vector<string> KeymapHistory;
 
-    static vector<string> historyLastSeen(TOPLEVEL::XML::ScalaMap, "");
+    static vector<string> historyLastSeen(TOPLEVEL::XML::ScalaMap + 1, ""); // don't really understand this :(
 }
 
 
@@ -2678,7 +2678,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (count = TOPLEVEL::XML::Instrument; count < TOPLEVEL::XML::ScalaMap; ++count)
+    for (count = TOPLEVEL::XML::Instrument; count <= TOPLEVEL::XML::ScalaMap; ++count)
     {
         switch (count)
         {
