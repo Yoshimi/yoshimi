@@ -499,21 +499,22 @@ namespace SCALES // usage SCALES::control::refFrequency
         invertScale,
         invertedScaleCenter,
         scaleShift,
-
         enableKeyboardMap = 16,
         lowKey,
         middleKey,
         highKey,
         tuning = 32,
+        clearAll,
+        retune, // GUI only
+        // all the above directly alter the tuning. retune must be the last
+
         keyboardMap,
         importScl = 48,
         importKbm,
         exportScl, // not yet
         exportKbm, // not yet
         name = 64,
-        comment,
-        retune = 80, // GUI only
-        clearAll = 96
+        comment
     };
 }
 

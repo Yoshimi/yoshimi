@@ -91,7 +91,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     string commandName;
 
    // this is unique and placed here to avoid Xruns
-    if (npart == TOPLEVEL::section::scales && (control <= SCALES::control::tuning || control >= SCALES::control::retune))
+    if (npart == TOPLEVEL::section::scales && control <= SCALES::control::retune)
         synth->setAllPartMaps();
 
     if (npart == TOPLEVEL::section::vector)
@@ -2652,7 +2652,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(parameter + 1) + isPad);
     }
 
-    if (write == true && engine == PART::engine::padSynth && control != 104)
+    if (write == true && engine == PART::engine::padSynth && control != PADSYNTH::control::applyChanges)
         isPad = " - Need to Apply";
     string contstr;
     switch (control)
