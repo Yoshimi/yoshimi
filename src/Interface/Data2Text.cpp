@@ -2489,76 +2489,88 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
-    string name;
-    if (control >= OSCILLATOR::control::clearHarmonics || control <= OSCILLATOR::control::harmonicRandomnessType)
-        name = " Oscillator";
-    else if (control >= OSCILLATOR::control::harmonicShift)
-        name = " Harm Mods";
-    else if (control >= OSCILLATOR::control::autoClear)
-        name = " Base Mods";
-    else
-        name = " Base Funct";
-
     string contstr;
     switch (control)
     {
         case OSCILLATOR::control::phaseRandomness:
-            contstr = " Random";
+            contstr = "Random";
             break;
         case OSCILLATOR::control::magType:
-            contstr = " Mag Type";
+            contstr = "Mag Type";
             break;
         case OSCILLATOR::control::harmonicAmplitudeRandomness:
-            contstr = " Harm Rnd";
+            contstr = "Harm Rnd";
             break;
         case OSCILLATOR::control::harmonicRandomnessType:
-            contstr = " Harm Rnd Type";
+            contstr = "Harm Rnd Type";
             break;
 
+        case OSCILLATOR::control::clearHarmonics:
+            contstr = "Clear Harmonics";
+            break;
+        case OSCILLATOR::control::convertToSine:
+            contstr = "Conv To Sine";
+            break;
+    }
+    if (!contstr.empty())
+    {
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Oscillator " + contstr + isPad);
+    }
+
+    switch(control)
+    {
         case OSCILLATOR::control::baseFunctionParameter:
-            contstr = " Par";
+            contstr = "Par";
             break;
         case OSCILLATOR::control::baseFunctionType:
-            contstr = " Type ";
+            contstr = "Type ";
             showValue = false;
             if (addValue)
                 contstr += stringCaps(waveformlist[int(value) * 2], 1);
             break;
         case OSCILLATOR::control::baseModulationParameter1:
-            contstr = " Mod Par 1";
+            contstr = "Mod Par 1";
             break;
         case OSCILLATOR::control::baseModulationParameter2:
-            contstr = " Mod Par 2";
+            contstr = "Mod Par 2";
             break;
         case OSCILLATOR::control::baseModulationParameter3:
-            contstr = " Mod Par 3";
+            contstr = "Mod Par 3";
             break;
         case OSCILLATOR::control::baseModulationType:
-            contstr = " Mod Type";
+            contstr = "Mod Type";
             break;
 
         case OSCILLATOR::control::autoClear: // this is local to the GUI
             break;
+    }
+    if (!contstr.empty())
+    {
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Base Func " + contstr + isPad);
+    }
+
+    switch(control)
+    {
         case OSCILLATOR::control::useAsBaseFunction:
-            contstr = " Osc As Base";
+            contstr = "Osc As Base";
             break;
         case OSCILLATOR::control::waveshapeParameter:
-            contstr = " Waveshape Par";
+            contstr = "Waveshape Par";
             break;
         case OSCILLATOR::control::waveshapeType:
-            contstr = " Waveshape Type";
+            contstr = "Waveshape Type";
             break;
         case OSCILLATOR::control::filterParameter1:
-            contstr = " Osc Filt Par 1";
+            contstr = "Osc Filt Par 1";
             break;
         case OSCILLATOR::control::filterParameter2:
-            contstr = " Osc Filt Par 2";
+            contstr = "Osc Filt Par 2";
             break;
         case OSCILLATOR::control::filterBeforeWaveshape:
-            contstr = " Osc Filt B4 Waveshape";
+            contstr = "Osc Filt B4 Waveshape";
             break;
         case OSCILLATOR::control::filterType:
-            contstr = " Osc Filt Type ";
+            contstr = "Osc Filt Type ";
             if (addValue)
             {
                 showValue = false;
@@ -2566,51 +2578,51 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
             }
             break;
         case OSCILLATOR::control::modulationParameter1:
-            contstr = " Osc Mod Par 1";
+            contstr = "Osc Mod Par 1";
             break;
         case OSCILLATOR::control::modulationParameter2:
-            contstr = " Osc Mod Par 2";
+            contstr = "Osc Mod Par 2";
             break;
         case OSCILLATOR::control::modulationParameter3:
-            contstr = " Osc Mod Par 3";
+            contstr = "Osc Mod Par 3";
             break;
         case OSCILLATOR::control::modulationType:
-            contstr = " Osc Mod Type";
+            contstr = "Osc Mod Type";
             break;
         case OSCILLATOR::control::spectrumAdjustParameter:
-            contstr = " Osc Spect Par";
+            contstr = "Osc Spect Par";
             break;
         case OSCILLATOR::control::spectrumAdjustType:
-            contstr = " Osc Spect Type";
+            contstr = "Osc Spect Type";
             break;
+    }
+    if (!contstr.empty())
+    {
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Base Mods " + contstr + isPad);
+    }
 
+    switch(control)
+    {
         case OSCILLATOR::control::harmonicShift:
-            contstr = " Shift";
+            contstr = "Shift";
             break;
         case OSCILLATOR::control::clearHarmonicShift:
-            contstr = " Reset";
+            contstr = "Reset";
             break;
         case OSCILLATOR::control::shiftBeforeWaveshapeAndFilter:
-            contstr = " B4 Waveshape & Filt";
+            contstr = "B4 Waveshape & Filt";
             break;
         case OSCILLATOR::control::adaptiveHarmonicsParameter:
-            contstr = " Adapt Param";
+            contstr = "Adapt Param";
             break;
         case OSCILLATOR::control::adaptiveHarmonicsBase:
-            contstr = " Adapt Base Freq";
+            contstr = "Adapt Base Freq";
             break;
         case OSCILLATOR::control::adaptiveHarmonicsPower:
-            contstr = " Adapt Power";
+            contstr = "Adapt Power";
             break;
         case OSCILLATOR::control::adaptiveHarmonicsType:
-            contstr = " Adapt Type";
-            break;
-
-        case OSCILLATOR::control::clearHarmonics:
-            contstr = " Clear Harmonics";
-            break;
-        case OSCILLATOR::control::convertToSine:
-            contstr = " Conv To Sine";
+            contstr = "Adapt Type";
             break;
 
         default:
@@ -2618,7 +2630,7 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harm Mods " + contstr + isPad);
 }
 
 
