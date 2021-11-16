@@ -4837,7 +4837,14 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         cmd = RESONANCE::control::smoothGraph;
     else if (input.matchnMove(1, "clear"))
         cmd = RESONANCE::control::clearGraph;
-
+    else if (input.matchnMove(2, "apply"))
+    { // this is a padsynth level control but must be callable here
+        if (engine != PART::engine::padSynth)
+            return REPLY::available_msg;
+        value = 1;
+        insert = UNUSED;
+        cmd = PADSYNTH::control::applyChanges;
+    }
     if (cmd > -1)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert);
 
@@ -5086,10 +5093,10 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
     }
 
     else if (input.matchnMove(2, "apply"))
-    {
+    { // this is a padsynth level control but must be callable here
         if (engine != PART::engine::padSynth)
             return REPLY::available_msg;
-        value = 0; // dummy
+        value = 1;
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
     }

@@ -1,5 +1,9 @@
 yoshimi 2.1.1 M
 
+2021-11-16 Will
+* BugFix: CLI padsynth waveform and resonance not setting 'apply'
+* New MIDI-learn style enabled.
+
 2021-11-12 Will
 * BugFix: Crash loading scala keymap file
 

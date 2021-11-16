@@ -582,6 +582,7 @@ static std::string  resonancelist [] = {
     "Smooth",              "reduce range and sharpness of peaks",
     "CLear",               "set all points to mid level",
     "POints [<n1> [n2]]",  "show all or set/read n1 to n2",
+    "APply",               "puts latest changes into the wavetable",
     "@end","@end"
 };
 
