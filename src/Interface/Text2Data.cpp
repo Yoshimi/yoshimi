@@ -723,7 +723,7 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         ;
     if (findAndStep(source, "Volume"))
         ctl = ADDSYNTH::control::volume;
-    else if (findAndStep(source, "Vel Sens"))
+    else if (findAndStep(source, "Velocity Sense") || findAndStep(source, "Vel Sens"))
         ctl = ADDSYNTH::control::velocitySense;
     else if (findAndStep(source, "Panning"))
         ctl = ADDSYNTH::control::panning;
@@ -903,7 +903,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         ctl = ADDVOICE::control::pitchBendAdjustment;
     else if (findAndStep(source, "Offset Hz"))
         ctl = ADDVOICE::control::pitchBendOffset;
-    else if (findAndStep(source, "Eq T"))
+    else if (findAndStep(source, "Equal Temper") || findAndStep(source, "Eq T"))
         ctl = ADDVOICE::control::equalTemperVariation;
     else if (findAndStep(source, "Detune"))
         ctl = ADDVOICE::control::detuneFrequency;
@@ -928,7 +928,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Volume"))
         ctl = ADDVOICE::control::volume;
-    else if (findAndStep(source, "Vel Sens"))
+    else if (findAndStep(source, "Velocity Sense") || findAndStep(source, "Vel Sens"))
         ctl = ADDVOICE::control::velocitySense;
     else if (findAndStep(source, "Panning"))
         ctl = ADDVOICE::control::panning;
@@ -1058,7 +1058,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
         ctl = SUBSYNTH::control::pitchBendAdjustment;
     else if (findAndStep(source, "Offset Hz"))
         ctl = SUBSYNTH::control::pitchBendOffset;
-    else if (findAndStep(source, "Eq T"))
+    else if (findAndStep(source, "Equal Temper") || findAndStep(source, "Eq T"))
         ctl = SUBSYNTH::control::equalTemperVariation;
     else if (findAndStep(source, "Detune"))
         ctl = SUBSYNTH::control::detuneFrequency;
@@ -1066,7 +1066,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     findAndStep(source, "Amplitude"); // throw away for next few
     if (findAndStep(source, "Volume"))
         ctl = SUBSYNTH::control::volume;
-    else if (findAndStep(source, "Vel Sens"))
+    else if (findAndStep(source, "Velocity Sense") || findAndStep(source, "Vel Sens"))
         ctl = SUBSYNTH::control::velocitySense;
     else if (findAndStep(source, "Panning"))
         ctl = SUBSYNTH::control::panning;
@@ -1203,7 +1203,7 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     findAndStep(source, "Amplitude"); // throw it away for the next few
     if (findAndStep(source, "Volume"))
         ctl =PADSYNTH::control::volume;
-    else if (findAndStep(source, "Vel Sens"))
+    else if (findAndStep(source, "Velocity Sense") || findAndStep(source, "Vel Sens"))
         ctl =PADSYNTH::control::velocitySense;
     else if (findAndStep(source, "Panning"))
         ctl =PADSYNTH::control::panning;
@@ -1237,7 +1237,7 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
         ctl =PADSYNTH::control::baseFrequencyAs440Hz;
     else if (findAndStep(source, "Detune"))
         ctl =PADSYNTH::control::detuneFrequency;
-    else if (findAndStep(source, "Eq T"))
+    else if (findAndStep(source, "Equal Temper") || findAndStep(source, "Eq T"))
         ctl =PADSYNTH::control::equalTemperVariation;
     else if (findAndStep(source, "Octave"))
         ctl =PADSYNTH::control::octave;
@@ -1441,9 +1441,9 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
         ctl = FILTERINSERT::control::centerFrequency;
     else if (findAndStep(source, "Q"))
         ctl = FILTERINSERT::control::Q;
-    else if (findAndStep(source, "VsensA") || findAndStep(source, "Vel Sens"))
+    else if (findAndStep(source, "VsensA") || findAndStep(source, "Velocity Sense"))
         ctl = FILTERINSERT::control::velocitySensitivity;
-    else if (findAndStep(source, "Vsens") || findAndStep(source, "Vel Sens Curve"))
+    else if (findAndStep(source, "Vsens") || findAndStep(source, "Velocity Sense Curve"))
         ctl = FILTERINSERT::control::velocityCurve;
     else if (findAndStep(source, "ain")) // missing G/g deliberate
         ctl = FILTERINSERT::control::gain;

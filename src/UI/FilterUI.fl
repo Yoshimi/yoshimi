@@ -432,7 +432,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           code1 {o->add("analog");o->add("formant");o->add("StVarF");}
         } {}
         Fl_Dial cfreqdial {
-          label {C.Freq}
+          label { C.Freq}
           callback {//
           send_data(0, FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -458,7 +458,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
-          label {V.SnsA.}
+          label {V.Sns.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write);}
           tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -466,7 +466,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
-          label {V.Sns.}
+          label { VF.Sns.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write);}
           tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1

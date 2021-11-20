@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -428,7 +428,7 @@ class ADvoiceUI {: {public Fl_Group}
             } {
               Fl_Group voiceFMfreqenvgroup {
                 label {ADSynth Modulator - Frequency Envelope}
-                xywh {585 290 205 70} box FLAT_BOX color 51 align 144
+                xywh {585 290 210 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMFreqEnvelope, npart, kititem, nvoice + PART::engine::addMod1, 1);}
                 code1 {if (pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
@@ -526,7 +526,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               }
               Fl_Group voiceFMampenvgroup {
                 label {ADSynth Modulator - Amplitude Envelope}
-                xywh {587 129 205 70} box FLAT_BOX color 51 align 144
+                xywh {585 129 210 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMAmpEnvelope, npart, kititem, nvoice + PART::engine::addMod1, 0);}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
@@ -553,7 +553,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 class mwheel_val_slider_rev
               }
             }
-            Fl_Group modOscDisplay {open
+            Fl_Group modOscDisplay {
               xywh {580 365 220 200}
             } {
               Fl_Group modoscil {
@@ -771,10 +771,10 @@ send_data(0, ADDVOICE::control::pitchBendOffset, o->value(), TOPLEVEL::type::Int
               class WidgetPDial
             }
           }
-          Fl_Group oscDisplay {open
+          Fl_Group oscDisplay {
             xywh {5 462 570 145}
           } {
-            Fl_Group oscGroup {open
+            Fl_Group oscGroup {
               xywh {5 462 570 145} labelfont 1 labelsize 13 align 17
               code0 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
             } {
@@ -1184,7 +1184,6 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     collect_data(synth, value, action, type, control, npart, kititem, nvoice + PART::engine::addVoice1);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
-
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;

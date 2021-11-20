@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
@@ -143,7 +143,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           code0 {o->add("Sine");o->add("Tri");o->add("Squr");o->add("R.up");o->add("R.dn");o->add("E1dn");o->add("E2dn");o->add("S&&H");o->add("RSqU");o->add("RSqD");}
         } {}
         Fl_Dial randomness {
-          label {Amp.}
+          label {Amp. }
           callback {//
           send_data(0, group, LFOINSERT::control::amplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Amplitude Randomness} xywh {145 30 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
@@ -151,7 +151,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           class WidgetPDial
         }
         Fl_Dial freqrand {
-          label {Freq.}
+          label {  Freq.}
           callback {//
           send_data(0, group, LFOINSERT::control::frequencyRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Frequency Randomness} xywh {170 30 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1

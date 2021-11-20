@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {Envelope.h} {not_in_source in_header
@@ -424,22 +424,22 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         class WidgetPDial
       }
       Fl_Check_Button linearenvelopecheck {
-        class Fl_Check_Button2
         label L
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
         tooltip {Linear Envelope} xywh {415 151 30 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
+        class Fl_Check_Button2
       }
       Fl_Check_Button forcedreleasecheck {
-        class Fl_Check_Button2
         label frcR
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
         tooltip {Forced Release} xywh {415 165 40 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
+        class Fl_Check_Button2
       }
       Fl_Button freecopy {
         label C
@@ -487,7 +487,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Dial e1rdt {
-          label {R.dt}
+          label {R.dt }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -505,12 +505,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Check_Button e1forcedrelease {
-          class Fl_Check_Button2
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
           tooltip {Forced Release} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
+          class Fl_Check_Button2
         }
         Fl_Dial e1envstretch {
           label Stretch
@@ -529,12 +529,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button e1linearenvelope {
-          class Fl_Check_Button2
           label L
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
           tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
+          class Fl_Check_Button2
         }
         Fl_Button e1C {
           label C
@@ -578,7 +578,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Dial e2rval {
-          label {R.val}
+          label {R.val }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -596,7 +596,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Dial e2envstretch {
-          label Stretch
+          label { Stretch}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -605,12 +605,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Check_Button e2forcedrelease {
-          class Fl_Check_Button2
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
+          class Fl_Check_Button2
         }
         Fl_Button e2C {
           label C
@@ -687,7 +687,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Dial e3rval {
-          label {R.val}
+          label {R.val }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -696,7 +696,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Dial e3envstretch {
-          label Stretch
+          label { Stretch}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -705,12 +705,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Check_Button e3forcedrelease {
-          class Fl_Check_Button2
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
           tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
+          class Fl_Check_Button2
         }
         Fl_Button e3E {
           label E
@@ -787,12 +787,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           class WidgetPDial
         }
         Fl_Check_Button e4forcedrelease {
-          class Fl_Check_Button2
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
           tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
+          class Fl_Check_Button2
         }
         Fl_Button e4C {
           label C

@@ -1410,13 +1410,13 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Volume";
             break;
         case PART::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
         case PART::control::panning:
             contstr = "Panning";
             break;
         case PART::control::velocityOffset:
-            contstr = "Vel Offset";
+            contstr = "Velocity Offset";
             break;
         case PART::control::midiChannel:
             showValue = false;
@@ -1783,7 +1783,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "Volume";
             break;
         case ADDSYNTH::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
 
         case ADDSYNTH::control::panning:
@@ -1874,7 +1874,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Volume";
             break;
         case ADDVOICE::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
         case ADDVOICE::control::panning:
             contstr = "Panning";
@@ -1934,7 +1934,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Detune";
             break;
         case ADDVOICE::control::equalTemperVariation:
-            contstr = "Eq T";
+            contstr = "Equal Temper";
             break;
         case ADDVOICE::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -2134,7 +2134,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Volume";
             break;
         case SUBSYNTH::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
         case SUBSYNTH::control::panning:
             contstr = "Panning";
@@ -2162,7 +2162,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Detune";
             break;
         case SUBSYNTH::control::equalTemperVariation:
-            contstr = "Eq T";
+            contstr = "Equal Temper";
             break;
         case SUBSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -2271,7 +2271,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Volume";
             break;
         case PADSYNTH::control::velocitySense:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
         case PADSYNTH::control::panning:
             contstr = "Panning";
@@ -2288,7 +2288,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Detune";
             break;
         case PADSYNTH::control::equalTemperVariation:
-            contstr = "Eq T";
+            contstr = "Equal Temper";
             break;
         case PADSYNTH::control::baseFrequencyAs440Hz:
             contstr = "440Hz";
@@ -2856,10 +2856,10 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
             contstr = "Freq Track";
             break;
         case FILTERINSERT::control::velocitySensitivity:
-            contstr = "Vel Sens";
+            contstr = "Velocity Sense";
             break;
         case FILTERINSERT::control::velocityCurve:
-            contstr = "Vel Sens Curve";
+            contstr = "Velocity Sense Curve";
             break;
         case FILTERINSERT::control::gain:
             contstr = "Gain";

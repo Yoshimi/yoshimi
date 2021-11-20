@@ -1,5 +1,11 @@
 yoshimi 2.1.1 M
 
+2021-11-20 Will
+* Added instruments from Hugh across various banks.
+* Updated User Guide
+* Adjustments to names in Data2Text and Text2Data
+* GUI text position adjustments.
+
 2021-11-16 Will
 * BugFix: CLI padsynth waveform and resonance not setting 'apply'
 * New MIDI-learn style enabled.
