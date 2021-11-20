@@ -6,6 +6,9 @@ yoshimi 2.1.1 M
 * Adjustments to names in Data2Text and Text2Data
 * GUI text position adjustments.
 
+* Filter tracking check box label now reflects its status.
+* Filter label changed to 'Parameters' and position properly scaled.
+
 2021-11-16 Will
 * BugFix: CLI padsynth waveform and resonance not setting 'apply'
 * New MIDI-learn style enabled.
