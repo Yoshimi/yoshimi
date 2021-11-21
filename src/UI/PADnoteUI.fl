@@ -548,11 +548,11 @@ class PADnoteUI {: {public PresetsUI_}
           xywh {0 20 580 385} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Box {} {
-            xywh {9 27 275 68} box PLASTIC_THIN_UP_BOX color 223
+            xywh {10 27 275 68} box PLASTIC_UP_BOX color 223
           }
           Fl_Group ampgrp {
             label AMPLITUDE
-            xywh {5 25 285 250} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+            xywh {5 27 285 250} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
           } {
             Fl_Dial volume {
               label Volume

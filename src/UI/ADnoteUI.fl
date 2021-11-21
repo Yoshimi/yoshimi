@@ -409,7 +409,7 @@ class ADvoiceUI {: {public Fl_Group}
       class Fl_Group
     } {
       Fl_Box {} {
-        xywh {8 71 277 64} box PLASTIC_THIN_UP_BOX color 223
+        xywh {8 69 277 66} box PLASTIC_UP_BOX color 223
       }
       Fl_Group voiceparametersgroup {
         xywh {0 0 805 615} box THIN_UP_FRAME color 48
@@ -830,7 +830,7 @@ Oscillator}
             }
           }
           Fl_Box {} {
-            xywh {205 35 85 35} box THIN_UP_FRAME
+            xywh {205 35 85 33} box THIN_UP_FRAME
           }
           Fl_Check_Button ResonanceEn {
             label Resonance
@@ -839,7 +839,7 @@ Oscillator}
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(0, ADDVOICE::control::enableResonance, enab, TOPLEVEL::type::Integer);}
-            tooltip {Resonance On/Off} xywh {238 50 17 19} down_box DOWN_BOX labelsize 12 align 1
+            tooltip {Resonance On/Off} xywh {238 49 17 19} down_box DOWN_BOX labelsize 12 align 1
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
             class Fl_Check_Button2
           }
@@ -932,7 +932,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
         }
         Fl_Group amplitudegroup {
           label AMPLITUDE
-          xywh {5 70 285 210} box UP_FRAME labelfont 1 labelsize 12 align 17
+          xywh {5 68 285 212} box UP_FRAME labelfont 1 labelsize 12 align 17
         } {
           Fl_Dial voicevolume {
             label Volume
@@ -940,7 +940,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                 int vol = lrint(o->value());
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicevolume->value(vol);
                 send_data(0, ADDVOICE::control::volume, vol, TOPLEVEL::type::Integer);}
-            tooltip Volume xywh {30 87 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            tooltip Volume xywh {30 86 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->setValueType(VC_ADDVoiceVolume);}
             code1 {o->value(pars->VoicePar[nvoice].PVolume);}
             class WidgetPDial
@@ -949,7 +949,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             label {Vel Sens}
             callback {//
                 send_data(0, ADDVOICE::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {85 87 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {86 87 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             code1 {o->setValueType(VC_AmpVelocitySense);}
             class WidgetPDial
@@ -959,7 +959,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             callback {//
     int pan = lrint(o->value());
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::panning, pan, TOPLEVEL::type::Integer);}
-            tooltip {Voice panning} xywh {160 87 33 33} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+            tooltip {Voice panning} xywh {160 86 33 33} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->setValueType(VC_PanningStd);}
             code1 {o->value(pars->VoicePar[nvoice].PPanning);}
             class WidgetPDial
@@ -968,7 +968,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             label Width
             callback {//
     send_data(0, ADDVOICE::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Voice random width} xywh {235 87 33 33} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+            tooltip {Voice random width} xywh {235 86 33 33} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
             code0 {o->setValueType(VC_PanningRandom);}
             code1 {o->value(pars->VoicePar[nvoice].PWidth);}
             class WidgetPDial
@@ -1036,7 +1036,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             class Fl_Check_Button2
           }
           Fl_Box {} {
-            xywh {140 86 4 44} box THIN_DOWN_FRAME
+            xywh {140 85 4 44} box THIN_DOWN_FRAME
           }
         }
         Fl_Group voicefiltergroup {
@@ -1082,16 +1082,16 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           }
         }
         Fl_Box {} {
-          xywh {5 35 64 35} box THIN_UP_FRAME
+          xywh {5 35 64 33} box THIN_UP_FRAME
         }
         Fl_Group {} {
-          xywh {69 35 136 35} box THIN_UP_FRAME
+          xywh {69 35 136 33} box THIN_UP_FRAME
         } {
           Fl_Value_Slider Delay {
             label Delay
             callback {//
                 send_data(0, ADDVOICE::control::delay, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Time before the voice activates} xywh {76 51 124 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
+            tooltip {Time before the voice activates} xywh {76 50 124 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
             code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
             class mwheel_slider_rev
@@ -1161,7 +1161,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         label On
         callback {//
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableVoice, o->value(), TOPLEVEL::type::Integer);}
-        xywh {12 43 50 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1
+        xywh {12 41 50 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
         class Fl_Check_Button2
       }
@@ -1989,17 +1989,17 @@ class ADnoteUI {: {public PresetsUI_}
         }
       }
       Fl_Box {} {
-        xywh {10 7 275 68} box PLASTIC_THIN_UP_BOX color 223
+        xywh {10 7 275 68} box PLASTIC_UP_BOX color 223
       }
       Fl_Group amplitudegrp {
         label AMPLITUDE
-        xywh {5 5 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+        xywh {5 7 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Dial globalvolume {
           label Volume
           callback {//
 send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Volume xywh {30 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip Volume xywh {30 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->GlobalPar.PVolume);}
           class WidgetPDial
@@ -2007,7 +2007,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
         Fl_Dial vsns {
           label {Vel Sens}
           callback {send_data(0, ADDSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {85 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {85 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
@@ -2016,7 +2016,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           label Pan
           callback {//
     send_data(0, ADDSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Global panning} xywh {155 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Global panning} xywh {155 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->GlobalPar.PPanning);}
           class WidgetPDial
@@ -2025,7 +2025,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           label Width
           callback {//
     send_data(0, ADDSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Global random width} xywh {235 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+          tooltip {Global random width} xywh {235 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->GlobalPar.PWidth);}
           class WidgetPDial
@@ -2039,7 +2039,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
         else
             globalwidth->activate();
         send_data(0, ADDSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
-          tooltip {Enable random panning} xywh {205 31 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+          tooltip {Enable random panning} xywh {205 32 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
           code0 {o->value(pars->GlobalPar.PRandom);}
           code1 {if (o->value() == 0) globalwidth->deactivate(); else globalwidth->activate();}
           class Fl_Check_Button2

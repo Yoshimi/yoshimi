@@ -189,11 +189,11 @@ class SUBnoteUI {: {public PresetsUI_}
         } {}
       }
       Fl_Box {} {
-        xywh {10 6 205 60} box PLASTIC_THIN_UP_BOX color 223
+        xywh {10 6 205 60} box PLASTIC_UP_BOX color 223
       }
       Fl_Group ampgrp {
         label AMPLITUDE
-        xywh {5 5 215 135} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+        xywh {5 6 215 135} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
       } {
         Fl_Dial vol {
           label Volume

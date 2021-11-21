@@ -491,7 +491,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       }
       Fl_Text_Display filterparamslabel {
         label Parameters
-        xywh {135 19 50 4} box NO_BOX labelfont 1 labelsize 10
+        xywh {135 14 50 4} box NO_BOX labelfont 1 labelsize 10
       }
       Fl_Button editbutton {
         label Edit
