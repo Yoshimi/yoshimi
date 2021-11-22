@@ -2213,6 +2213,7 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
 {
     Part *part = synth->part[getData->data.part];
     int kititem = getData->data.kit;
+    bool needApply = false;
     switch(getData->data.insert)
     {
         case UNUSED:
@@ -2237,24 +2238,31 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
         case TOPLEVEL::insert::oscillatorGroup:
             commandOscillator(getData,  part->kit[kititem].padpars->POscil);
             part->kit[kititem].padpars->presetsUpdated();
+            needApply = true;
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
             commandOscillator(getData,  part->kit[kititem].padpars->POscil);
             part->kit[kititem].padpars->presetsUpdated();
+            needApply = true;
             break;
         case TOPLEVEL::insert::harmonicPhaseBandwidth:
             commandOscillator(getData,  part->kit[kititem].padpars->POscil);
             part->kit[kititem].padpars->presetsUpdated();
+            needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGroup:
             commandResonance(getData, part->kit[kititem].padpars->resonance);
             part->kit[kititem].padpars->presetsUpdated();
+            needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGraphInsert:
             commandResonance(getData, part->kit[kititem].padpars->resonance);
             part->kit[kititem].padpars->presetsUpdated();
+            needApply = true;
             break;
     }
+    if (needApply)
+        part->kit[kititem].padpars->Papplied = 0;
     return true;
 }
 
@@ -4902,6 +4910,8 @@ void InterChange::commandSub(CommandBlock *getData)
         case SUBSYNTH::control::stereo:
             if (write)
                 pars->Pstereo = value_bool;
+            else
+                value = pars->Pstereo;
             break;
     }
 
@@ -5183,7 +5193,7 @@ void InterChange::commandPad(CommandBlock *getData)
         case PADSYNTH::control::applyChanges:
             if (write)
             { // this control is 'expensive' only used if necessary
-                if (value_bool)
+                if (!pars->Papplied)
                 {
                     synth->partonoffWrite(npart, -1);
                     getData->data.source = TOPLEVEL::action::lowPrio;
@@ -5191,15 +5201,15 @@ void InterChange::commandPad(CommandBlock *getData)
                 else
                     getData->data.source = TOPLEVEL::action::noAction;
             }
+            else
+                value = pars->Papplied;
             break;
 
         case PADSYNTH::control::stereo:
             if (write)
                 pars->PStereo = value_bool;
             else
-            {
-                ;
-            }
+                value = pars->PStereo;
             break;
 
         case PADSYNTH::control::dePop:
@@ -5234,6 +5244,8 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
     }
 
+    if (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::applyChanges)
+        pars->Papplied = 0;
     if (!write)
         getData->data.value = value;
 }

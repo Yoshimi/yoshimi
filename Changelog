@@ -1,5 +1,11 @@
 yoshimi 2.1.1 M
 
+2021-11-22 Will
+* Bugfix CLI sub and pad stereo set but not read.
+* padsynth applied status now correctly set.
+  GUI still not fully in sync.
+* CLI can now read padsynth applied status.
+
 2021-11-21 Will
 * More small GUI tweaks.
 

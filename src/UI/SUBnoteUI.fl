@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
@@ -238,7 +238,6 @@ class SUBnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button randompan {
-          class Fl_Check_Button2
           label Rand
           callback {//
         int tmp = o->value();
@@ -250,6 +249,7 @@ class SUBnoteUI {: {public PresetsUI_}
           tooltip {Enable random panning} xywh {155 31 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
           code0 {o->value(pars->PRandom);}
           code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
+          class Fl_Check_Button2
         }
         Fl_Box {} {
           xywh {108 22 4 37} box THIN_DOWN_FRAME
@@ -267,7 +267,6 @@ class SUBnoteUI {: {public PresetsUI_}
           class EnvelopeUI
         } {}
         Fl_Check_Button freqee {
-          class Fl_Check_Button2
           label On
           callback {//
           if (o->value() == 0)
@@ -279,6 +278,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (0, SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
           xywh {445 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
+          class Fl_Check_Button2
         }
         Fl_Counter octave {
           label Octave
@@ -307,7 +307,6 @@ class SUBnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Check_Button hz440 {
-          class Fl_Check_Button2
           label 440Hz
           callback {//
           int x = (int) o->value();
@@ -319,6 +318,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (0, SUBSYNTH::control::baseFrequencyAs440Hz, x, TOPLEVEL::type::Integer);}
           tooltip {set the base frequency to 440Hz} xywh {620 24 48 15} down_box DOWN_BOX labelfont 1 labelsize 10 align 24
           code0 {o->value(pars->Pfixedfreq);}
+          class Fl_Check_Button2
         }
         Fl_Dial fixedfreqetdial {
           label {Eq.T.}
@@ -382,7 +382,6 @@ class SUBnoteUI {: {public PresetsUI_}
           class EnvelopeUI
         } {}
         Fl_Check_Button bwee {
-          class Fl_Check_Button2
           label On
           callback {//
           if (o->value() == 0)
@@ -394,6 +393,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (0, SUBSYNTH::control::enableBandwidthEnvelope, o->value(), TOPLEVEL::type::Integer);}
           xywh {225 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->PBandWidthEnvelopeEnabled);}
+          class Fl_Check_Button2
         }
         Fl_Value_Slider bandwidth {
           label Bandwidth
@@ -474,7 +474,6 @@ class SUBnoteUI {: {public PresetsUI_}
         } {}
       }
       Fl_Check_Button filtere {
-        class Fl_Check_Button2
         label On
         callback {//
         if (o->value() == 0)
@@ -486,6 +485,7 @@ class SUBnoteUI {: {public PresetsUI_}
         send_data (0, SUBSYNTH::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
         xywh {446 227 36 13} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
         code0 {o->value(pars->PGlobalFilterEnabled);}
+        class Fl_Check_Button2
       }
       Fl_Group {} {
         xywh {504 406 226 35} box THIN_UP_FRAME
@@ -518,12 +518,12 @@ class SUBnoteUI {: {public PresetsUI_}
         xywh {441 414 16 17} box THIN_UP_BOX color 237
       }
       Fl_Check_Button stereo {
-        class Fl_Check_Button2
         label { Stereo}
         callback {//
         send_data (0, SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         xywh {442 415 59 15} down_box DOWN_BOX color 237 labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
+        class Fl_Check_Button2
       }
       Fl_Button subClear {
         label Clear

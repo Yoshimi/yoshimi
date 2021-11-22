@@ -465,6 +465,9 @@ class ResonanceUI {: PresetsUI_
         code0 {o->value(respar->Penabled);}
         class Fl_Check_Button2
       }
+      Fl_Box applybox {
+        xywh {696 261 80 24} box THIN_UP_BOX color 237
+      }
       Fl_Button applybutton {
         label Apply
         callback {//
@@ -485,7 +488,7 @@ class ResonanceUI {: PresetsUI_
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
           }}
-        tooltip {Right click: also reopen previous} xywh {700 285 74 16} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX labelsize 12
       }
     }
   }
@@ -592,6 +595,7 @@ class ResonanceUI {: PresetsUI_
     cbapplywidget = NULL;
     make_window();
     resSeen = false;
+    applybox->hide();
     applybutton->hide();
     refresh();} {}
   }
@@ -615,6 +619,7 @@ class ResonanceUI {: PresetsUI_
     this->cbwidget = cbwidget;
     this->cbapplywidget = cbapplywidget;
     rg->setcbwidget(cbwidget, applybutton);
+    applybox->show();
     applybutton->show();} {}
   }
   Function {refresh()} {} {

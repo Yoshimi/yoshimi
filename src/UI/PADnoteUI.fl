@@ -802,12 +802,14 @@ class PADnoteUI {: {public PresetsUI_}
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12 align 128
       }
+      Fl_Box {} {
+        xywh {236 407 139 31} box THIN_UP_BOX color 237 selection_color 29
+      }
       Fl_Button applybutton {
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        xywh {240 410 131 24} box THIN_UP_BOX labelfont 1 labelsize 12
-        code0 {o->color(FL_RED);}
+        xywh {242 412 128 22} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button padCopy {
         label C

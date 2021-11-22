@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -458,25 +458,30 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {: {public PresetsUI_}
+class OscilEditor {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
-o->hide();}
-      xywh {11 26 735 595} type Double hide resizable
+o->hide();} open
+      xywh {11 26 735 595} type Double labelsize 12 hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
       code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
+      Fl_Box applybox {
+        xywh {298 278 64 24} box THIN_UP_BOX color 237
+        code0 {if (!oscil->ADvsPAD) o->hide();}
+      }
       Fl_Button applybutton {
         label Apply
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
-        xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);} selected
+        xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
@@ -1263,8 +1268,8 @@ o->hide();}
     oldosc->redraw();
     if (cbwidget!=NULL) {
         cbwidget->do_callback();
-        applybutton->color(FL_RED);
-        applybutton->redraw();
+        //applybutton->color(FL_RED);
+        //applybutton->redraw();
 };} {}
   }
   Function {waveRtext()} {} {
@@ -1278,7 +1283,7 @@ o->hide();}
         int size12 = int(12 * dScale);
         int size14 = int(14 * dScale);
 
-        applybutton->labelsize(size14);
+        applybutton->labelsize(size12);
         hrndtype->labelsize(size);
             hrndtype->textsize(size);
         oscilname->labelsize(size12);
