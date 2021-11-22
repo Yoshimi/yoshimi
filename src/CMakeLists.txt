@@ -139,13 +139,6 @@ endif ()
 
 find_package (PkgConfig REQUIRED)
 
-include (CheckFunctionExists)
-
-check_function_exists(exp10f EXP10F)
-
-if (EXP10F)
-    add_definitions(-DHAVE_EXP10F)
-endif ()
 
 check_c_source_compiles (
     "#include <argp.h>

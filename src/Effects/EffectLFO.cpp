@@ -28,6 +28,9 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectLFO.h"
 
+using func::power;
+
+
 EffectLFO::EffectLFO(SynthEngine *_synth) :
     Pfreq(40),
     Prandomness(0),
@@ -68,7 +71,7 @@ void EffectLFO::resetState()
 // Update the changed parameters
 void EffectLFO::updateparams()
 {
-    float lfofreq = (powf(2.0f, Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
+    float lfofreq = (power<2>(Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
     incx = fabsf(lfofreq) * synth->fixed_sample_step_f;
     if (incx > 0.49999999f)
         incx = 0.499999999f; // Limit the Frequency
@@ -104,6 +107,7 @@ float EffectLFO::getlfoshape(float x)
             // updated (to allow more lfotypes)
         default:
             out = cosf(x * TWOPI); // EffectLFO_SINE
+            break;
     }
     return out;
 }

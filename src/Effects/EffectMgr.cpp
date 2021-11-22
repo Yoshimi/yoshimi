@@ -377,6 +377,7 @@ float LimitMgr::geteffectlimits(CommandBlock *getData)
             break;
         default:
             value = EFFECT::type::count - EFFECT::type::none;
+            break;
     }
     return value;
 }

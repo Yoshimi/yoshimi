@@ -42,6 +42,8 @@
 
 using file::saveData;
 using func::setAllPan;
+using func::power;
+
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
@@ -186,12 +188,12 @@ float PADnoteParameters::getprofile(float *smp, int size)
         smp[i] = 0.0f;
 
     const int supersample = 16;
-    float basepar = powf(2.0f, ((1.0f - Php.base.par1 / 127.0f) * 12.0f));
-    float freqmult = floorf(powf(2.0f, (Php.freqmult / 127.0f * 5.0f)) + 0.000001f);
+    float basepar = power<2>(((1.0f - Php.base.par1 / 127.0f) * 12.0f));
+    float freqmult = floorf(power<2>((Php.freqmult / 127.0f * 5.0f)) + 0.000001f);
 
-    float modfreq = floorf(powf(2.0f, (Php.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
+    float modfreq = floorf(power<2>((Php.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
     float modpar1 = powf((Php.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
-    float amppar1 = powf(2.0f, powf((Php.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
+    float amppar1 = power<2>(powf((Php.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
     float amppar2 = (1.0f - Php.amp.par2 / 127.0f) * 0.998f + 0.001f;
     float width = powf((150.0f / (Php.width + 22.0f)), 2.0f);
 
@@ -332,7 +334,7 @@ float PADnoteParameters::setPbandwidth(int Pbandwidth)
 {
     this->Pbandwidth = Pbandwidth;
     float result = powf(Pbandwidth / 1000.0f, 1.1f);
-    result = powf(10.0f, result * 4.0f) * 0.25f;
+    result = power<10>(result * 4.0f) * 0.25f;
     return result;
 }
 
@@ -341,7 +343,7 @@ float PADnoteParameters::setPbandwidth(int Pbandwidth)
 float PADnoteParameters::getNhr(int n)
 {
     float result = 1.0;
-    float par1 = powf(10.0f, -(1.0f - Phrpos.par1 / 255.0f) * 3.0f);
+    float par1 = power<10>(-(1.0f - Phrpos.par1 / 255.0f) * 3.0f);
     float par2 = Phrpos.par2 / 255.0f;
 
     float n0 = n - 1.0f;
@@ -437,7 +439,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
             continue;
         //compute the bandwidth of each harmonic
         float bandwidthcents = setPbandwidth(Pbandwidth);
-        float bw = (powf(2.0f, bandwidthcents / 1200.0f) - 1.0f) * basefreq / bwadjust;
+        float bw = (power<2>(bandwidthcents / 1200.0f) - 1.0f) * basefreq / bwadjust;
         float power = 1.0f;
         switch (Pbwscale)
         {
@@ -595,7 +597,7 @@ void PADnoteParameters::applyparameters()
 
     float bwadjust = getprofile(profile, profilesize);
 //    for (int i=0;i<profilesize;i++) profile[i]*=profile[i];
-    float basefreq = 65.406f * powf(2.0f, Pquality.basenote / 2);
+    float basefreq = 65.406f * power<2>(Pquality.basenote / 2);
     if (Pquality.basenote %2 == 1)
         basefreq *= 1.5;
 
@@ -623,7 +625,7 @@ void PADnoteParameters::applyparameters()
     for (int nsample = 0; nsample < samplemax; ++nsample)
     {
         float tmp = adj[nsample] - adj[samplemax - 1] * 0.5f;
-        float basefreqadjust = powf(2.0f, tmp);
+        float basefreqadjust = power<2>(tmp);
 
         if (Pmode == 0)
             generatespectrum_bandwidthMode(&spectrum[0], spectrumsize,

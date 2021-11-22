@@ -32,9 +32,11 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/FileMgrFuncs.h"
 
+using func::power;
 using file::loadText;
 using file::findLeafName;
 using std::cout;
@@ -133,7 +135,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     // compute global fine detune, -64.0 .. 63.0 cents
     float globalfinedetunerap =
         (Pglobalfinedetune > 64.0f || Pglobalfinedetune < 64.0f)
-            ? powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f)
+            ? power<2>((Pglobalfinedetune - 64.0f) / 1200.0f)
             : 1.0f;
     // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
 

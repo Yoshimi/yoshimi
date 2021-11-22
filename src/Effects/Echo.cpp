@@ -25,9 +25,13 @@
 */
 
 #include "Misc/NumericFuncs.h"
+#include "Misc/SynthHelper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 #include <iostream>
+
+using func::power;
+using func::powFrac;
 
 static const int PRESET_SIZE = 7;
 static const int NUM_PRESETS = 9;
@@ -214,7 +218,7 @@ void Echo::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (insertion == 0)
     {
-        outvolume.setTargetValue(powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f);
+        outvolume.setTargetValue(4.0f * powFrac<100>(1.0f - Pvolume / 127.0f));
         volume.setTargetValue(1.0f);
     }
     else
@@ -238,7 +242,7 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 {
     float tmp;
     Plrdelay = Plrdelay_;
-    tmp = (powf(2.0f, fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
+    tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
     if (Plrdelay < 64.0f)
         tmp = -tmp;
     lrdelay = (int)tmp;
@@ -331,6 +335,7 @@ void Echo::changepar(int npar, unsigned char value)
 
         default:
             Pchanged = false;
+            break;
     }
 }
 

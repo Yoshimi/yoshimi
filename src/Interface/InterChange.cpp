@@ -92,9 +92,13 @@ InterChange::InterChange(SynthEngine *_synth) :
     syncWrite(false),
     lowPrioWrite(false),
     tick(0),
+    sortResultsThreadHandle(0),
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
-    swapInstrument1(UNUSED)
+    swapInstrument1(UNUSED),
+    searchInst(0),
+    searchBank(0),
+    searchRoot(0)
 {
     ;
 }
@@ -419,21 +423,24 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 #endif
         bool ok = returnsBuffer.write(getData->bytes);
 #ifdef GUI_FLTK
-        if (synth->getRuntime().showGui && switchNum == TOPLEVEL::section::scales && control == SCALES::control::importScl)
-        {   // loading a tuning includes a name and comment!
-            getData->data.control = SCALES::control::name;
-            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
-            returnsBuffer.write(getData->bytes);
-            getData->data.control = SCALES::control::comment;
-            getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
-            ok &= returnsBuffer.write(getData->bytes);
+        if (synth->getRuntime().showGui)
+        {
+            if (switchNum == TOPLEVEL::section::scales && control == SCALES::control::importScl)
+            {   // loading a tuning includes a name and comment!
+                getData->data.control = SCALES::control::name;
+                getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
+                returnsBuffer.write(getData->bytes);
+                getData->data.control = SCALES::control::comment;
+                getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
+                ok &= returnsBuffer.write(getData->bytes);
+            }
+            if (switchNum == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
+                synth->midilearn.updateGui();
+                /*
+                 * This needs improving. We should only set it
+                 * when the state file contains a learn list.
+                 */
         }
-        if (synth->getRuntime().showGui && switchNum == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
-            synth->midilearn.updateGui();
-        /*
-         * This needs improving. We should only set it
-         * when the state file contains a learn list.
-         */
 #endif
         if (!ok)
             synth->getRuntime().Log("Unable to  write to returnsBuffer buffer");
@@ -443,7 +450,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         {
             synth->fileCompatible = true;
 #ifdef GUI_FLTK
-            if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI)
+            if (synth->getRuntime().showGui &&
+               (getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI)
             {
                 getData->data.control = TOPLEVEL::control::textMessage;
                 getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later has parameter types changed incompatibly with earlier versions, and with Yoshimi. It may not perform correctly.");
@@ -1757,8 +1765,8 @@ void InterChange::mediate()
         }
 #endif
 #ifdef GUI_FLTK
-
-        if (fromGUI.read(getData.bytes))
+        if (synth->getRuntime().showGui
+            && fromGUI.read(getData.bytes))
         {
             more = true;
             if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
@@ -1777,7 +1785,8 @@ void InterChange::mediate()
                 returns(&getData);
             }
 #ifdef GUI_FLTK
-            else if (getData.data.control == MIDILEARN::control::reportActivity)
+            else if (synth->getRuntime().showGui
+                    && getData.data.control == MIDILEARN::control::reportActivity)
                 toGUI.write(getData.bytes);
 #endif
         }
@@ -1799,30 +1808,33 @@ void InterChange::mediate()
         if (effpar > 0xffff)
         {
 #ifdef GUI_FLTK
-            CommandBlock effData;
-            memset(&effData.bytes, 255, sizeof(effData));
-            unsigned char npart = effpar & 0xff;
-            unsigned char effnum = (effpar >> 8) & 0xff;
-            unsigned char efftype;
-            if (npart < NUM_MIDI_PARTS)
+            if (synth->getRuntime().showGui)
             {
-                efftype = synth->part[npart]->partefx[effnum]->geteffect();
-                effData.data.control = PART::control::effectType;
-            }
-            else
-            {
-                effData.data.control = EFFECT::sysIns::effectType;
-                if (npart == TOPLEVEL::section::systemEffects)
-                    efftype = synth->sysefx[effnum]->geteffect();
+                CommandBlock effData;
+                memset(&effData.bytes, 255, sizeof(effData));
+                unsigned char npart = effpar & 0xff;
+                unsigned char effnum = (effpar >> 8) & 0xff;
+                unsigned char efftype;
+                if (npart < NUM_MIDI_PARTS)
+                {
+                    efftype = synth->part[npart]->partefx[effnum]->geteffect();
+                    effData.data.control = PART::control::effectType;
+                }
                 else
-                    efftype = synth->insefx[effnum]->geteffect();
+                {
+                    effData.data.control = EFFECT::sysIns::effectType;
+                    if (npart == TOPLEVEL::section::systemEffects)
+                        efftype = synth->sysefx[effnum]->geteffect();
+                    else
+                        efftype = synth->insefx[effnum]->geteffect();
+                }
+                effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
+                effData.data.type = TOPLEVEL::type::Write;
+                effData.data.value = efftype;
+                effData.data.part = npart;
+                effData.data.engine = effnum;
+                toGUI.write(effData.bytes);
             }
-            effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
-            effData.data.type = TOPLEVEL::type::Write;
-            effData.data.value = efftype;
-            effData.data.part = npart;
-            effData.data.engine = effnum;
-            toGUI.write(effData.bytes);
 #endif
             synth->getRuntime().effectChange = UNUSED;
         } // end of temporary fix
@@ -1873,13 +1885,16 @@ void InterChange::returns(CommandBlock *getData)
     if (getData->data.source < TOPLEVEL::action::lowPrio)
     { // currently only used by gui. this may change!
 #ifdef GUI_FLTK
-        unsigned char type = getData->data.type; // back from synth
-        int tmp = (getData->data.source & TOPLEVEL::action::noAction);
-        if (getData->data.source & TOPLEVEL::action::forceUpdate)
-            tmp = TOPLEVEL::action::toAll;
+        if (synth->getRuntime().showGui)
+        {
+            unsigned char type = getData->data.type; // back from synth
+            int tmp = (getData->data.source & TOPLEVEL::action::noAction);
+            if (getData->data.source & TOPLEVEL::action::forceUpdate)
+                tmp = TOPLEVEL::action::toAll;
 
-        if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
-            toGUI.write(getData->bytes);
+            if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
+                toGUI.write(getData->bytes);
+        }
 #endif
     }
     if (!decodeLoopback.write(getData->bytes))

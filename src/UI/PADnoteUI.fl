@@ -57,8 +57,9 @@ decl {\#include "Misc/SynthHelper.h"
 }
 
 decl {\#include "Misc/NumericFuncs.h"
-    using func::dB2rap;
-    using func::rap2dB;} {private local
+    using func::decibel;
+    using func::asDecibel;
+    using func::power;} {private local
 }
 
 decl {\#include "Misc/TextMsgBuffer.h"
@@ -243,8 +244,8 @@ this->pars=pars;} {}
         for (int i = 0; i < lx; i++)
         {
             float x = spectrum[i];
-            if (x > dB2rap(-maxdb))
-                x = rap2dB(x) / maxdb + 1;
+            if (x > decibel(-maxdb))
+                x = asDecibel(x) / maxdb + 1;
             else
                 continue;
             int yy = (int)(x * ly);
@@ -1033,7 +1034,7 @@ class PADnoteUI {: {public PresetsUI_}
         case PADSYNTH::control::bandwidth:
             bwdial->value(value);
             result = powf(value / 1000.0f, 1.1f);
-            result = powf(10.0f, result * 4.0f) * 0.25f;
+            result = power<10>(result * 4.0f) * 0.25f;
             bwcents->value(result);
             cbwidget->do_callback();
             break;

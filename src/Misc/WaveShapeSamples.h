@@ -27,6 +27,11 @@
 
 #include <cmath>
 
+#include "Misc/NumericFuncs.h"
+
+using func::power;
+
+
 class WaveShapeSamples
 {
     public:
@@ -87,7 +92,7 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
                 smps[i] = asinf(sinf(smps[i] * ws)) / tmpv;
             break;
         case 7:
-            ws = powf(2.0f, -ws * ws * 8.0f); // Limiter
+            ws = power<2>(-ws * ws * 8.0f); // Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -100,7 +105,7 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
             }
             break;
         case 8:
-            ws = powf(2.0f, -ws * ws * 8.0f); // Upper Limiter
+            ws = power<2>(-ws * ws * 8.0f); // Upper Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -110,7 +115,7 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
             }
             break;
         case 9:
-            ws = powf(2.0f, -ws * ws * 8.0f); // Lower Limiter
+            ws = power<2>(-ws * ws * 8.0f); // Lower Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -120,7 +125,7 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
             }
             break;
         case 10:
-            ws = (powf(2.0f, ws * 6.0f) - 1.0f) / powf(2.0f, 6.0f); // Inverse Limiter
+            ws = (power<2>(ws * 6.0f) - 1.0f) / power<2>(6.0f); // Inverse Limiter
             for (i = 0; i < n; ++i)
             {
                 float tmp = smps[i];
@@ -133,7 +138,7 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
             }
             break;
         case 11:
-            ws = powf(5.0f, ws * ws * 1.0f) - 1.0f; // Clip
+            ws = power<5>(ws * ws * 1.0f) - 1.0f; // Clip
             for (i = 0; i < n; ++i)
                 smps[i] = smps[i] * (ws + 0.5f) * 0.9999f - floorf(0.5f + smps[i] * (ws + 0.5f) * 0.9999f);
             break;

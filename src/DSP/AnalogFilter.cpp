@@ -30,7 +30,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
+using func::decibel;
 
 
 AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth) :
@@ -111,24 +111,24 @@ void AnalogFilter::cleanup()
 
 void AnalogFilter::computefiltercoefs(void)
 {
-    float tmp;
-    float omega, sn, cs, alpha, beta;
-    int zerocoefs = 0; // this is used if the freq is too high
+    double tmp;
+    double omega, sn, cs, alpha, beta;
+    bool zerocoefs = false; // this is used if the freq is too high
 
     // do not allow frequencies bigger than samplerate/2
     float freq = this->freq;
     if (freq > (synth->halfsamplerate_f - 500.0f))
     {
         freq = synth->halfsamplerate_f - 500.0f;
-        zerocoefs = 1;
+        zerocoefs = true;
     }
     if (freq < 0.1f)
         freq = 0.1;
     // do not allow bogus Q
     if (q < 0.0f)
         q = 0.0f;
-    float tmpq;
-    float tmpgain;
+    double tmpq;
+    double tmpgain;
     if (stages == 0)
     {
         tmpq = q;
@@ -136,22 +136,28 @@ void AnalogFilter::computefiltercoefs(void)
     }
     else
     {
-        tmpq = (q > 1.0f) ? powf(q, 1.0f / (stages + 1)) : q;
-        tmpgain = powf(gain, 1.0f / (stages + 1));
+        tmpq = (q > 1.0f) ? pow(q, 1.0 / (stages + 1)) : q;
+        tmpgain = pow(gain, 1.0 / (stages + 1));
     }
 
-    // most of theese are implementations of
+    // most of these are implementations of
     // the "Cookbook formulae for audio EQ" by Robert Bristow-Johnson
     // The original location of the Cookbook is:
     // http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt
+
+    // (Remark 2021: URL went offline in 2005; content can still be found on archive.org):
+    // https://web.archive.org/web/20050404051659/http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt
+
+    // Note: filter coefficients are computed using doubles,
+    //       to get reproducible numbers under optimisation on different compilers/platforms
     switch (type)
     {
         case 0: // LPF 1 pole
-            if (zerocoefs == 0)
-                tmp = expf(-2.0f * PI * freq / synth->samplerate_f);
+            if (not zerocoefs)
+                tmp = exp(-TWOPI * freq / synth->samplerate_f);
             else
-                tmp = 0.0f;
-            c[0] = 1.0f - tmp;
+                tmp = 0.0;
+            c[0] = 1.0 - tmp;
             c[1] = 0.0f;
             c[2] = 0.0f;
             d[1] = tmp;
@@ -160,12 +166,12 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 1: // HPF 1 pole
-            if (zerocoefs == 0)
-                tmp = expf(-2.0f * PI * freq / synth->samplerate_f);
+            if (not zerocoefs)
+                tmp = exp(-TWOPI * freq / synth->samplerate_f);
             else
                 tmp = 0.0f;
-            c[0] = (1.0f + tmp) / 2.0f;
-            c[1] = -(1.0f + tmp) / 2.0f;
+            c[0] = (1.0 + tmp) / 2.0;
+            c[1] = -(1.0 + tmp) / 2.0;
             c[2] = 0.0f;
             d[1] = tmp;
             d[2] = 0.0f;
@@ -173,23 +179,17 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 2:// LPF 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                alpha = sn / (2.0f * tmpq);
+                sn = sin(omega);
+                cs = cos(omega);
+                alpha = sn / (2.0 * tmpq);
                 tmp = 1 + alpha;
-                c[1] = (1.0f - cs) / tmp;
-                c[0] = c[2] = c[1] / 2.0f;
-                d[1] = -2.0f * cs / tmp * -1.0f;
-                d[2] = (1.0f - alpha) / tmp * -1.0f;
-
-                //c[0] = (1.0f - cs) / 2.0f / tmp;
-                //c[1] = (1.0f - cs) / tmp;
-                //c[2] = (1.0f - cs) / 2.0f / tmp;
-                //d[1] = -2.0f * cs / tmp * -1.0f;
-                //d[2] = (1.0f - alpha) / tmp * -1.0f;
+                c[1] = (1.0 - cs) / tmp;
+                c[0] = c[2] = c[1] / 2.0;
+                d[1] = -2.0 * cs / tmp * -1.0;
+                d[2] = (1.0 - alpha) / tmp * -1.0;
             }
             else
             {
@@ -200,18 +200,18 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 3: // HPF 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                alpha = sn / (2.0f * tmpq);
+                sn = sin(omega);
+                cs = cos(omega);
+                alpha = sn / (2.0 * tmpq);
                 tmp = 1 + alpha;
-                c[0] = (1.0f + cs) / 2.0f / tmp;
-                c[1] = -(1.0f + cs) / tmp;
-                c[2] = (1.0f + cs) / 2.0f / tmp;
-                d[1] = -2.0f * cs / tmp * -1.0f;
-                d[2] = (1.0f - alpha) / tmp * -1.0f;
+                c[0] = (1.0 + cs) / 2.0 / tmp;
+                c[1] = -(1.0 + cs) / tmp;
+                c[2] = (1.0 + cs) / 2.0 / tmp;
+                d[1] = -2.0 * cs / tmp * -1.0;
+                d[2] = (1.0 - alpha) / tmp * -1.0;
             }
             else
                 c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
@@ -219,18 +219,18 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 4: // BPF 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                alpha = sn / (2.0f * tmpq);
-                tmp = 1.0f + alpha;
-                c[0] = alpha / tmp * sqrtf(tmpq + 1.0f);
+                sn = sin(omega);
+                cs = cos(omega);
+                alpha = sn / (2.0 * tmpq);
+                tmp = 1.0 + alpha;
+                c[0] = alpha / tmp * sqrt(tmpq + 1.0);
                 c[1] = 0.0f;
-                c[2] = -alpha / tmp * sqrtf(tmpq + 1.0f);
-                d[1] = -2.0f * cs / tmp * -1.0f;
-                d[2] = (1.0f - alpha) / tmp * -1.0f;
+                c[2] = -alpha / tmp * sqrt(tmpq + 1.0);
+                d[1] = -2.0 * cs / tmp * -1.0;
+                d[2] = (1.0 - alpha) / tmp * -1.0;
             }
             else
                 c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
@@ -238,18 +238,18 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 5: // NOTCH 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                alpha = sn / (2.0f * sqrtf(tmpq));
-                tmp = 1.0f + alpha;
-                c[0] = 1.0f / tmp;
-                c[1] = -2.0f * cs / tmp;
-                c[2] = 1.0f / tmp;
-                d[1] = -2.0f * cs / tmp * -1.0f;
-                d[2] = (1.0f - alpha) / tmp * -1.0f;
+                sn = sin(omega);
+                cs = cos(omega);
+                alpha = sn / (2.0 * sqrt(tmpq));
+                tmp = 1.0 + alpha;
+                c[0] = 1.0 / tmp;
+                c[1] = -2.0 * cs / tmp;
+                c[2] = 1.0 / tmp;
+                d[1] = -2.0 * cs / tmp * -1.0;
+                d[2] = (1.0 - alpha) / tmp * -1.0;
             }
             else
             {
@@ -260,19 +260,19 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 6: // PEAK (2 poles)
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                tmpq *= 3.0f;
-                alpha = sn / (2.0f * tmpq);
-                tmp = 1.0f + alpha / tmpgain;
-                c[0] = (1.0f + alpha * tmpgain) / tmp;
-                c[1] = (-2.0f * cs) / tmp;
-                c[2] = (1.0f - alpha * tmpgain) / tmp;
-                d[1] = -2.0f * cs / tmp * -1.0f;
-                d[2] = (1.0f - alpha / tmpgain) / tmp * -1.0f;
+                sn = sin(omega);
+                cs = cos(omega);
+                tmpq *= 3.0;
+                alpha = sn / (2.0 * tmpq);
+                tmp = 1.0 + alpha / tmpgain;
+                c[0] = (1.0 + alpha * tmpgain) / tmp;
+                c[1] = (-2.0 * cs) / tmp;
+                c[2] = (1.0 - alpha * tmpgain) / tmp;
+                d[1] = -2.0 * cs / tmp * -1.0;
+                d[2] = (1.0 - alpha / tmpgain) / tmp * -1.0;
             }
             else
             {
@@ -283,21 +283,21 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 7: // Low Shelf - 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                tmpq = sqrtf(tmpq);
-                alpha = sn / (2.0f * tmpq);
-                beta = sqrtf(tmpgain) / tmpq;
-                tmp = (tmpgain + 1.0f) + (tmpgain - 1.0f) * cs + beta * sn;
+                sn = sin(omega);
+                cs = cos(omega);
+                tmpq = sqrt(tmpq);
+                alpha = sn / (2.0 * tmpq);
+                beta = sqrt(tmpgain) / tmpq;
+                tmp = (tmpgain + 1.0) + (tmpgain - 1.0) * cs + beta * sn;
 
-                c[0] = tmpgain * ((tmpgain + 1.0f) - (tmpgain - 1.0f) * cs + beta * sn) / tmp;
-                c[1] = 2.0f * tmpgain * ((tmpgain - 1.0f) - (tmpgain + 1.0f) * cs) / tmp;
-                c[2] = tmpgain * ((tmpgain + 1.0f) - (tmpgain - 1.0f) * cs - beta * sn) / tmp;
-                d[1] = -2.0f * ((tmpgain - 1.0f) + (tmpgain + 1.0f) * cs) / tmp * -1;
-                d[2] = ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs - beta * sn) / tmp * -1.0f;
+                c[0] = tmpgain * ((tmpgain + 1.0) - (tmpgain - 1.0) * cs + beta * sn) / tmp;
+                c[1] = 2.0 * tmpgain * ((tmpgain - 1.0) - (tmpgain + 1.0) * cs) / tmp;
+                c[2] = tmpgain * ((tmpgain + 1.0) - (tmpgain - 1.0) * cs - beta * sn) / tmp;
+                d[1] = -2.0 * ((tmpgain - 1.0) + (tmpgain + 1.0) * cs) / tmp * -1.0;
+                d[2] = ((tmpgain + 1.0) + (tmpgain - 1.0) * cs - beta * sn) / tmp * -1.0;
             }
             else
             {
@@ -308,21 +308,21 @@ void AnalogFilter::computefiltercoefs(void)
             break;
 
         case 8: // High Shelf - 2 poles
-            if (zerocoefs == 0)
+            if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
-                sn = sinf(omega);
-                cs = cosf(omega);
-                tmpq = sqrtf(tmpq);
-                alpha = sn / (2.0f * tmpq);
-                beta = sqrtf(tmpgain) / tmpq;
-                tmp = (tmpgain + 1.0f) - (tmpgain - 1.0f) * cs + beta * sn;
+                sn = sin(omega);
+                cs = cos(omega);
+                tmpq = sqrt(tmpq);
+                alpha = sn / (2.0 * tmpq);
+                beta = sqrt(tmpgain) / tmpq;
+                tmp = (tmpgain + 1.0) - (tmpgain - 1.0) * cs + beta * sn;
 
-                c[0] = tmpgain * ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs + beta * sn) / tmp;
-                c[1] = -2.0f * tmpgain * ((tmpgain - 1.0f) + (tmpgain + 1.0f) * cs) / tmp;
-                c[2] = tmpgain * ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs - beta * sn) / tmp;
-                d[1] = 2.0f * ((tmpgain - 1.0f) - (tmpgain + 1.0f) * cs) / tmp * -1.0f;
-                d[2] = ((tmpgain + 1.0f) - (tmpgain - 1.0f) * cs - beta * sn) / tmp * -1.0f;
+                c[0] = tmpgain * ((tmpgain + 1.0) + (tmpgain - 1.0) * cs + beta * sn) / tmp;
+                c[1] = -2.0 * tmpgain * ((tmpgain - 1.0) + (tmpgain + 1.0) * cs) / tmp;
+                c[2] = tmpgain * ((tmpgain + 1.0) + (tmpgain - 1.0) * cs - beta * sn) / tmp;
+                d[1] = 2.0 * ((tmpgain - 1.0) - (tmpgain + 1.0) * cs) / tmp * -1.0;
+                d[2] = ((tmpgain + 1.0) - (tmpgain - 1.0) * cs - beta * sn) / tmp * -1.0;
             }
             else
             {
@@ -387,7 +387,7 @@ void AnalogFilter::settype(int type_)
 
 void AnalogFilter::setgain(float dBgain)
 {
-    gain = dB2rap(dBgain);
+    gain = decibel(dBgain);
     computefiltercoefs();
 }
 

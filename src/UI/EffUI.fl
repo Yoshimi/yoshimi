@@ -53,6 +53,10 @@ decl {\#include "FilterUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
+decl {\#include "Misc/NumericFuncs.h"
+    using func::power;} {private local
+}
+
 decl {\#include "Effects/EffectMgr.h"} {public local
 }
 
@@ -175,7 +179,7 @@ eff = eff_;
   } {
     code {if (x > 1.0)
             x = 1.0;
-        return 20.0 * powf(1000.0, x);} {}
+        return 20.0 * power<1000>(x);} {}
   }
   Function {getfreqpos(float freq)} {return_type float
   } {

@@ -1384,6 +1384,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     value = (input.toggle() == 1);
                 }
             }
+            break;
         }
         if (selected > -1)
         {

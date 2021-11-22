@@ -214,7 +214,8 @@ class ADnote
             float  FMDetune; // in cents
             Envelope *FMFreqEnvelope;
             Envelope *FMAmpEnvelope;
-        } NoteVoicePar[NUM_VOICES];
+        };
+        ADnoteVoice NoteVoicePar[NUM_VOICES];
 
         // Internal values of the note and of the voices
         float time; // time from the start of the note

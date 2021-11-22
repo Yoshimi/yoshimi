@@ -25,7 +25,11 @@
 */
 
 #include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
 #include "Effects/Chorus.h"
+
+using func::power;
+
 
 #define MAX_CHORUS_DELAY 250.0f // ms
 
@@ -173,14 +177,14 @@ void Chorus::cleanup(void)
 void Chorus::setdepth(unsigned char Pdepth_)
 {
     Pdepth = Pdepth_;
-    depth = (powf(8.0f, (Pdepth / 127.0f) * 2.0f) - 1.0f) / 1000.0f; // seconds
+    depth = (power<8>((Pdepth / 127.0f) * 2.0f) - 1.0f) / 1000.0f; // seconds
 }
 
 
 void Chorus::setdelay(unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    delay = (powf(10.0f, (Pdelay / 127.0f) * 2.0f) - 1.0f) / 1000.0f; // seconds
+    delay = (power<10>((Pdelay / 127.0f) * 2.0f) - 1.0f) / 1000.0f; // seconds
 }
 
 
@@ -283,6 +287,7 @@ void Chorus::changepar(int npar, unsigned char value)
             break;
         default:
             Pchanged = false;
+            break;
     }
 }
 
