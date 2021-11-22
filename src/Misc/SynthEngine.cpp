@@ -358,7 +358,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         if (midilearn.loadList(feml))
         {
 #ifdef GUI_FLTK
-            midilearn.updateGui();
+            midilearn.updateGui(); // does nothing if --no-gui
 #endif
             Runtime.Log("midiLearn file " + feml + " loaded");
         }
