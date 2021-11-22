@@ -28,8 +28,9 @@
 #include "Misc/NumericFuncs.h"
 #include "Params/EnvelopeParams.h"
 
-using func::dB2rap;
-using func::rap2dB;
+using func::power;
+using func::decibel;
+using func::asDecibel;
 
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth):
@@ -90,7 +91,7 @@ void Envelope::recomputePoints()
 
             case 3:
                 envval[i] =
-                    (powf(2.0f, 6.0f * fabsf(_envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
+                    (power<2>(6.0f * fabsf(_envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
                 if (_envpars->Penvval[i] < 64)
                     envval[i] = -envval[i];
                 break;
@@ -105,6 +106,7 @@ void Envelope::recomputePoints()
 
             default:
                 envval[i] = _envpars->Penvval[i] / 127.0f;
+                break;
         }
     }
 }
@@ -191,9 +193,9 @@ float Envelope::envout_dB(void)
         return envout();
 
     if (currentpoint == 1 && (keyreleased == 0 || forcedrelase == 0))
-    {   // first point is always lineary interpolated
-        float v1 = dB2rap(envval[0]);
-        float v2 = dB2rap(envval[1]);
+    {   // first point is always linearly interpolated
+        float v1 = decibel(envval[0]);
+        float v2 = decibel(envval[1]);
         out = v1 + (v2 - v1) * t;
 
         float bufferdt = synth->sent_buffersize_f / synth->samplerate_f;
@@ -210,11 +212,11 @@ float Envelope::envout_dB(void)
         }
 
         if (out > 0.001f)
-            envoutval = rap2dB(out);
+            envoutval = asDecibel(out);
         else
             envoutval = MIN_ENVELOPE_DB;
     } else
-        out = dB2rap(envout());
+        out = decibel(envout());
 
     return out;
 }

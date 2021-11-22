@@ -31,11 +31,13 @@
 #include <cmath>
 #include <string>
 #include "globals.h"
+#include "Misc/NumericFuncs.h"
 
 class SynthEngine;
 class XMLwrapper;
 
 using std::string;
+using func::power;
 
 const size_t MAX_OCTAVE_SIZE = 128;
 
@@ -120,7 +122,7 @@ inline int Microtonal::getoctavesize(void)
 
 inline float Microtonal::getFixedNoteFreq(int note)
 {
-    return powf(2.0f, (float)(note - PrefNote) / 12.0f) * PrefFreq;
+    return power<2>(float(note - PrefNote) / 12.0f) * PrefFreq;
 }
 
 

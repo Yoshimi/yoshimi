@@ -84,8 +84,8 @@ decl {\#include "MasterUI.h"} {private global
 }
 
 decl {\#include "Misc/NumericFuncs.h"
-    using func::dB2rap;
-    using func::rap2dB;} {private local
+    using func::decibel;
+    using func::asDecibel;} {private local
 }
 
 class OscilSpectrum {: {public Fl_Box}
@@ -162,8 +162,8 @@ class OscilSpectrum {: {public Fl_Box}
         int tmp = i * GX + 2;
         x = spc[i] / max;
 
-        if (x > dB2rap(-maxdb))
-            x = rap2dB(x) / maxdb + 1;
+        if (x > decibel(-maxdb))
+            x = asDecibel(x) / maxdb + 1;
         else
             x = 0;
 

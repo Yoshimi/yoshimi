@@ -32,13 +32,16 @@
 #include "DSP/FFTwrapper.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
+#include "Synth/SUBnote.h"
 #include "Synth/Envelope.h"
 #include "DSP/Filter.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"
-#include "Synth/SUBnote.h"
 #include "Misc/NumericFuncs.h"
 
+using func::power;
+using func::powFrac;
+using func::decibel;
 using synth::velF;
 using synth::getDetune;
 using synth::interpolateAmplitude;
@@ -46,16 +49,6 @@ using synth::aboveAmplitudeThreshold;
 
 using func::setRandomPan;
 
-// These have little reason to exist, as GCC actually performs constant folding
-// on logf even on -O0 and Clang (currently, as of 9.0.1) constant-folds these
-// on -O1 and above. These used to be members of SUBnote initialized on note
-// construction. Thankfully constant folding would still occur, but it wasn't
-// ideal. Older compilers might generate library calls, so there might still be
-// some justification for this.
-const float LOG_0_01 = logf(0.01f);
-const float LOG_0_001 = logf(0.001f);
-const float LOG_0_0001 = logf(0.0001f);
-const float LOG_0_00001 = logf(0.00001f);
 
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float basefreq_,
@@ -137,6 +130,8 @@ SUBnote::SUBnote(const SUBnote &orig) :
     newamplitude(orig.newamplitude),
     lfilter(NULL),
     rfilter(NULL),
+    tmpsmp(NULL),
+    tmprnd(NULL),
     ctl(orig.ctl),
     oldpitchwheel(orig.oldpitchwheel),
     oldbandwidth(orig.oldbandwidth),
@@ -344,23 +339,23 @@ void SUBnote::computeNoteFreq()
         if (fixedfreqET)
         {   // if the frequency varies according the keyboard note
             float tmp =
-                (midinote - 69.0f) / 12.0f * powf(2.0f, (((fixedfreqET - 1) / 63.0f) - 1.0f));
+                (midinote - 69.0f) / 12.0f * power<2>((((fixedfreqET - 1) / 63.0f) - 1.0f));
             if (fixedfreqET <= 64)
-                notefreq *= powf(2.0f, tmp);
+                notefreq *= power<2>(tmp);
             else
-                notefreq *= powf(3.0f, tmp);
+                notefreq *= power<3>(tmp);
         }
     }
 
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
-    notefreq *= powf(2.0f, detune / 1200.0f); // detune
-//    notefreq*=ctl->pitchwheel.relfreq;//pitch wheel
+    notefreq *= power<2>(detune / 1200.0f); // detune
 }
 
 void SUBnote::computeNoteParameters()
 {
-    volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
-    volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
+    volume = 2.0f                                         // +6dB boost (note ADDnote and PADnote apply a +12dB boost)
+           * decibel<-60>(1.0f - pars->PVolume / 96.0f)   // -60 dB .. +19.375 dB
+           * velF(velocity, pars->PAmpVelocityScaleFunction);
 
     int BendAdj = pars->PBendAdjust - 64;
     if (BendAdj % 24 == 0)
@@ -593,7 +588,7 @@ void SUBnote::computeallfiltercoefs()
     if (FreqEnvelope != NULL)
     {
         envfreq = FreqEnvelope->envout() / 1200;
-        envfreq = powf(2.0f, envfreq);
+        envfreq = power<2>(envfreq);
     }
 
     envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
@@ -610,7 +605,7 @@ void SUBnote::computeallfiltercoefs()
     if (BandWidthEnvelope != NULL)
     {
         envbw = BandWidthEnvelope->envout();
-        envbw = powf(2.0f, envbw);
+        envbw = power<2>(envbw);
     }
     envbw *= ctl->bandwidth.relbw; // bandwidth controller
 
@@ -650,27 +645,15 @@ void SUBnote::computeallfiltercoefs()
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
 {
-    // disabled till we know what we are doing!
-    /*for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
-    {
-        int changed = pars->PfilterChanged[n];
-        if (changed)
-        {
-            if (changed == 6) // magnitude
-                ;
-            else if (changed == 7) // bandwidth
-                ;
-            cout << "Filter changed " << changed << endl;
-            pars->PfilterChanged[n] = 0;
-        }
-    }*/
     if (FreqEnvelope != NULL
         || BandWidthEnvelope != NULL
         || oldpitchwheel != ctl->pitchwheel.data
         || oldbandwidth != ctl->bandwidth.data
         || portamento != 0)
         computeallfiltercoefs();
-    newamplitude = volume * AmpEnvelope->envout_dB() * 2.0f;
+
+    // Envelope
+    newamplitude = volume * AmpEnvelope->envout_dB();
 
     // Filter
     if (GlobalFilterL != NULL)
@@ -856,23 +839,24 @@ float SUBnote::getHgain(int harmonic)
     switch (pars->Phmagtype)
     {
         case 1:
-            hgain = expf(hmagnew * LOG_0_01);
+            hgain = powFrac<100>(hmagnew);
             break;
 
         case 2:
-            hgain = expf(hmagnew * LOG_0_001);
+            hgain = powFrac<1000>(hmagnew);
             break;
 
         case 3:
-            hgain = expf(hmagnew * LOG_0_0001);
+            hgain = powFrac<10000>(hmagnew);
             break;
 
         case 4:
-            hgain = expf(hmagnew * LOG_0_00001);
+            hgain = powFrac<100000>(hmagnew);
             break;
 
         default:
             hgain = 1.0f - hmagnew;
+            break;
     }
 
     return hgain;
@@ -893,13 +877,13 @@ void SUBnote::updatefilterbank(void)
         overtone_rolloff[n] = computerolloff(freq);
 
         // the bandwidth is not absolute(Hz); it is relative to frequency
-        float bw = powf(10.0f, (pars->Pbandwidth - 127.0f) / 127.0f * 4.0f) * numstages;
+        float bw = power<10>((pars->Pbandwidth - 127.0f) / 127.0f * 4.0f) * numstages;
 
         // Bandwidth Scale
         bw *= powf(1000.0f / freq, (pars->Pbwscale - 64.0f) / 64.0f * 3.0f);
 
         // Relative BandWidth
-        bw *= powf(100.0f, (pars->Phrelbw[pos[n]] - 64.0f) / 64.0f);
+        bw *= power<100>((pars->Phrelbw[pos[n]] - 64.0f) / 64.0f);
 
         if (bw > 25.0f)
             bw = 25.0f;
@@ -937,6 +921,4 @@ void SUBnote::updatefilterbank(void)
     if (reduceamp < 0.001f)
         reduceamp = 1.0f;
     volume /= reduceamp;
-
 }
-

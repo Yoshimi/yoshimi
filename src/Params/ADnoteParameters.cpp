@@ -29,12 +29,12 @@
 #include <cmath>
 #include <stdlib.h>
 #include "Misc/NumericFuncs.h"
-
-using namespace std;
-using func::setAllPan;
-
 #include "Misc/SynthEngine.h"
 #include "Params/ADnoteParameters.h"
+
+using func::setAllPan;
+using func::power;
+
 
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
@@ -217,7 +217,7 @@ void ADnoteParameters::enableVoice(int nvoice)
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
     float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
-    bw = powf(2.0f, bw * pow(fabs(bw), 0.2f) * 5.0f);
+    bw = power<2>(bw * pow(fabs(bw), 0.2f) * 5.0f);
     return bw;
 }
 

@@ -30,7 +30,8 @@
 #include "Misc/NumericFuncs.h"
 #include "Params/FilterParams.h"
 
-using func::rap2dB;
+using func::asDecibel;
+using func::power;
 
 
 FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
@@ -167,7 +168,7 @@ float FilterParams::getgain(void)
 // Get the center frequency of the formant's graph
 float FilterParams::getcenterfreq(void)
 {
-    return 10000.0f * powf(10.0f, -(1.0f - Pcenterfreq / 127.0f) * 2.0f);
+    return 10000.0f * power<10>(-(1.0f - Pcenterfreq / 127.0f) * 2.0f);
 }
 
 
@@ -183,7 +184,7 @@ float FilterParams::getfreqx(float x)
 {
     if (x > 1.0f)
         x = 1.0f;
-    float octf = powf(2.0f, getoctavesfreq());
+    float octf = power<2>(getoctavesfreq());
     return getcenterfreq() / sqrtf(octf) * powf(octf, x);
 }
 
@@ -265,7 +266,7 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
     for (int i = 0; i < nfreqs; ++i)
     {
         if (freqs[i] > 0.000000001f)
-            freqs[i] = rap2dB(freqs[i]) + getgain();
+            freqs[i] = asDecibel(freqs[i]) + getgain();
         else
             freqs[i] = -90.0f;
     }

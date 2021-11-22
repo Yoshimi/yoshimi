@@ -30,8 +30,6 @@
 #include "DSP/SVFilter.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
-
 
 SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
                    unsigned char Fstages, SynthEngine *_synth) :
@@ -91,12 +89,13 @@ void SVFilter::cleanup()
 
 void SVFilter::computefiltercoefs(void)
 {
-    par.f = freq / synth->samplerate_f * 4.0f;
+    // calculations done in doubles for better portability of results
+    par.f = double(freq) / synth->samplerate * 4.0;
     if (par.f > 0.99999f)
         par.f = 0.99999f;
-    par.q = 1.0f - atanf(sqrtf(q)) * 2.0f / PI;
-    par.q = powf(par.q, 1.0f / (stages + 1));
-    par.q_sqrt = sqrtf(par.q);
+    double qq = 1.0 - atan(sqrt(q)) * 2.0 / PI;
+    par.q = pow(qq, 1.0 / (stages + 1));
+    par.q_sqrt = sqrt(qq);
 }
 
 

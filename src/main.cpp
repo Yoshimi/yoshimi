@@ -128,76 +128,87 @@ static void *mainThread(void *arg)
     map<SynthEngine *, MusicClient *>::iterator it;
 
 #ifdef GUI_FLTK
-
-    Fl::lock();
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
     const unsigned char lgreen = 0xf7;
     const unsigned char lblue = 0xff;
-    int winH, winW;
-    int LbX, LbY, LbW, LbH;
-    int timeout;
-
+    int winH=10, winW=50;
+    int LbX=2, LbY=2, LbW=2, LbH=2;
+    int timeout =3;
     std::string startup = YOSHIMI_VERSION;
-    if (showSplash)
+
+    if (bShowGui)
     {
-        startup = "V " + startup;
-        winH = splashHeight;
-        winW = splashWidth;
-        LbX = 0;
-        LbY = winH - textY - textHeight;
-        LbW = winW;
-        LbH = textHeight;
-        timeout = 5;
-    }
-    else
-    {
-        startup = "Yoshimi V " + startup + " is starting";
-        winH = 36;
-        winW = 300;
-        LbX = 2;
-        LbY = 2;
-        LbW = winW - 4;
-        LbH = winH -4;
-        timeout = 3;
-    }
+        Fl::lock();
+
+        if (showSplash)
+        {
+            startup = "V " + startup;
+            winH = splashHeight;
+            winW = splashWidth;
+            LbX = 0;
+            LbY = winH - textY - textHeight;
+            LbW = winW;
+            LbH = textHeight;
+            timeout = 5;
+        }
+        else
+        {
+            startup = "Yoshimi V " + startup + " is starting";
+            winH = 36;
+            winW = 300;
+            LbX = 2;
+            LbY = 2;
+            LbW = winW - 4;
+            LbH = winH -4;
+            timeout = 3;
+        }
+    }//bShowGui
+
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
     Fl_Window winSplash(winW, winH, "yoshimi splash screen");
     Fl_Box box(0, 0, winW,winH);
     Fl_Box boxLb(LbX, LbY, LbW, LbH, startup.c_str());
 
-    if (showSplash)
+    if (bShowGui)
     {
-        box.image(pix);
-        boxLb.box(FL_NO_BOX);
-        boxLb.align(FL_ALIGN_CENTER);
-        boxLb.labelsize(textHeight);
-        boxLb.labeltype(FL_NORMAL_LABEL);
-        boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
-        boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+        if (showSplash)
+        {
+            box.image(pix);
+            boxLb.box(FL_NO_BOX);
+            boxLb.align(FL_ALIGN_CENTER);
+            boxLb.labelsize(textHeight);
+            boxLb.labeltype(FL_NORMAL_LABEL);
+            boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
+            boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+        }
+        else
+        {
+            boxLb.box(FL_EMBOSSED_FRAME);
+            boxLb.labelsize(16);
+            boxLb.labelfont(FL_BOLD);
+            boxLb.labelcolor(YOSHI_COLOUR);
+        }
+        winSplash.border(false);
+        if (splashSet && bShowGui)
+        {
+            winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
+        }
+        else
+            splashSet = false;
+        do
+        {
+            winSplash.show();
+            usleep(33333);
+        }
+        while (firstSynth == NULL); // just wait
     }
-    else
+    else /* not bShowGui */
+#endif /*GUI_FLTK*/
     {
-        boxLb.box(FL_EMBOSSED_FRAME);
-        boxLb.labelsize(16);
-        boxLb.labelfont(FL_BOLD);
-        boxLb.labelcolor(YOSHI_COLOUR);
+        while (firstSynth == NULL); // just wait
     }
-    winSplash.border(false);
-    if (splashSet && bShowGui)
-    {
-        winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
-    }
-    else
-        splashSet = false;
-    do
-    {
-        winSplash.show();
-        usleep(33333);
-    }
-#endif
-    while (firstSynth == NULL); // just wait
 
     if (firstRuntime->autoInstance)
         newBlock();
@@ -527,7 +538,8 @@ int main(int argc, char *argv[])
     firstSynth->loadHistory();
     firstSynth->installBanks();
 #ifdef GUI_FLTK
-    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+    if (bShowGui)
+        GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 #endif
 
     //create command line processing thread

@@ -59,7 +59,7 @@ using file::createEmptyFile;
 using file::deleteFile;
 using file::make_legit_filename;
 
-using func::dB2rap;
+using func::decibel;
 using func::bitTest;
 using func::asString;
 using func::string2int;
@@ -358,7 +358,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         if (midilearn.loadList(feml))
         {
 #ifdef GUI_FLTK
-            midilearn.updateGui();
+            midilearn.updateGui(); // does nothing if --no-gui
 #endif
             Runtime.Log("midiLearn file " + feml + " loaded");
         }
@@ -2152,9 +2152,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // Mix the channels according to the part settings about System Effect
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (partLocal[npart]        // it's enabled
-                 && Psysefxvol[nefx][npart]      // it's sending an output
-                 && part[npart]->Paudiodest & 1) // it's connected to the main outs
+                if (partLocal[npart]               // it's enabled
+                 && Psysefxvol[nefx][npart]        // it's sending an output
+                 && (part[npart]->Paudiodest & 1)) // it's connected to the main outs
                 {
                     // the output volume of each part to system effect
                     float vol = sysefxvol[nefx][npart];
@@ -2226,12 +2226,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             if (Pvolume - TransVolume > cStep)
             {
                 TransVolume += cStep;
-                volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+                volume = decibel<-40>(1.0f - TransVolume/96.0f);
             }
             else if (TransVolume - Pvolume > cStep)
             {
                 TransVolume -= cStep;
-                volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+                volume = decibel<-40>(1.0f - TransVolume/96.0f);
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
@@ -2411,14 +2411,14 @@ void SynthEngine::setPkeyshift(int Pkeyshift_)
 void SynthEngine::setPsysefxvol(int Ppart, int Pefx, char Pvol)
 {
     Psysefxvol[Pefx][Ppart] = Pvol;
-    sysefxvol[Pefx][Ppart]  = powf(0.1f, (1.0f - Pvol / 96.0f) * 2.0f);
+    sysefxvol[Pefx][Ppart]  = decibel<-40>(1.0f - Pvol / 96.0f);  // Pvol=0..127 => -40dB .. +12.9166dB
 }
 
 
 void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
 {
     Psysefxsend[Pefxfrom][Pefxto] = Pvol;
-    sysefxsend[Pefxfrom][Pefxto]  = powf(0.1f, (1.0f - Pvol / 96.0f) * 2.0f);
+    sysefxsend[Pefxfrom][Pefxto]  = decibel<-40>(1.0f - Pvol / 96.0f);
 }
 
 void SynthEngine::setPaudiodest(int value)
@@ -3719,6 +3719,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
         case CONFIG::control::enableNRPNs:
             def = 1;
+            break;
 
         case CONFIG::control::saveCurrentConfig:
             break;

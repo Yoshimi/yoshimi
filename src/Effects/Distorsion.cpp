@@ -25,10 +25,13 @@
 */
 
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Effects/Distorsion.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
+using func::power;
+using func::powFrac;
+using func::decibel;
 
 
 namespace { // Implementation details...
@@ -131,7 +134,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
 {
     outvolume.advanceValue(synth->sent_buffersize);
 
-    float inputdrive = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
+    float inputdrive = power<5>((Pdrive - 32.0f) / 127.0f);
     if (Pnegate)
         inputdrive *= -1.0f;
 
@@ -163,7 +166,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
-        float lvl = dB2rap(60.0f * level.getAndAdvanceValue() - 40.0f);
+        float lvl = decibel<-40>(1.0f - 1.5f * level.getAndAdvanceValue());
         float lout = efxoutl[i];
         float rout = efxoutr[i];
         float l = lout * (1.0f - lrcross.getValue()) + rout * lrcross.getValue();
@@ -184,7 +187,7 @@ void Distorsion::setvolume(unsigned char Pvolume_)
     float tmp = Pvolume / 127.0f;
     if (insertion == 0)
     {
-        outvolume.setTargetValue(powf(0.01f, (1.0f - tmp)) * 4.0f);
+        outvolume.setTargetValue(4.0f * powFrac<100>(1.0f - tmp));
         volume.setTargetValue(1.0f);
     }
     else

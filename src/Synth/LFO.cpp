@@ -28,7 +28,11 @@
 #include <cmath>
 
 #include "Misc/SynthEngine.h"
+#include "Misc/SynthHelper.h"
 #include "Synth/LFO.h"
+
+using func::power;
+using func::powFrac;
 
 
 LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
@@ -107,7 +111,7 @@ inline void LFO::Recompute(void)
             break; // in octave
 
         default:
-            lfointensity = powf(2.0f, lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
+            lfointensity = power<2>(lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
             break;
     }
 
@@ -165,11 +169,11 @@ float LFO::lfoout()
             break;
 
         case 5: // LFO_EXP_DOWN 1
-            out = powf(0.05f, x) * 2.0f - 1.0f;
+            out = powFrac<20>(x) * 2.0f - 1.0f;
             break;
 
         case 6: // LFO_EXP_DOWN 2
-            out = powf(0.001f, x) * 2.0f - 1.0f;
+            out = powFrac<1000>(x) * 2.0f - 1.0f;
             break;
 
         case 7: // LFO_SAMPLE_&_HOLD
@@ -233,6 +237,7 @@ float LFO::lfoout()
 
         default:
             out = cosf(x * TWOPI); // LFO_SINE
+            break;
     }
 
     if (lfotype == 0 || lfotype == 1)
@@ -316,5 +321,5 @@ void LFO::computenextincrnd(void)
     if (!freqrndenabled)
         return;
     incrnd = nextincrnd;
-    nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);
+    nextincrnd = powFrac<2>(lfofreqrnd) + synth->numRandom() * (power<2>(lfofreqrnd) - 1.0f);
 }

@@ -29,10 +29,12 @@
 #include <cstring>
 #include <stdio.h>
 
-using namespace std;
-
 #include "Misc/Config.h"
+#include "Misc/NumericFuncs.h"
 #include "DSP/Unison.h"
+
+using func::power;
+
 
 Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth) :
     unison_size(0),
@@ -121,7 +123,7 @@ void Unison::updateParameters(void)
 //		printf("%g %g\n",uv[i].relative_amplitude,period);
     }
 
-    float max_speed = powf(2.0f, unison_bandwidth_cents / 1200.0f);
+    float max_speed = power<2>(unison_bandwidth_cents / 1200.0f);
 //    printf("speed %f\n", max_speed);
     unison_amplitude_samples = 0.125f * (max_speed - 1.0f) * synth->samplerate_f / base_freq;
 

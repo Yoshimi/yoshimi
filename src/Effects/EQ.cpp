@@ -24,11 +24,13 @@
 
 */
 
+#include "Misc/NumericFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
-#include "Misc/NumericFuncs.h"
 
-using func::rap2dB;
+using func::power;
+using func::powFrac;
+using func::asDecibel;
 
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
@@ -126,7 +128,7 @@ void EQ::out(float *smpsl, float *smpsr)
 void EQ::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    float tmp = powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
+    float tmp = 10.0f * powFrac<200>(1.0f - Pvolume / 127.0f);
     outvolume.setTargetValue(tmp);
     volume.setTargetValue((!insertion) ? 1.0f : tmp);
 }
@@ -164,6 +166,7 @@ void EQ::changepar(int npar, unsigned char value)
             break;
         case 1:
             Pband = value;
+            break;
     }
     if (npar < 10)
         return;
@@ -189,7 +192,7 @@ void EQ::changepar(int npar, unsigned char value)
 
         case 1:
             filter[nb].Pfreq = value;
-            tmp = 600.0f * powf(30.0f, (value - 64.0f) / 64.0f);
+            tmp = 600.0f * power<30>((value - 64.0f) / 64.0f);
             filter[nb].freq.setTargetValue(tmp);
             break;
 
@@ -201,7 +204,7 @@ void EQ::changepar(int npar, unsigned char value)
 
         case 3:
             filter[nb].Pq = value;
-            tmp = powf(30.0f, (value - 64.0f) / 64.0f);
+            tmp = power<30>((value - 64.0f) / 64.0f);
             filter[nb].q.setTargetValue(tmp);
             break;
 
@@ -271,7 +274,7 @@ float EQ::getfreqresponse(float freq)
         resp *= filter[i].l->H(freq);
     }
     // Only for UI purposes, use target value.
-    return rap2dB(resp * outvolume.getTargetValue());
+    return asDecibel(resp * outvolume.getTargetValue());
 }
 
 

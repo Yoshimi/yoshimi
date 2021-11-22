@@ -26,7 +26,8 @@
 #include "DSP/Filter.h"
 #include "Misc/NumericFuncs.h"
 
-using func::dB2rap;
+using func::decibel;
+using func::power;
 
 
 Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
@@ -72,7 +73,7 @@ void Filter::updateCurrentParameters()
             break;
 
         case 2:
-            filter->outgain = dB2rap(pars->getgain());
+            filter->outgain = decibel(pars->getgain());
             if (filter->outgain > 1.0f)
                 filter->outgain = sqrtf(filter->outgain);
             break;
@@ -82,7 +83,7 @@ void Filter::updateCurrentParameters()
             if (Ftype >= 6 && Ftype <= 8)
                 filter->setgain(pars->getgain());
             else
-                filter->outgain = dB2rap(pars->getgain());
+                filter->outgain = decibel(pars->getgain());
             break;
     }
 }
@@ -117,7 +118,7 @@ void Filter::setq(float q_)
 float Filter::getrealfreq(float freqpitch)
 {
     if (category == 0 || category == 2)
-        return powf(2.0f, freqpitch + 9.96578428f); // log2(1000)=9.95748
+        return power<2>(freqpitch + 9.96578428f); // log2(1000)=9.95748
     else
         return freqpitch;
 }

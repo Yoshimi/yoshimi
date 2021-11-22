@@ -85,7 +85,7 @@ decl {\#include "Misc/FormatFuncs.h"
 }
 
 decl {\#include "Misc/NumericFuncs.h"
-    using func::rap2dB;
+    using func::asDecibel;
     using func::limit;} {private local
 }
 
@@ -170,8 +170,8 @@ class FormantFilterGraph {: {public Fl_Box}
                     + " kHz";
             fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 2 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
             tmpstr = asString((int)
-                (rap2dB(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain()))
-                    + " dB";
+                (asDecibel(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain()))
+                          + " dB";
             fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 15 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
         }
 

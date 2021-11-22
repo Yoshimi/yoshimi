@@ -28,10 +28,12 @@
 #include <cmath>
 #include <iostream>
 
-using namespace std;
-
-#include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
+#include "Misc/SynthEngine.h"
+#include "Misc/NumericFuncs.h"
+
+using func::power;
+
 
 Resonance::Resonance(SynthEngine *_synth) : Presets(_synth)
 {
@@ -95,7 +97,7 @@ void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
         if (kx2 >= MAX_RESONANCE_POINTS)
             kx2 = MAX_RESONANCE_POINTS - 1;
         float y = (Prespoints[kx1] * (1.0 - dx) + Prespoints[kx2] * dx) / 127.0 - sum / 127.0;
-        y = powf(10.0f, y * PmaxdB / 20.0);
+        y = power<10>(y * PmaxdB / 20.0);
         if (Pprotectthefundamental != 0 && i == 1)
             y = 1.0;
         fftdata.c[i] *= y;
@@ -131,7 +133,7 @@ float Resonance::getfreqresponse(float freq)
         kx2 = MAX_RESONANCE_POINTS - 1;
     float result = (Prespoints[kx1] * (1.0 - dx) + Prespoints[kx2] * dx)
                          / 127.0 - sum / 127.0;
-    result = powf(10.0f, result * PmaxdB / 20.0);
+    result = power<10>(result * PmaxdB / 20.0);
     return result;
 }
 
@@ -202,7 +204,7 @@ float Resonance::getfreqx(float x)
 {
     if (x > 1.0)
         x = 1.0;
-    float octf = powf(2.0f, getoctavesfreq());
+    float octf = power<2>(getoctavesfreq());
     return (getcenterfreq() / sqrtf(octf) * powf(octf, x));
 }
 
@@ -217,7 +219,7 @@ float Resonance::getfreqpos(float freq)
 // Get the center frequency of the resonance graph
 float Resonance::getcenterfreq(void)
 {
-    return 10000.0 * powf(10.0f, -(1.0f - Pcenterfreq / 127.0f) * 2.0f);
+    return 10000.0 * power<10>(-(1.0f - Pcenterfreq / 127.0f) * 2.0f);
 }
 
 

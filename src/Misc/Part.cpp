@@ -50,9 +50,9 @@ using synth::velF;
 using file::isRegularFile;
 using file::setExtension;
 using file::findLeafName;
-using func::dB2rap;
 using func::findSplitPoint;
 using func::setAllPan;
+using func::decibel;
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
@@ -1272,7 +1272,7 @@ void Part::setVolume(float value)
 void Part::checkVolume(float step)
 {
     TransVolume += step;
-    volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+    volume = decibel<-40>(1.0f - TransVolume/96.0f);
     if (volume < 0.01015f) // done to get a smooth cutoff at what was - 40dB
         volume = 0.0f;
 }
