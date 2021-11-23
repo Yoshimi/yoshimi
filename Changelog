@@ -2,6 +2,7 @@ yoshimi 2.1.1 M
 
 2021-11-23 Will
 * Completed unification of padsynth apply status
+* CLI can now read CLI and GUI current status.
 
 2021-11-22 Will
 * Bugfix CLI sub and pad stereo set but not read.

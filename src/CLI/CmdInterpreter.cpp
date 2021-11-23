@@ -3148,16 +3148,26 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     else if (input.matchnMove(1, "gui"))
     {
         command = CONFIG::control::enableGUI;
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        if (controlType == type_read)
+            value = 0;
+        else
+        {
+            value = input.toggle();
+            if (value == -1)
+                return REPLY::value_msg;
+        }
     }
     else if (input.matchnMove(1, "cli"))
     {
         command = CONFIG::control::enableCLI;
-        value = input.toggle();
-        if (value == -1)
-            return REPLY::value_msg;
+        if (controlType == type_read)
+            value = 0;
+        else
+        {
+            value = input.toggle();
+            if (value == -1)
+                return REPLY::value_msg;
+        }
     }
 
     else if (input.matchnMove(2, "identify"))
