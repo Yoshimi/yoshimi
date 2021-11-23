@@ -856,10 +856,6 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         enableRandomPan,
         randomWidth,
 
-        bandwidth = 16,
-        bandwidthScale,
-        spectrumMode = 19, // Bandwidth, Discrete, Continuous
-
         detuneFrequency = 32,
         equalTemperVariation,
         baseFrequencyAs440Hz,
@@ -868,6 +864,10 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         coarseDetune,
         pitchBendAdjustment,
         pitchBendOffset,
+
+        bandwidth,// = 16, moved these three
+        bandwidthScale,
+        spectrumMode,// = 19, // Bandwidth, Discrete, Continuous
 
         overtoneParameter1 = 48,
         overtoneParameter2,

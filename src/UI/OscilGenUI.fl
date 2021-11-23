@@ -837,7 +837,7 @@ o->hide();} open
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
-    unsigned char eng = getData->data.engine;
+    //unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
     //if (eng != engine)
@@ -1080,11 +1080,6 @@ o->hide();} open
         waveformgroup->redraw();
         harmonicgroup->redraw();
         oldosc->redraw();
-        if (eng == 2)
-        {
-            applybutton->color(FL_RED);
-            applybutton->redraw();
-        }
     }} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float

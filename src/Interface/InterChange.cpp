@@ -2262,7 +2262,10 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
             break;
     }
     if (needApply)
+    {
         part->kit[kititem].padpars->Papplied = 0;
+        getData->data.offset = 0;
+    }
     return true;
 }
 
@@ -5245,7 +5248,10 @@ void InterChange::commandPad(CommandBlock *getData)
     }
 
     if (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::applyChanges)
+    {
         pars->Papplied = 0;
+        getData->data.offset = 0;
+    }
     if (!write)
         getData->data.value = value;
 }

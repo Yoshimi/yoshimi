@@ -275,9 +275,14 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Tabs {} {
         callback {//
             if (o->value() != harmonicstructuregroup)
+            {
+                applybox->hide();
                 applybutton->hide();
+            }
             else
-                applybutton->show();}
+            {
+                applybox->show();
+                applybutton->show();}}
         xywh {0 0 580 405}
       } {
         Fl_Group harmonicstructuregroup {
@@ -398,9 +403,7 @@ class PADnoteUI {: {public PresetsUI_}
           Fl_Box cbwidget {
             label {Harmonic Content}
             callback {//
-            overtonepos->redraw();
-            applybutton->color(FL_RED);
-            applybutton->redraw();}
+            overtonepos->redraw();}
             xywh {125 135 205 20} labelsize 12 align 16
           }
           Fl_Button resonance {
@@ -802,7 +805,7 @@ class PADnoteUI {: {public PresetsUI_}
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}
         tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12 align 128
       }
-      Fl_Box {} {
+      Fl_Box applybox {
         xywh {236 407 139 31} box THIN_UP_BOX color 237 selection_color 29
       }
       Fl_Button applybutton {
@@ -1243,33 +1246,11 @@ class PADnoteUI {: {public PresetsUI_}
                 if (wasFromHere)
                     alert(synth, "Some samples have failed.");
             }
-            applybutton->color(FL_GRAY);
-            applybutton->redraw();
-            if (oscui)
-            {
-                oscui->applybutton->color(FL_GRAY);
-                oscui->applybutton->redraw();
-            }
-            if (resui)
-            {
-                resui->applybutton->color(FL_GRAY);
-                resui->applybutton->redraw();
-            }
-            break; // TODO drop-through intended?
+            applycolour(FL_GRAY);
+            break;
 
         case PADSYNTH::control::applyChanges:
-            applybutton->color(FL_GRAY);
-            applybutton->redraw();
-            if (oscui)
-            {
-                oscui->applybutton->color(FL_GRAY);
-                oscui->applybutton->redraw();
-            }
-            if (resui)
-            {
-                resui->applybutton->color(FL_GRAY);
-                resui->applybutton->redraw();
-            }
+            applycolour(FL_GRAY);
             break;
 
         case PADSYNTH::control::stereo:
@@ -1296,6 +1277,21 @@ class PADnoteUI {: {public PresetsUI_}
             pvel->value(value);
             break;
 
+    }} {}
+  }
+  Function {applycolour(int set)} {} {
+    code {//
+    applybutton->color(set);
+    applybutton->redraw();
+    if (oscui)
+    {
+        oscui->applybutton->color(set);
+        oscui->applybutton->redraw();
+    }
+    if (resui)
+    {
+        resui->applybutton->color(set);
+        resui->applybutton->redraw();
     }} {}
   }
   Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {

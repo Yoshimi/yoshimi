@@ -262,11 +262,6 @@ class ResonanceGraph {: {public Fl_Box}
         if (cbwidget != NULL)
         {
             cbwidget->do_callback();
-            if (applybutton != NULL)
-            {
-                applybutton->color(FL_RED);
-                applybutton->redraw();
-            }
         }
     }
 
@@ -610,8 +605,6 @@ class ResonanceUI {: PresetsUI_
   Function {redrawPADnoteApply()} {} {
     code {if (cbwidget!=NULL) {
     cbwidget->do_callback();
-    applybutton->color(FL_RED);
-    applybutton->redraw();
 };} {}
   }
   Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *cbapplywidget)} {} {
