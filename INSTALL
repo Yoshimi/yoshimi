@@ -6,7 +6,7 @@ It's a normal CMake build.
 
 ---- Sample instructions to compile/build using ccmake on Linux, outside-source-tree -----
 
-This uses "yoshimi-1.5.1" as an example, and should work fine with other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
+This uses "yoshimi-1.5.1" as an example, and should work fine with all other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
 We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software', but downloaded the archive to /home/user/download.
 
