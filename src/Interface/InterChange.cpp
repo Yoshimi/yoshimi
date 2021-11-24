@@ -2835,6 +2835,13 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = firstSynth->getRuntime().showCLIcontext;
             break;
+
+        case CONFIG::control::readAudio:
+            value = int(synth->getRuntime().audioEngine);
+            break;
+        case CONFIG::control::readMIDI:
+            value = int(synth->getRuntime().midiEngine);
+            break;
 // jack
         case CONFIG::control::jackMidiSource: // done elsewhere
             break;

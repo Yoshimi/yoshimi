@@ -313,6 +313,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaAudioDevice,
         alsaPreferredAudio,
         alsaSampleRate,
+        readAudio,
+        readMIDI,
 
         // end of engine controls
         addPresetRootDir = 60,

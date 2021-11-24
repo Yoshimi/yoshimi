@@ -3277,24 +3277,38 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
 
     else if (input.matchnMove(2, "midi"))
     {
-        value = 1;
-        if (input.matchnMove(1, "alsa"))
-            command = CONFIG::control::alsaPreferredMidi;
-        else if (controlType != TOPLEVEL::type::Write || input.matchnMove(1, "jack"))
-            command = CONFIG::control::jackPreferredMidi;
+        if (controlType != TOPLEVEL::type::Write)
+        {
+            return sendDirect(synth, TOPLEVEL::action::fromCLI, 0, controlType, CONFIG::control::readMIDI, TOPLEVEL::section::config);
+        }
         else
-            return REPLY::value_msg;
+        {
+            value = 1;
+            if (input.matchnMove(1, "alsa"))
+                command = CONFIG::control::alsaPreferredMidi;
+            else if (input.matchnMove(1, "jack"))
+                command = CONFIG::control::jackPreferredMidi;
+            else
+                return REPLY::value_msg;
+        }
     }
 
     else if (input.matchnMove(2, "audio"))
     {
-        value = 1;
-        if (input.matchnMove(1, "alsa"))
-            command = CONFIG::control::alsaPreferredAudio;
-        else if (controlType != TOPLEVEL::type::Write || input.matchnMove(1, "jack"))
-            command = CONFIG::control::jackPreferredAudio;
+        if (controlType != TOPLEVEL::type::Write)
+        {
+            return sendDirect(synth, TOPLEVEL::action::fromCLI, 0, controlType, CONFIG::control::readAudio, TOPLEVEL::section::config);
+        }
         else
-            return REPLY::value_msg;
+        {
+            value = 1;
+            if (input.matchnMove(1, "alsa"))
+                command = CONFIG::control::alsaPreferredAudio;
+            else if (input.matchnMove(1, "jack"))
+                command = CONFIG::control::jackPreferredAudio;
+            else
+                return REPLY::value_msg;
+        }
     }
 
     else if (input.matchnMove(2, "root"))

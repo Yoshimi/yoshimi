@@ -1,9 +1,11 @@
-yoshimi 2.1.2 rc1
+yoshimi 2.1.2 rc2
 
 2021-11-24 Will
 * Improved recognition of Apply Parameters from MIDI
 * doc updates
 * Rationalised more Data2Text and Text2Data names.
+* CLI can now read midi source and audio destination.
+* Set version as 2.1.2 rc2
 
 2021-11-23 Will
 * Completed unification of padsynth apply status

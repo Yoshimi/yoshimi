@@ -701,6 +701,43 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             }
             break;
 
+        case CONFIG::control::readAudio:
+            contstr += "Audio Destination ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case 1:
+                        contstr += "JACK";
+                        break;
+                    case 2:
+                        contstr += "ALSA";
+                        break;
+                    default:
+                        contstr += "None";
+                }
+                showValue = false;
+            }
+            break;
+
+        case CONFIG::control::readMIDI:
+            contstr += "MIDI Source ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case 1:
+                        contstr += "JACK";
+                        break;
+                    case 2:
+                        contstr += "ALSA";
+                        break;
+                    default:
+                        contstr += "None";
+                }
+                showValue = false;
+            }
+            break;
         case CONFIG::control::jackMidiSource:
             contstr += "JACK MIDI source: ";
             if (addValue)
