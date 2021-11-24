@@ -736,11 +736,11 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Punch"))
     {
-        if (findAndStep(source, "Strngth"))
+        if (findAndStep(source, "Strength") || findAndStep(source, "Strngth"))
             ctl = ADDSYNTH::control::punchStrength;
         else if (findAndStep(source, "Time"))
             ctl = ADDSYNTH::control::punchDuration;
-        else if (findAndStep(source, "Strtch"))
+        else if (findAndStep(source, "Stretch") || findAndStep(source, "Strtch"))
             ctl = ADDSYNTH::control::punchStretch;
         else if (findAndStep(source, "Vel"))
             ctl = ADDSYNTH::control::punchVelocity;
@@ -751,7 +751,7 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         ctl = ADDSYNTH::control::detuneFrequency;
     else if (findAndStep(source, "Octave"))
         ctl = ADDSYNTH::control::octave;
-    else if (findAndStep(source, "Rel B Wdth"))
+    else if (findAndStep(source, "Relative Bandwidth") ||findAndStep(source, "Rel B Wdth"))
         ctl = ADDSYNTH::control::relativeBandwidth;
 
     if (ctl < UNUSED)
@@ -850,22 +850,26 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
         {
             if (findAndStep(source, "Enable Env"))
                 ctl = ADDVOICE::control::enableModulatorAmplitudeEnvelope;
-            else if (findAndStep(source, "Volume"))
-                ctl = ADDVOICE::control::modulatorAmplitude;
-            else if (findAndStep(source, "V Sense"))
-                ctl = ADDVOICE::control::modulatorVelocitySense;
-            else if (findAndStep(source, "F Damp"))
-                ctl = ADDVOICE::control::modulatorHFdamping;
-        }
-        else if (findAndStep(source, "Freq"))
+        } // throw it away for the next three controls
+        if (findAndStep(source, "Volume"))
+            ctl = ADDVOICE::control::modulatorAmplitude;
+        else if (findAndStep(source, "Vel Sense") || findAndStep(source, "V Sense"))
+            ctl = ADDVOICE::control::modulatorVelocitySense;
+        else if (findAndStep(source, "HF Damping") || findAndStep(source, "F Damp"))
+            ctl = ADDVOICE::control::modulatorHFdamping;
+
+        if (findAndStep(source, "Freq"))
         {
             if (findAndStep(source, "Enable Env"))
                 ctl = ADDVOICE::control::enableModulatorFrequencyEnvelope;
-            else if (findAndStep(source, "Octave"))
-                ctl = ADDVOICE::control::modulatorOctave;
-            else // detune frequency
-                ctl = ADDVOICE::control::modulatorDetuneFrequency;
-        }
+            else
+                ctl = ADDVOICE::control::modulatorDetuneFrequency; // old form
+        } // throw away for next
+        if (findAndStep(source, "Octave"))
+            ctl = ADDVOICE::control::modulatorOctave;
+
+        else if (findAndStep(source, "Detune"))
+            ctl = ADDVOICE::control::modulatorDetuneFrequency;
 
         else if (findAndStep(source, "Osc Phase"))
             ctl = ADDVOICE::control::modulatorOscillatorPhase;
@@ -1214,11 +1218,11 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Punch"))
     {
-        if (findAndStep(source, "Strngth"))
+        if (findAndStep(source, "Strength") || findAndStep(source, "Strngth"))
             ctl =PADSYNTH::control::punchStrength;
         else if (findAndStep(source, "Time"))
             ctl =PADSYNTH::control::punchDuration;
-        else if (findAndStep(source, "Strtch"))
+        else if (findAndStep(source, "Stretch") || findAndStep(source, "Strtch"))
             ctl =PADSYNTH::control::punchStretch;
         else if (findAndStep(source, "Vel"))
             ctl =PADSYNTH::control::punchVelocity;
@@ -1370,7 +1374,7 @@ void TextData::encodeLFO(string &source, CommandBlock &allData)
     unsigned char ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::LFOgroup;
 
-    if (findAndStep(source, "FreqRand")) // must be before Freq
+    if (findAndStep(source, "Freq Random") ||findAndStep(source, "FreqRand")) // must be before Freq
         ctl = LFOINSERT::control::frequencyRandomness;
     else if (findAndStep(source, "Freq"))
         ctl = LFOINSERT::control::speed;
@@ -1380,7 +1384,7 @@ void TextData::encodeLFO(string &source, CommandBlock &allData)
         ctl = LFOINSERT::control::start;
     else if (findAndStep(source, "Delay"))
         ctl = LFOINSERT::control::delay;
-    else if (findAndStep(source, "AmpRand"))
+    else if (findAndStep(source, "Amp Random")||findAndStep(source, "AmpRand"))
         ctl = LFOINSERT::control::amplitudeRandomness;
     else if (findAndStep(source, "Stretch"))
         ctl = LFOINSERT::control::stretch;
@@ -1403,19 +1407,19 @@ void TextData::encodeEnvelope(string &source, CommandBlock &allData)
     allData.data.insert = TOPLEVEL::insert::envelopeGroup;
     // this might be changed for freemode points
 
-    if (findAndStep(source, "A val"))
+    if (findAndStep(source, "Attack Level") || findAndStep(source, "A val"))
         ctl = ENVELOPEINSERT::control::attackLevel;
-    else if (findAndStep(source, "A dt"))
+    else if (findAndStep(source, "Attack Time") || findAndStep(source, "A dt"))
         ctl = ENVELOPEINSERT::control::attackTime;
-    else if (findAndStep(source, "D val"))
+    else if (findAndStep(source, "Decay Level") || findAndStep(source, "D val"))
         ctl = ENVELOPEINSERT::control::decayLevel;
-    else if (findAndStep(source, "S val"))
-        ctl = ENVELOPEINSERT::control::sustainLevel;
-    else if (findAndStep(source, "D dt"))
+    else if (findAndStep(source, "Decay Time") || findAndStep(source, "D dt"))
         ctl = ENVELOPEINSERT::control::decayTime;
-    else if (findAndStep(source, "R val"))
+    else if (findAndStep(source, "Sustain Level") || findAndStep(source, "S val"))
+        ctl = ENVELOPEINSERT::control::sustainLevel;
+    else if (findAndStep(source, "Release Level") || findAndStep(source, "R val"))
         ctl = ENVELOPEINSERT::control::releaseLevel;
-    else if (findAndStep(source, "R dt"))
+    else if (findAndStep(source, "Release Time") || findAndStep(source, "R dt"))
         ctl =ENVELOPEINSERT::control::releaseTime;
     else if (findAndStep(source, "Stretch"))
         ctl = ENVELOPEINSERT::control::stretch;

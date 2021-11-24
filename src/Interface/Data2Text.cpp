@@ -1805,7 +1805,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case ADDSYNTH::control::detuneType:
-            contstr = "Det type ";
+            contstr = "Detune Type ";
             showValue = false;
             if (addValue)
                 contstr += detuneType [int(value)];
@@ -1814,7 +1814,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "Coarse Det";
             break;
         case ADDSYNTH::control::relativeBandwidth:
-            contstr = "Rel B Wdth";
+            contstr = "Relative Bandwidth";
             break;
 
         case ADDSYNTH::control::stereo:
@@ -1830,16 +1830,16 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
             contstr = "De Pop";
             break;
         case ADDSYNTH::control::punchStrength:
-            contstr = "Punch Strngth";
+            contstr = "Punch Strength";
             break;
         case ADDSYNTH::control::punchDuration:
             contstr = "Punch Time";
             break;
         case ADDSYNTH::control::punchStretch:
-            contstr = "Punch Strtch";
+            contstr = "Punch Stretch";
             break;
         case ADDSYNTH::control::punchVelocity:
-            contstr = "Punch Vel";
+            contstr = "Punch Velocity";
             break;
 
         default:
@@ -1944,13 +1944,13 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case ADDVOICE::control::detuneType:
-            contstr = "Det type ";
+            contstr = "Detune Type ";
             showValue = false;
             if (addValue)
                 contstr += stringCaps(detuneType [int(value)], 1);
             break;
         case ADDVOICE::control::coarseDetune:
-            contstr = "Coarse Det";
+            contstr = "Coarse Detune";
             break;
         case ADDVOICE::control::pitchBendAdjustment:
             contstr = "Bend Adj";
@@ -2012,41 +2012,42 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
             break;
 
         case ADDVOICE::control::modulatorAmplitude:
-            contstr = "Modulator Amp Volume";
+            contstr = "Modulator Volume";
             break;
         case ADDVOICE::control::modulatorVelocitySense:
-            contstr = "Modulator Amp V Sense";
+            contstr = "Modulator Vel Sense";
             break;
         case ADDVOICE::control::modulatorHFdamping:
-            contstr = "Modulator Amp F Damp";
+            contstr = "Modulator HF Damping";
             break;
+
         case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
             contstr = "Modulator Amp Enable Env";
             yesno = true;
             break;
 
         case ADDVOICE::control::modulatorDetuneFrequency:
-            contstr = "Modulator Freq";
+            contstr = "Modulator Detune";
             break;
         case ADDVOICE::control::modulatorFrequencyAs440Hz:
-            contstr = "Modulator Freq 440Hz";
+            contstr = "Modulator 440Hz";
             yesno = true;
             break;
         case ADDVOICE::control::modulatorDetuneFromBaseOsc:
-            contstr = "Modulator Freq Follow voice";
+            contstr = "Modulator Follow voice";
             yesno = true;
             break;
         case ADDVOICE::control::modulatorOctave:
-            contstr = "Modulator Freq Octave";
+            contstr = "Modulator Octave";
             break;
         case ADDVOICE::control::modulatorDetuneType:
-            contstr = "Modulator Freq Det type ";
+            contstr = "Modulator Detune Type ";
             showValue = false;
             if (addValue)
                 contstr += detuneType [int(value)];
             break;
         case ADDVOICE::control::modulatorCoarseDetune:
-            contstr = "Modulator Freq Coarse Det";
+            contstr = "Modulator Coarse Detune";
             break;
         case ADDVOICE::control::enableModulatorFrequencyEnvelope: // local, external
             contstr = "Modulator Freq Enable Env";
@@ -2172,13 +2173,13 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case SUBSYNTH::control::detuneType:
-            contstr = "Det type ";
+            contstr = "Detune Type ";
             showValue = false;
             if (addValue)
                 contstr += detuneType [value_int];
             break;
         case SUBSYNTH::control::coarseDetune:
-            contstr = "Coarse Det";
+            contstr = "Coarse Detune";
             break;
         case SUBSYNTH::control::pitchBendAdjustment:
             contstr = "Bend Adj";
@@ -2298,17 +2299,17 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Octave";
             break;
         case PADSYNTH::control::detuneType:
-            contstr = "Det type ";
+            contstr = "Detune Type ";
             showValue = false;
             if (addValue)
                 contstr += detuneType [int(value)];
             break;
         case PADSYNTH::control::coarseDetune:
-            contstr = "Coarse Det";
+            contstr = "Coarse Detune";
             break;
 
         case PADSYNTH::control::pitchBendAdjustment:
-            contstr = "Bend Adj";
+            contstr = "Bend Adjust";
             break;
         case PADSYNTH::control::pitchBendOffset:
             contstr = "Offset Hz";
@@ -2321,16 +2322,16 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "De Pop";
             break;
         case PADSYNTH::control::punchStrength:
-            contstr = "Punch Strngth";
+            contstr = "Punch Strength";
             break;
         case PADSYNTH::control::punchDuration:
             contstr = "Punch Time";
             break;
         case PADSYNTH::control::punchStretch:
-            contstr = "Punch Strtch";
+            contstr = "Punch Stretch";
             break;
         case PADSYNTH::control::punchVelocity:
-            contstr = "Punch Vel";
+            contstr = "Punch Velocity";
             break;
 
             case PADSYNTH::control::applyChanges:
@@ -2794,7 +2795,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
             contstr = "Start";
             break;
         case LFOINSERT::control::amplitudeRandomness:
-            contstr = "AmpRand";
+            contstr = "Amp Rand";
             break;
         case LFOINSERT::control::type:
         {
@@ -2813,7 +2814,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
             yesno = true;
             break;
         case LFOINSERT::control::frequencyRandomness:
-            contstr = "FreqRand";
+            contstr = "Freq Rand";
             break;
         case LFOINSERT::control::stretch:
             contstr = "Stretch";
@@ -3059,25 +3060,25 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
     switch (control)
     {
         case ENVELOPEINSERT::control::attackLevel:
-            contstr = "A val";
+            contstr = "Attack Level";
             break;
         case ENVELOPEINSERT::control::attackTime:
-            contstr = "A dt";
+            contstr = "Attack Time";
             break;
         case ENVELOPEINSERT::control::decayLevel:
-            contstr = "D val";
+            contstr = "Decay Level";
             break;
         case ENVELOPEINSERT::control::decayTime:
-            contstr = "D dt";
+            contstr = "Decay Time";
             break;
         case ENVELOPEINSERT::control::sustainLevel:
-            contstr = "S val";
-            break;
-        case ENVELOPEINSERT::control::releaseTime:
-            contstr = "R dt";
+            contstr = "Sustain Level";
             break;
         case ENVELOPEINSERT::control::releaseLevel:
-            contstr = "R val";
+            contstr = "Release Level";
+            break;
+        case ENVELOPEINSERT::control::releaseTime:
+            contstr = "Release Time";
             break;
         case ENVELOPEINSERT::control::stretch:
             contstr = "Stretch";

@@ -3,6 +3,7 @@ yoshimi 2.1.2 rc1
 2021-11-24 Will
 * Improved recognition of Apply Parameters from MIDI
 * doc updates
+* Rationalised more Data2Text and Text2Data names.
 
 2021-11-23 Will
 * Completed unification of padsynth apply status
