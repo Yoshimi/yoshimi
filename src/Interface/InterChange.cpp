@@ -5194,12 +5194,13 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::applyChanges:
-            if (write)
+            if (write && value >= 0.5f)
             { // this control is 'expensive' only used if necessary
                 if (!pars->Papplied)
                 {
                     synth->partonoffWrite(npart, -1);
                     getData->data.source = TOPLEVEL::action::lowPrio;
+                    getData->data.value = 1;
                 }
                 else
                     getData->data.source = TOPLEVEL::action::noAction;

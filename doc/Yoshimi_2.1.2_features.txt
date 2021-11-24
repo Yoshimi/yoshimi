@@ -4,7 +4,7 @@ More small improvements and extensions.
 
 MIDI-learn had remained substantially unchanged since it was implemented in 2016. It's now been overhauled, as due to some internal changes the very oldest saved files could have been misread. This has now been resolved, and a degree of 'future proofing' has been achieved. There are also more controls that can be learned, with some learnable buttons given a pale blue surround (like the check boxes).
 
-PadSynth status can now be read by the CLI so as well as the " Need to Apply" warning when changing controls if you get distracted and want to check, "Read apply" while in the PadSynth context will make this clear. It is also a learnable control so it is now possible to change the harmonic content in a running project.
+PadSynth status can now be read by the CLI so as well as the " Need to Apply" warning when changing controls. This is useful if you get distracted and want to check. Just enter "Read apply" while in the PadSynth context to make this clear. It is also a learnable control so it is now possible to change the harmonic content in a running project.
 
 In the CLI as well as setting GUI/CLI saved status you can now read these without changing them.
 

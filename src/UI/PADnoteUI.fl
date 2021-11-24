@@ -1250,7 +1250,8 @@ class PADnoteUI {: {public PresetsUI_}
             break;
 
         case PADSYNTH::control::applyChanges:
-            applycolour(FL_GRAY);
+            if (lrint(value) == 1)
+                applycolour(FL_GRAY);
             break;
 
         case PADSYNTH::control::stereo:

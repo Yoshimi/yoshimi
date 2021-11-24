@@ -2336,10 +2336,13 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             case PADSYNTH::control::applyChanges:
             showValue = false;
             contstr = "Changes Applied ";
-            if (value_int != 0)
-                contstr += "Yes";
-            else
-                contstr += "No";
+            if (addValue)
+            {
+                if (value_int != 0)
+                    contstr += "Yes";
+                else
+                    contstr += "No";
+            }
             break;
     }
     if (!contstr.empty())
