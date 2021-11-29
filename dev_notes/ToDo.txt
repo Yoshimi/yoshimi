@@ -12,6 +12,7 @@ GUI Oddity. Press spacebar on startup and you disable part 1 AddSynth engine.
 From then on repeats the last action.
 
 Add which engines are enabled in CLI list part.
+In fact significantly re-write this!
 
 Revise GUI voice list related to voice editor.
 

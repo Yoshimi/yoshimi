@@ -236,7 +236,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1565,6 +1565,7 @@ Alan Calvert started the project}
         Fl_Button favecancel {
           label Back
           callback {//
+    fileroldpath->activate();
     filernewname->activate();
     fileruse->activate();
     filerback->activate();
@@ -1925,6 +1926,7 @@ Alan Calvert started the project}
   }
   Function {setfavourites()} {} {
     code {//
+    fileroldpath->deactivate();
     filernewname->deactivate();
     fileruse->deactivate();
     filerback->deactivate();

@@ -1,4 +1,10 @@
-yoshimi 2.1.2 rc2
+yoshimi 2.1.2
+
+2021-11-29 Will
+* Filer window path deactivated if in favourites.
+* Disabled difference reporting in midi learn.
+* Final doc and user guide updates.
+* Set release version 2.1.2
 
 2021-11-24 Will
 * Improved recognition of Apply Parameters from MIDI

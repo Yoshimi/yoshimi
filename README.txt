@@ -1,14 +1,23 @@
-Version 2.1.1
+Version 2.1.2
 
-This is a relatively minor update.
+More small improvements and extensions.
 
-Controllers and MIDI CCs windows now have separate buttons in the main window.
+Improvements to MIDI-learn, and better compatibility with the earliest versions.
 
-Instrument bank improvements give faster startup.
+CLI exensions:
+PadSynth status can be read.
+GUI status can be read.
+MIDI source and audio destination can be read.
 
-The switch for disabling 'Enable part on program change' has been removed.
+GUI clarity improvements.
 
-Further details in /doc/Yoshimi_2.1.1_features.txt
+Further revision and extension of the HTML user guide.
+
+Better actual sound conformity across distros/compliers.
+
+Bugfixes.
+
+Further details in /doc/Yoshimi_2.1.2_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

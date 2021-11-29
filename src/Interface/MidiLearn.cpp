@@ -20,7 +20,8 @@
 
 */
 
-#define newml YES
+#define NEWML YES
+//#define NEWML_REPORT YES
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
@@ -773,7 +774,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
 
     if (!ok)
         synth->getRuntime().Log("toGui buffer full!", _SYS_::LogNotSerious | _SYS_::LogError);
-#endif
+#endif // GUI_FLTK
 }
 
 
@@ -1030,10 +1031,11 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.frame.data.insert = xml->getpar255("Insert", 0);
                 entry.frame.data.parameter = xml->getpar255("Parameter", 0);
                 entry.frame.data.offset = xml->getpar255("Secondary_Parameter", 0);
-#ifdef newml
+#ifdef NEWML
                 CommandBlock allData;
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
+#ifdef NEWML_REPORT
                 if (ID == 0)
                     cout << endl;
                 cout << "line " << (ID + 1);
@@ -1052,7 +1054,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 if (allData.data.offset != entry.frame.data.offset)
                     cout << " changed offset Old " << int(entry.frame.data.offset) << " > " << int(allData.data.offset);
                 cout << endl;
-
+#endif // NEWML_REPORT
                 entry.frame.data.control = allData.data.control;
                 entry.frame.data.part = allData.data.part;
                 entry.frame.data.kit = allData.data.kit;
@@ -1060,7 +1062,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.frame.data.insert = allData.data.insert;
                 entry.frame.data.parameter = allData.data.parameter;
                 entry.frame.data.offset = allData.data.offset;
-#endif
+#endif // NEWML
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;

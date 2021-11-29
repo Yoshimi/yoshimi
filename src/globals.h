@@ -160,8 +160,9 @@ namespace _SYS_
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
     enum section : unsigned char {
-        part1 = 0,
-        part64 = 63,
+        part1 = 0,   // nothing must come
+        part64 = 63, // between these two
+
         copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8

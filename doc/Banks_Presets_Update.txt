@@ -2,11 +2,11 @@ Banks and Presets update
 
 Initially, existing users should see no difference, apart from a slightly quicker startup if they have a very large number of banks and roots. New users will see all the bank roots that Yoshimi can find, and this will include "$HOME/.local/share/yoshimi/found/" with "yoshimi/banks" and/or "zynaddsubfx/banks" if these are found in the default locations.
 
-Unlike the actual defaults, these will be editable. They are also kept up to date if any default ones are added to.
+Unlike the actual defaults, these will be editable. After first being copied they are NOT kept up to date if any default ones are added to. This is to protect any that you may have changed.
 
-This still happens for existing users, but these roots will not be shown in the roots list. Instead there will be a message informing you of this, and inviting you to add them to the Path, not add them, or ask again later.
+This is also the case for existing users the first time they see the new format, but these roots will not be shown in the roots list. Instead there will be a message informing you of this, and inviting you to A: add them to the Path,  B: not add them, C: ask again later.
 
-For all users if banks get added or removed by external means this will be reported, and the associated bank roots updated in the master file accordingly *without* disrupting any other banks and roots. Previously if new banks were seen as added externally the bank structure was regenerated, resulting in bank IDs changing - this could break old MIDI files that performed bank changes.
+For all users if any banks get added or removed by external means this will be reported, and the associated bank roots updated in the master file accordingly *without* disrupting any other banks and roots. Previously if new banks were seen as added externally the bank structure was regenerated, resulting in bank IDs changing - this could have broken old MIDI files that performed bank changes.
 
 
 There is a really strange anomaly where phantom empty banks sometimes get added to the first and/or the last bank root in the list. These are always at bank ID 0 - which should be impossible!
