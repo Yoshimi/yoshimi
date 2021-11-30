@@ -139,6 +139,7 @@ endif ()
 
 find_package (PkgConfig REQUIRED)
 
+find_package(Threads REQUIRED)
 
 check_c_source_compiles (
     "#include <argp.h>
@@ -435,6 +436,7 @@ set(ExternLibraries
     ${Readline_LIBRARY}
     ${ZLIB_LIBRARIES}
     ${LIBDL_LINUX}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
