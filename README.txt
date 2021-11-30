@@ -4,7 +4,7 @@ More small improvements and extensions.
 
 Improvements to MIDI-learn, and better compatibility with the earliest versions.
 
-CLI exensions:
+CLI extensions:
 PadSynth status can be read.
 GUI status can be read.
 MIDI source and audio destination can be read.

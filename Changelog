@@ -1,4 +1,9 @@
-yoshimi 2.1.2
+yoshimi 2.1.2.1
+
+2021-11-29 Will
+* BugFix: failed to link using recent cmake versions.
+  Thanks to David Runge for a timely fix.
+* set bugfix version 2.1.2.1
 
 2021-11-29 Will
 * Filer window path deactivated if in favourites.
