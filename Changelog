@@ -1,6 +1,11 @@
-yoshimi 2.1.2.1
+yoshimi 2.1.2.2
 
-2021-11-29 Will
+2021-12-3 Will
+* Includes compatibility fix for Clang compiler.
+* Set minimum C++ version to 14
+* set bugfix version 2.1.2.2
+
+2021-11-30 Will
 * BugFix: failed to link using recent cmake versions.
   Thanks to David Runge for a timely fix.
 * set bugfix version 2.1.2.1

@@ -27,8 +27,8 @@ endif () # opengl version
 if (POLICY CMP0072)
     cmake_policy (SET CMP0072 OLD)
 endif ()
-set (CMAKE_CXX_STANDARD 11) # we seem to need both for
-add_definitions(-std=gnu++11) # various versions of cmake
+set (CMAKE_CXX_STANDARD 14) # we seem to need both for
+add_definitions(-std=gnu++14) # various versions of cmake
 
 add_definitions(-Wall)
 
@@ -41,7 +41,7 @@ add_definitions(-Wall)
 #add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.1.2.1")
+set (YOSHIMI_VERSION "2.1.2.2")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=0)
