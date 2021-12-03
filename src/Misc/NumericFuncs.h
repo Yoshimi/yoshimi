@@ -93,13 +93,17 @@ namespace {
     template<unsigned int base, bool fraction=false>
     struct PowerFunction
     {
-        static constexpr float LN_BASE = log(fraction? 1.0/base : double(base));
+        static_assert(base > 0, "0^x is always zero");
 
         static float invoke(float exponent)
         {
             return expf(LN_BASE * exponent);
         }
+        static const float LN_BASE;
     };
+
+    template<unsigned int base, bool fraction>
+    const float PowerFunction<base,fraction>::LN_BASE = log(fraction? 1.0/base : double(base));
 }
 
 /* compute base^exponent for a fixed integral base */
