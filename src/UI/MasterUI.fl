@@ -3868,10 +3868,6 @@ Alan Calvert started the project}
   }
   decl {int CS_CC;} {private local
   }
-  decl {char word [20];} {private local
-  }
-  decl {FILE *windows;} {private local
-  }
   decl {string filename;} {private local
   }
   decl {int msgGroup;} {private local

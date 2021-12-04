@@ -42,7 +42,7 @@ class LFO
         float amplfoout(void);
     private:
         std::pair<float, float> getBpmFrac() {
-            return func::LFOfreqBPMFraction((float)lfopars->PfreqI / Fmul2I);
+            return func::LFOfreqBPMFraction((float)lfopars->PfreqI / float(Fmul2I));
         }
 
         LFOParams *lfopars;

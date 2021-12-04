@@ -148,8 +148,6 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
-  decl {SynthEngine *synth;} {private local
-  }
   decl {void (BankProcess_:: *fnc)(void);} {private local
   }
   decl {BankProcess_ *bp;} {private local
@@ -1716,12 +1714,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
   decl {int bankS;} {private local
   }
   decl {long selectedRootID;} {private local
-  }
-  decl {int EPCvalue;} {private local
-  }
-  decl {int BankRootvalue;} {private local
-  }
-  decl {int oldBank;} {private local
   }
   decl {int oldrootID;} {private local
   }

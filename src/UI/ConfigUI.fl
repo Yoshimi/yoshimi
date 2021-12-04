@@ -1450,8 +1450,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {int oldBank;} {private local
   }
-  decl {int oldrootID;} {private local
-  }
   decl {float confDW;} {private local
   }
   decl {float confDH;} {private local

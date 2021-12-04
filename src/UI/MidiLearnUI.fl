@@ -293,8 +293,6 @@ class MidiLearnKitItem {: {public Fl_Group}
   }
   decl {int n;} {private local
   }
-  decl {char label[50];} {private local
-  }
   decl {SynthEngine *synth;} {private local
   }
   decl {unsigned char stat;} {public local

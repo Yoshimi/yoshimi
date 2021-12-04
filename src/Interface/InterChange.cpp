@@ -5682,7 +5682,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             if(pars->Pbpm) // set a flag so CLI can read the status
                 getData->data.offset = 1;
             if (write)
-                pars->setPfreq(val * Fmul2I);
+                pars->setPfreq(val * float(Fmul2I));
             else
                 val = float(pars->PfreqI) / float(Fmul2I);
             break;

@@ -140,8 +140,8 @@ bool JackEngine::Start(void)
     internalbuff = synth->getRuntime().Buffersize;
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
-        if (jack_set_session_callback
-            && jack_set_session_callback(jackClient, _jsessionCallback, this))
+        //if (jack_set_session_callback &&
+        if(jack_set_session_callback(jackClient, _jsessionCallback, this))
             synth->getRuntime().Log("Set jack session callback failed");
     #endif
 

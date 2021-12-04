@@ -303,7 +303,7 @@ return(1);} {}
   }
   decl {EnvelopeParams *env;} {private local
   }
-  decl {int oldx,oldy;} {private local
+  decl {int oldx;} {private local
   }
   decl {int currentpoint,cpx,cpdt;} {private local
   }

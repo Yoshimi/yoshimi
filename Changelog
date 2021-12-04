@@ -1,4 +1,10 @@
-yoshimi 2.1.2.2
+yoshimi 2.1.2 M
+
+2021-12-4 Will
+In CMakeLists.txt:
+    * added (disabled) option to compile with Clang.
+    * added suppression of deprecation warning.
+Resolved warnings shown in Clang.
 
 2021-12-3 Will
 * Includes compatibility fix for Clang compiler.

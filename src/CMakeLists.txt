@@ -27,6 +27,9 @@ endif () # opengl version
 if (POLICY CMP0072)
     cmake_policy (SET CMP0072 OLD)
 endif ()
+
+#set(CMAKE_CXX_COMPILER "clang++")
+
 set (CMAKE_CXX_STANDARD 14) # we seem to need both for
 add_definitions(-std=gnu++14) # various versions of cmake
 
@@ -35,13 +38,14 @@ add_definitions(-Wall)
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
-#add_definitions(-Wfatal-errors) # stop on first
-#add_definitions(-Werror=format-security)
-#add_definitions(-Wextra)
-#add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
+add_definitions(-Wfatal-errors) # stop on first
+add_definitions(-Werror=format-security)
+add_definitions(-Wextra)
+add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
+add_definitions(-Wno-deprecated)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.1.2.2")
+set (YOSHIMI_VERSION "2.1.2 M")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=0)

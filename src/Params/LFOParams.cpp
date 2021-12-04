@@ -91,12 +91,12 @@ void LFOParams::setPfreq(int32_t n)
 
 void LFOParams::add2XML(XMLwrapper *xml)
 {
-    float freqF = float(PfreqI) / Fmul2I;
+    float freqF = float(PfreqI) / float(Fmul2I);
     if (Pbpm)
         // Save quantized, so that we can make the scale finer in the future, if
         // necessary.
         freqF = func::quantizedLFOfreqBPM(freqF);
-    xml->addpar("freqI", freqF * Fmul2I);
+    xml->addpar("freqI", freqF * float(Fmul2I));
     xml->addparreal("freq", freqF);
     xml->addpar("intensity", Pintensity);
     xml->addpar("start_phase", Pstartphase);
@@ -114,7 +114,7 @@ void LFOParams::getfromXML(XMLwrapper *xml)
 {
     //PfreqI = xml->getpar("freqI", -1, 0, Fmul2I);
     //if (PfreqI == -1)
-    PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * Fmul2I;
+    PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * float(Fmul2I);
     setPfreq(PfreqI);
 
     Pintensity = xml->getpar127("intensity", Pintensity);

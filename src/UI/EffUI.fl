@@ -187,7 +187,7 @@ eff = eff_;
             freq = 0.00001;
         return logf(freq / 20.0) / logf(1000.0);} {}
   }
-  decl {int oldx,oldy;} {private local
+  decl {int oldx;} {private local
   }
   decl {float khzval;} {public local
   }
