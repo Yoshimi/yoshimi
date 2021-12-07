@@ -2064,7 +2064,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine >= PART::engine::addVoice1)
     {
-        if ((engine > PART::engine::addVoice8 && engine < PART::engine::addMod1) || engine > PART::engine::addMod8)
+        if ( engine >= PART::engine::addVoiceModEnd)
         {
             getData->data.source = TOPLEVEL::action::noAction;
             synth->getRuntime().Log("Invalid voice number");
@@ -6655,7 +6655,7 @@ float InterChange::returnLimits(CommandBlock *getData)
 
         if ((insert == TOPLEVEL::insert::kitGroup || insert == UNUSED) && parameter == UNUSED && miscmsg == UNUSED)
         {
-            if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine <= PART::engine::addMod8))
+            if (engine == PART::engine::addSynth || (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;

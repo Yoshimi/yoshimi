@@ -677,22 +677,9 @@ namespace PART // usage PART::control::volume
         padSynth,
 
     // addVoice and addMod must be consecutive
-        addVoice1 = 128,
-        addVoice2,
-        addVoice3,
-        addVoice4,
-        addVoice5,
-        addVoice6,
-        addVoice7,
-        addVoice8,
-        addMod1 = 192,
-        addMod2,
-        addMod3,
-        addMod4,
-        addMod5,
-        addMod6,
-        addMod7,
-        addMod8
+        addVoice1 = NUM_VOICES,
+        addMod1 = addVoice1 + NUM_VOICES,
+        addVoiceModEnd = addMod1 + NUM_VOICES
     };
 
     namespace aftertouchType {

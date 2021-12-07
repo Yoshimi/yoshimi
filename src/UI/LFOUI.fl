@@ -112,7 +112,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label Depth
           callback {//
           int depth = lrint(o->value());
-          if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8 && group == 1) // special case to sync voice list vibrato
+          if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && group == 1) // special case to sync voice list vibrato
               synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(depth);
           send_data(0, group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -249,7 +249,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
 
         case LFOINSERT::control::depth:
             intensity->value(value);
-            if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8 && par == 1) // rather special to sync voice list vibrato
+            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && par == 1) // rather special to sync voice list vibrato
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(value);
             break;
 

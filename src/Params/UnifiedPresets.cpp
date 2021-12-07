@@ -35,7 +35,7 @@ string UnifiedPresets::findSectionName(CommandBlock *getData)
     if (insert != UNUSED) // temp!
         return name;
 
-    if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
     {
         string name = "VOICE id=\"" + std::to_string(int(engine - PART::engine::addVoice1)) + "\"";
         return name;
@@ -66,7 +66,7 @@ string UnifiedPresets::findleafExtension(CommandBlock *getData)
     if (insert != UNUSED) // temp!
         return name;
 
-    if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
         return "addsythn"; // all voices have the same extension
     switch (engine)
     {

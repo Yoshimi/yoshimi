@@ -1227,7 +1227,7 @@ o->hide();} open
         {
             tname = "AddSynth Voice ";
             int sourceEngine = -1;
-            if (engine <= PART::engine::addVoice8)
+            if (engine < PART::engine::addMod1)
             {
                 tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
                 sourceEngine = fetchData(0, ADDVOICE::control::voiceOscillatorSource,npart,kititem, engine);

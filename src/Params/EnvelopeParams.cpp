@@ -307,9 +307,9 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
     int engine = getData->data.engine;
-    if (engine >= PART::engine::addMod1 && engine <= PART::engine::addMod8)
+    if (engine >= PART::engine::addMod1 && engine < PART::engine::addVoiceModEnd)
         engine = PART::engine::addMod1;
-    else if (engine >= PART::engine::addVoice1 && engine <= PART::engine::addVoice8)
+    else if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
         engine = PART::engine::addVoice1;
     int parameter = getData->data.parameter;
 
