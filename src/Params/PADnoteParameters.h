@@ -153,7 +153,10 @@ class PADnoteParameters : public Presets
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
         unsigned char Papplied;
+        bool Pbuilding;
+        bool Pready;
         void applyparameters(void);
+        void activate_wavetable(void);
         bool export2wav(std::string basefilename);
 
         OscilParameters *POscil;
@@ -164,7 +167,7 @@ class PADnoteParameters : public Presets
             int size;
             float basefreq;
             float *smp;
-        } sample[PAD_MAX_SAMPLES], newsample;
+        } sample[PAD_MAX_SAMPLES], tempsample[PAD_MAX_SAMPLES], newsample;
 
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,
@@ -176,6 +179,7 @@ class PADnoteParameters : public Presets
                                          float basefreq);
         void deletesamples(void);
         void deletesample(int n);
+        void deletetempsample(int n);
 
         FFTwrapper *fft;
 };

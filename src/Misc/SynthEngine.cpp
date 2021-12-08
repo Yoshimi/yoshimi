@@ -2101,6 +2101,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             if (partLocal[npart])
             {
+                for(int kititem = 0; kititem < NUM_KIT_ITEMS; ++kititem)
+                {
+                    if (!part[npart]->kit[kititem].padpars)
+                        continue;
+                    if (part[npart]->kit[kititem].padpars->Pready)
+                        part[npart]->kit[kititem].padpars->activate_wavetable();
+                }
                 legatoPart = npart;
                 part[npart]->ComputePartSmps();
             }

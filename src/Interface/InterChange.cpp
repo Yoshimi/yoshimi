@@ -865,7 +865,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            synth->partonoffWrite(partnum, -1);
+            //synth->partonoffWrite(partnum, -1);
             setpadparams(partnum, kititem);
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
@@ -1943,13 +1943,20 @@ void InterChange::returns(CommandBlock *getData)
 }
 
 
+void InterChange::padparamsthread(int npart, int kititem)
+{
+    synth->part[npart]->kit[kititem].padpars->Pbuilding = true;
+    synth->part[npart]->kit[kititem].padpars->applyparameters();
+}
+
+
 void InterChange::setpadparams(int npart, int kititem)
 {
-    synth->part[npart]->busy = true;
     if (synth->part[npart]->kit[kititem].padpars != NULL)
-        synth->part[npart]->kit[kititem].padpars->applyparameters();
-    synth->part[npart]->busy = false;
-    synth->partonoffWrite(npart, 2);
+    {
+        std::thread th(&InterChange::padparamsthread, this, npart, kititem);
+        th.detach();
+    }
 }
 
 
@@ -3565,7 +3572,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->kit[kititem].Ppadenabled = value_bool;
                 if (!part->kit[kititem].padpars->Papplied)
                 {
-                    synth->partonoffWrite(npart, -1);
+                    //synth->partonoffWrite(npart, -1);
                     getData->data.source = TOPLEVEL::action::lowPrio;
                 }
             }
@@ -5411,7 +5418,7 @@ void InterChange::commandPad(CommandBlock *getData)
             { // this control is 'expensive' only used if necessary
                 if (!pars->Papplied)
                 {
-                    synth->partonoffWrite(npart, -1);
+                    //synth->partonoffWrite(npart, -1);
                     getData->data.source = TOPLEVEL::action::lowPrio;
                     getData->data.value = 1;
                 }

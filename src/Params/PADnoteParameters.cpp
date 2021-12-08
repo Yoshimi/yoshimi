@@ -26,6 +26,7 @@
 */
 
 #include <memory>
+#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
@@ -157,13 +158,25 @@ void PADnoteParameters::defaults(void)
     FilterLfo->defaults();
     deletesamples();
     Papplied = 0;
+    Pbuilding = false;
+    Pready = false;
+}
+
+
+void PADnoteParameters::deletetempsample(int n)
+{
+    if (sample[n].smp != NULL)
+    {
+        delete [] sample[n].smp;
+        sample[n].smp = NULL;
+    }
+    sample[n].size = 0;
+    sample[n].basefreq = 440.0f;
 }
 
 
 void PADnoteParameters::deletesample(int n)
 {
-    if (n < 0 || n >= PAD_MAX_SAMPLES)
-        return;
     if (sample[n].smp != NULL)
     {
         delete [] sample[n].smp;
@@ -665,18 +678,26 @@ void PADnoteParameters::applyparameters()
             newsample.smp[i + samplesize] = newsample.smp[i];
 
         // replace the current sample with the new computed sample
-        deletesample(nsample);
-        sample[nsample].smp = newsample.smp;
-        sample[nsample].size = samplesize;
-        sample[nsample].basefreq = basefreq * basefreqadjust;
+        tempsample[nsample].smp = newsample.smp;
+        tempsample[nsample].size = samplesize;
+        tempsample[nsample].basefreq = basefreq * basefreqadjust;
         newsample.smp = NULL;
     }
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
+        deletetempsample(i);
+    Pready = true;
+}
+
+
+void PADnoteParameters::activate_wavetable()
+{
+    deletesamples();
+    std::swap(sample, tempsample);
     Papplied = 1;
+    Pready = false;
 }
 
 
