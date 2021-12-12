@@ -4793,6 +4793,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     {
         value = 1;
         cmd = PADSYNTH::control::applyChanges;
+
     }
 
     if (cmd > -1)

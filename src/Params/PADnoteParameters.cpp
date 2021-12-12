@@ -26,6 +26,7 @@
 */
 
 #include <memory>
+#include <unistd.h>
 #include <iostream>
 
 #include "Misc/XMLwrapper.h"
@@ -70,7 +71,10 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
     FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
+    {
         sample[i].smp = NULL;
+        tempsample[i].smp = NULL;
+    }
     newsample.smp = NULL;
     defaults();
 }
@@ -79,6 +83,7 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
 PADnoteParameters::~PADnoteParameters()
 {
     deletesamples();
+    deletetempsamples();
     delete oscilgen;
     delete POscil;
     delete resonance;
@@ -157,7 +162,8 @@ void PADnoteParameters::defaults(void)
     FilterEnvelope->defaults();
     FilterLfo->defaults();
     deletesamples();
-    Papplied = 0;
+    deletetempsamples();
+    Papplied = false;
     Pbuilding = false;
     Pready = false;
 }
@@ -165,13 +171,13 @@ void PADnoteParameters::defaults(void)
 
 void PADnoteParameters::deletetempsample(int n)
 {
-    if (sample[n].smp != NULL)
+    if (tempsample[n].smp != NULL)
     {
-        delete [] sample[n].smp;
-        sample[n].smp = NULL;
+        delete [] tempsample[n].smp;
+        tempsample[n].smp = NULL;
     }
-    sample[n].size = 0;
-    sample[n].basefreq = 440.0f;
+    tempsample[n].size = 0;
+    tempsample[n].basefreq = 440.0f;
 }
 
 
@@ -184,6 +190,13 @@ void PADnoteParameters::deletesample(int n)
     }
     sample[n].size = 0;
     sample[n].basefreq = 440.0f;
+}
+
+
+void PADnoteParameters::deletetempsamples(void)
+{
+    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
+        deletetempsample(i);
 }
 
 
@@ -600,6 +613,10 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 // Applies the parameters (i.e. computes all the samples, based on parameters);
 void PADnoteParameters::applyparameters()
 {
+    while(Pbuilding)
+        usleep(200); // it's already busy!
+    Papplied = false;
+    Pbuilding = true;
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
     // spectrumsize can be quite large (up to 2MiB) and this is not a hot
@@ -626,6 +643,11 @@ void PADnoteParameters::applyparameters()
         samplemax = samplemax / 2 + 1;
     if (samplemax == 0)
         samplemax = 1;
+    if (!Pbuilding)
+    {
+        std::cout << "not building 1" << std::endl;
+        return;
+    }
 
     // prepare a BIG FFT stuff
     FFTwrapper fft = FFTwrapper(samplesize);
@@ -658,6 +680,13 @@ void PADnoteParameters::applyparameters()
             float phase = synth->numRandom() * 6.29f;
             fftfreqs.c[i] = spectrum[i] * cosf(phase);
             fftfreqs.s[i] = spectrum[i] * sinf(phase);
+            if (!Pbuilding)
+            {
+                std::cout << "not building 2" << std::endl;
+                if (newsample.smp)
+                    delete newsample.smp;
+                return;
+            }
         }
         fft.freqs2smps(&fftfreqs, newsample.smp);
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
@@ -665,7 +694,16 @@ void PADnoteParameters::applyparameters()
         // normalize(rms)
         float rms = 0.0;
         for (int i = 0; i < samplesize; ++i)
+        {
             rms += newsample.smp[i] * newsample.smp[i];
+            if (!Pbuilding)
+            {
+                std::cout << "not building 3" << std::endl;
+                if (newsample.smp)
+                    delete newsample.smp;
+                return;
+            }
+        }
         rms = sqrtf(rms);
         if (rms < 0.000001)
             rms = 1.0;
@@ -682,22 +720,28 @@ void PADnoteParameters::applyparameters()
         tempsample[nsample].size = samplesize;
         tempsample[nsample].basefreq = basefreq * basefreqadjust;
         newsample.smp = NULL;
+        if (!Pbuilding)
+        {
+            std::cout << "not building 4" << std::endl;
+            return;
+        }
     }
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletetempsample(i);
+    std::cout << "normal exit" << std::endl;
     Pready = true;
 }
 
 
 void PADnoteParameters::activate_wavetable()
 {
-    deletesamples();
-    std::swap(sample, tempsample);
-    Papplied = 1;
     Pready = false;
+    std::swap(sample, tempsample);
+    Papplied = true;
+    Pbuilding = false;
 }
 
 

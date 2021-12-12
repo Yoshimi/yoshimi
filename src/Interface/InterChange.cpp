@@ -865,7 +865,6 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            //synth->partonoffWrite(partnum, -1);
             setpadparams(partnum, kititem);
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
@@ -1945,13 +1944,16 @@ void InterChange::returns(CommandBlock *getData)
 
 void InterChange::padparamsthread(int npart, int kititem)
 {
-    synth->part[npart]->kit[kititem].padpars->Pbuilding = true;
     synth->part[npart]->kit[kititem].padpars->applyparameters();
+    while (synth->part[npart]->kit[kititem].padpars->Pbuilding)
+        usleep(100);
+    synth->part[npart]->kit[kititem].padpars->deletetempsamples();
 }
 
 
 void InterChange::setpadparams(int npart, int kititem)
 {
+    cout << "setting params" << endl;
     if (synth->part[npart]->kit[kititem].padpars != NULL)
     {
         std::thread th(&InterChange::padparamsthread, this, npart, kititem);
@@ -2122,7 +2124,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine == PART::engine::subSynth)
         return processSub(getData, synth);
-
     if (engine == PART::engine::padSynth)
         return processPad(getData, synth);
 
@@ -2329,9 +2330,10 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
             needApply = true;
             break;
     }
-    if (needApply)
+    if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
-        part->kit[kititem].padpars->Papplied = 0;
+        part->kit[kititem].padpars->Papplied = false;
+        part->kit[kititem].padpars->Pbuilding = false;
         getData->data.offset = 0;
     }
     return true;
@@ -3567,14 +3569,11 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->kit[kititem].Psubenabled;
             break;
         case PART::control::enablePad:
-            if (write)
+            if (write && !part->kit[kititem].Ppadenabled)
             {
                 part->kit[kititem].Ppadenabled = value_bool;
                 if (!part->kit[kititem].padpars->Papplied)
-                {
-                    //synth->partonoffWrite(npart, -1);
                     getData->data.source = TOPLEVEL::action::lowPrio;
-                }
             }
             else
                 value = part->kit[kititem].Ppadenabled;
@@ -5416,9 +5415,9 @@ void InterChange::commandPad(CommandBlock *getData)
         case PADSYNTH::control::applyChanges:
             if (write && value >= 0.5f)
             { // this control is 'expensive' only used if necessary
-                if (!pars->Papplied)
+                if (!pars->Papplied  && !pars->Pbuilding)
                 {
-                    //synth->partonoffWrite(npart, -1);
+                    cout << "applying params" << endl;
                     getData->data.source = TOPLEVEL::action::lowPrio;
                     getData->data.value = 1;
                 }
@@ -5470,7 +5469,11 @@ void InterChange::commandPad(CommandBlock *getData)
 
     if (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::applyChanges)
     {
-        pars->Papplied = 0;
+        if (write)
+        {
+            pars->Papplied = false;
+            pars->Pbuilding = false;
+        }
         getData->data.offset = 0;
     }
     if (!write)

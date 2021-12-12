@@ -1257,16 +1257,17 @@ o->hide();} open
         }
         osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }
-  Function {redrawoscil()} {} {
+  Function {redrawoscil()} {open
+  } {
     code {//
     waveformgroup->redraw();
     harmonicgroup->redraw();
     oldosc->redraw();
     if (cbwidget!=NULL) {
         cbwidget->do_callback();
-        //applybutton->color(FL_RED);
-        //applybutton->redraw();
-};} {}
+;
+};} {selected
+    }
   }
   Function {waveRtext()} {} {
     code {//

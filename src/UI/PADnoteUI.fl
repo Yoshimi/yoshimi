@@ -411,7 +411,8 @@ class PADnoteUI {: {public PresetsUI_}
             callback {//
             resui->resonancewindow->redraw();
             resui->Show();
-            resui->setcbwidget(cbwidget, applybutton);
+            resui->applybox->show();
+            resui->applybutton->show();
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             xywh {425 225 85 25} box THIN_UP_BOX labelfont 1 labelsize 12

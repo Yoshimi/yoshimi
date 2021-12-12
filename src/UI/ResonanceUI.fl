@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>} {public local
@@ -271,11 +271,6 @@ class ResonanceGraph {: {public Fl_Box}
 
     return(1);} {}
   }
-  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *applybutton)} {} {
-    code {//
-    this->cbwidget=cbwidget;
-    this->applybutton=applybutton;} {}
-  }
   decl {Fl_Value_Output *khzvalue;} {private local
   }
   decl {Fl_Value_Output *dbvalue;} {private local
@@ -511,7 +506,6 @@ class ResonanceUI {: PresetsUI_
     if (eng != engine)
         return;
 
-    bool set = true;
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
         rg->draw();
@@ -571,16 +565,7 @@ class ResonanceUI {: PresetsUI_
             case RESONANCE::control::smoothGraph:
                 resonancewindow->redraw();
                 break;
-
-            default:
-                set = false;
         }
-    }
-
-    if (set)
-    {
-        if (eng == PART::engine::padSynth)
-            redrawPADnoteApply();
     }} {}
   }
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {
@@ -590,8 +575,6 @@ class ResonanceUI {: PresetsUI_
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
-    cbwidget = NULL;
-    cbapplywidget = NULL;
     make_window();
     resSeen = false;
     applybox->hide();
@@ -606,22 +589,8 @@ class ResonanceUI {: PresetsUI_
     resSeen = false;
     resonancewindow->hide();} {}
   }
-  Function {redrawPADnoteApply()} {} {
-    code {if (cbwidget!=NULL) {
-    cbwidget->do_callback();
-};} {}
-  }
-  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *cbapplywidget)} {} {
-    code {//
-    this->cbwidget = cbwidget;
-    this->cbapplywidget = cbapplywidget;
-    rg->setcbwidget(cbwidget, applybutton);
-    applybox->show();
-    applybutton->show();} {}
-  }
   Function {refresh()} {} {
     code {//
-    redrawPADnoteApply();
     if (_SYS_::F2B(respar->Penabled))
     {
         enabled->value(1);
@@ -705,8 +674,6 @@ class ResonanceUI {: PresetsUI_
   decl {Resonance *respar;} {public local
   }
   decl {ResonanceGraph *rg;} {private local
-  }
-  decl {Fl_Widget *cbwidget,*cbapplywidget;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

@@ -152,7 +152,7 @@ class PADnoteParameters : public Presets
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
-        unsigned char Papplied;
+        bool Papplied;
         bool Pbuilding;
         bool Pready;
         void applyparameters(void);
@@ -168,6 +168,7 @@ class PADnoteParameters : public Presets
             float basefreq;
             float *smp;
         } sample[PAD_MAX_SAMPLES], tempsample[PAD_MAX_SAMPLES], newsample;
+        void deletetempsamples(void);
 
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,
