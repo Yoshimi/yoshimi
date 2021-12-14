@@ -234,7 +234,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
             // show maxdB
             static char tmpstr[8];
             const char *dbtag = "dB";
-            
+
             if ((maxdbl > NO_DB))
             {
                 fl_font(FL_HELVETICA | FL_BOLD, 9);
@@ -260,7 +260,8 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
     int lx = w()-4;
     int ly = h()-4;
     int mid = (w() / 2) - 2;
-    float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart);
+    int actualpart = npart + *plgroup;
+    float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart);
     if (Vpeak < 0) // its inactive
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);
@@ -270,7 +271,7 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
 
         if (Vpeak > 1.0f)
         {
-            panelpart.clip[npart] = true;
+            panelpart.clip[actualpart] = true;
             if (Vpeak > 1.5f)
                 Vpeak = 1.0f;
         }
@@ -280,23 +281,23 @@ class VUMeter {: {public Fl_Box, private GuiUpdates}
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
-        panelpart.oldpeak[npart] = int(db);
+        panelpart.oldpeak[actualpart] = int(db);
         fl_rectf(ox, oy,mid, ly, 0, 0, 0);
-        fl_rectf(ox, oy + ly - panelpart.oldpeak[npart], mid, panelpart.oldpeak[npart], 0, 200, 255);
-        if (panelpart.clip[npart])
+        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart], 0, 200, 255);
+        if (panelpart.clip[actualpart])
             fl_rectf(ox, oy, mid, 4, 255, 0, 0);
 
-        Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, npart, 1);
+        Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart, 1);
         if (Vpeak > 1.0)
-            panelpart.clipR[npart] = true;
+            panelpart.clipR[actualpart] = true;
         db = asDecibel(Vpeak);
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
-        panelpart.oldpeakR[npart] = int(db);
+        panelpart.oldpeakR[actualpart] = int(db);
         fl_rectf(ox + mid, oy,lx - mid, ly, 0, 0, 0);
-        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[npart], lx - mid, panelpart.oldpeakR[npart], 0, 200, 255);
-        if (panelpart.clipR[npart])
+        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart], 0, 200, 255);
+        if (panelpart.clipR[actualpart])
             fl_rectf(ox + mid, oy, lx - mid, 4, 255, 0, 0);
 
         // draw the scales
