@@ -195,6 +195,27 @@ void *InterChange::sortResultsThread(void)
                 resolveReplies(&getData);
         }
             usleep(80); // actually gives around 120 uS
+
+        // experimental auto apply - not stable with big wavetables
+        /*if ((tick & 0x7ff) == 1) // don't want these coming too fast!
+        {
+            for(int i = 0; i < synth->getRuntime().NumAvailableParts; ++i)
+            {
+                if (synth->part[i]->Penabled)
+                {
+                    int npart = i;
+                    for(int j = 0; j < NUM_KIT_ITEMS; ++j)
+                    {
+                        int kititem = j;
+                        if (synth->part[npart]->kit[kititem].Ppadenabled)
+                        {
+                            if (!synth->part[npart]->kit[kititem].padpars->Papplied && ! synth->part[npart]->kit[kititem].padpars->Pbuilding)
+                            setpadparams(npart, kititem);
+                        }
+                    }
+                }
+            }
+        }*/
     }
     return NULL;
 }
