@@ -684,7 +684,11 @@ void PADnoteParameters::applyparameters()
             {
                 std::cout << "not building 2" << std::endl;
                 if (newsample.smp)
+                {
                     delete newsample.smp;
+                    newsample.smp = NULL;
+                }
+                FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
         }
@@ -700,7 +704,11 @@ void PADnoteParameters::applyparameters()
             {
                 std::cout << "not building 3" << std::endl;
                 if (newsample.smp)
+                {
                     delete newsample.smp;
+                    newsample.smp = NULL;
+                }
+                FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
         }

@@ -156,6 +156,7 @@ class Config
         bool          singlePath;
         bool          banksChecked;
         unsigned char panLaw;
+        bool          autoPadsynth;
         bool          configChanged;
 
         int           rtprio;

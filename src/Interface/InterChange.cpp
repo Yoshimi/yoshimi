@@ -196,8 +196,18 @@ void *InterChange::sortResultsThread(void)
         }
             usleep(80); // actually gives around 120 uS
 
-        // experimental auto apply - not stable with big wavetables
-        /*if ((tick & 0x7ff) == 1) // don't want these coming too fast!
+        /*
+         * Experimental auto apply - not stable with big wavetables
+         * This limits the rate at which parameters will be applied,
+         * and also spreads different padsynth instances through this
+         * range to reduce the chance of several threads running at
+         * the same time.
+         * The offset also reduces the likelihood of the thread calls
+         * being made at the same time as other operations.
+         */
+        const unsigned int granularity = 1023; // must be (power of 2) - 1
+        const int stepsize = int(granularity / 97);
+        if (synth->getRuntime().autoPadsynth)
         {
             for(int i = 0; i < synth->getRuntime().NumAvailableParts; ++i)
             {
@@ -209,13 +219,16 @@ void *InterChange::sortResultsThread(void)
                         int kititem = j;
                         if (synth->part[npart]->kit[kititem].Ppadenabled)
                         {
-                            if (!synth->part[npart]->kit[kititem].padpars->Papplied && ! synth->part[npart]->kit[kititem].padpars->Pbuilding)
-                            setpadparams(npart, kititem);
+                            if (int(tick & granularity) == stepsize +(stepsize * npart * kititem))
+                            {
+                                if (!synth->part[npart]->kit[kititem].padpars->Papplied && ! synth->part[npart]->kit[kititem].padpars->Pbuilding)
+                                    setpadparams(npart, kititem);
+                            }
                         }
                     }
                 }
             }
-        }*/
+        }
     }
     return NULL;
 }
@@ -3590,7 +3603,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->kit[kititem].Psubenabled;
             break;
         case PART::control::enablePad:
-            if (write && !part->kit[kititem].Ppadenabled)
+            if (write && (part->kit[kititem].Ppadenabled != value_bool))
             {
                 part->kit[kititem].Ppadenabled = value_bool;
                 if (!part->kit[kititem].padpars->Papplied)
