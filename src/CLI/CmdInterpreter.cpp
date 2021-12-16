@@ -4793,6 +4793,8 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     {
         value = 1;
         cmd = PADSYNTH::control::applyChanges;
+        if(input.matchnMove(5, "force"))
+           return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, UNUSED, 0);
 
     }
 

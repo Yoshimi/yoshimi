@@ -611,10 +611,11 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters()
+void PADnoteParameters::applyparameters(bool force)
 {
     while(Pbuilding)
         usleep(200); // it's already busy!
+    deletetempsamples(); // just in case!
     Papplied = false;
     Pbuilding = true;
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
@@ -740,7 +741,16 @@ void PADnoteParameters::applyparameters()
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletetempsample(i);
     std::cout << "normal exit" << std::endl;
-    Pready = true;
+    if (force)
+    {
+        activate_wavetable();
+        std::cout << "forced apply" << std::endl;
+    }
+    else
+        Pready = true;
+    while (Pbuilding | Pready)
+        usleep(100);
+    deletetempsamples();
 }
 
 
@@ -1079,7 +1089,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
-    applyparameters();
+    applyparameters(true);
 }
 
 

@@ -556,7 +556,7 @@ void SynthEngine::setReproducibleState(int seed)
                         part[p]->busy = true;
                         kitItem.padpars->oscilgen->reseed(randomINT());
                         // rebuild PADSynth wavetable with new randseed
-                        kitItem.padpars->applyparameters();
+                        kitItem.padpars->applyparameters(true);
                         part[p]->busy = false;
                     }
             }
