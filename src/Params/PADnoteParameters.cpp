@@ -27,6 +27,7 @@
 
 #include <memory>
 #include <unistd.h>
+#include <thread>
 #include <iostream>
 
 #include "Misc/XMLwrapper.h"
@@ -610,6 +611,20 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 }
 
 
+void PADnoteParameters::setpadparams(bool force)
+{
+    std::cout << "setting params" << std::endl;
+    std::thread th(&PADnoteParameters::padparamsthread, this, force);
+    th.detach();
+}
+
+
+void PADnoteParameters::padparamsthread(bool force)
+{
+    applyparameters(force);
+}
+
+
 // Applies the parameters (i.e. computes all the samples, based on parameters);
 void PADnoteParameters::applyparameters(bool force)
 {
@@ -1089,6 +1104,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
+    //setpadparams(false);
     applyparameters(true);
 }
 

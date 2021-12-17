@@ -155,6 +155,8 @@ class PADnoteParameters : public Presets
         bool Papplied;
         bool Pbuilding;
         bool Pready;
+        void setpadparams(bool force);
+        void padparamsthread(bool force);
         void applyparameters(bool force);
         void activate_wavetable(void);
         bool export2wav(std::string basefilename);

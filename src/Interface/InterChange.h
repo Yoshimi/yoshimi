@@ -81,8 +81,6 @@ class InterChange : private DataText
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
         void returns(CommandBlock *getData);
-        void padparamsthread(int npart, int kititem, bool force = false);
-        void setpadparams(int npart, int kititem, bool force);
         void doClearPart(int npart);
         bool commandSend(CommandBlock *getData);
         float readAllData(CommandBlock *getData);

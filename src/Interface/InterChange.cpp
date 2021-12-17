@@ -222,7 +222,7 @@ void *InterChange::sortResultsThread(void)
                             if (int(tick & granularity) == stepsize +(stepsize * npart * kititem))
                             {
                                 if (!synth->part[npart]->kit[kititem].padpars->Papplied && ! synth->part[npart]->kit[kititem].padpars->Pbuilding)
-                                    setpadparams(npart, kititem, false);
+                                    synth->part[npart]->kit[kititem].padpars->setpadparams(false);
                             }
                         }
                     }
@@ -899,7 +899,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            setpadparams(partnum, kititem, false);
+            synth->part[partnum]->kit[kititem].padpars->setpadparams(false);
             while (!synth->part[partnum]->kit[kititem].padpars->Papplied)
                 usleep(100);
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
@@ -1518,14 +1518,14 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
                 int temp = kititem;
                 if (temp >= NUM_KIT_ITEMS)
                     temp = 0;
-                setpadparams(npart, temp, (parameter == 0));
+                synth->part[npart]->kit[temp].padpars->setpadparams((parameter == 0));
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
             break;
         case PART::control::padsynthParameters:
             if (write)
             {
-                setpadparams(npart, kititem, (parameter == 0));
+                synth->part[npart]->kit[kititem].padpars->setpadparams((parameter == 0));
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
             else
@@ -1975,23 +1975,6 @@ void InterChange::returns(CommandBlock *getData)
     }
     if (!decodeLoopback.write(getData->bytes))
         synth->getRuntime().Log("Unable to write to decodeLoopback buffer");
-}
-
-
-void InterChange::padparamsthread(int npart, int kititem, bool force)
-{
-    synth->part[npart]->kit[kititem].padpars->applyparameters(force);
-}
-
-
-void InterChange::setpadparams(int npart, int kititem, bool force)
-{
-    cout << "setting params" << endl;
-    if (synth->part[npart]->kit[kititem].padpars != NULL)
-    {
-        std::thread th(&InterChange::padparamsthread, this, npart, kititem, force);
-        th.detach();
-    }
 }
 
 
