@@ -53,7 +53,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     pars(parameters),
     firsttime(true),
     released(false),
-    nsample(0),
+    tableNr(0),
     portamento(portamento_),
     midinote(midinote_),
     ctl(ctl_),
@@ -112,9 +112,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         * NoteGlobalPar.AmpEnvelope->envout_dB()
         * NoteGlobalPar.AmpLfo->amplfoout();
 
-    int size = pars->sample[nsample].size;
-    if (size == 0)
-        size = 1;
+    size_t size = pars->waveTable.tableSize;
+    assert(size > 0);
 
     poshi_l = int(synth->numRandom() * (size - 1));
     if (pars->PStereo != 0)
@@ -123,7 +122,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         poshi_r = poshi_l;
     poslo = 0.0f;
 
-    if (parameters->sample[nsample].smp == NULL)
+    if (tableNr >= parameters->waveTable.numTables)
     {
         NoteStatus = NOTE_DISABLED;
     }
@@ -144,7 +143,7 @@ PADnote::PADnote(const PADnote &orig) :
     OffsetHz(orig.OffsetHz),
     firsttime(orig.firsttime),
     released(orig.released),
-    nsample(orig.nsample),
+    tableNr(orig.tableNr),
     portamento(orig.portamento),
     midinote(orig.midinote),
     ctl(orig.ctl),
@@ -185,7 +184,7 @@ PADnote::PADnote(const PADnote &orig) :
 
 void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
 {
-    if (pars->sample[nsample].smp == NULL)
+    if (tableNr >= pars->waveTable.numTables)
     {
         NoteStatus = NOTE_DISABLED;
         return;
@@ -226,7 +225,7 @@ void PADnote::legatoFadeOut(const PADnote &orig)
     OffsetHz = orig.OffsetHz;
     firsttime = orig.firsttime;
     released = orig.released;
-    nsample = orig.nsample;
+    tableNr = orig.tableNr;
     portamento = orig.portamento;
     globaloldamplitude = orig.globaloldamplitude;
     globalnewamplitude = orig.globalnewamplitude;
@@ -336,18 +335,17 @@ void PADnote::computeNoteParameters()
 
     // find out the closest note
     float logfreq = logf(basefreq * power<2>(NoteGlobalPar.Detune / 1200.0f));
-    float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
-    nsample = 0;
-    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
+    float mindist = fabsf(logfreq - logf(pars->waveTable.basefreq[0] + 0.0001f));
+    tableNr = 0;
+    // Note: even when empty(silent), tableNr.0 has always a usable basefreq
+    for (size_t tab = 1; tab < pars->waveTable.numTables; ++tab)
     {
-        if (pars->sample[i].smp == NULL)
-            break;
-        float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001f));
+        float dist = fabsf(logfreq - logf(pars->waveTable.basefreq[tab] + 0.0001f));
 //	printf("(mindist=%g) %i %g                  %g\n",mindist,i,dist,pars->sample[i].basefreq);
 
         if (dist < mindist)
         {
-            nsample = i;
+            tableNr = tab;
             mindist = dist;
         }
     }
@@ -410,13 +408,13 @@ void PADnote::computecurrentparameters()
 
 int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
 {
-    float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
+    if (tableNr >= pars->waveTable.numTables)
     {
         NoteStatus = NOTE_DISABLED;
         return 1;
     }
-    int size = pars->sample[nsample].size;
+    int size = pars->waveTable.tableSize;
+    float *smps = pars->waveTable[tableNr];
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         poshi_l += freqhi;
@@ -441,13 +439,13 @@ int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
 
 int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
 {
-    float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
+    if (tableNr >= pars->waveTable.numTables)
     {
         NoteStatus = NOTE_DISABLED;
         return 1;
     }
-    int size = pars->sample[nsample].size;
+    int size = pars->waveTable.tableSize;
+    float *smps = pars->waveTable[tableNr];
     float xm1, x0, x1, x2, a, b, c;
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
@@ -494,14 +492,13 @@ int PADnote::noteout(float *outl,float *outr)
         computeNoteParameters();
 
     computecurrentparameters();
-    float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
+    if (tableNr >= pars->waveTable.numTables)
     {
         memset(outl, 0, synth->sent_buffersize * sizeof(float));
         memset(outr, 0, synth->sent_buffersize * sizeof(float));
         return 1;
     }
-    float smpfreq = pars->sample[nsample].basefreq;
+    float smpfreq = pars->waveTable.basefreq[tableNr];
 
     float freqrap = realfreq / smpfreq;
     int freqhi = (int) (floorf(freqrap));

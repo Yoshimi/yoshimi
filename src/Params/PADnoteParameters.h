@@ -31,6 +31,7 @@
 #include "Params/Presets.h"
 
 #include <memory>
+#include <utility>
 #include <cassert>
 
 class XMLwrapper;
@@ -82,22 +83,38 @@ public: // can be moved and swapped, but not copied...
     PADTables(PADQuality const& quality)
         : numTables(calcNumTables(quality))
         , tableSize(calcTableSize(quality))
-        , samples(new float[numTables * (tableSize + INTERPOLATION_BUFFER)])
-        , basefreq(new float[numTables])
-    { }
+        , samples(new float[numTables * (tableSize + INTERPOLATION_BUFFER)]{0})
+        , basefreq(new float[numTables])                                 // zero-init samples
+    {
+        assert(numTables > 0);
+        assert(tableSize > 0);
+        for (size_t tab=0; tab<numTables; ++tab)
+            basefreq[tab] = 440.0f; // fallback base frequency; makes even empty wavetable usable
+    }
 
     // Subscript: access n-th wavetable
     float* operator[](size_t tableNo)
     {
         assert(samples);
+        assert(tableNo < numTables);
         return &samples[0] + tableNo * (tableSize + INTERPOLATION_BUFFER);
     }
-
 private:
     static size_t calcNumTables(PADQuality const&);
     static size_t calcTableSize(PADQuality const&);
 };
 
+namespace std {
+    // deliberately allow to swap two PADTables,
+    // even while not being move assignable due to the const fields
+    inline void swap(PADTables& p1, PADTables& p2)
+    {
+        swap(p1.samples, p2.samples);
+        swap(p1.basefreq,p2.basefreq);
+        swap(const_cast<size_t&>(p1.numTables), const_cast<size_t&>(p2.numTables));
+        swap(const_cast<size_t&>(p1.tableSize), const_cast<size_t&>(p2.tableSize));
+    }
+}
 
 
 class PADnoteParameters : public Presets
@@ -232,14 +249,6 @@ class PADnoteParameters : public Presets
         std::unique_ptr<PADTables> newWaveTable;
 ///////////////////////////////////////////TODO: (End)obsolete, will be replaced by future
 
-///////////////////////////////////////////TODO: obsolete, replaced by PADTables
-        struct {
-            int size;
-            float basefreq;
-            float *smp;
-        } sample[PAD_MAX_SAMPLES], tempsample[PAD_MAX_SAMPLES], newsample;
-        void deletetempsamples(void);
-///////////////////////////////////////////TODO: (End)obsolete, replaced by PADTables
 
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,
@@ -249,11 +258,6 @@ class PADnoteParameters : public Presets
                                             float bwadjust);
         void generatespectrum_otherModes(float *spectrum, int size,
                                          float basefreq);
-///////////////////////////////////////////TODO: obsolete, replaced by PADTables
-        void deletesamples(void);
-        void deletesample(int n);
-        void deletetempsample(int n);
-///////////////////////////////////////////TODO: (End)obsolete, replaced by PADTables
 
         FFTwrapper *fft;
 };

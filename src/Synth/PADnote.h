@@ -82,7 +82,8 @@ class PADnote
         bool firsttime;
         bool released;
 
-        int nsample, portamento, midinote;
+        size_t tableNr;
+        int portamento, midinote;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);

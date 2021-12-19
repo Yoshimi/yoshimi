@@ -25,9 +25,9 @@
 
 */
 
-#include <memory>
 #include <unistd.h>
 #include <thread>
+#include <memory>
 #include <iostream>
 
 #include "Misc/XMLwrapper.h"
@@ -75,22 +75,12 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth)
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
-    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-    {
-        sample[i].smp = NULL;
-        tempsample[i].smp = NULL;
-    }
-    newsample.smp = NULL;
     defaults();
 }
 
 
 PADnoteParameters::~PADnoteParameters()
 {
-///////////////////////////////////////////TODO: obsolete, PADTables has automatic memory management
-    deletesamples();
-    deletetempsamples();
-///////////////////////////////////////////TODO: (End)obsolete, PADTables has automatic memory management
     delete oscilgen;
     delete POscil;
     delete resonance;
@@ -165,8 +155,6 @@ void PADnoteParameters::defaults(void)
     GlobalFilter->defaults();
     FilterEnvelope->defaults();
     FilterLfo->defaults();
-    deletesamples();
-    deletetempsamples();
     Papplied = false;
     Pbuilding = false;
     Pready = false;
@@ -199,42 +187,6 @@ size_t PADTables::calcTableSize(PADQuality const& quality)
 }
 
 
-void PADnoteParameters::deletetempsample(int n)
-{
-    if (tempsample[n].smp != NULL)
-    {
-        delete [] tempsample[n].smp;
-        tempsample[n].smp = NULL;
-    }
-    tempsample[n].size = 0;
-    tempsample[n].basefreq = 440.0f;
-}
-
-
-void PADnoteParameters::deletesample(int n)
-{
-    if (sample[n].smp != NULL)
-    {
-        delete [] sample[n].smp;
-        sample[n].smp = NULL;
-    }
-    sample[n].size = 0;
-    sample[n].basefreq = 440.0f;
-}
-
-
-void PADnoteParameters::deletetempsamples(void)
-{
-    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        deletetempsample(i);
-}
-
-
-void PADnoteParameters::deletesamples(void)
-{
-    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
-}
 
 
 // Get the harmonic profile (i.e. the frequency distribution of a single harmonic)
@@ -642,7 +594,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 
 void PADnoteParameters::setpadparams(bool force)
 {
-    std::cout << "setting params" << std::endl;
+    std::cout << "setting params("<<force<<")" << std::endl;
     std::thread th(&PADnoteParameters::padparamsthread, this, force);
     th.detach();
 }
@@ -659,16 +611,13 @@ void PADnoteParameters::applyparameters(bool force)
 {
     while(Pbuilding)
         usleep(200); // it's already busy!
-    deletetempsamples(); // just in case!
     Papplied = false;
     Pbuilding = true;
 
     PADTables newTable(Pquality);
 
-///////////////////////////////////////////TODO: moved into PADTables, obsolete
-    const int samplesize = (((int)1) << (Pquality.samplesize + 14));
-///////////////////////////////////////////TODO: (END)moved into PADTables, obsolete
-    int spectrumsize = samplesize / 2;
+    const size_t spectrumsize = newTable.tableSize / 2;
+    std::cout << "START building.... spectrumsize="<<spectrumsize << std::endl;
     // spectrumsize can be quite large (up to 2MiB) and this is not a hot
     // function, so allocate this on the heap
     std::unique_ptr<float[]> spectrum(new float[spectrumsize]);
@@ -676,25 +625,10 @@ void PADnoteParameters::applyparameters(bool force)
     float profile[profilesize];
 
     float bwadjust = getprofile(profile, profilesize);
-//    for (int i=0;i<profilesize;i++) profile[i]*=profile[i];
     float basefreq = 65.406f * power<2>(Pquality.basenote / 2);
     if (Pquality.basenote %2 == 1)
         basefreq *= 1.5;
 
-///////////////////////////////////////////TODO: moved into PADTables, obsolete
-    int samplemax = Pquality.oct + 1;
-    int smpoct = Pquality.smpoct;
-    if (Pquality.smpoct == 5)
-        smpoct = 6;
-    if (Pquality.smpoct == 6)
-        smpoct = 12;
-    if (smpoct != 0)
-        samplemax *= smpoct;
-    else
-        samplemax = samplemax / 2 + 1;
-    if (samplemax == 0)
-        samplemax = 1;
-///////////////////////////////////////////TODO: (END)moved into PADTables, obsolete
     if (!Pbuilding)
     {
         std::cout << "not building 1" << std::endl;
@@ -702,17 +636,19 @@ void PADnoteParameters::applyparameters(bool force)
     }
 
     // prepare a BIG FFT stuff
-    FFTwrapper fft = FFTwrapper(samplesize);
+    FFTwrapper fft = FFTwrapper(newTable.tableSize);
     FFTFREQS fftfreqs;
-    FFTwrapper::newFFTFREQS(&fftfreqs, samplesize / 2);
+    FFTwrapper::newFFTFREQS(&fftfreqs, newTable.tableSize / 2);
 
-    float adj[samplemax]; // this is used to compute frequency relation to the base frequency
-    for (int nsample = 0; nsample < samplemax; ++nsample)
-        adj[nsample] = (Pquality.oct + 1.0f) * (float)nsample / samplemax;
-    for (int nsample = 0; nsample < samplemax; ++nsample)
+    float adj[newTable.numTables]; // this is used to compute frequency relation to the base frequency
+    for (size_t tabNr = 0; tabNr < newTable.numTables; ++tabNr)
+        adj[tabNr] = (Pquality.oct + 1.0f) * (float)tabNr / newTable.numTables;
+    for (size_t tabNr = 0; tabNr < newTable.numTables; ++tabNr)
     {
-        float tmp = adj[nsample] - adj[samplemax - 1] * 0.5f;
+        float tmp = adj[tabNr] - adj[newTable.numTables - 1] * 0.5f;
         float basefreqadjust = power<2>(tmp);
+
+        newTable.basefreq[tabNr] = basefreq *  basefreqadjust;
 
         if (Pmode == 0)
             generatespectrum_bandwidthMode(&spectrum[0], spectrumsize,
@@ -722,12 +658,9 @@ void PADnoteParameters::applyparameters(bool force)
             generatespectrum_otherModes(&spectrum[0], spectrumsize,
                                         basefreq * basefreqadjust);
 
-        const int extra_samples = 5; // the last samples contains the first
-                                     // samples (used for linear/cubic interpolation)
-        newsample.smp = new float[samplesize + extra_samples];
-
-        newsample.smp[0] = 0.0;
-        for (int i = 1; i < spectrumsize; ++i)
+        float* newsmp = newTable[tabNr];
+        newsmp[0] = 0.0f;
+        for (size_t i = 1; i < spectrumsize; ++i)
         {   // randomize the phases
             float phase = synth->numRandom() * 6.29f;
             fftfreqs.c[i] = spectrum[i] * cosf(phase);
@@ -735,31 +668,21 @@ void PADnoteParameters::applyparameters(bool force)
             if (!Pbuilding)
             {
                 std::cout << "not building 2" << std::endl;
-                if (newsample.smp)
-                {
-                    delete newsample.smp;
-                    newsample.smp = NULL;
-                }
                 FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
         }
-        fft.freqs2smps(&fftfreqs, newsample.smp);
+        fft.freqs2smps(&fftfreqs, newsmp);
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
         // normalize(rms)
         float rms = 0.0;
-        for (int i = 0; i < samplesize; ++i)
+        for (size_t i = 0; i < newTable.tableSize; ++i)
         {
-            rms += newsample.smp[i] * newsample.smp[i];
+            rms += newsmp[i] * newsmp[i];
             if (!Pbuilding)
             {
                 std::cout << "not building 3" << std::endl;
-                if (newsample.smp)
-                {
-                    delete newsample.smp;
-                    newsample.smp = NULL;
-                }
                 FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
@@ -767,19 +690,14 @@ void PADnoteParameters::applyparameters(bool force)
         rms = sqrtf(rms);
         if (rms < 0.000001)
             rms = 1.0;
-        rms *= sqrtf(float(1024 * 256) / samplesize);
-        for (int i = 0; i < samplesize; ++i)
-            newsample.smp[i] *= 1.0f / rms * 50.0f;
+        rms *= sqrtf(float(1024 * 256) / newTable.tableSize);
+        for (size_t i = 0; i < newTable.tableSize; ++i)
+            newsmp[i] *= 1.0f / rms * 50.0f;
 
         // prepare extra samples used by the linear or cubic interpolation
-        for (int i = 0; i < extra_samples; ++i)
-            newsample.smp[i + samplesize] = newsample.smp[i];
+        for (size_t i = 0; i < newTable.INTERPOLATION_BUFFER; ++i)
+            newsmp[newTable.tableSize + i] = newsmp[i];
 
-        // replace the current sample with the new computed sample
-        tempsample[nsample].smp = newsample.smp;
-        tempsample[nsample].size = samplesize;
-        tempsample[nsample].basefreq = basefreq * basefreqadjust;
-        newsample.smp = NULL;
         if (!Pbuilding)
         {
             std::cout << "not building 4" << std::endl;
@@ -788,9 +706,6 @@ void PADnoteParameters::applyparameters(bool force)
     }
     FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
-    // delete the additional samples that might exists and are not useful
-    for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
-        deletetempsample(i);
     std::cout << "normal exit" << std::endl;
     if (force)
     {
@@ -799,20 +714,25 @@ void PADnoteParameters::applyparameters(bool force)
     }
     else
         Pready = true;
-    while (Pbuilding | Pready)
-        usleep(100);
-    deletetempsamples();
     //////////////////////////TODO set future here
     newWaveTable.reset(new PADTables(std::move (newTable)));
+    //////////////////////////TODO (END)
+    while (Pbuilding | Pready)
+        usleep(100);
+    std::cout << "End Thread. newWaveTable="<<newWaveTable.get()<<" Basefreq="<<newWaveTable->basefreq[0]<<std::endl;
 }
 
 
 void PADnoteParameters::activate_wavetable()
 {
-    Pready = false;
-    std::swap(sample, tempsample);
-    Papplied = true;
-    Pbuilding = false;
+    if (newWaveTable)
+    {
+        std::swap(waveTable, *newWaveTable);
+        std::cout << "RLY activate.. Basefreq="<<waveTable.basefreq[0]<<std::endl;
+        Pready = false;
+        Papplied = true;
+        Pbuilding = false;
+    }
 }
 
 
@@ -836,20 +756,17 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 
     basefilename += "--sample-";
     bool isOK = true;
-    for (int k = 0; k < PAD_MAX_SAMPLES; ++k)
+    for (size_t tab = 0; tab < waveTable.numTables; ++tab)
     {
-        if (sample[k].smp == NULL)
-            continue;
         char tmpstr[20];
-        snprintf(tmpstr, 20, "-%02d", k + 1);
+        snprintf(tmpstr, 20, "-%02zu", tab + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
-        int nsmps = sample[k].size;
         unsigned int block;
         unsigned short int sBlock;
-        unsigned int buffSize = 44 + sizeof(short int) * nsmps; // total size
+        unsigned int buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
         char *buffer = (char*) malloc (buffSize);
         strcpy(buffer, type.c_str());
-        block = nsmps * 4 + 36; // 2 channel shorts + part header
+        block = waveTable.tableSize * 4 + 36; // 2 channel shorts + part header
         buffer[4] = block & 0xff;
         buffer[5] = (block >> 8) & 0xff;
         buffer[6] = (block >> 16) & 0xff;
@@ -874,13 +791,13 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         memcpy(buffer + 34, &sBlock, 2);
         temp = "data";
         strcpy(buffer + 36, temp.c_str());
-        block = nsmps * 2; // data size
+        block = waveTable.tableSize * 2; // data size
         memcpy(buffer + 40, &block, 4);
-        for (int i = 0; i < nsmps; ++i)
+        for (size_t smp = 0; smp < waveTable.tableSize; ++smp)
         {
-            sBlock = (sample[k].smp[i] * 32767.0f);
-            buffer [44 + i * 2] = sBlock & 0xff;
-            buffer [45 + i * 2] = (sBlock >> 8) & 0xff;
+            sBlock = (waveTable[tab][smp] * 32767.0f);
+            buffer [44 + smp * 2] = sBlock & 0xff;
+            buffer [45 + smp * 2] = (sBlock >> 8) & 0xff;
         }
         /*
          * The file manager can return a negative number on error,
