@@ -48,7 +48,11 @@ using func::setAllPan;
 using func::power;
 
 
-PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
+PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth)
+    : Presets(_synth)
+    , Pquality()
+    , waveTable(Pquality)
+    , newWaveTable() ///////////////////TODO will be replaced by future
 {
     setpresettype("Ppadsyth");
     fft = fft_;
@@ -83,8 +87,10 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
 
 PADnoteParameters::~PADnoteParameters()
 {
+///////////////////////////////////////////TODO: obsolete, PADTables has automatic memory management
     deletesamples();
     deletetempsamples();
+///////////////////////////////////////////TODO: (End)obsolete, PADTables has automatic memory management
     delete oscilgen;
     delete POscil;
     delete resonance;
@@ -125,10 +131,7 @@ void PADnoteParameters::defaults(void)
     Phrpos.par2 = 64;
     Phrpos.par3 = 0;
 
-    Pquality.samplesize = 3;
-    Pquality.basenote = 4;
-    Pquality.oct = 3;
-    Pquality.smpoct = 2;
+    Pquality.resetToDefaults();
 
     PStereo = 1; // stereo
     // Frequency Global Parameters
@@ -167,6 +170,32 @@ void PADnoteParameters::defaults(void)
     Papplied = false;
     Pbuilding = false;
     Pready = false;
+}
+
+
+/* derive number of Wavetables for the desired octave coverage */
+size_t PADTables::calcNumTables(PADQuality const& quality)
+{
+    int tables = quality.oct + 1;
+    int smpoct = quality.smpoct;
+    if (smpoct == 5)
+        smpoct = 6;
+    else
+    if (smpoct == 6)
+        smpoct = 12;
+    if (smpoct != 0)
+        tables *= smpoct;
+    else
+        tables = tables / 2 + 1;
+    if (tables == 0)
+        tables = 1;
+    return tables;
+}
+
+/* derive size of single wavetable for the desired quality settings */
+size_t PADTables::calcTableSize(PADQuality const& quality)
+{
+    return size_t(1) << (quality.samplesize + 14);
 }
 
 
@@ -633,7 +662,12 @@ void PADnoteParameters::applyparameters(bool force)
     deletetempsamples(); // just in case!
     Papplied = false;
     Pbuilding = true;
+
+    PADTables newTable(Pquality);
+
+///////////////////////////////////////////TODO: moved into PADTables, obsolete
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
+///////////////////////////////////////////TODO: (END)moved into PADTables, obsolete
     int spectrumsize = samplesize / 2;
     // spectrumsize can be quite large (up to 2MiB) and this is not a hot
     // function, so allocate this on the heap
@@ -647,6 +681,7 @@ void PADnoteParameters::applyparameters(bool force)
     if (Pquality.basenote %2 == 1)
         basefreq *= 1.5;
 
+///////////////////////////////////////////TODO: moved into PADTables, obsolete
     int samplemax = Pquality.oct + 1;
     int smpoct = Pquality.smpoct;
     if (Pquality.smpoct == 5)
@@ -659,6 +694,7 @@ void PADnoteParameters::applyparameters(bool force)
         samplemax = samplemax / 2 + 1;
     if (samplemax == 0)
         samplemax = 1;
+///////////////////////////////////////////TODO: (END)moved into PADTables, obsolete
     if (!Pbuilding)
     {
         std::cout << "not building 1" << std::endl;
@@ -766,6 +802,8 @@ void PADnoteParameters::applyparameters(bool force)
     while (Pbuilding | Pready)
         usleep(100);
     deletetempsamples();
+    //////////////////////////TODO set future here
+    newWaveTable.reset(new PADTables(std::move (newTable)));
 }
 
 

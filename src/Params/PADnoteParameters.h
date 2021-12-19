@@ -30,6 +30,9 @@
 
 #include "Params/Presets.h"
 
+#include <memory>
+#include <cassert>
+
 class XMLwrapper;
 class FFTwrapper;
 class OscilGen;
@@ -40,6 +43,62 @@ class LFOParams;
 class FilterParams;
 
 class SynthEngine;
+
+// defines quality / resolution of PADSynth wavetables
+struct PADQuality {
+    unsigned char samplesize;
+    unsigned char basenote, oct, smpoct;
+
+    PADQuality() { resetToDefaults(); }
+
+    void resetToDefaults()
+    {
+        samplesize = 3;
+        basenote = 4;
+        oct = 3;
+        smpoct = 2;
+    }
+};
+
+
+class PADTables
+{
+public:
+    // size parameters
+    static constexpr size_t INTERPOLATION_BUFFER = 5;
+    const size_t numTables;
+    const size_t tableSize;
+
+    std::unique_ptr<float[]> samples;
+    std::unique_ptr<float[]> basefreq;
+
+public: // can be moved and swapped, but not copied...
+   ~PADTables()                            = default;
+    PADTables(PADTables&&)                 = default;
+    PADTables(PADTables const&)            = delete;
+    PADTables& operator=(PADTables&&)      = delete;
+    PADTables& operator=(PADTables const&) = delete;
+
+    PADTables(PADQuality const& quality)
+        : numTables(calcNumTables(quality))
+        , tableSize(calcTableSize(quality))
+        , samples(new float[numTables * (tableSize + INTERPOLATION_BUFFER)])
+        , basefreq(new float[numTables])
+    { }
+
+    // Subscript: access n-th wavetable
+    float* operator[](size_t tableNo)
+    {
+        assert(samples);
+        return &samples[0] + tableNo * (tableSize + INTERPOLATION_BUFFER);
+    }
+
+private:
+    static size_t calcNumTables(PADQuality const&);
+    static size_t calcTableSize(PADQuality const&);
+};
+
+
 
 class PADnoteParameters : public Presets
 {
@@ -65,45 +124,47 @@ class PADnoteParameters : public Presets
         unsigned char Pmode;
 
         //Harmonic profile (the frequency distribution of a single harmonic)
-        struct {
-            struct {    //base function
+        struct HarmonicProfile {
+            struct BaseFunction {
                 unsigned char type;
                 unsigned char par1;
-            } base;
-            unsigned char freqmult; // frequency multiplier of the distribution
-            struct {                // the modulator of the distribution
+            };
+            struct Modulator{
                 unsigned char par1;
                 unsigned char freq;
-            } modulator;
-
-            unsigned char width; // the width of the resulting function after the modulation
-
-            struct { // the amplitude multiplier of the harmonic profile
+            };
+            struct AmplitudeMultiplier {
                 unsigned char mode;
                 unsigned char type;
                 unsigned char par1;
                 unsigned char par2;
-            } amp;
+            };
+
+            BaseFunction base;
+            unsigned char freqmult;  // frequency multiplier of the distribution
+            Modulator modulator;     // the modulator of the distribution
+            unsigned char width;     // the width of the resulting function after the modulation
+            AmplitudeMultiplier amp; // the amplitude multiplier of the harmonic profile
+
             bool autoscale;        //  if the scale of the harmonic profile is
                                    // computed automatically
             unsigned char onehalf; // what part of the base function is used to
                                    // make the distribution
-        } Php;
+        };
 
+        struct HarmonicPos { // where harmonics are positioned (on integer multiples or shifted away)
+            unsigned char type;
+            unsigned char par1, par2, par3; // 0..255
+        };
+
+
+        HarmonicProfile Php;
 
         unsigned int Pbandwidth; // the values are from 0 to 1000
         unsigned char Pbwscale;  // how the bandwidth is increased according to
                                  // the harmonic's frequency
-
-        struct { // where are positioned the harmonics (on integer multiplier or different places)
-            unsigned char type;
-            unsigned char par1, par2, par3; // 0..255
-        } Phrpos;
-
-        struct { // quality of the samples (how many samples, the length of them,etc.)
-            unsigned char samplesize;
-            unsigned char basenote, oct, smpoct;
-        } Pquality;
+        HarmonicPos Phrpos;
+        PADQuality Pquality;
 
         // Frequency parameters
         unsigned char Pfixedfreq; // If the base frequency is fixed to 440 Hz
@@ -165,12 +226,20 @@ class PADnoteParameters : public Presets
         OscilGen *oscilgen;
         Resonance *resonance;
 
+        PADTables waveTable;
+
+///////////////////////////////////////////TODO: obsolete, will be replaced by future
+        std::unique_ptr<PADTables> newWaveTable;
+///////////////////////////////////////////TODO: (End)obsolete, will be replaced by future
+
+///////////////////////////////////////////TODO: obsolete, replaced by PADTables
         struct {
             int size;
             float basefreq;
             float *smp;
         } sample[PAD_MAX_SAMPLES], tempsample[PAD_MAX_SAMPLES], newsample;
         void deletetempsamples(void);
+///////////////////////////////////////////TODO: (End)obsolete, replaced by PADTables
 
     private:
         void generatespectrum_bandwidthMode(float *spectrum, int size,
@@ -180,9 +249,11 @@ class PADnoteParameters : public Presets
                                             float bwadjust);
         void generatespectrum_otherModes(float *spectrum, int size,
                                          float basefreq);
+///////////////////////////////////////////TODO: obsolete, replaced by PADTables
         void deletesamples(void);
         void deletesample(int n);
         void deletetempsample(int n);
+///////////////////////////////////////////TODO: (End)obsolete, replaced by PADTables
 
         FFTwrapper *fft;
 };
