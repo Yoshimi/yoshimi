@@ -1299,7 +1299,7 @@ void ADnote::computeNoteParameters(void)
                 vc = adpars->VoicePar[nvoice].Pextoscil;
             adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
                                                getVoiceBaseFreq(nvoice),
-                                               adpars->VoicePar[nvoice].Presonance);
+                                               adpars->VoicePar[nvoice].Presonance != 0);
 
             // I store the first elements to the last position for speedups
             for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)

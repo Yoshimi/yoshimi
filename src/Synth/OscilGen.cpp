@@ -1063,7 +1063,7 @@ void OscilGen::prepare(void)
 
 void OscilGen::adaptiveharmonic(FFTFreqs& f, float freq)
 {
-    if (params->Padaptiveharmonics == 0 /*||(freq<1.0)*/)
+    if (params->Padaptiveharmonics == 0)
         return;
     if (freq < 1.0f)
         freq = 440.0f;
@@ -1189,12 +1189,16 @@ void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
 // Get the oscillator function
 void OscilGen::get(float *smps, float freqHz)
 {
-    this->get(smps, freqHz, 0);
+    this->get(smps, freqHz, false);
 }
 
 
 // Get the oscillator function
-void OscilGen::get(float *smps, float freqHz, int resonance)
+// NOTE: if params->ADvsPAD is set, then smps is expected to be of synth->halfoscilsize
+//       and is filled with the frequency amplitudes (discarding phase information);
+//       DC-Offset is discarded; index=0 corresponds to the fundamental.
+//       Otherwise smps must be synth->oscilsize, and will be filled with the rendered waveform
+void OscilGen::get(float *smps, float freqHz, bool applyResonance)
 {
     if (oldbasepar != params->Pbasefuncpar
         || oldbasefunc != params->Pcurrentbasefunc
@@ -1316,7 +1320,7 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
         }
     }
 
-    if (freqHz > 0.1 && resonance != 0)
+    if (applyResonance && freqHz > 0.1)
         res->applyres(nyquist - 1, outoscilFFTfreqs, freqHz);
 
     // Full RMS normalize
@@ -1337,7 +1341,10 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
     }
 
     if (params->ADvsPAD && freqHz > 0.1f)
-    {   // in this case the smps will contain the freqs
+    {   // in this case the smps will contain the freqs.
+        // Note: Spectrum slot=0 (DC-Offset) will be discarded.
+        //       In the result, index=0 is the fundamental.
+        //       See PADnoteParameters::generatespectrum_otherModes()
         for (int i = 1; i < synth->halfoscilsize; ++i)
             smps[i - 1] = sqrtf(outoscilFFTfreqs.c[i] * outoscilFFTfreqs.c[i]
                                + outoscilFFTfreqs.s[i] * outoscilFFTfreqs.s[i]);

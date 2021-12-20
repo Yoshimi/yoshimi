@@ -139,14 +139,14 @@ class PADnoteParameters : public Presets
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
 
-        //returns a value between 0.0-1.0 that represents the estimation
-        // perceived bandwidth
+        //returns a value between 0.0-1.0 that represents the estimation perceived bandwidth
         float getprofile(float *smp, int size);
 
         float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
-        float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
+        float calcHarmonicPositionFactor(float n); // gets the harmonic position as factor.
+
+        // (re)Building the Wavetable
         void setpadparams(bool force);
-        void padparamsthread(bool force);
         void applyparameters(bool force);
         void activate_wavetable(void);
         bool export2wav(std::string basefilename);
@@ -276,7 +276,7 @@ class PADnoteParameters : public Presets
         void generatespectrum_otherModes(float *spectrum, int size,
                                          float basefreq);
 
-        FFTwrapper *fft;
+        void padparamsthread(bool force);
 };
 
 #endif

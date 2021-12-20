@@ -102,7 +102,6 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth)
     , Pready{false}
     , waveTable(Pquality)
     , newWaveTable() ///////////////////TODO will be replaced by future
-    , fft{fft_}
 {
     setpresettype("Ppadsyth");
     POscil->ADvsPAD = true;  // OscilParameters::defaults() will be called again
@@ -222,6 +221,7 @@ size_t PADTables::calcTableSize(PADQuality const& quality)
 
 
 // Get the harmonic profile (i.e. the frequency distribution of a single harmonic)
+// returns a value between 0.0-1.0 that represents the estimation perceived bandwidth
 float PADnoteParameters::getprofile(float *smp, int size)
 {
     for (int i = 0; i < size; ++i)
@@ -379,60 +379,65 @@ float PADnoteParameters::setPbandwidth(int Pbandwidth)
 }
 
 
-// Get the harmonic(overtone) position
-float PADnoteParameters::getNhr(int n)
+// Frequency factor for the position of each harmonic.
+// Input is the number of the harmonic. n=0 is the fundamental, above are the overtones.
+// Returns a frequency factor relative to the undistorted frequency of the fundamental.
+float PADnoteParameters::calcHarmonicPositionFactor(float n)
 {
-    float result = 1.0;
     float par1 = power<10>(-(1.0f - Phrpos.par1 / 255.0f) * 3.0f);
     float par2 = Phrpos.par2 / 255.0f;
 
-    float n0 = n - 1.0f;
-    float tmp = 0.0f;
-    int thresh = 0;
+    float scale  = 1.0;
+    float thresh = 0.0;
+
+    float offset = 0.0;
     switch (Phrpos.type)
     {
     case 1:
-        thresh = int(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
-            result = n;
+            offset = n;
         else
-            result = 1.0f + n0 + (n0 - thresh + 1.0f) * par1 * 8.0f;
+            offset = n + (n - thresh) * par1 * 8.0f;
         break;
 
     case 2:
-        thresh = int(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
-            result = n;
+            offset = n;
         else
-            result = 1.0f + n0 - (n0 - thresh + 1.0f) * par1 * 0.90f;
+            offset = n - (n - thresh) * par1 * 0.90f;
         break;
 
     case 3:
-        tmp = par1 * 100.0f + 1.0f;
-        result = powf(n0 / tmp, (1.0f - par2 * 0.8f)) * tmp + 1.0f;
+        scale = par1 * 100.0f + 1.0f;
+        offset = powf(n / scale, (1.0f - par2 * 0.8f)) * scale;
         break;
 
     case 4:
-        result = n0 * (1.0f - par1) + powf(n0 * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f + 1.0f;
+        offset = n * (1.0f - par1) + powf(n * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f;
         break;
 
     case 5:
-        result = n0 + sinf(n0 * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f + 1.0f;
+        offset = n + sinf(n * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f;
         break;
 
     case 6:
-        tmp = powf((par2 * 2.0f), 2.0f) + 0.1f;
-        result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0f;
+        scale = powf((par2 * 2.0f), 2.0f) + 0.1f;
+        offset = n * powf(1.0f + par1 * powf(n * 0.8f, scale), scale);
         break;
 
-        case 7:
-            result = (n + Phrpos.par1 / 255.0f) / (Phrpos.par1 / 255.0f + 1);
-            break;
+    case 7:
+        scale = 1.0f + Phrpos.par1 / 255.0f;
+        offset = n / scale;
+        break;
 
     default:
-        result=n;
+        // undistorted. n=0 => factor=1.0 (corresponding to the base frequency)
+        offset = n;
         break;
     }
+    float result = 1.0f + offset;
     float par3 = Phrpos.par3 / 255.0f;
     float iresult = floorf(result + 0.5f);
     float dresult = result - iresult;
@@ -456,7 +461,8 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
     float harmonics[synth->halfoscilsize];
     memset(harmonics, 0, synth->halfoscilsize * sizeof(float));
 
-    // get the harmonic structure from the oscillator (I am using the frequency amplitudes, only)
+    // get the harmonic structure from the oscillator
+    // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
     oscilgen->get(harmonics, basefreq, false);
 
     // normalize
@@ -468,14 +474,14 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         max = 1;
     for (int i = 0; i < synth->halfoscilsize; ++i)
         harmonics[i] /= max;
-    for (int nh = 1; nh < synth->halfoscilsize; ++nh)
+    for (int nh = 0; nh+1 < synth->halfoscilsize; ++nh)
     {   //for each harmonic
-        float realfreq = getNhr(nh) * basefreq;
+        float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
         if (realfreq > synth->samplerate_f * 0.49999f)
             break;
         if (realfreq < 20.0f)
             break;
-        if (harmonics[nh - 1] < 1e-4f)
+        if (harmonics[nh] < 1e-4f)
             continue;
         //compute the bandwidth of each harmonic
         float bandwidthcents = setPbandwidth(Pbandwidth);
@@ -517,7 +523,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         }
         bw = bw * powf(realfreq / basefreq, power);
         int ibw = int((bw / (synth->samplerate_f * 0.5f) * size)) + 1;
-        float amp = harmonics[nh - 1];
+        float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
         if (ibw > profilesize)
@@ -567,8 +573,8 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
     float harmonics[synth->halfoscilsize];
     memset(harmonics, 0, synth->halfoscilsize * sizeof(float));
 
-    // get the harmonic structure from the oscillator (I am using the frequency
-    // amplitudes, only)
+    // get the harmonic structure from the oscillator
+    // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
     oscilgen->get(harmonics, basefreq, false);
 
     // normalize
@@ -581,9 +587,9 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
     for (int i = 0; i < synth->halfoscilsize; ++i)
         harmonics[i] /= max;
 
-    for (int nh = 1; nh < synth->halfoscilsize; ++nh)
+    for (int nh = 0; nh+1 < synth->halfoscilsize; ++nh)
     {   //for each harmonic
-        float realfreq = getNhr(nh) * basefreq;
+        float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
 
         ///sa fac aici interpolarea si sa am grija daca frecv descresc
         //[Romanian, from original Author] "do the interpolation here and be careful if they decrease frequency"
@@ -592,9 +598,8 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
             break;
         if (realfreq < 20.0f)
             break;
-//	if (harmonics[nh-1]<1e-4) continue;
 
-        float amp = harmonics[nh - 1];
+        float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
         int cfreq = int(realfreq / (synth->halfsamplerate_f) * size);

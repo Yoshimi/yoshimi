@@ -51,7 +51,7 @@ class OscilGen : private WaveShapeSamples
         void get(float *smps, float freqHz);
         // returns where should I start getting samples, used in block type randomness
 
-        void get(float *smps, float freqHz, int resonance);
+        void get(float *smps, float freqHz, bool applyResonance);
         // if freqHz is smaller than 0, return the "un-randomized" sample for UI
 
         // Get just the phase of the oscillator.
