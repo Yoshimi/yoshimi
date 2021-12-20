@@ -89,21 +89,21 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     else
         NoteGlobalPar.Punch.Enabled = 0;
 
-    NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope, basefreq, synth);
-    NoteGlobalPar.FreqLfo = new LFO(pars->FreqLfo, basefreq, synth);
+    NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope.get(), basefreq, synth);
+    NoteGlobalPar.FreqLfo = new LFO(pars->FreqLfo.get(), basefreq, synth);
 
-    NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope, basefreq, synth);
-    NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo, basefreq, synth);
+    NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope.get(), basefreq, synth);
+    NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo.get(), basefreq, synth);
 
     NoteGlobalPar.AmpEnvelope->envout_dB(); // discard the first envelope output
 
     NoteGlobalPar.GlobalFilterL =
-        new Filter(pars->GlobalFilter, synth);
+        new Filter(pars->GlobalFilter.get(), synth);
     NoteGlobalPar.GlobalFilterR =
-        new Filter(pars->GlobalFilter, synth);
+        new Filter(pars->GlobalFilter.get(), synth);
 
-    NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq, synth);
-    NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq, synth);
+    NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope.get(), basefreq, synth);
+    NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo.get(), basefreq, synth);
 
     computeNoteParameters();
 

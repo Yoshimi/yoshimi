@@ -299,14 +299,14 @@ class PADnoteUI {: {public PresetsUI_}
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseType, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 42 75 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Gauss");o->add("Square");o->add("DoubleExp");}
-              code1 {o->value(pars->Php.base.type);}
+              code1 {o->value(pars->PProfile.base.type);}
             } {}
             Fl_Dial hpbasepar1 {
               label Width
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
               xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.base.par1);}
+              code0 {o->value(pars->PProfile.base.par1);}
               class WidgetPDial
             }
             Fl_Dial hpfreqmult {
@@ -314,7 +314,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::frequencyMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.freqmult);}
+              code0 {o->value(pars->PProfile.freqmult);}
               class WidgetPDial
             }
             Fl_Dial hpmpar1 {
@@ -322,7 +322,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.modulator.par1);}
+              code0 {o->value(pars->PProfile.modulator.par1);}
               class WidgetPDial
             }
             Fl_Dial hpmfreq {
@@ -330,7 +330,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorFrequency, o->value(), TOPLEVEL::type::Integer);}
               xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.modulator.freq);}
+              code0 {o->value(pars->PProfile.modulator.freq);}
               class WidgetPDial
             }
             Fl_Dial hpwidth {
@@ -338,7 +338,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::size, o->value(), TOPLEVEL::type::Integer);}
               xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.width);}
+              code0 {o->value(pars->PProfile.width);}
               class WidgetPDial
             }
             Fl_Choice hponehalf {
@@ -347,7 +347,7 @@ class PADnoteUI {: {public PresetsUI_}
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicSidebands, o->value(), TOPLEVEL::type::Integer);}
               xywh {10 147 80 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Full");o->add("Upper Half");o->add("Lower Half");}
-              code1 {o->value(pars->Php.onehalf);}
+              code1 {o->value(pars->PProfile.onehalf);}
             } {}
             Fl_Group ampgroup {
               xywh {10 164 80 105} box BORDER_BOX
@@ -358,14 +358,14 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMode, o->value(), TOPLEVEL::type::Integer);}
                 xywh {15 209 70 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
                 code0 {o->add("Sum");o->add("Mult");o->add("Div1");o->add("Div2");}
-                code1 {o->value(pars->Php.amp.mode);}
+                code1 {o->value(pars->PProfile.amp.mode);}
               } {}
               Fl_Dial hpamppar1 {
                 label Par1
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralWidth, o->value(), TOPLEVEL::type::Integer);}
                 xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-                code0 {o->value(pars->Php.amp.par1);}
+                code0 {o->value(pars->PProfile.amp.par1);}
                 class WidgetPDial
               }
               Fl_Dial hpamppar2 {
@@ -373,7 +373,7 @@ class PADnoteUI {: {public PresetsUI_}
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralAmplitude, o->value(), TOPLEVEL::type::Integer);}
                 xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-                code0 {o->value(pars->Php.amp.par2);}
+                code0 {o->value(pars->PProfile.amp.par2);}
                 class WidgetPDial
               }
             }
@@ -383,7 +383,7 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 179 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("Off");o->add("Gauss");o->add("Sine");o->add("Flat");}
-              code1 {o->value(pars->Php.amp.type);}
+              code1 {o->value(pars->PProfile.amp.type);}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {}
             Fl_Check_Button hpautoscale {
@@ -391,14 +391,14 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
               xywh {10 274 74 15} down_box DOWN_BOX labelsize 11
-              code0 {o->value(pars->Php.autoscale);}
+              code0 {o->value(pars->PProfile.autoscale);}
               class Fl_Check_Button2
             }
           }
           Fl_Group {} {
             xywh {100 155 315 135} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179 align 6
             code0 {osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 130,"");}
-            code1 {osc->init(pars->oscilgen, synth);}
+            code1 {osc->init(pars->oscilgen.get(), synth);}
           } {}
           Fl_Box cbwidget {
             label {Harmonic Content}
@@ -423,7 +423,7 @@ class PADnoteUI {: {public PresetsUI_}
             if (oscui!=NULL)
                 delete (oscui);
             lastWaveW = 0;
-            oscui = new OscilEditor(pars->POscil, osc, cbwidget, applybutton, synth, npart, kititem, 2);
+            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             tooltip {Right click: also close this} xywh {425 260 85 25} box THIN_UP_BOX labelfont 1 labelsize 12
@@ -664,13 +664,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope} open
               xywh {10 95 250 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->AmpEnvelope, npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, 2, 0);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
               label {Amplitude LFO     } open
               xywh {10 165 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo, npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpLfo.get(), npart, kititem, 2, 0);}
               class LFOUI
             } {}
             Fl_Box {} {
@@ -684,19 +684,19 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group filterenv {
               label {PADSynth - Filter Envelope}
               xywh {295 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FilterEnvelope, npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterEnvelope.get(), npart, kititem, 2, 2);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
               label {Filter LFO     }
               xywh {295 200 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->FilterLfo, npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterLfo.get(), npart, kititem, 2, 2);}
               class LFOUI
             } {}
             Fl_Group filterui {
               label {PADsynth - Filter}
               xywh {295 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-              code0 {o->init(pars->GlobalFilter,&pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
+              code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
               class FilterUI
             } {}
           }
@@ -707,13 +707,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
               xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, 2, 1);}
               class EnvelopeUI
             } {}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqLfo.get(), npart, kititem, 2, 1);}
               class LFOUI
             } {}
             Fl_Dial bend {
@@ -1307,7 +1307,7 @@ class PADnoteUI {: {public PresetsUI_}
     lastpadW = 0;
     oscui = NULL;
     lastResuiW = 0;
-    resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
+    resui = new ResonanceUI(pars->resonance.get(), npart, kititem, 2);
     make_window();} {}
   }
   Function {~PADnoteUI()} {return_type virtual

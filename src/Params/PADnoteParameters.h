@@ -34,6 +34,8 @@
 #include <utility>
 #include <cassert>
 
+using std::unique_ptr;
+
 class XMLwrapper;
 class FFTwrapper;
 class OscilGen;
@@ -70,8 +72,8 @@ public:
     const size_t numTables;
     const size_t tableSize;
 
-    std::unique_ptr<float[]> samples;
-    std::unique_ptr<float[]> basefreq;
+    unique_ptr<float[]> samples;
+    unique_ptr<float[]> basefreq;
 
 public: // can be moved and swapped, but not copied...
    ~PADTables()                            = default;
@@ -121,7 +123,14 @@ class PADnoteParameters : public Presets
 {
     public:
         PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
-        ~PADnoteParameters();
+       ~PADnoteParameters()  = default;
+
+        // shall not be copied or moved or assigned
+        PADnoteParameters(PADnoteParameters&&)                 = delete;
+        PADnoteParameters(PADnoteParameters const&)            = delete;
+        PADnoteParameters& operator=(PADnoteParameters&&)      = delete;
+        PADnoteParameters& operator=(PADnoteParameters const&) = delete;
+
 
         void defaults(void);
         void setPan(char pan, unsigned char panLaw);
@@ -134,11 +143,14 @@ class PADnoteParameters : public Presets
         // perceived bandwidth
         float getprofile(float *smp, int size);
 
-        //parameters
+        float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
+        float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
+        void setpadparams(bool force);
+        void padparamsthread(bool force);
+        void applyparameters(bool force);
+        void activate_wavetable(void);
+        bool export2wav(std::string basefilename);
 
-        //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
-        //the harmonic profile is used only on mode 0
-        unsigned char Pmode;
 
         //Harmonic profile (the frequency distribution of a single harmonic)
         struct HarmonicProfile {
@@ -167,15 +179,27 @@ class PADnoteParameters : public Presets
                                    // computed automatically
             unsigned char onehalf; // what part of the base function is used to
                                    // make the distribution
+
+            void defaults();
         };
 
         struct HarmonicPos { // where harmonics are positioned (on integer multiples or shifted away)
-            unsigned char type;
-            unsigned char par1, par2, par3; // 0..255
+            unsigned char type = 0;
+            unsigned char par1 = 64;
+            unsigned char par2 = 64;
+            unsigned char par3 = 0; // 0..255
+
+            void defaults();
         };
 
+        //parameters
 
-        HarmonicProfile Php;
+        //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
+        //the harmonic profile is used only on mode 0
+        unsigned char Pmode;
+
+
+        HarmonicProfile PProfile;
 
         unsigned int Pbandwidth; // the values are from 0 to 1000
         unsigned char Pbwscale;  // how the bandwidth is increased according to
@@ -198,8 +222,12 @@ class PADnoteParameters : public Presets
         unsigned short int PCoarseDetune; // coarse detune+octave
         unsigned char      PDetuneType;   // detune type
 
-        EnvelopeParams *FreqEnvelope; // Frequency Envelope
-        LFOParams *FreqLfo;           // Frequency LFO
+        unique_ptr<OscilParameters> POscil;
+        unique_ptr<Resonance> resonance;
+        unique_ptr<OscilGen> oscilgen;
+
+        unique_ptr<EnvelopeParams> FreqEnvelope; // Frequency Envelope
+        unique_ptr<LFOParams> FreqLfo;           // Frequency LFO
 
         // Amplitude parameters
         unsigned char PStereo;
@@ -211,8 +239,8 @@ class PADnoteParameters : public Presets
         unsigned char PVolume;
         unsigned char PAmpVelocityScaleFunction;
 
-        EnvelopeParams *AmpEnvelope;
-        LFOParams *AmpLfo;
+        unique_ptr<EnvelopeParams> AmpEnvelope;
+        unique_ptr<LFOParams> AmpLfo;
 
         // Adjustment factor for anti-pop fadein
         unsigned char Fadein_adjustment;
@@ -220,28 +248,17 @@ class PADnoteParameters : public Presets
         unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
 
         // Filter Parameters
-        FilterParams *GlobalFilter;
+        unique_ptr<FilterParams> GlobalFilter;
         unsigned char PFilterVelocityScale; // filter velocity sensing
         unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
 
-        EnvelopeParams *FilterEnvelope;
-        LFOParams *FilterLfo;
+        unique_ptr<EnvelopeParams> FilterEnvelope;
+        unique_ptr<LFOParams> FilterLfo;
 
-        float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
-        float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
         bool Papplied;
         bool Pbuilding;
         bool Pready;
-        void setpadparams(bool force);
-        void padparamsthread(bool force);
-        void applyparameters(bool force);
-        void activate_wavetable(void);
-        bool export2wav(std::string basefilename);
-
-        OscilParameters *POscil;
-        OscilGen *oscilgen;
-        Resonance *resonance;
 
         PADTables waveTable;
 

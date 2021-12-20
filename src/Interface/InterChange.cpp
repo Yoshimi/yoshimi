@@ -2321,27 +2321,27 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::oscillatorGroup:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil.get());
             part->kit[kititem].padpars->presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil.get());
             part->kit[kititem].padpars->presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicPhaseBandwidth:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
+            commandOscillator(getData,  part->kit[kititem].padpars->POscil.get());
             part->kit[kititem].padpars->presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGroup:
-            commandResonance(getData, part->kit[kititem].padpars->resonance);
+            commandResonance(getData, part->kit[kititem].padpars->resonance.get());
             part->kit[kititem].padpars->presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGraphInsert:
-            commandResonance(getData, part->kit[kititem].padpars->resonance);
+            commandResonance(getData, part->kit[kititem].padpars->resonance.get());
             part->kit[kititem].padpars->presetsUpdated();
             needApply = true;
             break;
@@ -5332,75 +5332,75 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case PADSYNTH::control::baseWidth:
             if (write)
-                pars->Php.base.par1 = value_int;
+                pars->PProfile.base.par1 = value_int;
             else
-                value = pars->Php.base.par1;
+                value = pars->PProfile.base.par1;
             break;
         case PADSYNTH::control::frequencyMultiplier:
             if (write)
-                pars->Php.freqmult = value_int;
+                pars->PProfile.freqmult = value_int;
             else
-                value = pars->Php.freqmult;
+                value = pars->PProfile.freqmult;
             break;
         case PADSYNTH::control::modulatorStretch:
             if (write)
-                pars->Php.modulator.par1 = value_int;
+                pars->PProfile.modulator.par1 = value_int;
             else
-                value = pars->Php.modulator.par1;
+                value = pars->PProfile.modulator.par1;
             break;
         case PADSYNTH::control::modulatorFrequency:
             if (write)
-                pars->Php.modulator.freq = value_int;
+                pars->PProfile.modulator.freq = value_int;
             else
-                value = pars->Php.modulator.freq;
+                value = pars->PProfile.modulator.freq;
             break;
         case PADSYNTH::control::size:
             if (write)
-                pars->Php.width = value_int;
+                pars->PProfile.width = value_int;
             else
-                value = pars->Php.width;
+                value = pars->PProfile.width;
             break;
         case PADSYNTH::control::baseType:
             if (write)
-                pars->Php.base.type = value;
+                pars->PProfile.base.type = value;
             else
-                value = pars->Php.base.type;
+                value = pars->PProfile.base.type;
             break;
         case PADSYNTH::control::harmonicSidebands:
             if (write)
-                 pars->Php.onehalf = value;
+                 pars->PProfile.onehalf = value;
             else
-                value = pars->Php.onehalf;
+                value = pars->PProfile.onehalf;
             break;
         case PADSYNTH::control::spectralWidth:
             if (write)
-                pars->Php.amp.par1 = value_int;
+                pars->PProfile.amp.par1 = value_int;
             else
-                value = pars->Php.amp.par1;
+                value = pars->PProfile.amp.par1;
             break;
         case PADSYNTH::control::spectralAmplitude:
             if (write)
-                pars->Php.amp.par2 = value_int;
+                pars->PProfile.amp.par2 = value_int;
             else
-                value = pars->Php.amp.par2;
+                value = pars->PProfile.amp.par2;
             break;
         case PADSYNTH::control::amplitudeMultiplier:
             if (write)
-                pars->Php.amp.type = value;
+                pars->PProfile.amp.type = value;
             else
-                value = pars->Php.amp.type;
+                value = pars->PProfile.amp.type;
             break;
         case PADSYNTH::control::amplitudeMode:
             if (write)
-                pars->Php.amp.mode = value;
+                pars->PProfile.amp.mode = value;
             else
-                value = pars->Php.amp.mode;
+                value = pars->PProfile.amp.mode;
             break;
         case PADSYNTH::control::autoscale:
             if (write)
-                pars->Php.autoscale = value_bool;
+                pars->PProfile.autoscale = value_bool;
             else
-                value = pars->Php.autoscale;
+                value = pars->PProfile.autoscale;
             break;
 
         case PADSYNTH::control::harmonicBase:
@@ -5946,13 +5946,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         switch (insertParam)
         {
             case TOPLEVEL::insertType::amplitude:
-                lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo.get());
                 break;
             case TOPLEVEL::insertType::frequency:
-                lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo.get());
                 break;
             case TOPLEVEL::insertType::filter:
-                lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo.get());
                 break;
         }
     }
@@ -6081,7 +6081,7 @@ void InterChange::commandFilter(CommandBlock *getData)
     }
     else if (engine == PART::engine::padSynth)
     {
-        filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
+        filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter.get()
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
@@ -6379,13 +6379,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case TOPLEVEL::insertType::amplitude:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope.get());
                 break;
             case TOPLEVEL::insertType::frequency:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope.get());
                 break;
             case TOPLEVEL::insertType::filter:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope.get());
                 break;
         }
     }

@@ -50,76 +50,106 @@ using func::power;
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth)
     : Presets(_synth)
-    , Pquality()
+    , Pmode{0}
+    , PProfile{}
+    , Pbandwidth{500}
+    , Pbwscale{0}
+    , Phrpos{}
+    , Pquality{}
+    , Pfixedfreq{0}
+    , PfixedfreqET{0}
+    , PBendAdjust{88}
+    , POffsetHz{64}
+    , PDetune{8192}  // fine detune "zero"
+    , PCoarseDetune{0}
+    , PDetuneType{1}
+
+    // base Waveform
+    , POscil{new OscilParameters(synth)}
+    , resonance{new Resonance(synth)}
+    , oscilgen{new OscilGen(fft_, resonance.get(), synth, POscil.get())}
+    , FreqEnvelope{new EnvelopeParams(0, 0, synth)}
+    , FreqLfo{new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth)}
+
+    // Amplitude parameters
+    , PStereo{1}
+    , PPanning{64}
+    , PRandom{false}
+    , PWidth{63}
+    , pangainL{0.7}
+    , pangainR{0.7}
+    , PVolume{90}
+    , PAmpVelocityScaleFunction{64}
+    , AmpEnvelope{new EnvelopeParams(64, 1, synth)}
+    , AmpLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth)}
+
+    , Fadein_adjustment{FADEIN_ADJUSTMENT_SCALE}
+    , PPunchStrength{0}
+    , PPunchTime{60}
+    , PPunchStretch{64}
+    , PPunchVelocitySensing{72}
+
+    // Filter Parameters
+    , GlobalFilter{new FilterParams(2, 94, 40, 0, synth)}
+    , PFilterVelocityScale{64}
+    , PFilterVelocityScaleFunction{64}
+    , FilterEnvelope{new EnvelopeParams(0, 1, synth)}
+    , FilterLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth)}
+
+    // Wavetable building
+    , Papplied{false}
+    , Pbuilding{false}
+    , Pready{false}
     , waveTable(Pquality)
     , newWaveTable() ///////////////////TODO will be replaced by future
+    , fft{fft_}
 {
     setpresettype("Ppadsyth");
-    fft = fft_;
+    POscil->ADvsPAD = true;  // OscilParameters::defaults() will be called again
 
-    resonance = new Resonance(synth);
-    POscil = new OscilParameters(synth);
-    POscil->ADvsPAD = true;
-    oscilgen = new OscilGen(fft_, resonance, synth, POscil);
-
-    FreqEnvelope = new EnvelopeParams(0, 0, synth);
     FreqEnvelope->ASRinit(64, 50, 64, 60);
-    FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
-
-    AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
-    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
-
-    GlobalFilter = new FilterParams(2, 94, 40, 0, synth);
-    FilterEnvelope = new EnvelopeParams(0, 1, synth);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
     defaults();
 }
 
 
-PADnoteParameters::~PADnoteParameters()
+void PADnoteParameters::HarmonicProfile::defaults()
 {
-    delete oscilgen;
-    delete POscil;
-    delete resonance;
-    delete FreqEnvelope;
-    delete FreqLfo;
-    delete AmpEnvelope;
-    delete AmpLfo;
-    delete GlobalFilter;
-    delete FilterEnvelope;
-    delete FilterLfo;
+    base.type = 0;
+    base.par1 = 80;
+    freqmult = 0;
+    modulator.par1 = 0;
+    modulator.freq = 30;
+    width = 127;
+    amp.type = 0;
+    amp.mode = 0;
+    amp.par1 = 80;
+    amp.par2 = 64;
+    autoscale = true;
+    onehalf = 0;
 }
 
+void PADnoteParameters::HarmonicPos::defaults()
+{
+    type = 0;
+    par1 = 64;
+    par2 = 64;
+    par3 = 0;
+}
 
 void PADnoteParameters::defaults(void)
 {
     Pmode = 0;
-    Php.base.type = 0;
-    Php.base.par1 = 80;
-    Php.freqmult = 0;
-    Php.modulator.par1 = 0;
-    Php.modulator.freq = 30;
-    Php.width = 127;
-    Php.amp.type = 0;
-    Php.amp.mode = 0;
-    Php.amp.par1 = 80;
-    Php.amp.par2 = 64;
-    Php.autoscale = true;
-    Php.onehalf = 0;
+    PProfile.defaults();
+    Phrpos.defaults();
 
     setPbandwidth(500);
     Pbwscale = 0;
 
     resonance->defaults();
     oscilgen->defaults();
-
-    Phrpos.type = 0;
-    Phrpos.par1 = 64;
-    Phrpos.par2 = 64;
-    Phrpos.par3 = 0;
 
     Pquality.resetToDefaults();
 
@@ -155,6 +185,8 @@ void PADnoteParameters::defaults(void)
     GlobalFilter->defaults();
     FilterEnvelope->defaults();
     FilterLfo->defaults();
+
+    // Wavetable rebuilding
     Papplied = false;
     Pbuilding = false;
     Pready = false;
@@ -196,14 +228,14 @@ float PADnoteParameters::getprofile(float *smp, int size)
         smp[i] = 0.0f;
 
     const int supersample = 16;
-    float basepar = power<2>(((1.0f - Php.base.par1 / 127.0f) * 12.0f));
-    float freqmult = floorf(power<2>((Php.freqmult / 127.0f * 5.0f)) + 0.000001f);
+    float basepar = power<2>(((1.0f - PProfile.base.par1 / 127.0f) * 12.0f));
+    float freqmult = floorf(power<2>((PProfile.freqmult / 127.0f * 5.0f)) + 0.000001f);
 
-    float modfreq = floorf(power<2>((Php.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
-    float modpar1 = powf((Php.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
-    float amppar1 = power<2>(powf((Php.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
-    float amppar2 = (1.0f - Php.amp.par2 / 127.0f) * 0.998f + 0.001f;
-    float width = powf((150.0f / (Php.width + 22.0f)), 2.0f);
+    float modfreq = floorf(power<2>((PProfile.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
+    float modpar1 = powf((PProfile.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
+    float amppar1 = power<2>(powf((PProfile.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
+    float amppar2 = (1.0f - PProfile.amp.par2 / 127.0f) * 0.998f + 0.001f;
+    float width = powf((150.0f / (PProfile.width + 22.0f)), 2.0f);
 
     for (int i = 0; i < size * supersample; ++i)
     {
@@ -224,7 +256,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
             }
         }
         // compute the full profile or one half
-        switch (Php.onehalf)
+        switch (PProfile.onehalf)
         {
         case 1:
             x = x * 0.5f + 0.5f;
@@ -245,7 +277,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
         x = fmodf(x + 1000.0f, 1.0f) * 2.0f - 1.0f;
         // this is the base function of the profile
         float f;
-        switch (Php.base.type)
+        switch (PProfile.base.type)
         {
         case 1:
             f = expf(-(x * x) * basepar);
@@ -268,7 +300,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
         float amp = 1.0f;
         origx = origx * 2.0f - 1.0f;
         // compute the amplitude multiplier
-        switch (Php.amp.type)
+        switch (PProfile.amp.type)
         {
         case 1:
             amp = expf(-(origx * origx) * 10.0f * amppar1);
@@ -284,9 +316,9 @@ float PADnoteParameters::getprofile(float *smp, int size)
         }
         // apply the amplitude multiplier
         float finalsmp = f;
-        if (Php.amp.type != 0)
+        if (PProfile.amp.type != 0)
         {
-            switch (Php.amp.mode)
+            switch (PProfile.amp.mode)
             {
             case 0:
                 finalsmp = amp * (1.0f - amppar2) + finalsmp * amppar2;
@@ -320,7 +352,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
     for (int i = 0; i < size; ++i)
         smp[i] /= max;
 
-    if (!Php.autoscale)
+    if (!PProfile.autoscale)
         return 0.5f;
     // compute the estimated perceived bandwidth
     float sum = 0.0f;
@@ -821,18 +853,18 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("bandwidth_scale",Pbwscale);
 
     xml->beginbranch("HARMONIC_PROFILE");
-        xml->addpar("base_type",Php.base.type);
-        xml->addpar("base_par1",Php.base.par1);
-        xml->addpar("frequency_multiplier",Php.freqmult);
-        xml->addpar("modulator_par1",Php.modulator.par1);
-        xml->addpar("modulator_frequency",Php.modulator.freq);
-        xml->addpar("width",Php.width);
-        xml->addpar("amplitude_multiplier_type",Php.amp.type);
-        xml->addpar("amplitude_multiplier_mode",Php.amp.mode);
-        xml->addpar("amplitude_multiplier_par1",Php.amp.par1);
-        xml->addpar("amplitude_multiplier_par2",Php.amp.par2);
-        xml->addparbool("autoscale",Php.autoscale);
-        xml->addpar("one_half",Php.onehalf);
+        xml->addpar("base_type",PProfile.base.type);
+        xml->addpar("base_par1",PProfile.base.par1);
+        xml->addpar("frequency_multiplier",PProfile.freqmult);
+        xml->addpar("modulator_par1",PProfile.modulator.par1);
+        xml->addpar("modulator_frequency",PProfile.modulator.freq);
+        xml->addpar("width",PProfile.width);
+        xml->addpar("amplitude_multiplier_type",PProfile.amp.type);
+        xml->addpar("amplitude_multiplier_mode",PProfile.amp.mode);
+        xml->addpar("amplitude_multiplier_par1",PProfile.amp.par1);
+        xml->addpar("amplitude_multiplier_par2",PProfile.amp.par2);
+        xml->addparbool("autoscale",PProfile.autoscale);
+        xml->addpar("one_half",PProfile.onehalf);
     xml->endbranch();
 
     xml->beginbranch("OSCIL");
@@ -931,18 +963,18 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("HARMONIC_PROFILE"))
     {
-        Php.base.type=xml->getpar127("base_type",Php.base.type);
-        Php.base.par1=xml->getpar127("base_par1",Php.base.par1);
-        Php.freqmult=xml->getpar127("frequency_multiplier",Php.freqmult);
-        Php.modulator.par1=xml->getpar127("modulator_par1",Php.modulator.par1);
-        Php.modulator.freq=xml->getpar127("modulator_frequency",Php.modulator.freq);
-        Php.width=xml->getpar127("width",Php.width);
-        Php.amp.type=xml->getpar127("amplitude_multiplier_type",Php.amp.type);
-        Php.amp.mode=xml->getpar127("amplitude_multiplier_mode",Php.amp.mode);
-        Php.amp.par1=xml->getpar127("amplitude_multiplier_par1",Php.amp.par1);
-        Php.amp.par2=xml->getpar127("amplitude_multiplier_par2",Php.amp.par2);
-        Php.autoscale=xml->getparbool("autoscale",Php.autoscale);
-        Php.onehalf=xml->getpar127("one_half",Php.onehalf);
+        PProfile.base.type=xml->getpar127("base_type",PProfile.base.type);
+        PProfile.base.par1=xml->getpar127("base_par1",PProfile.base.par1);
+        PProfile.freqmult=xml->getpar127("frequency_multiplier",PProfile.freqmult);
+        PProfile.modulator.par1=xml->getpar127("modulator_par1",PProfile.modulator.par1);
+        PProfile.modulator.freq=xml->getpar127("modulator_frequency",PProfile.modulator.freq);
+        PProfile.width=xml->getpar127("width",PProfile.width);
+        PProfile.amp.type=xml->getpar127("amplitude_multiplier_type",PProfile.amp.type);
+        PProfile.amp.mode=xml->getpar127("amplitude_multiplier_mode",PProfile.amp.mode);
+        PProfile.amp.par1=xml->getpar127("amplitude_multiplier_par1",PProfile.amp.par1);
+        PProfile.amp.par2=xml->getpar127("amplitude_multiplier_par2",PProfile.amp.par2);
+        PProfile.autoscale=xml->getparbool("autoscale",PProfile.autoscale);
+        PProfile.onehalf=xml->getpar127("one_half",PProfile.onehalf);
         xml->exitbranch();
     }
 
