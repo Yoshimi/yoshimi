@@ -31,28 +31,23 @@
 
 OscilParameters::OscilParameters(SynthEngine *_synth) :
     Presets(_synth),
-    ADvsPAD(false)
+    ADvsPAD(false),
+    basefuncFFTfreqs(MAX_OSCIL_SIZE)
 {
     setpresettype("Poscilgen");
-    FFTwrapper::newFFTFREQS(&basefuncFFTfreqs, MAX_OSCIL_SIZE);
     defaults();
 }
 
-OscilParameters::~OscilParameters()
-{
-    FFTwrapper::deleteFFTFREQS(&basefuncFFTfreqs);
-}
 
-void OscilParameters::updatebasefuncFFTfreqs(const FFTFREQS *src, int samples)
+void OscilParameters::updatebasefuncFFTfreqs(FFTFreqs const& src, int samples)
 {
-    memcpy(basefuncFFTfreqs.c, src->c, samples * sizeof(float));
-    memcpy(basefuncFFTfreqs.s, src->s, samples * sizeof(float));
+    memcpy(basefuncFFTfreqs.c, src.c, samples * sizeof(float));
+    memcpy(basefuncFFTfreqs.s, src.s, samples * sizeof(float));
 }
 
 void OscilParameters::defaults()
 {
-    memset(basefuncFFTfreqs.s, 0, MAX_OSCIL_SIZE * sizeof(float));
-    memset(basefuncFFTfreqs.c, 0, MAX_OSCIL_SIZE * sizeof(float));
+    basefuncFFTfreqs.reset();
 
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {

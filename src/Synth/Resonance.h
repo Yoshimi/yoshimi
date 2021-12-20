@@ -40,7 +40,7 @@ class Resonance : public Presets
         Resonance(SynthEngine *_synth);
         ~Resonance() { }
         void setpoint(int n, unsigned char p);
-        void applyres(int n, FFTFREQS fftdata, float freq);
+        void applyres(int n, FFTFreqs& fftdata, float freq);
         void smooth(void);
         void interpolatepeaks(int type);
         void randomize(int type);

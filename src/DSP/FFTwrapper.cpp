@@ -23,11 +23,37 @@
 */
 
 #include <cstring>
+#include <stdexcept>
 
 using namespace std;
 
 #include "Misc/Config.h"
 #include "DSP/FFTwrapper.h"
+
+
+FFTFreqs::FFTFreqs(size_t tableSize)
+    : size(tableSize)
+{
+    this->c = (float*)fftwf_malloc(size * sizeof(float));
+    this->s = (float*)fftwf_malloc(size * sizeof(float));
+    if (!c or !s)
+        throw std::bad_alloc();
+    reset();
+}
+
+void FFTFreqs::reset()
+{
+    memset(this->c, 0, size * sizeof(float));
+    memset(this->s, 0, size * sizeof(float));
+}
+
+FFTFreqs::~FFTFreqs()
+{
+    if (s) fftwf_free(s);
+    if (c) fftwf_free(c);
+}
+
+
 
 FFTwrapper::FFTwrapper(int fftsize_) :
     fftsize(fftsize_),
@@ -49,44 +75,25 @@ FFTwrapper::~FFTwrapper()
 }
 
 
-void FFTwrapper::newFFTFREQS(FFTFREQS *f, int size)
-{
-    f->c = (float*)fftwf_malloc(size * sizeof(float));
-    memset(f->c, 0, size * sizeof(float));
-    f->s = (float*)fftwf_malloc(size * sizeof(float));
-    memset(f->s, 0, size * sizeof(float));
-}
-
-
-void FFTwrapper::deleteFFTFREQS(FFTFREQS *f)
-{
-    if (f->s)
-        fftwf_free(f->s);
-    if (f->c)
-        fftwf_free(f->c);
-    f->s = f->c = NULL;
-}
-
-
 // Fast Fourier Transform
-void FFTwrapper::smps2freqs(const float *smps, FFTFREQS *freqs)
+void FFTwrapper::smps2freqs(const float *smps, FFTFreqs& freqs)
 {
     memcpy(data1, smps, fftsize * sizeof(float));
     fftwf_execute(planBasic);
-    memcpy(freqs->c, data1, half_fftsize * sizeof(float));
+    memcpy(freqs.c, data1, half_fftsize * sizeof(float));
     for (int i = 1; i < half_fftsize; ++i)
-        freqs->s[i] = data1[fftsize - i];
+        freqs.s[i] = data1[fftsize - i];
     data2[half_fftsize] = 0.0f;
 }
 
 
 // Inverse Fast Fourier Transform
-void FFTwrapper::freqs2smps(const FFTFREQS *freqs, float *smps)
+void FFTwrapper::freqs2smps(FFTFreqs const& freqs, float *smps)
 {
-    memcpy(data2, freqs->c, half_fftsize * sizeof(float));
+    memcpy(data2, freqs.c, half_fftsize * sizeof(float));
     data2[half_fftsize] = 0.0;
     for (int i = 1; i < half_fftsize; ++i)
-        data2[fftsize - i] = freqs->s[i];
+        data2[fftsize - i] = freqs.s[i];
     fftwf_execute(planInv);
     memcpy(smps, data2, fftsize * sizeof(float));
 }

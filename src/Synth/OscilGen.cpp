@@ -28,6 +28,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -50,28 +51,26 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth, Oscil
     synth(_synth),
     tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
     fft(fft_),
+    outoscilFFTfreqs(synth->halfoscilsize),
+    oscilFFTfreqs(synth->halfoscilsize),
     oscilupdate(params),
     res(res_),
     randseed(1),
     basePrng{},
     harmonicPrng{}
 {
-    FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);
     if (!tmpsmps)
         synth->getRuntime().Log("Very bad error, failed to allocate OscilGen::tmpsmps");
     else
         memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
-    FFTwrapper::newFFTFREQS(&oscilFFTfreqs, synth->halfoscilsize);
     genDefaults();
 }
 
 OscilGen::~OscilGen()
 {
-    FFTwrapper::deleteFFTFREQS(&oscilFFTfreqs);
     if (tmpsmps)
     {
         fftwf_free(tmpsmps);
-        FFTwrapper::deleteFFTFREQS(&outoscilFFTfreqs);
     }
 }
 
@@ -107,8 +106,7 @@ void OscilGen::genDefaults(void)
     memset(hmag, 0, MAX_AD_HARMONICS * sizeof(float));
     memset(hphase, 0, MAX_AD_HARMONICS * sizeof(float));
 
-    memset(oscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
-    memset(oscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
+    oscilFFTfreqs.reset();
 
     oldfilterpars = 0;
     oldsapars = 0;
@@ -120,12 +118,10 @@ void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[synth->oscilsize];
-    FFTFREQS freqs;
-    FFTwrapper::newFFTFREQS(&freqs, synth->halfoscilsize);
+    FFTFreqs freqs(synth->halfoscilsize);
     get(oscil, -1.0f);
-    FFTwrapper *fft = new FFTwrapper(synth->oscilsize);
-    fft->smps2freqs(oscil, &freqs);
-    delete fft;
+    std::unique_ptr<FFTwrapper> fft(new FFTwrapper(synth->oscilsize));
+    fft->smps2freqs(oscil, freqs);
 
     float max = 0.0f;
 
@@ -157,7 +153,6 @@ void OscilGen::convert2sine()
         if (params->Phmag[i] == 64)
             params->Phphase[i] = 64;
     }
-    FFTwrapper::deleteFFTFREQS(&freqs);
     prepare();
 }
 
@@ -668,15 +663,15 @@ void OscilGen::changebasefunction(void)
     if (params->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
     {
         // User base function
-        memcpy(oscilFFTfreqs.c, params->getbasefuncFFTfreqs()->c,
+        memcpy(oscilFFTfreqs.c, params->getbasefuncFFTfreqs().c,
                synth->halfoscilsize * sizeof(float));
-        memcpy(oscilFFTfreqs.s, params->getbasefuncFFTfreqs()->s,
+        memcpy(oscilFFTfreqs.s, params->getbasefuncFFTfreqs().s,
                synth->halfoscilsize * sizeof(float));
     }
     else if (params->Pcurrentbasefunc != 0)
     {
         getbasefunction(tmpsmps);
-        fft->smps2freqs(tmpsmps, &oscilFFTfreqs);
+        fft->smps2freqs(tmpsmps, oscilFFTfreqs);
         oscilFFTfreqs.c[0] = 0.0f;
     }
     else
@@ -685,7 +680,7 @@ void OscilGen::changebasefunction(void)
             oscilFFTfreqs.s[i] = oscilFFTfreqs.c[i] = 0.0f;
         //in this case basefuncFFTfreqs_ are not used
     }
-    params->updatebasefuncFFTfreqs(&oscilFFTfreqs, synth->halfoscilsize);
+    params->updatebasefuncFFTfreqs(oscilFFTfreqs, synth->halfoscilsize);
 
     oldbasefunc = params->Pcurrentbasefunc;
     oldbasepar = params->Pbasefuncpar;
@@ -715,7 +710,7 @@ void OscilGen::waveshape(void)
         oscilFFTfreqs.s[synth->halfoscilsize - i] *= tmp;
         oscilFFTfreqs.c[synth->halfoscilsize- i] *= tmp;
     }
-    fft->freqs2smps(&oscilFFTfreqs, tmpsmps);
+    fft->freqs2smps(oscilFFTfreqs, tmpsmps);
 
     // Normalize
     float max = 0.0f;
@@ -731,7 +726,7 @@ void OscilGen::waveshape(void)
     // Do the waveshaping
     waveShapeSmps(synth->oscilsize, tmpsmps, params->Pwaveshapingfunction, params->Pwaveshaping);
 
-    fft->smps2freqs(tmpsmps, &oscilFFTfreqs); // perform FFT
+    fft->smps2freqs(tmpsmps, oscilFFTfreqs); // perform FFT
 }
 
 
@@ -780,7 +775,7 @@ void OscilGen::modulation(void)
         oscilFFTfreqs.s[synth->halfoscilsize - i] *= tmp;
         oscilFFTfreqs.c[synth->halfoscilsize - i] *= tmp;
     }
-    fft->freqs2smps(&oscilFFTfreqs, tmpsmps);
+    fft->freqs2smps(oscilFFTfreqs, tmpsmps);
     int extra_points = 2;
     float *in = new float[synth->oscilsize + extra_points];
 
@@ -831,7 +826,7 @@ void OscilGen::modulation(void)
     }
 
     delete [] in;
-    fft->smps2freqs(tmpsmps, &oscilFFTfreqs); // perform FFT
+    fft->smps2freqs(tmpsmps, oscilFFTfreqs); // perform FFT
 }
 
 
@@ -1010,8 +1005,7 @@ void OscilGen::prepare(void)
         if (params->Phmag[i] == 64)
             hmag[i] = 0.0f;
 
-    for (int i = 0; i < synth->halfoscilsize; ++i)
-        oscilFFTfreqs.c[i] = oscilFFTfreqs.s[i] = 0.0f;
+    oscilFFTfreqs.reset();
     if (params->Pcurrentbasefunc == 0)
     {   // the sine case
         for (int i = 0; i < MAX_AD_HARMONICS; ++i)
@@ -1031,8 +1025,8 @@ void OscilGen::prepare(void)
                 int k = i * (j + 1);
                 if (k >= synth->halfoscilsize)
                     break;
-                float a = params->getbasefuncFFTfreqs()->c[i];
-                float b = params->getbasefuncFFTfreqs()->s[i];
+                float a = params->getbasefuncFFTfreqs().c[i];
+                float b = params->getbasefuncFFTfreqs().s[i];
                 float c = hmag[j] * cosf(hphase[j] * k);
                 float d = hmag[j] * sinf(hphase[j] * k);
                 oscilFFTfreqs.c[k] += a * c - b * d;
@@ -1067,15 +1061,14 @@ void OscilGen::prepare(void)
 }
 
 
-void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
+void OscilGen::adaptiveharmonic(FFTFreqs& f, float freq)
 {
     if (params->Padaptiveharmonics == 0 /*||(freq<1.0)*/)
         return;
     if (freq < 1.0f)
         freq = 440.0f;
 
-    FFTFREQS inf;
-    FFTwrapper::newFFTFREQS(&inf, synth->halfoscilsize);
+    FFTFreqs inf(synth->halfoscilsize);
     for (int i = 0; i < synth->halfoscilsize; ++i)
     {
         inf.s[i] = f.s[i];
@@ -1145,7 +1138,6 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     f.c[1] += f.c[0];
     f.s[1] += f.s[0];
     f.c[0] = f.s[0] = 0.0f;
-    FFTwrapper::deleteFFTFREQS(&inf);
 }
 
 
@@ -1245,8 +1237,8 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
     // see also comment at OscilGen::reseed()
     resetHarmonicPrng();
 
-    memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
-    memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
+    outoscilFFTfreqs.reset();
+
     int nyquist = int(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (params->ADvsPAD)
         nyquist = synth->halfoscilsize;
@@ -1352,7 +1344,7 @@ void OscilGen::get(float *smps, float freqHz, int resonance)
     }
     else
     {
-        fft->freqs2smps(&outoscilFFTfreqs, smps);
+        fft->freqs2smps(outoscilFFTfreqs, smps);
         for (int i = 0; i < synth->oscilsize; ++i)
             smps[i] *= 0.25f; // correct the amplitude
     }
@@ -1388,8 +1380,8 @@ void OscilGen::getspectrum(int n, float *spc, int what)
             if (params->Pcurrentbasefunc == 0)
                 spc[i - 1] = (i == 1) ? 1.0f : 0.0f;
             else
-                spc[i - 1] = sqrtf(params->getbasefuncFFTfreqs()->c[i] * params->getbasefuncFFTfreqs()->c[i]
-                                   + params->getbasefuncFFTfreqs()->s[i] * params->getbasefuncFFTfreqs()->s[i]);
+                spc[i - 1] = sqrtf(params->getbasefuncFFTfreqs().c[i] * params->getbasefuncFFTfreqs().c[i]
+                                 + params->getbasefuncFFTfreqs().s[i] * params->getbasefuncFFTfreqs().s[i]);
         }
     }
 
@@ -1410,7 +1402,7 @@ void OscilGen::getspectrum(int n, float *spc, int what)
 // Convert the oscillator as base function
 void OscilGen::useasbase(void)
 {
-    params->updatebasefuncFFTfreqs(&oscilFFTfreqs, synth->halfoscilsize);
+    params->updatebasefuncFFTfreqs(oscilFFTfreqs, synth->halfoscilsize);
     oldbasefunc = params->Pcurrentbasefunc = 127;
     prepare();
 }

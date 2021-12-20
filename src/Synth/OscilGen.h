@@ -79,7 +79,6 @@ class OscilGen : private WaveShapeSamples
         SynthEngine *synth;
 
         float *tmpsmps;
-        FFTFREQS outoscilFFTfreqs;
 
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
@@ -99,7 +98,7 @@ class OscilGen : private WaveShapeSamples
 
         void modulation(void); // Do the oscil modulation stuff
 
-        void adaptiveharmonic(FFTFREQS f, float freq);
+        void adaptiveharmonic(FFTFreqs& f, float freq);
         // Do the adaptive harmonic stuff
 
         // Do the adaptive harmonic postprocessing (2n+1,2xS,2xA,etc..)
@@ -148,7 +147,9 @@ class OscilGen : private WaveShapeSamples
             oldmodulationpar2,
             oldmodulationpar3;
 
-        FFTFREQS oscilFFTfreqs; // Oscillator Frequencies - this is different
+        FFTFreqs outoscilFFTfreqs;
+
+        FFTFreqs oscilFFTfreqs; // Oscillator Frequencies - this is different
                                 // than the hamonics set-up by the user, it may
                                 // contain time-domain data if the antialiasing
                                 // is turned off

@@ -637,8 +637,7 @@ void PADnoteParameters::applyparameters(bool force)
 
     // prepare a BIG FFT stuff
     FFTwrapper fft = FFTwrapper(newTable.tableSize);
-    FFTFREQS fftfreqs;
-    FFTwrapper::newFFTFREQS(&fftfreqs, newTable.tableSize / 2);
+    FFTFreqs fftfreqs(newTable.tableSize / 2);
 
     float adj[newTable.numTables]; // this is used to compute frequency relation to the base frequency
     for (size_t tabNr = 0; tabNr < newTable.numTables; ++tabNr)
@@ -668,11 +667,10 @@ void PADnoteParameters::applyparameters(bool force)
             if (!Pbuilding)
             {
                 std::cout << "not building 2" << std::endl;
-                FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
         }
-        fft.freqs2smps(&fftfreqs, newsmp);
+        fft.freqs2smps(fftfreqs, newsmp);
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
         // normalize(rms)
@@ -683,7 +681,6 @@ void PADnoteParameters::applyparameters(bool force)
             if (!Pbuilding)
             {
                 std::cout << "not building 3" << std::endl;
-                FFTwrapper::deleteFFTFREQS(&fftfreqs);
                 return;
             }
         }
@@ -704,7 +701,6 @@ void PADnoteParameters::applyparameters(bool force)
             return;
         }
     }
-    FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     std::cout << "normal exit" << std::endl;
     if (force)

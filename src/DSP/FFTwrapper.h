@@ -27,10 +27,26 @@
 
 #include <fftw3.h>
 
-typedef struct {
+/* holds the spectrum coefficients */
+class FFTFreqs
+{
+    size_t size;
+public:
     float *s;
     float *c;
-} FFTFREQS;
+
+public: // can not be copied or moved
+    FFTFreqs(FFTFreqs&&)                 = delete;
+    FFTFreqs(FFTFreqs const&)            = delete;
+    FFTFreqs& operator=(FFTFreqs&&)      = delete;
+    FFTFreqs& operator=(FFTFreqs const&) = delete;
+
+    // automatic memory-management
+    FFTFreqs(size_t tableSize);
+   ~FFTFreqs();
+
+    void reset();
+};
 
 
 class FFTwrapper
@@ -38,10 +54,8 @@ class FFTwrapper
     public:
         FFTwrapper(int fftsize_);
         ~FFTwrapper();
-        void smps2freqs(const float *smps, FFTFREQS *freqs);
-        void freqs2smps(const FFTFREQS *freqs, float *smps);
-        static void newFFTFREQS(FFTFREQS *f, int size);
-        static void deleteFFTFREQS(FFTFREQS *f);
+        void smps2freqs(const float *smps, FFTFreqs& freqs);
+        void freqs2smps(FFTFreqs const& freqs, float *smps);
 
     private:
         int fftsize;
