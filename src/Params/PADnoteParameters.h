@@ -33,8 +33,11 @@
 #include <memory>
 #include <utility>
 #include <cassert>
+#include <vector>
+#include <string>
 
 using std::unique_ptr;
+using std::vector;
 
 class XMLwrapper;
 class FFTwrapper;
@@ -121,6 +124,10 @@ namespace std {
 
 class PADnoteParameters : public Presets
 {
+        static constexpr size_t SIZE_HARMONIC_PROFILE = 512;
+        static constexpr size_t PROFILE_OVERSAMPLING = 16;
+
+
     public:
         PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
        ~PADnoteParameters()  = default;
@@ -138,21 +145,21 @@ class PADnoteParameters : public Presets
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
-
-        //returns a value between 0.0-1.0 that represents the estimation perceived bandwidth
-        float getprofile(float *smp, int size);
-
-        float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
-        float calcHarmonicPositionFactor(float n); // gets the harmonic position as factor.
+        float getBandwithInCent(); // convert Pbandwith setting into cents
 
         // (re)Building the Wavetable
         void setpadparams(bool force);
-        void applyparameters(bool force);
+        void render_wavetable(bool force);
         void activate_wavetable(void);
         bool export2wav(std::string basefilename);
 
+        vector<float> buildProfile(size_t size);
+        float calcProfileBandwith(vector<float> const& profile);
+        float calcHarmonicPositionFactor(float n); // position of partials, possibly non-harmonic.
 
-        //Harmonic profile (the frequency distribution of a single harmonic)
+
+        // Harmonic profile settings
+        // (controls the frequency distribution of a single harmonic)
         struct HarmonicProfile {
             struct BaseFunction {
                 unsigned char type;
@@ -179,11 +186,14 @@ class PADnoteParameters : public Presets
                                    // computed automatically
             unsigned char onehalf; // what part of the base function is used to
                                    // make the distribution
-
             void defaults();
         };
 
-        struct HarmonicPos { // where harmonics are positioned (on integer multiples or shifted away)
+        // Positioning of partials
+        // on integer multiples (type=0 -> regular harmonics)
+        // or shifted away for distorted spectrum
+        // see calcHarmonicPositionFactor(partial)
+        struct HarmonicPos {
             unsigned char type = 0;
             unsigned char par1 = 64;
             unsigned char par2 = 64;
@@ -192,20 +202,21 @@ class PADnoteParameters : public Presets
             void defaults();
         };
 
-        //parameters
+
+        //----PADSynth parameters--------------
 
         //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
         //the harmonic profile is used only on mode 0
         unsigned char Pmode;
 
+        PADQuality Pquality;     // Quality settings; controls number and size of wavetables
 
         HarmonicProfile PProfile;
 
         unsigned int Pbandwidth; // the values are from 0 to 1000
         unsigned char Pbwscale;  // how the bandwidth is increased according to
                                  // the harmonic's frequency
-        HarmonicPos Phrpos;
-        PADQuality Pquality;
+        HarmonicPos Phrpos;      // Positioning of partials (harmonic / distorted)
 
         // Frequency parameters
         unsigned char Pfixedfreq; // If the base frequency is fixed to 440 Hz
@@ -263,18 +274,13 @@ class PADnoteParameters : public Presets
         PADTables waveTable;
 
 ///////////////////////////////////////////TODO: obsolete, will be replaced by future
-        std::unique_ptr<PADTables> newWaveTable;
+        unique_ptr<PADTables> newWaveTable;
 ///////////////////////////////////////////TODO: (End)obsolete, will be replaced by future
 
 
     private:
-        void generatespectrum_bandwidthMode(float *spectrum, int size,
-                                            float basefreq,
-                                            float *profile,
-                                            int profilesize,
-                                            float bwadjust);
-        void generatespectrum_otherModes(float *spectrum, int size,
-                                         float basefreq);
+        vector<float> generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize, vector<float> const& profile);
+        vector<float> generateSpectrum_otherModes(float basefreq, size_t spectrumSize);
 
         void padparamsthread(bool force);
 };

@@ -81,9 +81,10 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
     code {//
         int ox = x(), oy = y(), lx =w (), ly = h() - 1;
         if (!visible()) return;
-        float smps[lx];
 
-        float realbw = pars->getprofile(smps,lx);
+        std::vector<float> profile = pars->buildProfile(lx);
+        float realbw = pars->calcProfileBandwith(profile);
+
         bool active = active_r();
 
         //draw the equivalent bandwidth
@@ -121,7 +122,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
 
         for (int i = 0; i < lx; i += step)
         {
-             int val = int((ly - 2) * smps[i]);
+             int val = int((ly - 2) * profile[i]);
               if (active)
                 fl_color(180, 210, 240);
             else
@@ -137,7 +138,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         for (int i = 0; i < lx; i++)
         {
             int ni = ox + i;
-            float nv = (ly - 2) * smps[i];
+            float nv = (ly - 2) * profile[i];
 
             if (active)
                 fl_color(0, 0, 100);
@@ -442,7 +443,7 @@ class PADnoteUI {: {public PresetsUI_}
             label cents
             xywh {60 320 55 15} labelsize 10 align 5 maximum 10000 textsize 11
             code0 {o->step(0.1, 1);}
-            code1 {o->value(pars->setPbandwidth(pars->Pbandwidth));}
+            code1 {o->value(pars->getBandwithInCent());}
             code2 {if (pars->Pmode!=0) o->deactivate();}
           }
           Fl_Choice bwscale {

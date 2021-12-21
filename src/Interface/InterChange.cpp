@@ -5211,7 +5211,7 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case PADSYNTH::control::bandwidth:
             if (write)
-                pars->setPbandwidth(value_int);
+                pars->Pbandwidth = value_int;
             else
                 value = pars->Pbandwidth;
             break;
