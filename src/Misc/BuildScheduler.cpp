@@ -20,17 +20,26 @@
 
 #include "Misc/BuildScheduler.h"
 
+#include <chrono>
 #include <thread>
 #include <mutex>
-//#include <string>
 
 
 namespace { // Implementation helpers...
+
+    /* »dirty wait delay« : when further rebuilds are requested while
+     * a background build process is underway, an additional grace period
+     * is added to allow for more changes to trickle in and avoid overloading
+     * the system with lots of rescheduling tasks. */
+    constexpr auto RESCHEDULE_DELAY = std::chrono::milliseconds(50);
+
 
     class TaskRunnerImpl
     {
         std::mutex mtx;
         using Guard = const std::lock_guard<std::mutex>;
+
+        using Task = task::RunnerBackend::Task;
 
         public:
             /* Meyer's Singleton */
@@ -40,19 +49,27 @@ namespace { // Implementation helpers...
                 return instance;
             }
 
-            void schedule(task::RunnerBackend::Task&& task)
+            /* Simplistic implementation of scheduling into background thread;
+             * launch a new thread for each call, without imposing resource limits. */
+            void schedule(Task&& task)
             {
                 Guard lock(mtx);
-                UNIMPLEMENTED("actually schedule a task into a background thread");
+                std::thread backgroundThread(move(task));
+                backgroundThread.detach();
             };
 
-            void reschedule(task::RunnerBackend::Task&& task)
+            void reschedule(Task&& task)
             {
-                Guard lock(mtx);
-                UNIMPLEMENTED("re-schedule a task, possibly with some penalty or wait time");
+                Task delayedTask{[workOp = move(task)] () -> void
+                                    {
+                                        std::this_thread::sleep_for(RESCHEDULE_DELAY);
+                                        workOp();
+                                    }};
+                schedule(move(delayedTask));
             }
     };
 }//(End)Implementation helpers.
+
 
 
 namespace task {
@@ -68,5 +85,9 @@ namespace task {
     {
         TaskRunnerImpl::access().reschedule(move(task));
     }
-}
 
+    void dirty_wait_delay()
+    {
+        std::this_thread::sleep_for(RESCHEDULE_DELAY);
+    }
+}

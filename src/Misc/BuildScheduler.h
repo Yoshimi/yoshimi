@@ -21,9 +21,6 @@
 #ifndef BUILDSCHEDULER_H
 #define BUILDSCHEDULER_H
 
-//#include "globals.h"
-
-#include <unistd.h>
 #include <atomic>
 #include <future>
 #include <utility>
@@ -32,24 +29,9 @@
 #include <stdexcept>
 #include <cassert>
 
-//using std::string;
 using std::move;
 
 
-//////////////////////TODO work in progress
-#include <string>
-
-class ToDo : public std::logic_error
-{
-public:
-    ToDo(std::string msg) :
-        std::logic_error{"UNIMPLEMENTED: "+msg}
-    { }
-};
-
-#define UNIMPLEMENTED(_MSG_) \
-    throw ToDo(_MSG_)
-//////////////////////TODO work in progress
 
 
 
@@ -193,6 +175,9 @@ public:
  * - Blocking wait for the value to become ready: call blockingWait();
  * - Retrieve the value and reset all state atomically: swap(existingTab)
  *
+ * Remark: while this class was designed for use by PADSynth, in fact
+ * there is no direct dependency; it is sufficient that there is some
+ * background operation function, which returns a (movable) TAB value.
  */
 template<class TAB>
 class FutureBuild
@@ -259,6 +244,12 @@ namespace task {
             static void schedule(Task&&);
             static void reschedule(Task&&);
     };
+
+    /* Add a fixed sleep period; related to the duration of a "dirty wait".
+     * The latter is imposed when new parameter changes invalidate an ongoing
+     * build, since typically further subsequent changes will arrive from GUI. */
+    void dirty_wait_delay();
+
 
     /* Global facility to manage building actions as background task.
      * When constructing a concrete FutureBuild instance, this front-end shall be used
@@ -464,7 +455,7 @@ void FutureBuild<TAB>::blockingWait()  const
 {
     // possibly wait until the actual background task was started
     while (dirty.load(std::memory_order_relaxed) and not target.load(std::memory_order_relaxed))
-        usleep(100);
+        task::dirty_wait_delay();
     FutureVal* future = target.load(std::memory_order_seq_cst);
     if (future)
         future->wait(); // blocks until result is ready
@@ -481,7 +472,6 @@ FutureBuild<TAB>::~FutureBuild()
         delete future;
     }
 }
-
 
 
 #endif /*BUILDSCHEDULER_H*/
