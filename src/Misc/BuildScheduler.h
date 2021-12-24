@@ -23,12 +23,14 @@
 
 //#include "globals.h"
 
+#include <unistd.h>
 #include <atomic>
 #include <future>
 #include <utility>
 #include <optional>
 #include <functional>
 #include <stdexcept>
+#include <cassert>
 
 //using std::string;
 using std::move;
@@ -66,18 +68,39 @@ class Optional
     bool hasResult;
 
 
-    Optional()
+
+public:
+    Optional(EmptyPlaceholder const&)
         : empty()
         , hasResult{false}
     { }
-public:
-    static const Optional EMPTY;
+    static const EmptyPlaceholder NoResult;
 
     Optional(VAL&& result)
         : resultVal{move(result)}
         , hasResult{true}
     { }
-    // Note: Optional<VAL> is copyable or movable, whenever VAL is.
+
+   ~Optional()
+    {
+        if (hasResult)
+          resultVal.~VAL();
+    }
+
+    // may only be moved, not copied...
+    Optional(Optional const&)            = delete;
+    Optional& operator=(Optional&&)      = delete;
+    Optional& operator=(Optional const&) = delete;
+
+    Optional(Optional&& rr)
+        : empty()
+        , hasResult{rr.hasResult}
+    {
+        if (hasResult)
+        {
+            new(&resultVal) VAL{move(rr.resultVal)};
+        }
+    }
 
 
     explicit operator bool()  const
@@ -101,8 +124,57 @@ public:
 
 /* marker for the »missing result« */
 template<class VAL>
-const Optional<VAL> Optional<VAL>::EMPTY{};
+const typename Optional<VAL>::EmptyPlaceholder Optional<VAL>::NoResult{};
 
+
+
+
+/* Workaround for a long-standing problem in C++ : std::function binding move-only values.
+ * This problem notoriously appears when dealing with std::promise in "Task"-Functions.
+ * The official solution is proposed for C++23 (std::move_only_function).
+ *
+ * Explanation: std::function requires its target to be /copyable/; whenever we bind some
+ * target functor (e.g. a Lambda function) into a std::function capsule, the code for a
+ * copy constructor will be generated (even if this code is never used), leading to
+ * compilation failure, whenever the lambda captures a move-only type.
+ *
+ * This adapter encapsulates and forwards to the embedded type, but provides a "fake"
+ * copy constructor. The intention is to never actually use that copy-ctor, and as a
+ * safety feature, the implementation will terminate the program when invoked.
+ */
+template<typename M>
+class FakeCopyAdapter
+{
+    using Payload = std::decay_t<M>;
+    Payload payload;
+
+    static Payload&& must_not_be_called()
+    {   assert(not "Copy constructor must not be invoked");
+        std::terminate();
+    }
+
+public:
+    template<typename X>
+    FakeCopyAdapter(X&& initialiser)
+        : payload(std::forward<X>(initialiser))
+    { }
+
+    operator Payload& ()             { return payload; }
+    Payload& operator* ()            { return payload; }
+    Payload* operator->()            { return &payload;}
+    operator Payload const& () const { return payload; }
+    Payload const& operator*() const { return payload; }
+    Payload const* operator->()const { return &payload;}
+
+    FakeCopyAdapter()                                  = default;
+    FakeCopyAdapter(FakeCopyAdapter &&)                = default;
+    FakeCopyAdapter& operator=(FakeCopyAdapter&&)      = default;
+    FakeCopyAdapter& operator=(FakeCopyAdapter const&) = delete;
+
+    FakeCopyAdapter(FakeCopyAdapter const&) noexcept
+        : FakeCopyAdapter{must_not_be_called()}
+    { }
+};
 
 
 
@@ -127,9 +199,8 @@ class FutureBuild
 {
     // Type abbreviations
     using FutureVal = std::future<TAB>;
-    using Promise   = std::promise<TAB>;
-
-    using BuildOp = std::function<TAB()>;
+    using ResultVal = Optional<TAB>;
+    using BuildOp = std::function<ResultVal()>;
 
     /* the managed data value under construction */
     std::atomic<FutureVal*> target{nullptr};
@@ -139,14 +210,15 @@ class FutureBuild
 
 
     //--Customisation---
-    using ScheduleAction   = std::function<FutureVal()>;
+    using ScheduleAction = std::function<FutureVal()>;
+    using SchedulerSetup = std::function<ScheduleAction(BuildOp)>;
 
-    ScheduleAction   schedule;
+    ScheduleAction schedule;
 
     public:
        ~FutureBuild();
-        FutureBuild(ScheduleAction schedFun)
-           : schedule{move(schedFun)}
+        FutureBuild(SchedulerSetup setupScheduler, BuildOp backgroundAction)
+           : schedule{setupScheduler(wireState(backgroundAction))}
         { }
 
         // shall not be copied or moved or assigned
@@ -157,18 +229,21 @@ class FutureBuild
 
 
         // state information functions
-        bool isRequested()  const;
+        bool shallRebuild()  const;
         bool isUnderway()  const;
         bool isReady()  const;
 
         explicit operator bool()  const { return isUnderway(); }
 
-
         // mutating operations
         void requestNewBuild();
         void swap(TAB & dataToReplace);
 
+        void blockingWait()  const;
+
     private:
+        BuildOp wireState(BuildOp);
+        FutureVal* retrieveLatestTarget();
 };
 
 
@@ -201,49 +276,48 @@ namespace task {
         using ScheduleAction = std::function<FutureVal()>;
 
         private:
-            static RunnerBackend::Task buildTaskForScheduler(BuildOperation&& buildOp, Promise&& promise)
+            struct PackagedBuildOperation
             {
-                return [buildOp=move(buildOp),
-                        promise=move(promise)]() -> void
-                        {// This code will run within the scheduler/task
-                            try {
-                                OptionalResult result = buildOp();
+                BuildOperation buildOp;
+                FakeCopyAdapter<Promise> promise;
 
-                                if (result)
-                                {   // Computation successful; push result into connected future
-                                    promise.set_value(move(*result));
-                                    return;
-                                }
-                            }
-                            catch(...)
-                            {
-                                std::exception_ptr failure = std::current_exception();
-                                promise.set_exception(failure);
-                                return;
-                            }
+                void operator() ()
+                {// This code will run within the scheduler/task
+                    try {
+                        OptionalResult result = buildOp();
 
-                            // computation was marked as /aborted/
-                            // Thus use the exiting functor and promise
-                            // to package them into a new task for rescheduling...
-                            RunnerBackend::Task followUpTask = buildTaskForScheduler(move(buildOp),
-                                                                                     move(promise));
-                            RunnerBackend::reschedule(move(followUpTask));
-                        };
-            }
+                        if (result)
+                        {   // Computation successful; push result into connected future
+                            promise->set_value(move(*result));
+                            return;
+                        }
+                    }
+                    catch(...)
+                    {
+                        std::exception_ptr failure = std::current_exception();
+                        promise->set_exception(failure);
+                        return;
+                    }
+
+                    // computation was marked as /aborted/
+                    // Thus use the exiting functor and promise
+                    // to package them into a new task for rescheduling...
+                    RunnerBackend::Task followUpTask = PackagedBuildOperation{move(buildOp),
+                                                                              move(*promise)};
+                    RunnerBackend::reschedule(move(followUpTask));
+                }
+            };
 
         public:
             static ScheduleAction wireBuildFunction(BuildOperation buildOp)
             {
-                return [buildOp=move(buildOp)]()
+                return [buildOp]()
                         {// This code will run whenever the FutureBuild wants to schedule another BuildOperation...
                             Promise promise;
                             FutureVal future = promise.get_future();
 
-                            // Package the BuildOperation into a generic functor
-                            RunnerBackend::Task task = buildTaskForScheduler(move(buildOp), move(promise));
-
-                            // now pass this packaged Task to the Task-Runner backend...
-                            RunnerBackend::schedule(move(task));
+                            // pass BuildOperation to the Task-Runner backend, packaged as generic functor...
+                            RunnerBackend::schedule(PackagedBuildOperation{move(buildOp), move(promise)});
 
                             // hand-over the corresponding future to FutureBuild
                             return future;
@@ -251,49 +325,161 @@ namespace task {
             }
     };
 
-
 }//(End)namespace task
+
+
 
 
 /* === Implementation of FutureBuild API functions === */
 
+/* Thread safe evaluation: was a new build / abort requested? */
 template<class TAB>
-bool FutureBuild<TAB>::isRequested()  const
+bool FutureBuild<TAB>::shallRebuild()  const
 {
-    UNIMPLEMENTED("thread save evaluation: was a new build / abort requested?");
+    return dirty.load(std::memory_order_relaxed);
 }
 
+/* thread safe evaluation: do we currently have an active build task scheduled? */
 template<class TAB>
 bool FutureBuild<TAB>::isUnderway()  const
 {
-    UNIMPLEMENTED("thread save evaluation: do we currently have an active build task running, or a result ready to receive?");
+    return bool{target.load(std::memory_order_consume)}
+        or shallRebuild();
 }
 
+/* Thread safe evaluation: is there a new build result ready to be picked up, without blocking?
+ * Note: technically, if the value is not ready yet, the current thread might be blocked and
+ * rescheduled immediately. There is no guaranteed wait-free status check for futures. */
 template<class TAB>
 bool FutureBuild<TAB>::isReady()  const
 {
-    UNIMPLEMENTED("thread save evaluation: is there a new build result ready to be picked up, without blocking?");
+    FutureVal* future = target.load(std::memory_order_acquire);
+    return future
+       and future->wait_for(std::chrono::microseconds(0)) == std::future_status::ready;
 }
 
 
 
+/* internal helper: link the backgroundAction with the internal state management.
+ * On construction, a function to schedule background actions is passed as extension point.
+ * This scheduler call will be setup such as to invoke the (likewise customisable) background
+ * action, and to control and manage this background scheduling is the purpose of this class.
+ * The thread safe internal state management however requires that the backgroundAction itself
+ * flips the "dirty" flag in a thread-safe way whenever it starts -- which can be linked in by
+ * wrapping the action with this helper function, thereby keeping the flag an internal detail.
+ */
+template<class TAB>
+typename FutureBuild<TAB>::BuildOp FutureBuild<TAB>::wireState(BuildOp backgroundAction)
+{
+    return [this, buildOp = move(backgroundAction)] () -> ResultVal
+                  {// This code will run scheduled into a background thread...
+                      bool expectTrue{true};
+                      if (not dirty.compare_exchange_strong(expectTrue, false, std::memory_order_acq_rel))
+                          throw std::logic_error("FutureBuild state handling logic broken: dirty flag was false. "
+                                                 "Before a background task starts, the 'dirty' flag must be set "
+                                                 "and will be cleared synchronised with the start of the task.");
+
+                      // invoke background action...
+                      return buildOp();
+                  };
+}
+
+
+/* Thread-safe idempotent operation: cause a new build to be launched;
+ * possibly terminate an existing build beforehand (by setting "dirty").
+ * Note: setting dirty with compare-and-swap establishes a fence, which
+ * only one thread can pass, and thus no one can set the target pointer,
+ * after we have loaded and found it to be NULL. */
 template<class TAB>
 void FutureBuild<TAB>::requestNewBuild()
 {
-    UNIMPLEMENTED("Thread-save idempotent operation: set a flag to cause a new build to be launched; possibly terminate an existing build beforehand");
+    bool expectFalse{false};
+    if (not dirty.compare_exchange_strong(expectFalse, true, std::memory_order_acq_rel))
+        return; // just walk away since dirty flag was set already...
+
+    if (target.load(std::memory_order_acquire))
+        return; // already running background task will see the dirty flag,
+                // then abort and restart itself and clear the flag
+
+    // If we reach this point, we are the first ones to set the dirty flag
+    // and we can ensure there is currently no background task underway...
+    // Launch a new background task, which on start clears the dirty flag.
+    FutureVal* expectedState = nullptr;
+    if (not target.compare_exchange_strong(expectedState, new FutureVal{move(schedule())}
+                                          ,std::memory_order_release))
+        throw std::logic_error("FutureBuild state handling logic broken: "
+                               "concurrent attempt to start a build, causing data corruption.");
 }
 
+
+/* internal helper: get the latest version of the future and atomically empty the pointer.
+ * Implemented by looping until we're able to fetch a stable pointer value and swap the
+ * pointer to NULL. Guarantees
+ * - if the returned pointer is NULL, target /was already NULL/
+ * - if the returned pointer is non-NULL, no one else can/could fetch it, and target is NULL now.
+ */
+template<class TAB>
+typename FutureBuild<TAB>::FutureVal* FutureBuild<TAB>::retrieveLatestTarget()
+{
+    FutureVal* future = target.load(std::memory_order_acquire);
+    while (future and not target.compare_exchange_strong(future, nullptr, std::memory_order_acq_rel))
+    { } // loop until we got the latest pointee and could atomically set the pointer to NULL
+    return future;
+}
+
+
+/* Thread-safe mutator: pick up the result and exchange it with the old value.
+ * Reset state and discard old value then. Blocks if result is not yet ready.
+ * WARNING: FutureBuild<TAB>::swap() must not be called concurrently, otherwise
+ *          the whole state handling logic can break, causing multiple builds
+ *          to be triggered at the same time and other horrible races. */
 template<class TAB>
 void FutureBuild<TAB>::swap(TAB & dataToReplace)
 {
-    UNIMPLEMENTED("Thread-save mutator: pick up the result and exchange it with the old value. Discard old value then. Blocks if result is not yet ready");
+    FutureVal* future = retrieveLatestTarget();
+    bool needReschedule = shallRebuild();
+    if (future)
+    {
+        using std::swap;
+        TAB newData{move(future->get())};  // may block until value is ready
+        swap(dataToReplace, newData);
+    }
+    // we do not know if the "dirty" state was set before we picked up the future,
+    // or afterwards. In the latter case, a new build could already be underway,
+    // but it is impossible to detect that from here without a race. Fortunately,
+    // this discrepancy can be "absorbed" by just calling requestNewBuild(),
+    // since there a new build will be started only when necessary and atomically.
+    if (needReschedule
+            and not target.load(std::memory_order_relaxed))
+    {
+        // temporarily clear "dirty" flag to allow us to get into requestNewBuild();
+        // the fence when setting "dirty", followed by target.load() ensures atomicity.
+        dirty.store(false, std::memory_order_release);
+        requestNewBuild();
+    }
 }
+
+template<class TAB>
+void FutureBuild<TAB>::blockingWait()  const
+{
+    // possibly wait until the actual background task was started
+    while (dirty.load(std::memory_order_relaxed) and not target.load(std::memory_order_relaxed))
+        usleep(100);
+    FutureVal* future = target.load(std::memory_order_seq_cst);
+    if (future)
+        future->wait(); // blocks until result is ready
+}
+
 
 template<class TAB>
 FutureBuild<TAB>::~FutureBuild()
 {
-    if (target.load(std::memory_order_seq_cst))
-        delete target;
+    FutureVal* future = retrieveLatestTarget();
+    if (future and future->valid())
+    {
+        future->wait(); // blocking wait until background task has finished
+        delete future;
+    }
 }
 
 
