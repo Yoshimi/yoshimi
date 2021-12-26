@@ -4793,9 +4793,11 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     {
         value = 1;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
         if(input.matchnMove(5, "force"))
-           return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, UNUSED, 0);
-
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges (== PART::control::padsynthParameters)
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, UNUSED, parameter);
     }
 
     if (cmd > -1)

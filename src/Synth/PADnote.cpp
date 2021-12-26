@@ -490,6 +490,8 @@ int PADnote::noteout(float *outl,float *outr)
 {
     if (padSynthUpdate.checkUpdated())
         computeNoteParameters();
+    else
+        pars->activate_wavetable();
 
     computecurrentparameters();
     if (tableNr >= pars->waveTable.numTables)

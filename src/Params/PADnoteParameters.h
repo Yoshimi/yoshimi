@@ -29,6 +29,7 @@
 #define PAD_NOTE_PARAMETERS_H
 
 #include "Params/Presets.h"
+#include "Misc/BuildScheduler.h"
 
 #include <memory>
 #include <utility>
@@ -104,22 +105,24 @@ public: // can be moved and swapped, but not copied...
         assert(tableNo < numTables);
         return &samples[0] + tableNo * (tableSize + INTERPOLATION_BUFFER);
     }
-private:
-    static size_t calcNumTables(PADQuality const&);
-    static size_t calcTableSize(PADQuality const&);
-};
 
-namespace std {
     // deliberately allow to swap two PADTables,
     // even while not being move assignable due to the const fields
-    inline void swap(PADTables& p1, PADTables& p2)
+    friend void swap(PADTables& p1, PADTables& p2)
     {
+        using std::swap;
         swap(p1.samples, p2.samples);
         swap(p1.basefreq,p2.basefreq);
         swap(const_cast<size_t&>(p1.numTables), const_cast<size_t&>(p2.numTables));
         swap(const_cast<size_t&>(p1.tableSize), const_cast<size_t&>(p2.tableSize));
     }
-}
+
+private:
+    static size_t calcNumTables(PADQuality const&);
+    static size_t calcTableSize(PADQuality const&);
+};
+
+
 
 
 class PADnoteParameters : public Presets
@@ -148,8 +151,8 @@ class PADnoteParameters : public Presets
         float getBandwithInCent(); // convert Pbandwith setting into cents
 
         // (re)Building the Wavetable
-        void setpadparams(bool force);
-        void render_wavetable(bool force);
+        void buildNewWavetable(bool blocking =false);
+        Optional<PADTables> render_wavetable();
         void activate_wavetable(void);
         bool export2wav(std::string basefilename);
 
@@ -266,23 +269,23 @@ class PADnoteParameters : public Presets
         unique_ptr<EnvelopeParams> FilterEnvelope;
         unique_ptr<LFOParams> FilterLfo;
 
-
-        bool Papplied;
-        bool Pbuilding;
-        bool Pready;
-
+        // current wavetable
         PADTables waveTable;
 
-///////////////////////////////////////////TODO: obsolete, will be replaced by future
-        unique_ptr<PADTables> newWaveTable;
-///////////////////////////////////////////TODO: (End)obsolete, will be replaced by future
+        // control for rebuilding wavetable (background action)
+        FutureBuild<PADTables> futureBuild;
 
 
     private:
         vector<float> generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize, vector<float> const& profile);
         vector<float> generateSpectrum_otherModes(float basefreq, size_t spectrumSize);
 
-        void padparamsthread(bool force);
+        // type abbreviations
+        using FutureVal = std::future<PADTables>;
+        using ResultVal = Optional<PADTables>;
+        using BuildOperation = std::function<ResultVal()>;
+        using ScheduleAction = std::function<FutureVal()>;
+        using SchedulerSetup = std::function<ScheduleAction(BuildOperation)>;
 };
 
 #endif

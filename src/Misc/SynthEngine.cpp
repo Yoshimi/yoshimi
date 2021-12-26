@@ -553,11 +553,14 @@ void SynthEngine::setReproducibleState(int seed)
                     }
                 if (kitItem.padpars and kitItem.Ppadenabled)
                     {
-                        part[p]->busy = true;
                         kitItem.padpars->oscilgen->reseed(randomINT());
-                        // rebuild PADSynth wavetable with new randseed
-                        kitItem.padpars->render_wavetable(true);
-                        part[p]->busy = false;
+                        // synchronously rebuild PADSynth wavetable with new randseed
+                        auto newTable = kitItem.padpars->render_wavetable();
+                        if (newTable)
+                        {
+                            std::cout << "SWAP for part["<<p<<"] kitItem["<<i<<"]" <<std::endl;        ////////////////TODO padthread debugging output
+                            swap(kitItem.padpars->waveTable, *newTable);
+                        }
                     }
             }
     Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(seed));
@@ -2101,13 +2104,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         {
             if (partLocal[npart])
             {
-                for(int kititem = 0; kititem < NUM_KIT_ITEMS; ++kititem)
-                {
-                    if (!part[npart]->kit[kititem].padpars)
-                        continue;
-                    if (part[npart]->kit[kititem].padpars->Pready)
-                        part[npart]->kit[kititem].padpars->activate_wavetable();
-                }
                 legatoPart = npart;
                 part[npart]->ComputePartSmps();
             }

@@ -29,6 +29,7 @@
 #include <bitset>
 #include <unistd.h>
 #include <thread>
+#include <atomic>
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
@@ -196,39 +197,6 @@ void *InterChange::sortResultsThread(void)
         }
             usleep(80); // actually gives around 120 uS
 
-        /*
-         * Experimental auto apply - not stable with big wavetables
-         * This limits the rate at which parameters will be applied,
-         * and also spreads different padsynth instances through this
-         * range to reduce the chance of several threads running at
-         * the same time.
-         * The offset also reduces the likelihood of the thread calls
-         * being made at the same time as other operations.
-         */
-        const unsigned int granularity = 1023; // must be (power of 2) - 1
-        const int stepsize = int(granularity / 97);
-        if (synth->getRuntime().autoPadsynth)
-        {
-            for(int i = 0; i < synth->getRuntime().NumAvailableParts; ++i)
-            {
-                if (synth->part[i]->Penabled)
-                {
-                    int npart = i;
-                    for(int j = 0; j < NUM_KIT_ITEMS; ++j)
-                    {
-                        int kititem = j;
-                        if (synth->part[npart]->kit[kititem].Ppadenabled)
-                        {
-                            if (int(tick & granularity) == stepsize +(stepsize * npart * kititem))
-                            {
-                                if (!synth->part[npart]->kit[kititem].padpars->Papplied && ! synth->part[npart]->kit[kititem].padpars->Pbuilding)
-                                    synth->part[npart]->kit[kititem].padpars->setpadparams(false);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     return NULL;
 }
@@ -899,9 +867,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            synth->part[partnum]->kit[kititem].padpars->setpadparams(false);
-            while (!synth->part[partnum]->kit[kititem].padpars->Papplied)
-                usleep(100);
+            synth->part[partnum]->kit[kititem].padpars->buildNewWavetable(true); // blocking wait for result
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
                 synth->addHistory(text, TOPLEVEL::XML::PadSample);
@@ -1518,18 +1484,20 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
                 int temp = kititem;
                 if (temp >= NUM_KIT_ITEMS)
                     temp = 0;
-                synth->part[npart]->kit[temp].padpars->setpadparams((parameter == 0));
+                //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
+                synth->part[npart]->kit[temp].padpars->buildNewWavetable((parameter == 0));
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
             break;
         case PART::control::padsynthParameters:
             if (write)
             {
-                synth->part[npart]->kit[kititem].padpars->setpadparams((parameter == 0));
+                //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
+                synth->part[npart]->kit[kititem].padpars->buildNewWavetable((parameter == 0));  // parameter == 0 causes blocking wait
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
             else
-                value = part->kit[kititem].padpars->Papplied;
+                value = not part->kit[kititem].padpars->futureBuild.isUnderway();
             break;
 
         case PART::control::audioDestination:
@@ -2348,8 +2316,10 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
     }
     if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
-        part->kit[kititem].padpars->Papplied = false;
-        part->kit[kititem].padpars->Pbuilding = false;
+        if (synth->getRuntime().autoPadsynth)
+        {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
+            part->kit[kititem].padpars->buildNewWavetable();
+        }
         getData->data.offset = 0;
     }
     return true;
@@ -3588,8 +3558,10 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write && (part->kit[kititem].Ppadenabled != value_bool))
             {
                 part->kit[kititem].Ppadenabled = value_bool;
-                if (!part->kit[kititem].padpars->Papplied)
-                    getData->data.source = TOPLEVEL::action::lowPrio;
+                /////////////TODO padthread: do we want to trigger a rebuild unconditionally here, whenever activating a PADsynth?
+                /////////////                or is there any way we can know we still need to apply? do we actually need to care at all?
+                /////////////                or is it sufficient to auto-apply whenever a relevant PAD waveform parameter is changed?
+                part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
             }
             else
                 value = part->kit[kititem].Ppadenabled;
@@ -5430,18 +5402,13 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case PADSYNTH::control::applyChanges:
             if (write && value >= 0.5f)
-            { // this control is 'expensive' only used if necessary
-                if (!pars->Papplied  && !pars->Pbuilding)
-                {
-                    cout << "applying params" << endl;
-                    getData->data.source = TOPLEVEL::action::lowPrio;
-                    getData->data.value = 1;
-                }
-                else
-                    getData->data.source = TOPLEVEL::action::noAction;
+            {
+                bool blocking = (0 == getData->data.parameter);
+                cout << "applying params (blocking="<<blocking<<")" << endl;        ////////////////TODO padthread debugging output
+                pars->buildNewWavetable(blocking);
             }
             else
-                value = pars->Papplied;
+                value = not pars->futureBuild.isUnderway();
             break;
 
         case PADSYNTH::control::stereo:
@@ -5487,8 +5454,7 @@ void InterChange::commandPad(CommandBlock *getData)
     {
         if (write)
         {
-            pars->Papplied = false;
-            pars->Pbuilding = false;
+            pars->buildNewWavetable();
         }
         getData->data.offset = 0;
     }

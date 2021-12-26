@@ -28,6 +28,7 @@
 #include <functional>
 #include <stdexcept>
 #include <cassert>
+#include <iostream>        ////////////////TODO padthread debugging output
 
 using std::move;
 
@@ -48,7 +49,6 @@ class Optional
         VAL resultVal;
     };
     bool hasResult;
-
 
 
 public:
@@ -111,7 +111,7 @@ const typename Optional<VAL>::EmptyPlaceholder Optional<VAL>::NoResult{};
 
 
 
-/* Workaround for a long-standing problem in C++ : std::function binding move-only values.
+/* Workaround for a long-standing problem in C++ : std::function to bind move-only values.
  * This problem notoriously appears when dealing with std::promise in "Task"-Functions.
  * The official solution is proposed for C++23 (std::move_only_function).
  *
@@ -161,8 +161,8 @@ public:
 
 
 
-/* An optional link to a data value under construction.
- * The data value (template Parameter TAB) is assumed to be produced
+/* Thread-safe optional link to a data value under construction.
+ * The data value (template Parameter TAB) is expected to be produced
  * by a function running in some background thread or task scheduler.
  * FutureBuild is the front-end to be used by Synth code to deal with
  * such a value, and manage re-building of that value on demand.
@@ -178,6 +178,7 @@ public:
  * Remark: while this class was designed for use by PADSynth, in fact
  * there is no direct dependency; it is sufficient that there is some
  * background operation function, which returns a (movable) TAB value.
+ * Likewise, there is no direct dependency to the actual scheduler.
  */
 template<class TAB>
 class FutureBuild
@@ -351,7 +352,7 @@ bool FutureBuild<TAB>::isReady()  const
 
 
 
-/* internal helper: link the backgroundAction with the internal state management.
+/* Internal helper: Link the backgroundAction with the internal state management.
  * On construction, a function to schedule background actions is passed as extension point.
  * This scheduler call will be setup such as to invoke the (likewise customisable) background
  * action, and to control and manage this background scheduling is the purpose of this class.
@@ -392,6 +393,7 @@ void FutureBuild<TAB>::requestNewBuild()
         return; // already running background task will see the dirty flag,
                 // then abort and restart itself and clear the flag
 
+std::cout << "##+++++ requestNewBuild() --> indeed trigger..." <<std::endl;        ////////////////TODO padthread debugging output
     // If we reach this point, we are the first ones to set the dirty flag
     // and we can ensure there is currently no background task underway...
     // Launch a new background task, which on start clears the dirty flag.
@@ -455,10 +457,19 @@ void FutureBuild<TAB>::blockingWait()  const
 {
     // possibly wait until the actual background task was started
     while (dirty.load(std::memory_order_relaxed) and not target.load(std::memory_order_relaxed))
+    {
+std::cout << "##+++++ blockingWait() dirty = "<<dirty.load(std::memory_order_relaxed) <<std::endl;        ////////////////TODO padthread debugging output
         task::dirty_wait_delay();
+std::cout << "##+++++ blockingWait() dirty = "<<dirty.load(std::memory_order_relaxed) <<std::endl;        ////////////////TODO padthread debugging output
+    }
+
     FutureVal* future = target.load(std::memory_order_seq_cst);
     if (future)
+    {
+std::cout << "##+++++ blockingWait() future-state : "<<int(future->wait_for(std::chrono::microseconds(0))) <<std::endl;        ////////////////TODO padthread debugging output
         future->wait(); // blocks until result is ready
+std::cout << "##+++++ blockingWait() future-state : "<<int(future->wait_for(std::chrono::microseconds(0))) <<std::endl;        ////////////////TODO padthread debugging output
+    }
 }
 
 
