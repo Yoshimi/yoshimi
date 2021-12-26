@@ -35,8 +35,9 @@
 
 #include <list>
 
-class SynthEngine;
 class DataText;
+class SynthEngine;
+class PADnoteParameters;
 
 // used by main.cpp and SynthEngine.cpp
 extern std::string singlePath;
@@ -116,7 +117,7 @@ class InterChange : private DataText
         bool processAdd(CommandBlock *getData, SynthEngine *synth);
         bool processVoice(CommandBlock *getData, SynthEngine *synth);
         bool processSub(CommandBlock *getData, SynthEngine *synth);
-        bool processPad(CommandBlock *getData, SynthEngine *synth);
+        bool processPad(CommandBlock *getData);
 
         void commandMidi(CommandBlock *getData);
         void vectorClear(int Nvector);
@@ -130,7 +131,7 @@ class InterChange : private DataText
         void commandAdd(CommandBlock *getData);
         void commandAddVoice(CommandBlock *getData);
         void commandSub(CommandBlock *getData);
-        void commandPad(CommandBlock *getData);
+        bool commandPad(CommandBlock *getData, PADnoteParameters& pars);
         void commandOscillator(CommandBlock *getData, OscilParameters *oscil);
         void commandResonance(CommandBlock *getData, Resonance *respar);
         void commandLFO(CommandBlock *getData);

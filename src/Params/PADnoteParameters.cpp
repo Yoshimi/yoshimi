@@ -1063,6 +1063,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
     // trigger re-build of the wavetable as background task...
+    std::cout << "|PADpar::getfromXML| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
     buildNewWavetable();
     // result will be picked up from PADnote::noteout() when ready
 }
