@@ -49,6 +49,7 @@
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
 #include "Effects/EffectMgr.h"
+#include "DSP/FFTwrapper.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #ifdef GUI_FLTK
@@ -5610,7 +5611,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::useAsBaseFunction:
             if (write)
             {
-                FFTwrapper fft(synth->oscilsize);
+                FFTcalc fft(synth->oscilsize);
                 OscilGen gen(&fft, NULL, synth, oscil);
                 gen.useasbase();
                 if (value_bool)
@@ -5760,7 +5761,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::convertToSine:
             if (write)
             {
-                FFTwrapper fft(synth->oscilsize);
+                FFTcalc fft(synth->oscilsize);
                 OscilGen gen(&fft, NULL, synth, oscil);
                 gen.convert2sine();
                 oscil->presetsUpdated();

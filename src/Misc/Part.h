@@ -30,6 +30,7 @@
 #include <list>
 #include <string>
 #include "globals.h"
+#include "DSP/FFTwrapper.h"
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -41,7 +42,6 @@ class Controller;
 class XMLwrapper;
 class Microtonal;
 class EffectMgr;
-class FFTwrapper;
 
 class SynthEngine;
 
@@ -50,7 +50,7 @@ class Part
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
-        Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth);
+        Part(Microtonal *microtonal_, FFTcalc *fft_, SynthEngine *_synth);
         ~Part();
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
@@ -171,7 +171,7 @@ class Part
         void setPan(float value);
 
         Microtonal *microtonal;
-        FFTwrapper *fft;
+        FFTcalc *fft;
 
         struct PartNotes {
             NoteStatus status;

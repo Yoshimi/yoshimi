@@ -26,7 +26,6 @@
 
 #include <iostream>
 
-#include "DSP/FFTwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 

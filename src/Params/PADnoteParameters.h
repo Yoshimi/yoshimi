@@ -30,6 +30,7 @@
 
 #include "Params/Presets.h"
 #include "Misc/BuildScheduler.h"
+#include "DSP/FFTwrapper.h"
 
 #include <memory>
 #include <utility>
@@ -41,7 +42,6 @@ using std::unique_ptr;
 using std::vector;
 
 class XMLwrapper;
-class FFTwrapper;
 class OscilGen;
 class OscilParameters;
 class Resonance;
@@ -132,7 +132,7 @@ class PADnoteParameters : public Presets
 
 
     public:
-        PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
+        PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth);
        ~PADnoteParameters()  = default;
 
         // shall not be copied or moved or assigned

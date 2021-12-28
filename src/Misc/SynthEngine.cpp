@@ -271,7 +271,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     fadeStepShort = 1.0f / 0.005f / samplerate_f; // 5ms for 0 to 1
     ControlStep = 127.0f / 0.2f / samplerate_f; // 200ms for 0 to 127
 
-    if (!(fft = new FFTwrapper(oscilsize)))
+    if (!(fft = new FFTcalc(oscilsize)))
     {
         Runtime.Log("SynthEngine failed to allocate fft");
         goto bail_out;

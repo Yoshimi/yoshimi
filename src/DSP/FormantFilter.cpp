@@ -24,7 +24,6 @@
     This file is derivative of ZynAddSubFX original code
 */
 
-#include "DSP/FFTwrapper.h"
 #include "DSP/FormantFilter.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"

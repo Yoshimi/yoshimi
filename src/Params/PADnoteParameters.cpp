@@ -87,7 +87,7 @@ namespace{ // Implementation helpers...
 
 
 
-PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth)
+PADnoteParameters::PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth)
     : Presets(_synth)
     , Pmode{0}
     , Pquality{}
@@ -664,7 +664,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
     std::cout << "START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
-    FFTwrapper fft = FFTwrapper(newTable.tableSize);
+    FFTcalc fft{newTable.tableSize};
     FFTFreqs fftFreqs(spectrumSize);
 
     // (in »bandwidth mode«) build harmonic profile used for each line

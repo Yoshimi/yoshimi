@@ -25,7 +25,6 @@
 
 #include <cstring>
 
-#include "DSP/FFTwrapper.h"
 #include "DSP/AnalogFilter.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/NumericFuncs.h"

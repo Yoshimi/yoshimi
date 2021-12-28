@@ -39,7 +39,7 @@ using func::power;
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) :
+ADnoteParameters::ADnoteParameters(FFTcalc *fft_, SynthEngine *_synth) :
     Presets(_synth),
     fft(fft_)
 {

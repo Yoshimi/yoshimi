@@ -23,8 +23,8 @@ file (GLOB yoshimi_lv2_plugin_files
         lv2extui.h
         lv2extprg.h)
 file (GLOB yoshimi_dsp_files
-    ../DSP/FFTwrapper.cpp  ../DSP/AnalogFilter.cpp  ../DSP/FormantFilter.cpp
-    ../DSP/SVFilter.cpp  ../DSP/Filter.cpp  ../DSP/Unison.cpp
+    ../DSP/AnalogFilter.cpp  ../DSP/Filter.cpp  ../DSP/FormantFilter.cpp
+    ../DSP/SVFilter.cpp  ../DSP/Unison.cpp
     ../DSP/FFTwrapper.h  ../DSP/AnalogFilter.h  ../DSP/FormantFilter.h
     ../DSP/SVFilter.h  ../DSP/Filter.h  ../DSP/Unison.h)
 file (GLOB yoshimi_effects_files

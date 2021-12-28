@@ -33,6 +33,7 @@
 #include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
 #include "Misc/XMLwrapper.h"
+#include "DSP/FFTwrapper.h"
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
@@ -41,7 +42,7 @@ class SynthEngine;
 class OscilGen : private WaveShapeSamples
 {
     public:
-        OscilGen(FFTwrapper *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
+        OscilGen(FFTcalc *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
         ~OscilGen();
 
         void changeParams(OscilParameters *params_);
@@ -83,7 +84,7 @@ class OscilGen : private WaveShapeSamples
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
-        FFTwrapper *fft;
+        FFTcalc *fft;
 
         // computes the basefunction and make the FFT; newbasefunc<0  = same basefunc
         void changebasefunction(void);

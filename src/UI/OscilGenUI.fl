@@ -1095,7 +1095,7 @@ o->hide();} open
     kititem = kititem_;
     engine = engine_;
     oscil = oscil_;
-    fft = new FFTwrapper(synth->oscilsize);
+    fft = new FFTcalc(synth->oscilsize);
     oscilSmp = new OscilGen(fft, NULL, synth, oscil);
     oldosc = oldosc_;
     cbwidget = cbwidget_;
@@ -1341,7 +1341,7 @@ o->hide();} open
   }
   decl {OscilParameters *oscil;} {private local
   }
-  decl {FFTwrapper *fft;} {private local
+  decl {FFTcalc *fft;} {private local
   }
   decl {OscilGen *oscilSmp;} {private local
   }

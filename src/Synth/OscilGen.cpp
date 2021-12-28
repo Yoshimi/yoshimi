@@ -46,7 +46,7 @@ using func::power;
 //char OscilGen::harmonic_random_state[256];
 //struct random_data OscilGen::harmonic_random_buf;
 
-OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
+OscilGen::OscilGen(FFTcalc *fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
     params(params_),
     synth(_synth),
     tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
@@ -120,7 +120,7 @@ void OscilGen::convert2sine()
     float oscil[synth->oscilsize];
     FFTFreqs freqs(synth->halfoscilsize);
     get(oscil, -1.0f);
-    std::unique_ptr<FFTwrapper> fft(new FFTwrapper(synth->oscilsize));
+    std::unique_ptr<FFTcalc> fft(new FFTcalc(synth->oscilsize));
     fft->smps2freqs(oscil, freqs);
 
     float max = 0.0f;

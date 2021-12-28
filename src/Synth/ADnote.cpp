@@ -29,7 +29,6 @@
 #include <cassert>
 #include <iostream>
 
-#include "DSP/FFTwrapper.h"
 #include "Synth/Envelope.h"
 #include "Synth/ADnote.h"
 #include "Synth/LFO.h"

@@ -29,7 +29,6 @@
 #include <cmath>
 #include <iostream>
 
-#include "DSP/FFTwrapper.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
 #include "Synth/SUBnote.h"

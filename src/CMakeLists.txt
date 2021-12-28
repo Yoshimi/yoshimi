@@ -271,8 +271,8 @@ configure_file(
     IMMEDIATE @ONLY)
 
 set (DSP_sources
-    DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
-    DSP/SVFilter.cpp  DSP/Filter.cpp  DSP/Unison.cpp
+    DSP/AnalogFilter.cpp  DSP/Filter.cpp  DSP/FormantFilter.cpp
+    DSP/SVFilter.cpp  DSP/Unison.cpp
 )
 
 set (Effects_sources
