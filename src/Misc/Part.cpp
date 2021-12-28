@@ -76,7 +76,7 @@ Part::Part(Microtonal *microtonal_, FFTcalc *fft_, SynthEngine *_synth) :
 
     kit[0].adpars = new ADnoteParameters(fft, synth);
     kit[0].subpars = new SUBnoteParameters(synth);
-    kit[0].padpars = new PADnoteParameters(fft, synth);
+    kit[0].padpars = new PADnoteParameters(synth);
 
     // Part's Insertion Effects init
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
@@ -1340,7 +1340,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
         if (!kit[kititem].subpars)
             kit[kititem].subpars = new SUBnoteParameters(synth);
         if (!kit[kititem].padpars)
-            kit[kititem].padpars = new PADnoteParameters(fft, synth);
+            kit[kititem].padpars = new PADnoteParameters(synth);
     }
 
     if (resetallnotes)

@@ -80,6 +80,11 @@ namespace{ // Implementation helpers...
         // TODO can we explain those magical numbers??
         // (Likely due to the fact we're still pre-IFFT here)
         // Are those numbers exact, or just some "I don't care it seems to work" approximation?
+        //
+        // TODO Maybe related: http://fftw.org/fftw3_doc/Complex-DFTs.html at the bottom
+        // "FFTW computes an unnormalized transform: computing a forward followed by a backward transform
+        //  (or vice versa) will result in the original data multiplied by the size of the transform (the product of the dimensions).
+        //
         for (size_t i = 0; i < size; ++i)
             data[i] = float(double(data[i]) / rms);
     }
@@ -87,7 +92,7 @@ namespace{ // Implementation helpers...
 
 
 
-PADnoteParameters::PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth)
+PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
     : Presets(_synth)
     , Pmode{0}
     , Pquality{}
@@ -104,9 +109,10 @@ PADnoteParameters::PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth)
     , PDetuneType{1}
 
     // base Waveform
+    , fft(synth->oscilsize)
     , POscil{new OscilParameters(synth)}
     , resonance{new Resonance(synth)}
-    , oscilgen{new OscilGen(fft_, resonance.get(), synth, POscil.get())}
+    , oscilgen{new OscilGen(&fft, resonance.get(), synth, POscil.get())}
     , FreqEnvelope{new EnvelopeParams(0, 0, synth)}
     , FreqLfo{new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth)}
 
@@ -139,6 +145,8 @@ PADnoteParameters::PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth)
     , waveTable(Pquality)
     , futureBuild(task::BuildScheduler<PADTables>::wireBuildFunction
                  ,BuildOperation([this](){ return render_wavetable(); }))
+
+    , wavetablePhasePrng{}
 {
     setpresettype("Ppadsyth");
     POscil->ADvsPAD = true;  // OscilParameters::defaults() will be called again
@@ -220,6 +228,16 @@ void PADnoteParameters::defaults(void)
     GlobalFilter->defaults();
     FilterEnvelope->defaults();
     FilterLfo->defaults();
+
+    // reseed OscilGen and wavetable phase randomisation
+    reseed(synth->randomINT());
+}
+
+
+void PADnoteParameters::reseed(int seed)
+{
+    wavetablePhasePrng.init(seed);
+    oscilgen->reseed(seed);
 }
 
 
@@ -664,7 +682,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
     std::cout << "START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
-    FFTcalc fft{newTable.tableSize};
+    FFTcalcConcurrent fft{newTable.tableSize};
     FFTFreqs fftFreqs(spectrumSize);
 
     // (in »bandwidth mode«) build harmonic profile used for each line
@@ -698,8 +716,8 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
                       : generateSpectrum_otherModes(basefreq, spectrumSize);
 
         for (size_t i = 1; i < spectrumSize; ++i)
-        {   // randomize the phases
-            float phase = synth->numRandom() * 6.29f;
+        {   // Note: each wavetable uses differently randomised phases
+            float phase = wavetablePhasePrng.numRandom() * 6.29f;
             fftFreqs.c[i] = spectrum[i] * cosf(phase);
             fftFreqs.s[i] = spectrum[i] * sinf(phase);
         }

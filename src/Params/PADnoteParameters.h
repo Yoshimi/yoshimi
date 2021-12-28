@@ -30,6 +30,8 @@
 
 #include "Params/Presets.h"
 #include "Misc/BuildScheduler.h"
+#include "Misc/RandomGen.h"
+#include "Synth/OscilGen.h"
 #include "DSP/FFTwrapper.h"
 
 #include <memory>
@@ -42,7 +44,6 @@ using std::unique_ptr;
 using std::vector;
 
 class XMLwrapper;
-class OscilGen;
 class OscilParameters;
 class Resonance;
 class EnvelopeParams;
@@ -132,7 +133,7 @@ class PADnoteParameters : public Presets
 
 
     public:
-        PADnoteParameters(FFTcalc *fft_, SynthEngine *_synth);
+        PADnoteParameters(SynthEngine *_synth);
        ~PADnoteParameters()  = default;
 
         // shall not be copied or moved or assigned
@@ -143,6 +144,7 @@ class PADnoteParameters : public Presets
 
 
         void defaults(void);
+        void reseed(int value);
         void setPan(char pan, unsigned char panLaw);
 
         void add2XML(XMLwrapper *xml);
@@ -236,6 +238,8 @@ class PADnoteParameters : public Presets
         unsigned short int PCoarseDetune; // coarse detune+octave
         unsigned char      PDetuneType;   // detune type
 
+        FFTcalc fft; // private instance used by OscilGen
+
         unique_ptr<OscilParameters> POscil;
         unique_ptr<Resonance> resonance;
         unique_ptr<OscilGen> oscilgen;
@@ -275,8 +279,9 @@ class PADnoteParameters : public Presets
         // control for rebuilding wavetable (background action)
         FutureBuild<PADTables> futureBuild;
 
-
     private:
+        RandomGen wavetablePhasePrng;
+
         vector<float> generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize, vector<float> const& profile);
         vector<float> generateSpectrum_otherModes(float basefreq, size_t spectrumSize);
 

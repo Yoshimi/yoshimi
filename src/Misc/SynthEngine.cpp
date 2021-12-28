@@ -553,7 +553,7 @@ void SynthEngine::setReproducibleState(int seed)
                     }
                 if (kitItem.padpars and kitItem.Ppadenabled)
                     {
-                        kitItem.padpars->oscilgen->reseed(randomINT());
+                        kitItem.padpars->reseed(randomINT());
                         // synchronously rebuild PADSynth wavetable with new randseed
                         auto newTable = kitItem.padpars->render_wavetable();
                         if (newTable)
