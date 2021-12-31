@@ -75,6 +75,10 @@ decl {\#include "Misc/NumericFuncs.h"
     using func::power;} {private local
 }
 
+decl {using std::to_string;} {private global
+}
+
+
 class ResonanceGraph {: {public Fl_Box}
 } {
   Function {ResonanceGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {

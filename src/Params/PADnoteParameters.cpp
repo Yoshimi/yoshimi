@@ -682,8 +682,8 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
     std::cout << "START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
-    FFTcalcConcurrent fft{newTable.tableSize};
-    FFTFreqs fftFreqs(spectrumSize);
+    fft::CalcConcurrent fft{newTable.tableSize};
+    fft::Spectrum fftCoeff(spectrumSize);
 
     // (in »bandwidth mode«) build harmonic profile used for each line
     vector<float> profile = Pmode == 0? buildProfile(SIZE_HARMONIC_PROFILE)
@@ -718,8 +718,8 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         for (size_t i = 1; i < spectrumSize; ++i)
         {   // Note: each wavetable uses differently randomised phases
             float phase = wavetablePhasePrng.numRandom() * 6.29f;
-            fftFreqs.c[i] = spectrum[i] * cosf(phase);
-            fftFreqs.s[i] = spectrum[i] * sinf(phase);
+            fftCoeff.c(i) = spectrum[i] * cosf(phase);
+            fftCoeff.s(i) = spectrum[i] * sinf(phase);
         }
 
         if (futureBuild.shallRebuild())
@@ -731,7 +731,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         float* newsmp = newTable[tabNr];
         newsmp[0] = 0.0f;                ///TODO 12/2021 (why) is this necessary? Doesn't the IFFT generate a full waveform?
 
-        fft.freqs2smps(fftFreqs, newsmp);
+        fft.freqs2smps(fftCoeff, newsmp);
         // that's all; here is the only IFFT for the whole sample; no windows are used ;-) (Comment by original author)
 
         normaliseSpectrumRMS(newsmp, newTable.tableSize);

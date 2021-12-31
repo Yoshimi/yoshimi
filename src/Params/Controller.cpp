@@ -28,8 +28,6 @@
 #include <cmath>
 #include <iostream>
 
-using namespace std;
-
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/SynthHelper.h"

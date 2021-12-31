@@ -27,7 +27,7 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
 
-using namespace std;
+using std::complex;
 
 static const int PRESET_SIZE = 11;
 static const int NUM_PRESETS = 4;

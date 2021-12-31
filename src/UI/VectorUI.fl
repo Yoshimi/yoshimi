@@ -21,9 +21,6 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {selected in_source in_header
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "MasterUI.h"} {private global
 }
 
@@ -60,6 +57,13 @@ decl {\#include "Misc/TextMsgBuffer.h"
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
     }} {private local
 }
+
+decl {\#include <vector>
+    \#include <string>
+    using std::vector;
+    using std::to_string;} {private global
+}
+
 
 class VectorUI {} {
   Function {make_window(void)} {} {

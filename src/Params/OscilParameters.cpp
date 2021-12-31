@@ -32,22 +32,25 @@
 OscilParameters::OscilParameters(SynthEngine *_synth) :
     Presets(_synth),
     ADvsPAD(false),
-    basefuncFFTfreqs(MAX_OSCIL_SIZE)
+    basefuncSpectrum(MAX_OSCIL_SIZE)
 {
     setpresettype("Poscilgen");
     defaults();
 }
 
 
-void OscilParameters::updatebasefuncFFTfreqs(FFTFreqs const& src, int samples)
+void OscilParameters::updatebasefuncSpectrum(fft::Spectrum const& src, size_t samples)
 {
-    memcpy(basefuncFFTfreqs.c, src.c, samples * sizeof(float));
-    memcpy(basefuncFFTfreqs.s, src.s, samples * sizeof(float));
+    for (size_t i=0; i < samples; ++i)
+    {
+        basefuncSpectrum.c(i) = src.c(i);
+        basefuncSpectrum.s(i) = src.s(i);
+    }
 }
 
 void OscilParameters::defaults()
 {
-    basefuncFFTfreqs.reset();
+    basefuncSpectrum.reset();
 
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
@@ -152,10 +155,10 @@ void OscilParameters::add2XML(XMLwrapper *xml)
         float max = 0.0;
         for (int i = 0; i < synth->halfoscilsize; ++i)
         {
-            if (max < fabsf(basefuncFFTfreqs.c[i]))
-                max = fabsf(basefuncFFTfreqs.c[i]);
-            if (max < fabsf(basefuncFFTfreqs.s[i]))
-                max = fabsf(basefuncFFTfreqs.s[i]);
+            if (max < fabsf(basefuncSpectrum.c(i)))
+                max = fabsf(basefuncSpectrum.c(i));
+            if (max < fabsf(basefuncSpectrum.s(i)))
+                max = fabsf(basefuncSpectrum.s(i));
         }
         if (max < 0.00000001)
             max = 1.0;
@@ -163,8 +166,8 @@ void OscilParameters::add2XML(XMLwrapper *xml)
         xml->beginbranch("BASE_FUNCTION");
             for (int i = 1; i < synth->halfoscilsize; ++i)
             {
-                float xc = basefuncFFTfreqs.c[i] / max;
-                float xs = basefuncFFTfreqs.s[i] / max;
+                float xc = basefuncSpectrum.c(i) / max;
+                float xs = basefuncSpectrum.s(i) / max;
                 if (fabsf(xs) > 0.00001 && fabsf(xs) > 0.00001)
                 {
                     xml->beginbranch("BF_HARMONIC", i);
@@ -241,8 +244,8 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
         {
             if (xml->enterbranch("BF_HARMONIC", i))
             {
-                basefuncFFTfreqs.c[i] = xml->getparreal("cos", 0.0);
-                basefuncFFTfreqs.s[i] = xml->getparreal("sin", 0.0);
+                basefuncSpectrum.c(i) = xml->getparreal("cos", 0.0);
+                basefuncSpectrum.s(i) = xml->getparreal("sin", 0.0);
 
                 xml->exitbranch();
             }
@@ -251,23 +254,23 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
 
         float max = 0.0;
 
-        basefuncFFTfreqs.c[0] = 0.0;
+        basefuncSpectrum.c(0) = 0.0;
         for (int i = 0; i < synth->halfoscilsize; ++i)
         {
-            if (max < fabsf(basefuncFFTfreqs.c[i]))
-                max = fabsf(basefuncFFTfreqs.c[i]);
-            if (max < fabsf(basefuncFFTfreqs.s[i]))
-                max = fabsf(basefuncFFTfreqs.s[i]);
+            if (max < fabsf(basefuncSpectrum.c(i)))
+                max = fabsf(basefuncSpectrum.c(i));
+            if (max < fabsf(basefuncSpectrum.s(i)))
+                max = fabsf(basefuncSpectrum.s(i));
         }
         if (max < 0.00000001)
             max = 1.0;
 
         for (int i = 0; i < synth->halfoscilsize; ++i)
         {
-            if (basefuncFFTfreqs.c[i])
-                basefuncFFTfreqs.c[i] /= max;
-            if (basefuncFFTfreqs.s[i])
-                basefuncFFTfreqs.s[i] /= max;
+            if (basefuncSpectrum.c(i))
+                basefuncSpectrum.c(i) /= max;
+            if (basefuncSpectrum.s(i))
+                basefuncSpectrum.s(i) /= max;
         }
     }
 

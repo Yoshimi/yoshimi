@@ -62,6 +62,7 @@ enum envControl: unsigned char {
     redo
 };
 
+using std::to_string;
 using file::localPath;
 using file::findFile;
 using file::isRegularFile;
@@ -868,7 +869,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            cout << "|indirectMain| buildNewWavetable(blocking=true)" << std::endl;        ////////////////TODO padthread debugging output
+            std::cout << "|indirectMain| buildNewWavetable(blocking=true)" << std::endl;        ////////////////TODO padthread debugging output
             synth->part[partnum]->kit[kititem].padpars->buildNewWavetable(true); // blocking wait for result
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
@@ -1488,7 +1489,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
                 if (temp >= NUM_KIT_ITEMS)
                     temp = 0;
                 //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
-                cout << "|indirectPart::enablePad| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
+                std:: cout << "|indirectPart::enablePad| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
                 synth->part[npart]->kit[temp].padpars->buildNewWavetable((parameter == 0));
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
@@ -1497,7 +1498,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             if (write)
             {
                 //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
-                cout << "|indirectPart::padsynthParameters| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
+                std::cout << "|indirectPart::padsynthParameters| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
                 synth->part[npart]->kit[kititem].padpars->buildNewWavetable((parameter == 0));  // parameter == 0 causes blocking wait
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
@@ -3579,7 +3580,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 /////////////TODO padthread: do we want to trigger a rebuild unconditionally here, whenever activating a PADsynth?
                 /////////////                or is there any way we can know we still need to apply? do we actually need to care at all?
                 /////////////                or is it sufficient to auto-apply whenever a relevant PAD waveform parameter is changed?
-                cout << "|commandPart| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
+                std::cout << "|commandPart| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
                 part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
             }
             else
@@ -5611,7 +5612,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::useAsBaseFunction:
             if (write)
             {
-                FFTcalc fft(synth->oscilsize);
+                fft::Calc fft(synth->oscilsize);
                 OscilGen gen(&fft, NULL, synth, oscil);
                 gen.useasbase();
                 if (value_bool)
@@ -5761,7 +5762,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::convertToSine:
             if (write)
             {
-                FFTcalc fft(synth->oscilsize);
+                fft::Calc fft(synth->oscilsize);
                 OscilGen gen(&fft, NULL, synth, oscil);
                 gen.convert2sine();
                 oscil->presetsUpdated();

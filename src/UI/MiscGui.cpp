@@ -31,6 +31,9 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
+using std::to_string;
+using std::ostringstream;
+
 using func::bpm2text;
 using func::power;
 
@@ -887,7 +890,7 @@ string convert_value(ValueType type, float val)
             f = -20.0f * logf(powf((1.0f / 127.0f), f)) / log(10.0f);
             s += variable_prec_units(f, "dB", 2);
             s += "\nVelocity/2 = ";
-            s += variable_prec_units(f/(-1 * log2(127)), "dB", 2);
+            s += variable_prec_units(f/(-1 * std::log2(127)), "dB", 2);
             return(s);
 
         case VC_BandWidth:

@@ -33,9 +33,6 @@ decl {\#include "FL/Fl_Text_Display.H"} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "Misc/Config.h"} {private global
 }
 

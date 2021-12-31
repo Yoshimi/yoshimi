@@ -41,9 +41,6 @@ decl {\#include <string>} {public global
 decl {\#include <unistd.h>} {public global
 }
 
-decl {using namespace std;} {public global
-}
-
 decl {\#include "Params/Presets.h"} {public local
 }
 

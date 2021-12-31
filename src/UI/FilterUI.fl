@@ -501,7 +501,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     if (type > 2)
         type = 3;
     //std::cout << "type open " << type << std::endl;
-    loadWin(synth, W, H, X, Y, O, "xFilter-formant " + to_string(type));
+    loadWin(synth, W, H, X, Y, O, "xFilter-formant " + std::to_string(type));
     if (W < formantDW || H < formantDH)
     {
         W = formantDW;
@@ -719,7 +719,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         type = 3;
     //std::cout << "type close " << type << std::endl;
     if (formantSeen)
-        saveWin(synth, formantparswindow->w(), formantparswindow->h(), formantparswindow->x(), formantparswindow->y(), false, "xFilter-formant " +to_string(type));
+        saveWin(synth, formantparswindow->w(), formantparswindow->h(), formantparswindow->x(), formantparswindow->y(), false, "xFilter-formant " +std::to_string(type));
     formantSeen = false,
     formantparswindow->hide();
     lastformantW = 0;}

@@ -64,7 +64,12 @@ using func::bitTest;
 using func::asString;
 using func::string2int;
 
+using std::to_string;
+using std::ofstream;
+using std::ios_base;
 using std::set;
+using std::cout;
+using std::endl;
 
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
@@ -165,7 +170,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
-        Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
+        Runtime.vectordata.Name[i] = "No Name " + std::to_string(i + 1);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -271,7 +276,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     fadeStepShort = 1.0f / 0.005f / samplerate_f; // 5ms for 0 to 1
     ControlStep = 127.0f / 0.2f / samplerate_f; // 200ms for 0 to 127
 
-    if (!(fft = new FFTcalc(oscilsize)))
+    if (!(fft = new fft::Calc(oscilsize)))
     {
         Runtime.Log("SynthEngine failed to allocate fft");
         goto bail_out;

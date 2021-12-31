@@ -80,6 +80,10 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
+decl {using std::to_string;} {private global
+}
+
+
 class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
   } {

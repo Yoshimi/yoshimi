@@ -30,8 +30,6 @@
 
 #include <complex>
 
-using namespace std;
-
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
@@ -69,8 +67,8 @@ class Alienwah : public Effect
 
         // Internal Values
         float fb, depth, phase;
-        complex<float> *oldl, *oldr;
-        complex<float> oldclfol, oldclfor;
+        std::complex<float> *oldl, *oldr;
+        std::complex<float> oldclfol, oldclfor;
         int oldk;
 
 };

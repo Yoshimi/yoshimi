@@ -63,6 +63,10 @@ decl {\#include "Effects/EffectMgr.h"} {public local
 decl {\#include "PresetsUI.h"} {public local
 }
 
+decl {using std::to_string;} {private global
+}
+
+
 class EQGraph {: {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {

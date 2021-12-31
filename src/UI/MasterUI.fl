@@ -132,6 +132,9 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
+decl {using std::to_string;} {private global
+}
+
 decl {int lineitem;} {public local
 }
 
@@ -4064,7 +4067,7 @@ bpmfallback->format(format);} {}
   }
   decl {int fileruseX;} {private local
   }
-  decl {deque<FilerLine> filerlist;} {private local
+  decl {std::deque<FilerLine> filerlist;} {private local
   }
   decl {int lineno;} {private local
   }

@@ -32,9 +32,6 @@ decl {\#include <FL/fl_ask.H>
     \#include "Misc/SynthEngine.h"} {private global
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "MasterUI.h"} {private global
 }
 
@@ -51,6 +48,12 @@ decl {\#include "UI/MiscGui.h"
     \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetCheckButton.h"
     \#include "Params/Controller.h"} {public global
+}
+
+decl {\#include <vector>
+    \#include <string>
+    using std::vector;
+    using std::to_string;} {private global
 }
 
 decl {\#include "Misc/FileMgrFuncs.h"

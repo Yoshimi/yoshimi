@@ -24,9 +24,6 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 decl {\#include <set>} {public local
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "Misc/Config.h"} {private global
 }
 
@@ -35,6 +32,10 @@ decl {\#include "MasterUI.h"} {private global
 
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
+
+decl {using std::vector;} {private global
+}
+
 
 class ParametersUI {} {
   Function {make_window(void)} {} {

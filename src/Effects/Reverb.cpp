@@ -26,8 +26,6 @@
 
 #include <cmath>
 
-using namespace std;
-
 #include "DSP/Unison.h"
 #include "DSP/AnalogFilter.h"
 #include "Misc/SynthEngine.h"

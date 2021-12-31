@@ -238,7 +238,7 @@ class PADnoteParameters : public Presets
         unsigned short int PCoarseDetune; // coarse detune+octave
         unsigned char      PDetuneType;   // detune type
 
-        FFTcalc fft; // private instance used by OscilGen
+        fft::Calc fft; // private instance used by OscilGen
 
         unique_ptr<OscilParameters> POscil;
         unique_ptr<Resonance> resonance;

@@ -231,7 +231,7 @@ class SynthEngine
         // others ...
         Controller *ctl;
         Microtonal microtonal;
-        FFTcalc *fft;
+        fft::Calc *fft;
 
         // peaks for VU-meters
         union VUtransfer{

@@ -42,7 +42,7 @@ class SynthEngine;
 class OscilGen : private WaveShapeSamples
 {
     public:
-        OscilGen(FFTcalc *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
+        OscilGen(fft::Calc *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
         ~OscilGen();
 
         void changeParams(OscilParameters *params_);
@@ -61,7 +61,7 @@ class OscilGen : private WaveShapeSamples
         void getbasefunction(float *smps);
 
         // called by UI
-        void getspectrum(int n, float *spc, int what); // what=0 pt. oscil,1 pt. basefunc
+        void getspectrum(size_t n, float *spc, int what); // what=0 pt. oscil,1 pt. basefunc
         void getcurrentbasefunction(float *smps);
         void useasbase(void);
 
@@ -84,7 +84,7 @@ class OscilGen : private WaveShapeSamples
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
-        FFTcalc *fft;
+        fft::Calc *fft;
 
         // computes the basefunction and make the FFT; newbasefunc<0  = same basefunc
         void changebasefunction(void);
@@ -99,7 +99,7 @@ class OscilGen : private WaveShapeSamples
 
         void modulation(void); // Do the oscil modulation stuff
 
-        void adaptiveharmonic(FFTFreqs& f, float freq);
+        void adaptiveharmonic(fft::Spectrum& f, float freq);
         // Do the adaptive harmonic stuff
 
         // Do the adaptive harmonic postprocessing (2n+1,2xS,2xA,etc..)
@@ -148,12 +148,12 @@ class OscilGen : private WaveShapeSamples
             oldmodulationpar2,
             oldmodulationpar3;
 
-        FFTFreqs outoscilFFTfreqs;
+        fft::Spectrum outoscilSpectrum;
 
-        FFTFreqs oscilFFTfreqs; // Oscillator Frequencies - this is different
-                                // than the hamonics set-up by the user, it may
-                                // contain time-domain data if the antialiasing
-                                // is turned off
+        fft::Spectrum oscilSpectrum; // Oscillator Frequencies - this is different
+                                     // than the hamonics set-up by the user, it may
+                                     // contain time-domain data if the antialiasing
+                                     // is turned off
         Presets::PresetsUpdate oscilupdate;// whether the oscil is prepared, if
                                            // not prepared we need to call
                                            // ::prepare() before ::get()

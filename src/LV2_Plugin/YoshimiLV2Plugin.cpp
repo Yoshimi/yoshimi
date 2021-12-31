@@ -71,8 +71,6 @@ typedef struct _Yoshimi_LV2_Options_Option {
 } Yoshimi_LV2_Options_Option;
 
 
-using namespace std;
-
 
 
 LV2_Descriptor yoshimi_lv2_desc =

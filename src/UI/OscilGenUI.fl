@@ -88,6 +88,10 @@ decl {\#include "Misc/NumericFuncs.h"
     using func::asDecibel;} {private local
 }
 
+decl {using std::to_string;} {private global
+}
+
+
 class OscilSpectrum {: {public Fl_Box}
 } {
   Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
@@ -1095,7 +1099,7 @@ o->hide();} open
     kititem = kititem_;
     engine = engine_;
     oscil = oscil_;
-    fft = new FFTcalc(synth->oscilsize);
+    fft = new fft::Calc(synth->oscilsize);
     oscilSmp = new OscilGen(fft, NULL, synth, oscil);
     oldosc = oldosc_;
     cbwidget = cbwidget_;
@@ -1341,7 +1345,7 @@ o->hide();} open
   }
   decl {OscilParameters *oscil;} {private local
   }
-  decl {FFTcalc *fft;} {private local
+  decl {fft::Calc *fft;} {private local
   }
   decl {OscilGen *oscilSmp;} {private local
   }

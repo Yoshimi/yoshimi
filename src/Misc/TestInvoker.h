@@ -41,6 +41,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::function;
+using std::ios_base;
 
 using func::asString;
 using func::asCompactString;

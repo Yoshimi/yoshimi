@@ -195,7 +195,7 @@ struct ADnoteVoiceParam { // Voice parameters
 class ADnoteParameters : public Presets
 {
     public:
-        ADnoteParameters(FFTcalc *fft_, SynthEngine *_synth);
+        ADnoteParameters(fft::Calc *fft_, SynthEngine *_synth);
         ~ADnoteParameters();
         void defaults(void);
         void add2XML(XMLwrapper *xml);
@@ -216,7 +216,7 @@ class ADnoteParameters : public Presets
         void add2XMLsection(XMLwrapper *xml, int n);
         void getfromXMLsection(XMLwrapper *xml, int n);
 
-        FFTcalc *fft;
+        fft::Calc *fft;
 };
 
 #endif

@@ -54,7 +54,7 @@ using func::findSplitPoint;
 using func::setAllPan;
 using func::decibel;
 
-Part::Part(Microtonal *microtonal_, FFTcalc *fft_, SynthEngine *_synth) :
+Part::Part(Microtonal *microtonal_, fft::Calc *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
     fft(fft_),
     killallnotes(false),

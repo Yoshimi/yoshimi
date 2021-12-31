@@ -29,8 +29,7 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
-
-using namespace std;
+#include <cassert>
 
 #include "Effects/Distorsion.h"
 #include "Misc/Config.h"
@@ -40,19 +39,21 @@ using namespace std;
 
 using func::power;
 
+namespace {// Implementation helpers
+    inline float sqr(float v) { return v*v; }
 
-//char OscilGen::random_state[256];
-//struct random_data OscilGen::random_buf;
-//char OscilGen::harmonic_random_state[256];
-//struct random_data OscilGen::harmonic_random_buf;
+    constexpr float CUTOFF = 1e-10;
+    constexpr float LOW_LIMIT = 1e-5;
+}
 
-OscilGen::OscilGen(FFTcalc *fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
+
+OscilGen::OscilGen(fft::Calc *fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
     params(params_),
     synth(_synth),
     tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
     fft(fft_),
-    outoscilFFTfreqs(synth->halfoscilsize),
-    oscilFFTfreqs(synth->halfoscilsize),
+    outoscilSpectrum(synth->halfoscilsize),
+    oscilSpectrum(synth->halfoscilsize),
     oscilupdate(params),
     res(res_),
     randseed(1),
@@ -106,7 +107,7 @@ void OscilGen::genDefaults(void)
     memset(hmag, 0, MAX_AD_HARMONICS * sizeof(float));
     memset(hphase, 0, MAX_AD_HARMONICS * sizeof(float));
 
-    oscilFFTfreqs.reset();
+    oscilSpectrum.reset();
 
     oldfilterpars = 0;
     oldsapars = 0;
@@ -118,35 +119,36 @@ void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[synth->oscilsize];
-    FFTFreqs freqs(synth->halfoscilsize);
+    fft::Calc fft(synth->oscilsize);
+    fft::Spectrum freqs(synth->halfoscilsize);
     get(oscil, -1.0f);
-    std::unique_ptr<FFTcalc> fft(new FFTcalc(synth->oscilsize));
-    fft->smps2freqs(oscil, freqs);
+    fft.smps2freqs(oscil, freqs);
 
     float max = 0.0f;
 
     mag[0] = 0;
     phase[0] = 0;
+    assert (MAX_AD_HARMONICS < synth->halfoscilsize);
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
-        mag[i] = sqrtf(powf(freqs.s[i + 1], 2.0f ) + powf(freqs.c[i + 1], 2.0f));
-        phase[i] = atan2f(freqs.c[i + 1], freqs.s[i + 1]);
+        mag[i] = sqrtf(sqr(freqs.s(i+1)) + sqr(freqs.c(i+1)));
+        phase[i] = atan2(freqs.c(i+1), freqs.s(i+1));
         if (max < mag[i])
             max = mag[i];
     }
-    if (max < 0.00001f)
-        max = 1.0f;
+    if (max < CUTOFF)
+        max = 1.0;
 
     defaults();
 
-    for (int i = 0; i < MAX_AD_HARMONICS - 1; ++i)
+    for (size_t i = 0; i < MAX_AD_HARMONICS - 1; ++i)
     {
         float newmag = mag[i] / max;
         float newphase = phase[i];
 
-        params->Phmag[i] = (int)(newmag * 64.0f) + 64;
+        params->Phmag[i] = 64 + int(newmag * 64.0);
+        params->Phphase[i] = 64 - int(64.0 * newphase / PI);
 
-        params->Phphase[i] = 64 - (int)(64.0f * newphase / PI);
         if (params->Phphase[i] > 127)
             params->Phphase[i] = 127;
 
@@ -166,8 +168,8 @@ float OscilGen::basefunc_pulse(float x, float a)
 
 float OscilGen::basefunc_saw(float x, float a)
 {
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     else if (a > 0.99999f)
         a = 0.99999f;
     x = fmodf(x, 1.0f);
@@ -182,8 +184,8 @@ float OscilGen::basefunc_triangle(float x, float a)
 {
     x = fmodf(x + 0.25f, 1.0f);
     a = 1 - a;
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     if (x < 0.5f)
         x = x * 4.0f - 1.0f;
     else
@@ -200,8 +202,8 @@ float OscilGen::basefunc_triangle(float x, float a)
 float OscilGen::basefunc_power(float x, float a)
 {
     x = fmodf(x, 1.0f);
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     else if (a > 0.99999f)
         a = 0.99999f;
     return powf(x, (expf((a - 0.5f) * 10.0f))) * 2.0f - 1.0f;
@@ -211,16 +213,16 @@ float OscilGen::basefunc_power(float x, float a)
 float OscilGen::basefunc_gauss(float x, float a)
 {
     x = fmodf(x, 1.0f) * 2.0f - 1.0f;
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     return expf(-x * x * (expf(a * 8.0f) + 5.0f)) * 2.0f - 1.0f;
 }
 
 
 float OscilGen::basefunc_diode(float x, float a)
 {
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     else if (a > 0.99999f)
         a = 0.99999f;
     a = a * 2.0f - 1.0f;
@@ -234,8 +236,8 @@ float OscilGen::basefunc_diode(float x, float a)
 float OscilGen::basefunc_abssine(float x, float a)
 {
     x = fmodf(x, 1.0f);
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     else if (a > 0.99999f)
         a = 0.99999f;
     return sinf(powf(x, (expf((a - 0.5f) * 5.0f))) * PI) * 2.0f - 1.0f;
@@ -244,8 +246,8 @@ float OscilGen::basefunc_abssine(float x, float a)
 
 float OscilGen::basefunc_pulsesine(float x, float a)
 {
-    if (a < 0.00001f)
-        a = 0.00001f;
+    if (a < LOW_LIMIT)
+        a = LOW_LIMIT;
     x = (fmodf(x, 1.0f) - 0.5f) * expf((a - 0.5f) * logf(128.0f));
     if (x < -0.5f)
         x = -0.5f;
@@ -517,11 +519,11 @@ void OscilGen::oscilfilter(void)
     float par = 1.0f - params->Pfilterpar1 / 128.0f;
     float par2 = params->Pfilterpar2 / 127.0f;
     float max = 0.0f;
-    //float tmp = 0.0f;
     float p2;
     float x;
+    size_t lenSpectrum = oscilSpectrum.size();
 
-    for (int i = 1; i < synth->halfoscilsize; ++i)
+    for (size_t i = 1; i < lenSpectrum; ++i)
     {
         float gain = 1.0f;
         switch (params->Pfiltertype)
@@ -536,7 +538,7 @@ void OscilGen::oscilfilter(void)
             }
             case 2:
             {
-                gain = 1.0f - powf((1.0f - par * par), (float)(i + 1)); // hp1
+                gain = 1.0f - powf((1.0f - par * par), float(i + 1)); // hp1
                 gain = powf(gain, (par2 * 2.0f + 0.1f));
                 break;
             }
@@ -556,8 +558,8 @@ void OscilGen::oscilfilter(void)
                 gain = 1.0f / (1.0f + gain * gain / (i + 1.0f));
                 float tmp = power<5>((par2 * 2.0f));
                 gain = powf(gain, tmp);
-                if (gain < 1e-5f)
-                    gain = 1e-5f;
+                if (gain < LOW_LIMIT)
+                    gain = LOW_LIMIT;
                 break;
             }
             case 5:
@@ -569,15 +571,12 @@ void OscilGen::oscilfilter(void)
             }
             case 6:
             {
-                //float tmp = powf(par2, 0.33f);
                 gain = (i + 1 > power<2>((1.0f - par) * 10.0f) ? 0.0f : 1.0f)
                             * par2 + (1.0f - par2); // lp2
                 break;
             }
             case 7:
             {
-                //float tmp = powf(par2, 0.33f);
-                // tmp=1.0-(1.0-par2)*(1.0-par2);
                 gain = (i + 1 > power<2>((1.0f - par) * 7.0f) ? 1.0f : 0.0f)
                         * par2 + (1.0f - par2); // hp2
                 if (params->Pfilterpar1 == 0)
@@ -586,15 +585,12 @@ void OscilGen::oscilfilter(void)
             }
             case 8:
             {
-                //float tmp = powf(par2, 0.33f);
-                // tmp=1.0-(1.0-par2)*(1.0-par2);
                 gain = (fabsf(power<2>((1.0f - par) * 7.0f) - i) > i / 2 + 1 ? 0.0f : 1.0f)
                         * par2 + (1.0f - par2); // bp2
                 break;
             }
             case 9:
             {
-                //float tmp = powf(par2, 0.33f);
                 gain = (fabsf(power<2>((1.0f - par) * 7.0f) - i) < i / 2 + 1 ? 0.0f : 1.0f)
                         * par2 + (1.0f - par2); // bs2
                 break;
@@ -630,29 +626,28 @@ void OscilGen::oscilfilter(void)
             }
             case 13:
             {
-                int tmp = (int)power<2>(((1.0f - par) * 7.2f));
                 gain = 1.0f;
-                if (i == tmp)
+                if (i == size_t(power<2>(((1.0f - par) * 7.2f))))
                     gain = power<2>(par2 * par2 * 8.0f);
                 break;
             }
         }
 
-        oscilFFTfreqs.s[i] *= gain;
-        oscilFFTfreqs.c[i] *= gain;
-        float tmp = oscilFFTfreqs.s[i] * oscilFFTfreqs.s[i] + oscilFFTfreqs.c[i] * oscilFFTfreqs.c[i];
+        oscilSpectrum.s(i) *= gain;
+        oscilSpectrum.c(i) *= gain;
+        float tmp = sqr(oscilSpectrum.s(i)) + sqr(oscilSpectrum.c(i));
         if (max < tmp)
             max = tmp;
     }
 
     max = sqrtf(max);
-    if (max < 1e-10f)
+    if (max < CUTOFF)
         max = 1.0f;
     float imax = 1.0f / max;
-    for (int i = 1; i < synth->halfoscilsize; ++i)
+    for (size_t i = 1; i < lenSpectrum; ++i)
     {
-        oscilFFTfreqs.s[i] *= imax;
-        oscilFFTfreqs.c[i] *= imax;
+        oscilSpectrum.s(i) *= imax;
+        oscilSpectrum.c(i) *= imax;
     }
 }
 
@@ -663,24 +658,23 @@ void OscilGen::changebasefunction(void)
     if (params->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
     {
         // User base function
-        memcpy(oscilFFTfreqs.c, params->getbasefuncFFTfreqs().c,
-               synth->halfoscilsize * sizeof(float));
-        memcpy(oscilFFTfreqs.s, params->getbasefuncFFTfreqs().s,
-               synth->halfoscilsize * sizeof(float));
+        for (size_t i=0; i < size_t(synth->halfoscilsize); ++i)
+        {
+            oscilSpectrum.c(i) = params->getbasefuncSpectrum().c(i);
+            oscilSpectrum.s(i) = params->getbasefuncSpectrum().s(i);
+        }
     }
     else if (params->Pcurrentbasefunc != 0)
     {
         getbasefunction(tmpsmps);
-        fft->smps2freqs(tmpsmps, oscilFFTfreqs);
-        oscilFFTfreqs.c[0] = 0.0f;
+        fft->smps2freqs(tmpsmps, oscilSpectrum);
+        oscilSpectrum.c(0) = 0.0f; // DC offset
     }
     else
-    {
-        for (int i = 0; i < synth->halfoscilsize; ++i)
-            oscilFFTfreqs.s[i] = oscilFFTfreqs.c[i] = 0.0f;
-        //in this case basefuncFFTfreqs_ are not used
+    {// in this case basefuncSpectrum is not used
+        oscilSpectrum.reset();
     }
-    params->updatebasefuncFFTfreqs(oscilFFTfreqs, synth->halfoscilsize);
+    params->updatebasefuncSpectrum(oscilSpectrum, synth->halfoscilsize);
 
     oldbasefunc = params->Pcurrentbasefunc;
     oldbasepar = params->Pbasefuncpar;
@@ -699,25 +693,26 @@ void OscilGen::waveshape(void)
     if (params->Pwaveshapingfunction == 0)
         return;
 
-    int eighth_i = synth->oscilsize / 8;
+    size_t eighth_i = synth->oscilsize / 8;
     float eighth_f = synth->oscilsize_f / 8.0f;
+    size_t len = oscilSpectrum.size();
 
-    oscilFFTfreqs.c[0] = 0.0f; // remove the DC
+    oscilSpectrum.c(0) = 0.0f; // remove the DC
     // reduce the amplitude of the freqs near the nyquist
-    for (int i = 1; i < eighth_i; ++i)
+    for (size_t i = 1; i < eighth_i; ++i)
     {
-        float tmp = (float)i / eighth_f;
-        oscilFFTfreqs.s[synth->halfoscilsize - i] *= tmp;
-        oscilFFTfreqs.c[synth->halfoscilsize- i] *= tmp;
+        float damp = float(i) / eighth_f;
+        oscilSpectrum.s(len - i) *= damp;
+        oscilSpectrum.c(len - i) *= damp;
     }
-    fft->freqs2smps(oscilFFTfreqs, tmpsmps);
+    fft->freqs2smps(oscilSpectrum, tmpsmps);
 
     // Normalize
     float max = 0.0f;
     for (int i = 0; i < synth->oscilsize; ++i)
         if (max < fabsf(tmpsmps[i]))
             max = fabsf(tmpsmps[i]);
-    if (max < 0.00001f)
+    if (max < CUTOFF)
         max = 1.0f;
     max = 1.0f / max;
     for (int i = 0; i < synth->oscilsize; ++i)
@@ -726,7 +721,7 @@ void OscilGen::waveshape(void)
     // Do the waveshaping
     waveShapeSmps(synth->oscilsize, tmpsmps, params->Pwaveshapingfunction, params->Pwaveshaping);
 
-    fft->smps2freqs(tmpsmps, oscilFFTfreqs); // perform FFT
+    fft->smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
 }
 
 
@@ -764,18 +759,19 @@ void OscilGen::modulation(void)
             break;
     }
 
-    int eighth_i = synth->oscilsize / 8;
+    size_t eighth_i = synth->oscilsize / 8;
     float eighth_f = synth->oscilsize_f / 8.0f;
+    size_t len = oscilSpectrum.size();
 
-    oscilFFTfreqs.c[0] = 0.0f; // remove the DC
+    oscilSpectrum.c(0) = 0.0f; // remove the DC
     // reduce the amplitude of the freqs near the nyquist
-    for (int i = 1; i < eighth_i; ++i)
+    for (size_t i = 1; i < eighth_i; ++i)
     {
-        float tmp = (float)i / eighth_f;
-        oscilFFTfreqs.s[synth->halfoscilsize - i] *= tmp;
-        oscilFFTfreqs.c[synth->halfoscilsize - i] *= tmp;
+        float damp = float(i) / eighth_f;
+        oscilSpectrum.s(len - i) *= damp;
+        oscilSpectrum.c(len - i) *= damp;
     }
-    fft->freqs2smps(oscilFFTfreqs, tmpsmps);
+    fft->freqs2smps(oscilSpectrum, tmpsmps);
     int extra_points = 2;
     float *in = new float[synth->oscilsize + extra_points];
 
@@ -787,7 +783,7 @@ void OscilGen::modulation(void)
         if (max < absx)
             max = absx;
     }
-    if (max < 0.00001f)
+    if (max < CUTOFF)
         max = 1.0f;
     max = 1.0f / max;
     for (int i = 0; i < synth->oscilsize; ++i)
@@ -826,7 +822,7 @@ void OscilGen::modulation(void)
     }
 
     delete [] in;
-    fft->smps2freqs(tmpsmps, oscilFFTfreqs); // perform FFT
+    fft->smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
 }
 
 
@@ -856,20 +852,21 @@ void OscilGen::spectrumadjust(void)
     }
 
     float max = 0.0f;
-    for (int i = 0; i < synth->halfoscilsize; ++i)
+    size_t len = oscilSpectrum.size();
+    for (size_t i = 0; i < len; ++i)
     {
-        float tmp = powf(oscilFFTfreqs.c[i], 2.0f) + powf(oscilFFTfreqs.s[i], 2.0f);
+        float tmp = sqr(oscilSpectrum.c(i)) + sqr(oscilSpectrum.s(i));
         if (max < tmp)
             max = tmp;
     }
     max = sqrtf(max) / synth->oscilsize_f * 2.0f;
-    if (max < 1e-8f)
-        max = 1.0f;
+    if (max < CUTOFF)
+        max = 1.0;
 
-    for (int i = 0; i < synth->halfoscilsize; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
-        float mag = sqrtf(powf(oscilFFTfreqs.s[i], 2) + powf(oscilFFTfreqs.c[i], 2.0f)) / max;
-        float phase = atan2f(oscilFFTfreqs.s[i], oscilFFTfreqs.c[i]);
+        float mag = sqrtf(sqr(oscilSpectrum.s(i)) + sqr(oscilSpectrum.c(i))) / max;
+        float phase = atan2f(oscilSpectrum.s(i), oscilSpectrum.c(i));
 
         switch (params->Psatype)
         {
@@ -886,8 +883,8 @@ void OscilGen::spectrumadjust(void)
                     mag = 1.0f;
                 break;
         }
-        oscilFFTfreqs.c[i] = mag * cosf(phase);
-        oscilFFTfreqs.s[i] = mag * sinf(phase);
+        oscilSpectrum.c(i) = mag * cosf(phase);
+        oscilSpectrum.s(i) = mag * sinf(phase);
     }
 }
 
@@ -898,47 +895,48 @@ void OscilGen::shiftharmonics(void)
         return;
 
     float hc, hs;
+    size_t len = oscilSpectrum.size();
     int harmonicshift = -params->Pharmonicshift;
 
     if (harmonicshift > 0)
     {
-        for (int i = synth->halfoscilsize - 2; i >= 0; i--)
+        for (size_t j = len-1; j > 0; j--)
         {
-            int oldh = i - harmonicshift;
-            if (oldh < 0)
+            int oldh = j - harmonicshift;
+            if (oldh < 1)
                 hc = hs = 0.0f;
             else
             {
-                hc = oscilFFTfreqs.c[oldh + 1];
-                hs = oscilFFTfreqs.s[oldh + 1];
+                hc = oscilSpectrum.c(oldh);
+                hs = oscilSpectrum.s(oldh);
             }
-            oscilFFTfreqs.c[i + 1] = hc;
-            oscilFFTfreqs.s[i + 1] = hs;
+            oscilSpectrum.c(j) = hc;
+            oscilSpectrum.s(j) = hs;
         }
     }
     else
     {
-        for (int i = 0; i < synth->halfoscilsize - 1; ++i)
+        for (size_t i = 1; i < len; ++i)
         {
-            int oldh = i + abs(harmonicshift);
-            if (oldh >= synth->halfoscilsize - 1)
+            size_t oldh = i + abs(harmonicshift);
+            if (oldh >= len)
                 hc = hs = 0.0f;
             else
             {
-                hc = oscilFFTfreqs.c[oldh + 1];
-                hs = oscilFFTfreqs.s[oldh + 1];
-                if (fabsf(hc) < 0.000001f)
+                hc = oscilSpectrum.c(oldh);
+                hs = oscilSpectrum.s(oldh);
+                if (fabsf(hc) < CUTOFF)
                     hc = 0.0f;
-                if (fabsf(hs) < 0.000001f)
+                if (fabsf(hs) < CUTOFF)
                     hs = 0.0f;
             }
 
-            oscilFFTfreqs.c[i + 1] = hc;
-            oscilFFTfreqs.s[i + 1] = hs;
+            oscilSpectrum.c(i) = hc;
+            oscilSpectrum.s(i) = hs;
         }
     }
 
-    oscilFFTfreqs.c[0]=0.0f;
+    oscilSpectrum.c(0) = 0.0f;
 }
 
 
@@ -1001,36 +999,38 @@ void OscilGen::prepare(void)
     }
 
     // remove the harmonics where Phmag[i]==64
-    for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+    for (size_t i = 0; i < MAX_AD_HARMONICS; ++i)
         if (params->Phmag[i] == 64)
             hmag[i] = 0.0f;
 
-    oscilFFTfreqs.reset();
+    size_t len = oscilSpectrum.size();
+    assert (MAX_AD_HARMONICS < len);
+    oscilSpectrum.reset();
     if (params->Pcurrentbasefunc == 0)
     {   // the sine case
-        for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+        for (size_t i = 0; i < MAX_AD_HARMONICS; ++i)
         {
-            oscilFFTfreqs.c[i + 1] =- hmag[i] * sinf(hphase[i] * (i + 1)) / 2.0f;
-            oscilFFTfreqs.s[i + 1] = hmag[i] * cosf(hphase[i] * (i + 1)) / 2.0f;
+            oscilSpectrum.c(i+1) = -hmag[i] * sinf(hphase[i] * (i+1)) / 2.0f;
+            oscilSpectrum.s(i+1) =  hmag[i] * cosf(hphase[i] * (i+1)) / 2.0f;
         }
     }
     else
     {
-        for (int j = 0; j < MAX_AD_HARMONICS; ++j)
+        for (size_t j = 0; j < MAX_AD_HARMONICS; ++j)
         {
             if (params->Phmag[j] == 64)
                 continue;
-            for (int i = 1; i < synth->halfoscilsize; ++i)
+            for (size_t i = 1; i < len; ++i)
             {
-                int k = i * (j + 1);
-                if (k >= synth->halfoscilsize)
+                size_t k = i * (j + 1);
+                if (k >= len)
                     break;
-                float a = params->getbasefuncFFTfreqs().c[i];
-                float b = params->getbasefuncFFTfreqs().s[i];
+                float a = params->getbasefuncSpectrum().c(i);
+                float b = params->getbasefuncSpectrum().s(i);
                 float c = hmag[j] * cosf(hphase[j] * k);
                 float d = hmag[j] * sinf(hphase[j] * k);
-                oscilFFTfreqs.c[k] += a * c - b * d;
-                oscilFFTfreqs.s[k] += a * d + b * c;
+                oscilSpectrum.c(k) += a * c - b * d;
+                oscilSpectrum.s(k) += a * d + b * c;
             }
         }
     }
@@ -1054,28 +1054,28 @@ void OscilGen::prepare(void)
     if (!params->Pharmonicshiftfirst)
         shiftharmonics();
 
-    oscilFFTfreqs.c[0] = 0.0f;
+    oscilSpectrum.c(0) = 0.0f;
 
     oldhmagtype = params->Phmagtype;
     oldharmonicshift = params->Pharmonicshift + params->Pharmonicshiftfirst * 256;
 }
 
 
-void OscilGen::adaptiveharmonic(FFTFreqs& f, float freq)
+void OscilGen::adaptiveharmonic(fft::Spectrum& spec, float freq)
 {
     if (params->Padaptiveharmonics == 0)
         return;
     if (freq < 1.0f)
         freq = 440.0f;
 
-    FFTFreqs inf(synth->halfoscilsize);
+    fft::Spectrum inf(synth->halfoscilsize);
     for (int i = 0; i < synth->halfoscilsize; ++i)
     {
-        inf.s[i] = f.s[i];
-        inf.c[i] = f.c[i];
-        f.s[i] = f.c[i] = 0.0f;
+        inf.s(i) = spec.s(i);
+        inf.c(i) = spec.c(i);
+        spec.s(i) = spec.c(i) = 0.0f;
     }
-    inf.c[0] = inf.s[0] = 0.0f;
+    inf.c(0) = inf.s(0) = 0.0f;
 
     float hc = 0.0f;
     float hs = 0.0f;
@@ -1107,42 +1107,44 @@ void OscilGen::adaptiveharmonic(FFTFreqs& f, float freq)
         {
             if (down)
             {
-                f.c[high] += inf.c[i] * (1.0f - low);
-                f.s[high] += inf.s[i] * (1.0f - low);
-                f.c[high + 1] += inf.c[i] * low;
-                f.s[high + 1] += inf.s[i] * low;
+                spec.c(high)   += inf.c(i) * (1.0f - low);
+                spec.s(high)   += inf.s(i) * (1.0f - low);
+                spec.c(high+1) += inf.c(i) * low;
+                spec.s(high+1) += inf.s(i) * low;
             }
             else
             {
-                hc = inf.c[high] * (1.0f - low) + inf.c[high + 1] * low;
-                hs = inf.s[high] * (1.0f - low) + inf.s[high + 1] * low;
+                hc = inf.c(high) * (1.0f - low) + inf.c(high+1) * low;
+                hs = inf.s(high) * (1.0f - low) + inf.s(high+1) * low;
             }
-            if (fabsf(hc) < 0.000001f)
+            if (fabsf(hc) < CUTOFF)
                 hc = 0.0f;
-            if (fabsf(hs) < 0.000001f)
+            if (fabsf(hs) < CUTOFF)
                 hs = 0.0f;
         }
 
         if (!down)
         {
             if (i == 0)
-            {   //corect the aplitude of the first harmonic
+            {   //correct the amplitude of the first harmonic
                 hc *= rap;
                 hs *= rap;
             }
-            f.c[i] = hc;
-            f.s[i] = hs;
+            spec.c(i) = hc;
+            spec.s(i) = hs;
         }
     }
 
-    f.c[1] += f.c[0];
-    f.s[1] += f.s[0];
-    f.c[0] = f.s[0] = 0.0f;
+    spec.c(1) += spec.c(0);
+    spec.s(1) += spec.s(0);
+    spec.c(0) =  spec.s(0) = 0.0f;
 }
 
 
 void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
 {
+    // "Padaptiveharmonics" == type of adaptive spectrum to add
+    // Values: 0==OFF(default), 1=ON, 2="Square", 3="2xSub", 4="2xAdd", 3xSub, 3xAdd, 4xSub, 4xAdd
     if (params->Padaptiveharmonics <= 1)
         return;
     float *inf = new float[size];
@@ -1159,11 +1161,11 @@ void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
     {   // 2n+1
         for (int i = 0; i < size; ++i)
             if ((i % 2) == 0)
-                f[i] += inf[i]; // i=0 pt prima armonica,etc.
+                f[i] += inf[i]; // i=0 corresponds to the fundamental,...
     }
     else
     {
-        // celelalte moduri
+        // handle all other modes
         int nh = (params->Padaptiveharmonics - 3) / 2 + 2;
         int sub_vs_add = (params->Padaptiveharmonics - 3) % 2;
         if (sub_vs_add == 0)
@@ -1241,33 +1243,34 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
     // see also comment at OscilGen::reseed()
     resetHarmonicPrng();
 
-    outoscilFFTfreqs.reset();
+    outoscilSpectrum.reset();
 
-    int nyquist = int(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    size_t specLen = outoscilSpectrum.size();
+    size_t nyquist = size_t(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (params->ADvsPAD)
-        nyquist = synth->halfoscilsize;
-    if (nyquist > synth->halfoscilsize)
-        nyquist = synth->halfoscilsize;
+        nyquist = specLen;
+    if (nyquist > specLen)
+        nyquist = specLen;
 
-    int realnyquist = nyquist;
+    size_t realnyquist = nyquist;
 
     if (params->Padaptiveharmonics)
-        nyquist = synth->halfoscilsize;
-    for (int i = 1; i < nyquist - 1; ++i)
+        nyquist = specLen;
+    for (size_t i = 1; i < nyquist - 1; ++i)
     {
-        outoscilFFTfreqs.c[i] = oscilFFTfreqs.c[i];
-        outoscilFFTfreqs.s[i] = oscilFFTfreqs.s[i];
+        outoscilSpectrum.c(i) = oscilSpectrum.c(i);
+        outoscilSpectrum.s(i) = oscilSpectrum.s(i);
     }
 
-    adaptiveharmonic(outoscilFFTfreqs, freqHz);
-    adaptiveharmonicpostprocess(&outoscilFFTfreqs.c[1], synth->halfoscilsize - 1);
-    adaptiveharmonicpostprocess(&outoscilFFTfreqs.s[1], synth->halfoscilsize - 1);
+    adaptiveharmonic(outoscilSpectrum, freqHz);
+    adaptiveharmonicpostprocess(&outoscilSpectrum.c(1), specLen - 1);  //////////////TODO breaks encapsulation
+    adaptiveharmonicpostprocess(&outoscilSpectrum.s(1), specLen - 1);  //////////////TODO breaks encapsulation
 
     nyquist = realnyquist;
     if (params->Padaptiveharmonics)
     {   // do the antialiasing in the case of adaptive harmonics
-        for (int i = nyquist; i < synth->halfoscilsize; ++i)
-            outoscilFFTfreqs.s[i] = outoscilFFTfreqs.c[i] = 0;
+        for (size_t i = nyquist; i < specLen; ++i)
+            outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = 0.0f;
     }
 
     // Randomness (each harmonic), the block type is computed
@@ -1276,15 +1279,15 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
     {
         float rnd, angle, a, b, c, d;
         rnd = PI * powf((params->Prand - 64.0f) / 64.0f, 2.0f);
-        for (int i = 1; i < nyquist - 1; ++i)
+        for (size_t i = 1; i < nyquist - 1; ++i)
         {   // to Nyquist only for AntiAliasing
             angle = rnd * i * harmonicPrng.numRandom();
-            a = outoscilFFTfreqs.c[i];
-            b = outoscilFFTfreqs.s[i];
+            a = outoscilSpectrum.c(i);
+            b = outoscilSpectrum.s(i);
             c = cosf(angle);
             d = sinf(angle);
-            outoscilFFTfreqs.c[i] = a * c - b * d;
-            outoscilFFTfreqs.s[i] = a * d + b * c;
+            outoscilSpectrum.c(i) = a * c - b * d;
+            outoscilSpectrum.s(i) = a * d + b * c;
         }
     }
 
@@ -1298,11 +1301,11 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
             case 1:
                 power = power * 2.0f - 0.5f;
                 power = func::power<15>(power);
-                for (int i = 1; i < nyquist - 1; ++i)
+                for (size_t i = 1; i < nyquist - 1; ++i)
                 {
                     float amp = powf(harmonicPrng.numRandom(), power) * normalize;
-                    outoscilFFTfreqs.c[i] *= amp;
-                    outoscilFFTfreqs.s[i] *= amp;
+                    outoscilSpectrum.c(i) *= amp;
+                    outoscilSpectrum.s(i) *= amp;
                 }
                 break;
 
@@ -1310,34 +1313,32 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
                 power = power * 2.0f - 0.5f;
                 power = func::power<15>(power) * 2.0f;
                 float rndfreq = TWOPI * harmonicPrng.numRandom();
-                for (int i = 1 ; i < nyquist - 1; ++i)
+                for (size_t i = 1 ; i < nyquist - 1; ++i)
                 {
                     float amp = powf(fabsf(sinf(i * rndfreq)), power) * normalize;
-                    outoscilFFTfreqs.c[i] *= amp;
-                    outoscilFFTfreqs.s[i] *= amp;
+                    outoscilSpectrum.c(i) *= amp;
+                    outoscilSpectrum.s(i) *= amp;
                 }
                 break;
         }
     }
 
     if (applyResonance && freqHz > 0.1)
-        res->applyres(nyquist - 1, outoscilFFTfreqs, freqHz);
+        res->applyres(nyquist - 1, outoscilSpectrum, freqHz);
 
     // Full RMS normalize
     float sum = 0;
-    for (int j = 1; j < synth->halfoscilsize; ++j)
+    for (size_t j = 1; j < specLen; ++j)
     {
-        float term = outoscilFFTfreqs.c[j] * outoscilFFTfreqs.c[j]
-                     + outoscilFFTfreqs.s[j] * outoscilFFTfreqs.s[j];
-        sum += term;
+        sum += sqr(outoscilSpectrum.c(j)) + sqr(outoscilSpectrum.s(j));
     }
-    if (sum < 0.000001f)
+    if (sum < CUTOFF)
         sum = 1.0f;
     sum = 1.0f / sqrtf(sum);
-    for (int j = 1; j < synth->halfoscilsize; ++j)
+    for (size_t j = 1; j < specLen; ++j)
     {
-        outoscilFFTfreqs.c[j] *= sum;
-        outoscilFFTfreqs.s[j] *= sum;
+        outoscilSpectrum.c(j) *= sum;
+        outoscilSpectrum.s(j) *= sum;
     }
 
     if (params->ADvsPAD && freqHz > 0.1f)
@@ -1345,14 +1346,13 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
         // Note: Spectrum slot=0 (DC-Offset) will be discarded.
         //       In the result, index=0 is the fundamental.
         //       See PADnoteParameters::generatespectrum_otherModes()
-        for (int i = 1; i < synth->halfoscilsize; ++i)
-            smps[i - 1] = sqrtf(outoscilFFTfreqs.c[i] * outoscilFFTfreqs.c[i]
-                               + outoscilFFTfreqs.s[i] * outoscilFFTfreqs.s[i]);
+        for (size_t i = 1; i < specLen; ++i)
+            smps[i-1] = sqrtf(sqr(outoscilSpectrum.c(i)) + sqr(outoscilSpectrum.s(i)));
     }
     else
     {
-        fft->freqs2smps(outoscilFFTfreqs, smps);
-        for (int i = 0; i < synth->oscilsize; ++i)
+        fft->freqs2smps(outoscilSpectrum, smps);
+        for (size_t i = 0; i < size_t(synth->oscilsize); ++i)
             smps[i] *= 0.25f; // correct the amplitude
     }
 }
@@ -1370,37 +1370,37 @@ int OscilGen::getPhase()
 
 
 // Get the spectrum of the oscillator for the UI
-void OscilGen::getspectrum(int n, float *spc, int what)
+void OscilGen::getspectrum(size_t n, float *spc, int what)
 {
-    if (n > synth->halfoscilsize)
-        n = synth->halfoscilsize;
+    size_t specLen = outoscilSpectrum.size();
+    if (n > specLen)
+        n = specLen;
 
-    for (int i = 1; i < n; ++i)
+    for (size_t i = 1; i < n; ++i)
     {
         if (what == 0)
-        {
-            spc[i - 1] = sqrtf(oscilFFTfreqs.c[i] * oscilFFTfreqs.c[i]
-                               + oscilFFTfreqs.s[i] * oscilFFTfreqs.s[i]);
+        {// display intensities of resulting OscilGen spectrum
+            spc[i-1] = sqrtf(sqr(oscilSpectrum.c(i)) + sqr(oscilSpectrum.s(i)));
         }
         else
-        {
+        {// display intensities of the base function spectrum
             if (params->Pcurrentbasefunc == 0)
-                spc[i - 1] = (i == 1) ? 1.0f : 0.0f;
+                spc[i-1] = (i == 1) ? 1.0f : 0.0f;
             else
-                spc[i - 1] = sqrtf(params->getbasefuncFFTfreqs().c[i] * params->getbasefuncFFTfreqs().c[i]
-                                 + params->getbasefuncFFTfreqs().s[i] * params->getbasefuncFFTfreqs().s[i]);
+                spc[i-1] = sqrtf(sqr(params->getbasefuncSpectrum().c(i)) + sqr(params->getbasefuncSpectrum().s(i)));
         }
     }
 
     if (!what)
-    {
-        for (int i = 0; i < n; ++i)
-            outoscilFFTfreqs.s[i] = outoscilFFTfreqs.c[i] = spc[i];
-        for (int i = n; i < synth->halfoscilsize; ++i)
-            outoscilFFTfreqs.s[i] = outoscilFFTfreqs.c[i] = 0.0f;
-        adaptiveharmonic(outoscilFFTfreqs, 0.0);
-        for (int i = 0; i < n; ++i)
-            spc[i] = outoscilFFTfreqs.s[i];
+    {// in case of OscilGen spectrum: show also the effect of adaptive harmonics
+        assert(n <= specLen);
+        for (size_t i = 0; i < n; ++i)
+            outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = spc[i];
+        for (size_t i = n; i < specLen; ++i)
+            outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = 0.0f;
+        adaptiveharmonic(outoscilSpectrum, 0.0);
+        for (size_t i = 0; i < n; ++i)
+            spc[i] = outoscilSpectrum.s(i);
         adaptiveharmonicpostprocess(spc, n - 1);
     }
 }
@@ -1409,7 +1409,7 @@ void OscilGen::getspectrum(int n, float *spc, int what)
 // Convert the oscillator as base function
 void OscilGen::useasbase(void)
 {
-    params->updatebasefuncFFTfreqs(oscilFFTfreqs, synth->halfoscilsize);
+    params->updatebasefuncSpectrum(oscilSpectrum, synth->halfoscilsize);
     oldbasefunc = params->Pcurrentbasefunc = 127;
     prepare();
 }
@@ -1420,7 +1420,7 @@ void OscilGen::getcurrentbasefunction(float *smps)
 {
     if (params->Pcurrentbasefunc)
     {
-        fft->freqs2smps(params->getbasefuncFFTfreqs(), smps);
+        fft->freqs2smps(params->getbasefuncSpectrum(), smps);
     }
     else
         getbasefunction(smps); // the sine case

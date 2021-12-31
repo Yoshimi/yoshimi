@@ -207,7 +207,7 @@ class ADvoicelistitem {: {public Fl_Group}
     npart = npart_;
     kititem = kititem_;
     nvoice = nvoice_;
-    fft = new FFTcalc(synth->oscilsize);
+    fft = new fft::Calc(synth->oscilsize);
     oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
     oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
     make_window();
@@ -382,7 +382,7 @@ else
   }
   decl {int nvoice;} {public local
   }
-  decl {FFTcalc *fft;} {private local
+  decl {fft::Calc *fft;} {private local
   }
   decl {OscilGen *oscil;} {private local
   }
@@ -1854,7 +1854,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         kititem = kititem_;
         nvoice = nvoice_;
         lastdScale = 0;
-        fft = new FFTcalc(synth->oscilsize);
+        fft = new fft::Calc(synth->oscilsize);
         oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
         oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
         make_window();
@@ -1888,7 +1888,7 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
   decl {OscilEditor *oscedit;} {public local
   }
-  decl {FFTcalc *fft;} {private local
+  decl {fft::Calc *fft;} {private local
   }
   decl {OscilGen *oscil;} {private local
   }

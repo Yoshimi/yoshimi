@@ -28,46 +28,56 @@
 
 #include <fftw3.h>
 #include <stdexcept>
+#include <cassert>
 #include <cstring>
 #include <mutex>
 
+namespace fft {
 
 /* holds the spectrum coefficients */
-class FFTFreqs
+class Spectrum
 {
-    size_t size;
-public:
-    float *s;
-    float *c;
+    size_t siz;
+
+    float *co;
+    float *si;
 
 public: // can not be copied or moved
-    FFTFreqs(FFTFreqs&&)                 = delete;
-    FFTFreqs(FFTFreqs const&)            = delete;
-    FFTFreqs& operator=(FFTFreqs&&)      = delete;
-    FFTFreqs& operator=(FFTFreqs const&) = delete;
+    Spectrum(Spectrum&&)                 = delete;
+    Spectrum(Spectrum const&)            = delete;
+    Spectrum& operator=(Spectrum&&)      = delete;
+    Spectrum& operator=(Spectrum const&) = delete;
 
     // automatic memory-management
-    FFTFreqs(size_t tableSize)
-        : size(tableSize)
+    Spectrum(size_t tableSize)
+        : siz(tableSize)
     {
-        this->c = (float*)fftwf_malloc(size * sizeof(float));
-        this->s = (float*)fftwf_malloc(size * sizeof(float));
-        if (!c or !s)
+        this->co = (float*)fftwf_malloc(siz * sizeof(float));
+        this->si = (float*)fftwf_malloc(siz * sizeof(float));
+        if (!co or !si)
             throw std::bad_alloc();
         reset();
     }
 
-   ~FFTFreqs()
+   ~Spectrum()
     {
-        if (s) fftwf_free(s);
-        if (c) fftwf_free(c);
+        if (si) fftwf_free(si);
+        if (co) fftwf_free(co);
     }
 
     void reset()
     {
-        memset(this->c, 0, size * sizeof(float));
-        memset(this->s, 0, size * sizeof(float));
+        memset(this->co, 0, siz * sizeof(float));
+        memset(this->si, 0, siz * sizeof(float));
     }
+
+    // array-like access
+    float      & c(size_t i)       { return co[i]; }
+    float const& c(size_t i) const { return co[i]; }
+    float      & s(size_t i)       { return si[i]; }
+    float const& s(size_t i) const { return si[i]; }
+
+    size_t size()  const { return siz; }
 };
 
 
@@ -110,15 +120,18 @@ class FFTwrapper : POL
         FFTwrapper& operator=(FFTwrapper const&) = delete;
 
         /* Fast Fourier Transform */
-        void smps2freqs(float const* smps, FFTFreqs& freqs)
+        void smps2freqs(float const* smps, Spectrum& freqs)
         {
             auto lock = POL::lock4usage();
             size_t half_size{fftsize / 2};
+            assert (half_size <= freqs.size());
             memcpy(data1, smps, fftsize * sizeof(float));
             fftwf_execute(planFourier);
-            memcpy(freqs.c, data1, half_size * sizeof(float));
+//          memcpy(freqs.co, data1, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
+            for (size_t i = 0; i < half_size; ++i)
+                freqs.c(i) = data1[i];
             for (size_t i = 1; i < half_size; ++i)
-                freqs.s[i] = data1[fftsize - i];
+                freqs.s(i) = data1[fftsize - i];
             data2[half_size] = 0.0f; ////////////////////TODO this line was there from the first Import by Cal in 2010; but it looks like a mistake,
                                      ////////////////////     since data2 should not be touched by the forward fourier transform.
                                      ////////////////////     Maybe the original author intended to set freqs.s(0) = 0.0 ?
@@ -126,14 +139,17 @@ class FFTwrapper : POL
         }
 
         /* Fast Inverse Fourier Transform */
-        void freqs2smps(FFTFreqs const& freqs, float* smps)
+        void freqs2smps(Spectrum const& freqs, float* smps)
         {
             auto lock = POL::lock4usage();
             size_t half_size{fftsize / 2};
-            memcpy(data2, freqs.c, half_size * sizeof(float));
+            assert (half_size <= freqs.size());
+//          memcpy(data2, freqs.co, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
+            for (size_t i = 0; i < half_size; ++i)
+                data2[i] = freqs.c(i);
             data2[half_size] = 0.0;
             for (size_t i = 1; i < half_size; ++i)
-                data2[fftsize - i] = freqs.s[i];
+                data2[fftsize - i] = freqs.s(i);
             fftwf_execute(planInverse);
             memcpy(smps, data2, fftsize * sizeof(float));
         }
@@ -216,10 +232,11 @@ protected:
 };
 
 
-using FFTcalc = FFTwrapper<Policy_DoNothing>;
+using Calc = FFTwrapper<Policy_DoNothing>;
 
-using FFTcalcSharedUse = FFTwrapper<Policy_LockAtUsage<>>;
-using FFTcalcConcurrent = FFTwrapper<Policy_LockAtCreation<>>;
+using CalcSharedUse = FFTwrapper<Policy_LockAtUsage<>>;
+using CalcConcurrent = FFTwrapper<Policy_LockAtCreation<>>;
 
 
+}//(End)namespace fft
 #endif /*FFT_WRAPPER_H*/
