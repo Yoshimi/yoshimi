@@ -99,15 +99,6 @@ class OscilGen : private WaveShapeSamples
 
         void modulation(void); // Do the oscil modulation stuff
 
-        void adaptiveharmonic(fft::Spectrum& f, float freq);
-        // Do the adaptive harmonic stuff
-
-        // Do the adaptive harmonic postprocessing (2n+1,2xS,2xA,etc..)
-        // this function is called even for the user interface
-        // this can be called for the sine and components, and for the spectrum
-        // (that's why the sine and cosine components should be processed with
-        // a separate call)
-        void adaptiveharmonicpostprocess(float *f, int size);
 
         // Basic/base functions (Functiile De Baza)
         float basefunc_pulse(float x, float a);

@@ -109,7 +109,6 @@ class OscilSpectrum {: {public Fl_Box}
     int oy = y();
     int lx = w();
     int ly = h();
-    //fl_line_style(0, int(1 * ly / 50.0f));
     const int maxdb = 60; // must be multiple of 10
     int GX = 2;
     int n = lx / GX - 1;

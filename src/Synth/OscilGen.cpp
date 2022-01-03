@@ -30,6 +30,7 @@
 #include <iostream>
 #include <memory>
 #include <cassert>
+#include <functional>
 
 #include "Effects/Distorsion.h"
 #include "Misc/Config.h"
@@ -1061,28 +1062,33 @@ void OscilGen::prepare(void)
 }
 
 
-void OscilGen::adaptiveharmonic(fft::Spectrum& spec, float freq)
+namespace { // Implementation details...
+
+using Accessor = std::function<float&(size_t)>;
+
+inline void adaptiveharmonic(Accessor spec, size_t size,
+                             float currFreq, unsigned char bfreq,
+                             unsigned char type, unsigned char ppow, unsigned char ppar)
 {
-    if (params->Padaptiveharmonics == 0)
-        return;
-    if (freq < 1.0f)
-        freq = 440.0f;
+    if (type == 0)
+        return;// adaptive harmonics switched OFF
+    if (currFreq < 1.0f)
+        currFreq = 440.0f;
 
-    fft::Spectrum inf(synth->halfoscilsize);
-    for (int i = 0; i < synth->halfoscilsize; ++i)
+    assert(size > 0);
+    std::unique_ptr<float[]> inf{new float[size]};
+    for (size_t i = 0; i < size; ++i)
     {
-        inf.s(i) = spec.s(i);
-        inf.c(i) = spec.c(i);
-        spec.s(i) = spec.c(i) = 0.0f;
+        inf[i] = spec(i);
+        spec(i) = 0.0f;
     }
-    inf.c(0) = inf.s(0) = 0.0f;
+    inf[0] = 0.0f;
 
-    float hc = 0.0f;
-    float hs = 0.0f;
-    float basefreq = 30.0f * power<10>(params->Padaptiveharmonicsbasefreq / 128.0f);
-    float power = (params->Padaptiveharmonicspower + 1.0f) / 101.0f;
+    float adapted = 0.0f;
+    float baseFreq = 30.0f * power<10>(bfreq / 128.0f);
+    float power = (ppow + 1.0f) / 101.0f;
 
-    float rap = freq / basefreq;
+    float rap = currFreq / baseFreq;
 
     rap = powf(rap, power);
 
@@ -1093,99 +1099,82 @@ void OscilGen::adaptiveharmonic(fft::Spectrum& spec, float freq)
         down = true;
     }
 
-    for (int i = 0; i < synth->halfoscilsize - 2; ++i)
+    for (size_t i = 0; i < size - 2; ++i)
     {
         float h = i * rap;
-        int high = int(h);
+        size_t high(h);
         float low = fmodf(h, 1.0f);
 
-        if (high >= synth->halfoscilsize - 2)
-        {
+        if (high >= size - 2)
             break;
+
+        if (down)
+        {
+            spec(high)   += inf[i] * (1.0f - low);
+            spec(high+1) += inf[i] * low;
         }
         else
         {
-            if (down)
-            {
-                spec.c(high)   += inf.c(i) * (1.0f - low);
-                spec.s(high)   += inf.s(i) * (1.0f - low);
-                spec.c(high+1) += inf.c(i) * low;
-                spec.s(high+1) += inf.s(i) * low;
-            }
-            else
-            {
-                hc = inf.c(high) * (1.0f - low) + inf.c(high+1) * low;
-                hs = inf.s(high) * (1.0f - low) + inf.s(high+1) * low;
-            }
-            if (fabsf(hc) < CUTOFF)
-                hc = 0.0f;
-            if (fabsf(hs) < CUTOFF)
-                hs = 0.0f;
-        }
-
-        if (!down)
-        {
+            adapted = inf[high] * (1.0f - low) + inf[high+1] * low;
+            if (fabsf(adapted) < CUTOFF)
+                adapted = 0.0f;
             if (i == 0)
             {   //correct the amplitude of the first harmonic
-                hc *= rap;
-                hs *= rap;
+                adapted *= rap;
             }
-            spec.c(i) = hc;
-            spec.s(i) = hs;
+            spec(i) = adapted;
         }
     }
 
-    spec.c(1) += spec.c(0);
-    spec.s(1) += spec.s(0);
-    spec.c(0) =  spec.s(0) = 0.0f;
-}
+    spec(1) += spec(0);
+    spec(0) =  0.0f;
 
+    if (type <= 1)
+        return;
 
-void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
-{
+    //-----Implant the extended spectrum onto the base spectrum------
+
     // "Padaptiveharmonics" == type of adaptive spectrum to add
     // Values: 0==OFF(default), 1=ON, 2="Square", 3="2xSub", 4="2xAdd", 3xSub, 3xAdd, 4xSub, 4xAdd
-    if (params->Padaptiveharmonics <= 1)
-        return;
-    float *inf = new float[size];
-    float par = params->Padaptiveharmonicspar * 0.01f;
-    par = 1.0f - powf((1.0f - par), 1.5f);
+    float fade = 1.0f - powf((1.0f - 0.01f * ppar), 1.5f);
 
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 1; i < size; ++i)
     {
-        inf[i] = f[i] * par;
-        f[i] = f[i] * (1.0f - par);
+        inf[i] = spec(i) * fade;
+        spec(i) = spec(i) * (1.0f - fade);
     }
 
-    if (params->Padaptiveharmonics == 2)
-    {   // 2n+1
-        for (int i = 0; i < size; ++i)
-            if ((i % 2) == 0)
-                f[i] += inf[i]; // i=0 corresponds to the fundamental,...
+    if (type == 2)
+    {   // "Square" : enforce the even partials
+        for (size_t i = 1; i < size; ++i)
+            if (((i-1) % 2) == 0)
+                spec(i) += inf[i]; // i=1 corresponds to the fundamental,...
     }
     else
     {
         // handle all other modes
-        int nh = (params->Padaptiveharmonics - 3) / 2 + 2;
-        int sub_vs_add = (params->Padaptiveharmonics - 3) % 2;
+        int nh = (type - 3) / 2 + 2;
+        int sub_vs_add = (type - 3) % 2;
         if (sub_vs_add == 0)
         {
-            for (int i = 0; i < size; ++i)
+            for (size_t i = 1; i < size; ++i)
             {
-                if (((i + 1) % nh) == 0)
+                if ((i % nh) == 0)
                 {
-                    f[i] += inf[i];
+                    spec(i) += inf[i];
                 }
             }
         }
         else
         {
-            for (int i = 0; i < size / nh - 1; ++i)
-                f[(i + 1) * nh - 1] += inf[i];
+            for (size_t i = 1; i < (size-1) / nh; ++i)
+                spec(nh*i) += inf[i];
         }
     }
-    delete [] inf;
 }
+}//(End) implementation details (adaptive harmonics)
+
+
 
 
 // Get the oscillator function
@@ -1262,9 +1251,17 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
         outoscilSpectrum.s(i) = oscilSpectrum.s(i);
     }
 
-    adaptiveharmonic(outoscilSpectrum, freqHz);
-    adaptiveharmonicpostprocess(&outoscilSpectrum.c(1), specLen - 1);  //////////////TODO breaks encapsulation
-    adaptiveharmonicpostprocess(&outoscilSpectrum.s(1), specLen - 1);  //////////////TODO breaks encapsulation
+    {// Generate adaptive harmonics
+        unsigned char bfreq = params->Padaptiveharmonicsbasefreq;
+        unsigned char type = params->Padaptiveharmonics;
+        unsigned char ppow = params->Padaptiveharmonicspower;
+        unsigned char ppar = params->Padaptiveharmonicspar;
+
+        Accessor cosPart = [this](size_t i) -> float& { return outoscilSpectrum.c(i); };
+        Accessor sinPart = [this](size_t i) -> float& { return outoscilSpectrum.s(i); };
+        adaptiveharmonic(cosPart, specLen, freqHz, bfreq, type, ppow, ppar);
+        adaptiveharmonic(sinPart, specLen, freqHz, bfreq, type, ppow, ppar);
+    }
 
     nyquist = realnyquist;
     if (params->Padaptiveharmonics)
@@ -1393,15 +1390,24 @@ void OscilGen::getspectrum(size_t n, float *spc, int what)
 
     if (!what)
     {// in case of OscilGen spectrum: show also the effect of adaptive harmonics
+
+        unsigned char bfreq = params->Padaptiveharmonicsbasefreq;
+        unsigned char type  = params->Padaptiveharmonics;
+        unsigned char ppow  = params->Padaptiveharmonicspower;
+        unsigned char ppar  = params->Padaptiveharmonicspar;
+        float currFreq = 0.0;
+
+        Accessor accessLine = [spc](size_t i) -> float& { return spc[i]; };
+
+        adaptiveharmonic(accessLine, n, currFreq, bfreq, type, ppow, ppar);
+
+        /////TODO: do we really need the following side-effect on the spectrum stored in the UI's OscilGen?
+        /////      might be just a consequence of the 'tricky' way the original code calculated the adaptive harmonics
         assert(n <= specLen);
         for (size_t i = 0; i < n; ++i)
             outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = spc[i];
         for (size_t i = n; i < specLen; ++i)
             outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = 0.0f;
-        adaptiveharmonic(outoscilSpectrum, 0.0);
-        for (size_t i = 0; i < n; ++i)
-            spc[i] = outoscilSpectrum.s(i);
-        adaptiveharmonicpostprocess(spc, n - 1);
     }
 }
 
