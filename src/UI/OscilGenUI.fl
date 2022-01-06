@@ -1099,7 +1099,7 @@ o->hide();} open
     engine = engine_;
     oscil = oscil_;
     fft = new fft::Calc(synth->oscilsize);
-    oscilSmp = new OscilGen(fft, NULL, synth, oscil);
+    oscilSmp = new OscilGen(*fft, NULL, synth, oscil);
     oldosc = oldosc_;
     cbwidget = cbwidget_;
     cbapplywidget=cbapplywidget_;

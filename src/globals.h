@@ -963,7 +963,7 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         spike,
         circle,
         hyperSec,
-        user
+        user = 127
     };
 }
 

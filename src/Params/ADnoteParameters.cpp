@@ -188,10 +188,10 @@ void ADnoteParameters::defaults(int n)
 // Init the voice parameters
 void ADnoteParameters::enableVoice(int nvoice)
 {
-    VoicePar[nvoice].POscil = new OscilParameters(synth);
-    VoicePar[nvoice].POscilFM = new OscilParameters(synth);
-    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
-    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth, VoicePar[nvoice].POscilFM);
+    VoicePar[nvoice].POscil = new OscilParameters(*fft, synth);
+    VoicePar[nvoice].POscilFM = new OscilParameters(*fft, synth);
+    VoicePar[nvoice].OscilSmp = new OscilGen(*fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
+    VoicePar[nvoice].FMSmp = new OscilGen(*fft, NULL, synth, VoicePar[nvoice].POscilFM);
 
     VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);

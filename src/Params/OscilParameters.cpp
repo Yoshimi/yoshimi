@@ -29,23 +29,19 @@
 #include "Misc/SynthEngine.h"
 #include "Params/OscilParameters.h" // **** RHL ****
 
-OscilParameters::OscilParameters(SynthEngine *_synth) :
+OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine *_synth) :
     Presets(_synth),
     ADvsPAD(false),
-    basefuncSpectrum(MAX_OSCIL_SIZE)
+    basefuncSpectrum(fft.spectrumSize())
 {
     setpresettype("Poscilgen");
     defaults();
 }
 
 
-void OscilParameters::updatebasefuncSpectrum(fft::Spectrum const& src, size_t samples)
+void OscilParameters::updatebasefuncSpectrum(fft::Spectrum const& src)
 {
-    for (size_t i=0; i < samples; ++i)
-    {
-        basefuncSpectrum.c(i) = src.c(i);
-        basefuncSpectrum.s(i) = src.s(i);
-    }
+    basefuncSpectrum = src;
 }
 
 void OscilParameters::defaults()
@@ -150,10 +146,10 @@ void OscilParameters::add2XML(XMLwrapper *xml)
         }
     xml->endbranch();
 
-    if (Pcurrentbasefunc == 127)
+    if (Pcurrentbasefunc == OSCILLATOR::wave::user)
     {
         float max = 0.0;
-        for (int i = 0; i < synth->halfoscilsize; ++i)
+        for (size_t i = 0; i < basefuncSpectrum.size(); ++i)
         {
             if (max < fabsf(basefuncSpectrum.c(i)))
                 max = fabsf(basefuncSpectrum.c(i));
@@ -164,7 +160,7 @@ void OscilParameters::add2XML(XMLwrapper *xml)
             max = 1.0;
 
         xml->beginbranch("BASE_FUNCTION");
-            for (int i = 1; i < synth->halfoscilsize; ++i)
+            for (size_t i = 1; i < basefuncSpectrum.size(); ++i)
             {
                 float xc = basefuncSpectrum.c(i) / max;
                 float xs = basefuncSpectrum.s(i) / max;
@@ -240,7 +236,7 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("BASE_FUNCTION"))
     {
-        for (int i = 1; i < synth->halfoscilsize; ++i)
+        for (size_t i = 1; i < basefuncSpectrum.size(); ++i)
         {
             if (xml->enterbranch("BF_HARMONIC", i))
             {
@@ -255,7 +251,7 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
         float max = 0.0;
 
         basefuncSpectrum.c(0) = 0.0;
-        for (int i = 0; i < synth->halfoscilsize; ++i)
+        for (size_t i = 0; i < basefuncSpectrum.size(); ++i)
         {
             if (max < fabsf(basefuncSpectrum.c(i)))
                 max = fabsf(basefuncSpectrum.c(i));
@@ -265,7 +261,7 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
         if (max < 0.00000001)
             max = 1.0;
 
-        for (int i = 0; i < synth->halfoscilsize; ++i)
+        for (size_t i = 0; i < basefuncSpectrum.size(); ++i)
         {
             if (basefuncSpectrum.c(i))
                 basefuncSpectrum.c(i) /= max;

@@ -48,13 +48,13 @@ namespace {// Implementation helpers
 }
 
 
-OscilGen::OscilGen(fft::Calc *fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
+OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
     params(params_),
     synth(_synth),
-    tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
+    tmpsmps((float*)fftwf_malloc(fft_.tableSize() * sizeof(float))),
     fft(fft_),
-    outoscilSpectrum(synth->halfoscilsize),
-    oscilSpectrum(synth->halfoscilsize),
+    outoscilSpectrum(fft.spectrumSize()),
+    oscilSpectrum(fft.spectrumSize()),
     oscilupdate(params),
     res(res_),
     randseed(1),
@@ -64,7 +64,7 @@ OscilGen::OscilGen(fft::Calc *fft_, Resonance *res_, SynthEngine *_synth, OscilP
     if (!tmpsmps)
         synth->getRuntime().Log("Very bad error, failed to allocate OscilGen::tmpsmps");
     else
-        memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
+        memset(tmpsmps, 0, fft.spectrumSize() * sizeof(float));
     genDefaults();
 }
 
@@ -119,9 +119,8 @@ void OscilGen::genDefaults(void)
 void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
-    float oscil[synth->oscilsize];
-    fft::Calc fft(synth->oscilsize);
-    fft::Spectrum freqs(synth->halfoscilsize);
+    float oscil[fft.tableSize()];
+    fft::Spectrum freqs(fft.spectrumSize());
     get(oscil, -1.0f);
     fft.smps2freqs(oscil, freqs);
 
@@ -129,7 +128,7 @@ void OscilGen::convert2sine()
 
     mag[0] = 0;
     phase[0] = 0;
-    assert (MAX_AD_HARMONICS < synth->halfoscilsize);
+    assert (MAX_AD_HARMONICS < fft.spectrumSize());
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
         mag[i] = sqrtf(sqr(freqs.s(i+1)) + sqr(freqs.c(i+1)));
@@ -412,9 +411,9 @@ void OscilGen::getbasefunction(float *smps)
         default:
             break;
     }
-    for (int i = 0; i < synth->oscilsize; ++i)
+    for (size_t i = 0; i < fft.tableSize(); ++i)
     {
-        float t = (float)i / synth->oscilsize_f;
+        float t = float(i) / fft.tableSize();
 
         switch (params->Pbasefuncmodulation)
         {
@@ -505,7 +504,7 @@ void OscilGen::getbasefunction(float *smps)
                     break;
 
                 default: // sine
-                    smps[i] = -sinf(TWOPI * (float)i / synth->oscilsize_f);
+                    smps[i] = -sinf(TWOPI * (i) / fft.tableSize());
                     break;
         }
     }
@@ -653,29 +652,32 @@ void OscilGen::oscilfilter(void)
 }
 
 
-// Change the base function
+/* Ensure the base function spectrum in the OscilParameters
+ * matches the current parameter settings; possible regenerate
+ * this spectrum when using one of the predefined base functions.
+ * Remarks:
+ * - a "user base function" (generated with OscilGen::useasbase())
+ *   will be retained as-is and possibly persisted/loaded from XML.
+ * - this function abuses tmpsmps and oscilSpectrum as a temporary
+ *   working space; since it is only ever called from OscilGen::prepare()
+ *   the oscilSpectrium will be restored / updated immediately afterwards.
+ */
 void OscilGen::changebasefunction(void)
 {
-    if (params->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
+    if (params->Pcurrentbasefunc != OSCILLATOR::wave::user)
     {
-        // User base function
-        for (size_t i=0; i < size_t(synth->halfoscilsize); ++i)
-        {
-            oscilSpectrum.c(i) = params->getbasefuncSpectrum().c(i);
-            oscilSpectrum.s(i) = params->getbasefuncSpectrum().s(i);
+        if (params->Pcurrentbasefunc == OSCILLATOR::wave::sine)
+        {// in this case basefuncSpectrum is not used
+            oscilSpectrum.reset();
         }
-    }
-    else if (params->Pcurrentbasefunc != 0)
-    {
-        getbasefunction(tmpsmps);
-        fft->smps2freqs(tmpsmps, oscilSpectrum);
-        oscilSpectrum.c(0) = 0.0f; // DC offset
-    }
-    else
-    {// in this case basefuncSpectrum is not used
-        oscilSpectrum.reset();
-    }
-    params->updatebasefuncSpectrum(oscilSpectrum, synth->halfoscilsize);
+        else
+        {// generate spectrum for predefined base function
+            getbasefunction(tmpsmps);
+            fft.smps2freqs(tmpsmps, oscilSpectrum);
+            oscilSpectrum.c(0) = 0.0f; // DC offset
+        }
+        params->updatebasefuncSpectrum(oscilSpectrum);
+    }// note: no update in case of "user" base function
 
     oldbasefunc = params->Pcurrentbasefunc;
     oldbasepar = params->Pbasefuncpar;
@@ -694,9 +696,9 @@ void OscilGen::waveshape(void)
     if (params->Pwaveshapingfunction == 0)
         return;
 
-    size_t eighth_i = synth->oscilsize / 8;
-    float eighth_f = synth->oscilsize_f / 8.0f;
-    size_t len = oscilSpectrum.size();
+    size_t eighth_i = fft.tableSize() / 8;
+    float eighth_f = float(fft.tableSize()) / 8.0f;
+    size_t len = fft.spectrumSize();
 
     oscilSpectrum.c(0) = 0.0f; // remove the DC
     // reduce the amplitude of the freqs near the nyquist
@@ -706,23 +708,23 @@ void OscilGen::waveshape(void)
         oscilSpectrum.s(len - i) *= damp;
         oscilSpectrum.c(len - i) *= damp;
     }
-    fft->freqs2smps(oscilSpectrum, tmpsmps);
+    fft.freqs2smps(oscilSpectrum, tmpsmps);
 
     // Normalize
     float max = 0.0f;
-    for (int i = 0; i < synth->oscilsize; ++i)
+    for (size_t i = 0; i < fft.tableSize(); ++i)
         if (max < fabsf(tmpsmps[i]))
             max = fabsf(tmpsmps[i]);
     if (max < CUTOFF)
         max = 1.0f;
     max = 1.0f / max;
-    for (int i = 0; i < synth->oscilsize; ++i)
+    for (size_t i = 0; i < fft.tableSize(); ++i)
         tmpsmps[i] *= max;
 
     // Do the waveshaping
-    waveShapeSmps(synth->oscilsize, tmpsmps, params->Pwaveshapingfunction, params->Pwaveshaping);
+    waveShapeSmps(fft.tableSize(), tmpsmps, params->Pwaveshapingfunction, params->Pwaveshaping);
 
-    fft->smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
+    fft.smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
 }
 
 
@@ -760,9 +762,9 @@ void OscilGen::modulation(void)
             break;
     }
 
-    size_t eighth_i = synth->oscilsize / 8;
-    float eighth_f = synth->oscilsize_f / 8.0f;
-    size_t len = oscilSpectrum.size();
+    size_t eighth_i = fft.tableSize() / 8;
+    float eighth_f = float(fft.tableSize()) / 8.0f;
+    size_t len = fft.spectrumSize();
 
     oscilSpectrum.c(0) = 0.0f; // remove the DC
     // reduce the amplitude of the freqs near the nyquist
@@ -772,13 +774,13 @@ void OscilGen::modulation(void)
         oscilSpectrum.s(len - i) *= damp;
         oscilSpectrum.c(len - i) *= damp;
     }
-    fft->freqs2smps(oscilSpectrum, tmpsmps);
-    int extra_points = 2;
-    float *in = new float[synth->oscilsize + extra_points];
+    fft.freqs2smps(oscilSpectrum, tmpsmps);
+    size_t extra_points = 2;
+    float *in = new float[fft.tableSize() + extra_points];
 
     // Normalize
     float max = 0.0f;
-    for (int i = 0; i < synth->oscilsize; ++i)
+    for (size_t i = 0; i < fft.tableSize(); ++i)
     {
         float absx = fabsf(tmpsmps[i]);
         if (max < absx)
@@ -787,15 +789,15 @@ void OscilGen::modulation(void)
     if (max < CUTOFF)
         max = 1.0f;
     max = 1.0f / max;
-    for (int i = 0; i < synth->oscilsize; ++i)
+    for (size_t i = 0; i < fft.tableSize(); ++i)
         in[i] = tmpsmps[i] * max;
-    for (int i = 0; i < extra_points; ++i)
-        in[i + synth->oscilsize] = tmpsmps[i] * max;
+    for (size_t i = 0; i < extra_points; ++i)
+        in[i + fft.tableSize()] = tmpsmps[i] * max;
 
     // Do the modulation
-    for (int i = 0 ; i < synth->oscilsize; ++i)
+    for (size_t i = 0 ; i < fft.tableSize(); ++i)
     {
-        float t = (float)i / synth->oscilsize_f;
+        float t = float(i) / float(fft.tableSize());
         switch (params->Pmodulation)
         {
             case 1:
@@ -814,7 +816,7 @@ void OscilGen::modulation(void)
                 break;
         }
 
-        t = (t - floorf(t)) * synth->oscilsize_f;
+        t = (t - floorf(t)) * float(fft.tableSize());
 
         int poshi = int(t);
         float poslo = t - poshi;
@@ -823,7 +825,7 @@ void OscilGen::modulation(void)
     }
 
     delete [] in;
-    fft->smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
+    fft.smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
 }
 
 
@@ -860,7 +862,7 @@ void OscilGen::spectrumadjust(void)
         if (max < tmp)
             max = tmp;
     }
-    max = sqrtf(max) / synth->oscilsize_f * 2.0f;
+    max = 2.0f * sqrtf(max) / fft.tableSize();  ////TODO why factor 2 here?
     if (max < CUTOFF)
         max = 1.0;
 
@@ -1007,7 +1009,7 @@ void OscilGen::prepare(void)
     size_t len = oscilSpectrum.size();
     assert (MAX_AD_HARMONICS < len);
     oscilSpectrum.reset();
-    if (params->Pcurrentbasefunc == 0)
+    if (params->Pcurrentbasefunc == OSCILLATOR::wave::sine)
     {   // the sine case
         for (size_t i = 0; i < MAX_AD_HARMONICS; ++i)
         {
@@ -1348,8 +1350,8 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
     }
     else
     {
-        fft->freqs2smps(outoscilSpectrum, smps);
-        for (size_t i = 0; i < size_t(synth->oscilsize); ++i)
+        fft.freqs2smps(outoscilSpectrum, smps);
+        for (size_t i = 0; i < fft.tableSize(); ++i)
             smps[i] *= 0.25f; // correct the amplitude
     }
 }
@@ -1360,8 +1362,8 @@ int OscilGen::getPhase()
         return 0;
 
     int outpos;
-    outpos = (basePrng.numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (params->Prand - 64.0f) / 64.0f;
-    outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
+    outpos = int(fft.tableSize() * (basePrng.numRandom() * 2.0f - 1.0f) * (params->Prand - 64.0f) / 64.0f);
+    outpos = (outpos + 2 * fft.tableSize()) % fft.tableSize();
     return outpos;
 }
 
@@ -1381,7 +1383,7 @@ void OscilGen::getspectrum(size_t n, float *spc, int what)
         }
         else
         {// display intensities of the base function spectrum
-            if (params->Pcurrentbasefunc == 0)
+            if (params->Pcurrentbasefunc == OSCILLATOR::wave::sine)
                 spc[i-1] = (i == 1) ? 1.0f : 0.0f;
             else
                 spc[i-1] = sqrtf(sqr(params->getbasefuncSpectrum().c(i)) + sqr(params->getbasefuncSpectrum().s(i)));
@@ -1415,8 +1417,8 @@ void OscilGen::getspectrum(size_t n, float *spc, int what)
 // Convert the oscillator as base function
 void OscilGen::useasbase(void)
 {
-    params->updatebasefuncSpectrum(oscilSpectrum, synth->halfoscilsize);
-    oldbasefunc = params->Pcurrentbasefunc = 127;
+    params->updatebasefuncSpectrum(oscilSpectrum);
+    oldbasefunc = params->Pcurrentbasefunc = OSCILLATOR::wave::user;
     prepare();
 }
 
@@ -1424,9 +1426,9 @@ void OscilGen::useasbase(void)
 // Get the base function for UI
 void OscilGen::getcurrentbasefunction(float *smps)
 {
-    if (params->Pcurrentbasefunc)
+    if (params->Pcurrentbasefunc != OSCILLATOR::wave::sine)
     {
-        fft->freqs2smps(params->getbasefuncSpectrum(), smps);
+        fft.freqs2smps(params->getbasefuncSpectrum(), smps);
     }
     else
         getbasefunction(smps); // the sine case

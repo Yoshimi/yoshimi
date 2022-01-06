@@ -110,9 +110,9 @@ PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
 
     // base Waveform
     , fft(synth->oscilsize)
-    , POscil{new OscilParameters(synth)}
+    , POscil{new OscilParameters(fft, synth)}
     , resonance{new Resonance(synth)}
-    , oscilgen{new OscilGen(&fft, resonance.get(), synth, POscil.get())}
+    , oscilgen{new OscilGen(fft, resonance.get(), synth, POscil.get())}
     , FreqEnvelope{new EnvelopeParams(0, 0, synth)}
     , FreqLfo{new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth)}
 
@@ -500,7 +500,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
 {
     assert(spectrumSize > 1);
     vector<float> spectrum(spectrumSize, 0.0f); // zero-init
-    vector<float> harmonics(synth->halfoscilsize, 0.0f);
+    vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
     // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
@@ -510,7 +510,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
     // derive the "perceptual" bandwidth for the given profile (a value 0 .. 1)
     float bwadjust = calcProfileBandwith(profile);
 
-    for (int nh = 0; nh+1 < synth->halfoscilsize; ++nh)
+    for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
         float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
         if (realfreq > synth->samplerate_f * 0.49999f)
@@ -605,14 +605,14 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 {
     assert(spectrumSize > 1);
     vector<float> spectrum(spectrumSize, 0.0f); // zero-init
-    vector<float> harmonics(synth->halfoscilsize, 0.0f);
+    vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
     // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
     oscilgen->get(harmonics.data(), basefreq, false);
     normaliseMax(harmonics); // within 0.0 .. 1.0
 
-    for (int nh = 0; nh+1 < synth->halfoscilsize; ++nh)
+    for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
         float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
 

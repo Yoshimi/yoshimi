@@ -33,7 +33,7 @@
 class OscilParameters : public Presets
 {
     public:
-        OscilParameters(SynthEngine *_synth);
+        OscilParameters(fft::Calc const& fft, SynthEngine *_synth);
         virtual ~OscilParameters() = default;
 
         void add2XML(XMLwrapper *xml);
@@ -41,7 +41,7 @@ class OscilParameters : public Presets
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
 
-        void updatebasefuncSpectrum(fft::Spectrum const& src, size_t samples);
+        void updatebasefuncSpectrum(fft::Spectrum const& src);
         fft::Spectrum const& getbasefuncSpectrum() const { return basefuncSpectrum; }
 
     public:

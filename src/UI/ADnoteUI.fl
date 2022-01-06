@@ -208,8 +208,8 @@ class ADvoicelistitem {: {public Fl_Group}
     kititem = kititem_;
     nvoice = nvoice_;
     fft = new fft::Calc(synth->oscilsize);
-    oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
-    oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
+    oscil = new OscilGen(*fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
+    oscilFM = new OscilGen(*fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
     make_window();
     if (pars->VoicePar[nvoice].PFreqLfoEnabled > 0)
         voicelistvibratto->activate();
@@ -1855,8 +1855,8 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
         nvoice = nvoice_;
         lastdScale = 0;
         fft = new fft::Calc(synth->oscilsize);
-        oscil = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
-        oscilFM = new OscilGen(fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
+        oscil = new OscilGen(*fft, NULL, synth, parameters->VoicePar[nvoice].POscil);
+        oscilFM = new OscilGen(*fft, NULL, synth, parameters->VoicePar[nvoice].POscilFM);
         make_window();
         end();
         if (nvoice == 0)

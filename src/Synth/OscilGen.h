@@ -42,7 +42,7 @@ class SynthEngine;
 class OscilGen : private WaveShapeSamples
 {
     public:
-        OscilGen(fft::Calc *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
+        OscilGen(fft::Calc&,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
         ~OscilGen();
 
         void changeParams(OscilParameters *params_);
@@ -84,7 +84,7 @@ class OscilGen : private WaveShapeSamples
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
-        fft::Calc *fft;
+        fft::Calc& fft;
 
         // computes the basefunction and make the FFT; newbasefunc<0  = same basefunc
         void changebasefunction(void);

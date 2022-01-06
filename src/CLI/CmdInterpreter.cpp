@@ -425,7 +425,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     else if (bitTest(context, LEVEL::Oscillator))
     {
         int type = (int)readControl(synth, 0, OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::oscillatorGroup);
-        if (type > OSCILLATOR::wave::hyperSec)
+        if (type == OSCILLATOR::wave::user)
             result += " user";
         else
             result += (" " + waveshape[type]);

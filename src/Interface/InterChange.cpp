@@ -5613,7 +5613,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
             if (write)
             {
                 fft::Calc fft(synth->oscilsize);
-                OscilGen gen(&fft, NULL, synth, oscil);
+                OscilGen gen(fft, NULL, synth, oscil);
                 gen.useasbase();
                 if (value_bool)
                 {
@@ -5763,7 +5763,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
             if (write)
             {
                 fft::Calc fft(synth->oscilsize);
-                OscilGen gen(&fft, NULL, synth, oscil);
+                OscilGen gen(fft, NULL, synth, oscil);
                 gen.convert2sine();
                 oscil->presetsUpdated();
             }

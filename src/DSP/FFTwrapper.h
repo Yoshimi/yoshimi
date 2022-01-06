@@ -46,7 +46,21 @@ public: // can not be copied or moved
     Spectrum(Spectrum&&)                 = delete;
     Spectrum(Spectrum const&)            = delete;
     Spectrum& operator=(Spectrum&&)      = delete;
-    Spectrum& operator=(Spectrum const&) = delete;
+
+    // copy-assign other spectrum values
+    Spectrum& operator=(Spectrum const& src)
+    {
+        if (this != &src)
+        {
+            assert(src.size() == siz);
+            for (size_t i=0; i < siz; ++i)
+            {
+                c(i) = src.c(i);
+                s(i) = src.s(i);
+            }
+        }
+        return *this;
+    }
 
     // automatic memory-management
     Spectrum(size_t tableSize)
@@ -119,12 +133,15 @@ class FFTwrapper : POL
         FFTwrapper& operator=(FFTwrapper&&)      = delete;
         FFTwrapper& operator=(FFTwrapper const&) = delete;
 
+        size_t tableSize()    const { return fftsize; }
+        size_t spectrumSize() const { return fftsize / 2; }
+
         /* Fast Fourier Transform */
         void smps2freqs(float const* smps, Spectrum& freqs)
         {
             auto lock = POL::lock4usage();
-            size_t half_size{fftsize / 2};
-            assert (half_size <= freqs.size());
+            size_t half_size{spectrumSize()};
+            assert (half_size == freqs.size());
             memcpy(data1, smps, fftsize * sizeof(float));
             fftwf_execute(planFourier);
 //          memcpy(freqs.co, data1, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
@@ -142,8 +159,8 @@ class FFTwrapper : POL
         void freqs2smps(Spectrum const& freqs, float* smps)
         {
             auto lock = POL::lock4usage();
-            size_t half_size{fftsize / 2};
-            assert (half_size <= freqs.size());
+            size_t half_size{spectrumSize()};
+            assert (half_size == freqs.size());
 //          memcpy(data2, freqs.co, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
             for (size_t i = 0; i < half_size; ++i)
                 data2[i] = freqs.c(i);
