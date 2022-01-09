@@ -171,8 +171,6 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
         auto &oldvpar = orig.NoteVoicePar[i];
         auto &vpar = NoteVoicePar[i];
 
-        vpar.OscilSmp = NULL;
-        vpar.FMSmp = NULL;
         vpar.FMEnabled = oldvpar.FMEnabled;
 
         if (oldvpar.VoiceOut != NULL) {
@@ -220,22 +218,12 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
         // Now handle allocations
         if (subVoiceNumber == -1)
         {
-            size_t size = synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES;
+            vpar.OscilSmp.copyWaveform(oldvpar.OscilSmp);
+            vpar.FMSmp.copyWaveform(oldvpar.FMSmp);
 
-            if (oldvpar.OscilSmp != NULL)
-            {
-                vpar.OscilSmp = new float[size];
-                memcpy(vpar.OscilSmp, oldvpar.OscilSmp, size * sizeof(float));
-            }
-
-            if (oldvpar.FMSmp != NULL)
-            {
-                vpar.FMSmp = (float*)fftwf_malloc(size * sizeof(float));
-                memcpy(vpar.FMSmp, oldvpar.FMSmp, size * sizeof(float));
-            }
         } else {
-            vpar.OscilSmp = topVoice->NoteVoicePar[i].OscilSmp;
-            vpar.FMSmp = topVoice->NoteVoicePar[i].FMSmp;
+            vpar.OscilSmp.attachReference(topVoice->NoteVoicePar[i].OscilSmp);
+            vpar.FMSmp.attachReference(topVoice->NoteVoicePar[i].FMSmp);
         }
 
         vpar.FreqEnvelope = oldvpar.FreqEnvelope != NULL ?
@@ -433,8 +421,6 @@ void ADnote::construct()
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
-        NoteVoicePar[nvoice].OscilSmp = NULL;
-        NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
 
         NoteVoicePar[nvoice].FMEnabled = NONE;
@@ -540,22 +526,23 @@ void ADnote::construct()
         int vc = nvoice;
         if (adpars->VoicePar[nvoice].Pextoscil != -1)
             vc = adpars->VoicePar[nvoice].Pextoscil;
+
+        // prepare wavetable for the voice's oscil or external voice's oscil
         if (subVoiceNumber == -1) {
+            // this voice manages its own oscillator wavetable
+            NoteVoicePar[nvoice].OscilSmp.allocateWaveform(synth->oscilsize);
+
             // Draw new seed for randomisation of harmonics
             // Since NoteON happens at random times, this actually injects entropy
             adpars->VoicePar[nvoice].OscilSmp->newrandseed();
 
-            NoteVoicePar[nvoice].OscilSmp = // the extra points contains the first point
-                new float[synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES];
-
-            // Get the voice's oscil or external's voice oscil
             if (!adpars->GlobalPar.Hrandgrouping)
                 adpars->VoicePar[vc].OscilSmp->newrandseed();
 
             // Actual OscilSmp rendering done later.
         } else {
             // If subvoice, use oscillator from original voice.
-            NoteVoicePar[nvoice].OscilSmp = topVoice->NoteVoicePar[nvoice].OscilSmp;
+            NoteVoicePar[nvoice].OscilSmp.attachReference(topVoice->NoteVoicePar[nvoice].OscilSmp);
         }
 
         int oscposhi_start;
@@ -969,15 +956,8 @@ void ADnote::killNote()
     {
         if (NoteVoicePar[nvoice].Enabled)
             killVoice(nvoice);
-
-        // Parent deletes oscillator samples.
-        if (subVoiceNumber == -1)
-            delete [] NoteVoicePar[nvoice].OscilSmp;
-        if ((NoteVoicePar[nvoice].FMEnabled != NONE)
-            && (NoteVoicePar[nvoice].FMVoice < 0)
-            && (subVoiceNumber == -1))
-            fftwf_free(NoteVoicePar[nvoice].FMSmp);
     }
+    // Note: Storage for samples is managed automatically by SampleHolder
 
 
     delete NoteGlobalPar.FreqEnvelope;
@@ -1104,15 +1084,16 @@ void ADnote::initParameters(void)
                 vc = adpars->VoicePar[nvoice].PextFMoscil;
 
             if (subVoiceNumber == -1) {
-                adpars->VoicePar[nvoice].FMSmp->newrandseed();
-                NoteVoicePar[nvoice].FMSmp =
-                    (float*)fftwf_malloc((synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES) * sizeof(float));
+                // this voice maintains its own oscil wavetable...
+                NoteVoicePar[nvoice].FMSmp.allocateWaveform(synth->oscilsize);
 
+                adpars->VoicePar[nvoice].FMSmp->newrandseed();
                 if (!adpars->GlobalPar.Hrandgrouping)
                     adpars->VoicePar[vc].FMSmp->newrandseed();
+
             } else {
                 // If subvoice use oscillator from original voice.
-                NoteVoicePar[nvoice].FMSmp = topVoice->NoteVoicePar[nvoice].FMSmp;
+                NoteVoicePar[nvoice].FMSmp.attachReference(topVoice->NoteVoicePar[nvoice].FMSmp);
             }
 
             for (int k = 0; k < unison_size[nvoice]; ++k)
@@ -1296,14 +1277,12 @@ void ADnote::computeNoteParameters(void)
             int vc = nvoice;
             if (adpars->VoicePar[nvoice].Pextoscil != -1)
                 vc = adpars->VoicePar[nvoice].Pextoscil;
-            adpars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,
-                                               getVoiceBaseFreq(nvoice),
-                                               adpars->VoicePar[nvoice].Presonance != 0);
+            adpars->VoicePar[vc].OscilSmp->getWave(NoteVoicePar[nvoice].OscilSmp,
+                                                   getVoiceBaseFreq(nvoice),
+                                                   adpars->VoicePar[nvoice].Presonance != 0);
 
             // I store the first elements to the last position for speedups
-            for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
-                NoteVoicePar[nvoice].OscilSmp[synth->oscilsize + i] = NoteVoicePar[nvoice].OscilSmp[i];
-
+            NoteVoicePar[nvoice].OscilSmp.fillInterpolationBuffer();
         }
 
         int new_phase_offset = (int)((adpars->VoicePar[nvoice].Poscilphase - 64.0f)
@@ -1332,12 +1311,8 @@ void ADnote::computeNoteParameters(void)
                     || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
                     freqtmp = getFMVoiceBaseFreq(nvoice);
 
-                adpars->VoicePar[vc].FMSmp->
-                         get(NoteVoicePar[nvoice].FMSmp, freqtmp);
-
-                for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
-                    NoteVoicePar[nvoice].FMSmp[synth->oscilsize + i] =
-                        NoteVoicePar[nvoice].FMSmp[i];
+                adpars->VoicePar[vc].FMSmp->getWave(NoteVoicePar[nvoice].FMSmp, freqtmp);
+                NoteVoicePar[nvoice].FMSmp.fillInterpolationBuffer();
             }
 
             int new_FMphase_offset = (int)((adpars->VoicePar[nvoice].PFMoscilphase - 64.0f)
@@ -1830,13 +1805,14 @@ void ADnote::fadein(float *smps)
  */
 inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
 {
+    fft::Waveform const& smps = NoteVoicePar[nvoice].OscilSmp;
+
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         int    poshi  = oscposhi[nvoice][k];
         int    poslo  = oscposlo[nvoice][k] * (1<<24);
         int    freqhi = oscfreqhi[nvoice][k];
         int    freqlo = oscfreqlo[nvoice][k] * (1<<24);
-        float *smps   = NoteVoicePar[nvoice].OscilSmp;
         float *tw     = tmpwave_unison[k];
         assert(oscfreqlo[nvoice][k] < 1.0f);
         for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -2017,6 +1993,8 @@ void ADnote::normalizeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
 // Render the modulator with linear interpolation, no modulation on it
 void ADnote::computeVoiceModulatorLinearInterpolation(int nvoice)
 {
+    fft::Waveform const& smps = NoteVoicePar[nvoice].FMSmp;
+
     // Compute the modulator and store it in tmpmod_unison[][]
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
@@ -2025,7 +2003,6 @@ void ADnote::computeVoiceModulatorLinearInterpolation(int nvoice)
         int freqhiFM = oscfreqhiFM[nvoice][k];
         float freqloFM = oscfreqloFM[nvoice][k];
         float *tw = tmpmod_unison[k];
-        const float *smps = NoteVoicePar[nvoice].FMSmp;
 
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
@@ -2049,6 +2026,8 @@ void ADnote::computeVoiceModulatorLinearInterpolation(int nvoice)
 // Computes the Modulator (Phase Modulation or Frequency Modulation from parent voice)
 void ADnote::computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
 {
+    fft::Waveform const& smps = NoteVoicePar[nvoice].FMSmp;
+
     // do the modulation using parent's modulator, onto a new modulator
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
@@ -2061,11 +2040,10 @@ void ADnote::computeVoiceModulatorFrequencyModulation(int nvoice, int FMmode)
         // sound. However, if the carrier and modulator are very far apart in
         // frequency, then the modulation will affect them very differently,
         // since the phase difference is linear, not logarithmic. Compensate for
-        // this by favoring the carrier, and adjust the rate of modulation
+        // this by favouring the carrier, and adjust the rate of modulation
         // logarithmically, relative to this.
-        float oscVsFMratio = ((float)freqhiFM + freqloFM)
-            / ((float)oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
-        const float *smps = NoteVoicePar[nvoice].FMSmp;
+        float oscVsFMratio = float(freqhiFM + freqloFM)
+            / float(oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
 
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
@@ -2119,6 +2097,9 @@ void ADnote::computeVoiceModulatorForFMFrequencyModulation(int nvoice)
     // would have happened if there was no modulation. Then we take the linear
     // interpolation between the two nearest samples, and use that to construct
     // the resulting curve.
+
+    fft::Waveform const& smps = NoteVoicePar[nvoice].FMSmp;
+
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpmod_unison[k];
@@ -2126,10 +2107,8 @@ void ADnote::computeVoiceModulatorForFMFrequencyModulation(int nvoice)
         float posloFM = oscposloFM[nvoice][k];
         int freqhiFM = oscfreqhiFM[nvoice][k];
         float freqloFM = oscfreqloFM[nvoice][k];
-        float freqFM = (float)freqhiFM + freqloFM;
-        float oscVsFMratio = freqFM
-            / ((float)oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
-        const float *smps = NoteVoicePar[nvoice].FMSmp;
+        float freqFM   = float(freqhiFM) + freqloFM;
+        float oscVsFMratio = freqFM / float(oscfreqhi[nvoice][k] + oscfreqlo[nvoice][k]);
         float oldInterpPhase = FMFMoldInterpPhase[nvoice][k];
         float currentPhase = FMFMoldPhase[nvoice][k];
         float currentPMod = FMFMoldPMod[nvoice][k];
@@ -2252,6 +2231,8 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice)
 
 void ADnote::computeVoiceOscillatorForFMFrequencyModulation(int nvoice)
 {
+    fft::Waveform const& smps = NoteVoicePar[nvoice].OscilSmp;
+
     // See computeVoiceModulatorForFMFrequencyModulation for details on how this works.
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
@@ -2261,7 +2242,6 @@ void ADnote::computeVoiceOscillatorForFMFrequencyModulation(int nvoice)
         int freqhi = oscfreqhi[nvoice][k];
         float freqlo = oscfreqlo[nvoice][k];
         float freq = (float)freqhi + freqlo;
-        const float *smps = NoteVoicePar[nvoice].OscilSmp;
         float oldInterpPhase = oscFMoldInterpPhase[nvoice][k];
         float currentPhase = oscFMoldPhase[nvoice][k];
         float currentPMod = oscFMoldPMod[nvoice][k];

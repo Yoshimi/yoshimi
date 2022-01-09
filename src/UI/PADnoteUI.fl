@@ -192,7 +192,7 @@ this->pars=pars;} {}
         float spc[n];
         for (int i = 0; i < n; i++)
             spc[i] = 0.0;
-        pars->oscilgen->getspectrum(n, spc, 0);
+        pars->oscilgen->getOscilSpectrumIntensities(n, spc);
 
         //normalize
         float max = 0;

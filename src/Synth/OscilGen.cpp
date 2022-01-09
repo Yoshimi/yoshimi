@@ -51,8 +51,8 @@ namespace {// Implementation helpers
 OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilParameters *params_) :
     params(params_),
     synth(_synth),
-    tmpsmps((float*)fftwf_malloc(fft_.tableSize() * sizeof(float))),
     fft(fft_),
+    tmpsmps{fft_.tableSize()},
     outoscilSpectrum(fft.spectrumSize()),
     oscilSpectrum(fft.spectrumSize()),
     oscilupdate(params),
@@ -61,19 +61,7 @@ OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilP
     basePrng{},
     harmonicPrng{}
 {
-    if (!tmpsmps)
-        synth->getRuntime().Log("Very bad error, failed to allocate OscilGen::tmpsmps");
-    else
-        memset(tmpsmps, 0, fft.spectrumSize() * sizeof(float));
     genDefaults();
-}
-
-OscilGen::~OscilGen()
-{
-    if (tmpsmps)
-    {
-        fftwf_free(tmpsmps);
-    }
 }
 
 void OscilGen::changeParams(OscilParameters *params_)
@@ -119,9 +107,9 @@ void OscilGen::genDefaults(void)
 void OscilGen::convert2sine()
 {
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
-    float oscil[fft.tableSize()];
+    fft::Waveform oscil(fft.tableSize());
     fft::Spectrum freqs(fft.spectrumSize());
-    get(oscil, -1.0f);
+    getWave(oscil, 1.0f);
     fft.smps2freqs(oscil, freqs);
 
     float max = 0.0f;
@@ -373,7 +361,7 @@ float OscilGen::basefunc_hypsec(float x, float a)
 
 
 // Get the base function
-void OscilGen::getbasefunction(float *smps)
+void OscilGen::getbasefunction(fft::Waveform& smps)
 {
     float par = (params->Pbasefuncpar + 0.5f) / 128.0f;
     if (params->Pbasefuncpar == 64)
@@ -653,7 +641,7 @@ void OscilGen::oscilfilter(void)
 
 
 /* Ensure the base function spectrum in the OscilParameters
- * matches the current parameter settings; possible regenerate
+ * matches the current parameter settings; possibly regenerate
  * this spectrum when using one of the predefined base functions.
  * Remarks:
  * - a "user base function" (generated with OscilGen::useasbase())
@@ -721,8 +709,10 @@ void OscilGen::waveshape(void)
     for (size_t i = 0; i < fft.tableSize(); ++i)
         tmpsmps[i] *= max;
 
+    float* rawData = &tmpsmps[0];  // TODO: switch relevant buffers in SynthEngine also to fft::Waveform and automatic memory management
+
     // Do the waveshaping
-    waveShapeSmps(fft.tableSize(), tmpsmps, params->Pwaveshapingfunction, params->Pwaveshaping);
+    waveShapeSmps(fft.tableSize(), rawData, params->Pwaveshapingfunction, params->Pwaveshaping);
 
     fft.smps2freqs(tmpsmps, oscilSpectrum); // perform FFT
 }
@@ -1074,9 +1064,8 @@ inline void adaptiveharmonic(Accessor spec, size_t size,
 {
     if (type == 0)
         return;// adaptive harmonics switched OFF
-    if (currFreq < 1.0f)
-        currFreq = 440.0f;
 
+    assert(currFreq >= 1.0);
     assert(size > 0);
     std::unique_ptr<float[]> inf{new float[size]};
     for (size_t i = 0; i < size; ++i)
@@ -1180,19 +1169,38 @@ inline void adaptiveharmonic(Accessor spec, size_t size,
 
 
 // Get the oscillator function
-void OscilGen::get(float *smps, float freqHz)
+void OscilGen::getWave(fft::Waveform& smps, float freqHz, bool applyResonance, bool forGUI)
 {
-    this->get(smps, freqHz, false);
+    buildSpectrum(freqHz, applyResonance, forGUI);
+    fft.freqs2smps(outoscilSpectrum, smps);
+    for (size_t i = 0; i < fft.tableSize(); ++i)
+        smps[i] *= 0.25f; // correct the amplitude
+}
+
+// Get the current spectrum for rendering in PADSynth (synth->halfoscilsize)
+// Note: Spectrum slot=0 (DC-Offset) will be discarded.
+//       In the result, index=0 is the fundamental.
+//       See PADnoteParameters::generatespectrum_otherModes()
+void OscilGen::getSpectrum(float* harmonics, float freqHz)
+{
+    assert(params->ADvsPAD);
+    bool applyResonance = false;
+    bool forGUI = false;
+
+    buildSpectrum(freqHz, applyResonance, forGUI);
+    for (size_t i = 1; i < outoscilSpectrum.size(); ++i)
+        harmonics[i-1] = sqrtf(sqr(outoscilSpectrum.c(i)) + sqr(outoscilSpectrum.s(i)));
 }
 
 
-// Get the oscillator function
-// NOTE: if params->ADvsPAD is set, then smps is expected to be of synth->halfoscilsize
-//       and is filled with the frequency amplitudes (discarding phase information);
-//       DC-Offset is discarded; index=0 corresponds to the fundamental.
-//       Otherwise smps must be synth->oscilsize, and will be filled with the rendered waveform
-void OscilGen::get(float *smps, float freqHz, bool applyResonance)
+// Core implementation of OscilGen
+// - possibly prepare() will be called to generate the raw spectrum
+// - typically invoked for each buffer to generate the Wavetable
+//   including current phase randomisation
+// - also used to generate the base spectrum for PADsynth
+void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI)
 {
+    assert(freqHz > 0.0);
     if (oldbasepar != params->Pbasefuncpar
         || oldbasefunc != params->Pcurrentbasefunc
         || oldhmagtype != params->Phmagtype
@@ -1237,7 +1245,7 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
     outoscilSpectrum.reset();
 
     size_t specLen = outoscilSpectrum.size();
-    size_t nyquist = size_t(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    size_t nyquist = size_t(0.5f * synth->samplerate_f / freqHz) + 2;
     if (params->ADvsPAD)
         nyquist = specLen;
     if (nyquist > specLen)
@@ -1261,8 +1269,9 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
 
         Accessor cosPart = [this](size_t i) -> float& { return outoscilSpectrum.c(i); };
         Accessor sinPart = [this](size_t i) -> float& { return outoscilSpectrum.s(i); };
-        adaptiveharmonic(cosPart, specLen, freqHz, bfreq, type, ppow, ppar);
-        adaptiveharmonic(sinPart, specLen, freqHz, bfreq, type, ppow, ppar);
+        float currFreq = forGUI? 440.0f : freqHz;
+        adaptiveharmonic(cosPart, specLen, currFreq, bfreq, type, ppow, ppar);
+        adaptiveharmonic(sinPart, specLen, currFreq, bfreq, type, ppow, ppar);
     }
 
     nyquist = realnyquist;
@@ -1274,7 +1283,7 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
 
     // Randomness (each harmonic), the block type is computed
     // in ADnote by setting start position according to this setting
-    if (params->Prand > 64 && freqHz >= 0.0 && !params->ADvsPAD)
+    if (params->Prand > 64 && !forGUI && !params->ADvsPAD)
     {
         float rnd, angle, a, b, c, d;
         rnd = PI * powf((params->Prand - 64.0f) / 64.0f, 2.0f);
@@ -1291,7 +1300,7 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
     }
 
     // Harmonic Amplitude Randomness
-    if (freqHz > 0.1 && !params->ADvsPAD)
+    if (!forGUI && !params->ADvsPAD)
     {
         float power = params->Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
@@ -1322,7 +1331,7 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
         }
     }
 
-    if (applyResonance && freqHz > 0.1)
+    if (applyResonance && !forGUI)
         res->applyres(nyquist - 1, outoscilSpectrum, freqHz);
 
     // Full RMS normalize
@@ -1339,21 +1348,6 @@ void OscilGen::get(float *smps, float freqHz, bool applyResonance)
         outoscilSpectrum.c(j) *= sum;
         outoscilSpectrum.s(j) *= sum;
     }
-
-    if (params->ADvsPAD && freqHz > 0.1f)
-    {   // in this case the smps will contain the freqs.
-        // Note: Spectrum slot=0 (DC-Offset) will be discarded.
-        //       In the result, index=0 is the fundamental.
-        //       See PADnoteParameters::generatespectrum_otherModes()
-        for (size_t i = 1; i < specLen; ++i)
-            smps[i-1] = sqrtf(sqr(outoscilSpectrum.c(i)) + sqr(outoscilSpectrum.s(i)));
-    }
-    else
-    {
-        fft.freqs2smps(outoscilSpectrum, smps);
-        for (size_t i = 0; i < fft.tableSize(); ++i)
-            smps[i] *= 0.25f; // correct the amplitude
-    }
 }
 
 int OscilGen::getPhase()
@@ -1368,8 +1362,8 @@ int OscilGen::getPhase()
 }
 
 
-// Get the spectrum of the oscillator for the UI
-void OscilGen::getspectrum(size_t n, float *spc, int what)
+// Current base function spectrum intensities for display in the UI
+void OscilGen::getBasefuncSpectrumIntensities(size_t n, float *spc)
 {
     size_t specLen = outoscilSpectrum.size();
     if (n > specLen)
@@ -1377,44 +1371,48 @@ void OscilGen::getspectrum(size_t n, float *spc, int what)
 
     for (size_t i = 1; i < n; ++i)
     {
-        if (what == 0)
-        {// display intensities of resulting OscilGen spectrum
-            spc[i-1] = sqrtf(sqr(oscilSpectrum.c(i)) + sqr(oscilSpectrum.s(i)));
-        }
+        if (params->Pcurrentbasefunc == OSCILLATOR::wave::sine)
+            spc[i-1] = (i == 1) ? 1.0f : 0.0f;
         else
-        {// display intensities of the base function spectrum
-            if (params->Pcurrentbasefunc == OSCILLATOR::wave::sine)
-                spc[i-1] = (i == 1) ? 1.0f : 0.0f;
-            else
-                spc[i-1] = sqrtf(sqr(params->getbasefuncSpectrum().c(i)) + sqr(params->getbasefuncSpectrum().s(i)));
-        }
-    }
-
-    if (!what)
-    {// in case of OscilGen spectrum: show also the effect of adaptive harmonics
-
-        unsigned char bfreq = params->Padaptiveharmonicsbasefreq;
-        unsigned char type  = params->Padaptiveharmonics;
-        unsigned char ppow  = params->Padaptiveharmonicspower;
-        unsigned char ppar  = params->Padaptiveharmonicspar;
-        float currFreq = 0.0;
-
-        Accessor accessLine = [spc](size_t i) -> float& { return spc[i]; };
-
-        adaptiveharmonic(accessLine, n, currFreq, bfreq, type, ppow, ppar);
-
-        /////TODO: do we really need the following side-effect on the spectrum stored in the UI's OscilGen?
-        /////      might be just a consequence of the 'tricky' way the original code calculated the adaptive harmonics
-        assert(n <= specLen);
-        for (size_t i = 0; i < n; ++i)
-            outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = spc[i];
-        for (size_t i = n; i < specLen; ++i)
-            outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = 0.0f;
+            spc[i-1] = sqrtf(sqr(params->getbasefuncSpectrum().c(i)) + sqr(params->getbasefuncSpectrum().s(i)));
     }
 }
 
 
-// Convert the oscillator as base function
+// Effective oscillator spectrum intensities for display in the UI
+void OscilGen::getOscilSpectrumIntensities(size_t n, float *spc)
+{
+    size_t specLen = outoscilSpectrum.size();
+    if (n > specLen)
+        n = specLen;
+
+    for (size_t i = 1; i < n; ++i)
+        spc[i-1] = sqrtf(sqr(oscilSpectrum.c(i)) + sqr(oscilSpectrum.s(i)));
+
+    // display of full OscilGen spectrum: show also the effect of adaptive harmonics
+
+    unsigned char bfreq = params->Padaptiveharmonicsbasefreq;
+    unsigned char type  = params->Padaptiveharmonics;
+    unsigned char ppow  = params->Padaptiveharmonicspower;
+    unsigned char ppar  = params->Padaptiveharmonicspar;
+
+    Accessor accessLine = [spc](size_t i) -> float& { return spc[i]; };
+
+    float currFreq = 440.0; // GUI display shows adaptive harmonics with dummy "current" frequency
+    adaptiveharmonic(accessLine, n, currFreq, bfreq, type, ppow, ppar);
+
+    /////TODO: do we really need the following side-effect on the spectrum stored in the UI's OscilGen?
+    /////      might be just a consequence of the 'tricky' way the original code calculated the adaptive harmonics
+    assert(n <= specLen);
+    for (size_t i = 0; i < n; ++i)
+        outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = spc[i];
+    for (size_t i = n; i < specLen; ++i)
+        outoscilSpectrum.s(i) = outoscilSpectrum.c(i) = 0.0f;
+}
+
+
+// Convert the current oscillator spectrum into a
+// "user base function", which can then be further mixed and processed.
 void OscilGen::useasbase(void)
 {
     params->updatebasefuncSpectrum(oscilSpectrum);
@@ -1423,8 +1421,8 @@ void OscilGen::useasbase(void)
 }
 
 
-// Get the base function for UI
-void OscilGen::getcurrentbasefunction(float *smps)
+// Get the base function display for the "Osciloscope" in the UI
+void OscilGen::displayBasefuncForGui(fft::Waveform& smps)
 {
     if (params->Pcurrentbasefunc != OSCILLATOR::wave::sine)
     {
@@ -1432,4 +1430,15 @@ void OscilGen::getcurrentbasefunction(float *smps)
     }
     else
         getbasefunction(smps); // the sine case
+}
+
+
+// Get the current effective Oscillator waveform
+// for display in the "Osciloscope" in the UI
+void OscilGen::displayWaveformForGui(fft::Waveform& smps)
+{
+    float dummyFreq = 1.0;
+    bool applyResonance = false;
+    bool forGuiDisplay = true;
+    OscilGen::getWave(smps, dummyFreq, applyResonance, forGuiDisplay);
 }

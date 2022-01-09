@@ -43,26 +43,34 @@ class OscilGen : private WaveShapeSamples
 {
     public:
         OscilGen(fft::Calc&,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
-        ~OscilGen();
+       ~OscilGen() = default;
+
+        // shall not be copied or moved or assigned
+        OscilGen(OscilGen&&)                 = delete;
+        OscilGen(OscilGen const&)            = delete;
+        OscilGen& operator=(OscilGen&&)      = delete;
+        OscilGen& operator=(OscilGen const&) = delete;
+
 
         void changeParams(OscilParameters *params_);
 
         void prepare();
 
-        void get(float *smps, float freqHz);
-        // returns where should I start getting samples, used in block type randomness
-
-        void get(float *smps, float freqHz, bool applyResonance);
-        // if freqHz is smaller than 0, return the "un-randomized" sample for UI
+        void getWave(fft::Waveform&, float freqHz, bool applyResonance =false, bool forGUI =false);
+        void getSpectrum(float*, float freqHz);
 
         // Get just the phase of the oscillator.
         int getPhase();
 
-        void getbasefunction(float *smps);
+        void getbasefunction(fft::Waveform&);
 
         // called by UI
-        void getspectrum(size_t n, float *spc, int what); // what=0 pt. oscil,1 pt. basefunc
-        void getcurrentbasefunction(float *smps);
+        void getOscilSpectrumIntensities(size_t, float*);
+        void getBasefuncSpectrumIntensities(size_t, float*);
+        void displayBasefuncForGui(fft::Waveform&);
+        void displayWaveformForGui(fft::Waveform&);
+
+        // convert the current Oscil settings into a "user base function"
         void useasbase(void);
 
         void genDefaults(void);
@@ -79,19 +87,22 @@ class OscilGen : private WaveShapeSamples
 
         SynthEngine *synth;
 
-        float *tmpsmps;
+        fft::Calc& fft;
+
+        fft::Waveform tmpsmps;
 
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
-        fft::Calc& fft;
+        // OscilGen core implementation: generate the current Spectrum -> outoscilSpectrum
+        void buildSpectrum(float freqHz, bool applyResonance, bool forGUI);
 
-        // computes the basefunction and make the FFT; newbasefunc<0  = same basefunc
+        // computes the basefunction and make the FFT;
         void changebasefunction(void);
 
         void waveshape(void); // Waveshaping (no kidding!)
 
-        void oscilfilter(); // Filter the oscillator accotding to Pfiltertype and Pfilterpar
+        void oscilfilter(); // Filter the oscillator according to Pfiltertype and Pfilterpar
 
         void spectrumadjust(void); // Adjust the spectrum
 

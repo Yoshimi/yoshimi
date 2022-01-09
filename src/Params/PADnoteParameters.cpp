@@ -6,6 +6,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019 Will Godfrey
     Copyright 2020 Kristian Amlie & others
+    Copyright 2022 Ichthyostega
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -503,8 +504,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
     vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
-    // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
-    oscilgen->get(harmonics.data(), basefreq, false);
+    oscilgen->getSpectrum(harmonics.data(), basefreq);
     normaliseMax(harmonics); // within 0.0 .. 1.0
 
     // derive the "perceptual" bandwidth for the given profile (a value 0 .. 1)
@@ -517,7 +517,7 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
             break;
         if (realfreq < 20.0f)
             break;
-        if (harmonics[nh] < 1e-4f)
+        if (harmonics[nh] < 1e-5f)
             continue;
         //compute the bandwidth of each harmonic
         float bw = (power<2>(getBandwithInCent() / 1200.0f) - 1.0f) * basefreq / bwadjust;
@@ -608,8 +608,7 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
     vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
-    // Note: since ADvsPAD is set, we get the frequency amplitudes of the spectrum
-    oscilgen->get(harmonics.data(), basefreq, false);
+    oscilgen->getSpectrum(harmonics.data(), basefreq);
     normaliseMax(harmonics); // within 0.0 .. 1.0
 
     for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
@@ -731,7 +730,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         float* newsmp = newTable[tabNr];
         newsmp[0] = 0.0f;                ///TODO 12/2021 (why) is this necessary? Doesn't the IFFT generate a full waveform?
 
-        fft.freqs2smps(fftCoeff, newsmp);
+//      fft.freqs2smps(fftCoeff, newsmp);////////////////////////////////////////////////////////////////////////////////////////TODO switch
         // that's all; here is the only IFFT for the whole sample; no windows are used ;-) (Comment by original author)
 
         normaliseSpectrumRMS(newsmp, newTable.tableSize);

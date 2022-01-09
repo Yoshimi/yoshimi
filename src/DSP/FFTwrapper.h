@@ -28,13 +28,14 @@
 
 #include <fftw3.h>
 #include <stdexcept>
+#include <utility>
 #include <cassert>
 #include <cstring>
 #include <mutex>
 
 namespace fft {
 
-/* holds the spectrum coefficients */
+/* Spectrum coefficients - properly arranged for Fourier-operations through libFFTW3 */
 class Spectrum
 {
     size_t siz;
@@ -63,8 +64,8 @@ public: // can not be copied or moved
     }
 
     // automatic memory-management
-    Spectrum(size_t tableSize)
-        : siz(tableSize)
+    Spectrum(size_t spectrumSize)
+        : siz(spectrumSize)
     {
         this->co = (float*)fftwf_malloc(siz * sizeof(float));
         this->si = (float*)fftwf_malloc(siz * sizeof(float));
@@ -85,14 +86,113 @@ public: // can not be copied or moved
         memset(this->si, 0, siz * sizeof(float));
     }
 
+    size_t size()  const { return siz; }
+
     // array-like access
     float      & c(size_t i)       { return co[i]; }
     float const& c(size_t i) const { return co[i]; }
     float      & s(size_t i)       { return si[i]; }
     float const& s(size_t i) const { return si[i]; }
+};
+
+
+/* Waveform data - properly aligned for libFFTW3 Fourier-operations */
+class Waveform
+{
+    size_t siz;
+    float* samples;
+
+public:
+    static constexpr size_t INTERPOLATION_BUFFER = 5;
+
+    // can not be copied or moved
+    Waveform(Waveform&&)            = delete;
+    Waveform(Waveform const&)       = delete;
+    Waveform& operator=(Waveform&&) = delete;
+
+    // copy-assign other waveform sample data
+    Waveform& operator=(Waveform const& src)
+    {
+        if (this != &src)
+        {
+            assert(src.size() == siz);
+            for (size_t i=0; i < siz+INTERPOLATION_BUFFER; ++i)
+            {
+                samples[i] = src[i];
+            }
+        }
+        return *this;
+    }
+
+    // automatic memory-management
+    Waveform(size_t tableSize)
+        : siz(tableSize)
+    {
+        size_t allocsize = (siz+INTERPOLATION_BUFFER) * sizeof(float);
+        samples = (float*)fftwf_malloc(allocsize);
+        if (!samples)
+            throw std::bad_alloc();
+        reset();
+    }
+
+   ~Waveform()
+    {
+        if (samples) fftwf_free(samples);
+    }
+
+    void reset()
+    {
+        size_t allocsize = (siz+INTERPOLATION_BUFFER) * sizeof(float);
+        memset(samples, 0, allocsize);
+    }
+
+    /* redundantly append the first elements for interpolation */
+    void fillInterpolationBuffer()
+    {
+        assert(samples);
+        for (size_t i = 0; i < INTERPOLATION_BUFFER; ++i)
+            samples[siz+i] = samples[i];
+    }
 
     size_t size()  const { return siz; }
+
+    // array subscript operator
+    float      & operator[](size_t i)       { return samples[i]; }
+    float const& operator[](size_t i) const { return samples[i]; }
+
+
+    friend void swap(Waveform& w1, Waveform& w2)
+    {
+        using std::swap;
+        swap(w1.samples, w2.samples);
+        swap(w1.siz,     w2.siz);
+    }
+
+protected:
+    /* derived special Waveform holders may be created empty,
+     * allowing for statefull lifecycle and explicitly managed data.
+     * See WaveformHolder in ADnote.h */
+    Waveform()
+        : siz(0)
+        , samples{nullptr}
+    {  }
+
+    /** give up ownership without discarding data */
+    void detach()
+    {
+        samples = nullptr;
+        siz = 0;
+    }
+    /** allow a derived class to attach to an existing allocation */
+    void attach(Waveform const& other)
+    {
+        if (samples)
+            throw std::logic_error("Waveform already owns and manages a data allocation");
+        samples = other.samples;
+        siz = other.siz;
+    }
 };
+
 
 
 /* Standard Fourier Transform operations:
@@ -137,15 +237,18 @@ class FFTwrapper : POL
         size_t spectrumSize() const { return fftsize / 2; }
 
         /* Fast Fourier Transform */
-        void smps2freqs(float const* smps, Spectrum& freqs)
+        void smps2freqs(Waveform const& smps, Spectrum& freqs)
         {
             auto lock = POL::lock4usage();
             size_t half_size{spectrumSize()};
             assert (half_size == freqs.size());
-            memcpy(data1, smps, fftsize * sizeof(float));
+            assert (fftsize == smps.size());
+//          memcpy(data1, smps, fftsize * sizeof(float));        ////////////TODO : use »new-array-execute« API and eliminate data copy
+            for (size_t i=0; i < fftsize; ++i)
+                data1[i] = smps[i];
             fftwf_execute(planFourier);
 //          memcpy(freqs.co, data1, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
-            for (size_t i = 0; i < half_size; ++i)
+            for (size_t i=0; i < half_size; ++i)
                 freqs.c(i) = data1[i];
             for (size_t i = 1; i < half_size; ++i)
                 freqs.s(i) = data1[fftsize - i];
@@ -156,7 +259,7 @@ class FFTwrapper : POL
         }
 
         /* Fast Inverse Fourier Transform */
-        void freqs2smps(Spectrum const& freqs, float* smps)
+        void freqs2smps(Spectrum const& freqs, Waveform& smps)
         {
             auto lock = POL::lock4usage();
             size_t half_size{spectrumSize()};
@@ -168,7 +271,9 @@ class FFTwrapper : POL
             for (size_t i = 1; i < half_size; ++i)
                 data2[fftsize - i] = freqs.s(i);
             fftwf_execute(planInverse);
-            memcpy(smps, data2, fftsize * sizeof(float));
+//          memcpy(smps, data2, fftsize * sizeof(float));        ////////////TODO : use »new-array-execute« API and eliminate data copy
+            for (size_t i=0; i < fftsize; ++i)
+                smps[i] = data2[i];
         }
 };
 

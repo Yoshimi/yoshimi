@@ -120,9 +120,9 @@ class OscilSpectrum {: {public Fl_Box}
         spc[i] = 0.0;
 
     if (oscbase == 0)
-        oscilSmp->getspectrum(n, spc, 0);
+        oscilSmp->getOscilSpectrumIntensities(n, spc);
     else
-        oscilSmp->getspectrum(n, spc, 1);
+        oscilSmp->getBasefuncSpectrumIntensities(n, spc);
 
     // normalize
     float max = 0;
@@ -271,11 +271,11 @@ class Oscilloscope {: {public Fl_Box}
     int lx = w();
     int ly = h() - 1;
     fl_line_style(0, int(1 * ly / float(frame)));
-    float smps[synth->oscilsize];
+    fft::Waveform smps(synth->oscilsize);
     if (oscbase == 0)
-        oscilSmp->get(smps, -1.0);
+        oscilSmp->displayWaveformForGui(smps);
     else
-        oscilSmp->getcurrentbasefunction(smps);
+        oscilSmp->displayBasefuncForGui(smps);
 
     if (damage() != 1)
     {

@@ -30,20 +30,91 @@
 
 #include "Params/ADnoteParameters.h"
 #include "Misc/RandomGen.h"
+#include "DSP/FFTwrapper.h"
 
 class ADnoteParameters;
+class SynthEngine;
 class Controller;
 class Envelope;
-class LFO;
 class Filter;
+class LFO;
 
 // Globals
 
 #define FM_AMP_MULTIPLIER 14.71280603f
 
-#define OSCIL_SMP_EXTRA_SAMPLES 5
 
-class SynthEngine;
+
+/* Helper to either manage sample data or link to another voice's data.
+ * This class allows to mimic the behaviour of the original code base,
+ * while encapsulating and automatically managing the allocation.
+ * Initially created empty, it can either allocate a buffer or attach to
+ * existing storage managed elsewhere. After that, ownership is locked.
+ * Beyond that, it can be used like a fft::Waveform in Synth code */
+class SampleHolder
+    : public fft::Waveform
+{
+    bool ownData = false;
+
+public:
+        // by default created in empty state
+        SampleHolder() : fft::Waveform() { }
+
+        SampleHolder(SampleHolder const& r)
+            : fft::Waveform()
+        {
+            if (r.size() > 0)
+                throw std::logic_error("fully engaged SampleHolder not meant to be copied");
+        }
+
+        SampleHolder(SampleHolder && rr)
+            : fft::Waveform()
+            , ownData(rr.ownData)
+        {
+            if (rr.size() > 0)
+            {
+                if (ownData) // transfer ownership
+                    swap(*this, rr);
+                else
+                    attach(rr);
+            }
+        }
+        // Assignment to existing objects not permitted
+        SampleHolder& operator=(SampleHolder const&) =delete;
+        SampleHolder& operator=(SampleHolder &&)     =delete;
+
+        /* Note: SampleHolder can be an "alias" to another SampleHolder;
+         *       and in this case we don't take ownership of the data allocation */
+       ~SampleHolder()
+        {
+            if (not ownData) detach();
+            // otherwise the parent dtor will automatically discard storage
+        }
+
+        void allocateWaveform(size_t tableSize)
+        {
+            if (size() > 0) throw std::logic_error("already engaged.");
+            fft::Waveform allocation(tableSize);
+            swap(*this, allocation);
+            ownData = true;
+        }
+
+        void copyWaveform(SampleHolder const& src)
+        {
+            if (size() > 0) throw std::logic_error("already engaged.");
+            if (src.size() == 0) return;
+            allocateWaveform(src.size());
+            fft::Waveform::operator=(src);
+        }
+
+        void attachReference(fft::Waveform& existing)
+        {
+            attach(existing);
+            ownData = false;
+        }
+};
+
+
 
 class ADnote
 {
@@ -165,8 +236,8 @@ class ADnote
             int noisetype;    // (sound/noise)
             int filterbypass;
             int DelayTicks;
-            float *OscilSmp;  // Waveform of the Voice. Shared with sub voices.
-            int phase_offset; // PWM emulation
+            SampleHolder OscilSmp;  // Waveform of the Voice. Shared with sub voices.
+            int phase_offset;       // PWM emulation
 
             // Frequency parameters
             int fixedfreq;   // if the frequency is fixed to 440 Hz
@@ -206,8 +277,8 @@ class ADnote
             bool FMringToSide;
             unsigned char FMFreqFixed;
             int    FMVoice;
-            float *VoiceOut; // Voice Output used by other voices if use this as modullator
-            float *FMSmp;    // Wave of the Voice. Shared by sub voices.
+            float *VoiceOut;           // Voice Output used by other voices if use this as modullator
+            SampleHolder FMSmp;        // Wave of the Voice. Shared by sub voices.
             int    FMphase_offset;
             float  FMVolume;
             bool FMDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
