@@ -31,7 +31,6 @@
 
 OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine *_synth) :
     Presets(_synth),
-    ADvsPAD(false),
     basefuncSpectrum(fft.spectrumSize())
 {
     setpresettype("Poscilgen");
@@ -55,11 +54,7 @@ void OscilParameters::defaults()
     }
     Phmag[0] = 127;
     Phmagtype = 0;
-    if (ADvsPAD)
-        Prand = 127; // max phase randomness (useful if the oscil will be
-                     // imported to a ADsynth from a PADsynth
-    else
-        Prand = 64; // no randomness
+    Prand = 64;    // no randomness by default
 
     Pcurrentbasefunc = OSCILLATOR::wave::sine;
     Pbasefuncpar = 64;

@@ -74,12 +74,13 @@ class PADTables
 {
 public:
     // size parameters
-    static constexpr size_t INTERPOLATION_BUFFER = 5;
     const size_t numTables;
     const size_t tableSize;
 
-    unique_ptr<float[]> samples;
     unique_ptr<float[]> basefreq;
+
+private:
+    vector<fft::Waveform> samples;
 
 public: // can be moved and swapped, but not copied...
    ~PADTables()                            = default;
@@ -89,23 +90,27 @@ public: // can be moved and swapped, but not copied...
     PADTables& operator=(PADTables const&) = delete;
 
     PADTables(PADQuality const& quality)
-        : numTables(calcNumTables(quality))
-        , tableSize(calcTableSize(quality))
-        , samples(new float[numTables * (tableSize + INTERPOLATION_BUFFER)]{0})
-        , basefreq(new float[numTables])                                 // zero-init samples
+        : numTables{calcNumTables(quality)}
+        , tableSize{calcTableSize(quality)}
+        , basefreq{new float[numTables]}
+        , samples{}
     {
         assert(numTables > 0);
         assert(tableSize > 0);
+        samples.reserve(numTables);
         for (size_t tab=0; tab<numTables; ++tab)
+        {
+            samples.emplace_back(tableSize); // cause allocation and zero-init of wavetable(s)
             basefreq[tab] = 440.0f; // fallback base frequency; makes even empty wavetable usable
+        }
     }
 
     // Subscript: access n-th wavetable
-    float* operator[](size_t tableNo)
+    fft::Waveform& operator[](size_t tableNo)
     {
-        assert(samples);
         assert(tableNo < numTables);
-        return &samples[0] + tableNo * (tableSize + INTERPOLATION_BUFFER);
+        assert(samples.size() == numTables);
+        return samples[tableNo];
     }
 
     // deliberately allow to swap two PADTables,

@@ -28,8 +28,9 @@
 
 #include <cmath>
 #include <iostream>
-#include <memory>
 #include <cassert>
+#include <memory>
+#include <vector>
 #include <functional>
 
 #include "Effects/Distorsion.h"
@@ -39,6 +40,7 @@
 #include "Synth/OscilGen.h"
 
 using func::power;
+using std::vector;
 
 namespace {// Implementation helpers
     inline float sqr(float v) { return v*v; }
@@ -1171,7 +1173,8 @@ inline void adaptiveharmonic(Accessor spec, size_t size,
 // Get the oscillator function
 void OscilGen::getWave(fft::Waveform& smps, float freqHz, bool applyResonance, bool forGUI)
 {
-    buildSpectrum(freqHz, applyResonance, forGUI);
+    bool forPAD = false;
+    buildSpectrum(freqHz, applyResonance, forGUI, forPAD);
     fft.freqs2smps(outoscilSpectrum, smps);
     for (size_t i = 0; i < fft.tableSize(); ++i)
         smps[i] *= 0.25f; // correct the amplitude
@@ -1181,15 +1184,18 @@ void OscilGen::getWave(fft::Waveform& smps, float freqHz, bool applyResonance, b
 // Note: Spectrum slot=0 (DC-Offset) will be discarded.
 //       In the result, index=0 is the fundamental.
 //       See PADnoteParameters::generatespectrum_otherModes()
-void OscilGen::getSpectrum(float* harmonics, float freqHz)
+vector<float> OscilGen::getSpectrumForPAD(float freqHz)
 {
-    assert(params->ADvsPAD);
     bool applyResonance = false;
     bool forGUI = false;
+    bool forPAD = true;
+    buildSpectrum(freqHz, applyResonance, forGUI, forPAD);
 
-    buildSpectrum(freqHz, applyResonance, forGUI);
+    vector<float> harmonics(oscilSpectrum.size()); // zero-init
     for (size_t i = 1; i < outoscilSpectrum.size(); ++i)
         harmonics[i-1] = sqrtf(sqr(outoscilSpectrum.c(i)) + sqr(outoscilSpectrum.s(i)));
+
+    return harmonics;
 }
 
 
@@ -1198,7 +1204,7 @@ void OscilGen::getSpectrum(float* harmonics, float freqHz)
 // - typically invoked for each buffer to generate the Wavetable
 //   including current phase randomisation
 // - also used to generate the base spectrum for PADsynth
-void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI)
+void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI, bool forPAD)
 {
     assert(freqHz > 0.0);
     if (oldbasepar != params->Pbasefuncpar
@@ -1246,7 +1252,7 @@ void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI)
 
     size_t specLen = outoscilSpectrum.size();
     size_t nyquist = size_t(0.5f * synth->samplerate_f / freqHz) + 2;
-    if (params->ADvsPAD)
+    if (forPAD)
         nyquist = specLen;
     if (nyquist > specLen)
         nyquist = specLen;
@@ -1283,7 +1289,7 @@ void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI)
 
     // Randomness (each harmonic), the block type is computed
     // in ADnote by setting start position according to this setting
-    if (params->Prand > 64 && !forGUI && !params->ADvsPAD)
+    if (params->Prand > 64 && !forGUI && !forPAD)
     {
         float rnd, angle, a, b, c, d;
         rnd = PI * powf((params->Prand - 64.0f) / 64.0f, 2.0f);
@@ -1300,7 +1306,7 @@ void OscilGen::buildSpectrum(float freqHz, bool applyResonance, bool forGUI)
     }
 
     // Harmonic Amplitude Randomness
-    if (!forGUI && !params->ADvsPAD)
+    if (!forGUI && !forPAD)
     {
         float power = params->Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);

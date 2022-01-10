@@ -479,14 +479,14 @@ o->hide();} open
     } {
       Fl_Box applybox {
         xywh {298 278 64 24} box THIN_UP_BOX color 237
-        code0 {if (!oscil->ADvsPAD) o->hide();}
+        code0 {if (!forPAD) o->hide();}
       }
       Fl_Button applybutton {
         label Apply
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
         xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
-        code0 {if (!oscil->ADvsPAD) o->hide();}
+        code0 {if (!forPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
         xywh {5 5 360 300} box ENGRAVED_FRAME
@@ -503,7 +503,7 @@ o->hide();} open
         } {}
         Fl_Group {} {
           xywh {246 277 115 25} box ENGRAVED_BOX
-          code0 {if (oscil->ADvsPAD) o->hide();}
+          code0 {if (forPAD) o->hide();}
         } {
           Fl_Choice hrndtype {
             label {H.rnd}
@@ -532,7 +532,7 @@ o->hide();} open
 
           send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
-        code0 {if (oscil->ADvsPAD) o->hide();}
+        code0 {if (forPAD) o->hide();}
         class mwheel_val_slider_rev
       }
       Fl_Group basefuncdisplaygroup {
@@ -631,7 +631,7 @@ o->hide();} open
         osceditUI->hide();
         if ((Fl::event_button() == 3))
         {
-            if (oscil->ADvsPAD)
+            if (forPAD)
                 synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
             else
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->show();
@@ -1091,12 +1091,13 @@ o->hide();} open
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {OscilEditor(OscilParameters *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
+  Function {OscilEditor(OscilParameters *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_, bool forPAD_ =false)} {} {
     code {//
     synth = _synth;
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
+    forPAD = forPAD_;
     oscil = oscil_;
     fft = new fft::Calc(synth->oscilsize);
     oscilSmp = new OscilGen(*fft, NULL, synth, oscil);
@@ -1367,5 +1368,7 @@ o->hide();} open
   decl {bool OSCseen;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {bool forPAD;} {private local
   }
 }

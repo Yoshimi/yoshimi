@@ -65,19 +65,19 @@ namespace{ // Implementation helpers...
     }
 
     // normalise a float array to RMS
-    inline void normaliseSpectrumRMS(float* data, size_t size)
+    inline void normaliseSpectrumRMS(fft::Waveform& data)
     {
         auto sqr = [](double val){ return val*val; };
 
         double rms = 0.0;
-        for (size_t i = 0; i < size; ++i)
+        for (size_t i = 0; i < data.size(); ++i)
         {
             rms += sqr(data[i]);
         }
         rms = sqrt(rms);
         if (rms < 0.000001)
             rms = 1.0;
-        rms *= sqrt(double(1024 * 256) / size) / 50.0;
+        rms *= sqrt(double(1024 * 256) / data.size()) / 50.0;
         // TODO can we explain those magical numbers??
         // (Likely due to the fact we're still pre-IFFT here)
         // Are those numbers exact, or just some "I don't care it seems to work" approximation?
@@ -86,7 +86,7 @@ namespace{ // Implementation helpers...
         // "FFTW computes an unnormalized transform: computing a forward followed by a backward transform
         //  (or vice versa) will result in the original data multiplied by the size of the transform (the product of the dimensions).
         //
-        for (size_t i = 0; i < size; ++i)
+        for (size_t i = 0; i < data.size(); ++i)
             data[i] = float(double(data[i]) / rms);
     }
 }//(End)ImplHelpers
@@ -150,8 +150,6 @@ PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
     , wavetablePhasePrng{}
 {
     setpresettype("Ppadsyth");
-    POscil->ADvsPAD = true;  // OscilParameters::defaults() will be called again
-
     FreqEnvelope->ASRinit(64, 50, 64, 60);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
@@ -196,6 +194,14 @@ void PADnoteParameters::defaults(void)
 
     resonance->defaults();
     oscilgen->defaults();
+
+    // By default set the oscil to max phase randomness.
+    // Remark: phase randomness (and in fact oscil phase information)
+    // is ignored altogether by PADsynth, but this default setting
+    // can be useful in case the oscil is imported to an ADsynth
+    // Historical Remark: in the original code base, this was
+    // controlled by the "ADDvsPAD" setting.
+    POscil->Prand = 127;
 
     // Frequency Global Parameters
     Pfixedfreq = 0;
@@ -501,15 +507,15 @@ vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, 
 {
     assert(spectrumSize > 1);
     vector<float> spectrum(spectrumSize, 0.0f); // zero-init
-    vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
-    oscilgen->getSpectrum(harmonics.data(), basefreq);
+    vector<float> harmonics(oscilgen->getSpectrumForPAD(basefreq));
     normaliseMax(harmonics); // within 0.0 .. 1.0
 
     // derive the "perceptual" bandwidth for the given profile (a value 0 .. 1)
     float bwadjust = calcProfileBandwith(profile);
 
+    assert(harmonics.size() == fft.spectrumSize());
     for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
         float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
@@ -605,10 +611,9 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 {
     assert(spectrumSize > 1);
     vector<float> spectrum(spectrumSize, 0.0f); // zero-init
-    vector<float> harmonics(fft.spectrumSize(), 0.0f);
 
     // get the harmonic structure from the oscillator
-    oscilgen->getSpectrum(harmonics.data(), basefreq);
+    vector<float> harmonics(oscilgen->getSpectrumForPAD(basefreq));
     normaliseMax(harmonics); // within 0.0 .. 1.0
 
     for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
@@ -727,17 +732,16 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
             return Optional<PADTables>::NoResult;
         }
 
-        float* newsmp = newTable[tabNr];
+        fft::Waveform& newsmp = newTable[tabNr];
         newsmp[0] = 0.0f;                ///TODO 12/2021 (why) is this necessary? Doesn't the IFFT generate a full waveform?
 
-//      fft.freqs2smps(fftCoeff, newsmp);////////////////////////////////////////////////////////////////////////////////////////TODO switch
+        fft.freqs2smps(fftCoeff, newsmp);
         // that's all; here is the only IFFT for the whole sample; no windows are used ;-) (Comment by original author)
 
-        normaliseSpectrumRMS(newsmp, newTable.tableSize);
+        normaliseSpectrumRMS(newsmp);
 
         // prepare extra samples used by the linear or cubic interpolation
-        for (size_t i = 0; i < newTable.INTERPOLATION_BUFFER; ++i)
-            newsmp[newTable.tableSize + i] = newsmp[i];
+        newsmp.fillInterpolationBuffer();
     }
 
     std::cout << "End render_wavetable(). Basefreq="<<newTable.basefreq[0]<<std::endl;        ////////////////TODO padthread debugging output
@@ -749,9 +753,9 @@ void PADnoteParameters::activate_wavetable()
 {
     if (futureBuild.isReady())
     {
-        std::cout << "RLY activate.. old wavetable: "<<waveTable.samples.get() <<std::endl;        ////////////////TODO padthread debugging output
+        std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
         futureBuild.swap(waveTable);
-        std::cout << "... after swap new wavetable: "<<waveTable.samples.get() <<std::endl;        ////////////////TODO padthread debugging output
+        std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
     }
 }
 

@@ -105,8 +105,8 @@ class Waveform
 public:
     static constexpr size_t INTERPOLATION_BUFFER = 5;
 
-    // can not be copied or moved
-    Waveform(Waveform&&)            = delete;
+    // can only be moved, not copied
+    Waveform(Waveform&&)            = default;
     Waveform(Waveform const&)       = delete;
     Waveform& operator=(Waveform&&) = delete;
 

@@ -91,8 +91,6 @@ class OscilParameters : public Presets
                       Pmodulationpar2,
                       Pmodulationpar3; // the parameter of the parameters
 
-        bool ADvsPAD; // if it is used by ADsynth or by PADsynth
-
     private:
         fft::Spectrum basefuncSpectrum; // Base Function Frequencies
 };

@@ -29,6 +29,7 @@
 
 #include <sys/types.h>
 #include <limits.h>
+#include <vector>
 
 #include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
@@ -57,7 +58,7 @@ class OscilGen : private WaveShapeSamples
         void prepare();
 
         void getWave(fft::Waveform&, float freqHz, bool applyResonance =false, bool forGUI =false);
-        void getSpectrum(float*, float freqHz);
+        std::vector<float> getSpectrumForPAD(float freqHz);
 
         // Get just the phase of the oscillator.
         int getPhase();
@@ -95,7 +96,7 @@ class OscilGen : private WaveShapeSamples
         // the magnituides and the phases of the sine/nonsine harmonics
 
         // OscilGen core implementation: generate the current Spectrum -> outoscilSpectrum
-        void buildSpectrum(float freqHz, bool applyResonance, bool forGUI);
+        void buildSpectrum(float freqHz, bool applyResonance, bool forGUI, bool forPAD);
 
         // computes the basefunction and make the FFT;
         void changebasefunction(void);

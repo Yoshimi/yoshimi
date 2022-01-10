@@ -414,7 +414,7 @@ int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
         return 1;
     }
     int size = pars->waveTable.tableSize;
-    float *smps = pars->waveTable[tableNr];
+    fft::Waveform const& smps = pars->waveTable[tableNr];
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {
         poshi_l += freqhi;
@@ -445,7 +445,7 @@ int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
         return 1;
     }
     int size = pars->waveTable.tableSize;
-    float *smps = pars->waveTable[tableNr];
+    fft::Waveform const& smps = pars->waveTable[tableNr];
     float xm1, x0, x1, x2, a, b, c;
     for (int i = 0; i < synth->sent_buffersize; ++i)
     {

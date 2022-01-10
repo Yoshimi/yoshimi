@@ -424,7 +424,8 @@ class PADnoteUI {: {public PresetsUI_}
             if (oscui!=NULL)
                 delete (oscui);
             lastWaveW = 0;
-            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2);
+            bool forPAD = true;
+            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2, forPAD);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             tooltip {Right click: also close this} xywh {425 260 85 25} box THIN_UP_BOX labelfont 1 labelsize 12
