@@ -35,13 +35,64 @@
 
 namespace fft {
 
+/* Explanation of Memory usage and layout
+ *
+ * Yoshimi uses the "half-complex" format of libFFTW3
+ * http://fftw.org/fftw3_doc/The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT
+ *
+ * Note: the transforms implemented in libFFTW3 are unnormalised, so invoking smps2freqs followed by
+ * invoking freqs2smps on the same data will result in the original waveform scaled by N.
+ *
+ * Generally speaking, Fourier transform is an operation on complex numbers; however, in signal processing
+ * the waveform is a function of real numbers and thus the imaginary part will always be zero. For such
+ * a function, the spectrum (result of the Fourier transform) exhibits the "Hermite Symmetry": Given a
+ * waveform with N samples, line(N/2) in the spectrum corresponds to the Nyquist frequency and will
+ * have an imaginary part of 0*i. And line(N-k) will be the conjugate of line(k), i.e. have the same
+ * real part and an imaginary part with flipped sign. This can be exploited to yield a speedup of
+ * factor two in the Fourier operations, but requires the non-redundant information to be arranged
+ * in memory according to the following scheme:
+ * r0, r1, r2, ..., r(N/2-1), r(N/2), i(N/2-1), ..., i2, i1, [ i0 ]
+ *
+ * Here, r0 is the spectral line for freq = 0Hz, i.e. the DC-offset, r(N/2) is the spectral line for
+ * the Nyquist frequency and can be ignored in practice. The following imaginary parts (the "sine
+ * coefficients) encode the phase information; i0 is always zero and thus likewise ignored.
+ *
+ * In practice, the Synth code typically works directly on the "cosine" and "sine" coefficients,
+ * indexing them with 0 ... N-1. Thus, for practical reasons, the Spectrum type provides accessor
+ * functions c(i) and s(i). To simplify handling, an additional slot at index N will be allocated,
+ * so that s(0) = coeff[N-0] is a valid expression (not out-of-bounds), but never passed to libFFTW3,
+ * while coeff[N/2] is always set to zero and never accessed.
+ *
+ * For optimised implementation with SIMD operations (SSE, AVX, Altivec), libFFTW3 requires strict
+ * alignment rules, which can be ensured by allocating memory through fftw_malloc (which allocates
+ * some extra slots and then adjusts the start point to match the required alignment. Thus, all
+ * data is encapsulated into the fft::Spectrum and fft::Waveform types, which automate allocations.
+ * The Synth->oscilsize corresponds to FFTwrapper::tableSize().
+ *
+ * Lib FFTW3 builds a "FFT plan" for each operation, to optimise for the table size, the alignment,
+ * for in-place vs. in/out data (Yoshimi always uses the latter case). In theory, this plan could
+ * be optimised further by automatic performance tuning at start-up; but this would require to
+ * run test-transforms on each application start-up and thus we just use the default FFTW_ESTIMATE,
+ * which never touches the data pointers on plan generation and just guesses a suitable execution
+ * plan. Another relevant flag is FFTW_PRESERVE_INPUT, which forces libFFTW to preserve input data;
+ * FFTW could gain some additional performance when it is allowed to corrupt input data, however
+ * for the usage pattern in a Synth it is more important to avoid additional allocations and
+ * copying of data; thus we run each OscilGen with the fixed initial data allocation and pass
+ * these data arrays directly to libFFTW, ensuring proper alignment and memory layout.
+ */
+
+template<class POL>
+class FFTwrapper;
+
+
+
 /* Spectrum coefficients - properly arranged for Fourier-operations through libFFTW3 */
 class Spectrum
 {
-    size_t siz;
+    size_t siz;    // tableSize == 2*spectrumSize
+    float *coeff;
 
-    float *co;
-    float *si;
+    template<class POL> friend class FFTwrapper;  // allowed to access raw data
 
 public: // can not be copied or moved
     Spectrum(Spectrum&&)                 = delete;
@@ -53,47 +104,44 @@ public: // can not be copied or moved
     {
         if (this != &src)
         {
-            assert(src.size() == siz);
-            for (size_t i=0; i < siz; ++i)
-            {
-                c(i) = src.c(i);
-                s(i) = src.s(i);
-            }
+            assert(src.size() == siz/2);
+            for (size_t i=0; i <= siz; ++i)
+                coeff[i] = src.coeff[i];
         }
         return *this;
     }
 
     // automatic memory-management
     Spectrum(size_t spectrumSize)
-        : siz(spectrumSize)
+        : siz(2*spectrumSize)
     {
-        this->co = (float*)fftwf_malloc(siz * sizeof(float));
-        this->si = (float*)fftwf_malloc(siz * sizeof(float));
-        if (!co or !si)
+        size_t allocsize = (siz+1) * sizeof(float);
+        this->coeff = (float*)fftwf_malloc(allocsize);
+        if (!coeff)
             throw std::bad_alloc();
         reset();
     }
 
    ~Spectrum()
     {
-        if (si) fftwf_free(si);
-        if (co) fftwf_free(co);
+        if (coeff) fftwf_free(coeff);
     }
 
     void reset()
     {
-        memset(this->co, 0, siz * sizeof(float));
-        memset(this->si, 0, siz * sizeof(float));
+        size_t allocsize = (siz+1) * sizeof(float);
+        memset(coeff, 0, allocsize);
     }
 
-    size_t size()  const { return siz; }
+    size_t size()  const { return siz/2; }
 
     // array-like access
-    float      & c(size_t i)       { return co[i]; }
-    float const& c(size_t i) const { return co[i]; }
-    float      & s(size_t i)       { return si[i]; }
-    float const& s(size_t i) const { return si[i]; }
+    float      & c(size_t i)       { assert(i<=siz/2); return coeff[i];       }
+    float const& c(size_t i) const { assert(i<=siz/2); return coeff[i];       }
+    float      & s(size_t i)       { assert(i<=siz/2); return coeff[siz - i]; }
+    float const& s(size_t i) const { assert(i<=siz/2); return coeff[siz - i]; }
 };
+
 
 
 /* Waveform data - properly aligned for libFFTW3 Fourier-operations */
@@ -101,6 +149,8 @@ class Waveform
 {
     size_t siz;
     float* samples;
+
+    template<class POL> friend class FFTwrapper;  // allowed to access raw data
 
 public:
     static constexpr size_t INTERPOLATION_BUFFER = 5;
@@ -157,8 +207,8 @@ public:
     size_t size()  const { return siz; }
 
     // array subscript operator
-    float      & operator[](size_t i)       { return samples[i]; }
-    float const& operator[](size_t i) const { return samples[i]; }
+    float      & operator[](size_t i)       { assert(i<siz+INTERPOLATION_BUFFER); return samples[i]; }
+    float const& operator[](size_t i) const { assert(i<siz+INTERPOLATION_BUFFER); return samples[i]; }
 
 
     friend void swap(Waveform& w1, Waveform& w2)
@@ -215,8 +265,8 @@ class FFTwrapper : POL
             auto lock = POL::lock4setup();
             data1 = (float*)fftwf_malloc(fftsize * sizeof(float));
             data2 = (float*)fftwf_malloc(fftsize * sizeof(float));
-            planFourier = fftwf_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC, FFTW_ESTIMATE);
-            planInverse = fftwf_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R, FFTW_ESTIMATE);
+            planFourier = fftwf_plan_r2r_1d(fftsize, data1, data2, FFTW_R2HC, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+            planInverse = fftwf_plan_r2r_1d(fftsize, data2, data1, FFTW_HC2R, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
         }
 
        ~FFTwrapper()
@@ -243,37 +293,17 @@ class FFTwrapper : POL
             size_t half_size{spectrumSize()};
             assert (half_size == freqs.size());
             assert (fftsize == smps.size());
-//          memcpy(data1, smps, fftsize * sizeof(float));        ////////////TODO : use »new-array-execute« API and eliminate data copy
-            for (size_t i=0; i < fftsize; ++i)
-                data1[i] = smps[i];
-            fftwf_execute(planFourier);
-//          memcpy(freqs.co, data1, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
-            for (size_t i=0; i < half_size; ++i)
-                freqs.c(i) = data1[i];
-            for (size_t i = 1; i < half_size; ++i)
-                freqs.s(i) = data1[fftsize - i];
-            data2[half_size] = 0.0f; ////////////////////TODO this line was there from the first Import by Cal in 2010; but it looks like a mistake,
-                                     ////////////////////     since data2 should not be touched by the forward fourier transform.
-                                     ////////////////////     Maybe the original author intended to set freqs.s(0) = 0.0 ?
-                                     ////////////////////     data?[half_size] actually corresponds to the real part at Nyquist and is ignored.
+            fftwf_execute_r2r(planFourier, smps.samples, freqs.coeff);
+            freqs.c(half_size) = 0.0; // Nyquist line is irrelevant and never used
+            freqs.s(0) = 0.0;         // Phase of DC offset (not calculated by libFFTW3)
         }
 
         /* Fast Inverse Fourier Transform */
         void freqs2smps(Spectrum const& freqs, Waveform& smps)
         {
             auto lock = POL::lock4usage();
-            size_t half_size{spectrumSize()};
-            assert (half_size == freqs.size());
-//          memcpy(data2, freqs.co, half_size * sizeof(float));  ////////////TODO : use »new-array-execute« API and eliminate data copy
-            for (size_t i = 0; i < half_size; ++i)
-                data2[i] = freqs.c(i);
-            data2[half_size] = 0.0;
-            for (size_t i = 1; i < half_size; ++i)
-                data2[fftsize - i] = freqs.s(i);
-            fftwf_execute(planInverse);
-//          memcpy(smps, data2, fftsize * sizeof(float));        ////////////TODO : use »new-array-execute« API and eliminate data copy
-            for (size_t i=0; i < fftsize; ++i)
-                smps[i] = data2[i];
+            assert (spectrumSize() == freqs.size());
+            fftwf_execute_r2r(planInverse, freqs.coeff, smps.samples);
         }
 };
 
