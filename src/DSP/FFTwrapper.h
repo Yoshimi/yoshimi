@@ -31,6 +31,7 @@
 #include <utility>
 #include <cassert>
 #include <cstring>
+#include <memory>
 #include <mutex>
 
 namespace fft {
@@ -86,11 +87,52 @@ class FFTwrapper;
 
 
 
+/* ===== automatically manage fftw_malloc allocated memory ===== */
+
+struct Deleter
+{
+    void operator()(float* target) { fftwf_free(target); }
+};
+
+class Data
+    : public std::unique_ptr<float, Deleter>
+{
+    static float* allocate(size_t elemCnt)
+    {
+        if (elemCnt == 0) // allow to create an empty Data holder
+            return nullptr;
+        size_t allocsize = (elemCnt) * sizeof(float);
+        void* mem = fftwf_malloc(allocsize);
+        if (!mem)
+            throw std::bad_alloc();
+        return static_cast<float*>(mem);
+    }
+
+public:
+    using _unique_ptr = std::unique_ptr<float, Deleter>;
+
+    Data(size_t fftsize)
+        : _unique_ptr{allocate(fftsize)}
+    { }
+
+    /** discard existing allocation and possibly create/manage new allocation */
+    void reset(size_t newSize =0)
+    {
+        _unique_ptr::reset(allocate(newSize));
+    }
+
+    float      & operator[](size_t i)       { return get()[i]; }
+    float const& operator[](size_t i) const { return get()[i]; }
+};
+
+
+
+
 /* Spectrum coefficients - properly arranged for Fourier-operations through libFFTW3 */
 class Spectrum
 {
     size_t siz;    // tableSize == 2*spectrumSize
-    float *coeff;
+    Data coeff;
 
     template<class POL> friend class FFTwrapper;  // allowed to access raw data
 
@@ -113,24 +155,16 @@ public: // can not be copied or moved
 
     // automatic memory-management
     Spectrum(size_t spectrumSize)
-        : siz(2*spectrumSize)
+        : siz{2*spectrumSize}
+        , coeff{siz+1}
     {
-        size_t allocsize = (siz+1) * sizeof(float);
-        this->coeff = (float*)fftwf_malloc(allocsize);
-        if (!coeff)
-            throw std::bad_alloc();
         reset();
-    }
-
-   ~Spectrum()
-    {
-        if (coeff) fftwf_free(coeff);
     }
 
     void reset()
     {
         size_t allocsize = (siz+1) * sizeof(float);
-        memset(coeff, 0, allocsize);
+        memset(coeff.get(), 0, allocsize);
     }
 
     size_t size()  const { return siz/2; }
@@ -148,7 +182,7 @@ public: // can not be copied or moved
 class Waveform
 {
     size_t siz;
-    float* samples;
+    Data samples;
 
     template<class POL> friend class FFTwrapper;  // allowed to access raw data
 
@@ -176,24 +210,16 @@ public:
 
     // automatic memory-management
     Waveform(size_t tableSize)
-        : siz(tableSize)
+        : siz{tableSize}
+        , samples{siz+INTERPOLATION_BUFFER}
     {
-        size_t allocsize = (siz+INTERPOLATION_BUFFER) * sizeof(float);
-        samples = (float*)fftwf_malloc(allocsize);
-        if (!samples)
-            throw std::bad_alloc();
         reset();
-    }
-
-   ~Waveform()
-    {
-        if (samples) fftwf_free(samples);
     }
 
     void reset()
     {
         size_t allocsize = (siz+INTERPOLATION_BUFFER) * sizeof(float);
-        memset(samples, 0, allocsize);
+        memset(samples.get(), 0, allocsize);
     }
 
     /* redundantly append the first elements for interpolation */
@@ -224,25 +250,62 @@ protected:
      * See WaveformHolder in ADnote.h */
     Waveform()
         : siz(0)
-        , samples{nullptr}
+        , samples{0}
     {  }
 
     /** give up ownership without discarding data */
     void detach()
     {
-        samples = nullptr;
+        samples.release();
         siz = 0;
     }
-    /** allow a derived class to attach to an existing allocation */
+    /** allow derived classes to connect an existing allocation.
+     * @warning subverts unique ownership; use with care. */
     void attach(Waveform const& other)
     {
-        if (samples)
-            throw std::logic_error("Waveform already owns and manages a data allocation");
-        samples = other.samples;
+        Data::_unique_ptr& rawHolder{samples};
+        rawHolder.reset(other.samples.get());
         siz = other.siz;
     }
 };
 
+
+
+
+/* FFT-Operation execution plan : the standard setup.
+ * Yoshimi uses only a single setup scheme, comprised of a fourier and an inverse fourier transform
+ * for real valued functions with »half complex« spectrum representation (FFTW_R2HC, FFTW_HC2R).
+ * Calculation is always performed on working data allocations provided at invocation time, operating
+ * from input to output data (not in-place, different pointers passed),  where input data must not be
+ * corrupted or changed (FFTW_PRESERVE_INPUT). No dynamic measurement and optimisation is performed
+ * at startup time when creating the plan (FFTW_ESTIMATE)
+ */
+struct FFTplan
+{
+    fftwf_plan fourier{nullptr};
+    fftwf_plan inverse{nullptr};
+
+    // may be copied but not assigned
+    FFTplan(FFTplan const&)            = default;
+    FFTplan& operator=(FFTplan&&)      = delete;
+    FFTplan& operator=(FFTplan const&) = delete;
+
+// private:  /////////////////////////////////////////////TODO
+    // can not be generated directly,
+    // only through the managing FFTplanRepo
+    FFTplan(size_t fftsize)
+    {
+        //////////////////////////////////////////////////TODO handle locking in FFTplanRepo
+        static std::mutex mtx_plan;
+        std::lock_guard<std::mutex> lock(mtx_plan);
+        //////////////////////////////////////////////////TODO handle locking in FFTplanRepo
+        // dummy allocation used as placeholder for plan generation
+        Data samples{fftsize};
+        Data spectrum{fftsize};
+        fourier = fftwf_plan_r2r_1d(fftsize, samples.get(), spectrum.get(), FFTW_R2HC, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+        inverse = fftwf_plan_r2r_1d(fftsize, spectrum.get(), samples.get(), FFTW_HC2R, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+    }
+};
 
 
 /* Standard Fourier Transform operations:
@@ -253,29 +316,20 @@ template<class POL>
 class FFTwrapper : POL
 {
     size_t fftsize;
-    float *data1;
-    float *data2;
-    fftwf_plan planFourier;
-    fftwf_plan planInverse;
+    FFTplan plan;
 
     public:
         FFTwrapper(size_t fftsize_)
-            : fftsize(fftsize_)
-        {
-            auto lock = POL::lock4setup();
-            data1 = (float*)fftwf_malloc(fftsize * sizeof(float));
-            data2 = (float*)fftwf_malloc(fftsize * sizeof(float));
-            planFourier = fftwf_plan_r2r_1d(fftsize, data1, data2, FFTW_R2HC, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
-            planInverse = fftwf_plan_r2r_1d(fftsize, data2, data1, FFTW_HC2R, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
-        }
+            : fftsize{fftsize_}
+            , plan{fftsize}  ////////////////////TODO invoke Policy -> FFTplanRepo
+        { }
 
        ~FFTwrapper()
         {
+            /////////////////////////////////////TODO should be handled automatically by FFTplanRepo
             auto lock = POL::lock4setup();
-            fftwf_destroy_plan(planFourier);
-            fftwf_destroy_plan(planInverse);
-            fftwf_free(data1);
-            fftwf_free(data2);
+            fftwf_destroy_plan(plan.fourier);
+            fftwf_destroy_plan(plan.inverse);
         }
         // shall not be copied or moved
         FFTwrapper(FFTwrapper&&)                 = delete;
@@ -293,7 +347,7 @@ class FFTwrapper : POL
             size_t half_size{spectrumSize()};
             assert (half_size == freqs.size());
             assert (fftsize == smps.size());
-            fftwf_execute_r2r(planFourier, smps.samples, freqs.coeff);
+            fftwf_execute_r2r(plan.fourier, smps.samples.get(), freqs.coeff.get());
             freqs.c(half_size) = 0.0; // Nyquist line is irrelevant and never used
             freqs.s(0) = 0.0;         // Phase of DC offset (not calculated by libFFTW3)
         }
@@ -303,7 +357,7 @@ class FFTwrapper : POL
         {
             auto lock = POL::lock4usage();
             assert (spectrumSize() == freqs.size());
-            fftwf_execute_r2r(planInverse, freqs.coeff, smps.samples);
+            fftwf_execute_r2r(plan.inverse, freqs.coeff.get(), smps.samples.get());
         }
 };
 

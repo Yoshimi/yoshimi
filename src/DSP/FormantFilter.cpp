@@ -39,14 +39,14 @@ using func::power;
 FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
     pars(pars_),
     parsUpdate(pars_),
-    synth(_synth)
+    synth(_synth),
+    inbuffer(synth->buffersize),
+    tmpbuff (synth->buffersize)
 {
     numformants = pars->Pnumformants;
     for (int i = 0; i < numformants; ++i)
         formant[i] = new AnalogFilter(4/*BPF*/, 1000.0f, 10.0f, pars->Pstages, synth);
     cleanup();
-    inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
-    tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);
 
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
         oldformantamp[i] = 1.0f;
@@ -87,7 +87,10 @@ FormantFilter::FormantFilter(const FormantFilter &orig) :
     oldQfactor(orig.oldQfactor),
     vowelclearness(orig.vowelclearness),
     sequencestretch(orig.sequencestretch),
-    synth(orig.synth)
+    synth(orig.synth),
+    // These don't hold persistent state and don't need a memcpy
+    inbuffer(synth->buffersize),
+    tmpbuff (synth->buffersize)
 {
     outgain = orig.outgain;
 
@@ -98,10 +101,6 @@ FormantFilter::FormantFilter(const FormantFilter &orig) :
 
     for (int i = 0; i < numformants; ++i)
         formant[i] = new AnalogFilter(*orig.formant[i]);
-
-    // These don't hold persistent state and don't need a memcpy
-    inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
-    tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);
 }
 
 
@@ -109,8 +108,6 @@ FormantFilter::~FormantFilter()
 {
     for (int i = 0; i < numformants; ++i)
         delete(formant[i]);
-    fftwf_free(inbuffer);
-    fftwf_free(tmpbuf);
 }
 
 
@@ -247,24 +244,24 @@ void FormantFilter::setfreq_and_q(float frequency, float q_)
 
 void FormantFilter::filterout(float *smp)
 {
-    memcpy(inbuffer, smp, synth->sent_bufferbytes);
+    memcpy(inbuffer.get(), smp, synth->sent_bufferbytes);
     memset(smp, 0, synth->sent_bufferbytes);
 
     for (int j = 0; j < numformants; ++j)
     {
         for (int k = 0; k < synth->sent_buffersize; ++k)
-            tmpbuf[k] = inbuffer[k] * outgain;
-        formant[j]->filterout(tmpbuf);
+            tmpbuff[k] = inbuffer[k] * outgain;
+        formant[j]->filterout(tmpbuff.get());
 
         if (aboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))
             for (int i = 0; i < synth->sent_buffersize; ++i)
-                smp[i] += tmpbuf[i]
+                smp[i] += tmpbuff[i]
                           * interpolateAmplitude(oldformantamp[j],
                                                   currentformants[j].amp, i,
                                                   synth->sent_buffersize);
         else
             for (int i = 0; i < synth->sent_buffersize; ++i)
-                smp[i] += tmpbuf[i] * currentformants[j].amp;
+                smp[i] += tmpbuff[i] * currentformants[j].amp;
         oldformantamp[j] = currentformants[j].amp;
     }
 }

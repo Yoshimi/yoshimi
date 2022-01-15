@@ -31,6 +31,7 @@
 #include <string>
 #include "globals.h"
 #include "DSP/FFTwrapper.h"
+#include "Misc/Alloc.h"
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -50,8 +51,14 @@ class Part
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
-        Part(Microtonal *microtonal_, fft::Calc *fft_, SynthEngine *_synth);
-        ~Part();
+        Part(Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth);
+       ~Part();
+        // shall not be copied or moved
+        Part(Part&&)                 = delete;
+        Part(Part const&)            = delete;
+        Part& operator=(Part&&)      = delete;
+        Part& operator=(Part const&) = delete;
+
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
         void defaults(void);
@@ -145,11 +152,11 @@ class Part
         };
         Info info;
 
-        float *partoutl;
-        float *partoutr;
+        Samples partoutl;
+        Samples partoutr;
 
-        float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
-        float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
+        Samples partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
+        Samples partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
         unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
                                                // routed (to next effect/to out)
@@ -170,8 +177,11 @@ class Part
         void MonoMemRenote(void); // MonoMem stuff.
         void setPan(float value);
 
+        Samples& tmpoutl;
+        Samples& tmpoutr;
+
         Microtonal *microtonal;
-        fft::Calc *fft;
+        fft::Calc& fft;
 
         struct PartNotes {
             NoteStatus status;
@@ -202,10 +212,7 @@ class Part
         float oldVolumeAdjust;
         int oldModulationState;
 
-        float *tmpoutl;
-        float *tmpoutr;
         float oldfreq; // for portamento
-//        int partMuted;  // **** RHL ****
         bool killallnotes;
 
         // MonoMem stuff

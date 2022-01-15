@@ -31,6 +31,8 @@
 #include "Params/ADnoteParameters.h"
 #include "Misc/RandomGen.h"
 #include "DSP/FFTwrapper.h"
+#include "Misc/Alloc.h"
+
 
 class ADnoteParameters;
 class SynthEngine;
@@ -49,8 +51,10 @@ class LFO;
  * This class allows to mimic the behaviour of the original code base,
  * while encapsulating and automatically managing the allocation.
  * Initially created empty, it can either allocate a buffer or attach to
- * existing storage managed elsewhere. After that, ownership is locked.
- * Beyond that, it can be used like a fft::Waveform in Synth code */
+ * existing storage managed elsewhere; Ownership is locked subsequently.
+ * Beyond that, SampleHolder can be used like a fft::Waveform in Synth code.
+ * Warning: beware of slicing -- use only as nested component or local object.
+ */
 class SampleHolder
     : public fft::Waveform
 {
@@ -109,6 +113,8 @@ public:
 
         void attachReference(fft::Waveform& existing)
         {
+            if (size() > 0 and ownData)
+                throw std::logic_error("SampleHolder already owns and manages a data allocation");
             attach(existing);
             ownData = false;
         }
@@ -126,8 +132,6 @@ class ADnote
         ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
         ~ADnote();
 
-        void construct();
-
         int noteout(float *outl, float *outr);
         void releasekey();
         bool finished() const
@@ -143,6 +147,8 @@ class ADnote
         bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
+        void construct();
+        void allocateUnison(size_t unisonCnt, size_t buffSize);
 
         void setfreq(int nvoice, float in_freq, float pitchdetune);
         void setfreqFM(int nvoice, float in_freq, float pitchdetune);
@@ -184,7 +190,7 @@ class ADnote
 
         void computeVoiceOscillator(int nvoice);
 
-        void fadein(float *smps);
+        void fadein(Samples& smps);
 
 
         // Globals
@@ -277,7 +283,7 @@ class ADnote
             bool FMringToSide;
             unsigned char FMFreqFixed;
             int    FMVoice;
-            float *VoiceOut;           // Voice Output used by other voices if use this as modullator
+            Samples VoiceOut;          // Voice Output used by other voices if use this as modullator
             SampleHolder FMSmp;        // Wave of the Voice. Shared by sub voices.
             int    FMphase_offset;
             float  FMVolume;
@@ -301,7 +307,7 @@ class ADnote
         //pinking filter (Paul Kellet)
         float pinking[NUM_VOICES][14];
 
-        int unison_size[NUM_VOICES]; // the size of unison for a single voice
+        size_t unison_size[NUM_VOICES]; // the size of unison for a single voice
 
         float unison_stereo_spread[NUM_VOICES]; // stereo spread of unison subvoices (0.0=mono,1.0=max)
 
@@ -347,10 +353,10 @@ class ADnote
         float *oscFMoldPMod[NUM_VOICES];
         bool forFM; // Whether this voice will be used for FM modulation.
 
-        float **tmpwave_unison;
-        int max_unison;
+        std::unique_ptr<Samples[]> tmpwave_unison;
+        size_t max_unison;
 
-        float **tmpmod_unison;
+        std::unique_ptr<Samples[]> tmpmod_unison;
         bool freqbasedmod[NUM_VOICES];
 
         float globaloldamplitude; // interpolate the amplitudes

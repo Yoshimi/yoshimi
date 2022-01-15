@@ -32,6 +32,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Misc/CliFuncs.h"
+#include "Misc/Alloc.h"
 #include "CLI/Parser.h"
 
 
@@ -229,7 +230,6 @@ class TestInvoker
 
     size_t smpCnt;
 
-    using BufferHolder = std::unique_ptr<float[]>;
     enum ParamOp{SET,GET,MAX,MIN,DEFAULT};
 
     public:
@@ -309,7 +309,7 @@ class TestInvoker
         void performSoundCalculation(SynthEngine& synth)
         {
             if (!chunksize) chunksize = synth.buffersize;
-            BufferHolder buffer;
+            Samples buffer;
             OutputFile output = prepareOutput(synth.samplerate);
             allocate(buffer);
             synth.getRuntime().Log("TEST::Prepare");
@@ -344,11 +344,11 @@ class TestInvoker
                               cli::Parser& input, string& response);
 
 
-        void allocate(BufferHolder& buffer)
+        void allocate(Samples& buffer)
         {
             size_t size = 2 * (NUM_MIDI_PARTS + 1)
                             * chunksize;
-            buffer.reset(new float[size]);
+            buffer.reset(size);
         }
 
 
@@ -364,11 +364,11 @@ class TestInvoker
 
 
 
-        void pullSound(SynthEngine& synth, BufferHolder& buffer, OutputFile& output, StopWatch& timer)
+        void pullSound(SynthEngine& synth, Samples& buffer, OutputFile& output, StopWatch& timer)
         {
             float* buffL[NUM_MIDI_PARTS + 1];
             float* buffR[NUM_MIDI_PARTS + 1];
-            for (int i=0; i<=NUM_MIDI_PARTS; ++i)
+            for (size_t i=0; i<=NUM_MIDI_PARTS; ++i)
             {
                 buffL[i] = & buffer[(2*i  ) * chunksize];
                 buffR[i] = & buffer[(2*i+1) * chunksize];

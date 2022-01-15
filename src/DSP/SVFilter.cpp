@@ -38,12 +38,12 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
     q(Fq),
     needsinterpolation(0),
     firsttime(1),
+    tmpismp(_synth->buffersize),
     synth(_synth)
 {
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
     outgain = 1.0f;
-    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
     cleanup();
     setfreq_and_q(Ffreq, Fq);
 }
@@ -60,20 +60,11 @@ SVFilter::SVFilter(const SVFilter &orig) :
     oldabovenq(orig.oldabovenq),
     needsinterpolation(orig.needsinterpolation),
     firsttime(orig.firsttime),
+    tmpismp(orig.synth->buffersize),
     synth(orig.synth)
 {
     outgain = orig.outgain;
-
     memcpy(st, orig.st, sizeof(st));
-
-    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
-}
-
-
-SVFilter::~SVFilter()
-{
-    if (tmpismp)
-        fftwf_free(tmpismp);
 }
 
 
@@ -189,9 +180,9 @@ void SVFilter::filterout(float *smp)
 {
     if (needsinterpolation)
     {
-        memcpy(tmpismp, smp, synth->sent_bufferbytes);
+        memcpy(tmpismp.get(), smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
-            singlefilterout(tmpismp, st[i],ipar);
+            singlefilterout(tmpismp.get(), st[i],ipar);
     }
 
     for (int i = 0; i < stages + 1; ++i)

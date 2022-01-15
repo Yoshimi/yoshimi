@@ -40,7 +40,7 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
     gain(1.0),
     abovenq(0),
     oldabovenq(0),
-    tmpismp(NULL),
+    tmpismp(_synth->buffersize),
     synth(_synth)
 {
 
@@ -54,7 +54,6 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
     firsttime = true;
     d[0] = 0; // this is not used
     outgain = 1.0f;
-    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
 }
 
 
@@ -69,6 +68,7 @@ AnalogFilter::AnalogFilter(const AnalogFilter &orig) :
     firsttime(orig.firsttime),
     abovenq(orig.abovenq),
     oldabovenq(orig.oldabovenq),
+    tmpismp(orig.synth->buffersize),   // No need to copy sample data, as this is filled from imput data
     synth(orig.synth)
 {
     outgain = orig.outgain;
@@ -83,17 +83,8 @@ AnalogFilter::AnalogFilter(const AnalogFilter &orig) :
     memcpy(oldd, orig.oldd, sizeof(oldd));
     memcpy(xd, orig.xd, sizeof(xd));
     memcpy(yd, orig.yd, sizeof(yd));
-
-    // No need to memcpy as this is always memcpy'd to before use
-    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
 }
 
-
-AnalogFilter::~AnalogFilter()
-{
-    if (tmpismp)
-        fftwf_free(tmpismp);
-}
 
 
 void AnalogFilter::cleanup()
@@ -459,9 +450,9 @@ void AnalogFilter::filterout(float *smp)
 {
      if (needsinterpolation)
     {
-        memcpy(tmpismp, smp, synth->sent_bufferbytes);
+        memcpy(tmpismp.get(), smp, synth->sent_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
-            singlefilterout(tmpismp, oldx[i], oldy[i], oldc, oldd);
+            singlefilterout(tmpismp.get(), oldx[i], oldy[i], oldc, oldd);
     }
 
     for (int i = 0; i < stages + 1; ++i)

@@ -26,17 +26,19 @@
 #define ANALOG_FILTER_H
 
 #include "DSP/Filter_.h"
+#include "Misc/Alloc.h"
 #include "globals.h"
+
 
 class SynthEngine;
 
 class AnalogFilter : public Filter_
 {
     public:
+       ~AnalogFilter() = default;
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
                      unsigned char Fstages, SynthEngine *_synth);
         AnalogFilter(const AnalogFilter &orig);
-        ~AnalogFilter();
         Filter_* clone() { return new AnalogFilter(*this); };
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -62,8 +64,7 @@ class AnalogFilter : public Filter_
           oldx[MAX_FILTER_STAGES + 1],
           oldy[MAX_FILTER_STAGES + 1];
 
-        void singlefilterout(float *smp, fstage &x, fstage &y, float *c,
-                             float *d);
+        void singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d);
         void computefiltercoefs(void);
         int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages; // how many times the filter is applied (0->1,1->2,etc.)
@@ -79,10 +80,10 @@ class AnalogFilter : public Filter_
 
         float xd[3], yd[3]; // used if the filter is applied more times
         bool needsinterpolation, firsttime;
-        int abovenq;    // this is 1 if the frequency is above the nyquist
-        int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
+        int abovenq;        // this is 1 if the frequency is above the nyquist
+        int oldabovenq;     // if the last time was above nyquist (used to see if it needs interpolation)
 
-        float *tmpismp; // used if it needs interpolation in filterout()
+        Samples tmpismp;    // used if it needs interpolation in filterout()
         SynthEngine *synth;
 };
 

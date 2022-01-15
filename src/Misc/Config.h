@@ -31,6 +31,7 @@
 #include <deque>
 #include <list>
 
+#include "Misc/Alloc.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
 #include "FL/Fl.H"
@@ -47,7 +48,13 @@ class Config
 {
     public:
         Config(SynthEngine *_synth, list<string>& allArgs, bool isLV2Plugin);
-        ~Config();
+       ~Config();
+        // shall not be copied or moved or assigned
+        Config(Config&&)                 = delete;
+        Config(Config const&)            = delete;
+        Config& operator=(Config&&)      = delete;
+        Config& operator=(Config const&) = delete;
+
         bool Setup(void);
         void StartupReport(const string& clientName);
         void Announce(void);
@@ -216,14 +223,14 @@ class Config
          * were being made every time an add or sub note
          * was processed. Now global so treat with care!
          */
-        float *genTmp1;
-        float *genTmp2;
-        float *genTmp3;
-        float *genTmp4;
+        Samples genTmp1;
+        Samples genTmp2;
+        Samples genTmp3;
+        Samples genTmp4;
 
         // as above but for part and sys effect
-        float *genMixl;
-        float *genMixr;
+        Samples genMixl;
+        Samples genMixr;
 
     private:
         void applyOptions(Config*settings, list<string>& allArgs);

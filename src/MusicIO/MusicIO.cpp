@@ -36,32 +36,15 @@ using func::asString;
 
 
 MusicIO::MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker) :
-    interleaved(NULL),
+    LV2_engine{_synth->getIsLV2Plugin()},
+    bufferAllocation{},  // Allocation happens later in prepBuffers()
+    zynLeft{0},
+    zynRight{0},
+    interleaved(),
     beatTracker(_beatTracker),
     synth(_synth)
-{
-    memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    LV2_engine = synth->getIsLV2Plugin();
-}
+{ }
 
-
-MusicIO::~MusicIO()
-{
-    for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
-    {
-        if (zynLeft[npart])
-        {
-            fftwf_free(zynLeft[npart]);
-            zynLeft[npart] = NULL;
-        }
-        if (zynRight[npart])
-        {
-            fftwf_free(zynRight[npart]);
-            zynRight[npart] = NULL;
-        }
-    }
-}
 
 
 void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
@@ -133,44 +116,24 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
 bool MusicIO::prepBuffers(void)
 {
-    int buffersize = getBuffersize();
-    if (buffersize > 0)
-    {
-        for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)
-        {
-            if (!(zynLeft[part] = (float*) fftwf_malloc(buffersize * sizeof(float))))
-                goto bail_out;
-            if (!(zynRight[part] = (float*) fftwf_malloc(buffersize * sizeof(float))))
-                goto bail_out;
-            memset(zynLeft[part], 0, buffersize * sizeof(float));
-            memset(zynRight[part], 0, buffersize * sizeof(float));
+    size_t buffSize = getBuffersize();
+    if (buffSize == 0)
+        return false;
 
-        }
-        return true;
-    }
+    size_t allocSize = 2 * (NUM_MIDI_PARTS + 1)
+                         * buffSize;
+    // All buffers allocated together
+    // Note: std::bad_alloc is raised on failure, which kills the application...
+    bufferAllocation.reset(allocSize);
 
-bail_out:
-    synth->getRuntime().Log("Failed to allocate audio buffers, size " + asString(buffersize));
-    for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)
+    for (size_t i=0; i < (NUM_MIDI_PARTS + 1); ++i)
     {
-        if (zynLeft[part])
-        {
-            fftwf_free(zynLeft[part]);
-            zynLeft[part] = NULL;
-        }
-        if (zynRight[part])
-        {
-            fftwf_free(zynRight[part]);
-            zynRight[part] = NULL;
-        }
+        zynLeft[i]  = & bufferAllocation[(2*i  ) * buffSize];
+        zynRight[i] = & bufferAllocation[(2*i+1) * buffSize];
     }
-    if (interleaved)
-    {
-        delete[] interleaved;
-        interleaved = NULL;
-    }
-    return false;
+    return true;
 }
+
 
 BeatTracker::BeatTracker() :
     songVsMonotonicBeatDiff(0)

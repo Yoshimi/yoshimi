@@ -59,6 +59,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float basefreq
     GlobalFilterL(NULL),
     GlobalFilterR(NULL),
     GlobalFilterEnvelope(NULL),
+    tmpsmp(_synth->getRuntime().genTmp1),
+    tmprnd(_synth->getRuntime().genTmp2),
     ctl(ctl_),
     subNoteChange(parameters),
     synth(_synth),
@@ -129,8 +131,8 @@ SUBnote::SUBnote(const SUBnote &orig) :
     newamplitude(orig.newamplitude),
     lfilter(NULL),
     rfilter(NULL),
-    tmpsmp(NULL),
-    tmprnd(NULL),
+    tmpsmp(orig.synth->getRuntime().genTmp1),
+    tmprnd(orig.synth->getRuntime().genTmp2),
     ctl(orig.ctl),
     oldpitchwheel(orig.oldpitchwheel),
     oldbandwidth(orig.oldbandwidth),
@@ -679,8 +681,8 @@ void SUBnote::computecurrentparameters(void)
 // Note Output
 int SUBnote::noteout(float *outl, float *outr)
 {
-    tmpsmp = synth->getRuntime().genTmp1;
-    tmprnd = synth->getRuntime().genTmp2;
+    assert(tmpsmp.get() == synth->getRuntime().genTmp1.get());
+    assert(tmprnd.get() == synth->getRuntime().genTmp2.get());
     memset(outl, 0, synth->sent_bufferbytes);
     memset(outr, 0, synth->sent_bufferbytes);
     if (NoteStatus == NOTE_DISABLED)
@@ -698,9 +700,9 @@ int SUBnote::noteout(float *outl, float *outr)
     for (int n = 0; n < numharmonics; ++n)
     {
         float rolloff = overtone_rolloff[n];
-        memcpy(tmpsmp, tmprnd, synth->sent_bufferbytes);
+        memcpy(tmpsmp.get(), tmprnd.get(), synth->sent_bufferbytes);
         for (int nph = 0; nph < numstages; ++nph)
-            filter(lfilter[nph + n * numstages], tmpsmp);
+            filter(lfilter[nph + n * numstages], tmpsmp.get());
         for (int i = 0; i < synth->sent_buffersize; ++i)
             outl[i] += tmpsmp[i] * rolloff;
     }
@@ -716,9 +718,9 @@ int SUBnote::noteout(float *outl, float *outr)
         for (int n = 0; n < numharmonics; ++n)
         {
             float rolloff = overtone_rolloff[n];
-            memcpy(tmpsmp, tmprnd, synth->sent_bufferbytes);
+            memcpy(tmpsmp.get(), tmprnd.get(), synth->sent_bufferbytes);
             for (int nph = 0; nph < numstages; ++nph)
-                filter(rfilter[nph + n * numstages], tmpsmp);
+                filter(rfilter[nph + n * numstages], tmpsmp.get());
             for (int i = 0; i < synth->sent_buffersize; ++i)
                 outr[i] += tmpsmp[i] * rolloff;
         }

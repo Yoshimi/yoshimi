@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <semaphore.h>
 #include <string>
+#include <memory>
 #include <vector>
 #include <list>
 #include <map>
@@ -59,6 +60,8 @@ class MasterUI;
 #endif
 
 using std::string;
+using std::unique_ptr;
+
 
 enum LV2PluginType
 {
@@ -86,7 +89,13 @@ class SynthEngine
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
-        ~SynthEngine();
+       ~SynthEngine();
+        // shall not be copied or moved
+        SynthEngine(SynthEngine&&)                 = delete;
+        SynthEngine(SynthEngine const&)            = delete;
+        SynthEngine& operator=(SynthEngine&&)      = delete;
+        SynthEngine& operator=(SynthEngine const&) = delete;
+
         bool Init(unsigned int audiosrate, int audiobufsize);
 
         bool savePatchesXML(string filename);
@@ -231,7 +240,7 @@ class SynthEngine
         // others ...
         Controller *ctl;
         Microtonal microtonal;
-        fft::Calc *fft;
+        unique_ptr<fft::Calc> fft;
 
         // peaks for VU-meters
         union VUtransfer{

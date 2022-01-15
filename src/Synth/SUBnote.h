@@ -28,6 +28,9 @@
 #ifndef SUB_NOTE_H
 #define SUB_NOTE_H
 
+#include "globals.h"
+#include "Misc/Alloc.h"
+
 class SUBnoteParameters;
 class Controller;
 class Envelope;
@@ -42,7 +45,10 @@ class SUBnote
                 float freq_, float velocity_, int portamento_,
                 int midinote_, SynthEngine *_synth);
         SUBnote(const SUBnote &rhs);
-        ~SUBnote();
+       ~SUBnote();
+        // shall not be assigned
+        SUBnote& operator=(SUBnote&&)      = delete;
+        SUBnote& operator=(SUBnote const&) = delete;
 
         void legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const SUBnote &syncwith);
@@ -136,8 +142,8 @@ class SUBnote
         float overtone_rolloff[MAX_SUB_HARMONICS];
         float overtone_freq[MAX_SUB_HARMONICS];
 
-        float *tmpsmp;
-        float *tmprnd; // this is filled with random numbers
+        Samples& tmpsmp;
+        Samples& tmprnd; // this is filled with random numbers
 
         Controller *ctl;
         int oldpitchwheel;

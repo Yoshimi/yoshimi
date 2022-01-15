@@ -54,17 +54,17 @@ using func::findSplitPoint;
 using func::setAllPan;
 using func::decibel;
 
-Part::Part(Microtonal *microtonal_, fft::Calc *fft_, SynthEngine *_synth) :
+Part::Part(Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth) :
+    partoutl(_synth->buffersize),
+    partoutr(_synth->buffersize),
+    tmpoutl(_synth->getRuntime().genMixl), // Note: alias to a global shared buffer
+    tmpoutr(_synth->getRuntime().genMixr),
     microtonal(microtonal_),
     fft(fft_),
     killallnotes(false),
     synth(_synth)
 {
     ctl = new Controller(synth);
-    partoutl = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(partoutl, 0, synth->bufferbytes);
-    partoutr = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(partoutr, 0, synth->bufferbytes);
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
@@ -84,10 +84,8 @@ Part::Part(Microtonal *microtonal_, fft::Calc *fft_, SynthEngine *_synth) :
 
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
-        partfxinputl[n] = (float*)fftwf_malloc(synth->bufferbytes);
-        memset(partfxinputl[n], 0, synth->bufferbytes);
-        partfxinputr[n] = (float*)fftwf_malloc(synth->bufferbytes);
-        memset(partfxinputr[n], 0, synth->bufferbytes);
+        partfxinputl[n].reset(synth->buffersize);
+        partfxinputr[n].reset(synth->buffersize);
         Pefxbypass[n] = false;
     }
 
@@ -212,15 +210,15 @@ void Part::cleanup(void)
     Penabled = 0;
     for (int k = 0; k < POLIPHONY; ++k)
         KillNotePos(k);
-    memset(partoutl, 0, synth->bufferbytes);
-    memset(partoutr, 0, synth->bufferbytes);
+    memset(partoutl.get(), 0, synth->bufferbytes);
+    memset(partoutr.get(), 0, synth->bufferbytes);
 
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
-        memset(partfxinputl[n], 0, synth->bufferbytes);
-        memset(partfxinputr[n], 0, synth->bufferbytes);
+        memset(partfxinputl[n].get(), 0, synth->bufferbytes);
+        memset(partfxinputr[n].get(), 0, synth->bufferbytes);
 
     }
     Penabled = enablepart;
@@ -239,19 +237,10 @@ Part::~Part()
         if (kit[n].padpars)
             delete kit[n].padpars;
     }
-    fftwf_free(partoutl);
-    fftwf_free(partoutr);
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         if (partefx[nefx])
             delete partefx[nefx];
-    }
-    for (int n = 0; n < NUM_PART_EFX + 1; ++n)
-    {
-        if (partfxinputl[n])
-            fftwf_free(partfxinputl[n]);
-        if (partfxinputr[n])
-            fftwf_free(partfxinputr[n]);
     }
     if (ctl)
         delete ctl;
@@ -1087,12 +1076,13 @@ void Part::enforcekeylimit()
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    tmpoutl = synth->getRuntime().genMixl;
-    tmpoutr = synth->getRuntime().genMixr;
+    assert(tmpoutl.get() == synth->getRuntime().genMixl.get());
+    assert(tmpoutr.get() == synth->getRuntime().genMixr.get());
+
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
     {
-        memset(partfxinputl[nefx], 0, synth->sent_bufferbytes);
-        memset(partfxinputr[nefx], 0, synth->sent_bufferbytes);
+        memset(partfxinputl[nefx].get(), 0, synth->sent_bufferbytes);
+        memset(partfxinputr[nefx].get(), 0, synth->sent_bufferbytes);
     }
 
     for (int k = 0; k < POLIPHONY; ++k)
@@ -1152,7 +1142,7 @@ void Part::ComputePartSmps(void)
                 noteplay++;
                 if (adnote->ready())
                 {
-                    adnote->noteout(tmpoutl, tmpoutr);
+                    adnote->noteout(tmpoutl.get(), tmpoutr.get());
                     for (int i = 0; i < synth->sent_buffersize; ++i)
                     {   // add the ADnote to part(mix)
                         partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
@@ -1171,7 +1161,7 @@ void Part::ComputePartSmps(void)
                 noteplay++;
                 if (subnote->ready())
                 {
-                    subnote->noteout(tmpoutl, tmpoutr);
+                    subnote->noteout(tmpoutl.get(), tmpoutr.get());
                     for (int i = 0; i < synth->sent_buffersize; ++i)
                     {   // add the SUBnote to part(mix)
                         partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
@@ -1190,7 +1180,7 @@ void Part::ComputePartSmps(void)
                 noteplay++;
                 if (padnote->ready())
                 {
-                    padnote->noteout(tmpoutl, tmpoutr);
+                    padnote->noteout(tmpoutl.get(), tmpoutr.get());
                     for (int i = 0 ; i < synth->sent_buffersize; ++i)
                     {   // add the PADnote to part(mix)
                         partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
@@ -1223,7 +1213,7 @@ void Part::ComputePartSmps(void)
     {
         if (!Pefxbypass[nefx])
         {
-            partefx[nefx]->out(partfxinputl[nefx], partfxinputr[nefx]);
+            partefx[nefx]->out(partfxinputl[nefx].get(), partfxinputr[nefx].get());
             if (Pefxroute[nefx] == 2)
             {
                 for (int i = 0; i < synth->sent_buffersize; ++i)
@@ -1240,8 +1230,8 @@ void Part::ComputePartSmps(void)
             partfxinputr[routeto][i] += partfxinputr[nefx][i];
         }
     }
-    memcpy(partoutl, partfxinputl[NUM_PART_EFX], synth->sent_bufferbytes);
-    memcpy(partoutr, partfxinputr[NUM_PART_EFX], synth->sent_bufferbytes);
+    memcpy(partoutl.get(), partfxinputl[NUM_PART_EFX].get(), synth->sent_bufferbytes);
+    memcpy(partoutr.get(), partfxinputr[NUM_PART_EFX].get(), synth->sent_bufferbytes);
 
     // Kill All Notes if killallnotes true
     if (killallnotes)

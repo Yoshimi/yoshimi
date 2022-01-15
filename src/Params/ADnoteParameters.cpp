@@ -39,7 +39,7 @@ using func::power;
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(fft::Calc *fft_, SynthEngine *_synth) :
+ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
     Presets(_synth),
     fft(fft_)
 {
@@ -188,10 +188,10 @@ void ADnoteParameters::defaults(int n)
 // Init the voice parameters
 void ADnoteParameters::enableVoice(int nvoice)
 {
-    VoicePar[nvoice].POscil = new OscilParameters(*fft, synth);
-    VoicePar[nvoice].POscilFM = new OscilParameters(*fft, synth);
-    VoicePar[nvoice].OscilSmp = new OscilGen(*fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
-    VoicePar[nvoice].FMSmp = new OscilGen(*fft, NULL, synth, VoicePar[nvoice].POscilFM);
+    VoicePar[nvoice].POscil = new OscilParameters(fft, synth);
+    VoicePar[nvoice].POscilFM = new OscilParameters(fft, synth);
+    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth, VoicePar[nvoice].POscil);
+    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth, VoicePar[nvoice].POscilFM);
 
     VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);
