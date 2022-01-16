@@ -171,7 +171,7 @@ public:
  * - On construction, actual Scheduler implementation must be supplied (as Lambda)
  * - Whenever a new Data element must be built, invoke requestNewBuild()  (idempotent function)
  * - Test if a build is underway with the bool conversion (or isUnderway())
- * - Test if the new value is ready and can be retrieve without blocking: isReady()
+ * - Test if the new value is ready and can be retrieved without blocking: isReady()
  * - Blocking wait for the value to become ready: call blockingWait();
  * - Retrieve the value and reset all state atomically: swap(existingTab)
  *
@@ -393,7 +393,7 @@ void FutureBuild<TAB>::requestNewBuild()
         return; // already running background task will see the dirty flag,
                 // then abort and restart itself and clear the flag
 
-std::cout << "##+++++ requestNewBuild() --> indeed trigger..." <<std::endl;        ////////////////TODO padthread debugging output
+std::cout << "##·••·requestNewBuild() --> indeed trigger..." <<std::endl;        ////////////////TODO padthread debugging output
     // If we reach this point, we are the first ones to set the dirty flag
     // and we can ensure there is currently no background task underway...
     // Launch a new background task, which on start clears the dirty flag.

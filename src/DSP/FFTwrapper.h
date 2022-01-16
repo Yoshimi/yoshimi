@@ -33,6 +33,8 @@
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <map>
+#include <iostream>        ////////////////TODO padthread debugging output
 
 namespace fft {
 
@@ -82,8 +84,7 @@ namespace fft {
  * these data arrays directly to libFFTW, ensuring proper alignment and memory layout.
  */
 
-template<class POL>
-class FFTwrapper;
+class Calc;
 
 
 
@@ -134,7 +135,7 @@ class Spectrum
     size_t siz;    // tableSize == 2*spectrumSize
     Data coeff;
 
-    template<class POL> friend class FFTwrapper;  // allowed to access raw data
+    friend class Calc;  // allowed to access raw data
 
 public: // can not be copied or moved
     Spectrum(Spectrum&&)                 = delete;
@@ -184,7 +185,7 @@ class Waveform
     size_t siz;
     Data samples;
 
-    template<class POL> friend class FFTwrapper;  // allowed to access raw data
+    friend class Calc;  // allowed to access raw data
 
 public:
     static constexpr size_t INTERPOLATION_BUFFER = 5;
@@ -271,6 +272,7 @@ protected:
 
 
 
+class FFTplanRepo;
 
 /* FFT-Operation execution plan : the standard setup.
  * Yoshimi uses only a single setup scheme, comprised of a fourier and an inverse fourier transform
@@ -290,15 +292,12 @@ struct FFTplan
     FFTplan& operator=(FFTplan&&)      = delete;
     FFTplan& operator=(FFTplan const&) = delete;
 
-// private:  /////////////////////////////////////////////TODO
+private:
+    friend class FFTplanRepo;
     // can not be generated directly,
     // only through the managing FFTplanRepo
     FFTplan(size_t fftsize)
     {
-        //////////////////////////////////////////////////TODO handle locking in FFTplanRepo
-        static std::mutex mtx_plan;
-        std::lock_guard<std::mutex> lock(mtx_plan);
-        //////////////////////////////////////////////////TODO handle locking in FFTplanRepo
         // dummy allocation used as placeholder for plan generation
         Data samples{fftsize};
         Data spectrum{fftsize};
@@ -308,34 +307,69 @@ struct FFTplan
 };
 
 
-/* Standard Fourier Transform operations:
- * setup and access to FFTW calculation plans
- * Template Parameter POL : a policy to use for locking (see below)
+
+/* Create and manage FFTW execution plans.
+ * - Plan creation or retrieval is mutex protected
+ * - Plan handles are shared based on the FFT size
+ * - cached plans are never released
  */
-template<class POL>
-class FFTwrapper : POL
+class FFTplanRepo
+{
+    std::map<size_t, FFTplan> cache;
+    std::mutex mtx_createPlan;
+
+    using Guard = std::lock_guard<std::mutex>;
+
+public:
+    FFTplan retrieve_or_create_Plan(size_t fftSize)
+    {
+        Guard lock(mtx_createPlan);
+std::cout << "++·⇉⇉·FFTplan size="<<fftSize<<"?" << std::endl;        ////////////////TODO padthread debugging output
+        auto pos = cache.find(fftSize);
+        if (pos != cache.end())
+            return FFTplan{pos->second};
+
+std::cout << "++·↯↯·FFTplan create -> cache" << std::endl;            ////////////////TODO padthread debugging output
+        auto res = cache.emplace(fftSize, FFTplan{fftSize});
+        assert(res.second);
+std::cout << "++·✔✔·FFTplan created(size="<<fftSize<<") cache.size()="<<cache.size() << std::endl;  ////////////////TODO padthread debugging output
+        return FFTplan{res.first->second};
+    }
+};
+
+inline FFTplan getPlan(size_t fftSize)
+{
+    static FFTplanRepo planRepo;
+    return planRepo.retrieve_or_create_Plan(fftSize);
+}
+
+
+
+
+
+/* Calculator for standard Fourier Transform operations:
+ * A wrapper to invoke (I)FFT for a predetermined table size.
+ * - on creation, a suitable plan is fetched from the FFTplanRepo
+ * - if no plan exists for the given size, a new one is created.
+ * - retrieval or plan generation is protected by a global mutex
+ * - the actual FFT can be invoked concurrently, without any locking.
+ */
+class Calc
 {
     size_t fftsize;
     FFTplan plan;
 
     public:
-        FFTwrapper(size_t fftsize_)
-            : fftsize{fftsize_}
-            , plan{fftsize}  ////////////////////TODO invoke Policy -> FFTplanRepo
+        Calc(size_t fftSiz)
+            : fftsize{fftSiz}
+            , plan{getPlan(fftsize)}
         { }
 
-       ~FFTwrapper()
-        {
-            /////////////////////////////////////TODO should be handled automatically by FFTplanRepo
-            auto lock = POL::lock4setup();
-            fftwf_destroy_plan(plan.fourier);
-            fftwf_destroy_plan(plan.inverse);
-        }
         // shall not be copied or moved
-        FFTwrapper(FFTwrapper&&)                 = delete;
-        FFTwrapper(FFTwrapper const&)            = delete;
-        FFTwrapper& operator=(FFTwrapper&&)      = delete;
-        FFTwrapper& operator=(FFTwrapper const&) = delete;
+        Calc(Calc&&)                 = delete;
+        Calc(Calc const&)            = delete;
+        Calc& operator=(Calc&&)      = delete;
+        Calc& operator=(Calc const&) = delete;
 
         size_t tableSize()    const { return fftsize; }
         size_t spectrumSize() const { return fftsize / 2; }
@@ -343,7 +377,6 @@ class FFTwrapper : POL
         /* Fast Fourier Transform */
         void smps2freqs(Waveform const& smps, Spectrum& freqs)
         {
-            auto lock = POL::lock4usage();
             size_t half_size{spectrumSize()};
             assert (half_size == freqs.size());
             assert (fftsize == smps.size());
@@ -355,93 +388,10 @@ class FFTwrapper : POL
         /* Fast Inverse Fourier Transform */
         void freqs2smps(Spectrum const& freqs, Waveform& smps)
         {
-            auto lock = POL::lock4usage();
             assert (spectrumSize() == freqs.size());
             fftwf_execute_r2r(plan.inverse, freqs.coeff.get(), smps.samples.get());
         }
 };
-
-
-
-/* ========= FFTW Locking Policies ============ */
-/*
- * Note: creation of FFTW3 calculation plans is *not threadsafe*.
- * See http://fftw.org/fftw3_doc/Thread-safety.html
- * Moreover, when the input/output storage locations within a predefined
- * calculation plan are used, then concurrent invocations of the Fourier operations
- * themselves might lead to data corruption.
- *
- * Originally, ZynAddSubFX (and Yoshimi) were built with a sequential computation model
- * for the sound generation. As of 2021, most SynthEngine code still runs in a single thread.
- * In most cases thus the concurrency issues can be ignored. However, some usages related to PADSynth
- * can be performed concurrently and in the background, and here FFTW3 usage requires locking.
- *
- * Since all SynthEngine code accesses Fourier operations through the FFTwrapper, these
- * different requirements can be accommodated through a /compile time policy parameter/:
- * Mix in the appropriate policy to either make the locking statements NOP, or to implement
- * them with a shared or local lock. Note: Policies can be combined by chaining.
- */
-
-/*
- * Locking Policy: ignore any concurrency issues and access FFTW3 without locking.
- */
-class Policy_DoNothing
-{
-protected:
-    struct NoLockNecessary {
-       ~NoLockNecessary() { /* suppress warning about unused lock */ }
-    };
-
-    struct Guard
-    {
-        std::mutex& mtx_;
-        Guard(std::mutex& m) : mtx_{m} { mtx_.lock(); }
-       ~Guard()                        { mtx_.unlock(); }
-    };
-
-    NoLockNecessary lock4setup() { return NoLockNecessary{}; }
-    NoLockNecessary lock4usage() { return NoLockNecessary{}; }
-};
-
-
-/*
- * Locking Policy: ensure that creation of FFTW plans is locked globally.
- * This policy uses a single shared mutex in static memory
- */
-template<class POL = Policy_DoNothing>
-class Policy_LockAtCreation : protected POL
-{
-    static std::mutex mtx_createPlan;
-protected:
-    using Guard = typename POL::Guard;
-
-    Guard lock4setup() { return Guard{mtx_createPlan}; }
-};
-
-template<class POL>
-std::mutex Policy_LockAtCreation<POL>::mtx_createPlan{};
-
-
-/*
- * Locking Policy: ensure that this FFTwrapper /instance/ is never used
- * concurrently for actual Fourier operations.
- * This policy embeds a mutex lock into each instance.
- */
-template<class POL = Policy_DoNothing>
-class Policy_LockAtUsage : protected POL
-{
-    std::mutex mtx_usePlan;
-protected:
-    using Guard = typename POL::Guard;
-
-    Guard lock4usage() { return Guard{mtx_usePlan}; }
-};
-
-
-using Calc = FFTwrapper<Policy_DoNothing>;
-
-using CalcSharedUse = FFTwrapper<Policy_LockAtUsage<>>;
-using CalcConcurrent = FFTwrapper<Policy_LockAtCreation<>>;
 
 
 }//(End)namespace fft

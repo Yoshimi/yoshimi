@@ -683,10 +683,10 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 {
     PADTables newTable(Pquality);
     const size_t spectrumSize = newTable.tableSize / 2;
-    std::cout << "START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
+    std::cout << "++·↯↯·START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
-    fft::CalcConcurrent fft{newTable.tableSize};
+    fft::Calc fft{newTable.tableSize};
     fft::Spectrum fftCoeff(spectrumSize);
 
     // (in »bandwidth mode«) build harmonic profile used for each line
@@ -695,7 +695,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 
     if (futureBuild.shallRebuild())
     {
-        std::cout << "++++ABORT render_wavetable (1 : after Profile)" << std::endl;        ////////////////TODO padthread debugging output
+        std::cout << "++·↰↰·ABORT render_wavetable (1 : after Profile)" << std::endl;        ////////////////TODO padthread debugging output
         return Optional<PADTables>::NoResult;
     }
 
@@ -728,7 +728,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 
         if (futureBuild.shallRebuild())
         {
-            std::cout << "++++ABORT render_wavetable (2 : before IFFT)" << std::endl;        ////////////////TODO padthread debugging output
+            std::cout << "++·↰↰·ABORT render_wavetable (2 : before IFFT)" << std::endl;        ////////////////TODO padthread debugging output
             return Optional<PADTables>::NoResult;
         }
 
@@ -744,7 +744,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         newsmp.fillInterpolationBuffer();
     }
 
-    std::cout << "End render_wavetable(). Basefreq="<<newTable.basefreq[0]<<std::endl;        ////////////////TODO padthread debugging output
+    std::cout << "++·✔✔·DONE render_wavetable(). Basefreq="<<newTable.basefreq[0]<<std::endl;        ////////////////TODO padthread debugging output
     return newTable;
 }
 
