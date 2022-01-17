@@ -12,7 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2014-2021, Will Godfrey & others
-Copyright 2014-2021, Will Godfrey & others
+Copyright 2014-2022, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -236,7 +236,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -456,9 +456,9 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {827 535 385 470} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {697 33 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 480, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -922,28 +922,28 @@ class MasterUI {open : {private GuiUpdates}
         }
       }
       Fl_Group syseffectuigroup {
-        xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
+        xywh {3 158 378 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
-        Fl_Group syseffectui {open
-          xywh {3 158 384 95} labeltype NO_LABEL
+        Fl_Group syseffectui {
+          xywh {3 158 378 95} labeltype NO_LABEL
           code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
           class EffUI
         } {}
       }
       Fl_Group inseffectuigroup {
-        xywh {3 158 384 95} box FLAT_BOX color 48
+        xywh {3 158 378 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
         Fl_Group inseffectui {
-          xywh {3 158 379 95} color 52
+          xywh {3 158 378 95} color 52
           code0 {o->init(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
       }
       Fl_Group partuigroup {
-        xywh {3 255 380 172} box ENGRAVED_FRAME
+        xywh {3 255 378 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
           xywh {3 255 379 172} color 47
@@ -952,18 +952,26 @@ class MasterUI {open : {private GuiUpdates}
           class PartUI
         } {}
       }
+      Fl_Button undo {
+        label Undo
+        xywh {200 436 70 20} labelsize 12
+      }
+      Fl_Button redo {
+        label Redo
+        xywh {290 436 70 20} labelsize 12
+      }
       Fl_Group {} {
-        xywh {3 427 379 36} box DOWN_BOX color 43 labelsize 12
+        xywh {3 460 379 36} box DOWN_BOX color 43 labelsize 12
       } {
         Fl_Box vumeter {
           label {VU-Meter}
-          xywh {3 429 379 34} color 48 selection_color 75
+          xywh {3 461 379 34} color 48 selection_color 75
           code0 {o->init(-1, synth);}
           class VUMeter
         }
         Fl_Button {} {
           callback {vumeter->init(-1, synth);}
-          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 430 376 30} box NO_BOX
+          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 463 376 30} box NO_BOX
         }
       }
       Fl_Button mastermono {
@@ -1021,7 +1029,7 @@ class MasterUI {open : {private GuiUpdates}
         callback {//
                        send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Relative values when panned to extremes:
-   Per side, Equivalent Mono} xywh {219 340 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
+   Per side, Equivalent Mono} xywh {216 346 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
         code0 {o->add("Cut: 0dB, -6dB");o->add("Default: +3dB, -3dB");o->add("Boost: +6dB, 0dB");}
         code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {}
@@ -3658,6 +3666,9 @@ Alan Calvert started the project}
 
     panning_law->labelsize(size12);
         panning_law->textsize(size12);
+
+     undo->labelsize(size12);
+     redo->labelsize(size12);
 
     partui->groupRtext(dScale);
     masterwindow->redraw();} {}

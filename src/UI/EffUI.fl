@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2021, Will Godfrey & others
+Copyright 2016-2022, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -230,7 +230,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_null_window()} {} {
     Fl_Window effnullwindow {
-      xywh {915 700 375 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
+      xywh {915 700 378 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
       Fl_Text_Display noeffect {
@@ -241,7 +241,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
-      xywh {1005 24 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
+      xywh {1005 24 378 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
       class Fl_Group
     } {
       Fl_Text_Display revname {
@@ -364,7 +364,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_echo_window()} {} {
     Fl_Window effechowindow {
-      xywh {979 149 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
+      xywh {979 149 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Text_Display echoname {
@@ -450,7 +450,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_chorus_window()} {} {
     Fl_Window effchoruswindow {
-      xywh {881 316 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {881 316 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display chorusname {
@@ -585,7 +585,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_phaser_window()} {} {
     Fl_Window effphaserwindow {
-      xywh {849 326 375 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      xywh {849 326 378 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
       class Fl_Group
     } {
       Fl_Text_Display phasername {
@@ -743,7 +743,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
-      xywh {845 398 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {845 398 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display alienname {
@@ -863,7 +863,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_distorsion_window()} {} {
     Fl_Window effdistorsionwindow {
-      xywh {795 679 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {795 679 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display distname {
@@ -971,7 +971,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {1010 762 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1010 762 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display eqname {
@@ -1043,7 +1043,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
-      xywh {859 349 375 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {859 349 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display dfname {

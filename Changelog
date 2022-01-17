@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-1-17 Will
+* Set placeholders for Undo/Redo.
+* Made additional small adjustments to main window.
+
 2021-12-7 Will
 * globals AddVoice1 offset is now defined as NUM_VOICES
 * globals AddMod1 offset is now AddVoice1 + NUM_VOICES

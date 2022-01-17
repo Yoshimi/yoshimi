@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2021, Will Godfrey
+Copyright 2014-2022, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -238,7 +238,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,0);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {420 4 40 15} box THIN_UP_BOX labelsize 11
+          xywh {422 4 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
@@ -397,7 +397,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {794 168 380 170} type Double hide
+      xywh {794 168 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Box {} {
@@ -623,13 +623,13 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Controllers
           callback {//
           Showctl();}
-          tooltip {MIDI Controller range settings} xywh {2 82 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
+          tooltip {MIDI Controller range settings} xywh {6 82 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Button midiCCs {
           label {Midi CCs}
           callback {//
           Showctlmidi();}
-          tooltip {Emulates common MIDI CCs} xywh {96 82 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
+          tooltip {Emulates common MIDI CCs} xywh {98 82 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
         }
         Fl_Spinner partkeyshift {
           label {Key Shift}
@@ -710,7 +710,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Box {} {
-          xywh {240 106 134 62} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
+          xywh {240 106 134 61} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
         }
         Fl_Pack toSysEfx {
           xywh {246 122 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 10 align 0
