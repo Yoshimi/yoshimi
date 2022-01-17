@@ -194,6 +194,7 @@ void PADnoteParameters::defaults(void)
 
     resonance->defaults();
     oscilgen->defaults();
+    waveTable.reset();   // zero sound
 
     // By default set the oscil to max phase randomness.
     // Remark: phase randomness (and in fact oscil phase information)
@@ -1084,8 +1085,10 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
     // trigger re-build of the wavetable as background task...
+    std::cout << "|PADpar::getfromXML| silence PADtables..." << std::endl;       ////////////////TODO padthread debugging output
+    waveTable.reset();    // silence existing sound from previous instruments using the same part
     std::cout << "|PADpar::getfromXML| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
-    buildNewWavetable();
+    buildNewWavetable();  // launch rebuild of wavetables for the new instrument (background task)
     // result will be picked up from PADnote::noteout() when ready
 }
 

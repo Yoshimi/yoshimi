@@ -98,11 +98,17 @@ public: // can be moved and swapped, but not copied...
         assert(numTables > 0);
         assert(tableSize > 0);
         samples.reserve(numTables);
-        for (size_t tab=0; tab<numTables; ++tab)
+        for (size_t tab=0; tab < numTables; ++tab)
         {
             samples.emplace_back(tableSize); // cause allocation and zero-init of wavetable(s)
             basefreq[tab] = 440.0f; // fallback base frequency; makes even empty wavetable usable
         }
+    }
+
+    void reset() // fill existing wavetables with silence
+    {
+        for (size_t tab=0; tab < numTables; ++tab)
+            samples[tab].reset();
     }
 
     // Subscript: access n-th wavetable
