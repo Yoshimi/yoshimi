@@ -236,7 +236,7 @@ lineitem = n;}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -954,11 +954,11 @@ class MasterUI {: {private GuiUpdates}
       }
       Fl_Button undo {
         label Undo
-        xywh {200 436 70 20} labelsize 12
+        xywh {200 436 70 20} labelsize 12 deactivate
       }
       Fl_Button redo {
         label Redo
-        xywh {290 436 70 20} labelsize 12
+        xywh {290 436 70 20} labelsize 12 deactivate
       }
       Fl_Group {} {
         xywh {3 460 379 36} box DOWN_BOX color 43 labelsize 12

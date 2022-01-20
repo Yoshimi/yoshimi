@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+2022-1-20 Will
+* Swapped order of bank and main controls in cammdSendReal()
+  also put comment in for suggested undo/redo location.
+* Made Undo and Redo buttons in main inactive to aviod confusion.
+
 2022-1-17 Will
 * Set placeholders for Undo/Redo.
 * Made additional small adjustments to main window.

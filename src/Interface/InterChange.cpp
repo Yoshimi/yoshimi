@@ -1991,17 +1991,21 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         commandConfig(getData);
         return true;
     }
-    if (npart == TOPLEVEL::section::main)
-    {
-        commandMain(getData);
-        return true;
-    }
     if (npart == TOPLEVEL::section::bank)
     {
         commandBank(getData);
         return true;
     }
 
+    /*
+     * TODO insert undo/redo pair here
+     */
+
+    if (npart == TOPLEVEL::section::main)
+    {
+        commandMain(getData);
+        return true;
+    }
 
     if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == UNUSED)
     {
