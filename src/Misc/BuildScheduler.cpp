@@ -23,15 +23,31 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <queue>
 
 
-namespace { // Implementation helpers...
+namespace { // Implementation details of scheduling...
 
     /* »dirty wait delay« : when further rebuilds are requested while
      * a background build process is underway, an additional grace period
      * is added to allow for more changes to trickle in and avoid overloading
      * the system with lots of rescheduling tasks. */
     constexpr auto RESCHEDULE_DELAY = std::chrono::milliseconds(50);
+
+    /* number of threads to keep free as headroom for the Synth */
+    const size_t REQUIRED_HEADROOM = 2;
+
+    /* factor to overload the nominally available CPUs */
+    const double OVERPROVISIONING = 1.5;
+
+    size_t determineUsableBackgroundConcurrency()
+    {
+        size_t cpuCount = std::thread::hardware_concurrency();
+        int free = cpuCount * OVERPROVISIONING - REQUIRED_HEADROOM;
+std::cout << "**·!!·|BuildScheduler: THREAD_LIMIT = "<<std::max(free, 1) <<std::endl;        ////////////////TODO padthread debugging output
+        return std::max(free, 1);
+    }
+
 
 
     class TaskRunnerImpl
@@ -41,6 +57,11 @@ namespace { // Implementation helpers...
 
         using Task = task::RunnerBackend::Task;
 
+        std::queue<Task> waitingTasks{};
+
+        static const size_t THREAD_LIMIT;
+        size_t runningThreads = 0;
+
         public:
             /* Meyer's Singleton */
             static TaskRunnerImpl& access()
@@ -49,26 +70,75 @@ namespace { // Implementation helpers...
                 return instance;
             }
 
-            /* Simplistic implementation of scheduling into background thread;
-             * launch a new thread for each call, without imposing resource limits. */
+            /* Implementation of scheduling into background thread:
+             * pass the work task through a queue and start up to
+             * THREAD_LIMIT workers to consume those work tasks. */
             void schedule(Task&& task)
             {
                 Guard lock(mtx);
-                std::thread backgroundThread(move(task));
-                backgroundThread.detach();
+                waitingTasks.push(move(task));
+                if (runningThreads < THREAD_LIMIT)
+                    launchWorker();
             };
 
             void reschedule(Task&& task)
             {
-                Task delayedTask{[workOp = move(task)] () -> void
-                                    {
-                                        std::this_thread::sleep_for(RESCHEDULE_DELAY);
-                                        workOp();
-                                    }};
+                Task delayedTask{
+                    [workOp = move(task)] () -> void
+                        {// this code runs within a worker thread
+                            std::this_thread::sleep_for(RESCHEDULE_DELAY);
+                            workOp();
+                        }};
                 schedule(move(delayedTask));
             }
+
+        private:
+            void markWorker_finished()
+            {
+                Guard lock(mtx);
+                if (runningThreads == 0)
+                    throw std::logic_error("BuildScheduler: worker thread management floundered");
+                --runningThreads;
+std::cout << "**·⬙⬙·|BuildScheduler: terminated Worker-"<<runningThreads+1 <<std::endl;        ////////////////TODO padthread debugging output
+            }
+
+            void launchWorker()
+            {
+std::cout << "**·⬘⬘·|BuildScheduler: launch Worker-"<<runningThreads+1 <<std::endl;        ////////////////TODO padthread debugging output
+                // note: mutex locked at caller
+                std::thread backgroundThread(
+                    [this] () -> void
+                        {// worker thread(s): consume queue contents
+                            while (Task workOp = pullFromQueue())
+                                try {
+                                    workOp();
+                                }
+                                catch(...)
+                                {/* absorb failure in workOp */
+std::cout << "**·☀☀·|BuildScheduler: FAILURE in workOp()..." <<std::endl;        ////////////////TODO padthread debugging output
+                                }
+                            markWorker_finished();
+                        });
+                backgroundThread.detach();
+                assert(runningThreads < THREAD_LIMIT);
+                ++runningThreads;
+            }
+
+            Task pullFromQueue()
+            {
+                Guard lock(mtx);
+                if (waitingTasks.empty())
+                    return Task(); // empty Task to signal end
+                Task nextWorkOp(move(waitingTasks.front()));
+                waitingTasks.pop();
+if (waitingTasks.size()) std::cout << "**·⌛⌛·|BuildScheduler: "<<waitingTasks.size()<<" Tasks waiting..." <<std::endl;        ////////////////TODO padthread debugging output
+                return nextWorkOp;
+            }
     };
-}//(End)Implementation helpers.
+
+    const size_t TaskRunnerImpl::THREAD_LIMIT = determineUsableBackgroundConcurrency();
+
+}//(End)Implementation details of scheduling.
 
 
 
