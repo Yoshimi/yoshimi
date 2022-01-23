@@ -41,7 +41,9 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
-    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h)
+    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h
+    ../Misc/Alloc.h ../Misc/BuildScheduler.cpp ../Misc/BuildScheduler.h
+    ../Misc/WaveShapeSamples.h)
 file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
