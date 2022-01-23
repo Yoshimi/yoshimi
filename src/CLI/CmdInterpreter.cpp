@@ -4879,6 +4879,11 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         value = 1;
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
+        if(input.matchnMove(5, "force"))
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges (== PART::control::padsynthParameters)
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, insert, parameter);
     }
     if (cmd > -1)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert);
@@ -5134,6 +5139,11 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         value = 1;
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
+        if(input.matchnMove(5, "force"))
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges (== PART::control::padsynthParameters)
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, insert, parameter);
     }
     if (cmd == -1)
         return REPLY::available_msg;

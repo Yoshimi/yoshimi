@@ -664,13 +664,27 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 void PADnoteParameters::buildNewWavetable(bool blocking)
 {
     std::cout << "buildNewWavetable(blocking="<<blocking<<")" << std::endl;        ////////////////TODO padthread debugging output
-    futureBuild.requestNewBuild();
-    if (blocking)
+    if (not blocking)
     {
-        std::cout << "blocking wait for background work....(" << std::endl;        ////////////////TODO padthread debugging output
-        futureBuild.blockingWait();
-        std::cout << "futureBuild.isReady() = " << futureBuild.isReady() <<std::endl;        ////////////////TODO padthread debugging output
+        futureBuild.requestNewBuild();
+        return;
     }
+
+    std::cout << "blocking wait for background work.... isUnderway() == "<<futureBuild.isUnderway()<< std::endl;        ////////////////TODO padthread debugging output
+    // Guarantee to invoke a new build NOW and block until it is ready...
+    // This is tricky, since new builds can be triggered any time from the GUI
+    // and also the SynthEngine might pick up the result concurrently.
+
+    // (1) Attempt to get hold of a running build triggered earlier (with old parameters)
+    futureBuild.blockingWait();
+
+    // (2) when we trigger now, we can be sure the current state of parameters will be used
+    futureBuild.requestNewBuild();
+
+    // (3) again wait for this build to complete...
+    //     Note: Result will be published to SynthEngine -- unless a new build was triggered
+    futureBuild.blockingWait(true);
+    std::cout << "blocking wait finished. futureBuild.isReady() = " << futureBuild.isReady() <<std::endl;        ////////////////TODO padthread debugging output
 }
 
 
@@ -745,7 +759,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         newsmp.fillInterpolationBuffer();
     }
 
-    std::cout << "++·✔✔·DONE render_wavetable(). Basefreq="<<newTable.basefreq[0]<<std::endl;        ////////////////TODO padthread debugging output
+    std::cout << "++·✔✔·DONE render_wavetable(). Address="<<&newTable[0][0]<<std::endl;        ////////////////TODO padthread debugging output
     return newTable;
 }
 

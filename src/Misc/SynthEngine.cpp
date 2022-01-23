@@ -537,13 +537,10 @@ void SynthEngine::setReproducibleState(int seed)
                 if (kitItem.padpars and kitItem.Ppadenabled)
                     {
                         kitItem.padpars->reseed(randomINT());
+                        kitItem.padpars->oscilgen->forceUpdate(); // rebuild Spectrum
                         // synchronously rebuild PADSynth wavetable with new randseed
-                        auto newTable = kitItem.padpars->render_wavetable();
-                        if (newTable)
-                        {
-                            std::cout << "SWAP for part["<<p<<"] kitItem["<<i<<"]" <<std::endl;        ////////////////TODO padthread debugging output
-                            swap(kitItem.padpars->waveTable, *newTable);
-                        }
+                        kitItem.padpars->buildNewWavetable(true);
+                        kitItem.padpars->activate_wavetable();
                     }
             }
     Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(seed));

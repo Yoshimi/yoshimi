@@ -82,6 +82,7 @@ class OscilGen : private WaveShapeSamples
         void newrandseed() { randseed = basePrng.randomINT() + INT_MAX/2; }
         void resetHarmonicPrng() { harmonicPrng.init(randseed); }
         void reseed(int value);
+        void forceUpdate();
 
     private:
         OscilParameters *params;
@@ -169,5 +170,12 @@ class OscilGen : private WaveShapeSamples
         RandomGen basePrng;
         RandomGen harmonicPrng;
 };
+
+// allow to mark this OscilGen as "dirty" to force recalculation of spectrum
+// (as of 4/22 only relevant for automated testing, see SynthEngine::setReproducibleState()
+inline void OscilGen::forceUpdate()
+{
+    oscilupdate.forceUpdate();
+}
 
 #endif
