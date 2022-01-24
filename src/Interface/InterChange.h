@@ -32,6 +32,8 @@
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
+#include <list>
+
 class SynthEngine;
 class DataText;
 
@@ -137,6 +139,13 @@ class InterChange : private DataText
         void commandEnvelope(CommandBlock *getData);
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
+
+        void add2undo(CommandBlock *getData);
+        void undoLast();
+        void redoLast();
+        std::list<CommandBlock> undoList;
+        std::list<CommandBlock> redoList;
+        bool noteSeen;
 
         /*
          * this is made public specifically so that it can be

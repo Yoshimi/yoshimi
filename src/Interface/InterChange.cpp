@@ -100,7 +100,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     searchBank(0),
     searchRoot(0)
 {
-    ;
+    noteSeen = false;
 }
 
 
@@ -191,6 +191,8 @@ InterChange::~InterChange()
 {
     if (sortResultsThreadHandle)
         pthread_join(sortResultsThreadHandle, 0);
+    undoList.clear();
+    redoList.clear();
 }
 
 
@@ -3407,6 +3409,7 @@ void InterChange::commandPart(CommandBlock *getData)
         return;
     }
 
+    add2undo(getData);
     unsigned char effNum = part->Peffnum;
     if (!kitType)
         kititem = 0;
@@ -6546,6 +6549,12 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.value = value;
 }
 
+
+void InterChange::add2undo(CommandBlock *getData)
+{
+    undoList.push_back(*getData);
+    std::cout << "list size " << undoList.size() << std::endl;
+}
 // tests and returns corrected values
 void InterChange::testLimits(CommandBlock *getData)
 {
