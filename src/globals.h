@@ -152,6 +152,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part1 = 0,   // nothing must come
         part64 = 63, // between these two
 
+        undoMarker = 68, // 44
         copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8

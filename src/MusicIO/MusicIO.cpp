@@ -123,6 +123,8 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             putData.data.engine = par1;
             synth->midilearn.writeMidi(&putData, false);
         }
+        if (event == 0x90)
+            synth->interchange.noteSeen = true;
         return;
     }
     synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);

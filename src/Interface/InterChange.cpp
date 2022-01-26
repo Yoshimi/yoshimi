@@ -127,6 +127,7 @@ bool InterChange::Init()
         searchInst = searchBank = searchRoot = 0;
         return true;
     }
+    memset(&undoMarker.bytes, TOPLEVEL::section::undoMarker, sizeof(undoMarker));
 }
 
 
@@ -3409,7 +3410,9 @@ void InterChange::commandPart(CommandBlock *getData)
         return;
     }
 
-    add2undo(getData);
+    if (write)
+        add2undo(getData, noteSeen);
+
     unsigned char effNum = part->Peffnum;
     if (!kitType)
         kititem = 0;
@@ -6550,11 +6553,42 @@ void InterChange::commandEffects(CommandBlock *getData)
 }
 
 
-void InterChange::add2undo(CommandBlock *getData)
+void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 {
+    redoList.clear(); // always invalidated on new entry
+    if (noteSeen)
+    {
+        noteSeen = false;
+        undoList.push_back(undoMarker);
+    }
+    else if (!undoList.empty())
+    {
+        if (undoList.back().data.control == getData->data.control && undoList.back().data.part == getData->data.part)
+            return;
+        if (!group) // the first item in a group needs a marker, later ones don't
+            undoList.push_back(undoMarker);
+    }
+    /*
+     * the following is used to read the current value of the specific
+     * control as that is what we will want to revert to. It then restores
+     * the incoming value and write status.
+     */
+    float value = getData->data.value;
+    getData->data.type &= ~64;
+    commandSendReal(getData);
+    std::cout << "Control " << int(getData->data.control) << std::endl;
+    std::cout << "old value " << getData->data.value << std::endl;
+    getData->data.type &= 64;
+    std::cout << "new value " << getData->data.value << std::endl;
+    getData->data.value = value;
+
     undoList.push_back(*getData);
+    getData->data.value = value;
+
     std::cout << "list size " << undoList.size() << std::endl;
 }
+
+
 // tests and returns corrected values
 void InterChange::testLimits(CommandBlock *getData)
 {
@@ -6572,9 +6606,11 @@ void InterChange::testLimits(CommandBlock *getData)
         || control == CONFIG::control::extendedProgramChangeCC))
     {
         getData->data.miscmsg = NO_MSG; // just to be sure
-        if (value > 119)
+        if (value > 119) // we don't want controllers above this
             return;
         std::string text;
+        // TODO can bank and bankroot be combined
+        // as they now have the same options?
         if (control == CONFIG::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));

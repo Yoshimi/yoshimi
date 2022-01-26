@@ -140,19 +140,21 @@ class InterChange : private DataText
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
 
-        void add2undo(CommandBlock *getData);
+        void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);
         void undoLast();
         void redoLast();
         std::list<CommandBlock> undoList;
         std::list<CommandBlock> redoList;
-        bool noteSeen;
+        CommandBlock lastEntry;
+        CommandBlock undoMarker;
 
+    public:
+        bool noteSeen;
         /*
          * this is made public specifically so that it can be
          * reached from SynthEngine by jack freewheeling NRPNs.
          * This avoids unnecessary (error prone) duplication.
          */
-    public:
         void commandEffects(CommandBlock *getData);
 
     private:
