@@ -549,6 +549,8 @@ namespace MAIN // usage MAIN::control::volume
         openManual = 100,
         startInstance = 104,
         stopInstance,
+        undo,
+        redo,
         stopSound = 128,
         readPartPeak = 200, // now does L/R
         readMainLRpeak,

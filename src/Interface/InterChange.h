@@ -147,6 +147,7 @@ class InterChange : private DataText
         std::list<CommandBlock> redoList;
         CommandBlock lastEntry;
         CommandBlock undoMarker;
+        bool undoLoopBack;
 
     public:
         bool noteSeen;

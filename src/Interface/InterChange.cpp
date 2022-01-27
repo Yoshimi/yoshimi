@@ -101,6 +101,8 @@ InterChange::InterChange(SynthEngine *_synth) :
     searchRoot(0)
 {
     noteSeen = false;
+    undoLoopBack = false;
+    undoMarker.data.part = TOPLEVEL::section::undoMarker;
 }
 
 
@@ -127,7 +129,6 @@ bool InterChange::Init()
         searchInst = searchBank = searchRoot = 0;
         return true;
     }
-    memset(&undoMarker.bytes, TOPLEVEL::section::undoMarker, sizeof(undoMarker));
 }
 
 
@@ -978,6 +979,16 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 }
             }
             newMsg = true;
+            break;
+
+        case MAIN::control::undo:
+            synth->ShutUp();
+            undoLast();
+            break;
+
+        case MAIN::control::redo:
+            synth->ShutUp();
+            redoLast();
             break;
 
         case MAIN::control::stopSound:
@@ -3231,6 +3242,14 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::startInstance: // done elsewhere
             break;
         case MAIN::control::stopInstance: // done elsewhere
+            break;
+        case MAIN::control::undo:
+        case MAIN::control::redo:
+            if ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop)
+            {
+                muteQueueWrite(getData);
+                getData->data.source = TOPLEVEL::action::noAction;
+            }
             break;
         case MAIN::control::stopSound: // just stop
             if (write)
@@ -6555,10 +6574,14 @@ void InterChange::commandEffects(CommandBlock *getData)
 
 void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 {
+    if (undoLoopBack)
+        return; // don't want to reset what we've just undone!
+
     redoList.clear(); // always invalidated on new entry
     if (noteSeen)
     {
         noteSeen = false;
+        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
         undoList.push_back(undoMarker);
     }
     else if (!undoList.empty())
@@ -6574,18 +6597,65 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
      * the incoming value and write status.
      */
     float value = getData->data.value;
+    char type = getData->data.type;
+    char source = getData->data.source;
     getData->data.type &= ~64;
     commandSendReal(getData);
     std::cout << "Control " << int(getData->data.control) << std::endl;
     std::cout << "old value " << getData->data.value << std::endl;
-    getData->data.type &= 64;
-    std::cout << "new value " << getData->data.value << std::endl;
-    getData->data.value = value;
-
+    getData->data.type = type;
+    getData->data.source = source;
     undoList.push_back(*getData);
     getData->data.value = value;
-
+    std::cout << "new value " << getData->data.value << std::endl;
     std::cout << "list size " << undoList.size() << std::endl;
+}
+
+
+void InterChange::undoLast(void)
+{
+    if (undoList.empty())
+    {
+        std::cout << "undo empty" << std::endl;
+        return;
+    }
+    undoLoopBack = true;
+    std::cout << "here undo" << std::endl;
+    CommandBlock nextCommand;
+    do {
+         for (int i = 0; i < int(sizeof(nextCommand)); ++i)
+            nextCommand.bytes[i] = undoList.back().bytes[i];
+         if (nextCommand.data.part != TOPLEVEL::undoMarker)
+         {
+             nextCommand.data.type &= 254;
+             nextCommand.data.source = 32;
+             nextCommand.data.offset = 0;
+             commandSendReal(&nextCommand);
+             std::cout << "\n value " << int(nextCommand.data.value)
+                       << "\n type " << int(nextCommand.data.type)
+                       << "\n source " << int(nextCommand.data.type)
+                       << "\n cont " << int(nextCommand.data.control)
+                       << "\n part " << int(nextCommand.data.part)
+                       << "\n kit " << int(nextCommand.data.kit)
+                       << "\n engine " << int(nextCommand.data.engine)
+                       << "\n insert " << int(nextCommand.data.insert)
+                       << "\n offset " << int(nextCommand.data.offset)
+                       << std::endl;
+         }
+         undoList.pop_back();
+         undoLoopBack = false;
+    } while (!undoList.empty() && nextCommand.data.part != TOPLEVEL::undoMarker);
+}
+
+
+void InterChange::redoLast(void)
+{
+    if (undoList.empty())
+    {
+        std::cout << "redo empty" << std::endl;
+        return;
+    }
+    std::cout << "here redo" << std::endl;
 }
 
 
