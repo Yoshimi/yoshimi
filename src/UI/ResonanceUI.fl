@@ -469,7 +469,7 @@ class ResonanceUI {: PresetsUI_
       Fl_Button applybutton {
         label Apply
         callback {//
-              send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
+              send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
         xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button resClose {
@@ -493,7 +493,7 @@ class ResonanceUI {: PresetsUI_
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     int insert;
-    if (control == PART::control::padsynthParameters)
+    if (control == PADSYNTH::control::applyChanges)
         insert = UNUSED;
     else
         insert = TOPLEVEL::insert::resonanceGroup;

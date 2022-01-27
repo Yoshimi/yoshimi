@@ -622,7 +622,6 @@ namespace PART // usage PART::control::volume
         effectType,
         effectDestination,
         effectBypass,
-        padsynthParameters = 104,
         audioDestination = 120,
 
     // start of controllers

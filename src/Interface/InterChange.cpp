@@ -1482,22 +1482,10 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             }
         break;
 
-        case PART::control::enablePad:
+        case PADSYNTH::control::applyChanges:
             if (write)
             {
-                int temp = kititem;
-                if (temp >= NUM_KIT_ITEMS)
-                    temp = 0;
-                //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
-                std:: cout << "|indirectPart::enablePad| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
-                synth->part[npart]->kit[temp].padpars->buildNewWavetable((parameter == 0));
-                getData->data.source &= ~TOPLEVEL::action::lowPrio;
-            }
-            break;
-        case PART::control::padsynthParameters:
-            if (write)
-            {
-                //////////////////////////////////////////////////////////////////////////TODO padthread : could be redundant now, since we call it already from commandPart rsp. commandPad
+                // esp. a "blocking Apply" is redirected from Synth-Thread: commandSendReal() -> commandPad() -> returns() -> indirectTransfers()
                 std::cout << "|indirectPart::padsynthParameters| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
                 synth->part[npart]->kit[kititem].padpars->buildNewWavetable((parameter == 0));  // parameter == 0 causes blocking wait
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
@@ -5415,8 +5403,15 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
             if (write && value >= 0.5f)
             {
                 bool blocking = (0 == getData->data.parameter);
-                std::cout << "|commandPad| buildNewWavetable(blocking="<<blocking<<")" << std::endl;        ////////////////TODO padthread debugging output
-                pars.buildNewWavetable(blocking);
+                if (blocking)
+                {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
+                    getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()
+                }
+                else
+                {// build will run in parallel within a dedicated background thread
+                    std::cout << "|commandPad| buildNewWavetable(blocking="<<blocking<<")" << std::endl;        ////////////////TODO padthread debugging output
+                    pars.buildNewWavetable();
+                }
             }
             else
                 value = not pars.futureBuild.isUnderway();

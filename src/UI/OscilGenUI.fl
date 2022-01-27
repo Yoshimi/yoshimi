@@ -484,7 +484,7 @@ o->hide();} open
       Fl_Button applybutton {
         label Apply
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
+        send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
         xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {if (!forPAD) o->hide();}
       }
@@ -832,7 +832,7 @@ o->hide();} open
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
         int insert = TOPLEVEL::insert::oscillatorGroup;
-        if (control == PART::control::padsynthParameters)
+        if (control == PADSYNTH::control::applyChanges)
             insert = UNUSED;
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, npart, kititem, engine, insert);} {}
