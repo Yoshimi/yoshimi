@@ -955,13 +955,13 @@ class MasterUI {: {private GuiUpdates}
       Fl_Button undo {
         label Undo
         callback {//
-        send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMarker);}
         xywh {200 436 70 20} labelsize 12
       }
       Fl_Button redo {
         label Redo
         callback {//
-        send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMarker);}
         xywh {290 436 70 20} labelsize 12
       }
       Fl_Group {} {

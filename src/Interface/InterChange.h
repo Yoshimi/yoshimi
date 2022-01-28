@@ -141,13 +141,14 @@ class InterChange : private DataText
         void commandSysIns(CommandBlock *getData);
 
         void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);
-        void undoLast();
-        void redoLast();
+        void undoLast(CommandBlock *candidate);
+        void redoLast(CommandBlock *candidate);
         std::list<CommandBlock> undoList;
         std::list<CommandBlock> redoList;
         CommandBlock lastEntry;
         CommandBlock undoMarker;
         bool undoLoopBack;
+        bool fromRedo;
 
     public:
         bool noteSeen;
