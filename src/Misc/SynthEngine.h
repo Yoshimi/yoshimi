@@ -166,6 +166,8 @@ class SynthEngine
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
+        void CBtest(CommandBlock *candidate);
+
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;

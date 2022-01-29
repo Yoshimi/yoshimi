@@ -3756,3 +3756,18 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
     }
     return value;
 }
+
+
+void SynthEngine::CBtest(CommandBlock *candidate)
+{
+    std::cout << "\n value " << candidate->data.value
+            << "\n type " << int(candidate->data.type)
+            << "\n source " << int(candidate->data.source)
+            << "\n cont " << int(candidate->data.control)
+            << "\n part " << int(candidate->data.part)
+            << "\n kit " << int(candidate->data.kit)
+            << "\n engine " << int(candidate->data.engine)
+            << "\n insert " << int(candidate->data.insert)
+            << "\n offset " << int(candidate->data.offset)
+            << std::endl;
+}

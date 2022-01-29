@@ -6612,15 +6612,19 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     char source = getData->data.source;
     getData->data.type &= ~TOPLEVEL::type::Write;
     commandSendReal(getData);
-    std::cout << "Control " << int(getData->data.control) << std::endl;
-    std::cout << "old value " << getData->data.value << std::endl;
+
+    //std::cout << "Control " << int(getData->data.control) << std::endl;
+    //std::cout << "old value " << getData->data.value << std::endl;
     getData->data.type = type;
     getData->data.source = source;
     undoList.push_back(*getData);
+    std::cout << "add ";
+    synth->CBtest(&undoList.back());
+
     getData->data.value = value;
-    std::cout << "new value " << getData->data.value << std::endl;
-    std::cout << "undo list size " << undoList.size() << std::endl;
-    std::cout << "redo list size " << redoList.size() << std::endl;
+    //std::cout << "new value " << getData->data.value << std::endl;
+    //std::cout << "undo list size " << undoList.size() << std::endl;
+    //std::cout << "redo list size " << redoList.size() << std::endl;
 }
 
 
@@ -6634,25 +6638,19 @@ void InterChange::undoLast(CommandBlock *candidate)
     do {
          if (undoList.back().data.part != TOPLEVEL::undoMarker)
          {
-             memcpy(candidate->bytes, undoList.back().bytes, sizeof(candidate));
+             memcpy(candidate->bytes, undoList.back().bytes, sizeof(CommandBlock));
              candidate->data.type &= ~TOPLEVEL::action::noAction;
              candidate->data.source |= TOPLEVEL::action::forceUpdate;
-             /*std::cout << "\n value " << int(candidate->data.value)
-                       << "\n type " << int(candidate->data.type)
-                       << "\n source " << int(candidate->data.type)
-                       << "\n cont " << int(candidate->data.control)
-                       << "\n part " << int(candidate->data.part)
-                       << "\n kit " << int(candidate->data.kit)
-                       << "\n engine " << int(candidate->data.engine)
-                       << "\n insert " << int(candidate->data.insert)
-                       << "\n offset " << int(candidate->data.offset)
-                       << std::endl;*/
+
+             std::cout << "undo ";
+             synth->CBtest(candidate);
+
             if(setMarker)
             {
                 setMarker = false;
                 redoList.push_back(undoMarker);
             }
-            memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(oldCommand));
+            memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(CommandBlock));
             oldCommand.data.type &= ~TOPLEVEL::type::Write;
             commandSendReal(&oldCommand);
             oldCommand.data.type |= TOPLEVEL::type::Write;
@@ -6674,19 +6672,13 @@ void InterChange::redoLast(CommandBlock *candidate)
          {
              undoLoopBack = false;
              fromRedo = true;
-             memcpy(candidate->bytes, redoList.back().bytes, sizeof(candidate));
+             memcpy(candidate->bytes, redoList.back().bytes, sizeof(CommandBlock));
              candidate->data.type &= TOPLEVEL::type::Write;
              candidate->data.source = TOPLEVEL::action::forceUpdate;
-             /*std::cout << "\n value " << int(candidate->data.value)
-                       << "\n type " << int(candidate->data.type)
-                       << "\n source " << int(candidate->data.type)
-                       << "\n cont " << int(candidate->data.control)
-                       << "\n part " << int(candidate->data.part)
-                       << "\n kit " << int(candidate->data.kit)
-                       << "\n engine " << int(candidate->data.engine)
-                       << "\n insert " << int(candidate->data.insert)
-                       << "\n offset " << int(candidate->data.offset)
-                       << std::endl;*/
+
+             std::cout << "redo ";
+             synth->CBtest(candidate);
+
          }
          redoList.pop_back();
     } while (!redoList.empty() && redoList.back().data.part != TOPLEVEL::undoMarker);

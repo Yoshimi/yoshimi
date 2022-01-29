@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
+#include <iostream>
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
