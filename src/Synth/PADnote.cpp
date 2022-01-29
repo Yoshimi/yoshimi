@@ -488,11 +488,9 @@ int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
 
 int PADnote::noteout(float *outl,float *outr)
 {
+    pars->activate_wavetable();
     if (padSynthUpdate.checkUpdated())
         computeNoteParameters();
-    else
-        pars->activate_wavetable();
-
     computecurrentparameters();
     if (tableNr >= pars->waveTable.numTables)
     {

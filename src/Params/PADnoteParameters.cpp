@@ -770,6 +770,7 @@ void PADnoteParameters::activate_wavetable()
     {
         std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
         futureBuild.swap(waveTable);
+        presetsUpdated();
         std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
     }
 }
