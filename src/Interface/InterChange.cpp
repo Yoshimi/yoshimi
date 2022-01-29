@@ -845,6 +845,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::defaultPart: // clear part
             if (write)
             {
+                undoRedoClear();
                 doClearPart(value);
                 synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
@@ -6592,11 +6593,14 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     }
     else if (!undoList.empty())
     {
-        if (undoList.back().data.control == getData->data.control && undoList.back().data.part == getData->data.part)
+        if (undoList.back().data.control == getData->data.control
+            && undoList.back().data.part == getData->data.part
+            && undoList.back().data.kit == getData->data.kit
+            && undoList.back().data.engine == getData->data.engine
+            && undoList.back().data.insert == getData->data.insert)
             return;
         if (!group) // the first item in a group needs a marker, later ones don't
-            if(undoList.back().data.part != TOPLEVEL::undoMarker)
-                    undoList.push_back(undoMarker);
+            undoList.push_back(undoMarker);
     }
     /*
      * the following is used to read the current value of the specific
@@ -6646,8 +6650,7 @@ void InterChange::undoLast(CommandBlock *candidate)
             if(setMarker)
             {
                 setMarker = false;
-                if(redoList.empty() || redoList.back().data.part != TOPLEVEL::undoMarker)
-                    redoList.push_back(undoMarker);
+                redoList.push_back(undoMarker);
             }
             memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(oldCommand));
             oldCommand.data.type &= ~TOPLEVEL::type::Write;
@@ -6656,8 +6659,9 @@ void InterChange::undoLast(CommandBlock *candidate)
             redoList.push_back(oldCommand);
          }
          undoList.pop_back();
-
     } while (!undoList.empty() && undoList.back().data.part != TOPLEVEL::undoMarker);
+    if (!undoList.empty())
+        undoList.pop_back();
 }
 
 
@@ -6686,6 +6690,18 @@ void InterChange::redoLast(CommandBlock *candidate)
          }
          redoList.pop_back();
     } while (!redoList.empty() && redoList.back().data.part != TOPLEVEL::undoMarker);
+    if (!redoList.empty())
+        redoList.pop_back();
+}
+
+void InterChange::undoRedoClear(void)
+{
+    undoList.clear();
+    redoList.clear();
+    noteSeen = false;
+    undoLoopBack = false;
+    fromRedo = false;
+    std::cout << "Undo cleared" << std::endl;
 }
 
 

@@ -369,7 +369,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
     }
     /*
-     * put here so its threads don't run until everthing else is ready
+     * put here so its threads don't run until everything else is ready
      */
     if (!interchange.Init())
     {
@@ -1083,6 +1083,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 
 bool SynthEngine::setProgram(const string& fname, int npart)
 {
+    interchange.undoRedoClear();
     bool ok = true;
     if (!part[npart]->loadXMLinstrument(fname))
         ok = false;
@@ -1482,7 +1483,6 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
  */
 int SynthEngine::SetSystemValue(int type, int value)
 {
-
     list<string> msg;
     string label;
     label = "";
@@ -1903,6 +1903,7 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(bool andML)
 {
+    interchange.undoRedoClear();
     interchange.syncWrite = false;
     interchange.lowPrioWrite = false;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
@@ -2449,6 +2450,7 @@ void SynthEngine::ShutUp(void)
 
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
+    interchange.undoRedoClear();
     defaults();
     //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
@@ -2467,6 +2469,7 @@ bool SynthEngine::saveState(const string& filename)
 
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
+    interchange.undoRedoClear();
     bool result;
     fname = setExtension(fname, EXTEN::patchset);
     result = loadXML(fname); // load the data

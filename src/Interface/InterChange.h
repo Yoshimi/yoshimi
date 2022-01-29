@@ -152,6 +152,7 @@ class InterChange : private DataText
 
     public:
         bool noteSeen;
+        void undoRedoClear(void);
         /*
          * this is made public specifically so that it can be
          * reached from SynthEngine by jack freewheeling NRPNs.

@@ -126,6 +126,14 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
         return withValue(commandName, type, showValue, addValue, value);
     }
 
+    if (npart == TOPLEVEL::section::undoMarker)
+    {
+        if (control == MAIN::undo)
+            return "Nothing to undo!";
+        else
+            return "Nothing to redo!";
+    }
+
     if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
