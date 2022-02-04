@@ -3768,6 +3768,7 @@ void SynthEngine::CBtest(CommandBlock *candidate)
             << "\n kit " << int(candidate->data.kit)
             << "\n engine " << int(candidate->data.engine)
             << "\n insert " << int(candidate->data.insert)
+            << "\n parameter " << int(candidate->data.parameter)
             << "\n offset " << int(candidate->data.offset)
             << std::endl;
 }

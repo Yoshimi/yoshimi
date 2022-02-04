@@ -126,11 +126,11 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
         return withValue(commandName, type, showValue, addValue, value);
     }
 
-    if (npart == TOPLEVEL::section::undoMarker)
+    if (npart == TOPLEVEL::section::undoMark)
     {
         if (control == MAIN::undo)
             return "Nothing to undo!";
-        else
+        else if (control == MAIN::redo)
             return "Nothing to redo!";
     }
 
