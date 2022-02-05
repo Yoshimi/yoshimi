@@ -1,9 +1,16 @@
 yoshimi 2.1.2 M
 
+2022-2-5 Will
+* Added copy of MPE spec to dev_notes.
+* Corrected spelling mistakes here!
+
+2022-2-4 Will
+* Improved update system for User Guide version
+
 2022-1-20 Will
-* Swapped order of bank and main controls in cammdSendReal()
+* Swapped order of bank and main controls in commandSendReal()
   also put comment in for suggested undo/redo location.
-* Made Undo and Redo buttons in main inactive to aviod confusion.
+* Made Undo and Redo buttons in main inactive to avoid confusion.
 
 2022-1-17 Will
 * Set placeholders for Undo/Redo.
