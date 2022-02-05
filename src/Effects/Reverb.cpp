@@ -209,6 +209,17 @@ void Reverb::processmono(int ch, float *output)
 }
 
 
+namespace { //Helper: detect change above rounding errors for frequency interpolation
+
+    const float FREQUENCY_EPSILON = 1e-3;
+
+    bool significantChange(float newVal, float oldVal)
+    {
+        return std::fabs(newVal - oldVal) > FREQUENCY_EPSILON;
+    }
+}
+
+
 // Effect output
 void Reverb::out(float *smps_l, float *smps_r)
 {
@@ -238,9 +249,9 @@ void Reverb::out(float *smps_l, float *smps_r)
 
     if (lpf)
     {
-        float fr = lpffr.getValue();
+        float currFreq = lpf->getFreq();
         lpffr.advanceValue(synth->sent_buffersize);
-        if (fr != lpffr.getValue())
+        if (significantChange(currFreq, lpffr.getValue()))
         {
             lpf->interpolatenextbuffer();
             lpf->setfreq(lpffr.getValue());
@@ -249,9 +260,9 @@ void Reverb::out(float *smps_l, float *smps_r)
     }
      if (hpf)
     {
-        float fr = hpffr.getValue();
+        float currFreq = hpf->getFreq();
         hpffr.advanceValue(synth->sent_buffersize);
-        if (fr != hpffr.getValue())
+        if (significantChange(currFreq, hpffr.getValue()))
         {
             hpf->interpolatenextbuffer();
             hpf->setfreq(hpffr.getValue());

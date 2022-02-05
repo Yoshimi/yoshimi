@@ -340,6 +340,11 @@ void AnalogFilter::computefiltercoefs(void)
 }
 
 
+float AnalogFilter::getFreq()
+{
+    return this->freq;
+}
+
 void AnalogFilter::setfreq(float frequency)
 {
     if (frequency < 0.1f)
