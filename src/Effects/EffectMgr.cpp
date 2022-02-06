@@ -70,8 +70,6 @@ void EffectMgr::changeeffect(int _nefx)
     if (nefx == _nefx)
         return;
     nefx = _nefx;
-    memset(efxoutl, 0, synth->bufferbytes);
-    memset(efxoutr, 0, synth->bufferbytes);
     if (efx)
         delete efx;
     switch (nefx)
@@ -128,6 +126,8 @@ int EffectMgr::geteffect(void)
 // Cleanup the current effect
 void EffectMgr::cleanup(void)
 {
+    memset(efxoutl, 0, synth->bufferbytes);
+    memset(efxoutr, 0, synth->bufferbytes);
     if (efx)
         efx->cleanup();
 }

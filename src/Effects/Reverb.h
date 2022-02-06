@@ -91,20 +91,20 @@ class Reverb : public Effect
         float idelayfb;
         float roomsize;
         float rs; // rs is used to "normalise" the volume according to the roomsize
-        int comblen[REV_COMBS * 2];
-        int aplen[REV_APS * 2];
+        int comblen[REV_COMBS * 2];   // length for each CombFilter feedback line (random)
+        int aplen[REV_APS * 2];       // length for each AllPass feedback line (random)
         Unison *bandwidth;
 
         // Internal Variables
-        float *comb[REV_COMBS * 2];
-        int combk[REV_COMBS * 2];
-        float combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
-        float lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
-        float *ap[REV_APS * 2];
-        int apk[REV_APS * 2];
-        float *idelay;
-        AnalogFilter *lpf;  // filters
-        AnalogFilter *hpf;
+        float *comb[REV_COMBS * 2];   // N CombFilter pipelines for each channel
+        int combk[REV_COMBS * 2];     // current offset of the comb insertion point (cycling)
+        float combfb[REV_COMBS * 2];  // feedback coefficient of each Comb-filter
+        float lpcomb[REV_COMBS * 2];  // LowPass filtered output feedback from Comb
+        float *ap[REV_APS * 2];       // AllPass-filter
+        int apk[REV_APS * 2];         // current offset of the AllPass insertion point (cycling)
+        float *idelay;                // Input delay line
+        AnalogFilter *lpf;            // LowPass-filter on the input
+        AnalogFilter *hpf;            // HighPass-filter on the input
         synth::InterpolatedValue<float> lpffr;
         synth::InterpolatedValue<float> hpffr;
         float *inputbuf;

@@ -378,8 +378,6 @@ class TestInvoker
             size_t holdCnt = ceilf(holdfraction*duration * synth.samplerate / chunksize);
             holdCnt = std::min(holdCnt,turnCnt);
 
-            synth.ShutUp(); // TODO Ichthyo 6/21: why do we need to invoke that twice to clear state on chained reverb effects?
-
             // calculate sound data
             for (int tone=0; tone<repetitions; ++tone)
             {

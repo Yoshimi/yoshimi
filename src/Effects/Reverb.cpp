@@ -270,8 +270,8 @@ void Reverb::out(float *smps_l, float *smps_r)
          hpf->filterout(inputbuf);
     }
 
-    processmono(0, efxoutl); // left
-    processmono(1, efxoutr); // right
+    processmono(0, efxoutl); // reverb processing inputbuf -> left
+    processmono(1, efxoutr); // reverb processing inputbuf -> right
 
     float lvol = rs / REV_COMBS * pangainL.getAndAdvanceValue();
     float rvol = rs / REV_COMBS * pangainR.getAndAdvanceValue();
