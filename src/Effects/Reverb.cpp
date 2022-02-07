@@ -139,72 +139,68 @@ Reverb::~Reverb()
 }
 
 
-// Cleanup the effect
-void Reverb::cleanup(void)
+void Reverb::clearBuffers()
 {
-    int i, j;
-    memset(lpcomb, 0, sizeof(float) * REV_COMBS * 2);
-    for (i = 0; i < REV_COMBS * 2; ++i)
+    for (size_t j = 0; j < REV_COMBS * 2; ++j)
     {
-        for (j = 0; j < comblen[i]; ++j)
-            comb[i][j] = 0.0f; // not sure how to memset this!
+        combk[j] = 0;
+        lpcomb[j] = 0.0;
+        for (size_t smp = 0; smp < comblen[j]; ++smp)
+            comb[j][smp] = 0.0f;
     }
-    for (i = 0; i < REV_APS * 2; ++i)
-        for (j = 0; j < aplen[i]; ++j)
-            ap[i][j] = 0.0f;
+    for (size_t j = 0; j < REV_APS * 2; ++j)
+    {
+        apk[j] = 0;
+        for (size_t smp = 0; smp < aplen[j]; ++smp)
+            ap[j][smp] = 0.0f;
+    }
 
     if (idelay)
         memset(idelay, 0, sizeof(float) * idelaylen);
-    if (hpf)
-        hpf->cleanup();
-    if (lpf)
-        lpf->cleanup();
 }
 
 
 // Process one channel; 0 = left, 1 = right
-void Reverb::processmono(int ch, float *output)
+void Reverb::calculateReverb(size_t ch, float* inputFeed, float *output)
 {
-    int i, j;
-    float fbout, tmp;
-    // \todo: implement the high part from lohidamp
+    ////TODO: implement the high part from lohidamp    (comment probably from original author, before 2010)
 
-    for (j = REV_COMBS * ch; j < REV_COMBS * (ch + 1); ++j)
+    for (size_t j = REV_COMBS * ch; j < REV_COMBS * (ch + 1); ++j)
     {
-        int ck = combk[j];
-        int comblength = comblen[j];
-        float lpcombj = lpcomb[j];
-
-        for (i = 0; i < synth->sent_buffersize; ++i)
+        size_t offset = combk[j];
+        size_t combLen = comblen[j];
+        float lowpassj = lpcomb[j];
+        for (size_t smp = 0; smp < size_t(synth->sent_buffersize); ++smp)
         {
-            fbout = comb[j][ck] * combfb[j];
-            fbout = fbout * (1.0f - lohifb) + lpcombj * lohifb;
-            lpcombj = fbout;
+            float feedback = comb[j][offset] * combfb[j];
+            feedback = feedback * (1.0f - lohifb) + lowpassj * lohifb;
+            lowpassj = feedback;
 
-            comb[j][ck] = inputbuf[i] + fbout;
-            output[i] += fbout;
+            comb[j][offset] = inputFeed[smp] + feedback;
+            output[smp] += feedback;
 
-            if ((++ck) >= comblength)
-                ck = 0;
+            if ((++offset) >= combLen)
+                offset = 0;
         }
 
-        combk[j] = ck;
-        lpcomb[j] = lpcombj;
+        combk[j] = offset;
+        lpcomb[j] = lowpassj;
     }
 
-    for (j = REV_APS * ch; j < REV_APS * (1 + ch); ++j)
+    // feed result of comb filters into AllPass filters
+    for (size_t j = REV_APS * ch; j < REV_APS * (1 + ch); ++j)
     {
-        int ak = apk[j];
-        int aplength = aplen[j];
-        for (i = 0; i < synth->sent_buffersize; ++i)
+        size_t offset = apk[j];
+        size_t allpassLen = aplen[j];
+        for (size_t smp = 0; smp < size_t(synth->sent_buffersize); ++smp)
         {
-            tmp = ap[j][ak];
-            ap[j][ak] = 0.7f * tmp + output[i];
-            output[i] = tmp - 0.7f * ap[j][ak] + 1e-20f; // anti-denormal - a very, very, very small dc bias
-            if ((++ak) >= aplength)
-                ak = 0;
+            float feedback = ap[j][offset];
+            ap[j][offset] = 0.7f * feedback + output[smp];
+            output[smp] = feedback - 0.7f * ap[j][offset] + 1e-20f; // anti-denormal - a very, very, very small dc bias
+            if ((++offset) >= allpassLen)
+                offset = 0;
         }
-        apk[j] = ak;
+        apk[j] = offset;
     }
 }
 
@@ -220,23 +216,16 @@ namespace { //Helper: detect change above rounding errors for frequency interpol
 }
 
 
-// Effect output
-void Reverb::out(float *smps_l, float *smps_r)
+void Reverb::preprocessInput(float *rawL, float *rawR, float* inputFeed)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
-
-    if (!Pvolume && insertion)
-        return;
-
-    int i;
-    for (i = 0; i < synth->sent_buffersize; ++i)
+    for (size_t i = 0; i < size_t(synth->sent_buffersize); ++i)
     {
-        inputbuf[i] = float(1e-20) + ((smps_l[i] + smps_r[i]) / 2.0f); // includes anti-denormal
-        // Initial delay r
+        inputFeed[i] = float(1e-20) + ((rawL[i] + rawR[i]) / 2.0f); // includes anti-denormal
+
         if (idelay)
-        {
-            float tmp = inputbuf[i] + idelay[idelayk] * idelayfb;
-            inputbuf[i] = idelay[idelayk];
+        {// shift input by pre-delay
+            float tmp = inputFeed[i] + idelay[idelayk] * idelayfb;
+            inputFeed[i] = idelay[idelayk];
             idelay[idelayk] = tmp;
             idelayk++;
             if (idelayk >= idelaylen)
@@ -245,7 +234,7 @@ void Reverb::out(float *smps_l, float *smps_r)
     }
 
     if (bandwidth)
-        bandwidth->process(synth->sent_buffersize, inputbuf);
+        bandwidth->process(synth->sent_buffersize, inputFeed);
 
     if (lpf)
     {
@@ -256,7 +245,7 @@ void Reverb::out(float *smps_l, float *smps_r)
             lpf->interpolatenextbuffer();
             lpf->setfreq(lpffr.getValue());
         }
-        lpf->filterout(inputbuf);
+        lpf->filterout(inputFeed);
     }
      if (hpf)
     {
@@ -267,11 +256,24 @@ void Reverb::out(float *smps_l, float *smps_r)
             hpf->interpolatenextbuffer();
             hpf->setfreq(hpffr.getValue());
         }
-         hpf->filterout(inputbuf);
+         hpf->filterout(inputFeed);
     }
+}
 
-    processmono(0, efxoutl); // reverb processing inputbuf -> left
-    processmono(1, efxoutr); // reverb processing inputbuf -> right
+
+
+// Effect output
+void Reverb::out(float *rawL, float *rawR)
+{
+    outvolume.advanceValue(synth->sent_buffersize);
+
+    if (!Pvolume && insertion)
+        return;
+
+    preprocessInput(rawL,rawR, inputbuf);
+
+    calculateReverb(0, inputbuf, efxoutl); // inputbuf -> left
+    calculateReverb(1, inputbuf, efxoutr); // inputbuf -> right
 
     float lvol = rs / REV_COMBS * pangainL.getAndAdvanceValue();
     float rvol = rs / REV_COMBS * pangainR.getAndAdvanceValue();
@@ -280,11 +282,24 @@ void Reverb::out(float *smps_l, float *smps_r)
         lvol *= 2.0f;
         rvol *= 2.0f;
     }
-    for (i = 0; i < synth->sent_buffersize; ++i)
+    for (size_t i = 0; i < size_t(synth->sent_buffersize); ++i)
     {
         efxoutl[i] *= lvol;
         efxoutr[i] *= rvol;
     }
+}
+
+
+// Reset the effect to pristine state
+void Reverb::cleanup()
+{
+    setupPipelines();
+    settime(Ptime);
+    clearBuffers();
+    if (hpf)
+        hpf->cleanup();
+    if (lpf)
+        lpf->cleanup();
 }
 
 
@@ -313,7 +328,7 @@ void Reverb::settime(unsigned char Ptime_)
     Ptime = Ptime_;
     float t = power<60>(Ptime / 127.0f) - 0.97f;
     for (int i = 0; i < REV_COMBS * 2; ++i)
-        combfb[i] = -expf((float)comblen[i] / synth->samplerate_f * logf(0.001f) / t);
+        combfb[i] = -expf(float(comblen[i]) / synth->samplerate_f * logf(0.001f) / t);
         // the feedback is negative because it removes the DC
 }
 
@@ -400,10 +415,15 @@ void Reverb::setlpf(unsigned char Plpf_)
 void Reverb::settype(unsigned char Ptype_)
 {
     Ptype = Ptype_;
-    const int NUM_TYPES = 3;
     if (Ptype >= NUM_TYPES)
         Ptype = NUM_TYPES - 1;
 
+    cleanup();
+}
+
+
+void Reverb::setupPipelines()
+{
     int combtunings[NUM_TYPES][REV_COMBS] = {
         { 0, 0, 0, 0, 0, 0, 0, 0 }, // this is unused (for random)
 
@@ -433,7 +453,7 @@ void Reverb::settype(unsigned char Ptype_)
         if (i > REV_COMBS)
             tmp += 23.0f;
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
-        comblen[i] = int(tmp);
+        comblen[i] = size_t(tmp);
         if (comblen[i] < 10)
             comblen[i] = 10;
         combk[i] = 0;
@@ -457,7 +477,7 @@ void Reverb::settype(unsigned char Ptype_)
         if (i > REV_APS)
             tmp += 23.0f;
         tmp *= samplerate_adjust; // adjust the combs according to the samplerate
-        aplen[i] = int(tmp);
+        aplen[i] = size_t(tmp);
         if (aplen[i] < 10)
             aplen[i] = 10;
         apk[i] = 0;
@@ -479,8 +499,6 @@ void Reverb::settype(unsigned char Ptype_)
         //As this cannot be resized in a RT context, a good upper bound should
         //be found
     }
-    settime(Ptime);
-    cleanup();
 }
 
 
