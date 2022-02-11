@@ -1,5 +1,11 @@
 yoshimi 2.1.2 M
 
+2022-2-11 Hermann
+* Changes to make Reverb computations completely reproducible
+* Ensure InterpolatedValue stops when passing beyond interpolation-length
+* Allow to forcibly push InterpolatedValue to the next target; used for Effect::cleanup()
+* Fix spurious AnalogFilter recalculations due to float comparison glitches
+
 2022-2-5 Will
 * Added copy of MPE spec to dev_notes.
 * Corrected spelling mistakes here!

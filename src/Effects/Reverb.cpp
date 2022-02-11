@@ -293,6 +293,9 @@ void Reverb::out(float *rawL, float *rawR)
 // Reset the effect to pristine state
 void Reverb::cleanup()
 {
+    Effect::cleanup();
+    lpffr.pushToTarget();
+    hpffr.pushToTarget();
     setupPipelines();
     settime(Ptime);
     clearBuffers();
@@ -418,7 +421,7 @@ void Reverb::settype(unsigned char Ptype_)
     if (Ptype >= NUM_TYPES)
         Ptype = NUM_TYPES - 1;
 
-    cleanup();
+    cleanup(); // invokes setupPipelines()
 }
 
 
@@ -429,14 +432,13 @@ void Reverb::setupPipelines()
 
         // Freeverb by Jezar at Dreampoint
         { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 },
-        // duplicate of Freeverb by Jezar at Dreampoint
         { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 }
     };
 
     int aptunings[NUM_TYPES][REV_APS] = {
         { 0, 0, 0, 0 },         // this is unused (for random)
         { 225, 341, 441, 556 }, // Freeverb by Jezar at Dreampoint
-        { 225, 341, 441, 556 }  // duplicate of Freeverb by Jezar at Dreampoint
+        { 225, 341, 441, 556 }
     };
 
     float samplerate_adjust = synth->samplerate_f / 44100.0f;

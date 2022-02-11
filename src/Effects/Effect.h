@@ -42,7 +42,7 @@ class Effect
         virtual void changepar(int npar, unsigned char value) = 0;
         virtual unsigned char getpar(int npar) = 0;
         virtual void out(float *smpsl, float *smpsr) = 0;
-        virtual void cleanup() { };
+        virtual void cleanup();
         virtual float getfreqresponse(float /* freq */) { return (0); };
 
         unsigned char Ppreset; // Currentl preset

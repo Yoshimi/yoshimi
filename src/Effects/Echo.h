@@ -65,11 +65,11 @@ class Echo : public Effect
         void setvolume(unsigned char Pvolume_);
         void setdelay(unsigned char Pdelay_);
         void setlrdelay(unsigned char Plrdelay_);
-        void setfb(unsigned char Pfb_);
+        void setfeedback(unsigned char Pfb_);
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        synth::InterpolatedValue<float> fb, hidamp;
+        synth::InterpolatedValue<float> feedback, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);

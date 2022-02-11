@@ -51,7 +51,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pdelay(60),
     Plrdelay(100),
-    fb(1, _synth->samplerate),
+    feedback(1, _synth->samplerate),
     hidamp(1, _synth->samplerate),
     lrdelay(0),
     ldelay(NULL),
@@ -60,7 +60,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     rxfade(1, _synth->samplerate_f)
 {
     setvolume(50);
-    setfb(40);
+    setfeedback(40);
     sethidamp(60);
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
@@ -84,6 +84,11 @@ Echo::~Echo()
 // Cleanup the effect
 void Echo::cleanup(void)
 {
+    Effect::cleanup();
+    feedback.pushToTarget();
+    hidamp.pushToTarget();
+    lxfade.pushToTarget();
+    rxfade.pushToTarget();
     memset(ldelay, 0, maxdelay * sizeof(float));
     memset(rdelay, 0, maxdelay * sizeof(float));
     oldl = oldr = 0.0f;
@@ -190,9 +195,9 @@ void Echo::out(float* smpsl, float* smpsr)
         efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
         efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
 
-        ldl = smpsl[i] * pangainL.getAndAdvanceValue() - ldl * fb.getValue();
-        rdl = smpsr[i] * pangainR.getAndAdvanceValue() - rdl * fb.getValue();
-        fb.advanceValue();
+        ldl = smpsl[i] * pangainL.getAndAdvanceValue() - ldl * feedback.getValue();
+        rdl = smpsr[i] * pangainR.getAndAdvanceValue() - rdl * feedback.getValue();
+        feedback.advanceValue();
 
         // LowPass Filter
         ldelay[realposl] = ldl = ldl * hidamp.getValue() + oldl * (1.0f - hidamp.getValue());
@@ -249,10 +254,10 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
 }
 
 
-void Echo::setfb(unsigned char Pfb_)
+void Echo::setfeedback(unsigned char Pfb_)
 {
     Pfb = Pfb_;
-    fb.setTargetValue(Pfb / 128.0f);
+    feedback.setTargetValue(Pfb / 128.0f);
 }
 
 
@@ -322,7 +327,7 @@ void Echo::changepar(int npar, unsigned char value)
             break;
 
         case 5:
-            setfb(value);
+            setfeedback(value);
             break;
 
         case 6:

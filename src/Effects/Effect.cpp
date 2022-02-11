@@ -29,6 +29,10 @@
 
 using func::setAllPan;
 
+namespace {
+    const float PAN_NORMAL_CENTRE = cosf(0.5f * HALFPI);
+}
+
 Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
                FilterParams *filterpars_, unsigned char Ppreset_,
                SynthEngine *synth_) :
@@ -39,13 +43,25 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
     volume(0.5f, synth_->samplerate),
     filterpars(filterpars_),
     insertion(insertion_),
-    pangainL(0.5f, synth_->samplerate),
-    pangainR(0.5f, synth_->samplerate),
-    lrcross(0.5f, synth_->samplerate),
+    pangainL(PAN_NORMAL_CENTRE, synth_->samplerate),
+    pangainR(PAN_NORMAL_CENTRE, synth_->samplerate),
+    lrcross(40.0f/127, synth_->samplerate),
     synth(synth_)
 {
     setpanning(64);
     setlrcross(40);
+}
+
+
+// base implementation: force to clean reproducible state.
+// Note: be sure to invoke that from overridden implementations.
+void Effect::cleanup()
+{
+    outvolume.pushToTarget();
+    volume   .pushToTarget();
+    pangainL.pushToTarget();
+    pangainR.pushToTarget();
+    lrcross.pushToTarget();
 }
 
 

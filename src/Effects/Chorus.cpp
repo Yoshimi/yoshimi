@@ -167,6 +167,8 @@ void Chorus::out(float *smpsl, float *smpsr)
 // Cleanup the effect
 void Chorus::cleanup(void)
 {
+    Effect::cleanup();
+    fb.pushToTarget();
     for (int i = 0; i < maxdelay; ++i)
         delayl[i] = delayr[i] = 0.0f;
     lfo.resetState();

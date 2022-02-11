@@ -121,6 +121,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
 // Cleanup the effect
 void Alienwah::cleanup(void)
 {
+    Effect::cleanup();
     for (int i = 0; i < Pdelay; ++i)
     {
         oldl[i] = complex<float>(0.0f, 0.0f);
