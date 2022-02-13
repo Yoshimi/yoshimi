@@ -33,6 +33,7 @@
 #define REV_COMBS 8
 #define REV_APS 4
 
+
 class Unison;
 class AnalogFilter;
 
@@ -43,7 +44,7 @@ class Reverb : public Effect
     public:
         Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Reverb();
-        void out(float *smps_l, float *smps_r);
+        void out(float *rawL, float *rawR);
         void cleanup(void);
 
         void setpreset(unsigned char npreset);
@@ -52,6 +53,8 @@ class Reverb : public Effect
 
 
     private:
+        static constexpr size_t NUM_TYPES = 3;
+
         // Parametrii
         bool Pchanged;
         unsigned char Pvolume;
@@ -78,7 +81,6 @@ class Reverb : public Effect
         void settype(unsigned char Ptype_);
         void setroomsize(unsigned char Proomsize_);
         void setbandwidth(unsigned char Pbandwidth_);
-        void processmono(int ch, float *output);
 
 //        float erbalance;    // **** RHL ****
 
@@ -91,23 +93,28 @@ class Reverb : public Effect
         float idelayfb;
         float roomsize;
         float rs; // rs is used to "normalise" the volume according to the roomsize
-        int comblen[REV_COMBS * 2];
-        int aplen[REV_APS * 2];
+        size_t comblen[REV_COMBS * 2];   // length for each CombFilter feedback line (random)
+        size_t aplen[REV_APS * 2];       // length for each AllPass feedback line (random)
         Unison *bandwidth;
 
         // Internal Variables
-        float *comb[REV_COMBS * 2];
-        int combk[REV_COMBS * 2];
-        float combfb[REV_COMBS * 2];// <feedback-ul fiecarui filtru "comb"
-        float lpcomb[REV_COMBS * 2];  // <pentru Filtrul LowPass
-        float *ap[REV_APS * 2];
-        int apk[REV_APS * 2];
-        float *idelay;
-        AnalogFilter *lpf;  // filters
-        AnalogFilter *hpf;
+        float *comb[REV_COMBS * 2];   // N CombFilter pipelines for each channel
+        size_t combk[REV_COMBS * 2];  // current offset of the comb insertion point (cycling)
+        float combfb[REV_COMBS * 2];  // feedback coefficient of each Comb-filter
+        float lpcomb[REV_COMBS * 2];  // LowPass filtered output feedback from Comb
+        float *ap[REV_APS * 2];       // AllPass-filter
+        size_t apk[REV_APS * 2];      // current offset of the AllPass insertion point (cycling)
+        float *idelay;                // Input delay line
+        AnalogFilter *lpf;            // LowPass-filter on the input
+        AnalogFilter *hpf;            // HighPass-filter on the input
         synth::InterpolatedValue<float> lpffr;
         synth::InterpolatedValue<float> hpffr;
-        float *inputbuf;
+        float* inputbuf;
+
+        void preprocessInput(float *rawL, float *rawR, float* inputFeed);
+        void calculateReverb(size_t ch, float* inputFeed, float *output);
+        void setupPipelines();
+        void clearBuffers();
 };
 
 class Revlimit

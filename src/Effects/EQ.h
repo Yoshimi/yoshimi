@@ -28,10 +28,12 @@
 #ifndef EQ_H
 #define EQ_H
 
+#include "Misc/SynthEngine.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
-class SynthEngine;
+#include <memory>
+
 
 class EQ : public Effect
 {
@@ -46,16 +48,35 @@ class EQ : public Effect
         float getfreqresponse(float freq);
 
     private:
+        void setvolume(unsigned char Pvolume_);
+
         // Parameters
         bool Pchanged;
         unsigned char Pvolume;
         unsigned char Pband;
-        void setvolume(unsigned char Pvolume_);
-        struct {
+
+        struct FilterParam
+        {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
-            synth::InterpolatedValueDfl<float> freq, gain, q;
-            AnalogFilter *l, *r; // internal values
-        } filter[MAX_EQ_BANDS];
+            synth::InterpolatedValue<float> freq, gain, q;
+            std::unique_ptr<AnalogFilter> l; // internal values
+            std::unique_ptr<AnalogFilter> r; // internal values
+
+            FilterParam(SynthEngine& synth)
+                :Ptype{0}
+                ,Pfreq{64}
+                ,Pgain{64}
+                ,Pq{64}
+                ,Pstages{0}
+                ,freq{0, synth.samplerate}
+                ,gain{0, synth.samplerate}
+                ,q   {0, synth.samplerate}
+                ,l{new AnalogFilter(6, 1000.0, 1.0, 0, &synth)}
+                ,r{new AnalogFilter(6, 1000.0, 1.0, 0, &synth)}
+            { }
+        };
+
+        FilterParam filter[MAX_EQ_BANDS];
 };
 
 class EQlimit

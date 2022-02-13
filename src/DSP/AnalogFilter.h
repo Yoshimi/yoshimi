@@ -40,6 +40,7 @@ class AnalogFilter : public Filter_
         Filter_* clone() { return new AnalogFilter(*this); };
         void filterout(float *smp);
         void setfreq(float frequency);
+        float getFreq();
         void setfreq_and_q(float frequency, float q_);
         void setq(float q_);
 

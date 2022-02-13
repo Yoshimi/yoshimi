@@ -3,6 +3,7 @@
 
     Copyright 2011, Alan Calvert
     Copyright 2021, Kristian Amlie
+    Copyright 2022, Ichthyostega
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -23,7 +24,6 @@
 
 #include <cmath>
 
-#define DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS 50.0f
 
 namespace synth {
 
@@ -35,47 +35,37 @@ namespace synth {
 template <typename T>
 class InterpolatedValue
 {
+    static constexpr auto DEFAULT_PARAM_INTERPOLATION_LENGTH_msec{50.0};
+
+    T oldValue;
+    T newValue;
+    T targetValue;
+
+    const int interpolationLength;
+    int interpolationPos;
+
     public:
-        InterpolatedValue(T startValue, int sampleRate_)
+        InterpolatedValue(T startValue, size_t sampleRate)
             : oldValue(startValue)
             , newValue(startValue)
             , targetValue(startValue)
-            , sampleRate(sampleRate_)
-        {
-            setInterpolationLength(DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS);
-        }
-
-        void setInterpolationLength(float msecs)
-        {
-            float samples = msecs / 1000.0f * sampleRate;
             // Round up so we are as smooth as possible.
-            interpolationLength = ceilf(samples);
-            interpolationPos = interpolationLength;
-        }
+            , interpolationLength(ceilf(DEFAULT_PARAM_INTERPOLATION_LENGTH_msec / 1000.0 * sampleRate))
+            , interpolationPos(interpolationLength)
+        { }
 
         bool isInterpolating() const
         {
             return interpolationPos < interpolationLength;
         }
 
-        void setTargetValue(T value)
-        {
-            targetValue = value;
-            if (!isInterpolating() && targetValue != newValue)
-            {
-                newValue = value;
-                interpolationPos = 0;
-            }
-        }
-
-       // The value interpolated from.
+        // The value interpolated from.
         T getOldValue() const
         {
             return oldValue;
         }
 
-       // The value interpolated to (not necessarily the same as the last set
-       // target point).
+        // The value interpolated to (not necessarily the same as the last set target point).
         T getNewValue() const
         {
             return newValue;
@@ -88,12 +78,30 @@ class InterpolatedValue
 
         float factor() const
         {
-            return (float)interpolationPos / (float)interpolationLength;
+            return float(interpolationPos) / float(interpolationLength);
         }
 
         T getValue() const
         {
             return getOldValue() * (1.0f - factor()) + getNewValue() * factor();
+        }
+
+        void setTargetValue(T value)
+        {
+            targetValue = value;
+            if (!isInterpolating() && targetValue != newValue)
+            {
+                newValue = targetValue;
+                interpolationPos = 0;
+            }
+        }
+
+        // enforce clean reproducible state by immediately
+        // pushing the interpolation to current target value
+        void pushToTarget()
+        {
+            interpolationPos = interpolationLength;
+            oldValue = newValue = targetValue;
         }
 
         T getAndAdvanceValue()
@@ -121,50 +129,25 @@ class InterpolatedValue
 
         void advanceValue(int samples)
         {
+            if (interpolationPos >= interpolationLength)
+                return;
+
             if (interpolationPos + samples < interpolationLength)
+            {
                 interpolationPos += samples;
-            else if (interpolationPos + samples >= interpolationLength * 2)
-            {
-                oldValue = newValue = targetValue;
-                interpolationPos = interpolationLength;
+                return;
             }
-            else
+
+            oldValue = newValue;
+            if (targetValue != newValue)
             {
-                oldValue = newValue;
                 newValue = targetValue;
                 interpolationPos += samples - interpolationLength;
+                if (interpolationPos >= interpolationLength)
+                    pushToTarget();
             }
-        }
-
-    private:
-        T oldValue;
-        T newValue;
-        T targetValue;
-
-        int interpolationLength;
-        int interpolationPos;
-
-    protected:
-        int sampleRate;
-};
-
-// Default-initialized variant of InterpolatedValue. Use only if you must (for
-// example in an array), normally it is better to use the fully initialized
-// one. If you use this, then you should call setSampleRate immediately after
-// construction.
-template <typename T>
-class InterpolatedValueDfl : public InterpolatedValue<T>
-{
-    public:
-        InterpolatedValueDfl()
-            : InterpolatedValue<T>(0, 44100)
-        {
-        }
-
-        void setSampleRate(int sampleRate)
-        {
-            this->sampleRate = sampleRate;
-            this->setInterpolationLength(DEFAULT_PARAM_INTERPOLATION_LENGTH_MSECS);
+            else
+                interpolationPos = interpolationLength;
         }
 };
 

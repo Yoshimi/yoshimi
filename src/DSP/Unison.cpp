@@ -39,32 +39,20 @@ using func::power;
 Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth) :
     unison_size(0),
     base_freq(1.0f),
-    uv(NULL),
-    update_period_samples(update_period_samples_),
-    update_period_sample_k(0),
-    max_delay(int(_synth->samplerate_f * max_delay_sec_) + 1),
+    max_delay(std::max(10, int(_synth->samplerate_f * max_delay_sec_) + 1)),
     delay_k(0),
     first_time(false),
-    delay_buffer(NULL),
+    voice{},
+    delay_buffer{new float[max_delay]{0}}, // zero-init
+    update_period_samples(update_period_samples_),
+    update_period_sample_k(0),
     unison_amplitude_samples(0.0f),
     unison_bandwidth_cents(10.0f),
     synth(_synth)
 {
-    if (max_delay < 10)
-        max_delay = 10;
-    delay_buffer = new float[max_delay];
-    memset(delay_buffer, 0, max_delay * sizeof(float));
     setSize(1);
 }
 
-
-Unison::~Unison()
-{
-    if (delay_buffer)
-        delete [] delay_buffer;
-    if (uv)
-        delete [] uv;
-}
 
 
 void Unison::setSize(int new_size)
@@ -72,12 +60,10 @@ void Unison::setSize(int new_size)
     if (new_size < 1)
         new_size = 1;
     unison_size = new_size;
-    if (uv)
-        delete [] uv;
-    uv = new UnisonVoice [unison_size];
+    voice.reset(new UnisonVoice[unison_size]);
     for (int i = 0; i < unison_size; ++i)
     {
-        uv [i].setPosition(synth->numRandom() * 1.8f - 0.9f);
+        voice [i].setPosition(synth->numRandom() * 1.8f - 0.9f);
     }
     first_time = true;
     updateParameters();
@@ -107,19 +93,19 @@ void Unison::setBandwidth(float bandwidth)
 
 void Unison::updateParameters(void)
 {
-    if (!uv)
+    if (!voice)
         return;
     float increments_per_second = synth->samplerate_f / (float)update_period_samples;
 //	printf("#%g, %g\n",increments_per_second,base_freq);
     for (int i = 0; i < unison_size; ++i)
     {
         float base = powf(UNISON_FREQ_SPAN, synth->numRandom() * 2.0f - 1.0f);
-        uv[i].relative_amplitude = base;
+        voice[i].relative_amplitude = base;
         float period = base / base_freq;
         float m = 4.0f / (period * increments_per_second);
         if (synth->numRandom() < 0.5f)
             m = -m;
-        uv[i].step = m;
+        voice[i].step = m;
 //		printf("%g %g\n",uv[i].relative_amplitude,period);
     }
 
@@ -137,7 +123,7 @@ void Unison::updateParameters(void)
 
 void Unison::process(int bufsize, float *inbuf, float *outbuf)
 {
-    if (!uv)
+    if (!voice)
         return;
     if (!outbuf)
         outbuf = inbuf;
@@ -159,7 +145,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
         float sign = 1.0f;
         for (int k = 0; k < unison_size; ++k)
         {
-            float vpos = uv[k].realpos1 * (1.0f - xpos) + uv[k].realpos2 * xpos;
+            float vpos = voice[k].realpos1 * (1.0f - xpos) + voice[k].realpos2 * xpos;
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
             int posi = int(pos);
             int posi_next = posi + 1;
@@ -183,7 +169,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
 
 void Unison::updateUnisonData()
 {
-    if (!uv)
+    if (!voice)
         return;
 
     float newval;
@@ -192,8 +178,8 @@ void Unison::updateUnisonData()
     float vibratto_val;
     for (int k = 0; k < unison_size; ++k)
     {
-        pos  = uv[k].position;
-        step = uv[k].step;
+        pos  = voice[k].position;
+        step = voice[k].step;
         pos += step;
         if (pos <= -1.0f)
         {
@@ -212,17 +198,17 @@ void Unison::updateUnisonData()
         // #warning
         // I have to enlarge (reallocate) the buffer to make place for the whole delay
 
-        newval = 1.0f + 0.5f * (vibratto_val + 1.0f) * unison_amplitude_samples * uv[k].relative_amplitude;
+        newval = 1.0f + 0.5f * (vibratto_val + 1.0f) * unison_amplitude_samples * voice[k].relative_amplitude;
 
         if (first_time)
-            uv[k].realpos1 = uv[k].realpos2 = newval;
+            voice[k].realpos1 = voice[k].realpos2 = newval;
         else
         {
-            uv[k].realpos1 = uv[k].realpos2;
-            uv[k].realpos2 = newval;
+            voice[k].realpos1 = voice[k].realpos2;
+            voice[k].realpos2 = newval;
         }
-        uv[k].position = pos;
-        uv[k].step     = step;
+        voice[k].position = pos;
+        voice[k].step     = step;
     }
     first_time = false;
 }

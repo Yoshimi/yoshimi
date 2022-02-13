@@ -28,6 +28,8 @@
 
 #include "Misc/SynthEngine.h"
 
+#include <memory>
+
 #define UNISON_FREQ_SPAN 2.0f // how much the unison frequencies varies (always >= 1.0)
 
 class SynthEngine;
@@ -36,7 +38,7 @@ class Unison
 {
     public:
         Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth);
-        ~Unison();
+       ~Unison() = default;
 
         void setSize(int new_size);
         void setBaseFrequency(float freq);
@@ -48,32 +50,34 @@ class Unison
         void updateParameters(void);
         void updateUnisonData(void);
 
-        int   unison_size;
-        float base_freq;
         struct UnisonVoice {
             float step;     // base LFO
             float position;
             float realpos1; // the position regarding samples
             float realpos2;
             float relative_amplitude;
-            float lin_fpos;
-            float lin_ffreq;
-            UnisonVoice() {
-                realpos1 = 0.0f;
-                realpos2 = 0.0f;
-                step     = 0.0f;
-                relative_amplitude = 1.0f;
-            }
+            UnisonVoice()
+                : step{0.0f}
+                , position{}
+                , realpos1{}
+                , realpos2{}
+                , relative_amplitude{1.0f}
+            { }
+
             void setPosition(float newPos) {
                 position = newPos;
             }
-        } *uv;
+        };
+        int   unison_size;
+        float base_freq;
+        int   max_delay, delay_k;
+        bool  first_time;
+
+        std::unique_ptr<UnisonVoice[]> voice;
+        std::unique_ptr<float[]> delay_buffer;
 
         int           update_period_samples;
         int           update_period_sample_k;
-        int           max_delay, delay_k;
-        bool          first_time;
-        float        *delay_buffer;
         float         unison_amplitude_samples;
         float         unison_bandwidth_cents;
 

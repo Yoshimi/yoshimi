@@ -533,6 +533,7 @@ void SynthEngine::setAllPartMaps(void)
  * also resets long lived procedural state and rebuilds PAD wavetables */
 void SynthEngine::setReproducibleState(int seed)
 {
+    ShutUp();
     LFOtime = 0;
     monotonicBeat = songBeat = 0.0f;
     prng.init(seed);

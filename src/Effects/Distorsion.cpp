@@ -93,6 +93,10 @@ Distorsion::~Distorsion()
 // Cleanup the effect
 void Distorsion::cleanup(void)
 {
+    Effect::cleanup();
+    level.pushToTarget();
+    lpffr.pushToTarget();
+    hpffr.pushToTarget();
     lpfl->cleanup();
     hpfl->cleanup();
     lpfr->cleanup();

@@ -121,6 +121,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 // Cleanup the effect
 void DynamicFilter::cleanup(void)
 {
+    Effect::cleanup();
     reinitfilter();
     ms1 = ms2 = ms3 = ms4 = 0.0f;
     lfo.resetState();
