@@ -1,5 +1,8 @@
 yoshimi 2.1.2 M
 
+2022-2-15 Will
+* BugFix: CLI not correctly listing part contents.
+
 2022-2-11 Hermann
 * Changes to make Reverb computations completely reproducible
 * Ensure InterpolatedValue stops when passing beyond interpolation-length

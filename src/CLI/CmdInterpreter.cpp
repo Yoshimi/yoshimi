@@ -2494,10 +2494,10 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
     int avail = readControl(synth, 0, MAIN::control::availableParts, TOPLEVEL::section::main);
     bool full = input.matchnMove(1, "more");
     if (bitFindHigh(context) == LEVEL::Part)
-    {
+    { // part level list results
         if (!readControl(synth, 0, PART::control::kitMode, TOPLEVEL::section::part1 + npart))
         {
-            if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::addSynth))
+            if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::addSynth))
             {
                 name += " AddSynth ";
                 if (full)
@@ -2505,16 +2505,16 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                     string found = "";
                     for (int voice = 0; voice < NUM_VOICES; ++voice)
                     {
-                        if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
+                        if (readControl(synth, 0, ADDVOICE::control::enableVoice, TOPLEVEL::section::part1 + npart, 0, PART::engine::addVoice1 + voice))
                             found += (" " + to_string(voice + 1));
                     }
                     if (found > "")
                         name += ("Voices" + found + " ");
                 }
             }
-            if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::subSynth))
+            if (readControl(synth, 0, PART::control::enableSub, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::subSynth))
                 name += " SubSynth ";
-            if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::padSynth))
+            if (readControl(synth, 0, PART::control::enablePad, TOPLEVEL::section::part1 + npart, UNUSED, PART::engine::padSynth))
                 name += " PadSynth ";
             if (name == "")
                 name = "no engines active!";
@@ -2524,10 +2524,12 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
         msg_buf.push_back("kit items");
         for (int item = 0; item < NUM_KIT_ITEMS; ++item)
         {
+            if (!readControl(synth, 0, PART::control::enableKitLine, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
+                continue;
             name = "";
             if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
             {
-                name = "  " + to_string(item) + " ";
+                name = "  " + to_string(item + 1) + " ";
                 {
                 if (readControl(synth, 0, PART::control::kitItemMute, TOPLEVEL::section::part1 + npart, item, UNUSED, TOPLEVEL::insert::kitGroup))
                     name += "Quiet";
@@ -2556,7 +2558,7 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                         msg_buf.push_back(name);
                         name = "    ";
                     }
-                    if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::addSynth, TOPLEVEL::insert::kitGroup))
+                    if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, item, PART::engine::addSynth, TOPLEVEL::insert::kitGroup))
                     {
                         name += "AddSynth ";
                         if (full)
@@ -2564,16 +2566,16 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
                             string found = "";
                             for (int voice = 0; voice < NUM_VOICES; ++voice)
                             {
-                                if (readControl(synth, 0, PART::control::enableAdd, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
+                                if (readControl(synth, 0, ADDVOICE::control::enableVoice, TOPLEVEL::section::part1 + npart, item, PART::engine::addVoice1 + voice))
                                 found += (" " + to_string(voice + 1));
                             }
                             if (found > "")
                                 name += ("Voices" + found + " ");
                         }
                     }
-                    if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::subSynth, TOPLEVEL::insert::kitGroup))
+                    if (readControl(synth, 0, PART::control::enableSub, TOPLEVEL::section::part1 + npart, item, PART::engine::subSynth, TOPLEVEL::insert::kitGroup))
                         name += "SubSynth ";
-                    if (readControl(synth, 0, PART::control::enable, TOPLEVEL::section::part1 + npart, item, PART::engine::padSynth, TOPLEVEL::insert::kitGroup))
+                    if (readControl(synth, 0, PART::control::enablePad, TOPLEVEL::section::part1 + npart, item, PART::engine::padSynth, TOPLEVEL::insert::kitGroup))
                         name += "PadSynth ";
                     if (name == "")
                         name = "no engines active!";
@@ -2585,6 +2587,8 @@ void CmdInterpreter::listCurrentParts(Parser& input, list<string>& msg_buf)
         }
         return;
     }
+
+    // top level list results
     msg_buf.push_back(asString(avail) + " parts available");
     for (int partno = 0; partno < NUM_MIDI_PARTS; ++partno)
     {
