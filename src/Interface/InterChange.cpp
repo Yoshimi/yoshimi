@@ -3446,7 +3446,27 @@ void InterChange::commandPart(CommandBlock *getData)
     }
 
     if (write)
-        add2undo(getData, noteSeen);
+    {
+        if (control == PART::control::resetAllControllers)
+        {
+            addGroup2undo(&undoMarker);
+            CommandBlock tempData;
+            memset(&tempData.bytes, 255, sizeof(CommandBlock));
+            tempData.data.part = TOPLEVEL::undoResonanceMark;
+            addGroup2undo(&tempData);
+            //memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            for (int ctl = PART::control::volumeRange; ctl < PART::control::resetAllControllers; ++ctl)
+            {
+                tempData.data.control = ctl;
+                commandSendReal(&tempData);
+                addGroup2undo(&tempData);
+            }
+            tempData.data.part = TOPLEVEL::undoResonanceMark;
+            addGroup2undo(&tempData);
+        }
+        else
+            add2undo(getData, noteSeen);
+    }
 
     unsigned char effNum = part->Peffnum;
     if (!kitType)
@@ -6605,7 +6625,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 }
 
 
-void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
+void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
 {
     if (undoLoopBack)
     {
@@ -6632,8 +6652,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
             && undoList.back().data.insert == getData->data.insert
             && undoList.back().data.parameter == getData->data.parameter)
             return;
-        if (!group) // the first item in a group needs a marker, later ones don't
-            undoList.push_back(undoMarker);
+        undoList.push_back(undoMarker);
     }
     /*
      * the following is used to read the current value of the specific
@@ -6662,7 +6681,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 
 
 
-void InterChange::addGroup2undo(CommandBlock *getData, bool first)
+void InterChange::addGroup2undo(CommandBlock *getData)
 {
     if (undoLoopBack)
     {

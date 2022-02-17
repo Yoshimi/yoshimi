@@ -609,7 +609,7 @@ namespace PART // usage PART::control::volume
         audioDestination = 120,
 
     // start of controllers
-        volumeRange = 128,
+        volumeRange = 128, // start marker (must be first)
         volumeEnable,
         panningWidth,
         modWheelDepth,
@@ -623,16 +623,17 @@ namespace PART // usage PART::control::volume
         filterQdepth,
         filterCutoffDepth,
         breathControlEnable,
-        resonanceCenterFrequencyDepth = 144,
+        resonanceCenterFrequencyDepth,
         resonanceBandwidthDepth,
-        portamentoTime = 160,
+        portamentoTime,
         portamentoTimeStretch,
         portamentoThreshold,
         portamentoThresholdType,
         enableProportionalPortamento,
         proportionalPortamentoRate,
         proportionalPortamentoDepth,
-        receivePortamento = 168,
+        receivePortamento,
+        resetAllControllers, // end marker (must be last)
     // end of controllers
 
     // start of midi controls
@@ -654,7 +655,6 @@ namespace PART // usage PART::control::volume
         instrumentName,
         instrumentType,
         defaultInstrumentCopyright, // this needs to be split into two for load/save
-        resetAllControllers, // this needs to bump up 1 to make space
         partBusy = 252 // internally generated - read only
     };
 
