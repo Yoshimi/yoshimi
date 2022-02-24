@@ -2826,6 +2826,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = synth->getRuntime().instrumentFormat;
             break;
 // switches
+            case CONFIG::control::enableAutoPadSynth:
+            if (write)
+                synth->getRuntime().autoPadsynth = value_bool;
+            else
+                value = synth->getRuntime().autoPadsynth;
+            break;
         case CONFIG::control::defaultStateStart:
             if (write)
                 synth->getRuntime().loadDefaultState = value_bool;

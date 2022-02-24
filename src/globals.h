@@ -305,6 +305,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableGUI,
         enableCLI,
         enableAutoInstance,
+        enableAutoPadSynth,
         enableSinglePath,
         enableHighlight, // in banks
         historyLock,
