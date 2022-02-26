@@ -5717,6 +5717,10 @@ void InterChange::commandLFO(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
+
     if (engine == PART::engine::addSynth)
     {
        switch (insertParam)
@@ -5853,6 +5857,10 @@ void InterChange::commandFilter(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
 
     if (engine == PART::engine::addSynth)
     {
@@ -6127,6 +6135,10 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
 
     std::string env;
     std::string name;
