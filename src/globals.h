@@ -632,7 +632,7 @@ namespace PART // usage PART::control::volume
         enableProportionalPortamento,
         proportionalPortamentoRate,
         proportionalPortamentoDepth,
-        receivePortamento,
+        receivePortamento, // 151
         resetAllControllers, // end marker (must be last)
     // end of controllers
 

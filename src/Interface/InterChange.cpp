@@ -3448,22 +3448,25 @@ void InterChange::commandPart(CommandBlock *getData)
     if (write)
     {
         if (control == PART::control::resetAllControllers)
-        {
-            addGroup2undo(&undoMarker);
+            ;
+        /*{
+           addGroup2undo(&undoMarker);
             CommandBlock tempData;
             memset(&tempData.bytes, 255, sizeof(CommandBlock));
             tempData.data.part = TOPLEVEL::undoResonanceMark;
+            tempData.data.value = 0.0f;
             addGroup2undo(&tempData);
-            //memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
             for (int ctl = PART::control::volumeRange; ctl < PART::control::resetAllControllers; ++ctl)
             {
                 tempData.data.control = ctl;
-                commandSendReal(&tempData);
+                tempData.data.type &= ~TOPLEVEL::type::Write;
+                commandPart(&tempData);
                 addGroup2undo(&tempData);
             }
             tempData.data.part = TOPLEVEL::undoResonanceMark;
             addGroup2undo(&tempData);
-        }
+        }*/
         else
             add2undo(getData, noteSeen);
     }
@@ -4145,6 +4148,8 @@ void InterChange::commandAdd(CommandBlock *getData)
     part = synth->part[npart];
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
+    if (write)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
@@ -4323,6 +4328,9 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     part = synth->part[npart];
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
+
+    if (write)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
@@ -4740,6 +4748,9 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
+    if (write && control != SUBSYNTH::control::clearHarmonics)
+        add2undo(getData, noteSeen);
+
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
@@ -5012,6 +5023,9 @@ void InterChange::commandPad(CommandBlock *getData)
     part = synth->part[npart];
     PADnoteParameters *pars;
     pars = part->kit[kititem].padpars;
+
+    if (write && control != PADSYNTH::control::applyChanges)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
