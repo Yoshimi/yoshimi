@@ -3447,9 +3447,8 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if (write)
     {
-        if (control == PART::control::resetAllControllers)
-            ;
-        /*{
+        /*if (control == PART::control::resetAllControllers)
+        {
            addGroup2undo(&undoMarker);
             CommandBlock tempData;
             memset(&tempData.bytes, 255, sizeof(CommandBlock));
@@ -3467,6 +3466,11 @@ void InterChange::commandPart(CommandBlock *getData)
             tempData.data.part = TOPLEVEL::undoResonanceMark;
             addGroup2undo(&tempData);
         }*/
+        if (control == PART::control::enableKitLine || control == PART::control::kitMode)
+        {
+            undoList.clear(); // these would become completely invalid!
+            redoList.clear();
+        }
         else
             add2undo(getData, noteSeen);
     }
@@ -5355,6 +5359,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
     bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    if (write && control != OSCILLATOR::control::clearHarmonics && control != OSCILLATOR::control::convertToSine)
+        add2undo(getData, noteSeen);
+
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         if (write)
@@ -6558,6 +6565,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
         // the line above is to show it's changed from preset values
     }
+
+    if (write)
+        add2undo(getData, noteSeen);
 
     EffectMgr *eff;
 
