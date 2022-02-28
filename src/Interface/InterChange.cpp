@@ -6704,7 +6704,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
     //std::cout << "Control " << int(getData->data.control) << std::endl;
     //std::cout << "old value " << getData->data.value << std::endl;
     getData->data.type = type;
-    getData->data.source = source;
+    getData->data.source = source & ~TOPLEVEL::action::noAction; // makes it a system call
     undoList.push_back(*getData);
     std::cout << "add ";
     synth->CBtest(&undoList.back());

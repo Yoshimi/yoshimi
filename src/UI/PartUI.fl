@@ -1073,15 +1073,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Spinner inseffnocounter {
         callback {//
                 ninseff = o->value() - 1;
-                insefftype->value(part->partefx[ninseff]->geteffect());
-
-                inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-                int x = part->Pefxroute[ninseff];
-                if (x == 127)
-                    x = 1;
-                bypasseff->value(part->Pefxbypass[ninseff]);
-                sendtochoice->value(x);
-
+                setEffNum();
                 send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {20 8 35 22} labelsize 12 maximum 3 textsize 12
         code1 {o->value(ninseff+1);}
@@ -1723,6 +1715,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
     bool valBool = _SYS_::F2B(value);
+    bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     int valInt = lrint(value);
     string text;
     if (miscmsg != NO_MSG)
@@ -1992,6 +1985,12 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::effectNumber:
+            if (!fromUs)
+            {
+                ninseff = valInt;
+                inseffnocounter->value(ninseff + 1);
+                setEffNum();
+            }
             if (sameEff)
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
             else
@@ -2575,6 +2574,16 @@ class PartUI {: {public Fl_Group, PartUI_}
         text = part->Pname.c_str();
     partname = text;
     instrumentlabel->copy_label(text.c_str());} {}
+  }
+  Function {setEffNum()} {} {
+    code {//
+        insefftype->value(part->partefx[ninseff]->geteffect());
+        inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
+        int x = part->Pefxroute[ninseff];
+        if (x == 127)
+            x = 1;
+        bypasseff->value(part->Pefxbypass[ninseff]);
+        sendtochoice->value(x);} {}
   }
   Function {seteditname()} {} {
     code {//
