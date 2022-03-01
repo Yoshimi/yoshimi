@@ -196,8 +196,7 @@ InterChange::~InterChange()
 {
     if (sortResultsThreadHandle)
         pthread_join(sortResultsThreadHandle, 0);
-    undoList.clear();
-    redoList.clear();
+    undoRedoClear();
 }
 
 
@@ -629,6 +628,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         {
             if (write)
             {
+                add2undo(getData, noteSeen);
                 synth->microtonal.Pglobalfinedetune = value;
                 synth->setAllPartMaps();
             }
@@ -3091,7 +3091,10 @@ void InterChange::commandMain(CommandBlock *getData)
     {
         case MAIN::control::volume:
             if (write)
+            {
+                add2undo(getData, noteSeen);
                 synth->setPvolume(value);
+            }
             else
                 value = synth->Pvolume;
             break;
@@ -3104,7 +3107,11 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case MAIN::control::availableParts:
             if ((write) && (value == 16 || value == 32 || value == 64))
+            {
+                if (value < synth->getRuntime().NumAvailableParts)
+                    undoRedoClear(); // references might no longer exist
                 synth->getRuntime().NumAvailableParts = value;
+            }
             else
                 value = synth->getRuntime().NumAvailableParts;
             break;
@@ -3467,10 +3474,7 @@ void InterChange::commandPart(CommandBlock *getData)
             addGroup2undo(&tempData);
         }*/
         if (control == PART::control::enableKitLine || control == PART::control::kitMode)
-        {
-            undoList.clear(); // these would become completely invalid!
-            redoList.clear();
-        }
+            undoRedoClear(); // these would become completely invalid!
         else
             add2undo(getData, noteSeen);
     }
@@ -6673,13 +6677,13 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
         redoList.clear(); // always invalidated on new entry
     fromRedo = false;
 
-    if (noteSeen)
+    if (noteSeen || undoList.empty())
     {
         noteSeen = false;
         std::cout << "marker " << int(undoMarker.data.part) << std::endl;
         undoList.push_back(undoMarker);
     }
-    else if (!undoList.empty())
+    else
     {
         if (undoList.back().data.control == getData->data.control
             && undoList.back().data.part == getData->data.part
@@ -6692,27 +6696,19 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
     }
     /*
      * the following is used to read the current value of the specific
-     * control as that is what we will want to revert to. It then restores
-     * the incoming value and write status.
+     * control as that is what we will want to revert to.
      */
-    float value = getData->data.value;
-    char type = getData->data.type;
-    char source = getData->data.source;
-    getData->data.type &= ~TOPLEVEL::type::Write;
-    commandSendReal(getData);
+    CommandBlock candidate;
+    memcpy(candidate.bytes, getData->bytes, sizeof(CommandBlock));
+    candidate.data.type &= ~TOPLEVEL::type::Write;
+    commandSendReal(&candidate);
 
-    //std::cout << "Control " << int(getData->data.control) << std::endl;
-    //std::cout << "old value " << getData->data.value << std::endl;
-    getData->data.type = type;
-    getData->data.source = source & ~TOPLEVEL::action::noAction; // makes it a system call
-    undoList.push_back(*getData);
+    candidate.data.source |= TOPLEVEL::action::forceUpdate;
+    candidate.data.type |= TOPLEVEL::type::Write;
+    undoList.push_back(candidate);
+
     std::cout << "add ";
     synth->CBtest(&undoList.back());
-
-    getData->data.value = value;
-    //std::cout << "new value " << getData->data.value << std::endl;
-    //std::cout << "undo list size " << undoList.size() << std::endl;
-    //std::cout << "redo list size " << redoList.size() << std::endl;
 }
 
 
@@ -6729,6 +6725,7 @@ void InterChange::addGroup2undo(CommandBlock *getData)
     fromRedo = false;
 
     undoList.push_back(*getData);
+
     std::cout << "add group ";
     synth->CBtest(&undoList.back());
 }
@@ -6744,8 +6741,6 @@ void InterChange::undoLast(CommandBlock *candidate)
     if (undoList.back().data.part != TOPLEVEL::undoMark)
     {
         memcpy(candidate->bytes, undoList.back().bytes, sizeof(CommandBlock));
-        candidate->data.type &= ~TOPLEVEL::action::noAction;
-        candidate->data.source |= TOPLEVEL::action::forceUpdate;
 
         std::cout << "undo ";
         synth->CBtest(candidate);
@@ -6807,7 +6802,7 @@ void InterChange::undoRedoClear(void)
     noteSeen = false;
     undoLoopBack = false;
     fromRedo = false;
-    std::cout << "Undo cleared" << std::endl;
+    std::cout << "Undo/Redo cleared" << std::endl;
 }
 
 
