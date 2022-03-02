@@ -1360,7 +1360,8 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 int i = 0;
                 while (!firstSynth->getRuntime().presetsDirlist[i].empty())
-                    ++i;
+                    ++i;        //candidate->data.type |= TOPLEVEL::type::Write;
+        //candidate->data.source = TOPLEVEL::action::forceUpdate;
                 if (i > (MAX_PRESETS - 2))
                     text = " FAILED preset list full";
                 else
@@ -3123,7 +3124,8 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
 
-        case MAIN::control::detune: // done elsewhere
+        case MAIN::control::detune: // writes indirect
+            value = synth->microtonal.Pglobalfinedetune;
             break;
         case MAIN::control::keyShift: // done elsewhere
             break;
@@ -6700,17 +6702,17 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
      */
     CommandBlock candidate;
     memcpy(candidate.bytes, getData->bytes, sizeof(CommandBlock));
-    candidate.data.type &= ~TOPLEVEL::type::Write;
+    candidate.data.type &= TOPLEVEL::type::Integer;
+    candidate.data.source = 0;
     commandSendReal(&candidate);
 
-    candidate.data.source |= TOPLEVEL::action::forceUpdate;
-    candidate.data.type |= TOPLEVEL::type::Write;
+    candidate.data.source = getData->data.source | TOPLEVEL::action::forceUpdate;
+    candidate.data.type = getData->data.type;
     undoList.push_back(candidate);
 
     std::cout << "add ";
     synth->CBtest(&undoList.back());
 }
-
 
 
 void InterChange::addGroup2undo(CommandBlock *getData)
@@ -6751,9 +6753,13 @@ void InterChange::undoLast(CommandBlock *candidate)
             redoList.push_back(undoMarker);
         }
         memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(CommandBlock));
-        oldCommand.data.type &= ~TOPLEVEL::type::Write;
+        char temptype = oldCommand.data.type;
+        char tempsource = oldCommand.data.source;
+        oldCommand.data.type &= TOPLEVEL::type::Integer;
+        oldCommand.data.source = 0;
         commandSendReal(&oldCommand);
-        oldCommand.data.type |= TOPLEVEL::type::Write;
+        oldCommand.data.type = temptype;
+        oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
         redoList.push_back(oldCommand);
         undoList.pop_back();
     }
@@ -6777,14 +6783,11 @@ void InterChange::redoLast(CommandBlock *candidate)
         undoLoopBack = false;
         fromRedo = true;
         memcpy(candidate->bytes, redoList.back().bytes, sizeof(CommandBlock));
-        candidate->data.type &= TOPLEVEL::type::Write;
-        candidate->data.source = TOPLEVEL::action::forceUpdate;
 
         std::cout << "redo ";
         synth->CBtest(candidate);
         redoList.pop_back();
     }
-
 
     if (redoList.empty())
         setRedo = false;
@@ -6794,6 +6797,7 @@ void InterChange::redoLast(CommandBlock *candidate)
         redoList.pop_back();
     }
 }
+
 
 void InterChange::undoRedoClear(void)
 {
