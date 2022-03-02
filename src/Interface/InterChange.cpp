@@ -4,6 +4,7 @@
     Copyright 2016-2019, Will Godfrey & others
     Copyright 2020-2020, Kristian Amlie, Will Godfrey, & others
     Copyright 2021, Will Godfrey, Rainer Hans Liffers, & others
+    Copyright 2022, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -5675,7 +5676,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case RESONANCE::control::randomType:
             if (write)
             {
-                addGroup2undo(&undoMarker);
+                /*addGroup2undo(&undoMarker);
                 CommandBlock tempData;
                 tempData.data.part = TOPLEVEL::undoResonanceMark;
                 addGroup2undo(&tempData);
@@ -5689,7 +5690,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
                     addGroup2undo(&tempData);
                 }
                 tempData.data.part = TOPLEVEL::undoResonanceMark;
-                addGroup2undo(&tempData);
+                addGroup2undo(&tempData);*/
                 respar->randomize(value_int);
             }
             break;
