@@ -232,14 +232,14 @@ alsaTab->hide();}
         Fl_Group switchesTab {
           xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
         } {
-          Fl_Check_Button enablePadApply {
-            label {Auto Apply PadSynth}
+          Fl_Choice handlePadSynthBuild {
+            label {Build PADSynth Wavetable}
             callback {//
-                        send_data(0, CONFIG::control::enableAutoPadSynth, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Rebuild the wavetable while changing controls} xywh {190 30 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().autoPadsynth);}
-            class Fl_Check_Button2
-          }
+                        send_data(0, CONFIG::control::handlePadSynthBuild, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {How to rebuild wavetable after changes\\nTrigger manually and mute part, build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {200 228 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->add("Muted");o->add("Background");o->add("Auto-Apply");}
+            code1 {o->value(synth->getRuntime().handlePadSynthBuild);}
+          } {}
           Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
             callback {//
@@ -884,8 +884,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 case CONFIG::control::defaultStateStart:
                     setDefaultState->value(value_bool);
                     break;
-                 case CONFIG::control::enableAutoPadSynth:
-                    enablePadApply->value(value_bool);
+                case CONFIG::control::handlePadSynthBuild:
+                    handlePadSynthBuild->value(value_int);
                     break;
                 case CONFIG::control::hideNonFatalErrors:
                     nonFatal->value(value_bool);
@@ -1257,7 +1257,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
 
                 case 5 : // Switches
-                    enablePadApply->value(synth->getRuntime().autoPadsynth > 0);
+                    handlePadSynthBuild->value(synth->getRuntime().handlePadSynthBuild);
                     setDefaultState->value(synth->getRuntime().loadDefaultState > 0);
                     nonFatal->value(synth->getRuntime().hideErrors);
                     showSplash->value(synth->getRuntime().showSplash);
@@ -1349,7 +1349,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
 //
     Tab2->labelsize(size);
-    enablePadApply->labelsize(size);
+    handlePadSynthBuild->labelsize(size);
     bankHighlight->labelsize(size);
     setDefaultState->labelsize(size);
     nonFatal->labelsize(size);

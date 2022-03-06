@@ -920,7 +920,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
 
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)" << endl;
+        cout << "\nSet CONfig REPorts [s] - set report destination (Gui/Stdout)" << endl;
 
     synth->cliOutput(msg, LINES);
     return REPLY::exit_msg;
@@ -3077,6 +3077,18 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     {
         command = CONFIG::control::padSynthInterpolation;
         value = !input.matchnMove(1, "linear");
+    }
+    else if (input.matchnMove(3, "buildpad"))
+    {
+        command = CONFIG::control::handlePadSynthBuild;
+        if (input.matchnMove(1, "muted"))
+            value = 0;
+        else if (input.matchnMove(1, "background"))
+            value = 1;
+        else if (input.matchnMove(1, "autoapply"))
+            value = 2;
+        else if (controlType == TOPLEVEL::type::Write)
+            return REPLY::value_msg;
     }
     else if (input.matchnMove(1, "virtual"))
     {

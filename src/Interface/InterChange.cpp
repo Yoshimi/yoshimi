@@ -2322,7 +2322,7 @@ bool InterChange::processPad(CommandBlock *getData)
     }
     if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
-        if (synth->getRuntime().autoPadsynth)
+        if (synth->getRuntime().handlePadSynthBuild == 2)
         {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
             std::cout << "|processPad::Auto-Apply| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
             pars.buildNewWavetable();
@@ -2825,13 +2825,13 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
-// switches
-            case CONFIG::control::enableAutoPadSynth:
+        case CONFIG::control::handlePadSynthBuild:
             if (write)
-                synth->getRuntime().autoPadsynth = value_bool;
+                synth->getRuntime().handlePadSynthBuild = value_int;
             else
-                value = synth->getRuntime().autoPadsynth;
+                value = synth->getRuntime().handlePadSynthBuild;
             break;
+// switches
         case CONFIG::control::defaultStateStart:
             if (write)
                 synth->getRuntime().loadDefaultState = value_bool;

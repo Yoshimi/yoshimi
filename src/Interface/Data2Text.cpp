@@ -582,6 +582,25 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             }
             showValue = false;
             break;
+        case CONFIG::control::handlePadSynthBuild:
+            contstr = "PADSynth wavetable build ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "Muted";
+                        break;
+                    case 1:
+                        contstr += "Background";
+                        break;
+                    case 2:
+                        contstr += "AutoApply";
+                        break;
+                }
+            }
+            showValue = false;
+            break;
         case CONFIG::control::virtualKeyboardLayout:
             contstr = "Virtual keyboard ";
             if (addValue)

@@ -3612,6 +3612,9 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
            break;
         case CONFIG::control::padSynthInterpolation:
             break;
+        case CONFIG::control::handlePadSynthBuild:
+            max = 2;
+            break;
         case CONFIG::control::virtualKeyboardLayout:
             max = 3;
             break;
