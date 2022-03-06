@@ -143,6 +143,7 @@ PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
     , FilterLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth)}
 
     // Wavetable building
+    , PxFadeUpdate{0}
     , waveTable(Pquality)
     , futureBuild(task::BuildScheduler<PADTables>::wireBuildFunction
                  ,BuildOperation([this](){ return render_wavetable(); }))
@@ -236,6 +237,8 @@ void PADnoteParameters::defaults(void)
     GlobalFilter->defaults();
     FilterEnvelope->defaults();
     FilterLfo->defaults();
+
+    PxFadeUpdate = 200; // 200ms crossfade after updating wavetables
 
     // reseed OscilGen and wavetable phase randomisation
     reseed(synth->randomINT());
@@ -863,6 +866,7 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("mode",Pmode);
     xml->addpar("bandwidth",Pbandwidth);
     xml->addpar("bandwidth_scale",Pbwscale);
+    xml->addparU("xfade_update",PxFadeUpdate);
 
     xml->beginbranch("HARMONIC_PROFILE");
         xml->addpar("base_type",PProfile.base.type);
@@ -972,6 +976,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     Pmode=xml->getpar127("mode",0);
     Pbandwidth=xml->getpar("bandwidth",Pbandwidth,0,1000);
     Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
+    PxFadeUpdate=xml->getparU("xfade_update",PxFadeUpdate,0,20000);
 
     if (xml->enterbranch("HARMONIC_PROFILE"))
     {
@@ -1163,6 +1168,11 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
         case PADSYNTH::control::spectrumMode:
             def = 0;
             max = 2;
+            break;
+
+        case PADSYNTH::control::xFadeUpdate:
+            def = 200;
+            max = 20000;
             break;
 
         case PADSYNTH::control::detuneFrequency:

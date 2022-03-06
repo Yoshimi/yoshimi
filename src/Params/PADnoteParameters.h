@@ -285,6 +285,8 @@ class PADnoteParameters : public Presets
         unique_ptr<EnvelopeParams> FilterEnvelope;
         unique_ptr<LFOParams> FilterLfo;
 
+        unsigned int PxFadeUpdate;
+
         // current wavetable
         PADTables waveTable;
 

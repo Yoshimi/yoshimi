@@ -1201,6 +1201,8 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     }
     else if(findAndStep(source, "Spectrum Mode")) // new form
         ; // not yet
+    else if(findAndStep(source, "XFadeUpdate"))
+        ctl =PADSYNTH::control::xFadeUpdate;
 
     else if (findAndStep(source, "Changes Applied"))
         ctl =PADSYNTH::control::applyChanges;

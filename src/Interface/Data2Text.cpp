@@ -2446,6 +2446,9 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::spectrumMode:
             contstr = "Spectrum Mode";
             break;
+        case PADSYNTH::control::xFadeUpdate:
+            contstr = "XFade Update";
+            break;
     }
     if (!contstr.empty())
     {

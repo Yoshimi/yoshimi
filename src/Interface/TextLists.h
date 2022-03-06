@@ -564,6 +564,7 @@ static std::string padsynthlist [] = {
     "BAndwidth <n>",            "overall bandwidth",
     "SCale <s>",                "bandwidth scale (Normal, Equalhz, Quarter, Half, Threequart, Oneandhalf, Double, Inversehalf)",
     "SPectrum <s>",             "spectrum mode (Bandwidth, Discrete, Continuous)",
+    "XFadeupdate <n>",          "cross fade (millisec) after building new wavetable",
 
     "APply",                    "puts latest changes into the wavetable",
     "XPort <s>",                "export current sample set to named file",

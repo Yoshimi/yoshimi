@@ -5204,6 +5204,12 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
             else
                 value = pars.Pmode;
             break;
+        case PADSYNTH::control::xFadeUpdate:
+            if (write)
+                pars.PxFadeUpdate = value_int;
+            else
+                value = pars.PxFadeUpdate;
+            break;
 
         case PADSYNTH::control::detuneFrequency:
             if (write)

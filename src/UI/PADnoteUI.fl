@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -535,10 +535,21 @@ class PADnoteUI {: {public PresetsUI_}
             label {Sample Size}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::sampleSize, o->value(), TOPLEVEL::type::Integer);}
-            xywh {425 195 125 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            xywh {425 195 100 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
             code0 {o->add("16k (Tiny)");o->add("32k");o->add("64k (Small)");o->add("128k");o->add("256k");o->add("512k");o->add("1M (Big)");}
             code1 {o->value(pars->Pquality.samplesize);}
           } {}
+          Fl_Dial xFadeDial {
+            label xFade
+            callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::xFadeUpdate, logDial2millisec(o->value()), TOPLEVEL::type::Integer);}
+            tooltip {cross fade after building new Wavetable}
+            xywh {535 195 25 25} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 4301 step 1
+            code0 {int dialSetting = millisec2logDial(pars->PxFadeUpdate);
+                   o->value(dialSetting);}
+            code2 {o->setValueType(VC_XFadeUpdate);}
+            class WidgetPDial
+          }
           Fl_Group hprofile {
             xywh {100 45 475 90} box FLAT_BOX color 54 selection_color 218 labelcolor 63
             code0 {PADnoteHarmonicProfile *hpui=new PADnoteHarmonicProfile(o->x(),o->y(),o->w(),o->h(),"");}
@@ -950,6 +961,7 @@ class PADnoteUI {: {public PresetsUI_}
 
     qsamplesize->labelsize(size);
         qsamplesize->textsize(size11);
+    xFadeDial->labelsize(size);
 
     resonance->labelsize(size12);
     waveform->labelsize(size12);
@@ -1073,6 +1085,14 @@ class PADnoteUI {: {public PresetsUI_}
                 bwscale->deactivate();
             }
             cbwidget->do_callback();
+            break;
+
+        case PADSYNTH::control::xFadeUpdate:
+            {
+                int dialSetting = millisec2logDial(value);
+                xFadeDial->value(dialSetting);
+                cbwidget->do_callback();
+            }
             break;
 
         case PADSYNTH::control::detuneFrequency:

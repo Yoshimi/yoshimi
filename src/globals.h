@@ -869,6 +869,7 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         bandwidth,// = 16, moved these three
         bandwidthScale,
         spectrumMode,// = 19, // Bandwidth, Discrete, Continuous
+        xFadeUpdate,
 
         overtoneParameter1 = 48,
         overtoneParameter2,

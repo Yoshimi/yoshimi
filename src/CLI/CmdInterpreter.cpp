@@ -4801,6 +4801,10 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
         cmd = PADSYNTH::control::spectrumMode;
     }
+    else if (input.matchnMove(2, "xfadeupdate"))
+    {
+        cmd = PADSYNTH::control::xFadeUpdate;
+    }
 
     if (input.matchnMove(2, "apply"))
     {

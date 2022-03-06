@@ -916,10 +916,21 @@ string convert_value(ValueType type, float val)
         case VC_SubBandwidthScale:
             if ((int)val == 0)
                 return "Constant";
-	    f = val / 64.0f * 3.0f;
+            f = val / 64.0f * 3.0f;
             return "Factor (100,10k): " +
                 variable_prec_units(power<10>(f), "", 4) + ", " +
                 variable_prec_units(powf(0.1,f), "x", 4);
+
+        case VC_XFadeUpdate:
+        {
+            unsigned int millisec = logDial2millisec(val);
+            if (millisec > 1000)
+                return variable_prec_units(float(millisec) / 1000, "sec", 1);
+            if (millisec > 0)
+                return variable_prec_units(float(millisec), "ms", 0);
+            else
+                return "off";
+        }
 
         case VC_FilterVelocitySense: // this is also shown graphically
             if ((int)val==127)
@@ -1424,3 +1435,16 @@ ValueType getFilterFreqTrackType(int offset)
     }
 }
 
+/** convert a millesconds value to a logarithmic dial setting */
+int millisec2logDial(unsigned int ms)
+{
+    return ms==0? -1
+                : log10f(float(ms)) * 1000;
+}
+
+/** convert setting from a logarithmic dial back to millesconds */
+unsigned int logDial2millisec(int dial)
+{
+    return dial<0? 0
+                 : power<10>(dial / 1000.0f) + 0.5;
+}
