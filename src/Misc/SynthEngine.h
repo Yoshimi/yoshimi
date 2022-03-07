@@ -206,6 +206,7 @@ class SynthEngine
         float         ControlStep;
         int           Paudiodest;
         int           Pkeyshift;
+        float         PbpmFallback;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 

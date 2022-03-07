@@ -3131,6 +3131,13 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::keyShift: // done elsewhere
             break;
 
+        case MAIN::control::bpmFallback:
+            if (write)
+                synth->PbpmFallback = value;
+            else
+                value = synth->PbpmFallback;
+            break;
+
         case MAIN::control::mono:
             if (write)
                 synth->masterMono = value;

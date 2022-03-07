@@ -273,13 +273,9 @@ BeatTracker::BeatValues MultithreadedBeatTracker::getBeatValues()
     pthread_mutex_unlock(&mutex);
 
     if (time == lastTime) {
-        if (clock - time > 1000000) {
-            // If no MIDI clock messages have arrived for over a second, revert
-            // to a static 120 BPM. This is just a fallback to prevent
-            // oscillators from stalling completely.
-            ret.songBeat = songBeatTmp + (float)(clock - time) / 1000000.0f * 120.0f / 60.0f;
-            ret.monotonicBeat = monotonicBeatTmp + (float)(clock - time) / 1000000.0f * 120.0f / 60.0f;
-        }
+        // Can only happen on the very first iteration. Avoid division by zero.
+        ret.songBeat = 0;
+        ret.monotonicBeat = 0;
     } else {
         // Based on beat and clock from MIDI thread, interpolate and find the
         // beat for audio thread.

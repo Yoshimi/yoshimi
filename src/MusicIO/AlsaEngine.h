@@ -85,11 +85,14 @@ class AlsaEngine : public MusicIO
         void *MidiThread(void);
         static void *_MidiThread(void *arg);
 
+        void handleMidiEvents(uint64_t clock);
+        void handleMidiClockSilence(uint64_t clock);
+
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);
 
         void handleSongPos(float beat);
-        void handleMidiClock();
+        void handleMidiClock(uint64_t clock);
 
         struct {
             std::string        device;

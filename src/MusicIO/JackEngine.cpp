@@ -525,6 +525,8 @@ void JackEngine::handleBeatValues(jack_nframes_t nframes)
 
     if (pos.valid & JackPositionBBT)
         beats.bpm = pos.beats_per_minute;
+    else
+        beats.bpm = synth->PbpmFallback;
 
     float bpmInc = (float)nframes * beats.bpm
         / ((float)audio.jackSamplerate * 60.0f);

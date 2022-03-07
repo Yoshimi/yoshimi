@@ -78,6 +78,11 @@
 #define A_DEF 440.0f
 #define A_MAX 1100.0f
 
+// There is nothing which technically prevents these from being lower or higher,
+// but we need to set the limits for the UI somewhere.
+#define BPM_FALLBACK_MIN 32.0f
+#define BPM_FALLBACK_MAX 480.0f
+
 // The number of discrete steps we use for the LFO BPM frequency. Make sure to
 // update LFO_BPM_LCM as well, if this is updated.
 #define LFO_BPM_STEPS 33
@@ -523,6 +528,7 @@ namespace MAIN // usage MAIN::control::volume
         panLawType,
         detune = 32,
         keyShift = 35,
+        bpmFallback,
         reseed = 40,
         soloType = 48,
         soloCC,

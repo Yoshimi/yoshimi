@@ -1131,6 +1131,9 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
         case MAIN::control::keyShift:
             contstr = "Key Shift";
             break;
+        case MAIN::control::bpmFallback:
+            contstr = "Fallback BPM";
+            break;
         case MAIN::control::mono:
             contstr = "Master Mono/Stereo ";
             showValue = false;
