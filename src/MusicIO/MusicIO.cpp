@@ -291,6 +291,18 @@ BeatTracker::BeatValues MultithreadedBeatTracker::getBeatValues()
     return ret;
 }
 
+BeatTracker::BeatValues MultithreadedBeatTracker::getRawBeatValues()
+{
+    pthread_mutex_lock(&mutex);
+    BeatValues ret = {
+        songBeat,
+        monotonicBeat,
+        bpm,
+    };
+    pthread_mutex_unlock(&mutex);
+    return ret;
+}
+
 SinglethreadedBeatTracker::SinglethreadedBeatTracker()
 {
     beats.songBeat = 0;
@@ -313,6 +325,11 @@ BeatTracker::BeatValues SinglethreadedBeatTracker::setBeatValues(BeatTracker::Be
 }
 
 BeatTracker::BeatValues SinglethreadedBeatTracker::getBeatValues()
+{
+    return beats;
+}
+
+BeatTracker::BeatValues SinglethreadedBeatTracker::getRawBeatValues()
 {
     return beats;
 }

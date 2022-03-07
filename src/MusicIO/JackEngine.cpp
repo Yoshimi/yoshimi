@@ -521,7 +521,7 @@ void JackEngine::handleBeatValues(jack_nframes_t nframes)
     jack_position_t pos;
     jack_transport_state_t state = jack_transport_query(jackClient, &pos);
 
-    BeatTracker::BeatValues beats(beatTracker->getBeatValues());
+    BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
 
     if (pos.valid & JackPositionBBT)
         beats.bpm = pos.beats_per_minute;

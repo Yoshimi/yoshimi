@@ -119,7 +119,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     int offs = 0;
     uint32_t next_frame = 0;
     uint32_t processed = 0;
-    BeatTracker::BeatValues beats(beatTracker->getBeatValues());
+    BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
     uint32_t beatsAt = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
