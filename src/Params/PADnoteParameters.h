@@ -299,6 +299,8 @@ class PADnoteParameters : public Presets
         vector<float> generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize, vector<float> const& profile);
         vector<float> generateSpectrum_otherModes(float basefreq, size_t spectrumSize);
 
+        void mute_and_rebuild_synchronous();
+
         // type abbreviations
         using FutureVal = std::future<PADTables>;
         using ResultVal = Optional<PADTables>;

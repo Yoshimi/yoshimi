@@ -666,28 +666,29 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 
 void PADnoteParameters::buildNewWavetable(bool blocking)
 {
-    std::cout << "buildNewWavetable(blocking="<<blocking<<")" << std::endl;        ////////////////TODO padthread debugging output
+    std::cout << "buildNewWavetable("<<(synth->getRuntime().useLegacyPadBuild()? "Legacy" : blocking? "blocking" : "trigger-bg")<<")" << std::endl;        ////////////////TODO padthread debugging output
+    if (synth->getRuntime().useLegacyPadBuild())
+        mute_and_rebuild_synchronous();
+    else
     if (not blocking)
-    {
         futureBuild.requestNewBuild();
-        return;
+    else
+    {   // Guarantee to invoke a new build NOW and block until it is ready...
+        std::cout << "blocking wait for background work.... isUnderway() == "<<futureBuild.isUnderway()<< std::endl;        ////////////////TODO padthread debugging output
+        // This is tricky, since new builds can be triggered any time from the GUI
+        // and also the SynthEngine might pick up the result concurrently.
+
+        // (1) Attempt to get hold of a running build triggered earlier (with old parameters)
+        futureBuild.blockingWait();
+
+        // (2) when we trigger now, we can be sure the current state of parameters will be used
+        futureBuild.requestNewBuild();
+
+        // (3) again wait for this build to complete...
+        //     Note: Result will be published to SynthEngine -- unless a new build was triggered
+        futureBuild.blockingWait(true);
+        std::cout << "blocking wait finished. futureBuild.isReady() = " << futureBuild.isReady() <<std::endl;        ////////////////TODO padthread debugging output
     }
-
-    std::cout << "blocking wait for background work.... isUnderway() == "<<futureBuild.isUnderway()<< std::endl;        ////////////////TODO padthread debugging output
-    // Guarantee to invoke a new build NOW and block until it is ready...
-    // This is tricky, since new builds can be triggered any time from the GUI
-    // and also the SynthEngine might pick up the result concurrently.
-
-    // (1) Attempt to get hold of a running build triggered earlier (with old parameters)
-    futureBuild.blockingWait();
-
-    // (2) when we trigger now, we can be sure the current state of parameters will be used
-    futureBuild.requestNewBuild();
-
-    // (3) again wait for this build to complete...
-    //     Note: Result will be published to SynthEngine -- unless a new build was triggered
-    futureBuild.blockingWait(true);
-    std::cout << "blocking wait finished. futureBuild.isReady() = " << futureBuild.isReady() <<std::endl;        ////////////////TODO padthread debugging output
 }
 
 
@@ -767,6 +768,8 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 }
 
 
+/* called once before each buffer compute cycle;
+ * possibly pick up results from background wavetable build */
 void PADnoteParameters::activate_wavetable()
 {
     if (futureBuild.isReady())
@@ -777,6 +780,24 @@ void PADnoteParameters::activate_wavetable()
         std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
     }
 }
+
+
+/* Legacy mode: rebuild the PAD wavetable immediately,
+ * without any background thread scheduling. */
+void PADnoteParameters::mute_and_rebuild_synchronous()
+{
+    std::cout << "buildNewWavetable(OLDSTYLE)" << std::endl;        ////////////////TODO padthread debugging output
+    waveTable.reset();   // mute by zeroing
+    auto result = render_wavetable();
+    if (result)
+    {
+        using std::swap;
+        swap(waveTable, *result);
+        presetsUpdated();
+    }
+    std::cout << "buildNewWavetable: synchronous build finished" << std::endl;        ////////////////TODO padthread debugging output
+}
+
 
 
 void PADnoteParameters::setPan(char pan, unsigned char panLaw)

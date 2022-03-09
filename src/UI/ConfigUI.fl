@@ -177,7 +177,7 @@ alsaTab->hide();}
             label {Build PADSynth Wavetable}
             callback {//
                         send_data(0, CONFIG::control::handlePadSynthBuild, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {How to rebuild wavetable after changes\\nTrigger manually and mute part, build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 116 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {How to rebuild wavetable after changes: Trigger manually and mute part (legacy), build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 116 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Muted");o->add("Background");o->add("Auto-Apply");}
             code1 {o->value(synth->getRuntime().handlePadSynthBuild);}
           } {}

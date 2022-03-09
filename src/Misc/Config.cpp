@@ -124,8 +124,8 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     singlePath(false),
     banksChecked(false),
     panLaw(1),
-    handlePadSynthBuild(0),
     configChanged(false),
+    handlePadSynthBuild(0),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),   // 128 is used as 'disabled'

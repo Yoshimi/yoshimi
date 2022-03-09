@@ -163,8 +163,11 @@ class Config
         bool          singlePath;
         bool          banksChecked;
         unsigned char panLaw;
-        unsigned char handlePadSynthBuild;
         bool          configChanged;
+
+        unsigned char handlePadSynthBuild;
+        bool useLegacyPadBuild() { return handlePadSynthBuild == 0; }
+        bool usePadAutoApply()   { return handlePadSynthBuild == 2; }
 
         int           rtprio;
         int           midi_bank_root;

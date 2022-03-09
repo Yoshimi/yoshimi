@@ -1483,6 +1483,8 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
         break;
 
         case PADSYNTH::control::applyChanges:
+            if (part->Pkitmode == 0)
+                kititem = 0;
             if (write)
             {
                 // esp. a "blocking Apply" is redirected from Synth-Thread: commandSendReal() -> commandPad() -> returns() -> indirectTransfers()
@@ -2322,7 +2324,7 @@ bool InterChange::processPad(CommandBlock *getData)
     }
     if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
-        if (synth->getRuntime().handlePadSynthBuild == 2)
+        if (synth->getRuntime().usePadAutoApply())
         {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
             std::cout << "|processPad::Auto-Apply| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
             pars.buildNewWavetable();
@@ -3571,11 +3573,17 @@ void InterChange::commandPart(CommandBlock *getData)
             if (write && (part->kit[kititem].Ppadenabled != value_bool))
             {
                 part->kit[kititem].Ppadenabled = value_bool;
-                /////////////TODO padthread: do we want to trigger a rebuild unconditionally here, whenever activating a PADsynth?
-                /////////////                or is there any way we can know we still need to apply? do we actually need to care at all?
-                /////////////                or is it sufficient to auto-apply whenever a relevant PAD waveform parameter is changed?
-                std::cout << "|commandPart| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
-                part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
+                if (synth->getRuntime().useLegacyPadBuild())
+                {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
+                    toGUI.write(getData->bytes);                      // cause update in the GUI to enable the edit button
+                    getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()
+                    getData->data.control = PADSYNTH::control::applyChanges;
+                }
+                else
+                {
+                    std::cout << "|commandPart| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
+                    part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
+                }
             }
             else
                 value = part->kit[kititem].Ppadenabled;
@@ -5414,7 +5422,8 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
         case PADSYNTH::control::applyChanges:
             if (write && value >= 0.5f)
             {
-                bool blocking = (0 == getData->data.parameter);
+                bool blocking = (synth->getRuntime().useLegacyPadBuild()
+                                 or getData->data.parameter == 0);
                 if (blocking)
                 {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
                     getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()

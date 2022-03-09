@@ -305,11 +305,11 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableGUI,
         enableCLI,
         enableAutoInstance,
-        handlePadSynthBuild,
         enableSinglePath,
-        enableHighlight, // in banks
         historyLock,
         exposeStatus, // CLI only
+        enableHighlight, // in banks
+        handlePadSynthBuild,   // how to build PADSynth wavetable; 0=legacy/muted, 1=background thread, 2=autoApply
 
         // start of engine controls
         jackMidiSource = 32,
