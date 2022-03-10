@@ -5953,6 +5953,14 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return sendNormal(synth, TOPLEVEL::action::lowPrio, value, controlType, MAIN::control::keyShift, TOPLEVEL::section::main);
     }
 
+    if (input.matchnMove(3, "BPM"))
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        float value = string2float(input);
+        return sendNormal(synth, 0, value, controlType, MAIN::control::bpmFallback, TOPLEVEL::section::main);
+    }
+
     if (input.matchnMove(2, "solo"))
     {
         int value = MIDI::SoloType::Disabled;

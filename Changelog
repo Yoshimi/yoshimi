@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+2022-3-10 Will
+Merged in undo branch
+Merged in default BPM from Kristian
+Added CLI code for default BPM
+
 2022-3-9 Will
 * Corrected envelope info in user guide.
 

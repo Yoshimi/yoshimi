@@ -3442,6 +3442,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             min = BPM_FALLBACK_MIN;
             def = 120;
             max = BPM_FALLBACK_MAX;
+            type &= ~TOPLEVEL::type::Integer;
             break;
 
         case MAIN::control::mono:

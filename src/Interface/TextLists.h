@@ -175,6 +175,7 @@ static std::string toplist [] = {
     "  PANning <n>",            "panning type (Cut, Default, Boost)",
     "  Volume <n>",             "master volume",
     "  SHift <n>",              "master key shift semitones (0 no shift)",
+    "  BPM <n>",                "default BPM if none from MIDI",
     "  DEtune <n>",             "master fine detune",
     "  SOlo [s]",               "channel 'solo' switch type (ROw, COlumn, LOop, TWoway, CHannel {other} off)",
     "  SOlo CC <n>",            "incoming 'solo' CC number (type must be set first)",
