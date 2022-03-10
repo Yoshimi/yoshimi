@@ -126,6 +126,14 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
         return withValue(commandName, type, showValue, addValue, value);
     }
 
+    if (npart == TOPLEVEL::section::undoMark)
+    {
+        if (control == MAIN::undo)
+            return "Nothing to undo!";
+        else if (control == MAIN::redo)
+            return "Nothing to redo!";
+    }
+
     if ((kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
@@ -1122,6 +1130,9 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             break;
         case MAIN::control::keyShift:
             contstr = "Key Shift";
+            break;
+        case MAIN::control::bpmFallback:
+            contstr = "Fallback BPM";
             break;
         case MAIN::control::mono:
             contstr = "Master Mono/Stereo ";

@@ -4,6 +4,7 @@
     Copyright 2016-2019, Will Godfrey & others
     Copyright 2020-2020, Kristian Amlie, Will Godfrey, & others
     Copyright 2021, Will Godfrey, Rainer Hans Liffers, & others
+    Copyright 2022, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -100,7 +101,12 @@ InterChange::InterChange(SynthEngine *_synth) :
     searchBank(0),
     searchRoot(0)
 {
-    ;
+    noteSeen = false;
+    undoLoopBack = false;
+    fromRedo = false;
+    setUndo = false;
+    setRedo = false;
+    undoMarker.data.part = TOPLEVEL::section::undoMark;
 }
 
 
@@ -191,6 +197,7 @@ InterChange::~InterChange()
 {
     if (sortResultsThreadHandle)
         pthread_join(sortResultsThreadHandle, 0);
+    undoRedoClear();
 }
 
 
@@ -622,6 +629,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         {
             if (write)
             {
+                add2undo(getData, noteSeen);
                 synth->microtonal.Pglobalfinedetune = value;
                 synth->setAllPartMaps();
             }
@@ -840,6 +848,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::defaultPart: // clear part
             if (write)
             {
+                undoRedoClear();
                 doClearPart(value);
                 synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
@@ -976,7 +985,6 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             }
             newMsg = true;
             break;
-
         case MAIN::control::stopSound:
 #ifdef REPORT_NOTES_ON_OFF
             // note test
@@ -1353,7 +1361,8 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 int i = 0;
                 while (!firstSynth->getRuntime().presetsDirlist[i].empty())
-                    ++i;
+                    ++i;        //candidate->data.type |= TOPLEVEL::type::Write;
+        //candidate->data.source = TOPLEVEL::action::forceUpdate;
                 if (i > (MAX_PRESETS - 2))
                     text = " FAILED preset list full";
                 else
@@ -1751,6 +1760,19 @@ void InterChange::mediate()
     CommandBlock getData;
     getData.data.control = UNUSED; // No other data element could be read uninitialised
     syncWrite = true;
+    if (setUndo)
+    {
+        undoLast(&getData);
+        commandSend(&getData);
+        returns(&getData);
+    }
+    else if (setRedo)
+    {
+        redoLast(&getData);
+        commandSend(&getData);
+        returns(&getData);
+    }
+
     bool more;
     do
     {
@@ -1924,7 +1946,7 @@ bool InterChange::commandSend(CommandBlock *getData)
 {
     bool isChanged = commandSendReal(getData);
     bool isWrite = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    if (isWrite && isChanged) //write command
+    if (isWrite && isChanged) // write command
     {
         synth->setNeedsSaving(true);
         unsigned char control = getData->data.control;
@@ -1957,6 +1979,19 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         firstSynth->getRuntime().exitType = FORCED_EXIT;
         firstSynth->getRuntime().runSynth = false;
         return false;
+    }
+    if (npart == TOPLEVEL::section::undoMark)
+    {
+        if (getData->data.control == MAIN::control::undo && !undoList.empty())
+        {
+            setUndo = true;
+            getData->data.control = UNUSED;
+        }
+        else if (getData->data.control == MAIN::control::redo && !redoList.empty())
+        {
+            setRedo = true;
+            getData->data.control = UNUSED;
+        }
     }
 
     if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
@@ -1997,10 +2032,6 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    /*
-     * TODO insert undo/redo pair here
-     */
-
     if (npart == TOPLEVEL::section::main)
     {
         commandMain(getData);
@@ -2012,6 +2043,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         commandSysIns(getData);
         return true;
     }
+
     if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
     {
         commandEffects(getData);
@@ -3061,7 +3093,10 @@ void InterChange::commandMain(CommandBlock *getData)
     {
         case MAIN::control::volume:
             if (write)
+            {
+                add2undo(getData, noteSeen);
                 synth->setPvolume(value);
+            }
             else
                 value = synth->Pvolume;
             break;
@@ -3074,7 +3109,11 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case MAIN::control::availableParts:
             if ((write) && (value == 16 || value == 32 || value == 64))
+            {
+                if (value < synth->getRuntime().NumAvailableParts)
+                    undoRedoClear(); // references might no longer exist
                 synth->getRuntime().NumAvailableParts = value;
+            }
             else
                 value = synth->getRuntime().NumAvailableParts;
             break;
@@ -3086,9 +3125,17 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
 
-        case MAIN::control::detune: // done elsewhere
+        case MAIN::control::detune: // writes indirect
+            value = synth->microtonal.Pglobalfinedetune;
             break;
         case MAIN::control::keyShift: // done elsewhere
+            break;
+
+        case MAIN::control::bpmFallback:
+            if (write)
+                synth->PbpmFallback = value;
+            else
+                value = synth->PbpmFallback;
             break;
 
         case MAIN::control::mono:
@@ -3228,6 +3275,14 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::startInstance: // done elsewhere
             break;
         case MAIN::control::stopInstance: // done elsewhere
+            break;
+        case MAIN::control::undo:
+        case MAIN::control::redo:
+            if ((action & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::muteAndLoop)
+            {
+                muteQueueWrite(getData);
+                getData->data.source = TOPLEVEL::action::noAction;
+            }
             break;
         case MAIN::control::stopSound: // just stop
             if (write)
@@ -3405,6 +3460,33 @@ void InterChange::commandPart(CommandBlock *getData)
         getData->data.source = TOPLEVEL::action::noAction;
         synth->getRuntime().Log("Kit item " +  to_string(kititem + 1) + " not enabled");
         return;
+    }
+
+    if (write)
+    {
+        /*if (control == PART::control::resetAllControllers)
+        {
+           addGroup2undo(&undoMarker);
+            CommandBlock tempData;
+            memset(&tempData.bytes, 255, sizeof(CommandBlock));
+            tempData.data.part = TOPLEVEL::undoResonanceMark;
+            tempData.data.value = 0.0f;
+            addGroup2undo(&tempData);
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            for (int ctl = PART::control::volumeRange; ctl < PART::control::resetAllControllers; ++ctl)
+            {
+                tempData.data.control = ctl;
+                tempData.data.type &= ~TOPLEVEL::type::Write;
+                commandPart(&tempData);
+                addGroup2undo(&tempData);
+            }
+            tempData.data.part = TOPLEVEL::undoResonanceMark;
+            addGroup2undo(&tempData);
+        }*/
+        if (control == PART::control::enableKitLine || control == PART::control::kitMode)
+            undoRedoClear(); // these would become completely invalid!
+        else
+            add2undo(getData, noteSeen);
     }
 
     unsigned char effNum = part->Peffnum;
@@ -4084,6 +4166,8 @@ void InterChange::commandAdd(CommandBlock *getData)
     part = synth->part[npart];
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
+    if (write)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
@@ -4262,6 +4346,9 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     part = synth->part[npart];
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
+
+    if (write)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
@@ -4679,6 +4766,9 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
+    if (write && control != SUBSYNTH::control::clearHarmonics)
+        add2undo(getData, noteSeen);
+
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
@@ -4951,6 +5041,9 @@ void InterChange::commandPad(CommandBlock *getData)
     part = synth->part[npart];
     PADnoteParameters *pars;
     pars = part->kit[kititem].padpars;
+
+    if (write && control != PADSYNTH::control::applyChanges)
+        add2undo(getData, noteSeen);
 
     switch (control)
     {
@@ -5280,6 +5373,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
     bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
+    if (write && control != OSCILLATOR::control::clearHarmonics && control != OSCILLATOR::control::convertToSine)
+        add2undo(getData, noteSeen);
+
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
         if (write)
@@ -5586,7 +5682,24 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case RESONANCE::control::randomType:
             if (write)
+            {
+                /*addGroup2undo(&undoMarker);
+                CommandBlock tempData;
+                tempData.data.part = TOPLEVEL::undoResonanceMark;
+                addGroup2undo(&tempData);
+                memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+                tempData.data.control = RESONANCE::control::graphPoint;
+                tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
+                for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
+                {
+                    tempData.data.value = respar->Prespoints[i];
+                    tempData.data.parameter = i;
+                    addGroup2undo(&tempData);
+                }
+                tempData.data.part = TOPLEVEL::undoResonanceMark;
+                addGroup2undo(&tempData);*/
                 respar->randomize(value_int);
+            }
             break;
 
         case RESONANCE::control::interpolatePeaks:
@@ -5624,6 +5737,10 @@ void InterChange::commandLFO(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
 
     if (engine == PART::engine::addSynth)
     {
@@ -5761,6 +5878,10 @@ void InterChange::commandFilter(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
 
     if (engine == PART::engine::addSynth)
     {
@@ -6035,6 +6156,10 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
+
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    if (write)
+        add2undo(getData, noteSeen);
 
     std::string env;
     std::string name;
@@ -6455,6 +6580,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         // the line above is to show it's changed from preset values
     }
 
+    if (write)
+        add2undo(getData, noteSeen);
+
     EffectMgr *eff;
 
     if (npart == TOPLEVEL::section::systemEffects)
@@ -6546,6 +6674,150 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.value = value;
 }
 
+
+void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
+{
+    if (undoLoopBack)
+    {
+        undoLoopBack = false;
+        return; // don't want to reset what we've just undone!
+    }
+
+    if (!fromRedo)
+        redoList.clear(); // always invalidated on new entry
+    fromRedo = false;
+
+    if (noteSeen || undoList.empty())
+    {
+        noteSeen = false;
+        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
+        undoList.push_back(undoMarker);
+    }
+    else
+    {
+        if (undoList.back().data.control == getData->data.control
+            && undoList.back().data.part == getData->data.part
+            && undoList.back().data.kit == getData->data.kit
+            && undoList.back().data.engine == getData->data.engine
+            && undoList.back().data.insert == getData->data.insert
+            && undoList.back().data.parameter == getData->data.parameter)
+            return;
+        undoList.push_back(undoMarker);
+    }
+    /*
+     * the following is used to read the current value of the specific
+     * control as that is what we will want to revert to.
+     */
+    CommandBlock candidate;
+    memcpy(candidate.bytes, getData->bytes, sizeof(CommandBlock));
+    candidate.data.type &= TOPLEVEL::type::Integer;
+    candidate.data.source = 0;
+    commandSendReal(&candidate);
+
+    candidate.data.source = getData->data.source | TOPLEVEL::action::forceUpdate;
+    candidate.data.type = getData->data.type;
+    undoList.push_back(candidate);
+
+    std::cout << "add ";
+    synth->CBtest(&undoList.back());
+}
+
+
+void InterChange::addGroup2undo(CommandBlock *getData)
+{
+    if (undoLoopBack)
+    {
+        undoLoopBack = false;
+        return; // don't want to reset what we've just undone!
+    }
+
+    redoList.clear(); // always invalidated on new entry
+    fromRedo = false;
+
+    undoList.push_back(*getData);
+
+    std::cout << "add group ";
+    synth->CBtest(&undoList.back());
+}
+
+
+void InterChange::undoLast(CommandBlock *candidate)
+{
+    if (undoList.empty())
+        return;
+    undoLoopBack = true;
+    bool setMarker = true;
+    CommandBlock oldCommand;
+    if (undoList.back().data.part != TOPLEVEL::undoMark)
+    {
+        memcpy(candidate->bytes, undoList.back().bytes, sizeof(CommandBlock));
+
+        std::cout << "undo ";
+        synth->CBtest(candidate);
+
+        if(setMarker)
+        {
+            setMarker = false;
+            redoList.push_back(undoMarker);
+        }
+        memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(CommandBlock));
+        char temptype = oldCommand.data.type;
+        char tempsource = oldCommand.data.source;
+        oldCommand.data.type &= TOPLEVEL::type::Integer;
+        oldCommand.data.source = 0;
+        commandSendReal(&oldCommand);
+        oldCommand.data.type = temptype;
+        oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
+        redoList.push_back(oldCommand);
+        undoList.pop_back();
+    }
+
+    if (undoList.empty())
+        setUndo = false;
+    else if (undoList.back().data.part == TOPLEVEL::undoMark)
+    {
+        setUndo = false;
+        undoList.pop_back();
+    }
+}
+
+
+void InterChange::redoLast(CommandBlock *candidate)
+{
+    if (redoList.empty())
+        return;
+    if (redoList.back().data.part != TOPLEVEL::undoMark)
+    {
+        undoLoopBack = false;
+        fromRedo = true;
+        memcpy(candidate->bytes, redoList.back().bytes, sizeof(CommandBlock));
+
+        std::cout << "redo ";
+        synth->CBtest(candidate);
+        redoList.pop_back();
+    }
+
+    if (redoList.empty())
+        setRedo = false;
+    else if (redoList.back().data.part == TOPLEVEL::undoMark)
+    {
+        setRedo = false;
+        redoList.pop_back();
+    }
+}
+
+
+void InterChange::undoRedoClear(void)
+{
+    undoList.clear();
+    redoList.clear();
+    noteSeen = false;
+    undoLoopBack = false;
+    fromRedo = false;
+    std::cout << "Undo/Redo cleared" << std::endl;
+}
+
+
 // tests and returns corrected values
 void InterChange::testLimits(CommandBlock *getData)
 {
@@ -6563,9 +6835,11 @@ void InterChange::testLimits(CommandBlock *getData)
         || control == CONFIG::control::extendedProgramChangeCC))
     {
         getData->data.miscmsg = NO_MSG; // just to be sure
-        if (value > 119)
+        if (value > 119) // we don't want controllers above this
             return;
         std::string text;
+        // TODO can bank and bankroot be combined
+        // as they now have the same options?
         if (control == CONFIG::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));

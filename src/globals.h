@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
+#include <iostream>
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
@@ -76,6 +77,11 @@
 #define A_MIN 30.0f
 #define A_DEF 440.0f
 #define A_MAX 1100.0f
+
+// There is nothing which technically prevents these from being lower or higher,
+// but we need to set the limits for the UI somewhere.
+#define BPM_FALLBACK_MIN 32.0f
+#define BPM_FALLBACK_MAX 480.0f
 
 // The number of discrete steps we use for the LFO BPM frequency. Make sure to
 // update LFO_BPM_LCM as well, if this is updated.
@@ -152,6 +158,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part1 = 0,   // nothing must come
         part64 = 63, // between these two
 
+        undoMark = 68, // 44
+        undoResonanceMark,
         copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8
@@ -520,6 +528,7 @@ namespace MAIN // usage MAIN::control::volume
         panLawType,
         detune = 32,
         keyShift = 35,
+        bpmFallback,
         reseed = 40,
         soloType = 48,
         soloCC,
@@ -548,6 +557,8 @@ namespace MAIN // usage MAIN::control::volume
         openManual = 100,
         startInstance = 104,
         stopInstance,
+        undo,
+        redo,
         stopSound = 128,
         readPartPeak = 200, // now does L/R
         readMainLRpeak,
@@ -604,7 +615,7 @@ namespace PART // usage PART::control::volume
         audioDestination = 120,
 
     // start of controllers
-        volumeRange = 128,
+        volumeRange = 128, // start marker (must be first)
         volumeEnable,
         panningWidth,
         modWheelDepth,
@@ -618,16 +629,17 @@ namespace PART // usage PART::control::volume
         filterQdepth,
         filterCutoffDepth,
         breathControlEnable,
-        resonanceCenterFrequencyDepth = 144,
+        resonanceCenterFrequencyDepth,
         resonanceBandwidthDepth,
-        portamentoTime = 160,
+        portamentoTime,
         portamentoTimeStretch,
         portamentoThreshold,
         portamentoThresholdType,
         enableProportionalPortamento,
         proportionalPortamentoRate,
         proportionalPortamentoDepth,
-        receivePortamento = 168,
+        receivePortamento, // 151
+        resetAllControllers, // end marker (must be last)
     // end of controllers
 
     // start of midi controls
@@ -649,7 +661,6 @@ namespace PART // usage PART::control::volume
         instrumentName,
         instrumentType,
         defaultInstrumentCopyright, // this needs to be split into two for load/save
-        resetAllControllers, // this needs to bump up 1 to make space
         partBusy = 252 // internally generated - read only
     };
 

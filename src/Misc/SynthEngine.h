@@ -166,6 +166,8 @@ class SynthEngine
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
+        void CBtest(CommandBlock *candidate);
+
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;
@@ -204,6 +206,7 @@ class SynthEngine
         float         ControlStep;
         int           Paudiodest;
         int           Pkeyshift;
+        float         PbpmFallback;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 

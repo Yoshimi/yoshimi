@@ -3,6 +3,7 @@
 
     Copyright 2016-2020 Will Godfrey
     Copyright 2021,  Will Godfrey, Rainer Hans Liffers
+    Copyright 2022, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -31,6 +32,8 @@
 #include "Params/EnvelopeParams.h"
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
+
+#include <list>
 
 class SynthEngine;
 class DataText;
@@ -138,12 +141,27 @@ class InterChange : private DataText
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
 
+        void add2undo(CommandBlock *getData, bool& noteSeen);
+        void addGroup2undo(CommandBlock *getData);
+        void undoLast(CommandBlock *candidate);
+        void redoLast(CommandBlock *candidate);
+        std::list<CommandBlock> undoList;
+        std::list<CommandBlock> redoList;
+        CommandBlock lastEntry;
+        CommandBlock undoMarker;
+        bool undoLoopBack;
+        bool fromRedo;
+        bool setUndo;
+        bool setRedo;
+
+    public:
+        bool noteSeen;
+        void undoRedoClear(void);
         /*
          * this is made public specifically so that it can be
          * reached from SynthEngine by jack freewheeling NRPNs.
          * This avoids unnecessary (error prone) duplication.
          */
-    public:
         void commandEffects(CommandBlock *getData);
 
     private:

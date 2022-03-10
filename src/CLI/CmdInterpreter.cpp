@@ -1,7 +1,7 @@
 /*
     CmdInterpreter.cpp
 
-    Copyright 2019 - 2021, Will Godfrey and others.
+    Copyright 2019 - 2022, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -6361,7 +6361,6 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::what("add");
         }
     }
-
     if (input.matchWord(3, "import") || input.matchWord(3, "export") )
     { // need the double test to find which then move along line
         int type = 0;
@@ -6478,6 +6477,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 return Reply::DONE;
             }
         }
+
         if (input.matchnMove(2, "mlearn"))
         {
             if (input.matchnMove(3, "all"))
@@ -6758,6 +6758,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, PART::control::defaultInstrumentCopyright, TOPLEVEL::section::part1 + npart, UNUSED, UNUSED, UNUSED, 1);
         return Reply::what("save");
     }
+
+    if (input.matchnMove(3, "undo"))
+            return sendNormal(synth, 0, 0, TOPLEVEL::type::Write,  MAIN::control::undo, TOPLEVEL::section::undoMark);
+    if (input.matchnMove(3, "redo"))
+        return sendNormal(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::redo, TOPLEVEL::section::undoMark);
 
     if (input.matchnMove(2, "zread"))
     {

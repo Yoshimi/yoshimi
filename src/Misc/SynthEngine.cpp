@@ -369,7 +369,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
     }
     /*
-     * put here so its threads don't run until everthing else is ready
+     * put here so its threads don't run until everything else is ready
      */
     if (!interchange.Init())
     {
@@ -439,6 +439,7 @@ void SynthEngine::defaults(void)
     setPvolume(90);
     TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
+    PbpmFallback = 120;
 
     VUpeak.values.vuOutPeakL = 0;
     VUpeak.values.vuOutPeakR = 0;
@@ -1083,6 +1084,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 
 bool SynthEngine::setProgram(const string& fname, int npart)
 {
+    interchange.undoRedoClear();
     bool ok = true;
     if (!part[npart]->loadXMLinstrument(fname))
         ok = false;
@@ -1482,7 +1484,6 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
  */
 int SynthEngine::SetSystemValue(int type, int value)
 {
-
     list<string> msg;
     string label;
     label = "";
@@ -1903,6 +1904,7 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(bool andML)
 {
+    interchange.undoRedoClear();
     interchange.syncWrite = false;
     interchange.lowPrioWrite = false;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
@@ -2449,6 +2451,7 @@ void SynthEngine::ShutUp(void)
 
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
+    interchange.undoRedoClear();
     defaults();
     //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
@@ -2467,6 +2470,7 @@ bool SynthEngine::saveState(const string& filename)
 
 bool SynthEngine::loadPatchSetAndUpdate(string fname)
 {
+    interchange.undoRedoClear();
     bool result;
     fname = setExtension(fname, EXTEN::patchset);
     result = loadXML(fname); // load the data
@@ -3098,6 +3102,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     xml->addpar("panning_law", Runtime.panLaw);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
+    xml->addparreal("bpm_fallback", PbpmFallback);
     xml->addpar("channel_switch_type", Runtime.channelSwitchType);
     xml->addpar("channel_switch_CC", Runtime.channelSwitchCC);
 
@@ -3243,6 +3248,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.panLaw = xml->getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    PbpmFallback = xml->getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
     Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
@@ -3430,6 +3436,12 @@ float SynthEngine::getLimits(CommandBlock *getData)
             min = -36;
             def = 0;
             max = 36;
+            break;
+
+        case MAIN::control::bpmFallback:
+            min = BPM_FALLBACK_MIN;
+            def = 120;
+            max = BPM_FALLBACK_MAX;
             break;
 
         case MAIN::control::mono:
@@ -3752,4 +3764,20 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
     }
     return value;
+}
+
+
+void SynthEngine::CBtest(CommandBlock *candidate)
+{
+    std::cout << "\n value " << candidate->data.value
+            << "\n type " << int(candidate->data.type)
+            << "\n source " << int(candidate->data.source)
+            << "\n cont " << int(candidate->data.control)
+            << "\n part " << int(candidate->data.part)
+            << "\n kit " << int(candidate->data.kit)
+            << "\n engine " << int(candidate->data.engine)
+            << "\n insert " << int(candidate->data.insert)
+            << "\n parameter " << int(candidate->data.parameter)
+            << "\n offset " << int(candidate->data.offset)
+            << std::endl;
 }
