@@ -439,6 +439,7 @@ void SynthEngine::defaults(void)
     setPvolume(90);
     TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
+    PbpmFallback = 120;
 
     VUpeak.values.vuOutPeakL = 0;
     VUpeak.values.vuOutPeakR = 0;
@@ -3101,6 +3102,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     xml->addpar("panning_law", Runtime.panLaw);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
+    xml->addparreal("bpm_fallback", PbpmFallback);
     xml->addpar("channel_switch_type", Runtime.channelSwitchType);
     xml->addpar("channel_switch_CC", Runtime.channelSwitchCC);
 
@@ -3246,6 +3248,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.panLaw = xml->getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    PbpmFallback = xml->getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
     Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
@@ -3433,6 +3436,12 @@ float SynthEngine::getLimits(CommandBlock *getData)
             min = -36;
             def = 0;
             max = 36;
+            break;
+
+        case MAIN::control::bpmFallback:
+            min = BPM_FALLBACK_MIN;
+            def = 120;
+            max = BPM_FALLBACK_MAX;
             break;
 
         case MAIN::control::mono:

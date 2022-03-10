@@ -29,6 +29,9 @@
 
 using func::asString;
 
+// The number of nanoseconds before the MIDI clock is assumed missing.
+#define MIDI_CLOCK_TIMEOUT_US 1000000
+
 
 AlsaEngine::AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
     MusicIO(_synth, _beatTracker)
@@ -54,7 +57,10 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth, BeatTracker *_beatTracker) :
     for (int i = 0; i < ALSA_MIDI_BPM_MEDIAN_WINDOW; i++)
         midi.prevBpms[i] = 120;
     midi.prevBpmsPos = 0;
-    midi.prevClockUs = 0;
+
+    timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    midi.prevClockUs = time.tv_sec * 1000000 + time.tv_nsec / 1000;
 
     little_endian = synth->getRuntime().isLittleEndian;
 }
@@ -674,118 +680,173 @@ void *AlsaEngine::_MidiThread(void *arg)
 
 void *AlsaEngine::MidiThread(void)
 {
+    unsigned int pollCount = snd_seq_poll_descriptors_count(midi.handle, POLLIN);
+    struct pollfd pollfds[pollCount];
+
+    while (synth->getRuntime().runSynth)
+    {
+        snd_seq_poll_descriptors(midi.handle, pollfds, pollCount, POLLIN);
+
+        // Poll with timeout. Should be long-ish for performance reasons, but
+        // should be short enough to be smaller than MIDI_CLOCK_TIMEOUT_US, and
+        // short enough to be able to quit relatively quickly.
+        int pollResult = poll(pollfds, pollCount, 500);
+
+        if (pollResult < 0) {
+            if (errno == EINTR)
+                continue;
+            else {
+                char errMsg[200];
+                snprintf(errMsg, sizeof(errMsg),
+                    "Unable to handle error in MIDI thread: %s. Shutting down MIDI.",
+                    strerror(errno));
+                synth->getRuntime().Log(errMsg);
+                break;
+            }
+        }
+
+        timespec time;
+        clock_gettime(CLOCK_MONOTONIC, &time);
+        uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
+
+        if (pollResult > 0)
+            handleMidiEvents(clock);
+
+        if ((clock - midi.prevClockUs) >= MIDI_CLOCK_TIMEOUT_US)
+            handleMidiClockSilence(clock);
+    }
+
+    return NULL;
+}
+
+void AlsaEngine::handleMidiEvents(uint64_t clock)
+{
     snd_seq_event_t *event;
     unsigned int par;
     int chk;
     bool sendit;
     unsigned char par0, par1 = 0, par2 = 0;
-    while (synth->getRuntime().runSynth)
+
+    while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
     {
-        while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
+        if (!event)
+            continue;
+        sendit = true;
+        par0 = event->data.control.channel;
+        par = 0;
+        switch (event->type)
         {
-            if (!event)
-                continue;
-            sendit = true;
-            par0 = event->data.control.channel;
-            par = 0;
-            switch (event->type)
-            {
-                case SND_SEQ_EVENT_NOTEON:
-                    par0 = event->data.note.channel;
-                    par0 |= 0x90;
-                    par1 = event->data.note.note;
-                    par2 = event->data.note.velocity;
-                    break;
+            case SND_SEQ_EVENT_NOTEON:
+                par0 = event->data.note.channel;
+                par0 |= 0x90;
+                par1 = event->data.note.note;
+                par2 = event->data.note.velocity;
+                break;
 
-                case SND_SEQ_EVENT_NOTEOFF:
-                    par0 = event->data.note.channel;
-                    par0 |= 0x80;
-                    par1 = event->data.note.note;
-                    break;
+            case SND_SEQ_EVENT_NOTEOFF:
+                par0 = event->data.note.channel;
+                par0 |= 0x80;
+                par1 = event->data.note.note;
+                break;
 
-                case SND_SEQ_EVENT_KEYPRESS:
-                    par0 = event->data.note.channel;
-                    par0 |= 0xa0;
-                    par1 = event->data.note.note;
-                    par2 = event->data.note.velocity;
-                    break;
+            case SND_SEQ_EVENT_KEYPRESS:
+                par0 = event->data.note.channel;
+                par0 |= 0xa0;
+                par1 = event->data.note.note;
+                par2 = event->data.note.velocity;
+                break;
 
-                case SND_SEQ_EVENT_CHANPRESS:
-                    par0 |= 0xd0;
-                    par1 = event->data.control.value;
-                    break;
+            case SND_SEQ_EVENT_CHANPRESS:
+                par0 |= 0xd0;
+                par1 = event->data.control.value;
+                break;
 
-                case SND_SEQ_EVENT_PGMCHANGE:
-                    par0 |= 0xc0;
-                    par1 = event->data.control.value;
-                    break;
+            case SND_SEQ_EVENT_PGMCHANGE:
+                par0 |= 0xc0;
+                par1 = event->data.control.value;
+                break;
 
-                case SND_SEQ_EVENT_PITCHBEND:
-                    par0 |= 0xe0;
-                    par = event->data.control.value + 8192;
-                    par1 = par & 0x7f;
-                    par2 = par >> 7;
-                    break;
+            case SND_SEQ_EVENT_PITCHBEND:
+                par0 |= 0xe0;
+                par = event->data.control.value + 8192;
+                par1 = par & 0x7f;
+                par2 = par >> 7;
+                break;
 
-                case SND_SEQ_EVENT_CONTROLLER:
-                    par0 |= 0xb0;
-                    par1 = event->data.control.param;
-                    par2 = event->data.control.value;
-                    break;
+            case SND_SEQ_EVENT_CONTROLLER:
+                par0 |= 0xb0;
+                par1 = event->data.control.param;
+                par2 = event->data.control.value;
+                break;
 
-                case SND_SEQ_EVENT_NONREGPARAM:
-                    par0 |= 0xb0; // splitting into separate CCs
-                    par = event->data.control.param;
-                    setMidi(par0, 99, par >> 7);
-                    setMidi(par0, 99, par & 0x7f);
-                    par = event->data.control.value;
-                    setMidi(par0, 6, par >> 7);
-                    par1 = 38;
-                    par2 = par & 0x7f; // let last one through
-                    break;
+            case SND_SEQ_EVENT_NONREGPARAM:
+                par0 |= 0xb0; // splitting into separate CCs
+                par = event->data.control.param;
+                setMidi(par0, 99, par >> 7);
+                setMidi(par0, 99, par & 0x7f);
+                par = event->data.control.value;
+                setMidi(par0, 6, par >> 7);
+                par1 = 38;
+                par2 = par & 0x7f; // let last one through
+                break;
 
-                case SND_SEQ_EVENT_RESET: // reset to power-on state
-                    par0 = 0xff;
-                    break;
+            case SND_SEQ_EVENT_RESET: // reset to power-on state
+                par0 = 0xff;
+                break;
 
-                case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
-                    synth->getRuntime().Log("Alsa midi port connected");
-                    sendit = false;
-                    break;
+            case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
+                synth->getRuntime().Log("Alsa midi port connected");
+                sendit = false;
+                break;
 
-                case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
-                    synth->getRuntime().Log("Alsa midi port disconnected");
-                    sendit = false;
-                    break;
+            case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
+                synth->getRuntime().Log("Alsa midi port disconnected");
+                sendit = false;
+                break;
 
-                case SND_SEQ_EVENT_SONGPOS:
-                    handleSongPos((float)event->data.control.value
-                        / (float)MIDI_SONGPOS_BEAT_DIVISION);
-                    sendit = false;
-                    break;
+            case SND_SEQ_EVENT_SONGPOS:
+                handleSongPos((float)event->data.control.value
+                    / (float)MIDI_SONGPOS_BEAT_DIVISION);
+                sendit = false;
+                break;
 
-                case SND_SEQ_EVENT_CLOCK:
-                    handleMidiClock();
-                    sendit = false;
-                    break;
+            case SND_SEQ_EVENT_CLOCK:
+                handleMidiClock(clock);
+                sendit = false;
+                break;
 
-                default:
-                    sendit = false;// commented out some progs spam us :(
-                    /* synth->getRuntime().Log("Other non-handled midi event, type: "
-                                + asString((int)event->type));*/
-                    break;
-            }
-            if (sendit)
-                setMidi(par0, par1, par2);
-            snd_seq_free_event(event);
+            default:
+                sendit = false;// commented out some progs spam us :(
+                /* synth->getRuntime().Log("Other non-handled midi event, type: "
+                            + asString((int)event->type));*/
+                break;
         }
-;
-        if (chk < 0)
-        {
-            usleep(1024);
-        }
+        if (sendit)
+            setMidi(par0, par1, par2);
+        snd_seq_free_event(event);
     }
-    return NULL;
+}
+
+void AlsaEngine::handleMidiClockSilence(uint64_t clock)
+{
+    // This is equivalent to receiving a clock beat every MIDI_CLOCK_TIMEOUT_US
+    // nanoseconds, except we do not use it to calculate the BPM, but use the
+    // fallback value instead. In between these fake "beats", the BeatTracker
+    // interpolates the values for us, as it also does for normal MIDI clock
+    // beats. This means it may take up to MIDI_CLOCK_TIMEOUT_US nanoseconds to
+    // react to a change in the BPM fallback.
+    BeatTracker::BeatValues beats {
+        midi.lastDivSongBeat,
+        midi.lastDivMonotonicBeat,
+        synth->PbpmFallback,
+    };
+    float diff = (clock - midi.prevClockUs) * beats.bpm / (60.0f * 1000000.0f);
+    beats.songBeat += diff;
+    beats.monotonicBeat += diff;
+    midi.lastDivSongBeat = beats.songBeat;
+    midi.lastDivMonotonicBeat = beats.monotonicBeat;
+    beatTracker->setBeatValues(beats);
+    midi.prevClockUs = clock;
 }
 
 
@@ -817,12 +878,8 @@ void AlsaEngine::handleSongPos(float beat)
     //beatTracker->setBeatValues(beats);
 }
 
-void AlsaEngine::handleMidiClock()
+void AlsaEngine::handleMidiClock(uint64_t clock)
 {
-    timespec time;
-    clock_gettime(CLOCK_MONOTONIC, &time);
-    uint64_t clock = time.tv_sec * 1000000 + time.tv_nsec / 1000;
-
     float bpm = 1000000.0f * 60.0f / float((clock - midi.prevClockUs) * MIDI_CLOCKS_PER_BEAT);
     if (++midi.prevBpmsPos >= ALSA_MIDI_BPM_MEDIAN_WINDOW)
         midi.prevBpmsPos = 0;

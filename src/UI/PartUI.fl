@@ -2972,7 +2972,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {groupRtext(float dScale)} {} {
     code {//
-    partgroup->resize(3 * dScale, 255 * dScale, 380 * dScale, 170 * dScale);
+    partgroup->resize(3 * dScale, 285 * dScale, 380 * dScale, 170 * dScale);
     //partgroupui->size(378 * dScale, 168 * dScale);
 
     /* The above has to be numerically fixed as the relative size

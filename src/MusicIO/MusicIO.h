@@ -87,7 +87,10 @@ class BeatTracker
         // beat count gets high. The wrapped around value is guaranteed to
         // divide all possible LFO fractions.
         virtual BeatValues setBeatValues(BeatValues beats) = 0;
+        // Gets the beat values as close as possible in time to this moment.
         virtual BeatValues getBeatValues() = 0;
+        // Gets the raw beat values without any sort of time calculation.
+        virtual BeatValues getRawBeatValues() = 0;
 
     protected:
         void adjustMonotonicRounding(BeatValues *beats);
@@ -107,6 +110,7 @@ class MultithreadedBeatTracker : public BeatTracker
         // thread, the second from the audio thread.
         BeatValues setBeatValues(BeatValues beats);
         BeatValues getBeatValues();
+        BeatValues getRawBeatValues();
 
     private:
         // Current and last time and beats of the MIDI clock.
@@ -127,6 +131,7 @@ class SinglethreadedBeatTracker : public BeatTracker
 
         BeatValues setBeatValues(BeatValues beats);
         BeatValues getBeatValues();
+        BeatValues getRawBeatValues();
 
     private:
         BeatValues beats;

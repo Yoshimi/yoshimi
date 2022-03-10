@@ -119,8 +119,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     int offs = 0;
     uint32_t next_frame = 0;
     uint32_t processed = 0;
-    BeatTracker::BeatValues beats(beatTracker->getBeatValues());
+    BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
     uint32_t beatsAt = 0;
+    bool bpmProvided = false;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -196,8 +197,10 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                                 _atom_bpm, &bpm,
                                 NULL);
 
-            if (bpm && bpm->type == _atom_float)
+            if (bpm && bpm->type == _atom_float) {
                 beats.bpm = ((LV2_Atom_Float *)bpm)->body;
+                bpmProvided = true;
+            }
 
             uint32_t frame = event->time.frames;
             float bpmInc = (float)(frame - processed) * beats.bpm / (synth->samplerate_f * 60.f);
@@ -245,6 +248,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
     beats.songBeat += bpmInc;
     beats.monotonicBeat += bpmInc;
+    if (!bpmProvided)
+        beats.bpm = synth->PbpmFallback;
     beatTracker->setBeatValues(beats);
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
