@@ -28,7 +28,10 @@
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
+#include <memory>
+
 class PADnoteParameters;
+class WaveInterpolator;
 class Controller;
 class Envelope;
 class LFO;
@@ -72,9 +75,7 @@ class PADnote
         } NoteStatus;
         PADnoteParameters *pars;
 
-        int poshi_l;
-        int poshi_r;
-        float poslo;
+        std::unique_ptr<WaveInterpolator> waveInterpolator;
 
         float basefreq;
         float BendAdjust;
@@ -82,7 +83,6 @@ class PADnote
         bool firsttime;
         bool released;
 
-        size_t tableNr;
         int portamento, midinote;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
