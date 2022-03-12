@@ -75,8 +75,8 @@ class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window syseffsend {
-      xywh {916 486 30 30} type Double box NO_BOX labelfont 1 hide
-      class Fl_Group
+      xywh {916 486 30 30} type Double box NO_BOX labelfont 1
+      class Fl_Group visible
     } {
       Fl_Dial sysend {
         callback {//
@@ -498,19 +498,19 @@ class PartUI {: {public Fl_Group, PartUI_}
             lastkey = -1;
             Showedit();
         }}
-          xywh {330 6 42 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
+          xywh {330 2 42 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Box instrumentaddbox {
-          xywh {136 9 63 16} box FLAT_BOX
+          xywh {136 5 63 16} box FLAT_BOX
         }
         Fl_Box instrumentsubbox {
-          xywh {199 9 63 16} box FLAT_BOX
+          xywh {199 5 63 16} box FLAT_BOX
         }
         Fl_Box instrumentpadbox {
-          xywh {262 9 63 16} box FLAT_BOX
+          xywh {262 5 62 16} box FLAT_BOX
         }
         Fl_Button instrumentlabel {
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 20} box THIN_DOWN_FRAME labelsize 12 align 16
           code0 {setinstrumentlabel();}
         }
         Fl_Button buttontop {
@@ -532,7 +532,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Dial velocitysense {
           label {Vel. Sens}
@@ -709,8 +709,8 @@ class PartUI {: {public Fl_Group, PartUI_}
           send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
         }
-        Fl_Box {} {
-          xywh {240 106 134 61} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
+        Fl_Box sysEffBox {
+          xywh {240 106 134 58} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
         }
         Fl_Pack toSysEfx {
           xywh {246 122 122 39} type HORIZONTAL labeltype NO_LABEL labelsize 10 align 0
@@ -733,7 +733,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Text_Display syseffname {
         label {Send to System Effect}
-        xywh {255 134 103 15} box NO_BOX labelsize 11 align 2
+        xywh {255 134 103 13} box NO_BOX labelsize 11 align 2
       }
       Fl_Check_Button partGroupEnable {
         label Enabled

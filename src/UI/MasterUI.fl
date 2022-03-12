@@ -460,8 +460,8 @@ class MasterUI {: {private GuiUpdates}
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
-      Fl_Box {} {
-        xywh {279 28 103 115} box ENGRAVED_FRAME
+      Fl_Box topcontrols {
+        xywh {270 28 110 115} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
         callback {//
@@ -755,7 +755,7 @@ class MasterUI {: {private GuiUpdates}
           label Detune
           callback {//
           send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
+          tooltip {Global Fine Detune} xywh {280 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
           class WidgetPDial
@@ -771,19 +771,19 @@ class MasterUI {: {private GuiUpdates}
               else
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}}
           tooltip {Clear all dynamic settings
-(+Ctrl includes MIDI-learn)} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+(+Ctrl includes MIDI-learn)} xywh {7 60 68 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button mainstop {
           label {Stop!}
           callback {//
     send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {7 30 68 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
           send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
-          tooltip {Master Volume} xywh {335 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
+          tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
           class WidgetPDial
@@ -792,7 +792,7 @@ class MasterUI {: {private GuiUpdates}
           label {Virtual Keyboard}
           callback {//
           virkeyboard->ShowKbd();}
-          tooltip {Virtual Keyboard} xywh {85 60 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
@@ -802,31 +802,31 @@ class MasterUI {: {private GuiUpdates}
           panelType &= 3;
           updatepanel();
           panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mainmidilearn {
           label {Midi Learn}
           callback {//
                 midilearnui->showLearn();}
-          tooltip {Message Log} xywh {85 90 110 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Message Log} xywh {83 90 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button vectors {
           label Vectors
           callback {//
           vectorui->Show(synth);}
-          tooltip {Vector Setup Window} xywh {203 30 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button undo {
           label Undo
           callback {//
         send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button redo {
           label Redo
           callback {//
         send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          xywh {203 90 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
       }
       Fl_Tabs sysinsgroup {
@@ -979,23 +979,23 @@ class MasterUI {: {private GuiUpdates}
         }
       }
       Fl_Button mastermono {
-        label S
+        label Stereo
         callback {//
         int tmp = 1 -  o->value();
         o->value(tmp);
         if (tmp == 0)
-            o->label("S");
+            o->label("Stereo");
         else
-            o->label("M");
+            o->label("Mono");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Master Mono/Stereo switch} xywh {285 88 23 20} box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
+        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
-        label Shift
+        label {Key Shift}
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Shift pitch +/- N semitones} xywh {338 88 38 20} labelsize 10 minimum -36 maximum 36 textfont 1 textsize 12
+        tooltip {Shift pitch +/- N semitones} xywh {328 88 43 20} labelsize 10 minimum -36 maximum 36 textfont 1 textsize 12
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
         class WidgetSpinner
@@ -1004,7 +1004,7 @@ class MasterUI {: {private GuiUpdates}
         label {F. BPM}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::bpmFallback, o->value(), 0, TOPLEVEL::section::main);}
-        tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {320 116 56 20} labelsize 10 minimum 0 maximum 0 value 120 textfont 1 textsize 12
+        tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {316 116 56 20} labelsize 10 minimum 0 maximum 0 value 120 textfont 1 textsize 12
         code0 {o->range(BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);}
         code1 {o->step(1.0); o->type(FL_FLOAT_INPUT);}
         code2 {setBpmFallbackValue(synth->PbpmFallback);}
@@ -1076,6 +1076,9 @@ Instance from 1 to 31}
           callback {//}
           xywh {162 90 37 22} textsize 11
         }
+      }
+      Fl_Box divider {
+        xywh {18 320 350 2} box THIN_DOWN_FRAME
       }
     }
     comment {line spaces in boxes below are critical} {in_source in_header
@@ -2419,9 +2422,9 @@ Alan Calvert started the project}
         case MAIN::control::mono:
             mastermono->value(value_int);
             if (value_int)
-                mastermono->label("M");
+                mastermono->label("Mono");
             else
-                mastermono->label("S");
+                mastermono->label("Stereo");
             break;
 
         case MAIN::control::soloType:
@@ -3192,7 +3195,7 @@ Alan Calvert started the project}
     if (type != 5)
         vectorui->RefreshChans();
     mastermono->value(0);
-    mastermono->label("S");
+    mastermono->label("Stereo");
     if (type == 0x14)
     {
         for (int i = 1; i < 6; ++i)

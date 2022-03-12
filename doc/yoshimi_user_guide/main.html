@@ -103,23 +103,32 @@
     <br><br>
     <b>Stop</b> is the usual panic button. It cancels all sounding notes. However, while it does so extremely fast, it is actually a rapid fade down. This is so there isn't a sharp 'edge' that would be quite unpleasant if you are monitoring on headphones and might be damaging to some audio systems.
     <br><br>
-    <b>Mixer Panel</b> simply opens the mixer window, described later in <a href="part/part.html">Part</a>.
-    <br><br>
-    <b>Vectors</b> also opens another window, this time for combined control of up to four parts.
-    <br><br>
     <b>Reset</b> Stops all sound (as above) and also clears almost all settings, taking you back to the startup condition. The one exception is <em>Midi Learn</em>. If you want to clear this as well, you have to hold down the <em>Ctrl</em> key at the same time.
+    <br><br>
+    <b>Stereo</b> This button switches between stereo and mono (when the color changes to red and the word becomes 'Mono'). It only affects the output pair, and is never saved. It switches virtually silently and is very useful for checking how the music would sound on a mono system.
+    <br><br>
+    <b>Mixer Panel</b> simply opens the mixer window, described later in <a href="part/part.html">Part</a>.
     <br><br>
     <b>Virtual keyboard</b> opens the window displaying this in the same way as a first time startup.
     <br><br>
     <b>Midi Learn</b> opens the window for loading, saving and editing these learned controls.
     <br><br>
+    <b>Vectors</b> also opens another window, this time for combined control of up to four parts.
+    <br><br>
+    <b>Undo</b> reverts the last control that was changed.
+    <br><br>
+    <b>Redo</b> re-applies the most recent 'Undo' action.
+    <br><br>
+    There are some limitations to 'Undo' and 'Redo'. Loading a new part, performing a master reset, etc. will clear the lists. It would not be sensible to try to modify elements that simply might no longer exist. Also some of the waveform controls make such extreme changes that attempting to store, then re-apply them would be prohibitavely disruptive.
+    </p>
+    <p>
     <b>Detune</b> provides a very fine detune of the entire synth so you can match the pitch to any other synth or sound source you might be using.
     <br><br>
     <b>Volume</b> is the master volume control for the main audio output pair. It doesn't affect any individual part outputs you might have set (if using Jack audio, or LV2).
     <br><br>
-    <b>S</b> This button switches between stereo and mono (when the color changes to red and the letter becomes an 'M'). It only affects the output pair, and is never saved. It switches virtually silently and is very useful for checking how the music would sound on a mono system.
-    <br><br>
     <b>Shift</b> allows you to step the overall key up or down in semitone steps as much as three octaves.
+    <br><br>
+    <b>F. BPM</b> This provides a reference MIDI clock within Yoshimi when there is none being sent from your external keyboard/controller.
     </P>
     <a id="system"></a>
     <img src="images/system.png" alt="The System Effects Insert" class="image">
