@@ -31,55 +31,83 @@
 
 class WaveInterpolator
 {
-    const fft::Waveform* table;
-    float baseFreq;
+    protected:
+        fft::Waveform const& table;
+        const float baseFreq;
+        const size_t size;
 
-    size_t posHiL;
-    size_t posHiR;
-    float posLo;
-
-    public: // can be copy/move constructed, but not assigned...
-       ~WaveInterpolator()                                   = default;
-        WaveInterpolator(WaveInterpolator&&)                 = default;
-        WaveInterpolator(WaveInterpolator const&)            = default;
-        WaveInterpolator& operator=(WaveInterpolator&&)      = delete;
-        WaveInterpolator& operator=(WaveInterpolator const&) = delete;
+        size_t posHiL;
+        size_t posHiR;
+        float posLo;
 
         WaveInterpolator(fft::Waveform const& wave, float freq)
-            : table{&wave}
+            : table{wave}
             , baseFreq{freq}
+            , size{wave.size()}
             , posHiL{0}
             , posHiR{0}
             , posLo{0}
         { }
 
-        void useTable(fft::Waveform const& wave, float freq)
+    public: // can be copy/move constructed, but not assigned...
+        WaveInterpolator(WaveInterpolator&&)                 = default;
+        WaveInterpolator(WaveInterpolator const&)            = default;
+        WaveInterpolator& operator=(WaveInterpolator&&)      = delete;
+        WaveInterpolator& operator=(WaveInterpolator const&) = delete;
+
+        virtual ~WaveInterpolator() = default; // this is an interface
+
+
+        float getCurrentPhase()  const
         {
-            table = &wave;
-            baseFreq = freq;
+            return (posHiL + posLo) / float(size);
         }
 
         void setStartPos(float phase, bool stereo)
         {
-            size_t size = table->size();
-            posHiL = size_t(phase * (size-1));
+            phase = fmodf(phase, 1.0f);
+            float offset = phase * size;
+            posHiL = size_t(offset);
             posHiR = stereo? (posHiL + size/2) % size
                            : posHiL;
-            posLo = 0;
+            posLo = offset - posHiL;
+            assert (posHiL < size);
+            assert (posHiR < size);
+            assert (posLo < 1.0);
         }
 
 
-        /////TODO call through virtual function
-
-        void interpolateLinear(float *outl, float *outr, float freq, size_t cnt)
+        void caculateSamples(float *smpL, float *smpR, float freq, size_t cntSmp)
         {
             float speedFactor = freq / baseFreq;
             size_t incHi = size_t(floorf(speedFactor));
-            float incLo = speedFactor - incHi;
+            float  incLo = speedFactor - incHi;
 
-            fft::Waveform const& smps = *table;
-            size_t size = smps.size();
-            for (size_t i = 0; i < cnt; ++i)
+            doCalculate(smpL,smpR, cntSmp, incHi,incLo);
+        }
+
+
+        /* build a concrete interpolator instance for stereo interpolation either cubic or linear */
+        static WaveInterpolator* create(bool cubic, fft::Waveform const& wave, float tableFreq);
+        static WaveInterpolator* clone(WaveInterpolator const& orig);
+
+    protected:
+        virtual void doCalculate(float*,float*,size_t, size_t incHi, float incLo)  =0;
+        virtual WaveInterpolator* buildClone() const                               =0;
+};
+
+
+
+class LinearInterpolator
+    : public WaveInterpolator
+{
+        void doCalculate(float* smpL
+                        ,float* smpR
+                        ,size_t cntSmp
+                        ,size_t incHi
+                        ,float incLo)  override
+        {
+            for (size_t i = 0; i < cntSmp; ++i)
             {
                 posHiL += incHi;
                 posHiR += incHi;
@@ -95,21 +123,30 @@ class WaveInterpolator
                 if (posHiR >= size)
                     posHiR %= size;
 
-                outl[i] = smps[posHiL] * (1.0 - posLo) + smps[posHiL + 1] * posLo;
-                outr[i] = smps[posHiR] * (1.0 - posLo) + smps[posHiR + 1] * posLo;
+                smpL[i] = table[posHiL] * (1.0 - posLo) + table[posHiL + 1] * posLo;
+                smpR[i] = table[posHiR] * (1.0 - posLo) + table[posHiR + 1] * posLo;
             }
         }
 
-        void interpolateCubic(float *outl, float *outr, float freq, size_t cnt)
-        {
-            float speedFactor = freq / baseFreq;
-            size_t incHi = size_t(floorf(speedFactor));
-            float incLo = speedFactor - incHi;
+        WaveInterpolator* buildClone()  const override
+        {   return new LinearInterpolator(*this); }
 
-            fft::Waveform const& smps = *table;
-            size_t size = smps.size();
+    public:
+        using WaveInterpolator::WaveInterpolator;
+};
+
+
+class CubicInterpolator
+    : public WaveInterpolator
+{
+        void doCalculate(float* smpL
+                        ,float* smpR
+                        ,size_t cntSmp
+                        ,size_t incHi
+                        ,float incLo)  override
+        {
             float xm1, x0, x1, x2, a, b, c;
-            for (size_t i = 0; i < cnt; ++i)
+            for (size_t i = 0; i < cntSmp; ++i)
             {
                 posHiL += incHi;
                 posHiR += incHi;
@@ -126,27 +163,49 @@ class WaveInterpolator
                     posHiR %= size;
 
                 // left
-                xm1 = smps[posHiL];
-                x0 = smps[posHiL + 1];
-                x1 = smps[posHiL + 2];
-                x2 = smps[posHiL + 3];
+                xm1 = table[posHiL];
+                x0 = table[posHiL + 1];
+                x1 = table[posHiL + 2];
+                x2 = table[posHiL + 3];
                 a = (3.0 * (x0 - x1) - xm1 + x2) * 0.5;
                 b = 2.0 * x1 + xm1 - (5.0 * x0 + x2) * 0.5;
                 c = (x1 - xm1) * 0.5;
-                outl[i] = (((a * posLo) + b) * posLo + c) * posLo + x0;
+                smpL[i] = (((a * posLo) + b) * posLo + c) * posLo + x0;
                 // right
-                xm1 = smps[posHiR];
-                x0 = smps[posHiR + 1];
-                x1 = smps[posHiR + 2];
-                x2 = smps[posHiR + 3];
+                xm1 = table[posHiR];
+                x0 = table[posHiR + 1];
+                x1 = table[posHiR + 2];
+                x2 = table[posHiR + 3];
                 a = (3.0 * (x0 - x1) - xm1 + x2) * 0.5;
                 b = 2.0 * x1 + xm1 - (5.0 * x0 + x2) * 0.5;
                 c = (x1 - xm1) * 0.5;
-                outr[i] = (((a * posLo) + b) * posLo + c) * posLo + x0;
+                smpR[i] = (((a * posLo) + b) * posLo + c) * posLo + x0;
             }
         }
 
-    private:
+        WaveInterpolator* buildClone()  const override
+        {   return new CubicInterpolator(*this); }
+
+    public:
+        using WaveInterpolator::WaveInterpolator;
 };
+
+
+
+/* === Factory functions ===  */
+
+inline WaveInterpolator* WaveInterpolator::create(bool cubic, fft::Waveform const& wave, float tableFreq)
+{
+    if (cubic)
+        return new CubicInterpolator(wave,tableFreq);
+    else
+        return new LinearInterpolator(wave,tableFreq);
+}
+
+inline WaveInterpolator* WaveInterpolator::clone(WaveInterpolator const& orig)
+{
+    return orig.buildClone();
+}
+
 
 #endif /*WAVE_INTERPOLATOR_H*/

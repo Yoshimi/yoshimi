@@ -53,7 +53,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     float velocity, int portamento_, int midinote_, SynthEngine *_synth) :
     NoteStatus(NOTE_ENABLED),
     pars(parameters),
-    waveInterpolator{new WaveInterpolator{pars->waveTable[0], pars->waveTable.basefreq[0]}},
+    waveInterpolator{}, // will be installed in computeNoteParameters()
     firsttime(true),
     released(false),
     portamento(portamento_),
@@ -108,7 +108,6 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo.get(), basefreq, synth);
 
     computeNoteParameters();
-    waveInterpolator->setStartPos(synth->numRandom(), pars->PStereo);
 
     globaloldamplitude =
         globalnewamplitude = NoteGlobalPar.Volume
@@ -123,7 +122,7 @@ PADnote::PADnote(const PADnote &orig) :
     // notes gets used for another purpose
     NoteStatus(NOTE_KEEPALIVE),
     pars(orig.pars),
-    waveInterpolator{new WaveInterpolator{*orig.waveInterpolator}},  // use wavetable and reading position from orig
+    waveInterpolator{WaveInterpolator::clone(*orig.waveInterpolator)},  // use wavetable and reading position from orig
     basefreq(orig.basefreq),
     BendAdjust(orig.BendAdjust),
     OffsetHz(orig.OffsetHz),
@@ -196,7 +195,7 @@ void PADnote::legatoFadeOut(const PADnote &orig)
     portamento = orig.portamento;
     midinote = orig.midinote;
 
-    waveInterpolator.reset(new WaveInterpolator(*orig.waveInterpolator));
+    waveInterpolator.reset(WaveInterpolator::clone(*orig.waveInterpolator));
     basefreq = orig.basefreq;
     BendAdjust = orig.BendAdjust;
     OffsetHz = orig.OffsetHz;
@@ -309,7 +308,7 @@ void PADnote::computeNoteParameters()
 
     NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
 
-    // find out the closest note
+    // find wavetable closest to current note frequency
     float logfreq = logf(basefreq * power<2>(NoteGlobalPar.Detune / 1200.0f));
     float mindist = fabsf(logfreq - logf(pars->waveTable.basefreq[0] + 0.0001f));
     size_t tableNr = 0;
@@ -323,7 +322,16 @@ void PADnote::computeNoteParameters()
             mindist = dist;
         }
     }
-    waveInterpolator->useTable(pars->waveTable[tableNr], pars->waveTable.basefreq[tableNr]);
+    float currPhase = waveInterpolator? waveInterpolator->getCurrentPhase()
+                                      : synth->numRandom();
+
+    bool useCubicInterpolation = synth->getRuntime().Interpolation;
+    waveInterpolator.reset(WaveInterpolator::create(useCubicInterpolation
+                                                   ,pars->waveTable[tableNr]
+                                                   ,pars->waveTable.basefreq[tableNr]
+                                                   ));
+    waveInterpolator->setStartPos(currPhase, pars->PStereo);
+
 
     NoteGlobalPar.Volume =
         4.0f                                               // +12dB boost (similar on ADDnote, while SUBnote only boosts +6dB)
@@ -389,11 +397,8 @@ int PADnote::noteout(float *outl,float *outr)
         computeNoteParameters();
     computecurrentparameters();
 
-    if (synth->getRuntime().Interpolation)
-        waveInterpolator->interpolateCubic(outl,outr, realfreq, synth->sent_buffersize);
-    else
-        waveInterpolator->interpolateLinear(outl,outr, realfreq, synth->sent_buffersize);
-
+    waveInterpolator->caculateSamples(outl,outr, realfreq,
+                                      synth->sent_buffersize);
     if (firsttime)
     {
         fadein(outl);
