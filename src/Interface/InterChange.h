@@ -141,10 +141,8 @@ class InterChange : private DataText
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
 
-        void add2undo(CommandBlock *getData, bool& noteSeen);
-        void addGroup2undo(CommandBlock *getData);
-        void undoLast(CommandBlock *candidate);
-        void redoLast(CommandBlock *candidate);
+        void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);
+        void undoLast(CommandBlock *candidate, bool reverse = false);
         std::list<CommandBlock> undoList;
         std::list<CommandBlock> redoList;
         CommandBlock lastEntry;

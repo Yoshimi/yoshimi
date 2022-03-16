@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+
+2022-3-16 Will
+* Simplified Undo/Redo
+  Groups still not done :(
+
 2022-3-13 Will
 Revised GUI main window
 Updated User Manual

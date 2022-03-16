@@ -1768,7 +1768,7 @@ void InterChange::mediate()
     }
     else if (setRedo)
     {
-        redoLast(&getData);
+        undoLast(&getData, true);
         commandSend(&getData);
         returns(&getData);
     }
@@ -3464,25 +3464,23 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if (write)
     {
-        /*if (control == PART::control::resetAllControllers)
+        if (control == PART::control::resetAllControllers)
         {
-           addGroup2undo(&undoMarker);
             CommandBlock tempData;
-            memset(&tempData.bytes, 255, sizeof(CommandBlock));
-            tempData.data.part = TOPLEVEL::undoResonanceMark;
-            tempData.data.value = 0.0f;
-            addGroup2undo(&tempData);
             memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
             for (int ctl = PART::control::volumeRange; ctl < PART::control::resetAllControllers; ++ctl)
             {
-                tempData.data.control = ctl;
-                tempData.data.type &= ~TOPLEVEL::type::Write;
-                commandPart(&tempData);
-                addGroup2undo(&tempData);
+                getData->data.control = ctl;
+                getData->data.type &= ~TOPLEVEL::type::Write;
+                commandPart(getData);
+                if (ctl == PART::control::volumeRange)
+                    add2undo(getData, noteSeen, false);
+                else
+                    add2undo(getData, noteSeen, true);
             }
-            tempData.data.part = TOPLEVEL::undoResonanceMark;
-            addGroup2undo(&tempData);
-        }*/
+            memcpy(getData->bytes, tempData.bytes, sizeof(CommandBlock));
+        }
+
         if (control == PART::control::enableKitLine || control == PART::control::kitMode)
             undoRedoClear(); // these would become completely invalid!
         else
@@ -5683,21 +5681,22 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case RESONANCE::control::randomType:
             if (write)
             {
-                /*addGroup2undo(&undoMarker);
                 CommandBlock tempData;
-                tempData.data.part = TOPLEVEL::undoResonanceMark;
-                addGroup2undo(&tempData);
                 memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
-                tempData.data.control = RESONANCE::control::graphPoint;
-                tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
+                getData->data.control = RESONANCE::control::graphPoint;
+                getData->data.insert = TOPLEVEL::insert::resonanceGraphInsert;
+
                 for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
                 {
-                    tempData.data.value = respar->Prespoints[i];
-                    tempData.data.parameter = i;
-                    addGroup2undo(&tempData);
+                    getData->data.value = respar->Prespoints[i];
+                    getData->data.parameter = i;
+                    if(i == 0) // first line sets marker
+                        add2undo(getData, noteSeen, false);
+                    else
+                        add2undo(getData, noteSeen, true);
                 }
-                tempData.data.part = TOPLEVEL::undoResonanceMark;
-                addGroup2undo(&tempData);*/
+                memcpy(getData->bytes, tempData.bytes, sizeof(CommandBlock));
+
                 respar->randomize(value_int);
             }
             break;
@@ -6675,15 +6674,15 @@ void InterChange::commandEffects(CommandBlock *getData)
 }
 
 
-void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
+void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 {
-    if (undoLoopBack)
+    if (undoLoopBack && !group)
     {
         undoLoopBack = false;
         return; // don't want to reset what we've just undone!
     }
 
-    if (!fromRedo)
+    if (!fromRedo && !group)
         redoList.clear(); // always invalidated on new entry
     fromRedo = false;
 
@@ -6702,8 +6701,10 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
             && undoList.back().data.insert == getData->data.insert
             && undoList.back().data.parameter == getData->data.parameter)
             return;
-        undoList.push_back(undoMarker);
+        if (!group)
+            undoList.push_back(undoMarker);
     }
+
     /*
      * the following is used to read the current value of the specific
      * control as that is what we will want to revert to.
@@ -6723,34 +6724,31 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen)
 }
 
 
-void InterChange::addGroup2undo(CommandBlock *getData)
+void InterChange::undoLast(CommandBlock *candidate, bool reverse)
 {
-    if (undoLoopBack)
+
+    std::list<CommandBlock> *source;
+    std::list<CommandBlock> *dest;
+    if (!reverse)
     {
-        undoLoopBack = false;
-        return; // don't want to reset what we've just undone!
+        source = &undoList;
+        dest = &redoList;
+    }
+    else
+    {
+        source = &redoList;
+        dest = &undoList;
+        fromRedo = true;
     }
 
-    redoList.clear(); // always invalidated on new entry
-    fromRedo = false;
-
-    undoList.push_back(*getData);
-
-    std::cout << "add group ";
-    synth->CBtest(&undoList.back());
-}
-
-
-void InterChange::undoLast(CommandBlock *candidate)
-{
-    if (undoList.empty())
+    if (source->empty())
         return;
     undoLoopBack = true;
     bool setMarker = true;
     CommandBlock oldCommand;
-    if (undoList.back().data.part != TOPLEVEL::undoMark)
+    while (source->back().data.part != TOPLEVEL::undoMark)
     {
-        memcpy(candidate->bytes, undoList.back().bytes, sizeof(CommandBlock));
+        memcpy(candidate->bytes, source->back().bytes, sizeof(CommandBlock));
 
         std::cout << "undo ";
         synth->CBtest(candidate);
@@ -6758,9 +6756,9 @@ void InterChange::undoLast(CommandBlock *candidate)
         if(setMarker)
         {
             setMarker = false;
-            redoList.push_back(undoMarker);
+            dest->push_back(undoMarker);
         }
-        memcpy(oldCommand.bytes, undoList.back().bytes, sizeof(CommandBlock));
+        memcpy(oldCommand.bytes, source->back().bytes, sizeof(CommandBlock));
         char temptype = oldCommand.data.type;
         char tempsource = oldCommand.data.source;
         oldCommand.data.type &= TOPLEVEL::type::Integer;
@@ -6768,41 +6766,20 @@ void InterChange::undoLast(CommandBlock *candidate)
         commandSendReal(&oldCommand);
         oldCommand.data.type = temptype;
         oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
-        redoList.push_back(oldCommand);
-        undoList.pop_back();
+        dest->push_back(oldCommand);
+        source->pop_back();
     }
 
-    if (undoList.empty())
-        setUndo = false;
-    else if (undoList.back().data.part == TOPLEVEL::undoMark)
+    if (source->empty())
     {
         setUndo = false;
-        undoList.pop_back();
-    }
-}
-
-
-void InterChange::redoLast(CommandBlock *candidate)
-{
-    if (redoList.empty())
-        return;
-    if (redoList.back().data.part != TOPLEVEL::undoMark)
-    {
-        undoLoopBack = false;
-        fromRedo = true;
-        memcpy(candidate->bytes, redoList.back().bytes, sizeof(CommandBlock));
-
-        std::cout << "redo ";
-        synth->CBtest(candidate);
-        redoList.pop_back();
-    }
-
-    if (redoList.empty())
         setRedo = false;
-    else if (redoList.back().data.part == TOPLEVEL::undoMark)
+    }
+    else if (source->back().data.part == TOPLEVEL::undoMark)
     {
+        setUndo = false;
         setRedo = false;
-        redoList.pop_back();
+        source->pop_back();
     }
 }
 
