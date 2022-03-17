@@ -106,6 +106,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     fromRedo = false;
     setUndo = false;
     setRedo = false;
+    undoStart = false;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
 }
 
@@ -1985,11 +1986,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         if (getData->data.control == MAIN::control::undo && !undoList.empty())
         {
             setUndo = true;
+            undoStart = true;
             getData->data.control = UNUSED;
         }
         else if (getData->data.control == MAIN::control::redo && !redoList.empty())
         {
             setRedo = true;
+            undoStart = true;
             getData->data.control = UNUSED;
         }
     }
@@ -3464,27 +3467,39 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if (write)
     {
-        if (control == PART::control::resetAllControllers)
-        {
-            CommandBlock tempData;
-            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
-            for (int ctl = PART::control::volumeRange; ctl < PART::control::resetAllControllers; ++ctl)
-            {
-                getData->data.control = ctl;
-                getData->data.type &= ~TOPLEVEL::type::Write;
-                commandPart(getData);
-                if (ctl == PART::control::volumeRange)
-                    add2undo(getData, noteSeen, false);
-                else
-                    add2undo(getData, noteSeen, true);
-            }
-            memcpy(getData->bytes, tempData.bytes, sizeof(CommandBlock));
-        }
-
         if (control == PART::control::enableKitLine || control == PART::control::kitMode)
             undoRedoClear(); // these would become completely invalid!
+        else if (control == PART::control::resetAllControllers)
+        { // setup for group undo
+            CommandBlock tempData;
+            memset(tempData.bytes, 255, sizeof(CommandBlock));
+            tempData.data.source = TOPLEVEL::action::forceUpdate;
+            tempData.data.part = npart;
+
+            for (int contl = PART::control::volumeRange; contl < PART::control::resetAllControllers; ++contl)
+            {
+                noteSeen = true;
+                tempData.data.value = 0;
+                tempData.data.type = 0;
+                tempData.data.control = contl;
+
+                commandControllers(&tempData, false);
+
+                tempData.data.type |= TOPLEVEL::type::Write;
+                if (contl == PART::control::volumeRange)
+                    add2undo(&tempData, noteSeen);
+                else
+                    add2undo(&tempData, noteSeen, true);
+            }
+        }
         else
             add2undo(getData, noteSeen);
+    }
+
+    if (control >= PART::control::volumeRange && control < PART::control::resetAllControllers)
+    {
+        commandControllers(getData, write);
+        return;
     }
 
     unsigned char effNum = part->Peffnum;
@@ -3910,6 +3925,107 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Paudiodest;
             break;
 
+        case PART::control::resetAllControllers:
+            if (write)
+                part->ctl->resetall();
+            break;
+
+        case PART::control::midiModWheel:
+            if (write)
+                part->ctl->setmodwheel(value);
+            else
+                value = part->ctl->modwheel.data;
+            break;
+        case PART::control::midiBreath:
+            ; // not yet
+            break;
+        case PART::control::midiExpression:
+            if (write)
+                part->SetController(MIDI::CC::expression, value);
+            else
+                value = part->ctl->expression.data;
+            break;
+        case PART::control::midiSustain:
+            if (write)
+                part->ctl->setsustain(value);
+            else
+                value = part->ctl->sustain.data;
+            break;
+        case PART::control::midiPortamento:
+            if (write)
+                part->ctl->setportamento(value);
+            else
+                value = part->ctl->portamento.data;
+            break;
+        case PART::control::midiFilterQ:
+            if (write)
+                part->ctl->setfilterq(value);
+            else
+                value = part->ctl->filterq.data;
+            break;
+        case PART::control::midiFilterCutoff:
+            if (write)
+                part->ctl->setfiltercutoff(value);
+            else
+                value = part->ctl->filtercutoff.data;
+            break;
+        case PART::control::midiBandwidth:
+            if (write)
+                part->ctl->setbandwidth(value);
+            else
+                value = part->ctl->bandwidth.data;
+            break;
+
+        case PART::control::midiFMamp:
+            if (write)
+                part->ctl->setfmamp(value);
+            else
+                value = part->ctl->fmamp.data;
+            break;
+        case PART::control::midiResonanceCenter:
+            if (write)
+                part->ctl->setresonancecenter(value);
+            else
+                value = part->ctl->resonancecenter.data;
+            break;
+        case PART::control::midiResonanceBandwidth:
+            if (write)
+                part->ctl->setresonancebw(value);
+            else
+                value = part->ctl->resonancebandwidth.data;
+            break;
+
+        case PART::control::instrumentCopyright: // done elsewhere
+            break;
+        case PART::control::instrumentComments: // done elsewhere
+            break;
+        case PART::control::instrumentName: // done elsewhere
+            break;
+        case PART::control::instrumentType:// done elsewhere
+            break;
+        case PART::control::defaultInstrumentCopyright: // done elsewhere
+            ;
+    }
+
+    if (!write || control == PART::control::minToLastKey || control == PART::control::maxToLastKey)
+        getData->data.value = value;
+}
+
+
+void InterChange::commandControllers(CommandBlock *getData, bool write)
+{
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+
+    float value = getData->data.value;
+    int value_int = int(value);
+    char value_bool = _SYS_::F2B(value);
+
+    Part *part;
+    part = synth->part[npart];
+
+    switch (control)
+    {
         case PART::control::volumeRange: // start of controllers
             if (write)
                 part->ctl->setvolume(value_int); // not the *actual* volume
@@ -4059,86 +4175,6 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->portamento.receive = value_bool;
             else
                 value = part->ctl->portamento.receive;
-            break;
-
-        case PART::control::midiModWheel:
-            if (write)
-                part->ctl->setmodwheel(value);
-            else
-                value = part->ctl->modwheel.data;
-            break;
-        case PART::control::midiBreath:
-            ; // not yet
-            break;
-        case PART::control::midiExpression:
-            if (write)
-                part->SetController(MIDI::CC::expression, value);
-            else
-                value = part->ctl->expression.data;
-            break;
-        case PART::control::midiSustain:
-            if (write)
-                part->ctl->setsustain(value);
-            else
-                value = part->ctl->sustain.data;
-            break;
-        case PART::control::midiPortamento:
-            if (write)
-                part->ctl->setportamento(value);
-            else
-                value = part->ctl->portamento.data;
-            break;
-        case PART::control::midiFilterQ:
-            if (write)
-                part->ctl->setfilterq(value);
-            else
-                value = part->ctl->filterq.data;
-            break;
-        case PART::control::midiFilterCutoff:
-            if (write)
-                part->ctl->setfiltercutoff(value);
-            else
-                value = part->ctl->filtercutoff.data;
-            break;
-        case PART::control::midiBandwidth:
-            if (write)
-                part->ctl->setbandwidth(value);
-            else
-                value = part->ctl->bandwidth.data;
-            break;
-
-        case PART::control::midiFMamp:
-            if (write)
-                part->ctl->setfmamp(value);
-            else
-                value = part->ctl->fmamp.data;
-            break;
-        case PART::control::midiResonanceCenter:
-            if (write)
-                part->ctl->setresonancecenter(value);
-            else
-                value = part->ctl->resonancecenter.data;
-            break;
-        case PART::control::midiResonanceBandwidth:
-            if (write)
-                part->ctl->setresonancebw(value);
-            else
-                value = part->ctl->resonancebandwidth.data;
-            break;
-
-        case PART::control::instrumentCopyright: // done elsewhere
-            break;
-        case PART::control::instrumentComments: // done elsewhere
-            break;
-        case PART::control::instrumentName: // done elsewhere
-            break;
-        case PART::control::instrumentType:// done elsewhere
-            break;
-        case PART::control::defaultInstrumentCopyright: // done elsewhere
-            ;
-        case PART::control::resetAllControllers:
-            if (write)
-                part->SetController(0x79,0);
             break;
     }
 
@@ -5690,6 +5726,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
                 {
                     getData->data.value = respar->Prespoints[i];
                     getData->data.parameter = i;
+                    noteSeen = true;
                     if(i == 0) // first line sets marker
                         add2undo(getData, noteSeen, false);
                     else
@@ -6676,13 +6713,14 @@ void InterChange::commandEffects(CommandBlock *getData)
 
 void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 {
-    if (undoLoopBack && !group)
+    if (undoLoopBack)
     {
         undoLoopBack = false;
+        std::cout << "cleared undoloopback" << std::endl;
         return; // don't want to reset what we've just undone!
     }
 
-    if (!fromRedo && !group)
+    if (!fromRedo)
         redoList.clear(); // always invalidated on new entry
     fromRedo = false;
 
@@ -6690,9 +6728,10 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     {
         noteSeen = false;
         std::cout << "marker " << int(undoMarker.data.part) << std::endl;
-        undoList.push_back(undoMarker);
+        if (!group)
+            undoList.push_back(undoMarker);
     }
-    else
+    else if (!group)
     {
         if (undoList.back().data.control == getData->data.control
             && undoList.back().data.part == getData->data.part
@@ -6701,8 +6740,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
             && undoList.back().data.insert == getData->data.insert
             && undoList.back().data.parameter == getData->data.parameter)
             return;
-        if (!group)
-            undoList.push_back(undoMarker);
+        undoList.push_back(undoMarker);
     }
 
     /*
@@ -6742,33 +6780,41 @@ void InterChange::undoLast(CommandBlock *candidate, bool reverse)
     }
 
     if (source->empty())
-        return;
-    undoLoopBack = true;
-    bool setMarker = true;
-    CommandBlock oldCommand;
-    while (source->back().data.part != TOPLEVEL::undoMark)
     {
-        memcpy(candidate->bytes, source->back().bytes, sizeof(CommandBlock));
-
-        std::cout << "undo ";
-        synth->CBtest(candidate);
-
-        if(setMarker)
-        {
-            setMarker = false;
-            dest->push_back(undoMarker);
-        }
-        memcpy(oldCommand.bytes, source->back().bytes, sizeof(CommandBlock));
-        char temptype = oldCommand.data.type;
-        char tempsource = oldCommand.data.source;
-        oldCommand.data.type &= TOPLEVEL::type::Integer;
-        oldCommand.data.source = 0;
-        commandSendReal(&oldCommand);
-        oldCommand.data.type = temptype;
-        oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
-        dest->push_back(oldCommand);
-        source->pop_back();
+        setUndo = false;
+        setRedo = false;
+        return;
     }
+    if (source->back().data.part == TOPLEVEL::undoMark)
+    {
+        setUndo = false;
+        setRedo = false;
+        source->pop_back();
+        return;
+    }
+    undoLoopBack = true;
+    CommandBlock oldCommand;
+    memcpy(candidate->bytes, source->back().bytes, sizeof(CommandBlock));
+
+    /*if (!reverse)
+        std::cout << "undo ";
+    else
+        std::cout << "redo ";*/
+    if (undoStart)
+    {
+        dest->push_back(undoMarker);
+        undoStart = false;
+    }
+    memcpy(oldCommand.bytes, source->back().bytes, sizeof(CommandBlock));
+    char temptype = oldCommand.data.type;
+    char tempsource = oldCommand.data.source;
+    oldCommand.data.type &= TOPLEVEL::type::Integer;
+    oldCommand.data.source = 0;
+    commandSendReal(&oldCommand);
+    oldCommand.data.type = temptype;
+    oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
+    dest->push_back(oldCommand);
+    source->pop_back();
 
     if (source->empty())
     {
@@ -6806,15 +6852,17 @@ void InterChange::testLimits(CommandBlock *getData)
      * midi CCs need to be checked.
      * I don't like special cases either :(
      */
-    if (getData->data.part == TOPLEVEL::section::config
-        && (control == CONFIG::control::bankRootCC
-        || control == CONFIG::control::bankCC
-        || control == CONFIG::control::extendedProgramChangeCC))
+    if (getData->data.part == TOPLEVEL::section::config &&
+        (
+            control == CONFIG::control::bankRootCC
+         || control == CONFIG::control::bankCC
+         || control == CONFIG::control::extendedProgramChangeCC)
+        )
     {
         getData->data.miscmsg = NO_MSG; // just to be sure
         if (value > 119) // we don't want controllers above this
             return;
-        std::string text;
+        std::string text = "";
         // TODO can bank and bankroot be combined
         // as they now have the same options?
         if (control == CONFIG::control::bankRootCC)

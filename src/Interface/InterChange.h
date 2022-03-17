@@ -127,6 +127,7 @@ class InterChange : private DataText
         void commandMain(CommandBlock *getData);
         void commandBank(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
+        void commandControllers(CommandBlock *getData, bool write);
         void commandAdd(CommandBlock *getData);
         void commandAddVoice(CommandBlock *getData);
         void commandSub(CommandBlock *getData);
@@ -151,6 +152,7 @@ class InterChange : private DataText
         bool fromRedo;
         bool setUndo;
         bool setRedo;
+        bool undoStart;
 
     public:
         bool noteSeen;

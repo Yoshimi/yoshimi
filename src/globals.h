@@ -1,7 +1,7 @@
 /*
     globals.h - general static definitions
 
-    Copyright 2018-2021, Will Godfrey
+    Copyright 2018-2022, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -159,7 +159,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part64 = 63, // between these two
 
         undoMark = 68, // 44
-        undoResonanceMark,
         copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8
