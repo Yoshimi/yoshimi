@@ -1730,7 +1730,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-    if (source != TOPLEVEL::action::fromMIDI)
+    if (source != TOPLEVEL::action::fromMIDI && !setUndo && !setRedo)
         synth->getRuntime().Log(resolveAll(synth, getData, _SYS_::LogNotSerious));
 
     if (source == TOPLEVEL::action::fromCLI)
@@ -1763,15 +1763,25 @@ void InterChange::mediate()
     syncWrite = true;
     if (setUndo)
     {
-        undoLast(&getData);
-        commandSend(&getData);
-        returns(&getData);
+        int step = 0;
+        while (setUndo && step < 16)
+        {
+            undoLast(&getData);
+            commandSend(&getData);
+            returns(&getData);
+            ++ step;
+        }
     }
     else if (setRedo)
     {
-        undoLast(&getData, true);
-        commandSend(&getData);
-        returns(&getData);
+        int step = 0;
+        while (setRedo && step < 16)
+        {
+            undoLast(&getData, true);
+            commandSend(&getData);
+            returns(&getData);
+            ++ step;
+        }
     }
 
     bool more;
@@ -1987,13 +1997,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             setUndo = true;
             undoStart = true;
-            getData->data.control = UNUSED;
+            //getData->data.control = UNUSED;
         }
         else if (getData->data.control == MAIN::control::redo && !redoList.empty())
         {
             setRedo = true;
             undoStart = true;
-            getData->data.control = UNUSED;
+            //getData->data.control = UNUSED;
         }
     }
 
