@@ -103,7 +103,6 @@ InterChange::InterChange(SynthEngine *_synth) :
 {
     noteSeen = false;
     undoLoopBack = false;
-    fromRedo = false;
     setUndo = false;
     setRedo = false;
     undoStart = false;
@@ -1730,7 +1729,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
-    if (source != TOPLEVEL::action::fromMIDI && !setUndo && !setRedo)
+    if (source != TOPLEVEL::action::fromMIDI && !setUndo)
         synth->getRuntime().Log(resolveAll(synth, getData, _SYS_::LogNotSerious));
 
     if (source == TOPLEVEL::action::fromCLI)
@@ -1767,17 +1766,6 @@ void InterChange::mediate()
         while (setUndo && step < 16)
         {
             undoLast(&getData);
-            commandSend(&getData);
-            returns(&getData);
-            ++ step;
-        }
-    }
-    else if (setRedo)
-    {
-        int step = 0;
-        while (setRedo && step < 16)
-        {
-            undoLast(&getData, true);
             commandSend(&getData);
             returns(&getData);
             ++ step;
@@ -1997,13 +1985,12 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             setUndo = true;
             undoStart = true;
-            //getData->data.control = UNUSED;
         }
         else if (getData->data.control == MAIN::control::redo && !redoList.empty())
         {
+            setUndo = true;
             setRedo = true;
             undoStart = true;
-            //getData->data.control = UNUSED;
         }
     }
 
@@ -6726,20 +6713,20 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     if (undoLoopBack)
     {
         undoLoopBack = false;
-        std::cout << "cleared undoloopback" << std::endl;
+        std::cout << "cleared undoLoopBack" << std::endl;
         return; // don't want to reset what we've just undone!
     }
 
-    if (!fromRedo)
-        redoList.clear(); // always invalidated on new entry
-    fromRedo = false;
+    redoList.clear(); // always invalidated on new entry
 
     if (noteSeen || undoList.empty())
     {
         noteSeen = false;
-        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
         if (!group)
+        {
             undoList.push_back(undoMarker);
+            std::cout << "marker " << int(undoMarker.data.part) << std::endl;
+        }
     }
     else if (!group)
     {
@@ -6751,6 +6738,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
             && undoList.back().data.parameter == getData->data.parameter)
             return;
         undoList.push_back(undoMarker);
+        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
     }
 
     /*
@@ -6767,17 +6755,16 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     candidate.data.type = getData->data.type;
     undoList.push_back(candidate);
 
-    std::cout << "add ";
-    synth->CBtest(&undoList.back());
+    //std::cout << "add ";
+    //synth->CBtest(&undoList.back());
 }
 
 
-void InterChange::undoLast(CommandBlock *candidate, bool reverse)
+void InterChange::undoLast(CommandBlock *candidate)
 {
-
     std::list<CommandBlock> *source;
     std::list<CommandBlock> *dest;
-    if (!reverse)
+    if (!setRedo)
     {
         source = &undoList;
         dest = &redoList;
@@ -6786,7 +6773,6 @@ void InterChange::undoLast(CommandBlock *candidate, bool reverse)
     {
         source = &redoList;
         dest = &undoList;
-        fromRedo = true;
     }
 
     if (source->empty())
@@ -6806,7 +6792,7 @@ void InterChange::undoLast(CommandBlock *candidate, bool reverse)
     CommandBlock oldCommand;
     memcpy(candidate->bytes, source->back().bytes, sizeof(CommandBlock));
 
-    /*if (!reverse)
+    /*if (!setRedo)
         std::cout << "undo ";
     else
         std::cout << "redo ";*/
@@ -6846,7 +6832,7 @@ void InterChange::undoRedoClear(void)
     redoList.clear();
     noteSeen = false;
     undoLoopBack = false;
-    fromRedo = false;
+    undoStart = false;
     std::cout << "Undo/Redo cleared" << std::endl;
 }
 

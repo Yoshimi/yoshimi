@@ -6,6 +6,8 @@ yoshimi 2.1.2 M
   Runs faster without risk of Xruns
   No change to setting groups.
 
+* Further undo/redo refinements
+
 2022-3-17 Will
 * Can now group undo reset all controllers.
 * Can now group undo resonance set random.
