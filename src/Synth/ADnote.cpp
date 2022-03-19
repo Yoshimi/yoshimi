@@ -2406,7 +2406,7 @@ void ADnote::ComputeVoiceSpotNoise(int nvoice)
 
 
 // Compute the ADnote samples, returns 0 if the note is finished
-int ADnote::noteout(float *outl, float *outr)
+void ADnote::noteout(float *outl, float *outr)
 {
     Config &Runtime = synth->getRuntime();
     Samples& tmpwavel = Runtime.genTmp1;
@@ -2414,13 +2414,11 @@ int ADnote::noteout(float *outl, float *outr)
     Samples& bypassl = Runtime.genTmp3;
     Samples& bypassr = Runtime.genTmp4;
     int i, nvoice;
-    if (outl != NULL) {
+    if (outl and outr) {
         memset(outl, 0, synth->sent_bufferbytes);
         memset(outr, 0, synth->sent_bufferbytes);
     }
-
-    if (NoteStatus == NOTE_DISABLED)
-        return 0;
+    if (NoteStatus == NOTE_DISABLED) return;
 
     if (subVoiceNumber == -1) {
         memset(bypassl.get(), 0, synth->sent_bufferbytes);
@@ -2740,7 +2738,6 @@ int ADnote::noteout(float *outl, float *outr)
         }
         killNote();
     }
-    return 1;
 }
 
 

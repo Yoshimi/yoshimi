@@ -448,7 +448,7 @@ std::cout << "##+++++ swap() future:"<<future<<std::endl;        ///////////////
         using std::swap;
         TAB newData{move(future->get())};  // may block until value is ready
         swap(dataToReplace, newData);
-std::cout << "##+++++ swap() swapped Table-Addr="<<&dataToReplace[0][0]<<" (old: "<<&newData[0][0]<<")"<<std::endl;        ////////////////TODO padthread debugging output
+std::cout << "##+++++ swap() swapped Table-Addr="<<&dataToReplace[0][0]<<std::endl;        ////////////////TODO padthread debugging output
         delete future;
     }
     // we do not know if the "dirty" state was set before we picked up the future,

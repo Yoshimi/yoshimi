@@ -679,14 +679,13 @@ void SUBnote::computecurrentparameters(void)
 
 
 // Note Output
-int SUBnote::noteout(float *outl, float *outr)
+void SUBnote::noteout(float *outl, float *outr)
 {
     assert(tmpsmp.get() == synth->getRuntime().genTmp1.get());
     assert(tmprnd.get() == synth->getRuntime().genTmp2.get());
     memset(outl, 0, synth->sent_bufferbytes);
     memset(outr, 0, synth->sent_bufferbytes);
-    if (NoteStatus == NOTE_DISABLED)
-        return 0;
+    if (NoteStatus == NOTE_DISABLED) return;
 
     if (subNoteChange.checkUpdated())
     {
@@ -811,7 +810,6 @@ int SUBnote::noteout(float *outl, float *outr)
         }
         KillNote();
     }
-    return 1;
 }
 
 

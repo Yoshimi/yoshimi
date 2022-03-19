@@ -27,27 +27,23 @@
 #define WAVE_INTERPOLATOR_H
 
 #include "DSP/FFTwrapper.h"
+#include "Misc/Alloc.h"
+
+#include <memory>
+#include <functional>
+
+using std::unique_ptr;
+using std::function;
 
 
+/** Interface for wavetable interpolation */
 class WaveInterpolator
 {
     protected:
-        fft::Waveform const& table;
-        const float baseFreq;
-        const size_t size;
+        WaveInterpolator() = default;
 
-        size_t posHiL;
-        size_t posHiR;
-        float posLo;
-
-        WaveInterpolator(fft::Waveform const& wave, float freq)
-            : table{wave}
-            , baseFreq{freq}
-            , size{wave.size()}
-            , posHiL{0}
-            , posHiR{0}
-            , posLo{0}
-        { }
+        // "virtual copy" pattern
+        virtual WaveInterpolator* buildClone() const  =0;
 
     public: // can be copy/move constructed, but not assigned...
         WaveInterpolator(WaveInterpolator&&)                 = default;
@@ -58,12 +54,66 @@ class WaveInterpolator
         virtual ~WaveInterpolator() = default; // this is an interface
 
 
-        float getCurrentPhase()  const
+        virtual bool matches(fft::Waveform const&) const                   =0;
+        virtual float getCurrentPhase()  const                             =0;
+        virtual void caculateSamples(float*,float*, float freq,size_t cnt) =0;
+
+
+        /* build a concrete interpolator instance for stereo interpolation either cubic or linear */
+        static WaveInterpolator* create(bool cubic, float phase, bool stereo, fft::Waveform const& wave, float tableFreq);
+        static WaveInterpolator* clone(WaveInterpolator const& orig);
+
+        /* create a delegate for Cross-Fadeing WaveInterpolator */
+        static WaveInterpolator* createXFader(function<void(void)> attachXFader
+                                             ,function<void(void)> detachXFader
+                                             ,function<void(WaveInterpolator*)> switchInterpolator
+                                             ,unique_ptr<WaveInterpolator> oldInterpolator
+                                             ,unique_ptr<WaveInterpolator> newInterpolator
+                                             ,size_t crossFadeLengthSmps
+                                             ,size_t bufferSize);
+};
+
+
+/**
+ * Abstract Base Class : two channel interpolation
+ * with common phase and fixed 180° channel offset
+ */
+class StereoInterpolatorBase
+    : public WaveInterpolator
+{
+    protected:
+        fft::Waveform const& table;
+        const float baseFreq;
+        const size_t size;
+
+        size_t posHiL;
+        size_t posHiR;
+        float posLo;
+
+    public:
+        using WaveInterpolator::WaveInterpolator;
+
+        StereoInterpolatorBase(fft::Waveform const& wave, float freq)
+            : table{wave}
+            , baseFreq{freq}
+            , size{wave.size()}
+            , posHiL{0}
+            , posHiR{0}
+            , posLo{0}
+        { }
+
+
+        bool matches(fft::Waveform const& otherTable)  const override
+        {
+            return &table == &otherTable;
+        }
+
+        float getCurrentPhase()  const override
         {
             return (posHiL + posLo) / float(size);
         }
 
-        void setStartPos(float phase, bool stereo)
+        WaveInterpolator* setStartPos(float phase, bool stereo)
         {
             phase = fmodf(phase, 1.0f);
             float offset = phase * size;
@@ -74,39 +124,21 @@ class WaveInterpolator
             assert (posHiL < size);
             assert (posHiR < size);
             assert (posLo < 1.0);
+            return this;
         }
-
-
-        void caculateSamples(float *smpL, float *smpR, float freq, size_t cntSmp)
-        {
-            float speedFactor = freq / baseFreq;
-            size_t incHi = size_t(floorf(speedFactor));
-            float  incLo = speedFactor - incHi;
-
-            doCalculate(smpL,smpR, cntSmp, incHi,incLo);
-        }
-
-
-        /* build a concrete interpolator instance for stereo interpolation either cubic or linear */
-        static WaveInterpolator* create(bool cubic, fft::Waveform const& wave, float tableFreq);
-        static WaveInterpolator* clone(WaveInterpolator const& orig);
-
-    protected:
-        virtual void doCalculate(float*,float*,size_t, size_t incHi, float incLo)  =0;
-        virtual WaveInterpolator* buildClone() const                               =0;
 };
 
 
 
 class LinearInterpolator
-    : public WaveInterpolator
+    : public StereoInterpolatorBase
 {
-        void doCalculate(float* smpL
-                        ,float* smpR
-                        ,size_t cntSmp
-                        ,size_t incHi
-                        ,float incLo)  override
+        void caculateSamples(float *smpL, float *smpR, float freq, size_t cntSmp)  override
         {
+            float speedFactor = freq / baseFreq;
+            size_t incHi = size_t(floorf(speedFactor));
+            float  incLo = speedFactor - incHi;
+
             for (size_t i = 0; i < cntSmp; ++i)
             {
                 posHiL += incHi;
@@ -132,19 +164,19 @@ class LinearInterpolator
         {   return new LinearInterpolator(*this); }
 
     public:
-        using WaveInterpolator::WaveInterpolator;
+        using StereoInterpolatorBase::StereoInterpolatorBase;
 };
 
 
 class CubicInterpolator
-    : public WaveInterpolator
+    : public StereoInterpolatorBase
 {
-        void doCalculate(float* smpL
-                        ,float* smpR
-                        ,size_t cntSmp
-                        ,size_t incHi
-                        ,float incLo)  override
+        void caculateSamples(float *smpL, float *smpR, float freq, size_t cntSmp)  override
         {
+            float speedFactor = freq / baseFreq;
+            size_t incHi = size_t(floorf(speedFactor));
+            float  incLo = speedFactor - incHi;
+
             float xm1, x0, x1, x2, a, b, c;
             for (size_t i = 0; i < cntSmp; ++i)
             {
@@ -187,20 +219,148 @@ class CubicInterpolator
         {   return new CubicInterpolator(*this); }
 
     public:
-        using WaveInterpolator::WaveInterpolator;
+        using StereoInterpolatorBase::StereoInterpolatorBase;
 };
+
+
+
+/**
+ * Specially rigged wavetable interpolator which actually calculates two
+ * delegate interpolators and then cross-fades the generated samples.
+ * When the cross-fade is complete, a given clean-up-Functor is invoked,
+ * which typically discards this delegate and installs the the target
+ * interpolator instead for ongoing regular operation.
+ * @note since the interpolator base implementation just assigns new samples into the
+ *       given buffer (which is good for performance reasons in the standard case),
+ *       unfortunately we need to allocate a secondary working buffer
+ */
+class XFadeDelegate
+    : public WaveInterpolator
+{
+    unique_ptr<WaveInterpolator> oldInterpolator;
+    unique_ptr<WaveInterpolator> newInterpolator;
+    function<void(void)>              attach_instance;
+    function<void(void)>              detach_instance;
+    function<void(WaveInterpolator*)> install_followup;
+
+    const size_t fadeLengthSmps;
+    const size_t bufferSize;
+    Samples tmpL,tmpR;
+    size_t progress;
+
+    private:
+        bool matches(fft::Waveform const& otherTable) const override
+        {
+            return newInterpolator->matches(otherTable);
+        }
+
+        float getCurrentPhase()  const override
+        {
+            return newInterpolator->getCurrentPhase();
+        }
+
+        /** Delegate to both attached interpolators and then calculate cross-faded samples. */
+        void caculateSamples(float *smpL, float *smpR, float noteFreq, size_t cntSmp)  override
+        {
+            oldInterpolator->caculateSamples(tmpL.get(),tmpR.get(), noteFreq, cntSmp);
+            newInterpolator->caculateSamples(smpL,smpR, noteFreq, cntSmp);
+
+            assert(1.0 / fadeLengthSmps > std::numeric_limits<float>::epsilon());
+            // step = 20000ms/1000ms/s * 96kHz ≈ 1.92e6 < 2^-23 ==> 1-1/step can be represented as float
+            for (size_t i = 0;
+                 i < cntSmp and progress < fadeLengthSmps;
+                 ++i, ++progress)
+            {
+                float mix{float(progress) / fadeLengthSmps};
+                smpL[i] = tmpL[i] * (1.0f-mix) + smpL[i] * mix;
+                smpR[i] = tmpR[i] * (1.0f-mix) + smpR[i] * mix;
+            }
+            // When fadeLengthSmps is reached in the middle of a buffer, remainder was filled from otherInterpolator.
+            // Use given clean-up functor to detach and discard this instance and install otherInterpolator instead.
+            if (progress >= fadeLengthSmps)
+                install_followup(
+                    newInterpolator.release());
+        }
+
+
+        WaveInterpolator* buildClone()  const override
+        {
+            return new XFadeDelegate(attach_instance
+                                    ,detach_instance
+                                    ,install_followup
+                                    ,unique_ptr<WaveInterpolator>{WaveInterpolator::clone(*oldInterpolator)}
+                                    ,unique_ptr<WaveInterpolator>{WaveInterpolator::clone(*newInterpolator)}
+                                    ,this->fadeLengthSmps
+                                    ,this->bufferSize);
+        }
+
+    public:
+        XFadeDelegate(function<void(void)> attachXFader
+                     ,function<void(void)> detachXFader
+                     ,function<void(WaveInterpolator*)> switchInterpolator
+                     ,unique_ptr<WaveInterpolator> oldInterpolator
+                     ,unique_ptr<WaveInterpolator> newInterpolator
+                     ,size_t fadeLen, size_t buffSiz)
+            : oldInterpolator{move(oldInterpolator)}
+            , newInterpolator{move(newInterpolator)}
+            , attach_instance{attachXFader}
+            , detach_instance{detachXFader}
+            , install_followup{switchInterpolator}
+            , fadeLengthSmps{fadeLen}
+            , bufferSize{buffSiz}
+            , tmpL{bufferSize}
+            , tmpR{bufferSize}
+            , progress{0}
+        {
+            attach_instance(); // ensure old wavetable stays alive
+        }
+       ~XFadeDelegate()
+        {
+            detach_instance(); // one user less
+        }
+};
+
 
 
 
 /* === Factory functions ===  */
 
-inline WaveInterpolator* WaveInterpolator::create(bool cubic, fft::Waveform const& wave, float tableFreq)
+inline WaveInterpolator* WaveInterpolator::create(bool cubic
+                                                 ,float phase
+                                                 ,bool stereo
+                                                 ,fft::Waveform const& wave
+                                                 ,float tableFreq)
 {
+    StereoInterpolatorBase* ipo;
     if (cubic)
-        return new CubicInterpolator(wave,tableFreq);
+        ipo = new CubicInterpolator(wave,tableFreq);
     else
-        return new LinearInterpolator(wave,tableFreq);
+        ipo = new LinearInterpolator(wave,tableFreq);
+
+    return ipo->setStartPos(phase,stereo);
 }
+
+
+inline WaveInterpolator* WaveInterpolator::createXFader(function<void(void)> attachXFader
+                                                       ,function<void(void)> detachXFader
+                                                       ,function<void(WaveInterpolator*)> switchInterpolator
+                                                       ,unique_ptr<WaveInterpolator> oldInterpolator
+                                                       ,unique_ptr<WaveInterpolator> newInterpolator
+                                                       ,size_t fadeLen, size_t buffSiz)
+                                                     // Note: wrapped into unique_ptr to prevent memory leaks on error
+{
+    if (oldInterpolator and newInterpolator and fadeLen > 0)
+        return new XFadeDelegate(attachXFader
+                                ,detachXFader
+                                ,switchInterpolator
+                                ,move(oldInterpolator)
+                                ,move(newInterpolator)
+                                ,fadeLen
+                                ,buffSiz);
+    else
+        return newInterpolator.release();
+}
+
 
 inline WaveInterpolator* WaveInterpolator::clone(WaveInterpolator const& orig)
 {

@@ -24,7 +24,6 @@
     This file is derivative of ZynAddSubFX original code
 
 */
-#include <cmath>
 
 #include "Misc/Config.h"
 #include "Params/PADnoteParameters.h"
@@ -40,6 +39,10 @@
 #include "Misc/SynthHelper.h"
 #include "Misc/NumericFuncs.h"
 
+#include <limits>
+#include <memory>
+#include <cmath>
+
 using func::decibel;
 using func::power;
 using synth::velF;
@@ -47,6 +50,7 @@ using synth::getDetune;
 using synth::interpolateAmplitude;
 using synth::aboveAmplitudeThreshold;
 using func::setRandomPan;
+using std::unique_ptr;
 
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
@@ -294,6 +298,63 @@ inline void PADnote::fadein(float *smps)
 }
 
 
+bool PADnote::isWavetableChanged(size_t tableNr)
+{
+    return not(waveInterpolator
+               and waveInterpolator->matches(pars->waveTable[tableNr]));
+}
+
+
+WaveInterpolator* PADnote::buildInterpolator(size_t tableNr)
+{
+    bool useCubicInterpolation = synth->getRuntime().Interpolation;
+    float startPhase = waveInterpolator? waveInterpolator->getCurrentPhase()
+                                       : synth->numRandom();
+
+    return WaveInterpolator::create(useCubicInterpolation
+                                   ,startPhase
+                                   ,pars->PStereo
+                                   ,pars->waveTable[tableNr]
+                                   ,pars->waveTable.basefreq[tableNr]);
+}
+
+
+WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
+{
+    if (waveInterpolator and newInterpolator)
+    {
+        auto attachCrossFade = [&]()
+        {
+            pars->xFade.attachFader();
+            std::cout << "XFade-ATTACH.. Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
+        };
+        auto detachCrossFade = [&]()
+        {
+            std::cout << "XFade-DETACH.. Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
+            pars->xFade.detachFader();
+        };
+        auto switchInterpolator = [&](WaveInterpolator* followUpInterpolator)
+        {
+            std::cout << "XFade-COMPLETE Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
+            waveInterpolator.reset(followUpInterpolator);
+        };
+        static_assert(20000 * 96000 / 1000 < std::numeric_limits<size_t>::max(), "cross-fade sample count");
+        size_t crossFadeLengthSmps = pars->PxFadeUpdate * synth->samplerate / 1000; // param given in ms
+        WaveInterpolator* oldInterpolator = waveInterpolator.release();
+        WaveInterpolator* xFader = WaveInterpolator::createXFader(attachCrossFade
+                                                                 ,detachCrossFade
+                                                                 ,switchInterpolator
+                                                                 ,unique_ptr<WaveInterpolator>{oldInterpolator}
+                                                                 ,unique_ptr<WaveInterpolator>{newInterpolator}
+                                                                 ,crossFadeLengthSmps
+                                                                 ,synth->buffersize);
+        return xFader;
+    }
+    else // fallback: no existing Interpolator ==> just install given new one
+        return newInterpolator;
+}
+
+
 void PADnote::computeNoteParameters()
 {
     setBaseFreq(basefreq);
@@ -322,16 +383,13 @@ void PADnote::computeNoteParameters()
             mindist = dist;
         }
     }
-    float currPhase = waveInterpolator? waveInterpolator->getCurrentPhase()
-                                      : synth->numRandom();
-
-    bool useCubicInterpolation = synth->getRuntime().Interpolation;
-    waveInterpolator.reset(WaveInterpolator::create(useCubicInterpolation
-                                                   ,pars->waveTable[tableNr]
-                                                   ,pars->waveTable.basefreq[tableNr]
-                                                   ));
-    waveInterpolator->setStartPos(currPhase, pars->PStereo);
-
+    if (isWavetableChanged(tableNr))
+    {
+        if (pars->xFade)
+            waveInterpolator.reset(setupCrossFade(buildInterpolator(tableNr)));
+        else
+            waveInterpolator.reset(buildInterpolator(tableNr));
+    }
 
     NoteGlobalPar.Volume =
         4.0f                                               // +12dB boost (similar on ADDnote, while SUBnote only boosts +6dB)
@@ -390,12 +448,15 @@ void PADnote::computecurrentparameters()
 
 
 
-int PADnote::noteout(float *outl,float *outr)
+void PADnote::noteout(float *outl,float *outr)
 {
     pars->activate_wavetable();
     if (padSynthUpdate.checkUpdated())
         computeNoteParameters();
     computecurrentparameters();
+    if (not waveInterpolator
+         or NoteStatus == NOTE_DISABLED)
+        return;
 
     waveInterpolator->caculateSamples(outl,outr, realfreq,
                                       synth->sent_buffersize);
@@ -493,7 +554,6 @@ int PADnote::noteout(float *outl,float *outr)
         }
         NoteStatus = NOTE_DISABLED;
     }
-    return 1;
 }
 
 

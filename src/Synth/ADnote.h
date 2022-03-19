@@ -132,7 +132,7 @@ class ADnote
         ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
         ~ADnote();
 
-        int noteout(float *outl, float *outr);
+        void noteout(float *outl, float *outr);
         void releasekey();
         bool finished() const
         {

@@ -51,7 +51,7 @@ class PADnote
         void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const PADnote &orig);
 
-        int noteout(float *outl,float *outr);
+        void noteout(float *outl,float *outr);
         bool finished() const
         {
             return NoteStatus == NOTE_DISABLED ||
@@ -65,6 +65,9 @@ class PADnote
 
     private:
         void fadein(float *smps);
+        bool isWavetableChanged(size_t tableNr);
+        WaveInterpolator* buildInterpolator(size_t tableNr);
+        WaveInterpolator* setupCrossFade(WaveInterpolator*);
         void computeNoteParameters();
         void computecurrentparameters();
         void setBaseFreq(float basefreq_);

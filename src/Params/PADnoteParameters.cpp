@@ -143,6 +143,7 @@ PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
     , FilterLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth)}
 
     // Wavetable building
+    , xFade{}
     , PxFadeUpdate{0}
     , waveTable(Pquality)
     , futureBuild(task::BuildScheduler<PADTables>::wireBuildFunction
@@ -772,9 +773,13 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
  * possibly pick up results from background wavetable build */
 void PADnoteParameters::activate_wavetable()
 {
-    if (futureBuild.isReady())
-    {
-        std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
+    if (futureBuild.isReady()
+        and (PxFadeUpdate == 0 or xFade.startXFade(waveTable)))
+    {                          // Note: don't pick up new waveTable while fading
+        if (xFade)                                                                              ////////////////TODO padthread debugging output
+            std::cout << "RLY activate + XFade ="<<float(PxFadeUpdate)/1000<<"s"<<std::endl;    ////////////////TODO padthread debugging output
+        else                                                                                    ////////////////TODO padthread debugging output
+            std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
         futureBuild.swap(waveTable);
         presetsUpdated();
         std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
@@ -793,6 +798,7 @@ void PADnoteParameters::mute_and_rebuild_synchronous()
     {
         using std::swap;
         swap(waveTable, *result);
+std::cout << "RLY swap().. old wavetable: "<<&(*result)[0][0] <<" --new--> "<<&waveTable[0][0]<<std::endl;   ////////////////TODO padthread debugging output
         presetsUpdated();
     }
     std::cout << "buildNewWavetable: synchronous build finished" << std::endl;        ////////////////TODO padthread debugging output

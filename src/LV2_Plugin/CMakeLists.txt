@@ -67,7 +67,7 @@ file (GLOB yoshimi_synth_files
     ../Synth/SUBnote.cpp  ../Synth/Resonance.cpp  ../Synth/PADnote.cpp
     ../Synth/ADnote.h  ../Synth/Envelope.h  ../Synth/LFO.h  ../Synth/OscilGen.h
     ../Synth/SUBnote.h  ../Synth/Resonance.h  ../Synth/PADnote.h
-    ../Synth/WaveInterpolator.h ../Synth/BodyDisposal.h)
+    ../Synth/WaveInterpolator.h ../Synth/XFadeManager.h ../Synth/BodyDisposal.h)
 file (GLOB yoshimi_musicio_files
     ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h)
 file (GLOB yoshimi_manifest_ttl

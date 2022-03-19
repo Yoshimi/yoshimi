@@ -30,8 +30,9 @@
 #define PAD_NOTE_PARAMETERS_H
 
 #include "Params/Presets.h"
-#include "Misc/BuildScheduler.h"
 #include "Misc/RandomGen.h"
+#include "Misc/BuildScheduler.h"
+#include "Synth/XFadeManager.h"
 #include "Synth/OscilGen.h"
 #include "DSP/FFTwrapper.h"
 
@@ -285,7 +286,9 @@ class PADnoteParameters : public Presets
         unique_ptr<EnvelopeParams> FilterEnvelope;
         unique_ptr<LFOParams> FilterLfo;
 
-        unsigned int PxFadeUpdate;
+        // manage secondary PADTables during a wavetable X-Fade
+        XFadeManager<PADTables> xFade;
+        unsigned int PxFadeUpdate;    // in milliseconds, max.20000
 
         // current wavetable
         PADTables waveTable;

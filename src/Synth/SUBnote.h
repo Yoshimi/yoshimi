@@ -53,8 +53,7 @@ class SUBnote
         void legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const SUBnote &syncwith);
 
-        int noteout(float *outl,float *outr); // note output, return 0 if the
-                                              // note is finished
+        void noteout(float *outl,float *outr);
         void releasekey(void);
         bool finished() const
         {
