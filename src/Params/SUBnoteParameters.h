@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
     Copyright 2017-2018, Will Godfrey
-    Copyright 2020 Kristian Amlie & others
+    Copyright 2020-2022 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -102,8 +102,6 @@ class SUBnoteParameters : public Presets
 
         unsigned char Phmagtype;    // how the magnitudes are computed
                                     // 0 = linear, 1 = -60dB, 2 = -60dB
-
-        unsigned char PfilterChanged[MAX_SUB_HARMONICS]; // 0 = no, 6 = magnitude, 7 = bandwidth
 
         unsigned char Phmag[MAX_SUB_HARMONICS];   // Magnitudes
 

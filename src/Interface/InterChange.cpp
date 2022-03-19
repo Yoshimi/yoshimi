@@ -4797,8 +4797,50 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
-    if (write && control != SUBSYNTH::control::clearHarmonics)
-        add2undo(getData, noteSeen);
+    if (write)
+    {
+        if(control == SUBSYNTH::control::clearHarmonics)
+        {
+           CommandBlock tempData;
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            tempData.data.source = 0;//TOPLEVEL::action::forceUpdate;
+            tempData.data.type &= TOPLEVEL::type::Write;
+
+            tempData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
+            {
+                tempData.data.value = pars->Phmag[i];
+                tempData.data.control = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                if(i == 0) // first line sets marker
+                    add2undo(&tempData, noteSeen);
+                else
+                    add2undo(&tempData, noteSeen, true);
+            }
+
+            tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
+            {
+                tempData.data.value = pars->Phrelbw[i];
+                tempData.data.control = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                add2undo(&tempData, noteSeen, true);
+            }
+
+            for (int i = 0; i < MAX_SUB_HARMONICS; i++)
+            {
+                pars->Phmag[i] = 0;
+                pars->Phrelbw[i] = 64;
+            }
+            pars->Phmag[0] = 127;
+
+            return;
+        }
+        else
+            add2undo(getData, noteSeen);
+    }
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
     {
@@ -4807,20 +4849,21 @@ void InterChange::commandSub(CommandBlock *getData)
             if (write)
                 pars->Phmag[control] = value;
             else
+            {
                 value = pars->Phmag[control];
+                getData->data.value = value;
+            }
         }
         else
         {
             if (write)
                 pars->Phrelbw[control] = value;
             else
+            {
                 value = pars->Phrelbw[control];
+                getData->data.value = value;
+            }
         }
-
-        if (!write)
-            getData->data.value = value;
-        else
-            pars->PfilterChanged[control] = insert;
         return;
     }
 
@@ -5029,19 +5072,6 @@ void InterChange::commandSub(CommandBlock *getData)
             else
                 value = pars->Pstart;
             break;
-
-        case SUBSYNTH::control::clearHarmonics:
-            if (write)
-            {
-                for (int i = 0; i < MAX_SUB_HARMONICS; i++)
-                {
-                    pars->Phmag[i] = 0;
-                    pars->Phrelbw[i] = 64;
-                }
-                pars->Phmag[0] = 127;
-            }
-            break;
-
         case SUBSYNTH::control::stereo:
             if (write)
                 pars->Pstereo = value_bool;
@@ -5716,20 +5746,20 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             {
                 CommandBlock tempData;
                 memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
-                getData->data.control = RESONANCE::control::graphPoint;
-                getData->data.insert = TOPLEVEL::insert::resonanceGraphInsert;
+                tempData.data.control = RESONANCE::control::graphPoint;
+                tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
 
                 for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
                 {
-                    getData->data.value = respar->Prespoints[i];
-                    getData->data.parameter = i;
+                    tempData.data.value = respar->Prespoints[i];
+                    tempData.data.parameter = i;
                     noteSeen = true;
+                    undoLoopBack = false;
                     if(i == 0) // first line sets marker
-                        add2undo(getData, noteSeen, false);
+                        add2undo(&tempData, noteSeen);
                     else
-                        add2undo(getData, noteSeen, true);
+                        add2undo(&tempData, noteSeen, true);
                 }
-                memcpy(getData->bytes, tempData.bytes, sizeof(CommandBlock));
 
                 respar->randomize(value_int);
             }
@@ -6713,7 +6743,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
     if (undoLoopBack)
     {
         undoLoopBack = false;
-        std::cout << "cleared undoLoopBack" << std::endl;
+        //std::cout << "cleared undoLoopBack" << std::endl;
         return; // don't want to reset what we've just undone!
     }
 

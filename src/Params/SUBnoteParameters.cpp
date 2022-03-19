@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
     Copyright 2017-2019, Will Godfrey
-    Copyright 2020 Kristian Amlie & others
+    Copyright 2020-2022 Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -82,7 +82,6 @@ void SUBnoteParameters::defaults(void)
 
     for (int n = 0; n < MAX_SUB_HARMONICS; ++n)
     {
-        PfilterChanged[n] = 0;
         Phmag[n] = 0;
         Phrelbw[n] = 64;
     }

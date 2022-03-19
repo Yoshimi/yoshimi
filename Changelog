@@ -1,5 +1,8 @@
 yoshimi 2.1.2 M
 
+2022-3-19 Will
+* Undo done for SubSynth clear harmonics.
+
 2022-3-18 Will
 * Reduced undo/redo messaging spam
 * Group undo/redo now in blocks of 16

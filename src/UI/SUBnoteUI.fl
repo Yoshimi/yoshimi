@@ -11,7 +11,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2021, Will Godfrey & others
+Copyright 2015-2022, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -528,17 +528,7 @@ class SUBnoteUI {: {public PresetsUI_}
       Fl_Button subClear {
         label Clear
         callback {//
-        for (int i = 0; i < MAX_SUB_HARMONICS; i++)
-        {
-            h[i]->mag->value(0);
-            pars->Phmag[i] = 0;
-            h[i]->bw->value(0);
-            pars->Phrelbw[i] = 64;
-        }
-
-        h[0]->mag->value(127);
-        SUBparameters->redraw();
-        send_data (0, SUBSYNTH::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
+        send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button subCopy {
