@@ -4801,9 +4801,9 @@ void InterChange::commandSub(CommandBlock *getData)
     {
         if(control == SUBSYNTH::control::clearHarmonics)
         {
-           CommandBlock tempData;
+            CommandBlock tempData;
             memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
-            tempData.data.source = 0;//TOPLEVEL::action::forceUpdate;
+            tempData.data.source = 0;
             tempData.data.type &= TOPLEVEL::type::Write;
 
             tempData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
@@ -5434,8 +5434,49 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
     bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    if (write && control != OSCILLATOR::control::clearHarmonics && control != OSCILLATOR::control::convertToSine)
-        add2undo(getData, noteSeen);
+    if (write)
+    {
+        if (control == OSCILLATOR::control::clearHarmonics)
+        {
+            //getData->data.source &= TOPLEVEL::action::forceUpdate;
+            /*CommandBlock tempData;
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            tempData.data.source = 0;
+            tempData.data.type &= TOPLEVEL::type::Write;
+            tempData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+            {
+                tempData.data.value = oscil->Phmag[i];
+                tempData.data.control = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                if(i == 0) // first line sets marker
+                    add2undo(&tempData, noteSeen);
+                else
+                    add2undo(&tempData, noteSeen, true);
+            }
+            tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+            {
+                tempData.data.value = oscil->Phphase[i];
+                tempData.data.control = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                add2undo(&tempData, noteSeen, true);
+            }*/
+
+            for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
+                {
+                    oscil->Phmag[i] = 64;
+                    oscil->Phphase[i] = 64;
+                }
+            oscil->Phmag[0]=127;
+            oscil->presetsUpdated();
+            return;
+        }
+        else if (control != OSCILLATOR::control::convertToSine)
+            add2undo(getData, noteSeen);
+    }
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
@@ -5666,7 +5707,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 value = oscil->Padaptiveharmonics;
             break;
 
-        case OSCILLATOR::control::clearHarmonics:
+        /*case OSCILLATOR::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -5677,7 +5718,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 oscil->Phmag[0]=127;
                 oscil->presetsUpdated();
             }
-            break;
+            break;*/
         case OSCILLATOR::control::convertToSine:
             if (write)
             {
@@ -5703,6 +5744,35 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
     bool write = (type & TOPLEVEL::type::Write) > 0;
+
+
+    if (write)
+    {
+        if (control == RESONANCE::control::randomType ||
+            control == RESONANCE::control::clearGraph ||
+            control == RESONANCE::control::interpolatePeaks ||
+            control == RESONANCE::control::smoothGraph)
+        {
+            CommandBlock tempData;
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            tempData.data.control = RESONANCE::control::graphPoint;
+            tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
+
+            for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
+            {
+                tempData.data.value = respar->Prespoints[i];
+                tempData.data.parameter = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                if(i == 0) // first line sets marker
+                    add2undo(&tempData, noteSeen);
+                else
+                    add2undo(&tempData, noteSeen, true);
+            }
+        }
+        else
+            add2undo(getData, noteSeen);
+    }
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
@@ -5743,26 +5813,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case RESONANCE::control::randomType:
             if (write)
-            {
-                CommandBlock tempData;
-                memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
-                tempData.data.control = RESONANCE::control::graphPoint;
-                tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
-
-                for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
-                {
-                    tempData.data.value = respar->Prespoints[i];
-                    tempData.data.parameter = i;
-                    noteSeen = true;
-                    undoLoopBack = false;
-                    if(i == 0) // first line sets marker
-                        add2undo(&tempData, noteSeen);
-                    else
-                        add2undo(&tempData, noteSeen, true);
-                }
-
                 respar->randomize(value_int);
-            }
             break;
 
         case RESONANCE::control::interpolatePeaks:
