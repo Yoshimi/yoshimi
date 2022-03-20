@@ -5436,10 +5436,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
 
     if (write)
     {
-        if (control == OSCILLATOR::control::clearHarmonics)
+        /*if (control == OSCILLATOR::control::clearHarmonics)
         {
-            //getData->data.source &= TOPLEVEL::action::forceUpdate;
-            /*CommandBlock tempData;
+            CommandBlock tempData;
             memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
             tempData.data.source = 0;
             tempData.data.type &= TOPLEVEL::type::Write;
@@ -5463,18 +5462,10 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 noteSeen = true;
                 undoLoopBack = false;
                 add2undo(&tempData, noteSeen, true);
-            }*/
-
-            for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
-                {
-                    oscil->Phmag[i] = 64;
-                    oscil->Phphase[i] = 64;
-                }
-            oscil->Phmag[0]=127;
-            oscil->presetsUpdated();
+            }
             return;
-        }
-        else if (control != OSCILLATOR::control::convertToSine)
+        }*/
+        if (control != OSCILLATOR::control::convertToSine && control != OSCILLATOR::control::useAsBaseFunction && control != OSCILLATOR::control::clearHarmonics)
             add2undo(getData, noteSeen);
     }
 
@@ -5707,7 +5698,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 value = oscil->Padaptiveharmonics;
             break;
 
-        /*case OSCILLATOR::control::clearHarmonics:
+        case OSCILLATOR::control::clearHarmonics:
             if (write)
             {
                 for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -5718,7 +5709,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 oscil->Phmag[0]=127;
                 oscil->presetsUpdated();
             }
-            break;*/
+            break;
         case OSCILLATOR::control::convertToSine:
             if (write)
             {
