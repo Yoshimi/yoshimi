@@ -143,7 +143,9 @@ class PADnoteParameters : public Presets
 {
         static constexpr size_t SIZE_HARMONIC_PROFILE = 512;
         static constexpr size_t PROFILE_OVERSAMPLING = 16;
-
+    public:
+        static constexpr size_t XFADE_UPDATE_MAX   = 20000; // milliseconds
+        static constexpr size_t XFADE_UPDATE_DEFAULT = 200;
 
     public:
         PADnoteParameters(SynthEngine *_synth);
@@ -288,7 +290,7 @@ class PADnoteParameters : public Presets
 
         // manage secondary PADTables during a wavetable X-Fade
         XFadeManager<PADTables> xFade;
-        unsigned int PxFadeUpdate;    // in milliseconds, max.20000
+        unsigned int PxFadeUpdate;    // in milliseconds, XFADE_UPDATE_MAX = 20000
 
         // current wavetable
         PADTables waveTable;

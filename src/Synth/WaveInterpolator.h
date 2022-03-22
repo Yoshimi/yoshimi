@@ -28,6 +28,7 @@
 
 #include "DSP/FFTwrapper.h"
 #include "Misc/Alloc.h"
+#include "Misc/SynthHelper.h"
 
 #include <memory>
 #include <functional>
@@ -245,6 +246,8 @@ class XFadeDelegate
 
     const size_t fadeLengthSmps;
     const size_t bufferSize;
+
+    synth::SFadeCurve mixCurve;
     Samples tmpL,tmpR;
     size_t progress;
 
@@ -271,9 +274,9 @@ class XFadeDelegate
                  i < cntSmp and progress < fadeLengthSmps;
                  ++i, ++progress)
             {
-                float mix{float(progress) / fadeLengthSmps};
-                smpL[i] = tmpL[i] * (1.0f-mix) + smpL[i] * mix;
-                smpR[i] = tmpR[i] * (1.0f-mix) + smpR[i] * mix;
+                float mix = mixCurve.nextStep();
+                smpL[i] = tmpL[i] * (1-mix)  +  smpL[i] * mix;
+                smpR[i] = tmpR[i] * (1-mix)  +  smpR[i] * mix;
             }
             // When fadeLengthSmps is reached in the middle of a buffer, remainder was filled from otherInterpolator.
             // Use given clean-up functor to detach and discard this instance and install otherInterpolator instead.
@@ -308,6 +311,7 @@ class XFadeDelegate
             , install_followup{switchInterpolator}
             , fadeLengthSmps{fadeLen}
             , bufferSize{buffSiz}
+            , mixCurve{fadeLen}
             , tmpL{bufferSize}
             , tmpR{bufferSize}
             , progress{0}

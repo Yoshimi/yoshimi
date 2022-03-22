@@ -152,6 +152,53 @@ class InterpolatedValue
 };
 
 
+/**
+ * Exponential S-Fade Edit-curve.
+ * Create a soft transition without foregrounding the change. The generated value from 0.0 … 1.0
+ * lags first, then accelerates after 1/5 of the fade time and finally approaches 1.0 asymptotically.
+ * Approximation is based on the differential equation for exponential decay; two functions with
+ * different decay time are cascaded: the first one sets a moving goal for the second one
+ * to follow up damped, at the end both converging towards 1.0
+ *
+ * Differential equations  | Solution
+ *   g' = q1·(1 - g)         g(x) = 1 - e^-q·x
+ *   f' = q2·(g - f)         f(x) = 1 - k/(k-1) · e^-q·x  +  1/(k-1) · e^-k·q·x
+ *
+ * with Definitions: q1 = q, q2 = k·q
+ * turning point at: w  = 1/5·fadeLen
+ * ==> f''= 0  <=>  k = e^((k-1)·q·w)  <=>  q = 1/w·ln(k)/(k-1)
+ */
+class SFadeCurve
+{
+    static constexpr float ASYM = 1.0 / 0.938; // heuristics: typically the curve reaches 0.96 after fadeLen
+    static constexpr float K = 2.0;            // higher values of K create a more linear less S-shape curve
+    static constexpr float LN_K = log(K) / (K-1);
+    static constexpr float TURN = 1/5.0;       // heuristics: turning point after 1/5 of fade length
+
+    const float q1;
+    const float q2;
+    float goal;
+    float mix;
+
+    public:
+        SFadeCurve(size_t fadeLen)
+            : q1{LN_K / (TURN * fadeLen)}
+            , q2{K * q1}
+            , goal{0}
+            , mix{0}
+        { }
+
+        float nextStep()
+        {
+            goal += q1 * (ASYM - goal);
+            mix  += q2 * (goal - mix);
+            return std::min(mix, 1.0f);
+        }
+};
+
+
+
+
 inline bool aboveAmplitudeThreshold(float a, float b)
 {
     return ((2.0f * fabsf(b - a) / fabsf(b + a + 0.0000000001f)) > 0.0001f);

@@ -338,7 +338,8 @@ WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
             std::cout << "XFade-COMPLETE Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
             waveInterpolator.reset(followUpInterpolator);
         };
-        static_assert(20000 * 96000 / 1000 < std::numeric_limits<size_t>::max(), "cross-fade sample count");
+        static_assert(PADnoteParameters::XFADE_UPDATE_MAX/1000 * 96000  < std::numeric_limits<size_t>::max(),
+                      "cross-fade sample count represented as size_t");
         size_t crossFadeLengthSmps = pars->PxFadeUpdate * synth->samplerate / 1000; // param given in ms
         WaveInterpolator* oldInterpolator = waveInterpolator.release();
         WaveInterpolator* xFader = WaveInterpolator::createXFader(attachCrossFade

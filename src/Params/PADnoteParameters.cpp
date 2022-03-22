@@ -239,7 +239,7 @@ void PADnoteParameters::defaults(void)
     FilterEnvelope->defaults();
     FilterLfo->defaults();
 
-    PxFadeUpdate = 200; // 200ms crossfade after updating wavetables
+    PxFadeUpdate = XFADE_UPDATE_DEFAULT; // 200ms crossfade after updating wavetables
 
     // reseed OscilGen and wavetable phase randomisation
     reseed(synth->randomINT());
@@ -1003,7 +1003,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     Pmode=xml->getpar127("mode",0);
     Pbandwidth=xml->getpar("bandwidth",Pbandwidth,0,1000);
     Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
-    PxFadeUpdate=xml->getparU("xfade_update",PxFadeUpdate,0,20000);
+    PxFadeUpdate=xml->getparU("xfade_update",PxFadeUpdate, 0,XFADE_UPDATE_MAX);
 
     if (xml->enterbranch("HARMONIC_PROFILE"))
     {
