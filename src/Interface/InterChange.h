@@ -152,6 +152,7 @@ class InterChange : private DataText
         bool setUndo;
         bool setRedo;
         bool undoStart;
+        int cameFrom; // 0 = new command, 1 = undo, 2 = redo
 
     public:
         bool noteSeen;

@@ -106,6 +106,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     setUndo = false;
     setRedo = false;
     undoStart = false;
+    cameFrom = 0;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
 }
 
@@ -1780,6 +1781,7 @@ void InterChange::mediate()
         if (fromCLI.read(getData.bytes))
         {
             more = true;
+            cameFrom = 0;
             if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -1790,6 +1792,7 @@ void InterChange::mediate()
             && fromGUI.read(getData.bytes))
         {
             more = true;
+            cameFrom = 0;
             if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -1798,6 +1801,7 @@ void InterChange::mediate()
         if (fromMIDI.read(getData.bytes))
         {
             more = true;
+            cameFrom = 0;
             if (getData.data.part != TOPLEVEL::section::midiLearn)
                 // Normal MIDI message, not special midi-learn message
             {
@@ -6262,12 +6266,6 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    if (write)
-        add2undo(getData, noteSeen);
-
-    std::string env;
-    std::string name;
     if (engine == PART::engine::addSynth)
     {
         switch (insertParam)
@@ -6352,18 +6350,20 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
 void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
-    int val = lrint(getData->data.value); // these are all integers or bool
+    int val = int(getData->data.value) & 0x7f; // redo not currently restoring correct values
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
 
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char Xincrement = getData->data.offset;
-
+    //if (write)
+        //std::cout << "from " << cameFrom << std::endl;
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < UNUSED);
 
     if (insert == TOPLEVEL::insert::envelopePoints) // here be dragons :(
     {
+        //synth->CBtest(getData);
         if (!pars->Pfreemode)
         {
             getData->data.value = UNUSED;
@@ -6378,7 +6378,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             return;
         }
 
-        if (isAddpoint)
+        if (isAddpoint && cameFrom != 1)
         {
             if (envpoints < MAX_ENVELOPE_POINTS)
             {
@@ -6400,6 +6400,11 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 getData->data.value = val;
                 getData->data.offset = Xincrement;
                 pars->presetsUpdated();
+                if (cameFrom == 0)
+                {
+                    noteSeen = true;
+                    add2undo(getData, noteSeen);
+                }
             }
             else
                 getData->data.value = UNUSED;
@@ -6427,6 +6432,9 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         }
         return;
     }
+
+    if (write)
+        add2undo(getData, noteSeen);
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
@@ -6819,7 +6827,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
      */
     CommandBlock candidate;
     memcpy(candidate.bytes, getData->bytes, sizeof(CommandBlock));
-    candidate.data.type &= TOPLEVEL::type::Integer;
+    candidate.data.type &= ~TOPLEVEL::type::Write;
     candidate.data.source = 0;
     commandSendReal(&candidate);
 
@@ -6840,9 +6848,13 @@ void InterChange::undoLast(CommandBlock *candidate)
     {
         source = &undoList;
         dest = &redoList;
+        cameFrom = 1;
+        std::cout << "undo " << std::endl;
     }
     else
     {
+        cameFrom = 2;
+        std::cout << "redo " << std::endl;
         source = &redoList;
         dest = &undoList;
     }
@@ -6864,10 +6876,6 @@ void InterChange::undoLast(CommandBlock *candidate)
     CommandBlock oldCommand;
     memcpy(candidate->bytes, source->back().bytes, sizeof(CommandBlock));
 
-    /*if (!setRedo)
-        std::cout << "undo ";
-    else
-        std::cout << "redo ";*/
     if (undoStart)
     {
         dest->push_back(undoMarker);
