@@ -395,7 +395,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
-                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {
@@ -446,7 +446,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
-                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {
@@ -512,7 +512,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case TOPLEVEL::insert::envelopeGroup:
                         decode_envelope(synth, getData);
                         break;
-                    case TOPLEVEL::insert::envelopePoints:
+                    case TOPLEVEL::insert::envelopePointAdd:
                         decode_envelope(synth, getData);
                         break;
                     case TOPLEVEL::insert::envelopePointChange:
@@ -560,7 +560,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
-                case TOPLEVEL::insert::envelopePoints:
+                case TOPLEVEL::insert::envelopePointAdd:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {

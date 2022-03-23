@@ -168,7 +168,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointAdd:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -212,7 +212,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointAdd:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -238,7 +238,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointAdd:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -273,7 +273,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::envelopeGroup:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
-            case TOPLEVEL::insert::envelopePoints:
+            case TOPLEVEL::insert::envelopePointAdd:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -3084,7 +3084,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
             break;
     }
 
-    if (insert == TOPLEVEL::insert::envelopePoints)
+    if (insert == TOPLEVEL::insert::envelopePointAdd)
     {
         if (!write)
         {

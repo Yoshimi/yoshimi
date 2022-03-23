@@ -385,7 +385,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         int value = env->Penvval[curpoint];
         int offset = env->Penvdt[curpoint];
 
-        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints, offset);}
+        send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointAdd, offset);}
         xywh {112 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -400,7 +400,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         if (env->Penvpoints <= 3)
             return;
 
-send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePoints);}
+send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointAdd);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -871,7 +871,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
-    if (insert == TOPLEVEL::insert::envelopePoints || insert == TOPLEVEL::insert::envelopePointChange)
+    if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointChange)
     {
         if (insert == TOPLEVEL::insert::envelopePointChange) // adjust point
             freeedit->lastpoint = control;

@@ -2218,7 +2218,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
                     return REPLY::value_msg;
 
                 value = string2int(input); // Y
-                insert = TOPLEVEL::insert::envelopePoints;
+                insert = TOPLEVEL::insert::envelopePointAdd;
 
             }
             else if (input.matchnMove(1, "delete"))
@@ -2244,7 +2244,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
                 }
                 if (cmd < 0 || cmd >= (MAX_ENVELOPE_POINTS - 1))
                     return REPLY::range_msg;
-                insert = TOPLEVEL::insert::envelopePoints;
+                insert = TOPLEVEL::insert::envelopePointAdd;
             }
             else if (input.matchnMove(1, "change"))
             {

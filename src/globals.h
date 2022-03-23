@@ -231,13 +231,14 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         LFOgroup = 0,
         filterGroup,
         envelopeGroup,
-        envelopePoints, // this should be split in two
+        envelopePointAdd,
+        envelopePointDelete,
         envelopePointChange,
-        oscillatorGroup, // 5
+        oscillatorGroup, // 6
         harmonicAmplitude,
-        harmonicPhaseBandwidth, // this should also be split in two
+        harmonicPhaseBandwidth, // this should be split in two
         resonanceGroup,
-        resonanceGraphInsert, // 9
+        resonanceGraphInsert, // 10
         systemEffectSend = 16,
         partEffectSelect,
         kitGroup = 32
