@@ -143,6 +143,7 @@ class InterChange : private DataText
         void commandSysIns(CommandBlock *getData);
 
         void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);
+        void addFixed2undo(CommandBlock *getData);
         void undoLast(CommandBlock *candidate);
         std::list<CommandBlock> undoList;
         std::list<CommandBlock> redoList;

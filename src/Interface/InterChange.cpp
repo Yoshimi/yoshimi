@@ -6382,6 +6382,10 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         {
             if (envpoints < MAX_ENVELOPE_POINTS)
             {
+                synth->CBtest(getData);
+                if (cameFrom == 0)
+                    addFixed2undo(getData);
+
                 pars->Penvpoints += 1;
                 for (int i = envpoints; i >= point; -- i)
                 {
@@ -6400,11 +6404,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 getData->data.value = val;
                 getData->data.offset = Xincrement;
                 pars->presetsUpdated();
-                if (cameFrom == 0)
-                {
-                    noteSeen = true;
-                    add2undo(getData, noteSeen);
-                }
             }
             else
                 getData->data.value = UNUSED;
@@ -6787,6 +6786,13 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.value = value;
 }
 
+void InterChange::addFixed2undo(CommandBlock *getData)
+{
+    redoList.clear(); // always invalidated on new entry
+    undoList.push_back(undoMarker);
+    undoList.push_back(*getData);
+}
+
 
 void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
 {
@@ -6827,7 +6833,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
      */
     CommandBlock candidate;
     memcpy(candidate.bytes, getData->bytes, sizeof(CommandBlock));
-    candidate.data.type &= ~TOPLEVEL::type::Write;
+    candidate.data.type &= TOPLEVEL::type::Integer;
     candidate.data.source = 0;
     commandSendReal(&candidate);
 
@@ -6882,13 +6888,16 @@ void InterChange::undoLast(CommandBlock *candidate)
         undoStart = false;
     }
     memcpy(oldCommand.bytes, source->back().bytes, sizeof(CommandBlock));
-    char temptype = oldCommand.data.type;
     char tempsource = oldCommand.data.source;
-    oldCommand.data.type &= TOPLEVEL::type::Integer;
-    oldCommand.data.source = 0;
-    commandSendReal(&oldCommand);
-    oldCommand.data.type = temptype;
-    oldCommand.data.source = tempsource | TOPLEVEL::action::forceUpdate;
+    if(oldCommand.data.insert != TOPLEVEL::insert::envelopePoints)
+    {
+        char temptype = oldCommand.data.type;
+        oldCommand.data.type &= TOPLEVEL::type::Integer;
+        oldCommand.data.source = 0;
+        commandSendReal(&oldCommand);
+        oldCommand.data.type = temptype;
+    }
+    oldCommand.data.source = tempsource;
     dest->push_back(oldCommand);
     source->pop_back();
 
