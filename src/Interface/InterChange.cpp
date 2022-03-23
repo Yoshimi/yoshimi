@@ -54,6 +54,12 @@
     #include "MasterUI.h"
 #endif
 
+enum envControl: unsigned char {
+    input,
+    undo,
+    redo
+};
+
 using file::localPath;
 using file::findFile;
 using file::isRegularFile;
@@ -106,7 +112,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     setUndo = false;
     setRedo = false;
     undoStart = false;
-    cameFrom = 0;
+    cameFrom = envControl::input;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
 }
 
@@ -1781,7 +1787,7 @@ void InterChange::mediate()
         if (fromCLI.read(getData.bytes))
         {
             more = true;
-            cameFrom = 0;
+            cameFrom = envControl::input;
             if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -1792,7 +1798,7 @@ void InterChange::mediate()
             && fromGUI.read(getData.bytes))
         {
             more = true;
-            cameFrom = 0;
+            cameFrom = envControl::input;
             if (getData.data.part != TOPLEVEL::section::midiLearn) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -1801,7 +1807,7 @@ void InterChange::mediate()
         if (fromMIDI.read(getData.bytes))
         {
             more = true;
-            cameFrom = 0;
+            cameFrom = envControl::input;
             if (getData.data.part != TOPLEVEL::section::midiLearn)
                 // Normal MIDI message, not special midi-learn message
             {
@@ -6363,11 +6369,9 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     //if (write)
         //std::cout << "from " << cameFrom << std::endl;
     int envpoints = pars->Penvpoints;
-    bool isAddpoint = (Xincrement < UNUSED);
 
-    if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete) // here be dragons :(
+    if (insert == TOPLEVEL::insert::envelopePointAdd) // here be dragons :(
     {
-        //synth->CBtest(getData);
         if (!pars->Pfreemode)
         {
             getData->data.value = UNUSED;
@@ -6382,12 +6386,11 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             return;
         }
 
-        if (isAddpoint && cameFrom != 1)
+        if (cameFrom != envControl::undo)
         {
             if (envpoints < MAX_ENVELOPE_POINTS)
             {
-                synth->CBtest(getData);
-                if (cameFrom == 0)
+                if (cameFrom == envControl::input)
                     addFixed2undo(getData);
 
                 pars->Penvpoints += 1;
@@ -6421,6 +6424,80 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         }
         else
         {
+            envpoints -= 1;
+            for (int i = point; i < envpoints; ++ i)
+            {
+                pars->Penvdt[i] = pars->Penvdt[i + 1];
+                pars->Penvval[i] = pars->Penvval[i + 1];
+            }
+            if (point <= pars->Penvsustain)
+                -- pars->Penvsustain;
+            pars->Penvpoints = envpoints;
+            getData->data.value = envpoints;
+            pars->presetsUpdated();
+        }
+        return;
+    }
+
+    if (insert == TOPLEVEL::insert::envelopePointDelete) // here be other dragons :(
+    {
+        if (!pars->Pfreemode)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = UNUSED;
+            return;
+        }
+
+        if (!write || point == 0 || point >= envpoints)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = envpoints;
+            return;
+        }
+
+        if (cameFrom != envControl::input && cameFrom != envControl::redo)
+        {
+            if (envpoints < MAX_ENVELOPE_POINTS)
+            {
+                pars->Penvpoints += 1;
+                for (int i = envpoints; i >= point; -- i)
+                {
+                    pars->Penvdt[i + 1] = pars->Penvdt[i];
+                    pars->Penvval[i + 1] = pars->Penvval[i];
+                }
+
+                if (point == 0)
+                    pars->Penvdt[1] = 64;
+
+                if (point <= pars->Penvsustain)
+                    ++ pars->Penvsustain;
+
+                pars->Penvdt[point] = Xincrement;
+                pars->Penvval[point] = val;
+                getData->data.value = val;
+                getData->data.offset = Xincrement;
+                pars->presetsUpdated();
+            }
+            else
+                getData->data.value = UNUSED;
+            return;
+        }
+        else if (envpoints < 4)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = UNUSED;
+            return; // can't have less than 4
+        }
+        else
+        {
+            if (cameFrom == envControl::input)
+            {
+                getData->data.source = 0;
+                getData->data.type &= TOPLEVEL::type::Write;
+                getData->data.offset = pars->Penvdt[point];
+                getData->data.value = pars->Penvval[point];
+                addFixed2undo(getData);
+            }
             envpoints -= 1;
             for (int i = point; i < envpoints; ++ i)
             {
@@ -6858,12 +6935,12 @@ void InterChange::undoLast(CommandBlock *candidate)
     {
         source = &undoList;
         dest = &redoList;
-        cameFrom = 1;
+        cameFrom = envControl::undo;
         std::cout << "undo " << std::endl;
     }
     else
     {
-        cameFrom = 2;
+        cameFrom = envControl::redo;
         std::cout << "redo " << std::endl;
         source = &redoList;
         dest = &undoList;
