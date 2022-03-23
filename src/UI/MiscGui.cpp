@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2021 Will Godfrey & others
+    Copyright 2016-2022 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -396,6 +396,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
                 case TOPLEVEL::insert::envelopePointAdd:
+                case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {
@@ -447,6 +448,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
                 case TOPLEVEL::insert::envelopePointAdd:
+                case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {
@@ -513,6 +515,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         decode_envelope(synth, getData);
                         break;
                     case TOPLEVEL::insert::envelopePointAdd:
+                    case TOPLEVEL::insert::envelopePointDelete:
                         decode_envelope(synth, getData);
                         break;
                     case TOPLEVEL::insert::envelopePointChange:
@@ -561,6 +564,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
                 case TOPLEVEL::insert::envelopeGroup:
                 case TOPLEVEL::insert::envelopePointAdd:
+                case TOPLEVEL::insert::envelopePointDelete:
                 case TOPLEVEL::insert::envelopePointChange:
                     switch(parameter)
                     {

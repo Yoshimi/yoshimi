@@ -2139,6 +2139,7 @@ bool InterChange::processAdd(CommandBlock *getData, SynthEngine *synth)
             break;
         case TOPLEVEL::insert::envelopeGroup:
         case TOPLEVEL::insert::envelopePointAdd:
+        case TOPLEVEL::insert::envelopePointDelete:
         case TOPLEVEL::insert::envelopePointChange:
             commandEnvelope(getData);
             break;
@@ -2172,6 +2173,7 @@ bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
             break;
         case TOPLEVEL::insert::envelopeGroup:
         case TOPLEVEL::insert::envelopePointAdd:
+        case TOPLEVEL::insert::envelopePointDelete:
         case TOPLEVEL::insert::envelopePointChange:
             commandEnvelope(getData);
             break;
@@ -2239,6 +2241,7 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointAdd:
+        case TOPLEVEL::insert::envelopePointDelete:
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointChange:
@@ -2270,6 +2273,7 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointAdd:
+        case TOPLEVEL::insert::envelopePointDelete:
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointChange:
@@ -6361,7 +6365,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     int envpoints = pars->Penvpoints;
     bool isAddpoint = (Xincrement < UNUSED);
 
-    if (insert == TOPLEVEL::insert::envelopePointAdd) // here be dragons :(
+    if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete) // here be dragons :(
     {
         //synth->CBtest(getData);
         if (!pars->Pfreemode)
@@ -6889,7 +6893,7 @@ void InterChange::undoLast(CommandBlock *candidate)
     }
     memcpy(oldCommand.bytes, source->back().bytes, sizeof(CommandBlock));
     char tempsource = oldCommand.data.source;
-    if(oldCommand.data.insert != TOPLEVEL::insert::envelopePointAdd)
+    if(oldCommand.data.insert != TOPLEVEL::insert::envelopePointAdd && oldCommand.data.insert != TOPLEVEL::insert::envelopePointDelete)
     {
         char temptype = oldCommand.data.type;
         oldCommand.data.type &= TOPLEVEL::type::Integer;
@@ -7109,7 +7113,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             envelopeLimit envelopeLimits;
             return envelopeLimits.getEnvelopeLimits(getData);
         }
-        if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointChange)
+        if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete || insert == TOPLEVEL::insert::envelopePointChange)
             return 1; // temporary solution :(
         min = 0;
         max = 127;

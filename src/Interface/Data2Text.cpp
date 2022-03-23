@@ -169,6 +169,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointAdd:
+            case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -213,6 +214,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointAdd:
+            case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -239,6 +241,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointAdd:
+            case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -274,6 +277,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointAdd:
+            case TOPLEVEL::insert::envelopePointDelete:
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::envelopePointChange:
@@ -3084,7 +3088,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
             break;
     }
 
-    if (insert == TOPLEVEL::insert::envelopePointAdd)
+    if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete)
     {
         if (!write)
         {
