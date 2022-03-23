@@ -400,7 +400,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         if (env->Penvpoints <= 3)
             return;
 
-send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointAdd);}
+send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointDelete);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
