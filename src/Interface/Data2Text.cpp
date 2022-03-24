@@ -3047,8 +3047,8 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    unsigned char offset = getData->data.offset;
     unsigned char insertParam = getData->data.parameter;
-    int miscmsg = getData->data.miscmsg;
 
     string env;
     string name;
@@ -3092,10 +3092,10 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + to_string(int(miscmsg)));
+            return ("Freemode add/remove is write only. Current points " + to_string(value));
         }
-        if (miscmsg != UNUSED)
-            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(miscmsg)) + " Y");
+        if (insert == TOPLEVEL::insert::envelopePointAdd)
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int(control & 0x3f)) + " X increment " + to_string(int(offset)) + " Y");
         else
         {
             showValue = false;
@@ -3105,7 +3105,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 
     if (insert == TOPLEVEL::insert::envelopePointChange)
     {
-        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(miscmsg)) + " Y");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control)) + " X increment " + to_string(int(offset)) + " Y");
     }
 
     string contstr;

@@ -99,11 +99,11 @@ pair=NULL;} {}
     int npoints = env->Penvpoints;
     float sum=0;
     for (int i = 1; i < npoints; i++)
-        sum += env->getdt(i) + 1; // this is ambiguous :(
+        sum += (env->getdt(i) + 1);
 
-    float sumbefore = 0;//the sum of all points before the computed point
+    float sumbefore = 0; // the sum of all points before the computed point
     for (int i = 1; i <= n; i++)
-        sumbefore += env->getdt(i) + 1; // this is ambiguous :(
+        sumbefore += (env->getdt(i) + 1);
 
     return((int) (sumbefore / (float) sum * lx));} {}
   }

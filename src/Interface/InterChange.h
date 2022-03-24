@@ -140,6 +140,10 @@ class InterChange : private DataText
         void filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
         void commandEnvelope(CommandBlock *getData);
         void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
+        void envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars);
+        void envelopePointDelete(CommandBlock *getData, EnvelopeParams *pars);
+        void envelopePointChange(CommandBlock *getData, EnvelopeParams *pars);
+
         void commandSysIns(CommandBlock *getData);
 
         void add2undo(CommandBlock *getData, bool& noteSeen, bool group = false);

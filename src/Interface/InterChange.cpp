@@ -6362,186 +6362,31 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
     int val = int(getData->data.value) & 0x7f; // redo not currently restoring correct values
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-
-    unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char Xincrement = getData->data.offset;
     //if (write)
         //std::cout << "from " << cameFrom << std::endl;
     int envpoints = pars->Penvpoints;
 
-    if (insert == TOPLEVEL::insert::envelopePointAdd) // here be dragons :(
+    if (pars->Pfreemode)
     {
-        if (!pars->Pfreemode)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = UNUSED;
-            return;
-        }
-
-        if (!write || point == 0 || point >= envpoints)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = envpoints;
-            return;
-        }
-
-        if (cameFrom != envControl::undo)
-        {
-            if (envpoints < MAX_ENVELOPE_POINTS)
-            {
-                if (cameFrom == envControl::input)
-                    addFixed2undo(getData);
-
-                pars->Penvpoints += 1;
-                for (int i = envpoints; i >= point; -- i)
-                {
-                    pars->Penvdt[i + 1] = pars->Penvdt[i];
-                    pars->Penvval[i + 1] = pars->Penvval[i];
-                }
-
-                if (point == 0)
-                    pars->Penvdt[1] = 64;
-
-                if (point <= pars->Penvsustain)
-                    ++ pars->Penvsustain;
-
-                pars->Penvdt[point] = Xincrement;
-                pars->Penvval[point] = val;
-                getData->data.value = val;
-                getData->data.offset = Xincrement;
-                pars->presetsUpdated();
-            }
-            else
-                getData->data.value = UNUSED;
-            return;
-        }
-        else if (envpoints < 4)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = UNUSED;
-            return; // can't have less than 4
-        }
-        else
-        {
-            envpoints -= 1;
-            for (int i = point; i < envpoints; ++ i)
-            {
-                pars->Penvdt[i] = pars->Penvdt[i + 1];
-                pars->Penvval[i] = pars->Penvval[i + 1];
-            }
-            if (point <= pars->Penvsustain)
-                -- pars->Penvsustain;
-            pars->Penvpoints = envpoints;
-            getData->data.value = envpoints;
-            pars->presetsUpdated();
-        }
+        if (insert == TOPLEVEL::insert::envelopePointAdd)
+            envelopePointAdd(getData, pars);
+        else if (insert == TOPLEVEL::insert::envelopePointDelete)
+            envelopePointDelete(getData, pars);
+        else if (insert == TOPLEVEL::insert::envelopePointChange)
+            envelopePointChange(getData, pars);
         return;
     }
-
-    if (insert == TOPLEVEL::insert::envelopePointDelete) // here be other dragons :(
+    else if (insert != TOPLEVEL::insert::envelopeGroup)
     {
-        if (!pars->Pfreemode)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = UNUSED;
-            return;
-        }
-
-        if (!write || point == 0 || point >= envpoints)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = envpoints;
-            return;
-        }
-
-        if (cameFrom != envControl::input && cameFrom != envControl::redo)
-        {
-            if (envpoints < MAX_ENVELOPE_POINTS)
-            {
-                pars->Penvpoints += 1;
-                for (int i = envpoints; i >= point; -- i)
-                {
-                    pars->Penvdt[i + 1] = pars->Penvdt[i];
-                    pars->Penvval[i + 1] = pars->Penvval[i];
-                }
-
-                if (point == 0)
-                    pars->Penvdt[1] = 64;
-
-                if (point <= pars->Penvsustain)
-                    ++ pars->Penvsustain;
-
-                pars->Penvdt[point] = Xincrement;
-                pars->Penvval[point] = val;
-                getData->data.value = val;
-                getData->data.offset = Xincrement;
-                pars->presetsUpdated();
-            }
-            else
-                getData->data.value = UNUSED;
-            return;
-        }
-        else if (envpoints < 4)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = UNUSED;
-            return; // can't have less than 4
-        }
-        else
-        {
-            if (cameFrom == envControl::input)
-            {
-                getData->data.source = 0;
-                getData->data.type &= TOPLEVEL::type::Write;
-                getData->data.offset = pars->Penvdt[point];
-                getData->data.value = pars->Penvval[point];
-                addFixed2undo(getData);
-            }
-            envpoints -= 1;
-            for (int i = point; i < envpoints; ++ i)
-            {
-                pars->Penvdt[i] = pars->Penvdt[i + 1];
-                pars->Penvval[i] = pars->Penvval[i + 1];
-            }
-            if (point <= pars->Penvsustain)
-                -- pars->Penvsustain;
-            pars->Penvpoints = envpoints;
-            getData->data.value = envpoints;
-            pars->presetsUpdated();
-        }
+        getData->data.value = UNUSED;
+        getData->data.offset = UNUSED;
         return;
     }
 
     if (write)
         add2undo(getData, noteSeen);
-
-    if (insert == TOPLEVEL::insert::envelopePointChange)
-    {
-        if (!pars->Pfreemode || point >= envpoints)
-        {
-            getData->data.value = UNUSED;
-            getData->data.offset = UNUSED;
-            return;
-        }
-        if (write)
-        {
-            pars->Penvval[point] = val;
-            if (point == 0)
-                Xincrement = 0;
-            else
-                pars->Penvdt[point] = Xincrement;
-            pars->presetsUpdated();
-        }
-        else
-        {
-            val = pars->Penvval[point];
-            Xincrement = pars->Penvdt[point];
-        }
-        getData->data.value = val;
-        getData->data.offset = Xincrement;
-        return;
-    }
 
     switch (getData->data.control)
     {
@@ -6641,7 +6486,197 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             break;
     }
     if (write)
+    {
         pars->presetsUpdated();
+    }
+    getData->data.value = val;
+    getData->data.offset = Xincrement;
+    return;
+}
+
+
+void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
+{
+    unsigned char point = getData->data.control;
+    unsigned char Xincrement = getData->data.offset;
+    float val = getData->data.value;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    int envpoints = pars->Penvpoints;
+
+
+        if (!write || point == 0 || point >= envpoints)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = envpoints;
+            return;
+        }
+
+        if (cameFrom != envControl::undo)
+        {
+            if (envpoints < MAX_ENVELOPE_POINTS)
+            {
+                if (cameFrom == envControl::input)
+                    addFixed2undo(getData);
+
+                pars->Penvpoints += 1;
+                for (int i = envpoints; i >= point; -- i)
+                {
+                    pars->Penvdt[i + 1] = pars->Penvdt[i];
+                    pars->Penvval[i + 1] = pars->Penvval[i];
+                }
+
+                if (point == 0)
+                    pars->Penvdt[1] = 64;
+
+                if (point <= pars->Penvsustain)
+                    ++ pars->Penvsustain;
+
+                pars->Penvdt[point] = Xincrement;
+                pars->Penvval[point] = val;
+                getData->data.value = val;
+                getData->data.offset = Xincrement;
+                pars->presetsUpdated();
+            }
+            else
+            {
+                getData->data.value = UNUSED;
+            }
+            return;
+        }
+
+        if (envpoints < 4)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = UNUSED;
+            return; // can't have less than 4
+        }
+        else
+        {
+            envpoints -= 1;
+            for (int i = point; i < envpoints; ++ i)
+            {
+                pars->Penvdt[i] = pars->Penvdt[i + 1];
+                pars->Penvval[i] = pars->Penvval[i + 1];
+            }
+            if (point <= pars->Penvsustain)
+                -- pars->Penvsustain;
+            pars->Penvpoints = envpoints;
+            getData->data.value = envpoints;
+            pars->presetsUpdated();
+        }
+
+}
+
+
+void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *pars)
+{
+    unsigned char point = getData->data.control;
+    unsigned char Xincrement = getData->data.offset;
+    float val = getData->data.value;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    int envpoints = pars->Penvpoints;
+
+        if (!write || point == 0 || point >= envpoints)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = envpoints;
+            return;
+        }
+
+        if (cameFrom != envControl::input && cameFrom != envControl::redo)
+        {
+            if (envpoints < MAX_ENVELOPE_POINTS)
+            {
+                pars->Penvpoints += 1;
+                for (int i = envpoints; i >= point; -- i)
+                {
+                    pars->Penvdt[i + 1] = pars->Penvdt[i];
+                    pars->Penvval[i + 1] = pars->Penvval[i];
+                }
+
+                if (point == 0)
+                    pars->Penvdt[1] = 64;
+
+                if (point <= pars->Penvsustain)
+                    ++ pars->Penvsustain;
+
+                pars->Penvdt[point] = Xincrement;
+                pars->Penvval[point] = val;
+                getData->data.value = val;
+                getData->data.offset = Xincrement;
+                pars->presetsUpdated();
+            }
+            else
+            {
+                getData->data.value = UNUSED;
+            }
+            return;
+        }
+
+        if (envpoints < 4)
+        {
+            getData->data.value = UNUSED;
+            getData->data.offset = UNUSED;
+            return; // can't have less than 4
+        }
+        else
+        {
+            if (cameFrom == envControl::input)
+            {
+                getData->data.source = 0;
+                getData->data.type &= TOPLEVEL::type::Write;
+                getData->data.offset = pars->Penvdt[point];
+                getData->data.value = pars->Penvval[point];
+                addFixed2undo(getData);
+            }
+            envpoints -= 1;
+            for (int i = point; i < envpoints; ++ i)
+            {
+                pars->Penvdt[i] = pars->Penvdt[i + 1];
+                pars->Penvval[i] = pars->Penvval[i + 1];
+            }
+            if (point <= pars->Penvsustain)
+                -- pars->Penvsustain;
+            pars->Penvpoints = envpoints;
+            getData->data.value = envpoints;
+            pars->presetsUpdated();
+        }
+}
+
+
+void InterChange::envelopePointChange(CommandBlock *getData, EnvelopeParams *pars)
+{
+    unsigned char point = getData->data.control;
+    unsigned char Xincrement = getData->data.offset;
+    float val = getData->data.value;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
+    int envpoints = pars->Penvpoints;
+
+    if (point >= envpoints)
+    {
+        getData->data.value = UNUSED;
+        getData->data.offset = UNUSED;
+        return;
+    }
+    if (write)
+    {
+        add2undo(getData, noteSeen);
+        pars->Penvval[point] = val;
+        if (point == 0)
+        {
+            Xincrement = 0;
+        }
+        else
+        {
+            pars->Penvdt[point] = Xincrement;
+        }
+        pars->presetsUpdated();
+    }
+    else
+    {
+        val = pars->Penvval[point];
+        Xincrement = pars->Penvdt[point];
+    }
     getData->data.value = val;
     getData->data.offset = Xincrement;
     return;
