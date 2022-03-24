@@ -1269,13 +1269,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                         alsaSource->deactivate();
 
                     int fetchW, fetchH, fetchX, fetchY, fetchO;
-                    checkSane(fetchX, fetchY, fetchW, fetchH, confDW, confDH);
                     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Config");
                     if (fetchW < confDW || fetchH < confDH)
                     {
                         fetchW = confDW;
                         fetchH = confDH;
                     }
+                    checkSane(fetchX, fetchY, fetchW, fetchH, confDW, confDH);
                     configwindow->resize(fetchX, fetchY, fetchW, fetchH);
                     lastconfigW = 0;
                     configSeen = true;
