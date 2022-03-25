@@ -35,7 +35,7 @@
 
 using std::unique_ptr;
 using std::function;
-
+using synth::interpolateAmplitude;
 
 /** Interface for wavetable interpolation */
 class WaveInterpolator
@@ -249,7 +249,10 @@ class XFadeDelegate
 
     synth::SFadeCurve mixCurve;
     Samples tmpL,tmpR;
-    size_t progress;
+
+    size_t progress, mixStep;
+    float mixIn,mixOut,
+          mixInPrev,mixOutPrev;
 
     private:
         bool matches(fft::Waveform const& otherTable) const override
@@ -268,15 +271,26 @@ class XFadeDelegate
             oldInterpolator->caculateSamples(tmpL.get(),tmpR.get(), noteFreq, cntSmp);
             newInterpolator->caculateSamples(smpL,smpR, noteFreq, cntSmp);
 
-            assert(1.0 / fadeLengthSmps > std::numeric_limits<float>::epsilon());
+            static_assert(1.0 / (PADnoteParameters::XFADE_UPDATE_MAX/1000 * 96000) > std::numeric_limits<float>::epsilon(),
+                          "mixing step resolution represented as float");
             // step = 20000ms/1000ms/s * 96kHz ≈ 1.92e6 < 2^-23 ==> 1-1/step can be represented as float
             for (size_t i = 0;
                  i < cntSmp and progress < fadeLengthSmps;
                  ++i, ++progress)
             {
-                float mix = mixCurve.nextStep();
-                smpL[i] = tmpL[i] * (1-mix)  +  smpL[i] * mix;
-                smpR[i] = tmpR[i] * (1-mix)  +  smpR[i] * mix;
+                if (progress % bufferSize == 0)
+                {// k-Step : start linear fade sub-segment
+                    mixInPrev = mixIn;
+                    mixOutPrev = mixOut;
+                    mixIn = mixCurve.nextStep();     // S-shaped exponential mix curve
+                    mixOut = sqrtf(1 - mixIn*mixIn); // Equal-Power mix, since waveform typically not correlated
+                    mixStep = progress;
+                }
+                size_t offset = progress - mixStep;
+                float volOut  = interpolateAmplitude(mixOutPrev,mixOut, offset, bufferSize);
+                float volIn   = interpolateAmplitude(mixInPrev, mixIn,  offset, bufferSize);
+                smpL[i] = tmpL[i] * volOut  +  smpL[i] * volIn;
+                smpR[i] = tmpR[i] * volOut  +  smpR[i] * volIn;
             }
             // When fadeLengthSmps is reached in the middle of a buffer, remainder was filled from otherInterpolator.
             // Use given clean-up functor to detach and discard this instance and install otherInterpolator instead.
@@ -311,10 +325,15 @@ class XFadeDelegate
             , install_followup{switchInterpolator}
             , fadeLengthSmps{fadeLen}
             , bufferSize{buffSiz}
-            , mixCurve{fadeLen}
+            , mixCurve{fadeLen/buffSiz}
             , tmpL{bufferSize}
             , tmpR{bufferSize}
             , progress{0}
+            , mixStep{0}
+            , mixIn{0}
+            , mixOut{1}
+            , mixInPrev{0}
+            , mixOutPrev{0}
         {
             attach_instance(); // ensure old wavetable stays alive
         }
