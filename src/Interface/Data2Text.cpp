@@ -299,7 +299,7 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
 {
     int value_int = lrint(getData->data.value);
     unsigned char control = getData->data.control;
-    unsigned int chan = getData->data.insert;
+    unsigned int chan = getData->data.parameter;
 
     bool isFeature = false;
     string contstr = "";

@@ -2842,7 +2842,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
 
     if (input.matchWord(1, "off"))
     {
-        sendDirect(synth, 0, 0,controlType,VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
+        sendDirect(synth, 0, 0,controlType,VECTOR::control::erase, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
         axis = 0;
         bitClear(context, LEVEL::Vector);
         return REPLY::done_msg;
@@ -2870,13 +2870,13 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         tmp = string2int(input);
         if (axis == 0)
         {
-            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
+            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
             bitSet(context, LEVEL::Vector);
             return REPLY::done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
+            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
             return REPLY::done_msg;
         }
     }
@@ -2902,7 +2902,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
             if (name <= "!")
                 return REPLY::value_msg;
         }
-        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, chan, UNUSED, UNUSED, textMsgBuffer.push(name));
+        sendDirect(synth, TOPLEVEL::action::lowPrio, 0, controlType, VECTOR::control::name, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan, UNUSED, textMsgBuffer.push(name));
         return REPLY::done_msg;
     }
 
@@ -2919,7 +2919,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
             enable = 1;
         else if (feat > 1 && input.matchnMove(1, "reverse"))
             enable = 2;
-        sendDirect(synth, 0, enable, controlType, VECTOR::control::Xfeature0 + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)) + feat , TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
+        sendDirect(synth, 0, enable, controlType, VECTOR::control::Xfeature0 + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)) + feat , TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
         return REPLY::done_msg;
     }
 
@@ -2939,7 +2939,7 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         else
             return REPLY::op_msg;
         tmp = string2int(input);
-        sendDirect(synth, 0, tmp, controlType, VECTOR::control::XleftInstrument + hand + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)), TOPLEVEL::section::vector, UNUSED, UNUSED, chan);
+        sendDirect(synth, 0, tmp, controlType, VECTOR::control::XleftInstrument + hand + (axis * (VECTOR::control::Ycontroller - VECTOR::control::Xcontroller)), TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
         return REPLY::done_msg;
     }
 

@@ -132,7 +132,7 @@ switch (res)
         paramsui->Show(TOPLEVEL::XML::Vector);
         break;
     case 3:
-        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
+        send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
         break;
     case 4:
         send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);
@@ -258,7 +258,7 @@ switch (res)
         if (tmp < 14)
         {
             Xcc = 0;
-            send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan);
+            send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan);
             return;
         }
 
@@ -420,7 +420,7 @@ switch (res)
         (void) o; // suppress warning
         string tmp = input_text(synth, "Vector name:", loadlabel[BaseChan]);
         if (tmp != loadlabel[BaseChan])
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, BaseChan, UNUSED, textMsgBuffer.push(tmp));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan, textMsgBuffer.push(tmp));}
         tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
@@ -429,7 +429,7 @@ switch (res)
     code {//
         if (control != 84 && control != 85 && control != VECTOR::control::erase)
         {
-            insert = BaseChan;
+            parameter = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
@@ -438,7 +438,7 @@ switch (res)
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
-    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
     int value_int = lrint(value);
     string msg;
@@ -447,7 +447,7 @@ switch (res)
     {
         case VECTOR::control::name:
             msg = textMsgBuffer.fetch(miscmsg);;
-            loadlabel[insert] = msg;
+            loadlabel[parameter] = msg;
             Loaded->copy_label(msg.c_str());
             break;
 
@@ -533,7 +533,7 @@ switch (res)
             break;
 
         case VECTOR::control::erase:
-            if (insert >= NUM_MIDI_PARTS)
+            if (parameter >= NUM_MIDI_PARTS)
             {
                 for (int i = NUM_MIDI_CHANNELS - 1; i >= 0; --i)
                     clearVector(i);
@@ -541,7 +541,7 @@ switch (res)
                 setbasechan->value(1);
             }
             else
-                clearVector(insert);
+                clearVector(parameter);
             break;
 }} {}
   }

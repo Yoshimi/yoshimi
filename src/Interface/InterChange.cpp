@@ -487,15 +487,15 @@ int InterChange::indirectVector(CommandBlock *getData, SynthEngine *synth, unsig
     bool write = (getData->data.type & TOPLEVEL::type::Write);
     int value = getData->data.value;
     int control = getData->data.control;
-    int insert = getData->data.insert;
+    int parameter = getData->data.parameter;
 
     switch(control)
     {
         case VECTOR::control::name:
             if (write)
-                synth->getRuntime().vectordata.Name[insert] = text;
+                synth->getRuntime().vectordata.Name[parameter] = text;
             else
-                text = synth->getRuntime().vectordata.Name[insert];
+                text = synth->getRuntime().vectordata.Name[parameter];
             newMsg = true;
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             guiTo = true;
@@ -2399,9 +2399,9 @@ void InterChange::commandVector(CommandBlock *getData)
     int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned int chan = getData->data.insert;
+    unsigned int chan = getData->data.parameter;
     bool write = (type & TOPLEVEL::type::Write) > 0;
-
+synth->CBtest(getData);
     unsigned int features = 0;
 
     if (control == VECTOR::control::erase)
@@ -5450,12 +5450,11 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
 
     if (write)
     {
-        /*if (control == OSCILLATOR::control::clearHarmonics)
+        if (control == OSCILLATOR::control::clearHarmonics)
         {
-            CommandBlock tempData;
+            /*CommandBlock tempData;
             memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
             tempData.data.source = 0;
-            tempData.data.type &= TOPLEVEL::type::Write;
             tempData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
             for (int i = 0; i < MAX_AD_HARMONICS; ++i)
             {
@@ -5476,10 +5475,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 noteSeen = true;
                 undoLoopBack = false;
                 add2undo(&tempData, noteSeen, true);
-            }
-            return;
-        }*/
-        if (control != OSCILLATOR::control::convertToSine && control != OSCILLATOR::control::useAsBaseFunction && control != OSCILLATOR::control::clearHarmonics)
+            }*/
+        }
+        else if (control != OSCILLATOR::control::convertToSine && control != OSCILLATOR::control::useAsBaseFunction && control != OSCILLATOR::control::clearHarmonics)
             add2undo(getData, noteSeen);
     }
 
@@ -6971,12 +6969,12 @@ void InterChange::undoLast(CommandBlock *candidate)
         source = &undoList;
         dest = &redoList;
         cameFrom = envControl::undo;
-        std::cout << "undo " << std::endl;
+        //std::cout << "undo " << std::endl;
     }
     else
     {
         cameFrom = envControl::redo;
-        std::cout << "redo " << std::endl;
+        //std::cout << "redo " << std::endl;
         source = &redoList;
         dest = &undoList;
     }
