@@ -4,6 +4,8 @@ yoshimi 2.1.2 M
 * Added key based undo/redo patch from Jesper.
   [Alt]+u, [Alt]+r
 
+* Refined redraw action for resonance window on undo.
+
 2022-3-25 Will
 * Moved Vector control base channel from insert to paramater.
   Done to avoid possible centention with real inserts.

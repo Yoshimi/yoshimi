@@ -1922,9 +1922,17 @@ void InterChange::returns(CommandBlock *getData)
             int tmp = (getData->data.source & TOPLEVEL::action::noAction);
             if (getData->data.source & TOPLEVEL::action::forceUpdate)
                 tmp = TOPLEVEL::action::toAll;
-
-            if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
-                toGUI.write(getData->bytes);
+            /*
+             * by the time we reach this point setUndo will have been cleared for single
+             * undo/redo actions. It will also have been cleared for the last one of a group.
+             * By suppressing the GUI return for the resonance window we avoid a lot of
+             * unnecessary redraw actions for the entire graphic area.
+             */
+            if (!(setUndo && getData->data.insert == TOPLEVEL::insert::resonanceGraphInsert))
+            {
+                if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
+                    toGUI.write(getData->bytes);
+            }
         }
 #endif
     }
