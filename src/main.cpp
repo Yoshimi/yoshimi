@@ -122,6 +122,33 @@ void yoshimiSigHandler(int sig)
     }
 }
 
+#ifdef GUI_FLTK
+static MasterUI *mainUI;
+static int handle_shortcuts(int event)
+{
+    if (!mainUI || event != FL_SHORTCUT)
+    {
+        return 0;
+    }
+    auto key = Fl::event_key();
+    //printf("KEY: %d\n", key);
+    if (Fl::event_alt() && key == 117)
+    {
+        mainUI->send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+    }
+    else if (Fl::event_alt() && key == 114)
+    {
+        mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+    }
+    else
+    {
+        return 0;
+    }
+    return 1;
+}
+#endif
+
+
 static void *mainThread(void *arg)
 {
     sem_post((sem_t *)arg);
@@ -252,6 +279,8 @@ static void *mainThread(void *arg)
                 MasterUI *guiMaster = _synth->getGuiMaster(false);
                 if (guiMaster)
                 {
+                    mainUI = guiMaster;
+                    Fl::add_handler(handle_shortcuts);
                     if (guiMaster->masterwindow)
                     {
                         guiMaster->checkBuffer();
