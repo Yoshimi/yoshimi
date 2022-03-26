@@ -322,14 +322,14 @@ WaveInterpolator* PADnote::buildInterpolator(size_t tableNr)
 WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
 {
     if (waveInterpolator and newInterpolator)
-    {
+    {// typically called from the Synth-thread from an already playing note (=single-threaded)
         auto attachCrossFade = [&]()
-        {
+        {// Warning: not thread-safe!
             pars->xFade.attachFader();
             std::cout << "XFade-ATTACH.. Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
         };
         auto detachCrossFade = [&]()
-        {
+        {// Warning: not thread-safe!
             std::cout << "XFade-DETACH.. Freq="<<basefreq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
             pars->xFade.detachFader();
         };
@@ -352,7 +352,7 @@ WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
         return xFader;
     }
     else // fallback: no existing Interpolator ==> just install given new one
-        return newInterpolator;
+        return newInterpolator;   // typically invoked from NoteON (no waveInterpolator yet)
 }
 
 

@@ -37,6 +37,9 @@
  * - manage the storage of the old wavetable during XFade
  * @note for this to work, actual cross-fading calculations must detect the fact of
  *       an ongoing crossfade and then #attachFader() and #detachFader() when done.
+ * @warning the ref-count in this class is deliberately *not thread-safe* (to avoid
+ *       thread synchronisation overhead). If we ever start processing the SynthEngine
+ *       concurrently, this whole logic will break and needs to be revised!
  * @tparam WAV actual data type of the wavetable to be managed
  * @see PADnote::computeNoteParameters()
  */

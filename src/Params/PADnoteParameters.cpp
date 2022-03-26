@@ -770,7 +770,14 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 
 
 /* called once before each buffer compute cycle;
- * possibly pick up results from background wavetable build */
+ * possibly pick up results from background wavetable build.
+ * WARNING: while FutureBuild::isReady() is reliable and airtight, the remaining logic
+ *          within the body is not thread-safe. FutureBuild::swap() does not cover all corner cases
+ *          when re-scheduling and thus should not be called concurrently. And the ref-count in xFade
+ *          is *deliberately without thread synchronisation* (since we're on the hot audio codepath).
+ *          If we ever consider processing SynthEngine concurrently, this logic must be revised.
+ *          (comment by Ichthyo, 3/2022)
+ */
 void PADnoteParameters::activate_wavetable()
 {
     if (futureBuild.isReady()
