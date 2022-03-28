@@ -525,7 +525,7 @@ void SynthEngine::setReproducibleState(int seed)
         if (part[p] and part[p]->Penabled)
             for (int i = 0; i < NUM_KIT_ITEMS; ++i)
             {
-                Part::Kititem& kitItem = part[p]->kit[i];
+                Part::KitItem& kitItem = part[p]->kit[i];
                 if (!kitItem.Penabled) continue; // reseed only enabled items
                 if (kitItem.adpars and kitItem.Padenabled)
                     for (int v = 0; v < NUM_VOICES; ++v)

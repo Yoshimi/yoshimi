@@ -179,7 +179,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Button setmin {
           label m
           callback {//
-          int last = part->lastnote;
+          int last = part->getLastNote();
           if (last <= 0)
               return;
           int tmp;
@@ -196,7 +196,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Button setmax {
           label M
           callback {//
-          int last = part->lastnote;
+          int last = part->getLastNote();
           if (last <= 0)
               return;
           int tmp;
@@ -645,7 +645,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           callback {//
           send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-          code0 {o->range(1, POLIPHONY); // enough for one part!}
+          code0 {o->range(1, POLYPHONY); // enough for one part!}
           code1 {o->value(part->Pkeylimit);}
           class WidgetSpinner
         }
@@ -686,8 +686,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button setmin {
           label Set
           callback {//
-          if (part->lastnote >= 0)
-              minkcounter->value(part->lastnote);
+          if (part->getLastNote() >= 0)
+              minkcounter->value(part->getLastNote());
 
           send_data(0, PART::control::minToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
@@ -704,7 +704,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Button setmax {
           label Set
           callback {//
-          if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
+          if (part->getLastNote() >= 0) maxkcounter->value(part->getLastNote());
 
           send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10

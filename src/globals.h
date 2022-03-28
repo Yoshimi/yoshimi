@@ -107,7 +107,7 @@
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8
-#define POLIPHONY 60
+#define POLYPHONY 60
 #define PART_DEFAULT_LIMIT 20
 #define NUM_SYS_EFX 4
 #define NUM_INS_EFX 8

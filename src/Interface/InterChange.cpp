@@ -1483,7 +1483,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
         break;
 
         case PADSYNTH::control::applyChanges:
-            if (part->Pkitmode == 0)
+            if (not part->Pkitmode)
                 kititem = 0;
             if (write)
             {
@@ -2093,7 +2093,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (kititem > 0 && kititem != UNUSED)
     {
-        if (part->Pkitmode == 0)
+        if (not part->Pkitmode)
             return false;
         else if (!part->kit[kititem].Penabled)
             return false;
@@ -3481,7 +3481,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
-    if (part->Pkitmode == 0)
+    if (not part->Pkitmode)
     {
         kitType = false;
         if (control != PART::control::kitMode && kititem != UNUSED)
@@ -3731,7 +3731,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case PART::control::minToLastKey: // always return actual value
-            value_int = part->lastnote;
+            value_int = part->getLastNote();
             if (kitType)
             {
                 if ((write) && value_int >= 0)
@@ -3739,43 +3739,43 @@ void InterChange::commandPart(CommandBlock *getData)
                     if (value_int > part->kit[kititem].Pmaxkey)
                         part->kit[kititem].Pminkey = part->kit[kititem].Pmaxkey;
                     else
-                        part->kit[kititem].Pminkey = part->lastnote;
+                        part->kit[kititem].Pminkey = part->getLastNote();
                 }
                 value = part->kit[kititem].Pminkey;
             }
             else
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int > part->Pmaxkey)
                         part->Pminkey = part->Pmaxkey;
                     else
-                        part->Pminkey = part->lastnote;
+                        part->Pminkey = part->getLastNote();
                 }
                 value = part->Pminkey;
             }
             break;
         case PART::control::maxToLastKey: // always return actual value
-            value_int = part->lastnote;
+            value_int = part->getLastNote();
             if (kitType)
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int < part->kit[kititem].Pminkey)
                         part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
                     else
-                        part->kit[kititem].Pmaxkey = part->lastnote;
+                        part->kit[kititem].Pmaxkey = part->getLastNote();
                 }
                 value = part->kit[kititem].Pmaxkey;
             }
             else
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int < part->Pminkey)
                         part->Pmaxkey = part->Pminkey;
                     else
-                        part->Pmaxkey = part->lastnote;
+                        part->Pmaxkey = part->getLastNote();
                 }
                 value = part->Pmaxkey;
             }
@@ -3878,9 +3878,9 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::kitMode:
             if (write)
             {
-                if (value == 3)
+                if (value == 3) // crossfade
                 {
-                    part->Pkitmode = 1;
+                    part->Pkitmode = 1; // normal kit mode (multiple kit items playing)
                     part->Pkitfade = true;
                     value = 1; // just to be sure
                 }
@@ -3894,7 +3894,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 value = part->Pkitmode;
                 if (value == 1 && part->Pkitfade == true)
-                    value = 3;
+                    value = 3; // encode crossfade mode
             }
             break;
 

@@ -27,11 +27,13 @@
 #ifndef PART_H
 #define PART_H
 
-#include <list>
-#include <string>
 #include "globals.h"
 #include "DSP/FFTwrapper.h"
 #include "Misc/Alloc.h"
+
+#include <memory>
+#include <string>
+#include <list>
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -85,10 +87,10 @@ class Part
         void getfromXMLinstrument(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
 
-        Controller *ctl;
+        std::unique_ptr<Controller> ctl;
 
         // part's kit
-        struct Kititem
+        struct KitItem
         {
             std::string   Pname;
             unsigned char Penabled;
@@ -103,7 +105,7 @@ class Part
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
         };
-        Kititem kit[NUM_KIT_ITEMS];
+        KitItem kit[NUM_KIT_ITEMS];
 
         // Part parameters
         void enforcekeylimit(void);
@@ -112,8 +114,6 @@ class Part
         void checkVolume(float step);
         void setDestination(int value);
         void checkPanning(float step, unsigned char panLaw);
-
-        SynthEngine *getSynthEngine() {return synth;}
 
         bool PyoshiType;
         int PmapOffset;
@@ -129,7 +129,7 @@ class Part
         unsigned char Prcvchn;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
-        unsigned char Pkitmode;    // if the kitmode is enabled
+        unsigned char Pkitmode;    // Part uses kit mode: 0 == off, 1 == on, 2 == "Single": only first applicable kit item can play
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
@@ -167,15 +167,21 @@ class Part
         float volume;      // applied by MasterAudio
         float pangainL;
         float pangainR;
-        int lastnote;
         bool busy;
 
+        int getLastNote()  const { return this->prevNote; }
+        SynthEngine *getSynthEngine() const {return synth;}
 
     private:
+        void setPan(float value);
         void KillNotePos(int pos);
         void ReleaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
-        void setPan(float value);
+
+        void startNewNotes        (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote, bool portamento);
+        void startLegato          (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote);
+        void startLegatoPortamento(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote);
+        float computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity);
 
         Samples& tmpoutl;
         Samples& tmpoutr;
@@ -186,24 +192,28 @@ class Part
         struct PartNotes {
             NoteStatus status;
             int note;          // if there is no note playing, "note" = -1
-            int itemsplaying;
+            int time;
             int keyATtype;
             int keyATvalue;
-            struct Kititem {
+            size_t itemsplaying;
+
+            struct KitItemNotes {
                 ADnote *adnote;
                 SUBnote *subnote;
                 PADnote *padnote;
                 int sendtoparteffect;
             };
-            Kititem kititem[NUM_KIT_ITEMS];
-            int time;
-        };
+            KitItemNotes kitItem[NUM_KIT_ITEMS];
+        };                        // Note: kitItems are "packed", not using the same Index as in KitItem-array
 
-        PartNotes partnote[POLIPHONY];
+        PartNotes partnote[POLYPHONY];
 
-        int lastpos;              // previous pos and posb.
-        int lastposb;             // ^^
-        bool lastlegatomodevalid; // previous legatomodevalid.
+        int prevNote;             // previous MIDI note
+        int prevPos;              // previous note pos
+        float prevFreq;           // frequency of previous note (for portamento)
+        bool prevLegatoMode;      // previous note hat legato mode activated
+
+        bool killallnotes;        // "panic" switch
 
         int oldFilterState; // these for channel aftertouch
         int oldFilterQstate;
@@ -211,9 +221,6 @@ class Part
         float oldVolumeState;
         float oldVolumeAdjust;
         int oldModulationState;
-
-        float oldfreq; // for portamento
-        bool killallnotes;
 
         // MonoMem stuff
         std::list<unsigned char> monomemnotes; // held notes.
