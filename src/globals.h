@@ -237,8 +237,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         distortion,
         eq,
         dynFilter,
+        // any new effects should go here
         count, // this must be the last item!
-        effectEndMark = 32, // any new effects go before this
         LFOgroup,
         filterGroup,
         envelopeGroup,

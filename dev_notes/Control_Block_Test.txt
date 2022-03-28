@@ -1,0 +1,6 @@
+This can be called from anywhere in the code with:
+
+    synth->CBtest(datablock);
+
+Where datablock is any defined control block.
+This is most often getData or putData

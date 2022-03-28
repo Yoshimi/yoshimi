@@ -19,6 +19,3 @@ PI * 2.0f
 
 {some calculation} * PI / 2
 PI * {some calculation} / 2.0f
-
-Currently there are three remaining in Analogfitler.cpp
-We were leaving these until we can properly test the effect of unifying them with the rest.
