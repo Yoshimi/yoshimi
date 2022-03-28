@@ -6804,7 +6804,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
+    unsigned char kititem = getData->data.kit & 127;
     unsigned char effnum = getData->data.engine;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
@@ -6828,9 +6828,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
     else
         return; // invalid part number
-    if (kititem > EFFECT::type::dynFilter)
+    if (kititem > TOPLEVEL::insert::dynFilter)
         return; // invalid kit number
-    if (control != PART::control::effectType && (kititem & 127) != eff->geteffect())
+    if (control != PART::control::effectType && kititem != eff->geteffect())
     {
         if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI)
             synth->getRuntime().Log("Not Available"); // TODO sort this better for CLI as well as MIDI
@@ -6841,7 +6841,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (eff->geteffectpar(EFFECT::control::bpm) == 1)
         getData->data.offset = 1; // mark this for reporting in Data2Text
 
-    if (kititem == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
+    if (kititem == TOPLEVEL::insert::dynFilter && getData->data.insert != UNUSED)
     {
         if (write)
             eff->seteffectpar(-1, true); // effect changed
@@ -6859,7 +6859,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     if (write)
     {
-        if (kititem == EFFECT::type::eq)
+        if (kititem == TOPLEVEL::insert::eq)
         /*
          * specific to EQ
          * Control 1 is not a saved parameter, but a band index.
@@ -6882,7 +6882,7 @@ void InterChange::commandEffects(CommandBlock *getData)
             else
             {
                 eff->seteffectpar(control, value_int);
-                if (kititem == EFFECT::type::reverb && control == 10 && value_int == 2)
+                if (kititem == TOPLEVEL::insert::reverb && control == 10 && value_int == 2)
                     // bandwidth type update for GUI
                     getData->data.offset = eff->geteffectpar(12);
             }
@@ -6890,7 +6890,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     else
     {
-        if (kititem == EFFECT::type::eq && control > 1) // specific to EQ
+        if (kititem == TOPLEVEL::insert::eq && control > 1) // specific to EQ
         {
             value = eff->geteffectpar(control + (eff->geteffectpar(1) * 5));
             getData->data.parameter = eff->geteffectpar(1);
