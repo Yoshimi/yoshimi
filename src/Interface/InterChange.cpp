@@ -2062,7 +2062,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
+    if (kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128))
     {
         commandEffects(getData);
         return true;
@@ -7142,7 +7142,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     }
     // should prolly move other inserts up here
 
-    if (kititem >= EFFECT::type::none && kititem <= EFFECT::type::dynFilter)
+    if (kititem >= (TOPLEVEL::insert::none & 128) && kititem <= (TOPLEVEL::insert::dynFilter & 128))
     {
         LimitMgr limits;
         return limits.geteffectlimits(getData);
