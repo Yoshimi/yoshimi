@@ -1,5 +1,8 @@
 yoshimi 2.1.2 M
 
+2022-3-28 Will
+* Moved insert numbers to make space for effects.
+
 2022-3-26 Will
 * Added key based undo/redo patch from Jesper.
   [Alt]+u, [Alt]+r
