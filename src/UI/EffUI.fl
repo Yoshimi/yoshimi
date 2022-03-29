@@ -1203,7 +1203,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     unsigned char secondary = getData->data.offset;
 
     int textCol = 14;
-    if (fetchData(0, 200, getData->data.part, efftype, effnum) != 0)
+    if (fetchData(0, EFFECT::control::changed, getData->data.part, efftype, effnum) != 0)
         textCol = FL_BLUE;
     //cout << "colour " << textCol << endl;
     switch(efftype & 127)

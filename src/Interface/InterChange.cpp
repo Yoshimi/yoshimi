@@ -6848,8 +6848,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
         return;
     }
-    if (control >= EFFECT::control::changed)
+    if (control == EFFECT::control::changed)
     {
+        //std::cout << "Eff Changed " << std::endl;
         if (!write)
         {
             value = eff->geteffectpar(-1);
