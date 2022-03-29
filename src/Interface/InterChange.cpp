@@ -6699,7 +6699,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
-    //std::cout << "Itype " << int(type) << "  val " << value << "  cont " << int(control) << "  part " << int(npart) << "  effnum " << int(effnum) << "  insert " << int(insert) << std::endl;
+    //synth->CBtest(getData);
 
     int value_int = lrint(value);
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
@@ -6810,12 +6810,10 @@ void InterChange::commandEffects(CommandBlock *getData)
     bool write = (type & TOPLEVEL::type::Write) > 0;
     if (write)
     {
-        getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
+        getData->data.source |= TOPLEVEL::action::forceUpdate;
         // the line above is to show it's changed from preset values
-    }
-
-    if (write)
         add2undo(getData, noteSeen);
+    }
 
     EffectMgr *eff;
 
