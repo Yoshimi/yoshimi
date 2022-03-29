@@ -1,7 +1,7 @@
 /*
     Text2Data.cpp - conversion of text to commandBlock entries
 
-    Copyright 2021, Will Godfrey
+    Copyright 2022, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -560,7 +560,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         //cout << "effnum " << int(effnum) << endl;
         if (findAndStep(source, "DynFilter ~ Filter"))
         {
-            allData.data.kit = EFFECT::type::dynFilter;
+            allData.data.kit = TOPLEVEL::insert::dynFilter + 128;
             encodeFilter(source, allData);
             return;
         }
@@ -593,54 +593,55 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         }
 
         unsigned char efftype = findListEntry(source, 1, fx_list);
-        if (efftype >= EFFECT::type::count - EFFECT::type::none)
+        if (efftype >= TOPLEVEL::insert::count - TOPLEVEL::insert::none)
         {
             log(source, "effect type out of range");
             return;
         }
-        int effpos = efftype + EFFECT::type::none;
-        allData.data.kit = efftype + EFFECT::type::none;
+        int effpos = efftype + TOPLEVEL::insert::none;
+        allData.data.kit = efftype + TOPLEVEL::insert::none + 128;
 
         // now need to do actual control
         unsigned char result = UNUSED;
+        std::cout << "effpos " << effpos << std::endl;
         switch (effpos)
         {
-            case EFFECT::type::reverb:
+            case TOPLEVEL::insert::reverb:
                 result = findListEntry(source, 2, reverblist);
                 if (result > 4) // no 5 or 6
                     result += 2;
                 break;
-            case EFFECT::type::echo:
+            case TOPLEVEL::insert::echo:
                 result = findListEntry(source, 2, echolist);
                 if (result == 7) // skip unused numbers
                     result = EFFECT::control::bpm;
                 break;
-            case EFFECT::type::chorus:
+            case TOPLEVEL::insert::chorus:
                 result = findListEntry(source, 2, choruslist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;
                 break;
-            case EFFECT::type::phaser:
+            case TOPLEVEL::insert::phaser:
                 result = findListEntry(source, 2, phaserlist);
                 if (result >= 15) // skip unused numbers
                     result = result - 15 + EFFECT::control::bpm;
                 break;
-            case EFFECT::type::alienWah:
+            case TOPLEVEL::insert::alienWah:
                 result = findListEntry(source, 2, alienwahlist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;
                 break;
-            case EFFECT::type::distortion:
+            case TOPLEVEL::insert::distortion:
                 result = findListEntry(source, 2, distortionlist);
                 if (result > 5) // extra line
                     result -= 1;
                 break;
-            case EFFECT::type::eq:
+            case TOPLEVEL::insert::eq:
                 result = findListEntry(source, 2, eqlist);
                 if (result > 2) // extra line
                     result -= 1;
                 break;
-            case EFFECT::type::dynFilter:
+            case TOPLEVEL::insert::dynFilter:
                 result = findListEntry(source, 2, dynfilterlist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;
@@ -649,7 +650,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
                 log(source, "effect control out of range");
                 return;
         }
-        //cout << "effnum " << int(effnum) << "  efftype " << int(efftype + EFFECT::type::none) << "  control " << int(result) << endl;
+
         allData.data.control = result;
         return;
     }
