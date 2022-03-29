@@ -1199,7 +1199,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit;
     unsigned char effnum = getData->data.engine;
-    bool isdynfilter = (effnum == (TOPLEVEL::insert::dynFilter | 128));
+    bool isdynfilter = (effnum == EFFECT::type::dynFilter);
     unsigned char secondary = getData->data.offset;
 
     int textCol = 14;
@@ -1207,12 +1207,12 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         textCol = FL_BLUE;
     //cout << "colour " << textCol << endl;
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
-    switch(efftype & 127)
+    switch(efftype)
     {
-        case TOPLEVEL::insert::none:
+        case EFFECT::type::none:
             break;
 
-        case TOPLEVEL::insert::reverb:
+        case EFFECT::type::reverb:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1266,7 +1266,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             revp->redraw();
             break;
 
-        case TOPLEVEL::insert::echo:
+        case EFFECT::type::echo:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1305,7 +1305,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             echop->redraw();
             break;
 
-        case TOPLEVEL::insert::chorus:
+        case EFFECT::type::chorus:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1362,7 +1362,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             chorusp->redraw();
             break;
 
-        case TOPLEVEL::insert::phaser:
+        case EFFECT::type::phaser:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1448,7 +1448,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             phaserp->redraw();
             break;
 
-        case TOPLEVEL::insert::alienWah:
+        case EFFECT::type::alienWah:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1508,7 +1508,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             awp->redraw();
             break;
 
-        case TOPLEVEL::insert::distortion:
+        case EFFECT::type::distortion:
             switch (control)
             {
                 case EFFECT::control::level:
@@ -1552,7 +1552,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             distp->redraw();
             break;
 
-        case TOPLEVEL::insert::eq:
+        case EFFECT::type::eq:
             //synth->getRuntime().Log("EQ " + to_string(value_int) + "  " + to_string(int(control)));
             if (control == EFFECT::control::level)
             {
@@ -1598,7 +1598,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             effeqwindow->redraw();
             break;
 
-        case TOPLEVEL::insert::dynFilter:
+        case EFFECT::type::dynFilter:
             if (isdynfilter)
             { // shouldn't get here
                 //cout << "DyneFilter" << endl;
@@ -1716,7 +1716,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     }
     switch(eff->geteffect())
     {
-        case TOPLEVEL::insert::reverb:
+        case 1:
             revp->value(eff->getpreset());
             revp0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1737,7 +1737,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             revp12->value(eff->geteffectpar(12));
             effreverbwindow->show();
             break;
-        case TOPLEVEL::insert::echo:
+        case 2:
             echop->value(eff->getpreset());
             echop0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1754,7 +1754,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             echop17->value(eff->geteffectpar(17));
             effechowindow->show();
             break;
-        case TOPLEVEL::insert::chorus:
+        case 3:
             chorusp->value(eff->getpreset());
             chorusp0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1786,7 +1786,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             chorusp18->value(eff->geteffectpar(18));
             effchoruswindow->show();
             break;
-        case TOPLEVEL::insert::phaser:
+        case 4:
             phaserp->value(eff->getpreset());
             phaserp0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1837,7 +1837,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
             effphaserwindow->show();
             break;
-        case TOPLEVEL::insert::alienWah:
+        case 5:
             awp->value(eff->getpreset());
             awp0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1866,7 +1866,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             awp18->value(eff->geteffectpar(18));
             effalienwahwindow->show();
             break;
-        case TOPLEVEL::insert::distortion:
+        case 6:
             distp->value(eff->getpreset());
             distp0->value(eff->geteffectpar(0));
             if (eff->insertion != 0)
@@ -1886,7 +1886,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             distp10->value(eff->geteffectpar(10));
             effdistorsionwindow->show();
             break;
-        case TOPLEVEL::insert::eq:
+        case 7:
         {
             eqband = 0;
             int type = eff->geteffectpar(10);
@@ -1906,7 +1906,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             effeqwindow->show();
             break;
         }
-        case TOPLEVEL::insert::dynFilter:
+        case 8:
             make_filter_window();
             dfp->value(eff->getpreset());
             dfp0->value(eff->geteffectpar(0));
@@ -1949,36 +1949,36 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     int textCol = 14;
     if (changed)
          textCol = FL_BLUE;
-    efftype &= 127;
+
     switch (efftype + EFFECT::type::none)
     {
-        case TOPLEVEL::insert::reverb:
+        case EFFECT::type::reverb:
             revp->color(textCol);
             revp->redraw();
             break;
-        case TOPLEVEL::insert::echo:
+        case EFFECT::type::echo:
             echop->color(textCol);
             echop->redraw();
             break;
-        case TOPLEVEL::insert::chorus:
+        case EFFECT::type::chorus:
             chorusp->color(textCol);
             chorusp->redraw();
             break;
-        case TOPLEVEL::insert::phaser:
+        case EFFECT::type::phaser:
             phaserp->color(textCol);
             phaserp->redraw();
             break;
-        case TOPLEVEL::insert::alienWah:
+        case EFFECT::type::alienWah:
             awp->color(textCol);
             awp->redraw();
             break;
-        case TOPLEVEL::insert::distortion:
+        case EFFECT::type::distortion:
             distp->color(textCol);
             distp->redraw();
             break;
-        case TOPLEVEL::insert::eq:
+        case EFFECT::type::eq:
             break;
-        case TOPLEVEL::insert::dynFilter:
+        case EFFECT::type::dynFilter:
             dfp->color(textCol);
             dfp->redraw();
             break;

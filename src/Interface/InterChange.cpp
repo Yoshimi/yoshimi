@@ -7142,7 +7142,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     }
     // should prolly move other inserts up here
 
-    if (kititem >= (TOPLEVEL::insert::none & 128) && kititem <= (TOPLEVEL::insert::dynFilter & 128))
+    if (kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128))
     {
         LimitMgr limits;
         return limits.geteffectlimits(getData);
