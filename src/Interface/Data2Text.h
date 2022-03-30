@@ -60,6 +60,7 @@ class DataText
         std::string resolveResonance(CommandBlock *getData, bool addValue);
         std::string resolveLFO(CommandBlock *getData, bool addValue);
         std::string resolveFilter(CommandBlock *getData, bool addValue);
+        std::string filterControl(CommandBlock *getData, bool addValue);
         std::string resolveEnvelope(CommandBlock *getData, bool addValue);
         std::string resolveEffects(CommandBlock *getData, bool addValue);
 };

@@ -2883,15 +2883,9 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 
 string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 {
-    int value_int = int(getData->data.value);
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-
-    int nseqpos = getData->data.parameter;
-    int nformant = getData->data.parameter;
-    int nvowel = getData->data.offset;
 
     string name;
 
@@ -2903,7 +2897,21 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
         name = " PadSynth";
     else if (engine >= PART::engine::addVoice1)
         name = " Adsynth Voice " + to_string((engine - PART::engine::addVoice1) + 1);
-    string contstr;
+    string contstr = filterControl(getData, addValue);
+
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + contstr);
+}
+
+
+string DataText::filterControl(CommandBlock *getData, bool addValue)
+{
+    int value_int = int(getData->data.value);
+    unsigned char control = getData->data.control;
+
+    int nseqpos, nformant = getData->data.parameter;
+    int nvowel = getData->data.offset;
+
+    string contstr = "";
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -3033,8 +3041,8 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
         extra = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
-
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);
+    contstr = extra + contstr;
+    return contstr;
 }
 
 
@@ -3197,26 +3205,8 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             name = "Insert";
         else name = "Part " + to_string(npart + 1);
         name += " Effect " + to_string(effnum + 1);
-
         name += " DynFilter ~ Filter ";
-        switch (control)
-        {
-            case 0:
-                name += "C Freq";
-                break;
-            case 1:
-                name += "Q";
-                break;
-            case 5:
-                name += "Gain";
-                break;
-            case 2:
-                name += "FreqTrk";
-                break;
-            default:
-                name += "unrecognised";
-                break;
-        }
+        name += filterControl(getData, addValue);
         return name;
     }
 
