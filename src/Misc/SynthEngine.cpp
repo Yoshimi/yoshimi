@@ -848,7 +848,7 @@ void SynthEngine::SetZynControls(bool in_place)
         }
         else
         {
-            putData.data.kit = EFFECT::type::none + sysefx[effnum]->geteffect();
+            putData.data.kit = (TOPLEVEL::insert::none | 128) + sysefx[effnum]->geteffect();
             putData.data.control = parnum;
         }
     }
@@ -862,7 +862,7 @@ void SynthEngine::SetZynControls(bool in_place)
             putData.data.control = 2;
         else
         {
-            putData.data.kit = EFFECT::type::none + insefx[effnum]->geteffect();
+            putData.data.kit = (TOPLEVEL::insert::none | 128) + insefx[effnum]->geteffect();
             putData.data.control = parnum;
         }
     }

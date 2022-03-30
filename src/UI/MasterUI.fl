@@ -3168,13 +3168,13 @@ Alan Calvert started the project}
     int efftype = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, 0);
     if (efftype > 0)
     {
-        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::systemEffects, efftype + EFFECT::type::none, ninseff);
+        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::systemEffects, efftype + (TOPLEVEL::insert::none | 128), ninseff);
         syseffectui->UpdatePresetColour(status, sysefftype->value());
     }
     efftype = fetchData(0,EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, 0);
     if (efftype > 0)
     {
-        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::insertEffects, efftype + EFFECT::type::none, ninseff);
+        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::insertEffects, efftype + (TOPLEVEL::insert::none | 128), ninseff);
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
 

@@ -294,7 +294,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (kititem >= EFFECT::type::none && kititem != UNUSED) // effects
+    if (kititem >= (TOPLEVEL::insert::none | 128) && kititem != UNUSED) // effects
     {
         if (npart == TOPLEVEL::section::systemEffects)
         {

@@ -560,7 +560,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         //cout << "effnum " << int(effnum) << endl;
         if (findAndStep(source, "DynFilter ~ Filter"))
         {
-            allData.data.kit = TOPLEVEL::insert::dynFilter + 128;
+            allData.data.kit = TOPLEVEL::insert::dynFilter | 128;
             encodeFilter(source, allData);
             return;
         }
@@ -599,7 +599,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
             return;
         }
         int effpos = efftype + TOPLEVEL::insert::none;
-        allData.data.kit = efftype + TOPLEVEL::insert::none + 128;
+        allData.data.kit = efftype + (TOPLEVEL::insert::none | 128);
 
         // now need to do actual control
         unsigned char result = UNUSED;

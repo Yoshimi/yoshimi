@@ -134,7 +134,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             return "Nothing to redo!";
     }
 
-    if ((kititem >= (TOPLEVEL::insert::none + 128) && kititem <= (TOPLEVEL::insert::dynFilter + 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
+    if ((kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
         return withValue(commandName, type, showValue, addValue, value);
@@ -3197,7 +3197,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     else
         name = "Part " + to_string(npart + 1);
 
-    if (kititem == (TOPLEVEL::insert::dynFilter + 128) && getData->data.insert != UNUSED)
+    if (kititem == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3528,7 +3528,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             contstr = " Unrecognised";
     }
     //std::cout << "control " << int(control) << std::endl;
-    if (control == EFFECT::control::preset && kititem != (TOPLEVEL::insert::eq + 128))
+    if (control == EFFECT::control::preset && kititem != (TOPLEVEL::insert::eq | 128))
     {
         contstr = " Preset " + to_string (value + 1);
         showValue = false;
