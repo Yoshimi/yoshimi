@@ -239,7 +239,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         dynFilter,
         // any new effects should go here
         count, // this must be the last item!
-        LFOgroup,
+        LFOgroup, // 10
         filterGroup,
         envelopeGroup,
         envelopePointAdd,
@@ -252,7 +252,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         resonanceGraphInsert,
         systemEffectSend,
         partEffectSelect,
-        kitGroup,
+        kitGroup //23
     };
 
     enum insertType : unsigned char {
