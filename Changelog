@@ -1,8 +1,11 @@
 yoshimi 2.1.2 M
 
-2022-3-28 Will
+2022-3-30 Will
 * Bugfix: Dynfilter not reporting internal filte results to CLI
-  but performing them correcly.
+  but performing them correctly.
+
+* BugFix: analog filter type defaulting to High 1
+  Should be Low 2
 
 2022-3-28 Will
 * Working through effects initially just reading types from the
