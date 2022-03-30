@@ -11,6 +11,9 @@ Minor bug Multi instances produce jack error reports when main instance closed, 
 GUI Oddity. Press spacebar on startup and you disable part 1 AddSynth engine.
 From then on repeats the last action.
 
+Add dynfilter filter types to prompt.
+Never been done before :(
+
 Add which engines are enabled in CLI list part.
 In fact significantly re-write this!
 
