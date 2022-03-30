@@ -60,8 +60,7 @@ class Controller
         void setresonancecenter(int value);
         void setresonancebw(int value);
         void setPanDepth(char par) { panning.depth = par;}
-        int initportamento(float oldfreq, float newfreq, bool in_progress);
-        // returns 1 if the portamento's conditions are true, else return 0
+        bool initportamento(float oldfreq, float newfreq, bool in_progress); // returns true if portamento's preconditions are met
         void updateportamento(void); // update portamento values
         float getLimits(CommandBlock *getData);
 

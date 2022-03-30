@@ -176,99 +176,53 @@ SUBnote::SUBnote(const SUBnote &orig) :
 }
 
 
-void SUBnote::legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_)
+
+void SUBnote::performPortamento(float freq_, float velocity_, int midinote_)
 {
-    velocity = velocity_ > 1.0f ? 1.0f : velocity_;
-    portamento = portamento_;
+    portamento = true;
+    velocity = velocity_;
     midinote = midinote_;
-
-    basefreq = basefreq_;
+    basefreq = freq_;
     computeNoteFreq();
-
-    if (!portamento) // Do not crossfade portamento
-    {
-        legatoFade = 0.0f; // Start silent
-        legatoFadeStep = synth->fadeStepShort; // Positive steps
-
-        // I'm not sure if these are necessary or even beneficial
-        oldpitchwheel = 0;
-        oldbandwidth = 64;
-        oldamplitude = newamplitude;
-
-    }
+    // carry on all other parameters unaltered
 
     computeNoteParameters();
 }
 
 
-void SUBnote::legatoFadeOut(const SUBnote &orig)
+void SUBnote::legatoFadeIn(float freq_, float velocity_, int midinote_)
 {
-    velocity = orig.velocity;
-    portamento = orig.portamento;
-    midinote = orig.midinote;
+    portamento = false; // portamento-legato treated separately
+    velocity = velocity_;
+    midinote = midinote_;
+    basefreq = freq_;
+    computeNoteFreq();
 
-    firsttick = orig.firsttick;
-    volume = orig.volume;
+    computeNoteParameters();
 
-    basefreq = orig.basefreq;
-    notefreq = orig.notefreq;
+    legatoFade = 0.0f; // Start crossfade silent
+    legatoFadeStep = synth->fadeStepShort; // Positive steps
+}
 
-    // Not sure if this is necessary
-    oldamplitude = orig.oldamplitude;
-    newamplitude = orig.newamplitude;
 
-    // AmpEnvelope should never be null
-    *AmpEnvelope = *orig.AmpEnvelope;
-
-    if (orig.FreqEnvelope != NULL)
-        *FreqEnvelope = *orig.FreqEnvelope;
-    if (orig.BandWidthEnvelope != NULL)
-        *BandWidthEnvelope = *orig.BandWidthEnvelope;
-    if (pars->PGlobalFilterEnabled)
-    {
-        *GlobalFilterEnvelope = *orig.GlobalFilterEnvelope;
-
-        // Supporting virtual copy assignment would be hairy
-        // so we have to use the copy constructor here
-        delete GlobalFilterL;
-        GlobalFilterL = new Filter(*orig.GlobalFilterL);
-        delete GlobalFilterR;
-        GlobalFilterR = new Filter(*orig.GlobalFilterR);
-    }
-
-    // This assumes that numstages and numharmonics don't change
-    // while notes exist, or if they do change, they change for
-    // all notes equally and simultaneously. If this is ever not
-    // the case, this code needs to be changed.
-    if (orig.lfilter != NULL)
-    {
-        memcpy(lfilter, orig.lfilter,
-            numstages * numharmonics * sizeof(bpfilter));
-    }
-    if (orig.rfilter != NULL)
-    {
-        memcpy(rfilter, orig.rfilter,
-            numstages * numharmonics * sizeof(bpfilter));
-    }
-
-    memcpy(overtone_rolloff, orig.overtone_rolloff,
-        numharmonics * sizeof(float));
-    memcpy(overtone_freq, orig.overtone_freq,
-        numharmonics * sizeof(float));
-
-    legatoFade = 1.0f; // Start at full volume
+void SUBnote::legatoFadeOut()
+{
+    legatoFade = 1.0f;     // crossfade down from full volume
     legatoFadeStep = -synth->fadeStepShort; // Negative steps
+
+    // transitory state similar to a released Envelope
+    NoteStatus = NOTE_LEGATOFADEOUT;
 }
 
 
 SUBnote::~SUBnote()
 {
-    KillNote();
+    killNote();
 }
 
 
 // Kill the note
-void SUBnote::KillNote(void)
+void SUBnote::killNote(void)
 {
     if (NoteStatus != NOTE_DISABLED)
     {
@@ -594,12 +548,12 @@ void SUBnote::computeallfiltercoefs()
 
     envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
 
-    if (portamento != 0)
-    {   // portamento is used
+    if (portamento)
+    {
         envfreq *= ctl->portamento.freqrap;
         if (ctl->portamento.used == 0)
         {   // the portamento has finished
-            portamento = 0; // this note is no longer "portamented"
+            portamento = false; // this note is no longer "portamented"
         }
     }
 
@@ -786,7 +740,8 @@ void SUBnote::noteout(float *outl, float *outr)
                 legatoFadeStep = 0.0f;
                 memset(outl + i, 0, (synth->sent_buffersize - i) * sizeof(float));
                 memset(outr + i, 0, (synth->sent_buffersize - i) * sizeof(float));
-                break;
+                killNote(); // NOTE_DISABLED
+                return;
             }
             else if (legatoFade >= 1.0f)
             {
@@ -808,7 +763,8 @@ void SUBnote::noteout(float *outl, float *outr)
             outl[i] *= tmp;
             outr[i] *= tmp;
         }
-        KillNote();
+        killNote();
+        return;
     }
 }
 
@@ -816,6 +772,9 @@ void SUBnote::noteout(float *outl, float *outr)
 // Release Key (Note Off)
 void SUBnote::releasekey(void)
 {
+    if (NoteStatus == NOTE_LEGATOFADEOUT)
+        return; // keep envelopes in sustained state (thereby blocking NoteOff)
+
     AmpEnvelope->releasekey();
     if (FreqEnvelope != NULL)
         FreqEnvelope->releasekey();
@@ -826,6 +785,7 @@ void SUBnote::releasekey(void)
     if (NoteStatus == NOTE_KEEPALIVE)
         NoteStatus = NOTE_ENABLED;
 }
+
 
 float SUBnote::getHgain(int harmonic)
 {

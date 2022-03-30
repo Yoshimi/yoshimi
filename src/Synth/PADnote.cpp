@@ -6,6 +6,7 @@
     Copyright 2009-2011 Alan Calvert
     Copyright 2017-2019 Will Godfrey & others
     Copyright 2020 Kristian Amlie
+    Copyright 2022 Ichthyostega
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -111,12 +112,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope.get(), basefreq, synth);
     NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo.get(), basefreq, synth);
 
-    computeNoteParameters();
-
-    globaloldamplitude =
-        globalnewamplitude = NoteGlobalPar.Volume
-        * NoteGlobalPar.AmpEnvelope->envout_dB()
-        * NoteGlobalPar.AmpLfo->amplfoout();
+    // cause invocation of computeNoteParameter() with next noteout() in Synth-thread (to avoid races)
+    padSynthUpdate.forceUpdate();
 }
 
 
@@ -126,7 +123,7 @@ PADnote::PADnote(const PADnote &orig) :
     // notes gets used for another purpose
     NoteStatus(NOTE_KEEPALIVE),
     pars(orig.pars),
-    waveInterpolator{WaveInterpolator::clone(*orig.waveInterpolator)},  // use wavetable and reading position from orig
+    waveInterpolator{WaveInterpolator::clone(orig.waveInterpolator)},  // use wavetable and reading position from orig
     basefreq(orig.basefreq),
     BendAdjust(orig.BendAdjust),
     OffsetHz(orig.OffsetHz),
@@ -141,7 +138,7 @@ PADnote::PADnote(const PADnote &orig) :
     realfreq(orig.realfreq),
     randpanL(orig.randpanL),
     randpanR(orig.randpanR),
-    legatoFade(0.0f), // Silent by default
+    legatoFade(0.0f),     // initially silent..
     legatoFadeStep(0.0f), // Legato disabled
     padSynthUpdate(pars),
     synth(orig.synth)
@@ -169,79 +166,6 @@ PADnote::PADnote(const PADnote &orig) :
     gpar.FilterLfo = new LFO(*oldgpar.FilterLfo);
 }
 
-
-void PADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
-{
-    velocity = velocity_;
-    portamento = portamento_;
-    midinote = midinote_;
-
-    setBaseFreq(freq_);
-
-    globalnewamplitude = NoteGlobalPar.Volume
-        * NoteGlobalPar.AmpEnvelope->envout_dB()
-        * NoteGlobalPar.AmpLfo->amplfoout();
-    globaloldamplitude = globalnewamplitude;
-
-    if (!portamento) // Do not crossfade portamento
-    {
-        legatoFade = 0.0f; // Start silent
-        legatoFadeStep = synth->fadeStepShort; // Positive steps
-
-        computeNoteParameters();
-    }
-}
-
-
-void PADnote::legatoFadeOut(const PADnote &orig)
-{
-    velocity = orig.velocity;
-    portamento = orig.portamento;
-    midinote = orig.midinote;
-
-    waveInterpolator.reset(WaveInterpolator::clone(*orig.waveInterpolator));
-    basefreq = orig.basefreq;
-    BendAdjust = orig.BendAdjust;
-    OffsetHz = orig.OffsetHz;
-    firsttime = orig.firsttime;
-    released = orig.released;
-    portamento = orig.portamento;
-    globaloldamplitude = orig.globaloldamplitude;
-    globalnewamplitude = orig.globalnewamplitude;
-    realfreq = orig.realfreq;
-    randpanL = orig.randpanL;
-    randpanR = orig.randpanR;
-
-    auto &gpar = NoteGlobalPar;
-    auto &oldgpar = orig.NoteGlobalPar;
-
-    gpar.Detune = oldgpar.Detune;
-    gpar.Volume = oldgpar.Volume;
-    gpar.Panning = oldgpar.Panning;
-
-    gpar.Fadein_adjustment = oldgpar.Fadein_adjustment;
-    gpar.Punch = oldgpar.Punch;
-
-    *gpar.FreqEnvelope = *oldgpar.FreqEnvelope;
-    *gpar.FreqLfo = *oldgpar.FreqLfo;
-    *gpar.AmpEnvelope = *oldgpar.AmpEnvelope;
-    *gpar.AmpLfo = *oldgpar.AmpLfo;
-
-    *gpar.FilterEnvelope = *oldgpar.FilterEnvelope;
-    *gpar.FilterLfo = *oldgpar.FilterLfo;
-
-    // Supporting virtual copy assignment would be hairy
-    // so we have to use the copy constructor here
-    delete gpar.GlobalFilterL;
-    gpar.GlobalFilterL = new Filter(*oldgpar.GlobalFilterL);
-    delete gpar.GlobalFilterR;
-    gpar.GlobalFilterR = new Filter(*oldgpar.GlobalFilterR);
-
-    legatoFade = 1.0f; // Start at full volume
-    legatoFadeStep = -synth->fadeStepShort; // Negative steps
-}
-
-
 PADnote::~PADnote()
 {
     delete NoteGlobalPar.FreqEnvelope;
@@ -254,8 +178,44 @@ PADnote::~PADnote()
     delete NoteGlobalPar.FilterLfo;
 }
 
+void PADnote::legatoFadeIn(float freq_, float velocity_, int midinote_)
+{
+    portamento = false; // portamento-legato treated separately
+    velocity = velocity_;
+    midinote = midinote_;
+    setupBaseFreq(freq_);
+    // cause invocation of computeNoteParameter() with next noteout()
+    // in Synth-thread (deliberately not called directly, to avoid races)
+    padSynthUpdate.forceUpdate();
 
-void PADnote::setBaseFreq(float basefreq_)
+    legatoFade = 0.0f; // Start crossfade up from volume zero
+    legatoFadeStep = synth->fadeStepShort; // Positive steps
+}
+
+
+void PADnote::legatoFadeOut()
+{
+    legatoFade = 1.0f;     // crossfade down from full volume
+    legatoFadeStep = -synth->fadeStepShort; // Negative steps
+
+    // transitory state similar to a released Envelope
+    NoteStatus = NOTE_LEGATOFADEOUT;
+}
+
+
+
+void PADnote::performPortamento(float freq_, float velocity_, int midinote_)
+{
+    portamento = true;
+    velocity = velocity_;
+    midinote = midinote_;
+    setupBaseFreq(freq_);
+    // carry on all other parameters unaltered
+}
+
+
+
+void PADnote::setupBaseFreq(float basefreq_)
 {
     if (pars->Pfixedfreq == 0)
         basefreq = basefreq_;
@@ -341,24 +301,25 @@ WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
         static_assert(PADnoteParameters::XFADE_UPDATE_MAX/1000 * 96000  < std::numeric_limits<size_t>::max(),
                       "cross-fade sample count represented as size_t");
         size_t crossFadeLengthSmps = pars->PxFadeUpdate * synth->samplerate / 1000; // param given in ms
-        WaveInterpolator* oldInterpolator = waveInterpolator.release();
-        WaveInterpolator* xFader = WaveInterpolator::createXFader(attachCrossFade
-                                                                 ,detachCrossFade
-                                                                 ,switchInterpolator
-                                                                 ,unique_ptr<WaveInterpolator>{oldInterpolator}
-                                                                 ,unique_ptr<WaveInterpolator>{newInterpolator}
-                                                                 ,crossFadeLengthSmps
-                                                                 ,synth->buffersize);
-        return xFader;
+        return WaveInterpolator::createXFader(attachCrossFade
+                                             ,detachCrossFade
+                                             ,switchInterpolator
+                                             ,unique_ptr<WaveInterpolator>{waveInterpolator.release()}
+                                             ,unique_ptr<WaveInterpolator>{newInterpolator}
+                                             ,crossFadeLengthSmps
+                                             ,synth->buffersize);
     }
     else // fallback: no existing Interpolator ==> just install given new one
-        return newInterpolator;   // typically invoked from NoteON (no waveInterpolator yet)
+        return newInterpolator;    // relevant for NoteOn after wavetable rebuild (no waveInterpolator yet)
 }
 
 
+// Setup basic parameters and wavetable for this note instance.
+// Warning: should only be called from Synth-thread (not concurrently)
+//          to avoid races with wavetable rebuilding and crossfades.
 void PADnote::computeNoteParameters()
 {
-    setBaseFreq(basefreq);
+    setupBaseFreq(basefreq);
 
     int BendAdj = pars->PBendAdjust - 64;
     if (BendAdj % 24 == 0)
@@ -386,7 +347,7 @@ void PADnote::computeNoteParameters()
     }
     if (isWavetableChanged(tableNr))
     {
-        if (pars->xFade)
+        if (pars->xFade and not isLegatoFading())
             waveInterpolator.reset(setupCrossFade(buildInterpolator(tableNr)));
         else
             waveInterpolator.reset(buildInterpolator(tableNr));
@@ -465,6 +426,8 @@ void PADnote::noteout(float *outl,float *outr)
     {
         fadein(outl);
         fadein(outr);
+        globaloldamplitude = globalnewamplitude;
+        // avoid triggering amplitude interpolation at first buffer cycle
         firsttime = false;
     }
 
@@ -498,15 +461,14 @@ void PADnote::noteout(float *outl,float *outr)
     }
 
     if (aboveAmplitudeThreshold(globaloldamplitude,globalnewamplitude))
-    {
-        // Amplitude Interpolation
+    {// interpolate amplitude change
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
-            float tmpvol = interpolateAmplitude(globaloldamplitude,
-                                                globalnewamplitude, i,
-                                                synth->sent_buffersize);
-            outl[i] *= tmpvol * pangainL;
-            outr[i] *= tmpvol * pangainR;
+            float fade = interpolateAmplitude(globaloldamplitude,
+                                              globalnewamplitude, i,
+                                              synth->sent_buffersize);
+            outl[i] *= fade * pangainL;
+            outr[i] *= fade * pangainR;
         }
     }
     else
@@ -518,9 +480,8 @@ void PADnote::noteout(float *outl,float *outr)
         }
     }
 
-    // Apply legato fading if any
-    if (legatoFadeStep != 0.0f)
-    {
+    if (isLegatoFading())
+    {// apply legato fade to computed samples...
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             legatoFade += legatoFadeStep;
@@ -530,7 +491,8 @@ void PADnote::noteout(float *outl,float *outr)
                 legatoFadeStep = 0.0f;
                 memset(outl + i, 0, (synth->sent_buffersize - i) * sizeof(float));
                 memset(outr + i, 0, (synth->sent_buffersize - i) * sizeof(float));
-                break;
+                NoteStatus = NOTE_DISABLED; // causes clean-up of this note instance
+                return;
             }
             else if (legatoFade >= 1.0f)
             {
@@ -543,8 +505,7 @@ void PADnote::noteout(float *outl,float *outr)
         }
     }
 
-    // Check if the global amplitude is finished.
-    // If it does, disable the note
+    // Check global envelope and discard this note when finished.
     if (NoteGlobalPar.AmpEnvelope->finished() != 0)
     {
         for (int i = 0 ; i < synth->sent_buffersize; ++i)
@@ -553,16 +514,18 @@ void PADnote::noteout(float *outl,float *outr)
             outl[i] *= tmp;
             outr[i] *= tmp;
         }
-        NoteStatus = NOTE_DISABLED;
+        NoteStatus = NOTE_DISABLED; // causes clean-up of this note instance
+        return;
     }
 }
 
 
 void PADnote::releasekey()
 {
+    if (NoteStatus == NOTE_LEGATOFADEOUT)
+        return; // keep envelopes in sustained state (thereby blocking NoteOff)
+
     NoteGlobalPar.FreqEnvelope->releasekey();
     NoteGlobalPar.FilterEnvelope->releasekey();
     NoteGlobalPar.AmpEnvelope->releasekey();
-    if (NoteStatus == NOTE_KEEPALIVE)
-        NoteStatus = NOTE_ENABLED;
 }

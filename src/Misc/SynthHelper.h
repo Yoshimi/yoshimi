@@ -23,6 +23,7 @@
 #define SYNTHHELPER_H
 
 #include <cmath>
+#include <cassert>
 
 
 namespace synth {
@@ -201,7 +202,12 @@ class SFadeCurve
 
 inline bool aboveAmplitudeThreshold(float a, float b)
 {
-    return ((2.0f * fabsf(b - a) / fabsf(b + a + 0.0000000001f)) > 0.0001f);
+    float mean = (fabsf(a)+fabsf(b)) / 2;
+    float delta = fabsf(b - a);
+    if (mean == 0)
+        return false;
+    else
+        return 1e-5f < delta / mean;
 }
 
 

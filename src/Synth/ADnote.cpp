@@ -168,7 +168,7 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
 
         if (oldvpar.VoiceOut) {
             vpar.VoiceOut.reset(synth->buffersize);
-            // Not sure the memcpy is necessary
+            ///TODO: is copying of output buffers contents really necessary?
             memcpy(vpar.VoiceOut.get(), oldvpar.VoiceOut.get(), synth->bufferbytes);
         } else
             vpar.VoiceOut.reset();
@@ -347,11 +347,6 @@ ADnote::ADnote(const ADnote &orig, ADnote *topVoice_, float *parentFMmod_) :
             }
         }
 
-        oldamplitude[i] = orig.oldamplitude[i];
-        newamplitude[i] = orig.newamplitude[i];
-        FMoldamplitude[i] = orig.FMoldamplitude[i];
-        FMnewamplitude[i] = orig.FMnewamplitude[i];
-
         if (orig.subVoice[i] != NULL)
         {
             subVoice[i] = new ADnote*[orig.unison_size[i]];
@@ -432,6 +427,7 @@ void ADnote::construct()
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
+        NoteVoicePar[nvoice].enabled = true;
 
         int unison = adpars->VoicePar[nvoice].Unison_size;
         if (unison < 1)
@@ -685,54 +681,29 @@ void ADnote::initSubVoices(void)
     }
 }
 
-void ADnote::legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_)
+// Note portamento does not recompute note parameters, since it should be a smooth change in pitch,
+//      with no change in timbre (or at least rather a gradual one). It may be desirable to have base
+//      frequency sensitive things like filter scaling and envelope stretching take portamento into account,
+//      but to do this properly would require more than just recalculating based on a fixed base frequency,
+//      and the current code is thus not able to implement that.
+void ADnote::performPortamento(float freq_, float velocity_, int midinote_)
 {
+    portamento = true;
     basefreq = freq_;
-    velocity = velocity_;
-    if (velocity > 1.0)
-        velocity = 1.0;
-    portamento = portamento_;
     midinote = midinote_;
-
-    if (!portamento) // Do not crossfade portamento
-    {
-        legatoFade = 0.0f; // Start silent
-        legatoFadeStep = synth->fadeStepShort; // Positive steps
-
-        // Re-randomize harmonics, but only if we're not doing portamento
-        if (subVoiceNumber == -1)
-            for (int i = 0; i < NUM_VOICES; ++i)
-            {
-                adpars->VoicePar[i].OscilSmp->newrandseed();
-                auto &extoscil = adpars->VoicePar[i].Pextoscil;
-                if (extoscil != -1 && !adpars->GlobalPar.Hrandgrouping)
-                    adpars->VoicePar[extoscil].OscilSmp->newrandseed();
-            }
-
-        // This recalculates certain things like harmonic phase/amplitude randomness,
-        // which we probably don't want with portamento. This may not even be
-        // desirable with plain legato, but it at least makes some sense in that
-        // case. Portamento should be a smooth change in pitch, with no change in
-        // timbre, or at least a gradual one. It may be desirable to have base
-        // frequency sensitive things like filter scaling and envelope stretching
-        // take portamento into account, but to do this properly would require more
-        // than just recalculating based on basefreq.
-        computeNoteParameters();
-    }
+    velocity = velocity_;
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
-        auto &vpar = NoteVoicePar[i];
-
-        if (!vpar.Enabled)
-            continue;
+        if (not NoteVoicePar[i].enabled)
+            continue; // sub-Voices can only be attached to enabled voices
 
         if (subVoice[i] != NULL)
             for (size_t k = 0; k < unison_size[i]; ++k)
-                subVoice[i][k]->legatoFadeIn(getVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+                subVoice[i][k]->performPortamento(getVoiceBaseFreq(i), velocity_, midinote_);
         if (subFMVoice[i] != NULL)
             for (size_t k = 0; k < unison_size[i]; ++k)
-                subFMVoice[i][k]->legatoFadeIn(getFMVoiceBaseFreq(i), velocity_, portamento_, midinote_);
+                subFMVoice[i][k]->performPortamento(getFMVoiceBaseFreq(i), velocity_, midinote_);
     }
 }
 
@@ -755,101 +726,68 @@ template<class T> inline void copyOrAssign(T *lhs, const T *rhs)
         }
 }
 
-void ADnote::legatoFadeOut(const ADnote &orig)
+void ADnote::legatoFadeIn(float freq_, float velocity_, int midinote_)
 {
-    basefreq = orig.basefreq;
-    velocity = orig.velocity;
-    portamento = orig.portamento;
-    midinote = orig.midinote;
+    portamento = false; // portamento-legato treated separately
+    basefreq = freq_;
+    midinote = midinote_;
+    velocity = velocity_;
 
-    auto &gpar = NoteGlobalPar;
-    auto &oldgpar = orig.NoteGlobalPar;
+    // Re-randomize harmonics
+    if (subVoiceNumber == -1)
+        for (int i = 0; i < NUM_VOICES; ++i)
+        {
+            adpars->VoicePar[i].OscilSmp->newrandseed();
+            auto &extoscil = adpars->VoicePar[i].Pextoscil;
+            if (extoscil != -1 && !adpars->GlobalPar.Hrandgrouping)
+                adpars->VoicePar[extoscil].OscilSmp->newrandseed();
+        }
 
-    // These should never be null
-    *gpar.FreqEnvelope = *oldgpar.FreqEnvelope;
-    *gpar.FreqLfo = *oldgpar.FreqLfo;
-    *gpar.AmpEnvelope = *oldgpar.AmpEnvelope;
-    *gpar.AmpLfo = *oldgpar.AmpLfo;
-    *gpar.FilterEnvelope = *oldgpar.FilterEnvelope;
-    *gpar.FilterLfo = *oldgpar.FilterLfo;
+    // This recalculates stuff like harmonic phase/amplitude randomness,
+    // not sure if desirable for legato, at least it ensures sane initialisation.
+    // Note: to the contrary, Portamento does not re-init any of these values.
+    computeNoteParameters();
 
-    gpar.Fadein_adjustment = oldgpar.Fadein_adjustment;
-    gpar.Punch = oldgpar.Punch;
-
-    paramSeed = orig.paramSeed;
-
-    globalnewamplitude = orig.globalnewamplitude;
-    globaloldamplitude = orig.globaloldamplitude;
-
-    // Supporting virtual copy assignment would be hairy
-    // so we have to use the copy constructor here
-    delete gpar.GlobalFilterL;
-    gpar.GlobalFilterL = new Filter(*oldgpar.GlobalFilterL);
-    if (stereo)
-    {
-        delete gpar.GlobalFilterR;
-        gpar.GlobalFilterR = new Filter(*oldgpar.GlobalFilterR);
-    }
-
-    memcpy(pinking, orig.pinking, sizeof(pinking));
-    memcpy(firsttick, orig.firsttick, sizeof(firsttick));
-
-    memcpy(oldamplitude, orig.oldamplitude, sizeof(oldamplitude));
-    memcpy(newamplitude, orig.newamplitude, sizeof(newamplitude));
-    memcpy(FMoldamplitude, orig.FMoldamplitude, sizeof(FMoldamplitude));
-    memcpy(FMnewamplitude, orig.FMnewamplitude, sizeof(FMnewamplitude));
+    legatoFade = 0.0f; // Start crossfade silent
+    legatoFadeStep = synth->fadeStepShort; // Positive steps
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {
-        auto &vpar = NoteVoicePar[i];
-        auto &oldvpar = orig.NoteVoicePar[i];
-
-        vpar.Enabled = oldvpar.Enabled;
-        if (!vpar.Enabled)
-            continue;
-
-        vpar.DelayTicks = oldvpar.DelayTicks;
-        vpar.Punch = oldvpar.Punch;
-        vpar.phase_offset = oldvpar.phase_offset;
-
-        int unison = adpars->VoicePar[i].Unison_size;
-        memcpy(oscposhi[i], orig.oscposhi[i], unison * sizeof(int));
-        memcpy(oscposlo[i], orig.oscposlo[i], unison * sizeof(float));
-        memcpy(oscposhiFM[i], orig.oscposhiFM[i], unison * sizeof(int));
-        memcpy(oscposloFM[i], orig.oscposloFM[i], unison * sizeof(float));
-
-        copyOrAssign(vpar.FreqLfo, oldvpar.FreqLfo);
-        copyOrAssign(vpar.FreqEnvelope, oldvpar.FreqEnvelope);
-
-        copyOrAssign(vpar.AmpLfo, oldvpar.AmpLfo);
-        copyOrAssign(vpar.AmpEnvelope, oldvpar.AmpEnvelope);
-
-        delete vpar.VoiceFilterL;
-        vpar.VoiceFilterL = NULL;
-        if (oldvpar.VoiceFilterL != NULL)
-            vpar.VoiceFilterL = new Filter(*oldvpar.VoiceFilterL);
-        delete vpar.VoiceFilterR;
-        vpar.VoiceFilterR = NULL;
-        if (oldvpar.VoiceFilterR != NULL)
-            vpar.VoiceFilterR = new Filter(*oldvpar.VoiceFilterR);
-
-        copyOrAssign(vpar.FilterLfo, oldvpar.FilterLfo);
-        copyOrAssign(vpar.FilterEnvelope, oldvpar.FilterEnvelope);
-
-        copyOrAssign(vpar.FMFreqEnvelope, oldvpar.FMFreqEnvelope);
-        copyOrAssign(vpar.FMAmpEnvelope, oldvpar.FMAmpEnvelope);
+        if (not NoteVoicePar[i].enabled)
+            continue; // sub-Voices can only be attached to enabled voices
 
         if (subVoice[i] != NULL)
             for (size_t k = 0; k < unison_size[i]; ++k)
-                subVoice[i][k]->legatoFadeOut(*orig.subVoice[i][k]);
+                subVoice[i][k]->legatoFadeIn(getVoiceBaseFreq(i), velocity_, midinote_);
         if (subFMVoice[i] != NULL)
             for (size_t k = 0; k < unison_size[i]; ++k)
-                subFMVoice[i][k]->legatoFadeOut(*orig.subFMVoice[i][k]);
+                subFMVoice[i][k]->legatoFadeIn(getFMVoiceBaseFreq(i), velocity_, midinote_);
+    }
+}
+
+
+void ADnote::legatoFadeOut()
+{
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        if (not NoteVoicePar[i].enabled)
+            continue; // sub-Voices can only be attached to enabled voices
+
+        if (subVoice[i] != NULL)
+            for (size_t k = 0; k < unison_size[i]; ++k)
+                subVoice[i][k]->legatoFadeOut();
+        if (subFMVoice[i] != NULL)
+            for (size_t k = 0; k < unison_size[i]; ++k)
+                subFMVoice[i][k]->legatoFadeOut();
     }
 
-    legatoFade = 1.0f; // Start at full volume
+    legatoFade = 1.0f;     // crossfade down from full volume
     legatoFadeStep = -synth->fadeStepShort; // Negative steps
+
+    // transitory state similar to a released Envelope
+    NoteStatus = NOTE_LEGATOFADEOUT;
 }
+
 
 
 // Kill a voice of ADnote
@@ -966,7 +904,7 @@ void ADnote::killNote()
     delete NoteGlobalPar.FilterEnvelope;
     delete NoteGlobalPar.FilterLfo;
 
-    NoteStatus = NOTE_DISABLED;
+    NoteStatus = NOTE_DISABLED; // causes clean-up of this note instance
 }
 
 
@@ -1612,8 +1550,8 @@ void ADnote::computeWorkingParameters(void)
     if (portamento) // this voice use portamento
     {
         portamentofreqrap = ctl->portamento.freqrap;
-        if (!ctl->portamento.used) // the portamento has finished
-            portamento = 0;        // this note is no longer "portamented"
+        if (not ctl->portamento.used) // the portamento has finished
+            portamento = false;       // this note is no longer "portamented"
 
     }
 
@@ -2710,7 +2648,8 @@ void ADnote::noteout(float *outl, float *outr)
                     legatoFadeStep = 0.0f;
                     memset(outl + i, 0, (synth->sent_buffersize - i) * sizeof(float));
                     memset(outr + i, 0, (synth->sent_buffersize - i) * sizeof(float));
-                    break;
+                    killNote(); // NOTE_DISABLED
+                    return;
                 }
                 else if (legatoFade >= 1.0f)
                 {
@@ -2737,6 +2676,7 @@ void ADnote::noteout(float *outl, float *outr)
             }
         }
         killNote();
+        return;
     }
 }
 
@@ -2744,6 +2684,9 @@ void ADnote::noteout(float *outl, float *outr)
 // Release the key (NoteOff)
 void ADnote::releasekey(void)
 {
+    if (NoteStatus == NOTE_LEGATOFADEOUT)
+        return; // keep envelopes in sustained state (thereby blocking NoteOff)
+
     int nvoice;
     for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
@@ -2769,6 +2712,4 @@ void ADnote::releasekey(void)
     NoteGlobalPar.FreqEnvelope->releasekey();
     NoteGlobalPar.FilterEnvelope->releasekey();
     NoteGlobalPar.AmpEnvelope->releasekey();
-    if (NoteStatus == NOTE_KEEPALIVE)
-        NoteStatus = NOTE_ENABLED;
 }

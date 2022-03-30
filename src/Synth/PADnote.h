@@ -51,17 +51,13 @@ class PADnote
         void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
         void legatoFadeOut(const PADnote &orig);
 
-        void noteout(float *outl,float *outr);
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
-        void releasekey(void);
+        void performPortamento(float freq_, float velocity_, int midinote_);
+        void legatoFadeIn(float freq_, float velocity_, int midinote_);
+        void legatoFadeOut();
 
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
+        void noteout(float *outl,float *outr);
+        bool finished() const { return NoteStatus == NOTE_DISABLED; }
+        void releasekey(void);
 
     private:
         void fadein(float *smps);
@@ -70,11 +66,13 @@ class PADnote
         WaveInterpolator* setupCrossFade(WaveInterpolator*);
         void computeNoteParameters();
         void computecurrentparameters();
-        void setBaseFreq(float basefreq_);
+        void setupBaseFreq(float basefreq_);
+        bool isLegatoFading() const { return legatoFadeStep != 0.0f; };
+
         enum {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
+            NOTE_LEGATOFADEOUT
         } NoteStatus;
         PADnoteParameters *pars;
 

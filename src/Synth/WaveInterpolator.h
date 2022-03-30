@@ -62,6 +62,7 @@ class WaveInterpolator
 
         /* build a concrete interpolator instance for stereo interpolation either cubic or linear */
         static WaveInterpolator* create(bool cubic, float phase, bool stereo, fft::Waveform const& wave, float tableFreq);
+        static WaveInterpolator* clone(unique_ptr<WaveInterpolator> const&);
         static WaveInterpolator* clone(WaveInterpolator const& orig);
 
         /* create a delegate for Cross-Fadeing WaveInterpolator */
@@ -284,7 +285,7 @@ class XFadeDelegate
                     mixOutPrev = mixOut;
                     mixIn = mixCurve.nextStep();     // S-shaped exponential mix curve
                     mixOut = sqrtf(1 - mixIn*mixIn); // Equal-Power mix, since waveform typically not correlated
-                    mixStep = progress;
+                    mixStep = progress;              // recall progress value at start of (linear) interpolation segment
                 }
                 size_t offset = progress - mixStep;
                 float volOut  = interpolateAmplitude(mixOutPrev,mixOut, offset, bufferSize);
@@ -300,15 +301,13 @@ class XFadeDelegate
         }
 
 
+        // Note: since cloning is only used for Legato notes (as of 3/2022), which are then cross-faded
+        //       it is pointless to clone an ongoing wavetable crossfade, and moreover this could lead to
+        //       whole tree of crossfade delegates, when playing several Legato notes during an extended
+        //       x-fade. Thus "cloning" only the new target wavetable interpolator, to preserve phase info.
         WaveInterpolator* buildClone()  const override
         {
-            return new XFadeDelegate(attach_instance
-                                    ,detach_instance
-                                    ,install_followup
-                                    ,unique_ptr<WaveInterpolator>{WaveInterpolator::clone(*oldInterpolator)}
-                                    ,unique_ptr<WaveInterpolator>{WaveInterpolator::clone(*newInterpolator)}
-                                    ,this->fadeLengthSmps
-                                    ,this->bufferSize);
+            return WaveInterpolator::clone(newInterpolator);
         }
 
     public:
@@ -388,6 +387,12 @@ inline WaveInterpolator* WaveInterpolator::createXFader(function<void(void)> att
 inline WaveInterpolator* WaveInterpolator::clone(WaveInterpolator const& orig)
 {
     return orig.buildClone();
+}
+
+inline WaveInterpolator* WaveInterpolator::clone(unique_ptr<WaveInterpolator> const& orig)
+{
+    return orig? clone(*orig)
+               : nullptr;
 }
 
 

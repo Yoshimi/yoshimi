@@ -50,25 +50,18 @@ class SUBnote
         SUBnote& operator=(SUBnote&&)      = delete;
         SUBnote& operator=(SUBnote const&) = delete;
 
-        void legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_);
-        void legatoFadeOut(const SUBnote &syncwith);
+        void performPortamento(float freq_, float velocity_, int midinote_);
+        void legatoFadeIn(float freq_, float velocity_, int midinote_);
+        void legatoFadeOut();
 
         void noteout(float *outl,float *outr);
         void releasekey(void);
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
-
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
+        bool finished() const { return NoteStatus == NOTE_DISABLED; }
 
     private:
         void computecurrentparameters(void);
         void initparameters(float freq);
-        void KillNote(void);
+        void killNote(void);
         void updatefilterbank(void);
 
         SUBnoteParameters *pars;
@@ -81,7 +74,7 @@ class SUBnote
         float basefreq;
         float notefreq;
         float velocity;
-        int portamento;
+        bool portamento;
         int midinote;
         float BendAdjust;
         float OffsetHz;
@@ -100,8 +93,9 @@ class SUBnote
         enum {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
+            NOTE_LEGATOFADEOUT
         } NoteStatus;
+
         int firsttick;
         float volume;
         float oldamplitude;

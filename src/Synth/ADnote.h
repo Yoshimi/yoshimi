@@ -134,17 +134,10 @@ class ADnote
 
         void noteout(float *outl, float *outr);
         void releasekey();
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
-        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
-        void legatoFadeOut(const ADnote &syncwith);
-
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
+        bool finished() const { return NoteStatus == NOTE_DISABLED; }
+        void performPortamento(float freq_, float velocity_, int midinote_);
+        void legatoFadeIn(float freq_, float velocity_, int midinote_);
+        void legatoFadeOut();
 
     private:
         void construct();
@@ -203,7 +196,7 @@ class ADnote
         enum {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
+            NOTE_LEGATOFADEOUT
         } NoteStatus;
         Controller *ctl;
 
@@ -365,7 +358,7 @@ class ADnote
         char firsttick[NUM_VOICES]; // 1 - if it is the fitst tick.
                                     // used to fade in the sound
 
-        int portamento; // 1 if the note has portamento
+        bool portamento;            // note performs portamento starting from previous note frequency
 
         float bandwidthDetuneMultiplier; // how the fine detunes are made bigger or smaller
 

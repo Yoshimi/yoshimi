@@ -387,11 +387,10 @@ namespace { // Helpers to handle the tree kinds of KitItemNotes uniformly...
 void Part::startNewNotes(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote, bool portamento)
 {
     if (kit[item].adpars && kit[item].Padenabled)
-    {
         partnote[pos].kitItem[currItem].adnote =
             new ADnote(kit[item].adpars, *ctl, baseFreq, velocity,
                         portamento, midiNote, synth);
-    }
+
     if (kit[item].subpars && kit[item].Psubenabled)
         partnote[pos].kitItem[currItem].subnote =
             new SUBnote(kit[item].subpars, *ctl, baseFreq, velocity,
@@ -437,6 +436,8 @@ void Part::startLegato(int pos, size_t item, size_t currItem, float baseFreq, fl
     partnote[pos].kitItem[currItem].sendtoparteffect =
         (kit[item].Psendtoparteffect < NUM_PART_EFX)? kit[item].Psendtoparteffect
                                                     : NUM_PART_EFX; // direct to Part-output
+
+    partnote[prevPos].status = KEY_RELEASED; // treat legato crossfade similar to envelope-release
 
     if ( partnote[pos].kitItem[currItem].adnote
        ||partnote[pos].kitItem[currItem].subnote
@@ -1032,14 +1033,11 @@ void Part::ComputePartSmps(void)
             if (adnote)
             {
                 noteplay++;
-                if (adnote->ready())
-                {
-                    adnote->noteout(tmpoutl.get(), tmpoutr.get());
-                    for (int i = 0; i < synth->sent_buffersize; ++i)
-                    {   // add the ADnote to part(mix)
-                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
-                    }
+                adnote->noteout(tmpoutl.get(), tmpoutr.get());
+                for (int i = 0; i < synth->sent_buffersize; ++i)
+                {   // add the ADnote to part(mix)
+                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
                 if (adnote->finished())
                 {
@@ -1051,14 +1049,11 @@ void Part::ComputePartSmps(void)
             if (subnote)
             {
                 noteplay++;
-                if (subnote->ready())
-                {
-                    subnote->noteout(tmpoutl.get(), tmpoutr.get());
-                    for (int i = 0; i < synth->sent_buffersize; ++i)
-                    {   // add the SUBnote to part(mix)
-                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
-                    }
+                subnote->noteout(tmpoutl.get(), tmpoutr.get());
+                for (int i = 0; i < synth->sent_buffersize; ++i)
+                {   // add the SUBnote to part(mix)
+                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
                 if (subnote->finished())
                 {
@@ -1070,14 +1065,11 @@ void Part::ComputePartSmps(void)
             if (padnote)
             {
                 noteplay++;
-                if (padnote->ready())
-                {
-                    padnote->noteout(tmpoutl.get(), tmpoutr.get());
-                    for (int i = 0 ; i < synth->sent_buffersize; ++i)
-                    {   // add the PADnote to part(mix)
-                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
-                    }
+                padnote->noteout(tmpoutl.get(), tmpoutr.get());
+                for (int i = 0 ; i < synth->sent_buffersize; ++i)
+                {   // add the PADnote to part(mix)
+                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
                 if (padnote->finished())
                 {
