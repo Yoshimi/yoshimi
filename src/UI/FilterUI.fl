@@ -920,17 +920,17 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
     bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
 
-    if (part != npart || (kititem != EFFECT::type::dynFilter && eng != engine))
+    if (part != npart || (kititem != (TOPLEVEL::insert::dynFilter | 128) && eng != engine))
         return;
-    if (kititem == EFFECT::type::dynFilter)
+    if (kititem == (TOPLEVEL::insert::dynFilter | 128))
     {
         //cout << "Dyn filter seen part " << int(part)<< endl;
         if (part == TOPLEVEL::section::systemEffects)
-            synth->getGuiMaster()->syseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
+            synth->getGuiMaster()->syseffectui->UpdatePresetColour(1, TOPLEVEL::insert::dynFilter - TOPLEVEL::insert::none);
         else if (part == TOPLEVEL::section::insertEffects)
-            synth->getGuiMaster()->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
+            synth->getGuiMaster()->inseffectui->UpdatePresetColour(1, TOPLEVEL::insert::dynFilter - TOPLEVEL::insert::none);
         else
-           synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
+           synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, TOPLEVEL::insert::dynFilter - TOPLEVEL::insert::none); // normal part effect
     }
 
     qdial->activate();

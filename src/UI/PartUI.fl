@@ -2385,7 +2385,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     int efftype = fetchData(0, PART::control::effectType, npart, UNUSED, 0, TOPLEVEL::insert::partEffectSelect);
     if (efftype > 0)
     {
-        bool status = fetchData(0, EFFECT::control::changed, npart, efftype + EFFECT::type::none, ninseff);
+        bool status = fetchData(0, EFFECT::control::changed, npart, efftype + (TOPLEVEL::insert::none | 128), ninseff);
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
 
