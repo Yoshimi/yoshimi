@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-3-31 Will
+* Completed moving effect type identifiers to inserts.
+  Actual control still with kit.
+
 2022-3-30 Will
 * Bugfix: Dynfilter not reporting internal filte results to CLI
   but performing them correctly.

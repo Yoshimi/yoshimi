@@ -1053,21 +1053,8 @@ namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
     };
 }
 
-namespace EFFECT // usage EFFECT::type::none
+namespace EFFECT // usage EFFECT::control::level
 {
-    enum type : unsigned char {
-        none = 128, // must be higher than normal kits
-        reverb,
-        echo,
-        chorus,
-        phaser,
-        alienWah,
-        distortion,
-        eq,
-        dynFilter,
-        count // this must be the last item!
-    };
-
     enum control : unsigned char {
         level = 0, // volume, wet/dry, gain for EQ
         panning, // band for EQ
