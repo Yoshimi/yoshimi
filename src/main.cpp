@@ -130,21 +130,30 @@ static int handle_shortcuts(int event)
     {
         return 0;
     }
+
     auto key = Fl::event_key();
-    //printf("KEY: %d\n", key);
-    if (Fl::event_alt() && key == 117)
+    if(Fl::event_state() == 262144 && key == 122)
     {
         mainUI->send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+        return 1;
     }
-    else if (Fl::event_alt() && key == 114)
+    if (Fl::event_state() == 327680 && key == 122)
     {
         mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+        return 1;
     }
-    else
+
+    if (Fl::event_alt() && key == 117)
     {
-        return 0;
+            mainUI->send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+            return 1;
     }
-    return 1;
+    if ((Fl::event_alt() || Fl::event_ctrl()) && key == 114)
+    {
+            mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
+            return 1;
+    }
+    return 0;
 }
 #endif
 
