@@ -238,7 +238,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         eq,
         dynFilter,
         // any new effects should go here
-        count, // this must be the last item!
+        count, // this must be the last type!
+
         LFOgroup, // 10
         filterGroup,
         envelopeGroup,

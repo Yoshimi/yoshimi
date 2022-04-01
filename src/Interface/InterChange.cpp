@@ -2018,6 +2018,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
+    unsigned char effSend = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
@@ -2056,13 +2057,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         return true;
     }
 
-    if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && kititem == UNUSED)
+    if ((npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects) && effSend == UNUSED)
     {
         commandSysIns(getData);
         return true;
     }
 
-    if (kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128))
+    if (effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128))
     {
         commandEffects(getData);
         return true;
@@ -6804,7 +6805,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit & 127;
+    unsigned char effSend = getData->data.kit & 127;
     unsigned char effnum = getData->data.engine;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
@@ -6826,9 +6827,9 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
     else
         return; // invalid part number
-    if (kititem > TOPLEVEL::insert::dynFilter)
+    if (effSend > TOPLEVEL::insert::dynFilter)
         return; // invalid kit number
-    if (control != PART::control::effectType && kititem != eff->geteffect())
+    if (control != PART::control::effectType && effSend != eff->geteffect())
     {
         if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI)
             synth->getRuntime().Log("Not Available"); // TODO sort this better for CLI as well as MIDI
@@ -6839,7 +6840,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (eff->geteffectpar(EFFECT::control::bpm) == 1)
         getData->data.offset = 1; // mark this for reporting in Data2Text
 
-    if (kititem == TOPLEVEL::insert::dynFilter && getData->data.insert != UNUSED)
+    if (effSend == TOPLEVEL::insert::dynFilter && getData->data.insert != UNUSED)
     {
         if (write)
             eff->seteffectpar(-1, true); // effect changed
@@ -6858,7 +6859,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     if (write)
     {
-        if (kititem == TOPLEVEL::insert::eq)
+        if (effSend == TOPLEVEL::insert::eq)
         /*
          * specific to EQ
          * Control 1 is not a saved parameter, but a band index.
@@ -6881,7 +6882,7 @@ void InterChange::commandEffects(CommandBlock *getData)
             else
             {
                 eff->seteffectpar(control, value_int);
-                if (kititem == TOPLEVEL::insert::reverb && control == 10 && value_int == 2)
+                if (effSend == TOPLEVEL::insert::reverb && control == 10 && value_int == 2)
                     // bandwidth type update for GUI
                     getData->data.offset = eff->geteffectpar(12);
             }
@@ -6889,7 +6890,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     else
     {
-        if (kititem == TOPLEVEL::insert::eq && control > 1) // specific to EQ
+        if (effSend == TOPLEVEL::insert::eq && control > 1) // specific to EQ
         {
             value = eff->geteffectpar(control + (eff->geteffectpar(1) * 5));
             getData->data.parameter = eff->geteffectpar(1);
@@ -7104,6 +7105,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     int control = (int) getData->data.control;
     int npart = (int) getData->data.part;
     int kititem = (int) getData->data.kit;
+    int effSend = (int) getData->data.kit;
     int engine = (int) getData->data.engine;
     int insert = (int) getData->data.insert;
     int parameter = (int) getData->data.parameter;
@@ -7141,7 +7143,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     }
     // should prolly move other inserts up here
 
-    if (kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128))
+    if (effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128))
     {
         LimitMgr limits;
         return limits.geteffectlimits(getData);

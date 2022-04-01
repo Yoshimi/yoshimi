@@ -76,6 +76,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+    unsigned char effSend = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
@@ -134,7 +135,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             return "Nothing to redo!";
     }
 
-    if ((kititem >= (TOPLEVEL::insert::none | 128) && kititem <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
+    if ((effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
         return withValue(commandName, type, showValue, addValue, value);
@@ -3183,6 +3184,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+    unsigned char effSend = getData->data.kit;
     unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
@@ -3197,7 +3199,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     else
         name = "Part " + to_string(npart + 1);
 
-    if (kititem == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
+    if (effSend == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3305,7 +3307,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     int ref = control; // we frequently modify this
     bool isBPM = (ref == 2 && offset == 1);
     //std::cout << "isbpm " << int(isBPM) << std::endl;
-    switch (kititem & 127)
+    switch (effSend & 127)
     {
         case TOPLEVEL::insert::none:
             effname = " None";
@@ -3528,7 +3530,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             contstr = " Unrecognised";
     }
     //std::cout << "control " << int(control) << std::endl;
-    if (control == EFFECT::control::preset && kititem != (TOPLEVEL::insert::eq | 128))
+    if (control == EFFECT::control::preset && effSend != (TOPLEVEL::insert::eq | 128))
     {
         contstr = " Preset " + to_string (value + 1);
         showValue = false;
