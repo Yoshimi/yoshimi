@@ -4841,12 +4841,13 @@ void InterChange::commandSub(CommandBlock *getData)
             int target = 127; // first harmonic amplitude
             for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
             {
-                tempData.data.value = pars->Phmag[i];
-                tempData.data.control = i;
-                noteSeen = true;
-                undoLoopBack = false;
-                if (tempData.data.value != target)
+                int val = pars->Phmag[i];
+                if (val != target)
                 {
+                    tempData.data.value = val;
+                    tempData.data.control = i;
+                    noteSeen = true;
+                    undoLoopBack = false;
                     if (!markerSet)
                     {
                         add2undo(&tempData, noteSeen);
@@ -4861,12 +4862,16 @@ void InterChange::commandSub(CommandBlock *getData)
             tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
             for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
             {
-                tempData.data.value = pars->Phrelbw[i];
+                int val = pars->Phrelbw[i];
                 tempData.data.control = i;
                 noteSeen = true;
                 undoLoopBack = false;
-                if (tempData.data.value != 64)
+                if (val != 64)
                 {
+                    tempData.data.value = val;
+                    tempData.data.control = i;
+                    noteSeen = true;
+                    undoLoopBack = false;
                     if (!markerSet)
                     {
                         add2undo(&tempData, noteSeen);
@@ -5794,17 +5799,24 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
             tempData.data.control = RESONANCE::control::graphPoint;
             tempData.data.insert = TOPLEVEL::insert::resonanceGraphInsert;
-
+            bool markerSet = false;
             for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
             {
-                tempData.data.value = respar->Prespoints[i];
-                tempData.data.parameter = i;
-                noteSeen = true;
-                undoLoopBack = false;
-                if(i == 0) // first line sets marker
-                    add2undo(&tempData, noteSeen);
-                else
-                    add2undo(&tempData, noteSeen, true);
+                int val = respar->Prespoints[i];
+                if (val != 64)
+                {
+                    tempData.data.value = val;
+                    tempData.data.parameter = i;
+                    noteSeen = true;
+                    undoLoopBack = false;
+                    if (!markerSet)
+                    {
+                        add2undo(&tempData, noteSeen);
+                        markerSet = true;
+                    }
+                    else
+                        add2undo(&tempData, noteSeen, true);
+                }
             }
         }
         else
