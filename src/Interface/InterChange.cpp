@@ -1930,8 +1930,15 @@ void InterChange::returns(CommandBlock *getData)
              */
             if (!(setUndo && getData->data.insert == TOPLEVEL::insert::resonanceGraphInsert))
             {
-                if ((type & TOPLEVEL::type::Write) && tmp != TOPLEVEL::action::fromGUI)
-                    toGUI.write(getData->bytes);
+                if (type & TOPLEVEL::type::Write)
+                {
+                    if (tmp != TOPLEVEL::action::fromGUI)
+                        toGUI.write(getData->bytes);
+                    if (cameFrom == 1)
+                        synth->getRuntime().Log("Undo:");
+                    else if (cameFrom == 2)
+                        synth->getRuntime().Log("Redo:");
+                }
             }
         }
 #endif
@@ -4830,18 +4837,27 @@ void InterChange::commandSub(CommandBlock *getData)
             tempData.data.type &= TOPLEVEL::type::Write;
 
             tempData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
+            bool markerSet = false;
+            int target = 127; // first harmonic amplitude
             for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
             {
                 tempData.data.value = pars->Phmag[i];
                 tempData.data.control = i;
                 noteSeen = true;
                 undoLoopBack = false;
-                if(i == 0) // first line sets marker
-                    add2undo(&tempData, noteSeen);
-                else
-                    add2undo(&tempData, noteSeen, true);
+                if (tempData.data.value != target)
+                {
+                    if (!markerSet)
+                    {
+                        add2undo(&tempData, noteSeen);
+                        markerSet = true;
+                    }
+                    else
+                        add2undo(&tempData, noteSeen, true);
+                    if (target == 127)
+                        target = 0;
+                }
             }
-
             tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
             for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
             {
@@ -4849,7 +4865,16 @@ void InterChange::commandSub(CommandBlock *getData)
                 tempData.data.control = i;
                 noteSeen = true;
                 undoLoopBack = false;
-                add2undo(&tempData, noteSeen, true);
+                if (tempData.data.value != 64)
+                {
+                    if (!markerSet)
+                    {
+                        add2undo(&tempData, noteSeen);
+                        markerSet = true;
+                    }
+                    else
+                        add2undo(&tempData, noteSeen, true);
+                }
             }
 
             for (int i = 0; i < MAX_SUB_HARMONICS; i++)
@@ -6933,7 +6958,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
         if (!group)
         {
             undoList.push_back(undoMarker);
-            std::cout << "marker " << int(undoMarker.data.part) << std::endl;
+            //std::cout << "marker " << int(undoMarker.data.part) << std::endl;
         }
     }
     else if (!group)

@@ -7,6 +7,8 @@ yoshimi 2.1.2 M
 * Corrected GUI oscilator window event handler.
   It was always capturing mouse events.
 
+* Refined SubSynth Undo/Redo
+
 2022-4-1 Will
 * Changed some names to make effect controls clearer.
 
