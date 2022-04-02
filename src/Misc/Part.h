@@ -176,7 +176,7 @@ class Part
         void setPan(float value);
         void KillNotePos(int pos);
         void ReleaseNotePos(int pos);
-        void MonoMemRenote(void); // MonoMem stuff.
+        void monoNoteHistoryRecall(void);
 
         void startNewNotes        (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote, bool portamento);
         void startLegato          (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote);
@@ -222,16 +222,14 @@ class Part
         float oldVolumeAdjust;
         int oldModulationState;
 
-        // MonoMem stuff
-        std::list<unsigned char> monomemnotes; // held notes.
+        // MonoNote stuff
+        std::list<unsigned char> monoNoteHistory; // held notes.
         struct {
             unsigned char velocity;
-        } monomem[256];    // 256 is to cover all possible note values. monomem[]
-                           // is used in conjunction with the list to store the
-                           // velocity value of a given note
-                           // (the list only store note values). For example.
-                           // 'monomem[note].velocity' would be the velocity
-                           // value of the note 'note'.
+        } monoNote[256];   // 256 is to cover all possible note values. monoNote[]
+                           // is used in conjunction with the list to store the velocity value of a given note
+                           // (the list only store note values). For example:
+                           // 'monoNote[note].velocity' would be the velocity value of the note 'note'.
 
         SynthEngine *synth;
 };

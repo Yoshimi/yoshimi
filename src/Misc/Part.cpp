@@ -522,7 +522,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
     if (note < Pminkey || note > Pmaxkey)
         return;
 
-    // Legato and MonoMem used vars:
+    // Legato and MonoNote used vars:
     bool isLegatoMode = false;    // legato mode is determined applicable.
     bool performLegato = false;   // the current note actually applies legato.
     bool isMonoFirstNote = false; // (In Mono/Legato) true when we determined
@@ -531,13 +531,13 @@ void Part::NoteOn(int note, int velocity, bool renote)
     if (Pkeymode == PART_NORMAL)
     {// Polyphony is on
         enforcekeylimit();
-        monomemnotes.clear();
+        monoNoteHistory.clear();
     }
     else
-    {// Polyphony is off -- handle MonoMem
+    {// Polyphony is off -- possibly re-activate a still held/sustained previous note
         if (!renote)
-            monomemnotes.push_back(note);        // Add note to the list.
-        monomem[note].velocity = velocity;       // Store this note's velocity.
+            monoNoteHistory.push_back(note);       //  add note to the stack of held notes.
+        monoNote[note].velocity = velocity;       // store this note's velocity.
         if (partnote[prevPos].status != KEY_PLAYING
             && partnote[prevPos].status != KEY_RELEASED_AND_SUSTAINED)
         {
@@ -665,7 +665,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
                 }
                 if (prevItems == partnote[pos].itemsplaying)
                     // No legato notes were launched, so pretend nothing happened:
-                    monomemnotes.pop_back();  //...remove last note from the list.
+                    monoNoteHistory.pop_back();  //...remove last note from the list.
             }
         }
         else
@@ -706,20 +706,24 @@ void Part::NoteOn(int note, int velocity, bool renote)
 // Note Off Messages
 void Part::NoteOff(int note) //release the key
 {
-    // This note is released, so we remove it from the list.
-    monomemnotes.remove(note);
+    // releasing the last key, while previous keys are still sustained...
+    bool reactivate = Pkeymode > PART_NORMAL  && !Pdrummode
+                   && (monoNoteHistory.back() == note);
 
-    bool keep = Pkeymode > PART_NORMAL  && !Pdrummode && !monomemnotes.empty();
+    // This note is released, thus remove it from the list of held Mono-Note keys.
+    monoNoteHistory.remove(note);
+    reactivate = reactivate && !monoNoteHistory.empty();
+
     for (int i = 0; i < POLYPHONY; ++i)
     {   //first note in, is first out if there are same note multiple times
         if (partnote[i].status == KEY_PLAYING && partnote[i].note == note)
         {
             if (ctl->sustain.sustain)
                 partnote[i].status = KEY_RELEASED_AND_SUSTAINED;
-            else
-            {   //the sustain pedal is not pushed
-                if (keep)
-                    MonoMemRenote(); // To play most recent still held note.
+            else // sustain pedal is not pushed
+            {
+                if (reactivate)
+                    monoNoteHistoryRecall(); // re-play most recent note still held.
                 else
                 {
                     ReleaseNotePos(i);
@@ -846,12 +850,11 @@ void Part::SetController(unsigned int type, int par)
 // Release the sustained keys
 void Part::ReleaseSustainedKeys(void)
 {
-    // Let's call MonoMemRenote() on some conditions:
-    if ((Pkeymode < PART_MONO || Pkeymode > PART_LEGATO) && (!monomemnotes.empty()))
-        if (monomemnotes.back() != prevNote)
-            // Sustain controller manipulation would cause repeated same note
-            // respawn without this check.
-            MonoMemRenote(); // To play most recent still held note.
+    //in non-Polyphony mode, reactivate previous active keys when last one is released
+    if ((Pkeymode < PART_MONO || Pkeymode > PART_LEGATO) && (!monoNoteHistory.empty()))
+        if (monoNoteHistory.back() != prevNote)
+            // Sustain controller manipulation would respawn same note repeatedly without this check.
+            monoNoteHistoryRecall(); // To play most recent still held note.
 
     for (int i = 0; i < POLYPHONY; ++i)
         if (partnote[i].status == KEY_RELEASED_AND_SUSTAINED)
@@ -869,16 +872,16 @@ void Part::ReleaseAllKeys(void)
             ReleaseNotePos(i);
     }
     // Clear legato notes, if any.
-    monomemnotes.clear();
+    monoNoteHistory.clear();
 }
 
 
 // Call NoteOn(...) with the most recent still held key as new note
 // (Made for Mono/Legato).
-void Part::MonoMemRenote(void)
+void Part::monoNoteHistoryRecall(void)
 {
-    unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
-    NoteOn(mmrtempnote, monomem[mmrtempnote].velocity, true);
+    unsigned char mmrtempnote = monoNoteHistory.back(); // Last list element.
+    NoteOn(mmrtempnote, monoNote[mmrtempnote].velocity, true);
 }
 
 
