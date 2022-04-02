@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {ResonanceUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {ResonanceUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2015-2021, Will Godfrey
+Copyright 2015-2022, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -186,12 +186,16 @@ class ResonanceGraph {: {public Fl_Box}
     code {//
     int x_ = Fl::event_x() - x();
     int y_ = Fl::event_y() - y();
-
+    bool inFrame = false;
+    
     if ((x_ >= 0) && (x_ < w()) && (y_ >= 0) && (y_ < h()))
     {
         khzvalue->value(respar->getfreqx(x_ * 1.0 / w()) / 1000.0);
         dbvalue->value((1.0 - y_ * 2.0 / h()) * respar->PmaxdB);
+        inFrame = true; 
     }
+    if (!inFrame)
+        return 0;
 
     if ((event == FL_PUSH) || (event == FL_DRAG))
     {

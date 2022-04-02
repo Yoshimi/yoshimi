@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -820,13 +820,13 @@ class MasterUI {: {private GuiUpdates}
           label Undo
           callback {//
         send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Revert last change [Ctrl]+z or [Alt]+u} xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button redo {
           label Redo
           callback {//
         send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Re-apply last change [Crtl]+[Shift]+z or [Alt]+r} xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
       }
       Fl_Tabs sysinsgroup {

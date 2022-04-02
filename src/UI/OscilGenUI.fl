@@ -1,11 +1,11 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
 }
 
-comment {OscilgenUI.cc} {in_source not_in_header
+comment {OscilgenUI.cc} {selected in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -204,7 +204,7 @@ class PSlider {: {public mwheel_slider}
   } {
     code {int X=x(),Y=y(),W=w(),H=h();
 
-    int rval = 1;
+    int rval = 0;
 
     if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0))
         rval = mwheel_slider::handle(event);
@@ -217,6 +217,7 @@ class PSlider {: {public mwheel_slider}
             mwheel_slider::handle(FL_LEAVE);
             deactivate();
             activate();
+            rval = 1;
         }
         else
         {
@@ -225,7 +226,7 @@ class PSlider {: {public mwheel_slider}
     }
     else
     {
-        mwheel_slider::handle(FL_PUSH);
+       rval = mwheel_slider::handle(FL_PUSH);
     }
 
     update_selection_color((int) value());
@@ -480,7 +481,7 @@ o->hide();} open
       Fl_Button applybutton {
         label Apply
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);} selected
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::padsynthParameters, 1, TOPLEVEL::type::Integer);}
         xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
