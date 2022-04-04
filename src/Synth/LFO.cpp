@@ -37,7 +37,7 @@ using func::powFrac;
 
 LFO::LFO(LFOParams *_lfopars, float _basefreq, SynthEngine *_synth):
     lfopars(_lfopars),
-    lfoUpdate(lfopars),
+    lfoUpdate(*lfopars),
     basefreq(_basefreq),
     sampandholdvalue(0.0f),
     issampled(0), // initialized to 0 for correct startup

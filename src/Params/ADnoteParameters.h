@@ -29,14 +29,14 @@
 #define AD_NOTE_PARAMETERS_H
 
 #include "Params/EnvelopeParams.h"
-#include "Params/LFOParams.h"
-#include "Params/FilterParams.h"
 #include "Params/OscilParameters.h"
+#include "Params/FilterParams.h"
+#include "Params/LFOParams.h"
+#include "Params/Presets.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
-#include "Params/Presets.h"
 
 enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
 
@@ -96,8 +96,8 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char Unison_frequency_spread;  // How subvoices are spread
     unsigned char Unison_phase_randomness;  // How much phase randomization
     unsigned char Unison_stereo_spread;     // Stereo spread of the subvoices
-    unsigned char Unison_vibratto;          // Vibratto of the subvoices (which makes the unison more "natural")
-    unsigned char Unison_vibratto_speed;    // Medium speed of the vibratto of the subvoices
+    unsigned char Unison_vibrato;           // Vibrato of the subvoices (which makes the unison more "natural")
+    unsigned char Unison_vibrato_speed;     // Medium speed of the vibrato of the subvoices
     unsigned char Unison_invert_phase;      // Unison invert phase
                                             // 0 = none, 1 = random, 2 = 50%, 3 = 33%, 4 = 25%
     unsigned char Type;                     // Type of the voice 0 = Sound, 1 = Noise

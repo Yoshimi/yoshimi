@@ -29,6 +29,7 @@
 
 #include "globals.h"
 #include "DSP/FFTwrapper.h"
+#include "Params/Presets.h"
 #include "Misc/Alloc.h"
 
 #include <memory>
@@ -178,9 +179,9 @@ class Part
         void ReleaseNotePos(int pos);
         void monoNoteHistoryRecall(void);
 
-        void startNewNotes        (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote, bool portamento);
-        void startLegato          (int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote);
-        void startLegatoPortamento(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote);
+        void startNewNotes        (int pos, size_t item, size_t currItem, Note, bool portamento);
+        void startLegato          (int pos, size_t item, size_t currItem, Note);
+        void startLegatoPortamento(int pos, size_t item, size_t currItem, Note);
         float computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity);
 
         Samples& tmpoutl;

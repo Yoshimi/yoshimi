@@ -369,14 +369,12 @@ namespace { // Helpers to handle the tree kinds of KitItemNotes uniformly...
     template<class NOTE>
     inline void connectNewLegatoNote(NOTE*& oldNote
                                     ,NOTE*& newNote
-                                    ,float baseFreq
-                                    ,float velocity
-                                    ,int midiNote)
+                                    ,Note note)
     {   if (oldNote)
         {   // spawn new note as clone from previous note
             newNote = new NOTE(*oldNote);
             // instruct both notes to perform a short "legato" crossfade
-            newNote->legatoFadeIn(baseFreq, velocity, midiNote);
+            newNote->legatoFadeIn(note);
             oldNote->legatoFadeOut();
         }
     }
@@ -384,22 +382,19 @@ namespace { // Helpers to handle the tree kinds of KitItemNotes uniformly...
 
 
 // Start a regular note or a new Legato chain
-void Part::startNewNotes(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote, bool portamento)
+void Part::startNewNotes(int pos, size_t item, size_t currItem, Note note, bool portamento)
 {
     if (kit[item].adpars && kit[item].Padenabled)
         partnote[pos].kitItem[currItem].adnote =
-            new ADnote(kit[item].adpars, *ctl, baseFreq, velocity,
-                        portamento, midiNote, synth);
+            new ADnote(*kit[item].adpars, *ctl, note, portamento);
 
     if (kit[item].subpars && kit[item].Psubenabled)
         partnote[pos].kitItem[currItem].subnote =
-            new SUBnote(kit[item].subpars, *ctl, baseFreq, velocity,
-                        portamento, midiNote, synth);
+            new SUBnote(*kit[item].subpars, *ctl, note, portamento);
 
     if (kit[item].padpars && kit[item].Ppadenabled)
         partnote[pos].kitItem[currItem].padnote =
-            new PADnote(kit[item].padpars, *ctl, baseFreq, velocity,
-                        portamento, midiNote, synth);
+            new PADnote(*kit[item].padpars, *ctl, note, portamento);
 
     // Each Kit-item can send to any Part(Insert) effect, or just directly to Part-output (encoded as Psendtoparteffect==127)
     // The part effects in turn can send to the next one (default) or to some effect downstream or to output.
@@ -418,20 +413,20 @@ void Part::startNewNotes(int pos, size_t item, size_t currItem, float baseFreq, 
 
 // Initiate a Legato transition.
 // Spawn a new note at partnote[pos] and connect it with the previously spawned note (prevPos)
-void Part::startLegato(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote)
+void Part::startLegato(int pos, size_t item, size_t currItem, Note note)
 {
     if (kit[item].Padenabled)
         connectNewLegatoNote(partnote[prevPos].kitItem[currItem].adnote  // oldNote
                             ,partnote[pos]    .kitItem[currItem].adnote  // newNote
-                            ,baseFreq,velocity,midiNote);
+                            ,note);
     if (kit[item].Psubenabled)
         connectNewLegatoNote(partnote[prevPos].kitItem[currItem].subnote // oldNote
                             ,partnote[pos]    .kitItem[currItem].subnote // newNote
-                            ,baseFreq,velocity,midiNote);
+                            ,note);
     if (kit[item].Ppadenabled)
         connectNewLegatoNote(partnote[prevPos].kitItem[currItem].padnote // oldNote
                             ,partnote[pos]    .kitItem[currItem].padnote // newNote
-                            ,baseFreq,velocity,midiNote);
+                            ,note);
 
     partnote[pos].kitItem[currItem].sendtoparteffect =
         (kit[item].Psendtoparteffect < NUM_PART_EFX)? kit[item].Psendtoparteffect
@@ -448,17 +443,17 @@ void Part::startLegato(int pos, size_t item, size_t currItem, float baseFreq, fl
 
 
 // Portamento combined with Legato: instruct the existing note(s) to transition to new note frequency
-void Part::startLegatoPortamento(int pos, size_t item, size_t currItem, float baseFreq, float velocity, int midiNote)
+void Part::startLegatoPortamento(int pos, size_t item, size_t currItem, Note note)
 {
     if (kit[item].Padenabled)
         partnote[pos].kitItem[currItem].adnote->
-            performPortamento(baseFreq, velocity, midiNote);
+            performPortamento(note);
     if (kit[item].Psubenabled)
         partnote[pos].kitItem[currItem].subnote->
-            performPortamento(baseFreq, velocity, midiNote);
+            performPortamento(note);
     if (kit[item].Ppadenabled)
         partnote[pos].kitItem[currItem].padnote->
-            performPortamento(baseFreq, velocity, midiNote);
+            performPortamento(note);
 }
 
 
@@ -592,24 +587,24 @@ void Part::NoteOn(int note, int velocity, bool renote)
         vel = (vel > 1.0f) ? 1.0f : vel;
 
         // initialise note frequency
-        float notebasefreq;
-        if ((notebasefreq = PnoteMap[PmapOffset + note]) < 0.0f)
+        float noteFreq;
+        if ((noteFreq = PnoteMap[PmapOffset + note]) < 0.0f)
             return; // the key is not mapped
 
         // Humanise
         if (!Pdrummode && Pfrand >= 1) // otherwise 'off'
             // this is an approximation to keep the math simple and is about 1 cent out at 50 cents
-            notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
+            noteFreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
 
         // Portamento
         if (prevFreq < 1.0f) // happens when first note is played
-            prevFreq = notebasefreq;
+            prevFreq = noteFreq;
 
         // Initialise Portamento. For Mono/Legato it is disabled on first notes.
         // Thus, for Portamento to activate, the previous note needs to be still active or sustained,
         bool portamento{false};
         if (Pkeymode == PART_NORMAL || not isMonoFirstNote)
-            portamento = ctl->initportamento(prevFreq, notebasefreq, performLegato);
+            portamento = ctl->initportamento(prevFreq, noteFreq, performLegato);
 
         if (portamento and performLegato)
             // actually perform a Legato-Portamento,
@@ -632,11 +627,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
             {// non-Kit legato or legato-portamento note
                 if (portamento)
                     // just instruct the existing note(s) to transition to new note frequency
-                    startLegatoPortamento(pos,0,0,notebasefreq,vel,note);
+                    startLegatoPortamento(pos,0,0, Note{note,noteFreq,vel});
 
                 else
                     // spawn new note and connect it to prevPos-note
-                    startLegato(pos,0,0,notebasefreq,vel,note);
+                    startLegato(pos,0,0, Note{note,noteFreq,vel});
             }
             else
             {// "kit mode" legato or legato-portamento note
@@ -654,9 +649,9 @@ void Part::NoteOn(int note, int velocity, bool renote)
 
                     size_t currItem = partnote[pos].itemsplaying;
                     if (portamento)
-                        startLegatoPortamento(pos,item,currItem,notebasefreq,vel,note);
+                        startLegatoPortamento(pos,item,currItem, Note{note,noteFreq,vel});
                     else
-                        startLegato(pos,item,currItem,notebasefreq,vel,note);
+                        startLegato(pos,item,currItem, Note{note,noteFreq,vel});
 
                     if (Pkitmode == 2 // "single" kit item mode
                         && prevItems < partnote[pos].itemsplaying
@@ -673,7 +668,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
             partnote[pos].itemsplaying = 0;
             if (Pkitmode == 0)
                 // non-Kit mode: init Add-, Sub and PAD-notes...
-                startNewNotes(pos,0,0,notebasefreq,vel,note,portamento);
+                startNewNotes(pos,0,0, Note{note,noteFreq,vel}, portamento);
 
             else
             {// init new notes in "kit mode"
@@ -686,7 +681,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
 
                     size_t currItem = partnote[pos].itemsplaying;
                     float itemVelocity = Pkitfade? computeKitItemCrossfade(item, note, vel) : vel;
-                    startNewNotes(pos,item,currItem,notebasefreq,itemVelocity,note,portamento);
+                    startNewNotes(pos,item,currItem, Note{note,noteFreq,itemVelocity}, portamento);
 
                     if (Pkitmode == 2 // "single" kit item mode
                         and 0 < partnote[pos].itemsplaying
@@ -696,7 +691,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
             }
         }
         // recall note and pos for portamento and legato
-        prevFreq = notebasefreq;
+        prevFreq = noteFreq;
         prevNote = note;
         prevPos = pos;
     }

@@ -1917,6 +1917,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + contstr);
@@ -2171,6 +2172,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + " " + contstr);
@@ -2931,7 +2933,8 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
 
-    int nseqpos, nformant = getData->data.parameter;
+    int nformant = getData->data.parameter;
+    int nseqpos  = getData->data.parameter;
     int nvowel = getData->data.offset;
 
     string contstr = "";

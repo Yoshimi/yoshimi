@@ -57,7 +57,7 @@ OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilP
     tmpsmps{fft_.tableSize()},
     outoscilSpectrum(fft.spectrumSize()),
     oscilSpectrum(fft.spectrumSize()),
-    oscilupdate(params),
+    oscilupdate(*params),
     res(res_),
     randseed(1),
     basePrng{},
@@ -69,7 +69,7 @@ OscilGen::OscilGen(fft::Calc& fft_, Resonance *res_, SynthEngine *_synth, OscilP
 void OscilGen::changeParams(OscilParameters *params_)
 {
     params = params_;
-    oscilupdate.changePresets(params);
+    oscilupdate.changePresets(*params);
 }
 
 void OscilGen::defaults(void)

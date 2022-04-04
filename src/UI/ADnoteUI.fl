@@ -872,7 +872,7 @@ send_data(0, ADDVOICE::control::unisonStereoSpread, o->value(), TOPLEVEL::type::
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::Integer);}
               tooltip Vibratto xywh {396 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
+              code0 {o->value(pars->VoicePar[nvoice].Unison_vibrato);}
               class WidgetPDial
             }
             Fl_Choice UnisonInvert {
@@ -904,7 +904,7 @@ send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoSpeed, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Vibratto Average Speed} xywh {436 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
+              code0 {o->value(pars->VoicePar[nvoice].Unison_vibrato_speed);}
               class WidgetPDial
             }
             Fl_Dial UnisonPhRnd {

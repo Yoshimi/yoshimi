@@ -30,6 +30,11 @@
 
 #include "globals.h"
 #include "Misc/Alloc.h"
+#include "Params/Presets.h"
+
+#include <memory>
+
+using std::unique_ptr;
 
 class SUBnoteParameters;
 class Controller;
@@ -41,22 +46,22 @@ class SynthEngine;
 class SUBnote
 {
     public:
-        SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
-                float freq_, float velocity_, int portamento_,
-                int midinote_, SynthEngine *_synth);
-        SUBnote(const SUBnote &rhs);
+        SUBnote(SUBnoteParameters& parameters, Controller& ctl_, Note, bool portamento_);
+        SUBnote(SUBnote const&);
        ~SUBnote();
-        // shall not be assigned
+
+        // shall not be moved or assigned
+        SUBnote(SUBnote&&)                 = delete;
         SUBnote& operator=(SUBnote&&)      = delete;
         SUBnote& operator=(SUBnote const&) = delete;
 
-        void performPortamento(float freq_, float velocity_, int midinote_);
-        void legatoFadeIn(float freq_, float velocity_, int midinote_);
+        void performPortamento(Note);
+        void legatoFadeIn(Note);
         void legatoFadeOut();
 
         void noteout(float *outl,float *outr);
         void releasekey(void);
-        bool finished() const { return NoteStatus == NOTE_DISABLED; }
+        bool finished() const { return noteStatus == NOTE_DISABLED; }
 
     private:
         void computecurrentparameters(void);
@@ -64,37 +69,40 @@ class SUBnote
         void killNote(void);
         void updatefilterbank(void);
 
-        SUBnoteParameters *pars;
 
+        SynthEngine& synth;
+        SUBnoteParameters& pars;
+        Presets::PresetsUpdate subNoteChange;
+        Controller& ctl;
+
+        Note note;
         bool stereo;
-        int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
-        int numstages; // number of stages of filters
-        int numharmonics; // number of harmonics (after the too higher hamonics are removed)
-        int start; // how the harmonics start
-        float basefreq;
-        float notefreq;
-        float velocity;
+        float realfreq;
         bool portamento;
-        int midinote;
-        float BendAdjust;
-        float OffsetHz;
+        int numstages;              // number of stages of filters
+        int numharmonics;           // number of harmonics (after the too higher harmonics are removed)
+        int start;                  // how the harmonics start
+        int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
+        float bendAdjust;
+        float offsetHz;
         float randpanL;
         float randpanR;
 
-        Envelope *AmpEnvelope;
-        Envelope *FreqEnvelope;
-        Envelope *BandWidthEnvelope;
+        unique_ptr<Envelope> ampEnvelope;
+        unique_ptr<Envelope> freqEnvelope;
+        unique_ptr<Envelope> bandWidthEnvelope;
+        unique_ptr<Envelope> globalFilterEnvelope;
 
-        Filter *GlobalFilterL,*GlobalFilterR;
+        unique_ptr<Filter> globalFilterL;
+        unique_ptr<Filter> globalFilterR;
 
-        Envelope *GlobalFilterEnvelope;
 
         // internal values
-        enum {
+        enum NoteStatus {
             NOTE_DISABLED,
             NOTE_ENABLED,
             NOTE_LEGATOFADEOUT
-        } NoteStatus;
+        } noteStatus;
 
         int firsttick;
         float volume;
@@ -124,13 +132,13 @@ class SUBnote
         void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void computeNoteParameters();
-        void computeNoteFreq();
+        float computeRealFreq();
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
         float getHgain(int harmonic);
 
-        bpfilter *lfilter;
-        bpfilter *rfilter;
+        unique_ptr<bpfilter[]> lfilter;
+        unique_ptr<bpfilter[]> rfilter;
 
         float overtone_rolloff[MAX_SUB_HARMONICS];
         float overtone_freq[MAX_SUB_HARMONICS];
@@ -138,7 +146,6 @@ class SUBnote
         Samples& tmpsmp;
         Samples& tmprnd; // this is filled with random numbers
 
-        Controller *ctl;
         int oldpitchwheel;
         int oldbandwidth;
 
@@ -146,10 +153,7 @@ class SUBnote
         float legatoFade;
         float legatoFadeStep;
 
-        Presets::PresetsUpdate subNoteChange;
-
-        SynthEngine *synth;
         int filterStep;
 };
+#endif /*SUB_NOTE_H*/
 
-#endif

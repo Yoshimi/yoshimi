@@ -4604,15 +4604,15 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case ADDVOICE::control::unisonVibratoDepth:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto = value_int;
+                pars->VoicePar[nvoice].Unison_vibrato = value_int;
             else
-                value = pars->VoicePar[nvoice].Unison_vibratto;
+                value = pars->VoicePar[nvoice].Unison_vibrato;
             break;
         case ADDVOICE::control::unisonVibratoSpeed:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
+                pars->VoicePar[nvoice].Unison_vibrato_speed = value_int;
             else
-                value = pars->VoicePar[nvoice].Unison_vibratto_speed;
+                value = pars->VoicePar[nvoice].Unison_vibrato_speed;
             break;
         case ADDVOICE::control::unisonSize:
             if (write)

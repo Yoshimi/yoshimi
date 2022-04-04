@@ -38,7 +38,7 @@ using func::power;
 
 FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
     pars(pars_),
-    parsUpdate(pars_),
+    parsUpdate(*pars_),
     synth(_synth),
     inbuffer(synth->buffersize),
     tmpbuff (synth->buffersize)

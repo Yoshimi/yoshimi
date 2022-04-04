@@ -32,7 +32,7 @@ using func::power;
 
 Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
     pars(pars_),
-    parsUpdate(pars_),
+    parsUpdate(*pars_),
     synth(_synth)
 {
     unsigned char Ftype = pars->Ptype;

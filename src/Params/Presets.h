@@ -31,6 +31,28 @@
 
 class SynthEngine;
 
+struct Note
+{
+    int midi;
+    float freq;
+    float vel;
+
+    Note(int midiNote, float freq, float velocity)
+        : midi{midiNote}
+        , freq{freq}
+        , vel{limitVelocity(velocity)}
+    { }
+    // copyable and assignable
+
+    Note withFreq(float changedFreq)
+    { return Note{midi,changedFreq,vel}; }
+
+private:
+    static float limitVelocity(float rawVal)
+    { return std::max(0.0f, std::min(rawVal, 1.0f)); }
+};
+
+
 class Presets
 {
     public:
@@ -73,8 +95,8 @@ class Presets
         class PresetsUpdate
         {
             public:
-                PresetsUpdate(const Presets *presets_) :
-                    presets(presets_),
+                PresetsUpdate(Presets const& presets_) :
+                    presets(&presets_),
                     lastUpdated(presets->updatedAt)
                 {}
 
@@ -91,11 +113,11 @@ class Presets
                     lastUpdated = presets->updatedAt - 1;
                 }
 
-                void changePresets(const Presets *presets_)
+                void changePresets(Presets const& presets_)
                 {
-                    if (presets != presets_)
+                    if (presets != &presets_)
                     {
-                        presets = presets_;
+                        presets = &presets_;
                         forceUpdate();
                     }
                 }
