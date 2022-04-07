@@ -128,7 +128,7 @@ static int handle_shortcuts(int event)
 {
     if (!mainUI || event != FL_SHORTCUT)
     {
-        return 0;
+        return 1;
     }
 
     auto key = Fl::event_key();
@@ -153,7 +153,7 @@ static int handle_shortcuts(int event)
             mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
             return 1;
     }
-    return 0;
+    return 1;
 }
 #endif
 

@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-4-7 Will
+bn2108
+* BugFix: filer window becomes slow to respond after many calls.
+
 2022-4-2 Will
 * Added tooltips to Undo/Redo
 * Modified GUI resonance window event handler.
