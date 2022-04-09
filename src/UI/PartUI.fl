@@ -2529,7 +2529,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, lastkititem);
 
         if (part->kit[kititem].padpars)
-            padnoteui = new PADnoteUI(part->kit[kititem].padpars, npart, lastkititem);
+            padnoteui = new PADnoteUI(part->kit[kititem].padpars);
     }
 
     if (engine == 0 && adnoteui != NULL)

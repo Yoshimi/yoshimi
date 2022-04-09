@@ -28,6 +28,7 @@
 
 #include "Misc/Config.h"
 #include "Params/PADnoteParameters.h"
+#include "Params/PADStatus.h"
 #include "Params/Controller.h"
 #include "Synth/WaveInterpolator.h"
 #include "Synth/PADnote.h"
@@ -267,12 +268,15 @@ WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
         auto attachCrossFade = [&]()
         {// Warning: not thread-safe!
             pars.xFade.attachFader();
+            PADStatus::mark(PADStatus::FADING, synth.interchange, pars.partID,pars.kitID);
             std::cout << "XFade-ATTACH.. Freq="<<note.freq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
         };
         auto detachCrossFade = [&]()
         {// Warning: not thread-safe!
             std::cout << "XFade-DETACH.. Freq="<<note.freq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
             pars.xFade.detachFader();
+            if (not pars.xFade)
+                PADStatus::mark(PADStatus::CLEAN, synth.interchange, pars.partID,pars.kitID);
         };
         auto switchInterpolator = [&](WaveInterpolator* followUpInterpolator)
         {

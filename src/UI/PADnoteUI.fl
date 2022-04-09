@@ -12,6 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2015-2021, Will Godfrey
+Copyright 2022, Ichthyostega
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -49,7 +50,15 @@ decl {\#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
 }
 
+decl {\#include <memory>
+    using std::unique_ptr;
+    class PADStatus;} {public global
+}
+
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Params/PADStatus.h"} {private local
 }
 
 decl {\#include "Misc/SynthHelper.h"
@@ -826,6 +835,7 @@ class PADnoteUI {: {public PresetsUI_}
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
+        tooltip{Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases}
         xywh {242 412 128 22} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button padCopy {
@@ -1269,12 +1279,7 @@ class PADnoteUI {: {public PresetsUI_}
                 if (wasFromHere)
                     alert(synth, "Some samples have failed.");
             }
-            applycolour(FL_GRAY);
-            break;
-
-        case PADSYNTH::control::applyChanges:
-            if (lrint(value) == 1)
-                applycolour(FL_GRAY);
+            padStatus->activateStage(PADStatus::CLEAN);
             break;
 
         case PADSYNTH::control::stereo:
@@ -1301,36 +1306,51 @@ class PADnoteUI {: {public PresetsUI_}
             pvel->value(value);
             break;
 
+        case PADSYNTH::control::applyChanges:
+            if (lrint(value) == 0 and getData->data.offset != UNUSED)
+                padStatus->handleStateMessage(*getData);
+            break;
+
     }} {}
   }
-  Function {applycolour(int set)} {} {
+  Function {applyButton(Fl_Color colour, const char *const text)} {} {
     code {//
-    applybutton->color(set);
+    applybutton->color(colour);
+    applybutton->label(text);
     applybutton->redraw();
     if (oscui)
     {
-        oscui->applybutton->color(set);
+        oscui->applybutton->color(colour);
+        // not changing text due to limited space
         oscui->applybutton->redraw();
     }
     if (resui)
     {
-        resui->applybutton->color(set);
+        resui->applybutton->color(colour);
         resui->applybutton->redraw();
     }} {}
   }
-  Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
+  Function {PADnoteUI(PADnoteParameters *parameters)} {} {
     code {//
     synth = parameters->getSynthEngine();
     pars = parameters;
-    npart = npart_;
-    kititem = kititem_;
+    npart = parameters->partID;
+    kititem = parameters->kitID;
     padSeen = false;
     lastWaveW = 0;
     lastpadW = 0;
     oscui = NULL;
     lastResuiW = 0;
     resui = new ResonanceUI(pars->resonance.get(), npart, kititem, 2);
-    make_window();} {}
+    padStatus.reset(new PADStatus(npart,kititem));
+    make_window();
+    // setup handler to indicate PADSynth wavetable build status
+    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuild Wave"); });
+    padStatus->on(PADStatus::FADING,  [&]() { applyButton(FL_YELLOW, "fading..."); });
+    padStatus->on(PADStatus::PENDING, [&]() { applyButton(fl_color_average(FL_CYAN, FL_DARK_BLUE, 0.8), "pending Wave"); });
+    padStatus->on(PADStatus::BUILDING,[&]() { applyButton(fl_color_average(FL_RED, FL_DARK_MAGENTA, 0.6), "rebuilding..."); });
+    padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(FL_RED, "Apply Changes"); });
+} {}
   }
   Function {~PADnoteUI()} {return_type virtual
   } {
@@ -1368,5 +1388,7 @@ class PADnoteUI {: {public PresetsUI_}
   decl {int lastWaveW;} {private local
   }
   decl {int lastResuiW;} {private local
+  }
+  decl {unique_ptr<PADStatus> padStatus;} {private local
   }
 }

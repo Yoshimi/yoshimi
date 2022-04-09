@@ -59,7 +59,8 @@ file (GLOB yoshimi_params_files
     ../Params/Controller.cpp  ../Params/Presets.cpp ../Params/PresetsStore.cpp
     ../Params/ADnoteParameters.h  ../Params/EnvelopeParams.h
     ../Params/FilterParams.h  ../Params/LFOParams.h
-    ../Params/SUBnoteParameters.h  ../Params/PADnoteParameters.h
+    ../Params/SUBnoteParameters.h
+    ../Params/PADnoteParameters.h ../Params/PADStatus.h
     ../Params/OscilParameters.cpp ../Params/OscilParameters.h
     ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h)
 file (GLOB yoshimi_synth_files

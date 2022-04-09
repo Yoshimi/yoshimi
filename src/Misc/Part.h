@@ -54,7 +54,7 @@ class Part
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
-        Part(Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth);
+        Part(unsigned char id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth);
        ~Part();
         // shall not be copied or moved
         Part(Part&&)                 = delete;
@@ -152,6 +152,7 @@ class Part
             std::string   Pcomments;
         };
         Info info;
+        const uchar partID;
 
         Samples partoutl;
         Samples partoutr;

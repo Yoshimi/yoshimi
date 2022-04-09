@@ -26,6 +26,9 @@
 #include <string>
 #include <iostream>
 
+typedef unsigned char uchar;
+typedef unsigned int  uint;
+
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.

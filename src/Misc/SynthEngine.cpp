@@ -266,7 +266,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart] = new Part(&microtonal, *fft, this);
+        part[npart] = new Part(npart, &microtonal, *fft, this);
         if (!part[npart])
         {
             Runtime.Log("Failed to allocate new Part");

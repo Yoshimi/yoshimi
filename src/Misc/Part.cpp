@@ -57,8 +57,9 @@ using func::findSplitPoint;
 using func::setAllPan;
 using func::decibel;
 
-Part::Part(Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth) :
+Part::Part(uchar id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth) :
     ctl{new Controller(_synth)},
+    partID{id},
     partoutl(_synth->buffersize),
     partoutr(_synth->buffersize),
     tmpoutl(_synth->getRuntime().genMixl), // Note: alias to a global shared buffer
@@ -89,7 +90,7 @@ Part::Part(Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth) :
 
     kit[0].adpars = new ADnoteParameters(fft, synth);
     kit[0].subpars = new SUBnoteParameters(synth);
-    kit[0].padpars = new PADnoteParameters(synth);
+    kit[0].padpars = new PADnoteParameters(partID, 0, synth);
 
     // Part's Insertion Effects init
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
@@ -1212,7 +1213,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
         if (!kit[kititem].subpars)
             kit[kititem].subpars = new SUBnoteParameters(synth);
         if (!kit[kititem].padpars)
-            kit[kititem].padpars = new PADnoteParameters(synth);
+            kit[kititem].padpars = new PADnoteParameters(partID,kititem, synth);
     }
 
     if (resetallnotes)

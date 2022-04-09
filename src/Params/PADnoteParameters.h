@@ -148,7 +148,7 @@ class PADnoteParameters : public Presets
         static constexpr size_t XFADE_UPDATE_DEFAULT = 200;
 
     public:
-        PADnoteParameters(SynthEngine *_synth);
+        PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth);
        ~PADnoteParameters()  = default;
 
         // shall not be copied or moved or assigned
@@ -298,6 +298,9 @@ class PADnoteParameters : public Presets
         // control for rebuilding wavetable (background action)
         FutureBuild<PADTables> futureBuild;
 
+        const uchar partID;
+        const uchar kitID;
+
     private:
         RandomGen wavetablePhasePrng;
 
@@ -314,4 +317,4 @@ class PADnoteParameters : public Presets
         using SchedulerSetup = std::function<ScheduleAction(BuildOperation)>;
 };
 
-#endif
+#endif /*PAD_NOTE_PARAMETERS_H*/

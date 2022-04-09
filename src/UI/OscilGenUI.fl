@@ -482,9 +482,10 @@ o->hide();} open
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Button applybutton {
-        label Apply
+        label {Apply}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
+        tooltip{Rebuild PADSynth wavetable to pick up changes}
         xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {if (!forPAD) o->hide();}
       }

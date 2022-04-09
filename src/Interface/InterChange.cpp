@@ -45,6 +45,7 @@
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
+#include "Params/PADStatus.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
@@ -209,6 +210,13 @@ InterChange::~InterChange()
     if (sortResultsThreadHandle)
         pthread_join(sortResultsThreadHandle, 0);
     undoRedoClear();
+}
+
+
+void InterChange::Log(std::string const& msg)
+{
+    bool isError{true};
+    synth->getRuntime().Log(msg, isError);
 }
 
 
@@ -2324,9 +2332,12 @@ bool InterChange::processPad(CommandBlock *getData)
     }
     if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
+        PADStatus::mark(PADStatus::DIRTY, *this, pars.partID, pars.kitID);
+
         if (synth->getRuntime().usePadAutoApply())
         {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
             std::cout << "|processPad::Auto-Apply| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
+            synth->getRuntime().Log("PADSynth: trigger background wavetable build...");
             pars.buildNewWavetable();
         }
         getData->data.offset = 0;

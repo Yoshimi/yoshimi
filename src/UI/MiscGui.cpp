@@ -430,8 +430,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
                     break;
             }
-            if (getData->data.offset == 0)
-                synth->getGuiMaster()->partui->padnoteui->applycolour(FL_RED);
         }
         else if (miscmsg != NO_MSG)
         {

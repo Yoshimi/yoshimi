@@ -38,6 +38,7 @@
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
+#include "Params/PADStatus.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
@@ -93,7 +94,7 @@ namespace{ // Implementation helpers...
 
 
 
-PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
+PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
     : Presets(_synth)
     , Pmode{0}
     , Pquality{}
@@ -149,6 +150,8 @@ PADnoteParameters::PADnoteParameters(SynthEngine *_synth)
     , futureBuild(task::BuildScheduler<PADTables>::wireBuildFunction
                  ,BuildOperation([this](){ return render_wavetable(); }))
 
+    , partID{pID}
+    , kitID{kID}
     , wavetablePhasePrng{}
 {
     setpresettype("Ppadsyth");
@@ -668,6 +671,7 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 void PADnoteParameters::buildNewWavetable(bool blocking)
 {
     std::cout << "buildNewWavetable("<<(synth->getRuntime().useLegacyPadBuild()? "Legacy" : blocking? "blocking" : "trigger-bg")<<")" << std::endl;        ////////////////TODO padthread debugging output
+    PADStatus::mark(PADStatus::DIRTY, synth->interchange, partID,kitID);
     if (synth->getRuntime().useLegacyPadBuild())
         mute_and_rebuild_synchronous();
     else
@@ -703,6 +707,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
 {
     PADTables newTable(Pquality);
     const size_t spectrumSize = newTable.tableSize / 2;
+    PADStatus::mark(PADStatus::BUILDING, synth->interchange, partID,kitID);
     std::cout << "++·↯↯·START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
@@ -765,6 +770,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
     }
 
     std::cout << "++·✔✔·DONE render_wavetable(). Address="<<&newTable[0][0]<<std::endl;        ////////////////TODO padthread debugging output
+    PADStatus::mark(PADStatus::PENDING, synth->interchange, partID,kitID);
     return newTable;
 }
 
@@ -787,6 +793,8 @@ void PADnoteParameters::activate_wavetable()
             std::cout << "RLY activate + XFade ="<<float(PxFadeUpdate)/1000<<"s"<<std::endl;    ////////////////TODO padthread debugging output
         else                                                                                    ////////////////TODO padthread debugging output
             std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
+        synth->getRuntime().Log("PADSynth: switch to new wavetable.");
+        PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
         futureBuild.swap(waveTable);
         presetsUpdated();
         std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output

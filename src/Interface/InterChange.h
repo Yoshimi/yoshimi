@@ -89,6 +89,8 @@ class InterChange : private DataText
         std::string resolveText(CommandBlock *getData, bool addValue);
         void testLimits(CommandBlock *getData);
         float returnLimits(CommandBlock *getData);
+        void Log(std::string const& msg);
+
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;
 
