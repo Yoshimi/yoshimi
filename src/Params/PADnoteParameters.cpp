@@ -143,6 +143,19 @@ PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
     , FilterEnvelope{new EnvelopeParams(0, 1, synth)}
     , FilterLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth)}
 
+    // random walk re-Trigger
+    , PrebuildTrigger{0}
+    , PrandWalkDetune{0}
+    , PrandWalkBandwidth{0}
+    , PrandWalkFilterFreq{0}
+    , PrandWalkProfileWidth{0}
+    , PrandWalkProfileStretch{0}
+    , randWalkDetune{wavetablePhasePrng}
+    , randWalkBandwidth{wavetablePhasePrng}
+    , randWalkFilterFreq{wavetablePhasePrng}
+    , randWalkProfileWidth{wavetablePhasePrng}
+    , randWalkProfileStretch{wavetablePhasePrng}
+
     // Wavetable building
     , xFade{}
     , PxFadeUpdate{0}
@@ -152,6 +165,7 @@ PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
 
     , partID{pID}
     , kitID{kID}
+    , sampleTime{0}
     , wavetablePhasePrng{}
 {
     setpresettype("Ppadsyth");
@@ -166,9 +180,9 @@ PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
 void PADnoteParameters::HarmonicProfile::defaults()
 {
     base.type = 0;
-    base.par1 = 80;
+    base.pwidth = 80;
     freqmult = 0;
-    modulator.par1 = 0;
+    modulator.pstretch = 0;
     modulator.freq = 30;
     width = 127;
     amp.type = 0;
@@ -243,9 +257,16 @@ void PADnoteParameters::defaults(void)
     FilterLfo->defaults();
 
     PxFadeUpdate = XFADE_UPDATE_DEFAULT; // 200ms crossfade after updating wavetables
+    PrebuildTrigger = 0;                 // by default not auto-self-retrigger
+    PrandWalkDetune = 0;         randWalkDetune.reset();
+    PrandWalkBandwidth = 0;      randWalkBandwidth.reset();
+    PrandWalkFilterFreq = 0;     randWalkFilterFreq.reset();
+    PrandWalkProfileWidth = 0;   randWalkProfileWidth.reset();
+    PrandWalkProfileStretch = 0; randWalkProfileStretch.reset();
 
     // reseed OscilGen and wavetable phase randomisation
     reseed(synth->randomINT());
+    sampleTime = 0;
 }
 
 
@@ -290,14 +311,18 @@ vector<float> PADnoteParameters::buildProfile(size_t size)
 {
     vector<float> profile(size, 0.0); // zero-init
 
-    float basepar = power<2>(((1.0f - PProfile.base.par1 / 127.0f) * 12.0f));
+    float lineWidth = power<2>(((1.0f - PProfile.base.pwidth / 127.0f) * 12.0f));
     float freqmult = floorf(power<2>((PProfile.freqmult / 127.0f * 5.0f)) + 0.000001f);
 
-    float modfreq = floorf(power<2>((PProfile.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
-    float modpar1 = powf((PProfile.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
+    float modfreq  = floorf(power<2>((PProfile.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
+    float modStrch = powf((PProfile.modulator.pstretch / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
     float amppar1 = power<2>(powf((PProfile.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
     float amppar2 = (1.0f - PProfile.amp.par2 / 127.0f) * 0.998f + 0.001f;
     float width = powf((150.0f / (PProfile.width + 22.0f)), 2.0f);
+
+    // possibly apply a random walk
+    lineWidth *= randWalkProfileWidth.getFactor();
+    modStrch *= randWalkProfileStretch.getFactor();
 
     for (size_t i = 0; i < size * PROFILE_OVERSAMPLING; ++i)
     {
@@ -334,7 +359,7 @@ vector<float> PADnoteParameters::buildProfile(size_t size)
         x *= freqmult;
 
         // do the modulation of the profile
-        x += sinf(x_before_freq_mult * PI * modfreq) * modpar1;
+        x += sinf(x_before_freq_mult * PI * modfreq) * modStrch;
 
         x = fmodf(x + 1000.0f, 1.0f) * 2.0f - 1.0f;
         // this is the base function of the profile
@@ -342,7 +367,7 @@ vector<float> PADnoteParameters::buildProfile(size_t size)
         switch (PProfile.base.type)
         {
         case 1:
-            f = expf(-(x * x) * basepar);
+            f = expf(-(x * x) * lineWidth);
             if (f < 0.4f)
                 f = 0.0f;
             else
@@ -350,11 +375,11 @@ vector<float> PADnoteParameters::buildProfile(size_t size)
             break;
 
         case 2:
-            f = expf(-(fabsf(x)) * sqrtf(basepar));
+            f = expf(-(fabsf(x)) * sqrtf(lineWidth));
             break;
 
         default:
-            f = expf(-(x * x) * basepar);
+            f = expf(-(x * x) * lineWidth);
             break;
         }
         if (makezero)
@@ -434,7 +459,8 @@ float PADnoteParameters::calcProfileBandwith(vector<float> const& profile)
 // Convert the bandwidth parameter into cents
 float PADnoteParameters::getBandwithInCent()
 {
-    float result = powf(Pbandwidth / 1000.0f, 1.1f);
+    float currBandwidth = std::min(1000.0f, Pbandwidth * randWalkBandwidth.getFactor());
+    float result = powf(currBandwidth / 1000.0f, 1.1f);
     result = power<10>(result * 4.0f) * 0.25f;
     return result;
 }
@@ -797,7 +823,36 @@ void PADnoteParameters::activate_wavetable()
         PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
         futureBuild.swap(waveTable);
         presetsUpdated();
+        sampleTime = 0;
         std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
+    }
+    else
+        maybeRetrigger();
+}
+
+
+/* automatic self-retrigger: if activated, a new wavetable background build is launched
+ * after a given amount of "sample time" has passed. Moreover, some parameters may perform
+ * a »random walk« by applying a small random offset on each rebuild, within a given spread.
+ */
+void PADnoteParameters::maybeRetrigger()
+{
+    if (PrebuildTrigger == 0 or synth->getRuntime().useLegacyPadBuild())
+        return; // this feature requires a background build of the wavetable.
+
+    if (sampleTime < PrebuildTrigger)
+    {
+        sampleTime += synth->buffersize_f / synth->samplerate_f * 1000;
+        return;
+    }
+    else if (not futureBuild.isUnderway())
+    {
+        randWalkDetune.walkStep();
+        randWalkBandwidth.walkStep();
+        randWalkFilterFreq.walkStep();
+        randWalkProfileWidth.walkStep();
+        randWalkProfileStretch.walkStep();
+        futureBuild.requestNewBuild();
     }
 }
 
@@ -815,6 +870,7 @@ void PADnoteParameters::mute_and_rebuild_synchronous()
         swap(waveTable, *result);
 std::cout << "RLY swap().. old wavetable: "<<&(*result)[0][0] <<" --new--> "<<&waveTable[0][0]<<std::endl;   ////////////////TODO padthread debugging output
         presetsUpdated();
+        sampleTime = 0;
     }
     std::cout << "buildNewWavetable: synchronous build finished" << std::endl;        ////////////////TODO padthread debugging output
 }
@@ -912,9 +968,9 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
 
     xml->beginbranch("HARMONIC_PROFILE");
         xml->addpar("base_type",PProfile.base.type);
-        xml->addpar("base_par1",PProfile.base.par1);
+        xml->addpar("base_par1",PProfile.base.pwidth);
         xml->addpar("frequency_multiplier",PProfile.freqmult);
-        xml->addpar("modulator_par1",PProfile.modulator.par1);
+        xml->addpar("modulator_par1",PProfile.modulator.pstretch);
         xml->addpar("modulator_frequency",PProfile.modulator.freq);
         xml->addpar("width",PProfile.width);
         xml->addpar("amplitude_multiplier_type",PProfile.amp.type);
@@ -1010,6 +1066,15 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
             FilterLfo->add2XML(xml);
         xml->endbranch();
     xml->endbranch();
+
+    xml->beginbranch("RANDOM_WALK");
+        xml->addparU("rebuild_trigger",PrebuildTrigger);
+        xml->addpar("rand_detune",PrandWalkDetune);
+        xml->addpar("rand_bandwidth",PrandWalkBandwidth);
+        xml->addpar("rand_filter_freq",PrandWalkFilterFreq);
+        xml->addpar("rand_profile_width",PrandWalkProfileWidth);
+        xml->addpar("rand_profile_stretch",PrandWalkProfileStretch);
+    xml->endbranch();
 }
 
 void PADnoteParameters::getfromXML(XMLwrapper *xml)
@@ -1023,9 +1088,9 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     if (xml->enterbranch("HARMONIC_PROFILE"))
     {
         PProfile.base.type=xml->getpar127("base_type",PProfile.base.type);
-        PProfile.base.par1=xml->getpar127("base_par1",PProfile.base.par1);
+        PProfile.base.pwidth=xml->getpar127("base_par1",PProfile.base.pwidth);
         PProfile.freqmult=xml->getpar127("frequency_multiplier",PProfile.freqmult);
-        PProfile.modulator.par1=xml->getpar127("modulator_par1",PProfile.modulator.par1);
+        PProfile.modulator.pstretch=xml->getpar127("modulator_par1",PProfile.modulator.pstretch);
         PProfile.modulator.freq=xml->getpar127("modulator_frequency",PProfile.modulator.freq);
         PProfile.width=xml->getpar127("width",PProfile.width);
         PProfile.amp.type=xml->getpar127("amplitude_multiplier_type",PProfile.amp.type);
@@ -1146,6 +1211,21 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
+
+    if (xml->enterbranch("RANDOM_WALK"))
+    {
+        PrebuildTrigger        =xml->getparU("rebuild_trigger"       ,PrebuildTrigger, 0,REBUILDTRIGGER_MAX);
+        PrandWalkDetune        =xml->getpar127("rand_detune"         ,PrandWalkDetune);
+        PrandWalkBandwidth     =xml->getpar127("rand_bandwidth"      ,PrandWalkBandwidth);
+        PrandWalkFilterFreq    =xml->getpar127("rand_filter_freq"    ,PrandWalkFilterFreq);
+        PrandWalkProfileWidth  =xml->getpar127("rand_profile_width"  ,PrandWalkProfileWidth);
+        PrandWalkProfileStretch=xml->getpar127("rand_profile_stretch",PrandWalkProfileStretch);
+        randWalkDetune         .setSpread(PrandWalkDetune);
+        randWalkBandwidth      .setSpread(PrandWalkBandwidth);
+        randWalkFilterFreq     .setSpread(PrandWalkFilterFreq);
+        randWalkProfileWidth   .setSpread(PrandWalkProfileWidth);
+        randWalkProfileStretch .setSpread(PrandWalkProfileStretch);
+    }
     // trigger re-build of the wavetable as background task...
     std::cout << "|PADpar::getfromXML| silence PADtables..." << std::endl;       ////////////////TODO padthread debugging output
     waveTable.reset();           // silence existing sound from previous instruments using the same part
@@ -1215,6 +1295,36 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
         case PADSYNTH::control::xFadeUpdate:
             def = 200;
             max = 20000;
+            break;
+
+        case PADSYNTH::control::rebuildTrigger:
+            def = 0;
+            max = 60000;
+            break;
+
+        case PADSYNTH::control::randWalkDetune:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkBandwidth:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkFilterFreq:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkProfileWidth:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkProfileStretch:
+            def = 0;
+            max = 127;
             break;
 
         case PADSYNTH::control::detuneFrequency:

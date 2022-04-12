@@ -869,10 +869,10 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         pitchBendAdjustment,
         pitchBendOffset,
 
-        bandwidth,// = 16, moved these three
-        bandwidthScale,
-        spectrumMode,// = 19, // Bandwidth, Discrete, Continuous
-        xFadeUpdate,
+        bandwidth,
+        bandwidthScale,       // Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
+        spectrumMode,         // Bandwidth, Discrete, Continuous
+        xFadeUpdate,          // in millisec
 
         overtoneParameter1 = 48,
         overtoneParameter2,
@@ -896,6 +896,14 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         samplesPerOctave, // 0.5, 1, 2, 3, 4, 6, 12
         numberOfOctaves, // 1 - 8
         sampleSize, // 16k, 32k, 64k, 128k, 256k, 512k, 1M
+
+        rebuildTrigger = 90,
+        randWalkDetune,          // random walk spread, 0 off, 96 is factor 2
+        randWalkBandwidth,       // -> bandwidth
+        randWalkFilterFreq,      // -> centerFrequency
+        randWalkProfileWidth,    // -> baseWidth
+        randWalkProfileStretch,  // -> modulatorStretch
+
         applyChanges = 104,
         stereo = 112,
 

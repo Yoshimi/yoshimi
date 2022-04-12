@@ -2457,6 +2457,24 @@ string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool add
         case PADSYNTH::control::xFadeUpdate:
             contstr = "XFade Update";
             break;
+        case PADSYNTH::control::rebuildTrigger:
+            contstr = "BuildTrigger";
+            break;
+        case PADSYNTH::control::randWalkDetune:
+            contstr = "RWDetune";
+            break;
+        case PADSYNTH::control::randWalkBandwidth:
+            contstr = "RWBandwidth";
+            break;
+        case PADSYNTH::control::randWalkFilterFreq:
+            contstr = "RWFilterFreq";
+            break;
+        case PADSYNTH::control::randWalkProfileWidth:
+            contstr = "RWWidthProfile";
+            break;
+        case PADSYNTH::control::randWalkProfileStretch:
+            contstr = "RWStretchProfile";
+            break;
     }
     string padApply{synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
                                                          : " - Need to Apply"};

@@ -566,6 +566,13 @@ static std::string padsynthlist [] = {
     "SPectrum <s>",             "spectrum mode (Bandwidth, Discrete, Continuous)",
     "XFadeupdate <n>",          "cross fade (millisec) after building new wavetable",
 
+    "BUildtrigger <n>",         "re-trigger wavetable build after n millisec",
+    "RWDetune <n>",             "random walk spread of voice detune on re-triggered build (0:off 96 factor 2)",
+    "RWBandwidth <n>",          "random walk spread of line bandwidth",
+    "RWFilterFreq <n>",         "random walk spread of filter cutoff frequency",
+    "RWWidthProfile <n>",       "random walk spread of profile width",
+    "RWStretchProfile <n>",     "random walk spread of profile modulation stretch",
+
     "APply",                    "puts latest changes into the wavetable",
     "XPort <s>",                "export current sample set to named file",
     "WAveform ...",             "enter the oscillator waveform context",

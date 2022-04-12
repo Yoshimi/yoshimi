@@ -32,6 +32,7 @@
 #include "Params/Presets.h"
 #include "Misc/RandomGen.h"
 #include "Misc/BuildScheduler.h"
+#include "Params/RandomWalk.h"
 #include "Synth/XFadeManager.h"
 #include "Synth/OscilGen.h"
 #include "DSP/FFTwrapper.h"
@@ -146,6 +147,7 @@ class PADnoteParameters : public Presets
     public:
         static constexpr size_t XFADE_UPDATE_MAX   = 20000; // milliseconds
         static constexpr size_t XFADE_UPDATE_DEFAULT = 200;
+        static constexpr size_t REBUILDTRIGGER_MAX = 60000; // milliseconds
 
     public:
         PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth);
@@ -170,7 +172,7 @@ class PADnoteParameters : public Presets
         // (re)Building the Wavetable
         void buildNewWavetable(bool blocking =false);
         Optional<PADTables> render_wavetable();
-        void activate_wavetable(void);
+        void activate_wavetable();
         bool export2wav(std::string basefilename);
 
         vector<float> buildProfile(size_t size);
@@ -183,10 +185,10 @@ class PADnoteParameters : public Presets
         struct HarmonicProfile {
             struct BaseFunction {
                 unsigned char type;
-                unsigned char par1;
+                unsigned char pwidth;
             };
             struct Modulator{
-                unsigned char par1;
+                unsigned char pstretch;
                 unsigned char freq;
             };
             struct AmplitudeMultiplier {
@@ -288,9 +290,23 @@ class PADnoteParameters : public Presets
         unique_ptr<EnvelopeParams> FilterEnvelope;
         unique_ptr<LFOParams> FilterLfo;
 
+        // re-Trigger Wavetable build with random walk
+        uint PrebuildTrigger;
+        uchar PrandWalkDetune;
+        uchar PrandWalkBandwidth;
+        uchar PrandWalkFilterFreq;
+        uchar PrandWalkProfileWidth;
+        uchar PrandWalkProfileStretch;
+
+        RandomWalk randWalkDetune;
+        RandomWalk randWalkBandwidth;
+        RandomWalk randWalkFilterFreq;
+        RandomWalk randWalkProfileWidth;
+        RandomWalk randWalkProfileStretch;
+
         // manage secondary PADTables during a wavetable X-Fade
         XFadeManager<PADTables> xFade;
-        unsigned int PxFadeUpdate;    // in milliseconds, XFADE_UPDATE_MAX = 20000
+        uint PxFadeUpdate;    // in milliseconds, XFADE_UPDATE_MAX = 20000
 
         // current wavetable
         PADTables waveTable;
@@ -302,11 +318,13 @@ class PADnoteParameters : public Presets
         const uchar kitID;
 
     private:
+        size_t sampleTime;
         RandomGen wavetablePhasePrng;
 
         vector<float> generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize, vector<float> const& profile);
         vector<float> generateSpectrum_otherModes(float basefreq, size_t spectrumSize);
 
+        void maybeRetrigger();
         void mute_and_rebuild_synchronous();
 
         // type abbreviations

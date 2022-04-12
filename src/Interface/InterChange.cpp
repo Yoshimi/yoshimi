@@ -5229,6 +5229,57 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
             else
                 value = pars.PxFadeUpdate;
             break;
+        case PADSYNTH::control::rebuildTrigger:
+            if (write)
+                pars.PrebuildTrigger = value_int;
+            else
+                value = pars.PrebuildTrigger;
+            break;
+        case PADSYNTH::control::randWalkDetune:
+            if (write)
+            {
+                pars.PrandWalkDetune = value_int;
+                pars.randWalkDetune.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkDetune;
+            break;
+        case PADSYNTH::control::randWalkBandwidth:
+            if (write)
+            {
+                pars.PrandWalkBandwidth = value_int;
+                pars.randWalkBandwidth.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkBandwidth;
+            break;
+        case PADSYNTH::control::randWalkFilterFreq:
+            if (write)
+            {
+                pars.PrandWalkFilterFreq = value_int;
+                pars.randWalkFilterFreq.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkFilterFreq;
+            break;
+        case PADSYNTH::control::randWalkProfileWidth:
+            if (write)
+            {
+                pars.PrandWalkProfileWidth = value_int;
+                pars.randWalkProfileWidth.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkProfileWidth;
+            break;
+        case PADSYNTH::control::randWalkProfileStretch:
+            if (write)
+            {
+                pars.PrandWalkProfileStretch = value_int;
+                pars.randWalkProfileStretch.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkProfileStretch;
+            break;
 
         case PADSYNTH::control::detuneFrequency:
             if (write)
@@ -5334,9 +5385,9 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
 
         case PADSYNTH::control::baseWidth:
             if (write)
-                pars.PProfile.base.par1 = value_int;
+                pars.PProfile.base.pwidth = value_int;
             else
-                value = pars.PProfile.base.par1;
+                value = pars.PProfile.base.pwidth;
             break;
         case PADSYNTH::control::frequencyMultiplier:
             if (write)
@@ -5346,9 +5397,9 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
             break;
         case PADSYNTH::control::modulatorStretch:
             if (write)
-                pars.PProfile.modulator.par1 = value_int;
+                pars.PProfile.modulator.pstretch = value_int;
             else
-                value = pars.PProfile.modulator.par1;
+                value = pars.PProfile.modulator.pstretch;
             break;
         case PADSYNTH::control::modulatorFrequency:
             if (write)
@@ -5491,7 +5542,7 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
     if (write)
     {
         unsigned char control = getData->data.control;
-        needApply = (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::applyChanges);
+        needApply = (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::rebuildTrigger);
         getData->data.offset = 0;
     }
     else

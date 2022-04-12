@@ -82,7 +82,7 @@ inline int version2value(void)
 /* === Helper for exponential with constant base == */
 /*
  * Yoshimi code used the generic power function powf() at various places just to compute the exponential
- * for a fixed (and even integral) base. This can be optimised, since b^x = exp(ln(b)*x); and in fact,
+ * for a fixed (and even integral) base. This can be optimised, since b^x = exp(ln(b)·x); and in fact,
  * modern optimisers apply this rewriting with --fast-math. But unfortunately these rewritings differ
  * slightly (esp. regarding to SSE), which leads to slightly different sample (float numbers) being
  * computed on different Compilers/Platforms.

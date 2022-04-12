@@ -22,6 +22,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/NumericFuncs.h"
+#include "Params/RandomWalk.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
 
@@ -928,6 +929,27 @@ string convert_value(ValueType type, float val)
                 return variable_prec_units(float(millisec), "ms", 0);
             else
                 return "off";
+            break;
+        }
+
+        case VC_Retrigger:
+        {
+            if (val > 0) val += 2300;
+            // in the UI we remove a socket of 200ms from the dial setting,
+            // to prevent the user from choosing overly fast retriggering
+            // 200ms correspond to the log10 setting of 2300
+            return convert_value(VC_XFadeUpdate, val);
+            break;
+        }
+
+        case VC_RandWalkSpread:
+        {
+            double spread = RandomWalk::param2spread(val);
+            if (spread > 1)
+                return variable_prec_units((spread - 1) * 100.0, "%", 1);
+            else
+                return "no random walk.";
+            break;
         }
 
         case VC_FilterVelocitySense: // this is also shown graphically

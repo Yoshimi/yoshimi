@@ -60,7 +60,7 @@ file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.h  ../Params/EnvelopeParams.h
     ../Params/FilterParams.h  ../Params/LFOParams.h
     ../Params/SUBnoteParameters.h
-    ../Params/PADnoteParameters.h ../Params/PADStatus.h
+    ../Params/PADnoteParameters.h ../Params/PADStatus.h ../Params/RandomWalk.h
     ../Params/OscilParameters.cpp ../Params/OscilParameters.h
     ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h)
 file (GLOB yoshimi_synth_files

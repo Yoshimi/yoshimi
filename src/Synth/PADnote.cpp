@@ -347,8 +347,7 @@ void PADnote::computeNoteParameters()
 
 void PADnote::computecurrentparameters()
 {
-    float globalpitch,globalfilterpitch;
-    globalpitch =
+    float globalpitch =
         0.01 * (noteGlobal.freqEnvelope->envout()
         + noteGlobal.freqLFO->lfoout() * ctl.modwheel.relmod + noteGlobal.detune);
     globaloldamplitude = globalnewamplitude;
@@ -364,7 +363,7 @@ void PADnote::computecurrentparameters()
     float filterQ = pars.GlobalFilter->getq();
     float filterFreqTracking = pars.GlobalFilter->getfreqtracking(note.freq);
 
-    globalfilterpitch =
+    float globalfilterpitch =
         noteGlobal.filterEnvelope->envout() + noteGlobal.filterLFO->lfoout()
         + filterCenterPitch;
 
@@ -374,6 +373,7 @@ void PADnote::computecurrentparameters()
     tmpfilterfreq = noteGlobal.filterL->getrealfreq(tmpfilterfreq);
 
     float globalfilterq = filterQ * ctl.filterq.relq;
+    globalfilterq *= pars.randWalkFilterFreq.getFactor();
     noteGlobal.filterL->setfreq_and_q(tmpfilterfreq,globalfilterq);
     noteGlobal.filterR->setfreq_and_q(tmpfilterfreq,globalfilterq);
 
@@ -390,6 +390,7 @@ void PADnote::computecurrentparameters()
 
     realfreq = note.freq * portamentofreqrap * power<2>(globalpitch / 12.0)
                * powf(ctl.pitchwheel.relfreq, BendAdjust) + OffsetHz;
+    realfreq *= pars.randWalkDetune.getFactor();
 }
 
 

@@ -118,7 +118,9 @@ enum ValueType {
     VC_FXDistLevel,
     VC_FXDistLowPass,
     VC_FXDistHighPass,
-    VC_XFadeUpdate
+    VC_XFadeUpdate,
+    VC_Retrigger,
+    VC_RandWalkSpread,
 };
 
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char offset = 0xff, unsigned char miscmsg = 0xff, unsigned char request = 0xff);

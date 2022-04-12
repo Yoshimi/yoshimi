@@ -4805,6 +4805,30 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     {
         cmd = PADSYNTH::control::xFadeUpdate;
     }
+    else if (input.matchnMove(2, "buildtrigger"))
+    {
+        cmd = PADSYNTH::control::rebuildTrigger;
+    }
+    else if (input.matchnMove(3, "rwdetune"))
+    {
+        cmd = PADSYNTH::control::randWalkDetune;
+    }
+    else if (input.matchnMove(3, "rwbandwidth"))
+    {
+        cmd = PADSYNTH::control::randWalkBandwidth;
+    }
+    else if (input.matchnMove(3, "rwfilterfreq"))
+    {
+        cmd = PADSYNTH::control::randWalkFilterFreq;
+    }
+    else if (input.matchnMove(3, "rwwidthprofile"))
+    {
+        cmd = PADSYNTH::control::randWalkProfileWidth;
+    }
+    else if (input.matchnMove(3, "rwstretchprofile"))
+    {
+        cmd = PADSYNTH::control::randWalkProfileStretch;
+    }
 
     if (input.matchnMove(2, "apply"))
     {

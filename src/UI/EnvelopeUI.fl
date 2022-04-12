@@ -1094,10 +1094,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         freemodebutton->value(0);
 
     hide();
-    //int winx = freemodeeditwindow->x();
-    //int winy = freemodeeditwindow->y();
-
-    //freemodeeditwindow->hide();
 
     envwindow->hide();
     Fl_Group *par = envwindow->parent();
@@ -1109,8 +1105,6 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
 
     par->show();
     show();
-    //freemodeeditwindow->position(winx, winy);
-    //freemodeeditwindow->show();
 
     if (freemode)
     {

@@ -316,7 +316,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
               xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->PProfile.base.par1);}
+              code0 {o->value(pars->PProfile.base.pwidth);}
               class WidgetPDial
             }
             Fl_Dial hpfreqmult {
@@ -332,7 +332,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->PProfile.modulator.par1);}
+              code0 {o->value(pars->PProfile.modulator.pstretch);}
               class WidgetPDial
             }
             Fl_Dial hpmfreq {
@@ -520,7 +520,7 @@ class PADnoteUI {: {public PresetsUI_}
             label base
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicBase, o->value(), TOPLEVEL::type::Integer);}
-            xywh {425 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {425 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("C-2");o->add("G-2");o->add("C-3");o->add("G-3");o->add("C-4");o->add("G-4");o->add("C-5");o->add("G-5");o->add("G-6");}
             code1 {o->value(pars->Pquality.basenote);}
           } {}
@@ -528,7 +528,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {smp/oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::samplesPerOctave, o->value(), TOPLEVEL::type::Integer);}
-            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {475 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("0.5");o->add("1");o->add("2");o->add("3");o->add("4");o->add("6");o->add("12");}
             code1 {o->value(pars->Pquality.smpoct);}
           } {}
@@ -536,7 +536,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {no.oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::numberOfOctaves, o->value(), TOPLEVEL::type::Integer);}
-            xywh {530 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {525 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("1");o->add("2");o->add("3");o->add("4");o->add("5");o->add("6");o->add("7");o->add("8");}
             code1 {o->value(pars->Pquality.oct);}
           } {}
@@ -544,7 +544,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {Sample Size}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::sampleSize, o->value(), TOPLEVEL::type::Integer);}
-            xywh {425 195 100 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            xywh {425 195 95 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
             code0 {o->add("16k (Tiny)");o->add("32k");o->add("64k (Small)");o->add("128k");o->add("256k");o->add("512k");o->add("1M (Big)");}
             code1 {o->value(pars->Pquality.samplesize);}
           } {}
@@ -553,11 +553,20 @@ class PADnoteUI {: {public PresetsUI_}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::xFadeUpdate, logDial2millisec(o->value()), TOPLEVEL::type::Integer);}
             tooltip {cross fade after building new Wavetable}
-            xywh {535 195 25 25} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 4301 step 1
+            xywh {530 195 25 25} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 4301 step 1
             code0 {int dialSetting = millisec2logDial(pars->PxFadeUpdate);
                    o->value(dialSetting);}
             code2 {o->setValueType(VC_XFadeUpdate);}
             class WidgetPDial
+          }
+          Fl_Button randWalkUI {
+            label re
+            callback {//
+              show_randWalk();
+              if ((Fl::event_button() == 3))
+                  padnotewindow->hide();
+            }
+            xywh {560 200 15 15} labelsize 10
           }
           Fl_Group hprofile {
             xywh {100 45 475 90} box FLAT_BOX color 54 selection_color 218 labelcolor 63
@@ -835,7 +844,7 @@ class PADnoteUI {: {public PresetsUI_}
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip{Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases}
+        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases}
         xywh {242 412 128 22} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button padCopy {
@@ -854,6 +863,8 @@ class PADnoteUI {: {public PresetsUI_}
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "PadSynth");
         padSeen = false;
         resui->resonancewindow->hide();
+        if (randWalkWindow)
+            randWalkWindow->hide();
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
         {
@@ -865,6 +876,150 @@ class PADnoteUI {: {public PresetsUI_}
         tooltip {Right click: also reopen previous} xywh {505 410 61 24} box THIN_UP_BOX labelfont 1 labelsize 12
       }
     }
+  }
+  Function {make_randWalkWindow()} {
+  } {
+    Fl_Window randWalkWindow {
+      label {random walk} open
+      xywh {1145 175 160 285} type Double hide resizable
+      code0 {randDW = o->w(); randDH = o->h();}
+      code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}
+    } {
+      Fl_Group randomProp {open
+        xywh {0 5 160 280}
+      } {
+        Fl_Dial rebuildTrigger {
+          label retrigger
+          callback {//
+            int dialSetting = o->value();
+            if (dialSetting >= 0)
+                dialSetting += 2300;
+            // remove a socket of 200ms from the dial setting, i.e. the editable time in the UI starts > 200ms
+            // smaller values would be pointless and overload the system. (60sec = 4779, 200ms = 2300, thus max = 4779-2300 = 2479)
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::rebuildTrigger, logDial2millisec(dialSetting), TOPLEVEL::type::Integer);
+          }
+          tooltip {Trigger rebuild of PAD Wavetable after generating this amount of sample time; possibly randomise parameters below on each rebuild. WARNING: expensive!}
+          xywh {25 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 2479 step 1
+          code0 {//
+            int dialSetting = millisec2logDial(pars->PrebuildTrigger);
+            if (dialSetting >= 2300)
+                 dialSetting -= 2300;
+            else dialSetting = -1;
+            o->value(dialSetting);
+          }
+          code2 {o->setValueType(VC_Retrigger);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkDetune {
+          label Detune
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkDetune, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Let the voice detuning perform a random walk on each wavetable rebuild, within this spread..}
+          xywh {100 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkDetune);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkBandwidth {
+          label Bandwidth
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkBandwidth, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Bandwidth random walk on wavetable rebuild, within this spread..}
+          xywh {100 75 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkBandwidth);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkFilterFreq {
+          label {Filter Freq}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkFilterFreq, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Filter cutoff freq random walk on wavetable rebuild, within this spread..}
+          xywh {100 120 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkFilterFreq);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkProfileWidth {
+          label {Profile Width}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileWidth, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Profile width parameter random walk on wavetable rebuild, within this spread..}
+          xywh {100 165 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkProfileWidth);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkProfileStretch {
+          label {Profile Stretch}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileStretch, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Profile stretch parameter random walk on wavetable rebuild, within this spread..}
+          xywh {100 210 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkProfileStretch);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Button randClose {
+          label Close
+          callback {//
+              if (randSeen)
+                  saveWin(synth, randWalkWindow->w(), randWalkWindow->h(), randWalkWindow->x(), randWalkWindow->y(), false, string("padRandWalk"));
+              randWalkWindow->hide();
+              randSeen = false;
+              if ((Fl::event_button() == 3))
+                  synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
+          }
+          xywh {100 255 50 20} box THIN_UP_BOX labelsize 12
+        }
+      }
+    }
+  }
+  Function {show_randWalk()} {} {
+    code {//
+      int fetchW, fetchH, fetchX, fetchY, fetchO;
+      loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, string("padRandWalk"));
+
+      if (fetchW < randDW || fetchH < randDH)
+      {
+          fetchW = randDW;
+          fetchH = randDH;
+      }
+      checkSane(fetchX, fetchY, fetchW, fetchH, randDW, randDH);
+
+      randWalkWindow->resize(fetchX, fetchY, fetchW, fetchH);
+      randWalkWindow->show();
+      randWalkWindow_retext();
+      randSeen = true;
+    } {}
+  }
+  Function {randWalkWindow_retext()} {} {
+    code {//
+          int w = randWalkWindow->w();
+          int h = randWalkWindow->h();
+          float defW = 160;
+          float defH = 285;
+          float dW = w / defW;
+          float dH = h / defH;
+          float dScale;
+          if (dW < dH)
+              dScale = dW;
+          else
+              dScale = dH;
+          if (dScale < 0.2f)
+              dScale = 0.2f;
+
+          int size10 = int(10 * dScale);
+//        int size11 = int(11 * dScale);
+          int size12 = int(12 * dScale);
+
+          rebuildTrigger->labelsize(size10);
+          randClose->labelsize(size12);} {}
   }
   Function {Showpad()} {} {
     code {//
@@ -1105,6 +1260,17 @@ class PADnoteUI {: {public PresetsUI_}
             }
             break;
 
+        case PADSYNTH::control::rebuildTrigger:
+            {
+                int dialSetting = millisec2logDial(value);
+                // remove a socket of 200ms from the dial setting, editable time in the UI starts > 200ms
+                if (dialSetting >= 2300) dialSetting -= 2300;
+                else dialSetting = -1;
+                rebuildTrigger->value(dialSetting);
+                cbwidget->do_callback();
+            }
+            break;
+
         case PADSYNTH::control::detuneFrequency:
             detune->value(lrint(value));
             detunevalueoutput->do_callback();
@@ -1306,6 +1472,26 @@ class PADnoteUI {: {public PresetsUI_}
             pvel->value(value);
             break;
 
+        case PADSYNTH::control::randWalkDetune:
+            randWalkDetune->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkBandwidth:
+            randWalkBandwidth->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkFilterFreq:
+            randWalkFilterFreq->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkProfileWidth:
+            randWalkProfileWidth->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkProfileStretch:
+            randWalkProfileStretch->value(value);
+            break;
+
         case PADSYNTH::control::applyChanges:
             if (lrint(value) == 0 and getData->data.offset != UNUSED)
                 padStatus->handleStateMessage(*getData);
@@ -1337,13 +1523,15 @@ class PADnoteUI {: {public PresetsUI_}
     npart = parameters->partID;
     kititem = parameters->kitID;
     padSeen = false;
+    randSeen = false;
     lastWaveW = 0;
     lastpadW = 0;
     oscui = NULL;
     lastResuiW = 0;
     resui = new ResonanceUI(pars->resonance.get(), npart, kititem, 2);
-    padStatus.reset(new PADStatus(npart,kititem));
+    make_randWalkWindow();
     make_window();
+    padStatus.reset(new PADStatus(npart,kititem));
     // setup handler to indicate PADSynth wavetable build status
     padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuild Wave"); });
     padStatus->on(PADStatus::FADING,  [&]() { applyButton(FL_YELLOW, "fading..."); });
@@ -1357,7 +1545,14 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
     if (oscui)
         delete(oscui);
-    delete(resui);
+    if (resui)
+        delete(resui);
+    if (randWalkWindow) {
+        if (randSeen)
+            saveWin(synth, randWalkWindow->w(), randWalkWindow->h(), randWalkWindow->x(), randWalkWindow->y(),randWalkWindow->visible(), string("padRandWalk"));
+        randWalkWindow->hide();
+        delete (randWalkWindow);
+    }
     if (padSeen)
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padSeen, "PadSynth");
     padnotewindow->hide();
@@ -1381,9 +1576,15 @@ class PADnoteUI {: {public PresetsUI_}
   }
   decl {float padDH;} {private local
   }
+  decl {float randDW;} {private local
+  }
+  decl {float randDH;} {private local
+  }
   decl {int lastpadW;} {private local
   }
   decl {bool padSeen;} {private local
+  }
+  decl {bool randSeen;} {private local
   }
   decl {int lastWaveW;} {private local
   }
