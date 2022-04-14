@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+2022-14-7 Will
+bn2109
+* BugFix: previous fix didn't get the root cause.
+  Repeated key handler creation.
+
 2022-4-7 Will
 bn2108
 * BugFix: filer window becomes slow to respond after many calls.

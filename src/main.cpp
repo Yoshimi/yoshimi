@@ -289,7 +289,6 @@ static void *mainThread(void *arg)
                 if (guiMaster)
                 {
                     mainUI = guiMaster;
-                    Fl::add_handler(handle_shortcuts);
                     if (guiMaster->masterwindow)
                     {
                         guiMaster->checkBuffer();
@@ -394,7 +393,10 @@ int mainCreateNewInstance(unsigned int forceId)
     synth->getRuntime().StartupReport(musicClient->midiClientName());
 
     if (instanceID == 0)
+    {
+        Fl::add_handler(handle_shortcuts);
         std::cout << "\nYay! We're up and running :-)\n";
+    }
     else
     {
         std::cout << "\nStarted "<< instanceID << "\n";
