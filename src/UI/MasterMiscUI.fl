@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -109,7 +109,7 @@ decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
 
-class VUMeter {selected : {public Fl_Box, private GuiUpdates}
+class VUMeter {: {public Fl_Box}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}

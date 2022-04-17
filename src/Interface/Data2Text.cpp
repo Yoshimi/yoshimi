@@ -1,7 +1,7 @@
 /*
     Data2Text.cpp - conversion of commandBlock entries to text
 
-    Copyright 2021 Will Godfrey
+    Copyright 2021 - 2022 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -135,7 +135,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             return "Nothing to redo!";
     }
 
-    if ((effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && kititem == UNUSED))
+    if ((effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && effSend == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
         return withValue(commandName, type, showValue, addValue, value);
@@ -3183,8 +3183,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char effSend = getData->data.kit;
+    unsigned char effType = getData->data.kit;
     unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
@@ -3198,8 +3197,8 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         name = "Insert";
     else
         name = "Part " + to_string(npart + 1);
-
-    if (effSend == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
+;
+    if (effType == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3245,7 +3244,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             showValue = false;
         return (name + effname);
     }
-    else if (npart >= TOPLEVEL::section::systemEffects && kititem == UNUSED)
+    else if (npart >= TOPLEVEL::section::systemEffects && effType == UNUSED)
     {
         string contstr;
         string second = "";
@@ -3295,10 +3294,10 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
     }
     string contstr = "";
-    if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == EFFECT::sysIns::effectType))
+    if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && effType == UNUSED && control == EFFECT::sysIns::effectType))
     {
         name += " set to";
-        kititem = value | TOPLEVEL::insert::none | 128; // TODO fix this!
+        effType = value | TOPLEVEL::insert::none | 128; // TODO fix this!
         showValue = false;
     }
     else
@@ -3307,7 +3306,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     int ref = control; // we frequently modify this
     bool isBPM = (ref == 2 && offset == 1);
     //std::cout << "isbpm " << int(isBPM) << std::endl;
-    switch (effSend & 127)
+    switch (effType & 127)
     {
         case TOPLEVEL::insert::none:
             effname = " None";
@@ -3530,7 +3529,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             contstr = " Unrecognised";
     }
     //std::cout << "control " << int(control) << std::endl;
-    if (control == EFFECT::control::preset && effSend != (TOPLEVEL::insert::eq | 128))
+    if (control == EFFECT::control::preset && effType != (TOPLEVEL::insert::eq | 128))
     {
         contstr = " Preset " + to_string (value + 1);
         showValue = false;
