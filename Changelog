@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+2022-4-18 Will
+bn2111
+* Placed copy of Yoshimi_License_History.txt in doc
+* Removed 'library' from all licenses.
+
 2022-4-17 Will
 bn2110
 * Fixed regression (not reporting effect types)
