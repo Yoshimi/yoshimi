@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-4-20 Will
+bn2112
+* Bugfix: unable to cancel envelope freemode.
+
 2022-4-18 Will
 bn2111
 * Placed copy of Yoshimi_License_History.txt in doc

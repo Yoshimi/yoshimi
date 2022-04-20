@@ -6405,6 +6405,24 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     unsigned char Xincrement = getData->data.offset;
     //if (write)
         //std::cout << "from " << cameFrom << std::endl;
+    //synth->CBtest(getData);
+
+    if (getData->data.control == ENVELOPEINSERT::control::enableFreeMode)
+    {
+        if (write)
+        {
+            add2undo(getData, noteSeen);
+            pars->Pfreemode = (val != 0);
+        }
+        else
+            val = pars->Pfreemode;
+        getData->data.value = pars->Pfreemode;;
+        return;
+    }
+    else if (getData->data.control == ENVELOPEINSERT::control::edit)
+        return; // only of interest to the GUI
+
+
     int envpoints = pars->Penvpoints;
 
     if (pars->Pfreemode)
@@ -6494,17 +6512,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         case ENVELOPEINSERT::control::edit:
             break;
 
-        case ENVELOPEINSERT::control::enableFreeMode:
-            if (write)
-            {
-                if (val != 0)
-                    pars->Pfreemode = 1;
-                else
-                    pars->Pfreemode = 0;
-            }
-            else
-                val = pars->Pfreemode;
-            break;
         case ENVELOPEINSERT::control::points:
             if (!pars->Pfreemode)
             {
