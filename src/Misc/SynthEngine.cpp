@@ -547,6 +547,47 @@ void SynthEngine::setReproducibleState(int seed)
 }
 
 
+namespace {
+    // helper to support automated testing of PADSynth wavetable swap
+    inline PADnoteParameters* findFirstPADSynth(Part *part[NUM_MIDI_PARTS])
+    {
+        for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+            if (part[p] and part[p]->Penabled)
+                for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+                {
+                    Part::KitItem& kitItem = part[p]->kit[i];
+                    if (kitItem.padpars and kitItem.Ppadenabled)
+                        return kitItem.padpars;
+                }
+        return nullptr;
+    }
+}
+
+/* for automated testing: stash aside the wavetable of one PADSynth and possibly swap in another.
+ * Works together with the CLI command test/swapWave. See TestInvoker::swapPadTable() */
+void SynthEngine::swapTestPADtable()
+{
+    static unique_ptr<PADTables> testWavetable{nullptr};
+    // find the first enabled PADSynth to work on
+    auto padSynth = findFirstPADSynth(part);
+    if (not padSynth) return;
+
+    if (not testWavetable) // init with empty (muted) wavetable
+        testWavetable.reset(new PADTables{padSynth->Pquality});
+
+    using std::swap;
+    swap(padSynth->waveTable, *testWavetable);
+    padSynth->presetsUpdated();
+    if (padSynth->PxFadeUpdate)
+    {// rig a cross-fade for ongoing notes to pick up
+        PADTables copy4fade{padSynth->Pquality};
+        copy4fade.cloneDataFrom(*testWavetable);
+        padSynth->xFade.startXFade(copy4fade);
+    }
+}
+
+
+
 // Note On Messages
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
 {

@@ -5743,6 +5743,12 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
         // just consume; we are already in the test context
     }
 
+    if (controlType == TOPLEVEL::type::Write && input.matchWord(2, "swapwave"))
+    {// special treatment for testing the PADSynth wavetable swap and cross-fade
+        synth->setReproducibleState(0); // re-seed PRNG and rebuild all PAD wavetables (blocking).
+        synth->swapTestPADtable();
+    }// note: the following handler will consume the "swapwave" command and store the offset parameter
+
     string response;
     if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))
         synth->getRuntime().Log(response);

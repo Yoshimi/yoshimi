@@ -326,6 +326,7 @@ class SynthEngine
         float numRandom()   { return prng.numRandom(); }
         uint32_t randomINT(){ return prng.randomINT(); }   // random number in the range 0...INT_MAX
         void setReproducibleState(int value);
+        void swapTestPADtable();
 };
 
 #endif

@@ -43,6 +43,7 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
     ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h
     ../Misc/Alloc.h ../Misc/BuildScheduler.cpp ../Misc/BuildScheduler.h
+    ../Misc/TestInvoker.h ../Misc/TestSequence.h
     ../Misc/WaveShapeSamples.h)
 file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h

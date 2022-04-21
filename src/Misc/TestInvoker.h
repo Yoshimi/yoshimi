@@ -28,8 +28,10 @@
 #include <functional>
 #include <vector>
 #include <memory>
+#include <cmath>
 #include <ctime>
 
+#include "Misc/TestSequence.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/CliFuncs.h"
 #include "Misc/Alloc.h"
@@ -225,6 +227,9 @@ class TestInvoker
     float  holdfraction;     // fraction of the duration until sending note off
     int    repetitions;      // number of test tones in sequence
     int    scalestep;        // semi tones up/down to move for each tone
+    float  aOffset;          // play additional overlapping note with given offset
+    float  aHold;            // play additional overlapping note this holdfraction
+    float  swapWave;         // capture secondary PAD-wavetable and swap it after that offset time(fraction)
     size_t chunksize;        // number of samples to calculate at once. Note: < SynthEngine.buffersize
     string targetFilename;   // RAW file to write generated samples; "" => just calculate, don't write to file
 
@@ -241,6 +246,9 @@ class TestInvoker
             holdfraction{0.8},
             repetitions{4},
             scalestep{4},    // move major third upwards
+            aOffset{0.0},
+            aHold{0.0},
+            swapWave{0.0},
             chunksize{0},    // 0 means: initialise to SynthEngine.buffersize
             targetFilename{""},
             smpCnt{0}
@@ -267,8 +275,11 @@ class TestInvoker
                 || doTreatParameter<midiVal>(operation, this->velocity,      "velocity",   "MIDI Velocity",          64,   0,127,  string2int127,       input, response)
                 || doTreatParameter<float>  (operation, this->duration,      "duration",   "Overall duration(secs)",1.0,   0, 10,  limited(0.01f,10.0f),input, response)
                 || doTreatParameter<float>  (operation, this->holdfraction,  "holdfraction","Note hold (fraction)", 0.8,   0,1.0,  limited(0.1f,1.0f),  input, response)
-                || doTreatParameter<int>    (operation, this->repetitions,   "repetitions","Test note repetitions",   4,   1,100,  limited(1,100),      input, response)
+                || doTreatParameter<int>    (operation, this->repetitions,   "repetitions","Test note repetitions",   4,   1,500,  limited(1,500),      input, response)
                 || doTreatParameter<int>    (operation, this->scalestep,     "scalestep",  "Semi tones up/down",      4,-100,100,  limited(-100,+100),  input, response)
+                || doTreatParameter<float>  (operation, this->aOffset,       "aoffset",    "Add tone offset",       0.0,   0,0.9,  limited(0.0f,0.9f),  input, response)
+                || doTreatParameter<float>  (operation, this->aHold,         "ahold",      "Add tone hold",         0.0,   0,0.9,  limited(0.0f,0.9f),  input, response)
+                || doTreatParameter<float>  (operation, this->swapWave,      "swapwave",   "Swap PADtable after",   0.0,   0,0.9,  limited(0.0f,0.9f),  input, response)
                 || doTreatParameter<size_t> (operation, this->chunksize,     "buffersize", "Smps per call",        bfsz,   1,bfsz, limited(1,bfsz),     input, response)
                 || doTreatParameter<string> (operation, this->targetFilename,"target",     "Target RAW-filename",    "",  "","?",  getFilename,         input, response)
                  ;
@@ -276,17 +287,20 @@ class TestInvoker
 
         string showTestParams(bool compact)
         {
+            auto percent = [](float frac){ return asString(100*frac)+"%"; };
             if (compact)
                 return string{" TEST: "}
                      + (repetitions > 1? asString(repetitions)+"·":"")
                      + asMidiNoteString(pitch)
                      + (repetitions == 1? "" : scalestep==0? "" : " "+asString(scalestep) + (scalestep > 0? "⤴":"⤵"))
                      + " "+(duration < 1.0? asCompactString(duration*1000)+"ms" : asCompactString(duration)+"s")
+                     + (aOffset or aHold? " +("+percent(aOffset)+"/"+percent(aHold)+")":"")
+                     + (swapWave? " swap("+percent(swapWave)+")!":"")
                      + (0==targetFilename.length()? "":" >>\""+targetFilename+"\"")
                      ;
             else
                 return string{" TEST: exec "}
-                     + (repetitions > 1? asString(repetitions)+" notes ":"")
+                     + (repetitions > 1? asString(repetitions)+(aOffset or aHold? " cycles ":" notes "):"")
                      + (repetitions > 1 && scalestep != 0? ("start "+asMidiNoteString(pitch)+" step "+asString(scalestep)
                                                            +  (scalestep > 0? " up":" down")
                                                            +" to "+asMidiNoteString(bouncedNote(pitch+(repetitions-1)*scalestep))
@@ -296,7 +310,9 @@ class TestInvoker
                      + (velocity!=64? " vel."+asString(int(velocity)):"")
                      + (repetitions > 1? " each ":" for ")
                      + (duration < 1.0? asCompactString(duration*1000)+"ms" : asCompactString(duration)+"s")
-                     + (holdfraction < 1.0? " (hold"+asString(100*holdfraction)+"%)":"")
+                     + (holdfraction < 1.0? " (hold"+percent(holdfraction)+")":"")
+                     + (aOffset or aHold? " +add.tone(after"+percent(aOffset)+" hold"+percent(aHold)+")":"")
+                     + (swapWave? " swap PADSynth after"+percent(swapWave):"")
                      + " buffer="+asString(chunksize)
                      + (0==targetFilename.length()? " [calc only]":" write \""+targetFilename+"\"")
                      ;
@@ -364,6 +380,58 @@ class TestInvoker
 
 
 
+        template<class FUN>
+        void insertNote(TestSequence& testSeq, SynthEngine& synth, FUN& noteScale, float hold, float offset =0.0)
+        {
+            auto noteSlot = std::make_shared<int>(0);
+            TestSequence::Event noteOn =  [&, noteSlot]()
+                                          {
+                                              *noteSlot = noteScale();    //  draw next note from sequence
+                                              synth.NoteOn(chan-1, *noteSlot, velocity);
+                                          };
+            TestSequence::Event noteOff = [&, noteSlot]()
+                                          {
+                                              synth.NoteOff(chan-1, *noteSlot);
+                                          };
+
+            testSeq.addNote(noteOn,noteOff, hold, offset);
+        }
+
+        /* the test will execute sequence of note events, together with the appropriate count of
+         * compute-synth calls to yield the desired note duration; this sequence can be repeated
+         * several times. Each further note "draws" from the noteSacle as defined by the scaleStep
+         * (e.g. move up a major third); since the corresponding noteOn/noteOff events need to send
+         * the same MIDI note, a shared variable is allocated on the heap and used by both events.
+         * Depending on the test parameters, more than one note might be placed into a common
+         * "timeline", e.g. to cover legato notes or PADSynth wavetable swapping.
+         */
+        template<class FUN>
+        TestSequence buildTestSequence(SynthEngine& synth, size_t turnCnt, FUN& noteScale)
+        {
+            TestSequence testSeq{turnCnt};
+
+            // always insert at least one test note pre cycle...
+            insertNote(testSeq, synth, noteScale, holdfraction);
+
+            if (aOffset > 0.0 or aHold > 0.0)
+            {// insert a second overlapping note
+                if (aHold == 0.0)
+                    aHold = holdfraction;
+                insertNote(testSeq, synth, noteScale, aHold, aOffset);
+            }
+
+            if (swapWave > 0.0)
+            {// insert a event to swap PADSynth wavetables (-> trigger crossfade)
+                TestSequence::Event swap = [&](){ synth.swapTestPADtable(); };
+                testSeq.addEvent(swap, 0.0);      // at begin of each cycle: swap in the old wavetable
+                testSeq.addEvent(swap, swapWave); // at defined offset: swap in the new wavetable
+            }// Note: "old" wavetable has already been build and stored on CLI command "swapWave"
+
+            return testSeq;
+        }
+
+
+
         void pullSound(SynthEngine& synth, Samples& buffer, OutputFile& output, StopWatch& timer)
         {
             float* buffL[NUM_MIDI_PARTS + 1];
@@ -376,23 +444,28 @@ class TestInvoker
 
             // find out how much buffer cycles are required to get the desired note play time
             size_t turnCnt = ceilf(duration * synth.samplerate / chunksize);
-            size_t holdCnt = ceilf(holdfraction*duration * synth.samplerate / chunksize);
-            holdCnt = std::min(holdCnt,turnCnt);
+            // quantise the noteOff point to happen exactly after a buffer cycle
+            holdfraction = ceilf(holdfraction*duration * synth.samplerate / chunksize) / turnCnt;
+
+            auto noteScale = [midiNote{pitch},step{scalestep}]() mutable -> int
+                             {
+                                 int curr = bouncedNote(midiNote);  // bounce back when leaving value range
+                                 midiNote += step;
+                                 return curr;
+                             };
 
             // calculate sound data
+            TestSequence testSeq = buildTestSequence(synth,turnCnt,noteScale);
             for (int tone=0; tone<repetitions; ++tone)
             {
                 synth.ShutUp();
-                int midiNote = pitch + tone*scalestep;
-                midiNote = bouncedNote(midiNote); // bounce back when leaving value range
-
                 timer.start();
-                synth.NoteOn(chan-1, midiNote, velocity);
-                for (size_t i=0; i<holdCnt; ++i)
-                    computeCycle(synth,buffL,buffR,output);
-                synth.NoteOff(chan-1, midiNote);
-                for (size_t i=0; i < (turnCnt-holdCnt); ++i)
-                    computeCycle(synth,buffL,buffR,output);
+                for (auto const& seg : testSeq)
+                {
+                    seg.event();
+                    for (size_t i=0; i<seg.step; ++i)
+                        computeCycle(synth,buffL,buffR,output);
+                }
                 timer.stop();
             }
         }

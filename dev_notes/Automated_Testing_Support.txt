@@ -71,11 +71,36 @@ The following parameters of the test are exposed for set / get / min / max / def
         excluding the time spent in shutUp(), since the goal is to capture the performance
         of regular sound processing.
 
-    "SCalestep [n]",
+    "SCalestep [n]"
         Move up/down by this number of semi tones before repeating, default is 4 (major third).
         This allows to cover the whole sonic range with a sequence of test tones; if the note
         number reaches the end of the allowed MIDI note range, it "bounces" and the series
         continues in reversed direction.
+
+    "AOffset [n]"
+        Launch an additional possibly overlapping note within each repetition; this allows
+        to cover legato and portamento effects. The second note is started at a well defined
+        reproducible point just before a SynthEngine::MasterAudio() call. The start offset n
+        of this additional note is defined as fraction of the total "Duration" parameter and
+        by default the hold time will be defined by the current "Holdfraction" setting.
+
+    "AHold [n]"
+        use a different hold-fraction for an additional (possibly overlapping) note. Together with
+        the AOffset setting it is thus possible to start the second note within the play time of
+        the main note, partially overlapping or completely afterwards.
+
+    "SWapWave [n]"
+        Provide a new wavetable to the first PADSynth item while test is underway.
+        When PADSynth detects the availability of a new wavetable (which is typically built
+        within a background task), it will reconfigure currently playing notes and possibly
+        perform a cross fade for a smooth transition. New notes started after that point will
+        only use the new wavetable. To cover this behaviour, the wavetable of the first enabled
+        PADSynth kitItem (typically part 1 and kitItem 1) will be built right at that point when
+        this command is given at CLI, and based on the parameters set at that point. Any parameter
+        changes made afterwards will be reflected in the second wavetable. Each repetition will then
+        start with the first wavetable, and after offset n (given as fraction of the total "Duration")
+        has passed, the second wavetable will be swapped in. Both wavetables will be built after
+        reseeding the Synth for reproducible test state.
 
     "BUffersize [n]"
         Actual number of samples to request from MasterAudio(), default is the global buffsize,

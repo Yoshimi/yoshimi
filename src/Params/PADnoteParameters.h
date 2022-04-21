@@ -121,6 +121,24 @@ public: // can be moved and swapped, but not copied...
         return samples[tableNo];
     }
 
+    fft::Waveform const& operator[](size_t tableNo)  const
+    {   return const_cast<PADTables*>(this)->operator[](tableNo); }
+
+
+    void cloneDataFrom(PADTables const& org)
+    {
+        const_cast<size_t&>(numTables) = org.numTables;
+        const_cast<size_t&>(tableSize) = org.tableSize;
+        samples.clear(); // discard existing allocations (size may differ)
+        basefreq.reset(new float[numTables]);
+        for (size_t tab=0; tab < numTables; ++tab)
+        {
+            samples.emplace_back(tableSize);
+            samples[tab]  = org[tab];   // clone sample data
+            basefreq[tab] = org.basefreq[tab];
+        }
+    }
+
     // deliberately allow to swap two PADTables,
     // even while not being move assignable due to the const fields
     friend void swap(PADTables& p1, PADTables& p2)
