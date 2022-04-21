@@ -269,18 +269,15 @@ WaveInterpolator* PADnote::setupCrossFade(WaveInterpolator* newInterpolator)
         {// Warning: not thread-safe!
             pars.xFade.attachFader();
             PADStatus::mark(PADStatus::FADING, synth.interchange, pars.partID,pars.kitID);
-            std::cout << "XFade-ATTACH.. Freq="<<note.freq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
         };
         auto detachCrossFade = [&]()
         {// Warning: not thread-safe!
-            std::cout << "XFade-DETACH.. Freq="<<note.freq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
             pars.xFade.detachFader();
             if (not pars.xFade)
                 PADStatus::mark(PADStatus::CLEAN, synth.interchange, pars.partID,pars.kitID);
         };
         auto switchInterpolator = [&](WaveInterpolator* followUpInterpolator)
         {
-            std::cout << "XFade-COMPLETE Freq="<<note.freq<<" PADnote "<<this<<std::endl;        ////////////////TODO padthread debugging output
             waveInterpolator.reset(followUpInterpolator);
         };
         static_assert(PADnoteParameters::XFADE_UPDATE_MAX/1000 * 96000  < std::numeric_limits<size_t>::max(),

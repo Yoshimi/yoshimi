@@ -25,7 +25,6 @@
 #include "Interface/InterChange.h"
 #include "Misc/FormatFuncs.h"
 
-#include <iostream>      ////////////////TODO padthread debugging output
 #include <functional>
 #include <string>
 #include <array>
@@ -95,10 +94,7 @@ public:
             and stateMsg.data.part == partID
             and stateMsg.data.kit  == kitID
            )
-        {   //////////////////////////////////////////////////////////////////////////TODO padthread debugging output
-            std::cout << "--->> PADStatus("<<int(stateMsg.data.offset)<<") @@ ("<<int(partID)<<","<<int(kitID)<<")"<<std::endl;    ////////////////TODO padthread debugging output
             activateStage(Stage(stateMsg.data.offset));
-        }   //////////////////////////////////////////////////////////////////////////TODO padthread debugging output
     }
 
 
@@ -132,7 +128,6 @@ inline void PADStatus::mark(Stage newStage, InterChange& interChange, uchar part
     stateMsg.data.spare1    = UNUSED;
     stateMsg.data.value     = 0;
 
-    std::cout << ">---> PADStatus("<<int(stateMsg.data.offset)<<") to ("<<int(partID)<<","<<int(kitID)<<")"<<std::endl;    ////////////////TODO padthread debugging output
     bool success = interChange.toGUI.write(stateMsg.bytes);
     if (not success)
         interChange.Log("Failure PADStatus sending toGUI: newStage="+func::asString(newStage));

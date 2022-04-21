@@ -44,7 +44,6 @@ namespace { // Implementation details of scheduling...
     {
         size_t cpuCount = std::thread::hardware_concurrency();
         int free = cpuCount * OVERPROVISIONING - REQUIRED_HEADROOM;
-std::cout << "**·!!·|BuildScheduler: THREAD_LIMIT = "<<std::max(free, 1) <<std::endl;        ////////////////TODO padthread debugging output
         return std::max(free, 1);
     }
 
@@ -99,12 +98,10 @@ std::cout << "**·!!·|BuildScheduler: THREAD_LIMIT = "<<std::max(free, 1) <<std
                 if (runningThreads == 0)
                     throw std::logic_error("BuildScheduler: worker thread management floundered");
                 --runningThreads;
-std::cout << "**·⬙⬙·|BuildScheduler: terminated Worker-"<<runningThreads+1 <<std::endl;        ////////////////TODO padthread debugging output
             }
 
             void launchWorker()
             {
-std::cout << "**·⬘⬘·|BuildScheduler: launch Worker-"<<runningThreads+1 <<std::endl;        ////////////////TODO padthread debugging output
                 // note: mutex locked at caller
                 std::thread backgroundThread(
                     [this] () -> void
@@ -114,9 +111,7 @@ std::cout << "**·⬘⬘·|BuildScheduler: launch Worker-"<<runningThreads+1 <<s
                                     workOp();
                                 }
                                 catch(...)
-                                {/* absorb failure in workOp */
-std::cout << "**·☀☀·|BuildScheduler: FAILURE in workOp()..." <<std::endl;        ////////////////TODO padthread debugging output
-                                }
+                                {/* absorb failure in workOp */}
                             markWorker_finished();
                         });
                 backgroundThread.detach();
@@ -131,7 +126,6 @@ std::cout << "**·☀☀·|BuildScheduler: FAILURE in workOp()..." <<std::endl; 
                     return Task(); // empty Task to signal end
                 Task nextWorkOp(move(waitingTasks.front()));
                 waitingTasks.pop();
-if (waitingTasks.size()) std::cout << "**·⌛⌛·|BuildScheduler: "<<waitingTasks.size()<<" Tasks waiting..." <<std::endl;        ////////////////TODO padthread debugging output
                 return nextWorkOp;
             }
     };

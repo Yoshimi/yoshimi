@@ -24,14 +24,8 @@
 #include "globals.h"
 #include "Misc/RandomGen.h"
 #include "Misc/NumericFuncs.h"
-//#include "Interface/InterChange.h"
-//#include "Misc/FormatFuncs.h"
 
-#include <iostream>      ////////////////TODO padthread debugging output
 #include <cassert>
-//#include <functional>
-//#include <string>
-//#include <array>
 
 
 /**
@@ -108,7 +102,6 @@ public:
             {// strictly symmetrical distribution to avoid drift
                 float offset = 2.0f * rnd - 1;   //  ]-1 ... +1[
                 assert(-1 < offset and offset < 1);
-std::cout << "~~~~> Walk "<<pos<<"+"<<spread<<"*"<<offset<<"="<<pos+spread*offset<<" --> factor="<<powf(2,pos+spread*offset)<<std::endl;    ////////////////TODO padthread debugging output
                 pos += spread * offset;          //  random walk
                 float dist = fabsf(pos/spread);
                 if (dist > 1 and pos*offset > 0)

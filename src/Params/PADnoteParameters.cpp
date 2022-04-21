@@ -696,7 +696,6 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
 
 void PADnoteParameters::buildNewWavetable(bool blocking)
 {
-    std::cout << "buildNewWavetable("<<(synth->getRuntime().useLegacyPadBuild()? "Legacy" : blocking? "blocking" : "trigger-bg")<<")" << std::endl;        ////////////////TODO padthread debugging output
     PADStatus::mark(PADStatus::DIRTY, synth->interchange, partID,kitID);
     if (synth->getRuntime().useLegacyPadBuild())
         mute_and_rebuild_synchronous();
@@ -705,7 +704,6 @@ void PADnoteParameters::buildNewWavetable(bool blocking)
         futureBuild.requestNewBuild();
     else
     {   // Guarantee to invoke a new build NOW and block until it is ready...
-        std::cout << "blocking wait for background work.... isUnderway() == "<<futureBuild.isUnderway()<< std::endl;        ////////////////TODO padthread debugging output
         // This is tricky, since new builds can be triggered any time from the GUI
         // and also the SynthEngine might pick up the result concurrently.
 
@@ -718,7 +716,6 @@ void PADnoteParameters::buildNewWavetable(bool blocking)
         // (3) again wait for this build to complete...
         //     Note: Result will be published to SynthEngine -- unless a new build was triggered
         futureBuild.blockingWait(true);
-        std::cout << "blocking wait finished. futureBuild.isReady() = " << futureBuild.isReady() <<std::endl;        ////////////////TODO padthread debugging output
     }
 }
 
@@ -734,7 +731,6 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
     PADTables newTable(Pquality);
     const size_t spectrumSize = newTable.tableSize / 2;
     PADStatus::mark(PADStatus::BUILDING, synth->interchange, partID,kitID);
-    std::cout << "++·↯↯·START building.... spectrumsize="<<spectrumSize << std::endl;        ////////////////TODO padthread debugging output
 
     // prepare storage for a very large spectrum and FFT transformer
     fft::Calc fft{newTable.tableSize};
@@ -745,10 +741,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
                                       : vector<float>(); // empty dummy
 
     if (futureBuild.shallRebuild())
-    {
-        std::cout << "++·↰↰·ABORT render_wavetable (1 : after Profile)" << std::endl;        ////////////////TODO padthread debugging output
         return Optional<PADTables>::NoResult;
-    }
 
     float baseNoteFreq = 65.406f * power<2>(Pquality.basenote / 2);
     if (Pquality.basenote %2 == 1)
@@ -778,10 +771,7 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         }
 
         if (futureBuild.shallRebuild())
-        {
-            std::cout << "++·↰↰·ABORT render_wavetable (2 : before IFFT)" << std::endl;        ////////////////TODO padthread debugging output
             return Optional<PADTables>::NoResult;
-        }
 
         fft::Waveform& newsmp = newTable[tabNr];
         newsmp[0] = 0.0f;                ///TODO 12/2021 (why) is this necessary? Doesn't the IFFT generate a full waveform?
@@ -795,7 +785,6 @@ Optional<PADTables> PADnoteParameters::render_wavetable()
         newsmp.fillInterpolationBuffer();
     }
 
-    std::cout << "++·✔✔·DONE render_wavetable(). Address="<<&newTable[0][0]<<std::endl;        ////////////////TODO padthread debugging output
     PADStatus::mark(PADStatus::PENDING, synth->interchange, partID,kitID);
     return newTable;
 }
@@ -815,16 +804,10 @@ void PADnoteParameters::activate_wavetable()
     if (futureBuild.isReady()
         and (PxFadeUpdate == 0 or xFade.startXFade(waveTable)))
     {                          // Note: don't pick up new waveTable while fading
-        if (xFade)                                                                              ////////////////TODO padthread debugging output
-            std::cout << "RLY activate + XFade ="<<float(PxFadeUpdate)/1000<<"s"<<std::endl;    ////////////////TODO padthread debugging output
-        else                                                                                    ////////////////TODO padthread debugging output
-            std::cout << "RLY activate.. old wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
-        synth->getRuntime().Log("PADSynth: switch to new wavetable.");
         PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
         futureBuild.swap(waveTable);
         presetsUpdated();
         sampleTime = 0;
-        std::cout << "... after swap new wavetable: "<<&waveTable[0][0] <<std::endl;        ////////////////TODO padthread debugging output
     }
     else
         maybeRetrigger();
@@ -861,18 +844,15 @@ void PADnoteParameters::maybeRetrigger()
  * without any background thread scheduling. */
 void PADnoteParameters::mute_and_rebuild_synchronous()
 {
-    std::cout << "buildNewWavetable(OLDSTYLE)" << std::endl;        ////////////////TODO padthread debugging output
     waveTable.reset();   // mute by zeroing
     auto result = render_wavetable();
     if (result)
     {
         using std::swap;
         swap(waveTable, *result);
-std::cout << "RLY swap().. old wavetable: "<<&(*result)[0][0] <<" --new--> "<<&waveTable[0][0]<<std::endl;   ////////////////TODO padthread debugging output
         presetsUpdated();
         sampleTime = 0;
     }
-    std::cout << "buildNewWavetable: synchronous build finished" << std::endl;        ////////////////TODO padthread debugging output
 }
 
 
@@ -1227,10 +1207,8 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         randWalkProfileStretch .setSpread(PrandWalkProfileStretch);
     }
     // trigger re-build of the wavetable as background task...
-    std::cout << "|PADpar::getfromXML| silence PADtables..." << std::endl;       ////////////////TODO padthread debugging output
     waveTable.reset();           // silence existing sound from previous instruments using the same part
     futureBuild.blockingWait();  // possibly retrieve result of ongoing build without publishing (Note: blocks consecutive instrument loads from MIDI)
-    std::cout << "|PADpar::getfromXML| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
     buildNewWavetable();         // launch rebuild of wavetables for the new instrument (background task)
     // result will be picked up from PADnote::noteout() when ready
 }

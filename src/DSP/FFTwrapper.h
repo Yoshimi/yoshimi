@@ -34,7 +34,6 @@
 #include <memory>
 #include <mutex>
 #include <map>
-#include <iostream>        ////////////////TODO padthread debugging output
 
 namespace fft {
 
@@ -324,15 +323,12 @@ public:
     FFTplan retrieve_or_create_Plan(size_t fftSize)
     {
         Guard lock(mtx_createPlan);
-std::cout << "++·⇉⇉·FFTplan size="<<fftSize<<"?" << std::endl;        ////////////////TODO padthread debugging output
         auto pos = cache.find(fftSize);
         if (pos != cache.end())
             return FFTplan{pos->second};
 
-std::cout << "++·↯↯·FFTplan create -> cache" << std::endl;            ////////////////TODO padthread debugging output
         auto res = cache.emplace(fftSize, FFTplan{fftSize});
         assert(res.second);
-std::cout << "++·✔✔·FFTplan created(size="<<fftSize<<") cache.size()="<<cache.size() << std::endl;  ////////////////TODO padthread debugging output
         return FFTplan{res.first->second};
     }
 };

@@ -23,54 +23,16 @@
 #define TEST_SEQUENCE_H
 
 #include <string>
-//#include <unistd.h>
-//#include <iostream>
 #include <cassert>
 #include <functional>
 #include <vector>
 #include <memory>
 #include <cmath>
-//#include <ctime>
 
 #include "globals.h"
-//#include "Misc/SynthEngine.h"
-//#include "Misc/CliFuncs.h"
-//#include "Misc/Alloc.h"
-//#include "CLI/Parser.h"
 
 
 namespace test {
-
-//using std::cout;
-//using std::endl;
-//using std::string;
-//using std::function;
-//using std::ios_base;
-
-//using func::asString;
-//using func::asCompactString;
-//using func::asMidiNoteString;
-//using func::string2int;
-//using func::string2int127;
-//using func::string2float;
-
-//namespace type = TOPLEVEL::type;
-
-//using midiVal = unsigned char;
-
-
-namespace { // local implementation details
-
-    class Stop
-    {
-        size_t nanoSum;
-
-    public:
-    };
-
-}//(End)implementation detail namespace
-
-
 
 /**
  * Arrangement of Test events to be carried out for a single test cycle.

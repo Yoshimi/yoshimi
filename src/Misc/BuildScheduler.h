@@ -28,7 +28,6 @@
 #include <functional>
 #include <stdexcept>
 #include <cassert>
-#include <iostream>        ////////////////TODO padthread debugging output
 
 using std::move;
 
@@ -394,7 +393,6 @@ void FutureBuild<TAB>::requestNewBuild()
         return; // already running background task will see the dirty flag,
                 // then abort and restart itself and clear the flag
 
-std::cout << "##·••·requestNewBuild() --> indeed trigger..." <<std::endl;        ////////////////TODO padthread debugging output
     // If we reach this point, we are the first ones to set the dirty flag
     // and we can be sure there is currently no background task underway...
     // Launch a new background task, which on start clears the dirty flag.
@@ -444,11 +442,9 @@ void FutureBuild<TAB>::swap(TAB & dataToReplace)
     bool needReschedule = shallRebuild();
     if (future)
     {
-std::cout << "##+++++ swap() future:"<<future<<std::endl;        ////////////////TODO padthread debugging output
         using std::swap;
         TAB newData{move(future->get())};  // may block until value is ready
         swap(dataToReplace, newData);
-std::cout << "##+++++ swap() swapped Table-Addr="<<&dataToReplace[0][0]<<std::endl;        ////////////////TODO padthread debugging output
         delete future;
     }
     // we do not know if the "dirty" state was set before we picked up the future,
@@ -471,27 +467,16 @@ void FutureBuild<TAB>::blockingWait(bool publishResult)
 {
     // possibly wait until the actual background task was started
     while (dirty.load(std::memory_order_relaxed) and not target.load(std::memory_order_relaxed))
-    {
-std::cout << "##+++++ blockingWait() dirty = "<<dirty.load(std::memory_order_relaxed) <<std::endl;        ////////////////TODO padthread debugging output
         task::dirty_wait_delay();
-    }
-std::cout << "##+++++ blockingWait() dirty = "<<dirty.load(std::memory_order_relaxed)<<" future:"<<target.load(std::memory_order_relaxed)<<std::endl;        ////////////////TODO padthread debugging output
 
     FutureVal* future = retrieveLatestTarget();
     if (future)
     {
-std::cout << "##+++++ blockingWait() future-state BEFORE: "<<int(future->wait_for(std::chrono::microseconds(0))) <<std::endl;        ////////////////TODO padthread debugging output
         future->wait(); // blocks until result is ready
-std::cout << "##+++++ blockingWait() future-state AFTER : "<<int(future->wait_for(std::chrono::microseconds(0))) <<std::endl;        ////////////////TODO padthread debugging output
 
         // we alone hold the result now; attempt to publish it for the SynthEngine
         if (not publishResult or not installNewBuildTarget(future))
-        {
-std::cout << "##+++++ blockingWait() "<<(publishResult?" OTHER build meanwhile triggered":" DISCARD (not publish) result")<<std::endl;        ////////////////TODO padthread debugging output
              delete future; // obsolete since other background build was triggered since our wait
-        }
-        else
-std::cout << "##+++++ blockingWait() ---> successfully published" <<std::endl;        ////////////////TODO padthread debugging output
     }
 }
 

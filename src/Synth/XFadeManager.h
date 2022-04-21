@@ -72,20 +72,15 @@ class XFadeManager
         bool startXFade(WAV& existingOldTable)
         {
             if (oldTable and useCnt > 0)
-{                                                                                   ////////////////TODO padthread debugging output
-std::cout << "REJECT XFade... useCnt="<<useCnt<<" old wavetable: "<<(oldTable? &(*oldTable)[0][0]:(float*)0) <<std::endl;      ////////////////TODO padthread debugging output
                 return false;
-}                                                                                   ////////////////TODO padthread debugging output
             oldTable.reset(new WAV{std::move(existingOldTable)});
             useCnt = 0;
-std::cout << "START XFade... old wavetable: "<<&(*oldTable)[0][0] <<std::endl;      ////////////////TODO padthread debugging output
             return true;
         }
 
         void attachFader()
         {
             ++useCnt;
-std::cout << "   ...ATTACH... useCnt="<<useCnt<<std::endl;      ////////////////TODO padthread debugging output
         }
 
         void detachFader()
@@ -98,12 +93,9 @@ std::cout << "   ...ATTACH... useCnt="<<useCnt<<std::endl;      ////////////////
         {
             if (oldTable and useCnt <= 0)
             {
-std::cout << "XFade-KILL...  old wavetable: "<<&(*oldTable)[0][0] <<std::endl;      ////////////////TODO padthread debugging output
                 oldTable.reset();
                 useCnt = 0;
             }
-else                                                                                 ///////////////TODO padthread debugging output
-std::cout << "XFade     ...  use-cnt = "<<useCnt <<std::endl; //////////////////////////////////////TODO padthread debugging output
         }
 };
 

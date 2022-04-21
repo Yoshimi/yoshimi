@@ -182,7 +182,6 @@ void *InterChange::sortResultsThread(void)
          */
         while (synth->audioOut.load() == _SYS_::mute::Active)
         {
-            //std::cout << "here fetching" << std:: endl;
             if (muteQueue.read(getData.bytes))
                 indirectTransfers(&getData);
             else
@@ -224,12 +223,11 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
 {
     if (!muteQueue.write(getData->bytes))
     {
-        std::cout << "failed to write to muteQueue" << std::endl;
+        Log("failed to write to muteQueue");
         return;
     }
     if (synth->audioOut.load() == _SYS_::mute::Idle)
     {
-        //std::cout << "here pending" << std:: endl;
         synth->audioOut.store(_SYS_::mute::Pending);
     }
 }
@@ -489,7 +487,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     else // don't leave this hanging
     {
         synth->fileCompatible = true;
-        std::cout << "No indirect return" << std::endl;
     }
 }
 
@@ -877,7 +874,6 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            std::cout << "|indirectMain| buildNewWavetable(blocking=true)" << std::endl;        ////////////////TODO padthread debugging output
             synth->part[partnum]->kit[kititem].padpars->buildNewWavetable(true); // blocking wait for result
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
@@ -1496,7 +1492,6 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             if (write)
             {
                 // esp. a "blocking Apply" is redirected from Synth-Thread: commandSendReal() -> commandPad() -> returns() -> indirectTransfers()
-                std::cout << "|indirectPart::padsynthParameters| buildNewWavetable(blocking="<<(parameter == 0)<<")" << std::endl;        ////////////////TODO padthread debugging output
                 synth->part[npart]->kit[kititem].padpars->buildNewWavetable((parameter == 0));  // parameter == 0 causes blocking wait
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
@@ -2336,7 +2331,6 @@ bool InterChange::processPad(CommandBlock *getData)
 
         if (synth->getRuntime().usePadAutoApply())
         {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
-            std::cout << "|processPad::Auto-Apply| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
             synth->getRuntime().Log("PADSynth: trigger background wavetable build...");
             pars.buildNewWavetable();
         }
@@ -2353,8 +2347,6 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned char chan = getData->data.kit;
     unsigned int char1 = getData->data.engine;
     unsigned char miscmsg = getData->data.miscmsg;
-
-    //std::cout << "here MIDI " << control << "  " << value_int << "  " << int(chan) << "  " << int(char1) << std::endl;
 
     if (control == MIDI::control::controller && char1 >= 0x80)
         char1 |= 0x200; // for 'specials'
@@ -3193,7 +3185,6 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::reseed:
             synth->setReproducibleState(int(value));
-            // std::cout << "rnd " << synth->randomINT() << std::endl;
             break;
 
         case MAIN::control::soloType:
@@ -3591,10 +3582,7 @@ void InterChange::commandPart(CommandBlock *getData)
                     getData->data.control = PADSYNTH::control::applyChanges;
                 }
                 else
-                {
-                    std::cout << "|commandPart| buildNewWavetable()" << std::endl;        ////////////////TODO padthread debugging output
                     part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
-                }
             }
             else
                 value = part->kit[kititem].Ppadenabled;
@@ -4053,7 +4041,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::instrumentType:// done elsewhere
             break;
         case PART::control::defaultInstrumentCopyright: // done elsewhere
-            ;
+            break;
     }
 
     if (!write || control == PART::control::minToLastKey || control == PART::control::maxToLastKey)
@@ -5492,7 +5480,6 @@ bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
                 }
                 else
                 {// build will run in parallel within a dedicated background thread
-                    std::cout << "|commandPad| buildNewWavetable(blocking="<<blocking<<")" << std::endl;        ////////////////TODO padthread debugging output
                     pars.buildNewWavetable();
                 }
             }
@@ -6969,7 +6956,6 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     if (control == EFFECT::control::changed)
     {
-        //std::cout << "Eff Changed " << std::endl;
         if (!write)
         {
             value = eff->geteffectpar(-1);
@@ -7310,7 +7296,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             max = 127;
             def = 0;
 
-            std::cout << "Using engine defaults" << std::endl;
+            Log("Using engine defaults");
             switch (request)
             {
                 case TOPLEVEL::type::Adjust:
@@ -7357,7 +7343,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         min = 0;
         max = 127;
         def = 0;
-        std::cout << "Using insert defaults" << std::endl;
+        Log("Using insert defaults");
 
             switch (request)
             {
@@ -7490,9 +7476,8 @@ float InterChange::returnLimits(CommandBlock *getData)
                 break;
             default:
                 def = 64;
+                break;
         }
-        //std::cout << "here " << int(def) << std::endl;
-
 
         switch (request)
         {
@@ -7518,7 +7503,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    std::cout << "Using unknown defaults" << std::endl;
+    Log("Unidentified Limit reguest: using dummy defaults");
 
     switch (request)
     {
