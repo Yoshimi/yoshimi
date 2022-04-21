@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-4-21 Will
+bn2113
+* Switched keyboard undo/redo fro main.cpp to MasterUI.fl
+
 2022-4-20 Will
 bn2112
 * Bugfix: unable to cancel envelope freemode.

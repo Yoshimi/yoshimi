@@ -46,6 +46,9 @@ decl {\#define PANEL_DUAL_Y 600} {public local
 decl {\#include <FL/Fl_Tooltip.H>} {public local
 }
 
+decl {\#include <FL/Fl_Box.H>} {public local
+}
+
 decl {\#include <string>} {public local
 }
 
@@ -233,6 +236,59 @@ lineitem = n;}
     code {//
     filerlist->hide();
     delete (filerlist);} {}
+  }
+}
+
+class KeyHandle {: {public Fl_Box}
+} {
+  Function {KeyHandle(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+    code {} {}
+  }
+  Function {init(SynthEngine *_synth)} {} {
+    code {//
+        synth = _synth;} {}
+  }
+  Function {handle(int event)} {return_type int
+  } {
+    code {//
+    int ev = 0;
+    if (event == FL_FOCUS)
+        ev = 1;
+    else if (event == FL_UNFOCUS)
+        ev = 1;
+    else if (event == FL_SHORTCUT)
+    {
+        int key = Fl::event_key();
+        if (key == 'z')
+        {
+            if (Fl::event_state() == 327680) //ctrl + shift
+            {
+                synth->getGuiMaster()->redo->do_callback();
+                ev = 1;
+            }
+             else if (Fl::event_ctrl)
+             {
+                 synth->getGuiMaster()->undo->do_callback();
+                 ev = 1;
+             }
+        }
+        else if (Fl::event_alt)
+        {
+            if(key == 'r')
+            {
+                synth->getGuiMaster()->redo->do_callback();
+                ev = 1;
+            }
+            else if(key == 'u')
+            {
+                synth->getGuiMaster()->undo->do_callback();
+                ev = 1;
+            }
+        }
+    }
+    return ev;} {}
+  }
+  decl {SynthEngine *synth;} {private local
   }
 }
 
@@ -456,10 +512,16 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {697 63 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {1145 352 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
+      Fl_Box keyHandle {
+        label keyhandler
+        xywh {0 0 385 500} box FLAT_BOX
+        code0 {o->init(synth);}
+        class KeyHandle
+      }
       Fl_Box topcontrols {
         xywh {270 28 110 115} box ENGRAVED_FRAME
       }

@@ -122,41 +122,6 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-#ifdef GUI_FLTK
-static MasterUI *mainUI;
-static int handle_shortcuts(int event)
-{
-    if (!mainUI || event != FL_SHORTCUT)
-    {
-        return 1;
-    }
-
-    auto key = Fl::event_key();
-    if(Fl::event_state() == 262144 && key == 122)
-    {
-        mainUI->send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
-        return 1;
-    }
-    if (Fl::event_state() == 327680 && key == 122)
-    {
-        mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
-        return 1;
-    }
-
-    if (Fl::event_alt() && key == 117)
-    {
-            mainUI->send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
-            return 1;
-    }
-    if ((Fl::event_alt() || Fl::event_ctrl()) && key == 114)
-    {
-            mainUI->send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);
-            return 1;
-    }
-    return 1;
-}
-#endif
-
 
 static void *mainThread(void *arg)
 {
@@ -288,7 +253,6 @@ static void *mainThread(void *arg)
                 MasterUI *guiMaster = _synth->getGuiMaster(false);
                 if (guiMaster)
                 {
-                    mainUI = guiMaster;
                     if (guiMaster->masterwindow)
                     {
                         guiMaster->checkBuffer();
@@ -393,10 +357,7 @@ int mainCreateNewInstance(unsigned int forceId)
     synth->getRuntime().StartupReport(musicClient->midiClientName());
 
     if (instanceID == 0)
-    {
-        Fl::add_handler(handle_shortcuts);
         std::cout << "\nYay! We're up and running :-)\n";
-    }
     else
     {
         std::cout << "\nStarted "<< instanceID << "\n";
