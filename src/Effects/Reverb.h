@@ -28,6 +28,7 @@
 #ifndef REVERB_H
 #define REVERB_H
 
+#include "Misc/Alloc.h"
 #include "Effects/Effect.h"
 
 #define REV_COMBS 8
@@ -109,10 +110,10 @@ class Reverb : public Effect
         AnalogFilter *hpf;            // HighPass-filter on the input
         synth::InterpolatedValue<float> lpffr;
         synth::InterpolatedValue<float> hpffr;
-        float* inputbuf;
+        Samples inputbuf;
 
-        void preprocessInput(float *rawL, float *rawR, float* inputFeed);
-        void calculateReverb(size_t ch, float* inputFeed, float *output);
+        void preprocessInput(float *rawL, float *rawR, Samples& inputFeed);
+        void calculateReverb(size_t ch, Samples& inputFeed, float *output);
         void setupPipelines();
         void clearBuffers();
 };

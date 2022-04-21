@@ -26,9 +26,6 @@
 
 #include <cmath>
 
-using namespace std;
-
-#include "DSP/FFTwrapper.h"
 #include "DSP/Unison.h"
 #include "DSP/AnalogFilter.h"
 #include "Misc/SynthEngine.h"
@@ -93,10 +90,10 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     lpf(NULL),
     hpf(NULL), // no filter
     lpffr(0, synth->samplerate),
-    hpffr(0, synth->samplerate)
+    hpffr(0, synth->samplerate),
+    inputbuf(_synth->buffersize)
 {
     setvolume(48);
-    inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
 
@@ -132,7 +129,6 @@ Reverb::~Reverb()
         delete [] ap[i];
     for (i = 0; i < REV_COMBS * 2; ++i)
         delete [] comb[i];
-    fftwf_free(inputbuf);
 
     if (bandwidth)
         delete bandwidth;
@@ -161,7 +157,7 @@ void Reverb::clearBuffers()
 
 
 // Process one channel; 0 = left, 1 = right
-void Reverb::calculateReverb(size_t ch, float* inputFeed, float *output)
+void Reverb::calculateReverb(size_t ch, Samples& inputFeed, float *output)
 {
     ////TODO: implement the high part from lohidamp    (comment probably from original author, before 2010)
 
@@ -216,7 +212,7 @@ namespace { //Helper: detect change above rounding errors for frequency interpol
 }
 
 
-void Reverb::preprocessInput(float *rawL, float *rawR, float* inputFeed)
+void Reverb::preprocessInput(float *rawL, float *rawR, Samples& inputFeed)
 {
     for (size_t i = 0; i < size_t(synth->sent_buffersize); ++i)
     {
@@ -234,7 +230,7 @@ void Reverb::preprocessInput(float *rawL, float *rawR, float* inputFeed)
     }
 
     if (bandwidth)
-        bandwidth->process(synth->sent_buffersize, inputFeed);
+        bandwidth->process(synth->sent_buffersize, inputFeed.get());
 
     if (lpf)
     {
@@ -245,7 +241,7 @@ void Reverb::preprocessInput(float *rawL, float *rawR, float* inputFeed)
             lpf->interpolatenextbuffer();
             lpf->setfreq(lpffr.getValue());
         }
-        lpf->filterout(inputFeed);
+        lpf->filterout(inputFeed.get());
     }
      if (hpf)
     {
@@ -256,7 +252,7 @@ void Reverb::preprocessInput(float *rawL, float *rawR, float* inputFeed)
             hpf->interpolatenextbuffer();
             hpf->setfreq(hpffr.getValue());
         }
-         hpf->filterout(inputFeed);
+         hpf->filterout(inputFeed.get());
     }
 }
 

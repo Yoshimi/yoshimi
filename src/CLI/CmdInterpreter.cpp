@@ -65,6 +65,7 @@ namespace cli {
 
 using std::string;
 using std::to_string;
+using std::stringstream;
 using std::vector;
 using std::list;
 using std::cout;
@@ -424,7 +425,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     else if (bitTest(context, LEVEL::Oscillator))
     {
         int type = (int)readControl(synth, 0, OSCILLATOR::control::baseFunctionType, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::oscillatorGroup);
-        if (type > OSCILLATOR::wave::hyperSec)
+        if (type == OSCILLATOR::wave::user)
             result += " user";
         else
             result += (" " + waveshape[type]);
@@ -919,7 +920,7 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
 
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nSet CONfig REPorts [s] - set report destination (gui/stderr)" << endl;
+        cout << "\nSet CONfig REPorts [s] - set report destination (Gui/Stdout)" << endl;
 
     synth->cliOutput(msg, LINES);
     return REPLY::exit_msg;
@@ -3077,6 +3078,18 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         command = CONFIG::control::padSynthInterpolation;
         value = !input.matchnMove(1, "linear");
     }
+    else if (input.matchnMove(3, "buildpad"))
+    {
+        command = CONFIG::control::handlePadSynthBuild;
+        if (input.matchnMove(1, "muted"))
+            value = 0;
+        else if (input.matchnMove(1, "background"))
+            value = 1;
+        else if (input.matchnMove(1, "autoapply"))
+            value = 2;
+        else if (controlType == TOPLEVEL::type::Write)
+            return REPLY::value_msg;
+    }
     else if (input.matchnMove(1, "virtual"))
     {
         command = CONFIG::control::virtualKeyboardLayout;
@@ -4788,11 +4801,44 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
         cmd = PADSYNTH::control::spectrumMode;
     }
+    else if (input.matchnMove(2, "xfadeupdate"))
+    {
+        cmd = PADSYNTH::control::xFadeUpdate;
+    }
+    else if (input.matchnMove(2, "buildtrigger"))
+    {
+        cmd = PADSYNTH::control::rebuildTrigger;
+    }
+    else if (input.matchnMove(3, "rwdetune"))
+    {
+        cmd = PADSYNTH::control::randWalkDetune;
+    }
+    else if (input.matchnMove(3, "rwbandwidth"))
+    {
+        cmd = PADSYNTH::control::randWalkBandwidth;
+    }
+    else if (input.matchnMove(3, "rwfilterfreq"))
+    {
+        cmd = PADSYNTH::control::randWalkFilterFreq;
+    }
+    else if (input.matchnMove(3, "rwwidthprofile"))
+    {
+        cmd = PADSYNTH::control::randWalkProfileWidth;
+    }
+    else if (input.matchnMove(3, "rwstretchprofile"))
+    {
+        cmd = PADSYNTH::control::randWalkProfileStretch;
+    }
 
     if (input.matchnMove(2, "apply"))
     {
         value = 1;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
+        if(input.matchnMove(5, "force"))
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, UNUSED, parameter);
     }
 
     if (cmd > -1)
@@ -4873,6 +4919,11 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         value = 1;
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
+        if(input.matchnMove(5, "force"))
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, insert, parameter);
     }
     if (cmd > -1)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert);
@@ -5128,6 +5179,11 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         value = 1;
         insert = UNUSED;
         cmd = PADSYNTH::control::applyChanges;
+        unsigned char parameter = UNUSED;
+        if(input.matchnMove(5, "force"))
+            parameter = 0; // see InterChange::commandPad, case PADSYNTH::control::applyChanges
+                           // invokes PADnoteParameters::setpadparams(blocking)  with blocking = (parameter == 0)
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, insert, parameter);
     }
     if (cmd == -1)
         return REPLY::available_msg;
@@ -5573,7 +5629,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;
             value = string2int(input);
-            if (value < 1 || value > POLIPHONY)
+            if (value < 1 || value > POLYPHONY)
                 return REPLY::range_msg;
         }
         return sendNormal(synth, 0, value, controlType, PART::control::maxNotes, npart);
@@ -5686,6 +5742,12 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     {
         // just consume; we are already in the test context
     }
+
+    if (controlType == TOPLEVEL::type::Write && input.matchWord(2, "swapwave"))
+    {// special treatment for testing the PADSynth wavetable swap and cross-fade
+        synth->setReproducibleState(0); // re-seed PRNG and rebuild all PAD wavetables (blocking).
+        synth->swapTestPADtable();
+    }// note: the following handler will consume the "swapwave" command and store the offset parameter
 
     string response;
     if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))

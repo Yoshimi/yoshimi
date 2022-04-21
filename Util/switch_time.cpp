@@ -10,7 +10,6 @@
 #include <sys/time.h>
 # include <iostream>
 
-using namespace std;
 
 int packed(int test)
 {

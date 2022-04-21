@@ -27,15 +27,17 @@
 #define SV_FILTER_H
 
 #include "DSP/Filter_.h"
+#include "Misc/Alloc.h"
+
 
 class SynthEngine;
 
 class SVFilter : public Filter_
 {
     public:
+       ~SVFilter() = default;
         SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth);
         SVFilter(const SVFilter &orig);
-        ~SVFilter();
         Filter_* clone() { return new SVFilter(*this); };
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -65,7 +67,7 @@ class SVFilter : public Filter_
         int abovenq;   // this is 1 if the frequency is above the nyquist
         int oldabovenq;
         int needsinterpolation, firsttime;
-        float *tmpismp; // used if it needs interpolation in filterout()
+        Samples tmpismp; // used if it needs interpolation in filterout()
 
         SynthEngine *synth;
 };

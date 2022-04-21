@@ -26,34 +26,24 @@
 
 #include <iostream>
 
-#include "DSP/FFTwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 
 EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
-    Presets(_synth),
-    insertion(insertion_),
-    filterpars(NULL),
-    nefx(TOPLEVEL::insert::none),
-    efx(NULL),
-    dryonly(false)
+    Presets{_synth},
+    efxoutl{size_t(_synth->buffersize)},
+    efxoutr{size_t(_synth->buffersize)},
+    insertion{insertion_},
+    filterpars{NULL},
+    nefx{TOPLEVEL::insert::none},
+    dryonly{false},
+    efx{}
 {
     setpresettype("Peffect");
-    efxoutl = (float*)fftwf_malloc(synth->bufferbytes);
-    efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
-    memset(efxoutl, 0, synth->bufferbytes);
-    memset(efxoutr, 0, synth->bufferbytes);
     defaults();
 }
 
 
-EffectMgr::~EffectMgr()
-{
-    if (efx)
-        delete efx;
-    fftwf_free(efxoutl);
-    fftwf_free(efxoutr);
-}
 
 
 void EffectMgr::defaults(void)
@@ -70,45 +60,43 @@ void EffectMgr::changeeffect(int _nefx)
     if (nefx == _nefx)
         return;
     nefx = _nefx;
-    if (efx)
-        delete efx;
     switch (nefx)
     {
         case TOPLEVEL::insert::reverb:
-            efx = new Reverb(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::echo:
-            efx = new Echo(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::chorus:
-            efx = new Chorus(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::phaser:
-            efx = new Phaser(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::alienWah:
-            efx = new Alienwah(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::distortion:
-            efx = new Distorsion(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::eq:
-            efx = new EQ(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case TOPLEVEL::insert::dynFilter:
-            efx = new DynamicFilter(insertion, efxoutl, efxoutr, synth);
+            efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
             // put more effect here
         default:
-            efx = NULL;
+            efx.reset();
             break; // no effect (thru)
     }
     if (efx)
@@ -126,8 +114,8 @@ int EffectMgr::geteffect(void)
 // Cleanup the current effect
 void EffectMgr::cleanup(void)
 {
-    memset(efxoutl, 0, synth->bufferbytes);
-    memset(efxoutr, 0, synth->bufferbytes);
+    memset(efxoutl.get(), 0, synth->bufferbytes);
+    memset(efxoutr.get(), 0, synth->bufferbytes);
     if (efx)
         efx->cleanup();
 }
@@ -184,19 +172,19 @@ void EffectMgr::out(float *smpsl, float *smpsr)
         {
             memset(smpsl, 0, synth->sent_bufferbytes);
             memset(smpsr, 0, synth->sent_bufferbytes);
-            memset(efxoutl, 0, synth->sent_bufferbytes);
-            memset(efxoutr, 0, synth->sent_bufferbytes);
+            memset(efxoutl.get(), 0, synth->sent_bufferbytes);
+            memset(efxoutr.get(), 0, synth->sent_bufferbytes);
         }
         return;
     }
-    memset(efxoutl, 0, synth->sent_bufferbytes);
-    memset(efxoutr, 0, synth->sent_bufferbytes);
+    memset(efxoutl.get(), 0, synth->sent_bufferbytes);
+    memset(efxoutr.get(), 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
     if (nefx == TOPLEVEL::insert::eq)
     {   // this is need only for the EQ effect
-        memcpy(smpsl, efxoutl, synth->sent_bufferbytes);
-        memcpy(smpsr, efxoutr, synth->sent_bufferbytes);
+        memcpy(smpsl, efxoutl.get(), synth->sent_bufferbytes);
+        memcpy(smpsr, efxoutr.get(), synth->sent_bufferbytes);
         return;
     }
 

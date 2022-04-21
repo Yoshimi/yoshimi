@@ -38,6 +38,7 @@
     #include "MasterUI.h"
 #endif
 
+#include "Misc/Alloc.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "Params/Controller.h"
@@ -64,7 +65,12 @@ using func::bitTest;
 using func::asString;
 using func::string2int;
 
+using std::to_string;
+using std::ofstream;
+using std::ios_base;
 using std::set;
+using std::cout;
+using std::endl;
 
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
@@ -146,7 +152,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     sent_buffersize_f(0),
     ctl(NULL),
     microtonal(this),
-    fft(NULL),
+    fft(),
 #ifdef GUI_FLTK
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -165,7 +171,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     Runtime.isLittleEndian = (x.arr[0] == 0x44);
     ctl = new Controller(this);
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++ i)
-        Runtime.vectordata.Name[i] = "No Name " + to_string(i + 1);
+        Runtime.vectordata.Name[i] = "No Name " + std::to_string(i + 1);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -199,23 +205,6 @@ SynthEngine::~SynthEngine()
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         if (sysefx[nefx])
             delete sysefx[nefx];
-
-    if (Runtime.genTmp1)
-        fftwf_free(Runtime.genTmp1);
-    if (Runtime.genTmp2)
-        fftwf_free(Runtime.genTmp2);
-    if (Runtime.genTmp3)
-        fftwf_free(Runtime.genTmp3);
-    if (Runtime.genTmp4)
-        fftwf_free(Runtime.genTmp4);
-
-    if (Runtime.genMixl)
-        fftwf_free(Runtime.genMixl);
-    if (Runtime.genMixr)
-        fftwf_free(Runtime.genMixr);
-
-    if (fft)
-        delete fft;
 
     sem_destroy(&partlock);
     if (ctl)
@@ -271,17 +260,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     fadeStepShort = 1.0f / 0.005f / samplerate_f; // 5ms for 0 to 1
     ControlStep = 127.0f / 0.2f / samplerate_f; // 200ms for 0 to 127
 
-    if (!(fft = new FFTwrapper(oscilsize)))
-    {
-        Runtime.Log("SynthEngine failed to allocate fft");
-        goto bail_out;
-    }
+    fft.reset(new fft::Calc(oscilsize));
 
     sem_init(&partlock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart] = new Part(&microtonal, fft, this);
+        part[npart] = new Part(npart, &microtonal, *fft, this);
         if (!part[npart])
         {
             Runtime.Log("Failed to allocate new Part");
@@ -314,14 +299,14 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
      * were being made every time an add or sub note
      * was processed. Now global so treat with care!
      */
-    Runtime.genTmp1 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp2 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp3 = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genTmp4 = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genTmp1.reset(buffersize);
+    Runtime.genTmp2.reset(buffersize);
+    Runtime.genTmp3.reset(buffersize);
+    Runtime.genTmp4.reset(buffersize);
 
     // similar to above but for parts
-    Runtime.genMixl = (float*)fftwf_malloc(bufferbytes);
-    Runtime.genMixr = (float*)fftwf_malloc(bufferbytes);
+    Runtime.genMixl.reset(buffersize);
+    Runtime.genMixr.reset(buffersize);
 
     defaults();
     ClearNRPNs();
@@ -383,9 +368,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
 
 bail_out:
-    if (fft)
-        delete fft;
-    fft = NULL;
+    fft.reset();
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -542,7 +525,7 @@ void SynthEngine::setReproducibleState(int seed)
         if (part[p] and part[p]->Penabled)
             for (int i = 0; i < NUM_KIT_ITEMS; ++i)
             {
-                Part::Kititem& kitItem = part[p]->kit[i];
+                Part::KitItem& kitItem = part[p]->kit[i];
                 if (!kitItem.Penabled) continue; // reseed only enabled items
                 if (kitItem.adpars and kitItem.Padenabled)
                     for (int v = 0; v < NUM_VOICES; ++v)
@@ -553,15 +536,56 @@ void SynthEngine::setReproducibleState(int seed)
                     }
                 if (kitItem.padpars and kitItem.Ppadenabled)
                     {
-                        part[p]->busy = true;
-                        kitItem.padpars->oscilgen->reseed(randomINT());
-                        // rebuild PADSynth wavetable with new randseed
-                        kitItem.padpars->applyparameters();
-                        part[p]->busy = false;
+                        kitItem.padpars->reseed(randomINT());
+                        kitItem.padpars->oscilgen->forceUpdate(); // rebuild Spectrum
+                        // synchronously rebuild PADSynth wavetable with new randseed
+                        kitItem.padpars->buildNewWavetable(true);
+                        kitItem.padpars->activate_wavetable();
                     }
             }
     Runtime.Log("SynthEngine("+to_string(uniqueId)+"): reseeded with "+to_string(seed));
 }
+
+
+namespace {
+    // helper to support automated testing of PADSynth wavetable swap
+    inline PADnoteParameters* findFirstPADSynth(Part *part[NUM_MIDI_PARTS])
+    {
+        for (int p = 0; p < NUM_MIDI_PARTS; ++p)
+            if (part[p] and part[p]->Penabled)
+                for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+                {
+                    Part::KitItem& kitItem = part[p]->kit[i];
+                    if (kitItem.padpars and kitItem.Ppadenabled)
+                        return kitItem.padpars;
+                }
+        return nullptr;
+    }
+}
+
+/* for automated testing: stash aside the wavetable of one PADSynth and possibly swap in another.
+ * Works together with the CLI command test/swapWave. See TestInvoker::swapPadTable() */
+void SynthEngine::swapTestPADtable()
+{
+    static unique_ptr<PADTables> testWavetable{nullptr};
+    // find the first enabled PADSynth to work on
+    auto padSynth = findFirstPADSynth(part);
+    if (not padSynth) return;
+
+    if (not testWavetable) // init with empty (muted) wavetable
+        testWavetable.reset(new PADTables{padSynth->Pquality});
+
+    using std::swap;
+    swap(padSynth->waveTable, *testWavetable);
+    padSynth->presetsUpdated();
+    if (padSynth->PxFadeUpdate)
+    {// rig a cross-fade for ongoing notes to pick up
+        PADTables copy4fade{padSynth->Pquality};
+        copy4fade.cloneDataFrom(*testWavetable);
+        padSynth->xFade.startXFade(copy4fade);
+    }
+}
+
 
 
 // Note On Messages
@@ -2011,8 +2035,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
 
-    float *tmpmixl = Runtime.genMixl;
-    float *tmpmixr = Runtime.genMixr;
+    Samples& tmpmixl = Runtime.genMixl;
+    Samples& tmpmixr = Runtime.genMixr;
     sent_buffersize = buffersize;
     sent_bufferbytes = bufferbytes;
     sent_buffersize_f = buffersize_f;
@@ -2113,7 +2137,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             {
                 int efxpart = Pinsparts[nefx];
                 if (part[efxpart]->Penabled)
-                    insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
+                    insefx[nefx]->out(part[efxpart]->partoutl.get(),
+                                      part[efxpart]->partoutr.get());
             }
         }
 
@@ -2147,8 +2172,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 continue; // is disabled
 
             // Clear the samples used by the system effects
-            memset(tmpmixl, 0, sent_bufferbytes);
-            memset(tmpmixr, 0, sent_bufferbytes);
+            memset(tmpmixl.get(), 0, sent_bufferbytes);
+            memset(tmpmixr.get(), 0, sent_bufferbytes);
             if (!syseffEnable[nefx])
                 continue; // is off
 
@@ -2184,7 +2209,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                     }
                 }
             }
-            sysefx[nefx]->out(tmpmixl, tmpmixr);
+            sysefx[nefx]->out(tmpmixl.get(), tmpmixr.get());
 
             // Add the System Effect to sound output
             float outvol = sysefx[nefx]->sysefxgetvolume();
@@ -3627,6 +3652,9 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             max = MAX_BUFFER_SIZE;
            break;
         case CONFIG::control::padSynthInterpolation:
+            break;
+        case CONFIG::control::handlePadSynthBuild:
+            max = 2;
             break;
         case CONFIG::control::virtualKeyboardLayout:
             max = 3;

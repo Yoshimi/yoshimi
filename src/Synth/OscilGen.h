@@ -29,10 +29,12 @@
 
 #include <sys/types.h>
 #include <limits.h>
+#include <vector>
 
 #include "Misc/RandomGen.h"
 #include "Misc/WaveShapeSamples.h"
 #include "Misc/XMLwrapper.h"
+#include "DSP/FFTwrapper.h"
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
@@ -41,27 +43,35 @@ class SynthEngine;
 class OscilGen : private WaveShapeSamples
 {
     public:
-        OscilGen(FFTwrapper *fft_,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
-        ~OscilGen();
+        OscilGen(fft::Calc&,Resonance *res_, SynthEngine *_synth, OscilParameters *params_);
+       ~OscilGen() = default;
+
+        // shall not be copied or moved or assigned
+        OscilGen(OscilGen&&)                 = delete;
+        OscilGen(OscilGen const&)            = delete;
+        OscilGen& operator=(OscilGen&&)      = delete;
+        OscilGen& operator=(OscilGen const&) = delete;
+
 
         void changeParams(OscilParameters *params_);
 
         void prepare();
 
-        void get(float *smps, float freqHz);
-        // returns where should I start getting samples, used in block type randomness
-
-        void get(float *smps, float freqHz, int resonance);
-        // if freqHz is smaller than 0, return the "un-randomized" sample for UI
+        void getWave(fft::Waveform&, float freqHz, bool applyResonance =false, bool forGUI =false);
+        std::vector<float> getSpectrumForPAD(float freqHz);
 
         // Get just the phase of the oscillator.
         int getPhase();
 
-        void getbasefunction(float *smps);
+        void getbasefunction(fft::Waveform&);
 
         // called by UI
-        void getspectrum(int n, float *spc, int what); // what=0 pt. oscil,1 pt. basefunc
-        void getcurrentbasefunction(float *smps);
+        void getOscilSpectrumIntensities(size_t, float*);
+        void getBasefuncSpectrumIntensities(size_t, float*);
+        void displayBasefuncForGui(fft::Waveform&);
+        void displayWaveformForGui(fft::Waveform&);
+
+        // convert the current Oscil settings into a "user base function"
         void useasbase(void);
 
         void genDefaults(void);
@@ -72,26 +82,29 @@ class OscilGen : private WaveShapeSamples
         void newrandseed() { randseed = basePrng.randomINT() + INT_MAX/2; }
         void resetHarmonicPrng() { harmonicPrng.init(randseed); }
         void reseed(int value);
+        void forceUpdate();
 
     private:
         OscilParameters *params;
 
         SynthEngine *synth;
 
-        float *tmpsmps;
-        FFTFREQS outoscilFFTfreqs;
+        fft::Calc& fft;
+
+        fft::Waveform tmpsmps;
 
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 
-        FFTwrapper *fft;
+        // OscilGen core implementation: generate the current Spectrum -> outoscilSpectrum
+        void buildSpectrum(float freqHz, bool applyResonance, bool forGUI, bool forPAD);
 
-        // computes the basefunction and make the FFT; newbasefunc<0  = same basefunc
+        // computes the basefunction and make the FFT;
         void changebasefunction(void);
 
         void waveshape(void); // Waveshaping (no kidding!)
 
-        void oscilfilter(); // Filter the oscillator accotding to Pfiltertype and Pfilterpar
+        void oscilfilter(); // Filter the oscillator according to Pfiltertype and Pfilterpar
 
         void spectrumadjust(void); // Adjust the spectrum
 
@@ -99,15 +112,6 @@ class OscilGen : private WaveShapeSamples
 
         void modulation(void); // Do the oscil modulation stuff
 
-        void adaptiveharmonic(FFTFREQS f, float freq);
-        // Do the adaptive harmonic stuff
-
-        // Do the adaptive harmonic postprocessing (2n+1,2xS,2xA,etc..)
-        // this function is called even for the user interface
-        // this can be called for the sine and components, and for the spectrum
-        // (that's why the sine and cosine components should be processed with
-        // a separate call)
-        void adaptiveharmonicpostprocess(float *f, int size);
 
         // Basic/base functions (Functiile De Baza)
         float basefunc_pulse(float x, float a);
@@ -148,10 +152,12 @@ class OscilGen : private WaveShapeSamples
             oldmodulationpar2,
             oldmodulationpar3;
 
-        FFTFREQS oscilFFTfreqs; // Oscillator Frequencies - this is different
-                                // than the hamonics set-up by the user, it may
-                                // contain time-domain data if the antialiasing
-                                // is turned off
+        fft::Spectrum outoscilSpectrum;
+
+        fft::Spectrum oscilSpectrum; // Oscillator Frequencies - this is different
+                                     // than the hamonics set-up by the user, it may
+                                     // contain time-domain data if the antialiasing
+                                     // is turned off
         Presets::PresetsUpdate oscilupdate;// whether the oscil is prepared, if
                                            // not prepared we need to call
                                            // ::prepare() before ::get()
@@ -164,5 +170,12 @@ class OscilGen : private WaveShapeSamples
         RandomGen basePrng;
         RandomGen harmonicPrng;
 };
+
+// allow to mark this OscilGen as "dirty" to force recalculation of spectrum
+// (as of 4/22 only relevant for automated testing, see SynthEngine::setReproducibleState()
+inline void OscilGen::forceUpdate()
+{
+    oscilupdate.forceUpdate();
+}
 
 #endif

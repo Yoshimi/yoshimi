@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2021, Will Godfrey
+Copyright 2014 -2022, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -67,7 +67,7 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {close->do_callback();}
+      callback {close->do_callback();} open
       xywh {691 66 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
@@ -143,74 +143,81 @@ alsaTab->hide();}
         xywh {246 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12
       }
       Fl_Group configTabs {
-        xywh {5 5 380 298}
+        xywh {5 5 385 298}
       } {
         Fl_Group mainTab {
           xywh {5 25 382 277} box THIN_UP_BOX labelsize 12
         } {
+          Fl_Choice buff_size {
+            label {* Internal Buffer Size}
+            callback {//
+                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);} selected
+            tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {245 45 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
+            code1 {o->value(func::bitFindHigh(synth->getRuntime().Buffersize) - 4);}
+            code2 {//if (synth->getIsLV2Plugin()) o->deactivate();}
+          } {}
           Fl_Choice osc_size {
             label {* AddSynth Oscillator Size}
             callback {//
                         send_data(0, CONFIG::control::oscillatorSize, 256 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {250 32 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {ADSynth Oscillator Size (samples)} xywh {245 68 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");o->add("16384");}
             code1 {o->value(func::bitFindHigh(synth->getRuntime().Oscilsize) - 8);}
-          } {}
-          Fl_Choice buff_size {
-            label {* Internal Buffer Size}
-            callback {//
-                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {249 60 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
-            code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
-            code1 {o->value(func::bitFindHigh(synth->getRuntime().Buffersize) - 4);}
-            code2 {//if (synth->getIsLV2Plugin()) o->deactivate();}
           } {}
           Fl_Choice pad_interpol {
             label {PADsynth Interpolation}
             callback {//
                         send_data(0, CONFIG::control::padSynthInterpolation, o->value(), TOPLEVEL::type::Integer);}
-            xywh {250 88 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {245 92 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Linear(fast)");o->add("Cubic(slow)");}
             code1 {o->value(synth->getRuntime().Interpolation);}
+          } {}
+          Fl_Choice handlePadSynthBuild {
+            label {Build PADSynth Wavetable}
+            callback {//
+                        send_data(0, CONFIG::control::handlePadSynthBuild, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {How to rebuild wavetable after changes: Trigger manually and mute part (legacy), build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 116 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            code0 {o->add("Muted");o->add("Background");o->add("Auto-Apply");}
+            code1 {o->value(synth->getRuntime().handlePadSynthBuild);}
           } {}
           Fl_Choice v_keyboard {
             label {Virtual Keyboard Layout}
             callback {//
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
-            xywh {250 116 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {245 140 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("QWERTY");o->add("Dvorak");o->add("QWERTZ");o->add("AZERTY");}
             code1 {o->value(synth->getRuntime().VirKeybLayout);}
           } {}
-          Fl_Counter compression {
-            label {XML Compression Level}
-            callback {//
-                        send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 144 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
-            code0 {o->value(synth->getRuntime().GzipCompression);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
-          }
           Fl_Choice reports {
             label {Send reports to:}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Some system errors always go to stdout} xywh {200 172 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Some system errors always go to stdout} xywh {200 170 80 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("stdout");o->add("Console Window");}
             code1 {o->value(synth->getRuntime().toConsole);}
           } {}
           Fl_Counter logText {
-            label {Console Text Size}
             callback {//
                         send_data(0, CONFIG::control::logTextSize, o->value(), TOPLEVEL::type::Integer);
                         synth->getGuiMaster()->yoshiLog->setLogText(o->value());}
-            xywh {284 200 65 20} type Simple labelsize 12 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12
+            tooltip {Console Font Size} xywh {285 170 64 20} type Simple labeltype NO_LABEL labelsize 12 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12
             code1 {o->value(synth->getRuntime().consoleTextSize);}
             code2 {if (synth->getRuntime().toConsole) o->activate(); else o->deactivate();}
+          }
+          Fl_Counter compression {
+            label {XML Compression Level}
+            callback {//
+                        send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {gzip compression level (0 - uncompressed)} xywh {285 196 64 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
+            code0 {o->value(synth->getRuntime().GzipCompression);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
           Fl_Choice instrument {
             label {Saved Instrument Format}
             callback {//
                         send_data(0, CONFIG::control::savedInstrumentFormat, o->value() + 1, TOPLEVEL::type::Integer);}
-            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 228 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 225 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Legacy");o->add("Yoshimi");o->add("Both");}
             code1 {o->value(synth->getRuntime().instrumentFormat - 1);}
           } {}
@@ -219,13 +226,13 @@ alsaTab->hide();}
             callback {//
     int style = 2 - int(o->value());
     synth->getGuiMaster()->changepanelstyle(style);}
-            tooltip {Select single row or compact format} xywh {200 256 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Select single row or compact format} xywh {200 248 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("2 row x 8 entries");o->add("1 row x 16 entries");}
             code1 {o->value(synth->getRuntime().single_row_panel);}
           } {}
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
-            xywh {41 280 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
+            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
             code0 {if (synth->getUniqueId() != 0) o->hide();}
           }
         }
@@ -240,21 +247,11 @@ alsaTab->hide();}
             code0 {o->value(synth->getRuntime().bankHighlight);}
             class Fl_Check_Button2
           }
-          Fl_Check_Button setDefaultState {
-            label {* Start With Default State}
-            callback {//
-                        send_data(0, CONFIG::control::defaultStateStart, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {If you change this you must re-save the default state
-or when that loads it will revert to the previous value} xywh {190 60 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().loadDefaultState);}
-            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
-            class Fl_Check_Button2
-          }
           Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
             callback {//
                         send_data(0, CONFIG::control::hideNonFatalErrors, o->value(), TOPLEVEL::type::Integer);}
-            xywh {190 80 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
             code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
@@ -263,9 +260,18 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             label {Show Splash Screen}
             callback {//
                         send_data(0, CONFIG::control::showSplash, o->value(), TOPLEVEL::type::Integer);}
-            xywh {190 100 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {190 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
+          }
+          Fl_Check_Button logXML {
+            label {Log XML Headers}
+            callback {//
+                        send_data(0, CONFIG::control::logXMLheaders, o->value(), TOPLEVEL::type::Integer);}
+            xywh {190 100 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().logXMLheaders);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button logTimes {
@@ -276,20 +282,11 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             code0 {o->value(synth->getRuntime().showTimes);}
             class Fl_Check_Button2
           }
-          Fl_Check_Button logXML {
-            label {Log XML Headers}
-            callback {//
-                        send_data(0, CONFIG::control::logXMLheaders, o->value(), TOPLEVEL::type::Integer);}
-            xywh {190 140 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().logXMLheaders);}
-            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
-            class Fl_Check_Button2
-          }
           Fl_Check_Button saveAllXML {
-            label {Include all data in XML files}
+            label {Retain all Data}
             callback {//
                         send_data(0, CONFIG::control::saveAllXMLdata, o->value(), TOPLEVEL::type::Integer);}
-            xywh {190 160 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Include all data in XML files, even inactive settings} xywh {190 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().xmlmax);}
             class Fl_Check_Button2
           }
@@ -304,7 +301,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
                             send_data(0, CONFIG::control::enableGUI, o->value(), TOPLEVEL::type::Integer);
                         else
                             o->value(1);}
-            tooltip {Enable starting with this graphical  interface} xywh {190 180 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with this graphical interface} xywh {190 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
@@ -313,7 +310,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             label {* Enable CLI}
             callback {//
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable starting with interactive command line interface} xywh {190 200 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Enable starting with interactive command line interface} xywh {190 180 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showCli);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
@@ -322,7 +319,7 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             label {Enable Auto Instance}
             callback {//
                         send_data(0, CONFIG::control::enableAutoInstance, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Allow main instance to start all those open when last closed.} xywh {190 220 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Allow main instance to start all those open when last closed.} xywh {190 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
             code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
@@ -331,69 +328,80 @@ or when that loads it will revert to the previous value} xywh {190 60 27 25} dow
             label {* Enable Single Master}
             callback {//
           send_data(0, CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Redirect new start from desktop to create new instance instead.} xywh {190 240 27 25} down_box DOWN_BOX labelsize 12 align 4 hide
+            tooltip {Redirect new start from desktop to create new instance instead.} xywh {190 220 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
             class Fl_Check_Button2
           }
-          Fl_Text_Display historyLocks {
-            label {History Locks}
-            xywh {278 110 50 1} box NO_BOX labelsize 12 align 129 textsize 12
-          }
-          Fl_Check_Button H_instrument {
-            label Instrument
+          Fl_Check_Button setDefaultState {
+            label {* Start With Default State}
             callback {//
+                        send_data(0, CONFIG::control::defaultStateStart, o->value(), TOPLEVEL::type::Integer);}
+            tooltip {If you change this you must re-save the default state
+or when that loads it will revert to the previous value} xywh {190 250 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().loadDefaultState);}
+            code1 {if (synth->getIsLV2Plugin()) o->deactivate();}
+            class Fl_Check_Button2
+          }
+          Fl_Group {} {open
+            tooltip {When locked new entries will not not be added or change the list order} xywh {230 70 130 180} box EMBOSSED_FRAME
+          } {
+            Fl_Text_Display historyLocks {
+              label {History Locks}
+              xywh {278 110 50 1} box NO_BOX labelsize 12 align 129 textsize 12
+            }
+            Fl_Check_Button H_instrument {
+              label Instrument
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Instrument);}
-            xywh {240 120 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
-          }
-          Fl_Check_Button H_patchset {
-            label {Patch Set}
-            callback {//
+              xywh {240 120 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Instrument, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
+            Fl_Check_Button H_patchset {
+              label {Patch Set}
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Patch);}
-            xywh {240 140 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
-          }
-          Fl_Check_Button H_scale {
-            label Scale
-            callback {//
+              xywh {240 140 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Patch, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
+            Fl_Check_Button H_scale {
+              label Scale
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Scale);}
-            xywh {240 160 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
-          }
-          Fl_Check_Button H_state {
-            label State
-            callback {//
+              xywh {240 160 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Scale, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
+            Fl_Check_Button H_state {
+              label State
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::State);}
-            xywh {240 180 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
-          }
-          Fl_Check_Button H_vector {
-            label Vector
-            callback {//
+              xywh {240 180 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::State, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
+            Fl_Check_Button H_vector {
+              label Vector
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::Vector);}
-            xywh {240 200 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
-          }
-          Fl_Check_Button H_mlearn {
-            label {Midi Learn}
-            callback {//
+              xywh {240 200 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::Vector, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
+            Fl_Check_Button H_mlearn {
+              label {Midi Learn}
+              callback {//
                        send_data(TOPLEVEL::action::lowPrio, CONFIG::control::historyLock, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::config,TOPLEVEL::XML::MLearn);}
-            xywh {240 220 27 25} down_box DOWN_BOX labelsize 12 align 8
-            code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
-            class Fl_Check_Button2
+              xywh {240 220 27 25} down_box DOWN_BOX labelsize 12 align 8
+              code0 {o->value(_SYS_::F2B(fetchData(0, CONFIG::control::historyLock, TOPLEVEL::section::config, TOPLEVEL::XML::MLearn, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, TOPLEVEL::action::lowPrio)));}
+              class Fl_Check_Button2
+            }
           }
           Fl_Box switchesNote {
             label {* Changing these settings requires a restart}
             xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
           }
-          Fl_Group {} {open
-            tooltip {When locked new entries will not not be added or change the list order} xywh {230 70 130 180} box EMBOSSED_FRAME
-          } {}
         }
         Fl_Group jackTab {
           xywh {5 25 385 277} box THIN_UP_BOX labelsize 12 hide
@@ -876,6 +884,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 case CONFIG::control::defaultStateStart:
                     setDefaultState->value(value_bool);
                     break;
+                case CONFIG::control::handlePadSynthBuild:
+                    handlePadSynthBuild->value(value_int);
+                    break;
                 case CONFIG::control::hideNonFatalErrors:
                     nonFatal->value(value_bool);
                     break;
@@ -1246,6 +1257,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
 
                 case 5 : // Switches
+                    handlePadSynthBuild->value(synth->getRuntime().handlePadSynthBuild);
                     setDefaultState->value(synth->getRuntime().loadDefaultState > 0);
                     nonFatal->value(synth->getRuntime().hideErrors);
                     showSplash->value(synth->getRuntime().showSplash);
@@ -1337,6 +1349,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
 //
     Tab2->labelsize(size);
+    handlePadSynthBuild->labelsize(size);
     bankHighlight->labelsize(size);
     setDefaultState->labelsize(size);
     nonFatal->labelsize(size);

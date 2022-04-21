@@ -30,48 +30,128 @@
 
 #include "Params/ADnoteParameters.h"
 #include "Misc/RandomGen.h"
+#include "DSP/FFTwrapper.h"
+#include "Misc/Alloc.h"
+
+#include <memory>
+#include <array>
+
+using std::unique_ptr;
 
 class ADnoteParameters;
+class SynthEngine;
 class Controller;
 class Envelope;
-class LFO;
 class Filter;
+class LFO;
 
 // Globals
 
 #define FM_AMP_MULTIPLIER 14.71280603f
 
-#define OSCIL_SMP_EXTRA_SAMPLES 5
 
-class SynthEngine;
+
+/* Helper to either manage sample data or link to another voice's data.
+ * This class allows to mimic the behaviour of the original code base,
+ * while encapsulating and automatically managing the allocation.
+ * Initially created empty, it can either allocate a buffer or attach to
+ * existing storage managed elsewhere; Ownership is locked subsequently.
+ * Beyond that, SampleHolder can be used like a fft::Waveform in Synth code.
+ * Warning: beware of slicing -- use only as nested component or local object.
+ */
+class SampleHolder
+    : public fft::Waveform
+{
+    bool ownData = false;
+
+public:
+        // by default created in empty state
+        SampleHolder() : fft::Waveform() { }
+
+        SampleHolder(SampleHolder const& r)
+            : fft::Waveform()
+        {
+            if (r.size() > 0)
+                throw std::logic_error("fully engaged SampleHolder not meant to be copied");
+        }
+
+        SampleHolder(SampleHolder && rr)
+            : fft::Waveform()
+            , ownData(rr.ownData)
+        {
+            if (rr.size() > 0)
+            {
+                if (ownData) // transfer ownership
+                    swap(*this, rr);
+                else
+                    attach(rr);
+            }
+        }
+        // Assignment to existing objects not permitted
+        SampleHolder& operator=(SampleHolder const&) =delete;
+        SampleHolder& operator=(SampleHolder &&)     =delete;
+
+        /* Note: SampleHolder can be an "alias" to another SampleHolder;
+         *       and in this case we don't take ownership of the data allocation */
+       ~SampleHolder()
+        {
+            if (not ownData) detach();
+            // otherwise the parent dtor will automatically discard storage
+        }
+
+        void allocateWaveform(size_t tableSize)
+        {
+            if (size() > 0) throw std::logic_error("already engaged.");
+            fft::Waveform allocation(tableSize);
+            swap(*this, allocation);
+            ownData = true;
+        }
+
+        void copyWaveform(SampleHolder const& src)
+        {
+            if (size() > 0) throw std::logic_error("already engaged.");
+            if (src.size() == 0) return;
+            allocateWaveform(src.size());
+            fft::Waveform::operator=(src);
+        }
+
+        void attachReference(fft::Waveform& existing)
+        {
+            if (size() > 0 and ownData)
+                throw std::logic_error("SampleHolder already owns and manages a data allocation");
+            attach(existing);
+            ownData = false;
+        }
+};
+
+
 
 class ADnote
 {
+        ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool portamento_
+              ,ADnote *topVoice_, int subVoiceNr, int phaseOffset, float *parentFMmod_, bool forFM_);
     public:
-        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
-               int portamento_, int midinote_, SynthEngine *_synth);
+        ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note, bool portamento_);
         ADnote(ADnote *topVoice_, float freq_, int phase_offset_, int subVoiceNumber_,
                float *parentFMmod_, bool forFM_);
         ADnote(const ADnote &orig, ADnote *topVoice_ = NULL, float *parentFMmod_ = NULL);
-        ~ADnote();
+       ~ADnote();
 
-        void construct();
+        // shall not be moved or assigned
+        ADnote(ADnote&&)                 = delete;
+        ADnote& operator=(ADnote&&)      = delete;
+        ADnote& operator=(ADnote const&) = delete;
 
-        int noteout(float *outl, float *outr);
+        void noteout(float *outl, float *outr);
         void releasekey();
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
-        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
-        void legatoFadeOut(const ADnote &syncwith);
-
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
+        bool finished() const { return noteStatus == NOTE_DISABLED; }
+        void performPortamento(Note);
+        void legatoFadeIn(Note);
+        void legatoFadeOut();
 
     private:
+        void construct();
+        void allocateUnison(size_t unisonCnt, size_t buffSize);
 
         void setfreq(int nvoice, float in_freq, float pitchdetune);
         void setfreqFM(int nvoice, float in_freq, float pitchdetune);
@@ -113,113 +193,127 @@ class ADnote
 
         void computeVoiceOscillator(int nvoice);
 
-        void fadein(float *smps);
+        void fadein(Samples& smps);
 
 
         // Globals
-        ADnoteParameters *adpars;
-        bool  stereo;
-        int   midinote;
-        float velocity;
-        float basefreq;
+        SynthEngine& synth;
+        ADnoteParameters& adpars;
+        Presets::PresetsUpdate paramsUpdate;
+        Controller& ctl;
 
-        enum {
+        Note note;
+        bool stereo;
+
+        enum NoteStatus {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
-        } NoteStatus;
-        Controller *ctl;
+            NOTE_LEGATOFADEOUT
+        } noteStatus;
 
         // Global parameters
         struct ADnoteGlobal {
-            // Frequency global parameters
-            float  Detune; // cents
-            Envelope *FreqEnvelope;
-            LFO      *FreqLfo;
+            //****************************
+            // FREQUENCY GLOBAL PARAMETERS
+            //****************************
+            float detune; // in cents
 
-            // Amplitude global parameters
-            float Volume;  //  0 .. 1
-            float randpanL;
+            unique_ptr<Envelope> freqEnvelope;
+            unique_ptr<LFO>      freqLFO;
+
+            //****************************
+            // AMPLITUDE GLOBAL PARAMETERS
+            //****************************
+            float volume;   // [ 0 .. 1 ]
+            float randpanL; // [ 0 .. 1 ]
             float randpanR;
+            float fadeinAdjustment;
 
-            Envelope *AmpEnvelope;
-            LFO      *AmpLfo;
+            unique_ptr<Envelope> ampEnvelope;
+            unique_ptr<LFO>      ampLFO;
 
-            float Fadein_adjustment;
-            struct {
-                int      Enabled;
-                float initialvalue, dt, t;
-            } Punch;
+            struct Punch {
+                bool  enabled;
+                float initialvalue;
+                float dt;
+                float t;
+            } punch;
 
-            // Filter global parameters
-            Filter *GlobalFilterL;
-            Filter *GlobalFilterR;
-            Envelope *FilterEnvelope;
-            LFO      *FilterLfo;
-        } NoteGlobalPar;
+            //*************************
+            // FILTER GLOBAL PARAMETERS
+            //*************************
+            unique_ptr<Filter> filterL;
+            unique_ptr<Filter> filterR;
+
+            unique_ptr<Envelope> filterEnvelope;
+            unique_ptr<LFO>      filterLFO;
+
+            ADnoteGlobal();
+            ADnoteGlobal(ADnoteGlobal const&);
+        };
+        ADnoteGlobal noteGlobal;
 
         // Voice parameters
         struct ADnoteVoice {
-            bool Enabled;
-            int Voice;        // Voice I use as source.
-            int noisetype;    // (sound/noise)
-            int filterbypass;
-            int DelayTicks;
-            float *OscilSmp;  // Waveform of the Voice. Shared with sub voices.
-            int phase_offset; // PWM emulation
+            bool enabled;
+            int voice;              // the voice used as source.
+            int noiseType;          // (sound/noise)
+            int filterBypass;
+            int delayTicks;
+            SampleHolder oscilSmp;  // Waveform of the Voice. Shared with sub voices.
+            int phaseOffset;        // PWM emulation
 
             // Frequency parameters
-            int fixedfreq;   // if the frequency is fixed to 440 Hz
-            int fixedfreqET; // if the "fixed" frequency varies according to the note (ET)
+            int fixedFreq;          // if the frequency is fixed to 440 Hz
+            int fixedFreqET;        // if the "fixed" frequency varies according to the note (ET)
 
-            float Detune;     // cents = basefreq * VoiceDetune
-            float FineDetune;
-            float BendAdjust;
-            float OffsetHz;
+            float detune;           // cents = basefreq * VoiceDetune
+            float fineDetune;
+            float bendAdjust;
+            float offsetHz;
 
-            Envelope *FreqEnvelope;
-            LFO      *FreqLfo;
+            unique_ptr<Envelope> freqEnvelope;
+            unique_ptr<LFO>      freqLFO;
 
             // Amplitude parameters
-            float Volume;  // -1.0 .. 1.0
-            float Panning; // 0.0 = left, 0.5 = center, 1.0 = right
+            float volume;  // -1.0 .. 1.0
+            float panning; // 0.0 = left, 0.5 = center, 1.0 = right
             float randpanL;
             float randpanR;
 
-            Envelope *AmpEnvelope;
-            LFO      *AmpLfo;
+            unique_ptr<Envelope> ampEnvelope;
+            unique_ptr<LFO>      ampLFO;
 
-            struct {
-                int   Enabled;
+            struct Punch {
+                int   enabled;
                 float initialvalue, dt, t;
-            } Punch;
+            } punch;
 
             // Filter parameters
-            Filter   *VoiceFilterL;
-            Filter   *VoiceFilterR;
+            unique_ptr<Filter> voiceFilterL;
+            unique_ptr<Filter> voiceFilterR;
 
-            Envelope *FilterEnvelope;
-            LFO      *FilterLfo;
+            unique_ptr<Envelope> filterEnvelope;
+            unique_ptr<LFO>      filterLFO;
 
             // Modulator parameters
-            FMTYPE FMEnabled;
-            bool FMringToSide;
-            unsigned char FMFreqFixed;
-            int    FMVoice;
-            float *VoiceOut; // Voice Output used by other voices if use this as modullator
-            float *FMSmp;    // Wave of the Voice. Shared by sub voices.
-            int    FMphase_offset;
-            float  FMVolume;
-            bool FMDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
-            float  FMDetune; // in cents
-            Envelope *FMFreqEnvelope;
-            Envelope *FMAmpEnvelope;
+            FMTYPE fmEnabled;
+            bool fmRingToSide;
+            unsigned char fmFreqFixed;
+            int    fmVoice;
+            Samples voiceOut;          // Voice Output used by other voices if use this as modulator
+            SampleHolder fmSmp;        // Wave of the Voice. Shared by sub voices.
+            int    fmPhaseOffset;
+            float  fmVolume;
+            bool fmDetuneFromBaseOsc;  // Whether we inherit the base oscillator's detuning
+            float  fmDetune; // in cents
+            unique_ptr<Envelope> fmFreqEnvelope;
+            unique_ptr<Envelope> fmAmpEnvelope;
         };
         ADnoteVoice NoteVoicePar[NUM_VOICES];
 
         // Internal values of the note and of the voices
-        float time; // time from the start of the note
-        int Tspot; // spot noise noise interrupt time
+        int tSpot; // spot noise noise interrupt time
 
         RandomGen paramRNG; // A preseeded random number generator, reseeded
                             // with a known seed every time parameters are
@@ -230,67 +324,79 @@ class ADnote
         //pinking filter (Paul Kellet)
         float pinking[NUM_VOICES][14];
 
-        int unison_size[NUM_VOICES]; // the size of unison for a single voice
+        size_t unison_size[NUM_VOICES]; // the size of unison for a single voice
 
         float unison_stereo_spread[NUM_VOICES]; // stereo spread of unison subvoices (0.0=mono,1.0=max)
 
-        float *oscposlo[NUM_VOICES], *oscfreqlo[NUM_VOICES]; // fractional part (skip)
 
-        int *oscposhi[NUM_VOICES], *oscfreqhi[NUM_VOICES]; // integer part (skip)
+        // Array-of dynamically allocated value-Arrays [voice][unison]
+        template<typename T>
+        using VoiceUnisonArray = std::array<unique_ptr<T[]>, NUM_VOICES>;
 
-        float *oscposloFM[NUM_VOICES], *oscfreqloFM[NUM_VOICES]; // fractional part (skip) of the Modullator
+        // Wavetable reading position
+        // *hi = skip/slot in the base wavetable
+        // *lo = fractional part / interpolation
+        VoiceUnisonArray<int>   oscposhi;
+        VoiceUnisonArray<float> oscposlo;
 
-        float *unison_base_freq_rap[NUM_VOICES]; // the unison base_value
+        // Frequency / Wavetable increment
+        VoiceUnisonArray<int>   oscfreqhi;  // integer part (skip)
+        VoiceUnisonArray<float> oscfreqlo;  // fractional part (skip)
 
-        float *unison_freq_rap[NUM_VOICES]; // how the unison subvoice's frequency is changed (1.0 for no change)
+        // Modulator calculation pos and skip (frequency)
+        VoiceUnisonArray<int>   oscposhiFM;
+        VoiceUnisonArray<float> oscposloFM;
+
+        VoiceUnisonArray<int>   oscfreqhiFM;
+        VoiceUnisonArray<float> oscfreqloFM;
+
+        VoiceUnisonArray<float> unison_base_freq_rap;// the unison base_value
+        VoiceUnisonArray<float> unison_freq_rap;     // how the unison subvoice's frequency is changed (1.0 for no change)
+        VoiceUnisonArray<bool>  unison_invert_phase; // which unison subvoice has phase inverted
 
         // These are set by parent voices.
         float detuneFromParent;             // How much the voice should be detuned.
         float unisonDetuneFactorFromParent; // How much the voice should be detuned from unison.
 
-        bool *unison_invert_phase[NUM_VOICES]; // which unison subvoice has phase inverted
-
-        struct { // unison vibratto
+        struct UnisonVibrato {
             float  amplitude; // amplitude which be added to unison_freq_rap
-            float *step;      // value which increments the position
-            float *position;  // between -1.0 and 1.0
-        } unison_vibratto[NUM_VOICES];
+            unique_ptr<float[]> step;      // value which increments the position
+            unique_ptr<float[]> position;  // between -1.0 and 1.0
+        };
+        UnisonVibrato unison_vibrato[NUM_VOICES];
 
-        // integer part (skip) of the Modullator
-        int *oscposhiFM[NUM_VOICES];
-        int *oscfreqhiFM[NUM_VOICES];
+        float oldAmplitude[NUM_VOICES];  // used to compute and interpolate the
+        float newAmplitude[NUM_VOICES];  // amplitudes of voices and modulators
+        float fm_oldAmplitude[NUM_VOICES];
+        float fm_newAmplitude[NUM_VOICES];
 
-        float oldamplitude[NUM_VOICES];  // used to compute and interpolate the
-        float newamplitude[NUM_VOICES];  // amplitudes of voices and modullators
-        float FMoldamplitude[NUM_VOICES];
-        float FMnewamplitude[NUM_VOICES];
+        VoiceUnisonArray<float> fm_oldSmp; // used by Frequency Modulation (for integration)
 
-        float *FMoldsmp[NUM_VOICES]; // used by Frequency Modulation (for integration)
+        VoiceUnisonArray<float> fmfm_oldPhase; // use when rendering FM modulator with parent FM
+        VoiceUnisonArray<float> fmfm_oldPMod;
+        VoiceUnisonArray<float> fmfm_oldInterpPhase;
 
-        float *FMFMoldPhase[NUM_VOICES]; // use when rendering FM modulator with parent FM
-        float *FMFMoldInterpPhase[NUM_VOICES];
-        float *FMFMoldPMod[NUM_VOICES];
-        float *oscFMoldPhase[NUM_VOICES]; // use when rendering oscil with parent FM that will
-                                         // be used for FM
-        float *oscFMoldInterpPhase[NUM_VOICES];
-        float *oscFMoldPMod[NUM_VOICES];
+        VoiceUnisonArray<float> fm_oldOscPhase; // rendering Oscil with parent FM that will be used for FM
+        VoiceUnisonArray<float> fm_oldOscPMod;
+        VoiceUnisonArray<float> fm_oldOscInterpPhase;
+
         bool forFM; // Whether this voice will be used for FM modulation.
 
-        float **tmpwave_unison;
-        int max_unison;
+        unique_ptr<Samples[]> tmpwave_unison;
+        size_t max_unison;
 
-        float **tmpmod_unison;
+        unique_ptr<Samples[]> tmpmod_unison;
         bool freqbasedmod[NUM_VOICES];
 
         float globaloldamplitude; // interpolate the amplitudes
         float globalnewamplitude;
 
-        char firsttick[NUM_VOICES]; // 1 - if it is the fitst tick.
+        char firsttick[NUM_VOICES]; // 1 - if it is the first tick.
                                     // used to fade in the sound
 
-        int portamento; // 1 if the note has portamento
+        bool portamento;            // note performs portamento starting from previous note frequency
 
-        float bandwidthDetuneMultiplier; // how the fine detunes are made bigger or smaller
+        float bandwidthDetuneMultiplier; // factor to increase or reduce the fine detuning
 
         // Legato vars
         float legatoFade;
@@ -299,20 +405,18 @@ class ADnote
         float pangainL;
         float pangainR;
 
-        ADnote **subVoice[NUM_VOICES];
-        ADnote **subFMVoice[NUM_VOICES];
+        VoiceUnisonArray<unique_ptr<ADnote>> subVoice;
+        VoiceUnisonArray<unique_ptr<ADnote>> subFMVoice;
 
-        int subVoiceNumber;
-        // For sub voices: The original, "topmost" voice that triggered this
-        // one.
+        // Proxy-sub-Voice marker: -1 for ordinary (top-level) notes;
+        // otherwise the Voice within the top-level note to attach to.
+        // Note: in a (proxy)-sub-Voice, only the voice corresponding to the subVoiceNr is enabled,
+        //       and its oscilSmp is aliased to use the wavetable from the corresponding voice in the master
+        int subVoiceNr;
+        // For sub voices: The controlling top-level note that attached this sub-voice.
         ADnote *topVoice;
-        // For sub voices: Pointer to the closest parent that has
-        // phase/frequency modulation.
+        // For sub voices: Pointer to the closest parent that has phase/frequency modulation.
         float *parentFMmod;
-
-        Presets::PresetsUpdate paramsUpdate;
-
-        SynthEngine *synth;
 };
+#endif /*ADnote.h*/
 
-#endif

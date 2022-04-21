@@ -26,7 +26,6 @@
 #include <cstring>
 #include <regex>
 
-using namespace std;
 
 std::string asLongString(double n, size_t digits)
 {

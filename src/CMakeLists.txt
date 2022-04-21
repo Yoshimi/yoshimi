@@ -271,8 +271,8 @@ configure_file(
     IMMEDIATE @ONLY)
 
 set (DSP_sources
-    DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
-    DSP/SVFilter.cpp  DSP/Filter.cpp  DSP/Unison.cpp
+    DSP/AnalogFilter.cpp  DSP/Filter.cpp  DSP/FormantFilter.cpp
+    DSP/SVFilter.cpp  DSP/Unison.cpp
 )
 
 set (Effects_sources
@@ -284,8 +284,8 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/CmdOptions.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp
-    Misc/Splash.cpp  Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp
-    Misc/WavFile.cpp
+    Misc/BuildScheduler.cpp Misc/Microtonal.cpp   Misc/Part.cpp Misc/Splash.cpp
+    Misc/WavFile.cpp Misc/XMLwrapper.cpp
 )
 
 set (Interface_Sources

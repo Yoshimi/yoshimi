@@ -4,7 +4,7 @@
     Copyright 2016-2019, Will Godfrey & others
     Copyright 2020-2020, Kristian Amlie, Will Godfrey, & others
     Copyright 2021, Will Godfrey, Rainer Hans Liffers, & others
-    Copyright 2022, Will Godfrey & others
+    Copyright 2022, Will Godfrey, Ichthyostega & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 #include <bitset>
 #include <unistd.h>
 #include <thread>
+#include <atomic>
 
 #include "Interface/InterChange.h"
 #include "Interface/Data2Text.h"
@@ -44,10 +45,12 @@
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
+#include "Params/PADStatus.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
 #include "Effects/EffectMgr.h"
+#include "DSP/FFTwrapper.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #ifdef GUI_FLTK
@@ -60,6 +63,7 @@ enum envControl: unsigned char {
     redo
 };
 
+using std::to_string;
 using file::localPath;
 using file::findFile;
 using file::isRegularFile;
@@ -178,7 +182,6 @@ void *InterChange::sortResultsThread(void)
          */
         while (synth->audioOut.load() == _SYS_::mute::Active)
         {
-            //std::cout << "here fetching" << std:: endl;
             if (muteQueue.read(getData.bytes))
                 indirectTransfers(&getData);
             else
@@ -195,6 +198,7 @@ void *InterChange::sortResultsThread(void)
                 resolveReplies(&getData);
         }
             usleep(80); // actually gives around 120 uS
+
     }
     return NULL;
 }
@@ -208,16 +212,22 @@ InterChange::~InterChange()
 }
 
 
+void InterChange::Log(std::string const& msg)
+{
+    bool isError{true};
+    synth->getRuntime().Log(msg, isError);
+}
+
+
 void InterChange::muteQueueWrite(CommandBlock *getData)
 {
     if (!muteQueue.write(getData->bytes))
     {
-        std::cout << "failed to write to muteQueue" << std::endl;
+        Log("failed to write to muteQueue");
         return;
     }
     if (synth->audioOut.load() == _SYS_::mute::Idle)
     {
-        //std::cout << "here pending" << std:: endl;
         synth->audioOut.store(_SYS_::mute::Pending);
     }
 }
@@ -477,7 +487,6 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     else // don't leave this hanging
     {
         synth->fileCompatible = true;
-        std::cout << "No indirect return" << std::endl;
     }
 }
 
@@ -865,8 +874,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::exportPadSynthSamples:
         {
             unsigned char partnum = insert;
-            synth->partonoffWrite(partnum, -1);
-            setpadparams(partnum, kititem);
+            synth->part[partnum]->kit[kititem].padpars->buildNewWavetable(true); // blocking wait for result
             if (synth->part[partnum]->kit[kititem].padpars->export2wav(text))
             {
                 synth->addHistory(text, TOPLEVEL::XML::PadSample);
@@ -992,6 +1000,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             }
             newMsg = true;
             break;
+
         case MAIN::control::stopSound:
 #ifdef REPORT_NOTES_ON_OFF
             // note test
@@ -1477,24 +1486,17 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             }
         break;
 
-        case PART::control::enablePad:
+        case PADSYNTH::control::applyChanges:
+            if (not part->Pkitmode)
+                kititem = 0;
             if (write)
             {
-                int temp = kititem;
-                if (temp >= NUM_KIT_ITEMS)
-                    temp = 0;
-                setpadparams(npart, temp);
-                getData->data.source &= ~TOPLEVEL::action::lowPrio;
-            }
-            break;
-        case PART::control::padsynthParameters:
-            if (write)
-            {
-                setpadparams(npart, kititem);
+                // esp. a "blocking Apply" is redirected from Synth-Thread: commandSendReal() -> commandPad() -> returns() -> indirectTransfers()
+                synth->part[npart]->kit[kititem].padpars->buildNewWavetable((parameter == 0));  // parameter == 0 causes blocking wait
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
             else
-                value = part->kit[kititem].padpars->Papplied;
+                value = not part->kit[kititem].padpars->futureBuild.isUnderway();
             break;
 
         case PART::control::audioDestination:
@@ -1943,16 +1945,6 @@ void InterChange::returns(CommandBlock *getData)
 }
 
 
-void InterChange::setpadparams(int npart, int kititem)
-{
-    synth->part[npart]->busy = true;
-    if (synth->part[npart]->kit[kititem].padpars != NULL)
-        synth->part[npart]->kit[kititem].padpars->applyparameters();
-    synth->part[npart]->busy = false;
-    synth->partonoffWrite(npart, 2);
-}
-
-
 void InterChange::doClearPart(int npart)
 {
     synth->part[npart]->defaultsinstrument();
@@ -2104,7 +2096,7 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (kititem > 0 && kititem != UNUSED)
     {
-        if (part->Pkitmode == 0)
+        if (not part->Pkitmode)
             return false;
         else if (!part->kit[kititem].Penabled)
             return false;
@@ -2115,9 +2107,8 @@ bool InterChange::commandSendReal(CommandBlock *getData)
 
     if (engine == PART::engine::subSynth)
         return processSub(getData, synth);
-
     if (engine == PART::engine::padSynth)
-        return processPad(getData, synth);
+        return processPad(getData);
 
     if (engine >= PART::engine::addVoice1)
     {
@@ -2268,17 +2259,29 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
     return true;
 }
 
+namespace {
+    inline PADnoteParameters& getPADnoteParameters(CommandBlock *getData, SynthEngine *synth)
+    {
+        size_t partNo = getData->data.part;
+        size_t item = getData->data.kit;
+        Part *part = synth->part[partNo];
+        assert (part);
+        PADnoteParameters* padPars = part->kit[item].padpars;
+        assert (padPars);
+        return *padPars;
+    }
+}
 
-bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
+bool InterChange::processPad(CommandBlock *getData)
 {
-    Part *part = synth->part[getData->data.part];
-    int kititem = getData->data.kit;
-    bool needApply = false;
+    PADnoteParameters& pars = getPADnoteParameters(getData, synth);
+
+    bool needApply{false};
     switch(getData->data.insert)
     {
         case UNUSED:
-            commandPad(getData);
-            part->kit[kititem].padpars->presetsUpdated();
+            needApply = commandPad(getData, pars);
+            pars.presetsUpdated();
             break;
         case TOPLEVEL::insert::LFOgroup:
             commandLFO(getData);
@@ -2297,34 +2300,40 @@ bool InterChange::processPad(CommandBlock *getData, SynthEngine *synth)
             commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::oscillatorGroup:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-            part->kit[kititem].padpars->presetsUpdated();
+            commandOscillator(getData,  pars.POscil.get());
+            pars.presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-            part->kit[kititem].padpars->presetsUpdated();
+            commandOscillator(getData,  pars.POscil.get());
+            pars.presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicPhaseBandwidth:
-            commandOscillator(getData,  part->kit[kititem].padpars->POscil);
-            part->kit[kititem].padpars->presetsUpdated();
+            commandOscillator(getData,  pars.POscil.get());
+            pars.presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGroup:
-            commandResonance(getData, part->kit[kititem].padpars->resonance);
-            part->kit[kititem].padpars->presetsUpdated();
+            commandResonance(getData, pars.resonance.get());
+            pars.presetsUpdated();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGraphInsert:
-            commandResonance(getData, part->kit[kititem].padpars->resonance);
-            part->kit[kititem].padpars->presetsUpdated();
+            commandResonance(getData, pars.resonance.get());
+            pars.presetsUpdated();
             needApply = true;
             break;
     }
-    if (needApply)
+    if (needApply && (getData->data.type & TOPLEVEL::type::Write))
     {
-        part->kit[kititem].padpars->Papplied = 0;
+        PADStatus::mark(PADStatus::DIRTY, *this, pars.partID, pars.kitID);
+
+        if (synth->getRuntime().usePadAutoApply())
+        {// »Auto Apply« - trigger rebuilding of wavetable on each relevant change
+            synth->getRuntime().Log("PADSynth: trigger background wavetable build...");
+            pars.buildNewWavetable();
+        }
         getData->data.offset = 0;
     }
     return true;
@@ -2338,8 +2347,6 @@ void InterChange::commandMidi(CommandBlock *getData)
     unsigned char chan = getData->data.kit;
     unsigned int char1 = getData->data.engine;
     unsigned char miscmsg = getData->data.miscmsg;
-
-    //std::cout << "here MIDI " << control << "  " << value_int << "  " << int(chan) << "  " << int(char1) << std::endl;
 
     if (control == MIDI::control::controller && char1 >= 0x80)
         char1 |= 0x200; // for 'specials'
@@ -2823,6 +2830,12 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
+        case CONFIG::control::handlePadSynthBuild:
+            if (write)
+                synth->getRuntime().handlePadSynthBuild = value_int;
+            else
+                value = synth->getRuntime().handlePadSynthBuild;
+            break;
 // switches
         case CONFIG::control::defaultStateStart:
             if (write)
@@ -3172,7 +3185,6 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::reseed:
             synth->setReproducibleState(int(value));
-            // std::cout << "rnd " << synth->randomINT() << std::endl;
             break;
 
         case MAIN::control::soloType:
@@ -3471,7 +3483,7 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
-    if (part->Pkitmode == 0)
+    if (not part->Pkitmode)
     {
         kitType = false;
         if (control != PART::control::kitMode && kititem != UNUSED)
@@ -3560,14 +3572,17 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->kit[kititem].Psubenabled;
             break;
         case PART::control::enablePad:
-            if (write)
+            if (write && (part->kit[kititem].Ppadenabled != value_bool))
             {
                 part->kit[kititem].Ppadenabled = value_bool;
-                if (!part->kit[kititem].padpars->Papplied)
-                {
-                    synth->partonoffWrite(npart, -1);
-                    getData->data.source = TOPLEVEL::action::lowPrio;
+                if (synth->getRuntime().useLegacyPadBuild())
+                {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
+                    toGUI.write(getData->bytes);                      // cause update in the GUI to enable the edit button
+                    getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()
+                    getData->data.control = PADSYNTH::control::applyChanges;
                 }
+                else
+                    part->kit[kititem].padpars->buildNewWavetable();  // this triggers a rebuild via background thread
             }
             else
                 value = part->kit[kititem].Ppadenabled;
@@ -3715,7 +3730,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case PART::control::minToLastKey: // always return actual value
-            value_int = part->lastnote;
+            value_int = part->getLastNote();
             if (kitType)
             {
                 if ((write) && value_int >= 0)
@@ -3723,43 +3738,43 @@ void InterChange::commandPart(CommandBlock *getData)
                     if (value_int > part->kit[kititem].Pmaxkey)
                         part->kit[kititem].Pminkey = part->kit[kititem].Pmaxkey;
                     else
-                        part->kit[kititem].Pminkey = part->lastnote;
+                        part->kit[kititem].Pminkey = part->getLastNote();
                 }
                 value = part->kit[kititem].Pminkey;
             }
             else
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int > part->Pmaxkey)
                         part->Pminkey = part->Pmaxkey;
                     else
-                        part->Pminkey = part->lastnote;
+                        part->Pminkey = part->getLastNote();
                 }
                 value = part->Pminkey;
             }
             break;
         case PART::control::maxToLastKey: // always return actual value
-            value_int = part->lastnote;
+            value_int = part->getLastNote();
             if (kitType)
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int < part->kit[kititem].Pminkey)
                         part->kit[kititem].Pmaxkey = part->kit[kititem].Pminkey;
                     else
-                        part->kit[kititem].Pmaxkey = part->lastnote;
+                        part->kit[kititem].Pmaxkey = part->getLastNote();
                 }
                 value = part->kit[kititem].Pmaxkey;
             }
             else
             {
-                if ((write) && part->lastnote >= 0)
+                if ((write) && part->getLastNote() >= 0)
                 {
                     if (value_int < part->Pminkey)
                         part->Pmaxkey = part->Pminkey;
                     else
-                        part->Pmaxkey = part->lastnote;
+                        part->Pmaxkey = part->getLastNote();
                 }
                 value = part->Pmaxkey;
             }
@@ -3862,9 +3877,9 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::kitMode:
             if (write)
             {
-                if (value == 3)
+                if (value == 3) // crossfade
                 {
-                    part->Pkitmode = 1;
+                    part->Pkitmode = 1; // normal kit mode (multiple kit items playing)
                     part->Pkitfade = true;
                     value = 1; // just to be sure
                 }
@@ -3878,7 +3893,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 value = part->Pkitmode;
                 if (value == 1 && part->Pkitfade == true)
-                    value = 3;
+                    value = 3; // encode crossfade mode
             }
             break;
 
@@ -4026,7 +4041,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::instrumentType:// done elsewhere
             break;
         case PART::control::defaultInstrumentCopyright: // done elsewhere
-            ;
+            break;
     }
 
     if (!write || control == PART::control::minToLastKey || control == PART::control::maxToLastKey)
@@ -4588,15 +4603,15 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case ADDVOICE::control::unisonVibratoDepth:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto = value_int;
+                pars->VoicePar[nvoice].Unison_vibrato = value_int;
             else
-                value = pars->VoicePar[nvoice].Unison_vibratto;
+                value = pars->VoicePar[nvoice].Unison_vibrato;
             break;
         case ADDVOICE::control::unisonVibratoSpeed:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
+                pars->VoicePar[nvoice].Unison_vibrato_speed = value_int;
             else
-                value = pars->VoicePar[nvoice].Unison_vibratto_speed;
+                value = pars->VoicePar[nvoice].Unison_vibrato_speed;
             break;
         case ADDVOICE::control::unisonSize:
             if (write)
@@ -5133,23 +5148,14 @@ void InterChange::commandSub(CommandBlock *getData)
 }
 
 
-void InterChange::commandPad(CommandBlock *getData)
+bool InterChange::commandPad(CommandBlock *getData, PADnoteParameters& pars)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-
-    bool write = (type & TOPLEVEL::type::Write) > 0;
-
+    float value = getData->data.value;
     int value_int = lrint(value);
     char value_bool = _SYS_::F2B(value);
 
-    Part *part;
-    part = synth->part[npart];
-    PADnoteParameters *pars;
-    pars = part->kit[kititem].padpars;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
 
     if (write && control != PADSYNTH::control::applyChanges)
         add2undo(getData, noteSeen);
@@ -5158,71 +5164,128 @@ void InterChange::commandPad(CommandBlock *getData)
     {
         case PADSYNTH::control::volume:
             if (write)
-                pars->PVolume = value;
+                pars.PVolume = value;
             else
-                value = pars->PVolume;
+                value = pars.PVolume;
             break;
         case PADSYNTH::control::velocitySense:
             if (write)
-                pars->PAmpVelocityScaleFunction = value;
+                pars.PAmpVelocityScaleFunction = value;
             else
-                value = pars->PAmpVelocityScaleFunction;
+                value = pars.PAmpVelocityScaleFunction;
             break;
         case PADSYNTH::control::panning:
             if (write)
-                pars->setPan(value, synth->getRuntime().panLaw);
+                pars.setPan(value, synth->getRuntime().panLaw);
             else
-                value = pars->PPanning;
+                value = pars.PPanning;
             break;
         case PADSYNTH::control::enableRandomPan:
             if (write)
-                pars->PRandom = value_int;
+                pars.PRandom = value_int;
             else
-                value = pars->PRandom;
+                value = pars.PRandom;
             break;
         case PADSYNTH::control::randomWidth:
             if (write)
-                pars->PWidth = value_int;
+                pars.PWidth = value_int;
             else
-                value = pars->PWidth;
+                value = pars.PWidth;
             break;
 
         case PADSYNTH::control::bandwidth:
             if (write)
-                pars->setPbandwidth(value_int);
+                pars.Pbandwidth = value_int;
             else
-                value = pars->Pbandwidth;
+                value = pars.Pbandwidth;
             break;
         case PADSYNTH::control::bandwidthScale:
             if (write)
-                pars->Pbwscale = value_int;
+                pars.Pbwscale = value_int;
             else
-                value = pars->Pbwscale;
+                value = pars.Pbwscale;
             break;
         case PADSYNTH::control::spectrumMode:
             if (write)
-                pars->Pmode = value_int;
+                pars.Pmode = value_int;
             else
-                value = pars->Pmode;
+                value = pars.Pmode;
+            break;
+        case PADSYNTH::control::xFadeUpdate:
+            if (write)
+                pars.PxFadeUpdate = value_int;
+            else
+                value = pars.PxFadeUpdate;
+            break;
+        case PADSYNTH::control::rebuildTrigger:
+            if (write)
+                pars.PrebuildTrigger = value_int;
+            else
+                value = pars.PrebuildTrigger;
+            break;
+        case PADSYNTH::control::randWalkDetune:
+            if (write)
+            {
+                pars.PrandWalkDetune = value_int;
+                pars.randWalkDetune.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkDetune;
+            break;
+        case PADSYNTH::control::randWalkBandwidth:
+            if (write)
+            {
+                pars.PrandWalkBandwidth = value_int;
+                pars.randWalkBandwidth.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkBandwidth;
+            break;
+        case PADSYNTH::control::randWalkFilterFreq:
+            if (write)
+            {
+                pars.PrandWalkFilterFreq = value_int;
+                pars.randWalkFilterFreq.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkFilterFreq;
+            break;
+        case PADSYNTH::control::randWalkProfileWidth:
+            if (write)
+            {
+                pars.PrandWalkProfileWidth = value_int;
+                pars.randWalkProfileWidth.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkProfileWidth;
+            break;
+        case PADSYNTH::control::randWalkProfileStretch:
+            if (write)
+            {
+                pars.PrandWalkProfileStretch = value_int;
+                pars.randWalkProfileStretch.setSpread(value_int);
+            }
+            else
+                value = pars.PrandWalkProfileStretch;
             break;
 
         case PADSYNTH::control::detuneFrequency:
             if (write)
-                pars->PDetune = value_int + 8192;
+                pars.PDetune = value_int + 8192;
             else
-                value = pars->PDetune - 8192;
+                value = pars.PDetune - 8192;
             break;
         case PADSYNTH::control::equalTemperVariation:
             if (write)
-                pars->PfixedfreqET = value_int;
+                pars.PfixedfreqET = value_int;
             else
-                value = pars->PfixedfreqET;
+                value = pars.PfixedfreqET;
             break;
         case PADSYNTH::control::baseFrequencyAs440Hz:
             if (write)
-                pars->Pfixedfreq = value_bool;
+                pars.Pfixedfreq = value_bool;
             else
-                value = pars->Pfixedfreq;
+                value = pars.Pfixedfreq;
             break;
         case PADSYNTH::control::octave:
             if (write)
@@ -5230,11 +5293,11 @@ void InterChange::commandPad(CommandBlock *getData)
                 int tmp = value;
                 if (tmp < 0)
                     tmp += 16;
-                pars->PCoarseDetune = tmp * 1024 + pars->PCoarseDetune % 1024;
+                pars.PCoarseDetune = tmp * 1024 + pars.PCoarseDetune % 1024;
             }
             else
             {
-                int tmp = pars->PCoarseDetune / 1024;
+                int tmp = pars.PCoarseDetune / 1024;
                 if (tmp >= 8)
                     tmp -= 16;
                 value = tmp;
@@ -5248,10 +5311,10 @@ void InterChange::commandPad(CommandBlock *getData)
                     getData->data.value = 1;
                     value_int = 1;
                 }
-                 pars->PDetuneType = value_int;
+                 pars.PDetuneType = value_int;
             }
             else
-                value =  pars->PDetuneType;
+                value =  pars.PDetuneType;
             break;
         case PADSYNTH::control::coarseDetune:
             if (write)
@@ -5259,11 +5322,11 @@ void InterChange::commandPad(CommandBlock *getData)
                 int tmp = value;
                 if (tmp < 0)
                     tmp += 1024;
-                 pars->PCoarseDetune = tmp + (pars->PCoarseDetune / 1024) * 1024;
+                 pars.PCoarseDetune = tmp + (pars.PCoarseDetune / 1024) * 1024;
             }
             else
             {
-                int tmp = pars->PCoarseDetune % 1024;
+                int tmp = pars.PCoarseDetune % 1024;
                 if (tmp >= 512)
                     tmp -= 1024;
                 value = tmp;
@@ -5272,202 +5335,207 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case PADSYNTH::control::pitchBendAdjustment:
             if (write)
-                pars->PBendAdjust = value_int;
+                pars.PBendAdjust = value_int;
             else
-                value = pars->PBendAdjust;
+                value = pars.PBendAdjust;
             break;
         case PADSYNTH::control::pitchBendOffset:
             if (write)
-                pars->POffsetHz = value_int;
+                pars.POffsetHz = value_int;
             else
-                value = pars->POffsetHz;
+                value = pars.POffsetHz;
             break;
 
         case PADSYNTH::control::overtoneParameter1:
             if (write)
-                pars->Phrpos.par1 = value_int;
+                pars.Phrpos.par1 = value_int;
             else
-                value = pars->Phrpos.par1;
+                value = pars.Phrpos.par1;
             break;
         case PADSYNTH::control::overtoneParameter2:
             if (write)
-                pars->Phrpos.par2 = value_int;
+                pars.Phrpos.par2 = value_int;
             else
-                value = pars->Phrpos.par2;
+                value = pars.Phrpos.par2;
             break;
         case PADSYNTH::control::overtoneForceHarmonics:
             if (write)
-                pars->Phrpos.par3 = value_int;
+                pars.Phrpos.par3 = value_int;
             else
-                value = pars->Phrpos.par3;
+                value = pars.Phrpos.par3;
             break;
         case PADSYNTH::control::overtonePosition:
             if (write)
-                pars->Phrpos.type = value_int;
+                pars.Phrpos.type = value_int;
             else
-                value = pars->Phrpos.type;
+                value = pars.Phrpos.type;
             break;
 
         case PADSYNTH::control::baseWidth:
             if (write)
-                pars->Php.base.par1 = value_int;
+                pars.PProfile.base.pwidth = value_int;
             else
-                value = pars->Php.base.par1;
+                value = pars.PProfile.base.pwidth;
             break;
         case PADSYNTH::control::frequencyMultiplier:
             if (write)
-                pars->Php.freqmult = value_int;
+                pars.PProfile.freqmult = value_int;
             else
-                value = pars->Php.freqmult;
+                value = pars.PProfile.freqmult;
             break;
         case PADSYNTH::control::modulatorStretch:
             if (write)
-                pars->Php.modulator.par1 = value_int;
+                pars.PProfile.modulator.pstretch = value_int;
             else
-                value = pars->Php.modulator.par1;
+                value = pars.PProfile.modulator.pstretch;
             break;
         case PADSYNTH::control::modulatorFrequency:
             if (write)
-                pars->Php.modulator.freq = value_int;
+                pars.PProfile.modulator.freq = value_int;
             else
-                value = pars->Php.modulator.freq;
+                value = pars.PProfile.modulator.freq;
             break;
         case PADSYNTH::control::size:
             if (write)
-                pars->Php.width = value_int;
+                pars.PProfile.width = value_int;
             else
-                value = pars->Php.width;
+                value = pars.PProfile.width;
             break;
         case PADSYNTH::control::baseType:
             if (write)
-                pars->Php.base.type = value;
+                pars.PProfile.base.type = value;
             else
-                value = pars->Php.base.type;
+                value = pars.PProfile.base.type;
             break;
         case PADSYNTH::control::harmonicSidebands:
             if (write)
-                 pars->Php.onehalf = value;
+                 pars.PProfile.onehalf = value;
             else
-                value = pars->Php.onehalf;
+                value = pars.PProfile.onehalf;
             break;
         case PADSYNTH::control::spectralWidth:
             if (write)
-                pars->Php.amp.par1 = value_int;
+                pars.PProfile.amp.par1 = value_int;
             else
-                value = pars->Php.amp.par1;
+                value = pars.PProfile.amp.par1;
             break;
         case PADSYNTH::control::spectralAmplitude:
             if (write)
-                pars->Php.amp.par2 = value_int;
+                pars.PProfile.amp.par2 = value_int;
             else
-                value = pars->Php.amp.par2;
+                value = pars.PProfile.amp.par2;
             break;
         case PADSYNTH::control::amplitudeMultiplier:
             if (write)
-                pars->Php.amp.type = value;
+                pars.PProfile.amp.type = value;
             else
-                value = pars->Php.amp.type;
+                value = pars.PProfile.amp.type;
             break;
         case PADSYNTH::control::amplitudeMode:
             if (write)
-                pars->Php.amp.mode = value;
+                pars.PProfile.amp.mode = value;
             else
-                value = pars->Php.amp.mode;
+                value = pars.PProfile.amp.mode;
             break;
         case PADSYNTH::control::autoscale:
             if (write)
-                pars->Php.autoscale = value_bool;
+                pars.PProfile.autoscale = value_bool;
             else
-                value = pars->Php.autoscale;
+                value = pars.PProfile.autoscale;
             break;
 
         case PADSYNTH::control::harmonicBase:
             if (write)
-                pars->Pquality.basenote = value_int;
+                pars.Pquality.basenote = value_int;
             else
-                value = pars->Pquality.basenote;
+                value = pars.Pquality.basenote;
             break;
         case PADSYNTH::control::samplesPerOctave:
             if (write)
-                pars->Pquality.smpoct = value_int;
+                pars.Pquality.smpoct = value_int;
             else
-                value = pars->Pquality.smpoct;
+                value = pars.Pquality.smpoct;
             break;
         case PADSYNTH::control::numberOfOctaves:
             if (write)
-                pars->Pquality.oct = value_int;
+                pars.Pquality.oct = value_int;
             else
-                value = pars->Pquality.oct;
+                value = pars.Pquality.oct;
             break;
         case PADSYNTH::control::sampleSize:
             if (write)
-                pars->Pquality.samplesize = value_int;
+                pars.Pquality.samplesize = value_int;
             else
-                value = pars->Pquality.samplesize;
+                value = pars.Pquality.samplesize;
             break;
 
         case PADSYNTH::control::applyChanges:
             if (write && value >= 0.5f)
-            { // this control is 'expensive' only used if necessary
-                if (!pars->Papplied)
-                {
-                    synth->partonoffWrite(npart, -1);
-                    getData->data.source = TOPLEVEL::action::lowPrio;
-                    getData->data.value = 1;
+            {
+                bool blocking = (synth->getRuntime().useLegacyPadBuild()
+                                 or getData->data.parameter == 0);
+                if (blocking)
+                {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
+                    getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()
                 }
                 else
-                    getData->data.source = TOPLEVEL::action::noAction;
+                {// build will run in parallel within a dedicated background thread
+                    pars.buildNewWavetable();
+                }
             }
             else
-                value = pars->Papplied;
+                value = not pars.futureBuild.isUnderway();
             break;
 
         case PADSYNTH::control::stereo:
             if (write)
-                pars->PStereo = value_bool;
+                pars.PStereo = value_bool;
             else
-                value = pars->PStereo;
+                value = pars.PStereo;
             break;
 
         case PADSYNTH::control::dePop:
             if (write)
-                pars->Fadein_adjustment = value_int;
+                pars.Fadein_adjustment = value_int;
             else
-                value = pars->Fadein_adjustment;
+                value = pars.Fadein_adjustment;
             break;
         case PADSYNTH::control::punchStrength:
             if (write)
-                pars->PPunchStrength = value_int;
+                pars.PPunchStrength = value_int;
             else
-                value = pars->PPunchStrength;
+                value = pars.PPunchStrength;
             break;
         case PADSYNTH::control::punchDuration:
             if (write)
-                pars->PPunchTime = value_int;
+                pars.PPunchTime = value_int;
             else
-                value = pars->PPunchTime;
+                value = pars.PPunchTime;
             break;
         case PADSYNTH::control::punchStretch:
             if (write)
-                pars->PPunchStretch = value_int;
+                pars.PPunchStretch = value_int;
             else
-                value = pars->PPunchStretch;
+                value = pars.PPunchStretch;
             break;
         case PADSYNTH::control::punchVelocity:
             if (write)
-                pars->PPunchVelocitySensing = value_int;
+                pars.PPunchVelocitySensing = value_int;
             else
-                value = pars->PPunchVelocitySensing;
+                value = pars.PPunchVelocitySensing;
             break;
     }
-
-    if (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::applyChanges)
+    bool needApply{false};
+    if (write)
     {
-        pars->Papplied = 0;
+        unsigned char control = getData->data.control;
+        needApply = (control >= PADSYNTH::control::bandwidth && control < PADSYNTH::control::rebuildTrigger);
         getData->data.offset = 0;
     }
-    if (!write)
+    else
         getData->data.value = value;
+
+    return needApply;
 }
 
 
@@ -5609,8 +5677,8 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::useAsBaseFunction:
             if (write)
             {
-                FFTwrapper fft(synth->oscilsize);
-                OscilGen gen(&fft, NULL, synth, oscil);
+                fft::Calc fft(synth->oscilsize);
+                OscilGen gen(fft, NULL, synth, oscil);
                 gen.useasbase();
                 if (value_bool)
                 {
@@ -5759,8 +5827,8 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         case OSCILLATOR::control::convertToSine:
             if (write)
             {
-                FFTwrapper fft(synth->oscilsize);
-                OscilGen gen(&fft, NULL, synth, oscil);
+                fft::Calc fft(synth->oscilsize);
+                OscilGen gen(fft, NULL, synth, oscil);
                 gen.convert2sine();
                 oscil->presetsUpdated();
             }
@@ -5920,13 +5988,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         switch (insertParam)
         {
             case TOPLEVEL::insertType::amplitude:
-                lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo.get());
                 break;
             case TOPLEVEL::insertType::frequency:
-                lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo.get());
                 break;
             case TOPLEVEL::insertType::filter:
-                lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo.get());
                 break;
         }
     }
@@ -6055,7 +6123,7 @@ void InterChange::commandFilter(CommandBlock *getData)
     }
     else if (engine == PART::engine::padSynth)
     {
-        filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
+        filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter.get()
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
@@ -6353,13 +6421,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case TOPLEVEL::insertType::amplitude:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope.get());
                 break;
             case TOPLEVEL::insertType::frequency:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope.get());
                 break;
             case TOPLEVEL::insertType::filter:
-                envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope.get());
                 break;
         }
     }
@@ -6888,7 +6956,6 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     if (control == EFFECT::control::changed)
     {
-        //std::cout << "Eff Changed " << std::endl;
         if (!write)
         {
             value = eff->geteffectpar(-1);
@@ -7229,7 +7296,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             max = 127;
             def = 0;
 
-            std::cout << "Using engine defaults" << std::endl;
+            Log("Using engine defaults");
             switch (request)
             {
                 case TOPLEVEL::type::Adjust:
@@ -7276,7 +7343,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         min = 0;
         max = 127;
         def = 0;
-        std::cout << "Using insert defaults" << std::endl;
+        Log("Using insert defaults");
 
             switch (request)
             {
@@ -7409,9 +7476,8 @@ float InterChange::returnLimits(CommandBlock *getData)
                 break;
             default:
                 def = 64;
+                break;
         }
-        //std::cout << "here " << int(def) << std::endl;
-
 
         switch (request)
         {
@@ -7437,7 +7503,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    std::cout << "Using unknown defaults" << std::endl;
+    Log("Unidentified Limit reguest: using dummy defaults");
 
     switch (request)
     {

@@ -22,6 +22,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/NumericFuncs.h"
+#include "Params/RandomWalk.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
 
@@ -30,6 +31,9 @@
 
 #include <cairo.h>
 #include <cairo-xlib.h>
+
+using std::to_string;
+using std::ostringstream;
 
 using func::bpm2text;
 using func::power;
@@ -427,8 +431,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
                     break;
             }
-            if (getData->data.offset == 0)
-                synth->getGuiMaster()->partui->padnoteui->applycolour(FL_RED);
         }
         else if (miscmsg != NO_MSG)
         {
@@ -887,7 +889,7 @@ string convert_value(ValueType type, float val)
             f = -20.0f * logf(powf((1.0f / 127.0f), f)) / log(10.0f);
             s += variable_prec_units(f, "dB", 2);
             s += "\nVelocity/2 = ";
-            s += variable_prec_units(f/(-1 * log2(127)), "dB", 2);
+            s += variable_prec_units(f/(-1 * std::log2(127)), "dB", 2);
             return(s);
 
         case VC_BandWidth:
@@ -913,10 +915,42 @@ string convert_value(ValueType type, float val)
         case VC_SubBandwidthScale:
             if ((int)val == 0)
                 return "Constant";
-	    f = val / 64.0f * 3.0f;
+            f = val / 64.0f * 3.0f;
             return "Factor (100,10k): " +
                 variable_prec_units(power<10>(f), "", 4) + ", " +
                 variable_prec_units(powf(0.1,f), "x", 4);
+
+        case VC_XFadeUpdate:
+        {
+            unsigned int millisec = logDial2millisec(val);
+            if (millisec > 1000)
+                return variable_prec_units(float(millisec) / 1000, "sec", 1);
+            if (millisec > 0)
+                return variable_prec_units(float(millisec), "ms", 0);
+            else
+                return "off";
+            break;
+        }
+
+        case VC_Retrigger:
+        {
+            if (val > 0) val += 2300;
+            // in the UI we remove a socket of 200ms from the dial setting,
+            // to prevent the user from choosing overly fast retriggering
+            // 200ms correspond to the log10 setting of 2300
+            return convert_value(VC_XFadeUpdate, val);
+            break;
+        }
+
+        case VC_RandWalkSpread:
+        {
+            double spread = RandomWalk::param2spread(val);
+            if (spread > 1)
+                return variable_prec_units((spread - 1) * 100.0, "%", 1);
+            else
+                return "no random walk.";
+            break;
+        }
 
         case VC_FilterVelocitySense: // this is also shown graphically
             if ((int)val==127)
@@ -1421,3 +1455,16 @@ ValueType getFilterFreqTrackType(int offset)
     }
 }
 
+/** convert a millesconds value to a logarithmic dial setting */
+int millisec2logDial(unsigned int ms)
+{
+    return ms==0? -1
+                : log10f(float(ms)) * 1000;
+}
+
+/** convert setting from a logarithmic dial back to millesconds */
+unsigned int logDial2millisec(int dial)
+{
+    return dial<0? 0
+                 : power<10>(dial / 1000.0f) + 0.5;
+}

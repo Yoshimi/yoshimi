@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
@@ -12,6 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2015-2021, Will Godfrey
+Copyright 2022, Ichthyostega
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -29,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -49,7 +50,15 @@ decl {\#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
 }
 
+decl {\#include <memory>
+    using std::unique_ptr;
+    class PADStatus;} {public global
+}
+
 decl {\#include "MasterUI.h"} {private global
+}
+
+decl {\#include "Params/PADStatus.h"} {private local
 }
 
 decl {\#include "Misc/SynthHelper.h"
@@ -81,9 +90,10 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
     code {//
         int ox = x(), oy = y(), lx =w (), ly = h() - 1;
         if (!visible()) return;
-        float smps[lx];
 
-        float realbw = pars->getprofile(smps,lx);
+        std::vector<float> profile = pars->buildProfile(lx);
+        float realbw = pars->calcProfileBandwith(profile);
+
         bool active = active_r();
 
         //draw the equivalent bandwidth
@@ -121,7 +131,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
 
         for (int i = 0; i < lx; i += step)
         {
-             int val = int((ly - 2) * smps[i]);
+             int val = int((ly - 2) * profile[i]);
               if (active)
                 fl_color(180, 210, 240);
             else
@@ -137,7 +147,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         for (int i = 0; i < lx; i++)
         {
             int ni = ox + i;
-            float nv = (ly - 2) * smps[i];
+            float nv = (ly - 2) * profile[i];
 
             if (active)
                 fl_color(0, 0, 100);
@@ -191,7 +201,7 @@ this->pars=pars;} {}
         float spc[n];
         for (int i = 0; i < n; i++)
             spc[i] = 0.0;
-        pars->oscilgen->getspectrum(n, spc, 0);
+        pars->oscilgen->getOscilSpectrumIntensities(n, spc);
 
         //normalize
         float max = 0;
@@ -209,13 +219,13 @@ this->pars=pars;} {}
         for (int i = 0; i < lx; i++)
             spectrum[i] = 0;
 
-        for (int i = 1; i < n; i++)
+        for (int i = 0; i+1 < n; i++)
         {
-            float nhr = pars->getNhr(i);
+            float nhr = pars->calcHarmonicPositionFactor(i);
             int kx = (int)(lx / (float)maxharmonic * nhr);
             if (kx < 0 || kx >= lx)
                 continue;
-            spectrum[kx] = spc[i - 1] / max + 1e-9;
+            spectrum[kx] = spc[i] / max + 1e-9;
         }
 
         fl_color(180, 0, 0);
@@ -299,14 +309,14 @@ class PADnoteUI {: {public PresetsUI_}
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseType, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 42 75 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Gauss");o->add("Square");o->add("DoubleExp");}
-              code1 {o->value(pars->Php.base.type);}
+              code1 {o->value(pars->PProfile.base.type);}
             } {}
             Fl_Dial hpbasepar1 {
               label Width
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
               xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.base.par1);}
+              code0 {o->value(pars->PProfile.base.pwidth);}
               class WidgetPDial
             }
             Fl_Dial hpfreqmult {
@@ -314,7 +324,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::frequencyMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.freqmult);}
+              code0 {o->value(pars->PProfile.freqmult);}
               class WidgetPDial
             }
             Fl_Dial hpmpar1 {
@@ -322,7 +332,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.modulator.par1);}
+              code0 {o->value(pars->PProfile.modulator.pstretch);}
               class WidgetPDial
             }
             Fl_Dial hpmfreq {
@@ -330,7 +340,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorFrequency, o->value(), TOPLEVEL::type::Integer);}
               xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.modulator.freq);}
+              code0 {o->value(pars->PProfile.modulator.freq);}
               class WidgetPDial
             }
             Fl_Dial hpwidth {
@@ -338,7 +348,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::size, o->value(), TOPLEVEL::type::Integer);}
               xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->Php.width);}
+              code0 {o->value(pars->PProfile.width);}
               class WidgetPDial
             }
             Fl_Choice hponehalf {
@@ -347,7 +357,7 @@ class PADnoteUI {: {public PresetsUI_}
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicSidebands, o->value(), TOPLEVEL::type::Integer);}
               xywh {10 147 80 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
               code0 {o->add("Full");o->add("Upper Half");o->add("Lower Half");}
-              code1 {o->value(pars->Php.onehalf);}
+              code1 {o->value(pars->PProfile.onehalf);}
             } {}
             Fl_Group ampgroup {
               xywh {10 164 80 105} box BORDER_BOX
@@ -358,14 +368,14 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMode, o->value(), TOPLEVEL::type::Integer);}
                 xywh {15 209 70 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
                 code0 {o->add("Sum");o->add("Mult");o->add("Div1");o->add("Div2");}
-                code1 {o->value(pars->Php.amp.mode);}
+                code1 {o->value(pars->PProfile.amp.mode);}
               } {}
               Fl_Dial hpamppar1 {
                 label Par1
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralWidth, o->value(), TOPLEVEL::type::Integer);}
                 xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-                code0 {o->value(pars->Php.amp.par1);}
+                code0 {o->value(pars->PProfile.amp.par1);}
                 class WidgetPDial
               }
               Fl_Dial hpamppar2 {
@@ -373,7 +383,7 @@ class PADnoteUI {: {public PresetsUI_}
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralAmplitude, o->value(), TOPLEVEL::type::Integer);}
                 xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-                code0 {o->value(pars->Php.amp.par2);}
+                code0 {o->value(pars->PProfile.amp.par2);}
                 class WidgetPDial
               }
             }
@@ -383,7 +393,7 @@ class PADnoteUI {: {public PresetsUI_}
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
               xywh {15 179 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("Off");o->add("Gauss");o->add("Sine");o->add("Flat");}
-              code1 {o->value(pars->Php.amp.type);}
+              code1 {o->value(pars->PProfile.amp.type);}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
             } {}
             Fl_Check_Button hpautoscale {
@@ -391,14 +401,14 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
               xywh {10 274 74 15} down_box DOWN_BOX labelsize 11
-              code0 {o->value(pars->Php.autoscale);}
+              code0 {o->value(pars->PProfile.autoscale);}
               class Fl_Check_Button2
             }
           }
           Fl_Group {} {
             xywh {100 155 315 135} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179 align 6
             code0 {osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 130,"");}
-            code1 {osc->init(pars->oscilgen, synth);}
+            code1 {osc->init(pars->oscilgen.get(), synth);}
           } {}
           Fl_Box cbwidget {
             label {Harmonic Content}
@@ -411,7 +421,8 @@ class PADnoteUI {: {public PresetsUI_}
             callback {//
             resui->resonancewindow->redraw();
             resui->Show();
-            resui->setcbwidget(cbwidget, applybutton);
+            resui->applybox->show();
+            resui->applybutton->show();
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             xywh {425 225 85 25} box THIN_UP_BOX labelfont 1 labelsize 12
@@ -422,7 +433,8 @@ class PADnoteUI {: {public PresetsUI_}
             if (oscui!=NULL)
                 delete (oscui);
             lastWaveW = 0;
-            oscui = new OscilEditor(pars->POscil, osc, cbwidget, applybutton, synth, npart, kititem, 2);
+            bool forPAD = true;
+            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2, forPAD);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             tooltip {Right click: also close this} xywh {425 260 85 25} box THIN_UP_BOX labelfont 1 labelsize 12
@@ -441,7 +453,7 @@ class PADnoteUI {: {public PresetsUI_}
             label cents
             xywh {60 320 55 15} labelsize 10 align 5 maximum 10000 textsize 11
             code0 {o->step(0.1, 1);}
-            code1 {o->value(pars->setPbandwidth(pars->Pbandwidth));}
+            code1 {o->value(pars->getBandwithInCent());}
             code2 {if (pars->Pmode!=0) o->deactivate();}
           }
           Fl_Choice bwscale {
@@ -508,7 +520,7 @@ class PADnoteUI {: {public PresetsUI_}
             label base
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicBase, o->value(), TOPLEVEL::type::Integer);}
-            xywh {425 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {425 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("C-2");o->add("G-2");o->add("C-3");o->add("G-3");o->add("C-4");o->add("G-4");o->add("C-5");o->add("G-5");o->add("G-6");}
             code1 {o->value(pars->Pquality.basenote);}
           } {}
@@ -516,7 +528,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {smp/oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::samplesPerOctave, o->value(), TOPLEVEL::type::Integer);}
-            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {475 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("0.5");o->add("1");o->add("2");o->add("3");o->add("4");o->add("6");o->add("12");}
             code1 {o->value(pars->Pquality.smpoct);}
           } {}
@@ -524,7 +536,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {no.oct}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::numberOfOctaves, o->value(), TOPLEVEL::type::Integer);}
-            xywh {530 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
+            xywh {525 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 12
             code0 {o->add("1");o->add("2");o->add("3");o->add("4");o->add("5");o->add("6");o->add("7");o->add("8");}
             code1 {o->value(pars->Pquality.oct);}
           } {}
@@ -532,10 +544,30 @@ class PADnoteUI {: {public PresetsUI_}
             label {Sample Size}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::sampleSize, o->value(), TOPLEVEL::type::Integer);}
-            xywh {425 195 125 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            xywh {425 195 95 25} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
             code0 {o->add("16k (Tiny)");o->add("32k");o->add("64k (Small)");o->add("128k");o->add("256k");o->add("512k");o->add("1M (Big)");}
             code1 {o->value(pars->Pquality.samplesize);}
           } {}
+          Fl_Dial xFadeDial {
+            label xFade
+            callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::xFadeUpdate, logDial2millisec(o->value()), TOPLEVEL::type::Integer);}
+            tooltip {cross fade after building new Wavetable}
+            xywh {530 195 25 25} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 4301 step 1
+            code0 {int dialSetting = millisec2logDial(pars->PxFadeUpdate);
+                   o->value(dialSetting);}
+            code2 {o->setValueType(VC_XFadeUpdate);}
+            class WidgetPDial
+          }
+          Fl_Button randWalkUI {
+            label re
+            callback {//
+              show_randWalk();
+              if ((Fl::event_button() == 3))
+                  padnotewindow->hide();
+            }
+            xywh {560 200 15 15} labelsize 10
+          }
           Fl_Group hprofile {
             xywh {100 45 475 90} box FLAT_BOX color 54 selection_color 218 labelcolor 63
             code0 {PADnoteHarmonicProfile *hpui=new PADnoteHarmonicProfile(o->x(),o->y(),o->w(),o->h(),"");}
@@ -663,13 +695,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope} open
               xywh {10 95 250 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->AmpEnvelope, npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, 2, 0);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
               label {Amplitude LFO     } open
               xywh {10 165 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo, npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpLfo.get(), npart, kititem, 2, 0);}
               class LFOUI
             } {}
             Fl_Box {} {
@@ -683,19 +715,19 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group filterenv {
               label {PADSynth - Filter Envelope}
               xywh {295 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FilterEnvelope, npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterEnvelope.get(), npart, kititem, 2, 2);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
               label {Filter LFO     }
               xywh {295 200 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->FilterLfo, npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterLfo.get(), npart, kititem, 2, 2);}
               class LFOUI
             } {}
             Fl_Group filterui {
               label {PADsynth - Filter}
               xywh {295 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-              code0 {o->init(pars->GlobalFilter,&pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
+              code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
               class FilterUI
             } {}
           }
@@ -706,13 +738,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
               xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, 2, 1);}
               class EnvelopeUI
             } {}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqLfo.get(), npart, kititem, 2, 1);}
               class LFOUI
             } {}
             Fl_Dial bend {
@@ -812,6 +844,7 @@ class PADnoteUI {: {public PresetsUI_}
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
+        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases}
         xywh {242 412 128 22} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button padCopy {
@@ -830,6 +863,8 @@ class PADnoteUI {: {public PresetsUI_}
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "PadSynth");
         padSeen = false;
         resui->resonancewindow->hide();
+        if (randWalkWindow)
+            randWalkWindow->hide();
         padnotewindow->hide();
         if ((Fl::event_button() == 3))
         {
@@ -841,6 +876,150 @@ class PADnoteUI {: {public PresetsUI_}
         tooltip {Right click: also reopen previous} xywh {505 410 61 24} box THIN_UP_BOX labelfont 1 labelsize 12
       }
     }
+  }
+  Function {make_randWalkWindow()} {
+  } {
+    Fl_Window randWalkWindow {
+      label {random walk} open
+      xywh {1145 175 160 285} type Double hide resizable
+      code0 {randDW = o->w(); randDH = o->h();}
+      code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}
+    } {
+      Fl_Group randomProp {open
+        xywh {0 5 160 280}
+      } {
+        Fl_Dial rebuildTrigger {
+          label retrigger
+          callback {//
+            int dialSetting = o->value();
+            if (dialSetting >= 0)
+                dialSetting += 2300;
+            // remove a socket of 200ms from the dial setting, i.e. the editable time in the UI starts > 200ms
+            // smaller values would be pointless and overload the system. (60sec = 4779, 200ms = 2300, thus max = 4779-2300 = 2479)
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::rebuildTrigger, logDial2millisec(dialSetting), TOPLEVEL::type::Integer);
+          }
+          tooltip {Trigger rebuild of PAD Wavetable after generating this amount of sample time; possibly randomise parameters below on each rebuild. WARNING: expensive!}
+          xywh {25 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 2479 step 1
+          code0 {//
+            int dialSetting = millisec2logDial(pars->PrebuildTrigger);
+            if (dialSetting >= 2300)
+                 dialSetting -= 2300;
+            else dialSetting = -1;
+            o->value(dialSetting);
+          }
+          code2 {o->setValueType(VC_Retrigger);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkDetune {
+          label Detune
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkDetune, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Let the voice detuning perform a random walk on each wavetable rebuild, within this spread..}
+          xywh {100 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkDetune);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkBandwidth {
+          label Bandwidth
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkBandwidth, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Bandwidth random walk on wavetable rebuild, within this spread..}
+          xywh {100 75 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkBandwidth);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkFilterFreq {
+          label {Filter Freq}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkFilterFreq, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Filter cutoff freq random walk on wavetable rebuild, within this spread..}
+          xywh {100 120 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkFilterFreq);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkProfileWidth {
+          label {Profile Width}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileWidth, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Profile width parameter random walk on wavetable rebuild, within this spread..}
+          xywh {100 165 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkProfileWidth);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkProfileStretch {
+          label {Profile Stretch}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileStretch, o->value(), TOPLEVEL::type::Integer);
+          }
+          tooltip {Profile stretch parameter random walk on wavetable rebuild, within this spread..}
+          xywh {100 210 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum 0 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkProfileStretch);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Button randClose {
+          label Close
+          callback {//
+              if (randSeen)
+                  saveWin(synth, randWalkWindow->w(), randWalkWindow->h(), randWalkWindow->x(), randWalkWindow->y(), false, string("padRandWalk"));
+              randWalkWindow->hide();
+              randSeen = false;
+              if ((Fl::event_button() == 3))
+                  synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
+          }
+          xywh {100 255 50 20} box THIN_UP_BOX labelsize 12
+        }
+      }
+    }
+  }
+  Function {show_randWalk()} {} {
+    code {//
+      int fetchW, fetchH, fetchX, fetchY, fetchO;
+      loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, string("padRandWalk"));
+
+      if (fetchW < randDW || fetchH < randDH)
+      {
+          fetchW = randDW;
+          fetchH = randDH;
+      }
+      checkSane(fetchX, fetchY, fetchW, fetchH, randDW, randDH);
+
+      randWalkWindow->resize(fetchX, fetchY, fetchW, fetchH);
+      randWalkWindow->show();
+      randWalkWindow_retext();
+      randSeen = true;
+    } {}
+  }
+  Function {randWalkWindow_retext()} {} {
+    code {//
+          int w = randWalkWindow->w();
+          int h = randWalkWindow->h();
+          float defW = 160;
+          float defH = 285;
+          float dW = w / defW;
+          float dH = h / defH;
+          float dScale;
+          if (dW < dH)
+              dScale = dW;
+          else
+              dScale = dH;
+          if (dScale < 0.2f)
+              dScale = 0.2f;
+
+          int size10 = int(10 * dScale);
+//        int size11 = int(11 * dScale);
+          int size12 = int(12 * dScale);
+
+          rebuildTrigger->labelsize(size10);
+          randClose->labelsize(size12);} {}
   }
   Function {Showpad()} {} {
     code {//
@@ -947,6 +1126,7 @@ class PADnoteUI {: {public PresetsUI_}
 
     qsamplesize->labelsize(size);
         qsamplesize->textsize(size11);
+    xFadeDial->labelsize(size);
 
     resonance->labelsize(size12);
     waveform->labelsize(size12);
@@ -1070,6 +1250,25 @@ class PADnoteUI {: {public PresetsUI_}
                 bwscale->deactivate();
             }
             cbwidget->do_callback();
+            break;
+
+        case PADSYNTH::control::xFadeUpdate:
+            {
+                int dialSetting = millisec2logDial(value);
+                xFadeDial->value(dialSetting);
+                cbwidget->do_callback();
+            }
+            break;
+
+        case PADSYNTH::control::rebuildTrigger:
+            {
+                int dialSetting = millisec2logDial(value);
+                // remove a socket of 200ms from the dial setting, editable time in the UI starts > 200ms
+                if (dialSetting >= 2300) dialSetting -= 2300;
+                else dialSetting = -1;
+                rebuildTrigger->value(dialSetting);
+                cbwidget->do_callback();
+            }
             break;
 
         case PADSYNTH::control::detuneFrequency:
@@ -1246,12 +1445,7 @@ class PADnoteUI {: {public PresetsUI_}
                 if (wasFromHere)
                     alert(synth, "Some samples have failed.");
             }
-            applycolour(FL_GRAY);
-            break;
-
-        case PADSYNTH::control::applyChanges:
-            if (lrint(value) == 1)
-                applycolour(FL_GRAY);
+            padStatus->activateStage(PADStatus::CLEAN);
             break;
 
         case PADSYNTH::control::stereo:
@@ -1278,43 +1472,87 @@ class PADnoteUI {: {public PresetsUI_}
             pvel->value(value);
             break;
 
+        case PADSYNTH::control::randWalkDetune:
+            randWalkDetune->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkBandwidth:
+            randWalkBandwidth->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkFilterFreq:
+            randWalkFilterFreq->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkProfileWidth:
+            randWalkProfileWidth->value(value);
+            break;
+
+        case PADSYNTH::control::randWalkProfileStretch:
+            randWalkProfileStretch->value(value);
+            break;
+
+        case PADSYNTH::control::applyChanges:
+            if (lrint(value) == 0 and getData->data.offset != UNUSED)
+                padStatus->handleStateMessage(*getData);
+            break;
+
     }} {}
   }
-  Function {applycolour(int set)} {} {
+  Function {applyButton(Fl_Color colour, const char *const text)} {} {
     code {//
-    applybutton->color(set);
+    applybutton->color(colour);
+    applybutton->label(text);
     applybutton->redraw();
     if (oscui)
     {
-        oscui->applybutton->color(set);
+        oscui->applybutton->color(colour);
+        // not changing text due to limited space
         oscui->applybutton->redraw();
     }
     if (resui)
     {
-        resui->applybutton->color(set);
+        resui->applybutton->color(colour);
         resui->applybutton->redraw();
     }} {}
   }
-  Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
+  Function {PADnoteUI(PADnoteParameters *parameters)} {} {
     code {//
     synth = parameters->getSynthEngine();
     pars = parameters;
-    npart = npart_;
-    kititem = kititem_;
+    npart = parameters->partID;
+    kititem = parameters->kitID;
     padSeen = false;
+    randSeen = false;
     lastWaveW = 0;
     lastpadW = 0;
     oscui = NULL;
     lastResuiW = 0;
-    resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
-    make_window();} {}
+    resui = new ResonanceUI(pars->resonance.get(), npart, kititem, 2);
+    make_randWalkWindow();
+    make_window();
+    padStatus.reset(new PADStatus(npart,kititem));
+    // setup handler to indicate PADSynth wavetable build status
+    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuild Wave"); });
+    padStatus->on(PADStatus::FADING,  [&]() { applyButton(FL_YELLOW, "fading..."); });
+    padStatus->on(PADStatus::PENDING, [&]() { applyButton(fl_color_average(FL_CYAN, FL_DARK_BLUE, 0.8), "pending Wave"); });
+    padStatus->on(PADStatus::BUILDING,[&]() { applyButton(fl_color_average(FL_RED, FL_DARK_MAGENTA, 0.6), "rebuilding..."); });
+    padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(FL_RED, "Apply Changes"); });
+} {}
   }
   Function {~PADnoteUI()} {return_type virtual
   } {
     code {//
     if (oscui)
         delete(oscui);
-    delete(resui);
+    if (resui)
+        delete(resui);
+    if (randWalkWindow) {
+        if (randSeen)
+            saveWin(synth, randWalkWindow->w(), randWalkWindow->h(), randWalkWindow->x(), randWalkWindow->y(),randWalkWindow->visible(), string("padRandWalk"));
+        randWalkWindow->hide();
+        delete (randWalkWindow);
+    }
     if (padSeen)
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), padSeen, "PadSynth");
     padnotewindow->hide();
@@ -1338,12 +1576,20 @@ class PADnoteUI {: {public PresetsUI_}
   }
   decl {float padDH;} {private local
   }
+  decl {float randDW;} {private local
+  }
+  decl {float randDH;} {private local
+  }
   decl {int lastpadW;} {private local
   }
   decl {bool padSeen;} {private local
   }
+  decl {bool randSeen;} {private local
+  }
   decl {int lastWaveW;} {private local
   }
   decl {int lastResuiW;} {private local
+  }
+  decl {unique_ptr<PADStatus> padStatus;} {private local
   }
 }

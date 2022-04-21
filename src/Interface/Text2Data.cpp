@@ -1201,6 +1201,20 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
     }
     else if(findAndStep(source, "Spectrum Mode")) // new form
         ; // not yet
+    else if(findAndStep(source, "XFade Update"))
+        ctl =PADSYNTH::control::xFadeUpdate;
+    else if(findAndStep(source, "BuildTrigger"))
+        ctl =PADSYNTH::control::rebuildTrigger;
+    else if(findAndStep(source, "RWDetune"))
+        ctl =PADSYNTH::control::randWalkDetune;
+    else if(findAndStep(source, "RWBandwidth"))
+        ctl =PADSYNTH::control::randWalkBandwidth;
+    else if(findAndStep(source, "RWFilterFreq"))
+        ctl =PADSYNTH::control::randWalkFilterFreq;
+    else if(findAndStep(source, "RWWidthProfile"))
+        ctl =PADSYNTH::control::randWalkProfileWidth;
+    else if(findAndStep(source, "RWStretchProfile"))
+        ctl =PADSYNTH::control::randWalkProfileStretch;
 
     else if (findAndStep(source, "Changes Applied"))
         ctl =PADSYNTH::control::applyChanges;

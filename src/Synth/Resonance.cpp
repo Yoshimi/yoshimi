@@ -66,7 +66,7 @@ void Resonance::setpoint(int n, unsigned char p)
 
 
 // Apply the resonance to FFT data
-void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
+void Resonance::applyres(int n, fft::Spectrum& fftdata, float freq)
 {
     if (Penabled == 0)
         return; // if the resonance is disabled
@@ -100,8 +100,8 @@ void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
         y = power<10>(y * PmaxdB / 20.0);
         if (Pprotectthefundamental != 0 && i == 1)
             y = 1.0;
-        fftdata.c[i] *= y;
-        fftdata.s[i] *= y;
+        fftdata.c(i) *= y;
+        fftdata.s(i) *= y;
     }
 }
 

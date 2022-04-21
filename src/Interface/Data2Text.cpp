@@ -158,7 +158,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
         switch(insert)
         {
             case UNUSED:
-                commandName = resolvePad(getData, addValue);
+                commandName = resolvePad(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::LFOgroup:
                 commandName = resolveLFO(getData, addValue);
@@ -177,19 +177,19 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
-                commandName = resolveResonance(getData, addValue);
+                commandName = resolveResonance(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGraphInsert:
-                commandName = resolveResonance(getData, addValue);
+                commandName = resolveResonance(synth, getData, addValue);
                 break;
         }
         return withValue(commandName, type, showValue, addValue, value);
@@ -249,13 +249,13 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::oscillatorGroup:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicAmplitude:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::harmonicPhaseBandwidth:
-                commandName = resolveOscillator(getData, addValue);
+                commandName = resolveOscillator(synth, getData, addValue);
                 break;
         }
         return withValue(commandName, type, showValue, addValue, value);
@@ -285,10 +285,10 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
                 commandName = resolveEnvelope(getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
-                commandName = resolveResonance(getData, addValue);
+                commandName = resolveResonance(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGraphInsert:
-                commandName = resolveResonance(getData, addValue);
+                commandName = resolveResonance(synth, getData, addValue);
                 break;
         }
     }
@@ -367,6 +367,7 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     if (control == VECTOR::control::undefined)
@@ -503,6 +504,7 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
 
     }
 
@@ -579,6 +581,25 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
                     contstr += "cubic";
                 else
                     contstr += "linear";
+            }
+            showValue = false;
+            break;
+        case CONFIG::control::handlePadSynthBuild:
+            contstr = "PADSynth wavetable build ";
+            if (addValue)
+            {
+                switch (value_int)
+                {
+                    case 0:
+                        contstr += "Muted";
+                        break;
+                    case 1:
+                        contstr += "Background";
+                        break;
+                    case 2:
+                        contstr += "AutoApply";
+                        break;
+                }
             }
             showValue = false;
             break;
@@ -1346,6 +1367,7 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Main " + contstr);
@@ -1816,6 +1838,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             showValue = false;
             name = "";
             contstr = "Unrecognised";
+            break;
     }
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
@@ -1898,6 +1921,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + contstr);
@@ -2152,6 +2176,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + " " + contstr);
@@ -2301,14 +2326,16 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + contstr);
 }
 
 
-string DataText::resolvePad(CommandBlock *getData, bool addValue)
+string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
+    SynthEngine *synth = _synth;
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2387,7 +2414,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
             contstr = "Punch Velocity";
             break;
 
-            case PADSYNTH::control::applyChanges:
+        case PADSYNTH::control::applyChanges:
             showValue = false;
             contstr = "Changes Applied ";
             if (addValue)
@@ -2427,11 +2454,34 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         case PADSYNTH::control::spectrumMode:
             contstr = "Spectrum Mode";
             break;
+        case PADSYNTH::control::xFadeUpdate:
+            contstr = "XFade Update";
+            break;
+        case PADSYNTH::control::rebuildTrigger:
+            contstr = "BuildTrigger";
+            break;
+        case PADSYNTH::control::randWalkDetune:
+            contstr = "RWDetune";
+            break;
+        case PADSYNTH::control::randWalkBandwidth:
+            contstr = "RWBandwidth";
+            break;
+        case PADSYNTH::control::randWalkFilterFreq:
+            contstr = "RWFilterFreq";
+            break;
+        case PADSYNTH::control::randWalkProfileWidth:
+            contstr = "RWWidthProfile";
+            break;
+        case PADSYNTH::control::randWalkProfileStretch:
+            contstr = "RWStretchProfile";
+            break;
     }
+    string padApply{synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                         : " - Need to Apply"};
     if (!contstr.empty())
     {
         if (write)
-            contstr += " - Need to Apply";
+            contstr += padApply;
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
     }
 
@@ -2479,7 +2529,7 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
     {
         contstr = "Harmonic Base " + contstr;
         if (write)
-            contstr += " - Need to Apply";
+            contstr += padApply;
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
     }
 
@@ -2500,17 +2550,19 @@ string DataText::resolvePad(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
     if (contstr != "Unrecognised")
         contstr = "Harmonic Samples " + contstr;
     if (write && contstr != "Unrecognised")
-        contstr += " - Need to Apply";
+        contstr += padApply;
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
 }
 
 
-string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
+string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
+    SynthEngine* synth = _synth;
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2527,7 +2579,8 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
     {
         eng_name = " PadSynth";
         if (write)
-            isPad = " - Need to Apply";
+            isPad = synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                         : " - Need to Apply";
     }
     else
     {
@@ -2689,14 +2742,16 @@ string DataText::resolveOscillator(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harm Mods " + contstr + isPad);
 }
 
 
-string DataText::resolveResonance(CommandBlock *getData, bool addValue)
+string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bool addValue)
 {
+    SynthEngine *synth = _synth;
     int value = int(getData->data.value + 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2709,24 +2764,20 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
 
     string name;
     string isPad = "";
-    if (engine == PART::engine::padSynth)
+    if (engine == PART::engine::padSynth && control != PADSYNTH::control::applyChanges)
     {
         name = " PadSynth";
         if (write)
-            isPad = " - Need to Apply";
+            isPad = synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                         : " - Need to Apply";
     }
     else
         name = " AddSynth";
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
     {
-        if (write == true && engine == PART::engine::padSynth)
-            isPad = " - Need to Apply";
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(parameter + 1) + isPad);
     }
-
-    if (write == true && engine == PART::engine::padSynth && control != PADSYNTH::control::applyChanges)
-        isPad = " - Need to Apply";
     string contstr;
     switch (control)
     {
@@ -2784,6 +2835,7 @@ string DataText::resolveResonance(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
@@ -2876,6 +2928,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
@@ -2909,7 +2962,8 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
     int value_int = int(getData->data.value);
     unsigned char control = getData->data.control;
 
-    int nseqpos, nformant = getData->data.parameter;
+    int nformant = getData->data.parameter;
+    int nseqpos  = getData->data.parameter;
     int nvowel = getData->data.offset;
 
     string contstr = "";
@@ -3036,6 +3090,7 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
     string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
@@ -3172,6 +3227,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
         default:
             showValue = false;
             contstr = "Unrecognised";
+            break;
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
@@ -3527,6 +3583,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             contstr = " Unrecognised";
+            break;
     }
     //std::cout << "control " << int(control) << std::endl;
     if (control == EFFECT::control::preset && effType != (TOPLEVEL::insert::eq | 128))

@@ -35,7 +35,7 @@ using func::asDecibel;
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth):
     _envpars(envpars),
-    envUpdate(envpars),
+    envUpdate(*envpars),
     basefreq(basefreq_),
     synth(_synth)
 {

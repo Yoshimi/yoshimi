@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <semaphore.h>
 #include <string>
+#include <memory>
 #include <vector>
 #include <list>
 #include <map>
@@ -39,6 +40,7 @@
 #include "Misc/RandomGen.h"
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
+#include "DSP/FFTwrapper.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
 #include "Interface/MidiDecode.h"
@@ -58,6 +60,8 @@ class MasterUI;
 #endif
 
 using std::string;
+using std::unique_ptr;
+
 
 enum LV2PluginType
 {
@@ -85,7 +89,13 @@ class SynthEngine
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
-        ~SynthEngine();
+       ~SynthEngine();
+        // shall not be copied or moved
+        SynthEngine(SynthEngine&&)                 = delete;
+        SynthEngine(SynthEngine const&)            = delete;
+        SynthEngine& operator=(SynthEngine&&)      = delete;
+        SynthEngine& operator=(SynthEngine const&) = delete;
+
         bool Init(unsigned int audiosrate, int audiobufsize);
 
         bool savePatchesXML(string filename);
@@ -230,7 +240,7 @@ class SynthEngine
         // others ...
         Controller *ctl;
         Microtonal microtonal;
-        FFTwrapper *fft;
+        unique_ptr<fft::Calc> fft;
 
         // peaks for VU-meters
         union VUtransfer{
@@ -316,6 +326,7 @@ class SynthEngine
         float numRandom()   { return prng.numRandom(); }
         uint32_t randomINT(){ return prng.randomINT(); }   // random number in the range 0...INT_MAX
         void setReproducibleState(int value);
+        void swapTestPADtable();
 };
 
 #endif

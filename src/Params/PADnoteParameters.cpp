@@ -6,6 +6,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019 Will Godfrey
     Copyright 2020 Kristian Amlie & others
+    Copyright 2022 Ichthyostega
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -25,7 +26,10 @@
 
 */
 
+#include <unistd.h>
+#include <thread>
 #include <memory>
+#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
@@ -34,96 +38,191 @@
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
+#include "Params/PADStatus.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/NumericFuncs.h"
 #include "Params/PADnoteParameters.h"
 #include "Misc/WavFile.h"
 
+using std::vector;
 using file::saveData;
 using func::setAllPan;
 using func::power;
 
+namespace{ // Implementation helpers...
 
-PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
+    // normalise the numbers in the table to 0.0 .. 1.0
+    inline void normaliseMax(vector<float>& table)
+    {
+        double max = 0.0;
+        for (float const& val : table)
+            if (val > max)
+                max = val;
+
+        if (max >= 0.000001)
+            for (float& val : table)
+                val = float(double(val) / max);
+    }
+
+    // normalise a float array to RMS
+    inline void normaliseSpectrumRMS(fft::Waveform& data)
+    {
+        auto sqr = [](double val){ return val*val; };
+
+        double rms = 0.0;
+        for (size_t i = 0; i < data.size(); ++i)
+        {
+            rms += sqr(data[i]);
+        }
+        rms = sqrt(rms);
+        if (rms < 0.000001)
+            rms = 1.0;
+        rms *= sqrt(double(1024 * 256) / data.size()) / 50.0;
+        // TODO can we explain those magical numbers??
+        // (Likely due to the fact we're still pre-IFFT here)
+        // Are those numbers exact, or just some "I don't care it seems to work" approximation?
+        //
+        // TODO Maybe related: http://fftw.org/fftw3_doc/Complex-DFTs.html at the bottom
+        // "FFTW computes an unnormalized transform: computing a forward followed by a backward transform
+        //  (or vice versa) will result in the original data multiplied by the size of the transform (the product of the dimensions).
+        //
+        for (size_t i = 0; i < data.size(); ++i)
+            data[i] = float(double(data[i]) / rms);
+    }
+}//(End)ImplHelpers
+
+
+
+PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
+    : Presets(_synth)
+    , Pmode{0}
+    , Pquality{}
+    , PProfile{}
+    , Pbandwidth{500}
+    , Pbwscale{0}
+    , Phrpos{}
+    , Pfixedfreq{0}
+    , PfixedfreqET{0}
+    , PBendAdjust{88}
+    , POffsetHz{64}
+    , PDetune{8192}  // fine detune "zero"
+    , PCoarseDetune{0}
+    , PDetuneType{1}
+
+    // base Waveform
+    , fft(synth->oscilsize)
+    , POscil{new OscilParameters(fft, synth)}
+    , resonance{new Resonance(synth)}
+    , oscilgen{new OscilGen(fft, resonance.get(), synth, POscil.get())}
+    , FreqEnvelope{new EnvelopeParams(0, 0, synth)}
+    , FreqLfo{new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth)}
+
+    // Amplitude parameters
+    , PStereo{1}
+    , PPanning{64}
+    , PRandom{false}
+    , PWidth{63}
+    , pangainL{0.7}
+    , pangainR{0.7}
+    , PVolume{90}
+    , PAmpVelocityScaleFunction{64}
+    , AmpEnvelope{new EnvelopeParams(64, 1, synth)}
+    , AmpLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth)}
+
+    , Fadein_adjustment{FADEIN_ADJUSTMENT_SCALE}
+    , PPunchStrength{0}
+    , PPunchTime{60}
+    , PPunchStretch{64}
+    , PPunchVelocitySensing{72}
+
+    // Filter Parameters
+    , GlobalFilter{new FilterParams(2, 94, 40, 0, synth)}
+    , PFilterVelocityScale{64}
+    , PFilterVelocityScaleFunction{64}
+    , FilterEnvelope{new EnvelopeParams(0, 1, synth)}
+    , FilterLfo{new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth)}
+
+    // random walk re-Trigger
+    , PrebuildTrigger{0}
+    , PrandWalkDetune{0}
+    , PrandWalkBandwidth{0}
+    , PrandWalkFilterFreq{0}
+    , PrandWalkProfileWidth{0}
+    , PrandWalkProfileStretch{0}
+    , randWalkDetune{wavetablePhasePrng}
+    , randWalkBandwidth{wavetablePhasePrng}
+    , randWalkFilterFreq{wavetablePhasePrng}
+    , randWalkProfileWidth{wavetablePhasePrng}
+    , randWalkProfileStretch{wavetablePhasePrng}
+
+    // Wavetable building
+    , xFade{}
+    , PxFadeUpdate{0}
+    , waveTable(Pquality)
+    , futureBuild(task::BuildScheduler<PADTables>::wireBuildFunction
+                 ,BuildOperation([this](){ return render_wavetable(); }))
+
+    , partID{pID}
+    , kitID{kID}
+    , sampleTime{0}
+    , wavetablePhasePrng{}
 {
     setpresettype("Ppadsyth");
-    fft = fft_;
-
-    resonance = new Resonance(synth);
-    POscil = new OscilParameters(synth);
-    POscil->ADvsPAD = true;
-    oscilgen = new OscilGen(fft_, resonance, synth, POscil);
-
-    FreqEnvelope = new EnvelopeParams(0, 0, synth);
     FreqEnvelope->ASRinit(64, 50, 64, 60);
-    FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
-
-    AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
-    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
-
-    GlobalFilter = new FilterParams(2, 94, 40, 0, synth);
-    FilterEnvelope = new EnvelopeParams(0, 1, synth);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
-    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        sample[i].smp = NULL;
-    newsample.smp = NULL;
     defaults();
 }
 
 
-PADnoteParameters::~PADnoteParameters()
+void PADnoteParameters::HarmonicProfile::defaults()
 {
-    deletesamples();
-    delete oscilgen;
-    delete POscil;
-    delete resonance;
-    delete FreqEnvelope;
-    delete FreqLfo;
-    delete AmpEnvelope;
-    delete AmpLfo;
-    delete GlobalFilter;
-    delete FilterEnvelope;
-    delete FilterLfo;
+    base.type = 0;
+    base.pwidth = 80;
+    freqmult = 0;
+    modulator.pstretch = 0;
+    modulator.freq = 30;
+    width = 127;
+    amp.type = 0;
+    amp.mode = 0;
+    amp.par1 = 80;
+    amp.par2 = 64;
+    autoscale = true;
+    onehalf = 0;
 }
 
+void PADnoteParameters::HarmonicPos::defaults()
+{
+    type = 0;
+    par1 = 64;
+    par2 = 64;
+    par3 = 0;
+}
 
 void PADnoteParameters::defaults(void)
 {
     Pmode = 0;
-    Php.base.type = 0;
-    Php.base.par1 = 80;
-    Php.freqmult = 0;
-    Php.modulator.par1 = 0;
-    Php.modulator.freq = 30;
-    Php.width = 127;
-    Php.amp.type = 0;
-    Php.amp.mode = 0;
-    Php.amp.par1 = 80;
-    Php.amp.par2 = 64;
-    Php.autoscale = true;
-    Php.onehalf = 0;
+    Pquality.resetToDefaults();
+    PProfile.defaults();
+    Phrpos.defaults();
 
-    setPbandwidth(500);
+    Pbandwidth = 500;
     Pbwscale = 0;
 
     resonance->defaults();
     oscilgen->defaults();
+    waveTable.reset();   // zero sound
 
-    Phrpos.type = 0;
-    Phrpos.par1 = 64;
-    Phrpos.par2 = 64;
-    Phrpos.par3 = 0;
+    // By default set the oscil to max phase randomness.
+    // Remark: phase randomness (and in fact oscil phase information)
+    // is ignored altogether by PADsynth, but this default setting
+    // can be useful in case the oscil is imported to an ADsynth
+    // Historical Remark: in the original code base, this was
+    // controlled by the "ADDvsPAD" setting.
+    POscil->Prand = 127;
 
-    Pquality.samplesize = 3;
-    Pquality.basenote = 4;
-    Pquality.oct = 3;
-    Pquality.smpoct = 2;
-
-    PStereo = 1; // stereo
     // Frequency Global Parameters
     Pfixedfreq = 0;
     PfixedfreqET = 0;
@@ -137,10 +236,11 @@ void PADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     PVolume = 90;
+    PStereo = 1; // stereo
     setPan(PPanning = 64, synth->getRuntime().panLaw); // center
-    PAmpVelocityScaleFunction = 64;
     PRandom = false;
     PWidth = 63;
+    PAmpVelocityScaleFunction = 64;
     AmpEnvelope->defaults();
     AmpLfo->defaults();
     Fadein_adjustment = FADEIN_ADJUSTMENT_SCALE;
@@ -155,52 +255,79 @@ void PADnoteParameters::defaults(void)
     GlobalFilter->defaults();
     FilterEnvelope->defaults();
     FilterLfo->defaults();
-    deletesamples();
-    Papplied = 0;
+
+    PxFadeUpdate = XFADE_UPDATE_DEFAULT; // 200ms crossfade after updating wavetables
+    PrebuildTrigger = 0;                 // by default not auto-self-retrigger
+    PrandWalkDetune = 0;         randWalkDetune.reset();
+    PrandWalkBandwidth = 0;      randWalkBandwidth.reset();
+    PrandWalkFilterFreq = 0;     randWalkFilterFreq.reset();
+    PrandWalkProfileWidth = 0;   randWalkProfileWidth.reset();
+    PrandWalkProfileStretch = 0; randWalkProfileStretch.reset();
+
+    // reseed OscilGen and wavetable phase randomisation
+    reseed(synth->randomINT());
+    sampleTime = 0;
 }
 
 
-void PADnoteParameters::deletesample(int n)
+void PADnoteParameters::reseed(int seed)
 {
-    if (n < 0 || n >= PAD_MAX_SAMPLES)
-        return;
-    if (sample[n].smp != NULL)
-    {
-        delete [] sample[n].smp;
-        sample[n].smp = NULL;
-    }
-    sample[n].size = 0;
-    sample[n].basefreq = 440.0f;
+    wavetablePhasePrng.init(seed);
+    oscilgen->reseed(seed);
 }
 
 
-void PADnoteParameters::deletesamples(void)
+/* derive number of Wavetables for the desired octave coverage */
+size_t PADTables::calcNumTables(PADQuality const& quality)
 {
-    for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
+    int tables = quality.oct + 1;
+    int smpoct = quality.smpoct;
+    if (smpoct == 5)
+        smpoct = 6;
+    else
+    if (smpoct == 6)
+        smpoct = 12;
+    if (smpoct != 0)
+        tables *= smpoct;
+    else
+        tables = tables / 2 + 1;
+    if (tables == 0)
+        tables = 1;
+    return tables;
 }
+
+/* derive size of single wavetable for the desired quality settings */
+size_t PADTables::calcTableSize(PADQuality const& quality)
+{
+    return size_t(1) << (quality.samplesize + 14);
+}
+
+
 
 
 // Get the harmonic profile (i.e. the frequency distribution of a single harmonic)
-float PADnoteParameters::getprofile(float *smp, int size)
+// returns the profile normalised to 0..1, with resolution as requested by the size.
+vector<float> PADnoteParameters::buildProfile(size_t size)
 {
-    for (int i = 0; i < size; ++i)
-        smp[i] = 0.0f;
+    vector<float> profile(size, 0.0); // zero-init
 
-    const int supersample = 16;
-    float basepar = power<2>(((1.0f - Php.base.par1 / 127.0f) * 12.0f));
-    float freqmult = floorf(power<2>((Php.freqmult / 127.0f * 5.0f)) + 0.000001f);
+    float lineWidth = power<2>(((1.0f - PProfile.base.pwidth / 127.0f) * 12.0f));
+    float freqmult = floorf(power<2>((PProfile.freqmult / 127.0f * 5.0f)) + 0.000001f);
 
-    float modfreq = floorf(power<2>((Php.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
-    float modpar1 = powf((Php.modulator.par1 / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
-    float amppar1 = power<2>(powf((Php.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
-    float amppar2 = (1.0f - Php.amp.par2 / 127.0f) * 0.998f + 0.001f;
-    float width = powf((150.0f / (Php.width + 22.0f)), 2.0f);
+    float modfreq  = floorf(power<2>((PProfile.modulator.freq / 127.0f * 5.0f)) + 0.000001f);
+    float modStrch = powf((PProfile.modulator.pstretch / 127.0f), 4.0f) * 5.0 / sqrtf(modfreq);
+    float amppar1 = power<2>(powf((PProfile.amp.par1 / 127.0f), 2.0f) * 10.0f) - 0.999f;
+    float amppar2 = (1.0f - PProfile.amp.par2 / 127.0f) * 0.998f + 0.001f;
+    float width = powf((150.0f / (PProfile.width + 22.0f)), 2.0f);
 
-    for (int i = 0; i < size * supersample; ++i)
+    // possibly apply a random walk
+    lineWidth *= randWalkProfileWidth.getFactor();
+    modStrch *= randWalkProfileStretch.getFactor();
+
+    for (size_t i = 0; i < size * PROFILE_OVERSAMPLING; ++i)
     {
         bool makezero = false;
-        float x = i * 1.0f / (size * (float)supersample);
+        float x = i * 1.0f / (size * float(PROFILE_OVERSAMPLING));
         float origx = x;
         // do the sizing (width)
         x = (x - 0.5f) * width + 0.5f;
@@ -216,7 +343,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
             }
         }
         // compute the full profile or one half
-        switch (Php.onehalf)
+        switch (PProfile.onehalf)
         {
         case 1:
             x = x * 0.5f + 0.5f;
@@ -232,15 +359,15 @@ float PADnoteParameters::getprofile(float *smp, int size)
         x *= freqmult;
 
         // do the modulation of the profile
-        x += sinf(x_before_freq_mult * PI * modfreq) * modpar1;
+        x += sinf(x_before_freq_mult * PI * modfreq) * modStrch;
 
         x = fmodf(x + 1000.0f, 1.0f) * 2.0f - 1.0f;
         // this is the base function of the profile
         float f;
-        switch (Php.base.type)
+        switch (PProfile.base.type)
         {
         case 1:
-            f = expf(-(x * x) * basepar);
+            f = expf(-(x * x) * lineWidth);
             if (f < 0.4f)
                 f = 0.0f;
             else
@@ -248,11 +375,11 @@ float PADnoteParameters::getprofile(float *smp, int size)
             break;
 
         case 2:
-            f = expf(-(fabsf(x)) * sqrtf(basepar));
+            f = expf(-(fabsf(x)) * sqrtf(lineWidth));
             break;
 
         default:
-            f = expf(-(x * x) * basepar);
+            f = expf(-(x * x) * lineWidth);
             break;
         }
         if (makezero)
@@ -260,7 +387,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
         float amp = 1.0f;
         origx = origx * 2.0f - 1.0f;
         // compute the amplitude multiplier
-        switch (Php.amp.type)
+        switch (PProfile.amp.type)
         {
         case 1:
             amp = expf(-(origx * origx) * 10.0f * amppar1);
@@ -276,9 +403,9 @@ float PADnoteParameters::getprofile(float *smp, int size)
         }
         // apply the amplitude multiplier
         float finalsmp = f;
-        if (Php.amp.type != 0)
+        if (PProfile.amp.type != 0)
         {
-            switch (Php.amp.mode)
+            switch (PProfile.amp.mode)
             {
             case 0:
                 finalsmp = amp * (1.0f - amppar2) + finalsmp * amppar2;
@@ -298,148 +425,142 @@ float PADnoteParameters::getprofile(float *smp, int size)
                 break;
             }
         }
-        smp[i / supersample] += finalsmp / supersample;
+        profile[i / PROFILE_OVERSAMPLING] += finalsmp / PROFILE_OVERSAMPLING;
     }
-    // normalize the profile (make the max. to be equal to 1.0)
-    float max = 0.0f;
-    for (int i = 0; i < size; ++i)
-    {
-        if (smp[i] > max)
-            max = smp[i];
-    }
-    if (max < 0.00001f)
-        max = 1.0f;
-    for (int i = 0; i < size; ++i)
-        smp[i] /= max;
 
-    if (!Php.autoscale)
-        return 0.5f;
-    // compute the estimated perceived bandwidth
-    float sum = 0.0f;
-    int i;
-    for (i = 0; i < size / 2 - 2; ++i)
-    {
-        sum += smp[i] * smp[i] + smp[size - i -1] * smp[size - i - 1];
-        if (sum >= 4.0f)
-            break;
-    }
-    float result = 1.0f - 2.0f * i / (float)size;
-    return result;
+    // normalise the profile to 0.0 .. 1.0
+    normaliseMax(profile);
+    return profile;
 }
 
 
-// Compute the real bandwidth in cents and returns it
-// Also, sets the bandwidth parameter
-float PADnoteParameters::setPbandwidth(int Pbandwidth)
+// calculate relative factor 0.0 ..1.0 to estimate the perceived bandwidth
+float PADnoteParameters::calcProfileBandwith(vector<float> const& profile)
 {
-    this->Pbandwidth = Pbandwidth;
-    float result = powf(Pbandwidth / 1000.0f, 1.1f);
+    if (!PProfile.autoscale)
+        return 0.5f;
+
+    size_t size = profile.size();
+    auto sqrSlot = [&](size_t i){ return profile[i]*profile[i]; };
+
+    // compute the estimated perceptual bandwidth
+    float sum = 0.0f;
+    size_t i;
+    for (i = 0; i < size / 2 - 2; ++i)
+    {
+        sum += sqrSlot(i) + sqrSlot(size-1 - i);
+        if (sum >= 4.0f)
+            break;
+    }
+    return 1.0 - 2.0 * i / double(size);
+}
+
+
+// Convert the bandwidth parameter into cents
+float PADnoteParameters::getBandwithInCent()
+{
+    float currBandwidth = std::min(1000.0f, Pbandwidth * randWalkBandwidth.getFactor());
+    float result = powf(currBandwidth / 1000.0f, 1.1f);
     result = power<10>(result * 4.0f) * 0.25f;
     return result;
 }
 
 
-// Get the harmonic(overtone) position
-float PADnoteParameters::getNhr(int n)
+// Frequency factor for the position of each harmonic; allows for distorted non-harmonic spectra.
+// Input is the number of the harmonic. n=0 is the fundamental, above are the overtones.
+// Returns a frequency factor relative to the undistorted frequency of the fundamental.
+float PADnoteParameters::calcHarmonicPositionFactor(float n)
 {
-    float result = 1.0;
     float par1 = power<10>(-(1.0f - Phrpos.par1 / 255.0f) * 3.0f);
     float par2 = Phrpos.par2 / 255.0f;
 
-    float n0 = n - 1.0f;
-    float tmp = 0.0f;
-    int thresh = 0;
+    float scale  = 1.0;
+    float thresh = 0.0;
+
+    float offset = 0.0;
     switch (Phrpos.type)
     {
     case 1:
-        thresh = int(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
-            result = n;
+            offset = n;
         else
-            result = 1.0f + n0 + (n0 - thresh + 1.0f) * par1 * 8.0f;
+            offset = n + (n - thresh) * par1 * 8.0f;
         break;
 
     case 2:
-        thresh = int(par2 * par2 * 100.0f) + 1;
+        thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
-            result = n;
+            offset = n;
         else
-            result = 1.0f + n0 - (n0 - thresh + 1.0f) * par1 * 0.90f;
+            offset = n - (n - thresh) * par1 * 0.90f;
         break;
 
     case 3:
-        tmp = par1 * 100.0f + 1.0f;
-        result = powf(n0 / tmp, (1.0f - par2 * 0.8f)) * tmp + 1.0f;
+        scale = par1 * 100.0f + 1.0f;
+        offset = powf(n / scale, (1.0f - par2 * 0.8f)) * scale;
         break;
 
     case 4:
-        result = n0 * (1.0f - par1) + powf(n0 * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f + 1.0f;
+        offset = n * (1.0f - par1) + powf(n * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f;
         break;
 
     case 5:
-        result = n0 + sinf(n0 * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f + 1.0f;
+        offset = n + sinf(n * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f;
         break;
 
     case 6:
-        tmp = powf((par2 * 2.0f), 2.0f) + 0.1f;
-        result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0f;
+        scale = powf((par2 * 2.0f), 2.0f) + 0.1f;
+        offset = n * powf(1.0f + par1 * powf(n * 0.8f, scale), scale);
         break;
 
-        case 7:
-            result = (n + Phrpos.par1 / 255.0f) / (Phrpos.par1 / 255.0f + 1);
-            break;
+    case 7:
+        scale = 1.0f + Phrpos.par1 / 255.0f;
+        offset = n / scale;
+        break;
 
     default:
-        result=n;
+        // undistorted. n=0 => factor=1.0 (corresponding to the base frequency)
+        offset = n;
         break;
     }
+    float result = 1.0f + offset;
     float par3 = Phrpos.par3 / 255.0f;
     float iresult = floorf(result + 0.5f);
     float dresult = result - iresult;
     result = iresult + (1.0f - par3) * dresult;
+    if (result < 0.0f) result = 0.0f;
     return result;
 }
 
 
 // Generates the long spectrum for Bandwidth mode (only amplitudes are generated;
 // phases will be random)
-void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
-                                                       int size,
-                                                       float basefreq,
-                                                       float *profile,
-                                                       int profilesize,
-                                                       float bwadjust)
+vector<float> PADnoteParameters::generateSpectrum_bandwidthMode(float basefreq, size_t spectrumSize,
+                                                                vector<float> const& profile)
 {
-    memset(spectrum, 0, sizeof(float) * size);
+    assert(spectrumSize > 1);
+    vector<float> spectrum(spectrumSize, 0.0f); // zero-init
 
-    //float harmonics[synth->getOscilsize() / 2];
-    float harmonics[synth->halfoscilsize];
-    memset(harmonics, 0, synth->halfoscilsize * sizeof(float));
+    // get the harmonic structure from the oscillator
+    vector<float> harmonics(oscilgen->getSpectrumForPAD(basefreq));
+    normaliseMax(harmonics); // within 0.0 .. 1.0
 
-    // get the harmonic structure from the oscillator (I am using the frequency amplitudes, only)
-    oscilgen->get(harmonics, basefreq, false);
+    // derive the "perceptual" bandwidth for the given profile (a value 0 .. 1)
+    float bwadjust = calcProfileBandwith(profile);
 
-    // normalize
-    float max = 0.0f;
-    for (int i = 0; i < synth->halfoscilsize; ++i)
-        if (harmonics[i] > max)
-            max = harmonics[i];
-    if (max < 0.000001f)
-        max = 1;
-    for (int i = 0; i < synth->halfoscilsize; ++i)
-        harmonics[i] /= max;
-    for (int nh = 1; nh < synth->halfoscilsize; ++nh)
+    assert(harmonics.size() == fft.spectrumSize());
+    for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
-        float realfreq = getNhr(nh) * basefreq;
+        float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
         if (realfreq > synth->samplerate_f * 0.49999f)
             break;
         if (realfreq < 20.0f)
             break;
-        if (harmonics[nh - 1] < 1e-4f)
+        if (harmonics[nh] < 1e-5f)
             continue;
         //compute the bandwidth of each harmonic
-        float bandwidthcents = setPbandwidth(Pbandwidth);
-        float bw = (power<2>(bandwidthcents / 1200.0f) - 1.0f) * basefreq / bwadjust;
+        float bw = (power<2>(getBandwithInCent() / 1200.0f) - 1.0f) * basefreq / bwadjust;
         float power = 1.0f;
         switch (Pbwscale)
         {
@@ -476,30 +597,31 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
             break;
         }
         bw = bw * powf(realfreq / basefreq, power);
-        int ibw = int((bw / (synth->samplerate_f * 0.5f) * size)) + 1;
-        float amp = harmonics[nh - 1];
+        size_t ibw = 1 + size_t(bw / (synth->samplerate_f * 0.5f) * spectrumSize);
+        float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
+        size_t profilesize = profile.size();
         if (ibw > profilesize)
         {   // if the bandwidth is larger than the profilesize
-            float rap = sqrtf((float)profilesize / (float)ibw);
-            int cfreq = int(realfreq / (synth->halfsamplerate_f) * size) - ibw / 2;
-            for (int i = 0; i < ibw; ++i)
+            float rap = sqrtf(float(profilesize) / float(ibw));
+            int cfreq = int(realfreq / (synth->halfsamplerate_f) * spectrumSize) - ibw / 2;
+            for (size_t i = 0; i < ibw; ++i)
             {
                 int src = int(i * rap * rap);
                 int spfreq = i + cfreq;
                 if (spfreq < 0)
                     continue;
-                if (spfreq >= size)
+                if (spfreq >= int(spectrumSize))
                     break;
                 spectrum[spfreq] += amp * profile[src] * rap;
             }
         }
         else
         {   // if the bandwidth is smaller than the profilesize
-            float rap = sqrtf((float)ibw / (float)profilesize);
-            float ibasefreq = realfreq / (synth->halfsamplerate_f) * size;
-            for (int i = 0; i < profilesize; ++i)
+            float rap = sqrtf(float(ibw) / float(profilesize));
+            float ibasefreq = realfreq / (synth->halfsamplerate_f) * spectrumSize;
+            for (size_t i = 0; i < profilesize; ++i)
             {
                 float idfreq = i / (float)profilesize - 0.5f;
                 idfreq *= ibw;
@@ -507,43 +629,30 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
                 float fspfreq = fmodf(idfreq + ibasefreq, 1.0f);
                 if (spfreq <= 0)
                     continue;
-                if (spfreq >= size - 1)
+                if (spfreq >= int(spectrumSize) - 1)
                     break;
                 spectrum[spfreq] += amp * profile[i] * rap * (1.0f - fspfreq);
                 spectrum[spfreq + 1] += amp * profile[i] * rap * fspfreq;
             }
         }
     }
+    return spectrum;
 }
 
 
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
-void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
-                                                    int size,
-                                                    float basefreq)
+vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, size_t spectrumSize)
 {
-    memset(spectrum, 0, sizeof(float) * size);
+    assert(spectrumSize > 1);
+    vector<float> spectrum(spectrumSize, 0.0f); // zero-init
 
-    float harmonics[synth->halfoscilsize];
-    memset(harmonics, 0, synth->halfoscilsize * sizeof(float));
+    // get the harmonic structure from the oscillator
+    vector<float> harmonics(oscilgen->getSpectrumForPAD(basefreq));
+    normaliseMax(harmonics); // within 0.0 .. 1.0
 
-    // get the harmonic structure from the oscillator (I am using the frequency
-    // amplitudes, only)
-    oscilgen->get(harmonics, basefreq, false);
-
-    // normalize
-    float max = 0.0f;
-    for (int i = 0; i < synth->halfoscilsize; ++i)
-        if (harmonics[i] > max)
-            max = harmonics[i];
-    if (max < 0.000001f)
-        max = 1;
-    for (int i = 0; i < synth->halfoscilsize; ++i)
-        harmonics[i] /= max;
-
-    for (int nh = 1; nh < synth->halfoscilsize; ++nh)
+    for (size_t nh = 0; nh+1 < fft.spectrumSize(); ++nh)
     {   //for each harmonic
-        float realfreq = getNhr(nh) * basefreq;
+        float realfreq = calcHarmonicPositionFactor(nh) * basefreq;
 
         ///sa fac aici interpolarea si sa am grija daca frecv descresc
         //[Romanian, from original Author] "do the interpolation here and be careful if they decrease frequency"
@@ -552,27 +661,27 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
             break;
         if (realfreq < 20.0f)
             break;
-//	if (harmonics[nh-1]<1e-4) continue;
 
-        float amp = harmonics[nh - 1];
+        float amp = harmonics[nh];
         if (resonance->Penabled)
             amp *= resonance->getfreqresponse(realfreq);
-        int cfreq = int(realfreq / (synth->halfsamplerate_f) * size);
+        int cfreq = int(realfreq / (synth->halfsamplerate_f) * spectrumSize);
         spectrum[cfreq] = amp + 1e-9f;
     }
 
     if (Pmode != 1)
     {
-        int old = 0;
-        for (int k = 1; k < size; ++k)
+        size_t old = 0;
+        for (size_t k = 1; k < spectrumSize; ++k)
         {
-            if ((spectrum[k] > 1e-10f) || (k == (size - 1)))
+            if ((spectrum[k] > 1e-10f) || (k == (spectrumSize - 1)))
             {
-                int delta = k - old;
+                assert(k > old);
+                size_t delta = k - old;
                 float val1 = spectrum[old];
                 float val2 = spectrum[k];
                 float idelta = 1.0f / delta;
-                for (int i = 0; i < delta; ++i)
+                for (size_t i = 0; i < delta; ++i)
                 {
                     float x = idelta * i;
                     spectrum[old+i] = val1 * (1.0f - x) + val2 * x;
@@ -581,103 +690,171 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
             }
         }
     }
+    return spectrum;
 }
 
 
-// Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters()
+void PADnoteParameters::buildNewWavetable(bool blocking)
 {
-    const int samplesize = (((int)1) << (Pquality.samplesize + 14));
-    int spectrumsize = samplesize / 2;
-    // spectrumsize can be quite large (up to 2MiB) and this is not a hot
-    // function, so allocate this on the heap
-    std::unique_ptr<float[]> spectrum(new float[spectrumsize]);
-    int profilesize = 512;
-    float profile[profilesize];
-
-    float bwadjust = getprofile(profile, profilesize);
-//    for (int i=0;i<profilesize;i++) profile[i]*=profile[i];
-    float basefreq = 65.406f * power<2>(Pquality.basenote / 2);
-    if (Pquality.basenote %2 == 1)
-        basefreq *= 1.5;
-
-    int samplemax = Pquality.oct + 1;
-    int smpoct = Pquality.smpoct;
-    if (Pquality.smpoct == 5)
-        smpoct = 6;
-    if (Pquality.smpoct == 6)
-        smpoct = 12;
-    if (smpoct != 0)
-        samplemax *= smpoct;
+    PADStatus::mark(PADStatus::DIRTY, synth->interchange, partID,kitID);
+    if (synth->getRuntime().useLegacyPadBuild())
+        mute_and_rebuild_synchronous();
     else
-        samplemax = samplemax / 2 + 1;
-    if (samplemax == 0)
-        samplemax = 1;
+    if (not blocking)
+        futureBuild.requestNewBuild();
+    else
+    {   // Guarantee to invoke a new build NOW and block until it is ready...
+        // This is tricky, since new builds can be triggered any time from the GUI
+        // and also the SynthEngine might pick up the result concurrently.
 
-    // prepare a BIG FFT stuff
-    FFTwrapper fft = FFTwrapper(samplesize);
-    FFTFREQS fftfreqs;
-    FFTwrapper::newFFTFREQS(&fftfreqs, samplesize / 2);
+        // (1) Attempt to get hold of a running build triggered earlier (with old parameters)
+        futureBuild.blockingWait();
 
-    float adj[samplemax]; // this is used to compute frequency relation to the base frequency
-    for (int nsample = 0; nsample < samplemax; ++nsample)
-        adj[nsample] = (Pquality.oct + 1.0f) * (float)nsample / samplemax;
-    for (int nsample = 0; nsample < samplemax; ++nsample)
+        // (2) when we trigger now, we can be sure the current state of parameters will be used
+        futureBuild.requestNewBuild();
+
+        // (3) again wait for this build to complete...
+        //     Note: Result will be published to SynthEngine -- unless a new build was triggered
+        futureBuild.blockingWait(true);
+    }
+}
+
+
+
+
+// This is the heart of the PADSynth: generate a set of perfectly looped wavetables,
+// based on rendering a harmonic profile for each line of the base waveform spectrum.
+// Each table is generated by a single inverse FFT, but using a high resolution spectrum.
+// Note: when returning the NoResult marker, the build shall be aborted and restarted.
+Optional<PADTables> PADnoteParameters::render_wavetable()
+{
+    PADTables newTable(Pquality);
+    const size_t spectrumSize = newTable.tableSize / 2;
+    PADStatus::mark(PADStatus::BUILDING, synth->interchange, partID,kitID);
+
+    // prepare storage for a very large spectrum and FFT transformer
+    fft::Calc fft{newTable.tableSize};
+    fft::Spectrum fftCoeff(spectrumSize);
+
+    // (in »bandwidth mode«) build harmonic profile used for each line
+    vector<float> profile = Pmode == 0? buildProfile(SIZE_HARMONIC_PROFILE)
+                                      : vector<float>(); // empty dummy
+
+    if (futureBuild.shallRebuild())
+        return Optional<PADTables>::NoResult;
+
+    float baseNoteFreq = 65.406f * power<2>(Pquality.basenote / 2);
+    if (Pquality.basenote %2 == 1)
+        baseNoteFreq *= 1.5;
+
+    float adj[newTable.numTables]; // used to compute frequency relation to the base note frequency
+    for (size_t tabNr = 0; tabNr < newTable.numTables; ++tabNr)
+        adj[tabNr] = (Pquality.oct + 1.0f) * (float)tabNr / newTable.numTables;
+
+    for (size_t tabNr = 0; tabNr < newTable.numTables; ++tabNr)
     {
-        float tmp = adj[nsample] - adj[samplemax - 1] * 0.5f;
+        float tmp = adj[tabNr] - adj[newTable.numTables - 1] * 0.5f;
         float basefreqadjust = power<2>(tmp);
+        float basefreq = baseNoteFreq *  basefreqadjust;
 
-        if (Pmode == 0)
-            generatespectrum_bandwidthMode(&spectrum[0], spectrumsize,
-                                           basefreq * basefreqadjust, profile,
-                                           profilesize, bwadjust);
-        else
-            generatespectrum_otherModes(&spectrum[0], spectrumsize,
-                                        basefreq * basefreqadjust);
+        newTable.basefreq[tabNr] = basefreq;
 
-        const int extra_samples = 5; // the last samples contains the first
-                                     // samples (used for linear/cubic interpolation)
-        newsample.smp = new float[samplesize + extra_samples];
+        vector<float> spectrum =
+            Pmode == 0? generateSpectrum_bandwidthMode(basefreq, spectrumSize, profile)
+                      : generateSpectrum_otherModes(basefreq, spectrumSize);
 
-        newsample.smp[0] = 0.0;
-        for (int i = 1; i < spectrumsize; ++i)
-        {   // randomize the phases
-            float phase = synth->numRandom() * 6.29f;
-            fftfreqs.c[i] = spectrum[i] * cosf(phase);
-            fftfreqs.s[i] = spectrum[i] * sinf(phase);
+        for (size_t i = 1; i < spectrumSize; ++i)
+        {   // Note: each wavetable uses differently randomised phases
+            float phase = wavetablePhasePrng.numRandom() * 6.29f;
+            fftCoeff.c(i) = spectrum[i] * cosf(phase);
+            fftCoeff.s(i) = spectrum[i] * sinf(phase);
         }
-        fft.freqs2smps(&fftfreqs, newsample.smp);
-        // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
-        // normalize(rms)
-        float rms = 0.0;
-        for (int i = 0; i < samplesize; ++i)
-            rms += newsample.smp[i] * newsample.smp[i];
-        rms = sqrtf(rms);
-        if (rms < 0.000001)
-            rms = 1.0;
-        rms *= sqrtf(float(1024 * 256) / samplesize);
-        for (int i = 0; i < samplesize; ++i)
-            newsample.smp[i] *= 1.0f / rms * 50.0f;
+        if (futureBuild.shallRebuild())
+            return Optional<PADTables>::NoResult;
+
+        fft::Waveform& newsmp = newTable[tabNr];
+        newsmp[0] = 0.0f;                ///TODO 12/2021 (why) is this necessary? Doesn't the IFFT generate a full waveform?
+
+        fft.freqs2smps(fftCoeff, newsmp);
+        // that's all; here is the only IFFT for the whole sample; no windows are used ;-) (Comment by original author)
+
+        normaliseSpectrumRMS(newsmp);
 
         // prepare extra samples used by the linear or cubic interpolation
-        for (int i = 0; i < extra_samples; ++i)
-            newsample.smp[i + samplesize] = newsample.smp[i];
-
-        // replace the current sample with the new computed sample
-        deletesample(nsample);
-        sample[nsample].smp = newsample.smp;
-        sample[nsample].size = samplesize;
-        sample[nsample].basefreq = basefreq * basefreqadjust;
-        newsample.smp = NULL;
+        newsmp.fillInterpolationBuffer();
     }
-    FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
-    // delete the additional samples that might exists and are not useful
-    for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
-    Papplied = 1;
+    PADStatus::mark(PADStatus::PENDING, synth->interchange, partID,kitID);
+    return newTable;
 }
+
+
+/* called once before each buffer compute cycle;
+ * possibly pick up results from background wavetable build.
+ * WARNING: while FutureBuild::isReady() is reliable and airtight, the remaining logic
+ *          within the body is not thread-safe. FutureBuild::swap() does not cover all corner cases
+ *          when re-scheduling and thus should not be called concurrently. And the ref-count in xFade
+ *          is *deliberately without thread synchronisation* (since we're on the hot audio codepath).
+ *          If we ever consider processing SynthEngine concurrently, this logic must be revised.
+ *          (comment by Ichthyo, 3/2022)
+ */
+void PADnoteParameters::activate_wavetable()
+{
+    if (futureBuild.isReady()
+        and (PxFadeUpdate == 0 or xFade.startXFade(waveTable)))
+    {                          // Note: don't pick up new waveTable while fading
+        PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
+        futureBuild.swap(waveTable);
+        presetsUpdated();
+        sampleTime = 0;
+    }
+    else
+        maybeRetrigger();
+}
+
+
+/* automatic self-retrigger: if activated, a new wavetable background build is launched
+ * after a given amount of "sample time" has passed. Moreover, some parameters may perform
+ * a »random walk« by applying a small random offset on each rebuild, within a given spread.
+ */
+void PADnoteParameters::maybeRetrigger()
+{
+    if (PrebuildTrigger == 0 or synth->getRuntime().useLegacyPadBuild())
+        return; // this feature requires a background build of the wavetable.
+
+    if (sampleTime < PrebuildTrigger)
+    {
+        sampleTime += synth->buffersize_f / synth->samplerate_f * 1000;
+        return;
+    }
+    else if (not futureBuild.isUnderway())
+    {
+        randWalkDetune.walkStep();
+        randWalkBandwidth.walkStep();
+        randWalkFilterFreq.walkStep();
+        randWalkProfileWidth.walkStep();
+        randWalkProfileStretch.walkStep();
+        futureBuild.requestNewBuild();
+    }
+}
+
+
+/* Legacy mode: rebuild the PAD wavetable immediately,
+ * without any background thread scheduling. */
+void PADnoteParameters::mute_and_rebuild_synchronous()
+{
+    waveTable.reset();   // mute by zeroing
+    auto result = render_wavetable();
+    if (result)
+    {
+        using std::swap;
+        swap(waveTable, *result);
+        presetsUpdated();
+        sampleTime = 0;
+    }
+}
+
 
 
 void PADnoteParameters::setPan(char pan, unsigned char panLaw)
@@ -700,20 +877,17 @@ bool PADnoteParameters::export2wav(std::string basefilename)
 
     basefilename += "--sample-";
     bool isOK = true;
-    for (int k = 0; k < PAD_MAX_SAMPLES; ++k)
+    for (size_t tab = 0; tab < waveTable.numTables; ++tab)
     {
-        if (sample[k].smp == NULL)
-            continue;
         char tmpstr[20];
-        snprintf(tmpstr, 20, "-%02d", k + 1);
+        snprintf(tmpstr, 20, "-%02zu", tab + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
-        int nsmps = sample[k].size;
         unsigned int block;
         unsigned short int sBlock;
-        unsigned int buffSize = 44 + sizeof(short int) * nsmps; // total size
+        unsigned int buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
         char *buffer = (char*) malloc (buffSize);
         strcpy(buffer, type.c_str());
-        block = nsmps * 4 + 36; // 2 channel shorts + part header
+        block = waveTable.tableSize * 4 + 36; // 2 channel shorts + part header
         buffer[4] = block & 0xff;
         buffer[5] = (block >> 8) & 0xff;
         buffer[6] = (block >> 16) & 0xff;
@@ -738,13 +912,13 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         memcpy(buffer + 34, &sBlock, 2);
         temp = "data";
         strcpy(buffer + 36, temp.c_str());
-        block = nsmps * 2; // data size
+        block = waveTable.tableSize * 2; // data size
         memcpy(buffer + 40, &block, 4);
-        for (int i = 0; i < nsmps; ++i)
+        for (size_t smp = 0; smp < waveTable.tableSize; ++smp)
         {
-            sBlock = (sample[k].smp[i] * 32767.0f);
-            buffer [44 + i * 2] = sBlock & 0xff;
-            buffer [45 + i * 2] = (sBlock >> 8) & 0xff;
+            sBlock = (waveTable[tab][smp] * 32767.0f);
+            buffer [44 + smp * 2] = sBlock & 0xff;
+            buffer [45 + smp * 2] = (sBlock >> 8) & 0xff;
         }
         /*
          * The file manager can return a negative number on error,
@@ -770,20 +944,21 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("mode",Pmode);
     xml->addpar("bandwidth",Pbandwidth);
     xml->addpar("bandwidth_scale",Pbwscale);
+    xml->addparU("xfade_update",PxFadeUpdate);
 
     xml->beginbranch("HARMONIC_PROFILE");
-        xml->addpar("base_type",Php.base.type);
-        xml->addpar("base_par1",Php.base.par1);
-        xml->addpar("frequency_multiplier",Php.freqmult);
-        xml->addpar("modulator_par1",Php.modulator.par1);
-        xml->addpar("modulator_frequency",Php.modulator.freq);
-        xml->addpar("width",Php.width);
-        xml->addpar("amplitude_multiplier_type",Php.amp.type);
-        xml->addpar("amplitude_multiplier_mode",Php.amp.mode);
-        xml->addpar("amplitude_multiplier_par1",Php.amp.par1);
-        xml->addpar("amplitude_multiplier_par2",Php.amp.par2);
-        xml->addparbool("autoscale",Php.autoscale);
-        xml->addpar("one_half",Php.onehalf);
+        xml->addpar("base_type",PProfile.base.type);
+        xml->addpar("base_par1",PProfile.base.pwidth);
+        xml->addpar("frequency_multiplier",PProfile.freqmult);
+        xml->addpar("modulator_par1",PProfile.modulator.pstretch);
+        xml->addpar("modulator_frequency",PProfile.modulator.freq);
+        xml->addpar("width",PProfile.width);
+        xml->addpar("amplitude_multiplier_type",PProfile.amp.type);
+        xml->addpar("amplitude_multiplier_mode",PProfile.amp.mode);
+        xml->addpar("amplitude_multiplier_par1",PProfile.amp.par1);
+        xml->addpar("amplitude_multiplier_par2",PProfile.amp.par2);
+        xml->addparbool("autoscale",PProfile.autoscale);
+        xml->addpar("one_half",PProfile.onehalf);
     xml->endbranch();
 
     xml->beginbranch("OSCIL");
@@ -871,6 +1046,15 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
             FilterLfo->add2XML(xml);
         xml->endbranch();
     xml->endbranch();
+
+    xml->beginbranch("RANDOM_WALK");
+        xml->addparU("rebuild_trigger",PrebuildTrigger);
+        xml->addpar("rand_detune",PrandWalkDetune);
+        xml->addpar("rand_bandwidth",PrandWalkBandwidth);
+        xml->addpar("rand_filter_freq",PrandWalkFilterFreq);
+        xml->addpar("rand_profile_width",PrandWalkProfileWidth);
+        xml->addpar("rand_profile_stretch",PrandWalkProfileStretch);
+    xml->endbranch();
 }
 
 void PADnoteParameters::getfromXML(XMLwrapper *xml)
@@ -879,21 +1063,22 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     Pmode=xml->getpar127("mode",0);
     Pbandwidth=xml->getpar("bandwidth",Pbandwidth,0,1000);
     Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
+    PxFadeUpdate=xml->getparU("xfade_update",PxFadeUpdate, 0,XFADE_UPDATE_MAX);
 
     if (xml->enterbranch("HARMONIC_PROFILE"))
     {
-        Php.base.type=xml->getpar127("base_type",Php.base.type);
-        Php.base.par1=xml->getpar127("base_par1",Php.base.par1);
-        Php.freqmult=xml->getpar127("frequency_multiplier",Php.freqmult);
-        Php.modulator.par1=xml->getpar127("modulator_par1",Php.modulator.par1);
-        Php.modulator.freq=xml->getpar127("modulator_frequency",Php.modulator.freq);
-        Php.width=xml->getpar127("width",Php.width);
-        Php.amp.type=xml->getpar127("amplitude_multiplier_type",Php.amp.type);
-        Php.amp.mode=xml->getpar127("amplitude_multiplier_mode",Php.amp.mode);
-        Php.amp.par1=xml->getpar127("amplitude_multiplier_par1",Php.amp.par1);
-        Php.amp.par2=xml->getpar127("amplitude_multiplier_par2",Php.amp.par2);
-        Php.autoscale=xml->getparbool("autoscale",Php.autoscale);
-        Php.onehalf=xml->getpar127("one_half",Php.onehalf);
+        PProfile.base.type=xml->getpar127("base_type",PProfile.base.type);
+        PProfile.base.pwidth=xml->getpar127("base_par1",PProfile.base.pwidth);
+        PProfile.freqmult=xml->getpar127("frequency_multiplier",PProfile.freqmult);
+        PProfile.modulator.pstretch=xml->getpar127("modulator_par1",PProfile.modulator.pstretch);
+        PProfile.modulator.freq=xml->getpar127("modulator_frequency",PProfile.modulator.freq);
+        PProfile.width=xml->getpar127("width",PProfile.width);
+        PProfile.amp.type=xml->getpar127("amplitude_multiplier_type",PProfile.amp.type);
+        PProfile.amp.mode=xml->getpar127("amplitude_multiplier_mode",PProfile.amp.mode);
+        PProfile.amp.par1=xml->getpar127("amplitude_multiplier_par1",PProfile.amp.par1);
+        PProfile.amp.par2=xml->getpar127("amplitude_multiplier_par2",PProfile.amp.par2);
+        PProfile.autoscale=xml->getparbool("autoscale",PProfile.autoscale);
+        PProfile.onehalf=xml->getpar127("one_half",PProfile.onehalf);
         xml->exitbranch();
     }
 
@@ -1006,7 +1191,26 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
         xml->exitbranch();
     }
-    applyparameters();
+
+    if (xml->enterbranch("RANDOM_WALK"))
+    {
+        PrebuildTrigger        =xml->getparU("rebuild_trigger"       ,PrebuildTrigger, 0,REBUILDTRIGGER_MAX);
+        PrandWalkDetune        =xml->getpar127("rand_detune"         ,PrandWalkDetune);
+        PrandWalkBandwidth     =xml->getpar127("rand_bandwidth"      ,PrandWalkBandwidth);
+        PrandWalkFilterFreq    =xml->getpar127("rand_filter_freq"    ,PrandWalkFilterFreq);
+        PrandWalkProfileWidth  =xml->getpar127("rand_profile_width"  ,PrandWalkProfileWidth);
+        PrandWalkProfileStretch=xml->getpar127("rand_profile_stretch",PrandWalkProfileStretch);
+        randWalkDetune         .setSpread(PrandWalkDetune);
+        randWalkBandwidth      .setSpread(PrandWalkBandwidth);
+        randWalkFilterFreq     .setSpread(PrandWalkFilterFreq);
+        randWalkProfileWidth   .setSpread(PrandWalkProfileWidth);
+        randWalkProfileStretch .setSpread(PrandWalkProfileStretch);
+    }
+    // trigger re-build of the wavetable as background task...
+    waveTable.reset();           // silence existing sound from previous instruments using the same part
+    futureBuild.blockingWait();  // possibly retrieve result of ongoing build without publishing (Note: blocks consecutive instrument loads from MIDI)
+    buildNewWavetable();         // launch rebuild of wavetables for the new instrument (background task)
+    // result will be picked up from PADnote::noteout() when ready
 }
 
 
@@ -1064,6 +1268,41 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
         case PADSYNTH::control::spectrumMode:
             def = 0;
             max = 2;
+            break;
+
+        case PADSYNTH::control::xFadeUpdate:
+            def = 200;
+            max = 20000;
+            break;
+
+        case PADSYNTH::control::rebuildTrigger:
+            def = 0;
+            max = 60000;
+            break;
+
+        case PADSYNTH::control::randWalkDetune:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkBandwidth:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkFilterFreq:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkProfileWidth:
+            def = 0;
+            max = 127;
+            break;
+
+        case PADSYNTH::control::randWalkProfileStretch:
+            def = 0;
+            max = 127;
             break;
 
         case PADSYNTH::control::detuneFrequency:

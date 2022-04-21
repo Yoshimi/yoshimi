@@ -30,7 +30,9 @@
 class Filter_
 {
     public:
-        Filter_() { };
+        Filter_()
+            : outgain{0.0}
+        { };
         virtual ~Filter_() { };
         virtual Filter_* clone() = 0;
         virtual void filterout(float *smp) = 0;

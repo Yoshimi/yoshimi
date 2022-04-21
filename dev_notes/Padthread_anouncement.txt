@@ -1,0 +1,171 @@
+At 15.12.21 at 13:22 Will Godfrey wrote:
+> This now has an auto apply feature fairly well implemented.
+> However it will crash on extreme wavetable sizes (I don't know why yet).
+
+
+
+Hello Yoshimi developers,
+
+As we all know, concurrent programming can be surprisingly tricky,
+even for seemingly simple stuff -- and so this new feature kept us
+busy for quite some time, until reaching a state now where it works
+without crashes and sound glitches, and thus appears to be "feasible".
+Some issues (most notably XRuns) need to be sorted out yet.
+
+You can see the current state of this experimental feature in my Github
+
+https://github.com/Ichthyostega/yoshimi.git
+
+Branch: padthread
+
+/Unfortunately this is a huge changeset, going deep down the rabbit's hole/
+
+
+===========================================================================
+What do we hope to achieve?
+
+The PADSynth is based on a exceptionally fine-grained spectrum distribution
+and uses a huge Fast-Fourier-Transform operation to generate a likewise large
+but perfectly looped wavetable. The generated sound is conceptionally equivalent
+to results produced by "granular synthesis".
+
+Rendering this huge spectrum is a compute intensive task, and can
+easily take up several seconds. During that time, event processing in
+Yoshimi is blocked -- which leads to the idea to perform wavetable
+re-building as a background operation and load the results when ready.
+
+At 18.12.21 12:12 Will Godfrey wrote:
+> Ideally I'd want as seamless behaviour as possible.
+> Looking ahead there are three scenarios that I'd ideally like to see.
+>
+> 1 (manual) User moves control; nothing happens until setting 'apply'.
+> Nothing else is interrupted apart from the discontinuity of the actual swap.
+>
+> 2 (partially automatic) System tracks control changes applying them as they
+> arrive. If they come too fast the build can be interrupted so only the last
+> one is completed. Again, just a discontinuity at the swap time.
+>
+> 3 (fully automatic) As 2, but instead of a swap, maintain both original and
+> new sample set while morphing between the two, then delete the old ones,
+> but keep the relatively small 'framework' - so a form of double buffer.
+> Morph time could be made user variable, with the proviso that further
+> harmonics changes would be ignored during this time.
+>
+> 3 is really icing on the cake, and if it can be done would be something to shout about
+
+To translate this feature description into a programming task....
+
+(1) we want to move the expensive rebuilding of wavetables
+    into a background thread, so the event handling thread
+    is no longer blocked.
+
+(2) we want to ensure the following conditions
+    * whenever the PadSynth-Parameters are "dirty", a rebuild should happen
+    * only after that rebuild is really complete, the swap-in should happen
+
+(3) we want to prevent redundant rebuilds from happening at the same time.
+
+Addition to (1): under some conditions (CLI Scripts) we still want to block
+the calling thread until the actual build is complete, in order to ensure
+predictable state.
+
+
+===========================================================================
+Challenges
+
+The Yoshimi code base can be described as rather cohesive and tangled.
+Many parts are written in some "I know what I am about to do so get out
+of my way" style, leading to code that is hard to understand and maintain,
+and easy to break. Notable raw buffers of various size are allocated and
+then passed through dozens and dozens of functions, at the end to be
+processed somewhere by an algorithm which just "magically" seems to
+know how to deal with that data, and often behaves quite different
+based on some implied condition detected from magic markers.
+
+Moreover Yoshimi uses effectively global yet mutable state even where
+this wouldn't be necessary, and this state is often manipulated from
+a totally remote code location by grabbing into the innards of some
+seemingly unrelated facility. There is often no notion of ownership
+or hierarchy, parts are mutually dependent and have to be bootstrapped
+and initialised in a very specific order.
+
+Thus, to extract some functionality and perform it in a different and
+effectively non-deterministic order, we're bound to trace down and
+understand lots of details meticulously to identify which parts should
+be rearranged and disentangled.
+
+A further challenge arises from constraints imposed by the lib FFTW3,
+which Yoshimi relies on to implement the Fast Fourier Transform operation.
+This library in itself is very elaborate and flexible and meanwhile has
+been adapted to allow concurrent and re-entrant calculations, albeit
+with very strictly delineated prerequisites -- which the existing usage
+in Yoshimi did not need to fulfil, since it operated based on the
+assumption of a single deterministic computation path.
+
+The necessary changes were especially related to the feature of a "FFT
+computation plan". At start, Lib FFTW3 requires the user to pick the
+appropriate feature set and invocation scheme. Some users e.g. want to use
+complex numbers and multidimensional functions, while others (like Yoshimi)
+just need real valued functions and prefer to work with "sine" and "cosine"
+coefficients in the Spectrum to represent the phase of a spectral line.
+Actually, libFFTW3 would even be able to perform timing measurements and
+persist or load a FFT plan optimised for the specific setup and hardware --
+an advanced feature Yoshimi does not exploit. Unfortunately this definition
+of FFT plans turned out to be not threadsafe -- and Yoshimi sometimes happened
+to re-build those FFT plans during normal operation, especially after GUI
+interactions, thereby relying on the ability of libFFTW3 to detect and re-use
+similar plan definitions behind the scenes (and this caching seems to be one
+of the reasons why the setup of such FFT plans interferes with other concurrent
+memory management operations.
+
+To overcome this discrepancy, we had to overturn and rearrange all memory
+management related to spectrum and waveform data. The FFT plans are now
+prepared at first usage and shared by all further calculations, while the
+spectrum data is now arranged in memory right from start in the specific order
+required by the Fast Fourier algorithm, and with appropriate alignment to allow
+for SIMD optimisation. Thus the transform calculation can now be invoked
+directly on the working data within OscilGen or the PADnoteParameters, instead
+of allocating a shared data block and copying and rearranging the spectrum
+coefficients for each invocation (as it was done previously). To carry out this
+tricky refactoring safely, we relied on the help by the compiler: Spectrum and
+Waveform data is now encapsulated into a data holder object (based on a single-
+ownership smart-pointer); various function signatures within OscilGen and
+SynthEngine have been converted step by step from using raw and unbounded float*
+to accepting these new data holder types.
+
+
+===========================================================================
+Implementation of PADSynth background builds
+
+Whenever a new instrument involving PADSynth Kit-Items is loaded, and when
+the user hits the "Apply" button in the PAD editor, or when the new »auto-Apply«
+feature detects relevant parameter changes, a background build is triggered.
+Further changes during an ongoing build will cause that build to start over
+from scratch (but in the case of »auto-Apply« with a short delay to combine
+several change messages caused from dragging the sliders in the GUI)
+
+The data storage for the PADSynth wavetables was likewise encapsulated into
+a new data holder type "PADtables", which can be moved only (single ownership).
+This result data will be handed over from the background thread to the Synth
+thread with the help of a C++ std::future, while the rebuild-trigger is
+coordinated through a std::atomic variable. For the background tasks a rather
+simplistic scheduler has been added, to start a limited number of background
+threads, based on the number of available CPU cores, as reported by the C++
+runtime system. Incoming build tasks are enqueued and picked up by those
+worker threads. Since these operations never interfere directly with the
+Synth, we can keep matters straight and use a simple Mutex for protection.
+
+Within the SynthEngine thread, at the begin of every buffer cycle when
+calculating sound for PADSynth notes, the readiness state of the future
+is probed (non blocking), to swap in the new PADtables when actually ready.
+
+All of this state handling logic has been embodied into a new component
+"FutureBuild", defined in Misc/BuildScheduler.h|cpp. Each PADnoteParameters
+instance now holds a PADtables instance and a FutureBuild instance, and
+delegates to the latter for all requests pertaining wavetable builds.
+This FutureBuild state manager has been written in a way to remain agnostic
+both of the actual data type to transport (which is the PADtables) and the
+actual scheduler backend implementation to use, allowing to tweak and evolve
+those parts independently as we see fit.
+
+-- Hermann

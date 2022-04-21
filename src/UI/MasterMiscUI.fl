@@ -38,9 +38,6 @@ decl {\#include <string>} {public local
 decl {\#include <iostream>} {public local
 }
 
-decl {using namespace std;} {public local
-}
-
 decl {\#include "UI/MiscGui.h"} {public local
 }
 

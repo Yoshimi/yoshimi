@@ -302,6 +302,12 @@ static void *mainThread(void *arg)
         }
     }
 
+    if (waitForTest)
+        // After launching an automated test,
+        // get out of the way and leave main thread without persisting state...
+        // Test runs single threaded and we do not want to persist test state.
+        return NULL;
+
     if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
         firstSynth->getRuntime().restoreConfig(firstSynth);
 

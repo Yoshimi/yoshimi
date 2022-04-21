@@ -26,6 +26,9 @@
 #include <string>
 #include <iostream>
 
+typedef unsigned char uchar;
+typedef unsigned int  uint;
+
 /*
  * For test purposes where you want guaranteed identical results, enable the
  * #define below.
@@ -60,7 +63,6 @@
 #define MAX_INSTRUMENTS_IN_BANK 160
 #define MAX_AD_HARMONICS 128
 #define MAX_SUB_HARMONICS 64
-#define PAD_MAX_SAMPLES 96
 #define NUM_MIDI_PARTS 64
 #define PART_NORMAL 0
 #define PART_MONO 1
@@ -108,7 +110,7 @@
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8
-#define POLIPHONY 60
+#define POLYPHONY 60
 #define PART_DEFAULT_LIMIT 20
 #define NUM_SYS_EFX 4
 #define NUM_INS_EFX 8
@@ -307,9 +309,10 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableCLI,
         enableAutoInstance,
         enableSinglePath,
-        enableHighlight, // in banks
         historyLock,
         exposeStatus, // CLI only
+        enableHighlight, // in banks
+        handlePadSynthBuild,   // how to build PADSynth wavetable; 0=legacy/muted, 1=background thread, 2=autoApply
 
         // start of engine controls
         jackMidiSource = 32,
@@ -623,7 +626,6 @@ namespace PART // usage PART::control::volume
         effectType,
         effectDestination,
         effectBypass,
-        padsynthParameters = 104,
         audioDestination = 120,
 
     // start of controllers
@@ -867,9 +869,10 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         pitchBendAdjustment,
         pitchBendOffset,
 
-        bandwidth,// = 16, moved these three
-        bandwidthScale,
-        spectrumMode,// = 19, // Bandwidth, Discrete, Continuous
+        bandwidth,
+        bandwidthScale,       // Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
+        spectrumMode,         // Bandwidth, Discrete, Continuous
+        xFadeUpdate,          // in millisec
 
         overtoneParameter1 = 48,
         overtoneParameter2,
@@ -893,6 +896,14 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
         samplesPerOctave, // 0.5, 1, 2, 3, 4, 6, 12
         numberOfOctaves, // 1 - 8
         sampleSize, // 16k, 32k, 64k, 128k, 256k, 512k, 1M
+
+        rebuildTrigger = 90,
+        randWalkDetune,          // random walk spread, 0 off, 96 is factor 2
+        randWalkBandwidth,       // -> bandwidth
+        randWalkFilterFreq,      // -> centerFrequency
+        randWalkProfileWidth,    // -> baseWidth
+        randWalkProfileStretch,  // -> modulatorStretch
+
         applyChanges = 104,
         stereo = 112,
 
@@ -964,7 +975,7 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         spike,
         circle,
         hyperSec,
-        user
+        user = 127
     };
 }
 

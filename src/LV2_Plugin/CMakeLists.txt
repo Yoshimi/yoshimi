@@ -23,8 +23,8 @@ file (GLOB yoshimi_lv2_plugin_files
         lv2extui.h
         lv2extprg.h)
 file (GLOB yoshimi_dsp_files
-    ../DSP/FFTwrapper.cpp  ../DSP/AnalogFilter.cpp  ../DSP/FormantFilter.cpp
-    ../DSP/SVFilter.cpp  ../DSP/Filter.cpp  ../DSP/Unison.cpp
+    ../DSP/AnalogFilter.cpp  ../DSP/Filter.cpp  ../DSP/FormantFilter.cpp
+    ../DSP/SVFilter.cpp  ../DSP/Unison.cpp
     ../DSP/FFTwrapper.h  ../DSP/AnalogFilter.h  ../DSP/FormantFilter.h
     ../DSP/SVFilter.h  ../DSP/Filter.h  ../DSP/Unison.h)
 file (GLOB yoshimi_effects_files
@@ -41,7 +41,10 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
-    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h)
+    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/WavFile.h
+    ../Misc/Alloc.h ../Misc/BuildScheduler.cpp ../Misc/BuildScheduler.h
+    ../Misc/TestInvoker.h ../Misc/TestSequence.h
+    ../Misc/WaveShapeSamples.h)
 file (GLOB yoshimi_interface_files
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
@@ -57,7 +60,8 @@ file (GLOB yoshimi_params_files
     ../Params/Controller.cpp  ../Params/Presets.cpp ../Params/PresetsStore.cpp
     ../Params/ADnoteParameters.h  ../Params/EnvelopeParams.h
     ../Params/FilterParams.h  ../Params/LFOParams.h
-    ../Params/SUBnoteParameters.h  ../Params/PADnoteParameters.h
+    ../Params/SUBnoteParameters.h
+    ../Params/PADnoteParameters.h ../Params/PADStatus.h ../Params/RandomWalk.h
     ../Params/OscilParameters.cpp ../Params/OscilParameters.h
     ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h)
 file (GLOB yoshimi_synth_files
@@ -65,7 +69,7 @@ file (GLOB yoshimi_synth_files
     ../Synth/SUBnote.cpp  ../Synth/Resonance.cpp  ../Synth/PADnote.cpp
     ../Synth/ADnote.h  ../Synth/Envelope.h  ../Synth/LFO.h  ../Synth/OscilGen.h
     ../Synth/SUBnote.h  ../Synth/Resonance.h  ../Synth/PADnote.h
-    ../Synth/BodyDisposal.h)
+    ../Synth/WaveInterpolator.h ../Synth/XFadeManager.h ../Synth/BodyDisposal.h)
 file (GLOB yoshimi_musicio_files
     ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h)
 file (GLOB yoshimi_manifest_ttl

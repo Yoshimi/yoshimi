@@ -25,9 +25,11 @@
 #define MUSIC_IO_H
 
 #include "globals.h"
+#include "Misc/Alloc.h"
 #include "Misc/SynthEngine.h"
 
 #include <string>
+
 
 class SynthEngine;
 class BeatTracker;
@@ -35,8 +37,15 @@ class BeatTracker;
 class MusicIO
 {
     public:
+        virtual ~MusicIO() = default;
+
         MusicIO(SynthEngine *_synth, BeatTracker *_beatTracker);
-        virtual ~MusicIO();
+        // shall not be copied or moved
+        MusicIO(MusicIO&&)                 = delete;
+        MusicIO(MusicIO const&)            = delete;
+        MusicIO& operator=(MusicIO&&)      = delete;
+        MusicIO& operator=(MusicIO const&) = delete;
+
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
@@ -50,13 +59,16 @@ class MusicIO
         virtual void registerAudioPort(int) = 0;
 
     protected:
-        bool LV2_engine;
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
-        float *zynLeft [NUM_MIDI_PARTS + 1];
-        float *zynRight [NUM_MIDI_PARTS + 1];
-        int *interleaved;
+
+        bool LV2_engine;
+        Samples bufferAllocation;
+        float*  zynLeft[NUM_MIDI_PARTS + 1];
+        float* zynRight[NUM_MIDI_PARTS + 1];
+
+        std::unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
 
         // The engine which tracks song beats (MIDI driver).
         BeatTracker *beatTracker;

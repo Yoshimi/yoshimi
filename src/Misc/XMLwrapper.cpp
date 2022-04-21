@@ -114,6 +114,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparbool("enable_CLI", synth->getRuntime().showCli);
             addparbool("enable_single_master", synth->getRuntime().singlePath);
             addparbool("banks_checked", synth->getRuntime().banksChecked);
+            addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
             addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);

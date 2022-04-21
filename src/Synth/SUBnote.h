@@ -28,6 +28,14 @@
 #ifndef SUB_NOTE_H
 #define SUB_NOTE_H
 
+#include "globals.h"
+#include "Misc/Alloc.h"
+#include "Params/Presets.h"
+
+#include <memory>
+
+using std::unique_ptr;
+
 class SUBnoteParameters;
 class Controller;
 class Envelope;
@@ -38,65 +46,64 @@ class SynthEngine;
 class SUBnote
 {
     public:
-        SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
-                float freq_, float velocity_, int portamento_,
-                int midinote_, SynthEngine *_synth);
-        SUBnote(const SUBnote &rhs);
-        ~SUBnote();
+        SUBnote(SUBnoteParameters& parameters, Controller& ctl_, Note, bool portamento_);
+        SUBnote(SUBnote const&);
+       ~SUBnote();
 
-        void legatoFadeIn(float basefreq_, float velocity_, int portamento_, int midinote_);
-        void legatoFadeOut(const SUBnote &syncwith);
+        // shall not be moved or assigned
+        SUBnote(SUBnote&&)                 = delete;
+        SUBnote& operator=(SUBnote&&)      = delete;
+        SUBnote& operator=(SUBnote const&) = delete;
 
-        int noteout(float *outl,float *outr); // note output, return 0 if the
-                                              // note is finished
+        void performPortamento(Note);
+        void legatoFadeIn(Note);
+        void legatoFadeOut();
+
+        void noteout(float *outl,float *outr);
         void releasekey(void);
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
-
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
+        bool finished() const { return noteStatus == NOTE_DISABLED; }
 
     private:
         void computecurrentparameters(void);
         void initparameters(float freq);
-        void KillNote(void);
+        void killNote(void);
         void updatefilterbank(void);
 
-        SUBnoteParameters *pars;
 
+        SynthEngine& synth;
+        SUBnoteParameters& pars;
+        Presets::PresetsUpdate subNoteChange;
+        Controller& ctl;
+
+        Note note;
         bool stereo;
+        float realfreq;
+        bool portamento;
+        int numstages;              // number of stages of filters
+        int numharmonics;           // number of harmonics (after the too higher harmonics are removed)
+        int start;                  // how the harmonics start
         int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
-        int numstages; // number of stages of filters
-        int numharmonics; // number of harmonics (after the too higher hamonics are removed)
-        int start; // how the harmonics start
-        float basefreq;
-        float notefreq;
-        float velocity;
-        int portamento;
-        int midinote;
-        float BendAdjust;
-        float OffsetHz;
+        float bendAdjust;
+        float offsetHz;
         float randpanL;
         float randpanR;
 
-        Envelope *AmpEnvelope;
-        Envelope *FreqEnvelope;
-        Envelope *BandWidthEnvelope;
+        unique_ptr<Envelope> ampEnvelope;
+        unique_ptr<Envelope> freqEnvelope;
+        unique_ptr<Envelope> bandWidthEnvelope;
+        unique_ptr<Envelope> globalFilterEnvelope;
 
-        Filter *GlobalFilterL,*GlobalFilterR;
+        unique_ptr<Filter> globalFilterL;
+        unique_ptr<Filter> globalFilterR;
 
-        Envelope *GlobalFilterEnvelope;
 
         // internal values
-        enum {
+        enum NoteStatus {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
-        } NoteStatus;
+            NOTE_LEGATOFADEOUT
+        } noteStatus;
+
         int firsttick;
         float volume;
         float oldamplitude;
@@ -125,21 +132,20 @@ class SUBnote
         void computeallfiltercoefs();
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void computeNoteParameters();
-        void computeNoteFreq();
+        float computeRealFreq();
         void filter(bpfilter &filter, float *smps);
         void filterVarRun(bpfilter &filter, float *smps);
         float getHgain(int harmonic);
 
-        bpfilter *lfilter;
-        bpfilter *rfilter;
+        unique_ptr<bpfilter[]> lfilter;
+        unique_ptr<bpfilter[]> rfilter;
 
         float overtone_rolloff[MAX_SUB_HARMONICS];
         float overtone_freq[MAX_SUB_HARMONICS];
 
-        float *tmpsmp;
-        float *tmprnd; // this is filled with random numbers
+        Samples& tmpsmp;
+        Samples& tmprnd; // this is filled with random numbers
 
-        Controller *ctl;
         int oldpitchwheel;
         int oldbandwidth;
 
@@ -147,10 +153,7 @@ class SUBnote
         float legatoFade;
         float legatoFadeStep;
 
-        Presets::PresetsUpdate subNoteChange;
-
-        SynthEngine *synth;
         int filterStep;
 };
+#endif /*SUB_NOTE_H*/
 
-#endif

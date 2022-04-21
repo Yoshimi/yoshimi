@@ -1,5 +1,15 @@
 yoshimi 2.1.2 M
 
+2022-4-21 Hermann
+Landing "padthread" feature
+* Extensive rework of FFTW memory management
+* rework and clean-up of Legato / Portament notes
+* Notes and parameters mostly use unique_ptr for memory management
+* PADSynth wavetables now built in background thread
+* crossfade on playing notes when new PADSynth wavetable ready
+* PADSynth may self-retrigger PADSynth wavetable build with random walk
+* ability to cover Legato, Portamento and XFade with automated tests
+
 2022-4-21 Will
 bn2113
 * Switched keyboard undo/redo fro main.cpp to MasterUI.fl

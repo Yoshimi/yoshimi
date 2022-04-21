@@ -33,16 +33,16 @@
 class OscilParameters : public Presets
 {
     public:
-        OscilParameters(SynthEngine *_synth);
-        virtual ~OscilParameters();
+        OscilParameters(fft::Calc const& fft, SynthEngine *_synth);
+        virtual ~OscilParameters() = default;
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
 
-        void updatebasefuncFFTfreqs(const FFTFREQS *src, int samples);
-        const FFTFREQS *getbasefuncFFTfreqs() const { return &basefuncFFTfreqs; }
+        void updatebasefuncSpectrum(fft::Spectrum const& src);
+        fft::Spectrum const& getbasefuncSpectrum() const { return basefuncSpectrum; }
 
     public:
         /**
@@ -91,10 +91,8 @@ class OscilParameters : public Presets
                       Pmodulationpar2,
                       Pmodulationpar3; // the parameter of the parameters
 
-        bool ADvsPAD; // if it is used by ADsynth or by PADsynth
-
     private:
-        FFTFREQS basefuncFFTfreqs; // Base Function Frequencies
+        fft::Spectrum basefuncSpectrum; // Base Function Frequencies
 };
 
 #endif // OSCIL_PARAMETERS_H

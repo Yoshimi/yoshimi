@@ -84,14 +84,8 @@ bool AlsaEngine::openAudio(void)
         {
             if (prepSwparams())
             {
-                if (prepBuffers())
-                {
-                    int buffersize = getBuffersize();
-                    interleaved = new int[buffersize * card_chans];
-                    if (NULL == interleaved)
-                        goto bail_out;
-                    memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
-                }
+                prepBuffers();
+                interleaved.reset(new int[getBuffersize() * card_chans]{0});
             }
         }
     }
@@ -452,10 +446,10 @@ bail_out:
 
 void AlsaEngine::Interleave(int buffersize)
 {
-    int idx = 0;
+    size_t idx = 0;
     bool byte_swap = (little_endian != card_endian);
     unsigned short int tmp16a, tmp16b;
-    int chans;
+    size_t chans;
     unsigned int tmp32a, tmp32b;
     unsigned int shift = 0x78000000;
     if (card_bits == 24)
@@ -557,7 +551,7 @@ void *AlsaEngine::AudioThread(void)
 void AlsaEngine::Write(snd_pcm_uframes_t towrite)
 {
     snd_pcm_sframes_t wrote = 0;
-    int *data = interleaved;
+    int *data = interleaved.get();
 
     while (towrite > 0)
     {

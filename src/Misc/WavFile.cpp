@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "WavFile.h"
-using namespace std;
+
 /*  ######## currently none of this is used
 WavFile::WavFile(string filename, int samplerate, int channels)
     :sampleswritten(0), samplerate(samplerate), channels(channels),

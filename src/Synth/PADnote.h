@@ -28,7 +28,12 @@
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
+#include <memory>
+
+using std::unique_ptr;
+
 class PADnoteParameters;
+class WaveInterpolator;
 class Controller;
 class Envelope;
 class LFO;
@@ -40,49 +45,55 @@ class SynthEngine;
 class PADnote
 {
     public:
-        PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-                float velocity, int portamento_, int midinote_, SynthEngine *_synth);
+        PADnote(PADnoteParameters& parameters, Controller& ctl_, Note, bool portamento_);
         PADnote(const PADnote &orig);
-        ~PADnote();
+       ~PADnote();
 
-        void legatoFadeIn(float freq_, float velocity_, int portamento_, int midinote_);
-        void legatoFadeOut(const PADnote &orig);
+        // shall not be moved or assigned
+        PADnote(PADnote&&)                 = delete;
+        PADnote& operator=(PADnote&&)      = delete;
+        PADnote& operator=(PADnote const&) = delete;
 
-        int noteout(float *outl,float *outr);
-        bool finished() const
-        {
-            return NoteStatus == NOTE_DISABLED ||
-                (NoteStatus != NOTE_KEEPALIVE && legatoFade == 0.0f);
-        }
+        void performPortamento(Note);
+        void legatoFadeIn(Note);
+        void legatoFadeOut();
+
+        void noteout(float *outl,float *outr);
+        bool finished() const { return noteStatus == NOTE_DISABLED; }
         void releasekey(void);
-
-        // Whether the note has samples to output.
-        // Currently only used for dormant legato notes.
-        bool ready() { return legatoFade != 0.0f || legatoFadeStep != 0.0f; };
 
     private:
         void fadein(float *smps);
+        bool isWavetableChanged(size_t tableNr);
+        WaveInterpolator* buildInterpolator(size_t tableNr);
+        WaveInterpolator* setupCrossFade(WaveInterpolator*);
         void computeNoteParameters();
         void computecurrentparameters();
-        void setBaseFreq(float basefreq_);
-        enum {
+        void setupBaseFreq();
+        bool isLegatoFading() const { return legatoFadeStep != 0.0f; };
+
+
+        SynthEngine& synth;
+        PADnoteParameters& pars;
+        Presets::PresetsUpdate padSynthUpdate;
+        Controller& ctl;
+
+        enum NoteStatus {
             NOTE_DISABLED,
             NOTE_ENABLED,
-            NOTE_KEEPALIVE
-        } NoteStatus;
-        PADnoteParameters *pars;
+            NOTE_LEGATOFADEOUT
+        } noteStatus;
 
-        int poshi_l;
-        int poshi_r;
-        float poslo;
+        unique_ptr<WaveInterpolator> waveInterpolator;
 
-        float basefreq;
+        Note note;
+        float realfreq;
         float BendAdjust;
         float OffsetHz;
         bool firsttime;
         bool released;
 
-        int nsample, portamento, midinote;
+        bool portamento;
 
         int Compute_Linear(float *outl, float *outr, int freqhi,
                            float freqlo);
@@ -90,61 +101,52 @@ class PADnote
                           float freqlo);
 
 
-        struct {
+        struct PADnoteGlobal {
             //****************************
             // FREQUENCY GLOBAL PARAMETERS
             //****************************
-            float Detune;//cents
+            float detune; // in cents
 
-            Envelope *FreqEnvelope;
-            LFO *FreqLfo;
+            unique_ptr<Envelope> freqEnvelope;
+            unique_ptr<LFO>      freqLFO;
 
             //****************************
             // AMPLITUDE GLOBAL PARAMETERS
             //****************************
-            float Volume; // [ 0 .. 1 ]
+            float volume;  // [ 0 .. 1 ]
+            float panning; // [ 0 .. 1 ]
+            float fadeinAdjustment;
 
-            float Panning; // [ 0 .. 1 ]
+            unique_ptr<Envelope> ampEnvelope;
+            unique_ptr<LFO>      ampLFO;
 
-            Envelope *AmpEnvelope;
-            LFO *AmpLfo;
-
-            float Fadein_adjustment;
-            struct {
-                int Enabled;
+            struct Punch {
+                bool  enabled;
                 float initialvalue;
                 float dt;
                 float t;
-            } Punch;
+            } punch;
 
             //*************************
             // FILTER GLOBAL PARAMETERS
             //*************************
-            Filter *GlobalFilterL;
-            Filter *GlobalFilterR;
+            unique_ptr<Filter> filterL;
+            unique_ptr<Filter> filterR;
 
-            Envelope *FilterEnvelope;
+            unique_ptr<Envelope> filterEnvelope;
+            unique_ptr<LFO>      filterLFO;
+        };
 
-            LFO *FilterLfo;
-        } NoteGlobalPar;
+        PADnoteGlobal noteGlobal;
 
-
-        Controller *ctl;
         float globaloldamplitude;
         float globalnewamplitude;
-        float velocity;
-        float realfreq;
-//        float *tmpwave;
         float randpanL;
         float randpanR;
 
         // Legato vars
         float legatoFade;
         float legatoFadeStep;
-
-        Presets::PresetsUpdate padSynthUpdate;
-
-        SynthEngine *synth;
 };
+#endif /*PADnote.h*/
 
-#endif

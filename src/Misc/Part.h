@@ -27,9 +27,14 @@
 #ifndef PART_H
 #define PART_H
 
-#include <list>
-#include <string>
 #include "globals.h"
+#include "DSP/FFTwrapper.h"
+#include "Params/Presets.h"
+#include "Misc/Alloc.h"
+
+#include <memory>
+#include <string>
+#include <list>
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -41,7 +46,6 @@ class Controller;
 class XMLwrapper;
 class Microtonal;
 class EffectMgr;
-class FFTwrapper;
 
 class SynthEngine;
 
@@ -50,8 +54,14 @@ class Part
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELEASED_AND_SUSTAINED, KEY_RELEASED };
 
-        Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth);
-        ~Part();
+        Part(unsigned char id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth);
+       ~Part();
+        // shall not be copied or moved
+        Part(Part&&)                 = delete;
+        Part(Part const&)            = delete;
+        Part& operator=(Part&&)      = delete;
+        Part& operator=(Part const&) = delete;
+
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
         void defaults(void);
@@ -78,10 +88,10 @@ class Part
         void getfromXMLinstrument(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);
 
-        Controller *ctl;
+        std::unique_ptr<Controller> ctl;
 
         // part's kit
-        struct Kititem
+        struct KitItem
         {
             std::string   Pname;
             unsigned char Penabled;
@@ -96,7 +106,7 @@ class Part
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
         };
-        Kititem kit[NUM_KIT_ITEMS];
+        KitItem kit[NUM_KIT_ITEMS];
 
         // Part parameters
         void enforcekeylimit(void);
@@ -105,8 +115,6 @@ class Part
         void checkVolume(float step);
         void setDestination(int value);
         void checkPanning(float step, unsigned char panLaw);
-
-        SynthEngine *getSynthEngine() {return synth;}
 
         bool PyoshiType;
         int PmapOffset;
@@ -122,7 +130,7 @@ class Part
         unsigned char Prcvchn;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
-        unsigned char Pkitmode;    // if the kitmode is enabled
+        unsigned char Pkitmode;    // Part uses kit mode: 0 == off, 1 == on, 2 == "Single": only first applicable kit item can play
         bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
@@ -144,12 +152,13 @@ class Part
             std::string   Pcomments;
         };
         Info info;
+        const uchar partID;
 
-        float *partoutl;
-        float *partoutr;
+        Samples partoutl;
+        Samples partoutr;
 
-        float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
-        float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
+        Samples partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
+        Samples partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
         unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
                                                // routed (to next effect/to out)
@@ -160,40 +169,53 @@ class Part
         float volume;      // applied by MasterAudio
         float pangainL;
         float pangainR;
-        int lastnote;
         bool busy;
 
+        int getLastNote()  const { return this->prevNote; }
+        SynthEngine *getSynthEngine() const {return synth;}
 
     private:
+        void setPan(float value);
         void KillNotePos(int pos);
         void ReleaseNotePos(int pos);
-        void MonoMemRenote(void); // MonoMem stuff.
-        void setPan(float value);
+        void monoNoteHistoryRecall(void);
+
+        void startNewNotes        (int pos, size_t item, size_t currItem, Note, bool portamento);
+        void startLegato          (int pos, size_t item, size_t currItem, Note);
+        void startLegatoPortamento(int pos, size_t item, size_t currItem, Note);
+        float computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity);
+
+        Samples& tmpoutl;
+        Samples& tmpoutr;
 
         Microtonal *microtonal;
-        FFTwrapper *fft;
+        fft::Calc& fft;
 
         struct PartNotes {
             NoteStatus status;
             int note;          // if there is no note playing, "note" = -1
-            int itemsplaying;
+            int time;
             int keyATtype;
             int keyATvalue;
-            struct Kititem {
+            size_t itemsplaying;
+
+            struct KitItemNotes {
                 ADnote *adnote;
                 SUBnote *subnote;
                 PADnote *padnote;
                 int sendtoparteffect;
             };
-            Kititem kititem[NUM_KIT_ITEMS];
-            int time;
-        };
+            KitItemNotes kitItem[NUM_KIT_ITEMS];
+        };                        // Note: kitItems are "packed", not using the same Index as in KitItem-array
 
-        PartNotes partnote[POLIPHONY];
+        PartNotes partnote[POLYPHONY];
 
-        int lastpos;              // previous pos and posb.
-        int lastposb;             // ^^
-        bool lastlegatomodevalid; // previous legatomodevalid.
+        int prevNote;             // previous MIDI note
+        int prevPos;              // previous note pos
+        float prevFreq;           // frequency of previous note (for portamento)
+        bool prevLegatoMode;      // previous note hat legato mode activated
+
+        bool killallnotes;        // "panic" switch
 
         int oldFilterState; // these for channel aftertouch
         int oldFilterQstate;
@@ -202,22 +224,14 @@ class Part
         float oldVolumeAdjust;
         int oldModulationState;
 
-        float *tmpoutl;
-        float *tmpoutr;
-        float oldfreq; // for portamento
-//        int partMuted;  // **** RHL ****
-        bool killallnotes;
-
-        // MonoMem stuff
-        std::list<unsigned char> monomemnotes; // held notes.
+        // MonoNote stuff
+        std::list<unsigned char> monoNoteHistory; // held notes.
         struct {
             unsigned char velocity;
-        } monomem[256];    // 256 is to cover all possible note values. monomem[]
-                           // is used in conjunction with the list to store the
-                           // velocity value of a given note
-                           // (the list only store note values). For example.
-                           // 'monomem[note].velocity' would be the velocity
-                           // value of the note 'note'.
+        } monoNote[256];   // 256 is to cover all possible note values. monoNote[]
+                           // is used in conjunction with the list to store the velocity value of a given note
+                           // (the list only store note values). For example:
+                           // 'monoNote[note].velocity' would be the velocity value of the note 'note'.
 
         SynthEngine *synth;
 };
