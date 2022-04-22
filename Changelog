@@ -1,5 +1,10 @@
 yoshimi 2.1.2 M
 
+2022-4-22 Will
+bn2115
+* Revised position of new controls in PadSynth window.
+* Completed text rescaling in Retrigger window.
+
 2022-4-21 Hermann
 Landing "padthread" feature
 * Extensive rework of FFTW memory management
