@@ -3577,7 +3577,9 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->kit[kititem].Ppadenabled = value_bool;
                 if (synth->getRuntime().useLegacyPadBuild())
                 {// do the blocking build in the CMD-Dispatch background thread ("sortResultsThread")
+#ifdef GUI_FLTK
                     toGUI.write(getData->bytes);                      // cause update in the GUI to enable the edit button
+#endif
                     getData->data.source = TOPLEVEL::action::lowPrio; // marker to cause dispatch in InterChange::sortResultsThread()
                     getData->data.control = PADSYNTH::control::applyChanges;
                 }

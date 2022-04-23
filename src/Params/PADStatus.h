@@ -128,9 +128,11 @@ inline void PADStatus::mark(Stage newStage, InterChange& interChange, uchar part
     stateMsg.data.spare1    = UNUSED;
     stateMsg.data.value     = 0;
 
+#ifdef GUI_FLTK
     bool success = interChange.toGUI.write(stateMsg.bytes);
     if (not success)
         interChange.Log("Failure PADStatus sending toGUI: newStage="+func::asString(newStage));
+#endif
 }
 
 #endif /*PAD_STATUS_H*/

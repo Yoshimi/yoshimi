@@ -4,6 +4,9 @@ yoshimi 2.1.2 M
 bn2116
 * Bugfix: Missing random walk exit branch when loading instrument.
 
+bn 2117
+* Bugfix: New FLTK commands not disabled for headless build.
+
 2022-4-22 Will
 bn2115
 * Revised position of new controls in PadSynth window.
