@@ -1205,6 +1205,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         randWalkFilterFreq     .setSpread(PrandWalkFilterFreq);
         randWalkProfileWidth   .setSpread(PrandWalkProfileWidth);
         randWalkProfileStretch .setSpread(PrandWalkProfileStretch);
+        xml->exitbranch();
     }
     // trigger re-build of the wavetable as background task...
     waveTable.reset();           // silence existing sound from previous instruments using the same part

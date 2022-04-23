@@ -1,5 +1,9 @@
 yoshimi 2.1.2 M
 
+2022-4-23 Will
+bn2116
+* Bugfix: Missing random walk exit branch when loading instrument.
+
 2022-4-22 Will
 bn2115
 * Revised position of new controls in PadSynth window.
