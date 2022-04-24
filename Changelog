@@ -1,17 +1,23 @@
 yoshimi 2.1.2 M
 
 2022-4-23 Will
+bn2119
+* Adjusted position of Random Walk controls.
+* Updated User Guide Image.
+* Swapped order of some of these entries.
+  Makes more sense!
+
 bn2118
 * Changed Random Walk window to horizontal layout.
 * Revised Config window layout.
 * Initial update to User Guide for new features.
 
 2022-4-23 Will
+bn2117
+* Bugfix: New FLTK commands not disabled for headless build.
+
 bn2116
 * Bugfix: Missing random walk exit branch when loading instrument.
-
-bn 2117
-* Bugfix: New FLTK commands not disabled for headless build.
 
 2022-4-22 Will
 bn2115
