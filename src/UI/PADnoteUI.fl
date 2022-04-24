@@ -879,16 +879,16 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {make_randWalkWindow()} {} {
     Fl_Window randWalkWindow {
-      label {random walk}
-      xywh {1145 175 160 285} type Double hide resizable
+      label {PadSynth - Random Walk}
+      xywh {858 154 240 155} type Double resizable
       code0 {randDW = o->w(); randDH = o->h();}
-      code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}
+      code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Group randomProp {
-        xywh {0 5 160 280}
+        xywh {0 0 240 154}
       } {
         Fl_Dial rebuildTrigger {
-          label retrigger
+          label Retrigger
           callback {//
             int dialSetting = o->value();
             if (dialSetting >= 0)
@@ -896,7 +896,7 @@ class PADnoteUI {: {public PresetsUI_}
             // remove a socket of 200ms from the dial setting, i.e. the editable time in the UI starts > 200ms
             // smaller values would be pointless and overload the system. (60sec = 4779, 200ms = 2300, thus max = 4779-2300 = 2479)
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::rebuildTrigger, logDial2millisec(dialSetting), TOPLEVEL::type::Integer);}
-          tooltip {Trigger rebuild of PAD Wavetable after generating this amount of sample time; possibly randomise parameters below on each rebuild. WARNING: expensive!} xywh {25 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 2479 step 1
+          tooltip {Trigger rebuild of PAD Wavetable after generating this amount of sample time; possibly randomise parameters below on each rebuild. WARNING: expensive!} xywh {20 25 30 30} box ROUND_UP_BOX labelsize 10 align 1 minimum -1 maximum 2479 step 1
           code0 {//
             int dialSetting = millisec2logDial(pars->PrebuildTrigger);
             if (dialSetting >= 2300)
@@ -906,38 +906,11 @@ class PADnoteUI {: {public PresetsUI_}
           code2 {o->setValueType(VC_Retrigger);}
           class WidgetPDial
         }
-        Fl_Dial randWalkDetune {
-          label Detune
-          callback {//
-            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkDetune, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Let the voice detuning perform a random walk on each wavetable rebuild, within this spread..} xywh {100 30 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->PrandWalkDetune);}
-          code2 {o->setValueType(VC_RandWalkSpread);}
-          class WidgetPDial
-        }
-        Fl_Dial randWalkBandwidth {
-          label Bandwidth
-          callback {//
-            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkBandwidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Bandwidth random walk on wavetable rebuild, within this spread..} xywh {100 75 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->PrandWalkBandwidth);}
-          code2 {o->setValueType(VC_RandWalkSpread);}
-          class WidgetPDial
-        }
-        Fl_Dial randWalkFilterFreq {
-          label {Filter Freq}
-          callback {//
-            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkFilterFreq, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Filter cutoff freq random walk on wavetable rebuild, within this spread..} xywh {100 120 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->PrandWalkFilterFreq);}
-          code2 {o->setValueType(VC_RandWalkSpread);}
-          class WidgetPDial
-        }
         Fl_Dial randWalkProfileWidth {
           label {Profile Width}
           callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileWidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Profile width parameter random walk on wavetable rebuild, within this spread..} xywh {100 165 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Profile width parameter random walk on wavetable rebuild, within this spread..} xywh {100 25 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->PrandWalkProfileWidth);}
           code2 {o->setValueType(VC_RandWalkSpread);}
           class WidgetPDial
@@ -946,8 +919,35 @@ class PADnoteUI {: {public PresetsUI_}
           label {Profile Stretch}
           callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileStretch, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Profile stretch parameter random walk on wavetable rebuild, within this spread..} xywh {100 210 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Profile stretch parameter random walk on wavetable rebuild, within this spread..} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->PrandWalkProfileStretch);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkDetune {
+          label Detune
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkDetune, o->value(), TOPLEVEL::type::Integer);}
+          tooltip {Let the voice detuning perform a random walk on each wavetable rebuild, within this spread..} xywh {20 80 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkDetune);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkFilterFreq {
+          label {Filter Freq}
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkFilterFreq, o->value(), TOPLEVEL::type::Integer);}
+          tooltip {Filter cutoff freq random walk on wavetable rebuild, within this spread..} xywh {100 80 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkFilterFreq);}
+          code2 {o->setValueType(VC_RandWalkSpread);}
+          class WidgetPDial
+        }
+        Fl_Dial randWalkBandwidth {
+          label Bandwidth
+          callback {//
+            send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkBandwidth, o->value(), TOPLEVEL::type::Integer);}
+          tooltip {Bandwidth random walk on wavetable rebuild, within this spread..} xywh {180 80 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          code0 {o->value(pars->PrandWalkBandwidth);}
           code2 {o->setValueType(VC_RandWalkSpread);}
           class WidgetPDial
         }
@@ -960,7 +960,7 @@ class PADnoteUI {: {public PresetsUI_}
               randSeen = false;
               if ((Fl::event_button() == 3))
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();}
-          xywh {100 255 50 20} box THIN_UP_BOX labelsize 12
+          xywh {175 124 50 20} box THIN_UP_BOX labelsize 12
         }
       }
     }
@@ -986,10 +986,8 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
           int w = randWalkWindow->w();
           int h = randWalkWindow->h();
-          float defW = 160;
-          float defH = 285;
-          float dW = w / defW;
-          float dH = h / defH;
+          float dW = w / float(randDW);
+          float dH = h / float(randDH);
           float dScale;
           if (dW < dH)
               dScale = dW;

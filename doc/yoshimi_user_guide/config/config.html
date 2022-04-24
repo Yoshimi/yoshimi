@@ -19,8 +19,17 @@
     <br><br>
     <b>Internal Buffer Size</b> Lower values will give lower latency and more accurate resolution, but at the cost of CPU loading. We recommend you keep this as low as possible without getting Xruns.
     <br><br>
-    <b>PADsynth Interpolation</b> For those with good hearing at high pitches, setting this to 'Cubic' will give very slightly better results, but it is slower to operate.
+    <b>PadSynth Interpolation</b> For those with good hearing at high pitches, setting this to 'Cubic' will give very slightly better results, but it is slower to operate.
     <br><br>
+    <b>Build PadSynth Wavetable</b> Wavetable build and application method.
+    <div class="tab">
+    Mute - disable part while wavetable is assembled. Unmute when ready to be applied.
+    <br>
+    Background - continue using old wavetable until new one is ready to be applied.
+    <br>
+    Auto-Apply - continue using old wavetable. Apply new one when ready.
+    </div>
+    <br>
     <b>Virtual Keyboard Layout</b> You can have various standard layouts, when using the virtual keyboard, and this lets you select the most common.
     <br><br>
     <b>XML Compression Level</b> The degree of compression applied to saved data. Zero is useful for creating files readable in a text editor when checking for problems.

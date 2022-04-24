@@ -1,6 +1,12 @@
 yoshimi 2.1.2 M
 
 2022-4-23 Will
+bn2118
+* Changed Random Walk window to horizontal layout.
+* Revised Config window layout.
+* Initial update to User Guide for new features.
+
+2022-4-23 Will
 bn2116
 * Bugfix: Missing random walk exit branch when loading instrument.
 

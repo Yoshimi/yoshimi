@@ -2,8 +2,8 @@ Yoshimi User Guide notes 10/8/2021
 
 WARNINNG!
 
-DO NOT EDIT index.html
-It is generated  from /indexref.html with the current version number added.
+DO NOT EDIT the top lines of index.html
+This area is modified by adding the current version number and counts lines to find it.
 
 
 This is the complete user guide for Yoshimi version 2.0

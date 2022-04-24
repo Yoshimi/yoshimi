@@ -13,7 +13,7 @@
     <img src="images/padharmonic.png" alt="PadSynth Harmonics Window" class="double">
     <img src="images/padenvelope.png" alt="PadSynth Envelopes Window" class="double">
     <p>
-    The PadSynth engine was designed by Paul Nasca and to the best of our knowledge there is no comparable type generally available. It uses a waveform oscillator that is virtually identical to the one used by AddSynth. Some complex mathematics is then applied to manipulate the overall spectrum. Finally this is converted to a set of fixed perfectly looping wavetables. As a result none of these <em>harmonics</em> controls are real-time. Also, it is the wavetables that are called for actual sound generation after passing through the usual envelope controls (which are real-time).
+    The PadSynth engine was designed by Paul Nasca and to the best of our knowledge there is no comparable type generally available. It uses a waveform oscillator that is virtually identical to the one used by AddSynth. Some complex mathematics is then applied to manipulate the overall spectrum. Finally this is converted to a set of fixed perfectly looping wavetables. By default, none of these <em>harmonics</em> controls are real-time as discussed in <a href="../config/config.html">Settings</a>. Also, it is the wavetables that are called for actual sound generation after passing through the usual envelope controls (which are real-time).
     <br><br>
     There are two tabbed views in a single window. You will normally be shown the harmonic structure, the envelopes one (as it's name suggests) consisting mostly of envelope and LFO inserts.
     </p>
@@ -24,7 +24,7 @@
     The way some of these controls operate is rather obscure. While making dramatic changes to the visual aspect of the harmonic profile, the effect on the sound is often quite subtle. Unfortunately, it is difficult to describe their operation without deep understanding of the mathematics involved.
     <br><br>
     <div class="tab">
-    <B>Base Type</b> Base shape of the harmonic: Gauss, Square or Double Explonential.
+    <b>Base Type</b> Base shape of the harmonic: Gauss, Square or Double Explonential.
     <br><br>
     <b>Width</b> (spread) of one harmonic.
     <br><br>
@@ -59,10 +59,14 @@
     <br><br>
     <b>Sample Size</b> Size of the sample.
     <br><br>
+    <b>Crossfade</b> The time it takes to fade from the old wavetable to the new one (for Background and Auto-Apply modes).
+    <br><br>
+    <b>Retrigger </b> This button opens a window for <a href="random.html">Random</a> regeneration of the wavetable.
+    </div>
+    <br>
     There is a button to give access to an overall <a href="../resonance/resonance.html">Resonance</a> that can be applied to the engine.
 
     Below this is a <a href="../wave/wave.html">Waveform</a> button which gives access to a highly detailed waveshape editor.
-    </div>
     </p>
     <p>
     (bottom)

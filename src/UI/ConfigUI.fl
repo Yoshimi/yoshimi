@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -67,8 +67,8 @@ class ConfigUI {} {
   Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {close->do_callback();} open
-      xywh {691 66 390 330} type Double hide resizable
+      callback {close->do_callback();}
+      xywh {821 82 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -151,8 +151,8 @@ alsaTab->hide();}
           Fl_Choice buff_size {
             label {* Internal Buffer Size}
             callback {//
-                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);} selected
-            tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {245 45 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+                        send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
+            tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {245 34 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
             code1 {o->value(func::bitFindHigh(synth->getRuntime().Buffersize) - 4);}
             code2 {//if (synth->getIsLV2Plugin()) o->deactivate();}
@@ -161,23 +161,23 @@ alsaTab->hide();}
             label {* AddSynth Oscillator Size}
             callback {//
                         send_data(0, CONFIG::control::oscillatorSize, 256 << o->value(), TOPLEVEL::type::Integer);}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {245 68 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {ADSynth Oscillator Size (samples)} xywh {245 58 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");o->add("16384");}
             code1 {o->value(func::bitFindHigh(synth->getRuntime().Oscilsize) - 8);}
           } {}
           Fl_Choice pad_interpol {
-            label {PADsynth Interpolation}
+            label {PadSynth Interpolation}
             callback {//
                         send_data(0, CONFIG::control::padSynthInterpolation, o->value(), TOPLEVEL::type::Integer);}
-            xywh {245 92 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {245 82 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Linear(fast)");o->add("Cubic(slow)");}
             code1 {o->value(synth->getRuntime().Interpolation);}
           } {}
           Fl_Choice handlePadSynthBuild {
-            label {Build PADSynth Wavetable}
+            label {Build PadSynth Wavetable}
             callback {//
                         send_data(0, CONFIG::control::handlePadSynthBuild, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {How to rebuild wavetable after changes: Trigger manually and mute part (legacy), build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 116 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {How to rebuild wavetable after changes: Trigger manually and mute part (legacy), build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 106 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Muted");o->add("Background");o->add("Auto-Apply");}
             code1 {o->value(synth->getRuntime().handlePadSynthBuild);}
           } {}
@@ -185,7 +185,7 @@ alsaTab->hide();}
             label {Virtual Keyboard Layout}
             callback {//
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
-            xywh {245 140 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            xywh {245 130 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("QWERTY");o->add("Dvorak");o->add("QWERTZ");o->add("AZERTY");}
             code1 {o->value(synth->getRuntime().VirKeybLayout);}
           } {}
@@ -193,15 +193,16 @@ alsaTab->hide();}
             label {Send reports to:}
             callback {//
                         send_data(TOPLEVEL::action::forceUpdate, CONFIG::control::reportsDestination, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Some system errors always go to stdout} xywh {200 170 80 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Some system errors always go to stdout} xywh {200 178 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("stdout");o->add("Console Window");}
             code1 {o->value(synth->getRuntime().toConsole);}
           } {}
           Fl_Counter logText {
+            label {Console text Size}
             callback {//
                         send_data(0, CONFIG::control::logTextSize, o->value(), TOPLEVEL::type::Integer);
                         synth->getGuiMaster()->yoshiLog->setLogText(o->value());}
-            tooltip {Console Font Size} xywh {285 170 64 20} type Simple labeltype NO_LABEL labelsize 12 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12
+            tooltip {Console Font Size} xywh {285 202 64 20} type Simple labelsize 12 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12
             code1 {o->value(synth->getRuntime().consoleTextSize);}
             code2 {if (synth->getRuntime().toConsole) o->activate(); else o->deactivate();}
           }
@@ -209,7 +210,7 @@ alsaTab->hide();}
             label {XML Compression Level}
             callback {//
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {285 196 64 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {285 154 64 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -217,7 +218,7 @@ alsaTab->hide();}
             label {Saved Instrument Format}
             callback {//
                         send_data(0, CONFIG::control::savedInstrumentFormat, o->value() + 1, TOPLEVEL::type::Integer);}
-            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 225 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Yoshimi format includes Controllers and Humanise} xywh {200 226 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("Legacy");o->add("Yoshimi");o->add("Both");}
             code1 {o->value(synth->getRuntime().instrumentFormat - 1);}
           } {}
@@ -226,7 +227,7 @@ alsaTab->hide();}
             callback {//
     int style = 2 - int(o->value());
     synth->getGuiMaster()->changepanelstyle(style);}
-            tooltip {Select single row or compact format} xywh {200 248 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
+            tooltip {Select single row or compact format} xywh {200 250 150 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12
             code0 {o->add("2 row x 8 entries");o->add("1 row x 16 entries");}
             code1 {o->value(synth->getRuntime().single_row_panel);}
           } {}
@@ -1328,6 +1329,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
     pad_interpol->labelsize(size);
         pad_interpol->textsize(size);
+
+    handlePadSynthBuild->labelsize(size);
+        handlePadSynthBuild->textsize(size);
 
     v_keyboard->labelsize(size);
         v_keyboard->textsize(size);
