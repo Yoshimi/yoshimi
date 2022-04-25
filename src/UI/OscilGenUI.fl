@@ -5,13 +5,13 @@ code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
 }
 
-comment {OscilgenUI.cc} {selected in_source not_in_header
+comment {OscilgenUI.cc} {in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2021 Will Godfrey and others.
+Copyright 2016-2022 Will Godfrey and others.
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -90,7 +90,6 @@ decl {\#include "Misc/NumericFuncs.h"
 
 decl {using std::to_string;} {private global
 }
-
 
 class OscilSpectrum {: {public Fl_Box}
 } {
@@ -462,15 +461,14 @@ class Oscilharmonic {: {public Fl_Group}
   }
 }
 
-class OscilEditor {open : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
-o->hide();} open
+o->hide();}
       xywh {11 26 735 595} type Double labelsize 12 hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
@@ -482,11 +480,10 @@ o->hide();} open
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Button applybutton {
-        label {Apply}
+        label Apply
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip{Rebuild PADSynth wavetable to pick up changes}
-        xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
@@ -621,6 +618,8 @@ o->hide();} open
       Fl_Button useasbase {
         label {Use as base}
         callback {//
+        if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\nThis action is not easily reversed and may cause strange Undo/Redo behaviour.") < 2)
+            return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::useAsBaseFunction, autoclearbutton->value() > 0, TOPLEVEL::type::Integer);}
         tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
@@ -642,7 +641,7 @@ o->hide();} open
       Fl_Button clearHarm {
         label Clear
         callback {//
-        if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?") < 2)
+        if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\n This action can't be reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -804,7 +803,7 @@ o->hide();} open
       Fl_Button tosine {
         label Sine
         callback {//
-        if (choice(synth, "", "Yes", "No", "Convert to SINE?") < 2)
+        if (choice(synth, "", "Yes", "No", "Convert to SINE?\\nThis action can't be reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
 
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer);}
@@ -1262,8 +1261,7 @@ o->hide();} open
         }
         osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
   }
-  Function {redrawoscil()} {open
-  } {
+  Function {redrawoscil()} {} {
     code {//
     waveformgroup->redraw();
     harmonicgroup->redraw();
@@ -1271,8 +1269,7 @@ o->hide();} open
     if (cbwidget!=NULL) {
         cbwidget->do_callback();
 ;
-};} {selected
-    }
+};} {}
   }
   Function {waveRtext()} {} {
     code {//

@@ -1,5 +1,12 @@
 yoshimi 2.1.2 M
 
+
+2022-4-24 Will
+bn2120
+* Added undoRedoClear() if deleting a kit line.
+  Removed this from overal kit enabling.
+* Added warnings to various GUI actions that could disrupt undo/redo behavoir.
+
 2022-4-23 Will
 bn2119
 * Adjusted position of Random Walk controls.

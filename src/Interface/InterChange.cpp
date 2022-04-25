@@ -3501,9 +3501,16 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if (write)
     {
+        /*
+         * The following is not quite correct.the sections will be inactive
+         * but still present, so although an undo might appear to do nothing
+         * it won't actually cause a problem.
+         *
         if (control == PART::control::enableKitLine || control == PART::control::kitMode)
             undoRedoClear(); // these would become completely invalid!
-        else if (control == PART::control::resetAllControllers)
+        else
+            */
+        if (control == PART::control::resetAllControllers)
         { // setup for group undo
             CommandBlock tempData;
             memset(tempData.bytes, 255, sizeof(CommandBlock));
@@ -3592,6 +3599,8 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::enableKitLine:
             if (write)
             {
+                if (!_SYS_::F2B(value))
+                    undoRedoClear();
                 synth->partonoffWrite(npart, -1);
                 getData->data.source = TOPLEVEL::action::lowPrio;
             }
