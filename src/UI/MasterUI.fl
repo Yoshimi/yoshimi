@@ -3027,7 +3027,7 @@ Alan Calvert started the project}
     int nval = _npart;
     partuigroup->remove(partui);
     delete partui;
-    partui = new PartUI(3 * mainScale, 285 * mainScale, 765 * mainScale, 525 * mainScale);
+    partui = new PartUI(3, 285, 380, mainScale);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
@@ -3702,24 +3702,12 @@ bpmfallback->format(format);} {}
   }
   Function {mainRtext()} {} {
     code {//
-    int w = masterwindow->w();
-    int h = masterwindow->h();
 
-    float dW = w / mainDW;
-    float dH = h / mainDH;
-    float dScale;
+    mainScale = float(masterwindow->w() / mainDW);
 
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
-    mainScale = dScale;
-
-    int size = int(10 * dScale);
-    int size11 = int(11 * dScale);
-    int size12 = int(12 * dScale);
+    int size = int(10 * mainScale);
+    int size11 = int(11 * mainScale);
+    int size12 = int(12 * mainScale);
 
     mastermenu->textsize(size12);
 
@@ -3752,7 +3740,7 @@ bpmfallback->format(format);} {}
     sysEffSend->labelsize(size11);
     sysCopy->labelsize(size11);
     sysPaste->labelsize(size11);
-    syseffectui->effRtext(dScale, sysefftype->value());
+    syseffectui->effRtext(mainScale, sysefftype->value());
 
 
     InsertionEffectsGrp->labelsize(size12);
@@ -3765,7 +3753,7 @@ bpmfallback->format(format);} {}
         inseffpart->textsize(size11);
     insCopy->labelsize(size11);
     insPaste->labelsize(size11);
-    inseffectui->effRtext(dScale, insefftype->value());
+    inseffectui->effRtext(mainScale, insefftype->value());
 
     npartcounter->labelsize(size11);
         npartcounter->textsize(size11);
@@ -3778,7 +3766,7 @@ bpmfallback->format(format);} {}
     undo->labelsize(size11);
     redo->labelsize(size11);
 
-    partui->groupRtext(dScale);
+    partui->groupRtext(mainScale);
     masterwindow->redraw();} {}
   }
   Function {panelRtext()} {} {

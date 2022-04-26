@@ -75,8 +75,8 @@ class PartSysEffSend {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window syseffsend {
-      xywh {916 486 30 30} type Double box NO_BOX labelfont 1
-      class Fl_Group visible
+      xywh {916 486 30 30} type Double box NO_BOX labelfont 1 hide
+      class Fl_Group
     } {
       Fl_Dial sysend {
         callback {//
@@ -2973,11 +2973,10 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {groupRtext(float dScale)} {} {
     code {//
     partgroup->resize(3 * dScale, 285 * dScale, 380 * dScale, 170 * dScale);
-    //partgroupui->size(378 * dScale, 168 * dScale);
 
     /* The above has to be numerically fixed as the relative size
      * can change when a part number is changed. The group is deleted
-     * and re-creacted based on the *current* master window
+     * and re-created based on the *current* master window
     */
 
     toSysEfx->size(122 * dScale, 39 * dScale);
