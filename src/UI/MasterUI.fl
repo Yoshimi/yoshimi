@@ -3027,7 +3027,7 @@ Alan Calvert started the project}
     int nval = _npart;
     partuigroup->remove(partui);
     delete partui;
-    partui = new PartUI(3, 285, 380, mainScale);
+    partui = new PartUI(3, 285, 380, 170);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);
