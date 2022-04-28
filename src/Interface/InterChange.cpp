@@ -5877,20 +5877,17 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             for (int i = 0; i < MAX_RESONANCE_POINTS; ++i)
             {
                 int val = respar->Prespoints[i];
-                if (val != 64)
+                tempData.data.value = val;
+                tempData.data.parameter = i;
+                noteSeen = true;
+                undoLoopBack = false;
+                if (!markerSet)
                 {
-                    tempData.data.value = val;
-                    tempData.data.parameter = i;
-                    noteSeen = true;
-                    undoLoopBack = false;
-                    if (!markerSet)
-                    {
-                        add2undo(&tempData, noteSeen);
-                        markerSet = true;
-                    }
-                    else
-                        add2undo(&tempData, noteSeen, true);
+                    add2undo(&tempData, noteSeen);
+                    markerSet = true;
                 }
+                else
+                    add2undo(&tempData, noteSeen, true);
             }
         }
         else
@@ -7063,7 +7060,7 @@ void InterChange::add2undo(CommandBlock *getData, bool& noteSeen, bool group)
             && undoList.back().data.parameter == getData->data.parameter)
             return;
         undoList.push_back(undoMarker);
-        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
+//        std::cout << "marker " << int(undoMarker.data.part) << std::endl;
     }
 
     /*

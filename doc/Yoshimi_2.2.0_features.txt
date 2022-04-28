@@ -1,8 +1,10 @@
 Version 2.2.0
 
-Blurb
+A major feature is the revision of the PadSynth engine.
 
-Further details in /doc/Yoshimi_2.2.0_features.txt
+There is now comprehensive Undo/Redo implemented.
+
+A new control allows you to set a default Midi Clock over a wide range if Yoshimi can't see an incoming one.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

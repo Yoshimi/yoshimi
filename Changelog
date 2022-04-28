@@ -1,4 +1,10 @@
-yoshimi 2.1.2 M
+yoshimi 2.2.0 rc0
+
+2022-4-28 Will
+bn2123
+* Reverted Resonance undo speedup test - caused odd issues.
+* Further Adjustments to User Guide
+* Initial preparation for Release of V 2.2.0
 
 2022-4-27 Will
 bn2122
