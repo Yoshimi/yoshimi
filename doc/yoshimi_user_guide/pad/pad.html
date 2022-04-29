@@ -28,7 +28,7 @@
     <br><br>
     <b>Width</b> (spread) of a single peak within the profile.
     <br><br>
-    <b>FreqMlt</b> Repeat the same base shape multiple times within the generated profile.
+    <b>FreqMlt</b> Repeat the same base shape multiple times in the generated profile.
     <br><br>
     <b>Str</b> Modulate and spread the base shape, thereby creating several <em>side bands</em> with frequency shifted slightly above / below the centre &mdash; side bands create a chorus like quality.
     <br><br>
@@ -41,10 +41,10 @@
     <b>AmpMultiplier</b> Apply a secondary modulation on top of the profile built thus far;<br/>the modulating shape can be a bell function (Gauss), a Sine wave or just a plateau in the centre (Flat).
     <br><br>
     <b>AmpMode</b> The way how this secondary modulation is worked into the profile.
-    <ul><li>Sum: a linear blend between the secondary modulator, and the original profile; the fade is controlled by par2</li>
-        <li>Multiply: the profile is filtered by (multiplied with) the modulator; the strength of filtering is controlled by par2</li>
-        <li>Div1: the profile is divided by the modulator &mdash; where the latter is strong, the profile is damped</li>
-        <li>Div2: the modulator is divided by the profile, i.e. the profile is carved out of the modulator shape</li>
+    <ul><li><b>Sum</b>: a linear blend between the secondary modulator, and the original profile; the fade is controlled by par2</li>
+        <li><b>Multiply</b>: the profile is filtered by (multiplied with) the modulator; the strength of filtering is controlled by par2</li>
+        <li><b>Div1</b>: the profile is divided by the modulator &mdash; where the latter is strong, the profile is damped</li>
+        <li><b>Div2</b>: the modulator is divided by the profile, i.e. the profile is carved out of the modulator shape</li>
     </ul>
     <b>Par1</b> Squeeze or spread the secondary modulating shape.
     <br><br>
@@ -55,20 +55,23 @@
     <b>Bandwidth</b> This is the most important control, and defines the effective Bandwidth of the harmonic profile in cents. By increasing this value, the sound transitions gradually from the precise waveform to a sonic cloud.
     <br><br>
     <b>Bandwidth Scale</b> How the Bandwidth is adjusted with the increasing frequency of each harmonic.
-    <ul><li>Normal: Bandwith grows with frequency, and thus perceptually the spread is the same on each harmonic.</li>
-        <li>EqualHz: Bandwidth is constant, independent of frequency. Perceptually this means that the bandwidth on higher harmonics seems to diminish.</li>
-        <li>Quarter, Half, 75%, 150%, Double: all these setting increase the Bandwith for higher harmonics to various degrees</li>
-        <li>Inv.Half: here the Bandwidth is even reduced for higher harmonics by half an octave per octave</li>
+    <ul><li><b>Normal</b>: Bandwith grows with frequency, and thus perceptually the spread is the same on each harmonic.</li>
+        <li><b>EqualHz</b>: Bandwidth is constant, independent of frequency. Perceptually this means that the bandwidth on higher harmonics seems to diminish.</li>
+        <li><b>Quarter, Half, 75%, 150%, Double</b>: all these setting increase the Bandwith for higher harmonics to various degrees</li>
+        <li><b>Inv.Half</b>: here the Bandwidth is even reduced for higher harmonics by half an octave per octave</li>
     </ul>
     </div>
     <br>
     (right side)
+    <br/><br/>
+    PadSynth builds a series of wavetables to cover the most important middle octaves. Each tone is drawn from the closest wavetable starting at a random point (phase) and sampled up or down to the required note frequency. The quality of this resampling interpolation can be increased with the <a href="../config/config.html#PadSynthInterpolation">PadSynth Interpolation</a> global setting. These quality settings (and the number of octaves) can be relevant for sharp and dense sounds, and for very high or low notes.
+    <br/><br/>
     <div class="tab">
     <b>base</b> The note value for the lowest wavetable generated.
     <br><br>
     <b>smp/oct</b> The number of wavetables generated within each octave.
     <br><br>
-    <b>no.oct</b> The number of octaves to generate independent wavetables.
+    <b>no.oct</b> The number of octaves to cover with dedicated wavetables.
     <br><br>
     <b>Sample Size</b> Size of the generated wavetable(s). A large wavetable captures more fine details of the harmonic profile and gives more time until the patterns repeat, but it costs more time to build and it takes up more memory.
     <ul><li>128k: the default value provides 2.6sec of sound at 48kHz sampling rate and requires ½ MiB.</li>
@@ -82,28 +85,40 @@
     <br>
     There is a button to give access to an overall <a href="../resonance/resonance.html">Resonance</a> that can be applied to the engine.
 
-    Below this is a <a href="../wave/wave.html">Waveform</a> button which gives access to a highly detailed waveshape editor.
+    Below this is a <a href="../wave/wave.html">Waveform</a> button which gives access to a highly detailed waveshape editor, which is identical to the one available in AddSynth &mdash; with the exception of the phase control on individual partials; PadSynth ignores these and always picks completely random phases, whenever building a new wavetable. Note also that you can copy and paste the entire settings of this waveform editor between AddSynth and PadSynth; you may create a clear and pronounced sound with AddSynth and then take it into PadSynth to soften, spread and blur it, while retaining its character.
     </p>
     <p>
     (bottom)
     <div class="tab">
-    <b>Spectrum Mode</b> We don't currently have information about this control.
-    <br><br>
-    <b>Overtones Position</b> This sets the type of overtone variation. For <em>Harmonic</em> there is no control, so the other parameters are inactive. Similarly Par&nbsp;2 does nothing for <em>Shift</em> so is disabled for that variation.
-    <br><br>
-    <b>Par 1</b> spreads the harmonics according to the 'position' type.
-    <br><br>
-    <b>Par 2</b> provides a further variation on the harmonics spread.
-    <br><br>
-    <b>ForceH</b> This moves the shifted harmonics by a variable amount towards to the nearest actual multiple of the fundamental.
-    </div>
+    <b>Spectrum Mode</b> defines the way how PadSynth generates the spectrum, which is then rendered into wavetables.
+    <ul><li><b>Bandwidth</b>(default): widen each harmonic of the base function spectrum with the harmonic profile, by an amount controlled through the bandwidth setting and bandwidth scale.</li>
+        <li><b>Discrete</b>: similar to AddSynth, each harmonic is retained as a sharp line, not using bandwidth and profile, yet the overtones position can still be shifted and unharmonic.</li>
+        <li><b>Continuous</b>: likewise ignoring bandwidth and profile, but this time taken to the other extreme; the <em>outline</em> of all harmonics is connected into a common distribution and thus rendered into a form of coloured noise.</li>
+    </ul>
     <br>
+    <b>Overtones Position</b> Since PadSynth re-renders the partials with high resolution, it is possible to shift overtones to non-harmonic positions, to create a wide array of metallic and noisy flavours. For <em>Harmonic</em> there is no control, so the other parameters are inactive. Similarly Par&nbsp;2 does nothing for <em>Shift</em> so is disabled for that variation.
+    <ul><li><b>Harmonic</b>(default): Overtones are located at exact multiples of the base frequency.</li>
+        <li><b>Shift</b>: all overtones are spread towards higher pitches</li>
+        <li><b>Power</b>: here the spread is guided by a power function and thus increases excessively for higher harmonics;<br/>par2 defines the exponent (i.e. the acceleration)</li>
+        <li><b>ShiftU</b> / <b>ShiftL</b>: par2 defines a threshold, harmonics above are spread or condensed</li>
+        <li><b>PowerU</b>: par1 defines a turning point, par2 the strength of the effect;<br/>harmonics are condensed around the turning point by a power function</li>
+        <li><b>PowerL</b>: par1 controls a linear blend between the harmonic positions and positions shifed by a power function;<br/>harmonics are here spread away from a fixed turning point at the 10-th overtone</li>
+        <li><b>Sine</b>: harmonics are alternatingly shifted up or down, causing them to cluster;<br/>par2 defines the frequency and thus the density of these overtone clusters</li>
+    </ul>
+    <br>
+    <b>Par 1</b> spreads the harmonics according to the 'position' type.
+    <br>
+    <b>Par 2</b> provides a further variation on the harmonics spread, depending on type.
+    <br><br>
+    <b>ForceH</b> moves the shifted harmonics by a variable amount back towards the nearest actual multiple of the fundamental. This allows to reduce and fine-tune the actual amount of <em>noisiness</em>
+    </div>
+    <br/><br/>
     <b>Note</b>
     <div class="tab">
-    If any of the above controls for the harmonic profile are altered it will be necessary to rebuild the wavetables to hear the effect. Also, be aware that with a very big sample size and/or octave range and samples/octave this could take many seconds to complete. Yoshimi provides several modes to handle these PadSynth wavetable builds, which can be configured in the <a href="../config/config.html">Global Settings</a>
-    <ul><li>Mute: build is triggered manually with the Apply button &mdash; disable part while wavetable is assembled.<br/>This is the <em>legacy mode</em> and should be used if the other modes cause audible clicks.</li>
-        <li>Background(default): build triggered manually &mdash; continue using old wavetables while building the new ones in the background; smooth transition with crossfade when ready.</li>
-        <li>Auto-Apply: automatically launch a wavetable build whenever a parameter is changed.</li>
+    <a id="ApplyChanges"><b>Apply Changes</b></a>: If any of the above controls for the harmonic profile are altered it will be necessary to rebuild the wavetables to hear the effect. Also, be aware that with a very big sample size and/or octave range and samples/octave this could take many seconds to complete. Yoshimi provides several modes to handle these PadSynth wavetable builds, which can be configured in the <a href="../config/config.html#PadSynthApply">Global Settings</a>
+    <ul><li><b>Mute</b>: build is triggered manually with the Apply button &mdash; disable part while wavetable is assembled.<br/>This is the <em>legacy mode</em> and should be used if the other modes cause audible clicks.</li>
+        <li><b>Background</b>(default): build triggered manually &mdash; continue using old wavetables while building the new ones in the background; smooth transition with crossfade when ready.</li>
+        <li><b>Auto-Apply</b>: automatically launch a wavetable build whenever a parameter is changed.</li>
     </ul>
     </div>
     </p>

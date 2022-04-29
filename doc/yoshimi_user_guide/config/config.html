@@ -19,15 +19,15 @@
     <br><br>
     <b>Internal Buffer Size</b> Lower values will give lower latency and more accurate resolution, but at the cost of CPU loading. We recommend you keep this as low as possible without getting Xruns.
     <br><br>
-    <b>PadSynth Interpolation</b> For those with good hearing at high pitches, setting this to 'Cubic' will give very slightly better results, but it is slower to operate.
+    <a id="PadSynthInterpolation"><b>PadSynth Interpolation</b></a> Relevant when transposing to notes far away from the nominal frequency of the wavetable. For those with good hearing at high pitches, setting this to 'Cubic' will give very slightly better results, but it is slower to operate.
     <br><br>
-    <b>PadSynth Wavetable Build Mode</b> Wavetable build and application method.
+    <a id="PadSynthApply"><b>PadSynth Wavetable Build Mode</b></a> Wavetable <a href="../pad/pad.html#ApplyChanges">build and application method</a>.
     <div class="tab">
     Mute - disable part while wavetable is assembled. Unmute when ready to be applied.
     <br>
-    Background - continue using old wavetable until new one is ready to be applied.
+    Background - continue using old wavetable until new one is ready to be applied, use cross-fade.
     <br>
-    Auto-Apply - continue using old wavetable. Apply new one when ready.
+    Auto-Apply - automatically build new wavetable on changes. Fade to new one when ready.
     </div>
     <br>
     <b>Virtual Keyboard Layout</b> You can have various standard layouts, when using the virtual keyboard, and this lets you select the most common.

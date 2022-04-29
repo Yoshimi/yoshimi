@@ -234,11 +234,11 @@ class PADnoteParameters : public Presets
         // or shifted away for distorted spectrum
         // see calcHarmonicPositionFactor(partial)
         struct HarmonicPos {
-            unsigned char type = 0;
-            unsigned char par1 = 64;
-            unsigned char par2 = 64;
-            unsigned char par3 = 0; // 0..255
-
+            unsigned char type = 0;  // harmonic,ushift,lshift,upower,lpower,sine,power,shift
+            unsigned char par1 = 64; // strength of the shift
+            unsigned char par2 = 64; // depending on type, defines threshold, exponent or frequency
+            unsigned char par3 = 0;  // forceH : increasingly shift towards next harmonic position
+                                     // these params are 0..255
             void defaults();
         };
 

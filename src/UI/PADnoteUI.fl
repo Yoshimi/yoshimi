@@ -910,7 +910,7 @@ class PADnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Dial randWalkProfileWidth {
-          label {Profile Width}
+          label {Line Width}
           callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::randWalkProfileWidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Profile width parameter random walk on wavetable rebuild, within this spread..} xywh {100 85 30 30} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1

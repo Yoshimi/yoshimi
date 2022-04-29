@@ -12,21 +12,23 @@
     <h2 style="text-align: center">Random Walk</h2>
     <img src="images/padrandom.png" alt="random walk window" class="image">
     <p>
-    <b>Retrigger</b> The time between changes from 0mS to 60S. Zero disables retriggering completely.
+    The sound from PadSynth can be soft and scintillating, yet after playing some time, you will notice recurring patterns. This is due to the fixed wavetables, which are built once and then looped over and over again, for performance reasons. However &mdash; each new set of wavetables will re-shuffle the phase information randomly, and so we'll get a completely new patterning, whenever building all wavetables from scratch. This is an expensive operation, but fortunately it suffices to do it occasionally.
+    <br><br>
+    <b>Retrigger</b> The sample time before recomputing, from 200ms to 60sec.<br/>Zero (left) disables retriggering completely.
     <br><br>
     At the above times the settings of the following controls will be read. They each randomly change one characteristic of the wavetable by a varable amount between 0 (off) and 599%
     </p>
     <p>
     <div class="tab">
-    <b>Profile Width</b>
+    <b>Detune</b>: slightly change the note pitch
     <br><br>
-    <b>Profile Stretch</b>
+    <b>Filter freq</b>: nominal frequency of the filter, rsp. vowel position of the formant filter
     <br><br>
-    <b>Detune</b>
+    <b>Bandwidth</b>: spread of the harmonic profile
     <br><br>
-    <b>Filter freq</b>
+    <b>Line Width</b>: width of a single peak within the profile
     <br><br>
-    <b>Bandwidth</b>
+    <b>Profile Stretch</b>: stretch out and modulate
     </div>
     </p>
     <p>

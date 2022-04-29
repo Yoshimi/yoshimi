@@ -570,7 +570,7 @@ static std::string padsynthlist [] = {
     "RWDetune <n>",             "random walk spread of voice detune on re-triggered build (0:off 96 factor 2)",
     "RWBandwidth <n>",          "random walk spread of line bandwidth",
     "RWFilterFreq <n>",         "random walk spread of filter cutoff frequency",
-    "RWWidthProfile <n>",       "random walk spread of profile width",
+    "RWWidthProfile <n>",       "random walk spread of profile line width",
     "RWStretchProfile <n>",     "random walk spread of profile modulation stretch",
 
     "APply",                    "puts latest changes into the wavetable",
