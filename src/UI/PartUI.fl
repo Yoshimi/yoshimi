@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -404,9 +404,28 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {80 60 17 17} box THIN_UP_BOX color 237
       }
       Fl_Group partgroupui {
-        xywh {0 0 378 168}
+        xywh {0 0 378 168} box FLAT_BOX
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
+        Fl_Box instrumentaddbox {
+          xywh {136 5 63 16} box FLAT_BOX
+        }
+        Fl_Box instrumentsubbox {
+          xywh {199 5 63 16} box FLAT_BOX
+        }
+        Fl_Box instrumentpadbox {
+          xywh {262 5 62 16} box FLAT_BOX
+        }
+        Fl_Button instrumentlabel {
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 2 192 22} box NO_BOX labelsize 12 align 16
+          code0 {setinstrumentlabel();}
+        }
+        Fl_Box {} {
+          xywh {4 2 134 22} box FLAT_BOX
+        }
+        Fl_Box {} {
+          xywh {322 2 56 22} box FLAT_BOX
+        }
         Fl_Button partedit {
           label Edit
           callback {//
@@ -500,18 +519,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         }}
           xywh {330 2 42 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
-        Fl_Box instrumentaddbox {
-          xywh {136 5 63 16} box FLAT_BOX
-        }
-        Fl_Box instrumentsubbox {
-          xywh {199 5 63 16} box FLAT_BOX
-        }
-        Fl_Box instrumentpadbox {
-          xywh {262 5 62 16} box FLAT_BOX
-        }
-        Fl_Button instrumentlabel {
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 20} box THIN_DOWN_FRAME labelsize 12 align 16
-          code0 {setinstrumentlabel();}
+        Fl_Box {} {
+          xywh {137 5 186 16} box THIN_DOWN_FRAME
         }
         Fl_Button buttontop {
           callback {//
@@ -532,7 +541,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 20} box THIN_DOWN_FRAME labeltype NO_LABEL labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 2 192 22} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Dial velocitysense {
           label {Vel. Sens}

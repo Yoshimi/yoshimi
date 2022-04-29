@@ -189,7 +189,7 @@ static std::string configlist [] = {
     "Oscillator <n>",      "* Add/Pad size (power 2 256-16384)",
     "BUffer <n>",          "* internal size (power 2 16-4096)",
     "PAdsynth [s]",        "interpolation type (Linear, other = cubic)",
-    "BUIldpad [s]",        "PADSynth wavetable build (Muted, Background, Autoapply)",
+    "BUIldpad [s]",        "PADSynth wavetable build mode (Muted, Background, Autoapply)",
     "Virtual <n>",         "keyboard (0 = QWERTY, 1 = Dvorak, 2 = QWERTZ, 3 = AZERTY)",
     "Xml <n>",             "compression (0-9)",
     "REports [s]",         "destination (Stdout, other = console)",
@@ -879,7 +879,7 @@ static std::string dynfilterlist [] = {
     "SENsitivity <n>",  "amount amplitude changes filter",
     "INVert <s>",       "reverse effect of sensitivity (ON {other})",
     "RATe <n>",         "speed of filter change with amplitude",
-    "FILter ...",       "enter dynamic filter context",
+    "FILter ...",       "enter dynamic filter context - ? FIL for controls",
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
     "@end","@end"

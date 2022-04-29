@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0305
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -515,7 +515,7 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {1145 352 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -526,7 +526,7 @@ class MasterUI {: {private GuiUpdates}
         class KeyHandle
       }
       Fl_Box topcontrols {
-        xywh {270 28 110 115} box ENGRAVED_FRAME
+        xywh {271 28 111 115} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
         callback {//
@@ -999,21 +999,21 @@ class MasterUI {: {private GuiUpdates}
         }
       }
       Fl_Group syseffectuigroup {
-        xywh {3 188 378 95} box FLAT_BOX color 48 labeltype NO_LABEL
+        xywh {3 188 379 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
         Fl_Group syseffectui {
-          xywh {3 188 378 95} labeltype NO_LABEL
+          xywh {3 188 379 95} labeltype NO_LABEL
           code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
           class EffUI
         } {}
       }
       Fl_Group inseffectuigroup {
-        xywh {3 188 378 95} box FLAT_BOX color 48
+        xywh {3 188 379 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
         Fl_Group inseffectui {
-          xywh {3 188 378 95} color 52
+          xywh {3 188 379 95} color 52
           code0 {o->init(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
@@ -1081,7 +1081,7 @@ class MasterUI {: {private GuiUpdates}
         int nval = o->value() - 1;
         activePart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 294 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
+        xywh {36 294 40 22} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -1099,7 +1099,7 @@ class MasterUI {: {private GuiUpdates}
                 tmp = 32;
         }
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Set the number of available parts} xywh {93 294 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
+        tooltip {Set the number of available parts} xywh {93 294 40 22} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
         class WidgetSpinner
       }
@@ -3027,7 +3027,7 @@ Alan Calvert started the project}
     int nval = _npart;
     partuigroup->remove(partui);
     delete partui;
-    partui = new PartUI(3, 285, 380, 170);
+    partui = new PartUI(3 * mainScale, 285 * mainScale, 380 * mainScale, 170 * mainScale);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->groupRtext(mainScale);

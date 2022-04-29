@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0308
+version 1.0305
 header_name {.h}
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -174,7 +174,7 @@ alsaTab->hide();}
             code1 {o->value(synth->getRuntime().Interpolation);}
           } {}
           Fl_Choice handlePadSynthBuild {
-            label {Build PadSynth Wavetable}
+            label {PadSynth Wavetable Build Mode}
             callback {//
                         send_data(0, CONFIG::control::handlePadSynthBuild, o->value(), TOPLEVEL::type::Integer);}
             tooltip {How to rebuild wavetable after changes: Trigger manually and mute part (legacy), build in background and activate when ready, or automatically trigger background build on each parameter change (expensive)} xywh {245 106 105 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 12

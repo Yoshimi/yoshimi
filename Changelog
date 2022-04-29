@@ -1,5 +1,11 @@
 yoshimi 2.2.0 rc0
 
+2022-4-29 Will
+bn2124
+* GUI main window adjustments.
+* doc updates.
+* User Guide updates.
+
 2022-4-28 Will
 bn2123
 * Reverted Resonance undo speedup test - caused odd issues.

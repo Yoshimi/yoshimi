@@ -7158,7 +7158,7 @@ void InterChange::undoRedoClear(void)
     noteSeen = false;
     undoLoopBack = false;
     undoStart = false;
-    std::cout << "Undo/Redo cleared" << std::endl;
+//    std::cout << "Undo/Redo cleared" << std::endl;
 }
 
 
