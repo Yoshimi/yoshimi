@@ -28,13 +28,13 @@
     <br><br>
     <b>Width</b> (spread) of a single peak within the profile.
     <br><br>
-    <b>FreqMlt</b> Repeat the same base shape multiple times in the generated profile.
+    <b>Repeat</b> Repeat the same base shape multiple times in the generated profile.
     <br><br>
     <b>Str</b> Modulate and spread the base shape, thereby creating several <em>side bands</em> with frequency shifted slightly above / below the centre &mdash; side bands create a chorus like quality.
     <br><br>
-    <b>SFreq</b> Increase the frequency of this modulation to increase the density of side bands.
+    <b>Freq</b> Increase the frequency of this modulation to increase the density of side bands.
     <br><br>
-    <b>Size</b> The profile as a whole can be stretched or squeezed by this parameter. <br/>Note: when AutoScale is on (see below), the effect of this parameter is almost completely compensated.
+    <b>Scale</b> The profile as a whole can be stretched or squeezed by this parameter. <br/>Note: when AutoScale is on (see below), the effect of this parameter is almost completely compensated.
     <br><br>
     <b>Profile</b> Which part of the profile to use: Full (default), or only the upper or lower half.
     <br><br>
@@ -91,7 +91,7 @@
     (bottom)
     <div class="tab">
     <b>Spectrum Mode</b> defines the way how PadSynth generates the spectrum, which is then rendered into wavetables.
-    <ul><li><b>Bandwidth</b>(default): widen each harmonic of the base function spectrum with the harmonic profile, by an amount controlled through the bandwidth setting and bandwidth scale.</li>
+    <ul><li><b>Bandwidth</b>(default): widen each harmonic of the base waveform spectrum with the harmonic profile, by an amount controlled through the bandwidth setting and bandwidth scale.</li>
         <li><b>Discrete</b>: similar to AddSynth, each harmonic is retained as a sharp line, not using bandwidth and profile, yet the overtones position can still be shifted and unharmonic.</li>
         <li><b>Continuous</b>: likewise ignoring bandwidth and profile, but this time taken to the other extreme; the <em>outline</em> of all harmonics is connected into a common distribution and thus rendered into a form of coloured noise.</li>
     </ul>
@@ -106,7 +106,7 @@
         <li><b>Sine</b>: harmonics are alternatingly shifted up or down, causing them to cluster;<br/>par2 defines the frequency and thus the density of these overtone clusters</li>
     </ul>
     <br>
-    <b>Par 1</b> spreads the harmonics according to the 'position' type.
+    <b>Par 1</b> spreads the harmonics according to the 'Overtones Position' type.
     <br>
     <b>Par 2</b> provides a further variation on the harmonics spread, depending on type.
     <br><br>
