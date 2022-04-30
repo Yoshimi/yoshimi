@@ -1,7 +1,13 @@
+-------- Mailing List Message ------------------------------------
+Subject: [Yoshimi-devel] PADSynth background rebuild ("padthread")
+Date: Mon, 31 Jan 2022 04:20:52 +0100
+From: Ichthyostega <prg@ichthyostega.de>
+To: Yohimi-developers <yoshimi-devel@lists.sourceforge.net>
+
+
 At 15.12.21 at 13:22 Will Godfrey wrote:
 > This now has an auto apply feature fairly well implemented.
 > However it will crash on extreme wavetable sizes (I don't know why yet).
-
 
 
 Hello Yoshimi developers,
@@ -26,7 +32,7 @@ What do we hope to achieve?
 
 The PADSynth is based on a exceptionally fine-grained spectrum distribution
 and uses a huge Fast-Fourier-Transform operation to generate a likewise large
-but perfectly looped wavetable. The generated sound is conceptionally equivalent
+yet perfectly looped wavetable. The generated sound is conceptionally equivalent
 to results produced by "granular synthesis".
 
 Rendering this huge spectrum is a compute intensive task, and can
@@ -84,22 +90,22 @@ based on some implied condition detected from magic markers.
 
 Moreover Yoshimi uses effectively global yet mutable state even where
 this wouldn't be necessary, and this state is often manipulated from
-a totally remote code location by grabbing into the innards of some
-seemingly unrelated facility. There is often no notion of ownership
-or hierarchy, parts are mutually dependent and have to be bootstrapped
+a totally remote code location by grabbing into the innards of another
+seemingly unrelated facility. There is often no notion of ownership or
+hierarchy, parts are mutually dependent and have to be bootstrapped
 and initialised in a very specific order.
 
 Thus, to extract some functionality and perform it in a different and
 effectively non-deterministic order, we're bound to trace down and
-understand lots of details meticulously to identify which parts should
-be rearranged and disentangled.
+understand lots of details meticulously to identify which parts
+can be rearranged or need to be disentangled.
 
-A further challenge arises from constraints imposed by the lib FFTW3,
+A further complication arises from constraints imposed by the lib FFTW3,
 which Yoshimi relies on to implement the Fast Fourier Transform operation.
 This library in itself is very elaborate and flexible and meanwhile has
 been adapted to allow concurrent and re-entrant calculations, albeit
 with very strictly delineated prerequisites -- which the existing usage
-in Yoshimi did not need to fulfil, since it operated based on the
+in Yoshimi did not need to fulfil, since up to now it operated on the
 assumption of a single deterministic computation path.
 
 The necessary changes were especially related to the feature of a "FFT
@@ -118,31 +124,32 @@ similar plan definitions behind the scenes (and this caching seems to be one
 of the reasons why the setup of such FFT plans interferes with other concurrent
 memory management operations.
 
-To overcome this discrepancy, we had to overturn and rearrange all memory
-management related to spectrum and waveform data. The FFT plans are now
-prepared at first usage and shared by all further calculations, while the
-spectrum data is now arranged in memory right from start in the specific order
-required by the Fast Fourier algorithm, and with appropriate alignment to allow
-for SIMD optimisation. Thus the transform calculation can now be invoked
-directly on the working data within OscilGen or the PADnoteParameters, instead
-of allocating a shared data block and copying and rearranging the spectrum
-coefficients for each invocation (as it was done previously). To carry out this
-tricky refactoring safely, we relied on the help by the compiler: Spectrum and
-Waveform data is now encapsulated into a data holder object (based on a single-
-ownership smart-pointer); various function signatures within OscilGen and
-SynthEngine have been converted step by step from using raw and unbounded float*
-to accepting these new data holder types.
+To overcome these difficulties, we had to overturn and rearrange all memory
+management related to spectrum and waveform data -- to get reliable control
+over the actual allocations and change the point in time when allocations are
+workable. So the FFT plans are now prepared at first usage and shared by all
+further calculations, while spectrum data is now arranged in memory right from
+start in the very specific order required by the Fast Fourier algorithm, and
+with appropriate alignment to allow for SIMD optimisation. Thus the transform
+calculation can now be invoked directly on the working data within OscilGen or
+the PADnoteParameters, instead of allocating a shared data block and copying
+and rearranging the spectrum coefficients for each invocation (as it was done
+as of yet). To carry out this tricky refactoring safely, we relied on the help
+by the compiler: Spectrum and Waveform data became encapsulated into a data holder
+object (based on a single-ownership smart-pointer); various function signatures
+within OscilGen and SynthEngine have been converted step by step from using raw
+and unbounded float* to accepting these new data holder types.
 
 
 ===========================================================================
 Implementation of PADSynth background builds
 
-Whenever a new instrument involving PADSynth Kit-Items is loaded, and when
-the user hits the "Apply" button in the PAD editor, or when the new »auto-Apply«
-feature detects relevant parameter changes, a background build is triggered.
-Further changes during an ongoing build will cause that build to start over
-from scratch (but in the case of »auto-Apply« with a short delay to combine
-several change messages caused from dragging the sliders in the GUI)
+Whenever a new instrument involving PADSynth Kit-Items is loaded, and also when
+the user hits the "Apply" button in the PAD editor, or by the new »auto-Apply«
+feature detecting relevant parameter changes, a background build is triggered.
+Further changes during ongoing builds will cause these to start over afresh --
+however in the case of »auto-Apply« with a short delay to integrate several
+change messages caused from dragging the sliders in the GUI.
 
 The data storage for the PADSynth wavetables was likewise encapsulated into
 a new data holder type "PADtables", which can be moved only (single ownership).
@@ -168,4 +175,63 @@ both of the actual data type to transport (which is the PADtables) and the
 actual scheduler backend implementation to use, allowing to tweak and evolve
 those parts independently as we see fit.
 
--- Hermann
+===========================================================================
+Integration and Extensions: Cross-Fade and Random Walk
+
+[30.4.2022: added these explanations]
+
+While "a transition by cross fade" might be deemed simple at first sight,
+it turned out as rather tricky on close investigation, because cross-fading
+is an ongoing task and need to be interwoven with the actual sound computation
+on the inner processing loop. It would be a simple addition indeed within a
+processing architecture based on processing tasks and a scheduler -- Yoshimi
+however takes the opposite ascent with a single top-down compute-buffer call,
+handling any variations by pre-coded forking in the computation path. Moreover,
+the concept of a "note" was shaped rather accidentally and then extended by
+copy-n-paste to SUBnote and PADnote after the fact. And so, especially for
+PADSynth, there is no room between the triggering of a note instance within
+Part.cpp, and the actual low-level wavetable based sample computation.
+
+Duplicating this sample computation code into a cross-fading version was not
+deemed acceptable, and directly hooking the cross fade into the computation
+was not even considered (for obvious performance reasons). Which leaves the
+option of abstracting out the actual computation as a wavetable interpolator
+component, which can then be wired either directly, or combined with a fade.
+The details of this refactoring however turn out to be quite involved, since
+a set of wavetables is maintained for each PADSynth kit-item in its own
+PADnoteParameters object, which in turn can be shared by multiple note
+instances, which additionally can also be legato or portamento notes.
+
+The "check point" for integrating a newly built set of wavetables is at the
+begin of the buffer computation cycle for some note, and this might happen
+at any point and for any note right in the middle of the overall calculation
+call. At this point, a new XFadeManager component was added, to take hold of
+the old wavetable, mark an ongoing cross-fade and keep track of all users
+through reference counting. This could have been implemented by just using
+a std::shared_ptr -- but this idea was rejected, since shared_ptr uses
+atomic locks for coordination, which might add a considerable overhead
+within the inner processing loop, and thus would necessitate extended
+investigation and timing measurements to be safe -- on the other hand,
+the actual SynthEngine code is known to run entirely single threaded,
+and to fit in with that image, even the note-initialisation of PADnotes
+has now be moved over into the Synth thread to forego any necessitation
+of thread synchronisation (beyond the FutureBuild used for handing in
+the new wavetables).
+
+In listening tests it turned out that a simple linear crossfade is not sufficient
+at this point, since the waveform of old and new wavetables typically show very
+low correlation (due to the randomised phases). Thus an equal-power mix seems
+adequate. Moreover, even such a mix would still be noticeable as a "manipulation",
+and for that reason, a typical S-Fade edit curve was devised, and combined with
+segment-wise linear interpolation, so to compute the expensive square root for
+the equal power mix only once per block.
+
+And finally, after having built all this scaffolding, it became simple to add
+a user-visible new feature on top, which hopefully expands the musical viability
+of PADSynth: it is now possible to re-trigger this background build process
+periodically, and even to perform a classical random walk on some parameters,
+to break the subtle trait of "sameness", which, after playing for some time,
+arises from the fixed wavetables. Even while the sound superficially might
+seem random, in fact the patterns repeat after some time; but rebuilding
+a new set of wavetables will completely re-shuffle all phases and thereby
+randomise the patterning in the sound.
