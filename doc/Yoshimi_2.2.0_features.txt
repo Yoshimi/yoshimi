@@ -2,7 +2,7 @@ Version 2.2.0
 
 A major feature is the revision of the PadSynth engine incuding the following:
 A new mode control in 'Settings' gives 'Muted', 'Background' and 'Auto-Apply'
-'Muted' is the old form where the part is disable while the wavetable is being built.
+'Muted' is the old form where the part is disabled while the wavetable is being built.
 'Background' (the new default) allows you to continue using the exisiting wavetable until the new one is built, then makes it available to apply - this will then be done seamlessly.
 'Auto-Apply' as the name suggests will seamlessly apply the wavetable once it is ready.
 

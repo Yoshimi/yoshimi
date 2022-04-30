@@ -13,7 +13,7 @@
     <img src="images/padharmonic.png" alt="PadSynth Harmonics Window" class="double">
     <img src="images/padenvelope.png" alt="PadSynth Envelopes Window" class="double">
     <p>
-    The PadSynth engine was designed by Paul Nasca and to the best of our knowledge there is no comparable type generally available. It starts from a waveform that is virtually identical to the one used by AddSynth. However, each harmonic of this waveform is then widened and shifted and blurred, by rendering it with a <em>harmonic profile</em> (Frequency Distribution). The resulting sound is similar to Granular Synthesis, but can be generated very efficiently from a set of perfectly looping wavetables. These wavetables need to be precomputed after change, and so none of the harmonic profile controls are real-time. Also, it is the wavetables that are called for actual sound generation after passing through the usual envelope controls (and this part of sound generation does work real-time).
+    The PadSynth engine was designed by Paul Nasca and to the best of our knowledge there is no comparable type generally available. It starts with a waveform that is virtually identical to the one used by AddSynth. However, each harmonic of this waveform is then widened and shifted and blurred, by rendering it with a <em>harmonic profile</em> (Frequency Distribution). The resulting sound is similar to Granular Synthesis, but can be generated very efficiently from a set of perfectly looping wavetables. These wavetables need to be precomputed after a change, so none of the harmonic profile controls are real-time. Also, it is the wavetables that are called for actual sound generation after passing through the usual envelope controls (and this part of sound generation does work real-time).
     <br><br>
     There are two tabbed views in a single window. You will normally be shown the harmonic structure, the envelopes one (as it's name suggests) consisting mostly of envelope and LFO inserts.
     </p>
@@ -21,7 +21,7 @@
     <h3>Harmonic Structure</h3>
     (left side)
     <br><br>
-    The way some of these controls operate is rather obscure. While making dramatic changes to the visual aspect of the harmonic profile, the effect on the sound is often quite subtle. Generally speaking, when widening a harmonic profile, the corresponding sound starts to beat and fluctuate irregularly, like a swarm of bees hovering around common focal points.
+    The way some of these controls operate is rather obscure. The effect on the sound is often quite subtle, while making dramatic changes to the visual aspect of the harmonic profile. Generally speaking, when widening a harmonic profile, the corresponding sound starts to beat and fluctuate irregularly, like a swarm of bees hovering around common focal points.
     <br><br>
     <div class="tab">
     <b>Base Type</b> Base shape used to widen and spread each harmonic: Gauss, Square or Double Explonential.
@@ -40,7 +40,7 @@
     <br><br>
     <b>AmpMultiplier</b> Apply a secondary modulation on top of the profile built thus far;<br/>the modulating shape can be a bell function (Gauss), a Sine wave or just a plateau in the centre (Flat).
     <br><br>
-    <b>AmpMode</b> The way how this secondary modulation is worked into the profile.
+    <b>AmpMode</b> The way this secondary modulation is worked into the profile.
     <ul><li><b>Sum</b>: a linear blend between the secondary modulator, and the original profile; the fade is controlled by par2</li>
         <li><b>Multiply</b>: the profile is filtered by (multiplied with) the modulator; the strength of filtering is controlled by par2</li>
         <li><b>Div1</b>: the profile is divided by the modulator &mdash; where the latter is strong, the profile is damped</li>
@@ -90,7 +90,7 @@
     <p>
     (bottom)
     <div class="tab">
-    <b>Spectrum Mode</b> defines the way how PadSynth generates the spectrum, which is then rendered into wavetables.
+    <b>Spectrum Mode</b> defines the way PadSynth generates the spectrum, which is then rendered into wavetables.
     <ul><li><b>Bandwidth</b>(default): widen each harmonic of the base waveform spectrum with the harmonic profile, by an amount controlled through the bandwidth setting and bandwidth scale.</li>
         <li><b>Discrete</b>: similar to AddSynth, each harmonic is retained as a sharp line, not using bandwidth and profile, yet the overtones position can still be shifted and unharmonic.</li>
         <li><b>Continuous</b>: likewise ignoring bandwidth and profile, but this time taken to the other extreme; the <em>outline</em> of all harmonics is connected into a common distribution and thus rendered into a form of coloured noise.</li>
@@ -110,7 +110,7 @@
     <br>
     <b>Par 2</b> provides a further variation on the harmonics spread, depending on type.
     <br><br>
-    <b>ForceH</b> moves the shifted harmonics by a variable amount back towards the nearest actual multiple of the fundamental. This allows to reduce and fine-tune the actual amount of <em>noisiness</em>
+    <b>ForceH</b> moves the shifted harmonics by a variable amount back towards the nearest actual multiple of the fundamental. This allows you to reduce and fine-tune the actual amount of <em>noisiness</em>
     </div>
     <br/><br/>
     <b>Note</b>
@@ -118,7 +118,7 @@
     <a id="ApplyChanges"><b>Apply Changes</b></a>: If any of the above controls for the harmonic profile are altered it will be necessary to rebuild the wavetables to hear the effect. Also, be aware that with a very big sample size and/or octave range and samples/octave this could take many seconds to complete. Yoshimi provides several modes to handle these PadSynth wavetable builds, which can be configured in the <a href="../config/config.html#PadSynthApply">Global Settings</a>
     <ul><li><b>Mute</b>: build is triggered manually with the Apply button &mdash; disable part while wavetable is assembled.<br/>This is the <em>legacy mode</em> and should be used if the other modes cause audible clicks.</li>
         <li><b>Background</b>(default): build triggered manually &mdash; continue using old wavetables while building the new ones in the background; smooth transition with crossfade when ready.</li>
-        <li><b>Auto-Apply</b>: automatically launch a wavetable build whenever a parameter is changed.</li>
+        <li><b>Auto-Apply</b>: automatically launch a wavetable build whenever a parameter is changed, then crossfade when ready.</li>
     </ul>
     </div>
     </p>
