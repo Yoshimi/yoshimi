@@ -1272,36 +1272,43 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::xFadeUpdate:
+            type |= learnable;
             def = 200;
             max = 20000;
             break;
 
         case PADSYNTH::control::rebuildTrigger:
+            type |= learnable;
             def = 0;
             max = 60000;
             break;
 
         case PADSYNTH::control::randWalkDetune:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkBandwidth:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkFilterFreq:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkProfileWidth:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkProfileStretch:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
