@@ -1,0 +1,26 @@
+Mostly songbirds and often with an added byline :)
+
+1.3.8  The Swan
+1.3.9  Skylark
+1.4.0  Diamond Dove
+1.4.1  Lyrebird
+1.5.0  The Robin
+1.5.1  Jenny Wren
+1.5.2  Goldfinch
+1.5.3  Swift
+1.5.4  Blackbird
+1.5.5  Mistle Thrush
+1.5.6  Fieldfare
+1.5.7  Nightingale
+1.5.8  Kingfisher
+1.5.9  Sparrow
+1.5.10 Redwing
+1.5.11 Waxwing
+
+Only doing the more signifiant releases from here on.
+1.6.0  Reed Warbler
+1.7.0  Pipit
+2.0 Northern Cardinal
+2.1.0 Marsh Warbler
+
+2.2.0 ?

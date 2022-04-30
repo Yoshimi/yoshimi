@@ -28,7 +28,7 @@ e.g. on entry
 This would return 127 - the input value adusted to the maximium for master volume.
 
 
-TODO
+TODO - still not extended in 2022 :(
 
 If an out of range setting is found part way along a command chain. 'value' should be set to the byte number where the error was encountered and 'type' bit 4 should be set, otherwise it should be cleared.
 

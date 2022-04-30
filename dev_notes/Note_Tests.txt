@@ -1,3 +1,4 @@
+
 This is a new test facility for checking note on and note off behaviour. It is disabled by default and enabled at compile time in ccmake as "ReportNotes".
 
 When enabled it continually checks that all notes at their entry to Yoshimi are passed on the the actual note on/off code and reports any differences to the reports console or stdio (whichever is selected).
