@@ -480,7 +480,7 @@ float PADnoteParameters::calcHarmonicPositionFactor(float n)
     float offset = 0.0;
     switch (Phrpos.type)
     {
-    case 1:
+    case 1: //  "ShiftU"
         thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
             offset = n;
@@ -488,7 +488,7 @@ float PADnoteParameters::calcHarmonicPositionFactor(float n)
             offset = n + (n - thresh) * par1 * 8.0f;
         break;
 
-    case 2:
+    case 2: //  "ShiftL"
         thresh = int(par2 * par2 * 100.0f);
         if (n < thresh)
             offset = n;
@@ -496,31 +496,31 @@ float PADnoteParameters::calcHarmonicPositionFactor(float n)
             offset = n - (n - thresh) * par1 * 0.90f;
         break;
 
-    case 3:
+    case 3: //  "PowerU"
         scale = par1 * 100.0f + 1.0f;
         offset = powf(n / scale, (1.0f - par2 * 0.8f)) * scale;
         break;
 
-    case 4:
+    case 4: //  "PowerL"
         offset = n * (1.0f - par1) + powf(n * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f;
         break;
 
-    case 5:
+    case 5: //  "Sine"
         offset = n + sinf(n * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f;
         break;
 
-    case 6:
+    case 6: //  "Power"
         scale = powf((par2 * 2.0f), 2.0f) + 0.1f;
         offset = n * powf(1.0f + par1 * powf(n * 0.8f, scale), scale);
         break;
 
-    case 7:
+    case 7: //  "Shift"
         scale = 1.0f + Phrpos.par1 / 255.0f;
         offset = n / scale;
         break;
 
-    default:
-        // undistorted. n=0 => factor=1.0 (corresponding to the base frequency)
+    default://  "Harmonic"
+           //    undistorted. n=0 => factor=1.0 (corresponding to the base frequency)
         offset = n;
         break;
     }
@@ -670,7 +670,7 @@ vector<float> PADnoteParameters::generateSpectrum_otherModes(float basefreq, siz
     }
 
     if (Pmode != 1)
-    {
+    {// if not "discrete", i.e. render "continuous" spectrum
         size_t old = 0;
         for (size_t k = 1; k < spectrumSize; ++k)
         {
@@ -1272,36 +1272,43 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::xFadeUpdate:
+            type |= learnable;
             def = 200;
             max = 20000;
             break;
 
         case PADSYNTH::control::rebuildTrigger:
+            type |= learnable;
             def = 0;
             max = 60000;
             break;
 
         case PADSYNTH::control::randWalkDetune:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkBandwidth:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkFilterFreq:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkProfileWidth:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
 
         case PADSYNTH::control::randWalkProfileStretch:
+            type |= learnable;
             def = 0;
             max = 127;
             break;
