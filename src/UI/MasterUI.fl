@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -1081,7 +1081,7 @@ class MasterUI {: {private GuiUpdates}
         int nval = o->value() - 1;
         activePart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 294 40 22} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
+        xywh {36 293 40 22} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -1099,7 +1099,7 @@ class MasterUI {: {private GuiUpdates}
                 tmp = 32;
         }
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Set the number of available parts} xywh {93 294 40 22} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
+        tooltip {Set the number of available parts} xywh {93 293 40 22} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
         class WidgetSpinner
       }

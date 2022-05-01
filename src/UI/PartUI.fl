@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -393,7 +393,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {selected : {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -404,20 +404,20 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {80 60 17 17} box THIN_UP_BOX color 237
       }
       Fl_Group partgroupui {
-        xywh {0 0 378 168} box FLAT_BOX
+        xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
         Fl_Box instrumentaddbox {
-          xywh {136 5 63 16} box FLAT_BOX
+          xywh {136 5 63 14} box FLAT_BOX
         }
         Fl_Box instrumentsubbox {
-          xywh {199 5 63 16} box FLAT_BOX
+          xywh {199 5 63 14} box FLAT_BOX
         }
         Fl_Box instrumentpadbox {
-          xywh {262 5 62 16} box FLAT_BOX
+          xywh {262 5 62 14} box FLAT_BOX
         }
         Fl_Button instrumentlabel {
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 2 192 22} box NO_BOX labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 18} box NO_BOX labelsize 12 align 16
           code0 {setinstrumentlabel();}
         }
         Fl_Box {} {
@@ -517,10 +517,10 @@ class PartUI {: {public Fl_Group, PartUI_}
             lastkey = -1;
             Showedit();
         }}
-          xywh {330 2 42 22} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
+          xywh {330 0 42 24} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Box {} {
-          xywh {137 5 186 16} box THIN_DOWN_FRAME
+          xywh {137 4 186 16} box THIN_DOWN_FRAME
         }
         Fl_Button buttontop {
           callback {//
@@ -541,7 +541,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 2 192 22} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 1 193 22} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Dial velocitysense {
           label {Vel. Sens}
