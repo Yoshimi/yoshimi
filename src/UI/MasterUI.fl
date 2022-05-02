@@ -1035,12 +1035,12 @@ class MasterUI {open : {private GuiUpdates}
           Fl_Dial partVol {
             label Volume
             callback {//
-    if (activePart >= panelgroup && activePart < (panelgroup + NUM_MIDI_CHANNELS))
+    if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
           setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-    send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);} selected
+    send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {335 327 32 32} labelsize 10 maximum 127 step 1
-            code0 {o->value(fetchData(0, PART::control::volume, activePart));}
+            code0 {o->value(fetchData(0, PART::control::volume, npart));}
             class WidgetPDial
           }
         }
@@ -2985,7 +2985,8 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {updatepanel(bool full = false)} {} {
+  Function {updatepanel(bool full = false)} {open
+  } {
     code {//
     for (int npart = 0; npart < partmax; ++npart)
     {
@@ -3038,7 +3039,8 @@ Alan Calvert started the project}
     };
     panelwindow->changed();} {}
   }
-  Function {partNew(int _npart)} {} {
+  Function {partNew(int _npart)} {open
+  } {
     code {//
     int nval = _npart;
     partuigroup->remove(partui);
@@ -3054,9 +3056,12 @@ Alan Calvert started the project}
     updatelistitem(npart);
     updatelistitem(nval);
     activePart = nval;
-    npart = nval;} {}
+    npart = nval;
+    partVol->value(synth->part[npart]->Pvolume);} {selected
+    }
   }
-  Function {updatepart()} {} {
+  Function {updatepart()} {open
+  } {
     code {//
     if (checkmaxparts())
     {
