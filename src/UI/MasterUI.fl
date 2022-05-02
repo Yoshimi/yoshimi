@@ -516,9 +516,9 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }} open
-      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 resizable
+      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -1032,10 +1032,14 @@ class MasterUI {open : {private GuiUpdates}
         Fl_Group partControls {open
           xywh {3 286 378 175}
         } {
-          Fl_Dial that {
-            label This
-            callback {send_data(0, PART::control::volume, o->value(), 128, activePart);} selected
-            xywh {345 318 32 32} labelsize 10 maximum 127 step 1
+          Fl_Dial partVol {
+            label Volume
+            callback {//
+    if (activePart >= panelgroup && activePart < (panelgroup + NUM_MIDI_CHANNELS))
+          setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
+
+    send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);} selected
+            xywh {335 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, activePart));}
             class WidgetPDial
           }
@@ -2194,7 +2198,7 @@ Alan Calvert started the project}
 
         collect_data(synth, value, action, type, control, part, UNUSED, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {open return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
@@ -2314,7 +2318,7 @@ Alan Calvert started the project}
                             partui->modulation->value(value);
                             break;
                         case MIDI::CC::volume:
-                            partui->partvol->value(vol);
+                            partVol->value(vol);
                             break;
                         case MIDI::CC::panning:
                             partui->partpan->value(value);
@@ -3071,7 +3075,7 @@ Alan Calvert started the project}
 
     partui->partGroupEnable->value(synth->partonoffRead(npart));
     partui->partpan->value(synth->part[npart]->Ppanning);
-    partui->partvol->value(synth->part[npart]->Pvolume);
+    partVol->value(synth->part[npart]->Pvolume);
     partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
     partui->velocitysense->value(synth->part[npart]->Pvelsns);
     partui->velocityoffset->value(synth->part[npart]->Pveloffs);
@@ -3441,7 +3445,7 @@ Alan Calvert started the project}
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
     if (_npart == npart)
-        partui->partvol->value(_value);} {}
+        partVol->value(_value);} {}
   }
   Function {setPartPanWidget(int _npart, float _value)} {} {
     code {//
@@ -3723,7 +3727,7 @@ bpmfallback->format(format);} {}
     int size12 = int(12 * mainScale);
 
     mastermenu->textsize(size12);
-    that->labelsize(size);
+    partVol->labelsize(size);
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
     mainvirtkeyb->labelsize(size11);

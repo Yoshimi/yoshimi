@@ -260,7 +260,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
 
-//        cout << "Con " << int(control) << "  Kit " << int(kititem) << "  Eng " << int(engine) << "  Ins " << int(insert) << endl;
+//    synth->CBtest(getData);
 
     if (control == TOPLEVEL::control::textMessage) // just show a non-modal message
     {

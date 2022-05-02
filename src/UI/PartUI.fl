@@ -572,18 +572,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
           code1 {o->value(part->Ppanning);}
           class WidgetPDial
         }
-        Fl_Dial partvol {
-          label Volume
-          callback {//;
-          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-          synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-          send_data(0, PART::control::volume, o->value(), 0);}
-          xywh {335 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(VC_PartVolume);}
-          code1 {o->value(part->Pvolume);}
-          class WidgetPDial
-        }
         Fl_Check_Button enportamento {
           label Portamento
           callback {//
@@ -1744,6 +1733,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                     synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
                 break;
             case PART::control::volume:
+                synth->getGuiMaster()->partVol->value(value);
                 synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
                 break;
             case PART::control::panning:
@@ -1854,10 +1844,6 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                 partkititem[kititem]->partkititemgroup->activate();
             else
                 partkititem[kititem]->clearLine();
-            break;
-
-        case PART::control::volume:
-            partvol->value(value);
             break;
 
         case PART::control::velocitySense:
@@ -3005,7 +2991,6 @@ class PartUI {selected : {public Fl_Group, PartUI_}
     velocityoffset->labelsize(size);
     velocitysense->labelsize(size);
     partpan->labelsize(size);
-    partvol->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
         midich->textsize(size11);
