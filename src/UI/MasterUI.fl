@@ -516,7 +516,7 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }} open
-      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {259 203 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -1041,6 +1041,17 @@ class MasterUI {open : {private GuiUpdates}
     send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {335 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
+            class WidgetPDial
+          }
+          Fl_Dial partPan {
+            label Panning
+            callback {//
+    if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+          setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
+
+    send_data(0, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);} selected
+            xywh {288 327 32 32} labelsize 10 maximum 127 step 1
+            code0 {o->value(fetchData(0, PART::control::panning, npart));}
             class WidgetPDial
           }
         }
@@ -2321,7 +2332,7 @@ Alan Calvert started the project}
                             partVol->value(vol);
                             break;
                         case MIDI::CC::panning:
-                            partui->partpan->value(value);
+                            partPan->value(value);
                             break;
                         case MIDI::CC::expression:
                             partui->expression->value(value);
@@ -3057,8 +3068,8 @@ Alan Calvert started the project}
     updatelistitem(nval);
     activePart = nval;
     npart = nval;
-    partVol->value(synth->part[npart]->Pvolume);} {selected
-    }
+    partVol->value(synth->part[npart]->Pvolume);
+    partPan->value(synth->part[npart]->Ppanning);} {}
   }
   Function {updatepart()} {open
   } {
@@ -3079,7 +3090,7 @@ Alan Calvert started the project}
         partui->partgroupui->deactivate();
 
     partui->partGroupEnable->value(synth->partonoffRead(npart));
-    partui->partpan->value(synth->part[npart]->Ppanning);
+    partPan->value(synth->part[npart]->Ppanning);
     partVol->value(synth->part[npart]->Pvolume);
     partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
     partui->velocitysense->value(synth->part[npart]->Pvelsns);
@@ -3455,7 +3466,7 @@ Alan Calvert started the project}
   Function {setPartPanWidget(int _npart, float _value)} {} {
     code {//
     if (_npart == npart)
-        partui->partpan->value(_value);} {}
+        partPan->value(_value);} {}
   }
   Function {setPanelPartVolWidget(int _npart, float _value)} {} {
     code {//
@@ -3732,7 +3743,11 @@ bpmfallback->format(format);} {}
     int size12 = int(12 * mainScale);
 
     mastermenu->textsize(size12);
+
     partVol->labelsize(size);
+    partPan->labelsize(size);
+
+
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
     mainvirtkeyb->labelsize(size11);

@@ -393,17 +393,18 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
-  Function {make_window()} {} {
-    Fl_Window partgroup {
+  Function {make_window()} {open
+  } {
+    Fl_Window partgroup {open
       xywh {794 168 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Box {} {
         xywh {80 60 17 17} box THIN_UP_BOX color 237
       }
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -560,19 +561,6 @@ class PartUI {selected : {public Fl_Group, PartUI_}
           code0 {o->value(part->Pveloffs);}
           class WidgetPDial
         }
-        Fl_Dial partpan {
-          label Pan
-          callback {//;
-          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-              synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
-
-          send_data(0, PART::control::panning, o->value(), 0);}
-          xywh {289 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(VC_PanningStd);}
-          code1 {o->value(part->Ppanning);}
-          class WidgetPDial
-        }
-
         Fl_Check_Button enportamento {
           label Portamento
           callback {//
@@ -1737,6 +1725,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                 synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
                 break;
             case PART::control::panning:
+                synth->getGuiMaster()->partPan->value(value);
                 synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
                 break;
             case PART::control::midiChannel:
@@ -1848,10 +1837,6 @@ class PartUI {selected : {public Fl_Group, PartUI_}
 
         case PART::control::velocitySense:
             velocitysense->value(value);
-            break;
-
-        case PART::control::panning:
-            partpan->value(value);
             break;
 
         case PART::control::velocityOffset:
@@ -2965,7 +2950,8 @@ class PartUI {selected : {public Fl_Group, PartUI_}
 
     instrumentkitlist->redraw();} {}
   }
-  Function {groupRtext(float dScale)} {} {
+  Function {groupRtext(float dScale)} {open
+  } {
     code {//
     partgroup->resize(3 * dScale, 285 * dScale, 380 * dScale, 170 * dScale);
 
@@ -2990,7 +2976,6 @@ class PartUI {selected : {public Fl_Group, PartUI_}
     syseffname->labelsize(size);
     velocityoffset->labelsize(size);
     velocitysense->labelsize(size);
-    partpan->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
         midich->textsize(size11);
@@ -3011,7 +2996,8 @@ class PartUI {selected : {public Fl_Group, PartUI_}
     setmax->labelsize(size);
     partGroupEnable->labelsize(size11);
 
-    partgroup->redraw();} {}
+    partgroup->redraw();} {selected
+    }
   }
   Function {~PartUI()} {} {
     code {//

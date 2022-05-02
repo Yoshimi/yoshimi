@@ -515,7 +515,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         realvalue = o->value();
     synth->getGuiMaster()->partVol->value(realvalue);
-    send_data(0, PART::control::volume, realvalue, TOPLEVEL::type::Integer);} selected
+    send_data(0, PART::control::volume, realvalue, TOPLEVEL::type::Integer);}
           xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
@@ -523,10 +523,12 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         }
         Fl_Dial partpanning {
           callback {//
+    int realvalue =  o->value();
     if (Fl::event_button() == 3)
-        o->value(64);
+       realvalue = 64;
 
-    send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, o->value(), TOPLEVEL::type::Integer);}
+    synth->getGuiMaster()->partPan->value(realvalue);
+    send_data(0, PART::control::panning, realvalue, TOPLEVEL::type::Integer);} selected
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}
