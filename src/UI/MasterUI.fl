@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -295,7 +295,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -477,7 +477,8 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -514,10 +515,10 @@ class MasterUI {: {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }}
-      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 hide resizable
+            }} open
+      xywh {667 236 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -1019,7 +1020,7 @@ class MasterUI {: {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -1028,6 +1029,17 @@ class MasterUI {: {private GuiUpdates}
           code1 {o->show();}
           class PartUI
         } {}
+        Fl_Group partControls {open
+          xywh {3 286 378 175}
+        } {
+          Fl_Dial that {
+            label This
+            callback {send_data(0, PART::control::volume, o->value(), 128, activePart);} selected
+            xywh {345 318 32 32} labelsize 10 maximum 127 step 1
+            code0 {o->value(fetchData(0, PART::control::volume, activePart));}
+            class WidgetPDial
+          }
+        }
       }
       Fl_Group {} {
         xywh {3 460 379 35} box DOWN_BOX color 43 labelsize 12
@@ -2182,7 +2194,7 @@ Alan Calvert started the project}
 
         collect_data(synth, value, action, type, control, part, UNUSED, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
-  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
+  Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {open return_type float
   } {
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
@@ -3700,7 +3712,8 @@ bpmfallback->format(format);} {}
     bankui->wincheck();
     partui->wincheck();} {}
   }
-  Function {mainRtext()} {} {
+  Function {mainRtext()} {open
+  } {
     code {//
 
     mainScale = float(masterwindow->w() / mainDW);
@@ -3710,7 +3723,7 @@ bpmfallback->format(format);} {}
     int size12 = int(12 * mainScale);
 
     mastermenu->textsize(size12);
-
+    that->labelsize(size);
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
     mainvirtkeyb->labelsize(size11);
