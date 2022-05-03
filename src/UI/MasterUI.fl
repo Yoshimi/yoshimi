@@ -515,7 +515,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open selected
+            }} open
       xywh {259 203 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
@@ -1038,8 +1038,8 @@ class MasterUI {open : {private GuiUpdates}
             if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
             setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-            send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {337 327 32 32} labelsize 10 maximum 127 step 1
+            send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);} selected
+            xywh {340 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
             class WidgetPDial
           }
@@ -1050,7 +1050,7 @@ class MasterUI {open : {private GuiUpdates}
                 setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
             send_data(0, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {290 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {292 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::panning, npart));}
             class WidgetPDial
           }
@@ -1058,8 +1058,16 @@ class MasterUI {open : {private GuiUpdates}
             label {Vel.Offs}
             callback {//
             send_data(0, PART::control::velocityOffset, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {243 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {244 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::velocityOffset, npart));}
+            class WidgetPDial
+          }
+          Fl_Dial partVelSense {
+            label {Vel.Sense}
+            callback {//
+            send_data(0, PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer, npart);}
+            xywh {196 327 32 32} labelsize 10 maximum 127 step 1
+            code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
           }
         }
@@ -3078,7 +3086,8 @@ Alan Calvert started the project}
     npart = nval;
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
-    partVelOffset->value(synth->part[npart]->Pveloffs);} {}
+    partVelOffset->value(synth->part[npart]->Pveloffs);
+    partVelSense->value(synth->part[npart]->Pvelsns);} {}
   }
   Function {updatepart()} {open
   } {
@@ -3103,8 +3112,8 @@ Alan Calvert started the project}
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
     partVelOffset->value(synth->part[npart]->Pveloffs);
+    partVelSense->value(synth->part[npart]->Pvelsns);
 
-    partui->velocitysense->value(synth->part[npart]->Pvelsns);
     partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
     partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
     partui->minkcounter->value(synth->part[npart]->Pminkey);
@@ -3469,7 +3478,6 @@ Alan Calvert started the project}
         }
     }} {}
   }
-
   Function {setPanelPartVolWidget(int _npart, float _value)} {} {
     code {//
     panellistitem[_npart]->partvolume->value(_value);} {}
@@ -3749,6 +3757,7 @@ bpmfallback->format(format);} {}
     partVol->labelsize(size);
     partPan->labelsize(size);
     partVelOffset->labelsize(size);
+    partVelSense->labelsize(size);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);

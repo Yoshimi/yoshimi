@@ -544,15 +544,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
           }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 1 193 22} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
-        Fl_Dial velocitysense {
-          label {Vel. Sens}
-          callback {//
-          send_data(0, PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          xywh {192 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(part->Pvelsns);}
-          code2 {o->setValueType(VC_AmpVelocitySense);}
-          class WidgetPDial
-        }
         Fl_Check_Button enportamento {
           label Portamento
           callback {//
@@ -1832,7 +1823,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
 
         case PART::control::velocitySense:
-            velocitysense->value(value);
+            synth->getGuiMaster()->partVelSense->value(value);
             break;
 
         case PART::control::midiChannel:
@@ -2946,6 +2937,9 @@ class PartUI {open : {public Fl_Group, PartUI_}
   } {
     code {//
     partgroup->resize(3 * dScale, 285 * dScale, 380 * dScale, 170 * dScale);
+    partedit->resize(333 * dScale, 285 * dScale, 42 * dScale, 24 * dScale);
+    partcontrollers->resize(9 * dScale, 367 * dScale, 86 * dScale, 22 * dScale);
+    midiCCs->resize(101 * dScale, 367 * dScale, 60 * dScale, 22 * dScale);
 
     /* The above has to be numerically fixed as the relative size
      * can change when a part number is changed. The group is deleted
@@ -2966,7 +2960,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
     partedit->labelsize(size12);
     instrumentlabel->labelsize(size12);
     syseffname->labelsize(size);
-    velocitysense->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
         midich->textsize(size11);
