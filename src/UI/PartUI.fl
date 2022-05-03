@@ -408,25 +408,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
-        Fl_Box instrumentaddbox {
-          xywh {136 5 63 14} box FLAT_BOX
-        }
-        Fl_Box instrumentsubbox {
-          xywh {199 5 63 14} box FLAT_BOX
-        }
-        Fl_Box instrumentpadbox {
-          xywh {262 5 62 14} box FLAT_BOX
-        }
-        Fl_Button instrumentlabel {
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 3 192 18} box NO_BOX labelsize 12 align 16
-          code0 {setinstrumentlabel();}
-        }
-        Fl_Box {} {
-          xywh {4 2 134 22} box FLAT_BOX
-        }
-        Fl_Box {} {
-          xywh {322 2 56 22} box FLAT_BOX
-        }
         Fl_Button partedit {
           label Edit
           callback {//
@@ -519,30 +500,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
             Showedit();
         }}
           xywh {330 0 42 24} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
-        }
-        Fl_Box {} {
-          xywh {137 4 186 16} box THIN_DOWN_FRAME
-        }
-        Fl_Button buttontop {
-          callback {//
-          int event = Fl::event_button();
-          if (event == FL_LEFT_MOUSE)
-          {
-              synth->getGuiMaster()->activePart = npart;
-              bankui->Show();
-          }
-          else if (event == FL_RIGHT_MOUSE)
-          {
-              string name = input_text(synth, "Instrument name:", part->Pname);
-              if (name == DEFAULT_NAME)
-                  alert(synth, "Can't use name of default sound");
-              else if (name != part->Pname)
-              {
-                  unsigned char id = textMsgBuffer.push(name);
-                  send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, id);
-              }
-          }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 1 193 22} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
         }
         Fl_Check_Button enportamento {
           label Portamento
@@ -1673,7 +1630,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;
@@ -2114,7 +2072,11 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
         case PART::control::instrumentName:
             if (!kitType)
+            {
                 checkEngines(text);
+                text = part->Pname.c_str();
+                synth->getGuiMaster()->instrumentlabel->copy_label(text.c_str());
+            }
             else
                 partkititem[kititem]->labelbutton->copy_label(text.c_str());
             break;
@@ -2132,7 +2094,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
     }
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
-    checkEngines();} {}
+    checkEngines();} {selected
+    }
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2416,22 +2379,25 @@ class PartUI {open : {public Fl_Group, PartUI_}
     }
 
     if (engine & 1) // addsynth
-        instrumentaddbox->color(ADD_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(ADD_COLOUR);
     else
-        instrumentaddbox->color(BASE_COLOUR);
-    if (engine & 2) // subynth
-        instrumentsubbox->color(SUB_COLOUR);
-    else
-        instrumentsubbox->color(BASE_COLOUR);
-    if (engine & 4) // padsynth
-        instrumentpadbox->color(PAD_COLOUR);
-    else
-        instrumentpadbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(BASE_COLOUR);
 
-    instrumentaddbox->damage(1);
-    instrumentsubbox->damage(1);
-    instrumentpadbox->damage(1);
-    instrumentlabel->copy_label(instrumentName.c_str());
+    if (engine & 2) // subsynth
+        synth->getGuiMaster()->instrumentsubbox->color(SUB_COLOUR);
+    else
+        synth->getGuiMaster()->instrumentsubbox->color(BASE_COLOUR);
+
+    if (engine & 4) // padsynth
+        synth->getGuiMaster()->instrumentpadbox->color(PAD_COLOUR);
+    else
+        synth->getGuiMaster()->instrumentpadbox->color(BASE_COLOUR);
+
+    synth->getGuiMaster()->instrumentaddbox->damage(1);
+    synth->getGuiMaster()->instrumentsubbox->damage(1);
+    synth->getGuiMaster()->instrumentpadbox->damage(1);
+    synth->getGuiMaster()->instrumentlabel->copy_label(instrumentName.c_str());
+    synth->getGuiMaster()->instrumentlabel->damage(1);
 
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
     {
@@ -2502,7 +2468,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
     if (engine == 2 && padnoteui != NULL)
         padnoteui->Showpad();} {}
   }
-  Function {setinstrumentlabel(string text = "")} {} {
+  Function {setinstrumentlabel(string text = "")} {open
+  } {
     code {//
     engine = 0;
 
@@ -2516,27 +2483,28 @@ class PartUI {open : {public Fl_Group, PartUI_}
             engine |= 4;
     }
     if (engine & 1)
-        instrumentaddbox->color(ADD_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(ADD_COLOUR);
     else
-        instrumentaddbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(BASE_COLOUR);
+
     if (engine & 2)
-        instrumentsubbox->color(SUB_COLOUR);
+        synth->getGuiMaster()->instrumentsubbox->color(SUB_COLOUR);
     else
-        instrumentsubbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentsubbox->color(BASE_COLOUR);
 
     if (engine & 4)
-        instrumentpadbox->color(PAD_COLOUR);
+        synth->getGuiMaster()->instrumentpadbox->color(PAD_COLOUR);
     else
-        instrumentpadbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentpadbox->color(BASE_COLOUR);
 
     if (part->PyoshiType)
-        instrumentlabel->labelcolor(YOSHI_COLOUR);
+        synth->getGuiMaster()->instrumentlabel->labelcolor(YOSHI_COLOUR);
     else
-        instrumentlabel->labelcolor(FL_BLACK);
+        synth->getGuiMaster()->instrumentlabel->labelcolor(FL_BLACK);
     if (text == "")
         text = part->Pname.c_str();
     partname = text;
-    instrumentlabel->copy_label(text.c_str());} {}
+    synth->getGuiMaster()->instrumentlabel->copy_label(text.c_str());} {}
   }
   Function {setEffNum()} {} {
     code {//
@@ -2958,7 +2926,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     int size11 = int(11 * dScale);
     int size12 = int(12 * dScale);
     partedit->labelsize(size12);
-    instrumentlabel->labelsize(size12);
+    //instrumentlabel->labelsize(size12);
     syseffname->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
@@ -2980,8 +2948,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     setmax->labelsize(size);
     partGroupEnable->labelsize(size11);
 
-    partgroup->redraw();} {selected
-    }
+    partgroup->redraw();} {}
   }
   Function {~PartUI()} {} {
     code {//

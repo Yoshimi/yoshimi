@@ -516,9 +516,9 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }} open
-      xywh {259 203 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {896 437 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -1038,7 +1038,7 @@ class MasterUI {open : {private GuiUpdates}
             if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
             setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
-            send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);} selected
+            send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {340 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
             class WidgetPDial
@@ -1069,6 +1069,45 @@ class MasterUI {open : {private GuiUpdates}
             xywh {196 327 32 32} labelsize 10 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
+          }
+          Fl_Group instrumentGroup {open
+            xywh {135 293 193 22}
+          } {
+            Fl_Box instrumentaddbox {
+              xywh {139 297 62 14} box FLAT_BOX
+            }
+            Fl_Box instrumentsubbox {
+              xywh {200 297 65 14} box FLAT_BOX
+            }
+            Fl_Box instrumentpadbox {
+              xywh {264 297 63 14} box FLAT_BOX
+            }
+            Fl_Button instrumentlabel {
+              label test
+              callback {//}
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 296 187 16} box THIN_DOWN_FRAME labelsize 12 align 16
+            }
+            Fl_Button buttontop {
+              callback {//
+          int event = Fl::event_button();
+          if (event == FL_LEFT_MOUSE)
+          {
+              synth->getGuiMaster()->activePart = npart;
+              bankui->Show();
+          }
+          else if (event == FL_RIGHT_MOUSE)
+          {
+              string name = input_text(synth, "Instrument name:", synth->part[activePart]->Pname);
+              if (name == DEFAULT_NAME)
+                  alert(synth, "Can't use name of default sound");
+              else if (name != synth->part[activePart]->Pname)
+              {
+                  unsigned char id = textMsgBuffer.push(name);
+                  send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
+              }
+          }} selected
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
+            }
           }
         }
       }
@@ -2230,7 +2269,8 @@ Alan Calvert started the project}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
@@ -3087,7 +3127,8 @@ Alan Calvert started the project}
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
     partVelOffset->value(synth->part[npart]->Pveloffs);
-    partVelSense->value(synth->part[npart]->Pvelsns);} {}
+    partVelSense->value(synth->part[npart]->Pvelsns);
+    partui->setinstrumentlabel();} {}
   }
   Function {updatepart()} {open
   } {
@@ -3128,7 +3169,8 @@ Alan Calvert started the project}
     npartcounter->redraw();
     partui->checkEngines();} {}
   }
-  Function {updatepartprogram(int _npart)} {} {
+  Function {updatepartprogram(int _npart)} {open
+  } {
     code {//
     if (vectorui)
         vectorui->setInstrumentLabel(_npart);
@@ -3758,6 +3800,7 @@ bpmfallback->format(format);} {}
     partPan->labelsize(size);
     partVelOffset->labelsize(size);
     partVelSense->labelsize(size);
+    instrumentlabel->labelsize(size12);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
