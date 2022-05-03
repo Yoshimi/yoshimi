@@ -516,7 +516,7 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }} open
-      xywh {896 437 385 500} type Double labelfont 13 labelsize 12 resizable
+      xywh {421 430 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
@@ -1070,8 +1070,8 @@ class MasterUI {open : {private GuiUpdates}
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
           }
-          Fl_Group instrumentGroup {open
-            xywh {135 293 193 22}
+          Fl_Group instrumentGroup {open selected
+            xywh {135 292 196 24} box FLAT_BOX color 237
           } {
             Fl_Box instrumentaddbox {
               xywh {139 297 62 14} box FLAT_BOX
@@ -1083,7 +1083,7 @@ class MasterUI {open : {private GuiUpdates}
               xywh {264 297 63 14} box FLAT_BOX
             }
             Fl_Button instrumentlabel {
-              label test
+              label {Simple Sound}
               callback {//}
               tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 296 187 16} box THIN_DOWN_FRAME labelsize 12 align 16
             }
@@ -1105,9 +1105,115 @@ class MasterUI {open : {private GuiUpdates}
                   unsigned char id = textMsgBuffer.push(name);
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
               }
-          }} selected
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box UP_FRAME labeltype NO_LABEL labelsize 12 align 16
+          }}
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box UP_FRAME color 50 labeltype NO_LABEL labelsize 12 align 16
             }
+          }
+          Fl_Button partEdit {
+            label Edit
+            callback {//
+       /* bool divert = true;
+        if (lastkey >= 49 && lastkey <= 56)
+        { // not working yet :(
+            int voiceNum = lastkey - 49;
+            if (Fl::event_button() == 3)
+            {
+                send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 0);
+                adsynenabledcheck->value(1);
+                send_data(TOPLEVEL::action::forceUpdate, PART::control::volumeEnable, voiceNum, TOPLEVEL::type::Integer);
+                //synth->getGuiMaster()->partui->adnoteui->advoice->nvoice = voiceNum;
+                //synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(1);
+            }
+            if (adsynenabledcheck->value() == 1)
+            {
+                ;
+            }
+            lastkey = -1;
+        }
+        switch(lastkey)
+        {
+            case 97: // a
+                if (Fl::event_button() == 3)
+                {
+                    send_data(0, PART::control::enableAdd, 1, TOPLEVEL::type::Integer, UNUSED, 0);
+                    adsynenabledcheck->value(1);
+                }
+
+                lastkey = -1;
+                if (adsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,0);
+                    checkEngines();
+                    seteditname();
+                }
+                else
+                    divert = false;
+                break;
+            case 115: // s
+                if (Fl::event_button() == 3)
+                {
+                    send_data(0, PART::control::enableSub, 1, TOPLEVEL::type::Integer, UNUSED, 1);
+                    subsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (subsynenabledcheck->value() == 1)
+                {
+                showparameters(0,1);
+                checkEngines();
+                seteditname();
+                }
+                else
+                    divert = false;
+                break;
+            case 100: // d
+            case 112: // p
+                if (Fl::event_button() == 3)
+                {
+                    send_data(0, PART::control::enablePad, 1, TOPLEVEL::type::Integer, UNUSED, 2);
+                    padsynenabledcheck->value(1);
+                }
+                lastkey = -1;
+                if (padsynenabledcheck->value() == 1)
+                {
+                    showparameters(0,2);
+                    checkEngines();
+                    seteditname();
+                    lastkey = -1;
+                }
+                else
+                    divert = false;
+                break;
+            case 107: // k
+                lastkey = -1;
+                Showkit();
+                break;
+            case 101: // e
+                lastkey = -1;
+                Showefx();
+                break;
+            default:
+                divert = false;
+                break;
+        }
+        */
+        //if (!divert)
+        //{
+            //lastkey = -1;
+            partui->Showedit();
+       // }}
+            xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12
+          }
+          Fl_Button partControllers {
+            label Controllers
+            callback {//
+          partui->Showctl();}
+            tooltip {MIDI Controller range settings} xywh {8 373 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
+          }
+          Fl_Button partMidiCCs {
+            label {Midi CCs}
+            callback {//
+          partui->Showctlmidi();}
+            tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
           }
         }
       }
@@ -3801,6 +3907,9 @@ bpmfallback->format(format);} {}
     partVelOffset->labelsize(size);
     partVelSense->labelsize(size);
     instrumentlabel->labelsize(size12);
+    partEdit->labelsize(size12);
+    partControllers->labelsize(size12);
+    partMidiCCs->labelsize(size12);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);

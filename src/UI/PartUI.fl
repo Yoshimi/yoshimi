@@ -408,99 +408,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
-        Fl_Button partedit {
-          label Edit
-          callback {//
-        bool divert = true;
-        if (lastkey >= 49 && lastkey <= 56)
-        { // not working yet :(
-            /*int voiceNum = lastkey - 49;
-            if (Fl::event_button() == 3)
-            {
-                send_data(0, PART::control::enable, 1, TOPLEVEL::type::Integer, UNUSED, 0);
-                adsynenabledcheck->value(1);
-                send_data(TOPLEVEL::action::forceUpdate, PART::control::volumeEnable, voiceNum, TOPLEVEL::type::Integer);
-                //synth->getGuiMaster()->partui->adnoteui->advoice->nvoice = voiceNum;
-                //synth->getGuiMaster()->partui->adnoteui->advoice->voiceonbutton->value(1);
-            }
-            if (adsynenabledcheck->value() == 1)
-            {
-                ;
-            }*/
-            lastkey = -1;
-        }
-        switch(lastkey)
-        {
-            case 97: // a
-                if (Fl::event_button() == 3)
-                {
-                    send_data(0, PART::control::enableAdd, 1, TOPLEVEL::type::Integer, UNUSED, 0);
-                    adsynenabledcheck->value(1);
-                }
-
-                lastkey = -1;
-                if (adsynenabledcheck->value() == 1)
-                {
-                    showparameters(0,0);
-                    checkEngines();
-                    seteditname();
-                }
-                else
-                    divert = false;
-                break;
-            case 115: // s
-                if (Fl::event_button() == 3)
-                {
-                    send_data(0, PART::control::enableSub, 1, TOPLEVEL::type::Integer, UNUSED, 1);
-                    subsynenabledcheck->value(1);
-                }
-                lastkey = -1;
-                if (subsynenabledcheck->value() == 1)
-                {
-                showparameters(0,1);
-                checkEngines();
-                seteditname();
-                }
-                else
-                    divert = false;
-                break;
-            case 100: // d
-            case 112: // p
-                if (Fl::event_button() == 3)
-                {
-                    send_data(0, PART::control::enablePad, 1, TOPLEVEL::type::Integer, UNUSED, 2);
-                    padsynenabledcheck->value(1);
-                }
-                lastkey = -1;
-                if (padsynenabledcheck->value() == 1)
-                {
-                    showparameters(0,2);
-                    checkEngines();
-                    seteditname();
-                    lastkey = -1;
-                }
-                else
-                    divert = false;
-                break;
-            case 107: // k
-                lastkey = -1;
-                Showkit();
-                break;
-            case 101: // e
-                lastkey = -1;
-                Showefx();
-                break;
-            default:
-                divert = false;
-                break;
-        }
-        if (!divert)
-        {
-            lastkey = -1;
-            Showedit();
-        }}
-          xywh {330 0 42 24} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
-        }
         Fl_Check_Button enportamento {
           label Portamento
           callback {//
@@ -545,18 +452,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code1 {int tmp = synth->ReadPartKeyMode(npart);}
           code2 {if (tmp > 1) o->value(2); else o->value(tmp);}
         } {}
-        Fl_Button partcontrollers {
-          label Controllers
-          callback {//
-          Showctl();}
-          tooltip {MIDI Controller range settings} xywh {6 82 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
-        }
-        Fl_Button midiCCs {
-          label {Midi CCs}
-          callback {//
-          Showctlmidi();}
-          tooltip {Emulates common MIDI CCs} xywh {98 82 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
-        }
         Fl_Spinner partkeyshift {
           label {Key Shift}
           callback {//
@@ -2094,8 +1989,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
     }
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
-    checkEngines();} {selected
-    }
+    checkEngines();} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2905,9 +2799,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
   } {
     code {//
     partgroup->resize(3 * dScale, 285 * dScale, 380 * dScale, 170 * dScale);
-    partedit->resize(333 * dScale, 285 * dScale, 42 * dScale, 24 * dScale);
-    partcontrollers->resize(9 * dScale, 367 * dScale, 86 * dScale, 22 * dScale);
-    midiCCs->resize(101 * dScale, 367 * dScale, 60 * dScale, 22 * dScale);
 
     /* The above has to be numerically fixed as the relative size
      * can change when a part number is changed. The group is deleted
@@ -2924,17 +2815,12 @@ class PartUI {open : {public Fl_Group, PartUI_}
 
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
-    int size12 = int(12 * dScale);
-    partedit->labelsize(size12);
-    //instrumentlabel->labelsize(size12);
     syseffname->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
         midich->textsize(size11);
     keymode->textsize(size11);
     modepatch->labelsize(size11);
-    partcontrollers->labelsize(size12);
-    midiCCs->labelsize(size12);
     partkeyshift->labelsize(size);
         partkeyshift->textsize(size11);
     partkeylimit->labelsize(size);
@@ -2948,7 +2834,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
     setmax->labelsize(size);
     partGroupEnable->labelsize(size11);
 
-    partgroup->redraw();} {}
+    partgroup->redraw();} {selected
+    }
   }
   Function {~PartUI()} {} {
     code {//
