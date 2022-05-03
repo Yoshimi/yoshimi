@@ -553,14 +553,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
-        Fl_Dial velocityoffset {
-          label {Vel. Offs}
-          callback {//
-          send_data(0, PART::control::velocityOffset, o->value(), TOPLEVEL::type::Integer);}
-          xywh {242 34 32 32} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(part->Pveloffs);}
-          class WidgetPDial
-        }
         Fl_Check_Button enportamento {
           label Portamento
           callback {//
@@ -1835,12 +1827,12 @@ class PartUI {open : {public Fl_Group, PartUI_}
                 partkititem[kititem]->clearLine();
             break;
 
-        case PART::control::velocitySense:
-            velocitysense->value(value);
+        case PART::control::velocityOffset:
+            synth->getGuiMaster()->partVelOffset->value(value);
             break;
 
-        case PART::control::velocityOffset:
-            velocityoffset->value(value);
+        case PART::control::velocitySense:
+            velocitysense->value(value);
             break;
 
         case PART::control::midiChannel:
@@ -2974,7 +2966,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
     partedit->labelsize(size12);
     instrumentlabel->labelsize(size12);
     syseffname->labelsize(size);
-    velocityoffset->labelsize(size);
     velocitysense->labelsize(size);
     enportamento->labelsize(size11);
     midich->labelsize(size11);
