@@ -335,15 +335,26 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->configui->returns_update(getData);
         return;
     }
+
     if (npart == TOPLEVEL::section::main && control == MAIN::control::exportPadSynthSamples) // special case
     {
         npart = parameter & 0x3f;
         getData->data.part = npart;
     }
+
     if (npart >= TOPLEVEL::section::main) // main / sys / ins
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
+    }
+    /*
+     * we are managing some part-related controls from here
+    */
+    if (npart < NUM_MIDI_PARTS && (kititem & engine & insert) == UNUSED)
+    {
+        std::cout << "here" << std::endl;
+        if (synth->getGuiMaster()->returns_update(getData))
+            return;
     }
 
     if (npart >= NUM_MIDI_PARTS)

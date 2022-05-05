@@ -1679,7 +1679,12 @@ float Part::getLimits(CommandBlock *getData)
         case PART::control::midiChannel:
             min = 0;
             def = 0;
-            max = 16; // disabled
+            max = (NUM_MIDI_CHANNELS * 3) - 1;
+            /*
+             * 0 - 15 Normal
+             * 16 - 31 note off only
+             * 32 - 47 disabled
+             */
             break;
 
         case PART::control::channelATset:

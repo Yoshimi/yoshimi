@@ -416,25 +416,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code0 {o->value(part->ctl->portamento.portamento);}
           class Fl_Check_Button2
         }
-        Fl_Spinner midich {
-          label Midi
-          callback {//
-          int tmp = ((int)o->value() -1);
-          if (tmp > 15)
-          {
-              tmp &= 15;
-              o->value(tmp +1);
-          }
-          o->textcolor(FL_BLACK);
-          if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-              synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
-
-          send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer);}
-          tooltip {MIDI channel for this part} xywh {31 36 40 19} labelsize 11 maximum 16 textsize 11
-          code0 {o->value(part->Prcvchn + 1);}
-          code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
-          class WidgetSpinner
-        }
         Fl_Box modepatch {
           label Mode
           xywh {150 37 32 17} box FLAT_BOX color 29 labelsize 11
@@ -556,34 +537,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         label {Send to System Effect}
         xywh {255 134 103 13} box NO_BOX labelsize 11 align 2
       }
-      Fl_Check_Button partGroupEnable {
-        label Enabled
-        callback {//;
-        if (o->value() != 1)
-        {
-            partgroupui->deactivate();
-            toSysEfx->deactivate();
-        }
-        else
-        {
-            partgroupui->activate();
-            toSysEfx->activate();
-        }
-
-        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        {
-            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partenabled->value(o->value());
-            if (o->value() != 1)
-                synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->deactivate();
-            else
-            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
-        }
-
-        send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
-        xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
-        code0 {o->value(part->Penabled == 1);}
-        class Fl_Check_Button2
-      }
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
@@ -697,7 +650,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           }
           Fl_Box addbox {
             xywh {10 226 89 18} box FLAT_BOX
-            code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(BASE_COLOUR);}
+            code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button adeditbutton {
             label Edit
@@ -727,7 +680,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           }
           Fl_Box subbox {
             xywh {110 226 89 18} box FLAT_BOX
-            code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(BASE_COLOUR);}
+            code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button subeditbutton {
             label Edit
@@ -757,7 +710,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
           }
           Fl_Box padbox {
             xywh {210 226 89 18} box FLAT_BOX
-            code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(BASE_COLOUR);}
+            code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button padeditbutton {
             label Edit
@@ -1542,42 +1495,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
     string text;
     if (miscmsg != NO_MSG)
         text = textMsgBuffer.fetch(miscmsg);
-
-    // these are specific to the mixer panel
-    if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
-    {
-        int displaypart = newpart % NUM_MIDI_CHANNELS;
-        switch (control)
-        {
-            case PART::control::enable:
-                synth->getGuiMaster()->panellistitem[displaypart]->partenabled->value(valBool);
-                if (valBool)
-                    synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->activate();
-                else
-                    synth->getGuiMaster()->panellistitem[displaypart]->panellistitemgroup->deactivate();
-                break;
-            case PART::control::volume:
-                synth->getGuiMaster()->partVol->value(value);
-                synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
-                break;
-            case PART::control::panning:
-                synth->getGuiMaster()->partPan->value(value);
-                synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
-                break;
-            case PART::control::midiChannel:
-                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(valInt & 0xf);
-                if (valInt < (NUM_MIDI_CHANNELS - 1))
-                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
-                else
-                    synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
-                break;
-            case PART::control::audioDestination:
-                int send = valInt - 1;
-                if (send < 0 or send > 2)
-                    send = 0;
-                synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
-        }
-    }
     //std::cout << "reached npart " << int(npart) << "  new " << int(newpart) <<std::endl;
     if (npart != newpart)
         return;
@@ -1587,19 +1504,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         kititem = 0;
     switch(control)
     {
-        case PART::control::enable:
-            partGroupEnable->value(valBool);
-            if (valBool)
-            {
-                partgroupui->activate();
-                toSysEfx->activate();
-            }
-            else
-            {
-                partgroupui->deactivate();
-                toSysEfx->deactivate();
-            }
-            break;
         case PART::control::enableAdd:
             partkititem[kititem]->adcheck->value(valBool);
             if (valBool)
@@ -1670,23 +1574,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
             else
                 partkititem[kititem]->clearLine();
             break;
-
-        case PART::control::velocityOffset:
-            synth->getGuiMaster()->partVelOffset->value(value);
-            break;
-
-        case PART::control::velocitySense:
-            synth->getGuiMaster()->partVelSense->value(value);
-            break;
-
-        case PART::control::midiChannel:
-            midich->value(valInt + 1);
-            if (valInt < NUM_MIDI_CHANNELS)
-                midich->textcolor(FL_BLACK);
-            else
-                midich->textcolor(FL_WHITE);
-            break;
-
         case PART::control::keyMode:
             modepatch->color(29);
             if (valInt > 1)
@@ -1966,14 +1853,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             commentField->value(text.c_str());
             break;
         case PART::control::instrumentName:
-            if (!kitType)
-            {
-                checkEngines(text);
-                text = part->Pname.c_str();
-                synth->getGuiMaster()->instrumentlabel->copy_label(text.c_str());
-            }
-            else
-                partkititem[kititem]->labelbutton->copy_label(text.c_str());
+            partkititem[kititem]->labelbutton->copy_label(text.c_str());
             break;
         case PART::control::instrumentType:
             instrumentType->value(value);
@@ -1989,7 +1869,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
     }
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
-    checkEngines();} {}
+    checkEngines();} {selected
+    }
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -2247,17 +2128,17 @@ class PartUI {open : {public Fl_Group, PartUI_}
     if (adsynenabledcheck->value())
         addbox->color(ADD_COLOUR);
     else
-        addbox->color(BASE_COLOUR);
+        addbox->color(FL_BACKGROUND_COLOR);
     ADD->damage(1);
     if (subsynenabledcheck->value())
         subbox->color(SUB_COLOUR);
     else
-        subbox->color(BASE_COLOUR);
+        subbox->color(FL_BACKGROUND_COLOR);
     SUB->damage(1);
     if (padsynenabledcheck->value())
         padbox->color(PAD_COLOUR);
     else
-        padbox->color(BASE_COLOUR);
+        padbox->color(FL_BACKGROUND_COLOR);
     PAD->damage(1);
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
@@ -2299,15 +2180,15 @@ class PartUI {open : {public Fl_Group, PartUI_}
         if (engine & 1)
             synth->getGuiMaster()->panellistitem[num]->partadd->color(ADD_COLOUR);
         else
-            synth->getGuiMaster()->panellistitem[num]->partadd->color(BASE_COLOUR);
+            synth->getGuiMaster()->panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
         if (engine & 2)
             synth->getGuiMaster()->panellistitem[num]->partsub->color(SUB_COLOUR);
         else
-            synth->getGuiMaster()->panellistitem[num]->partsub->color(BASE_COLOUR);
+            synth->getGuiMaster()->panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
         if (engine & 4)
             synth->getGuiMaster()->panellistitem[num]->partpad->color(PAD_COLOUR);
         else
-            synth->getGuiMaster()->panellistitem[num]->partpad->color(BASE_COLOUR);
+            synth->getGuiMaster()->panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
 
         synth->getGuiMaster()->panellistitem[num]->partadd->damage(1);
         synth->getGuiMaster()->panellistitem[num]->partsub->damage(1);
@@ -2817,8 +2698,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
     int size11 = int(11 * dScale);
     syseffname->labelsize(size);
     enportamento->labelsize(size11);
-    midich->labelsize(size11);
-        midich->textsize(size11);
     keymode->textsize(size11);
     modepatch->labelsize(size11);
     partkeyshift->labelsize(size);
@@ -2832,10 +2711,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
     setmin->labelsize(size);
     setnorm->labelsize(size11);
     setmax->labelsize(size);
-    partGroupEnable->labelsize(size11);
 
-    partgroup->redraw();} {selected
-    }
+    partgroup->redraw();} {}
   }
   Function {~PartUI()} {} {
     code {//

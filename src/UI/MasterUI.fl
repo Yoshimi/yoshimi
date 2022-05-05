@@ -1070,22 +1070,25 @@ class MasterUI {open : {private GuiUpdates}
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
           }
-          Fl_Group instrumentGroup {open selected
-            xywh {135 292 196 24} box FLAT_BOX color 237
+          Fl_Group instrumentGroup {
+            xywh {136 292 195 24} box PLASTIC_UP_BOX color 228
           } {
             Fl_Box instrumentaddbox {
-              xywh {139 297 62 14} box FLAT_BOX
+              xywh {139 297 62 14} box FLAT_BOX color 17
             }
             Fl_Box instrumentsubbox {
-              xywh {200 297 65 14} box FLAT_BOX
+              xywh {200 297 65 14} box FLAT_BOX color 17
             }
             Fl_Box instrumentpadbox {
-              xywh {264 297 63 14} box FLAT_BOX
+              xywh {264 297 63 14} box FLAT_BOX color 17
             }
             Fl_Button instrumentlabel {
               label {Simple Sound}
               callback {//}
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 296 187 16} box THIN_DOWN_FRAME labelsize 12 align 16
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 295 187 16} box NO_BOX labelsize 12 align 16
+            }
+            Fl_Box instrumentFrame {
+              xywh {139 296 187 16} box PLASTIC_DOWN_FRAME color 237
             }
             Fl_Button buttontop {
               callback {//
@@ -1106,8 +1109,26 @@ class MasterUI {open : {private GuiUpdates}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box UP_FRAME color 50 labeltype NO_LABEL labelsize 12 align 16
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box NO_BOX labeltype NO_LABEL labelsize 12 align 16
             }
+          }
+          Fl_Spinner partMidiCh {
+            label Midi
+            callback {//
+          int tmp = int(o->value()) -1;
+          if (tmp >= NUM_MIDI_CHANNELS)
+          {
+              tmp &= (NUM_MIDI_CHANNELS - 1);
+              o->value(tmp +1);
+          }
+          o->textcolor(FL_BLACK);
+          if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+              setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+
+          send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
+            tooltip {MIDI channel for this part} xywh {34 350 40 19} labelsize 11 maximum 16 textsize 11
+            code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
+            class WidgetSpinner
           }
           Fl_Button partEdit {
             label Edit
@@ -1215,6 +1236,34 @@ class MasterUI {open : {private GuiUpdates}
           partui->Showctlmidi();}
             tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
           }
+        }
+        Fl_Check_Button partEnable {
+          label On
+          callback {//;
+        if (o->value() != 1)
+        {
+            partControls->deactivate();
+            partui->toSysEfx->deactivate();
+        }
+        else
+        {
+            partControls->activate();
+            partui->toSysEfx->activate();
+        }
+
+        if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+        {
+            panellistitem[npart % NUM_MIDI_CHANNELS]->partenabled->value(o->value());
+            if (o->value() != 1)
+                panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->deactivate();
+            else
+                panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
+        }
+
+        send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
+          xywh {55 326 20 20} down_box DOWN_BOX align 4
+          code0 {o->value(fetchData(0,  PART::control::enable, npart));}
+          class Fl_Check_Button2
         }
       }
       Fl_Group {} {
@@ -2375,7 +2424,7 @@ Alan Calvert started the project}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
+  Function {returns_update(CommandBlock *getData)} {open return_type bool
   } {
     code {//
     float value = getData->data.value;
@@ -2396,12 +2445,103 @@ Alan Calvert started the project}
     string name;
     if (miscmsg != NO_MSG)
         name = textMsgBuffer.fetch(miscmsg);
+    int panelpart = 0;
+
+    if (newpart < NUM_MIDI_PARTS)
+    {
+        bool panelVisible = ((newpart / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS));
+        if (panelVisible)
+            panelpart = newpart % NUM_MIDI_CHANNELS;
+
+        bool seen = false;
+        switch (control)
+        {
+            case PART::control::enable:
+            {
+                partEnable->value(value);
+                if (value)
+                    partControls->activate();
+                else
+                    partControls->deactivate();
+                if (panelVisible)
+                {
+                    panellistitem[panelpart]->partenabled->value(value);
+                    if (value)
+                        panellistitem[panelpart]->panellistitemgroup->activate();
+                    else
+                        panellistitem[panelpart]->panellistitemgroup->deactivate();
+                }
+                seen = true;
+                break;
+            }
+            case PART::control::volume:
+                partVol->value(value);
+                if (panelVisible)
+                    panellistitem[panelpart]->partvolume->value(value);
+                seen = true;
+                break;
+            case PART::control::panning:
+                partPan->value(value);
+                if (panelVisible)
+                    panellistitem[panelpart]->partpanning->value(value);
+                seen = true;
+                break;
+            case PART::control::velocityOffset:
+                partVelOffset->value(value);
+                seen = true;
+                break;
+
+            case PART::control::velocitySense:
+                partVelSense->value(value);
+                seen = true;
+                break;
+                
+            case PART::control::midiChannel:
+            {
+                int tmp = value_int;
+                int textCol = FL_BLACK;
+                if (tmp >= NUM_MIDI_CHANNELS)
+                {
+                    if (tmp >= NUM_MIDI_CHANNELS * 2)
+                        textCol = FL_RED;
+                    else
+                        textCol = FL_DARK_CYAN;
+                    tmp = (tmp % NUM_MIDI_CHANNELS);
+                }
+                partMidiCh->textcolor(textCol);
+                partMidiCh->value(tmp + 1);
+                if (panelVisible)
+                {
+                    panellistitem[panelpart]->partrcv->textcolor(textCol);
+                    panellistitem[panelpart]->partrcv->value(tmp);
+                }
+                seen = true;
+                break;
+            }
+            
+            case PART::control::instrumentName:
+                partui->checkEngines();
+                synth->getGuiMaster()->instrumentlabel->copy_label(synth->part[newpart]->Pname.c_str());
+                seen = true;
+                break;
+                
+            case PART::control::audioDestination:
+                int send = value_int - 1;
+                if (send < 0 or send > 2)
+                    send = 0;
+                if (panelVisible)
+                    panellistitem[panelpart]->audiosend->value(send);
+                seen = true;
+                break;
+        }
+        return seen;
+    }
     if (newpart == TOPLEVEL::section::midiIn)
     {
         if (engine == MIDI::CC::volume && partui->part->ctl->volume.receive == 0)
-            return; // disabled
+            return false; // disabled
         if (engine == MIDI::CC::expression && partui->part->ctl->expression.receive == 0)
-            return; // disabled
+            return false; // disabled
 
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
         if (control == MIDI::control::controller)
@@ -2425,7 +2565,7 @@ Alan Calvert started the project}
         }
 
         bool isForUs = (isSingle && chan == npart)
-             || (!isSingle &&  (partui->midich->value() == (chan & mask) + 1));// && partui->partGroupEnable->value() != 0);
+             || (!isSingle &&  (partMidiCh->value() == (chan & mask) + 1));
         switch(control)
         {
             case MIDI::control::noteOn:
@@ -2435,7 +2575,7 @@ Alan Calvert started the project}
                 //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
                 if (engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
-                    int newch = partui->midich->value() - 1;
+                    int newch = partMidiCh->value() - 1;
                     switch (synth->getRuntime().channelSwitchType)
                     {
                         case MIDI::SoloType::Row:
@@ -2475,12 +2615,12 @@ Alan Calvert started the project}
                             break;
 
                     }
-                    partui->midich->value(newch + 1);
+                    partMidiCh->value(newch + 1);
 
                     if (newch < NUM_MIDI_CHANNELS)
-                        partui->midich->textcolor(FL_BLACK);
+                        partMidiCh->textcolor(FL_BLACK);
                     else
-                        partui->midich->textcolor(FL_WHITE);
+                        partMidiCh->textcolor(FL_WHITE);
                     updatepanel();
                 }
                 else if (isForUs)
@@ -2532,7 +2672,7 @@ Alan Calvert started the project}
                 bankui->rescan_for_banks();
                 break;
         }
-        return;
+        return false;
     }
     if (newpart == TOPLEVEL::section::systemEffects)
     {
@@ -2578,7 +2718,7 @@ Alan Calvert started the project}
                     sysefftype->deactivate();
             }
         }
-        return;
+        return false;
     }
     else if (newpart == TOPLEVEL::section::insertEffects)
     {
@@ -2617,7 +2757,7 @@ Alan Calvert started the project}
                     showInsEfxUI();
             }
         }
-        return;
+        return false;
     }
 
     switch(control)
@@ -2909,7 +3049,9 @@ Alan Calvert started the project}
             vumeter->init(-1, synth);
             resetPartsClip();
             break;
-    }} {}
+    }
+    return false;} {selected
+    }
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
@@ -3234,7 +3376,13 @@ Alan Calvert started the project}
     partPan->value(synth->part[npart]->Ppanning);
     partVelOffset->value(synth->part[npart]->Pveloffs);
     partVelSense->value(synth->part[npart]->Pvelsns);
-    partui->setinstrumentlabel();} {}
+    partui->setinstrumentlabel();
+    partMidiCh->value(synth->part[npart]->Prcvchn + 1);
+    partEnable->value(synth->part[npart]->Penabled == 1);
+    if (partEnable->value() == 1)
+        partControls->activate();
+    else
+        partControls->deactivate();} {}
   }
   Function {updatepart()} {open
   } {
@@ -3254,7 +3402,7 @@ Alan Calvert started the project}
     else
         partui->partgroupui->deactivate();
 
-    partui->partGroupEnable->value(synth->partonoffRead(npart));
+    partEnable->value(synth->partonoffRead(npart));
 
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
@@ -3288,13 +3436,13 @@ Alan Calvert started the project}
 
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
-        partui->midich->value(partui->part->Prcvchn + 1);
-        partui->midich->textcolor(FL_BLACK);
+        partMidiCh->value(partui->part->Prcvchn + 1);
+        partMidiCh->textcolor(FL_BLACK);
     }
     else
     {
-         partui->midich->textcolor(FL_WHITE);
-         partui->midich->redraw();
+         partMidiCh->textcolor(FL_WHITE);
+         partMidiCh->redraw();
     }
     partNew(_npart);} {}
   }
@@ -3375,7 +3523,7 @@ Alan Calvert started the project}
         panellistitem[displaypart]->partenabled->value(0);
         panellistitem[displaypart]->panellistitemgroup->deactivate();
     }
-    partui->partGroupEnable->value(0);
+    partEnable->value(0);
     partui->partgroup->deactivate();
     send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
@@ -3613,7 +3761,7 @@ Alan Calvert started the project}
     code {//
     if (_npart == npart)
     {
-        partui->partGroupEnable->value(active);
+        partEnable->value(active);
         if (active)
         {
             partui->partgroupui->activate();
@@ -3637,8 +3785,8 @@ Alan Calvert started the project}
   Function {setPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
     if (_npart == npart)
-        partui->midich->value(_value);
-    partui->midich->textcolor(FL_BLACK);} {}
+        partMidiCh->value(_value);
+    partMidiCh->textcolor(FL_BLACK);} {}
   }
   Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
@@ -3910,6 +4058,9 @@ bpmfallback->format(format);} {}
     partEdit->labelsize(size12);
     partControllers->labelsize(size12);
     partMidiCCs->labelsize(size12);
+    partMidiCh->labelsize(size11);
+        partMidiCh->textsize(size11);
+    partEnable->labelsize(14 * mainScale);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);

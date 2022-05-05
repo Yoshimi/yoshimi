@@ -100,9 +100,9 @@ typedef unsigned int  uint;
 
 // GUI colours
 #define ADD_COLOUR 0xdfafbf00
-#define BASE_COLOUR 0xbfbfbf00
+#define BASE_COLOUR 0xfdf6e600
 #define SUB_COLOUR 0xafcfdf00
-#define PAD_COLOUR 0xcfdfaf00
+#define PAD_COLOUR 0xcdddad00
 #define YOSHI_COLOUR 0x0000e100
 #define EXTOSC_COLOUR 0x8fbfdf00
 #define EXTVOICE_COLOUR 0x9fdf8f00
