@@ -352,7 +352,6 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     */
     if (npart < NUM_MIDI_PARTS && (kititem & engine & insert) == UNUSED)
     {
-        std::cout << "here" << std::endl;
         if (synth->getGuiMaster()->returns_update(getData))
             return;
     }

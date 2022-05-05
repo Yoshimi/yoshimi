@@ -401,38 +401,10 @@ class PartUI {open : {public Fl_Group, PartUI_}
       xywh {794 168 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
-      Fl_Box {} {
-        xywh {80 60 17 17} box THIN_UP_BOX color 237
-      }
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {open selected
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
-        Fl_Check_Button enportamento {
-          label Portamento
-          callback {//
-          send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable/Disable the portamento} xywh {82 61 17 15} down_box DOWN_BOX color 237 labelsize 11 align 8
-          code0 {o->value(part->ctl->portamento.portamento);}
-          class Fl_Check_Button2
-        }
-        Fl_Box modepatch {
-          label Mode
-          xywh {150 37 32 17} box FLAT_BOX color 29 labelsize 11
-        }
-        Fl_Choice keymode {
-          callback {//
-          if (o->value() > 1 && drumMode->value() != 0)
-              modepatch->color(91);
-          else
-              modepatch->color(29);
-          modepatch->redraw();
-          send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Poly, Mono or Legato mode} xywh {82 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
-          code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
-          code1 {int tmp = synth->ReadPartKeyMode(npart);}
-          code2 {if (tmp > 1) o->value(2); else o->value(tmp);}
-        } {}
         Fl_Spinner partkeyshift {
           label {Key Shift}
           callback {//
@@ -1574,18 +1546,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
             else
                 partkititem[kititem]->clearLine();
             break;
-        case PART::control::keyMode:
-            modepatch->color(29);
-            if (valInt > 1)
-            {
-                keymode->value(2);
-                if (drumMode->value())
-                    modepatch->color(91);
-            }
-            else
-                keymode->value(valInt);
-            modepatch->redraw();
-            break;
         case PART::control::channelATset:
             channelATselection = valInt;
             fetchChannel();
@@ -1603,10 +1563,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
                 channelATselection = parameter;
                 fetchChannel();
             }
-            break;
-
-        case PART::control::portamento:
-            enportamento->value(valBool);
             break;
 
         case PART::control::kitItemMute:
@@ -1671,11 +1627,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
 
         case PART::control::drumMode:
             drumMode->value(valBool);
-            if (valBool && keymode->value() > 1)
-                modepatch->color(91);
-            else
-                modepatch->color(29);
-            modepatch->redraw();
             break;
 
         case PART::control::kitMode:
@@ -1869,8 +1820,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
     }
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
-    checkEngines();} {selected
-    }
+    checkEngines();} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -1904,8 +1854,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
   }
   Function {updatecontrollers()} {} {
     code {//
-    enportamento->value(0);
-    keymode->value(part->Pkeymode & MIDI_NOT_LEGATO);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -2073,7 +2021,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
         }
         send_data(0, PART::keyATset, keyATselection, TOPLEVEL::type::Integer);} {}
   }
-  Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
+  Function {init(Part *part_,int npart_,BankUI *bankui_)} {open
+  } {
     code {//
     synth = part_->getSynthEngine();
     bankui = bankui_;
@@ -2089,7 +2038,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         bool status = fetchData(0, EFFECT::control::changed, npart, efftype + (TOPLEVEL::insert::none | 128), ninseff);
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
-
     channelATselection = int(fetchData(0, PART::control::channelATset, npart));
     int tmp = int(fetchData(0, PART::control::humanise, npart));
     humanise->value(tmp); // will inc number
@@ -2697,9 +2645,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
     int size = int(10 * dScale);
     int size11 = int(11 * dScale);
     syseffname->labelsize(size);
-    enportamento->labelsize(size11);
-    keymode->textsize(size11);
-    modepatch->labelsize(size11);
     partkeyshift->labelsize(size);
         partkeyshift->textsize(size11);
     partkeylimit->labelsize(size);

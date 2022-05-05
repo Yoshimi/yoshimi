@@ -1236,6 +1236,34 @@ class MasterUI {open : {private GuiUpdates}
           partui->Showctlmidi();}
             tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
           }
+          Fl_Box modepatch {
+            label Mode
+            xywh {155 328 32 17} box FLAT_BOX color 29 labelsize 11
+          }
+          Fl_Choice partKeymode {
+            callback {//
+          if (o->value() > 1 && partui->drumMode->value() != 0)
+              modepatch->color(91);
+          else
+              modepatch->color(29);
+          modepatch->redraw();
+          send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer, npart);}
+            tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+            code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
+            code1 {int tmp = synth->ReadPartKeyMode(npart); if (tmp > 1) o->value(2); else o->value(tmp);}
+            code3 {o->value(fetchData(0, PART::control::keyMode, npart));}
+          } {}
+          Fl_Box portamento_patch {
+            xywh {82 353 18 18} box THIN_UP_BOX color 237
+          }
+          Fl_Check_Button partPortamento {
+            label Portamento
+            callback {//
+          send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
+            tooltip {Enable/Disable the portamento} xywh {84 353 18 18} down_box DOWN_BOX labelsize 11 align 8
+            code0 {o->value(fetchData(0, PART::control::portamento, npart));}
+            class Fl_Check_Button2
+          }
         }
         Fl_Check_Button partEnable {
           label On
@@ -1261,7 +1289,7 @@ class MasterUI {open : {private GuiUpdates}
         }
 
         send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
-          xywh {55 326 20 20} down_box DOWN_BOX align 4
+          xywh {58 326 20 20} down_box DOWN_BOX align 4
           code0 {o->value(fetchData(0,  PART::control::enable, npart));}
           class Fl_Check_Button2
         }
@@ -2495,7 +2523,7 @@ Alan Calvert started the project}
                 partVelSense->value(value);
                 seen = true;
                 break;
-                
+
             case PART::control::midiChannel:
             {
                 int tmp = value_int;
@@ -2518,13 +2546,35 @@ Alan Calvert started the project}
                 seen = true;
                 break;
             }
-            
+
+            case PART::control::keyMode:
+                partKeymode->value(value_int);
+                if(value_int > 1 && partui->part->Pdrummode != 0)
+                    modepatch->color(91);
+                else
+                    modepatch->color(29);
+                modepatch->redraw();
+                seen = true;
+                break;
+
+            case PART::control::drumMode: // we allow this to cayry on to PartUI
+                if(value_bool != 0 && partKeymode->value() > 1)
+                    modepatch->color(91);
+                else
+                    modepatch->color(29);
+                modepatch->redraw();
+                break;
+
+            case PART::control::portamento:
+                partPortamento->value(value_bool);
+                break;
+
             case PART::control::instrumentName:
                 partui->checkEngines();
                 synth->getGuiMaster()->instrumentlabel->copy_label(synth->part[newpart]->Pname.c_str());
                 seen = true;
                 break;
-                
+
             case PART::control::audioDestination:
                 int send = value_int - 1;
                 if (send < 0 or send > 2)
@@ -2642,16 +2692,16 @@ Alan Calvert started the project}
                         case MIDI::CC::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
-                            partui->modepatch->color(29);
+                            modepatch->color(29);
                             if (mode > 1)
                             {
-                                partui->keymode->value(2);
+                                partKeymode->value(2);
                                 if (partui->drumMode->value() != 0)
-                                    partui->modepatch->color(91);
+                                    modepatch->color(91);
                             }
                             else
-                                partui->keymode->value(mode);
-                            partui->modepatch->redraw();
+                                partKeymode->value(mode);
+                            modepatch->redraw();
                             break;
                         }
                         case MIDI::CC::filterQ:
@@ -3378,6 +3428,18 @@ Alan Calvert started the project}
     partVelSense->value(synth->part[npart]->Pvelsns);
     partui->setinstrumentlabel();
     partMidiCh->value(synth->part[npart]->Prcvchn + 1);
+
+    int tmp = synth->ReadPartKeyMode(npart);
+    if (tmp > 1)
+        partKeymode->value(2);
+    else
+        partKeymode->value(tmp);
+    if (tmp > 1 && synth->part[npart]->Pdrummode != 0)
+        modepatch->color(91);
+    else
+        modepatch->color(29);
+    modepatch->redraw();
+
     partEnable->value(synth->part[npart]->Penabled == 1);
     if (partEnable->value() == 1)
         partControls->activate();
@@ -3413,9 +3475,9 @@ Alan Calvert started the project}
     partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
     partui->minkcounter->value(synth->part[npart]->Pminkey);
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
-    partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
+    partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
 
-    partui->keymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
+    partKeymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
     maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);
@@ -4060,6 +4122,10 @@ bpmfallback->format(format);} {}
     partMidiCCs->labelsize(size12);
     partMidiCh->labelsize(size11);
         partMidiCh->textsize(size11);
+    partKeymode->textsize(size11);
+        modepatch->labelsize(size11);
+    partPortamento->labelsize(size11);
+
     partEnable->labelsize(14 * mainScale);
 
     mainreset->labelsize(size11);
