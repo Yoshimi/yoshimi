@@ -405,24 +405,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
-        Fl_Spinner partkeyshift {
-          label {Key Shift}
-          callback {//
-          send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer);}
-          xywh {194 111 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
-          code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
-          code1 {o->value(part->Pkeyshift - 64);}
-          class WidgetSpinner
-        }
-        Fl_Spinner partkeylimit {
-          label {Key Limit}
-          callback {//
-          send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Maximum keys for this part} xywh {194 143 38 20} labelsize 10 value 20 textsize 11
-          code0 {o->range(1, POLYPHONY); // enough for one part!}
-          code1 {o->value(part->Pkeylimit);}
-          class WidgetSpinner
-        }
         Fl_Box sysEffBox {
           xywh {240 106 134 58} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
         }
@@ -1527,14 +1509,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
             partkititem[kititem]->sendtoeffect->value(valInt);
             break;
 
-        case PART::control::maxNotes:
-            partkeylimit->value(valInt);
-            break;
-
-        case PART::control::keyShift:
-            partkeyshift->value(valInt);
-            break;
-
         case PART::control::partToSystemEffect1:
         case PART::control::partToSystemEffect2:
         case PART::control::partToSystemEffect3:
@@ -2569,12 +2543,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     }
 
     int size = int(10 * dScale);
-    int size11 = int(11 * dScale);
     syseffname->labelsize(size);
-    partkeyshift->labelsize(size);
-        partkeyshift->textsize(size11);
-    partkeylimit->labelsize(size);
-        partkeylimit->textsize(size11);
     partgroup->redraw();} {}
   }
   Function {~PartUI()} {} {

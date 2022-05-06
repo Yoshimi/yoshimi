@@ -1326,6 +1326,24 @@ class MasterUI {open : {private GuiUpdates}
           }}
             tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX labelsize 10
           }
+          Fl_Spinner partKeyShift {
+            label {Key Shift}
+            callback {//
+          send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer, npart);}
+            xywh {195 403 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
+            code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);}
+            code1 {o->value(fetchData(0, PART::control::keyShift, npart));}
+            class WidgetSpinner
+          }
+          Fl_Spinner partKeyLimit {
+            label {Key Limit}
+            callback {//
+          send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer, npart);}
+            tooltip {Maximum keys for this part} xywh {195 435 38 20} labelsize 10 value 20 textsize 11
+            code0 {o->range(1, POLYPHONY); // enough for one part!}
+            code1 {o->value(fetchData(0, PART::control::maxNotes, npart));}
+            class WidgetSpinner
+          }
         }
         Fl_Check_Button partEnable {
           label On
@@ -2655,6 +2673,15 @@ Alan Calvert started the project}
                  seen = true;
              break;
 
+             case PART::control::keyShift:
+                 partKeyShift->value(value_int);
+                 seen = true;
+                 break;
+
+             case PART::control::maxNotes:
+                 partKeyLimit->value(value_int);
+                 seen = true;
+                 break;
 
 
             case PART::control::audioDestination:
@@ -3183,7 +3210,8 @@ Alan Calvert started the project}
             resetPartsClip();
             break;
     }
-    return false;} {}
+    return false;} {selected
+    }
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
@@ -3528,8 +3556,7 @@ Alan Calvert started the project}
     if (partEnable->value() == 1)
         partControls->activate();
     else
-        partControls->deactivate();} {selected
-    }
+        partControls->deactivate();} {}
   }
   Function {updatepart()} {open
   } {
@@ -3556,8 +3583,8 @@ Alan Calvert started the project}
     partVelOffset->value(synth->part[npart]->Pveloffs);
     partVelSense->value(synth->part[npart]->Pvelsns);
 
-    partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
-    partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
+    partKeyLimit->value(synth->part[npart]->Pkeylimit);
+    partKeyShift->value(synth->part[npart]->Pkeyshift - 64);
     minKeyCount->value(synth->part[npart]->Pminkey);
     maxKeyCount->value(synth->part[npart]->Pmaxkey);
     partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
@@ -4197,6 +4224,7 @@ bpmfallback->format(format);} {}
 
     mastermenu->textsize(size12);
 
+    // part insert controls
     partVol->labelsize(size);
     partPan->labelsize(size);
     partVelOffset->labelsize(size);
@@ -4217,6 +4245,10 @@ bpmfallback->format(format);} {}
     setMinToLast->labelsize(size);
     setNormal->labelsize(size11);
     setMaxToLast->labelsize(size);
+    partKeyShift->labelsize(size);
+        partKeyShift->textsize(size11);
+    partKeyLimit->labelsize(size);
+        partKeyLimit->textsize(size11);
 
     partEnable->labelsize(14 * mainScale);
 
