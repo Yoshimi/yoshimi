@@ -423,66 +423,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
           code1 {o->value(part->Pkeylimit);}
           class WidgetSpinner
         }
-        Fl_Spinner minkcounter {
-          label {Min Note}
-          callback {//
-          int tmp = o->value();
-          int other = maxkcounter->value();
-          if (tmp > other)
-          {
-              tmp = other;
-              o->value(tmp);
-          }
-
-          send_data(0, PART::control::minNote, tmp, TOPLEVEL::type::Integer);}
-          tooltip {Minimum note the part receives} xywh {57 111 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-          code0 {o->range(0.0, 127.0);o->step(1.0);}
-          code1 {o->value(part->Pminkey);}
-          class WidgetSpinner
-        }
-        Fl_Spinner maxkcounter {
-          label {Max Note}
-          callback {//
-          int tmp = o->value();
-          int other = minkcounter->value();
-          if (tmp < other)
-          {
-              tmp = other;
-              o->value(tmp);
-          }
-
-          send_data(0, PART::control::maxNote, tmp, TOPLEVEL::type::Integer);}
-          tooltip {Maximum note the part receives} xywh {57 143 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
-          code0 {o->range(0.0, 127.0);o->step(1.0);}
-          code1 {o->value(part->Pmaxkey);}
-          class WidgetSpinner
-        }
-        Fl_Button setmin {
-          label Set
-          callback {//
-          if (part->getLastNote() >= 0)
-              minkcounter->value(part->getLastNote());
-
-          send_data(0, PART::control::minToLastKey, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Set minimum note to the last note played} xywh {104 111 30 16} box PLASTIC_UP_BOX labelsize 10
-        }
-        Fl_Button setnorm {
-          label R
-          callback {//
-          minkcounter->value(0);
-          maxkcounter->value(127);
-
-          send_data(0, PART::control::resetMinMaxKey, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {104 129 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
-        }
-        Fl_Button setmax {
-          label Set
-          callback {//
-          if (part->getLastNote() >= 0) maxkcounter->value(part->getLastNote());
-
-          send_data(0, PART::control::maxToLastKey, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Set maximum note to the last note played} xywh {104 147 30 16} box PLASTIC_UP_BOX labelsize 10
-        }
         Fl_Box sysEffBox {
           xywh {240 106 134 58} box ENGRAVED_FRAME labelfont 1 labelsize 11 align 18
         }
@@ -1570,31 +1510,17 @@ class PartUI {open : {public Fl_Group, PartUI_}
             break;
         case PART::control::minNote:
         case PART::control::minToLastKey: // this will have been modified for last key press
-            if (kitType)
-               partkititem[kititem]->minkcounter->value(valInt);
-            else
-                minkcounter->value(valInt);
+            partkititem[kititem]->minkcounter->value(valInt);;
             break;
 
         case PART::control::maxNote:
         case PART::control::maxToLastKey: // this will have been modified for last key press
-            if (kitType)
-                partkititem[kititem]->maxkcounter->value(valInt);
-            else
-                maxkcounter->value(valInt);
+            partkititem[kititem]->maxkcounter->value(valInt);
             break;
 
         case PART::control::resetMinMaxKey:
-            if (kitType)
-            {
-                partkititem[kititem]->minkcounter->value(0);
-                partkititem[kititem]->maxkcounter->value(127);
-            }
-            else
-            {
-                minkcounter->value(0);
-                maxkcounter->value(127);
-            }
+            partkititem[kititem]->minkcounter->value(0);
+            partkititem[kititem]->maxkcounter->value(127);
             break;
 
         case PART::control::kitEffectNum:
@@ -2649,14 +2575,6 @@ class PartUI {open : {public Fl_Group, PartUI_}
         partkeyshift->textsize(size11);
     partkeylimit->labelsize(size);
         partkeylimit->textsize(size11);
-    minkcounter->labelsize(size);
-        minkcounter->textsize(size11);
-    maxkcounter->labelsize(size);
-        maxkcounter->textsize(size11);
-    setmin->labelsize(size);
-    setnorm->labelsize(size11);
-    setmax->labelsize(size);
-
     partgroup->redraw();} {}
   }
   Function {~PartUI()} {} {

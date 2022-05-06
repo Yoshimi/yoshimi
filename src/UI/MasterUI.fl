@@ -1088,7 +1088,7 @@ class MasterUI {open : {private GuiUpdates}
               tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 295 187 16} box NO_BOX labelsize 12 align 16
             }
             Fl_Box instrumentFrame {
-              xywh {139 296 187 16} box PLASTIC_DOWN_FRAME color 237
+              xywh {139 296 188 16} box PLASTIC_DOWN_FRAME color 237
             }
             Fl_Button buttontop {
               callback {//
@@ -1254,15 +1254,77 @@ class MasterUI {open : {private GuiUpdates}
             code3 {o->value(fetchData(0, PART::control::keyMode, npart));}
           } {}
           Fl_Box portamento_patch {
-            xywh {82 353 18 18} box THIN_UP_BOX color 237
+            xywh {81 351 18 18} box THIN_UP_BOX color 237
           }
           Fl_Check_Button partPortamento {
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 353 18 18} down_box DOWN_BOX labelsize 11 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelsize 11 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
+          }
+          Fl_Spinner minKeyCount {
+            label {Min Note}
+            callback {//
+          int tmp = o->value();
+          int other = maxKeyCount->value();
+          if (tmp > other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
+
+          send_data(0, PART::control::minNote, tmp, TOPLEVEL::type::Integer, npart);}
+            tooltip {Minimum note the part receives} xywh {59 402 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+            code0 {o->value(fetchData(0, PART::control::minNote, npart));}
+            class WidgetSpinner
+          }
+          Fl_Spinner maxKeyCount {
+            label {Max Note}
+            callback {//
+          int tmp = o->value();
+          int other = minKeyCount->value();
+          if (tmp < other)
+          {
+              tmp = other;
+              o->value(tmp);
+          }
+
+          send_data(0, PART::control::maxNote, tmp, TOPLEVEL::type::Integer, npart);}
+            tooltip {Maximum note the part receives} xywh {59 434 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+            code0 {o->value(fetchData(0, PART::control::maxNote, npart));}
+            class WidgetSpinner
+          }
+          Fl_Button setMinToLast {
+            label Set
+            callback {//
+          int lastnote = synth->part[npart]->getLastNote();
+          if (lastnote >= 0)
+          {
+              minKeyCount->value(lastnote);
+              send_data(0, PART::control::minToLastKey, 1, TOPLEVEL::type::Integer, npart);
+          }}
+            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX labelsize 10
+          }
+          Fl_Button setNormal {
+            label R
+            callback {//
+          minKeyCount->value(0);
+          maxKeyCount->value(127);
+          send_data(0, PART::control::resetMinMaxKey, 1, TOPLEVEL::type::Integer, npart);}
+            tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {105 421 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+          }
+          Fl_Button setMaxToLast {
+            label Set
+            callback {//
+          int lastnote = synth->part[npart]->getLastNote();
+          if (lastnote >= 0)
+          {
+              maxKeyCount->value(lastnote);
+              send_data(0, PART::control::maxToLastKey, 1, TOPLEVEL::type::Integer, npart);
+          }}
+            tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX labelsize 10
           }
         }
         Fl_Check_Button partEnable {
@@ -2575,6 +2637,26 @@ Alan Calvert started the project}
                 seen = true;
                 break;
 
+             case PART::control::minNote:
+             case PART::control::minToLastKey: // this will have been modified for last key press
+                minKeyCount->value(value_int);
+                seen = true;
+             break;
+
+             case PART::control::maxNote:
+             case PART::control::maxToLastKey: // this will have been modified for last key press
+                maxKeyCount->value(value_int);
+                seen = true;
+             break;
+
+             case PART::control::resetMinMaxKey:
+                 minKeyCount->value(0);
+                 maxKeyCount->value(127);
+                 seen = true;
+             break;
+
+
+
             case PART::control::audioDestination:
                 int send = value_int - 1;
                 if (send < 0 or send > 2)
@@ -2586,6 +2668,7 @@ Alan Calvert started the project}
         }
         return seen;
     }
+
     if (newpart == TOPLEVEL::section::midiIn)
     {
         if (engine == MIDI::CC::volume && partui->part->ctl->volume.receive == 0)
@@ -3100,8 +3183,7 @@ Alan Calvert started the project}
             resetPartsClip();
             break;
     }
-    return false;} {selected
-    }
+    return false;} {}
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
@@ -3428,6 +3510,8 @@ Alan Calvert started the project}
     partVelSense->value(synth->part[npart]->Pvelsns);
     partui->setinstrumentlabel();
     partMidiCh->value(synth->part[npart]->Prcvchn + 1);
+    minKeyCount->value(synth->part[npart]->Pminkey);
+    maxKeyCount->value(synth->part[npart]->Pmaxkey);
 
     int tmp = synth->ReadPartKeyMode(npart);
     if (tmp > 1)
@@ -3444,7 +3528,8 @@ Alan Calvert started the project}
     if (partEnable->value() == 1)
         partControls->activate();
     else
-        partControls->deactivate();} {}
+        partControls->deactivate();} {selected
+    }
   }
   Function {updatepart()} {open
   } {
@@ -3473,8 +3558,8 @@ Alan Calvert started the project}
 
     partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
     partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
-    partui->minkcounter->value(synth->part[npart]->Pminkey);
-    partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
+    minKeyCount->value(synth->part[npart]->Pminkey);
+    maxKeyCount->value(synth->part[npart]->Pmaxkey);
     partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
 
     partKeymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
@@ -4125,8 +4210,16 @@ bpmfallback->format(format);} {}
     partKeymode->textsize(size11);
         modepatch->labelsize(size11);
     partPortamento->labelsize(size11);
+    minKeyCount->labelsize(size);
+        minKeyCount->textsize(size11);
+    maxKeyCount->labelsize(size);
+        maxKeyCount->textsize(size11);
+    setMinToLast->labelsize(size);
+    setNormal->labelsize(size11);
+    setMaxToLast->labelsize(size);
 
     partEnable->labelsize(14 * mainScale);
+
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
