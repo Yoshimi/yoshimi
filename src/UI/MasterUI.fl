@@ -516,9 +516,9 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }} open
-      xywh {421 430 385 500} type Double labelfont 13 labelsize 12 resizable
+      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -1029,7 +1029,7 @@ class MasterUI {open : {private GuiUpdates}
           code1 {o->show();}
           class PartUI
         } {}
-        Fl_Group partControls {open
+        Fl_Group partControls {
           xywh {3 286 378 175}
         } {
           Fl_Dial partVol {
@@ -1344,20 +1344,54 @@ class MasterUI {open : {private GuiUpdates}
             code1 {o->value(fetchData(0, PART::control::maxNotes, npart));}
             class WidgetSpinner
           }
+          Fl_Group sysEffBox {
+            xywh {240 400 134 58} box ENGRAVED_FRAME
+          } {
+            Fl_Text_Display sysEffName {
+              label {Send to System Effect}
+              xywh {255 440 103 1} box NO_BOX labelsize 11 align 2
+            }
+            Fl_Dial sysEff1 {
+              label 1
+              callback {//
+
+    send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect1, o->value(), TOPLEVEL::type::Integer, npart);}
+              xywh {246 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              class WidgetPDial
+            }
+            Fl_Dial sysEff2 {
+              label 2
+              callback {//
+
+    send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect2, o->value(), TOPLEVEL::type::Integer, npart);}
+              xywh {278 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              class WidgetPDial
+            }
+            Fl_Dial sysEff3 {
+              label 3
+              callback {//
+
+    send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect3, o->value(), TOPLEVEL::type::Integer, npart);}
+              xywh {310 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              class WidgetPDial
+            }
+            Fl_Dial sysEff4 {
+              label 4
+              callback {//
+
+    send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect4, o->value(), TOPLEVEL::type::Integer, npart);}
+              xywh {342 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              class WidgetPDial
+            }
+          }
         }
         Fl_Check_Button partEnable {
           label On
           callback {//;
         if (o->value() != 1)
-        {
             partControls->deactivate();
-            partui->toSysEfx->deactivate();
-        }
         else
-        {
             partControls->activate();
-            partui->toSysEfx->activate();
-        }
 
         if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
         {
@@ -1368,7 +1402,7 @@ class MasterUI {open : {private GuiUpdates}
                 panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
         }
 
-        send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, npart);}
           xywh {58 326 20 20} down_box DOWN_BOX align 4
           code0 {o->value(fetchData(0,  PART::control::enable, npart));}
           class Fl_Check_Button2
@@ -2532,7 +2566,7 @@ Alan Calvert started the project}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open return_type bool
+  Function {returns_update(CommandBlock *getData)} {return_type bool
   } {
     code {//
     float value = getData->data.value;
@@ -2683,6 +2717,22 @@ Alan Calvert started the project}
                  seen = true;
                  break;
 
+             case PART::partToSystemEffect1:
+                 sysEff1->value(value);
+                 seen = true;
+                 break;
+             case PART::partToSystemEffect2:
+                 sysEff2->value(value);
+                 seen = true;
+                 break;
+             case PART::partToSystemEffect3:
+                 sysEff3->value(value);
+                 seen = true;
+                 break;
+             case PART::partToSystemEffect4:
+                 sysEff4->value(value);
+                 seen = true;
+                 break;
 
             case PART::control::audioDestination:
                 int send = value_int - 1;
@@ -3210,8 +3260,7 @@ Alan Calvert started the project}
             resetPartsClip();
             break;
     }
-    return false;} {selected
-    }
+    return false;} {}
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
@@ -3523,7 +3572,6 @@ Alan Calvert started the project}
     partui = new PartUI(3 * mainScale, 285 * mainScale, 380 * mainScale, 170 * mainScale);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
-    partui->groupRtext(mainScale);
     partui->kitRtext(true);
     partui->redraw();
     npartcounter->value(nval + 1);
@@ -3541,6 +3589,12 @@ Alan Calvert started the project}
     minKeyCount->value(synth->part[npart]->Pminkey);
     maxKeyCount->value(synth->part[npart]->Pmaxkey);
 
+    sysEff1->value(synth->Psysefxvol[0][npart]);
+    sysEff2->value(synth->Psysefxvol[1][npart]);
+    sysEff3->value(synth->Psysefxvol[2][npart]);
+    sysEff4->value(synth->Psysefxvol[3][npart]);
+
+
     int tmp = synth->ReadPartKeyMode(npart);
     if (tmp > 1)
         partKeymode->value(2);
@@ -3556,7 +3610,8 @@ Alan Calvert started the project}
     if (partEnable->value() == 1)
         partControls->activate();
     else
-        partControls->deactivate();} {}
+        partControls->deactivate();} {selected
+    }
   }
   Function {updatepart()} {open
   } {
@@ -3570,11 +3625,6 @@ Alan Calvert started the project}
         maxparts->redraw();
         return;
     }
-
-    if (synth->partonoffRead(npart))
-        partui->partgroupui->activate();
-    else
-        partui->partgroupui->deactivate();
 
     partEnable->value(synth->partonoffRead(npart));
 
@@ -3698,7 +3748,6 @@ Alan Calvert started the project}
         panellistitem[displaypart]->panellistitemgroup->deactivate();
     }
     partEnable->value(0);
-    partui->partgroup->deactivate();
     send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentByName, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, npart, UNUSED, UNUSED, textMsgBuffer.push(fname));} {}
   }
   Function {do_load_master(string filename)} {} {
@@ -3936,16 +3985,6 @@ Alan Calvert started the project}
     if (_npart == npart)
     {
         partEnable->value(active);
-        if (active)
-        {
-            partui->partgroupui->activate();
-            partui->toSysEfx->activate();
-        }
-        else
-        {
-            partui->partgroupui->deactivate();
-            partui->toSysEfx->deactivate();
-        }
     }} {}
   }
   Function {setPanelPartVolWidget(int _npart, float _value)} {} {
@@ -4212,8 +4251,7 @@ bpmfallback->format(format);} {}
     bankui->wincheck();
     partui->wincheck();} {}
   }
-  Function {mainRtext()} {open
-  } {
+  Function {mainRtext()} {} {
     code {//
 
     mainScale = float(masterwindow->w() / mainDW);
@@ -4250,8 +4288,13 @@ bpmfallback->format(format);} {}
     partKeyLimit->labelsize(size);
         partKeyLimit->textsize(size11);
 
-    partEnable->labelsize(14 * mainScale);
+    sysEff1->labelsize(size);
+    sysEff2->labelsize(size);
+    sysEff3->labelsize(size);
+    sysEff4->labelsize(size);
+    sysEffName->labelsize(size);
 
+    partEnable->labelsize(14 * mainScale);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
@@ -4282,7 +4325,7 @@ bpmfallback->format(format);} {}
     sysEffSend->labelsize(size11);
     sysCopy->labelsize(size11);
     sysPaste->labelsize(size11);
-    syseffectui->effRtext(mainScale, sysefftype->value());
+    //syseffectui->effRtext(mainScale, sysefftype->value());
 
 
     InsertionEffectsGrp->labelsize(size12);
@@ -4308,7 +4351,6 @@ bpmfallback->format(format);} {}
     undo->labelsize(size11);
     redo->labelsize(size11);
 
-    partui->groupRtext(mainScale);
     masterwindow->redraw();} {}
   }
   Function {panelRtext()} {} {
