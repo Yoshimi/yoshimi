@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -295,7 +295,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -418,6 +418,8 @@ class MasterUI {open : {private GuiUpdates}
       openedit = false;
       make_window();
       bool foundWindows = Showmaster();
+      if (partui)
+          partui->checkEngines();
       if (instance > 0)
           foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
@@ -998,7 +1000,7 @@ class MasterUI {open : {private GuiUpdates}
           }
         }
       }
-      Fl_Group syseffectuigroup {open
+      Fl_Group syseffectuigroup {
         xywh {3 188 379 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
@@ -1008,7 +1010,7 @@ class MasterUI {open : {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {3 188 379 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
@@ -1019,7 +1021,7 @@ class MasterUI {open : {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -3096,12 +3098,6 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::loadInstrumentFromBank:
-            /*if (insert != UNUSED)
-                ;// updateBankRootDirs() // apparently not needed!
-            if (engine != UNUSED)
-                bankui->readbankcfg(); // why did we have this?
-            if (insert != UNUSED || engine != UNUSED)
-                bankui->rescan_for_banks(); // why did we have this?*/
             bankui->refreshinstrumentwindow();
             updatepartprogram(kititem);
             break;
@@ -3151,7 +3147,6 @@ Alan Calvert started the project}
             {
                 setMasterLabel(findLeafName(name));
                 //RecentParams->activate();
-                //updatepanel(); // why?
             }
             break;
 
@@ -3577,7 +3572,6 @@ Alan Calvert started the project}
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
-    updatelistitem(npart);
     updatelistitem(nval);
     activePart = nval;
     npart = nval;
@@ -3611,7 +3605,8 @@ Alan Calvert started the project}
     if (partEnable->value() == 1)
         partControls->activate();
     else
-        partControls->deactivate();} {}
+        partControls->deactivate();
+    partui->checkEngines();} {}
   }
   Function {updatepart()} {} {
     code {//
@@ -3650,11 +3645,6 @@ Alan Calvert started the project}
     code {//
     if (vectorui)
         vectorui->setInstrumentLabel(_npart);
-    /*if (_npart != npart) // not needed?
-    {
-        updatelistitem(_npart);
-        return;
-    }*/
 
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
@@ -3789,9 +3779,6 @@ Alan Calvert started the project}
     setInsEff(ninseff);
 
     sysinsgroup->value(SystemEffectsGrp);
-
-
-
 
     bool status;
     SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
@@ -4348,8 +4335,7 @@ bpmfallback->format(format);} {}
     undo->labelsize(size11);
     redo->labelsize(size11);
 
-    masterwindow->redraw();} {selected
-    }
+    masterwindow->redraw();} {}
   }
   Function {panelRtext()} {} {
     code {//

@@ -1867,7 +1867,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     {
         originalname->hide();
         originaltext->hide();
-    }
+    };
     lastkey = -1;
     lasteditW = 0;
     lastctlW = 0;
