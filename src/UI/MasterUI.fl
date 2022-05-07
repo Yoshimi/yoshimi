@@ -1358,6 +1358,7 @@ class MasterUI {: {private GuiUpdates}
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect1, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {246 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(fetchData(0, PART::control::partToSystemEffect1, npart));}
               class WidgetPDial
             }
             Fl_Dial sysEff2 {
@@ -1366,6 +1367,7 @@ class MasterUI {: {private GuiUpdates}
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect2, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {278 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(fetchData(0, PART::control::partToSystemEffect2, npart));}
               class WidgetPDial
             }
             Fl_Dial sysEff3 {
@@ -1374,6 +1376,7 @@ class MasterUI {: {private GuiUpdates}
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect3, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {310 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(fetchData(0, PART::control::partToSystemEffect3, npart));}
               class WidgetPDial
             }
             Fl_Dial sysEff4 {
@@ -1382,6 +1385,7 @@ class MasterUI {: {private GuiUpdates}
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect4, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {342 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(fetchData(0, PART::control::partToSystemEffect4, npart));}
               class WidgetPDial
             }
           }
