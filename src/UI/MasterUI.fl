@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -295,7 +295,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -4323,8 +4323,7 @@ bpmfallback->format(format);} {}
     sysEffSend->labelsize(size11);
     sysCopy->labelsize(size11);
     sysPaste->labelsize(size11);
-    //syseffectui->effRtext(mainScale, sysefftype->value());
-
+    syseffectui->effRtext(mainScale, sysefftype->value());
 
     InsertionEffectsGrp->labelsize(size12);
     inseffnocounter->labelsize(size11);
@@ -4349,7 +4348,8 @@ bpmfallback->format(format);} {}
     undo->labelsize(size11);
     redo->labelsize(size11);
 
-    masterwindow->redraw();} {}
+    masterwindow->redraw();} {selected
+    }
   }
   Function {panelRtext()} {} {
     code {//
