@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -295,7 +295,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -477,8 +477,7 @@ class MasterUI {open : {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -515,7 +514,7 @@ class MasterUI {open : {private GuiUpdates}
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
                 synth->guiClosed(true);
-            }} open
+            }}
       xywh {371 427 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
@@ -999,7 +998,7 @@ class MasterUI {open : {private GuiUpdates}
           }
         }
       }
-      Fl_Group syseffectuigroup {
+      Fl_Group syseffectuigroup {open
         xywh {3 188 379 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
@@ -1009,7 +1008,7 @@ class MasterUI {open : {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group inseffectuigroup {
+      Fl_Group inseffectuigroup {open
         xywh {3 188 379 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
@@ -2566,31 +2565,15 @@ Alan Calvert started the project}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {return_type bool
+  Function {part_group_returns(CommandBlock *getData)} {return_type bool
   } {
     code {//
-    float value = getData->data.value;
-    bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
-    bool force = getData->data.source & TOPLEVEL::action::forceUpdate;
-    unsigned char control = getData->data.control;
-    unsigned char newpart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char miscmsg = getData->data.miscmsg;
-    int value_int = lrint(value);
-    bool value_bool = _SYS_::F2B(value);
-    int chan = kititem & 0x3f;
-    bool isSingle = kititem >= 0x40;
-    int mask = NUM_MIDI_CHANNELS - 1;
-    string name;
-    if (miscmsg != NO_MSG)
-        name = textMsgBuffer.fetch(miscmsg);
-    int panelpart = 0;
-
-    if (newpart < NUM_MIDI_PARTS)
-    {
+        float value = getData->data.value;
+        unsigned char control = getData->data.control;
+        unsigned char newpart = getData->data.part;
+        int value_int = lrint(value);
+        bool value_bool = _SYS_::F2B(value);
+        int panelpart = 0;
         bool panelVisible = ((newpart / NUM_MIDI_CHANNELS) == (panelgroup / NUM_MIDI_CHANNELS));
         if (panelVisible)
             panelpart = newpart % NUM_MIDI_CHANNELS;
@@ -2743,9 +2726,29 @@ Alan Calvert started the project}
                 seen = true;
                 break;
         }
-        return seen;
-    }
-
+        return seen;} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {return_type bool
+  } {
+    code {//
+    float value = getData->data.value;
+    bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
+    bool force = getData->data.source & TOPLEVEL::action::forceUpdate;
+    unsigned char control = getData->data.control;
+    unsigned char newpart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
+    unsigned char miscmsg = getData->data.miscmsg;
+    int value_int = lrint(value);
+    bool value_bool = _SYS_::F2B(value);
+    int chan = kititem & 0x3f;
+    bool isSingle = kititem >= 0x40;
+    int mask = NUM_MIDI_CHANNELS - 1;
+    string name;
+    if (miscmsg != NO_MSG)
+        name = textMsgBuffer.fetch(miscmsg);
     if (newpart == TOPLEVEL::section::midiIn)
     {
         if (engine == MIDI::CC::volume && partui->part->ctl->volume.receive == 0)
@@ -2988,7 +2991,7 @@ Alan Calvert started the project}
                 activePart = value_int;
 
             partNew(activePart);
-            //updatepanel(); // not needed?
+            updatepanel();
             if (openedit)
             {
                 partui->Showedit();
@@ -3509,8 +3512,7 @@ Alan Calvert started the project}
         panelwindow->hide();
     }} {}
   }
-  Function {updatepanel(bool full = false)} {open
-  } {
+  Function {updatepanel(bool full = false)} {} {
     code {//
     for (int npart = 0; npart < partmax; ++npart)
     {
@@ -3563,8 +3565,7 @@ Alan Calvert started the project}
     };
     panelwindow->changed();} {}
   }
-  Function {partNew(int _npart)} {open
-  } {
+  Function {partNew(int _npart)} {} {
     code {//
     int nval = _npart;
     partuigroup->remove(partui);
@@ -3610,11 +3611,9 @@ Alan Calvert started the project}
     if (partEnable->value() == 1)
         partControls->activate();
     else
-        partControls->deactivate();} {selected
-    }
+        partControls->deactivate();} {}
   }
-  Function {updatepart()} {open
-  } {
+  Function {updatepart()} {} {
     code {//
     if (checkmaxparts())
     {
@@ -3647,8 +3646,7 @@ Alan Calvert started the project}
     npartcounter->redraw();
     partui->checkEngines();} {}
   }
-  Function {updatepartprogram(int _npart)} {open
-  } {
+  Function {updatepartprogram(int _npart)} {} {
     code {//
     if (vectorui)
         vectorui->setInstrumentLabel(_npart);
