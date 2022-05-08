@@ -7508,6 +7508,17 @@ float InterChange::returnLimits(CommandBlock *getData)
         return value;
     }
 
+    if (npart == TOPLEVEL::section::undoMark)
+    {
+        switch (control)
+        {
+            case MAIN::control::undo:
+            case MAIN::control::redo:
+                return value; // these have no limits!
+            break;
+        }
+    }
+
     min = 0;
     max = 127;
     def = 0;

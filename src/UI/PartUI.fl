@@ -1247,12 +1247,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         int ret = Fl_Group::handle(event);
         return 0;
-        
+
         /*
          * I don't know why we need to do this but it screws up
          * MasterUi if it is either active or fully removed.
         */
-        
+
         switch(event)
         {
             case FL_FOCUS:

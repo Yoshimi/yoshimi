@@ -1027,7 +1027,6 @@ class MasterUI {: {private GuiUpdates}
         Fl_Group partui {
           xywh {3 285 379 172} color 47
           code0 {o->init(synth->part[0],0,bankui);}
-          code1 {o->show();}
           class PartUI
         } {}
         Fl_Group partControls {
@@ -2678,50 +2677,50 @@ Alan Calvert started the project}
                 seen = true;
                 break;
 
-             case PART::control::minNote:
-             case PART::control::minToLastKey: // this will have been modified for last key press
+            case PART::control::minNote:
+            case PART::control::minToLastKey: // this will have been modified for last key press
                 minKeyCount->value(value_int);
                 seen = true;
-             break;
+                break;
 
-             case PART::control::maxNote:
-             case PART::control::maxToLastKey: // this will have been modified for last key press
+            case PART::control::maxNote:
+            case PART::control::maxToLastKey: // this will have been modified for last key press
                 maxKeyCount->value(value_int);
                 seen = true;
-             break;
+                break;
 
-             case PART::control::resetMinMaxKey:
-                 minKeyCount->value(0);
-                 maxKeyCount->value(127);
-                 seen = true;
-             break;
+            case PART::control::resetMinMaxKey:
+                minKeyCount->value(0);
+                maxKeyCount->value(127);
+                seen = true;
+                break;
 
-             case PART::control::keyShift:
-                 partKeyShift->value(value_int);
-                 seen = true;
-                 break;
+            case PART::control::keyShift:
+                partKeyShift->value(value_int);
+                seen = true;
+                break;
 
-             case PART::control::maxNotes:
-                 partKeyLimit->value(value_int);
-                 seen = true;
-                 break;
+            case PART::control::maxNotes:
+                partKeyLimit->value(value_int);
+                seen = true;
+                break;
 
-             case PART::partToSystemEffect1:
-                 sysEff1->value(value);
-                 seen = true;
-                 break;
-             case PART::partToSystemEffect2:
-                 sysEff2->value(value);
-                 seen = true;
-                 break;
-             case PART::partToSystemEffect3:
-                 sysEff3->value(value);
-                 seen = true;
-                 break;
-             case PART::partToSystemEffect4:
-                 sysEff4->value(value);
-                 seen = true;
-                 break;
+            case PART::partToSystemEffect1:
+                sysEff1->value(value);
+                seen = true;
+                break;
+            case PART::partToSystemEffect2:
+                sysEff2->value(value);
+                seen = true;
+                break;
+            case PART::partToSystemEffect3:
+                sysEff3->value(value);
+                seen = true;
+                break;
+            case PART::partToSystemEffect4:
+                sysEff4->value(value);
+                seen = true;
+                break;
 
             case PART::control::audioDestination:
                 int send = value_int - 1;
@@ -3569,7 +3568,7 @@ Alan Calvert started the project}
     int nval = _npart;
     partuigroup->remove(partui);
     delete partui;
-    partui = new PartUI(3 * mainScale, 285 * mainScale, 380 * mainScale, 170 * mainScale);
+    partui = new PartUI(0, 0, 0, 0);
     partuigroup->add(partui);
     partui->init(synth->part[nval], nval, bankui);
     partui->kitRtext(true);
