@@ -22,5 +22,4 @@ Only doing the more signifiant releases from here on.
 1.7.0  Pipit
 2.0 Northern Cardinal
 2.1.0 Marsh Warbler
-
-2.2.0 ?
+2.2.0 Blackcap

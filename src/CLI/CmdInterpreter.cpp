@@ -5450,11 +5450,12 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
         return midiControllers(input, controlType);
     }
 
+    if (input.matchnMove(2, "drum"))
+        return sendNormal(synth, 0, (input.toggle() != 0), controlType, PART::control::drumMode, npart);
+
     if (inKitEditor)
     {
         int value;
-        if (input.matchnMove(2, "drum"))
-            return sendNormal(synth, 0, (input.toggle() != 0), controlType, PART::control::drumMode, npart);
         if (input.matchnMove(2, "quiet"))
             return sendNormal(synth, 0, (input.toggle() != 0), controlType, PART::control::kitItemMute, npart, kitNumber, UNUSED, TOPLEVEL::insert::kitGroup);
          // This is for selection from 3 part effects. See above for definitions.

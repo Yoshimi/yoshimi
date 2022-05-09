@@ -1,0 +1,9 @@
+2009
+Yoshimi forked from ZynAddSubFX by Alan Calvert.
+Officially acknowledged on September 1st.
+
+2011
+Maintenance taken over by Jeremy Jongpier.
+
+2014
+Maintenance passed on to Will Godfrey.

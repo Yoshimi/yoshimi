@@ -335,7 +335,9 @@ bool FutureBuild<TAB>::shallRebuild()  const
 template<class TAB>
 bool FutureBuild<TAB>::isUnderway()  const
 {
-    return bool{target.load(std::memory_order_consume)}
+    // changed curly braces below to normal ones to suppress warnings (was this intended?) - Will
+    //return bool{target.load(std::memory_order_consume)}
+    return bool(target.load(std::memory_order_consume))
         or shallRebuild();
 }
 

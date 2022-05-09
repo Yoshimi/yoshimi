@@ -1,4 +1,12 @@
-yoshimi 2.2.0 rc0
+yoshimi 2.2.0 rc1
+
+2022-5-9 Will
+bn2128
+Merged in altmain with adjusted main window.
+BugFix: CLI drum mode control in wrong place.
+Suppressed compiler warning in BuildScheduler.h
+Updated docs and User guide.
+Set release candidate 2.2.0 rc1
 
 2022-5-1 Will
 bn2127
