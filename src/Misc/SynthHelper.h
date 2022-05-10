@@ -173,7 +173,7 @@ class SFadeCurve
 {
     static constexpr float ASYM = 1.0 / 0.938; // heuristics: typically the curve reaches 0.96 after fadeLen
     static constexpr float K = 2.0;            // higher values of K create a more linear less S-shape curve
-    static constexpr float LN_K = log(K) / (K-1);
+    static float lnK() { return log(K) / (K-1);}
     static constexpr float TURN = 1/5.0;       // heuristics: turning point after 1/5 of fade length
 
     const float q1;
@@ -183,7 +183,7 @@ class SFadeCurve
 
     public:
         SFadeCurve(size_t fadeLen)
-            : q1{LN_K / (TURN * fadeLen)}
+            : q1{lnK() / (TURN * fadeLen)}
             , q2{K * q1}
             , goal{0}
             , mix{0}

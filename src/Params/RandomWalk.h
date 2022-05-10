@@ -45,9 +45,6 @@ class RandomWalk
     float spread{0}; // likewise log2 (spread=1.0 ==> spread-factor 2.0)
     RandomGen& prng;
 
-    static constexpr uint PARAM_SCALE = 4;
-    static constexpr double LN_4 = log(PARAM_SCALE);
-
 public:
     RandomWalk(RandomGen& randSrc)
         : prng{randSrc}
@@ -127,7 +124,7 @@ public:
         if (param >127) param = 127;
         // calculate 1 + (4 ^ (p/96 - 1))^4
         double arg = param/96.0 - 1.0;
-        double exp4 = exp(LN_4 * arg); // 4^arg
+        double exp4 = exp(log(4) * arg); // 4^arg
         return 1 + exp4*exp4*exp4*exp4;
     }
 
@@ -140,7 +137,7 @@ public:
         // p/96 - 1 = log4(root4(s) - 1)
         // p = 96·(log4(root4(s) - 1) + 1)
         double root4 = exp(log(spread)/4);
-        double log4 = log(root4 - 1)/LN_4;
+        double log4 = log(root4 - 1)/log(4);
         return uchar(96 * (log4 + 1));
     }
 };

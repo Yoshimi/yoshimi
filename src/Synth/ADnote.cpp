@@ -233,7 +233,7 @@ ADnote::ADnote(ADnote const& orig, ADnote *topVoice_, float *parentFMmod_)
     , subVoice{}
     , subFMVoice{}
     , subVoiceNr{orig.subVoiceNr}
-    , topVoice{topVoice? topVoice_ : this}
+    , topVoice{topVoice_? topVoice_ : this}
     , parentFMmod{parentFMmod_}
 {
     // These are all arrays, so sizeof is correct
