@@ -8,10 +8,11 @@ A major feature is the revision of the PadSynth engine including a new mode cont
 
 * 'Auto-Apply' as the name suggests will seamlessly apply the wavetable once it is ready.
 
-In the Padsynth engine itself there is a new control allowing you to set how long it takes for the new wavetable to fade in. This can be up to 20 seconds.
+In the Padsynth engine itself there is a new control allowing you to set how long it takes for the new wavetable to fade in. This can be up to 60 seconds.
 
 Also, there is a New experimental 'Retrigger' window with various morphing controls.
 The retrigger control itself set the time when a regeneration will take place. At this time the other controls will be applied by a random amount between zero and the control setting.
+With a retrigger time of around 500mS and small values set for the other controls, there will be minor changes to the wavetable giving subtle 'movement' to the sound. Larger values can be used for specific and more abrupt effects.
 
 
 In the main window there are Undo/Redo buttons for comprehensive Undo/Redo operations. We've had to make some changes to the main window layout to accomodate those sensibly. At the same time we took the opportunity to make other changes that had previously been requested.

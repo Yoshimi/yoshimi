@@ -14,3 +14,5 @@ The master reset will zero all of these figures.
 Yoshimi's virtual keyboard is not supported by this system and will actually produce negative numbers!
 
 Bear in mind you can have more note_ons than note-offs as two note_ons at the same pitch and channel will both be cancelled by a single note_off. These will be reported as 'hanging' notes.
+
+This last point is no longer true. Note_on events are counted and will require the same number of of note-off events. However, if you change the incoming channel number while a note is playing *within Yoshimi* the incoming counts will be correct, but there will be notes still sounding.
