@@ -1222,7 +1222,7 @@ class MasterUI {: {private GuiUpdates}
             //lastkey = -1;
             partui->Showedit();
        // }}
-            xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12
+            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12
           }
           Fl_Button partControllers {
             label Controllers

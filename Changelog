@@ -1,6 +1,10 @@
 yoshimi 2.2.0 rc2
 
 2022-5-11 Will
+bn2130
+* Changed cmake policy CMP0072 from OLD to NEW.
+* Added tooltip to Edit button.
+
 bn2129
 * Applied patch from Hermann for compiling with clang.
 * Changed randWalkWindow_retext() to randRtext()
