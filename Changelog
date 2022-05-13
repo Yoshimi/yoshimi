@@ -1,4 +1,10 @@
-yoshimi 2.2.0 rc2
+yoshimi 2.2.0 rc3
+
+2022-5-13 Will
+bn2130
+* Corrected some entries in textLists.h
+  Adjusted User Guide to match.
+* Set release candidate 2.2.0 rc3
 
 2022-5-11 Will
 bn2130
