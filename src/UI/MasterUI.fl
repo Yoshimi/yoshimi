@@ -261,7 +261,7 @@ class KeyHandle {: {public Fl_Box}
         ev = 1;
     else if (event == FL_SHORTCUT)
     {
-        int key = Fl::event_key();
+        auto key = Fl::event_key();
         if (key == 'z')
         {
             if (Fl::event_state() == 327680) //ctrl + shift
@@ -269,13 +269,13 @@ class KeyHandle {: {public Fl_Box}
                 synth->getGuiMaster()->redo->do_callback();
                 ev = 1;
             }
-             else if (Fl::event_ctrl)
+             else if (Fl::event_ctrl())
              {
                  synth->getGuiMaster()->undo->do_callback();
                  ev = 1;
              }
         }
-        else if (Fl::event_alt)
+        else if (Fl::event_alt())
         {
             if(key == 'r')
             {

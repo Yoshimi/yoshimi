@@ -1,8 +1,12 @@
 Version 2.2.0
 
-Blurb
+A major feature is the revision of the PadSynth engine, giving more dynamic control.
 
-Further details in /doc/Yoshimi_2.2.0_features.txt
+We now support Undo/Redo for most settings.
+
+Some controls in the main window are better placed and should be more obvious.
+
+Full details are in /doc/Yoshimi_2.2.0_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

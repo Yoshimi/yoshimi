@@ -1,4 +1,8 @@
-yoshimi 2.2.0 rc3
+yoshimi 2.2.0
+
+* Final cleanups and adjustments.
+* Commented out cmake testing definitions.
+* Set release version 2.2.0
 
 2022-5-13 Will
 bn2130

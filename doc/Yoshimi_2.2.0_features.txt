@@ -26,6 +26,8 @@ We've swapped over the positions of the MIDI channel spinbox and the checkbox fo
 * The Edit button is now the same colour as all the other buttons, making it more obvious.
 
 
+There has also been a very thorough revision of our documentation, including the Advanced Reference Manual.
+
 Not forgetting, the usual bugfixes and minor detail enhancements.
 
 Yoshimi source code is available from either:

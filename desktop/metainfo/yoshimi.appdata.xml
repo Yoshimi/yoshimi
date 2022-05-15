@@ -23,11 +23,11 @@
     Version 2.1.0 extends MIDI sync for Effects where relevant, and extensions to NRPNs. There is also an new HTML User Guide.
     </p>
     <p>
-        Version 2.2.0 sees a major revision of the PadSynth engine allowing significant morphing of the wavetables in real-time.
+    Version 2.2.0 sees a major revision of the PadSynth engine allowing significant morphing of the wavetables in real-time.
     </p>
   </description>
   <releases>
-​    <release version="2.2.0" date="2022-5-9" />
+​    <release version="2.2.0" date="2022-5-16" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>
