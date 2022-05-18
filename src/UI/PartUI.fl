@@ -1867,7 +1867,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     {
         originalname->hide();
         originaltext->hide();
-    };
+    }
     lastkey = -1;
     lasteditW = 0;
     lastctlW = 0;
@@ -2161,8 +2161,8 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     if (partfx->visible())
     {
-    	if (insefftype->value() == 8) // dynfilter
-    	{
+        if (insefftype->value() == 8) // dynfilter
+        {
             if(inseffectui->filterwindow != NULL)
             {
                 if(inseffectui->filterwindow->visible())

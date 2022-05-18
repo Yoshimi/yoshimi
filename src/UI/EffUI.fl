@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
@@ -65,7 +65,6 @@ decl {\#include "PresetsUI.h"} {public local
 
 decl {using std::to_string;} {private global
 }
-
 
 class EQGraph {: {public Fl_Box}
 } {
@@ -234,7 +233,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_null_window()} {} {
     Fl_Window effnullwindow {
-      xywh {915 700 378 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
+      xywh {912 927 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
       Fl_Text_Display noeffect {
@@ -245,7 +244,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
-      xywh {1005 24 378 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
+      xywh {880 45 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
       class Fl_Group
     } {
       Fl_Text_Display revname {
@@ -368,7 +367,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_echo_window()} {} {
     Fl_Window effechowindow {
-      xywh {979 149 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
+      xywh {880 169 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Text_Display echoname {
@@ -395,7 +394,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 1;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::echo | 128), TOPLEVEL::type::Integer);}
-        xywh {59 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        xywh {64 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
@@ -404,7 +403,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 2;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::echo | 128), TOPLEVEL::type::Integer);}
-        xywh {111 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay);}
         class WidgetPDial
       }
@@ -413,7 +412,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 3;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::echo | 128), TOPLEVEL::type::Integer);}
-        tooltip {Delay between L/R} xywh {164 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        tooltip {Delay between L/R} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(VC_FXEchoLRdel);}
         class WidgetPDial
       }
@@ -422,7 +421,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 4;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::echo | 128), TOPLEVEL::type::Integer);}
-        tooltip {L/R crossover} xywh {218 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {L/R crossover} xywh {226 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -431,7 +430,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 5;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::echo | 128), TOPLEVEL::type::Integer);}
-        tooltip Feedback xywh {273 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Feedback xywh {280 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -454,7 +453,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_chorus_window()} {} {
     Fl_Window effchoruswindow {
-      xywh {881 316 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {879 294 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display chorusname {
@@ -524,7 +523,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 5;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        tooltip {L/R phase shift} xywh {235 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {L/R phase shift} xywh {237 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXlfoStereo);}
         class WidgetPDial
       }
@@ -533,7 +532,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 6;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        tooltip {LFO depth} xywh {270 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {LFO depth} xywh {272 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXChorusDepth);}
         class WidgetPDial
       }
@@ -542,7 +541,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 7;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        xywh {305 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        xywh {307 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXChorusDelay);}
         class WidgetPDial
       }
@@ -551,7 +550,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt =8;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        tooltip Feedback xywh {340 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip Feedback xywh {342 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(VC_FXdefaultFb);}
         class WidgetPDial
       }
@@ -560,7 +559,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 9;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        tooltip {Channel routing} xywh {252 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        tooltip {Channel routing} xywh {254 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -576,7 +575,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Subtract
         callback {//
         send_data(0, 11, o->value(), (TOPLEVEL::insert::chorus | 128), TOPLEVEL::type::Integer);}
-        tooltip {Inverts the output} xywh {295 19 70 16} down_box DOWN_BOX color 230 labelsize 11
+        tooltip {Inverts the output} xywh {300 19 70 16} down_box DOWN_BOX color 230 labelsize 11
         class Fl_Check_Button2
       }
       Fl_Check_Button chorusp17 {
@@ -589,7 +588,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_phaser_window()} {} {
     Fl_Window effphaserwindow {
-      xywh {849 326 378 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      xywh {878 419 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
       class Fl_Group
     } {
       Fl_Text_Display phasername {
@@ -693,7 +692,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Stages
         callback {//
         send_data(0, 8, o->value(), (TOPLEVEL::insert::phaser | 128), TOPLEVEL::type::Integer);}
-        xywh {324 63 45 15} type Simple labelsize 11 minimum 1 maximum 12 step 1 textfont 1 textsize 11
+        xywh {326 63 45 15} type Simple labelsize 11 minimum 1 maximum 12 step 1 textfont 1 textsize 11
       }
       Fl_Dial phaserp9 {
         label {L/R}
@@ -708,7 +707,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {Sub.}
         callback {//
         send_data(0, 10, o->value(), (TOPLEVEL::insert::phaser | 128), TOPLEVEL::type::Integer);}
-        tooltip {Inverts the output} xywh {354 42 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
+        tooltip {Inverts the output} xywh {356 42 17 16} down_box DOWN_BOX color 230 labelsize 11 align 4
         class Fl_Check_Button2
       }
       Fl_Dial phaserp11 {
@@ -724,7 +723,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Hyper
         callback {//
         send_data(0, 12, o->value(), (TOPLEVEL::insert::phaser | 128), TOPLEVEL::type::Integer);}
-        tooltip {Hyper-sine} xywh {354 26 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
+        tooltip {Hyper-sine} xywh {356 26 17 15} down_box DOWN_BOX labelsize 11 align 4 deactivate
         class Fl_Check_Button2
       }
       Fl_Dial phaserp13 {
@@ -740,14 +739,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Analog
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), (TOPLEVEL::insert::phaser | 128), TOPLEVEL::type::Integer);}
-        tooltip {Emulates FET} xywh {354 10 17 15} down_box DOWN_BOX labelsize 11 align 4
+        tooltip {Emulates FET} xywh {356 10 17 15} down_box DOWN_BOX labelsize 11 align 4
         class Fl_Check_Button2
       }
     }
   }
   Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
-      xywh {845 398 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {877 543 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display alienname {
@@ -854,7 +853,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Delay
         callback {//
         send_data(0, 8, o->value(), (TOPLEVEL::insert::alienWah | 128), TOPLEVEL::type::Integer);}
-        xywh {336 64 35 15} type Simple labelsize 11 minimum 0 maximum 100 step 1 textsize 11
+        xywh {338 64 35 15} type Simple labelsize 11 minimum 0 maximum 100 step 1 textsize 11
       }
       Fl_Check_Button awp17 {
         label BPM
@@ -867,7 +866,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_distorsion_window()} {} {
     Fl_Window effdistorsionwindow {
-      xywh {795 679 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {879 667 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display distname {
@@ -961,21 +960,21 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {St.}
         callback {//
         send_data(0, 9, o->value(), (TOPLEVEL::insert::distortion | 128), TOPLEVEL::type::Integer);}
-        tooltip Stereo xywh {355 55 15 15} down_box DOWN_BOX labelsize 11 align 2
+        tooltip Stereo xywh {357 55 15 15} down_box DOWN_BOX labelsize 11 align 2
         class Fl_Check_Button2
       }
       Fl_Check_Button distp10 {
         label PF
         callback {//
         send_data(0, 10, o->value(), (TOPLEVEL::insert::distortion | 128), TOPLEVEL::type::Integer);}
-        tooltip {Applies the filters(before or after) the distortion} xywh {355 38 15 15} down_box DOWN_BOX labelsize 11 align 1
+        tooltip {Applies the filters(before or after) the distortion} xywh {357 38 15 15} down_box DOWN_BOX labelsize 11 align 1
         class Fl_Check_Button2
       }
     }
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {1010 762 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {878 791 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display eqname {
@@ -998,13 +997,13 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         code0 {o->bounds(0,MAX_EQ_BANDS-1);}
       }
       Fl_Group bandgroup {
-        xywh {245 40 130 50} box ENGRAVED_FRAME
+        xywh {241 40 134 50} box ENGRAVED_FRAME
       } {
         Fl_Dial freqdial {
           label Freq
           callback {//;
           send_data(TOPLEVEL::action::forceUpdate, 11, o->value(), (TOPLEVEL::insert::eq | 128), TOPLEVEL::type::Integer);}
-          xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
+          xywh {247 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQfreq);}
           class WidgetPDial
         }
@@ -1012,7 +1011,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           label Gain
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, 12, o->value(), (TOPLEVEL::insert::eq | 128), TOPLEVEL::type::Integer);}
-          xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
+          xywh {277 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           code0 {o->setValueType(VC_FXEQfilterGain);}
           class WidgetPDial
         }
@@ -1020,7 +1019,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           label Q
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, 13, o->value(), (TOPLEVEL::insert::eq | 128), TOPLEVEL::type::Integer);}
-          tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
+          tooltip {Resonance/Bandwidth} xywh {307 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQq);}
           class WidgetPDial
         }
@@ -1028,7 +1027,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           label Stages
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), (TOPLEVEL::insert::eq | 128), TOPLEVEL::type::Integer);}
-          tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
+          tooltip {Additional filter stages} xywh {337 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
       }
@@ -1047,7 +1046,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
-      xywh {859 349 378 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {877 915 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display dfname {
@@ -1065,14 +1064,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {LFO type}
         callback {//
         send_data(0, 4, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {LFO function} xywh {190 64 43 15} down_box BORDER_BOX labelsize 10 align 2 textfont 1 textsize 9
+        tooltip {LFO function} xywh {190 60 43 15} down_box BORDER_BOX labelsize 10 align 2 textfont 1 textsize 9
         code0 {o->add("Sine");o->add("Tri");}
       } {}
       Fl_Dial dfp0 {
         label Vol
         callback {//
         send_data(0, 0, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {Effect volume} xywh {6 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {Effect volume} xywh {6 44 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp1 {
@@ -1080,7 +1079,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 1;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        xywh {42 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        xywh {42 44 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp2 {
@@ -1088,7 +1087,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 2;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {LFO frequency} xywh {80 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        tooltip {LFO frequency} xywh {80 44 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXlfofreq);}
         class WidgetPDial
       }
@@ -1097,7 +1096,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         int butt = 3;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {LFO randomness} xywh {155 49 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        tooltip {LFO randomness} xywh {155 44 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -1105,7 +1104,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Start
         callback {//
         send_data(0, EFFECT::control::bpmStart, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {118 49 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {118 44 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->setValueType(VC_PhaseOffset);}
         code1 {if (eff->geteffectpar(EFFECT::control::bpm)) o->activate(); else o->deactivate();}
         class WidgetPDial
@@ -1121,36 +1120,36 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label LfoD
         callback {int butt = 6;
         send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {LFO depth} xywh {240 10 30 30} box ROUND_UP_BOX labelsize 11 align 8 maximum 127
+        tooltip {LFO depth} xywh {240 8 30 30} box ROUND_UP_BOX labelsize 11 align 8 maximum 127
         class WidgetPDial
       }
       Fl_Button filter {
         label Filter
         callback {Showfilt();}
-        xywh {325 14 37 16} box PLASTIC_THIN_UP_BOX labelsize 11
+        xywh {325 12 37 16} box PLASTIC_THIN_UP_BOX labelsize 11
       }
       Fl_Group {} {
-        xywh {275 42 100 53} box EMBOSSED_BOX color 181
+        xywh {277 37 99 53} box EMBOSSED_BOX color 181
       } {
         Fl_Dial dfp7 {
           label {A.S.}
           callback {int butt = 7;
           send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-          tooltip {Filter vs amplitude} xywh {280 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+          tooltip {Filter vs amplitude} xywh {282 44 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
           class WidgetPDial
         }
         Fl_Dial dfp9 {
           label {A.M}
           callback {int butt = 9;
           send_data(0, butt, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-          tooltip {Rate that  amplitude changes the filter} xywh {316 49 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+          tooltip {Rate that  amplitude changes the filter} xywh {318 44 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
           class WidgetPDial
         }
         Fl_Check_Button dfp8 {
           label {Inv.}
           callback {//
           send_data(0, 8, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-          tooltip {Enable for filter frequency to lower with higher input amplitude} xywh {352 64 15 15} down_box DOWN_BOX labelsize 11 align 2
+          tooltip {Enable for filter frequency to lower with higher input amplitude} xywh {353 58 15 15} down_box DOWN_BOX labelsize 11 align 2
           class Fl_Check_Button2
         }
       }
@@ -1158,7 +1157,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label BPM
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (TOPLEVEL::insert::dynFilter | 128), TOPLEVEL::type::Integer);}
-        tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {191 45 45 15} down_box DOWN_BOX labelsize 11
+        tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {191 41 45 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(eff->geteffectpar(EFFECT::control::bpm));}
       }
     }
@@ -1167,9 +1166,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     Fl_Window filterwindow {
       label {Filter Parameters for DynFilter Eff.}
       callback {//
-    filterclose->do_callback();}
-      xywh {1109 779 290 110} type Double hide resizable
+    filterclose->do_callback();} open
+      xywh {1109 779 285 110} type Double hide resizable
       code0 {filtDW = o->w(); filtDH = o->h();}
+      code1 {o->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter}
@@ -2183,16 +2183,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     if (lastfiltW == filterwindow->w())
         return;
     lastfiltW = filterwindow->w();
-    float dW = filterwindow->w() / filtDW;
-    float dH = filterwindow->h() / filtDH;
-    float dScale;
 
-    if (dW < dH)
-        dScale = dW;
-    else
-        dScale = dH;
-    if (dScale < 0.2f)
-        dScale = 0.2f;
+    float dScale = filterwindow->w() / filtDW;
+    if (dScale < 1.0f)
+        dScale = 1.0f;
 
     filterclose->labelsize(12 * dScale);
 

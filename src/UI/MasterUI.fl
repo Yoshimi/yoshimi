@@ -3575,6 +3575,7 @@ Alan Calvert started the project}
     partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
+    updatelistitem(npart); // deselect old one
     updatelistitem(nval);
     activePart = nval;
     npart = nval;
@@ -4197,6 +4198,23 @@ bpmfallback->format(format);} {}
         msgRtext();
         lastmsgW = message->w();
         msgSeen = true;
+    }
+
+    if (syseffectui->visible() && sysefftype->value() == 8)
+    {
+        if(syseffectui->filterwindow != NULL)
+        {
+            if (syseffectui->filterwindow->visible())
+                syseffectui->filtRtext();
+        }
+    }
+    else if (inseffectui->visible() && insefftype->value() == 8)
+    {
+        if(inseffectui->filterwindow != NULL)
+        {
+            if (inseffectui->filterwindow->visible())
+                inseffectui->filtRtext();
+        }
     }
 
     if (syseffsendwindow->visible() &&  syseffsendwindow->w() != lastsyseffW)
