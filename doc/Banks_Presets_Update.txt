@@ -11,7 +11,7 @@ For all users if any banks get added or removed by external means this will be r
 
 There is a really strange anomaly where phantom empty banks sometimes get added to the first and/or the last bank root in the list. These are always at bank ID 0 - which should be impossible!
 
-Work rounds have been created to hide these (and not include them when the master file is saved), but still report them to the CLI. Also there is nothing to stop you adding real ones at these locations. We don't recommend it as many sequencers try to set root and bank zero with every program change unless you keep resetting them yourself. This is a ridiculous waste of bandwith and is *not* a requirement in the MIDI spec.
+Work rounds have been created to hide these (and not include them when the master file is saved), but still report them to the CLI. Also there is nothing to stop you adding real ones at these locations. We don't recommend it as many sequencers try to set root and bank zero with every program change unless you keep resetting them yourself. This is a ridiculous waste of bandwidth and is *not* a requirement in the MIDI spec.
 
 Yoshimi reports, but ignores unrecognised locations. Repeat calls to the same ones are reported as done, but ignored.
 

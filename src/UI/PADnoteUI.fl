@@ -469,7 +469,7 @@ class PADnoteUI {: {public PresetsUI_}
             label {Spectrum Mode}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectrumMode, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {How to generate the spectrum: Bandwith: widen each harmonic by a profile, Discrete: no blurring, similar to AddSynth, Continuous: connect outline of all harmonics into a continuous noisy distribution.} xywh {265 315 90 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+            tooltip {How to generate the spectrum: Bandwidth: widen each harmonic by a profile, Discrete: no blurring, similar to AddSynth, Continuous: connect outline of all harmonics into a continuous noisy distribution.} xywh {265 315 90 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
             code0 {o->add("Bandwidth");o->add("Discrete");o->add("Continuous");}
             code1 {o->value(pars->Pmode);}
           } {}
