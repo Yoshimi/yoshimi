@@ -179,8 +179,6 @@ class FilerLine {: {public Fl_Group}
         }
       }
       Fl_Button name {
-        callback {//std::cout << "pressed " << n << std::endl;
-//lineitem = n;}
         xywh {25 0 415 21} box NO_BOX color 7 labelsize 12 align 20
       }
       Fl_Button nametop {
@@ -3585,8 +3583,11 @@ Alan Calvert started the project}
     partVelSense->value(synth->part[npart]->Pvelsns);
     partui->setinstrumentlabel();
     partMidiCh->value(synth->part[npart]->Prcvchn + 1);
+    partKeyLimit->value(synth->part[npart]->Pkeylimit);
+    partKeyShift->value(synth->part[npart]->Pkeyshift - 64);
     minKeyCount->value(synth->part[npart]->Pminkey);
     maxKeyCount->value(synth->part[npart]->Pmaxkey);
+    partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
 
     sysEff1->value(synth->Psysefxvol[0][npart]);
     sysEff2->value(synth->Psysefxvol[1][npart]);
