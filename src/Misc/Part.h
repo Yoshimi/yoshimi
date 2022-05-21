@@ -184,6 +184,7 @@ class Part
         void startLegato          (int pos, size_t item, size_t currItem, Note);
         void startLegatoPortamento(int pos, size_t item, size_t currItem, Note);
         float computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity);
+        void incrementItemsPlaying(int pos, size_t currItem);
 
         Samples& tmpoutl;
         Samples& tmpoutr;
