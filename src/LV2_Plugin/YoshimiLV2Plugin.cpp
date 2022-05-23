@@ -145,11 +145,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             next_frame = event->time.frames;
             if (next_frame >= sample_count)
                 continue;
-            /*if (next_frame == _bufferSize - 1
-               && processed == 0)
-            {
-                next_frame = 0;
-            }*/
+
             uint32_t to_process = next_frame - offs;
 
             if ((to_process > 0)
@@ -287,24 +283,9 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 
 void *YoshimiLV2Plugin::idleThread()
 {
-    //temporary
-//    _synth->getRuntime().showGui = true;
-//    MasterUI *guiMaster = _synth->getGuiMaster();
-//    if (guiMaster == NULL)
-//    {
-//        _synth->getRuntime().Log("Failed to instantiate gui");
-//        return NULL;
-//    }
-//    guiMaster->Init("yoshimi lv2 plugin");
-
     while (_synth->getRuntime().runSynth)
     {
-//        // where all the action is ...
-//        if (_synth->getRuntime().showGui)
-//            Fl::wait(0.033333);
-//        else
-            usleep(33333);
-
+        usleep(33333); // TODO what is the point of this?
     }
     return NULL;
 }
@@ -778,7 +759,7 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
         uiHost.plugin_human_id = NULL;
     }
     _plugin->_synth->closeGui();
-    Fl::check();
+    Fl::check(); // TODO do we need this?
 }
 
 

@@ -7,7 +7,7 @@
     Copyright 2009, James Morris
     Copyright 2014-2020, Will Godfrey & others
 
-    Copyright 2021, Will Godfrey, Rainer Hans Liffers
+    Copyright 2022, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -2350,50 +2350,32 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 
 void SynthEngine::fetchMeterData()
-{ // overload protection below shouldn't be needed :(
+{
     if (!VUready)
         return;
+
     float fade;
     float root;
-    int buffsize;
-    buffsize = VUcopy.values.buffersize;
-    root = sqrt(VUcopy.values.vuRmsPeakL / buffsize);
-    if (VUdata.values.vuRmsPeakL >= 1.0f) // overload protection
-        VUdata.values.vuRmsPeakL = root;
-    else
-        VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
+    int buffsize = VUcopy.values.buffersize;
 
+    root = sqrt(VUcopy.values.vuRmsPeakL / buffsize);
+    VUdata.values.vuRmsPeakL = ((VUdata.values.vuRmsPeakL * 7) + root) / 8;
     root = sqrt(VUcopy.values.vuRmsPeakR / buffsize);
-    if (VUdata.values.vuRmsPeakR >= 1.0f) // overload protection
-        VUdata.values.vuRmsPeakR = root;
-    else
-        VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
+    VUdata.values.vuRmsPeakR = ((VUdata.values.vuRmsPeakR * 7) + root) / 8;
 
     fade = VUdata.values.vuOutPeakL * 0.92f;// mult;
     if (fade >= 1.0f) // overload protection
         fade = 0.0f;
-    if (VUcopy.values.vuOutPeakL > 1.8f) // overload protection
-        VUcopy.values.vuOutPeakL = fade;
+    if (VUcopy.values.vuOutPeakL > fade)
+        VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
     else
-    {
-        if (VUcopy.values.vuOutPeakL > fade)
-            VUdata.values.vuOutPeakL = VUcopy.values.vuOutPeakL;
-        else
-            VUdata.values.vuOutPeakL = fade;
-    }
+        VUdata.values.vuOutPeakL = fade;
 
     fade = VUdata.values.vuOutPeakR * 0.92f;// mult;
-    if (fade >= 1.0f) // overload protection
-        fade = 0.0f;
-    if (VUcopy.values.vuOutPeakR > 1.8f) // overload protection
-        VUcopy.values.vuOutPeakR = fade;
+    if (VUcopy.values.vuOutPeakR > fade)
+        VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
     else
-    {
-        if (VUcopy.values.vuOutPeakR > fade)
-            VUdata.values.vuOutPeakR = VUcopy.values.vuOutPeakR;
-        else
-            VUdata.values.vuOutPeakR = fade;
-    }
+        VUdata.values.vuOutPeakR = fade;
 
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {

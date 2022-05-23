@@ -1,5 +1,9 @@
 yoshimi 2.2.0 M
 
+2023-5-21 Will
+bn2136
+* Small refinements in Main, SynthEngine, MiscGui, LV2.
+
 2022-5-21 Will
 bn2135
 * BugFix: GUI not updating key shift, key limit, portamento
