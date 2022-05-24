@@ -125,6 +125,9 @@ void yoshimiSigHandler(int sig)
 
 static void *mainThread(void *arg)
 {
+#ifndef GUI_FLTK
+    bShowGui = false; // just to be sure
+#endif
     sem_post((sem_t *)arg);
     map<SynthEngine *, MusicClient *>::iterator it;
 
@@ -211,6 +214,7 @@ static void *mainThread(void *arg)
         while (firstSynth == NULL); // just wait
     }
 
+
     if (firstRuntime->autoInstance)
         newBlock();
     while (firstRuntime->runSynth)
@@ -260,8 +264,7 @@ static void *mainThread(void *arg)
                 }
                 else
                     GuiThreadMsg::processGuiMessages();
-                Fl::check();
-
+                Fl::wait(33333);
 
                 if (splashSet)
                 {
@@ -291,7 +294,7 @@ static void *mainThread(void *arg)
             configuring = false;
             startInstance = testInstance; // to prevent repeats!
         }
-        else
+        if (!bShowGui)
             usleep(33333);
     }
 

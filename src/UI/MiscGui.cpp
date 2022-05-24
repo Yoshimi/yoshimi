@@ -181,16 +181,21 @@ void GuiUpdates::read_updates(SynthEngine *synth)
         decode_updates(synth, &getData);
         Fl::unlock();
     }
+
     // test refresh time
     /*
     static int count = 0;
-    if (count >= 30)
+    static int toggle = false;
+    ++count;
+    if (count > 30)
     {
         count = 0;
-        synth->getRuntime().Log("Tick");
+        toggle = !toggle;
+        if (toggle)
+            synth->getRuntime().Log("Tick");
+        else
+            synth->getRuntime().Log("tock");
     }
-    else
-        ++count;
     */
 
     // and pull up to 5 entries from log

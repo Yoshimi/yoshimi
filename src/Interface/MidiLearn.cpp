@@ -403,7 +403,7 @@ void MidiLearn::generalOperations(CommandBlock *getData)
     if (control == MIDILEARN::control::sendRefreshRequest)
     {
         updateGui();
-        synth->getRuntime().Log("GUI refreshed");
+//        synth->getRuntime().Log("GUI refreshed");
         return;
     }
 
