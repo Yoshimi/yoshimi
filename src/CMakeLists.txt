@@ -143,6 +143,7 @@ endif ()
 
 find_package (PkgConfig REQUIRED)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 check_c_source_compiles (
