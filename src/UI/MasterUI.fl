@@ -3510,24 +3510,25 @@ Alan Calvert started the project}
   }
   Function {updatepanel(bool full = false)} {} {
     code {//
-    for (int npart = 0; npart < partmax; ++npart)
+    for (int part = 0; part < partmax; ++part)
     {
-        if (npart < NUM_MIDI_CHANNELS)
-            panellistitem[npart]->refresh();
-        vectorui->setInstrumentLabel(npart);
+        if (part < NUM_MIDI_CHANNELS) // will be orred with panel group
+            panellistitem[part]->refresh();
+        vectorui->setInstrumentLabel(part);
     }
 
-    if (partmax == 64)
+    if (partmax == (NUM_MIDI_CHANNELS * 4))
     {
+        Panelgroups->value(npart / NUM_MIDI_CHANNELS);
         Panelgroups->show();
-        //Panelgroups->value(0);
     }
     else
         Panelgroups->hide();
-    if (partmax == 32)
+
+    if (partmax == (NUM_MIDI_CHANNELS * 2))
     {
+        Panelsmallgroups->value(npart / NUM_MIDI_CHANNELS);
         Panelsmallgroups->show();
-        //Panelsmallgroups->value(0);
     }
     else
         Panelsmallgroups->hide();
@@ -3558,7 +3559,7 @@ Alan Calvert started the project}
         synth->getRuntime().channelSwitchCC = 128;
         CSspinner->hide();
         CSpend->hide();
-    };
+    }
     panelwindow->changed();} {}
   }
   Function {partNew(int _npart)} {} {
@@ -3577,6 +3578,86 @@ Alan Calvert started the project}
     updatelistitem(nval);
     activePart = nval;
     npart = nval;
+
+    partEnable->value(synth->part[npart]->Penabled == 1);
+    if (partEnable->value() == 1)
+        partControls->activate();
+    else
+        partControls->deactivate();
+    refreshControls(npart);} {}
+  }
+  Function {updateEngines(int engine, string instrumentName)} {} {
+    code {//
+        if (engine & 1) // addsynth
+        instrumentaddbox->color(ADD_COLOUR);
+    else
+        instrumentaddbox->color(BASE_COLOUR);
+
+    if (engine & 2) // subsynth
+        instrumentsubbox->color(SUB_COLOUR);
+    else
+        instrumentsubbox->color(BASE_COLOUR);
+
+    if (engine & 4) // padsynth
+        instrumentpadbox->color(PAD_COLOUR);
+    else
+        instrumentpadbox->color(BASE_COLOUR);
+
+    instrumentaddbox->damage(1);
+    instrumentsubbox->damage(1);
+    instrumentpadbox->damage(1);
+    instrumentlabel->copy_label(instrumentName.c_str());
+    instrumentlabel->damage(1);
+
+    if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
+    {
+        int num = npart % NUM_MIDI_CHANNELS;
+        if (engine & 1)
+            panellistitem[num]->partadd->color(ADD_COLOUR);
+        else
+            panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
+        if (engine & 2)
+            panellistitem[num]->partsub->color(SUB_COLOUR);
+        else
+            panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
+        if (engine & 4)
+            panellistitem[num]->partpad->color(PAD_COLOUR);
+        else
+            panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
+
+        panellistitem[num]->partadd->damage(1);
+        panellistitem[num]->partsub->damage(1);
+        panellistitem[num]->partpad->damage(1);
+        panellistitem[num]->partname->copy_label(instrumentName.c_str());
+    }} {}
+  }
+  Function {updatepart()} {} {
+    code {//
+    if (checkmaxparts())
+    {
+        if (npart >= partmax)
+        {
+            npart %= NUM_MIDI_CHANNELS;
+            npart += (partmax - NUM_MIDI_CHANNELS);
+            npartcounter->value(npart + 1);
+            npartcounter->do_callback();
+        }
+        maxparts->value(partmax);
+        maxparts->redraw();
+        return;
+    }
+
+    partEnable->value(synth->partonoffRead(npart));
+
+    maxparts->value(partmax);
+    maxparts->redraw();
+    npartcounter->value(npart + 1);
+    activePart = npart;
+    npartcounter->redraw();
+    refreshControls(npart);} {}
+  }
+  Function {refreshControls(int npart)} {} {
+    code {//
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
     partVelOffset->value(synth->part[npart]->Pveloffs);
@@ -3594,56 +3675,17 @@ Alan Calvert started the project}
     sysEff3->value(synth->Psysefxvol[2][npart]);
     sysEff4->value(synth->Psysefxvol[3][npart]);
 
-
     int tmp = synth->ReadPartKeyMode(npart);
-    if (tmp > 1)
-        partKeymode->value(2);
+    if (tmp > PART_MONO)
+        partKeymode->value(PART_LEGATO);
     else
         partKeymode->value(tmp);
-    if (tmp > 1 && synth->part[npart]->Pdrummode != 0)
+    if (tmp > PART_MONO && synth->part[npart]->Pdrummode != 0)
         modepatch->color(91);
     else
         modepatch->color(29);
     modepatch->redraw();
 
-    partEnable->value(synth->part[npart]->Penabled == 1);
-    if (partEnable->value() == 1)
-        partControls->activate();
-    else
-        partControls->deactivate();
-    partui->checkEngines();} {}
-  }
-  Function {updatepart()} {} {
-    code {//
-    if (checkmaxparts())
-    {
-        npart = 0;
-        npartcounter->value(npart + 1);
-        npartcounter->do_callback();
-        maxparts->value(partmax);
-        maxparts->redraw();
-        return;
-    }
-
-    partEnable->value(synth->partonoffRead(npart));
-
-    partVol->value(synth->part[npart]->Pvolume);
-    partPan->value(synth->part[npart]->Ppanning);
-    partVelOffset->value(synth->part[npart]->Pveloffs);
-    partVelSense->value(synth->part[npart]->Pvelsns);
-
-    partKeyLimit->value(synth->part[npart]->Pkeylimit);
-    partKeyShift->value(synth->part[npart]->Pkeyshift - 64);
-    minKeyCount->value(synth->part[npart]->Pminkey);
-    maxKeyCount->value(synth->part[npart]->Pmaxkey);
-    partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
-
-    partKeymode->value(synth->part[npart]->Pkeymode & MIDI_NOT_LEGATO);
-    maxparts->value(partmax);
-    maxparts->redraw();
-    npartcounter->value(npart + 1);
-    activePart = npart;
-    npartcounter->redraw();
     partui->checkEngines();} {}
   }
   Function {updatepartprogram(int _npart)} {} {

@@ -1907,49 +1907,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             }
         }
     }
-
-    if (engine & 1) // addsynth
-        synth->getGuiMaster()->instrumentaddbox->color(ADD_COLOUR);
-    else
-        synth->getGuiMaster()->instrumentaddbox->color(BASE_COLOUR);
-
-    if (engine & 2) // subsynth
-        synth->getGuiMaster()->instrumentsubbox->color(SUB_COLOUR);
-    else
-        synth->getGuiMaster()->instrumentsubbox->color(BASE_COLOUR);
-
-    if (engine & 4) // padsynth
-        synth->getGuiMaster()->instrumentpadbox->color(PAD_COLOUR);
-    else
-        synth->getGuiMaster()->instrumentpadbox->color(BASE_COLOUR);
-
-    synth->getGuiMaster()->instrumentaddbox->damage(1);
-    synth->getGuiMaster()->instrumentsubbox->damage(1);
-    synth->getGuiMaster()->instrumentpadbox->damage(1);
-    synth->getGuiMaster()->instrumentlabel->copy_label(instrumentName.c_str());
-    synth->getGuiMaster()->instrumentlabel->damage(1);
-
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-    {
-        int num = npart % NUM_MIDI_CHANNELS;
-        if (engine & 1)
-            synth->getGuiMaster()->panellistitem[num]->partadd->color(ADD_COLOUR);
-        else
-            synth->getGuiMaster()->panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
-        if (engine & 2)
-            synth->getGuiMaster()->panellistitem[num]->partsub->color(SUB_COLOUR);
-        else
-            synth->getGuiMaster()->panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
-        if (engine & 4)
-            synth->getGuiMaster()->panellistitem[num]->partpad->color(PAD_COLOUR);
-        else
-            synth->getGuiMaster()->panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
-
-        synth->getGuiMaster()->panellistitem[num]->partadd->damage(1);
-        synth->getGuiMaster()->panellistitem[num]->partsub->damage(1);
-        synth->getGuiMaster()->panellistitem[num]->partpad->damage(1);
-        synth->getGuiMaster()->panellistitem[num]->partname->copy_label(instrumentName.c_str());
-    }} {}
+    synth->getGuiMaster()->updateEngines(engine, instrumentName);} {}
   }
   Function {showparameters(int kititem, int engine)} {} {
     code {//

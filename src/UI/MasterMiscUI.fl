@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -429,15 +429,14 @@ class SysEffSend {: {public WidgetPDial}
   }
 }
 
-class Panellistitem {open : {public Fl_Group}
+class Panellistitem {: {public Fl_Group}
 } {
-  Function {make_window()} {open
-  } {
-    Fl_Window panellistitem {open
+  Function {make_window()} {} {
+    Fl_Window panellistitem {
       xywh {648 54 65 270} type Double hide
       class Fl_Group
     } {
-      Fl_Group panellistitemgroup {open
+      Fl_Group panellistitemgroup {
         xywh {0 -5 65 279} box PLASTIC_THIN_UP_BOX
         code0 {if (!synth->partonoffRead(npart + *plgroup)) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio && synth->getLV2PluginType() != LV2PluginTypeMulti) audiosend->deactivate();}
@@ -528,7 +527,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
        realvalue = 64;
 
     synth->getGuiMaster()->partPan->value(realvalue);
-    send_data(0, PART::control::panning, realvalue, TOPLEVEL::type::Integer);} selected
+    send_data(0, PART::control::panning, realvalue, TOPLEVEL::type::Integer);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}

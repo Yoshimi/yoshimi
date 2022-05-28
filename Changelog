@@ -1,5 +1,10 @@
 yoshimi 2.2.0 M
 
+2023-5-28 Will
+bn2138
+* Moved master/mixer engine updates from partUI to masterUI.
+* Consolidated partnew/updatepart duplicated settings.
+
 2023-5-24 Will
 bn2137
 * Partially reverted last change in main.cpp.
