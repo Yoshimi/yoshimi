@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -293,7 +293,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -396,7 +396,8 @@ class MasterUI {: {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init(const char *_label)} {open
+  } {
     code {//
       instance = synth->getUniqueId();
       file::createDir(file::configDir() + "/windows");
@@ -416,8 +417,14 @@ class MasterUI {: {private GuiUpdates}
       openedit = false;
       make_window();
       bool foundWindows = Showmaster();
-      if (partui)
-          partui->checkEngines();
+
+      partui = new PartUI(0, 0, 0, 0);
+      partuigroup->add(partui);
+      partui->init(synth->part[npart], npart, bankui);
+      partui->kitRtext(true);
+      partui->redraw();
+
+      partui->checkEngines();
       if (instance > 0)
           foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
@@ -2995,13 +3002,13 @@ Alan Calvert started the project}
 
             partNew(activePart);
             updatepanel();
-            if (openedit)
+            /*if (openedit)
             {
                 partui->Showedit();
                 openedit = false;
             }
             else
-                partui->instrumenteditwindow->hide();
+                partui->instrumenteditwindow->hide();*/
             }
             break;
 
@@ -3562,29 +3569,27 @@ Alan Calvert started the project}
     }
     panelwindow->changed();} {}
   }
-  Function {partNew(int _npart)} {} {
+  Function {partNew(int _npart)} {open
+  } {
     code {//
     int nval = _npart;
-    partuigroup->remove(partui);
-    delete partui;
-    partui = new PartUI(0, 0, 0, 0);
-    partuigroup->add(partui);
-    partui->init(synth->part[nval], nval, bankui);
-    partui->kitRtext(true);
-    partui->redraw();
     npartcounter->value(nval + 1);
     npartcounter->redraw();
     updatelistitem(npart); // deselect old one
     updatelistitem(nval);
     activePart = nval;
     npart = nval;
-
+    partui->rebuild(npart);
+    partui->redraw();
+    
     partEnable->value(synth->part[npart]->Penabled == 1);
     if (partEnable->value() == 1)
         partControls->activate();
     else
         partControls->deactivate();
-    refreshControls(npart);} {}
+    refreshControls(npart);
+    masterwindow->redraw();} {selected
+    }
   }
   Function {updateEngines(int engine, string instrumentName)} {} {
     code {//
@@ -3656,7 +3661,8 @@ Alan Calvert started the project}
     npartcounter->redraw();
     refreshControls(npart);} {}
   }
-  Function {refreshControls(int npart)} {} {
+  Function {refreshControls(int npart)} {open
+  } {
     code {//
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);

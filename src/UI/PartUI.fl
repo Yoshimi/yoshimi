@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -72,7 +72,7 @@ decl {\#include "Interface/TextLists.h"} {public local
 }
 
 class PartUI_ {} {
-  Function {showparameters(int /* kititem */,int /* engine */)} {return_type virtual
+  Function {showparameters(int /* kititem */,int /* engine */)} {open return_type virtual
   } {
     code {;} {}
   }
@@ -339,7 +339,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentkitlist {
@@ -1649,6 +1649,15 @@ class PartUI {: {public Fl_Group, PartUI_}
     lastatW = 0;
     lastkititem = -1;} {}
   }
+  Function {rebuild(int npart)} {open
+  } {
+    code {//
+        part = synth->part[npart];
+        checkEngines();
+        setinstrumentlabel();
+        fillInstrumentType();
+        updatecontrollers();} {}
+  }
   Function {fillInstrumentType()} {} {
     code {//
 
@@ -1830,7 +1839,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
         send_data(0, PART::keyATset, keyATselection, TOPLEVEL::type::Integer);} {}
   }
-  Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
+  Function {init(Part *part_,int npart_,BankUI *bankui_)} {open
+  } {
     code {//
     synth = part_->getSynthEngine();
     bankui = bankui_;
@@ -1873,7 +1883,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     lastctlW = 0;
     end();} {}
   }
-  Function {checkEngines(string instrumentName = "")} {} {
+  Function {checkEngines(string instrumentName = "")} {open
+  } {
     code {//
     engine = 0;
     if (instrumentName == "")
@@ -1897,17 +1908,18 @@ class PartUI {: {public Fl_Group, PartUI_}
     PAD->damage(1);
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        if (partkititem[i]->enabledcheck->value())
+        if (part->kit[i].Penabled)
         { // nested so we don't access non existent
-            if (partkititem[i]->mutedcheck->value() == 0)
+            if (part->kit[i].Pmuted == 0)
             {
-                engine |= partkititem[i]->adcheck->value();
-                engine |= (partkititem[i]->subcheck->value() << 1);
-                engine |= (partkititem[i]->padcheck->value() << 2);
+                engine |= part->kit[i].Padenabled;
+                engine |= (part->kit[i].Psubenabled << 1);
+                engine |= (part->kit[i].Ppadenabled << 2);
             }
         }
     }
-    synth->getGuiMaster()->updateEngines(engine, instrumentName);} {}
+    synth->getGuiMaster()->updateEngines(engine, instrumentName);} {selected
+    }
   }
   Function {showparameters(int kititem, int engine)} {} {
     code {//
@@ -1956,7 +1968,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (engine == 2 && padnoteui != NULL)
         padnoteui->Showpad();} {}
   }
-  Function {setinstrumentlabel(string text = "")} {} {
+  Function {setinstrumentlabel(string text = "")} {open
+  } {
     code {//
     engine = 0;
 
