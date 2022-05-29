@@ -267,7 +267,7 @@ class PartKitItem {: {public Fl_Group}
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
+        collect_data(synth, value, action, type, control, synth->getRuntime().currentPart, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -403,7 +403,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         else
             kitlist->deactivate();
 
-        send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer, npart);}
         tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade");}
         code1 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
@@ -413,7 +413,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(part->Pdrummode);}
         class Fl_Check_Button2
@@ -447,7 +447,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Enabled
             callback {//
 
-            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, npart);}
             tooltip {enable/disable ADsynth} xywh {15 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
             class Fl_Check_Button2
@@ -477,7 +477,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Enabled
             callback {//
 
-            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, npart);}
             tooltip {enable/disable SUBsynth} xywh {115 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
             class Fl_Check_Button2
@@ -507,7 +507,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Enabled
             callback {//
 
-            send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, npart);}
             tooltip {enable/disable PADsynth} xywh {215 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
             class Fl_Check_Button2
@@ -561,13 +561,13 @@ class PartUI {: {public Fl_Group, PartUI_}
             int param = 0;
             if (Fl::event_state(FL_CTRL))
             param = 1;
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer, 255, 255, 255, param);}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::defaultInstrumentCopyright, 0, TOPLEVEL::type::Integer, npart, 255, 255, 255, param);}
           tooltip {Load default author & copyright
  + Ctrl: save current text as default} xywh {327 25 63 20} labelsize 12
         }
         Fl_Input copyright {
           callback {//
-           send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentCopyright, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
+           send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentCopyright, 0, TOPLEVEL::type::Integer, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {5 49 385 55} type Multiline color 26 labelsize 12 align 9
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
@@ -575,7 +575,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Input commentField {
           label Comments
           callback {//
-          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
+          send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
           xywh {5 123 385 91} type Multiline color 26 labelsize 12 align 5
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
@@ -583,7 +583,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Choice instrumentType {
           label {Type:}
           callback {//
-              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentType, o->value(), TOPLEVEL::type::Integer);}
+              send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentType, o->value(), TOPLEVEL::type::Integer, npart);}
           xywh {5 25 155 20} down_box BORDER_BOX labelfont 1 labelsize 11 align 5 textfont 1 textsize 11
           code0 {fillInstrumentType();}
           code1 {o->value(part->info.Ptype);}
@@ -600,7 +600,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Detune
         callback {//
 
-        send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random detune of whole part in cents} xywh {12 342 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseDetune);//o->useCustomTip(true);}
         class mwheel_val_slider_rev
@@ -609,7 +609,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Velocity
         callback {//
 
-        send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random velocity attenuation of whole part} xywh {12 363 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
@@ -652,14 +652,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
                 ninseff = o->value() - 1;
                 setEffNum();
-                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {20 8 35 22} labelsize 12 maximum 3 textsize 12
         code1 {o->value(ninseff+1);}
         class WidgetSpinner
       }
       Fl_Choice insefftype {
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11 textfont 1 textsize 12
         code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
         code1 {o->value(part->partefx[ninseff]->geteffect());}
@@ -676,7 +676,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Choice sendtochoice {
         label To
         callback {//
-        send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12 textfont 1 textsize 12
         code0 {o->add("Next Effect");o->add("Part Out");o->add("Dry Out");}
         code1 {int x = part->Pefxroute[ninseff]; if (x == 127) x = 1;}
@@ -698,7 +698,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button bypasseff {
         label Bypass
         callback {//
-        send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+        send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 12
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
         class Fl_Check_Button2
@@ -728,7 +728,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial modulation {
         label Modulation
         callback {//
-        send_data(0, PART::control::midiModWheel, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::midiModWheel, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
         class WidgetPDial
@@ -736,7 +736,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial expression {
         label Expression
         callback {//
-        send_data(0, PART::control::midiExpression,  o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::midiExpression,  o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip Expression xywh {80 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
         class WidgetPDial
@@ -744,7 +744,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial filterq {
         label {Filter Q}
         callback {//
-        send_data(0, PART::control::midiFilterQ, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::midiFilterQ, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
         class WidgetPDial
@@ -752,7 +752,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial filtercutoff {
         label {Filter Cutoff}
         callback {//
-        send_data(0, PART::control::midiFilterCutoff, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::midiFilterCutoff, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
         class WidgetPDial
@@ -760,7 +760,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial masterbandwidth {
         label Bandwidth
         callback {//
-        send_data(0, PART::control::midiBandwidth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::midiBandwidth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.data);}
         class WidgetPDial
@@ -785,7 +785,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial volrng {
         label {Vol Rng}
         callback {//
-        send_data(0, PART::control::volumeRange, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::volumeRange, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
         class WidgetPDial
@@ -793,7 +793,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button vol {
         label Vol
         callback {//
-        send_data(0, PART::control::volumeEnable, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::volumeEnable, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Volume enable} xywh {175 81 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
         class Fl_Check_Button2
@@ -801,7 +801,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial panwidth {
         label PanWdth
         callback {//
-        send_data(0, PART::control::panningWidth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::panningWidth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
         class WidgetPDial
@@ -809,7 +809,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial modwh {
         label ModWh
         callback {//
-        send_data(0, PART::control::modWheelDepth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::modWheelDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
         class WidgetPDial
@@ -817,7 +817,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button expmwh {
         label {Exp MWh}
         callback {//
-        send_data(0, PART::control::exponentialModWheel, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::exponentialModWheel, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->modwheel.exponential);}
         class Fl_Check_Button2
@@ -825,7 +825,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial bwdpth {
         label BwDpth
         callback {//
-        send_data(0, PART::control::bandwidthDepth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::bandwidthDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {BandWidth depth} xywh {132 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
         class WidgetPDial
@@ -833,7 +833,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button expbw {
         label {Exp BW}
         callback {//
-        send_data(0, 134, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, 134, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Exponential BandWidth Controller} xywh {92 15 35 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->bandwidth.exponential);}
         class Fl_Check_Button2
@@ -841,7 +841,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button expr {
         label Expr
         callback {//
-        send_data(0, 135, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, 135, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Expression enable} xywh {175 59 45 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
         class Fl_Check_Button2
@@ -849,7 +849,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button fmamp {
         label FMamp
         callback {//
-        send_data(0, PART::control::FMamplitudeEnable, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::FMamplitudeEnable, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {FM amplitude enable} xywh {225 59 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
         class Fl_Check_Button2
@@ -857,7 +857,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button sustain {
         label Sustain
         callback {//
-        send_data(0, PART::control::sustainPedalEnable, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::sustainPedalEnable, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Sustain pedal enable} xywh {225 81 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
         class Fl_Check_Button2
@@ -865,7 +865,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button breath {
         label Breath
         callback {//
-        send_data(0, 141, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, 141, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Breath Control enable} xywh {225 38 60 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->PbreathControl == 2);}
         class Fl_Check_Button2
@@ -873,7 +873,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Counter pwheelbrng {
         label {PWheel Rng (cents)}
         callback {//
-        send_data(0, PART::control::pitchWheelRange, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::pitchWheelRange, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
@@ -881,7 +881,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial filtq {
         label FltQ
         callback {//
-        send_data(0, PART::control::filterQdepth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::filterQdepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
         class WidgetPDial
@@ -889,7 +889,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial fltcut {
         label FltCut
         callback {//
-        send_data(0, PART::control::filterCutoffDepth, o->value(), TOPLEVEL::type::Integer);}
+        send_data(0, PART::control::filterCutoffDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
         class WidgetPDial
@@ -901,7 +901,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial cfdpth {
           label CFdpth
           callback {//
-          send_data(0, PART::control::resonanceCenterFrequencyDepth, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::resonanceCenterFrequencyDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
           class WidgetPDial
@@ -909,7 +909,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial rbwdpth {
           label BWdpth
           callback {//
-          send_data(0, PART::control::resonanceBandwidthDepth, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::resonanceBandwidthDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
           class WidgetPDial
@@ -926,7 +926,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial prtime {
           label time
           callback {//
-          send_data(0, PART::control::portamentoTime, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::portamentoTime, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
           class WidgetPDial
@@ -934,7 +934,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial timedu {
           label {t.dn/up}
           callback {//
-          send_data(0, PART::control::portamentoTimeStretch, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::portamentoTimeStretch, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
           class WidgetPDial
@@ -942,14 +942,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Counter thresh {
           label Thresh
           callback {//
-          send_data(0, PART::control::portamentoThreshold, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::portamentoThreshold, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple color 237 selection_color 0 labelsize 10 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {
           label {th.type}
           callback {//
-          send_data(0, PART::control::portamentoThresholdType, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::portamentoThresholdType, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
           class Fl_Check_Button2
@@ -957,7 +957,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial propta {
           label {Prp.Rate}
           callback {//
-          send_data(0, PART::control::proportionalPortamentoRate, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::proportionalPortamentoRate, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
           class WidgetPDial
@@ -965,7 +965,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial proptb {
           label {Prp.Dpth}
           callback {//
-          send_data(0, PART::control::proportionalPortamentoDepth, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::proportionalPortamentoDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
           class WidgetPDial
@@ -973,7 +973,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Check_Button rcv {
           label Rcv
           callback {//
-          send_data(0, PART::control::receivePortamento, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::receivePortamento, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
           code0 {o->value(part->ctl->portamento.receive);}
           class Fl_Check_Button2
@@ -991,7 +991,7 @@ class PartUI {: {public Fl_Group, PartUI_}
               propta->deactivate();
               proptb->deactivate();
           }
-          send_data(0, PART::control::enableProportionalPortamento, o->value(), TOPLEVEL::type::Integer);}
+          send_data(0, PART::control::enableProportionalPortamento, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if (o->value()){propta->activate();proptb->activate();}}
@@ -1002,7 +1002,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button resetallctl {
         label {Reset all controllers}
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer);}
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer, npart);}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Button aftertouch {
@@ -1279,7 +1279,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
         return(ret);} {}
   }
-  Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
+  Function {send_data(int action, int control, float value, int type, int npart, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
         collect_data(synth, value, action, type, control, npart, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
@@ -1651,8 +1651,26 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {rebuild(int npart_)} {} {
     code {//
+        if (adnoteui != NULL)
+            delete adnoteui;
+        if (subnoteui != NULL)
+            delete subnoteui;
+        if (padnoteui != NULL)
+            delete padnoteui;
+        adnoteui = NULL;
+        subnoteui = NULL;
+        padnoteui = NULL;
+
         npart = npart_;
         part = synth->part[npart];
+
+        if (part->kit[0].adpars)
+            adnoteui = new ADnoteUI(part->kit[0].adpars, npart, 0);
+        if (part->kit[0].subpars)
+            subnoteui = new SUBnoteUI(part->kit[0].subpars, npart, 0);
+        if (part->kit[0].padpars)
+            padnoteui = new PADnoteUI(part->kit[0].padpars);
+
         instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
         checkEngines();
         setinstrumentlabel();
@@ -1665,7 +1683,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         humanise->value(part->Pfrand);
         velocityhumanise->value(part->Pvelrand);
 
-
+        kitrefresh();
         updatecontrollers();
         ctlmidirefresh();
         ATrefresh();} {}
@@ -1682,8 +1700,70 @@ class PartUI {: {public Fl_Group, PartUI_}
             entry = type_list[i];
         }} {}
   }
+  Function {kitrefresh()} {} {
+    code {//
+        instrumentkitlist->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+        drumMode->value(part->Pdrummode);
+        kitMode->value(part->Pkitmode);
+        if (kitMode->value())
+        {
+            //partKitOn = true;
+            kitlist->activate();
+        }
+        else
+        {
+            //partKitOn = false;
+            kitlist->deactivate();
+        }
+
+        for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+        {
+            if (part->kit[i].Penabled)
+            {
+                partkititem[i]->enabledcheck->value(1);
+                partkititem[i]->partkititemgroup->activate();
+                partkititem[i]->mutedcheck->value(!part->kit[i].Penabled);
+
+                partkititem[i]->adcheck->value(part->kit[i].Padenabled);
+                if (partkititem[i]->adcheck->value())
+                    partkititem[i]->adeditbutton->activate();
+                else
+                    partkititem[i]->adeditbutton->deactivate();
+                partkititem[i]->subcheck->value(part->kit[i].Psubenabled);
+                if (partkititem[i]->subcheck->value())
+                    partkititem[i]->subeditbutton->activate();
+                else
+                    partkititem[i]->subeditbutton->deactivate();
+                partkititem[i]->padcheck->value(part->kit[i].Ppadenabled);
+                if (partkititem[i]->padcheck->value())
+                    partkititem[i]->padeditbutton->activate();
+                else
+                    partkititem[i]->padeditbutton->deactivate();
+            }
+            else
+            {
+                partkititem[i]->enabledcheck->value(0);
+                partkititem[i]->partkititemgroup->deactivate();
+                partkititem[i]->mutedcheck->value(0);
+                partkititem[i]->adcheck->value(0);
+                partkititem[i]->adeditbutton->deactivate();
+                partkititem[i]->subcheck->value(0);
+                partkititem[i]->subeditbutton->deactivate();
+                partkititem[i]->padcheck->value(0);
+                partkititem[i]->padeditbutton->deactivate();
+            }
+            partkititem[i]->labelbutton->copy_label(part->kit[i].Pname.c_str());
+            partkititem[i]->minkcounter->value(part->kit[i].Pminkey);
+            partkititem[i]->maxkcounter->value(part->kit[i].Pmaxkey);
+            int effnum = part->kit[i].Psendtoparteffect + 1;
+            if (effnum > 3)
+                effnum = 0;
+            partkititem[i]->sendtoeffect->value(effnum);
+        }} {}
+  }
   Function {updatecontrollers()} {} {
     code {//
+    ctlwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -1719,6 +1799,68 @@ class PartUI {: {public Fl_Group, PartUI_}
     timedu->value(part->ctl->portamento.updowntimestretch);
     thtype->value(part->ctl->portamento.pitchthreshtype);
     proptb->value(part->ctl->portamento.propDepth);} {}
+  }
+  Function {ctlmidirefresh()} {} {
+    code {//
+        ctlmidi->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+        modulation->value(part->ctl->modwheel.data);
+        expression->value(part->ctl->expression.data);
+        filterq->value(part->ctl->filterq.data);
+        filtercutoff->value(part->ctl->filtercutoff.data);
+        masterbandwidth->value(part->ctl->bandwidth.data);} {}
+  }
+  Function {ATrefresh()} {} {
+    code {//
+    int channelAT = part->PchannelATchoice;
+
+    channelfiltercutoff->value((channelAT & PART::aftertouchType::filterCutoff) > 0);
+    if (channelfiltercutoff->value())
+        channelfilterCminus->activate();
+    else
+         channelfilterCminus->deactivate();
+    channelfilterCminus->value((channelAT & PART::aftertouchType::filterCutoffDown) > 0);
+
+    channelfilterQ->value((channelAT & PART::aftertouchType::filterQ) > 0);
+    if (channelfilterQ->value())
+        channelfilterQminus->activate();
+    else
+         channelfilterQminus->deactivate();
+    channelfilterQminus->value((channelAT & PART::aftertouchType::filterQdown) > 0);
+
+    channelpitchbend->value((channelAT & PART::aftertouchType::pitchBend) > 0);
+    if (channelpitchbend->value())
+        channelpitchBminus->activate();
+    else
+         channelpitchBminus->deactivate();
+    channelpitchBminus->value((channelAT & PART::aftertouchType::pitchBendDown) > 0);
+
+    channelmodulation->value((channelAT & PART::aftertouchType::modulation) > 0);
+    channelvolume->value((channelAT & PART::aftertouchType::volume) > 0);
+
+    int keyAT =  part->PkeyATchoice;
+
+    polyfiltercutoff->value((keyAT & PART::aftertouchType::filterCutoff) > 0);
+    if (polyfiltercutoff->value())
+        polyfilterCminus->activate();
+    else
+         polyfilterCminus->deactivate();
+    polyfilterCminus->value((keyAT & PART::aftertouchType::filterCutoffDown) > 0);
+
+    polyfilterQ->value((keyAT & PART::aftertouchType::filterQ) > 0);
+    if (polyfilterQ->value())
+        polyfilterQminus->activate();
+    else
+         polyfilterQminus->deactivate();
+    polyfilterQminus->value((keyAT & PART::aftertouchType::filterQdown) > 0);
+
+    polypitchbend->value((keyAT & PART::aftertouchType::pitchBend) > 0);
+    if (polypitchbend->value())
+        polypitchBminus->activate();
+    else
+         polypitchBminus->deactivate();
+    polypitchBminus->value((keyAT & PART::aftertouchType::pitchBendDown) > 0);
+
+    polymodulation->value((keyAT & PART::aftertouchType::modulation) > 0);} {}
   }
   Function {fetchChannel()} {} {
     code {//
@@ -1825,7 +1967,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                     channelATselection &= ~PART::aftertouchType::pitchBendDown;
             }
         }
-        send_data(0, PART::channelATset, channelATselection, TOPLEVEL::type::Integer);} {}
+        send_data(0, PART::channelATset, channelATselection, TOPLEVEL::type::Integer, npart);} {}
   }
   Function {setATkey(int type, int state)} {} {
     code {//
@@ -1853,7 +1995,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                     keyATselection &= ~PART::aftertouchType::pitchBendDown;
             }
         }
-        send_data(0, PART::keyATset, keyATselection, TOPLEVEL::type::Integer);} {}
+        send_data(0, PART::keyATset, keyATselection, TOPLEVEL::type::Integer, npart);} {}
   }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
@@ -2123,67 +2265,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlmidi->resize(fetchX, fetchY, fetchW, fetchH);
     ctlmidi->show();
     ctlmidiSeen = true;} {}
-  }
-  Function {ctlmidirefresh()} {} {
-    code {//
-    modulation->value(part->ctl->modwheel.data);
-    expression->value(part->ctl->expression.data);
-    filterq->value(part->ctl->filterq.data);
-    filtercutoff->value(part->ctl->filtercutoff.data);
-    masterbandwidth->value(part->ctl->bandwidth.data);} {}
-  }
-  Function {ATrefresh()} {} {
-    code {//
-    int channelAT = part->PchannelATchoice;
-
-    channelfiltercutoff->value((channelAT & PART::aftertouchType::filterCutoff) > 0);
-    if (channelfiltercutoff->value())
-        channelfilterCminus->activate();
-    else
-         channelfilterCminus->deactivate();
-    channelfilterCminus->value((channelAT & PART::aftertouchType::filterCutoffDown) > 0);
-
-    channelfilterQ->value((channelAT & PART::aftertouchType::filterQ) > 0);
-    if (channelfilterQ->value())
-        channelfilterQminus->activate();
-    else
-         channelfilterQminus->deactivate();
-    channelfilterQminus->value((channelAT & PART::aftertouchType::filterQdown) > 0);
-
-    channelpitchbend->value((channelAT & PART::aftertouchType::pitchBend) > 0);
-    if (channelpitchbend->value())
-        channelpitchBminus->activate();
-    else
-         channelpitchBminus->deactivate();
-    channelpitchBminus->value((channelAT & PART::aftertouchType::pitchBendDown) > 0);
-
-    channelmodulation->value((channelAT & PART::aftertouchType::modulation) > 0);
-    channelvolume->value((channelAT & PART::aftertouchType::volume) > 0);
-
-    int keyAT =  part->PkeyATchoice;
-
-    polyfiltercutoff->value((keyAT & PART::aftertouchType::filterCutoff) > 0);
-    if (polyfiltercutoff->value())
-        polyfilterCminus->activate();
-    else
-         polyfilterCminus->deactivate();
-    polyfilterCminus->value((keyAT & PART::aftertouchType::filterCutoffDown) > 0);
-
-    polyfilterQ->value((keyAT & PART::aftertouchType::filterQ) > 0);
-    if (polyfilterQ->value())
-        polyfilterQminus->activate();
-    else
-         polyfilterQminus->deactivate();
-    polyfilterQminus->value((keyAT & PART::aftertouchType::filterQdown) > 0);
-
-    polypitchbend->value((keyAT & PART::aftertouchType::pitchBend) > 0);
-    if (polypitchbend->value())
-        polypitchBminus->activate();
-    else
-         polypitchBminus->deactivate();
-    polypitchBminus->value((keyAT & PART::aftertouchType::pitchBendDown) > 0);
-
-    polymodulation->value((keyAT & PART::aftertouchType::modulation) > 0);} {}
   }
   Function {Showefx()} {} {
     code {//
