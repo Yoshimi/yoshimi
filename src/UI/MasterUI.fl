@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -293,7 +293,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -396,8 +396,7 @@ class MasterUI {open : {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {open
-  } {
+  Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
       file::createDir(file::configDir() + "/windows");
@@ -3569,8 +3568,7 @@ Alan Calvert started the project}
     }
     panelwindow->changed();} {}
   }
-  Function {partNew(int _npart)} {open
-  } {
+  Function {partNew(int _npart)} {} {
     code {//
     int nval = _npart;
     npartcounter->value(nval + 1);
@@ -3588,8 +3586,7 @@ Alan Calvert started the project}
     else
         partControls->deactivate();
     refreshControls(npart);
-    masterwindow->redraw();} {selected
-    }
+    masterwindow->redraw();} {}
   }
   Function {updateEngines(int engine, string instrumentName)} {} {
     code {//
@@ -3661,8 +3658,7 @@ Alan Calvert started the project}
     npartcounter->redraw();
     refreshControls(npart);} {}
   }
-  Function {refreshControls(int npart)} {open
-  } {
+  Function {refreshControls(int npart)} {} {
     code {//
     partVol->value(synth->part[npart]->Pvolume);
     partPan->value(synth->part[npart]->Ppanning);
@@ -4002,11 +3998,11 @@ Alan Calvert started the project}
     code {//
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
-  Function {setPartWindowTitle(string prefix)} {return_type string
+  Function {setPartWindowTitle(string prefix)} {open return_type string
   } {
     code {//
-    string extension = " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
-    if (partui->part->Pkitmode)
+    string extension = " - Part " + asString(npart + 1) + " " + synth->part[npart]->Pname;
+    if (synth->part[npart]->Pkitmode)
     {
         extension += ", Kit ";
         if (partui->lastkititem >= 0)

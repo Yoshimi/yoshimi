@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -339,7 +339,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_}
+class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentkitlist {
@@ -1649,14 +1649,26 @@ class PartUI {open : {public Fl_Group, PartUI_}
     lastatW = 0;
     lastkititem = -1;} {}
   }
-  Function {rebuild(int npart)} {open
-  } {
+  Function {rebuild(int npart_)} {} {
     code {//
+        npart = npart_;
         part = synth->part[npart];
+        instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
         checkEngines();
         setinstrumentlabel();
+        instrumenteditwindow->redraw();
         fillInstrumentType();
-        updatecontrollers();} {}
+        copyright->value(part->info.Pauthor.c_str());
+        commentField->value(part->info.Pcomments.c_str());
+        instrumentType->value(part->info.Ptype);
+
+        humanise->value(part->Pfrand);
+        velocityhumanise->value(part->Pvelrand);
+
+
+        updatecontrollers();
+        ctlmidirefresh();
+        ATrefresh();} {}
   }
   Function {fillInstrumentType()} {} {
     code {//
@@ -1807,6 +1819,8 @@ class PartUI {open : {public Fl_Group, PartUI_}
                 channelATselection &= ~type;
                 if (type == PART::aftertouchType::filterCutoff)
                     channelATselection &= ~PART::aftertouchType::filterCutoffDown;
+                else if (type == PART::aftertouchType::filterQ)
+                    channelATselection &= ~PART::aftertouchType::filterQdown;
                 else if (type == PART::aftertouchType::pitchBend)
                     channelATselection &= ~PART::aftertouchType::pitchBendDown;
             }
@@ -1833,14 +1847,15 @@ class PartUI {open : {public Fl_Group, PartUI_}
                 keyATselection &= ~type;
                 if (type == PART::aftertouchType::filterCutoff)
                     keyATselection &= ~PART::aftertouchType::filterCutoffDown;
+                else if (type == PART::aftertouchType::filterQ)
+                    keyATselection &= ~PART::aftertouchType::filterQdown;
                 else if (type == PART::aftertouchType::pitchBend)
                     keyATselection &= ~PART::aftertouchType::pitchBendDown;
             }
         }
         send_data(0, PART::keyATset, keyATselection, TOPLEVEL::type::Integer);} {}
   }
-  Function {init(Part *part_,int npart_,BankUI *bankui_)} {open
-  } {
+  Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
     synth = part_->getSynthEngine();
     bankui = bankui_;
@@ -1883,30 +1898,56 @@ class PartUI {open : {public Fl_Group, PartUI_}
     lastctlW = 0;
     end();} {}
   }
-  Function {checkEngines(string instrumentName = "")} {open
-  } {
+  Function {checkEngines(string instrumentName = "")} {} {
     code {//
     engine = 0;
     if (instrumentName == "")
         instrumentName = part->Pname;
-    partname = instrumentName; // this needs improving
+    partname = instrumentName;
 
-    if (adsynenabledcheck->value())
+    if (part->kit[0].Padenabled)
+    {
+        engine |= 1;
+        adsynenabledcheck->value(1);
+        adeditbutton->activate();
         addbox->color(ADD_COLOUR);
+    }
     else
+    {
+        adsynenabledcheck->value(0);
+        adeditbutton->deactivate();
         addbox->color(FL_BACKGROUND_COLOR);
+    }
     ADD->damage(1);
-    if (subsynenabledcheck->value())
+    if (part->kit[0].Psubenabled)
+    {
+        engine |= 2;
+        subsynenabledcheck->value(1);
+        subeditbutton->activate();
         subbox->color(SUB_COLOUR);
+    }
     else
+    {
+        subsynenabledcheck->value(0);
+        subeditbutton->deactivate();
         subbox->color(FL_BACKGROUND_COLOR);
+    }
     SUB->damage(1);
-    if (padsynenabledcheck->value())
+    if (part->kit[0].Ppadenabled)
+    {
+        engine |= 4;
+        padsynenabledcheck->value(1);
+        padeditbutton->activate();
         padbox->color(PAD_COLOUR);
+    }
     else
+    {
+        padsynenabledcheck->value(0);
+        padeditbutton->deactivate();
         padbox->color(FL_BACKGROUND_COLOR);
+    }
     PAD->damage(1);
-    for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+    for (int i = 1; i < NUM_KIT_ITEMS; ++i)
     {
         if (part->kit[i].Penabled)
         { // nested so we don't access non existent
@@ -1918,8 +1959,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             }
         }
     }
-    synth->getGuiMaster()->updateEngines(engine, instrumentName);} {selected
-    }
+    synth->getGuiMaster()->updateEngines(engine, instrumentName);} {}
   }
   Function {showparameters(int kititem, int engine)} {} {
     code {//
@@ -1968,8 +2008,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     if (engine == 2 && padnoteui != NULL)
         padnoteui->Showpad();} {}
   }
-  Function {setinstrumentlabel(string text = "")} {open
-  } {
+  Function {setinstrumentlabel(string text = "")} {} {
     code {//
     engine = 0;
 
@@ -2092,6 +2131,59 @@ class PartUI {open : {public Fl_Group, PartUI_}
     filterq->value(part->ctl->filterq.data);
     filtercutoff->value(part->ctl->filtercutoff.data);
     masterbandwidth->value(part->ctl->bandwidth.data);} {}
+  }
+  Function {ATrefresh()} {} {
+    code {//
+    int channelAT = part->PchannelATchoice;
+
+    channelfiltercutoff->value((channelAT & PART::aftertouchType::filterCutoff) > 0);
+    if (channelfiltercutoff->value())
+        channelfilterCminus->activate();
+    else
+         channelfilterCminus->deactivate();
+    channelfilterCminus->value((channelAT & PART::aftertouchType::filterCutoffDown) > 0);
+
+    channelfilterQ->value((channelAT & PART::aftertouchType::filterQ) > 0);
+    if (channelfilterQ->value())
+        channelfilterQminus->activate();
+    else
+         channelfilterQminus->deactivate();
+    channelfilterQminus->value((channelAT & PART::aftertouchType::filterQdown) > 0);
+
+    channelpitchbend->value((channelAT & PART::aftertouchType::pitchBend) > 0);
+    if (channelpitchbend->value())
+        channelpitchBminus->activate();
+    else
+         channelpitchBminus->deactivate();
+    channelpitchBminus->value((channelAT & PART::aftertouchType::pitchBendDown) > 0);
+
+    channelmodulation->value((channelAT & PART::aftertouchType::modulation) > 0);
+    channelvolume->value((channelAT & PART::aftertouchType::volume) > 0);
+
+    int keyAT =  part->PkeyATchoice;
+
+    polyfiltercutoff->value((keyAT & PART::aftertouchType::filterCutoff) > 0);
+    if (polyfiltercutoff->value())
+        polyfilterCminus->activate();
+    else
+         polyfilterCminus->deactivate();
+    polyfilterCminus->value((keyAT & PART::aftertouchType::filterCutoffDown) > 0);
+
+    polyfilterQ->value((keyAT & PART::aftertouchType::filterQ) > 0);
+    if (polyfilterQ->value())
+        polyfilterQminus->activate();
+    else
+         polyfilterQminus->deactivate();
+    polyfilterQminus->value((keyAT & PART::aftertouchType::filterQdown) > 0);
+
+    polypitchbend->value((keyAT & PART::aftertouchType::pitchBend) > 0);
+    if (polypitchbend->value())
+        polypitchBminus->activate();
+    else
+         polypitchBminus->deactivate();
+    polypitchBminus->value((keyAT & PART::aftertouchType::pitchBendDown) > 0);
+
+    polymodulation->value((keyAT & PART::aftertouchType::modulation) > 0);} {}
   }
   Function {Showefx()} {} {
     code {//
