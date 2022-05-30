@@ -3579,7 +3579,7 @@ Alan Calvert started the project}
     npart = nval;
     partui->rebuild(npart);
     partui->redraw();
-    
+
     partEnable->value(synth->part[npart]->Penabled == 1);
     if (partEnable->value() == 1)
         partControls->activate();
@@ -3998,7 +3998,7 @@ Alan Calvert started the project}
     code {//
     send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::loadNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(filename));} {}
   }
-  Function {setPartWindowTitle(string prefix)} {open return_type string
+  Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
     string extension = " - Part " + asString(npart + 1) + " " + synth->part[npart]->Pname;

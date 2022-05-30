@@ -644,7 +644,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window partfx {
       label {Part's Insert Effects}
       xywh {520 67 385 160} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Part Effects").c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
       code2 {o->size_range(fxDW, fxDH, 0, 0, 0, 0, 1);}
     } {
@@ -1028,8 +1028,9 @@ class PartUI {: {public Fl_Group, PartUI_}
       label Aftertouch
       callback {atClose->do_callback();}
       xywh {569 115 485 180} type Double hide resizable
-      code0 {atDW = o->w(); atDH = o->h();}
-      code1 {o->size_range(atDW, atDH, 0, 0, 0, 0, 1);}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Aftertouch").c_str());}
+      code1 {atDW = o->w(); atDH = o->h();}
+      code2 {o->size_range(atDW, atDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Box {} {
         xywh {9 5 228 171} box ENGRAVED_FRAME
@@ -1683,6 +1684,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         humanise->value(part->Pfrand);
         velocityhumanise->value(part->Pvelrand);
 
+        effectsrefresh();
         kitrefresh();
         updatecontrollers();
         ctlmidirefresh();
@@ -1699,6 +1701,12 @@ class PartUI {: {public Fl_Group, PartUI_}
             ++ i;
             entry = type_list[i];
         }} {}
+  }
+  Function {effectsrefresh()} {} {
+    code {//
+        partfx->copy_label(synth->getGuiMaster()->setPartWindowTitle("Part Effects").c_str());
+        setEffNum();
+        fxRtext();} {}
   }
   Function {kitrefresh()} {} {
     code {//
@@ -1811,8 +1819,9 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ATrefresh()} {} {
     code {//
-    int channelAT = part->PchannelATchoice;
+    aftertouchcontrol->copy_label(synth->getGuiMaster()->setPartWindowTitle("Aftertouch").c_str());
 
+    int channelAT = part->PchannelATchoice;
     channelfiltercutoff->value((channelAT & PART::aftertouchType::filterCutoff) > 0);
     if (channelfiltercutoff->value())
         channelfilterCminus->activate();
@@ -1838,7 +1847,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     channelvolume->value((channelAT & PART::aftertouchType::volume) > 0);
 
     int keyAT =  part->PkeyATchoice;
-
     polyfiltercutoff->value((keyAT & PART::aftertouchType::filterCutoff) > 0);
     if (polyfiltercutoff->value())
         polyfilterCminus->activate();
