@@ -3747,11 +3747,6 @@ Alan Calvert started the project}
         showSysEfxUI();
     }} {}
   }
-  Function {updatecontrollers(int _npart)} {} {
-    code {//
-    if (npart == _npart)
-        partui->ctlmidirefresh();} {}
-  }
   Function {setMasterLabel(string name)} {} {
     code {//
     string prefix;

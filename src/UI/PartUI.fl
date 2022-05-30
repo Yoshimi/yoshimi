@@ -344,6 +344,9 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {make_window()} {} {
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
+      callback {//
+    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), true, "Part-kit");
+    instrumentkitlist->hide();}
       xywh {341 129 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
@@ -421,6 +424,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button kitClose {
         label Close
         callback {//
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), true, "Part-kit");
         instrumentkitlist->hide();
         if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->instrumenteditwindow->show();}
@@ -643,6 +647,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
+      callback {//
+    saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
+    partfx->hide();}
       xywh {520 67 385 160} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Part Effects").c_str());}
       code1 {fxDW = o->w(); fxDH = o->h();}
@@ -706,7 +713,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button effClose {
         label Close
         callback {//
-        saveWin(synth,  partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
+        saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
         if(inseffectui->filterwindow != NULL)
             inseffectui->filterwindow->hide();
         fxSeen = false;
@@ -1026,7 +1033,9 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window aftertouchcontrol {
       label Aftertouch
-      callback {atClose->do_callback();}
+      callback {//
+    saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
+    aftertouchcontrol->hide();}
       xywh {569 115 485 180} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Aftertouch").c_str());}
       code1 {atDW = o->w(); atDH = o->h();}
@@ -1606,11 +1615,9 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::instrumentCopyright:
-            copyright->value("");
             copyright->value(text.c_str());
             break;
         case PART::control::instrumentComments:
-            commentField->value("");
             commentField->value(text.c_str());
             break;
         case PART::control::instrumentName:
@@ -1624,7 +1631,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 copyright->value(text.c_str());
             break;
         case PART::control::resetAllControllers:
-            updatecontrollers();
+            controllersrefresh();
             break;
         default:
             break;
@@ -1672,21 +1679,11 @@ class PartUI {: {public Fl_Group, PartUI_}
         if (part->kit[0].padpars)
             padnoteui = new PADnoteUI(part->kit[0].padpars);
 
-        instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
         checkEngines();
-        setinstrumentlabel();
-        instrumenteditwindow->redraw();
-        fillInstrumentType();
-        copyright->value(part->info.Pauthor.c_str());
-        commentField->value(part->info.Pcomments.c_str());
-        instrumentType->value(part->info.Ptype);
-
-        humanise->value(part->Pfrand);
-        velocityhumanise->value(part->Pvelrand);
-
+        editrefresh();
         effectsrefresh();
         kitrefresh();
-        updatecontrollers();
+        controllersrefresh();
         ctlmidirefresh();
         ATrefresh();} {}
   }
@@ -1701,6 +1698,18 @@ class PartUI {: {public Fl_Group, PartUI_}
             ++ i;
             entry = type_list[i];
         }} {}
+  }
+  Function {editrefresh()} {} {
+    code {//
+        instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+        setinstrumentlabel();
+        instrumenteditwindow->redraw();
+        fillInstrumentType();
+        copyright->value(part->info.Pauthor.c_str());
+        commentField->value(part->info.Pcomments.c_str());
+        instrumentType->value(part->info.Ptype);
+        humanise->value(fetchData(0, PART::control::humanise, npart));
+        velocityhumanise->value(fetchData(0, PART::control::humanvelocity, npart));} {}
   }
   Function {effectsrefresh()} {} {
     code {//
@@ -1769,7 +1778,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             partkititem[i]->sendtoeffect->value(effnum);
         }} {}
   }
-  Function {updatecontrollers()} {} {
+  Function {controllersrefresh()} {} {
     code {//
     ctlwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
     expmwh->value(part->ctl->modwheel.exponential);
@@ -2022,6 +2031,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
     channelATselection = int(fetchData(0, PART::control::channelATset, npart));
+
+    //why are the next two done this way?
     int tmp = int(fetchData(0, PART::control::humanise, npart));
     humanise->value(tmp); // will inc number
     tmp = int(fetchData(0, PART::control::humanvelocity, npart));
