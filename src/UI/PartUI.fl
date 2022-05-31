@@ -1660,17 +1660,23 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {rebuild(int npart_)} {} {
     code {//
         if (adnoteui != NULL)
+        {
             delete adnoteui;
+            adnoteui = NULL;
+        }
         if (subnoteui != NULL)
+        {
             delete subnoteui;
+            subnoteui = NULL;
+        }
         if (padnoteui != NULL)
+        {
             delete padnoteui;
-        adnoteui = NULL;
-        subnoteui = NULL;
-        padnoteui = NULL;
-
+            padnoteui = NULL;
+        }
         npart = npart_;
         part = synth->part[npart];
+        lastkey = -1;
 
         if (part->kit[0].adpars)
             adnoteui = new ADnoteUI(part->kit[0].adpars, npart, 0);
@@ -1707,6 +1713,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         fillInstrumentType();
         copyright->value(part->info.Pauthor.c_str());
         commentField->value(part->info.Pcomments.c_str());
+        string name = part->Poriginal;
+        if (!name.empty() && part->Pname != name)
+        {
+            originaltext->copy_label(name.c_str());
+            originalname->show();
+            originaltext->show();
+        }
+        else
+        {
+            originalname->hide();
+            originaltext->hide();
+        }
         instrumentType->value(part->info.Ptype);
         humanise->value(fetchData(0, PART::control::humanise, npart));
         velocityhumanise->value(fetchData(0, PART::control::humanvelocity, npart));} {}
@@ -1830,54 +1848,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     aftertouchcontrol->copy_label(synth->getGuiMaster()->setPartWindowTitle("Aftertouch").c_str());
 
-    int channelAT = part->PchannelATchoice;
-    channelfiltercutoff->value((channelAT & PART::aftertouchType::filterCutoff) > 0);
-    if (channelfiltercutoff->value())
-        channelfilterCminus->activate();
-    else
-         channelfilterCminus->deactivate();
-    channelfilterCminus->value((channelAT & PART::aftertouchType::filterCutoffDown) > 0);
 
-    channelfilterQ->value((channelAT & PART::aftertouchType::filterQ) > 0);
-    if (channelfilterQ->value())
-        channelfilterQminus->activate();
-    else
-         channelfilterQminus->deactivate();
-    channelfilterQminus->value((channelAT & PART::aftertouchType::filterQdown) > 0);
-
-    channelpitchbend->value((channelAT & PART::aftertouchType::pitchBend) > 0);
-    if (channelpitchbend->value())
-        channelpitchBminus->activate();
-    else
-         channelpitchBminus->deactivate();
-    channelpitchBminus->value((channelAT & PART::aftertouchType::pitchBendDown) > 0);
-
-    channelmodulation->value((channelAT & PART::aftertouchType::modulation) > 0);
-    channelvolume->value((channelAT & PART::aftertouchType::volume) > 0);
-
-    int keyAT =  part->PkeyATchoice;
-    polyfiltercutoff->value((keyAT & PART::aftertouchType::filterCutoff) > 0);
-    if (polyfiltercutoff->value())
-        polyfilterCminus->activate();
-    else
-         polyfilterCminus->deactivate();
-    polyfilterCminus->value((keyAT & PART::aftertouchType::filterCutoffDown) > 0);
-
-    polyfilterQ->value((keyAT & PART::aftertouchType::filterQ) > 0);
-    if (polyfilterQ->value())
-        polyfilterQminus->activate();
-    else
-         polyfilterQminus->deactivate();
-    polyfilterQminus->value((keyAT & PART::aftertouchType::filterQdown) > 0);
-
-    polypitchbend->value((keyAT & PART::aftertouchType::pitchBend) > 0);
-    if (polypitchbend->value())
-        polypitchBminus->activate();
-    else
-         polypitchBminus->deactivate();
-    polypitchBminus->value((keyAT & PART::aftertouchType::pitchBendDown) > 0);
-
-    polymodulation->value((keyAT & PART::aftertouchType::modulation) > 0);} {}
+    channelATselection = int(fetchData(0, PART::control::channelATset, npart));
+    fetchChannel();
+    keyATselection = int(fetchData(0, PART::control::keyATset, npart));
+    fetchKey();} {}
   }
   Function {fetchChannel()} {} {
     code {//
@@ -2023,40 +1998,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     plgroup = &synth->getGuiMaster()->panelgroup;
     ninseff = 0;
     make_window();
-
-    int efftype = fetchData(0, PART::control::effectType, npart, UNUSED, 0, TOPLEVEL::insert::partEffectSelect);
-    if (efftype > 0)
-    {
-        bool status = fetchData(0, EFFECT::control::changed, npart, efftype + (TOPLEVEL::insert::none | 128), ninseff);
-        inseffectui->UpdatePresetColour(status, insefftype->value());
-    }
-    channelATselection = int(fetchData(0, PART::control::channelATset, npart));
-
-    //why are the next two done this way?
-    int tmp = int(fetchData(0, PART::control::humanise, npart));
-    humanise->value(tmp); // will inc number
-    tmp = int(fetchData(0, PART::control::humanvelocity, npart));
-    velocityhumanise->value(tmp); // will inc number
-
-    fetchChannel();
-    keyATselection = int(fetchData(0, PART::control::keyATset, npart));
-    fetchKey();
-
-    string name = part->Poriginal;
-    if (!name.empty() && part->Pname != name)
-    {
-        originaltext->copy_label(name.c_str());
-        originalname->show();
-        originaltext->show();
-    }
-    else
-    {
-        originalname->hide();
-        originaltext->hide();
-    }
-    lastkey = -1;
-    lasteditW = 0;
-    lastctlW = 0;
     end();} {}
   }
   Function {checkEngines(string instrumentName = "")} {} {
