@@ -345,10 +345,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
       callback {//
-    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), true, "Part-kit");
-    instrumentkitlist->hide();}
+    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
+    instrumentkitlist->hide();
+    kitSeen = false;}
       xywh {341 129 670 370} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
       code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
     } {
@@ -424,8 +425,9 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Button kitClose {
         label Close
         callback {//
-        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), true, "Part-kit");
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
         instrumentkitlist->hide();
+        kitSeen = false;
         if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX
@@ -1733,11 +1735,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         partfx->copy_label(synth->getGuiMaster()->setPartWindowTitle("Part Effects").c_str());
         setEffNum();
+        bool res = fetchData(0, EFFECT::control::changed, npart,  (TOPLEVEL::insert::none | 128) + insefftype->value(), inseffnocounter->value() - 1);
+        inseffectui->UpdatePresetColour(res, insefftype->value());
         fxRtext();} {}
   }
   Function {kitrefresh()} {} {
     code {//
-        instrumentkitlist->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+        instrumentkitlist->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());
         drumMode->value(part->Pdrummode);
         kitMode->value(part->Pkitmode);
         if (kitMode->value())
@@ -1798,7 +1802,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {controllersrefresh()} {} {
     code {//
-    ctlwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+    ctlwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -1837,7 +1841,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {ctlmidirefresh()} {} {
     code {//
-        ctlmidi->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());
+        ctlmidi->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());
         modulation->value(part->ctl->modwheel.data);
         expression->value(part->ctl->expression.data);
         filterq->value(part->ctl->filterq.data);

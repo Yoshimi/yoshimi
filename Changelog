@@ -1,5 +1,12 @@
 yoshimi 2.2.0 M
 
+2023-6-1 Will
+bn2140
+* BugFix: Changed effects not highlighted.
+* Corrected some window title bars.
+* Part kit window and part effects window visible status
+  now remembered over Yoshimi shutdown and restart.
+
 2023-5-31 Will
 bn2139
 * Merged in part UI improvements from newGUIpart.
