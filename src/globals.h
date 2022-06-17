@@ -565,7 +565,7 @@ namespace MAIN // usage MAIN::control::volume
         saveNamedState,
         readLastSeen,
         loadFileFromList,
-        defaultPart,
+        defaultInstrument,
         exportPadSynthSamples,
         masterReset,
         masterResetAndMlearn,

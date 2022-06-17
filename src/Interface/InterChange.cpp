@@ -861,11 +861,11 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::loadFileFromList:
             break; // do nothing here
 
-        case MAIN::control::defaultPart: // clear part
+        case MAIN::control::defaultInstrument: // clear part's instrument
             if (write)
             {
                 undoRedoClear();
-                doClearPart(value);
+                doClearPartInstrument(value);
                 synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
@@ -1945,7 +1945,7 @@ void InterChange::returns(CommandBlock *getData)
 }
 
 
-void InterChange::doClearPart(int npart)
+void InterChange::doClearPartInstrument(int npart)
 {
     synth->part[npart]->defaultsinstrument();
     synth->part[npart]->cleanup();
@@ -3291,7 +3291,7 @@ void InterChange::commandMain(CommandBlock *getData)
             getData->data.source = TOPLEVEL::action::noAction;
             break;
 
-        case MAIN::control::defaultPart: // doClearPart
+        case MAIN::control::defaultInstrument: // clear part's instrument
             if (write)
             {
                 synth->partonoffWrite(value_int, -1);

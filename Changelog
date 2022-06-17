@@ -1,5 +1,12 @@
 yoshimi 2.2.0 M
 
+2023-6-17 Will
+bn2141
+* Added reset button to part edit window.
+  Re-arranged the window's layout to accomode this.
+* Updated User Guide.
+* Changed defaultPart to more accurate defaultInstrument.
+
 2023-6-1 Will
 bn2140
 * BugFix: Changed effects not highlighted.

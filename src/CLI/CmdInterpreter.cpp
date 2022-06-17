@@ -5310,7 +5310,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     {
         if (controlType != TOPLEVEL::type::Write)
             return REPLY::writeOnly_msg;
-        return sendNormal(synth, 0, npart, controlType, MAIN::control::defaultPart, TOPLEVEL::section::main);
+        return sendNormal(synth, 0, npart, controlType, MAIN::control::defaultInstrument, TOPLEVEL::section::main);
     }
 
     if (input.matchnMove(2, "program") || input.matchnMove(1, "instrument"))
@@ -6090,7 +6090,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         if (!readControl(synth, 0, PART::control::enable, value))
             return REPLY::inactive_msg;
 
-        return sendNormal(synth, 0, value, controlType, MAIN::control::defaultPart, TOPLEVEL::section::main);
+        return sendNormal(synth, 0, value, controlType, MAIN::control::defaultInstrument, TOPLEVEL::section::main);
     }
     return REPLY::op_msg;
 }

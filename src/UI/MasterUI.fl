@@ -292,7 +292,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -609,11 +609,6 @@ class MasterUI {open : {private GuiUpdates}
             * to offer the INTERNAL name first rather than a possibly
             * confusing external filename.
             */
-            if (!fetchData(0, PART::control::enable, activePart))
-            {
-                alert(synth, "Active part disabled");
-                return;
-            }
             string newname = synth->part[activePart]->Pname;
             if (newname == DEFAULT_NAME)
             {
@@ -645,8 +640,7 @@ class MasterUI {open : {private GuiUpdates}
                 alert(synth, "Active part disabled");
                 return;
             }
-            if (query("", "Yes", "No", "Clear parameters of instrument " + to_string(npart + 1) + "?") > 1)
-                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart,partui->npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+            partui->instrumentReset->do_callback();
             break;
         case 14: // search
         if (!fetchData(0, PART::control::enable, activePart))
@@ -3225,7 +3219,7 @@ Alan Calvert started the project}
             else
                 setMasterLabel(findLeafName(name) + " - State");
             break;
-        case MAIN::control::defaultPart:
+        case MAIN::control::defaultInstrument:
             partSwitch(activePart);
             updatepanel();
             break;
@@ -3333,6 +3327,7 @@ Alan Calvert started the project}
     int result = 0;
     while(querywindow->shown())
     {
+        querywindow->show(); // keep it on top
         queryRtext();
         if (yesQ->value())
             result = 3;
@@ -3403,6 +3398,7 @@ Alan Calvert started the project}
     size_t pos = 1;
     while (textwindow->shown())
     {
+        textwindow->show(); // keep it on top
         textinRtext();
         result = string(textLine->value());
         Fl::wait();
@@ -3569,11 +3565,14 @@ Alan Calvert started the project}
   }
   Function {partSwitch(int next)} {} {
     code {//
-    npartcounter->value(next + 1);
-    npartcounter->redraw();
-    updatelistitem(npart); // deselect old one
-    updatelistitem(next);  // select new one
-    npart = next;
+    if (npart != next)
+    {
+        npartcounter->value(next + 1);
+        npartcounter->redraw();
+        updatelistitem(npart); // deselect old one
+        npart = next;
+    }
+    updatelistitem(next); // select and/or modify
     activePart = npart;
     partui->rebuild(npart);
     partui->redraw();
@@ -3809,7 +3808,6 @@ Alan Calvert started the project}
     npartcounter->value((synth->getRuntime().currentPart) + 1);
     int next = synth->getRuntime().currentPart;
     partSwitch(next);
-    activePart = next;
 
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
@@ -4149,7 +4147,7 @@ bpmfallback->format(format);} {}
         partui->Showctlmidi();
     else
         partui->ctlmidi->hide();
-        
+
     if (lastSeen(synth, "Part-kit"))
         partui->Showkit();
     else

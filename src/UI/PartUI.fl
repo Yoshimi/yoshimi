@@ -436,30 +436,30 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
-      xywh {330 188 395 385} type Double hide resizable
+      xywh {705 199 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = 395; editDH = 385;}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 220 395 103} box ENGRAVED_BOX
+        xywh {0 222 395 100} box ENGRAVED_BOX
       } {
         Fl_Group ADD {
           label ADDsynth
-          xywh {5 246 100 72} box ENGRAVED_FRAME labelfont 1
+          xywh {5 246 94 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable ADsynth} xywh {15 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable ADsynth} xywh {12 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
             class Fl_Check_Button2
           }
           Fl_Box addbox {
-            xywh {10 226 89 18} box FLAT_BOX
+            xywh {8 226 84 18} box FLAT_BOX
             code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button adeditbutton {
@@ -471,25 +471,25 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {15 276 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {12 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
         Fl_Group SUB {
           label SUBsynth
-          xywh {105 246 100 72} box ENGRAVED_FRAME labelfont 1
+          xywh {100 246 94 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable SUBsynth} xywh {115 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable SUBsynth} xywh {107 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
             class Fl_Check_Button2
           }
           Fl_Box subbox {
-            xywh {110 226 89 18} box FLAT_BOX
+            xywh {103 226 84 18} box FLAT_BOX
             code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button subeditbutton {
@@ -501,25 +501,25 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {115 276 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {107 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
         Fl_Group PAD {
           label PADsynth
-          xywh {205 246 100 72} box ENGRAVED_FRAME labelfont 1
+          xywh {195 246 94 72} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
             label Enabled
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable PADsynth} xywh {215 252 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
+            tooltip {enable/disable PADsynth} xywh {202 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
             class Fl_Check_Button2
           }
           Fl_Box padbox {
-            xywh {210 226 89 18} box FLAT_BOX
+            xywh {198 226 84 18} box FLAT_BOX
             code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button padeditbutton {
@@ -531,7 +531,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {215 276 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
+            tooltip {Right click: also close this} xywh {202 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -542,7 +542,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {310 245 80 35} box PLASTIC_UP_BOX color 230 selection_color 220 labelfont 1 align 128
+          tooltip {Right click: also close this} xywh {295 227 94 28} box PLASTIC_UP_BOX color 230 selection_color 220 labelfont 1 align 128
         }
         Fl_Button effects {
           label Effects
@@ -551,11 +551,20 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {310 283 80 35} box PLASTIC_UP_BOX color 230 labelfont 1
+          tooltip {Right click: also close this} xywh {295 258 94 28} box PLASTIC_UP_BOX color 230 labelfont 1
+        }
+        Fl_Button editAT {
+          label Aftertouch
+          callback {//
+                ShowAT();
+                atSeen = 2;
+                if ((Fl::event_button() == 3))
+                    instrumenteditwindow->hide();}
+          xywh {295 290 94 28} box PLASTIC_UP_BOX color 230 labelfont 1
         }
       }
       Fl_Group {} {
-        xywh {0 5 395 215} box ENGRAVED_FRAME
+        xywh {0 2 395 216} box ENGRAVED_FRAME
       } {
         Fl_Text_Display A_C_display {
           label {Author and Copyright}
@@ -595,8 +604,8 @@ class PartUI {: {public Fl_Group, PartUI_}
           code1 {o->value(part->info.Ptype);}
         } {}
       }
-      Fl_Box {} {
-        xywh {0 322 268 62} box ENGRAVED_FRAME labelfont 1 align 8
+      Fl_Box humaniseBox {
+        xywh {0 324 272 58} box ENGRAVED_FRAME labelfont 1 align 8
       }
       Fl_Text_Display humanise_display {
         label Humanise
@@ -607,7 +616,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
 
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer, npart);}
-        tooltip {Random detune of whole part in cents} xywh {12 342 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random detune of whole part in cents} xywh {12 342 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseDetune);//o->useCustomTip(true);}
         class mwheel_val_slider_rev
       }
@@ -616,9 +625,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
 
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer, npart);}
-        tooltip {Random velocity attenuation of whole part} xywh {12 363 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
+        tooltip {Random velocity attenuation of whole part} xywh {12 362 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         class mwheel_val_slider_rev
+      }
+      Fl_Button instrumentReset {
+        label Reset
+        callback {//
+         if (!fetchData(0, PART::control::enable, npart))
+         {
+             alert(synth, "Selected part is disabled");
+             return;
+         }
+         if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
+                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        tooltip {Revert to default instrument} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1
       }
       Fl_Button editClose {
         label Close
@@ -627,16 +648,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   editSeen = false;
                   lasteditW = 0;
                   instrumenteditwindow->hide();}
-        xywh {290 358 86 21} box THIN_UP_BOX labelfont 1
-      }
-      Fl_Button editAT {
-        label Aftertouch
-        callback {//
-                ShowAT();
-                atSeen = 2;
-                if ((Fl::event_button() == 3))
-                    instrumenteditwindow->hide();}
-        xywh {283 328 101 26} box PLASTIC_UP_BOX color 230 labelfont 1
+        xywh {282 358 100 24} box THIN_UP_BOX labelfont 1
       }
       Fl_Text_Display originalname {
         label {Derived From}
@@ -2330,22 +2342,23 @@ class PartUI {: {public Fl_Group, PartUI_}
     int boxHeight = int(18 * dScale);
 
     ADD->labelsize(size14);
-    addbox->resize(int(10 * dScale), boxY, boxWidth, boxHeight);
+    addbox->resize(int(8 * dScale), boxY, boxWidth, boxHeight);
     adsynenabledcheck->labelsize(size11);
     adeditbutton->labelsize(size14);
 
     SUB->labelsize(size14);
-    subbox->resize(int(110 * dScale), boxY, boxWidth, boxHeight);
+    subbox->resize(int(103 * dScale), boxY, boxWidth, boxHeight);
     subsynenabledcheck->labelsize(size11);
     subeditbutton->labelsize(size14);
 
     PAD->labelsize(size14);
-    padbox->resize(int(210 * dScale), boxY, boxWidth, boxHeight);
+    padbox->resize(int(198 * dScale), boxY, boxWidth, boxHeight);
     padsynenabledcheck->labelsize(size11);
     padeditbutton->labelsize(size14);
 
     kitedit->labelsize(size14);
     effects->labelsize(size14);
+    editAT->labelsize(size14);
 
     A_C_display->labelsize(size12);
     A_C_default->labelsize(size12);
@@ -2360,11 +2373,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
     humanise->labelsize(size12);
         humanise->textsize(size);
-
     velocityhumanise->labelsize(size12);
         velocityhumanise->textsize(size);
-    editAT->labelsize(size14);
+
+    instrumentReset->labelsize(size14);
     editClose->labelsize(size14);
+;
     humanise_display->labelsize(size14);
 
     instrumenteditwindow->redraw();} {}

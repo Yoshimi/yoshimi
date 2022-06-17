@@ -82,7 +82,7 @@ class InterChange : private DataText
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
         void returns(CommandBlock *getData);
-        void doClearPart(int npart);
+        void doClearPartInstrument(int npart);
         bool commandSend(CommandBlock *getData);
         float readAllData(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
