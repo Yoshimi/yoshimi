@@ -64,7 +64,8 @@ class Part
 
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
-        void defaults(void);
+        void reset(int npart);
+        void defaults(int npart);
         void setNoteMap(int keyshift);
         void defaultsinstrument(void);
         void cleanup(void);

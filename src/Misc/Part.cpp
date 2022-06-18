@@ -118,12 +118,27 @@ Part::Part(uchar id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_syn
         partnote[i].time = 0;
     }
     cleanup();
+    PmapOffset = 0; // this only needs to be set once
+    /*
+     * Do we actually need the following two?
+     * defaults is called for all parts at startup by Config.cpp
+     * and Pname is then set to the default name when defaults
+     * calls defaultsinstrument
+     */
     Pname.clear();
-    defaults();
+    defaults(0);
 }
 
 
-void Part::defaults(void)
+void Part::reset(int npart)
+{
+    cleanup();
+    defaults(npart);
+    synth->setPartMap(npart);
+    synth->partonoffWrite(npart, 1);
+}
+
+void Part::defaults(int npart)
 {
     Penabled = 0;
     Pminkey = 0;
@@ -134,8 +149,6 @@ void Part::defaults(void)
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
-    PmapOffset = 0;
-    Prcvchn = 0;
     oldFilterState = -1;
     oldBendState = -1;
     oldVolumeState = -1;
@@ -154,6 +167,7 @@ void Part::defaults(void)
     busy = false;
     defaultsinstrument();
     ctl->resetall();
+    Prcvchn = npart % NUM_MIDI_CHANNELS;
     setNoteMap(0);
 }
 
@@ -1610,7 +1624,7 @@ void Part::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("INSTRUMENT"))
     {
-        Pname = ""; // clear out any previous name
+        Pname.clear(); // erase any previous name
         getfromXMLinstrument(xml);
         xml->exitbranch();
     }

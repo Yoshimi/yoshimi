@@ -637,9 +637,16 @@ class PartUI {: {public Fl_Group, PartUI_}
              alert(synth, "Selected part is disabled");
              return;
          }
+
+         if (Fl::event_state(FL_CTRL))
+         {
+             if (choice(synth, "", "Yes", "No", "Set entire part " + std::to_string(npart + 1) + " controls to default values ?") > 1)
+                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+             return;
+         }
          if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Revert to default instrument} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1
+        tooltip {Revert to default instrument \n +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1
       }
       Fl_Button editClose {
         label Close

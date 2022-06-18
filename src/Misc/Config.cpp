@@ -797,10 +797,8 @@ bool Config::restoreSessionData(string sessionfile)
         // mark as soon as anything changes
         synth->getRuntime().stateChanged = true;
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-        {
-            synth->part[npart]->defaults();
-            synth->part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
-        }
+            synth->part[npart]->defaults(npart);
+
         ok = synth->getfromXML(xml);
         if (ok)
             synth->setAllPartMaps();

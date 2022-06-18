@@ -5310,6 +5310,8 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     {
         if (controlType != TOPLEVEL::type::Write)
             return REPLY::writeOnly_msg;
+        if (input.matchnMove(3, "all")) // clear entire part
+            return sendNormal(synth, 0, npart, controlType, MAIN::control::defaultPart, TOPLEVEL::section::main);
         return sendNormal(synth, 0, npart, controlType, MAIN::control::defaultInstrument, TOPLEVEL::section::main);
     }
 

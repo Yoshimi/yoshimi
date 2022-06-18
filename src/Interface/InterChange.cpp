@@ -861,6 +861,16 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::loadFileFromList:
             break; // do nothing here
 
+        case MAIN::control::defaultPart: // clear entire part
+            if (write)
+            {
+                undoRedoClear();
+                synth->part[value]->reset(value);
+                synth->getRuntime().sessionSeen[TOPLEVEL::XML::Instrument] = false;
+                getData->data.source &= ~TOPLEVEL::action::lowPrio;
+            }
+            break;
+
         case MAIN::control::defaultInstrument: // clear part's instrument
             if (write)
             {
@@ -3289,6 +3299,16 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::loadFileFromList:
             muteQueueWrite(getData);
             getData->data.source = TOPLEVEL::action::noAction;
+            break;
+
+        case MAIN::control::defaultPart: // clear entire part
+            if (write)
+            {
+                synth->partonoffWrite(value_int, -1);
+                getData->data.source = TOPLEVEL::action::lowPrio;
+            }
+            else
+                getData->data.source = TOPLEVEL::action::noAction;
             break;
 
         case MAIN::control::defaultInstrument: // clear part's instrument

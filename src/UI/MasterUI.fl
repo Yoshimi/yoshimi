@@ -3219,6 +3219,7 @@ Alan Calvert started the project}
             else
                 setMasterLabel(findLeafName(name) + " - State");
             break;
+        case MAIN::control::defaultPart:
         case MAIN::control::defaultInstrument:
             partSwitch(activePart);
             updatepanel();

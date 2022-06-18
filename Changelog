@@ -1,5 +1,11 @@
 yoshimi 2.2.0 M
 
+2023-6-18 Will
+bn2142
+* Enabled whole part reset for part button and dropdown menu.
+  (holding down Ctrl)
+* Updated HTML user guide.
+
 2023-6-17 Will
 bn2141
 * Added reset button to part edit window.

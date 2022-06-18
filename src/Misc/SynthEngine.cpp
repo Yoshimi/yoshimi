@@ -430,10 +430,8 @@ void SynthEngine::defaults(void)
     VUpeak.values.vuRmsPeakR = 0;
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        part[npart]->defaults();
-        part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
-    }
+        part[npart]->defaults(npart);
+
     VUpeak.values.parts[0] = -1.0f;
     VUpeak.values.partsR[0] = -1.0f;
     VUdata.values.parts[0] = -1.0f;
@@ -3468,6 +3466,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             def = 115;
             max = 119;
             break;
+        case MAIN::control::defaultPart:
         case MAIN::control::defaultInstrument:
             def = 0;
             max = Runtime.NumAvailableParts -1;
