@@ -35,6 +35,13 @@ add_definitions(-std=gnu++14) # various versions of cmake
 
 add_definitions(-Wall)
 
+# avoid exporting any (spurious) symbols in EXE and Plugin
+# Note: the two LV2 descriptors are already marked visibility=default in LV2 headers
+cmake_policy (SET CMP0063 NEW)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
