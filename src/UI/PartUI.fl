@@ -466,7 +466,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Edit
             callback {//
             showparameters(0,0);
-            checkEngines();
+            //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))
             {
@@ -496,7 +496,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Edit
             callback {//
             showparameters(0,1);
-            checkEngines();
+            //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))
             {
@@ -526,7 +526,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             label Edit
             callback {//
             showparameters(0,2);
-            checkEngines();
+            //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))
             {
@@ -646,7 +646,8 @@ class PartUI {: {public Fl_Group, PartUI_}
          }
          if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Revert to default instrument \n +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1
+        tooltip {Revert to default instrument
+ +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1
       }
       Fl_Button editClose {
         label Close
@@ -1295,10 +1296,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             //case FL_KEYUP:              // keyboard key released
             {
                 if (lastkey != Fl::event_key())
-                {
                     lastkey = Fl::event_key();
-                    //cout << "Key " << lastkey << endl;
-                }
                 break;
             }
             case FL_KEYUP:
@@ -1336,7 +1334,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     string text;
     if (miscmsg != NO_MSG)
         text = textMsgBuffer.fetch(miscmsg);
-    //std::cout << "reached npart " << int(npart) << "  new " << int(newpart) <<std::endl;
+
     if (npart != newpart)
         return;
     bool sameEff = (engine == ninseff);
@@ -1765,15 +1763,15 @@ class PartUI {: {public Fl_Group, PartUI_}
         kitMode->value(part->Pkitmode);
         if (kitMode->value())
         {
-            //partKitOn = true;
+            partKitOn = true;
             kitlist->activate();
         }
         else
         {
-            //partKitOn = false;
+            partKitOn = false;
             kitlist->deactivate();
         }
-
+        lastkititem = -1;
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (part->kit[i].Penabled)

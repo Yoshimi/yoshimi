@@ -328,8 +328,8 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         alsaSampleRate,
         readAudio,
         readMIDI,
-
         // end of engine controls
+
         addPresetRootDir = 60,
         removePresetRootDir,
         currentPresetRoot,
@@ -403,7 +403,7 @@ namespace VECTOR // usage VECTOR::control::name
 
 namespace COPYPASTE // usage COPYPASTE::control::toClipboard
 {
-    enum control : unsigned char {
+    enum control : unsigned char { // not yet implemented
         toClipboard = 0,
         toFile,
         fromClipboard,
@@ -927,6 +927,7 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         baseFunctionParameter = 16,
         baseFunctionType, // Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
             // PulseSine, StrchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle
+
         baseModulationParameter1 = 18,
         baseModulationParameter2,
         baseModulationParameter3,
