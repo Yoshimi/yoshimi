@@ -259,7 +259,9 @@ class KeyHandle {: {public Fl_Box}
     else if (event == FL_SHORTCUT)
     {
         auto key = Fl::event_key();
-        if (key == 'z')
+        if (key == FL_Escape)
+            ev = 1;
+        else if (key == 'z')
         {
             if (Fl::event_state() == 327680) //ctrl + shift
             {

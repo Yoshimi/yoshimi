@@ -1904,8 +1904,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             if (type < 6)
                 gaindial->deactivate();
             stagescounter->value(eff->geteffectpar(14));
-            eqgraph->redraw();
             eqgraph->init(eff);
+            eqgraph->redraw();
             effeqwindow->show();
             break;
         }
