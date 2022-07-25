@@ -1,12 +1,17 @@
-Version 2.2.0
+Version 2.2.1
 
-A major feature is the revision of the PadSynth engine, giving more dynamic control.
+There are just a few useful variations to the way
+Yoshimi is controlled in this minor release.
 
-We now support Undo/Redo for most settings.
+A new 'reset' button in the part edit window.
 
-Some controls in the main window are better placed and should be more obvious.
+More windows stay open when you change parts.
 
-Full details are in /doc/Yoshimi_2.2.0_features.txt
+Two new instruments have been added to the default banks.
+
+Some doc updates and bugfixes.
+
+Full details are in /doc/Yoshimi_2.2.1_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

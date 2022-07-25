@@ -1,6 +1,12 @@
-yoshimi 2.2.0 M
+yoshimi 2.2.1
 
-2022-7-? Will
+2022-7-25 Will
+bn2146
+* Updated HTML manual
+* Updated docs
+* Set release version 2.2.1
+
+2022-7-20 Will
 bn2145
 * Disabled 'Escape' key if main window has focus.
 * Added Hugh's 'Nostalgia' to Synth bank.

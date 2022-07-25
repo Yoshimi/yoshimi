@@ -1,12 +1,12 @@
 
 Ensure all new files have been added to commit!!!
 
-Before the commit (but after build) run the python file /home/will/yoshimi-code/update_guide_version.py
-This will ensure the guide has the correct version number.
-
 /src/CMakeLists.txt
     Ensure version number is correct.
     Disable extra compiler tests.
+
+Before the commit (but after build) run the python file /home/{user}/yoshimi-code/update_guide_version.py
+This will ensure the guide has the correct version number.
 
 /desktop/yoshimi.1
     Ensure version number and dates are correct.
@@ -23,7 +23,7 @@ This will ensure the guide has the correct version number.
 /doc
     Ensure these are up-to-date - especially check
     yoshimi-user-manual has correct version number.
-    Move Yoshimi_1.n.x_features.txt into Histories and
+    Move Yoshimi_2.n.x_features.txt into Histories and
     replace with new one for the current version.
 
 Changelog

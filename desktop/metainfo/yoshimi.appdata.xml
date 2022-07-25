@@ -28,7 +28,7 @@
     </p>
   </description>
   <releases>
-​    <release type="stable" version="2.2.0" date="2022-5-16" />
+​    <release type="stable" version="2.2.1" date="2022-7-25" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>
