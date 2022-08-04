@@ -414,7 +414,6 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
-      openedit = false;
       make_window();
       bool foundWindows = Showmaster();
 
@@ -2984,26 +2983,11 @@ Alan Calvert started the project}
             break;
 
         case MAIN::control::partNumber:
-            {
-            //bool ctlmidiSeen = partui->ctlmidi->visible();
-            //if(partui->instrumenteditwindow->visible())
-                //openedit = true;
-            // openedit also set by right click in mixer panel
-            // might need further refinement
-
             if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI)
                 activePart = value_int;
 
             partSwitch(activePart);
             updatepanel();
-            /*if (openedit)
-            {
-                partui->Showedit();
-                openedit = false;
-            }
-            else
-                partui->instrumenteditwindow->hide();*/
-            }
             break;
 
         case MAIN::control::availableParts:
@@ -3706,46 +3690,6 @@ Alan Calvert started the project}
          partMidiCh->redraw();
     }
     partSwitch(next);} {}
-  }
-  Function {updateeffects(int data)} {} {
-    code {//
-    int partnum = data >> 24;
-    int effclass = (data >> 22) & 3;
-    int parameter = (data >> 8) & 0x7f;
-
-    if (effclass == 2)
-    {
-         // will be part effects
-    }
-    else if (effclass == 1)
-    {
-        ninseff = parameter & 0x3f;
-        sysinsgroup->value(InsertionEffectsGrp);
-        showInsEfxUI();
-        inseffnocounter->value(ninseff + 1);
-        inseffpart->value(partnum);
-        if (partnum != 1) // off
-        {
-            insefftype->activate();
-            inseffectui->activate();
-        }
-        else
-        {
-            insefftype->deactivate();
-            inseffectui->deactivate();
-        }
-        insefftype->value(synth->insefx[ninseff]->geteffect());
-        inseffectui->refresh(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
-    }
-    else
-    {
-        nsyseff = parameter & 0x3f;
-        sysinsgroup->value(SystemEffectsGrp);
-        syseffnocounter->value(nsyseff + 1);
-        sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-        syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
-        showSysEfxUI();
-    }} {}
   }
   Function {setMasterLabel(string name)} {} {
     code {//
@@ -4616,8 +4560,6 @@ bpmfallback->format(format);} {}
   decl {string filename;} {private local
   }
   decl {int msgGroup;} {private local
-  }
-  decl {bool openedit;} {public local
   }
   decl {float mainDW;} {private local
   }

@@ -52,7 +52,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 #add_definitions(-Wno-deprecated)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.2.1")
+set (YOSHIMI_VERSION "2.2.1 M")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=0)

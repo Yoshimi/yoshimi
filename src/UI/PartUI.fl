@@ -181,7 +181,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Button adeditbutton {
           label edit
           callback {//
-          partui->showparameters(n,0);
+          partui->showparameters(n,PART::engine::addSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {422 4 40 15} box THIN_UP_BOX labelsize 11
@@ -198,7 +198,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Button subeditbutton {
           label edit
           callback {//
-          partui->showparameters(n,1);
+          partui->showparameters(n,PART::engine::subSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {490 4 40 15} box THIN_UP_BOX labelsize 11
@@ -215,7 +215,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Button padeditbutton {
           label edit
           callback {//
-          partui->showparameters(n,2);
+          partui->showparameters(n,PART::engine::padSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {560 4 40 15} box THIN_UP_BOX labelsize 11
@@ -465,7 +465,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Button adeditbutton {
             label Edit
             callback {//
-            showparameters(0,0);
+            showparameters(0,PART::engine::addSynth);
             //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))
@@ -495,7 +495,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Button subeditbutton {
             label Edit
             callback {//
-            showparameters(0,1);
+            showparameters(0,PART::engine::subSynth);
             //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))
@@ -525,7 +525,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           Fl_Button padeditbutton {
             label Edit
             callback {//
-            showparameters(0,2);
+            showparameters(0,PART::engine::padSynth);
             //checkEngines();
             seteditname();
             if ((Fl::event_button() == 3))

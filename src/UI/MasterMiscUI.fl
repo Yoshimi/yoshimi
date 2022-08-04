@@ -466,12 +466,8 @@ class Panellistitem {: {public Fl_Group}
               int newpart = npart | synth->getGuiMaster()->panelgroup;
               synth->getGuiMaster()->activePart = npart + *plgroup;
               if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_RIGHT_MOUSE)
-              {
-                  if (newpart == synth->getGuiMaster()->partui->npart)
-                      synth->getGuiMaster()->partui->Showedit();
-                  else
-                      synth->getGuiMaster()->openedit = true;
-              }
+                  synth->getGuiMaster()->partui->Showedit();
+
               if ((int)bankui->cbwig->value() != (newpart + 1))
               {
                   bankui->cbwig->value(newpart + 1);
