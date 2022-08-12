@@ -1754,7 +1754,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         setEffNum();
         bool res = fetchData(0, EFFECT::control::changed, npart,  (TOPLEVEL::insert::none | 128) + insefftype->value(), inseffnocounter->value() - 1);
         inseffectui->UpdatePresetColour(res, insefftype->value());
-        fxRtext();} {}
+        lastfxW = 0;} {}
   }
   Function {kitrefresh()} {} {
     code {//
@@ -2283,7 +2283,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
     if (instrumenteditwindow->visible())
         editRtext();
-
     if (partfx->visible())
     {
         if (insefftype->value() == 8) // dynfilter
@@ -2294,14 +2293,8 @@ class PartUI {: {public Fl_Group, PartUI_}
                     inseffectui->filtRtext();
             }
         }
-        if ( partfx->w() != lastfxW)
-        {
-            fxRtext();
-            lastfxW = partfx->w();
-        }
+        fxRtext();
     }
-
-
     if (instrumentkitlist->visible() && instrumentkitlist->w() != lastkitW)
     {
         kitRtext();
@@ -2490,7 +2483,16 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {fxRtext()} {} {
     code {//
-    float dScale =  partfx->w() / float(fxDW);
+    if (lastfxW < 3)
+    {
+        ++lastfxW;
+        return;
+    }
+    if (lastfxW == partfx->w())
+        return;
+    lastfxW = partfx->w();
+
+    float dScale =  lastfxW / float(fxDW);
     if (dScale < 0.2f)
         dScale = 0.2f;
 

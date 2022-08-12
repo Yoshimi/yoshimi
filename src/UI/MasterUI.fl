@@ -3090,7 +3090,6 @@ Alan Calvert started the project}
 
         case MAIN::control::loadInstrumentByName:
             updatepartprogram(kititem);
-            //RecentInstruments->activate();
             break;
 
         case MAIN::control::saveNamedInstrument: // save instrument
@@ -3562,7 +3561,6 @@ Alan Calvert started the project}
     updatelistitem(next); // select and/or modify
     activePart = npart;
     partui->rebuild(npart);
-    partui->redraw();
 
     partEnable->value(synth->part[npart]->Penabled == 1);
     if (partEnable->value() == 1)

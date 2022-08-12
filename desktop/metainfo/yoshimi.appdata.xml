@@ -49,10 +49,8 @@
     </screenshot>
   </screenshots>
   <categories>
-     <category>AudioVideo</category>
      <category>Audio</category>
-     <category>Midi</category>
-     <category>Synthesiser</category>
+     <category>Music</category>
   </categories>
   <url type="homepage">https://sourceforge.net/projects/yoshimi/</url>
 </component>
