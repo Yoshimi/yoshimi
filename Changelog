@@ -1,5 +1,11 @@
 yoshimi 2.2.1 M
 
+2022-8-16 Will
+bn2149
+* Increased size of char array to suppress compiler warnings.
+* Changed direct comparison to strcmp( to suppress compiler warnings.
+* Commented out #include <optional> to suppress compiler warnings.
+
 2022-8-12 Will
 bn2148
 * Attempt to improve EQ graph display.

@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2019-2021 Will Godfrey and others.
+    Copyright 2019-2022 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -421,7 +421,7 @@ inline int countDir(const std::string dirName)
     {
         if (fn->d_type == DT_DIR)
         {
-            if(fn->d_name != dir1 && fn->d_name != dir2)
+            if (strcmp(fn->d_name, dir1) !=0 && strcmp(fn->d_name, dir2) !=0)
                 ++ count;
         }
     }

@@ -879,8 +879,8 @@ bool PADnoteParameters::export2wav(std::string basefilename)
     bool isOK = true;
     for (size_t tab = 0; tab < waveTable.numTables; ++tab)
     {
-        char tmpstr[20];
-        snprintf(tmpstr, 20, "-%02zu", tab + 1);
+        char tmpstr[22];
+        snprintf(tmpstr, 22, "-%02zu", tab + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
         unsigned int block;
         unsigned short int sBlock;
