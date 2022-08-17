@@ -60,37 +60,37 @@ void EffectMgr::changeeffect(int _nefx)
     if (nefx == _nefx)
         return;
     nefx = _nefx;
-    switch (nefx)
+    switch (nefx + EFFECT::type::none)
     {
-        case TOPLEVEL::insert::reverb:
+        case EFFECT::type::reverb:
             efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::echo:
+        case EFFECT::type::echo:
             efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::chorus:
+        case EFFECT::type::chorus:
             efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::phaser:
+        case EFFECT::type::phaser:
             efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::alienWah:
+        case EFFECT::type::alienWah:
             efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::distortion:
+        case EFFECT::type::distortion:
             efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::eq:
+        case EFFECT::type::eq:
             efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
-        case TOPLEVEL::insert::dynFilter:
+        case EFFECT::type::dynFilter:
             efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
@@ -324,47 +324,47 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
 
 float LimitMgr::geteffectlimits(CommandBlock *getData)
 {
-    int effType = getData->data.kit & 127;
+    int effType = getData->data.kit;
     float value = 0;
     switch (effType)
     {
-        case TOPLEVEL::insert::none:
+        case EFFECT::type::none:
             value = 0;
             break;
-        case TOPLEVEL::insert::reverb:
+        case EFFECT::type::reverb:
             Revlimit reverb;
             value = reverb.getlimits(getData);
             break;
-        case TOPLEVEL::insert::echo:
+        case EFFECT::type::echo:
             Echolimit echo;
             value = echo.getlimits(getData);
             break;
-        case TOPLEVEL::insert::chorus:
+        case EFFECT::type::chorus:
             Choruslimit chorus;
             value = chorus.getlimits(getData);
             break;
-        case TOPLEVEL::insert::phaser:
+        case EFFECT::type::phaser:
             Phaserlimit phaser;
             value = phaser.getlimits(getData);
             break;
-        case TOPLEVEL::insert::alienWah:
+        case EFFECT::type::alienWah:
             Alienlimit alien;
             value = alien.getlimits(getData);
             break;
-        case TOPLEVEL::insert::distortion:
+        case EFFECT::type::distortion:
             Distlimit dist;
             value = dist.getlimits(getData);
             break;
-        case TOPLEVEL::insert::eq:
+        case EFFECT::type::eq:
             EQlimit EQ;
             value = EQ.getlimits(getData);
             break;
-        case TOPLEVEL::insert::dynFilter:
+        case EFFECT::type::dynFilter:
             Dynamlimit dyn;
             value = dyn.getlimits(getData);
             break;
         default:
-            value = TOPLEVEL::insert::count - TOPLEVEL::insert::none;
+            value = EFFECT::type::count - EFFECT::type::none;
             break;
     }
     return value;
