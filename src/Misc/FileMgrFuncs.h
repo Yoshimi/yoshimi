@@ -475,7 +475,9 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
         build.clear();
         return;
     }
-    bool instype = ((exten == ".xiz") | (exten == ".xiy")  | (exten == ".xi*"));
+
+    // int to suppress clang compiler warning
+    bool instype = (int(exten == ".xiz") | (exten == ".xiy")  | (exten == ".xi*"));
     string last;
     last.clear();
     for (std::list<string>::iterator it = build.begin(); it != build.end(); ++it)

@@ -1,7 +1,13 @@
 yoshimi 2.2.1 M
 
 2022-8-17 Will
-bn2150 (branch temeff)
+bn2151
+* Fixed MIDI-learn regressions.
+  Settings saved, but not received.
+* Suppressed clang compliler warnings.
+* Doc updates.
+
+bn2150 (branch tempeff)
 * Effect control labels now taken back out of inserts and
   as a group now sit immediately above kit numbers.
 

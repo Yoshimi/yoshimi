@@ -473,33 +473,33 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
             ctl = PART::control::resonanceBandwidthDepth;
         }
     }
+    else if (findAndStep(source,"Time"))
+    {
+        if (findAndStep(source,"Stretch"))
+            ctl = PART::control::portamentoTimeStretch;
+        else
+            ctl = PART::control::portamentoTime;
+    }
     else if (findAndStep(source,"Portamento"))
     {
         if (findAndStep(source,"Receive"))
             ctl = PART::control::receivePortamento;
-        else if (findAndStep(source,"Time"))
-        {
-            if (findAndStep(source,"Stretch"))
-                ctl = PART::control::portamentoTimeStretch;
-            else
-                ctl = PART::control::portamentoTime;
-        }
-        else if (findAndStep(source,"Threshold Gate"))
-        {
-            if (findAndStep(source,"Type"))
-                ctl = PART::control::portamentoThresholdType;
-            else
-                ctl = PART::control::portamentoThreshold;
-        }
-        else if (findAndStep(source,"Prop"))
-        {
-            if (findAndStep(source,"Enable"))
-                ctl = PART::control::enableProportionalPortamento;
-            else if (findAndStep(source,"Rate"))
-                ctl = PART::control::proportionalPortamentoRate;
-            else if (findAndStep(source,"depth"))
-                ctl = PART::control::proportionalPortamentoDepth;
-        }
+    }
+    else if (findAndStep(source,"Threshold Gate"))
+    {
+        if (findAndStep(source,"Type"))
+            ctl = PART::control::portamentoThresholdType;
+        else
+            ctl = PART::control::portamentoThreshold;
+    }
+    else if (findAndStep(source,"Prop"))
+    {
+        if (findAndStep(source,"Enable"))
+            ctl = PART::control::enableProportionalPortamento;
+        else if (findAndStep(source,"Rate"))
+            ctl = PART::control::proportionalPortamentoRate;
+        else if (findAndStep(source,"depth"))
+            ctl = PART::control::proportionalPortamentoDepth;
     }
     if (ctl < UNUSED)
     {

@@ -2393,7 +2393,7 @@ int CmdInterpreter::commandList(Parser& input)
     if (input.matchnMove(1, "banks")
         || (bitFindHigh(context) == LEVEL::Bank && (input.isAtEnd() || input.isdigit())))
     {
-        if (input.isAtEnd() | !input.isdigit())
+        if (input.isAtEnd() || !input.isdigit())
             ID = 128;
         else
             ID = string2int(input);
