@@ -926,11 +926,11 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     {
         //cout << "Dyn filter seen part " << int(part)<< endl;
         if (part == TOPLEVEL::section::systemEffects)
-            synth->getGuiMaster()->syseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - TOPLEVEL::insert::none);
+            synth->getGuiMaster()->syseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
         else if (part == TOPLEVEL::section::insertEffects)
-            synth->getGuiMaster()->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - TOPLEVEL::insert::none);
+            synth->getGuiMaster()->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none);
         else
-           synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - TOPLEVEL::insert::none); // normal part effect
+           synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
     }
 
     qdial->activate();

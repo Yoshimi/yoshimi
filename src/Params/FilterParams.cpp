@@ -395,7 +395,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
-    int effType = getData->data.kit & 127;
+    int effType = getData->data.kit;
     int engine = getData->data.engine;
 
     unsigned char type = 0;
@@ -411,7 +411,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
-            if (effType == TOPLEVEL::insert::dynFilter)
+            if (effType == EFFECT::type::dynFilter)
                 def = 45;
             else if (engine == PART::engine::subSynth)
                 def = 80;
@@ -423,7 +423,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::Q:
             if (engine >= PART::engine::addVoice1)
                 def = 60;
-            else if (effType != TOPLEVEL::insert::dynFilter)
+            else if (effType != EFFECT::type::dynFilter)
                 def = 40;
             break; // for dynFilter it's the default 64
         case FILTERINSERT::control::frequencyTracking:
@@ -437,7 +437,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::gain:
             break;
         case FILTERINSERT::control::stages:
-            if (effType == TOPLEVEL::insert::dynFilter)
+            if (effType == EFFECT::type::dynFilter)
                 def = 1;
             else
                 def = 0;

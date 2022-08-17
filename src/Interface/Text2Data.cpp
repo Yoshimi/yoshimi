@@ -560,7 +560,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         //cout << "effnum " << int(effnum) << endl;
         if (findAndStep(source, "DynFilter ~ Filter"))
         {
-            allData.data.kit = TOPLEVEL::insert::dynFilter | 128;
+            allData.data.kit = EFFECT::type::dynFilter;
             encodeFilter(source, allData);
             return;
         }
@@ -593,55 +593,55 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         }
 
         unsigned char efftype = findListEntry(source, 1, fx_list);
-        if (efftype >= TOPLEVEL::insert::count - TOPLEVEL::insert::none)
+        if (efftype >= EFFECT::type::count - EFFECT::type::none)
         {
             log(source, "effect type out of range");
             return;
         }
-        int effpos = efftype + TOPLEVEL::insert::none;
-        allData.data.kit = efftype + (TOPLEVEL::insert::none | 128);
+        int effpos = efftype + EFFECT::type::none;
+        allData.data.kit = efftype + EFFECT::type::none;
 
         // now need to do actual control
         unsigned char result = UNUSED;
         std::cout << "effpos " << effpos << std::endl;
         switch (effpos)
         {
-            case TOPLEVEL::insert::reverb:
+            case EFFECT::type::reverb:
                 result = findListEntry(source, 2, reverblist);
                 if (result > 4) // no 5 or 6
                     result += 2;
                 break;
-            case TOPLEVEL::insert::echo:
+            case EFFECT::type::echo:
                 result = findListEntry(source, 2, echolist);
                 if (result == 7) // skip unused numbers
                     result = EFFECT::control::bpm;
                 break;
-            case TOPLEVEL::insert::chorus:
+            case EFFECT::type::chorus:
                 result = findListEntry(source, 2, choruslist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;
                 break;
-            case TOPLEVEL::insert::phaser:
+            case EFFECT::type::phaser:
                 result = findListEntry(source, 2, phaserlist);
                 if (result >= 15) // skip unused numbers
                     result = result - 15 + EFFECT::control::bpm;
                 break;
-            case TOPLEVEL::insert::alienWah:
+            case EFFECT::type::alienWah:
                 result = findListEntry(source, 2, alienwahlist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;
                 break;
-            case TOPLEVEL::insert::distortion:
+            case EFFECT::type::distortion:
                 result = findListEntry(source, 2, distortionlist);
                 if (result > 5) // extra line
                     result -= 1;
                 break;
-            case TOPLEVEL::insert::eq:
+            case EFFECT::type::eq:
                 result = findListEntry(source, 2, eqlist);
                 if (result > 2) // extra line
                     result -= 1;
                 break;
-            case TOPLEVEL::insert::dynFilter:
+            case EFFECT::type::dynFilter:
                 result = findListEntry(source, 2, dynfilterlist);
                 if (result >= 11) // skip unused numbers
                     result = result - 11 + EFFECT::control::bpm;

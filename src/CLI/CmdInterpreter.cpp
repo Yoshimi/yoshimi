@@ -254,14 +254,14 @@ string CmdInterpreter::buildAllFXStatus()
     }
     nFXtype = readControl(synth, 0, ctl, section, UNUSED, nFX);
     result += (" eff " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 6));
-    nFXpreset = readControl(synth, 0, EFFECT::control::preset, section,  (TOPLEVEL::insert::none | 128) + nFXtype, nFX);
+    nFXpreset = readControl(synth, 0, EFFECT::control::preset, section, EFFECT::type::none + nFXtype, nFX);
 
     if (bitTest(context, LEVEL::InsFX) && readControl(synth, 0, EFFECT::sysIns::effectDestination, TOPLEVEL::section::systemEffects, UNUSED, nFX) == -1)
         result += " Unrouted";
     else if (nFXtype > 0 && nFXtype != 7)
     {
         result += ("-" + asString(nFXpreset + 1));
-        if (readControl(synth, 0, EFFECT::control::changed, section,  (TOPLEVEL::insert::none | 128) + nFXtype, nFX))
+        if (readControl(synth, 0, EFFECT::control::changed, section, EFFECT::type::none + nFXtype, nFX))
             result += "?";
     }
     return result;
@@ -1020,7 +1020,7 @@ int CmdInterpreter::effectsList(Parser& input, bool presets)
     else
         all = input.matchnMove(1, "all");
     if (!all)
-        msg.push_back("  effect     presets");
+        msg.push_back(" EFFECT     presets");
     for (int i = 0; i < 9; ++ i)
     {
         presetsPos = 1;
@@ -1205,7 +1205,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (selected == EFFECT::control::frequency && value == -1)
                 {
                     input.skipChars();
-                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX));
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
@@ -1221,7 +1221,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (selected == EFFECT::control::frequency && value == -1)
                 {
                     input.skipChars();
-                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX));
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
@@ -1252,7 +1252,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (selected == EFFECT::control::frequency && value == -1)
                 {
                     input.skipChars();
-                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX));
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
@@ -1283,7 +1283,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (selected == EFFECT::control::frequency && value == -1)
                 {
                     input.skipChars();
-                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX));
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
@@ -1356,7 +1356,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (selected == EFFECT::control::frequency && value == -1)
                 {
                     input.skipChars();
-                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX));
+                    value = freqBPMset(input, readControl(synth, 0, EFFECT::control::bpm, effClass, EFFECT::type::none + nFXtype, nFX));
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
@@ -1395,7 +1395,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 value = string2int(input);
             }
             //cout << "Val " << value << "  type " << controlType << "  cont " << selected << "  part " << context << "  efftype " << int(nFXtype) << "  num " << int(nFX) << endl;
-            return sendNormal(synth, 0, value, controlType, selected, effClass, (TOPLEVEL::insert::none | 128) + nFXtype, nFX);
+            return sendNormal(synth, 0, value, controlType, selected, effClass, EFFECT::type::none + nFXtype, nFX);
         }
         // Continue cos it's not for us.
     }
@@ -1475,7 +1475,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             partno = TOPLEVEL::section::insertEffects;
         else
             partno = TOPLEVEL::section::systemEffects;
-        return sendNormal(synth, 0, nFXpreset, controlType, EFFECT::control::preset, partno,  (TOPLEVEL::insert::none | 128) + nFXtype, nFX);
+        return sendNormal(synth, 0, nFXpreset, controlType, EFFECT::control::preset, partno, EFFECT::type::none + nFXtype, nFX);
     }
     return REPLY::op_msg;
 }
@@ -1833,7 +1833,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     bool isDyn = false;
     if (bitTest(context, LEVEL::AllFX) && nFXtype == 8)
     {
-        kit = TOPLEVEL::insert::dynFilter | 128;
+        kit = EFFECT::type::dynFilter;
         engine = 0;
         if (bitTest(context, LEVEL::InsFX))
         {

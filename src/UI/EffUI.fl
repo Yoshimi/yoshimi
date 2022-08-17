@@ -1717,7 +1717,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         delete(filterwindow);
         filterwindow=NULL;
     }
-    switch(eff->geteffect() | 128)
+    switch(eff->geteffect() | 128) // get effect not yet converted
     {
         case EFFECT::type::reverb:
             revp->value(eff->getpreset());

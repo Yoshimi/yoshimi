@@ -135,7 +135,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             return "Nothing to redo!";
     }
 
-    if ((effSend >= (TOPLEVEL::insert::none | 128) && effSend <= (TOPLEVEL::insert::dynFilter | 128)) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && effSend == UNUSED))
+    if ((effSend >= EFFECT::type::none && effSend < EFFECT::type::count) || (control >= PART::control::effectNumber && control <= PART::control::effectBypass && effSend == UNUSED))
     {
         commandName = resolveEffects(getData, addValue);
         return withValue(commandName, type, showValue, addValue, value);
@@ -3258,8 +3258,8 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         name = "Insert";
     else
         name = "Part " + to_string(npart + 1);
-;
-    if (effType == (TOPLEVEL::insert::dynFilter | 128) && getData->data.insert != UNUSED)
+
+    if (effType == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {
         if (npart == TOPLEVEL::section::systemEffects)
             name = "System";
@@ -3358,7 +3358,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && effType == UNUSED && control == EFFECT::sysIns::effectType))
     {
         name += " set to";
-        effType = value | TOPLEVEL::insert::none | 128; // TODO fix this!
+        effType = value | EFFECT::type::none; // TODO fix this!
         showValue = false;
     }
     else
@@ -3367,13 +3367,13 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     int ref = control; // we frequently modify this
     bool isBPM = (ref == 2 && offset == 1);
     //std::cout << "isbpm " << int(isBPM) << std::endl;
-    switch (effType & 127)
+    switch (effType)
     {
-        case TOPLEVEL::insert::none:
+        case EFFECT::type::none:
             effname = " None";
             contstr = " ";
             break;
-        case TOPLEVEL::insert::reverb:
+        case EFFECT::type::reverb:
         {
             if (ref > 4) // there is no 5 or 6 in the list names
                 ref -= 2;
@@ -3397,7 +3397,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             }
             break;
         }
-        case TOPLEVEL::insert::echo:
+        case EFFECT::type::echo:
             effname = " Echo ";
             if (ref > 6) // there is no 7-16 in the list names
                 ref -= 10;
@@ -3408,7 +3408,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 contstr += (" " + bpm2text(float(value) / 127.0f));
             }
             break;
-        case TOPLEVEL::insert::chorus:
+        case EFFECT::type::chorus:
         {
             effname = " Chorus ";
             if (ref > 10) // there is no 11-16 in the list names
@@ -3442,7 +3442,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             }
             break;
         }
-        case TOPLEVEL::insert::phaser:
+        case EFFECT::type::phaser:
             effname = " Phaser ";
             if (ref > 14) // there is no 15-16 in the list names
                 ref -= 2;
@@ -3475,7 +3475,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 }
             }
             break;
-        case TOPLEVEL::insert::alienWah:
+        case EFFECT::type::alienWah:
             effname = " AlienWah ";
             if (ref > 10) // there is no 11-16 in the list names
                 ref -= 6;
@@ -3494,7 +3494,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
                 contstr += (" " + bpm2text(float(value) / 127.0f));
             }
             break;
-        case TOPLEVEL::insert::distortion:
+        case EFFECT::type::distortion:
         {
             effname = " Distortion ";
             if (ref > 5) // there is an extra line in the list names
@@ -3532,7 +3532,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             controlType = distortionlist[ref * 2];
             break;
         }
-        case TOPLEVEL::insert::eq:
+        case EFFECT::type::eq:
         {
             effname = " EQ ";
             if (control > 1)
@@ -3554,7 +3554,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             controlType = eqlist[ref * 2];
             break;
         }
-        case TOPLEVEL::insert::dynFilter:
+        case EFFECT::type::dynFilter:
             effname = " DynFilter ";
             if (ref > 10) // there is no 11-16 in the list names
                 ref -= 6;
@@ -3591,7 +3591,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             break;
     }
     //std::cout << "control " << int(control) << std::endl;
-    if (control == EFFECT::control::preset && effType != (TOPLEVEL::insert::eq | 128))
+    if (control == EFFECT::control::preset && effType != EFFECT::type::eq)
     {
         contstr = " Preset " + to_string (value + 1);
         showValue = false;

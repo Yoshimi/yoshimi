@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2019, Will Godfrey
+    Copyright 2017-2022, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -35,7 +35,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr{size_t(_synth->buffersize)},
     insertion{insertion_},
     filterpars{NULL},
-    nefx{TOPLEVEL::insert::none},
+    nefx{EFFECT::type::none & 127},
     dryonly{false},
     efx{}
 {
@@ -48,7 +48,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
 
 void EffectMgr::defaults(void)
 {
-    changeeffect(TOPLEVEL::insert::none);
+    changeeffect(EFFECT::type::none & 127);
     setdryonly(false);
 }
 
@@ -181,7 +181,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     memset(efxoutr.get(), 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
-    if (nefx == TOPLEVEL::insert::eq)
+    if (nefx == (EFFECT::type::eq & 127))
     {   // this is need only for the EQ effect
         memcpy(smpsl, efxoutl.get(), synth->sent_bufferbytes);
         memcpy(smpsr, efxoutr.get(), synth->sent_bufferbytes);
@@ -282,7 +282,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
 
 void EffectMgr::getfromXML(XMLwrapper *xml)
 {
-    changeeffect(xml->getpar127("type", geteffect()));
+    changeeffect(xml->getpar127("type", geteffect())); // not convinced this is OK?
     if (!efx || !geteffect())
         return;
     changepreset(xml->getpar127("preset", efx->Ppreset));

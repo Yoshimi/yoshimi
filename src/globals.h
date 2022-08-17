@@ -230,19 +230,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
     // inserts are here as they are split between many
     // sections but must remain distinct.
     enum insert : unsigned char {
-        none = 0,
-        reverb,
-        echo,
-        chorus,
-        phaser,
-        alienWah,
-        distortion,
-        eq,
-        dynFilter,
-        // any new effects should go here
-        count, // this must be the last type!
-
-        LFOgroup, // 10
+        LFOgroup = 0,
         filterGroup,
         envelopeGroup,
         envelopePointAdd,
@@ -255,7 +243,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         resonanceGraphInsert,
         systemEffectSend,
         partEffectSelect,
-        kitGroup //23
+        kitGroup
     };
 
     enum insertType : unsigned char {
