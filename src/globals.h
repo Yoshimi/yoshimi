@@ -1057,20 +1057,6 @@ namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
 
 namespace EFFECT // usage EFFECT::control::level
 {
-    enum type : unsigned char {
-        none = 128,
-        reverb,
-        echo,
-        chorus,
-        phaser,
-        alienWah,
-        distortion,
-        eq,
-        dynFilter,
-        // any new effects should go here
-        count, // this must be the last type!
-    };
-
     enum control : unsigned char {
         level = 0, // volume, wet/dry, gain for EQ
         panning, // band for EQ
@@ -1089,6 +1075,20 @@ namespace EFFECT // usage EFFECT::control::level
         effectType,
         effectDestination, // insert only
         effectEnable // system only
+    };
+
+    enum type : unsigned char { // sits above part kits
+        none = NUM_KIT_ITEMS,
+        reverb,
+        echo,
+        chorus,
+        phaser,
+        alienWah,
+        distortion,
+        eq,
+        dynFilter,
+        // any new effects should go here
+        count, // this must be the last type!
     };
 }
 

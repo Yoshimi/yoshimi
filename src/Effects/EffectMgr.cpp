@@ -35,7 +35,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr{size_t(_synth->buffersize)},
     insertion{insertion_},
     filterpars{NULL},
-    nefx{EFFECT::type::none & 127},
+    nefx{0}, // type none resolves to zero internally
     dryonly{false},
     efx{}
 {
@@ -48,7 +48,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
 
 void EffectMgr::defaults(void)
 {
-    changeeffect(EFFECT::type::none & 127);
+    changeeffect(0); // type none resolves to zero internally
     setdryonly(false);
 }
 
@@ -181,7 +181,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     memset(efxoutr.get(), 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
-    if (nefx == (EFFECT::type::eq & 127))
+    if (nefx == (EFFECT::type::eq - EFFECT::type::none))
     {   // this is need only for the EQ effect
         memcpy(smpsl, efxoutl.get(), synth->sent_bufferbytes);
         memcpy(smpsr, efxoutr.get(), synth->sent_bufferbytes);

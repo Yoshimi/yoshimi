@@ -6966,7 +6966,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (effSend >= EFFECT::type::count)
         return; // invalid kit number
 
-    if (control != PART::control::effectType && effSend != (eff->geteffect() | 128)) // geteffect not yet converted
+    if (control != PART::control::effectType && effSend != (eff->geteffect() + EFFECT::type::none)) // geteffect not yet converted
     {
         if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI)
             synth->getRuntime().Log("Not Available"); // TODO sort this better for CLI as well as MIDI

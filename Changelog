@@ -1,5 +1,10 @@
 yoshimi 2.2.1 M
 
+2022-8-17 Will
+bn2150 (branch temeff)
+* Effect control labels now taken back out of inserts and
+  as a group now sit immediately above kit numbers.
+
 2022-8-16 Will
 bn2149
 * Increased size of char array to suppress compiler warnings.
