@@ -166,6 +166,8 @@ class ADnote
         void computeUnisonFreqRap(int nvoice);
         void computeNoteParameters(void);
         void computeWorkingParameters(void);
+        void computePhaseOffsets(int nvoice);
+        void computeFMPhaseOffsets(int nvoice);
         void initParameters(void);
         void initSubVoices(void);
         void killVoice(int nvoice);

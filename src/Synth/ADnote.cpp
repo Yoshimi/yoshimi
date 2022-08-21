@@ -148,11 +148,13 @@ ADnote::ADnote(ADnoteParameters& adpars_, Controller& ctl_, Note note_, bool por
     , topVoice{topVoice_}
     , parentFMmod{parentFMmod_}
 {
+    // Start phase for sub-Voices should be negative so that the zero phase in
+    // the first cycle will result in a positive phase change.
     int phase = (topVoice==this)? 0 : synth.oscilsize - phaseOffset;
-             // Start phase for sub-Voices should be negative
-             // so that the zero phase in the first cycle will result in a positive phase change.
-    for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
+    for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice) {
         NoteVoicePar[nvoice].phaseOffset = phase;
+        NoteVoicePar[nvoice].fmPhaseOffset = phase;
+    }
 
     construct();
 }
@@ -560,20 +562,6 @@ void ADnote::construct()
             NoteVoicePar[nvoice].oscilSmp.attachReference(topVoice->NoteVoicePar[nvoice].oscilSmp);
         }
 
-        int oscposhi_start;
-        if (NoteVoicePar[nvoice].voice == -1)
-            oscposhi_start = adpars.VoicePar[vc].OscilSmp->getPhase();
-        else
-            oscposhi_start = 0;
-        int kth_start = oscposhi_start;
-        for (int k = 0; k < unison; ++k)
-        {
-            oscposhi[nvoice][k] = kth_start % synth.oscilsize;
-            // put random starting point for other subvoices
-            kth_start = oscposhi_start + (int)(synth.numRandom() * adpars.VoicePar[nvoice].Unison_phase_randomness
-                                        / 127.0f * (synth.oscilsize - 1));
-        }
-
         if (adpars.VoicePar[nvoice].Type != 0)
             NoteVoicePar[nvoice].fmEnabled = NONE;
         else
@@ -661,6 +649,8 @@ void ADnote::initSubVoices(void)
 
         if (NoteVoicePar[nvoice].voice != -1)
         {
+            computePhaseOffsets(nvoice);
+
             subVoice[nvoice].reset(new unique_ptr<ADnote>[unison_size[nvoice]]);
             for (size_t k = 0; k < unison_size[nvoice]; ++k)
             {
@@ -675,6 +665,8 @@ void ADnote::initSubVoices(void)
 
         if (NoteVoicePar[nvoice].fmVoice != -1)
         {
+            computeFMPhaseOffsets(nvoice);
+
             bool voiceForFM = NoteVoicePar[nvoice].fmEnabled == FREQ_MOD;
             subFMVoice[nvoice].reset(new unique_ptr<ADnote>[unison_size[nvoice]]);
             for (size_t k = 0; k < unison_size[nvoice]; ++k) {
@@ -914,35 +906,53 @@ void ADnote::initParameters(void)
         if (adpars.VoicePar[nvoice].PFilterLfoEnabled)
             NoteVoicePar[nvoice].filterLFO.reset(new LFO{adpars.VoicePar[nvoice].FilterLfo, note.freq, &synth});
 
-        // Voice Modulation Parameters Init
-        if (NoteVoicePar[nvoice].fmEnabled != NONE
-           && NoteVoicePar[nvoice].fmVoice < 0)
+        int kth_start = 0;
+        for (size_t k = 0; k < unison_size[nvoice]; ++k)
         {
-            // Perform Anti-aliasing only on MORPH or RING MODULATION
+            oscposhi[nvoice][k] = kth_start;
+            // put random starting point for other subvoices
+            kth_start = (int)(synth.numRandom() * adpars.VoicePar[nvoice].Unison_phase_randomness
+                              / 127.0f * (synth.oscilsize - 1));
+        }
 
-            int vc = nvoice;
-            if (adpars.VoicePar[nvoice].PextFMoscil != -1)
-                vc = adpars.VoicePar[nvoice].PextFMoscil;
+        // Voice Modulation Parameters Init
+        if (NoteVoicePar[nvoice].fmEnabled != NONE)
+        {
+            if (NoteVoicePar[nvoice].fmVoice < 0)
+            {
+                int vc = nvoice;
+                if (adpars.VoicePar[nvoice].PextFMoscil != -1)
+                    vc = adpars.VoicePar[nvoice].PextFMoscil;
 
-            if (subVoiceNr == -1) {
-                // this voice maintains its own oscil wavetable...
-                NoteVoicePar[nvoice].fmSmp.allocateWaveform(synth.oscilsize);
+                if (subVoiceNr == -1) {
+                    // this voice maintains its own oscil wavetable...
+                    NoteVoicePar[nvoice].fmSmp.allocateWaveform(synth.oscilsize);
 
-                adpars.VoicePar[nvoice].FMSmp->newrandseed();
-                if (!adpars.GlobalPar.Hrandgrouping)
-                    adpars.VoicePar[vc].FMSmp->newrandseed();
+                    adpars.VoicePar[nvoice].FMSmp->newrandseed();
+                    if (!adpars.GlobalPar.Hrandgrouping)
+                        adpars.VoicePar[vc].FMSmp->newrandseed();
 
+                } else {
+                    // If subvoice use oscillator from original voice.
+                    NoteVoicePar[nvoice].fmSmp.attachReference(topVoice->NoteVoicePar[nvoice].fmSmp);
+                }
+
+                for (size_t k = 0; k < unison_size[nvoice]; ++k)
+                    oscposhiFM[nvoice][k] =
+                        (oscposhi[nvoice][k] + adpars.VoicePar[vc].FMSmp->
+                         getPhase()) % synth.oscilsize;
             } else {
-                // If subvoice use oscillator from original voice.
-                NoteVoicePar[nvoice].fmSmp.attachReference(topVoice->NoteVoicePar[nvoice].fmSmp);
+                for (size_t k = 0; k < unison_size[nvoice]; ++k)
+                    oscposhiFM[nvoice][k] = oscposhi[nvoice][k];
             }
+        }
 
+        // Offset by oscillator phase.
+        if (NoteVoicePar[nvoice].voice == -1) {
+            int oscposhi_start;
+            oscposhi_start = adpars.VoicePar[nvoice].OscilSmp->getPhase();
             for (size_t k = 0; k < unison_size[nvoice]; ++k)
-                oscposhiFM[nvoice][k] =
-                    (oscposhi[nvoice][k] + adpars.VoicePar[vc].FMSmp->
-                     getPhase()) % synth.oscilsize;
-
-            NoteVoicePar[nvoice].fmPhaseOffset = 0;
+                oscposhi[nvoice][k] = (oscposhi[nvoice][k] + oscposhi_start) % synth.oscilsize;
         }
 
         if (adpars.VoicePar[nvoice].PFMFreqEnvelopeEnabled != 0)
@@ -1119,51 +1129,25 @@ void ADnote::computeNoteParameters(void)
             NoteVoicePar[nvoice].oscilSmp.fillInterpolationBuffer();
         }
 
-        int new_phase_offset = (int)((adpars.VoicePar[nvoice].Poscilphase - 64.0f)
-                                    / 128.0f * synth.oscilsize + synth.oscilsize * 4);
-        int phase_offset_diff = new_phase_offset - NoteVoicePar[nvoice].phaseOffset;
-        for (int k = 0; k < unison; ++k) {
-            oscposhi[nvoice][k] = (oscposhi[nvoice][k] + phase_offset_diff) % synth.oscilsize;
-            if (oscposhi[nvoice][k] < 0)
-                // This is necessary, because C '%' operator does not always
-                // return a positive result.
-                oscposhi[nvoice][k] += synth.oscilsize;
-        }
-        NoteVoicePar[nvoice].phaseOffset = new_phase_offset;
-
         if (NoteVoicePar[nvoice].fmEnabled != NONE
-            && NoteVoicePar[nvoice].fmVoice < 0)
-        {
-            if (subVoiceNr == -1) {
-                int vc = nvoice;
-                if (adpars.VoicePar[nvoice].PextFMoscil != -1)
-                    vc = adpars.VoicePar[nvoice].PextFMoscil;
+            && NoteVoicePar[nvoice].fmVoice < 0
+            && subVoiceNr == -1) {
+            int vc = nvoice;
+            if (adpars.VoicePar[nvoice].PextFMoscil != -1)
+                vc = adpars.VoicePar[nvoice].PextFMoscil;
 
-                float freqtmp = 1.0f;
-                if (adpars.VoicePar[vc].POscilFM->Padaptiveharmonics != 0
-                    || (NoteVoicePar[nvoice].fmEnabled == MORPH)
-                    || (NoteVoicePar[nvoice].fmEnabled == RING_MOD))
-                    freqtmp = getFMVoiceBaseFreq(nvoice);
+            float freqtmp = 1.0f;
+            if (adpars.VoicePar[vc].POscilFM->Padaptiveharmonics != 0
+                || (NoteVoicePar[nvoice].fmEnabled == MORPH)
+                || (NoteVoicePar[nvoice].fmEnabled == RING_MOD))
+                freqtmp = getFMVoiceBaseFreq(nvoice);
 
-                adpars.VoicePar[vc].FMSmp->getWave(NoteVoicePar[nvoice].fmSmp, freqtmp);
-                NoteVoicePar[nvoice].fmSmp.fillInterpolationBuffer();
-            }
-
-            int new_FMphase_offset = (int)((adpars.VoicePar[nvoice].PFMoscilphase - 64.0f)
-                                         / 128.0f * synth.oscilsize_f
-                                         + synth.oscilsize_f * 4.0f);
-            int FMphase_offset_diff = new_FMphase_offset - NoteVoicePar[nvoice].fmPhaseOffset;
-            for (size_t k = 0; k < unison_size[nvoice]; ++k)
-            {
-                oscposhiFM[nvoice][k] += FMphase_offset_diff;
-                oscposhiFM[nvoice][k] %= synth.oscilsize;
-                if (oscposhiFM[nvoice][k] < 0)
-                    // This is necessary, because C '%' operator does not always
-                    // return a positive result.
-                    oscposhiFM[nvoice][k] += synth.oscilsize;
-            }
-            NoteVoicePar[nvoice].fmPhaseOffset = new_FMphase_offset;
+            adpars.VoicePar[vc].FMSmp->getWave(NoteVoicePar[nvoice].fmSmp, freqtmp);
+            NoteVoicePar[nvoice].fmSmp.fillInterpolationBuffer();
         }
+
+        computePhaseOffsets(nvoice);
+        computeFMPhaseOffsets(nvoice);
 
         bool is_pwm = NoteVoicePar[nvoice].fmEnabled == PW_MOD;
 
@@ -1286,6 +1270,41 @@ void ADnote::computeNoteParameters(void)
                     break;
             }
         }
+    }
+}
+
+void ADnote::computePhaseOffsets(int nvoice)
+{
+    int new_phase_offset = (int)((adpars.VoicePar[nvoice].Poscilphase - 64.0f)
+                                / 128.0f * synth.oscilsize + synth.oscilsize * 4);
+    int phase_offset_diff = new_phase_offset - NoteVoicePar[nvoice].phaseOffset;
+    for (size_t k = 0; k < unison_size[nvoice]; ++k) {
+        oscposhi[nvoice][k] = (oscposhi[nvoice][k] + phase_offset_diff) % synth.oscilsize;
+        if (oscposhi[nvoice][k] < 0)
+            // This is necessary, because C '%' operator does not always
+            // return a positive result.
+            oscposhi[nvoice][k] += synth.oscilsize;
+    }
+    NoteVoicePar[nvoice].phaseOffset = new_phase_offset;
+}
+
+void ADnote::computeFMPhaseOffsets(int nvoice)
+{
+    if (NoteVoicePar[nvoice].fmEnabled != NONE) {
+        int new_FMphase_offset = (int)((adpars.VoicePar[nvoice].PFMoscilphase - 64.0f)
+                                     / 128.0f * synth.oscilsize_f
+                                     + synth.oscilsize_f * 4.0f);
+        int FMphase_offset_diff = new_FMphase_offset - NoteVoicePar[nvoice].fmPhaseOffset;
+        for (size_t k = 0; k < unison_size[nvoice]; ++k)
+        {
+            oscposhiFM[nvoice][k] += FMphase_offset_diff;
+            oscposhiFM[nvoice][k] %= synth.oscilsize;
+            if (oscposhiFM[nvoice][k] < 0)
+                // This is necessary, because C '%' operator does not always
+                // return a positive result.
+                oscposhiFM[nvoice][k] += synth.oscilsize;
+        }
+        NoteVoicePar[nvoice].fmPhaseOffset = new_FMphase_offset;
     }
 }
 
