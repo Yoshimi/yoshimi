@@ -102,7 +102,7 @@ class SUBnoteharmonic {: {public Fl_Group}
         else
             o->value(0);
 
-        send_data(0, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
+        send_data(0, TOPLEVEL::insert::harmonicBandwidth, n, x, TOPLEVEL::type::Integer);}
         tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 128} type {Vert Knob} box FLAT_BOX minimum 63 maximum -64 step 1
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
@@ -749,7 +749,7 @@ class SUBnoteUI {: {public PresetsUI_}
         h[control]->mag->value((int) value);
         return;
     }
-    if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicBandwidth)
     {
         h[control]->bw->value((int)value - 64);
         return;

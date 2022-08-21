@@ -2197,7 +2197,7 @@ bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
             break;
         case TOPLEVEL::insert::oscillatorGroup:
         case TOPLEVEL::insert::harmonicAmplitude:
-        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+        case TOPLEVEL::insert::harmonicPhase:
             if (engine >= PART::engine::addMod1)
             {
                 engine -= PART::engine::addMod1;
@@ -2248,7 +2248,7 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
             commandSub(getData);
             part->kit[kititem].subpars->presetsUpdated();
             break;
-        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+        case TOPLEVEL::insert::harmonicBandwidth:
             commandSub(getData);
             part->kit[kititem].subpars->presetsUpdated();
             break;
@@ -2319,7 +2319,7 @@ bool InterChange::processPad(CommandBlock *getData)
             pars.presetsUpdated();
             needApply = true;
             break;
-        case TOPLEVEL::insert::harmonicPhaseBandwidth:
+        case TOPLEVEL::insert::harmonicPhase:
             commandOscillator(getData,  pars.POscil.get());
             pars.presetsUpdated();
             needApply = true;
@@ -4900,7 +4900,7 @@ void InterChange::commandSub(CommandBlock *getData)
                         target = 0;
                 }
             }
-            tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            tempData.data.insert = TOPLEVEL::insert::harmonicBandwidth;
             for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
             {
                 int val = pars->Phrelbw[i];
@@ -4936,7 +4936,7 @@ void InterChange::commandSub(CommandBlock *getData)
             add2undo(getData, noteSeen);
     }
 
-    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicBandwidth)
     {
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
         {
@@ -5600,7 +5600,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 else
                     add2undo(&tempData, noteSeen, true);
             }
-            tempData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            tempData.data.insert = TOPLEVEL::insert::harmonicPhase;
             for (int i = 0; i < MAX_AD_HARMONICS; ++i)
             {
                 tempData.data.value = oscil->Phphase[i];
@@ -5627,7 +5627,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
             getData->data.value = oscil->Phmag[control];
         return;
     }
-    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    else if (insert == TOPLEVEL::insert::harmonicPhase)
     {
         if (write)
         {
@@ -7290,7 +7290,7 @@ float InterChange::returnLimits(CommandBlock *getData)
         Part *part;
         part = synth->part[npart];
 
-        if (engine == PART::engine::subSynth && (insert == UNUSED || (insert >= TOPLEVEL::oscillatorGroup && insert <= TOPLEVEL::harmonicPhaseBandwidth)) && parameter == UNUSED)
+        if (engine == PART::engine::subSynth && (insert == UNUSED || (insert >= TOPLEVEL::oscillatorGroup && insert <= TOPLEVEL::harmonicBandwidth)) && parameter == UNUSED)
         {
             SUBnoteParameters *subpars;
             subpars = part->kit[kititem].subpars;
@@ -7347,7 +7347,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             }
             return value;
         }
-        if (insert >= TOPLEVEL::insert::oscillatorGroup && insert <= TOPLEVEL::insert::harmonicPhaseBandwidth)
+        if (insert >= TOPLEVEL::insert::oscillatorGroup && insert <= TOPLEVEL::insert::harmonicPhase)
         {
             return part->kit[0].adpars->VoicePar[0].POscil->getLimits(getData);
             // we also use this for pad limits

@@ -387,7 +387,7 @@ class Oscilharmonic {: {public Fl_Group}
         else
             x = 64 - (int)o->value();
 
-        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhaseBandwidth, n, x, TOPLEVEL::type::Integer);}
+        send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhase, n, x, TOPLEVEL::type::Integer);}
         xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1
         code0 {o->value(64 - oscil->Phphase[n]);}
         code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
@@ -855,7 +855,7 @@ o->hide();}
         h[control]->mag->value(64 - value);
     }
 
-    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    else if (insert == TOPLEVEL::insert::harmonicPhase)
     {
         h[control]->phase->value(64 - value);
     }

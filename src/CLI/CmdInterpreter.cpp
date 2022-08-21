@@ -4353,7 +4353,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         }
         else if (input.matchnMove(1, "bandwidth"))
         {
-            insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            insert = TOPLEVEL::insert::harmonicBandwidth;
             set = true;
         }
         if (set)
@@ -5006,7 +5006,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
             if (input.matchnMove(1, "amp"))
                 insert = TOPLEVEL::insert::harmonicAmplitude;
             else if (input.matchnMove(1, "phase"))
-                insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+                insert = TOPLEVEL::insert::harmonicPhase;
 
             if (input.lineEnd(controlType))
                 return REPLY::value_msg;

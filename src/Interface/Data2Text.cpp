@@ -182,7 +182,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::harmonicAmplitude:
                 commandName = resolveOscillator(synth, getData, addValue);
                 break;
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::harmonicPhase:
                 commandName = resolveOscillator(synth, getData, addValue);
                 break;
             case TOPLEVEL::insert::resonanceGroup:
@@ -205,7 +205,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::harmonicAmplitude:
                 commandName = resolveSub(getData, addValue);
                 break;
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::harmonicBandwidth:
                 commandName = resolveSub(getData, addValue);
                 break;
             case TOPLEVEL::insert::filterGroup:
@@ -254,7 +254,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
             case TOPLEVEL::insert::harmonicAmplitude:
                 commandName = resolveOscillator(synth, getData, addValue);
                 break;
-            case TOPLEVEL::insert::harmonicPhaseBandwidth:
+            case TOPLEVEL::insert::harmonicPhase:
                 commandName = resolveOscillator(synth, getData, addValue);
                 break;
         }
@@ -2198,7 +2198,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
 
     int value_int = int(value);
 
-    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicBandwidth)
     {
         string Htype;
         if (insert == TOPLEVEL::insert::harmonicAmplitude)
@@ -2603,7 +2603,7 @@ string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, b
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
-    else if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    else if (insert == TOPLEVEL::insert::harmonicPhase)
     {
         return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }

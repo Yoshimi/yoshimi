@@ -409,7 +409,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
-    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicBandwidth)
     { // do harmonics stuff
         if (control >= MAX_SUB_HARMONICS)
         {
@@ -417,7 +417,7 @@ float SUBnoteParameters::getLimits(CommandBlock *getData)
             return 1;
         }
 
-        if (insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+        if (insert == TOPLEVEL::insert::harmonicBandwidth)
             def = 64;
         else if (control == 0)
             def = 127;

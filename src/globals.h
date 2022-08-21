@@ -210,7 +210,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     enum control : unsigned char {
         // insert any new entries here
-
         /*
          * the following values must never appear in any other sections
          */
@@ -238,7 +237,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         envelopePointChange,
         oscillatorGroup,
         harmonicAmplitude,
-        harmonicPhaseBandwidth, // this should be split in two
+        harmonicPhase,
+        harmonicBandwidth,
         resonanceGroup,
         resonanceGraphInsert,
         systemEffectSend,

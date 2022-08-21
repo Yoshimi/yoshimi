@@ -1029,7 +1029,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
         }
         else if (findAndStep(source, "Bandwidth"))
         {
-            allData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            allData.data.insert = TOPLEVEL::insert::harmonicBandwidth;
             ctl = harmonicNum;
         }
         if (ctl < UNUSED)
@@ -1292,7 +1292,7 @@ void TextData::encodeWaveform(string &source, CommandBlock &allData)
         if (findAndStep(source, "Amplitude"))
             allData.data.insert = TOPLEVEL::insert::harmonicAmplitude;
         else if (findAndStep(source, "Phase"))
-            allData.data.insert = TOPLEVEL::insert::harmonicPhaseBandwidth;
+            allData.data.insert = TOPLEVEL::insert::harmonicPhase;
         else
             log(source, " no harmonic type");
     }

@@ -1,5 +1,15 @@
 yoshimi 2.2.1 M
 
+2022-8-21 Will
+bn2152
+* Split harmonicPhaseBandwidth label
+  SubSynth -> harmonicBandwidth
+  Add/PadSynth -> harmonicPhase
+
+2022-8-20 Kristian
+bn2151a
+* BugFix: phase randomness not recognised by modulators.
+
 2022-8-17 Will
 bn2151
 * Fixed MIDI-learn regressions.

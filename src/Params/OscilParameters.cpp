@@ -285,7 +285,7 @@ float OscilParameters::getLimits(CommandBlock *getData)
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
-    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhaseBandwidth)
+    if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhase)
     { // do harmonics stuff
         if (insert == TOPLEVEL::insert::harmonicAmplitude && control == 0)
             def = 127;

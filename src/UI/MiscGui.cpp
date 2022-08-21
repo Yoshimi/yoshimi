@@ -427,7 +427,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
                 case TOPLEVEL::insert::oscillatorGroup:
                 case TOPLEVEL::insert::harmonicAmplitude:
-                case TOPLEVEL::insert::harmonicPhaseBandwidth:
+                case TOPLEVEL::insert::harmonicPhase:
                     if (synth->getGuiMaster()->partui->padnoteui->oscui)
                         synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
                     break;
@@ -480,7 +480,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
                 case UNUSED:
                 case TOPLEVEL::insert::harmonicAmplitude:
-                case TOPLEVEL::insert::harmonicPhaseBandwidth:
+                case TOPLEVEL::insert::harmonicBandwidth:
                     synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
                     break;
             }
@@ -531,7 +531,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
                         break;
                     case TOPLEVEL::insert::oscillatorGroup:
                     case TOPLEVEL::insert::harmonicAmplitude:
-                    case TOPLEVEL::insert::harmonicPhaseBandwidth:
+                    case TOPLEVEL::insert::harmonicPhase:
                         if (synth->getGuiMaster()->partui->adnoteui->advoice->oscedit)
                             synth->getGuiMaster()->partui->adnoteui->advoice->oscedit->returns_update(getData);
                         break;
