@@ -1,5 +1,9 @@
 yoshimi 2.2.1 M
 
+2022-8-27 Will
+bn2153
+* Re-ordered retry attempts in MusicClient.cpp to avoid occasional lockups.
+
 2022-8-21 Will
 bn2152
 * Split harmonicPhaseBandwidth label

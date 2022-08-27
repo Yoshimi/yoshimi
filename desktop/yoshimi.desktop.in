@@ -1,14 +1,14 @@
 [Desktop Entry]
 Name=Yoshimi
-Comment=Real Time Synthesizer
-Comment[fr]=Synthétiseur temps-réel
 GenericName=Synthesizer
 GenericName[fr]=Synthétiseur
+Comment=Real Time Synthesizer
+Comment[fr]=Synthétiseur temps-réel
+Icon=yoshimi
 Type=Application
-Categories=Music;Midi;AudioVideo;X-Sound;Audio;X-Multitrack;X-Alsa;X-Jack;
-Keywords=music;synthesiser;softsynth;microtonal;multichannel;midi;alsa;jack;realtime;standalone;lv2;
 Exec=yoshimi
 TryExec=yoshimi
 Terminal=false
 StartupNotify=true
-Icon=yoshimi
+Categories=Music;Midi;AudioVideo;X-Sound;Audio;X-Multitrack;X-Alsa;X-Jack;
+Keywords=music;synthesiser;softsynth;microtonal;multichannel;midi;alsa;jack;realtime;standalone;lv2;

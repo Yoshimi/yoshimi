@@ -45,9 +45,9 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
     std::set<music_clients> clSet;
     music_clients c1 = {0, _synth->getRuntime().audioEngine, _synth->getRuntime().midiEngine};
     clSet.insert(c1);
-    music_clients c2 = {1, jack_audio, jack_midi};
+    music_clients c2 = {1, jack_audio, alsa_midi};
     clSet.insert(c2);
-    music_clients c3 = {2, jack_audio, alsa_midi};
+    music_clients c3 = {2, jack_audio, jack_midi};
     clSet.insert(c3);
     music_clients c4 = {3, alsa_audio, alsa_midi};
     clSet.insert(c4);
@@ -55,8 +55,12 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
     clSet.insert(c5);
     music_clients c6 = {5, alsa_audio, no_midi};
     clSet.insert(c6);
-    music_clients c7 = {6, no_audio, no_midi}; //this one always will do the work :)
+    music_clients c7 = {6, no_audio, alsa_midi};
     clSet.insert(c7);
+    music_clients c8 = {7, no_audio, jack_midi};
+    clSet.insert(c8);
+    music_clients c9 = {8, no_audio, no_midi}; //this one always will do the work :)
+    clSet.insert(c9);
 
     for (std::set<music_clients>::iterator it = clSet.begin(); it != clSet.end(); ++it)
     {
@@ -76,7 +80,6 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
             delete client;
         }
     }
-
     return 0;
 }
 
