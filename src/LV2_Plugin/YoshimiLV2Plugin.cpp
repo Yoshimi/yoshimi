@@ -281,16 +281,6 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 }
 
 
-void *YoshimiLV2Plugin::idleThread()
-{
-    while (_synth->getRuntime().runSynth)
-    {
-        usleep(33333); // TODO what is the point of this?
-    }
-    return NULL;
-}
-
-
 YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
     MusicIO(synth, new SinglethreadedBeatTracker),
     _synth(synth),
@@ -303,7 +293,6 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _pIdleThread(0),
     _lv2_desc(desc)
 {
     _uridMap.handle = NULL;
@@ -383,8 +372,6 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
             getProgram(flatbankprgs.size() + 1);
         }
         _synth->getRuntime().runSynth = false;
-        if(_pIdleThread)
-            pthread_join(_pIdleThread, NULL);
         delete _synth;
         _synth = NULL;
     }
@@ -417,12 +404,6 @@ bool YoshimiLV2Plugin::init()
     memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
 
     _synth->getRuntime().runSynth = true;
-
-    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, "LV2 idle"))
-    {
-        synth->getRuntime().Log("Failed to start idle thread");
-        return false;
-    }
 
     synth->getRuntime().Log("Starting in LV2 plugin mode");
     return true;
@@ -664,12 +645,6 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
         synth->mididecode.setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
     synth->mididecode.setMidiProgram(channel, program, isFreeWheel);
-}
-
-
-void *YoshimiLV2Plugin::static_idleThread(void *arg)
-{
-    return static_cast<YoshimiLV2Plugin *>(arg)->idleThread();
 }
 
 
