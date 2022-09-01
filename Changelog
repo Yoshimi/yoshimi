@@ -1,4 +1,14 @@
-yoshimi 2.2.1 M
+yoshimi 2.2.2
+
+2022-9-1 Will
+bn2154
+* Updated meta-data
+* Updated HTML guide
+* Set release version 2.2.2
+
+2022-8-29 Kristian
+bn2153-a
+* Removed redundant (time wasting) code from LV2.
 
 2022-8-27 Will
 bn2153
@@ -34,7 +44,7 @@ bn2149
 2022-8-12 Will
 bn2148
 * Attempt to improve EQ graph display.
-* Small code cleanus and doc corrections.
+* Small code cleanups and doc corrections.
 
 2022-8-4 Will
 bn2147

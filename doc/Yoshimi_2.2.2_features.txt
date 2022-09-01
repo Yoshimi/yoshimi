@@ -1,8 +1,8 @@
 Version 2.2.2
 
-This is just a minor bugfix and general update release.
+There are also a number of code improvements and a some bug fixes. Also the reproted metadata has been expanded.
 
-Full details are in /doc/Yoshimi_2.2.2_features.txt
+The user guide and various docs have been updated.
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi
