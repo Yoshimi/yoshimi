@@ -2586,11 +2586,14 @@ Alan Calvert started the project}
         {
             case PART::control::enable:
             {
-                partEnable->value(value);
-                if (value)
-                    partControls->activate();
-                else
-                    partControls->deactivate();
+                if (npart == newpart)
+                {
+                    partEnable->value(value);
+                    if (value)
+                        partControls->activate();
+                    else
+                        partControls->deactivate();
+                }
                 if (panelVisible)
                 {
                     panellistitem[panelpart]->partenabled->value(value);

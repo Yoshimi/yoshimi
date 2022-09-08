@@ -1,4 +1,9 @@
-yoshimi 2.2.2
+yoshimi 2.2.2 M
+
+2022-9-8 Will
+bn2155
+* BugFix: disabling a part in the panel window marked the main window
+  as disabled when that was pointed to a different part.
 
 2022-9-1 Will
 bn2154
