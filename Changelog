@@ -1,4 +1,11 @@
-yoshimi 2.2.2 M
+yoshimi 2.2.2.1
+
+2022-9-12 Will
+bn2156
+* Applied riscV64 patch from debian.
+* Changed text 'distorsion' to 'distortion' in code.
+  debian was reporting this as 'spelling error in binary'
+* Set bugfix release 2.2.2.1
 
 2022-9-8 Will
 bn2155

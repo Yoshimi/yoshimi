@@ -219,7 +219,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         effchoruswindow->hide();        // delete (effchoruswindow);
         effphaserwindow->hide();        // delete (effphaserwindow);
         effalienwahwindow->hide();      // delete (effalienwahwindow);
-        effdistorsionwindow->hide();    // delete (effdistorsionwindow);
+        effdistortionwindow->hide();    // delete (effdistortionwindow);
         effeqwindow->hide();            // delete (effeqwindow);
         effdynamicfilterwindow->hide(); // delete (effdynamicfilterwindow);
 
@@ -864,8 +864,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       }
     }
   }
-  Function {make_distorsion_window()} {} {
-    Fl_Window effdistorsionwindow {
+  Function {make_distortion_window()} {} {
+    Fl_Window effdistortionwindow {
       xywh {879 667 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
@@ -1677,7 +1677,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     make_chorus_window();
     make_phaser_window();
     make_alienwah_window();
-    make_distorsion_window();
+    make_distortion_window();
     make_eq_window();
     make_dynamicfilter_window();
 
@@ -1690,7 +1690,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     effchoruswindow->position(px,py);
     effphaserwindow->position(px,py);
     effalienwahwindow->position(px,py);
-    effdistorsionwindow->position(px,py);
+    effdistortionwindow->position(px,py);
     effeqwindow->position(px,py);
     effdynamicfilterwindow->position(px,py);
     refresh(eff, npart, neff);} {}
@@ -1707,7 +1707,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     effchoruswindow->hide();
     effphaserwindow->hide();
     effalienwahwindow->hide();
-    effdistorsionwindow->hide();
+    effdistortionwindow->hide();
     effeqwindow->hide();
     effdynamicfilterwindow->hide();
     eqband=0;
@@ -1887,7 +1887,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             distp8->value(eff->geteffectpar(8));
             distp9->value(eff->geteffectpar(9));
             distp10->value(eff->geteffectpar(10));
-            effdistorsionwindow->show();
+            effdistortionwindow->show();
             break;
         case EFFECT::type::eq:
         {
