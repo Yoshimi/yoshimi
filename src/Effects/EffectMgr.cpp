@@ -59,6 +59,7 @@ void EffectMgr::changeeffect(int _nefx)
     cleanup();
     if (nefx == _nefx)
         return;
+    //std::cout << "Change eff" << std::endl;
     nefx = _nefx;
     switch (nefx + EFFECT::type::none)
     {

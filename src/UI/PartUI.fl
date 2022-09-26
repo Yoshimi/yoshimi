@@ -1752,7 +1752,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         partfx->copy_label(synth->getGuiMaster()->setPartWindowTitle("Part Effects").c_str());
         setEffNum();
-        bool res = fetchData(0, EFFECT::control::changed, npart,  (EFFECT::type::none) + insefftype->value(), inseffnocounter->value() - 1);
+        bool res = fetchData(0, EFFECT::control::changed, npart,  EFFECT::type::none + insefftype->value(), inseffnocounter->value() - 1);
         inseffectui->UpdatePresetColour(res, insefftype->value());
         lastfxW = 0;} {}
   }
@@ -2483,7 +2483,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {fxRtext()} {} {
     code {//
-    if (lastfxW < 3)
+    if (lastfxW < 12)
     {
         ++lastfxW;
         return;

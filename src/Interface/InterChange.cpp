@@ -333,6 +333,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 case TOPLEVEL::XML::Instrument:
                 {
                     control = MAIN::control::loadInstrumentByName;
+                    //std::cout << "List ins load" << std::endl;
                     getData->data.kit = insert;
                     break;
                 }
@@ -691,6 +692,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         {
             unsigned int result = synth->setProgramFromBank(getData);
             text = textMsgBuffer.fetch(result & NO_MSG);
+            //std::cout << "Indirect bank ins load" << std::endl;
             if (result < 0x1000)
             {
                 if (synth->getRuntime().bankHighlight)
@@ -708,6 +710,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         case MAIN::control::loadInstrumentByName:
         {
             getData->data.miscmsg = textMsgBuffer.push(text);
+            //std::cout << "Indirect ins load" << std::endl;
             unsigned int result = synth->setProgramByName(getData);
             text = textMsgBuffer.fetch(result & NO_MSG);
             synth->getRuntime().lastBankPart = UNUSED;
@@ -1844,7 +1847,8 @@ void InterChange::mediate()
 
         int effpar = synth->getRuntime().effectChange;
         if (effpar > 0xffff)
-        {
+        { std::cout << "In interchange temp fix" << std::endl;
+            /* is this just for preset paste? */
 #ifdef GUI_FLTK
             if (synth->getRuntime().showGui)
             {
@@ -1917,6 +1921,8 @@ void InterChange::historyActionCheck(CommandBlock *getData)
 void InterChange::returns(CommandBlock *getData)
 {
     synth->getRuntime().finishedCLI = true; // belt and braces :)
+    //std::cout << "Returns ins" << std::endl;
+    //synth->CBtest(getData);
     if ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::noAction)
         return; // no further action
 
@@ -1940,7 +1946,10 @@ void InterChange::returns(CommandBlock *getData)
                 if (type & TOPLEVEL::type::Write)
                 {
                     if (tmp != TOPLEVEL::action::fromGUI)
+                    {
                         toGUI.write(getData->bytes);
+                        //std::cout << "Main toGUI" << std::endl;
+                    }
                     if (cameFrom == 1)
                         synth->getRuntime().Log("Undo:");
                     else if (cameFrom == 2)
@@ -3255,11 +3264,13 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::loadInstrumentFromBank:
             synth->partonoffLock(kititem, -1);
+            //std::cout << "Main bank ins load" << std::endl;
             getData->data.source |= TOPLEVEL::action::lowPrio;
             break;
 
         case MAIN::control::loadInstrumentByName:
             synth->partonoffLock(kititem, -1);
+            //std::cout << "Main ins load" << std::endl;
             getData->data.source |= TOPLEVEL::action::lowPrio;
             break;
 

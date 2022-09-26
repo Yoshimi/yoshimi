@@ -2135,6 +2135,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
                 typechoice->labelsize(size11);
                     typechoice->textsize(size9);
+
+                effeqwindow->redraw();
                 break;
             case 8: // dynfilter
                 dfname->labelsize(size12);

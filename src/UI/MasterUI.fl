@@ -3122,7 +3122,7 @@ Alan Calvert started the project}
                 setMasterLabel(findLeafName(name));
                 refresh_master_ui(2);
             }
-
+            lastsyseffeqW = 0;
             break;
 
         case MAIN::control::saveNamedPatchset: // save patch set
@@ -3787,9 +3787,6 @@ Alan Calvert started the project}
         inseffectui->UpdatePresetColour(status, insefftype->value());
     }
 
-
-
-
     showSysEfxUI();
 
     masterkeyshift->value(synth->Pkeyshift - 64);
@@ -4194,20 +4191,37 @@ bpmfallback->format(format);} {}
         msgSeen = true;
     }
 
-    if (syseffectui->visible() && sysefftype->value() == 8)
+    if (syseffectui->visible())
     {
-        if(syseffectui->filterwindow != NULL)
+        int efftype = EFFECT::type::eq - EFFECT::type::none;
+        if(sysefftype->value() == efftype)
+        {
+            if (lastsyseffeqW < 0.15f)
+            {
+                lastsyseffeqW += 0.01f;
+            }
+            else if (lastsyseffeqW != mainScale)
+            {
+                syseffectui->effRtext(mainScale, efftype);
+                lastsyseffeqW = mainScale;
+            }
+        }
+        if(sysefftype->value() == efftype && syseffectui->filterwindow != NULL)
         {
             if (syseffectui->filterwindow->visible())
+            {
                 syseffectui->filtRtext();
+            }
         }
     }
-    else if (inseffectui->visible() && insefftype->value() == 8)
+    else if (inseffectui->visible() && insefftype->value() == EFFECT::type::dynFilter - EFFECT::type::none)
     {
         if(inseffectui->filterwindow != NULL)
         {
             if (inseffectui->filterwindow->visible())
+            {
                 inseffectui->filtRtext();
+            }
         }
     }
 
@@ -4627,6 +4641,8 @@ bpmfallback->format(format);} {}
   decl {int lastmsgW} {private local
   }
   decl {int lastsyseffW} {private local
+  }
+  decl {float lastsyseffeqW} {private local
   }
   decl {int lastvirtW} {private local
   }
