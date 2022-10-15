@@ -3123,6 +3123,8 @@ Alan Calvert started the project}
                 refresh_master_ui(2);
             }
             lastsyseffeqW = 0;
+            lastsysDynFiltW = 0;
+            lastinsDynFiltW = 0;
             break;
 
         case MAIN::control::saveNamedPatchset: // save patch set
@@ -4206,21 +4208,33 @@ bpmfallback->format(format);} {}
                 lastsyseffeqW = mainScale;
             }
         }
-        if(sysefftype->value() == efftype && syseffectui->filterwindow != NULL)
+    }
+    if (syseffectui != NULL)
+    {
+        if (syseffectui->filterwindow != NULL)
         {
             if (syseffectui->filterwindow->visible())
             {
-                syseffectui->filtRtext();
+                if (lastsysDynFiltW != syseffectui->filterwindow->w())
+                {
+                    syseffectui->filtRtext();
+                    lastsysDynFiltW = syseffectui->filterwindow->w();
+                }
             }
         }
     }
-    else if (inseffectui->visible() && insefftype->value() == EFFECT::type::dynFilter - EFFECT::type::none)
+
+    if (inseffectui != NULL)
     {
         if(inseffectui->filterwindow != NULL)
         {
             if (inseffectui->filterwindow->visible())
             {
-                inseffectui->filtRtext();
+                if (lastinsDynFiltW != inseffectui->filterwindow->w())
+                {
+                    inseffectui->filtRtext();
+                    lastinsDynFiltW = inseffectui->filterwindow->w();
+                }
             }
         }
     }
@@ -4328,31 +4342,34 @@ bpmfallback->format(format);} {}
     nextInst->labelsize(size11);
     valueInst->textsize(size11);
     cancelInst->labelsize(size11);
+    if (syseffectui->visible())
+    {
+        SystemEffectsGrp->labelsize(size12);
+        syseffnocounter->labelsize(size11);
+            syseffnocounter->textsize(size11);
+        sysefftype->labelsize(size11);
+            sysefftype->textsize(size11);
 
-    SystemEffectsGrp->labelsize(size12);
-    syseffnocounter->labelsize(size11);
-        syseffnocounter->textsize(size11);
-    sysefftype->labelsize(size11);
-        sysefftype->textsize(size11);
+        SysEffOn->labelsize(size11);
+        sysEffSend->labelsize(size11);
+        sysCopy->labelsize(size11);
+        sysPaste->labelsize(size11);
+        syseffectui->effRtext(mainScale, sysefftype->value());
+    }
+    else
+    {
+        InsertionEffectsGrp->labelsize(size12);
+        inseffnocounter->labelsize(size11);
+            inseffnocounter->textsize(size11);
+        insefftype->labelsize(size11);
+            insefftype->textsize(size11);
 
-    SysEffOn->labelsize(size11);
-    sysEffSend->labelsize(size11);
-    sysCopy->labelsize(size11);
-    sysPaste->labelsize(size11);
-    syseffectui->effRtext(mainScale, sysefftype->value());
-
-    InsertionEffectsGrp->labelsize(size12);
-    inseffnocounter->labelsize(size11);
-        inseffnocounter->textsize(size11);
-    insefftype->labelsize(size11);
-        insefftype->textsize(size11);
-
-    inseffpart->labelsize(size11);
-        inseffpart->textsize(size11);
-    insCopy->labelsize(size11);
-    insPaste->labelsize(size11);
-    inseffectui->effRtext(mainScale, insefftype->value());
-
+        inseffpart->labelsize(size11);
+            inseffpart->textsize(size11);
+        insCopy->labelsize(size11);
+        insPaste->labelsize(size11);
+        inseffectui->effRtext(mainScale, insefftype->value());
+    }
     npartcounter->labelsize(size11);
         npartcounter->textsize(size11);
     maxparts->labelsize(size11);
@@ -4643,6 +4660,10 @@ bpmfallback->format(format);} {}
   decl {int lastsyseffW} {private local
   }
   decl {float lastsyseffeqW} {private local
+  }
+  decl {int lastsysDynFiltW} {private local
+  }
+  decl {int lastinsDynFiltW} {private local
   }
   decl {int lastvirtW} {private local
   }

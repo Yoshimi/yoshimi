@@ -208,8 +208,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     code {//
     eff = NULL;
     filterwindow = NULL;
-    fwin_filterui = NULL;
-    lastfiltW = 0;} {}
+    fwin_filterui = NULL;} {}
   }
   Function {~EffUI()} {} {
     code {//
@@ -2177,15 +2176,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, filtDW, filtDH);
     filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
-    filterwindow->show();
-    lastfiltW = 0;} {}
+    filterwindow->show();} {}
   }
   Function {filtRtext()} {} {
     code {//
-    if (lastfiltW == filterwindow->w())
-        return;
-    lastfiltW = filterwindow->w();
-
     float dScale = filterwindow->w() / filtDW;
     if (dScale < 1.0f)
         dScale = 1.0f;
@@ -2243,7 +2237,5 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   decl {float filtDW;} {private local
   }
   decl {float filtDH;} {private local
-  }
-  decl {int lastfiltW;} {private local
   }
 }

@@ -721,7 +721,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label P
         callback {//
         synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
-        synth->getRuntime().effectChange = npart | (ninseff << 8); // temporary fix}
+        synth->getRuntime().effectChange = npart | (ninseff << (EFFECT::type::dynFilter - EFFECT::type::none)); // temporary fix - for what?}
         xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Check_Button bypasseff {
@@ -1486,7 +1486,10 @@ class PartUI {: {public Fl_Group, PartUI_}
             if (sameEff)
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
             else
+            {
                 lastfxW = 0;
+                lastDynFiltW = 0;
+            }
             break;
 
         case PART::control::effectType:
@@ -1671,6 +1674,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlmidiSeen = false;
     atSeen = false;
     lastfxW = 0;
+    lastDynFiltW = 0;
     lastkitW = 0;
     lastmidiW = 0;
     lastatW = 0;
@@ -1754,7 +1758,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         setEffNum();
         bool res = fetchData(0, EFFECT::control::changed, npart,  EFFECT::type::none + insefftype->value(), inseffnocounter->value() - 1);
         inseffectui->UpdatePresetColour(res, insefftype->value());
-        lastfxW = 0;} {}
+        lastfxW = 0;
+        lastDynFiltW = 0;} {}
   }
   Function {kitrefresh()} {} {
     code {//
@@ -2285,12 +2290,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         editRtext();
     if (partfx->visible())
     {
-        if (insefftype->value() == 8) // dynfilter
+        if (insefftype->value() == (EFFECT::type::dynFilter - EFFECT::type::none))
         {
             if(inseffectui->filterwindow != NULL)
             {
                 if(inseffectui->filterwindow->visible())
-                    inseffectui->filtRtext();
+                {
+                    if (lastDynFiltW != inseffectui->filterwindow->w())
+                    {
+                      inseffectui->filtRtext();
+                      lastDynFiltW = inseffectui->filterwindow->w();
+                    }
+                }
             }
         }
         fxRtext();
@@ -2686,6 +2697,8 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {bool kitSeen;} {private local
   }
   decl {int lastfxW;} {private local
+  }
+  decl {int lastDynFiltW;} {private local
   }
   decl {int lastkitW;} {private local
   }

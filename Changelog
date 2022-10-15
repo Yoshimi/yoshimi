@@ -1,5 +1,9 @@
 yoshimi 2.2.2.1
 
+2022-10-15 Will
+bn2158
+* BugFix: System effect dynfilter filter window not resizing text.
+
 2022-9-26 Will
 bn2157
 * applied temporary fix for wrong EQ graph on loading.
