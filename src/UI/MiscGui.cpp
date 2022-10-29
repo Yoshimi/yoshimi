@@ -80,7 +80,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 {
     if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
-        if (collect_readData(synth, 0, PART::control::partBusy, part))
+        if (collect_readData(synth, 0, TOPLEVEL::control::partBusy, part))
         {
             alert(synth, "Part " + to_string(part + 1) + " is busy");
             return;

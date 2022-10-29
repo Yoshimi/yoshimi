@@ -1694,7 +1694,7 @@ float InterChange::readAllData(CommandBlock *getData)
     bool indirect = ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio);
     if (npart < NUM_MIDI_PARTS && synth->part[npart]->busy)
     {
-        getData->data.control = PART::control::partBusy; // part busy message
+        getData->data.control = TOPLEVEL::control::partBusy; // part busy message
         getData->data.kit = UNUSED;
         getData->data.engine = UNUSED;
         getData->data.insert = UNUSED;
@@ -2096,13 +2096,13 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if (part->busy && engine == PART::engine::padSynth)
     {
         getData->data.type &= ~TOPLEVEL::type::Write; // turn it into a read
-        getData->data.control = PART::control::partBusy;
+        getData->data.control = TOPLEVEL::control::partBusy;
         getData->data.kit = UNUSED;
         getData->data.engine = UNUSED;
         getData->data.insert = UNUSED;
         return false;
     }
-    if (control == PART::control::partBusy)
+    if (control == TOPLEVEL::control::partBusy)
     {
         getData->data.value = part->busy;
         return false;

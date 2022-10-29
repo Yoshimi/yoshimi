@@ -161,7 +161,6 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         part64 = 63, // between these two
 
         undoMark = 68, // 44
-        copyPaste = 72, // 48 (not yet!)
         vector = 192, // CO
         midiLearn = 216, // D8
         midiIn,
@@ -212,10 +211,13 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // insert any new entries here
         /*
          * the following values must never appear in any other sections
+         * they are all callable from any section
          */
-        unrecognised = 253, // FD
+        copyPaste =  251, // FB
+        partBusy, // internally generated - read only
+        unrecognised,
         textMessage,
-        forceExit // this is effective from *any* section!
+        forceExit
     };
 
     enum msgResponse : unsigned char {
@@ -389,16 +391,6 @@ namespace VECTOR // usage VECTOR::control::name
     };
 }
 
-namespace COPYPASTE // usage COPYPASTE::control::toClipboard
-{
-    enum control : unsigned char { // not yet implemented
-        toClipboard = 0,
-        toFile,
-        fromClipboard,
-        fromFile
-    };
-}
-
 namespace MIDILEARN // usage MIDILEARN::control::block
 {
     enum control : unsigned char {
@@ -420,10 +412,10 @@ namespace MIDILEARN // usage MIDILEARN::control::block
         sendRefreshRequest, // currently GUI only
         reportActivity = 24,
         clearAll = 96,
-        loadList = 241,
+        loadList = 128,
         loadFromRecent,
-        saveList = 245,
-        cancelLearn = 250,
+        saveList,
+        cancelLearn,
         learned
     };
 }
@@ -664,7 +656,6 @@ namespace PART // usage PART::control::volume
         instrumentName,
         instrumentType,
         defaultInstrumentCopyright, // this needs to be split into two for load/save
-        partBusy = 252 // internally generated - read only
     };
 
     enum kitType : unsigned char {

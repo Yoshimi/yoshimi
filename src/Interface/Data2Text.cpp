@@ -1695,7 +1695,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
             contstr = "Cleared controllers";
             break;
 
-        case PART::control::partBusy:
+        case TOPLEVEL::control::partBusy:
             showValue = false;
             if (value_bool)
                 contstr = "is busy";
