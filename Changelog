@@ -6,6 +6,8 @@ bn2159
 * moved partBusy control from part section to top level
 * removed some (now redundant) code
 
+* forgot to update Control Numbers file :(
+
 2022-10-15 Will
 bn2158
 * BugFix: System effect dynfilter filter window not resizing text.
