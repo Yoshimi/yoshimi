@@ -31,8 +31,7 @@ class SynthEngine;
 class UnifiedPresets
 {
     public:
-        string findSectionName(CommandBlock *getData);
-        string findleafExtension(CommandBlock *getData);
+        string copy(CommandBlock *getData);
 };
 
 #endif

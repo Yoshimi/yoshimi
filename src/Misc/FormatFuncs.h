@@ -346,5 +346,84 @@ inline std::string nextLine(std::string& list) // this is destructive
     return line;
 }
 
+inline std::string findPresetType(CommandBlock *getData)
+{
+    int kititem = getData->data.kit;
+    int engine = getData->data.engine;
+    int insert = getData->data.insert;
+    int parameter = getData->data.parameter;
+    string name = "";
+
+    if (kititem > EFFECT::type:: none && kititem < EFFECT::type::count)
+        return "Peffect";
+
+
+    switch (insert)
+    {
+        case TOPLEVEL::insert::LFOgroup:
+            switch (parameter)
+            {
+                case 0:
+                    name = "Plfoamplitude";
+                    break;
+                case 1:
+                    name = "Plfofrequency";
+                    break;
+                case 2:
+                    name = "Plfofilter";
+                    break;
+            }
+            break;
+        case TOPLEVEL::insert::filterGroup:
+            name = "Pfilter";
+            break;
+        case TOPLEVEL::insert::envelopeGroup:
+            switch (parameter)
+            {
+                case 0:
+                    name = "Penvamplitude";
+                    break;
+                case 1:
+                    name = "Penvfrequency";
+                    break;
+                case 2:
+                    name = "Penvfilter";
+                    break;
+                case 3:
+                    name = "Penvbandwidth";
+                    break;
+            }
+            break;
+        case TOPLEVEL::insert::oscillatorGroup:
+            name = "Poscilgen";
+            break;
+        case TOPLEVEL::insert::resonanceGroup:
+            name = "Presonance";
+            break;
+
+    }
+    if (!name.empty())
+        return name;
+
+
+    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
+        return "Padsythn"; // all voices have the same extension
+
+    switch (engine)
+    {
+        case PART::engine::addSynth:
+            name = "Paddsyth";
+            break;
+        case PART::engine::subSynth:
+            name = "Psubsyth";
+            break;
+        case PART::engine::padSynth:
+            name = "Ppadsyth";
+            break;
+    }
+    return name;
+}
+
+
 }//(End)namespace func
 #endif /*FORMATFUNCS_H*/

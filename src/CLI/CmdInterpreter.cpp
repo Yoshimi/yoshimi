@@ -5787,14 +5787,18 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     string name;
 
 
-    /*CommandBlock getData;
-    getData.data.value = 0;
-    getData.data.part = TOPLEVEL::section::copyPaste;
-    getData.data.kit = 0;
-    getData.data.engine = 135;
-    getData.data.insert = UNUSED;
-    cout << synth->unifiedpresets.findSectionName(&getData) << endl;*/
-
+    CommandBlock getData;
+    memset(&getData.bytes, 255, sizeof(getData));
+    if (input.matchnMove(4, "copy"))
+    {
+        getData.data.value = 0;
+        getData.data.part = 0;
+        getData.data.engine = 1;
+        getData.data.insert = TOPLEVEL::insert::envelopeGroup;
+        getData.data.parameter = 1;
+        cout << synth->unifiedpresets.copy(&getData) << endl;
+        return REPLY::done_msg;
+    }
 
     if (input.matchnMove(2, "yoshimi"))
     {

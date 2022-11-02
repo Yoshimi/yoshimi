@@ -21,65 +21,11 @@
 #include <string>
 
 #include "Misc/SynthEngine.h"
+#include "Misc/FormatFuncs.h"
 
-string UnifiedPresets::findSectionName(CommandBlock *getData)
+string UnifiedPresets::copy(CommandBlock *getData)
 {
-    unsigned char value = int (getData->data.value + 0.5f);
-    int engine = getData->data.engine;
-    int insert = getData->data.insert;
-    string name = "unrecognised";
-
-    if (getData->data.part != TOPLEVEL::control::copyPaste || value >= NUM_MIDI_PARTS)
-        return name;
-
-    if (insert != UNUSED) // temp!
-        return name;
-
-    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
-    {
-        string name = "VOICE id=\"" + std::to_string(int(engine - PART::engine::addVoice1)) + "\"";
-        return name;
-    }
-    switch (engine)
-    {
-        case PART::engine::addSynth:
-            return "ADD_SYNTH_PARAMETERS";
-            break;
-        case PART::engine::subSynth:
-            return "SUB_SYNTH_PARAMETERS";
-            break;
-        case PART::engine::padSynth:
-            return "PAD_SYNTH_PARAMETERS";
-            break;
-
-    }
-    return name;
-}
-
-
-string UnifiedPresets::findleafExtension(CommandBlock *getData)
-{
-    int engine = getData->data.engine;
-    int insert = getData->data.insert;
-    string name = "unrecognised";
-
-    if (insert != UNUSED) // temp!
-        return name;
-
-    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
-        return "addsythn"; // all voices have the same extension
-    switch (engine)
-    {
-        case PART::engine::addSynth:
-            return "addsyth";
-            break;
-        case PART::engine::subSynth:
-            return "subsyth";
-            break;
-        case PART::engine::padSynth:
-            return "padsyth";
-            break;
-    }
+    std::string name = func::findPresetType(getData);
     return name;
 }
 
