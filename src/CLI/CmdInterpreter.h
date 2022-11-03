@@ -131,11 +131,14 @@ class CmdInterpreter
 
         // the following are used pervasively
         unsigned int context;
+        int section;
         int npart;
         int kitMode;
         int kitNumber;
         bool inKitEditor;
+        int engine;
         int voiceNumber;
+        int insertGroup;
         int insertType;
         int nFXtype;
 

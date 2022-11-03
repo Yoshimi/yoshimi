@@ -119,12 +119,14 @@ CmdInterpreter::CmdInterpreter() :
     testInvoker{},
 
     context{LEVEL::Top},
+    section{UNUSED},
     npart{0},
     kitMode{PART::kitType::Off},
     kitNumber{0},
     inKitEditor{false},
     voiceNumber{0},
-    insertType{0},
+    insertGroup{UNUSED},
+    insertType{UNUSED},
     nFXtype{0},
     nFXpreset{0},
     nFXeqBand{0},
@@ -146,12 +148,14 @@ CmdInterpreter::~CmdInterpreter()
 void CmdInterpreter::defaults()
 {
     context = LEVEL::Top;
+    section = UNUSED;
     npart = 0;
     kitMode = PART::kitType::Off;
     kitNumber = 0;
     inKitEditor = false;
     voiceNumber = 0;
-    insertType = 0;
+    insertType = UNUSED;
+    insertGroup = UNUSED;
     nFXtype = 0;
     nFXpreset = 0;
     nFXeqBand = 0;
@@ -339,7 +343,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     if (bitFindHigh(context) == LEVEL::MControl)
         return result +" Midi controllers";
 
-    int engine = contextToEngines(context);
+    engine = contextToEngines(context);
     switch (engine)
     {
         case PART::engine::addSynth:
@@ -435,7 +439,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     {
         result += ", LFO ";
         int cmd = -1;
-        switch (insertType)
+        switch (insertGroup)
         {
             case TOPLEVEL::insertType::amplitude:
                 cmd = ADDVOICE::control::enableAmplitudeLFO;
@@ -497,7 +501,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
     {
         result += ", Envel ";
         int cmd = -1;
-        switch (insertType)
+        switch (insertGroup)
         {
             case TOPLEVEL::insertType::amplitude:
                 if (engine == PART::engine::addMod1)
@@ -523,7 +527,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 break;
         }
 
-        if (readControl(synth, 0, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType))
+        if (readControl(synth, 0, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertGroup))
             result += " free";
         if (engine == PART::engine::addVoice1  || engine == PART::engine::addMod1 || (engine == PART::engine::subSynth && cmd != ADDVOICE::control::enableAmplitudeEnvelope && cmd != ADDVOICE::control::enableFilterEnvelope))
         {
@@ -1052,6 +1056,7 @@ int CmdInterpreter::effectsList(Parser& input, bool presets)
 
 int CmdInterpreter::effects(Parser& input, unsigned char controlType)
 {
+    kitNumber = EFFECT::type::none;
     Config &Runtime = synth->getRuntime();
     int nFXavail;
     int par = nFX;
@@ -1084,7 +1089,9 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
         nFXtype = synth->sysefx[nFX]->geteffect();
         int tmp = input.toggle();
         if (tmp >= 0)
+        {
             return sendNormal(synth, 0, tmp, controlType, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, nFX);
+        }
     }
 
     if (input.lineEnd(controlType))
@@ -1432,7 +1439,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             value = 1; // dummy
         int control;
         int partno;
-        int engine = nFX;
+        engine = nFX;
         int insert = UNUSED;
 
         if (bitTest(context, LEVEL::Part))
@@ -1674,10 +1681,13 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     int cmd = -1;
     float value = -1;
     int group = -1;
+    if (insertGroup == UNUSED)
+        insertGroup = TOPLEVEL::insertType::amplitude;
+
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
-    int engine = contextToEngines(context);
+    engine = contextToEngines(context);
     if (engine == PART::engine::addVoice1)
         engine += voiceNumber;
 
@@ -1688,9 +1698,9 @@ int CmdInterpreter::LFOselect(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "filter"))
         group = TOPLEVEL::insertType::filter;
     if (group > -1)
-        insertType = group;
+        insertGroup = group;
     else
-        group = insertType;
+        group = insertGroup;
     switch (group)
     {
         case TOPLEVEL::insertType::amplitude:
@@ -1827,7 +1837,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
-    int engine = contextToEngines(context);
+    engine = contextToEngines(context);
     if (engine == PART::engine::addVoice1)
         engine += voiceNumber;
     bool isDyn = false;
@@ -2079,10 +2089,11 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
     int group = -1;
     unsigned char insert = TOPLEVEL::insert::envelopeGroup;
     unsigned char offset = UNUSED;
-    if (input.lineEnd(controlType))
-        return REPLY::done_msg;
 
-    int engine = contextToEngines(context);
+    if (insertGroup == UNUSED)
+        insertGroup = TOPLEVEL::insertType::amplitude;
+
+    engine = contextToEngines(context);
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
         engine += voiceNumber;
 
@@ -2101,11 +2112,11 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
     }
 
     if (group > -1)
-        insertType = group;
+        insertGroup = group;
     else
-        group = insertType;
+        group = insertGroup;
 
-    switch (insertType)
+    switch (insertGroup)
     {
         case TOPLEVEL::insertType::amplitude:
             if (engine < PART::engine::addMod1)
@@ -2140,7 +2151,7 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
 
     if (input.matchnMove(2, "fmode"))
     {
-        return sendNormal(synth, 0, (input.toggle() == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+        return sendNormal(synth, 0, (input.toggle() == 1), controlType, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertGroup);
     }
 
     // common controls
@@ -2159,11 +2170,11 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
         value = (input.toggle() == 1);
     }
 
-    bool freeMode = readControl(synth, 0, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertType);
+    bool freeMode = readControl(synth, 0, ENVELOPEINSERT::control::enableFreeMode, npart, kitNumber, engine, TOPLEVEL::insert::envelopeGroup, insertGroup);
 
     if (freeMode && cmd == -1)
     {
-        int pointCount = readControl(synth, 0, ENVELOPEINSERT::control::points, npart, kitNumber, engine, insert, insertType);
+        int pointCount = readControl(synth, 0, ENVELOPEINSERT::control::points, npart, kitNumber, engine, insert, insertGroup);
         if (input.matchnMove(1, "Points"))
         {
             value = 0; // dummy value
@@ -2306,9 +2317,9 @@ int CmdInterpreter::envelopeSelect(Parser& input, unsigned char controlType)
         value = string2float(input);
     }
 
-    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertType) << endl;
+    //cout << ">> base cmd " << int(cmd) << "  part " << int(npart) << "  kit " << int(kitNumber) << "  engine " << int(engine) << "  parameter " << int(insertGroup) << endl;
 
-    return sendNormal(synth, 0, string2float(input), controlType, cmd, npart, kitNumber, engine, insert, insertType, offset);
+    return sendNormal(synth, 0, string2float(input), controlType, cmd, npart, kitNumber, engine, insert, insertGroup, offset);
 }
 
 int CmdInterpreter::commandGroup(Parser& input)
@@ -3552,6 +3563,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
         if (input.matchnMove(2, "waveform"))
         {
             bitSet(context, LEVEL::Oscillator);
+            insertGroup = TOPLEVEL::insert::oscillatorGroup;
             return waveform(input, controlType);
         }
 
@@ -3694,6 +3706,8 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
+        if (insertGroup == UNUSED)
+            insertGroup = TOPLEVEL::insertType::amplitude;
         return envelopeSelect(input, controlType);
     }
 
@@ -3729,6 +3743,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
+        insertGroup = TOPLEVEL::insert::oscillatorGroup;
         return waveform(input, controlType);
     }
 
@@ -3833,11 +3848,13 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "lfo"))
     {
         bitSet(context, LEVEL::LFO);
+        insertType = TOPLEVEL::insert::LFOgroup;
         return LFOselect(input, controlType);
     }
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
+        insertGroup = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
@@ -3985,13 +4002,15 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(2, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
+        insertGroup = TOPLEVEL::insert::resonanceGroup;
         return resonance(input, controlType);
     }
     if (input.matchnMove(3, "voice"))
     {
         bitSet(context, LEVEL::AddVoice);
         // starting point for envelopes etc.
-        insertType = TOPLEVEL::insertType::amplitude;
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         return addVoice(input, controlType);
     }
     if (input.lineEnd(controlType))
@@ -4100,16 +4119,19 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "lfo"))
     {
         bitSet(context, LEVEL::LFO);
+        insertType = TOPLEVEL::insert::LFOgroup;
         return LFOselect(input, controlType);
     }
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
+        insertGroup = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
+        insertType = TOPLEVEL::insert::envelopeGroup;
         return envelopeSelect(input, controlType);
     }
 
@@ -4256,11 +4278,15 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     if (cmd == -1 && input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
+        insertGroup = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (cmd == -1 && input.matchnMove(3, "envelope"))
     {
+        if (insertGroup == UNUSED) // why do we need this here?
+            insertGroup = TOPLEVEL::insertType::amplitude;
         bitSet(context, LEVEL::Envelope);
+        insertType = TOPLEVEL::insert::envelopeGroup;
         return envelopeSelect(input, controlType);
     }
 
@@ -4433,11 +4459,13 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(2, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
+        insertGroup = TOPLEVEL::insert::resonanceGroup;
         return resonance(input, controlType);
     }
     if (input.matchnMove(2, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
+        insertGroup = TOPLEVEL::insert::oscillatorGroup;
         return waveform(input, controlType);
     }
 
@@ -4546,16 +4574,19 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "lfo"))
     {
         bitSet(context, LEVEL::LFO);
+        insertType = TOPLEVEL::insert::LFOgroup;
         return LFOselect(input, controlType);
     }
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
+        insertGroup = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
+        insertType = TOPLEVEL::insert::envelopeGroup;
         return envelopeSelect(input, controlType);
     }
 
@@ -4855,7 +4886,7 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
 {
     int value = input.toggle();
     int cmd = -1;
-    int engine = contextToEngines(context);
+    engine = contextToEngines(context);
     int insert = TOPLEVEL::insert::resonanceGroup;
     if (value > -1)
     {
@@ -4971,7 +5002,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         return REPLY::done_msg;
     float value = -1;
     int cmd = -1;
-    int engine = contextToEngines(context);
+    engine = contextToEngines(context);
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
 
     if (controlType == type_read && input.isAtEnd())
@@ -5197,6 +5228,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
     int tmp = -1;
+    section = npart;
     if (bitTest(context, LEVEL::AllFX))
         return effects(input, controlType);
     bool partIsOn = readControl(synth, 0, PART::control::enable, npart);
@@ -5427,14 +5459,16 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "addsynth"))
     {
         bitSet(context, LEVEL::AddSynth);
-        insertType = TOPLEVEL::insertType::amplitude;
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         return addSynth(input, controlType);
     }
 
     if (input.matchnMove(3, "subsynth"))
     {
         bitSet(context, LEVEL::SubSynth);
-        insertType = TOPLEVEL::insertType::amplitude;
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         return subSynth(input, controlType);
     }
 
@@ -5442,7 +5476,8 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     {
         bitSet(context, LEVEL::PadSynth);
         voiceNumber = 0; // TODO find out what *realy* causes this to screw up!
-        insertType = TOPLEVEL::insertType::amplitude;
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         return padSynth(input, controlType);
     }
 
@@ -5792,10 +5827,17 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     if (input.matchnMove(4, "copy"))
     {
         getData.data.value = 0;
-        getData.data.part = 0;
-        getData.data.engine = 1;
-        getData.data.insert = TOPLEVEL::insert::envelopeGroup;
-        getData.data.parameter = 1;
+        getData.data.part = section;
+        getData.data.engine = engine;
+        if (section == TOPLEVEL::section::systemEffects || section == TOPLEVEL::section::insertEffects)
+            getData.data.kit = EFFECT::type::none;
+        else if (section == npart)
+            getData.data.kit = kitNumber;
+        // need to make the above add in the effect number
+
+        getData.data.insert = insertGroup;
+        getData.data.parameter = insertType;
+        synth->CBtest(&getData);
         cout << synth->unifiedpresets.copy(&getData) << endl;
         return REPLY::done_msg;
     }
@@ -5955,6 +5997,9 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
             return REPLY::done_msg;
         }*/
         context = LEVEL::Top;
+        engine = 1;
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         bitSet(context, LEVEL::Part);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
         return commandPart(input, controlType);
@@ -5980,6 +6025,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
     if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && input.matchnMove(3, "system"))
     {
+        section = TOPLEVEL::section::systemEffects;
         bitSet(context,LEVEL::AllFX);
         bitClear(context, LEVEL::InsFX);
         nFX = 0; // just to be sure
@@ -5990,6 +6036,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     }
     if ((context == LEVEL::Top || bitTest(context, LEVEL::AllFX)) && !bitTest(context, LEVEL::Part) && input.matchnMove(3, "insert"))
     {
+        section = TOPLEVEL::section::insertEffects;
         bitSet(context,LEVEL::AllFX);
         bitSet(context,LEVEL::InsFX);
         nFX = 0; // just to be sure
@@ -6272,6 +6319,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 
     if (input.startsWith(".."))
     {
+        insertGroup = UNUSED;
+        insertType = UNUSED;
         input.skip(2);
         input.skipSpace();
         if (bitFindHigh(context) == LEVEL::Filter)

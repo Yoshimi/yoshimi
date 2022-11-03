@@ -26,6 +26,8 @@
 string UnifiedPresets::copy(CommandBlock *getData)
 {
     std::string name = func::findPresetType(getData);
+    if (name.empty())
+        name = "No presets in this context";
     return name;
 }
 

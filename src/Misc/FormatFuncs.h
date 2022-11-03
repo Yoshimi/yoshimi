@@ -2,7 +2,7 @@
     FormatFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2021, Will Godfrey and others.
+    Copyright 2014-2022, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -346,17 +346,20 @@ inline std::string nextLine(std::string& list) // this is destructive
     return line;
 }
 
+
 inline std::string findPresetType(CommandBlock *getData)
 {
+    int part = getData->data.part;
     int kititem = getData->data.kit;
     int engine = getData->data.engine;
     int insert = getData->data.insert;
     int parameter = getData->data.parameter;
     string name = "";
 
-    if (kititem > EFFECT::type:: none && kititem < EFFECT::type::count)
+    if (part != TOPLEVEL::section::systemEffects && part != TOPLEVEL::section::insertEffects && part > TOPLEVEL::section::part64)
+        return name;
+    if (kititem >= EFFECT::type:: none && kititem < EFFECT::type::count)
         return "Peffect";
-
 
     switch (insert)
     {
@@ -400,11 +403,9 @@ inline std::string findPresetType(CommandBlock *getData)
         case TOPLEVEL::insert::resonanceGroup:
             name = "Presonance";
             break;
-
     }
     if (!name.empty())
         return name;
-
 
     if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
         return "Padsythn"; // all voices have the same extension
