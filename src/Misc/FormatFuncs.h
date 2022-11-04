@@ -359,12 +359,17 @@ inline std::string findPresetType(CommandBlock *getData)
     if (part != TOPLEVEL::section::systemEffects && part != TOPLEVEL::section::insertEffects && part > TOPLEVEL::section::part64)
         return name;
     if (kititem >= EFFECT::type:: none && kititem < EFFECT::type::count)
-        return "Peffect";
+    {
+        if (insert == TOPLEVEL::insert::filterGroup)
+            return "Pfilter";
+        else
+            return "Peffect";
+    }
 
-    switch (insert)
+    switch (parameter)
     {
         case TOPLEVEL::insert::LFOgroup:
-            switch (parameter)
+            switch (insert)
             {
                 case 0:
                     name = "Plfoamplitude";
@@ -381,7 +386,7 @@ inline std::string findPresetType(CommandBlock *getData)
             name = "Pfilter";
             break;
         case TOPLEVEL::insert::envelopeGroup:
-            switch (parameter)
+            switch (insert)
             {
                 case 0:
                     name = "Penvamplitude";
@@ -407,8 +412,8 @@ inline std::string findPresetType(CommandBlock *getData)
     if (!name.empty())
         return name;
 
-    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
-        return "Padsythn"; // all voices have the same extension
+    if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
+        return "Padsythn"; // all voice and modulator level have the same extension
 
     switch (engine)
     {

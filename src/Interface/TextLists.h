@@ -1,7 +1,7 @@
 /*
     TextLists.h
 
-    Copyright 2019-2021, Will Godfrey
+    Copyright 2019-2022, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -29,7 +29,7 @@
  * is set so you can then step back up the level tree.
  * It is also possible to zero it so that you immediately go to
  * the top level. Therefore, the sequence is important.
- * 19 bits are currently defined out of a possible 32.
+ * 21 bits are currently defined out of a possible 32.
  *
  * Top, AllFX and InsFX MUST be the first three
  */

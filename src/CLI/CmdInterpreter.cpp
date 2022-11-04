@@ -268,6 +268,8 @@ string CmdInterpreter::buildAllFXStatus()
         if (readControl(synth, 0, EFFECT::control::changed, section, EFFECT::type::none + nFXtype, nFX))
             result += "?";
     }
+    if (nFXtype == 8 && bitTest(context, LEVEL::Filter))
+        result += " in filt";
     return result;
 }
 
@@ -3706,6 +3708,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
+        insertType = TOPLEVEL::insert::envelopeGroup;
         if (insertGroup == UNUSED)
             insertGroup = TOPLEVEL::insertType::amplitude;
         return envelopeSelect(input, controlType);
@@ -3860,6 +3863,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "envelope"))
     {
         bitSet(context, LEVEL::Envelope);
+        insertType = TOPLEVEL::insert::envelopeGroup;
         return envelopeSelect(input, controlType);
     }
 
@@ -5829,6 +5833,8 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         getData.data.value = 0;
         getData.data.part = section;
         getData.data.engine = engine;
+        if (engine == PART::engine::addVoice1)
+            getData.data.engine += voiceNumber;
         if (section == TOPLEVEL::section::systemEffects || section == TOPLEVEL::section::insertEffects)
             getData.data.kit = EFFECT::type::none;
         else if (section == npart)
@@ -5836,6 +5842,8 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         // need to make the above add in the effect number
 
         getData.data.insert = insertGroup;
+        if (nFXtype == 8 && bitTest(context, LEVEL::Filter)) // dynfilter
+            getData.data.insert = TOPLEVEL::insert::filterGroup;
         getData.data.parameter = insertType;
         synth->CBtest(&getData);
         cout << synth->unifiedpresets.copy(&getData) << endl;
