@@ -141,7 +141,7 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     currentRoot(0),
     bankHighlight(false),
     lastBankPart(UNUSED),
-    currentPreset(0),
+    presetsRootID(0),
     tempBank(0),
     tempRoot(0),
     VUcount(0),
@@ -514,7 +514,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     if (!found)
     {
         defaultPresets();
-        currentPreset = 0;
+        presetsRootID = 0;
         configChanged = true; // give the user the choice
     }
 
@@ -598,7 +598,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
         bankHighlight = xml->getparbool("bank_highlight", bankHighlight);
 
-        currentPreset = xml->getpar("presetsCurrentRootID", currentPreset, 0, MAX_PRESETS);
+        presetsRootID = xml->getpar("presetsCurrentRootID", presetsRootID, 0, MAX_PRESETS);
 
         Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
@@ -708,7 +708,7 @@ void Config::addConfigXML(XMLwrapper *xml)
 
     xml->addparbool("bank_highlight", bankHighlight);
 
-    xml->addpar("presetsCurrentRootID", currentPreset);
+    xml->addpar("presetsCurrentRootID", presetsRootID);
 
     xml->addpar("interpolation", Interpolation);
 

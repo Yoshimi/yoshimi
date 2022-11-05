@@ -1120,7 +1120,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 if (firstSynth->getRuntime().presetsDirlist[i].size())
                 {
                     string name;
-                    if (i == synth->getRuntime().currentPreset)
+                    if (i == synth->getRuntime().presetsRootID)
                         name = "* ";
                     else
                         name = "  ";

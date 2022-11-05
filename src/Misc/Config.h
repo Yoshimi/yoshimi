@@ -184,7 +184,7 @@ class Config
         unsigned int  currentRoot;
         bool          bankHighlight;
         int           lastBankPart;
-        int           currentPreset;
+        int           presetsRootID;
         int           tempBank;
         int           tempRoot;
         int           noteOnSent; // note test

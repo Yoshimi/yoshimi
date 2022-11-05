@@ -290,7 +290,7 @@ o->hide();}
     code {//
     copybrowse->clear();
     pastebrowse->clear();
-    p->rescanforpresets(synth->getRuntime().currentPreset);
+    p->rescanforpresets();
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
         string name = firstSynth->getPresetsStore().presets[i].name;

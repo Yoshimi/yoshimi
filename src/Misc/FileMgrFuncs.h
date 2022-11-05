@@ -504,8 +504,8 @@ inline void dir2string(string &wanted, string currentDir, string exten, int opt 
                     }
                     else
                     {
-                    if (findExtension(line) == exten)
-                        next = *it;
+                        if (findExtension(line) == exten)
+                            next = *it;
                     }
 
                     // remove the extension, the source knows what it is

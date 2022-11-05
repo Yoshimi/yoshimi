@@ -1414,7 +1414,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
                 ++i;
             }
             firstSynth->getRuntime().presetsDirlist[i] = "";
-            synth->getRuntime().currentPreset = 0;
+            synth->getRuntime().presetsRootID = 0;
             newMsg = true;
             synth->getRuntime().configChanged = true;
             break;
@@ -1423,11 +1423,11 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
         {
             if (write)
             {
-                synth->getRuntime().currentPreset = value;
+                synth->getRuntime().presetsRootID = value;
                 synth->getRuntime().configChanged = true;
             }
             else
-                value = synth->getRuntime().currentPreset = value;
+                value = synth->getRuntime().presetsRootID = value;
             text = firstSynth->getRuntime().presetsDirlist[value];
             newMsg = true;
             break;

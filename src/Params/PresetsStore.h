@@ -61,7 +61,7 @@ class PresetsStore
         };
         presetstruct presets[MAX_PRESETS];
 
-        void rescanforpresets(const string& type, int root);
+        void rescanforpresets(const string& type);
 
     private:
         void clearpresets(void);

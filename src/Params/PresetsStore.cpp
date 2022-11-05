@@ -114,7 +114,7 @@ void PresetsStore::clearpresets(void)
 }
 
 
-void PresetsStore::rescanforpresets(const string& type, int root)
+void PresetsStore::rescanforpresets(const string& type)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
@@ -134,7 +134,7 @@ void PresetsStore::rescanforpresets(const string& type, int root)
         altType = ".SUBnoteParameters" + preset_extension;
     else if (type == "Ppadsyth")
         altType = ".PADnoteParameters" + preset_extension;
-    string dirname = firstSynth->getRuntime().presetsDirlist[root];
+    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (dirname.empty())
         return;
     //std::cout << "Preset root " << dirname << std::endl;
@@ -199,7 +199,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string&
     synth->getRuntime().Log(name);
     string tmpfilename = name;
     make_legit_filename(tmpfilename);
-    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().currentPreset];
+    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);
