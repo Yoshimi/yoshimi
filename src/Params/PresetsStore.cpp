@@ -129,27 +129,8 @@ void PresetsStore::rescanforpresets(const string& type)
     }
     closedir(dir);
 
-    if (presets.size() < 2)
-        return;
-    // sort the presets
-    bool check = true;
-    while (check)
-    {
-        check = false;
-        for (int j = 0; j < presets.size() - 1; ++j)
-        {
-            for (int i = j + 1; i < presets.size(); ++i)
-            {
-                if (presets[i].empty() || presets[j].empty())
-                    continue;
-                if (strcasecmp(presets[i].c_str(), presets[j].c_str()) < 0)
-                {
-                    presets[i].swap(presets[j]);
-                    check = true;
-                }
-            }
-        }
-    }
+    if(presets.size() > 1)
+        sort(presets.begin(), presets.end());
 }
 
 
@@ -168,7 +149,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string&
 }
 
 
-bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
+bool PresetsStore::pastepreset(XMLwrapper *xml, size_t npreset)
 {
     if (npreset > presets.size() || npreset < 1)
         return false;
@@ -181,7 +162,7 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 }
 
 
-void PresetsStore::deletepreset(int npreset)
+void PresetsStore::deletepreset(size_t npreset)
 {
     if (npreset >= presets.size() || npreset < 1)
         return;

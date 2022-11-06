@@ -54,8 +54,8 @@ class PresetsStore
 
         // presets stuff
         void copypreset(XMLwrapper *xml, const string& type, const string& name);
-        bool pastepreset(XMLwrapper *xml, int npreset);
-        void deletepreset(int npreset);
+        bool pastepreset(XMLwrapper *xml, size_t npreset);
+        void deletepreset(size_t npreset);
 
         vector<string> presets;
 
