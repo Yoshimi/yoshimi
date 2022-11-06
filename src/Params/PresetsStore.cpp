@@ -46,7 +46,7 @@ PresetsStore::PresetsStore(SynthEngine *_synth) :
 
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        presets[i].file.clear();
+        presets[i] = "";;
     }
 }
 
@@ -104,7 +104,7 @@ void PresetsStore::clearpresets(void)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        presets[i].file.clear();
+        presets[i] = "";;
     }
 }
 
@@ -113,7 +113,7 @@ void PresetsStore::rescanforpresets(const string& type)
 {
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        presets[i].file.clear();
+        presets[i] = "";;
     }
     int presetk = 0;
     string ftype = "." + type + EXTEN::presets;
@@ -137,7 +137,7 @@ void PresetsStore::rescanforpresets(const string& type)
         }
         if (dirname.at(dirname.size() - 1) != '/')
             dirname += "/";
-        presets[presetk].file = dirname + filename;
+        presets[presetk] = dirname + filename;
         presetk++;
         if (presetk >= MAX_PRESETS)
             return;
@@ -153,11 +153,11 @@ void PresetsStore::rescanforpresets(const string& type)
         {
             for (int i = j + 1; i < MAX_PRESETS; ++i)
             {
-                if (presets[i].file.empty() || presets[j].file.empty())
+                if (presets[i].empty() || presets[j].empty())
                     continue;
-                if (strcasecmp(presets[i].file.c_str(), presets[j].file.c_str()) < 0)
+                if (strcasecmp(presets[i].c_str(), presets[j].c_str()) < 0)
                 {
-                    presets[i].file.swap(presets[j].file);
+                    presets[i].swap(presets[j]);
                     check = true;
                 }
             }
@@ -186,11 +186,11 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
     if (npreset >= MAX_PRESETS || npreset < 1)
         return false;
     npreset--;
-    if (presets[npreset].file.empty())
+    if (presets[npreset].empty())
         return false;
     if (synth->getRuntime().effectChange != UNUSED)
         synth->getRuntime().effectChange |= 0xff0000; // temporary fix - fills in effect header
-    return xml->loadXMLfile(presets[npreset].file);
+    return xml->loadXMLfile(presets[npreset]);
 }
 
 
@@ -199,6 +199,6 @@ void PresetsStore::deletepreset(int npreset)
     if (npreset >= MAX_PRESETS || npreset < 1)
         return;
     npreset--;
-    if (!presets[npreset].file.empty())
-        file::deleteFile(presets[npreset].file);
+    if (!presets[npreset].empty())
+        file::deleteFile(presets[npreset]);
 }

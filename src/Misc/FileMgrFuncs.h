@@ -47,6 +47,14 @@
  * that should be safe for any reasonable architecture.
  */
 
+
+/*
+ * If changing filesystems it may be necessary to provide
+ * a translation of directory and file leaf separators as
+ * well as file extension markers.
+ * These are used as spilt points in other code areas.
+ */
+
 namespace EXTEN {
 
 using std::string;

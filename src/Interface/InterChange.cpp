@@ -1390,8 +1390,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 int i = 0;
                 while (!firstSynth->getRuntime().presetsDirlist[i].empty())
-                    ++i;        //candidate->data.type |= TOPLEVEL::type::Write;
-        //candidate->data.source = TOPLEVEL::action::forceUpdate;
+                    ++i;
                 if (i > (MAX_PRESETS - 2))
                     text = " FAILED preset list full";
                 else

@@ -293,7 +293,7 @@ o->hide();}
     p->rescanforpresets();
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        string name = file::findLeafName(firstSynth->getPresetsStore().presets[i].file);
+        string name = file::findLeafName(firstSynth->getPresetsStore().presets[i]);
         if (name.empty())
             break;
         name = name.substr(0, name.find('.'));

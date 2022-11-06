@@ -55,10 +55,7 @@ class PresetsStore
         bool pastepreset(XMLwrapper *xml, int npreset);
         void deletepreset(int npreset);
 
-        struct presetstruct {
-            string file;
-        };
-        presetstruct presets[MAX_PRESETS];
+        string presets[MAX_PRESETS];
 
         void rescanforpresets(const string& type);
 
