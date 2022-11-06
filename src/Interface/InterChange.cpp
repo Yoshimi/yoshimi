@@ -1842,13 +1842,16 @@ void InterChange::mediate()
             more = true;
         }
 
-         // temporary fix block
-         // TODO find a better place to put this out of the main process!
+         /*
+          * temporary fix block
+          * this is just for preset paste
+
+          TODO find a better place to put this out of the main process!
+          */
 
         int effpar = synth->getRuntime().effectChange;
         if (effpar > 0xffff)
         { std::cout << "In interchange temp fix" << std::endl;
-            /* is this just for preset paste? */
 #ifdef GUI_FLTK
             if (synth->getRuntime().showGui)
             {

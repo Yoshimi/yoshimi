@@ -11,7 +11,7 @@ comment {PresetsUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2017-2020, Will Godfrey
+Copyright 2017-2022, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -296,6 +296,7 @@ o->hide();}
         string name = file::findLeafName(firstSynth->getPresetsStore().presets[i].file);
         if (name.empty())
             break;
+        name = name.substr(0, name.find('.'));
         copybrowse->add(name.c_str());
         pastebrowse->add(name.c_str());
     }
