@@ -29,8 +29,10 @@
 #include "Misc/Config.h"
 
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 #define MAX_PRESETTYPE_SIZE 30
 
@@ -55,13 +57,11 @@ class PresetsStore
         bool pastepreset(XMLwrapper *xml, int npreset);
         void deletepreset(int npreset);
 
-        string presets[MAX_PRESETS];
+        vector<string> presets;
 
         void rescanforpresets(const string& type);
 
     private:
-        void clearpresets(void);
-
         struct _clipboard{
             char *data;
             string type;

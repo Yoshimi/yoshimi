@@ -38,6 +38,9 @@ decl {\#include <FL/fl_ask.H>} {public local
 decl {\#include <string>} {public global
 }
 
+decl {\#include <vector>} {public global
+}
+
 decl {\#include <unistd.h>} {public global
 }
 
@@ -291,7 +294,8 @@ o->hide();}
     copybrowse->clear();
     pastebrowse->clear();
     p->rescanforpresets();
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    size_t i = 0;
+    while (i < firstSynth->getPresetsStore().presets.size())
     {
         string name = file::findLeafName(firstSynth->getPresetsStore().presets[i]);
         if (name.empty())
@@ -299,6 +303,7 @@ o->hide();}
         name = name.substr(0, name.find('.'));
         copybrowse->add(name.c_str());
         pastebrowse->add(name.c_str());
+        ++i;
     }
     int  W, H, X, Y, O;
     loadWin(synth, W, H, X, Y, O, "PresetWin");

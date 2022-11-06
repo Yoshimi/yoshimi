@@ -28,6 +28,7 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
+#include <vector>
 
 class SynthEngine;
 

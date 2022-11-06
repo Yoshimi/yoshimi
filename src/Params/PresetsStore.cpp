@@ -44,10 +44,7 @@ PresetsStore::PresetsStore(SynthEngine *_synth) :
     clipboard.data = NULL;
     clipboard.type.clear();
 
-    for (int i = 0; i < MAX_PRESETS; ++i)
-    {
-        presets[i] = "";;
-    }
+    presets.clear();
 }
 
 
@@ -59,7 +56,7 @@ PresetsStore::~PresetsStore()
         free(_data);
 
     }
-    clearpresets();
+    presets.clear();
 }
 
 
@@ -100,21 +97,9 @@ bool PresetsStore::checkclipboardtype(const string& type)
 }
 
 
-void PresetsStore::clearpresets(void)
-{
-    for (int i = 0; i < MAX_PRESETS; ++i)
-    {
-        presets[i] = "";;
-    }
-}
-
-
 void PresetsStore::rescanforpresets(const string& type)
 {
-    for (int i = 0; i < MAX_PRESETS; ++i)
-    {
-        presets[i] = "";;
-    }
+    presets.clear();
     int presetk = 0;
     string ftype = "." + type + EXTEN::presets;
     //std::cout << "type " << type << std::endl;
@@ -137,21 +122,23 @@ void PresetsStore::rescanforpresets(const string& type)
         }
         if (dirname.at(dirname.size() - 1) != '/')
             dirname += "/";
-        presets[presetk] = dirname + filename;
+        presets.push_back(dirname + filename);
         presetk++;
         if (presetk >= MAX_PRESETS)
             return;
     }
     closedir(dir);
 
+    if (presets.size() < 2)
+        return;
     // sort the presets
     bool check = true;
     while (check)
     {
         check = false;
-        for (int j = 0; j < MAX_PRESETS - 1; ++j)
+        for (int j = 0; j < presets.size() - 1; ++j)
         {
-            for (int i = j + 1; i < MAX_PRESETS; ++i)
+            for (int i = j + 1; i < presets.size(); ++i)
             {
                 if (presets[i].empty() || presets[j].empty())
                     continue;
@@ -183,7 +170,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string&
 
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 {
-    if (npreset >= MAX_PRESETS || npreset < 1)
+    if (npreset > presets.size() || npreset < 1)
         return false;
     npreset--;
     if (presets[npreset].empty())
@@ -196,7 +183,7 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 
 void PresetsStore::deletepreset(int npreset)
 {
-    if (npreset >= MAX_PRESETS || npreset < 1)
+    if (npreset >= presets.size() || npreset < 1)
         return;
     npreset--;
     if (!presets[npreset].empty())
