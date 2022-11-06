@@ -57,7 +57,6 @@ class PresetsStore
 
         struct presetstruct {
             string file;
-            string name;
         };
         presetstruct presets[MAX_PRESETS];
 
@@ -71,8 +70,6 @@ class PresetsStore
             string type;
         };
         static _clipboard clipboard;
-
-        const string preset_extension;
 
         SynthEngine *synth;
 };

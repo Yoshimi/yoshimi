@@ -49,6 +49,7 @@ void Presets::copy(const char *name)
 {
     XMLwrapper *xml = new XMLwrapper(synth);
     // used only for the clipboard
+    bool oldMin = xml->minimal;
     if (name == NULL)
         xml->minimal = false;
 
@@ -73,7 +74,7 @@ void Presets::copy(const char *name)
         synth->getPresetsStore().copyclipboard(xml, type);
     else
         firstSynth->getPresetsStore().copypreset(xml, type,name);
-
+    xml->minimal = oldMin;
     delete(xml);
     nelement = -1;
 }
@@ -115,18 +116,7 @@ void Presets::paste(int npreset)
         }
     }
 
-    string altType = "";
-    if (string(type) == "Padsyth")
-        altType = "ADnoteParameters";
-    else if (string(type) == "Padsythn")
-        altType = "ADnoteParametersn";
-    else if (string(type) == "Psubsyth")
-        altType = "SUBnoteParameters";
-    else if (string(type) == "Ppadsyth")
-        altType = "PADnoteParameters";
-
     if (xml->enterbranch(type) == 0)
-        if (altType.empty() || xml->enterbranch(altType) == 0)
     {
         nelement = -1;
         delete(xml);

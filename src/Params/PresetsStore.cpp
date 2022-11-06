@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2017-2019 Will Godfrey
+    Copyright 2017-2022 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -24,7 +24,6 @@
 */
 
 #include <dirent.h>
-//#include <iostream>
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
@@ -40,7 +39,6 @@ PresetsStore::_clipboard PresetsStore::clipboard;
 
 
 PresetsStore::PresetsStore(SynthEngine *_synth) :
-    preset_extension(".xpz"),
     synth(_synth)
 {
     clipboard.data = NULL;
@@ -49,7 +47,6 @@ PresetsStore::PresetsStore(SynthEngine *_synth) :
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
         presets[i].file.clear();
-        presets[i].name.clear();
     }
 }
 
@@ -109,7 +106,6 @@ void PresetsStore::clearpresets(void)
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
         presets[i].file.clear();
-        presets[i].name.clear();
     }
 }
 
@@ -119,21 +115,10 @@ void PresetsStore::rescanforpresets(const string& type)
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
         presets[i].file.clear();
-        presets[i].name.clear();
     }
     int presetk = 0;
-    string ftype = "." + type + preset_extension;
-
+    string ftype = "." + type + EXTEN::presets;
     //std::cout << "type " << type << std::endl;
-    string altType = "";
-    if (type == "Padsyth")
-        altType = ".ADnoteParameters" + preset_extension;
-    else if (type == "Padsythn")
-        altType = ".ADnoteParametersn" + preset_extension;
-    else if (type == "Psubsyth")
-        altType = ".SUBnoteParameters" + preset_extension;
-    else if (type == "Ppadsyth")
-        altType = ".PADnoteParameters" + preset_extension;
     string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (dirname.empty())
         return;
@@ -149,19 +134,11 @@ void PresetsStore::rescanforpresets(const string& type)
         //std::cout << "file " << filename << std::endl;
         if (filename.find(ftype) == string::npos)
         {
-            if (altType.empty() || filename.find(altType) == string::npos)
-                continue;
+            continue;
         }
         if (dirname.at(dirname.size() - 1) != '/')
             dirname += "/";
         presets[presetk].file = dirname + filename;
-
-        size_t endpos = filename.find(ftype);
-        if (endpos == string::npos)
-            if (!altType.empty())
-                endpos = filename.find(altType);
-        presets[presetk].name = filename.substr(0, endpos);
-//        std::cout << "Preset name " << presets[presetk].name << std::endl;
         presetk++;
         if (presetk >= MAX_PRESETS)
             return;
@@ -177,12 +154,11 @@ void PresetsStore::rescanforpresets(const string& type)
         {
             for (int i = j + 1; i < MAX_PRESETS; ++i)
             {
-                if (presets[i].name.empty() || presets[j].name.empty())
+                if (presets[i].file.empty() || presets[j].file.empty())
                     continue;
-                if (strcasecmp(presets[i].name.c_str(), presets[j].name.c_str()) < 0)
+                if (strcasecmp(presets[i].file.c_str(), presets[j].file.c_str()) < 0)
                 {
                     presets[i].file.swap(presets[j].file);
-                    presets[i].name.swap(presets[j].name);
                     check = true;
                 }
             }
@@ -202,7 +178,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string&
     string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
-    xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);
+    xml->saveXMLfile(dirname + tmpfilename + "." + type + EXTEN::presets);
 }
 
 
@@ -225,5 +201,5 @@ void PresetsStore::deletepreset(int npreset)
         return;
     npreset--;
     if (!presets[npreset].file.empty())
-        remove(presets[npreset].file.c_str());
+        file::deleteFile(presets[npreset].file);
 }

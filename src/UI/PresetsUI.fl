@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {PresetsUI.h} {not_in_source in_header
@@ -293,7 +293,7 @@ o->hide();}
     p->rescanforpresets();
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        string name = firstSynth->getPresetsStore().presets[i].name;
+        string name = file::findLeafName(firstSynth->getPresetsStore().presets[i].file);
         if (name.empty())
             break;
         copybrowse->add(name.c_str());
