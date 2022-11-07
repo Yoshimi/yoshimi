@@ -3464,10 +3464,15 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
             Runtime.Log("Write only - use 'list'");
             return REPLY::done_msg;
         }
-        if (command <= SCALES::control::keyboardMap)
+        if (command == SCALES::control::tuning || command == SCALES::control::keyboardMap)
         {
             if (input.matchnMove(3, "import"))
-                command += (SCALES::control::importKbm - SCALES::control::keyboardMap);
+            {
+                if (command == SCALES::control::tuning)
+                    command = SCALES::control::importScl;
+                else
+                    command = SCALES::control::importKbm;
+            }
         }
         name = string{input};
         if (name == "" && controlType == TOPLEVEL::type::Write)
@@ -3539,8 +3544,7 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
             }
         }
     }
-    sendDirect(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
-    return REPLY::done_msg;
+    return sendNormal(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
 }
 
 

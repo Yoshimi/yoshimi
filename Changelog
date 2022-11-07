@@ -1,5 +1,13 @@
 yoshimi 2.2.2.1
 
+2022-11-7 Will
+bn2160
+Merged in copyPaste so branches don't get out of sync.
+Fixed CLI regression - not importing Scala keymaps.
+BugFix: scale imports not reporting names when loaded.
+Modifed TextMsgBuffer.h to provide non-destructive read.
+
+
 2022-10-22 Will
 bn2159
 * moved down top few control values for MIDI-learn

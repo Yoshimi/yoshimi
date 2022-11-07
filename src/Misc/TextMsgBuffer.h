@@ -1,7 +1,7 @@
 /*
     TextMsgBuffer.h
 
-    Copyright 2014-2019, Will Godfrey
+    Copyright 2014-2022, Will Godfrey, Ichthyostega
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -77,7 +77,7 @@ class TextMsgBuffer
         void init(void);
         void clear(void);
         int push(std::string text);
-        std::string fetch(int pos);
+        std::string fetch(int pos, bool remove = true);
 };
 
 
@@ -91,8 +91,8 @@ inline void TextMsgBuffer::init()
     /*
      * We immediately fill the list, as we use the list position
      * to provide the ID for reading. Therefore once it has been
-     * started entries can only be modified in-place nat added
-     * ar removed.
+     * started entries can only be modified in-place not added
+     * or removed.
      * We use 255 (NO_MSG) to denote an invalid entry.
      */
 }
@@ -144,7 +144,7 @@ inline int TextMsgBuffer::push(std::string _text)
 }
 
 
-inline std::string TextMsgBuffer::fetch(int _pos)
+inline std::string TextMsgBuffer::fetch(int _pos, bool remove)
 {
     if (_pos >= NO_MSG)
         return "";
@@ -169,7 +169,10 @@ inline std::string TextMsgBuffer::fetch(int _pos)
     std::string result = "";
     if (idx == pos)
     {
-        swap (result, *it); // in case of a new entry before return
+        if (remove)
+            swap (result, *it); // in case of a new entry before return
+        else
+            result = *it;
     }
     sem_post(&lock);
     return result;
