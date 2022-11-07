@@ -196,6 +196,42 @@ inline bool cmd2string(std::string cmd, string& result)
     return isok;
 }
 
+/*
+ * This performs the actual file operations for preset management
+ */
+inline bool presetsList(string dirname, const string& type, std::vector<string>& presets)
+{
+    int presetk = 0;
+    string ftype = "." + type + EXTEN::presets;
+    presets.clear();
+
+    DIR *dir = opendir(dirname.c_str());
+    if (dir == NULL)
+        return false;
+
+    struct dirent *fn;
+    while ((fn = readdir(dir)))
+    {
+        string filename = string(fn->d_name);
+        if (filename.find(ftype) == string::npos)
+        {
+            continue;
+        }
+        if (dirname.at(dirname.size() - 1) != '/')
+            dirname += "/";
+        presets.push_back(dirname + filename);
+        presetk++;
+        if (presetk >= MAX_PRESETS)
+        {
+            closedir(dir);
+            return true;
+        }
+    }
+    closedir(dir);
+
+    return true;
+}
+
 
 /*
  * This is only intended for calls on the local filesystem
@@ -439,7 +475,7 @@ inline int countDir(const std::string dirName)
 
 
 /*
- * we return the contents as sorted, sequential lists in directories
+ * We return the contents as sorted, sequential lists in directories
  * and files of the required type as a series of leaf names (as the
  * root directory is already known). This reduces the size of the
  * string to a manageable length.
@@ -632,6 +668,10 @@ inline char * loadGzipped(const string& _filename, string * report)
  * This is used for text files, preserving individual lines. These can
  * then be split up by the receiving functions without needing a file
  * handle, or any knowledge of the file system.
+ *
+ * All leading and trailing whitespace is removed, as well as line-end
+ * variations. Blank lines are removed, and a single newline character
+ * is added to the end of each remaining line.
  */
 inline string loadText(const string& filename)
 {

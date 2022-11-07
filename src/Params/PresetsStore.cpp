@@ -99,38 +99,15 @@ bool PresetsStore::checkclipboardtype(const string& type)
 
 void PresetsStore::rescanforpresets(const string& type)
 {
-    presets.clear();
-    int presetk = 0;
-    string ftype = "." + type + EXTEN::presets;
-    //std::cout << "type " << type << std::endl;
     string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
-    if (dirname.empty())
-        return;
-    //std::cout << "Preset root " << dirname << std::endl;
-    DIR *dir = opendir(dirname.c_str());
-    if (dir == NULL)
-        return;
-
-    struct dirent *fn;
-    while ((fn = readdir(dir)))
+    if (!dirname.empty())
     {
-        string filename = string(fn->d_name);
-        //std::cout << "file " << filename << std::endl;
-        if (filename.find(ftype) == string::npos)
+        file::presetsList(dirname, type, presets);
+        if(presets.size() > 1)
         {
-            continue;
+            sort(presets.begin(), presets.end());
         }
-        if (dirname.at(dirname.size() - 1) != '/')
-            dirname += "/";
-        presets.push_back(dirname + filename);
-        presetk++;
-        if (presetk >= MAX_PRESETS)
-            return;
     }
-    closedir(dir);
-
-    if(presets.size() > 1)
-        sort(presets.begin(), presets.end());
 }
 
 
