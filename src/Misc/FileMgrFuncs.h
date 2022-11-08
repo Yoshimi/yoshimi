@@ -74,7 +74,8 @@ const string scalaTuning =   ".scl";
 const string scalaKeymap =   ".kbm";
 const string vector =        ".xvy";
 const string mlearn =        ".xly";
-const string MSwave=         ".wav";
+const string MSwave =        ".wav";
+const string lists =         ".list";
 
 }//(End)namespace EXTEN
 

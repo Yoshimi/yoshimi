@@ -114,6 +114,9 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
+decl {extern SynthEngine *firstSynth;} {public local
+}
+
 decl {\#include "Misc/FileMgrFuncs.h"
     using file::isRegularFile;
     using file::findLeafName;} {private local

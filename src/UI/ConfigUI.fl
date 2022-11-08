@@ -1117,14 +1117,14 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     code {//
             presetbrowse->clear();
             for (int i = 0; i < MAX_PRESET_DIRS; ++i)
-                if (firstSynth->getRuntime().presetsDirlist[i].size())
+                if (synth->getRuntime().presetsDirlist[i].size())
                 {
                     string name;
                     if (i == synth->getRuntime().presetsRootID)
                         name = "* ";
                     else
                         name = "  ";
-                    name += firstSynth->getRuntime().presetsDirlist[i];
+                    name += synth->getRuntime().presetsDirlist[i];
                     presetbrowse->add(name.c_str());
                 }} {}
   }

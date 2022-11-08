@@ -33,8 +33,6 @@
 using file::make_legit_filename;
 
 
-extern SynthEngine *firstSynth;
-
 PresetsStore::_clipboard PresetsStore::clipboard;
 
 
@@ -99,7 +97,7 @@ bool PresetsStore::checkclipboardtype(const string& type)
 
 void PresetsStore::rescanforpresets(const string& type)
 {
-    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
+    string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (!dirname.empty())
     {
         file::presetsList(dirname, type, presets);
@@ -113,13 +111,13 @@ void PresetsStore::rescanforpresets(const string& type)
 
 void PresetsStore::copypreset(XMLwrapper *xml, const string& type, const string& name)
 {
-    if (firstSynth->getRuntime().presetsDirlist[0].empty())
+    if (synth->getRuntime().presetsDirlist[0].empty())
         return;
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     synth->getRuntime().Log(name);
     string tmpfilename = name;
     make_legit_filename(tmpfilename);
-    string dirname = firstSynth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
+    string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     xml->saveXMLfile(dirname + tmpfilename + "." + type + EXTEN::presets);

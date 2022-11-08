@@ -50,9 +50,6 @@ decl {\#include "Params/Presets.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-decl {extern SynthEngine *firstSynth;} {public local
-}
-
 decl {\#include "MasterUI.h"} {private global
 }
 
@@ -295,9 +292,9 @@ o->hide();}
     pastebrowse->clear();
     p->rescanforpresets();
     size_t i = 0;
-    while (i < firstSynth->getPresetsStore().presets.size())
+    while (i < synth->getPresetsStore().presets.size())
     {
-        string name = file::findLeafName(firstSynth->getPresetsStore().presets[i]);
+        string name = file::findLeafName(synth->getPresetsStore().presets[i]);
         if (name.empty())
             break;
         name = name.substr(0, name.find('.'));

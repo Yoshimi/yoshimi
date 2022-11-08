@@ -1389,15 +1389,16 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (isOK)
             {
                 int i = 0;
-                while (!firstSynth->getRuntime().presetsDirlist[i].empty())
+                while (!synth->getRuntime().presetsDirlist[i].empty())
                     ++i;
                 if (i > (MAX_PRESETS - 2))
                     text = " FAILED preset list full";
                 else
                 {
-                    firstSynth->getRuntime().presetsDirlist[i] = text;
+                    synth->getRuntime().presetsDirlist[i] = text;
                     text = "ed " + text;
                 }
+                synth->getRuntime().savePresetsList();
             }
             newMsg = true;
             synth->getRuntime().configChanged = true;
@@ -1406,13 +1407,13 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
         case CONFIG::control::removePresetRootDir:
         {
             int i = value;
-            text = firstSynth->getRuntime().presetsDirlist[i];
-            while (!firstSynth->getRuntime().presetsDirlist[i + 1].empty())
+            text = synth->getRuntime().presetsDirlist[i];
+            while (!synth->getRuntime().presetsDirlist[i + 1].empty())
             {
-                firstSynth->getRuntime().presetsDirlist[i] = firstSynth->getRuntime().presetsDirlist[i + 1];
+                synth->getRuntime().presetsDirlist[i] = synth->getRuntime().presetsDirlist[i + 1];
                 ++i;
             }
-            firstSynth->getRuntime().presetsDirlist[i] = "";
+            synth->getRuntime().presetsDirlist[i] = "";
             synth->getRuntime().presetsRootID = 0;
             newMsg = true;
             synth->getRuntime().configChanged = true;
@@ -1427,7 +1428,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             }
             else
                 value = synth->getRuntime().presetsRootID = value;
-            text = firstSynth->getRuntime().presetsDirlist[value];
+            text = synth->getRuntime().presetsDirlist[value];
             newMsg = true;
             break;
         }
@@ -1728,7 +1729,7 @@ float InterChange::readAllData(CommandBlock *getData)
 
 void InterChange::resolveReplies(CommandBlock *getData)
 {
-    //synth->CBtest(getData);
+    //synth->CBtest(getData, false);
 
     unsigned char source = getData->data.source & TOPLEVEL::action::noAction;
     // making sure there are no stray top bits.

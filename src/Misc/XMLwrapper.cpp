@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2021, Will Godfrey
+    Copyright 2014-2022, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -392,6 +392,10 @@ char *XMLwrapper::getXMLdata()
 
         case TOPLEVEL::XML::History:
             addparstr("XMLtype", "Recent Files");
+            break;
+
+        case TOPLEVEL::XML::PresetDirs:
+            addparstr("XMLtype", "Preset Directories");
             break;
 
         default:

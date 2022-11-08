@@ -1,5 +1,10 @@
 yoshimi 2.2.2.1
 
+2022-11-8 Will
+bn2161
+Instances now have independent preset directory choice.
+Previously these were all slaved to firstSynth.
+
 2022-11-7 Will
 bn2160
 Merged in copyPaste so branches don't get out of sync.

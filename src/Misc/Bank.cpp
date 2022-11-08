@@ -91,8 +91,6 @@ Bank::Bank(SynthEngine *_synth) :
     foundLocal = file::localDir() + "/found/";
 }
 
-extern SynthEngine *firstSynth;
-
 string Bank::getBankFileTitle(size_t root, size_t bank)
 {
     return synth->makeUniqueName("Root " + asString(root) + ", Bank " + asString(bank) + " - " + getBankPath(root, bank));

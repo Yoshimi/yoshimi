@@ -28,7 +28,6 @@
 #include "Misc/SynthEngine.h"
 #include "Params/Presets.h"
 
-extern SynthEngine *firstSynth;
 
 Presets::Presets(SynthEngine *_synth) :
     nelement(-1),
@@ -73,7 +72,7 @@ void Presets::copy(const char *name)
     if (name == NULL)
         synth->getPresetsStore().copyclipboard(xml, type);
     else
-        firstSynth->getPresetsStore().copypreset(xml, type,name);
+        synth->getPresetsStore().copypreset(xml, type, name);
     xml->minimal = oldMin;
     delete(xml);
     nelement = -1;
@@ -101,14 +100,14 @@ void Presets::paste(int npreset)
             delete(xml);
             return;
         }
-        if (!firstSynth->getPresetsStore().pasteclipboard(xml))
+        if (!synth->getPresetsStore().pasteclipboard(xml))
         {
             delete(xml);
             nelement = -1;
             return;
         }
     } else {
-        if (!firstSynth->getPresetsStore().pastepreset(xml, npreset))
+        if (!synth->getPresetsStore().pastepreset(xml, npreset))
         {
             delete(xml);
             nelement = -1;
@@ -163,11 +162,11 @@ void Presets::rescanforpresets(void)
     strcpy(type, this->type);
     if (nelement != -1)
         strcat(type, "n");
-    firstSynth->getPresetsStore().rescanforpresets(type);
+    synth->getPresetsStore().rescanforpresets(type);
 }
 
 
 void Presets::deletepreset(int npreset)
 {
-    firstSynth->getPresetsStore().deletepreset(npreset);
+    synth->getPresetsStore().deletepreset(npreset);
 }

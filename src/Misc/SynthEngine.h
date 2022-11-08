@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2021, Will Godfrey & others
+    Copyright 2014-2022, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -176,7 +176,7 @@ class SynthEngine
         float getLimits(CommandBlock *getData);
         float getVectorLimits(CommandBlock *getData);
         float getConfigLimits(CommandBlock *getData);
-        void CBtest(CommandBlock *candidate);
+        void CBtest(CommandBlock *candidate, bool miscmsg = false);
 
 
         Part *part[NUM_MIDI_PARTS];
