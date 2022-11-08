@@ -376,6 +376,7 @@ bool Config::loadConfig(void)
             }
         }
     }
+    loadPresetsList();
 
     //cout << "Session Stage " << sessionStage << endl;
 
@@ -490,29 +491,31 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     // get preset dirs
     int count = 0;
     bool found = false;
-    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+    if (!isRegularFile(file::localDir() + "/presetDirs"))
     {
-        if (xml->enterbranch("PRESETSROOT", i))
+        for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         {
-            string dir = xml->getparstr("presets_root");
-            if (isDirectory(dir))
+            if (xml->enterbranch("PRESETSROOT", i))
             {
-                presetsDirlist[count] = dir;
-                found = true;
-                ++count;
+                string dir = xml->getparstr("presets_root");
+                if (isDirectory(dir))
+                {
+                    presetsDirlist[count] = dir;
+                    found = true;
+                    ++count;
+                }
+                xml->exitbranch();
             }
-            xml->exitbranch();
         }
-    }
-    if (!found)
-    {
-        defaultPresets();
-        presetsRootID = 0;
-        configChanged = true; // give the user the choice
-    }
-    if (file::findFile(file::localDir(), "preset", EXTEN::lists).empty())
-    {
-        savePresetsList(); // move these to new location
+
+        if (!found)
+        {
+            defaultPresets();
+            presetsRootID = 0;
+            configChanged = true; // give the user the choice
+
+            savePresetsList(); // move these to new location
+        }
     }
 
     xml->exitbranch(); // BaseParameters

@@ -1,6 +1,9 @@
 yoshimi 2.2.2.1
 
 2022-11-8 Will
+bn2162
+BugFix: old preset list was overwriting new one.
+
 bn2161
 Instances now have independent preset directory choice.
 Previously these were all slaved to firstSynth.

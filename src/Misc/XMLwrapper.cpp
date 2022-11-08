@@ -119,17 +119,6 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
-
-            for (int i = 0; i < MAX_PRESET_DIRS; ++i)
-            {
-                if (synth->getRuntime().presetsDirlist[i].size())
-                {
-                    beginbranch("PRESETSROOT",i);
-                    addparstr("presets_root", synth->getRuntime().presetsDirlist[i]);
-                    endbranch();
-                }
-            }
-
         endbranch();
         return;
     }
