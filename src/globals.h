@@ -126,7 +126,7 @@ typedef unsigned int  uint;
 #define DEFAULT_NAME "Simple Sound"
 #define UNTITLED "No Title"
 
-#define DEFAULT_AUDIO alsa_audio
+#define DEFAULT_AUDIO jack_audio
 #define DEFAULT_MIDI alsa_midi
 
 #define FORCED_EXIT 16

@@ -1,5 +1,9 @@
 yoshimi 2.2.2.1
 
+2022-11-9 Will
+bn2163
+Reverted default Audio to Jack as workround for pulseaudio issue.
+
 2022-11-8 Will
 bn2162
 BugFix: old preset list was overwriting new one.
