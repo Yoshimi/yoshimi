@@ -443,9 +443,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label Q
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1 deactivate
           code0 {o->value(pars->Pq);}
           code1 {updateVCforQ();}
+          code2 {if (filtertype->value() == 0 && analogfiltertypechoice->value() < 2) o->deactivate(); else o->activate();}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
@@ -767,8 +768,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   }
   Function {refresh()} {} {
     code {//
-        update_formant_window();
-        formantfiltergraph->redraw();
         int categ = pars->Pcategory;
         int parstype = pars->Ptype;
         filtertype->value(categ);
@@ -778,35 +777,44 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         qdial->value(pars->Pq);
         freqtrdial->value(pars->Pfreqtrack);
         gaindial->value(pars->Pgain);
-        stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
 
         qdial->activate();
-        if (categ != 1)
+        switch (categ)
         {
-            if (categ == 0)
+            case 0:
             {
                 analogfiltertypechoice->value(parstype);
                 analogfiltertypechoice->show();
                 svfiltertypechoice->hide();
+                editbutton->hide();
+                formantparswindow->hide();
+                cfreqdial->label("C.freq");
                 if (parstype < 2)
                     qdial->deactivate();
+                break;
             }
-            else
+            case 1:
             {
+                analogfiltertypechoice->hide();
+                svfiltertypechoice->hide();
+                editbutton->show();
+                update_formant_window();
+                formantfiltergraph->redraw();
+                cfreqdial->label("BS.pos");
+                break;
+            }
+            case 2:
+            {
+
                 svfiltertypechoice->value(parstype);
                 svfiltertypechoice->show();
                 analogfiltertypechoice->hide();
+                editbutton->hide();
+                formantparswindow->hide();
+                stcounter->value(fetchData(0, FILTERINSERT::control::stages, npart, kititem, engine, TOPLEVEL::insert::filterGroup) + 1);
+                cfreqdial->label("C.freq");
+                break;
             }
-            editbutton->hide();
-            formantparswindow->hide();
-            cfreqdial->label("C.freq");
-        }
-        else
-        {
-            analogfiltertypechoice->hide();
-            svfiltertypechoice->hide();
-            editbutton->show();
-            cfreqdial->label("BS.pos");
         }
         filterparamswindow->redraw();} {}
   }
@@ -933,7 +941,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
            synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
     }
 
-    qdial->activate();
     switch(control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -942,7 +949,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::Q:
             qdial->value(value);
-            formantfiltergraph->redraw();
+            if (filtertype->value() == 1)
+                formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::frequencyTracking:
@@ -983,6 +991,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             analogfiltertypechoice->value(value_int);
             if (value_int < 2)
                 qdial->deactivate();
+            else
+                qdial->activate();
             updateVCforQ();
             break;
 
@@ -1139,7 +1149,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     switch (filtertype->value())
     {
         case 0:
-            if (analogfiltertypechoice->value()<2)
+            if (analogfiltertypechoice->value() < 2)
                 qdial->setValueType(VC_FilterQAnalogUnused);
             else
                 qdial->setValueType(VC_FilterQ);
@@ -1147,6 +1157,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case 1:
         case 2:
             qdial->setValueType(VC_FilterQ);
+            break;
     }} {}
   }
   decl {FormantFilterGraph *formantfiltergraph;} {public local
