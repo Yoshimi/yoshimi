@@ -137,7 +137,8 @@ void FormantFilter::setpos(float input)
         //	oldinput=input; daca setez asta, o sa faca probleme la schimbari foarte lente
         firsttime = 0;
         return;
-    } else
+    }
+    else
         oldinput = input;
 
     float pos = input * sequencestretch;
@@ -171,7 +172,9 @@ void FormantFilter::setpos(float input)
             oldformantamp[i] = currentformants[i].amp;
         }
         firsttime = 0;
-    } else {
+    }
+    else
+    {
         for (int i = 0; i < numformants; ++i)
         {
             currentformants[i].freq =
@@ -200,12 +203,14 @@ void FormantFilter::setpos(float input)
 void FormantFilter::updateCurrentParameters()
 {
     for (int j = 0; j < FF_MAX_VOWELS; ++j)
+    {
         for (int i = 0; i < numformants; ++i)
         {
             formantpar[j][i].freq = pars->getformantfreq(pars->Pvowels[j].formants[i].freq);
             formantpar[j][i].amp = pars->getformantamp(pars->Pvowels[j].formants[i].amp);
             formantpar[j][i].q = pars->getformantq(pars->Pvowels[j].formants[i].q);
         }
+    }
 
     formantslowness = powf(1.0f - (pars->Pformantslowness / 128.0f), 3.0f);
 
@@ -254,14 +259,18 @@ void FormantFilter::filterout(float *smp)
         formant[j]->filterout(tmpbuff.get());
 
         if (aboveAmplitudeThreshold(oldformantamp[j], currentformants[j].amp))
+        {
             for (int i = 0; i < synth->sent_buffersize; ++i)
                 smp[i] += tmpbuff[i]
                           * interpolateAmplitude(oldformantamp[j],
                                                   currentformants[j].amp, i,
                                                   synth->sent_buffersize);
+        }
         else
+        {
             for (int i = 0; i < synth->sent_buffersize; ++i)
                 smp[i] += tmpbuff[i] * currentformants[j].amp;
+        }
         oldformantamp[j] = currentformants[j].amp;
     }
 }

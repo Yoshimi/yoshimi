@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2022, Will Godfrey & others
+Copyright 2014-2023, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -524,9 +524,9 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -2658,7 +2658,7 @@ Alan Calvert started the project}
                 if(value_int > 1 && partui->part->Pdrummode != 0)
                     modepatch->color(91);
                 else
-                    modepatch->color(29);
+                    modepatch->color(FL_BACKGROUND_COLOR);
                 modepatch->redraw();
                 seen = true;
                 break;

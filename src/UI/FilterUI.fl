@@ -11,7 +11,7 @@ comment {FilterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016-2022 Will Godfrey
+Copyright 2016-2023 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -390,7 +390,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         velsns=NULL;
         nvowel = 0;
         nformant = 0;
-        nseqpos = 0;} {}
+        nseqpos = 0;
+        nseqsize = 3;
+        nVoCount = 0;
+        nFoCount = 0;} {}
   }
   Function {~FilterUI()} {} {
     code {filterui->hide();
@@ -403,7 +406,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
-      Fl_Group filterparamswindow {
+      Fl_Group filterparamswindow {open
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -549,7 +552,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
       callback {formClose->do_callback();}
-      xywh {94 78 700 205} type Double labelfont 1 labelsize 12 hide resizable
+      xywh {176 99 700 205} type Double labelfont 1 labelsize 12 hide resizable
       code0 {formantDW = o->w(); formantDH = o->h();}
       code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
     } {
@@ -557,12 +560,17 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         xywh {1 1 698 203} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
-          xywh {485 47 105 113} box THIN_UP_BOX
+          xywh {485 47 105 113} box THIN_UP_FRAME
         } {
           Fl_Counter formantnumber {
             label {Formant }
             callback {//
           nformant = (int) o->value();
+          if (nformant >= nFoCount -1)
+          {
+              nformant =  nFoCount -1;
+              o->value(nformant);
+          }
           update_formant_window();
           formantfiltergraph->redraw();
           //send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantNumber, o->value(), TOPLEVEL::type::Write);}
@@ -570,13 +578,15 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             code0 {o->bounds(0,FF_MAX_FORMANTS-1);}
             code1 {o->value(nformant);}
           }
+          Fl_Box vowelpatch {
+            xywh {487 69 58 4} box FLAT_BOX
+          }
           Fl_Counter vowelnumber {
             label {Vowel no.}
             callback {//
           nvowel = (int) o->value();
-          update_formant_window();
-          formantfiltergraph->redraw();
-          //send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelNumber, o->value(), TOPLEVEL::type::Write);}
+
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelNumber, o->value(), TOPLEVEL::type::Write);}
             xywh {545 55 40 20} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 11
             code0 {o->bounds(0,FF_MAX_VOWELS-1);}
             code1 {o->value(nvowel);}
@@ -613,25 +623,40 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           Fl_Counter seqsize {
             label {Seq.Size}
             callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequenceSize, o->value(), TOPLEVEL::type::Write);}
+          nseqsize = o->value();
+          if (nseqpos >= nseqsize)
+          {
+              nseqpos = nseqsize - 1;
+              seqpos->value(nseqpos);
+          }
+
+
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequenceSize, nseqsize, TOPLEVEL::type::Write);}
             xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
             code0 {o->bounds(1,FF_MAX_SEQUENCE);}
-            code1 {o->value(pars->Psequencesize);}
+            code1 {o->value(nseqsize);}
           }
           Fl_Counter seqpos {
             label {S.Pos.}
             callback {//
-          nseqpos = (int) o->value();
-          update_formant_window();
-          send_data(0, FILTERINSERT::control::sequencePosition, o->value(), TOPLEVEL::type::Write);}
+          nseqpos = int(o->value());
+          if (nseqpos >= nseqsize)
+          {
+              nseqpos = nseqsize - 1;
+              o->value(nseqpos);
+          }
+
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequencePosition, o->value(), TOPLEVEL::type::Write);}
             tooltip {Current position in the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
-            code0 {o->bounds(0,FF_MAX_SEQUENCE-1);}
+            code0 {o->bounds(0,FF_MAX_SEQUENCE -1 );}
             code1 {o->value(nseqpos);}
           }
           Fl_Counter vowel_counter {
             label Vowel
             callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelPositionInSequence, o->value(), TOPLEVEL::type::Write, nseqpos);}
+          nVoCount = o->value();
+
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelPositionInSequence, nVoCount, TOPLEVEL::type::Write, nseqpos);}
             tooltip {Vowel number at the sequence position} xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 10
             code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           }
@@ -656,10 +681,17 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Counter formantcount {
           label Formants
           callback {//
+        nFoCount = o->value();
+
+        if (nformant >= nFoCount -1)
+          {
+              nformant =  nFoCount -1;
+              formantnumber->value(nformant);
+          }
+
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::numberOfFormants, o->value(), TOPLEVEL::type::Write);}
           xywh {485 15 65 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 12
           code0 {o->bounds(1,FF_MAX_FORMANTS);}
-          code1 {o->value(pars->Pnumformants);}
         }
         Fl_Dial frsldial {
           label {Fr.Sl.}
@@ -754,17 +786,27 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
-        if (nformant < pars->Pnumformants)
-            formantparsgroup->activate();
-        else
-            formantparsgroup->deactivate();
+        nseqsize = pars->Psequencesize;
+        seqsize->value(nseqsize);
 
-        if (nseqpos < pars->Psequencesize)
-            vowel_counter->activate();
+        nFoCount = fetchData(0, FILTERINSERT::control::numberOfFormants, npart, kititem, engine, TOPLEVEL::insert::filterGroup);
+        formantcount->value(nFoCount);
+        nVoCount = fetchData(0, FILTERINSERT::control::vowelPositionInSequence, npart, kititem, engine, TOPLEVEL::insert::filterGroup, nseqpos);
+        vowel_counter->value(nVoCount);} {}
+  }
+  Function {check_vowel()} {} {
+    code {//
+        bool vowelseen = false;
+        for (int i = 0; i < nseqsize; ++i)
+        {
+            if (nvowel == fetchData(0, FILTERINSERT::control::vowelPositionInSequence, npart, kititem, engine, TOPLEVEL::insert::filterGroup, i))
+                vowelseen = true;
+        }
+        if (vowelseen)
+            vowelpatch->color(FL_BACKGROUND_COLOR);
         else
-            vowel_counter->deactivate();
-
-        vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {}
+             vowelpatch->color(91);
+        vowelpatch->redraw();} {}
   }
   Function {refresh()} {} {
     code {//
@@ -799,6 +841,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                 svfiltertypechoice->hide();
                 editbutton->show();
                 update_formant_window();
+                check_vowel();
                 formantfiltergraph->redraw();
                 cfreqdial->label("BS.pos");
                 break;
@@ -1074,6 +1117,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case FILTERINSERT::control::vowelNumber:
             nvowel = value_int;
             update_formant_window();
+            check_vowel();
             formantfiltergraph->redraw();
             break;
 
@@ -1086,14 +1130,20 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case FILTERINSERT::control::sequenceSize:
             seqsize->value(value_int);
             update_formant_window();
+
+            formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::sequencePosition:
             update_formant_window();
+            check_vowel();
             break;
 
         case FILTERINSERT::control::vowelPositionInSequence:
             vowel_counter->value(value_int);
+            update_formant_window();
+            check_vowel();
+            formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::negateInput:
@@ -1166,7 +1216,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   }
   decl {unsigned char *velsnsamp,*velsns;} {private local
   }
-  decl {int nvowel,nformant,nseqpos;} {private local
+  decl {int nvowel,nformant,nseqpos, nseqsize, nVoCount, nFoCount;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }
