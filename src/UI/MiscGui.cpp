@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2022 Will Godfrey & others
+    Copyright 2016-2023 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -257,6 +257,26 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char miscmsg = getData->data.miscmsg;
 
 //    synth->CBtest(getData);
+    if (getData->data.control == TOPLEVEL::control::copyPaste)
+    {
+        return; // temporarily disabling these
+
+        if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
+        {
+            std::cout << "copy/paste sys/ins" << std::endl;
+            return; // call into master here
+        }
+        else if (npart <= TOPLEVEL::section::part64)
+        {
+            std::cout << "copy/paste part" << std::endl;
+            return; // call into part here
+        }
+        else
+        {
+            std::cout << "no copy/paste valid" << std::endl;
+            return; // not valid
+        }
+    }
 
     if (control == TOPLEVEL::control::textMessage) // just show a non-modal message
     {

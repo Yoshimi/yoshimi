@@ -1,7 +1,7 @@
 /*
     CmdInterpreter.h
 
-    Copyright 2019 - 2021, Will Godfrey and others.
+    Copyright 2019 - 2022, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -89,6 +89,7 @@ class CmdInterpreter
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent, bool single = false);
         char helpList(Parser& input, unsigned int local);
+        void copypasteList(string name);
         string historySelect(int listnum, size_t selection);
         void historyList(int listnum);
         void listCurrentParts(Parser& input, list<string>& msg_buf);
@@ -116,6 +117,7 @@ class CmdInterpreter
         int commandPart(Parser& input, unsigned char controlType);
         int commandTest(Parser& input, unsigned char controlType);
         int commandReadnSet(Parser& input, unsigned char controlType);
+        void presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset = UNUSED,unsigned char miscmsg = UNUSED);
         Reply processSrcriptFile(const string& filename, bool toplevel = true);
 
     private:
@@ -141,11 +143,11 @@ class CmdInterpreter
         int insertGroup;
         int insertType;
         int nFXtype;
+        int nFX;
 
         // the remaining ones are only used at some places
         int nFXpreset;
         int nFXeqBand;
-        int nFX;
 
         int filterSequenceSize;
         int filterVowelNumber;

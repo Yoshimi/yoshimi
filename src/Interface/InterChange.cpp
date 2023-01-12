@@ -4,7 +4,7 @@
     Copyright 2016-2019, Will Godfrey & others
     Copyright 2020-2020, Kristian Amlie, Will Godfrey, & others
     Copyright 2021, Will Godfrey, Rainer Hans Liffers, & others
-    Copyright 2022, Will Godfrey, Ichthyostega & others
+    Copyright 2023, Will Godfrey, Ichthyostega & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -319,6 +319,38 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     bool guiTo = false;
     (void) guiTo; // suppress warning when headless build
     unsigned char newMsg = false;//NO_MSG;
+
+    if (control == TOPLEVEL::control::copyPaste)
+    {
+        string name = synth->unifiedpresets.section(synth, getData);
+        if (type == TOPLEVEL::type::Adjust) // list (actually zero)
+        {
+            textMsgBuffer.push(name);
+        }
+        else if (type & TOPLEVEL::type::Learnable) // load
+        {
+            // this comes *after* the relative section has been loaded.
+            if (getData->data.part == TOPLEVEL::section::systemEffects)
+            {
+                synth->syseffEnable[synth->syseffnum] = getData->data.offset;
+            }
+            else if (getData->data.part == TOPLEVEL::section::insertEffects)
+            {
+                int tmp = getData->data.offset;
+                if (tmp >=254)
+                    tmp = tmp - 256;
+                synth->Pinsparts[value] = tmp;
+            }
+            else if (getData->data.part <= TOPLEVEL::section::part64)
+            {
+                synth->partonoffWrite(getData->data.part, 2);
+            }
+        }
+#ifdef GUI_FLTK
+        toGUI.write(getData->bytes);
+#endif
+        return; // currently only sending this to the GUI
+    }
 
     if (switchNum == TOPLEVEL::section::main && control == MAIN::control::loadFileFromList)
     {
@@ -2028,11 +2060,31 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         }
     }
 
-    if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
-        return true; // indirect transfer
-
+    unsigned char value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
+    {
+        if (control == TOPLEVEL::control::copyPaste && (type & TOPLEVEL::type::Learnable))
+        {
+            if (getData->data.part == TOPLEVEL::section::systemEffects)
+            {
+                getData->data.offset = synth->syseffEnable[value];
+                synth->syseffEnable[synth->syseffnum] = 0; // off
+            }
+            else if (getData->data.part == TOPLEVEL::section::insertEffects)
+            {
+                getData->data.offset = synth->Pinsparts[value];
+                synth->Pinsparts[value] = -1; // effectively off
+            }
+            else if (getData->data.part <= TOPLEVEL::section::part64)
+            {
+                synth->partonoffWrite(getData->data.part, -1); // off
+            }
+        }
+        return true; // indirect transfer
+    }
+
     unsigned char kititem = getData->data.kit;
     unsigned char effSend = getData->data.kit;
     unsigned char engine = getData->data.engine;

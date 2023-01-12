@@ -579,7 +579,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             code1 {o->value(nformant);}
           }
           Fl_Box vowelpatch {
-            xywh {487 69 58 4} box FLAT_BOX
+            xywh {487 70 56 3} box FLAT_BOX
           }
           Fl_Counter vowelnumber {
             label {Vowel no.}
@@ -805,7 +805,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         if (vowelseen)
             vowelpatch->color(FL_BACKGROUND_COLOR);
         else
-             vowelpatch->color(91);
+             vowelpatch->color(FL_DARK_RED);
         vowelpatch->redraw();} {}
   }
   Function {refresh()} {} {

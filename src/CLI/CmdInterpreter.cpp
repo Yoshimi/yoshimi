@@ -1,7 +1,7 @@
 /*
     CmdInterpreter.cpp
 
-    Copyright 2019 - 2022, Will Godfrey and others.
+    Copyright 2019 - 2023, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -36,6 +36,7 @@
 #include <atomic>
 #include <map>
 #include <list>
+#include <string>
 #include <vector>
 #include <sstream>
 #include <cassert>
@@ -128,13 +129,13 @@ CmdInterpreter::CmdInterpreter() :
     insertGroup{UNUSED},
     insertType{UNUSED},
     nFXtype{0},
+    nFX{0},
     nFXpreset{0},
     nFXeqBand{0},
-    nFX{0},
     filterSequenceSize{1},
-    filterVowelNumber{0},
+    filterVowelNumber{UNUSED},
     filterNumberOfFormants{1},
-    filterFormantNumber{0},
+    filterFormantNumber{UNUSED},
     chan{0},
     axis{0},
     mline{0}
@@ -157,11 +158,11 @@ void CmdInterpreter::defaults()
     insertType = UNUSED;
     insertGroup = UNUSED;
     nFXtype = 0;
+    nFX = 0;
     nFXpreset = 0;
     nFXeqBand = 0;
-    nFX = 0;
-    filterVowelNumber = 0;
-    filterFormantNumber = 0;
+    filterVowelNumber = UNUSED;
+    filterFormantNumber = UNUSED;
     chan = 0;
     axis = 0;
     mline = 0;
@@ -478,9 +479,12 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 filterSequenceSize = readControl(synth, 0, FILTERINSERT::control::sequenceSize, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
                 filterNumberOfFormants = readControl(synth, 0, FILTERINSERT::control::numberOfFormants, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
                 result += "formant V";
-                result += to_string(filterVowelNumber);
-                result += " F";
-                result += to_string(filterFormantNumber);
+                if (bitTest(context, LEVEL::Formant))
+                {
+                    result += to_string(filterVowelNumber);
+                    result += " F";
+                    result += to_string(filterFormantNumber);
+                }
                 break;
             case 2:
                 result += "state var";
@@ -670,6 +674,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::filter;
         else if (input.matchnMove(3, "envelope"))
             listnum = LISTS::envelope;
+        else if (input.matchnMove(3, "section"))
+            listnum = LISTS::section;
 
         else if (input.matchnMove(1, "vector"))
             listnum = LISTS::vector;
@@ -932,6 +938,30 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
     return REPLY::exit_msg;
 }
 
+void CmdInterpreter::copypasteList(string name)
+{
+    list<string>msg;
+    size_t pos = 0;
+    size_t last = 0;
+    int count = 1;
+    string txt = "";
+    while ((pos = name.find('\n', last)) != string::npos)
+    {
+        txt = name.substr(last, pos - last);
+        if (!txt.empty())
+        {
+            msg.push_back(to_string(count) + " " + txt);
+            ++ count;
+        }
+        last = pos + 1;
+    }
+    txt = name.substr(last);
+    if (!txt.empty())
+    {
+        msg.push_back(to_string(count) + " " + txt);
+    }
+    synth->cliOutput(msg, LINES);
+}
 
 void CmdInterpreter::historyList(int listnum)
 {
@@ -1835,7 +1865,6 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     float value = -1;
     int thisPart = npart;
     int kit = kitNumber;
-    int param = UNUSED;
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
 
@@ -1900,11 +1929,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
             if (input.matchnMove(1, "analog"))
                 value = 0;
             else if (input.matchnMove(1, "formant"))
-            {
                 value = 1;
-                filterVowelNumber = 0;
-                filterFormantNumber = 0;
-            }
             else if (input.matchnMove(1, "state"))
                 value = 2;
             else
@@ -1926,32 +1951,41 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         //cout << "baseType " << baseType << endl;
         if (baseType == 1) // formant
         {
-            if (input.matchnMove(1, "invert"))
+            if (input.matchnMove(2, "edit"))
             {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = (input.toggle() == 1);
-                cmd = FILTERINSERT::control::negateInput;
+                filterVowelNumber = 0;
+                filterFormantNumber = 0;
+                bitSet(context, LEVEL::Formant);
+                return REPLY::done_msg;
             }
-            else if (input.matchnMove(2, "fcenter"))
-                cmd = FILTERINSERT::control::formantCenter;
-            else if (input.matchnMove(2, "frange"))
-                cmd = FILTERINSERT::control::formantOctave;
-            else if (input.matchnMove(1, "expand"))
-                cmd = FILTERINSERT::control::formantStretch;
-            else if (input.matchnMove(1, "lucidity"))
-                cmd = FILTERINSERT::control::formantClearness;
-            else if (input.matchnMove(1, "morph"))
-                cmd = FILTERINSERT::control::formantSlowness;
-            else if (input.matchnMove(2, "size"))
+            if (bitTest(context, LEVEL::Formant))
             {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                if (filterVowelNumber >= value)
+                if (input.matchnMove(1, "invert"))
                 {
-                    filterVowelNumber = value -1; // bring back into range
-                    filterFormantNumber = 0; // zero as size unknown
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    value = (input.toggle() == 1);
+                    cmd = FILTERINSERT::control::negateInput;
+                }
+                else if (input.matchnMove(2, "fcenter"))
+                    cmd = FILTERINSERT::control::formantCenter;
+                else if (input.matchnMove(2, "frange"))
+                    cmd = FILTERINSERT::control::formantOctave;
+                else if (input.matchnMove(1, "expand"))
+                    cmd = FILTERINSERT::control::formantStretch;
+                else if (input.matchnMove(1, "lucidity"))
+                    cmd = FILTERINSERT::control::formantClearness;
+                else if (input.matchnMove(1, "morph"))
+                    cmd = FILTERINSERT::control::formantSlowness;
+                else if (input.matchnMove(2, "size"))
+                {
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    value = string2int(input);
+                    if (filterVowelNumber >= value)
+                    {
+                        filterVowelNumber = value -1; // bring back into range
+                        filterFormantNumber = 0; // zero as size unknown
                 }
                 cmd = FILTERINSERT::control::sequenceSize;
             }
@@ -2011,8 +2045,11 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 value = string2int(input);
                 return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
             }
+            return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, 0);
+            }
         }
-        else if (input.matchnMove(2, "type"))
+
+        if (input.matchnMove(2, "type"))
         {
             if (controlType == type_read && input.isAtEnd())
                 value = 0;
@@ -2080,7 +2117,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
     if (value == -1)
         value = string2float(input);
 
-    return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, param);
+    return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup);
 }
 
 
@@ -2490,6 +2527,12 @@ int CmdInterpreter::commandList(Parser& input)
         return effectsList(input);
     if (input.matchnMove(3, "presets"))
         return effectsList(input, true);
+
+    if (input.matchnMove(3, "section")) // section presets
+    {
+        presetsControl(0, TOPLEVEL::type::Adjust, section,  kitNumber,  engine,  insertType, insertGroup, filterFormantNumber, filterVowelNumber);
+        return REPLY::done_msg;
+    }
 
     msg.push_back("Lists:");
     helpLoop(msg, listlist, 2);
@@ -3569,7 +3612,7 @@ int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
         if (input.matchnMove(2, "waveform"))
         {
             bitSet(context, LEVEL::Oscillator);
-            insertGroup = TOPLEVEL::insert::oscillatorGroup;
+            insertType = TOPLEVEL::insert::oscillatorGroup;
             return waveform(input, controlType);
         }
 
@@ -3750,7 +3793,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
-        insertGroup = TOPLEVEL::insert::oscillatorGroup;
+        insertType = TOPLEVEL::insert::oscillatorGroup;
         return waveform(input, controlType);
     }
 
@@ -3861,7 +3904,7 @@ int CmdInterpreter::addVoice(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
-        insertGroup = TOPLEVEL::insert::filterGroup;
+        insertType = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
@@ -4010,7 +4053,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(2, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
-        insertGroup = TOPLEVEL::insert::resonanceGroup;
+        insertType = TOPLEVEL::insert::resonanceGroup;
         return resonance(input, controlType);
     }
     if (input.matchnMove(3, "voice"))
@@ -4133,7 +4176,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
-        insertGroup = TOPLEVEL::insert::filterGroup;
+        insertType = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
@@ -4286,7 +4329,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
     if (cmd == -1 && input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
-        insertGroup = TOPLEVEL::insert::filterGroup;
+        insertType = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (cmd == -1 && input.matchnMove(3, "envelope"))
@@ -4467,13 +4510,13 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(2, "resonance"))
     {
         bitSet(context, LEVEL::Resonance);
-        insertGroup = TOPLEVEL::insert::resonanceGroup;
+        insertType = TOPLEVEL::insert::resonanceGroup;
         return resonance(input, controlType);
     }
     if (input.matchnMove(2, "waveform"))
     {
         bitSet(context, LEVEL::Oscillator);
-        insertGroup = TOPLEVEL::insert::oscillatorGroup;
+        insertType = TOPLEVEL::insert::oscillatorGroup;
         return waveform(input, controlType);
     }
 
@@ -4588,7 +4631,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "filter"))
     {
         bitSet(context, LEVEL::Filter);
-        insertGroup = TOPLEVEL::insert::filterGroup;
+        insertType = TOPLEVEL::insert::filterGroup;
         return filterSelect(input, controlType);
     }
     if (input.matchnMove(3, "envelope"))
@@ -5293,6 +5336,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
                 //if (npart != tmp) // TODO sort this properly!
                 {
                     npart = tmp;
+                    section = npart;
                     if (controlType == TOPLEVEL::type::Write)
                     {
                         context = LEVEL::Top;
@@ -5827,32 +5871,6 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
 int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 {
     Config &Runtime = synth->getRuntime();
-    string name;
-
-
-    CommandBlock getData;
-    memset(&getData.bytes, 255, sizeof(getData));
-    if (input.matchnMove(4, "copy"))
-    {
-        getData.data.value = 0;
-        getData.data.part = section;
-        getData.data.engine = engine;
-        if (engine == PART::engine::addVoice1)
-            getData.data.engine += voiceNumber;
-        if (section == TOPLEVEL::section::systemEffects || section == TOPLEVEL::section::insertEffects)
-            getData.data.kit = EFFECT::type::none;
-        else if (section == npart)
-            getData.data.kit = kitNumber;
-        // need to make the above add in the effect number
-
-        getData.data.insert = insertGroup;
-        if (nFXtype == 8 && bitTest(context, LEVEL::Filter)) // dynfilter
-            getData.data.insert = TOPLEVEL::insert::filterGroup;
-        getData.data.parameter = insertType;
-        synth->CBtest(&getData);
-        cout << synth->unifiedpresets.copy(&getData) << endl;
-        return REPLY::done_msg;
-    }
 
     if (input.matchnMove(2, "yoshimi"))
     {
@@ -5926,6 +5944,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
             return envelopeSelect(input, controlType);
             break;
         case LEVEL::Filter:
+        case LEVEL::Formant:
             return filterSelect(input, controlType);
             break;
         case LEVEL::LFO:
@@ -6161,6 +6180,35 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 }
 
 
+void CmdInterpreter::presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
+{
+    string name;
+    if (engine == PART::engine::addVoice1)
+    {
+        engine += voiceNumber;
+    }
+
+    if (kitNumber == EFFECT::type::none)
+    {
+        value = nFX;
+        kitNumber += nFXtype;
+        if (kitNumber == EFFECT::type::dynFilter && bitTest(context, LEVEL::Filter))
+        {
+            insert = TOPLEVEL::insert::filterGroup;
+        }
+    }
+    if (type == TOPLEVEL::type::Adjust)
+    {
+        string name = readControlText(synth, TOPLEVEL::action::lowPrio, TOPLEVEL::control::copyPaste, section, kitNumber, engine, insert, parameter, offset);
+        copypasteList(name);
+    }
+    else
+    {
+        sendDirect(synth, TOPLEVEL::action::lowPrio, value, type, TOPLEVEL::control::copyPaste, section, kitNumber, engine, insert, parameter, offset, miscmsg);
+    }
+}
+
+
 Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
 {
     if (filename <= "!")
@@ -6331,14 +6379,17 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
 
     if (input.startsWith(".."))
     {
-        insertGroup = UNUSED;
-        insertType = UNUSED;
         input.skip(2);
         input.skipSpace();
-        if (bitFindHigh(context) == LEVEL::Filter)
+        if (bitFindHigh(context) == LEVEL::Formant)
         {
-            filterVowelNumber = 0;
-            filterFormantNumber = 0;
+            filterVowelNumber = UNUSED;
+            filterFormantNumber = UNUSED;
+        }
+        else
+        {
+            insertGroup = UNUSED;
+            insertType = UNUSED;
         }
 
         /*
@@ -6811,6 +6862,14 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             sendDirect(synth, 0, 0, TOPLEVEL::type::Write, MAIN::control::loadInstrumentByName, TOPLEVEL::section::main, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name));
             return Reply::DONE;
         }
+        if  (input.matchnMove(3, "section"))
+        {
+            if (filterVowelNumber != UNUSED)
+                presetsControl(0, TOPLEVEL::type::Learnable, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
+            else
+                presetsControl(0, TOPLEVEL::type::Learnable, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
+            return Reply::DONE;
+        }
         if  (input.matchnMove(1, "default"))
         {
             if (bitFindHigh(context) == LEVEL::Part)
@@ -6890,6 +6949,15 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (input.isAtEnd())
                 return Reply{REPLY::name_msg};
             sendDirect(synth, TOPLEVEL::action::lowPrio, npart, TOPLEVEL::type::Write, MAIN::control::saveNamedInstrument, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string{input}));
+            return Reply::DONE;
+        }
+
+        if  (input.matchnMove(3, "section"))
+        {
+            if (filterVowelNumber != UNUSED)
+                presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
+            else
+                presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))

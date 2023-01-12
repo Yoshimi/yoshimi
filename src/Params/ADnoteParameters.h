@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2018, Will Godfrey
-    Copyright 2020-2021 Kristian Amlie, Will Godfrey
+    Copyright 2020-2023 Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -207,14 +207,19 @@ class ADnoteParameters : public Presets
         void setVoicePan(int voice, char pan, unsigned char panLaw);
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
+        /*
+         * didn't want to make the following two public but could find
+         * no other way to access them from UnifiedPresets.
+         * Will.
+         */
+        void add2XMLsection(XMLwrapper *xml, int n);
+        void getfromXMLsection(XMLwrapper *xml, int n);
         static int ADnote_unison_sizes[15];
 
     private:
         void defaults(int n); // n is the nvoice
         void enableVoice(int nvoice);
         void killVoice(int nvoice);
-        void add2XMLsection(XMLwrapper *xml, int n);
-        void getfromXMLsection(XMLwrapper *xml, int n);
 
         fft::Calc& fft;
 };

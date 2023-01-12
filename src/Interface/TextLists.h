@@ -1,7 +1,7 @@
 /*
     TextLists.h
 
-    Copyright 2019-2022, Will Godfrey
+    Copyright 2019-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -55,6 +55,7 @@ namespace LEVEL{
         Resonance,
         LFO, // amp/freq/filt
         Filter, // params only (slightly confused with env)
+        Formant, // in the formant editor itself
         Envelope, // amp/freq/filt/ (Sub only) band
         Test, // special ops for Yoshimi-testsuite
     };
@@ -103,6 +104,7 @@ namespace LISTS {
     filter,
     envelope,
     reverb,
+    section,
     echo,
     chorus,
     phaser,
@@ -699,6 +701,8 @@ static std::string filterlist [] = {
     "peak",         "two stage peak",
     "lshelf",       "two stage low shelf",
     "hshelf",       "two stage high shelf",
+    " - formant -","",
+    "EDit ...",     "Enter formant editor context",
     " - state variable -","",
     "low",      "low pass",
     "high",     "high pass",
@@ -945,6 +949,7 @@ static std::string noteslist [] = { // from 21
 
 static std::string loadlist [] = {
     "Instrument <s>",   "instrument to current part from named file",
+    "SECtion [s]",      "to current copy/paste context - no name = from clipboard",
     "Default",          "default copyright to current part",
     "SCale <s>",        "scale settings from named file",
     "VEctor [n] <s>",   "vector to channel n (or saved) from named file",
@@ -956,6 +961,7 @@ static std::string loadlist [] = {
 
 static std::string savelist [] = {
     "Instrument <s>",   "current part to named file",
+    "SECtion [s]",      "from current copy/paste context - no name = to clipboard",
     "Default",          "current part copyright as default",
     "SCale <s>",        "current scale settings to named file",
     "VEctor <n> <s>",   "vector on channel n to named file",
@@ -977,6 +983,7 @@ static std::string listlist [] = {
     "Keymap",           "microtonal scale keyboard map",
     "Config",           "current configuration",
     "MLearn [s <n>]",   "midi learned controls ('@' n for full details on one line)",
+    "SECtion [s]",      "copy/paste section presets",
     "History [s]",      "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "Effects [s]",      "effect types ('all' include preset numbers and names)",
     "PREsets",          "all the presets for the currently selected effect",
