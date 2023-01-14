@@ -270,7 +270,12 @@ string CmdInterpreter::buildAllFXStatus()
             result += "?";
     }
     if (nFXtype == 8 && bitTest(context, LEVEL::Filter))
-        result += " in filt";
+    {
+        if (bitTest(context, LEVEL::Formant))
+            result += " formant edit";
+        else
+            result += " in filt";
+    }
     return result;
 }
 
@@ -1983,68 +1988,69 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                         return REPLY::value_msg;
                     value = string2int(input);
                     if (filterVowelNumber >= value)
-                    {
+                        return REPLY::range_msg;
+                    /*{
                         filterVowelNumber = value -1; // bring back into range
                         filterFormantNumber = 0; // zero as size unknown
+                    }*/
+                    cmd = FILTERINSERT::control::sequenceSize;
                 }
-                cmd = FILTERINSERT::control::sequenceSize;
-            }
-            else if (input.matchnMove(2, "count"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                if (filterFormantNumber >= value)
-                    filterFormantNumber = value -1; // bring back into range
-                cmd = FILTERINSERT::control::numberOfFormants;
-            }
-            else if (input.matchnMove(2, "vowel"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                int number = string2int(input);
-                if (number < 0 || number >= filterSequenceSize)
-                    return REPLY::range_msg;
-                filterVowelNumber = number;
-                filterFormantNumber = 0;
-                return REPLY::done_msg;
-            }
-            else if (input.matchnMove(1, "point"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                value = string2int(input);
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                input.skipChars();
-                int position = string2int(input);
-                //cout << "val " << value << "  pos " << position << endl;
-                return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
-            }
-            else if (input.matchnMove(2, "formant"))
-            {
-                if (input.lineEnd(controlType))
-                    return REPLY::value_msg;
-                int number = string2int(input);
-                if (number < 0 || number >= filterNumberOfFormants)
-                    return REPLY::range_msg;
-                filterFormantNumber = number;
-                return REPLY::done_msg;
-            }
-            else
-            {
-                if (input.matchnMove(2, "ffrequency"))
-                    cmd = FILTERINSERT::control::formantFrequency;
-                else if (input.matchnMove(2, "fq"))
-                    cmd = FILTERINSERT::control::formantQ;
-                else if (input.matchnMove(2, "fgain"))
-                    cmd = FILTERINSERT::control::formantAmplitude;
-                if (cmd == -1)
-                    return REPLY::range_msg;
-                value = string2int(input);
-                return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
-            }
+                else if (input.matchnMove(2, "count"))
+                {
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    value = string2int(input);
+                    if (filterFormantNumber >= value)
+                        filterFormantNumber = value -1; // bring back into range
+                    cmd = FILTERINSERT::control::numberOfFormants;
+                }
+                else if (input.matchnMove(2, "vowel"))
+                {
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    value = string2int(input);
+                    int number = string2int(input);
+                    if (number < 0 || number >= filterSequenceSize)
+                        return REPLY::range_msg;
+                    filterVowelNumber = number;
+                    filterFormantNumber = 0;
+                    return REPLY::done_msg;
+                }
+                else if (input.matchnMove(1, "point"))
+                {
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    value = string2int(input);
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    input.skipChars();
+                    int position = string2int(input);
+                    //cout << "val " << value << "  pos " << position << endl;
+                    return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
+                }
+                else if (input.matchnMove(2, "formant"))
+                {
+                    if (input.lineEnd(controlType))
+                        return REPLY::value_msg;
+                    int number = string2int(input);
+                    if (number < 0 || number >= filterNumberOfFormants)
+                        return REPLY::range_msg;
+                    filterFormantNumber = number;
+                    return REPLY::done_msg;
+                }
+                else
+                {
+                    if (input.matchnMove(2, "ffrequency"))
+                        cmd = FILTERINSERT::control::formantFrequency;
+                    else if (input.matchnMove(2, "fq"))
+                        cmd = FILTERINSERT::control::formantQ;
+                    else if (input.matchnMove(2, "fgain"))
+                        cmd = FILTERINSERT::control::formantAmplitude;
+                    if (cmd == -1)
+                        return REPLY::range_msg;
+                    value = string2int(input);
+                    return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
+                }
             return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, 0);
             }
         }

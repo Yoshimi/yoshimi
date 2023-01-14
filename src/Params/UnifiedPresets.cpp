@@ -48,6 +48,8 @@ using std::endl;
 string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
+    //synth->CBtest(getData, false);
+
     string name = findPresetType(getData);
     if (name.empty())
     {
@@ -74,7 +76,6 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
         }
         else if (type & TOPLEVEL::type::Learnable)
         {
-            //cout << "load/fetch" << endl;
             load(getData);
         }
     }
@@ -213,13 +214,11 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
 
     string name = "";
 
-    /*if (kitItem == EFFECT::type::dynFilter && insert == TOPLEVEL::insert::filterGroup)
+    if (kitItem == EFFECT::type::dynFilter && insert == TOPLEVEL::insert::filterGroup)
     {
-        name = filterXML(xml, getData, isLoad);
-        return name;
-    }*/
-
-    if (kitItem >= EFFECT::type:: none && kitItem < EFFECT::type::count)
+        ; // passed on to filters
+    }
+    else if (kitItem >= EFFECT::type:: none && kitItem < EFFECT::type::count)
     {
         {
             EffectMgr *sectionType;
@@ -479,6 +478,10 @@ string UnifiedPresets::filterXML(XMLwrapper *xml, CommandBlock *getData, bool is
     }
 
     // part level
+    else if (kitItem == EFFECT::type::dynFilter)
+    {
+        sectionType = synth->part[npart]->partefx[0]->filterpars;
+    }
     else if (engineType == PART::engine::addSynth)
     {
         sectionType = synth->part[npart]->kit[kitItem].adpars->GlobalPar.GlobalFilter;
@@ -768,8 +771,6 @@ bool UnifiedPresets::load(CommandBlock *getData)
     string dirname;
     string prefix;
 
-    synth->CBtest(getData, false);
-
     if (name.empty())
     {
         dirname = file::localDir() + "/clipboard";
@@ -787,8 +788,6 @@ bool UnifiedPresets::load(CommandBlock *getData)
         dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
         prefix = dirname + "/" + name + ".";
     }
-cout << "type " << type << endl;
-cout << "file " << prefix << endl;
     string filename = prefix + type + EXTEN::presets;
 
     if (file::isRegularFile(prefix + type + EXTEN::presets) == 0)
@@ -798,7 +797,6 @@ cout << "file " << prefix << endl;
     }
 
     xml->loadXMLfile(filename);
-    //cout << filename << endl;
     findXML(xml, getData, true);
     delete xml;
     return false;

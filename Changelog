@@ -1,6 +1,10 @@
 yoshimi 2.2.2.1
 
 2023-1-12
+bn 2167
+Resolved issues with effects formant filter.
+
+2023-1-12
 bn 2166
 Brought in latest work from copyPaste branch.
 

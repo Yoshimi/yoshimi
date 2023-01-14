@@ -332,11 +332,11 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
             // this comes *after* the relative section has been loaded.
             if (getData->data.part == TOPLEVEL::section::systemEffects)
             {
-                synth->syseffEnable[synth->syseffnum] = getData->data.offset;
+                synth->syseffEnable[synth->syseffnum] = getData->data.spare0;
             }
             else if (getData->data.part == TOPLEVEL::section::insertEffects)
             {
-                int tmp = getData->data.offset;
+                int tmp = getData->data.spare0;
                 if (tmp >=254)
                     tmp = tmp - 256;
                 synth->Pinsparts[value] = tmp;
@@ -2069,12 +2069,12 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         {
             if (getData->data.part == TOPLEVEL::section::systemEffects)
             {
-                getData->data.offset = synth->syseffEnable[value];
+                getData->data.spare0 = synth->syseffEnable[value];
                 synth->syseffEnable[synth->syseffnum] = 0; // off
             }
             else if (getData->data.part == TOPLEVEL::section::insertEffects)
             {
-                getData->data.offset = synth->Pinsparts[value];
+                getData->data.spare0 = synth->Pinsparts[value];
                 synth->Pinsparts[value] = -1; // effectively off
             }
             else if (getData->data.part <= TOPLEVEL::section::part64)
