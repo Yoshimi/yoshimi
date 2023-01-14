@@ -2530,7 +2530,7 @@ int CmdInterpreter::commandList(Parser& input)
 
     if (input.matchnMove(3, "section")) // section presets
     {
-        presetsControl(0, TOPLEVEL::type::Adjust, section,  kitNumber,  engine,  insertType, insertGroup, filterFormantNumber, filterVowelNumber);
+        presetsControl(0, TOPLEVEL::type::Adjust, section, kitNumber, engine, insertType, filterFormantNumber, filterVowelNumber);
         return REPLY::done_msg;
     }
 

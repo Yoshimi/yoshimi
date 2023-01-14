@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2022, Will Godfrey
+Copyright 2014-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -1497,7 +1497,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             {
                 insefftype->value(valInt);
                 part->partefx[engine]->geteffect();
-                inseffectui->UpdatePresetColour(parameter, insefftype->value());
+                inseffectui->UpdatePresetColour(0, insefftype->value());
+                // changing effect type always sets default values
                 inseffectui->refresh(part->partefx[engine], npart, engine);
                 fxRtext();
             }

@@ -1207,8 +1207,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
     int textCol = 14;
     if (fetchData(0, EFFECT::control::changed, getData->data.part, efftype, effnum) != 0)
-        textCol = FL_BLUE;
-    //cout << "colour " << textCol << endl;
+    textCol = FL_BLUE;
+    //std::cout << "colour " << textCol << std::endl;
     switch(efftype)
     {
         case EFFECT::type::none:

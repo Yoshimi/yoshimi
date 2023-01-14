@@ -96,14 +96,14 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
         return name;
     if (kitItem >= EFFECT::type:: none && kitItem < EFFECT::type::count)
     {
-        /*if (insert == TOPLEVEL::insert::filterGroup)
+        if (insert == TOPLEVEL::insert::filterGroup)
         {
             if (offset == UNUSED)
                 return "Pfilter";
             else
                 return "Pfiltern";
         }
-        else*/
+        else
             return "Peffect";
     }
 
@@ -768,7 +768,7 @@ bool UnifiedPresets::load(CommandBlock *getData)
     string dirname;
     string prefix;
 
-    //synth->CBtest(getData, false);
+    synth->CBtest(getData, false);
 
     if (name.empty())
     {
@@ -787,7 +787,8 @@ bool UnifiedPresets::load(CommandBlock *getData)
         dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
         prefix = dirname + "/" + name + ".";
     }
-
+cout << "type " << type << endl;
+cout << "file " << prefix << endl;
     string filename = prefix + type + EXTEN::presets;
 
     if (file::isRegularFile(prefix + type + EXTEN::presets) == 0)

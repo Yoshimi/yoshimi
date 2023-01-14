@@ -2924,7 +2924,8 @@ Alan Calvert started the project}
                 nsyseff = engine;
                 sysefftype->value(value_int);
                 syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
-                syseffectui->UpdatePresetColour(parameter, sysefftype->value());
+                syseffectui->UpdatePresetColour(0, sysefftype->value());
+                // changing effect type always sets default values
                 if (sysinsgroup->value() == SystemEffectsGrp)
                 {
                     showSysEfxUI();
@@ -2959,7 +2960,8 @@ Alan Calvert started the project}
             ninseff = engine;
             insefftype->value(value_int);
             setInsEff(ninseff);
-            inseffectui->UpdatePresetColour(parameter, insefftype->value());
+            inseffectui->UpdatePresetColour(0, insefftype->value());
+            // changing effect type always sets default values
             if (sysinsgroup->value() == InsertionEffectsGrp)
             {
                 showInsEfxUI();
