@@ -524,9 +524,9 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 resizable
+      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -3255,6 +3255,34 @@ Alan Calvert started the project}
             break;
     }
     return false;} {}
+  }
+  Function {paste(CommandBlock *getData)} {} {
+    code {//
+        synth->CBtest(getData);
+
+
+        if (getData->data.part == TOPLEVEL::section::systemEffects)
+        {
+            sysinsgroup->value(SystemEffectsGrp);
+            int type = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, 0);
+            sysefftype->value(type);
+            nsyseff = fetchData(0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, 0);
+            syseffnocounter->value(nsyseff + 1);
+            syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+            syseffectui->UpdatePresetColour(0, sysefftype->value());
+            showSysEfxUI();
+        }
+        else
+        {
+            sysinsgroup->value(InsertionEffectsGrp);
+            int type = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, 0);
+            insefftype->value(type);
+            ninseff = fetchData(0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects, UNUSED, 0);
+            inseffnocounter->value(ninseff + 1);
+            setInsEff(ninseff);
+            inseffectui->UpdatePresetColour(0, insefftype->value());
+            showInsEfxUI();
+        }} {}
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {

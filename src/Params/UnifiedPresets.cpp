@@ -23,7 +23,6 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
-#include "Misc/FormatFuncs.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Effects/EffectMgr.h"
 #include "Params/ADnoteParameters.h"

@@ -259,22 +259,20 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 //    synth->CBtest(getData);
     if (getData->data.control == TOPLEVEL::control::copyPaste)
     {
-        return; // temporarily disabling these
-
         if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
         {
-            std::cout << "copy/paste sys/ins" << std::endl;
-            return; // call into master here
+            synth->getGuiMaster()->paste(getData);
+            return;
         }
         else if (npart <= TOPLEVEL::section::part64)
         {
-            std::cout << "copy/paste part" << std::endl;
-            return; // call into part here
+            synth->getGuiMaster()->partui->paste(getData);
+            return;
         }
         else
         {
             std::cout << "no copy/paste valid" << std::endl;
-            return; // not valid
+            return;
         }
     }
 
