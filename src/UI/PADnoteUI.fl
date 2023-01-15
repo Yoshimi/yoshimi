@@ -269,7 +269,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {: {public PresetsUI_}
+class PADnoteUI {open : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be after panwidth} {in_source in_header
@@ -1495,6 +1495,20 @@ class PADnoteUI {: {public PresetsUI_}
             break;
 
     }} {}
+  }
+  Function {paste(CommandBlock *getData)} {} {
+    code {//
+        switch (getData->data.insert)
+        {
+            case TOPLEVEL::insert::resonanceGroup:
+            {
+                if (resui)
+                    resui->refresh();
+                break;
+            }
+        }
+        std::cout << "in paddsynth" << std::endl;
+        ;} {}
   }
   Function {applyButton(Fl_Color colour, const char *const text)} {} {
     code {//

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {ADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2021, Will Godfrey
+Copyright 2014-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -2549,6 +2549,20 @@ o->hide();}
             break;
 
     }} {}
+  }
+  Function {paste(CommandBlock *getData)} {} {
+    code {//
+        switch (getData->data.insert)
+        {
+            case TOPLEVEL::insert::resonanceGroup:
+            {
+                if (resui)
+                    resui->refresh();
+                break;
+            }
+        }
+        std::cout << "in addsynth" << std::endl;
+        ;} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//

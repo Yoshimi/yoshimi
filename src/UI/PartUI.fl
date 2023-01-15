@@ -1683,6 +1683,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         else if (engine == PART::engine::addSynth)
         {
+            if (getData->data.insert == TOPLEVEL::insert::resonanceGroup)
+            {
+                if (adnoteui)
+                    adnoteui->paste(getData);
+                return;
+            }
             std::cout << "add top level" << engine << std::endl;
             bool show = false;
             if (adnoteui != NULL)
@@ -1714,6 +1720,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         else if (engine == PART::engine::padSynth)
         {
+            if (getData->data.insert == TOPLEVEL::insert::resonanceGroup)
+            {
+                if (padnoteui)
+                    padnoteui->paste(getData);
+                return;
+            }
             std::cout << "pad top level" << std::endl;
             bool show = false;
             if (padnoteui != NULL)
