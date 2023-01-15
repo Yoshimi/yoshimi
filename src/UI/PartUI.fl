@@ -1670,7 +1670,11 @@ class PartUI {: {public Fl_Group, PartUI_}
         std::cout << "paste into part" << std::endl;
         if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count)
         {
-            std::cout << "effects" << std::endl;
+            std::cout << "effects top level" << std::endl;
+            bool show = partfx->visible();
+            effectsrefresh();
+            if (show)
+                partfx->show();
         }
         else if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
@@ -1680,39 +1684,48 @@ class PartUI {: {public Fl_Group, PartUI_}
         else if (engine == PART::engine::addSynth)
         {
             std::cout << "add top level" << engine << std::endl;
+            bool show = false;
             if (adnoteui != NULL)
             {
+                show = adnoteui->ADnoteGlobalParameters->visible();
                 delete adnoteui;
                 adnoteui = NULL;
             }
             adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, 0);
-            adnoteui ->ShowGlobal();
+            if (show)
+                adnoteui ->ShowGlobal();
         }
 
         else if (engine == PART::engine::subSynth)
         {
 
             std::cout << "sub top level" << std::endl;
+            bool show = false;
             if (subnoteui != NULL)
             {
+                show = subnoteui->SUBparameters->visible();
                 delete subnoteui;
                 subnoteui = NULL;
             }
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, 0);
-            subnoteui->Showsub();
+            if (show)
+                subnoteui->Showsub();
         }
 
         else if (engine == PART::engine::padSynth)
         {
             std::cout << "pad top level" << std::endl;
+            bool show = false;
             if (padnoteui != NULL)
             {
+                show = padnoteui->padnotewindow->visible();
                 delete padnoteui;
                 padnoteui = NULL;
             }
             if (part->kit[kititem].padpars)
             padnoteui = new PADnoteUI(part->kit[kititem].padpars);
-            padnoteui->Showpad();
+            if (show)
+                padnoteui->Showpad();
         }
 
         else
