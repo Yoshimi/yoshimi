@@ -259,6 +259,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 //    synth->CBtest(getData);
     if (getData->data.control == TOPLEVEL::control::copyPaste)
     {
+        if (getData->data.type == TOPLEVEL::type::Adjust)
+            return; // just looking
         if (npart == TOPLEVEL::section::systemEffects || npart == TOPLEVEL::section::insertEffects)
         {
             synth->getGuiMaster()->paste(getData);

@@ -1,0 +1,7 @@
+All six vowels are always available, and from the main filter window a preset stores all of them, their formants and the sequence information. However, only the number of vowels selected will be active. This complicated by the fact that the sequnce doesn't have to be of any specific vowels in any particular order.
+For example; if you have three vowels set then these could be 5, 1, 3 in that order, or even 4, 2, 4. Yes, the same vowel can be in two places.
+Another trap for the unwary is that you can still edit vowels that are not currently in use... and wonder why nothing seems to change. There is now a warning of this in the form of a dark red line that appears unther the vowel number if it's not in use.
+
+When actually in the formant window itself you only store the formants of the currently selected vowel as a preset. No other data at all.
+
+Eeven though you may only have 3-4 formants per vowel enabled and active, Yoshimi will store (and recover) all 12 possible formants per vowel.

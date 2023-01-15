@@ -1664,7 +1664,59 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {paste(CommandBlock *getData)} {} {
     code {//
-        std::cout << "paste into part" << std::endl;} {}
+        int kititem = getData->data.kit;
+        int engine = getData->data.engine;
+
+        std::cout << "paste into part" << std::endl;
+        if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count)
+        {
+            std::cout << "effects" << std::endl;
+        }
+        else if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
+        {
+            std::cout << "add voice" << engine << std::endl;
+        }
+
+        else if (engine == PART::engine::addSynth)
+        {
+            std::cout << "add top level" << engine << std::endl;
+            if (adnoteui != NULL)
+            {
+                delete adnoteui;
+                adnoteui = NULL;
+            }
+            adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, 0);
+            adnoteui ->ShowGlobal();
+        }
+
+        else if (engine == PART::engine::subSynth)
+        {
+
+            std::cout << "sub top level" << std::endl;
+            if (subnoteui != NULL)
+            {
+                delete subnoteui;
+                subnoteui = NULL;
+            }
+            subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, 0);
+            subnoteui->Showsub();
+        }
+
+        else if (engine == PART::engine::padSynth)
+        {
+            std::cout << "pad top level" << std::endl;
+            if (padnoteui != NULL)
+            {
+                delete padnoteui;
+                padnoteui = NULL;
+            }
+            if (part->kit[kititem].padpars)
+            padnoteui = new PADnoteUI(part->kit[kititem].padpars);
+            padnoteui->Showpad();
+        }
+
+        else
+            std::cout << "invalid" << std::endl;} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
