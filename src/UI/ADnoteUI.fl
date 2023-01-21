@@ -1144,7 +1144,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
               int x = int(o->value());
               send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, x, TOPLEVEL::type::Integer);}
             tooltip {Oscillator Type (sound/noise)} xywh {8 454 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 10
-            code0 {o->add("Sound");o->add("Whit Ns");o->add("Pink Ns");;o->add("Spot Ns");}
+            code0 {o->add("Sound");o->add("Whit Ns");o->add("Pink Ns");o->add("Spot Ns");}
             code1 {o->value(pars->VoicePar[nvoice].Type);}
             code2 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
             code3 {if (pars->VoicePar[nvoice].PVoice >= 0) o->deactivate();}
@@ -1600,6 +1600,20 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             update_osclabels();
             break;
     }} {}
+  }
+  Function {paste(CommandBlock *getData)} {} {
+    code {//
+       /* switch (getData->data.insert)
+        {
+            case TOPLEVEL::insert::resonanceGroup:
+            {
+                if (resui)
+                    resui->refresh();
+                break;
+            }
+        }*/
+        std::cout << "in addvoice" << std::endl;
+        ;} {}
   }
   Function {update_osclabels()} {} {
     code {//
@@ -2840,7 +2854,7 @@ o->hide();}
 
     float dScale = ADnoteVoiceList->w() / float(listDW);
     if (dScale < 0.2f)
-        dScale = 0.2f;;
+        dScale = 0.2f;
 
     for (int i = 0; i < NUM_VOICES; ++i)
     {

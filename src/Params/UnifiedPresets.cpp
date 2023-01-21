@@ -707,7 +707,7 @@ string UnifiedPresets::envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool i
             case 2:
                 name = "Penvfilter";
                 sectionType = synth->part[npart]->kit[kitItem].padpars->FilterEnvelope.get();
-            break;;
+            break;
         }
     }
     if (name.empty())

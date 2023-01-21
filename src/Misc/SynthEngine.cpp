@@ -1640,7 +1640,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             { // this is far from ideal !!!
                 string label = Runtime.testCCvalue(value);if (label != "")
                 {
-                    parameter = textMsgBuffer.push(label);;
+                    parameter = textMsgBuffer.push(label);
                     value = 128;
                 }
                 cmd = CONFIG::control::extendedProgramChangeCC;

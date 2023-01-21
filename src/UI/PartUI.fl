@@ -1437,7 +1437,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
         case PART::control::minNote:
         case PART::control::minToLastKey: // this will have been modified for last key press
-            partkititem[kititem]->minkcounter->value(valInt);;
+            partkititem[kititem]->minkcounter->value(valInt);
             break;
 
         case PART::control::maxNote:

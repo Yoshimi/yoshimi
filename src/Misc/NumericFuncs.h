@@ -210,7 +210,7 @@ inline void setRandomPan(float rand, float& left, float& right, unsigned char co
     float min = float (pan - range) / 126.0f;
     if (min < 0)
         min = 0;
-    float max = float (pan + range) / 126.0f;;
+    float max = float (pan + range) / 126.0f;
     if (max > 1)
         max = 1;
     float t = rand * (max-min) + min;

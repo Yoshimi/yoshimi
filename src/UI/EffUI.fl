@@ -1165,7 +1165,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     Fl_Window filterwindow {
       label {Filter Parameters for DynFilter Eff.}
       callback {//
-    filterclose->do_callback();} open
+    filterclose->do_callback();}
       xywh {1109 779 285 110} type Double hide resizable
       code0 {filtDW = o->w(); filtDH = o->h();}
       code1 {o->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);}

@@ -90,7 +90,7 @@ class VectorUI {} {
 switch (res)
 {
     case 0:
-        loadVector("");;
+        loadVector("");
         break;
     case 1:
     {
@@ -450,7 +450,7 @@ switch (res)
     switch (control)
     {
         case VECTOR::control::name:
-            msg = textMsgBuffer.fetch(miscmsg);;
+            msg = textMsgBuffer.fetch(miscmsg);
             loadlabel[parameter] = msg;
             Loaded->copy_label(msg.c_str());
             break;
@@ -764,7 +764,7 @@ switch (res)
     Yfeat1->labelsize(size12);
         Yfeat1->textsize(size12);
     Yfeat2->labelsize(size12);
-        Yfeat2->textsize(size12);;
+        Yfeat2->textsize(size12);
     Yfeat3->labelsize(size12);
         Yfeat3->textsize(size12);
     Yfeat4->labelsize(size12);

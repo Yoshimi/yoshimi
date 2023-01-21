@@ -334,7 +334,7 @@ class VirKeyboard {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {//
-      virtClose->do_callback();;}
+      virtClose->do_callback();}
       tooltip {+ Shift to hold or release keys} xywh {1085 88 650 130} type Double hide resizable
       code0 {virtDW = o->w(); virtDH = o->h();}
       code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);}

@@ -353,7 +353,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         }
     }
 
-    //_synth->getRuntime().Log("Buffer size " + to_string(nomBufSize));;
+    //_synth->getRuntime().Log("Buffer size " + to_string(nomBufSize));
     if (nomBufSize > 0)
         _bufferSize = nomBufSize;
     else if (_bufferSize == 0)

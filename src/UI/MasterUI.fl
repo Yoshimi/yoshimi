@@ -1243,12 +1243,8 @@ class MasterUI {: {private GuiUpdates}
           }
           Fl_Choice partKeymode {
             callback {//
-          if (o->value() > 1 && partui->drumMode->value() != 0)
-              modepatch->color(91);
-          else
-              modepatch->color(29);
-          modepatch->redraw();
-          send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer, npart);}
+                updateModepatch(o->value() > 1 && partui->drumMode->value() != 0);
+                send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer, npart);}
             tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
             code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
             code1 {int tmp = synth->ReadPartKeyMode(npart); if (tmp > 1) o->value(2); else o->value(tmp);}
@@ -1931,7 +1927,7 @@ Alan Calvert started the project}
         name += "/";
     if (!file::isDirectory(name))
     {
-        alert(synth, "Not a valid path");;
+        alert(synth, "Not a valid path");
         return;
     }
     fileroldpath->value(name.c_str());
@@ -2655,20 +2651,12 @@ Alan Calvert started the project}
 
             case PART::control::keyMode:
                 partKeymode->value(value_int);
-                if(value_int > 1 && partui->part->Pdrummode != 0)
-                    modepatch->color(91);
-                else
-                    modepatch->color(FL_BACKGROUND_COLOR);
-                modepatch->redraw();
+                updateModepatch(value_int > 1 && partui->part->Pdrummode != 0);
                 seen = true;
                 break;
 
             case PART::control::drumMode: // we allow this to cayry on to PartUI
-                if(value_bool != 0 && partKeymode->value() > 1)
-                    modepatch->color(91);
-                else
-                    modepatch->color(29);
-                modepatch->redraw();
+                updateModepatch(value_bool != 0 && partKeymode->value() > 1);
                 break;
 
             case PART::control::portamento:
@@ -2864,16 +2852,11 @@ Alan Calvert started the project}
                         case MIDI::CC::legato:
                         {
                             int mode = synth->ReadPartKeyMode(npart);
-                            modepatch->color(29);
                             if (mode > 1)
-                            {
                                 partKeymode->value(2);
-                                if (partui->drumMode->value() != 0)
-                                    modepatch->color(91);
-                            }
                             else
                                 partKeymode->value(mode);
-                            modepatch->redraw();
+                            updateModepatch(mode > 1 && partui->drumMode->value() != 0);
                             break;
                         }
                         case MIDI::CC::filterQ:
@@ -3653,6 +3636,14 @@ Alan Calvert started the project}
         panellistitem[num]->partname->copy_label(instrumentName.c_str());
     }} {}
   }
+  Function {updateModepatch(bool inactive)} {} {
+    code {//
+        if (inactive)
+            modepatch->color(91);
+        else
+            modepatch->color(FL_BACKGROUND_COLOR);
+        modepatch->redraw();} {}
+  }
   Function {updatepart()} {} {
     code {//
     if (checkmaxparts())
@@ -3702,11 +3693,7 @@ Alan Calvert started the project}
         partKeymode->value(PART_LEGATO);
     else
         partKeymode->value(tmp);
-    if (tmp > PART_MONO && synth->part[npart]->Pdrummode != 0)
-        modepatch->color(91);
-    else
-        modepatch->color(29);
-    modepatch->redraw();
+    updateModepatch(tmp > PART_MONO && synth->part[npart]->Pdrummode != 0);
 
     partui->checkEngines();} {}
   }

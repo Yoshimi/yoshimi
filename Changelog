@@ -1,6 +1,17 @@
 yoshimi 2.2.2.1
 
-2023-1-12
+2023-1-21
+bn 2168
+Formant filter unused vowel warning now same
+    style as legato mode warning.
+Added the following instruments
+    Wood Block
+    Finger Snap
+    Cello
+Various code cleaups
+Corrected date of previous build
+
+2023-1-15
 bn 2167
 Resolved issues with effects formant filter.
 

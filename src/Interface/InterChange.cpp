@@ -6577,7 +6577,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         }
         else
             val = pars->Pfreemode;
-        getData->data.value = pars->Pfreemode;;
+        getData->data.value = pars->Pfreemode;
         return;
     }
     else if (getData->data.control == ENVELOPEINSERT::control::edit)

@@ -406,7 +406,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
-      Fl_Group filterparamswindow {open
+      Fl_Group filterparamswindow {
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -578,11 +578,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             code0 {o->bounds(0,FF_MAX_FORMANTS-1);}
             code1 {o->value(nformant);}
           }
-          Fl_Box vowelpatch {
-            xywh {487 70 56 3} box FLAT_BOX
-          }
           Fl_Counter vowelnumber {
-            label {Vowel no.}
             callback {//
           nvowel = (int) o->value();
 
@@ -590,6 +586,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             xywh {545 55 40 20} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 11
             code0 {o->bounds(0,FF_MAX_VOWELS-1);}
             code1 {o->value(nvowel);}
+          }
+          Fl_Box vowelpatch {
+            label {Vowel no.}
+            xywh {487 56 56 18} box FLAT_BOX labelfont 1 labelsize 10
           }
           Fl_Group formantparsgroup {
             xywh {490 105 95 50} box ENGRAVED_FRAME
@@ -805,7 +805,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         if (vowelseen)
             vowelpatch->color(FL_BACKGROUND_COLOR);
         else
-             vowelpatch->color(FL_DARK_RED);
+             vowelpatch->color(91);
         vowelpatch->redraw();} {}
   }
   Function {refresh()} {} {
@@ -916,7 +916,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
     formantnumber->labelsize(size);
         formantnumber->textsize(size);
-    vowelnumber->labelsize(size);
+    vowelpatch->labelsize(size);
         vowelnumber->textsize(size11);
 
     formant_freq_dial->labelsize(size);
