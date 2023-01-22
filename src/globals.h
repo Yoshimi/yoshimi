@@ -56,7 +56,7 @@ typedef unsigned int  uint;
 // sizes
 #define COMMAND_SIZE 252
 #define MAX_HISTORY 25
-#define MAX_PRESETS 1000
+#define MAX_PRESETS 128
 #define MAX_PRESET_DIRS 128
 #define MAX_BANK_ROOT_DIRS 128
 #define MAX_BANKS_IN_ROOT 128
@@ -110,7 +110,7 @@ typedef unsigned int  uint;
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8
-#define POLYPHONY 60
+#define POLYPHONY 60 // per part!
 #define PART_DEFAULT_LIMIT 20
 #define NUM_SYS_EFX 4
 #define NUM_INS_EFX 8
@@ -198,7 +198,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
             fromCLI,
             fromGUI,
             // space for any other sources
-            noAction = 15, // internal use
+            noAction = 15, // internal use (also a mask for the above)
             // remaining used bit-wise
             forceUpdate = 32,
             loop = 64, // internal use
@@ -465,9 +465,11 @@ namespace MIDI // usage MIDI::control::noteOn
         soloType,
         soloCC,
 
-        pitchWheel = 640,
-        channelPressure,
-        keyPressure,
+        // the following are generated internally for MIDI-learn and
+        // are deliberately well outside the range on normal MIDI
+        pitchWheel = 640, // seen as 128
+        channelPressure,  // 129
+        keyPressure,      // 130
 
         programchange = 999,
 
