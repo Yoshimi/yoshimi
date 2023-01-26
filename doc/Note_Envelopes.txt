@@ -9,7 +9,7 @@ This sort of idea works best with 'Forced Release' disabled.
 
 An unexpected twist to this, is that taking the combined voice envelope time against the main (global) AddSynth envelope, although attack and decay times follow the above pattern, it is which ever (the voice group or the global value) has the *shortest* release that sets the AddSynth time as a whole. This can really catch you out!
 
-With regard to the 'modulator' amplitude envelopes. They don't change the overall time, but if they are shorter than their voice length (or any voice that the modulator is slaved to) the modulation may end a bit strangely. If they are longer, then part of their action will be missed. Also, when using the 'Morph' type, you *must* have an envelope set, as this is what conrtols the way the sound morphs between the voice oscillator and the modulator one.
+With regard to the 'modulator' amplitude envelopes. They don't change the overall time, but if they are shorter than their voice length (or any voice that the modulator is slaved to) the modulation may end a bit strangely. If they are longer, then part of their action will be missed. Also, when using the 'Morph' type, you *must* have an envelope set, as this is what controls the way the sound morphs between the voice oscillator and the modulator one.
 
 Finally, there is what I believe to be a bug that goes back to Zyn 2.2.1 - original zyn :)
 

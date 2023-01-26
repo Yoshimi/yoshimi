@@ -481,16 +481,26 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += "analog";
                 break;
             case 1:
+            {
                 filterSequenceSize = readControl(synth, 0, FILTERINSERT::control::sequenceSize, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
-                filterNumberOfFormants = readControl(synth, 0, FILTERINSERT::control::numberOfFormants, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup);
+                bool unusedVowel = true;
+                for (int i = 0; i < filterSequenceSize; ++i)
+                {
+                    if (filterVowelNumber == readControl(synth, 0, FILTERINSERT::control::vowelPositionInSequence, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup, i))
+                        unusedVowel = false;
+                }
+                filterNumberOfFormants = readControl(synth, 0, FILTERINSERT::control::numberOfFormants, npart, kitNumber, engine + voiceNumber, TOPLEVEL::insert::filterGroup, 0);
                 result += "formant V";
                 if (bitTest(context, LEVEL::Formant))
                 {
                     result += to_string(filterVowelNumber);
+                    if (unusedVowel)
+                        result += "?";
                     result += " F";
                     result += to_string(filterFormantNumber);
                 }
                 break;
+            }
             case 2:
                 result += "state var";
                 break;
@@ -2010,7 +2020,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                         return REPLY::value_msg;
                     value = string2int(input);
                     int number = string2int(input);
-                    if (number < 0 || number >= filterSequenceSize)
+                    if (number < 0 || number >= FF_MAX_VOWELS)
                         return REPLY::range_msg;
                     filterVowelNumber = number;
                     filterFormantNumber = 0;

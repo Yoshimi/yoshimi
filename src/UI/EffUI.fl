@@ -2176,6 +2176,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, filtDW, filtDH);
     filterwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    filtRtext();
     filterwindow->show();} {}
   }
   Function {filtRtext()} {} {
