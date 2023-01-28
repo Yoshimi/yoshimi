@@ -1918,6 +1918,170 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         value = -1; // leave it as if not set
     }
 
+    int baseType = readControl(synth, 0, FILTERINSERT::control::baseType, thisPart, kit, engine, TOPLEVEL::insert::filterGroup);
+
+    if (baseType == 1) // only formant filter controls
+    {
+        if (input.matchnMove(2, "edit"))
+        {
+            filterVowelNumber = 0;
+            filterFormantNumber = 0;
+            bitSet(context, LEVEL::Formant);
+            return REPLY::done_msg;
+        }
+        if (bitTest(context, LEVEL::Formant))
+        {
+            // now actually IN the formant editor
+            if (input.matchnMove(1, "invert"))
+            {
+                value = (input.toggle() == 1);
+                cmd = FILTERINSERT::control::negateInput;
+            }
+            else if (input.matchnMove(2, "center"))
+                cmd = FILTERINSERT::control::formantCenter;
+            else if (input.matchnMove(1, "range"))
+                cmd = FILTERINSERT::control::formantOctave;
+            else if (input.matchnMove(1, "expand"))
+                cmd = FILTERINSERT::control::formantStretch;
+            else if (input.matchnMove(1, "lucidity"))
+                cmd = FILTERINSERT::control::formantClearness;
+            else if (input.matchnMove(1, "morph"))
+                cmd = FILTERINSERT::control::formantSlowness;
+            else if (input.matchnMove(1, "size"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                if (filterVowelNumber >= value)
+                    return REPLY::range_msg;
+                cmd = FILTERINSERT::control::sequenceSize;
+            }
+            else if (input.matchnMove(2, "count"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                cmd = FILTERINSERT::control::numberOfFormants;
+            }
+            else if (input.matchnMove(1, "vowel"))
+            {
+                if (controlType == type_read)
+                    return REPLY::done_msg; // it's already showing!
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                int number = string2int(input);
+                if (number < 0 || number >= FF_MAX_VOWELS)
+                    return REPLY::range_msg;
+                filterVowelNumber = number;
+                filterFormantNumber = 0;
+                return REPLY::done_msg;
+            }
+            else if (input.matchnMove(1, "point"))
+            {
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                value = string2int(input);
+                if (input.lineEnd(controlType))
+                return REPLY::value_msg;
+                input.skipChars();
+                int position = string2int(input);
+                //cout << "val " << value << "  pos " << position << endl;
+                return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
+            }
+            else if (input.matchnMove(2, "formant"))
+            {
+                if (controlType == type_read)
+                    return REPLY::done_msg; // it's already showing!
+                if (input.lineEnd(controlType))
+                    return REPLY::value_msg;
+                int number = string2int(input);
+                if (number < 0 || number >= filterNumberOfFormants)
+                    return REPLY::range_msg;
+                filterFormantNumber = number;
+                return REPLY::done_msg;
+            }
+            else
+            {
+                if (input.matchnMove(2, "frequency"))
+                    cmd = FILTERINSERT::control::formantFrequency;
+                else if (input.matchnMove(1, "q"))
+                    cmd = FILTERINSERT::control::formantQ;
+                else if (input.matchnMove(1, "gain"))
+                    cmd = FILTERINSERT::control::formantAmplitude;
+                if (cmd == -1)
+                    return REPLY::range_msg;
+                value = string2int(input);
+                return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
+            }
+            if (value == -1)
+                value = string2int(input);
+            return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, 0);
+        }
+    }
+    else if (input.matchnMove(2, "type")) // formant doesn't have a 'type'
+    {
+        if (controlType == type_read && input.isAtEnd())
+            value = 0;
+        switch (baseType)
+        {
+            case 0: // analog
+            {
+                if (value == -1)
+                {
+                    int idx = 0;
+                    while (filterlist [idx] != "l1")
+                        idx += 2;
+                    int start = idx;
+                    while (filterlist [idx] != "hshelf")
+                        idx += 2;
+                    int end = idx;
+                    idx = start;
+                    while (idx <= end)
+                    {
+                        if (input.matchnMove(2, filterlist[idx].c_str()))
+                            break;
+                        idx += 2;
+                    }
+                        if (idx > end)
+                            return REPLY::range_msg;
+                        value = (idx - start) / 2;
+                    }
+                    cmd = FILTERINSERT::control::analogType;
+                    break;
+            }
+            case 2: // state variable
+            {
+                if (value == -1)
+                {
+                    int idx = 0;
+                    while (filterlist [idx] != "low")
+                        idx += 2;
+                    int start = idx;
+                    while (filterlist [idx] != "stop")
+                        idx += 2;
+                    int end = idx;
+                    idx = start;
+                    while (idx <= end)
+                    {
+                        if (input.matchnMove(2, filterlist[idx].c_str()))
+                            break;
+                        idx += 2;
+                    }
+                    if (idx > end)
+                        return REPLY::range_msg;
+                    value = (idx - start) / 2;
+                }
+                cmd = FILTERINSERT::control::stateVariableType;
+                break;
+            }
+            default:
+                return REPLY::available_msg;
+                break;
+        }
+    }
+
+    // the following are common to all categories
     if (input.matchnMove(2, "center"))
         cmd = FILTERINSERT::control::centerFrequency;
     else if (input.matchnMove(1, "q"))
@@ -1959,176 +2123,6 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
         value = string2int(input) - 1;
         cmd = FILTERINSERT::control::stages;
     }
-
-    if (cmd == -1)
-    {
-        int baseType = readControl(synth, 0, FILTERINSERT::control::baseType, thisPart, kit, engine, TOPLEVEL::insert::filterGroup);
-        //cout << "baseType " << baseType << endl;
-        if (baseType == 1) // formant
-        {
-            if (input.matchnMove(2, "edit"))
-            {
-                filterVowelNumber = 0;
-                filterFormantNumber = 0;
-                bitSet(context, LEVEL::Formant);
-                return REPLY::done_msg;
-            }
-            if (bitTest(context, LEVEL::Formant))
-            {
-                if (input.matchnMove(1, "invert"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    value = (input.toggle() == 1);
-                    cmd = FILTERINSERT::control::negateInput;
-                }
-                else if (input.matchnMove(2, "fcenter"))
-                    cmd = FILTERINSERT::control::formantCenter;
-                else if (input.matchnMove(2, "frange"))
-                    cmd = FILTERINSERT::control::formantOctave;
-                else if (input.matchnMove(1, "expand"))
-                    cmd = FILTERINSERT::control::formantStretch;
-                else if (input.matchnMove(1, "lucidity"))
-                    cmd = FILTERINSERT::control::formantClearness;
-                else if (input.matchnMove(1, "morph"))
-                    cmd = FILTERINSERT::control::formantSlowness;
-                else if (input.matchnMove(2, "size"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    value = string2int(input);
-                    if (filterVowelNumber >= value)
-                        return REPLY::range_msg;
-                    /*{
-                        filterVowelNumber = value -1; // bring back into range
-                        filterFormantNumber = 0; // zero as size unknown
-                    }*/
-                    cmd = FILTERINSERT::control::sequenceSize;
-                }
-                else if (input.matchnMove(2, "count"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    value = string2int(input);
-                    if (filterFormantNumber >= value)
-                        filterFormantNumber = value -1; // bring back into range
-                    cmd = FILTERINSERT::control::numberOfFormants;
-                }
-                else if (input.matchnMove(2, "vowel"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    value = string2int(input);
-                    int number = string2int(input);
-                    if (number < 0 || number >= FF_MAX_VOWELS)
-                        return REPLY::range_msg;
-                    filterVowelNumber = number;
-                    filterFormantNumber = 0;
-                    return REPLY::done_msg;
-                }
-                else if (input.matchnMove(1, "point"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    value = string2int(input);
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    input.skipChars();
-                    int position = string2int(input);
-                    //cout << "val " << value << "  pos " << position << endl;
-                    return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
-                }
-                else if (input.matchnMove(2, "formant"))
-                {
-                    if (input.lineEnd(controlType))
-                        return REPLY::value_msg;
-                    int number = string2int(input);
-                    if (number < 0 || number >= filterNumberOfFormants)
-                        return REPLY::range_msg;
-                    filterFormantNumber = number;
-                    return REPLY::done_msg;
-                }
-                else
-                {
-                    if (input.matchnMove(2, "ffrequency"))
-                        cmd = FILTERINSERT::control::formantFrequency;
-                    else if (input.matchnMove(2, "fq"))
-                        cmd = FILTERINSERT::control::formantQ;
-                    else if (input.matchnMove(2, "fgain"))
-                        cmd = FILTERINSERT::control::formantAmplitude;
-                    if (cmd == -1)
-                        return REPLY::range_msg;
-                    value = string2int(input);
-                    return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, filterFormantNumber, filterVowelNumber);
-                }
-            return sendNormal(synth, 0, value, controlType, cmd, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, 0);
-            }
-        }
-
-        if (input.matchnMove(2, "type"))
-        {
-            if (controlType == type_read && input.isAtEnd())
-                value = 0;
-            switch (baseType)
-            {
-                case 0: // analog
-                {
-                    if (value == -1)
-                    {
-                        int idx = 0;
-                        while (filterlist [idx] != "l1")
-                            idx += 2;
-                        int start = idx;
-                        while (filterlist [idx] != "hshelf")
-                            idx += 2;
-                        int end = idx;
-                        idx = start;
-                        while (idx <= end)
-                        {
-                            if (input.matchnMove(2, filterlist[idx].c_str()))
-                                break;
-                            idx += 2;
-                        }
-                        if (idx > end)
-                            return REPLY::range_msg;
-                        value = (idx - start) / 2;
-                    }
-                    cmd = FILTERINSERT::control::analogType;
-                    break;
-                }
-                case 2: // state variable
-                {
-                    if (value == -1)
-                    {
-                        int idx = 0;
-                        while (filterlist [idx] != "low")
-                            idx += 2;
-                        int start = idx;
-                        while (filterlist [idx] != "stop")
-                            idx += 2;
-                        int end = idx;
-                        idx = start;
-                        while (idx <= end)
-                        {
-                            if (input.matchnMove(2, filterlist[idx].c_str()))
-                                break;
-                            idx += 2;
-                        }
-                        if (idx > end)
-                            return REPLY::range_msg;
-                        value = (idx - start) / 2;
-                    }
-                    cmd = FILTERINSERT::control::stateVariableType;
-                    break;
-                }
-                default:
-                    return REPLY::available_msg;
-                    break;
-            }
-        }
-    }
-
-    //cout << ">> base cmd " << int(cmd) << "  part " << int(thisPart) << "  kit " << int(kit) << "  engine " << int(engine) << "  parameter " << int(param) << endl;
 
     if (value == -1)
         value = string2float(input);

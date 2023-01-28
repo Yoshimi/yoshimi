@@ -1130,7 +1130,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case FILTERINSERT::control::sequenceSize:
             seqsize->value(value_int);
             update_formant_window();
-
+            check_vowel();
             formantfiltergraph->redraw();
             break;
 

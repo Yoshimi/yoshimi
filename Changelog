@@ -1,5 +1,11 @@
 yoshimi 2.2.2.1
 
+2023-1-28
+bn 2170
+Revised and simpified CLI format filter commands.
+CLI now identifes editing and unused vowel.
+Fixed desktop metainfo error.
+
 2023-1-26
 bn 2169
 BugFix: LV2 needed UnifiedPresets.h but doesn't use it!

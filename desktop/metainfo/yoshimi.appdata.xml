@@ -7,7 +7,7 @@
   <content_rating type="oars-1.1" />
   <name>Yoshimi</name>
   <summary>A Software Synthesizer for Linux</summary>
-  <icon>https://a.fsdn.com/allura/p/yoshimi/icon?1652648963</icon>
+  <icon>https://a.fsdn.com/allura/p/yoshimi/icon</icon>
   <description>
     <p>
     Yoshimi is a MIDI software synthesizer for Linux. It synthesizes in real time, can run polyphonic and/or monophonic in multiple simultaneous patches in one or more MIDI channels and has broad microtonal capability. It includes extensive additive, subtractive, and PAD synth capabilities which can be run simultaneously within the same patch. It also has comprehensive effects capabilities.
