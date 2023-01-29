@@ -101,6 +101,7 @@ namespace LISTS {
     addmod,
     waveform,
     lfo,
+    formant,
     filter,
     envelope,
     reverb,
@@ -707,9 +708,12 @@ static std::string filterlist [] = {
     "band",     "band pass",
     "stop",     "band stop",
     " - formant -","",
-    "EDit ...",     "Enter formant editor context",
-    "","",
-    " - formant editor -",   "(shows V current vowel, F current formant)",
+    "EDit ...",     "enter editor context level",
+    "@end","@end"
+};
+
+static std::string formantlist [] = {
+    "","(shows V current vowel, and F current formant)",
     "Invert <s>",       "invert effect of LFOs, envelopes (ON, OFF)",
     "CEnter <n>",       "center frequency of sequence",
     "Range <n>",        "octave range of formants",

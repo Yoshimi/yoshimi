@@ -685,6 +685,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::waveform;
         else if (input.matchnMove(3, "lfo"))
             listnum = LISTS::lfo;
+        else if (input.matchnMove(3, "formant"))
+            listnum = LISTS::formant;
         else if (input.matchnMove(3, "filter"))
             listnum = LISTS::filter;
         else if (input.matchnMove(3, "envelope"))
@@ -750,6 +752,8 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::envelope;
         else if (bitTest(local, LEVEL::LFO))
             listnum = LISTS::lfo;
+        else if (bitTest(local, LEVEL::Formant))
+            listnum = LISTS::formant;
         else if (bitTest(local, LEVEL::Filter))
             listnum = LISTS::filter;
         else if (bitTest(local, LEVEL::Oscillator))
@@ -852,6 +856,10 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
         case LISTS::lfo:
             msg.push_back("Engine LFOs:");
             helpLoop(msg, LFOlist, 2);
+            break;
+        case LISTS::formant:
+            msg.push_back("Formant Filter:");
+            helpLoop(msg, formantlist, 2);
             break;
         case LISTS::filter:
             msg.push_back("Engine Filters:");

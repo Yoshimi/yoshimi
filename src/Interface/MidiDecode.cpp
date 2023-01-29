@@ -201,6 +201,7 @@ void MidiDecode::setMidiController(unsigned char ch, int ctrl, int param, bool i
     int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
     std::cout << "Delay " << std::to_string(actual) << "uS" << std::endl;
 */
+
     /*
     * This is done here instead of in 'setMidi' so MidiLearn
     * handles all 14 bit values the same.

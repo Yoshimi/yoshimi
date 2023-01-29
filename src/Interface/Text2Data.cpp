@@ -50,8 +50,6 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
     }
     encodeLoop(source, allData);
 
-    //cout << "Control " << int(allData.data.control) << "  Part " << int(allData.data.part) << "  Kit " << int(allData.data.kit) << "  Engine " << int(allData.data.engine) << "  Insert " << int(allData.data.insert) << "  Parameter " << int(allData.data.parameter) << "  Offset " << int(allData.data.offset) << endl;
-
     /*
      * If we later decide to be able to set and read values
      * this is where the code should go in order to catch
@@ -603,7 +601,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
         // now need to do actual control
         unsigned char result = UNUSED;
-        std::cout << "effpos " << effpos << std::endl;
+        //cout << "effpos " << effpos << endl;
         switch (effpos)
         {
             case EFFECT::type::reverb:

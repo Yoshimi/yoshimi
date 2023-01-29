@@ -4165,7 +4165,7 @@ bpmfallback->format(format);} {}
             if ((y + h) > Fl::h())
                 y = Fl::h() - h;
             masterwindow->resize(x, y, w, h);
-            std::cout << "Screen ratio " << ratio << std::endl;} {}
+            //std::cout << "Screen ratio " << ratio << std::endl;} {}
   }
   Function {wincheck()} {} {
     code {//
