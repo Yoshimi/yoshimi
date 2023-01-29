@@ -1,5 +1,12 @@
 yoshimi 2.2.2.1
 
+2023-1-29
+bn 2171
+Further cleanups on CLI
+EQ Band numbers now start from 1.
+Halted further improvements to deal with serious fault with
+MIDI-learn and all effects.
+
 2023-1-28
 bn 2170
 Revised and simpified CLI format filter commands.

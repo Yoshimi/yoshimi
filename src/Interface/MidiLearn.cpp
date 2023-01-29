@@ -21,7 +21,7 @@
 */
 
 #define NEWML YES
-//#define NEWML_REPORT YES
+#define NEWML_REPORT YES
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
@@ -1055,13 +1055,13 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                     cout << " changed offset Old " << int(entry.frame.data.offset) << " > " << int(allData.data.offset);
                 cout << endl;
 #endif // NEWML_REPORT
-                entry.frame.data.control = allData.data.control;
+                /*entry.frame.data.control = allData.data.control;
                 entry.frame.data.part = allData.data.part;
                 entry.frame.data.kit = allData.data.kit;
                 entry.frame.data.engine = allData.data.engine;
                 entry.frame.data.insert = allData.data.insert;
                 entry.frame.data.parameter = allData.data.parameter;
-                entry.frame.data.offset = allData.data.offset;
+                entry.frame.data.offset = allData.data.offset;*/
 #endif // NEWML
                 xml->exitbranch();
             xml->exitbranch();

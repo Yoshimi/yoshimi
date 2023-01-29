@@ -1391,7 +1391,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     if (controlType == TOPLEVEL::type::Write)
                     {
                         input.skipChars();
-                        value = string2int(input);
+                        value = string2int(input) - 1;
                         if (value < 0 || value >= MAX_EQ_BANDS)
                             return REPLY::range_msg;
                         nFXeqBand = value;

@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2022, Will Godfrey & others
+Copyright 2016-2023, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -973,7 +973,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {878 791 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {753 685 380 100} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display eqname {
@@ -991,9 +991,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Counter bandcounter {
         label Band
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, 1, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-        tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 textsize 11
-        code0 {o->bounds(0,MAX_EQ_BANDS-1);}
+        send_data(TOPLEVEL::action::forceUpdate, 1, o->value() - 1, (EFFECT::type::eq), TOPLEVEL::type::Integer);}
+        tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 value 1 textsize 11
+        code0 {o->bounds(1,MAX_EQ_BANDS);}
       }
       Fl_Group bandgroup {
         xywh {241 40 134 50} box ENGRAVED_FRAME
@@ -1026,8 +1026,12 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           label Stages
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-          tooltip {Additional filter stages} xywh {337 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
-          code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
+          tooltip {Additional filter stages} xywh {337 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11
+          code0 {o->bounds(0,MAX_FILTER_STAGES - 1);}
+        }
+        Fl_Text_Display extra {
+          label Extra
+          xywh {334 60 35 0} labelsize 11 textsize 9
         }
       }
       Fl_Choice typechoice {
@@ -1563,6 +1567,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             else if (control == EFFECT::control::panning) // band numnber here!
             {
                 eqband = value_int;
+                bandcounter->value(eqband + 1);
                 EQbandUpdate();
             }
             else
@@ -1893,7 +1898,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             eqband = 0;
             int type = eff->geteffectpar(10);
             eqp0->value(eff->geteffectpar(0));
-            bandcounter->value(eqband);
+            bandcounter->value(eqband + 1);
             typechoice->value(type);
             freqdial->value(eff->geteffectpar(11));
             gaindial->value(eff->geteffectpar(12));
@@ -1902,7 +1907,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                 qdial->deactivate();
             if (type < 6)
                 gaindial->deactivate();
-            stagescounter->value(eff->geteffectpar(14));
+            stagescounter->value(eff->geteffectpar(14) + 1);
             eqgraph->init(eff);
             eqgraph->damage(1);
             eqgraph->redraw();
@@ -2131,6 +2136,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                 qdial->labelsize(size11);
                 stagescounter->labelsize(size);
                     stagescounter->textsize(size11);
+                    extra->labelsize(size);
 
                 typechoice->labelsize(size11);
                     typechoice->textsize(size9);
@@ -2193,7 +2199,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {EQbandUpdate()} {} {
     code {//
-    int npb = eqband * 5 + 10;
+    int npb = (eqband) * 5 + 10;
 
     int type = eff->geteffectpar(npb);
     typechoice->value(type);

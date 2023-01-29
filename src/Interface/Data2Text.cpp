@@ -1,7 +1,7 @@
 /*
     Data2Text.cpp - conversion of commandBlock entries to text
 
-    Copyright 2021 - 2022 Will Godfrey
+    Copyright 2021 - 2023 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -3535,10 +3535,15 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         case EFFECT::type::eq:
         {
             effname = " EQ ";
-            if (control > 1)
+            if (control == 1)
             {
-                if (offset)
-                    effname += "(Band " + to_string(int(parameter)) + ") ";
+                contstr = " " + to_string(int(value) + 1);
+                showValue = false;
+            }
+            else if (control > 1)
+            {
+                if (offset > 0)
+                    effname += "(Band " + to_string(int(parameter) + 1) + ") ";
                 if (ref > 10)
                     ref -= 7;
                 else    // there is no 3 to 9 in the list names
