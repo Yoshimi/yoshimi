@@ -20,8 +20,13 @@
 
 */
 
-#define NEWML YES
-#define NEWML_REPORT YES
+const int fromString = 1;
+/*
+ * 0 = use numbers
+ * 1 = use string
+ * 2 = use numbers report diff
+ * 3 = use string report diff
+ */
 
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
@@ -1031,38 +1036,70 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.frame.data.insert = xml->getpar255("Insert", 0);
                 entry.frame.data.parameter = xml->getpar255("Parameter", 0);
                 entry.frame.data.offset = xml->getpar255("Secondary_Parameter", 0);
-#ifdef NEWML
+
                 CommandBlock allData;
+if (fromString)
+{
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
-#ifdef NEWML_REPORT
+}
+if (fromString & 2)
+{
+                bool ok = true;
                 if (ID == 0)
                     cout << endl;
                 cout << "line " << (ID + 1);
                 if (allData.data.control != entry.frame.data.control)
+                {
+                    ok = false;
                     cout << " changed control Old " << int(entry.frame.data.control) << " > New " << int(allData.data.control);
+                }
                 if (allData.data.part != entry.frame.data.part)
+                {
+                    ok = false;
                     cout << " changed part Old " << int(entry.frame.data.part) << " > New " << int(allData.data.part);
+                }
                 if (allData.data.kit != entry.frame.data.kit)
+                {
+                    ok = false;
                     cout << " changed kit Old " << int(entry.frame.data.kit) << " > New " << int(allData.data.kit);
+                }
                 if (allData.data.engine != entry.frame.data.engine)
+                {
+                    ok = false;
                     cout << " changed engine Old " << int(entry.frame.data.engine) << " > New " << int(allData.data.engine);
+                }
                 if (allData.data.insert != entry.frame.data.insert)
+                {
+                    ok = false;
                     cout << " changed insert Old " << int(entry.frame.data.insert) << " > New " << int(allData.data.insert);
+                }
                 if (allData.data.parameter != entry.frame.data.parameter)
+                {
+                    ok = false;
                     cout << " changed parameter Old " << int(entry.frame.data.parameter) << " > New " << int(allData.data.parameter);
+                }
                 if (allData.data.offset != entry.frame.data.offset)
+                {
+                    ok = false;
                     cout << " changed offset Old " << int(entry.frame.data.offset) << " > " << int(allData.data.offset);
+                }
+                if (ok)
+                {
+                    cout << " OK";
+                }
                 cout << endl;
-#endif // NEWML_REPORT
-                /*entry.frame.data.control = allData.data.control;
+}
+if (fromString == 3)
+{
+                entry.frame.data.control = allData.data.control;
                 entry.frame.data.part = allData.data.part;
                 entry.frame.data.kit = allData.data.kit;
                 entry.frame.data.engine = allData.data.engine;
                 entry.frame.data.insert = allData.data.insert;
                 entry.frame.data.parameter = allData.data.parameter;
-                entry.frame.data.offset = allData.data.offset;*/
-#endif // NEWML
+                entry.frame.data.offset = allData.data.offset;
+}
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;

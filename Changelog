@@ -1,5 +1,9 @@
 yoshimi 2.2.2.1
 
+2023-1-31 Will
+bn 2172
+BugFix: MIDI-learn saving but not recognising saved effects controls.
+
 2023-1-29
 bn 2171
 Further cleanups on CLI
