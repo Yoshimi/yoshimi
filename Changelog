@@ -1,5 +1,13 @@
 yoshimi 2.2.2.1
 
+2023-1-1 Will
+bn 2173
+BugFix: MIDI-learn and CLI mixing up EQ filter bands.
+In CLI Changed EQ Band control name to Number to avoid
+    confusion with Bank controls.
+BugFix MIDI-learn changing the GUI of whichever part is visible
+    while correctly changing the actual parameters.
+
 2023-1-31 Will
 bn 2172
 BugFix: MIDI-learn saving but not recognising saved effects controls.

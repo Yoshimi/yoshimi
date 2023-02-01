@@ -655,7 +655,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
                     {
                         unsigned char tmp;
                         if (findCharNum(source, tmp))
-                        allData.data.parameter = tmp;
+                            allData.data.parameter = tmp;
                     }
                 }
 

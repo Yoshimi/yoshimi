@@ -1612,6 +1612,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 break;
             }
         }*/
+       getData->data.spare1 = getData->data.spare0; // suppress "unused" warning
         std::cout << "in addvoice" << std::endl;
         ;} {}
   }

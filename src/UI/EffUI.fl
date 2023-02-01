@@ -995,8 +995,15 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 value 1 textsize 11
         code0 {o->bounds(1,MAX_EQ_BANDS);}
       }
+      Fl_Choice typechoice {
+        label Type
+        callback {//
+        send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
+        tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textfont 1 textsize 9
+        code0 {o->add("Off");o->add("Lp1");o->add("Hp1");o->add("Lp2");o->add("Hp2");o->add("Bp2");o->add("N2");o->add("Pk");o->add("LSh");o->add("HSh");}
+      } {}
       Fl_Group bandgroup {
-        xywh {241 40 134 50} box ENGRAVED_FRAME
+        xywh {241 40 134 50} box ENGRAVED_FRAME deactivate
       } {
         Fl_Dial freqdial {
           label Freq
@@ -1034,13 +1041,6 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
           xywh {334 60 35 0} labelsize 11 textsize 9
         }
       }
-      Fl_Choice typechoice {
-        label Type
-        callback {//
-        send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-        tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textfont 1 textsize 9
-        code0 {o->add("Off");o->add("Lp1");o->add("Hp1");o->add("Lp2");o->add("Hp2");o->add("Bp2");o->add("N2");o->add("Pk");o->add("LSh");o->add("HSh");}
-      } {}
       Fl_Box eqgraph {
         xywh {45 10 190 75} box BORDER_BOX color 178
         class EQGraph
@@ -1192,7 +1192,12 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   Function {send_data(int action, int control, float value, int group, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, type, control, npart, group, neff);} {}
+    int parameter = UNUSED;
+    if (group == EFFECT::type::eq)
+    {
+        parameter = bandcounter->value() - 1;
+    }
+    collect_data(synth, value, action, type, control, npart, group, neff, UNUSED, parameter);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
@@ -1207,6 +1212,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     unsigned char efftype = getData->data.kit;
     unsigned char effnum = getData->data.engine;
     bool isdynfilter = (effnum == (EFFECT::type::dynFilter));
+    unsigned char eqband =  getData->data.parameter;
     unsigned char secondary = getData->data.offset;
 
     int textCol = 14;
@@ -1564,13 +1570,13 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             {
                 eqp0->value(value);
             }
-            else if (control == EFFECT::control::panning) // band numnber here!
+            else if (control == EFFECT::control::panning) // band number here!
             {
                 eqband = value_int;
                 bandcounter->value(eqband + 1);
-                EQbandUpdate();
+                EQbandUpdate(eqband);
             }
-            else
+            else if (bandcounter->value() == eqband + 1)
             {
                 switch (control)
                 {
@@ -1897,6 +1903,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         {
             eqband = 0;
             int type = eff->geteffectpar(10);
+            if (type > 0)
+                bandgroup->activate();
+            else
+                bandgroup->activate();
             eqp0->value(eff->geteffectpar(0));
             bandcounter->value(eqband + 1);
             typechoice->value(type);
@@ -2197,10 +2207,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
     filterwindow->redraw();} {}
   }
-  Function {EQbandUpdate()} {} {
+  Function {EQbandUpdate(int eqband)} {} {
     code {//
     int npb = (eqband) * 5 + 10;
-
     int type = eff->geteffectpar(npb);
     typechoice->value(type);
 

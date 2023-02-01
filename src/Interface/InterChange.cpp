@@ -7061,17 +7061,26 @@ void InterChange::commandEffects(CommandBlock *getData)
         if (effSend == EFFECT::type::eq)
         /*
          * specific to EQ
-         * Control 1 is not a saved parameter, but a band index.
+         * Control 1 is not a normal parameter, but a band index.
          * Also, EQ does not have presets, and 16 is the control
          * for the band 1 frequency parameter
         */
         {
+            unsigned char band = getData->data.parameter;
             if (control <= 1)
                 eff->seteffectpar(control, value_int);
             else
             {
-                eff->seteffectpar(control + (eff->geteffectpar(1) * 5), value_int);
-                getData->data.parameter = eff->geteffectpar(1);
+                if (band != UNUSED)
+                {
+                   eff->seteffectpar(1, band); // should always be the case
+                }
+                else
+                {
+                    band = eff->geteffectpar(1);
+                    getData->data.parameter = band;
+                }
+                eff->seteffectpar(control + (band * 5), value_int);
             }
         }
         else

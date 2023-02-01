@@ -314,6 +314,12 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    bool allowPartUpdate = false;
+    int GUIpart = synth->getGuiMaster()->npartcounter->value() -1;
+    if (GUIpart == npart)
+    {
+        allowPartUpdate = true;
+    }
     if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count) // effects
     {
         if (npart == TOPLEVEL::section::systemEffects)
@@ -334,7 +340,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
             else
                 synth->getGuiMaster()->inseffectui->returns_update(getData);
         }
-        else if (npart < NUM_MIDI_PARTS)
+        else if (npart < NUM_MIDI_PARTS && allowPartUpdate)
         {
             if (engine != synth->getGuiMaster()->partui->ninseff)
                 return;
@@ -366,13 +372,13 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     /*
      * we are managing some part-related controls from here
     */
-    if (npart < NUM_MIDI_PARTS && (kititem & engine & insert) == UNUSED)
+    if (npart < NUM_MIDI_PARTS && (kititem & engine & insert) == UNUSED && allowPartUpdate)
     {
         if (synth->getGuiMaster()->part_group_returns(getData))
             return;
     }
 
-    if (npart >= NUM_MIDI_PARTS)
+    if (npart >= NUM_MIDI_PARTS || !allowPartUpdate)
         return; // invalid part number
 
     if (kititem >= NUM_KIT_ITEMS && kititem != UNUSED)
