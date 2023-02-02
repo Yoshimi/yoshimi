@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -380,7 +380,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -548,35 +548,36 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       }
     }
   }
-  Function {make_formant_window()} {} {
+  Function {make_formant_window()} {open
+  } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      callback {formClose->do_callback();}
-      xywh {176 99 700 205} type Double labelfont 1 labelsize 12 hide resizable
+      callback {formClose->do_callback();} open
+      xywh {176 99 700 205} type Double labelfont 1 labelsize 12 resizable
       code0 {formantDW = o->w(); formantDH = o->h();}
-      code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
+      code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);} visible
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {1 1 698 203} box ENGRAVED_FRAME
       } {
-        Fl_Group {} {
+        Fl_Group {} {open
           xywh {485 47 105 113} box THIN_UP_FRAME
         } {
           Fl_Counter formantnumber {
             label {Formant }
             callback {//
-          nformant = (int) o->value();
-          if (nformant >= nFoCount -1)
+          nformant = int(o->value()) - 1;
+          if (nformant >= nFoCount)
           {
-              nformant =  nFoCount -1;
-              o->value(nformant);
+              nformant =  nFoCount - 1;
+              o->value(nformant + 1);
           }
           update_formant_window();
           formantfiltergraph->redraw();
-          //send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantNumber, o->value(), TOPLEVEL::type::Write);}
-            xywh {545 80 40 15} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textsize 10
-            code0 {o->bounds(0,FF_MAX_FORMANTS-1);}
-            code1 {o->value(nformant);}
+          //send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantNumber, o->value(), TOPLEVEL::type::Write);} selected
+            xywh {545 80 40 15} type Simple labelfont 1 labelsize 10 align 4 minimum 1 maximum 127 step 1 value 1 textsize 10
+            code0 {o->bounds(1,FF_MAX_FORMANTS);}
+            code1 {o->value(nformant + 1);}
           }
           Fl_Counter vowelnumber {
             callback {//
@@ -955,7 +956,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     code {//
         return collect_readData(synth, value, control, part, kititem, engine, insert, parameter, offset, miscmsg, request);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     unsigned char control = getData->data.control;

@@ -497,7 +497,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                     if (unusedVowel)
                         result += "?";
                     result += " F";
-                    result += to_string(filterFormantNumber);
+                    result += to_string(filterFormantNumber + 1);
                 }
                 break;
             }
@@ -2003,7 +2003,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                     return REPLY::done_msg; // it's already showing!
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
-                int number = string2int(input);
+                int number = string2int(input) - 1;
                 if (number < 0 || number >= filterNumberOfFormants)
                     return REPLY::range_msg;
                 filterFormantNumber = number;

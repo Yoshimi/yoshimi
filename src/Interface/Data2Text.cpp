@@ -3099,7 +3099,7 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
     }
     string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
-        extra = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant) + " ";
+        extra = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant + 1) + " ";
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
     contstr = extra + contstr;
