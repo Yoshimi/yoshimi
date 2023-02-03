@@ -493,7 +493,7 @@ string CmdInterpreter::buildPartStatus(bool showPartDetails)
                 result += "formant V";
                 if (bitTest(context, LEVEL::Formant))
                 {
-                    result += to_string(filterVowelNumber);
+                    result += to_string(filterVowelNumber + 1);
                     if (unusedVowel)
                         result += "?";
                     result += " F";
@@ -1960,7 +1960,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(input);
-                if (filterVowelNumber >= value)
+                if (controlType == TOPLEVEL::type::Write && filterVowelNumber >= value)
                     return REPLY::range_msg;
                 cmd = FILTERINSERT::control::sequenceSize;
             }
@@ -1978,7 +1978,7 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 if (input.lineEnd(controlType))
                     return REPLY::value_msg;
                 value = string2int(input);
-                int number = string2int(input);
+                int number = string2int(input) -1;
                 if (number < 0 || number >= FF_MAX_VOWELS)
                     return REPLY::range_msg;
                 filterVowelNumber = number;
@@ -1987,15 +1987,14 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
             }
             else if (input.matchnMove(1, "point"))
             {
-                if (input.lineEnd(controlType))
+                if (input.lineEnd(TOPLEVEL::type::Write)) // always must have a value here
                     return REPLY::value_msg;
-                value = string2int(input);
+                value = string2int(input) - 1;
                 if (input.lineEnd(controlType))
                 return REPLY::value_msg;
                 input.skipChars();
-                int position = string2int(input);
-                //cout << "val " << value << "  pos " << position << endl;
-                return sendNormal(synth, 0, value, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, position);
+                int position = string2int(input) - 1;
+                return sendNormal(synth, 0, position, controlType, FILTERINSERT::control::vowelPositionInSequence, thisPart, kit, engine, TOPLEVEL::insert::filterGroup, value);
             }
             else if (input.matchnMove(2, "formant"))
             {

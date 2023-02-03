@@ -3097,12 +3097,27 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
             contstr = "Unrecognised";
             break;
     }
-    string extra = "";
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
-        extra = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant + 1) + " ";
+    {
+        contstr = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant + 1) + " "+ contstr;
+    }
+    else if (control == FILTERINSERT::control::sequencePosition)
+    {
+        if (addValue)
+        {
+            contstr += " Value " + to_string(value_int + 1);
+        }
+        showValue = false;
+    }
     else if (control == FILTERINSERT::control::vowelPositionInSequence)
-        extra = "Seq Pos " + to_string(nseqpos) + " ";
-    contstr = extra + contstr;
+    {
+        contstr = "Seq Pos " + to_string(nseqpos + 1) + " " + contstr;
+        if (addValue)
+        {
+            contstr += " Value " + to_string(value_int + 1);
+        }
+        showValue = false;
+    }
     return contstr;
 }
 

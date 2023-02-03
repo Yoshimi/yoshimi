@@ -723,7 +723,7 @@ static std::string formantlist [] = {
     "Size <n>",         "number of vowels in sequence",
     "COunt <n>",        "number of formants in vowels",
     "Vowel <n>",        "vowel being processed",
-    "Point <n1> <n2>",  "vowel n1 at sequence position n2",
+    "Point <n1> <n2>",  "sequence position n1 vowel n2 value",
     "FOrmant <n>",      "formant being processed",
     " - per formant -","",
     "  FRequency <n>", "center frequency of formant",
