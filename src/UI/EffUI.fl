@@ -1917,7 +1917,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                 qdial->deactivate();
             if (type < 6)
                 gaindial->deactivate();
-            stagescounter->value(eff->geteffectpar(14) + 1);
+            stagescounter->value(eff->geteffectpar(14));
             eqgraph->init(eff);
             eqgraph->damage(1);
             eqgraph->redraw();
