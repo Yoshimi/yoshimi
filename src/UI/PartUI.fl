@@ -1667,16 +1667,18 @@ class PartUI {selected : {public Fl_Group, PartUI_}
         int kititem = getData->data.kit;
         int engine = getData->data.engine;
 
-        std::cout << "paste into part" << std::endl;
         if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count)
         {
-            std::cout << "effects top level" << std::endl;
-            bool show = partfx->visible();
+            bool show = partfx->visible() && engine == ninseff;
             effectsrefresh();
             if (show)
                 partfx->show();
+            return;
         }
-        else if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
+        if (kititem != lastkititem)
+            return; // only update engines if current kititem
+
+        if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
             std::cout << "add voice" << engine << std::endl;
         }
