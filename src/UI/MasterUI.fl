@@ -3241,8 +3241,7 @@ Alan Calvert started the project}
   }
   Function {paste(CommandBlock *getData)} {} {
     code {//
-        synth->CBtest(getData);
-
+//        synth->CBtest(getData);
 
         if (getData->data.part == TOPLEVEL::section::systemEffects)
         {

@@ -49,10 +49,9 @@ add_definitions(-Wfatal-errors) # stop on first
 add_definitions(-Werror=format-security)
 add_definitions(-Wextra)
 add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
-add_definitions(-Wno-deprecated)
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.2.2.1")
+set (YOSHIMI_VERSION "2.2.3 rc1")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=0)

@@ -1,11 +1,18 @@
-yoshimi 2.2.2.1
+yoshimi 2.2.3 rc1
 
-2023-1-3 Will
+2023-2-8 Will
+bn 2175
+Small code cleanups.
+Commented out various code 'cout' lines.
+User Guide updates.
+Set version as 2.2.3 rc1
+
+2023-2-3 Will
 bn 2174
 Formant filter counters now start at 1 (not zero)
 Improved CLI access the formant filter.
 
-2023-1-1 Will
+2023-2-1 Will
 bn 2173
 BugFix: MIDI-learn and CLI mixing up EQ filter bands.
 In CLI Changed EQ Band control name to Number to avoid

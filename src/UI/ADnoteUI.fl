@@ -1613,7 +1613,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             }
         }*/
        getData->data.spare1 = getData->data.spare0; // suppress "unused" warning
-        std::cout << "in addvoice" << std::endl;
+        //std::cout << "in addvoice" << std::endl;
         ;} {}
   }
   Function {update_osclabels()} {} {
@@ -2576,7 +2576,7 @@ o->hide();}
                 break;
             }
         }
-        std::cout << "in addsynth" << std::endl;
+        //std::cout << "in addsynth" << std::endl;
         ;} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {

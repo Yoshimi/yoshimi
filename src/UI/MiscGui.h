@@ -284,7 +284,7 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         if (y < 30)
             y = 30;
     }
-//    std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
+    //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
 
 #endif

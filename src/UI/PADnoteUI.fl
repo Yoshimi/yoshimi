@@ -1507,7 +1507,7 @@ class PADnoteUI {open : {public PresetsUI_}
                 break;
             }
         }
-        std::cout << "in paddsynth" << std::endl;
+        //std::cout << "in paddsynth" << std::endl;
         ;} {}
   }
   Function {applyButton(Fl_Color colour, const char *const text)} {} {

@@ -7031,7 +7031,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (control != PART::control::effectType && effSend != (eff->geteffect() + EFFECT::type::none)) // geteffect not yet converted
     {
-        if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI)
+        if ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromMIDI && control != TOPLEVEL::control::copyPaste)
             synth->getRuntime().Log("Not Available"); // TODO sort this better for CLI as well as MIDI
         getData->data.source = TOPLEVEL::action::noAction;
         return;

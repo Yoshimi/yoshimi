@@ -1680,7 +1680,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
 
         if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
-            std::cout << "add voice" << engine << std::endl;
+            ;// std::cout << "add voice" << engine - PART::engine::addVoice1 << std::endl;
         }
 
         else if (engine == PART::engine::addSynth)
@@ -1691,7 +1691,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                     adnoteui->paste(getData);
                 return;
             }
-            std::cout << "add top level" << engine << std::endl;
+            //std::cout << "add top level" << engine << std::endl;
             bool show = false;
             if (adnoteui != NULL)
             {
@@ -1707,7 +1707,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
         else if (engine == PART::engine::subSynth)
         {
 
-            std::cout << "sub top level" << std::endl;
+            //std::cout << "sub top level" << std::endl;
             bool show = false;
             if (subnoteui != NULL)
             {
@@ -1728,7 +1728,7 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                     padnoteui->paste(getData);
                 return;
             }
-            std::cout << "pad top level" << std::endl;
+            //std::cout << "pad top level" << std::endl;
             bool show = false;
             if (padnoteui != NULL)
             {
@@ -1742,8 +1742,8 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                 padnoteui->Showpad();
         }
 
-        else
-            std::cout << "invalid" << std::endl;} {}
+        //else
+            //std::cout << "invalid" << std::endl;} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
