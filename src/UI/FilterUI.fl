@@ -618,7 +618,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           }
         }
         Fl_Group {} {
-          xywh {590 47 102 113} box THIN_UP_BOX
+          xywh {590 47 104 113} box THIN_UP_BOX
         } {
           Fl_Counter seqsize {
             label {Seq.Size}
@@ -632,7 +632,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequenceSize, nseqsize, TOPLEVEL::type::Write);}
-            xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11
+            xywh {614 62 54 18} type Simple labelfont 1 labelsize 10 align 5 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11
             code0 {o->bounds(1,FF_MAX_SEQUENCE);}
             code1 {o->value(nseqsize);}
           }
@@ -647,7 +647,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           }
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequencePosition, nseqpos, TOPLEVEL::type::Write);}
-            tooltip {Current position in the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 1 maximum 127 step 1 value 1 textsize 10
+            tooltip {Current position in the sequence} xywh {596 98 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 1 maximum 127 step 1 value 1 textsize 10
             code0 {o->bounds(1,FF_MAX_SEQUENCE);}
             code1 {o->value(nseqpos + 1);}
           }
@@ -657,22 +657,22 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           nVoCount = o->value() - 1;
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelPositionInSequence, nVoCount, TOPLEVEL::type::Write, nseqpos);}
-            tooltip {Vowel number at the sequence position} xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 1 maximum 127 step 1 value 1 textsize 10
+            tooltip {Vowel number at the sequence position} xywh {648 98 40 15} type Simple labelsize 10 align 1 minimum 1 maximum 127 step 1 value 1 textsize 10
             code0 {o->bounds(1,FF_MAX_VOWELS);}
           }
           Fl_Check_Button neginput {
             label {Neg.Input}
             callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::negateInput, o->value(), TOPLEVEL::type::Write);}
-            tooltip {Negate the input from LFO/envelopes/etc.} xywh {625 132 60 20} down_box DOWN_BOX labelsize 10
+            tooltip {Negate the input from LFO/envelopes/etc.} xywh {628 132 60 20} down_box DOWN_BOX labelsize 10
             code0 {o->value(pars->Psequencereversed);}
             class Fl_Check_Button2
           }
           Fl_Dial strchdial {
-            label Strch
+            label Stretch
             callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantStretch, o->value(), TOPLEVEL::type::Write);}
-            tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+            tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 5 maximum 127 step 1
             code0 {o->value(pars->Psequencestretch);}
             code1 {o->setValueType(VC_FormFilterStretch);}
             class WidgetPDial
@@ -690,7 +690,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           }
 
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::numberOfFormants,nFoCount, TOPLEVEL::type::Write);}
-          xywh {485 15 65 20} type Simple labelfont 1 labelsize 10 align 1 minimum 1 maximum 127 step 1 value 1 textsize 12
+          xywh {485 19 65 20} type Simple labelsize 12 align 1 minimum 1 maximum 127 step 1 value 1 textsize 12
           code0 {o->bounds(1,FF_MAX_FORMANTS);}
         }
         Fl_Dial frsldial {
@@ -770,7 +770,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
         Fl_Box formvowel {
           label Vowel
-          xywh {635 7 55 15}
+          xywh {635 8 55 15}
+        }
+        Fl_Box {} {
+          xywh {630 4 64 40} box EMBOSSED_FRAME
         }
       }
     }
@@ -931,7 +934,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         vowel_counter->textsize(size);
     neginput->labelsize(size);
     strchdial->labelsize(size);
-    formantcount->labelsize(size);
+    formantcount->labelsize(size12);
         formantcount->textsize(size12);
     frsldial->labelsize(size);
     centerfreqvo->labelsize(size12);
