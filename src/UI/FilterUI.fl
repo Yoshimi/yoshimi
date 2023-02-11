@@ -1099,15 +1099,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::formantCenter:
             cfknob->value(value);
-            if (!fromUs)
-                centerfreqvo->do_callback();
+            centerfreqvo->do_callback();
             formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::formantOctave:
             octknob->value(value);
-            if (!fromUs)
-                octavesfreqvo->do_callback();
+            octavesfreqvo->do_callback();
             formantfiltergraph->redraw();
             break;
 

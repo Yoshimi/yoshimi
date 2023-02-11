@@ -1,5 +1,11 @@
 yoshimi 2.2.3 rc1
 
+2023-2-11 Will
+bn 2176
+BugFix: formant filter window not updating centre frequency
+and octave range numeric entries.
+Set version as 2.2.3 rc2
+
 2023-2-8 Will
 bn 2175
 Small code cleanups.
