@@ -1675,23 +1675,34 @@ class PartUI {selected : {public Fl_Group, PartUI_}
                 partfx->show();
             return;
         }
+
         if (kititem != lastkititem)
             return; // only update engines if current kititem
 
         if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
-            ;// std::cout << "add voice" << engine - PART::engine::addVoice1 << std::endl;
+            int voiceNum = engine - PART::engine::addVoice1;
+            if (adnoteui->ADnoteVoice && voiceNum == adnoteui->nvoice)
+            {
+                if(adnoteui->ADnoteVoice->visible())
+                {
+                    //std::cout << "here" << std::endl;
+                    adnoteui->editVoice(voiceNum);
+                }
+            }
+            return;
         }
 
-        else if (engine == PART::engine::addSynth)
+        if (engine == PART::engine::addSynth)
         {
             if (getData->data.insert == TOPLEVEL::insert::resonanceGroup)
             {
+                //std::cout << "in Resonance" << std::endl;
                 if (adnoteui)
                     adnoteui->paste(getData);
                 return;
             }
-            //std::cout << "add top level" << engine << std::endl;
+            //std::cout << "add top level " << engine << std::endl;
             bool show = false;
             if (adnoteui != NULL)
             {
@@ -1702,9 +1713,11 @@ class PartUI {selected : {public Fl_Group, PartUI_}
             adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, 0);
             if (show)
                 adnoteui ->ShowGlobal();
+            return;
         }
+        //std::cout << "Next section" << std::endl;
 
-        else if (engine == PART::engine::subSynth)
+        if (engine == PART::engine::subSynth)
         {
 
             //std::cout << "sub top level" << std::endl;
@@ -1718,9 +1731,10 @@ class PartUI {selected : {public Fl_Group, PartUI_}
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, 0);
             if (show)
                 subnoteui->Showsub();
+            return;
         }
 
-        else if (engine == PART::engine::padSynth)
+        if (engine == PART::engine::padSynth)
         {
             if (getData->data.insert == TOPLEVEL::insert::resonanceGroup)
             {
@@ -1740,10 +1754,10 @@ class PartUI {selected : {public Fl_Group, PartUI_}
             padnoteui = new PADnoteUI(part->kit[kititem].padpars);
             if (show)
                 padnoteui->Showpad();
+            return;
         }
 
-        //else
-            //std::cout << "invalid" << std::endl;} {}
+        std::cout << "invalid paste" << std::endl;} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
