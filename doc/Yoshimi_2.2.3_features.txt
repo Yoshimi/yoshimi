@@ -1,0 +1,25 @@
+Version 2.2.3
+
+The Command Line can now use Yoshimi's Copy/Paste feature and stored presets. Currently this only partially updates the GUI, and can sometimes produce spurious 'Not Available' messages. This is work in progress and while it won't be an issue for those with sight issues, we will be developing it further.
+
+When editing vowels in the (GUI) formant filter, there is now a reddish background to the vowel field if none of the sequence positions call for it. The fact that you can be editing a vowel that isn't actually in use, can be quite confusing otherwise!
+
+Both the Formant and EQ effect windows now use 'human friendy' numbering, rather than counting from zero. This is also reflected in the Command line.
+
+The command lie also now has a specific contect for the format editior, making it more obvious where you are and simplifying some of the commands.
+
+The HTML User Guide and various docs have been updated.
+
+There are also more code improvements and a some bug fixes.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

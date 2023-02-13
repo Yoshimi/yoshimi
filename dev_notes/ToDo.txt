@@ -4,8 +4,6 @@ BUG! If jack is selected for audio but there are no physical ports Yoshimi quits
 
 BUG! stand-alone GUI freezes and no further system changes if new instance started while instrument change in progress.
 
-BUG! large buffer sizes progressively chop off the first part of note attack.
-
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
 GUI Oddity. Press spacebar on startup and you disable part 1 AddSynth engine.
