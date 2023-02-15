@@ -255,6 +255,18 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         bandwidth
     };
 
+    enum filter :unsigned char {
+        Low1 = 0,
+        High1,
+        Low2,
+        High2,
+        Band2,
+        Notch2,
+        Peak2,
+        LowShelf2,
+        HighShelf2
+    };
+
     enum XML : unsigned char { // file and history types
         Instrument = 0, // individual externally sourced Instruments
         Patch, //      full instrument Patch Sets

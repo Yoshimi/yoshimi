@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified April 2011
+    This file is a derivative of a ZynAddSubFX original
 */
 
 #include <cstring>
@@ -142,7 +142,7 @@ void AnalogFilter::computefiltercoefs(void)
     //       to get reproducible numbers under optimisation on different compilers/platforms
     switch (type)
     {
-        case 0: // LPF 1 pole
+        case TOPLEVEL::filter::Low1: // LPF 1 pole
             if (not zerocoefs)
                 tmp = exp(-TWOPI * freq / synth->samplerate_f);
             else
@@ -155,7 +155,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 1;
             break;
 
-        case 1: // HPF 1 pole
+        case TOPLEVEL::filter::High1: // HPF 1 pole
             if (not zerocoefs)
                 tmp = exp(-TWOPI * freq / synth->samplerate_f);
             else
@@ -168,7 +168,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 1;
             break;
 
-        case 2:// LPF 2 poles
+        case TOPLEVEL::filter::Low2:// LPF 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -189,7 +189,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 3: // HPF 2 poles
+        case TOPLEVEL::filter::High2: // HPF 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -208,7 +208,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 4: // BPF 2 poles
+        case TOPLEVEL::filter::Band2: // BPF 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -227,7 +227,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 5: // NOTCH 2 poles
+        case TOPLEVEL::filter::Notch2: // NOTCH 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -249,7 +249,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 6: // PEAK (2 poles)
+        case TOPLEVEL::filter::Peak2: // PEAK (2 poles)
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -272,7 +272,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 7: // Low Shelf - 2 poles
+        case TOPLEVEL::filter::LowShelf2: // Low Shelf - 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -297,7 +297,7 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        case 8: // High Shelf - 2 poles
+        case TOPLEVEL::filter::HighShelf2: // High Shelf - 2 poles
             if (not zerocoefs)
             {
                 omega = TWOPI * freq / synth->samplerate_f;
@@ -322,8 +322,8 @@ void AnalogFilter::computefiltercoefs(void)
             order = 2;
             break;
 
-        default: // wrong type
-            type = 0;
+        default: // wrong type so give it the simplest
+            type = TOPLEVEL::filter::Low1;
             computefiltercoefs();
             break;
     }

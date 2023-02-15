@@ -449,7 +449,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1 deactivate
           code0 {o->value(pars->Pq);}
           code1 {updateVCforQ();}
-          code2 {if (filtertype->value() == 0 && analogfiltertypechoice->value() < 2) o->deactivate(); else o->activate();}
+          code2 {if (filtertype->value() == TOPLEVEL::filter::Low1 && analogfiltertypechoice->value() < TOPLEVEL::filter::Low2) o->deactivate(); else o->activate();}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {

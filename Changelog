@@ -1,11 +1,18 @@
-yoshimi 2.2.3
+yoshimi 2.2.3 M
 
-2020-2-13 Will
-bn 2177
+2023-2-15 Will
+bn 2178
+Out of sequence so patched manually # 2023-2-11 Jesper
+Added copy_if_different step to fltk source generation to speed up rebuilds.
+
+Set labels to filter types in code - easier to see what they are!
+
+2023-2-13 Will
+
 Updated docs
 Set release version 2.2.3
 
-2020-2-12 Will
+2023-2-12 Will
 bn 2176
 CLI paste now updates adsynth voice correctly.
 Set version as 2.2.3 rc3

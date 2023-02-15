@@ -71,8 +71,8 @@ class EQ : public Effect
                 ,freq{0, synth.samplerate}
                 ,gain{0, synth.samplerate}
                 ,q   {0, synth.samplerate}
-                ,l{new AnalogFilter(6, 1000.0, 1.0, 0, &synth)}
-                ,r{new AnalogFilter(6, 1000.0, 1.0, 0, &synth)}
+                ,l{new AnalogFilter(TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0, &synth)}
+                ,r{new AnalogFilter(TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0, &synth)}
             { }
         };
 

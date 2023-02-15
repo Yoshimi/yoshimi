@@ -45,7 +45,7 @@ FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
 {
     numformants = pars->Pnumformants;
     for (int i = 0; i < numformants; ++i)
-        formant[i] = new AnalogFilter(4/*BPF*/, 1000.0f, 10.0f, pars->Pstages, synth);
+        formant[i] = new AnalogFilter(TOPLEVEL::filter::Band2, 1000.0f, 10.0f, pars->Pstages, synth);
     cleanup();
 
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)

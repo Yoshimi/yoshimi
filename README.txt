@@ -2,7 +2,7 @@ Version 2.2.3
 
 The Formant editor window has been made a bit more user friendly.
 The Command line can now use Yoshimi's Copy/Paste feature and stored presets.
-There are also minor bugfixs and general updates.
+There are also minor bugfixes and general updates.
 
 Full details are in /doc/Yoshimi_2.2.3_features.txt
 
