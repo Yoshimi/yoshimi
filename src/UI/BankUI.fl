@@ -148,7 +148,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     if (bank->engines_used(rt, bk, nslot) & 8)
         labelcolor(YOSHI_COLOUR);
     else
-        labelcolor(0);} {}
+        labelcolor(FL_BLACK);} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }

@@ -121,7 +121,7 @@ class VirKeys {: {public Fl_Box}
     int i;
     if (damage() != 1)
     {
-        fl_color(250, 240, 230);
+        fl_color(WHITE_KEY_COLOUR);
         fl_rectf(ox, oy, lx, ly);
 
         fl_color(FL_BLACK);
@@ -144,9 +144,9 @@ class VirKeys {: {public Fl_Box}
         if (kv >= 0)
         {   // white keys
             if (pressed[i] == 0)
-                fl_color(250, 240, 230);
+                fl_color(WHITE_KEY_COLOUR);
             else
-                fl_color(FL_BLUE);
+                fl_color(WHITE_KEY_PRESSED);
             fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) + 3, oy + ly * 3 / 5 + 2,
                         (*keyWhite) - 4, ly * 2 / 5 - 3);
         }
@@ -156,7 +156,7 @@ class VirKeys {: {public Fl_Box}
             if (pressed[i] == 0)
                 fl_color(FL_BLACK);
             else
-                fl_color(FL_BLUE);
+                fl_color(28);
             fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) - (*keyBlack) / 2 + 2, oy + 2,
                         (*keyBlack) - 3, ly * 3 / 5 - 5);
         }

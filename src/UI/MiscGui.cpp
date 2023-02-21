@@ -1347,10 +1347,10 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         for (i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
         {
             y = ry * (i + 1);
-            fl_color(169,169,169);
+            fl_color(FL_GRAY);
             fl_line(x0, cy - y, x0 + _w, cy - y);
             fl_line(x0, cy + y, x0 + _w, cy + y);
-            fl_color(0,0,0);
+            fl_color(FL_BLACK);
             fl_draw(xMarkers[i].c_str(), x0 - 28, (cy - y - 4), 24, 12,
                     Fl_Align(FL_ALIGN_RIGHT));
             fl_draw(xMarkers[i + 4].c_str(), x0 - 28, (cy + y - 4), 24, 12,
@@ -1359,7 +1359,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
 
         /* Hz lines */
 
-        fl_color(196,196,196); /* Lighter inner lines*/
+        fl_color(FL_GRAY); /* Lighter inner lines*/
 
         for (i = 10;i != 0; i *= 10)
         {
@@ -1379,7 +1379,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         for (i = 0; i < 4; i++) /* 20, 100, 1k, 10k */
         {
             x = x0 + (i == 0 ?  0 : ((float)i + 1 - lg1020) * rx);
-            fl_color(127,127,127); /* Darker boundary lines */
+            fl_color(44); /* Darker boundary lines */
             fl_line(x, y0, x, y0 - _h);
             fl_color(FL_BLACK);
             fl_draw(hzMarkers[i].c_str(), x - 20, y0 + 4, 40, 12,
@@ -1389,7 +1389,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         fl_draw("Hz", x0 + _w, y0 + 4, 20, 12, Fl_Align(FL_ALIGN_LEFT));
 
         /* Vertical center line */
-        fl_color(64,64,64);
+        fl_color(38);
         fl_line(x0 - margin, cy, x0 + _w, cy);
 
         /* Function curve */
