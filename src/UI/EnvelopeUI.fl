@@ -151,7 +151,7 @@ return(nearestpoint);} {}
     if (active_r())
         fl_color(FL_BLACK);
     else
-        fl_color(90,90,90);
+        fl_color(MODOFF_COLOUR);
     if (!active_r()) currentpoint=-1;
 
     fl_rectf(ox,oy,lx,ly);
@@ -169,7 +169,7 @@ return(nearestpoint);} {}
     fl_line_style(0, int(2 *scale));
     Fl_Color alb = FL_WHITE;
     if (!active_r())
-        alb = fl_rgb_color(180,180,180);
+        alb = FL_GRAY;
     fl_color(alb);
     int oldxx = 0;
     int xx = 0;
@@ -217,7 +217,7 @@ return(nearestpoint);} {}
     }
     else
     {
-        fl_color(255,0,0);
+        fl_color(FL_RED);
         time = env->getdt(currentpoint);
     };
     char tmpstr[40];

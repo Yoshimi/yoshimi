@@ -107,6 +107,12 @@ typedef unsigned int  uint;
 #define EXTOSC_COLOUR 0x8fbfdf00
 #define EXTVOICE_COLOUR 0x9fdf8f00
 #define MODOFF_COLOUR 0x80808000
+#define WHITE_KEY_COLOUR 0xFAF0E600
+#define WHITE_KEY_PRESSED 0xBEB4AA00
+#define VU_DB 0x00A0C800
+#define VU_5DB 0x00E6F000
+#define VU_LEVEL 0x00C8FF00
+#define VU_OFF 0x8C8C8C00
 
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8

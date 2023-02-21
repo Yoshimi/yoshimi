@@ -192,41 +192,41 @@ class VUMeter {: {public Fl_Box}
             // compute RMS - end
 
             // draw db level
-            fl_rectf(ox, oy, oldpeakl, VULENY, 0, 200, 255);
-            fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY, 0, 200, 255);
+            fl_rectf(ox, oy, oldpeakl, VULENY, VU_LEVEL);
+            fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY, VU_LEVEL);
 
             // fill with black
-            fl_rectf(ox + oldpeakl, oy, VULENX - oldpeakl, VULENY, 0, 0, 0);
-            fl_rectf(ox + oldpeakr, oy + ly / 2, VULENX - oldpeakr, VULENY, 0, 0, 0);
+            fl_rectf(ox + oldpeakl, oy, VULENX - oldpeakl, VULENY, FL_BLACK);
+            fl_rectf(ox + oldpeakr, oy + ly / 2, VULENX - oldpeakr, VULENY, FL_BLACK);
 
             // draw scale
             float tmp = VULENX * 1.0 / MIN_DB;
             for (int i = 1; i < 1 - MIN_DB; ++i)
             {
                 int tx = VULENX + (int)(tmp * i);
-                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 160, 200);
+                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, VU_DB);
                 if (i % 5 == 0)
-                    fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 230, 240);
+                    fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, VU_5DB);
                 if (i % 10 == 0)
-                    fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, 0, 225, 255);
+                    fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, FL_CYAN);
             }
 
             // mellow yellow rms indicator
             if (irmsdbl)
-                fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, 255, 255, 0);
+                fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, FL_YELLOW);
             if (irmsdbr)
-                fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, 255, 255, 0);
+                fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, FL_YELLOW);
 
             // see red if clipped
             if (clipped & 1)
-                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 250, 10, 10);
+                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, FL_RED);
             else
-                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 0, 0, 10);
+                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, FL_BLACK);
 
             if (clipped & 2)
-                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 250, 10, 10);
+                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, FL_RED);
             else
-                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 0, 0, 10);
+                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, FL_BLACK);
 
             // show maxdB
             static char tmpstr[8];
@@ -235,7 +235,7 @@ class VUMeter {: {public Fl_Box}
             if ((maxdbl > NO_DB))
             {
                 fl_font(FL_HELVETICA | FL_BOLD, 9);
-                fl_color(255, 255, 255);
+                fl_color(FL_WHITE);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
                     lx - VULENX - 4, VULENY - 2, FL_ALIGN_RIGHT, NULL, 0);
@@ -244,7 +244,7 @@ class VUMeter {: {public Fl_Box}
             if ((maxdbr > NO_DB))
             {
                 fl_font(FL_HELVETICA | FL_BOLD, 9);
-                fl_color(255, 255, 255);
+                fl_color(FL_WHITE);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
@@ -261,7 +261,7 @@ class VUMeter {: {public Fl_Box}
     float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart);
     if (Vpeak < 0) // its inactive
     {
-        fl_rectf(ox, oy, lx, ly, 140, 140, 140);
+        fl_rectf(ox, oy, lx, ly, VU_OFF);
     }
     else
     {
@@ -279,10 +279,10 @@ class VUMeter {: {public Fl_Box}
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
         panelpart.oldpeak[actualpart] = int(db);
-        fl_rectf(ox, oy,mid, ly, 0, 0, 0);
-        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart], 0, 200, 255);
+        fl_rectf(ox, oy,mid, ly, FL_BLACK);
+        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart], VU_LEVEL);
         if (panelpart.clip[actualpart])
-            fl_rectf(ox, oy, mid, 4, 255, 0, 0);
+            fl_rectf(ox, oy, mid, 4, FL_RED);
 
         Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart, 1);
         if (Vpeak > 1.0)
@@ -292,10 +292,10 @@ class VUMeter {: {public Fl_Box}
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
         panelpart.oldpeakR[actualpart] = int(db);
-        fl_rectf(ox + mid, oy,lx - mid, ly, 0, 0, 0);
-        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart], 0, 200, 255);
+        fl_rectf(ox + mid, oy,lx - mid, ly, FL_BLACK);
+        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart], VU_LEVEL);
         if (panelpart.clipR[actualpart])
-            fl_rectf(ox + mid, oy, lx - mid, 4, 255, 0, 0);
+            fl_rectf(ox + mid, oy, lx - mid, 4, FL_RED);
 
         // draw the scales
         float tmp = ly * 1.0 / MIN_DB;
@@ -303,12 +303,13 @@ class VUMeter {: {public Fl_Box}
         {
             int ty = ly + int(tmp * i);
             if (i % 5 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
+                fl_rectf(ox, oy + ly - ty, lx, 1, VU_DB);
             if (i % 10 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
+                fl_rectf(ox, oy + ly - ty, lx, 1, VU_5DB);
         }
+        fl_rectf(x() + mid, oy, 4, ly, FL_GRAY);
     }
-    fl_rectf(x() + mid, oy, 4, ly, 127, 127, 127);} {}
+    fl_rectf(x() + mid, oy, 4, ly, MODOFF_COLOUR);} {}
   }
   Function {draw()} {} {
     code {//
@@ -618,9 +619,9 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         tmp = 0;
     audiosend->value(tmp);
     if ((int)bankui->cbwig->value() != (setpart + 1))
-        panellistitemgroup->color(fl_rgb_color(160, 160, 160));
+        panellistitemgroup->color(FL_BACKGROUND_COLOR);
     else
-        panellistitemgroup->color(fl_rgb_color(50,190,240));
+        panellistitemgroup->color(230);
     panellistitemgroup->redraw();
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
@@ -651,7 +652,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (synth->part[npart | *plgroup]->PyoshiType)
         partname->labelcolor(YOSHI_COLOUR);
     else
-        partname->labelcolor(0);
+        partname->labelcolor(FL_BLACK);
     partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}

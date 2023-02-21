@@ -2547,6 +2547,11 @@ int CmdInterpreter::commandList(Parser& input)
 
     if (input.matchnMove(3, "section")) // section presets
     {
+        if (insertType == TOPLEVEL::insert::envelopeGroup || insertType == TOPLEVEL::insert::LFOgroup)
+        {
+            presetsControl(0, TOPLEVEL::type::Adjust, section, kitNumber, engine, insertType, insertGroup, UNUSED);
+            return REPLY::done_msg;
+        }
         presetsControl(0, TOPLEVEL::type::Adjust, section, kitNumber, engine, insertType, filterFormantNumber, filterVowelNumber);
         return REPLY::done_msg;
     }

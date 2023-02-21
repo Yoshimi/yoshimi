@@ -278,7 +278,7 @@ class Oscilloscope {: {public Fl_Box}
 
     if (damage() != 1)
     {
-        fl_color(0, 0, 0);
+        fl_color(FL_BLACK);
         fl_rectf(ox, oy, lx, ly);
     }
 

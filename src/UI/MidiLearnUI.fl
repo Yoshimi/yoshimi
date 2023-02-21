@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {MidiLearnUI.h} {not_in_source in_header
@@ -82,9 +82,9 @@ class MidiLearnKitItem {: {public Fl_Group}
         xywh {56 -4 745 23} box FLAT_BOX
       } {
         Fl_Spinner CCcounter {
-          class WidgetSpinner
           callback {send_data(0, MIDILEARN::control::CCorChannel);}
           tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
+          class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
@@ -172,16 +172,16 @@ class MidiLearnKitItem {: {public Fl_Group}
           }
         }
         Fl_Check_Button compresscheck {
-          class Fl_Check_Button2
           callback {//
           send_data(0, MIDILEARN::control::limit);}
           tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
+          class Fl_Check_Button2
         }
         Fl_Check_Button blockcheck {
-          class Fl_Check_Button2
           callback {//
           send_data(0, MIDILEARN::control::block);}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+          class Fl_Check_Button2
         }
         Fl_Light_Button activity {
           callback {//
@@ -192,19 +192,19 @@ class MidiLearnKitItem {: {public Fl_Group}
           xywh {180 0 13 15} box NO_BOX color 15 selection_color 2
         }
         Fl_Spinner minval {
-          class WidgetSpinner
           callback {send_data(0, MIDILEARN::control::minimum);}
           tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 0 textsize 12
+          class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
           xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Spinner maxval {
-          class WidgetSpinner
           callback {//
           send_data(0, MIDILEARN::control::maximum);}
           tooltip {Maximim % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
+          class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
@@ -218,7 +218,6 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
       }
       Fl_Check_Button mutecheck {
-        class Fl_Check_Button2
         callback {//
         if (o->value())
             midilearnkititemgroup->deactivate();
@@ -227,6 +226,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         send_data(0, MIDILEARN::control::mute);}
         tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
+        class Fl_Check_Button2
       }
     }
   }

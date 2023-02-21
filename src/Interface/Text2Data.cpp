@@ -1,7 +1,7 @@
 /*
     Text2Data.cpp - conversion of text to commandBlock entries
 
-    Copyright 2022, Will Godfrey
+    Copyright 2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -20,8 +20,6 @@
 */
 #include <iostream>
 #include <stdlib.h>
-
-#include<bits/stdc++.h>
 
 #include "Interface/Text2Data.h"
 #include "Interface/TextLists.h"
