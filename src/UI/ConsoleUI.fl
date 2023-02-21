@@ -124,7 +124,7 @@ class ConsoleUI {open
     int maxW = Fl::w() - 5; // wiggle room
     int maxH = Fl::h() - 30; // space for minimal titlebar
 
-    if ((fetchX + fetchW) > maxW) // postion
+    if ((fetchX + fetchW) > maxW) // position
         fetchX = maxW / 2;
     if ((fetchY + fetchH) > maxH)
         fetchY = maxH / 2;

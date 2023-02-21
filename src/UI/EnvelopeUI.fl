@@ -165,7 +165,7 @@ return(nearestpoint);} {}
     fl_color(FL_GRAY);
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
-    //draws the evelope points and lines
+    //draws the envelope points and lines
     fl_line_style(0, int(2 *scale));
     Fl_Color alb = FL_WHITE;
     if (!active_r())
@@ -1204,7 +1204,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     envASRbw->hide();
     envfree->hide();
 /*
-    We now always initialse and position related groups as well as the freemode one
+    We now always initialise and position related groups as well as the freemode one
     This is to ensure that resizing will have the correct starting size and position
     even if a part was loaded specifying the freemode form.
 */

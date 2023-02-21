@@ -45,7 +45,7 @@ class Effect
         virtual void cleanup();
         virtual float getfreqresponse(float /* freq */) { return (0); };
 
-        unsigned char Ppreset; // Currentl preset
+        unsigned char Ppreset; // Current preset
         float *const efxoutl;
         float *const efxoutr;
         synth::InterpolatedValue<float> outvolume;

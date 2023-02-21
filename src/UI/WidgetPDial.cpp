@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Coyright 2020 - 2021, Will Godfrey & others
+    Copyright 2020 - 2021, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public

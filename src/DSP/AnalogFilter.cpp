@@ -68,7 +68,7 @@ AnalogFilter::AnalogFilter(const AnalogFilter &orig) :
     firsttime(orig.firsttime),
     abovenq(orig.abovenq),
     oldabovenq(orig.oldabovenq),
-    tmpismp(orig.synth->buffersize),   // No need to copy sample data, as this is filled from imput data
+    tmpismp(orig.synth->buffersize),   // No need to copy sample data, as this is filled from input data
     synth(orig.synth)
 {
     outgain = orig.outgain;

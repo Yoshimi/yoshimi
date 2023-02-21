@@ -280,7 +280,7 @@ inline string findExtension(const string& name)
         return "";
     string exten = name.substr(point);
     if (exten.find('/') != string::npos)
-        return ""; // not acceptible as an extension!
+        return ""; // not acceptable as an extension!
     return exten;
 }
 
@@ -661,7 +661,7 @@ inline char * loadGzipped(const string& _filename, string * report)
         }
     }
     gzclose(gzf);
-    //*report = "it looks like we sucessfully loaded" + filename;
+    //*report = "it looks like we successfully loaded" + filename;
     return data;
 }
 

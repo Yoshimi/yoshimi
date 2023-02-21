@@ -107,7 +107,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     }
 
     /*
-     * Our implimentation of LV2 has a problem with envelopes. In general
+     * Our implementation of LV2 has a problem with envelopes. In general
      * the bigger the buffer size the shorter the envelope, and whichever
      * is the smallest (host size or Yoshimi size) determines the time.
      *

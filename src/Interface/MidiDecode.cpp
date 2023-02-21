@@ -529,7 +529,7 @@ bool MidiDecode::nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, uns
     putData.data.kit = nLow;
     putData.data.engine = dLow;
     if (nLow == TOPLEVEL::XML::Vector && dHigh < NUM_MIDI_CHANNELS)
-        putData.data.insert = dHigh; // othewise set by file
+        putData.data.insert = dHigh; // otherwise set by file
     else if (nLow == TOPLEVEL::XML::Instrument)
     {
         unsigned char tmp = synth->getRuntime().vectordata.Part;

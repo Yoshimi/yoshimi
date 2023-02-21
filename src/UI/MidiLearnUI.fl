@@ -204,7 +204,7 @@ class MidiLearnKitItem {: {public Fl_Group}
           class WidgetSpinner
           callback {//
           send_data(0, MIDILEARN::control::maximum);}
-          tooltip {Maximim % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
+          tooltip {Maximum % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}

@@ -104,7 +104,7 @@ void SVFilter::setfreq(float frequency)
 
 
     if (rap > 3.0f || nyquistthresh != 0)
-    {   //if the frequency is changed fast, it needs interpolation (now, filter and coeficients backup)
+    {   //if the frequency is changed fast, it needs interpolation (now, filter and coefficients backup)
         if (firsttime == 0)
             needsinterpolation = 1;
         ipar = par;

@@ -64,7 +64,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
     if (event == 0xb0 && par1 == AFTERTOUCH_EMULATE)
     {
-        par0 = 0xd0 | channel; // change to chanel aftertouch
+        par0 = 0xd0 | channel; // change to channel aftertouch
         par1 = par2; // shift parameter across
         synth->mididecode.midiProcess(par0, par1, par2, in_place, inSync);
         return;

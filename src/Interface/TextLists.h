@@ -454,7 +454,7 @@ static std::string addvoicelist [] = {
 
 static std::string addmodlist [] = {
     "MOdulator",            "enter Modulator context",
-    " - catgory - ","",
+    " - category - ","",
     "OFF",                  "disable modulator",
     "MORph","",
     "RINg","",
@@ -649,7 +649,7 @@ static std::string waveformlist [] = {
 };
 
 static std::string LFOlist [] = {
-    " - catgory -","",
+    " - category -","",
     "AMplitude",             "amplitude type",
     "FRequency",             "frequency type",
     "FIlter",                "filter type",

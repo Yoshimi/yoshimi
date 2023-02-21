@@ -20,7 +20,7 @@
 
 /*
  *
- * This code is no longer used but is mothballed for future refence
+ * This code is no longer used but is mothballed for future reference
 
 
 #include "YoshiWin.h"

@@ -59,7 +59,7 @@ extern SynthEngine *firstSynth;
 extern std::atomic <bool> waitForTest;
 
 
-// these two are both zero and repesented by an enum entry
+// these two are both zero and represented by an enum entry
 const unsigned char type_read = TOPLEVEL::type::Adjust;
 
 namespace cli {
@@ -2407,7 +2407,7 @@ int CmdInterpreter::commandGroup(Parser& input)
     /*
     * Having two lists is messy, but the list routine clears 'msg' and
     * we need 'instrumentGroup' kept for later actual part loads.
-    * Also, the search list needs embeded root, bank, and instrument IDs
+    * Also, the search list needs embedded root, bank, and instrument IDs
     * but the reported one only wants the list number.
     */
     input.skipChars();
@@ -5544,7 +5544,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "padsynth"))
     {
         bitSet(context, LEVEL::PadSynth);
-        voiceNumber = 0; // TODO find out what *realy* causes this to screw up!
+        voiceNumber = 0; // TODO find out what *really* causes this to screw up!
         insertGroup = UNUSED;
         insertType = UNUSED;
         return padSynth(input, controlType);
@@ -5787,7 +5787,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             }
             else if (name == DEFAULT_NAME)
             {
-                Runtime.Log("Cant use name of default sound");
+                Runtime.Log("Cannot use name of default sound");
                 return REPLY::done_msg;
             }
             else
