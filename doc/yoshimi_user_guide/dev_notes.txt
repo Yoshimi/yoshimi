@@ -1,6 +1,6 @@
 Yoshimi User Guide notes 10/8/2021
 
-WARNINNG!
+WARNING!
 
 DO NOT EDIT the top lines of index.html
 This area is modified by adding the current version number and counts lines to find it.

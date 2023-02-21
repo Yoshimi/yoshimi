@@ -4,13 +4,13 @@ To learn, hold CTRL while right-clicking on any GUI control then operate a physi
 
 Along with parameters, a text string is provided with precise details of this complete action.
 
-Control capabilites:
+Control capabilities:
 
 Incoming CC and channel tracked (in that order).
 
 Multiple actions on the same CC/channel pair.
 
-Range limiting, compression or threshhold setting.
+Range limiting, compression or threshold setting.
 
 Blocking of all later actions on the same CC / channel pair.
 
