@@ -226,7 +226,7 @@ inline unsigned int string2uint(std::string str)
 }
 
 /*
- * turns the 1st count mumber to upper case
+ * turns the 1st count number to upper case
  * all the rest to lower case
  */
 inline std::string stringCaps(std::string str, int count)

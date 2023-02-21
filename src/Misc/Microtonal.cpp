@@ -583,7 +583,7 @@ int Microtonal::loadkbm(const string& filename)
     int tmpMid;
     if (err == 0)
     {
-        // loads the middle note where scale fro scale degree=0
+        // loads the middle note where scale from scale degree=0
        if (loadLine(text, point, tmp, BUFFSIZ))
             err = -5;
         else if (!sscanf(&tmp[0], "%d", &tmpMid))

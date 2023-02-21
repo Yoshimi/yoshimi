@@ -7468,7 +7468,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             return value;
     }
 
-    // not sure where the following should realy be
+    // not sure where the following should really be
     if (npart == TOPLEVEL::section::systemEffects)
     {
         min = 0;

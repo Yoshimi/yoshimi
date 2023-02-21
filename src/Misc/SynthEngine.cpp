@@ -3479,7 +3479,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::loadInstrumentFromBank:
-            return value; // this is just a workround :(
+            return value; // this is just a workaround :(
             break;
 
         default:

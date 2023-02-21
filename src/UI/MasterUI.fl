@@ -2306,7 +2306,7 @@ Alan Calvert started the project}
     else if (dosave)
     {
         if (extension == TOPLEVEL::XML::Instrument)
-        { // try to cover all possibilites!
+        { // try to cover all possibilities!
             int type = fetchData(0, CONFIG::control::savedInstrumentFormat,TOPLEVEL::section::config);
             if ((type == 3 || type == 1) && isRegularFile(filerfound + EXTEN::zynInst))
             {
@@ -3388,7 +3388,7 @@ Alan Calvert started the project}
     textLine->value(oldLine.c_str());
     int X, Y, W, H, O;
     loadWin(synth, W, H, X, Y, O, "Master-textin");
-    X = Fl::event_x_root(); // aways want these relative to parent
+    X = Fl::event_x_root(); // always want these relative to parent
     Y = Fl::event_y_root();
     if(W < textinDW || H < textinDH)
     {

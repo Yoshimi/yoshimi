@@ -272,7 +272,7 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         }
     }
 
-    if ((x + w) > maxW) // postion
+    if ((x + w) > maxW) // position
     {
         x = maxW - w;
         if (x < 5)

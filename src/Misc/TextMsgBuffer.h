@@ -99,7 +99,7 @@ inline void TextMsgBuffer::init()
 
 
 inline void TextMsgBuffer::clear()
-{ // catches messge leaks - shirley knot :@)
+{ // catches message leaks - surely knot :@)
 #ifdef REPORT_MISCMSG
     std::cout << "TextMsgBuffer cleared" << std::endl;
 #endif

@@ -135,7 +135,7 @@ set (BuildOptionsThisCPU
 
 set (BuildOptionsBasic
     "-ffast-math -fomit-frame-pointer"
-    CACHE STRING "basic compilier options"
+    CACHE STRING "basic compiler options"
 )
 
 set (BuildOptionsDebug

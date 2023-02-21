@@ -51,7 +51,7 @@ typedef unsigned int  uint;
 #define Cshift2I 23
 
 // many of the following are for convenience and consistency
-// changing them is likely to have unpredicable consequences
+// changing them is likely to have unpredictable consequences
 
 // sizes
 #define COMMAND_SIZE 252

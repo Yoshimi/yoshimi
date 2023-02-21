@@ -56,7 +56,7 @@ namespace { // constants used in the implementation
         {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
         {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
         {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
-        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size", 0},
+        {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscillator size", 0},
         {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
         {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
         #if defined(JACK_SESSION)

@@ -1021,7 +1021,7 @@ class PartUI {: {public Fl_Group, PartUI_}
               proptb->deactivate();
           }
           send_data(0, PART::control::enableProportionalPortamento, o->value(), TOPLEVEL::type::Integer, npart);}
-          tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
+          tooltip {Enable Proportional Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if (o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
