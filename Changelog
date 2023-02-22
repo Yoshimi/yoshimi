@@ -1,5 +1,16 @@
 yoshimi 2.2.3 M
 
+2023-2-22 Will
+bn 2179
+BugFix: sys/ins text not resizing
+Further conversion to fltk tables, no definitions in globals.h
+Initial code for colour themes
+
+BugFix: CLI list sections LFO and Envelopes error
+BugFix: GCC specific include file in Text2Data.cpp
+Most direct RGB colour settings changed to equivalent fltk
+table values or labelled version in globals.h
+
 2023-2-15 Will
 bn 2178
 Out of sequence so patched manually # 2023-2-11 Jesper

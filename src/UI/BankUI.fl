@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -83,7 +83,6 @@ decl {\#include "Misc/TextMsgBuffer.h"
 decl {using std::to_string;} {private global
 }
 
-
 class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
   } {
@@ -146,7 +145,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     bankID = bk;
     lastSeen = last;
     if (bank->engines_used(rt, bk, nslot) & 8)
-        labelcolor(YOSHI_COLOUR);
+        labelcolor(219);
     else
         labelcolor(FL_BLACK);} {}
   }
@@ -192,15 +191,15 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         else
             bcol = 17;
         if (engine & 1)
-            acol = ADD_COLOUR;
+            acol = 214;
         else
             acol = bcol;
         if (engine & 2)
-            scol = SUB_COLOUR;
+            scol = 236;
         else
             scol = bcol;
         if (engine & 4)
-            pcol = PAD_COLOUR;
+            pcol = 158;
         else
             pcol = bcol;
 
@@ -214,7 +213,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     draw_box(FL_FLAT_BOX, x() + wid * 2, y(), wid, h(), (Fl_Color) pcol);
 
     //frame for label
-    draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), (Fl_Color) BASE_COLOUR);
+    draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), Fl_Color(17));
 
     //draw_backdrop();
 
@@ -483,7 +482,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
       }
       Fl_Text_Display insT3 {
-        label {Engines Used}
+        label {Engines Types Used}
         xywh {495 546 96 3} box NO_BOX labelsize 12 align 33 textsize 12
       }
       Fl_Button insClose {
@@ -512,17 +511,17 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Button addpatch {
           label Add
           xywh {473 550 47 16} box FLAT_BOX labelsize 12 align 32
-          code0 {o->color(ADD_COLOUR);}
+          code0 {o->color(214);}
         }
         Fl_Button subpatch {
           label Sub
           xywh {520 550 47 16} box FLAT_BOX labelsize 12 align 32
-          code0 {o->color(SUB_COLOUR);}
+          code0 {o->color(236);}
         }
         Fl_Button padpatch {
           label Pad
           xywh {567 550 47 16} box FLAT_BOX color 29 labelsize 12 align 32
-          code0 {o->color(PAD_COLOUR);}
+          code0 {o->color(158);}
         }
         Fl_Button {} {
           xywh {474 549 139 17} box THIN_UP_FRAME labelsize 12

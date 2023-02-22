@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {VirKeyboard.h} {not_in_source in_header
@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2020, Will Godfrey
+Copyright 2014-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -58,6 +58,18 @@ decl {\#include "UI/WidgetMWSlider.h"} {public local
 }
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
+}
+
+decl {\#define WHITE_KEY_COLOUR 0xFAF0E600} {public local
+}
+
+decl {\#define WHITE_KEY_PRESSED 0xBEB4AA00} {public local
+}
+
+decl {\#define BLACK_KEY_COLOUR 0x00000000} {public local
+}
+
+decl {\#define BLACK_KEY_PRESSED 0x70807000} {public local
 }
 
 decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {private local
@@ -154,9 +166,9 @@ class VirKeys {: {public Fl_Box}
         {   // black keys
             kv = keyspos[(i + 1) % 12];
             if (pressed[i] == 0)
-                fl_color(FL_BLACK);
+                fl_color(BLACK_KEY_COLOUR);
             else
-                fl_color(28);
+                fl_color(BLACK_KEY_PRESSED);
             fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) - (*keyBlack) / 2 + 2, oy + 2,
                         (*keyBlack) - 3, ly * 3 / 5 - 5);
         }
@@ -457,7 +469,6 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         class WidgetPDial
       }
       Fl_Spinner midichannel {
-        class WidgetSpinner
         label {MIDI Channel}
         callback {//
         relaseallkeys();
@@ -468,6 +479,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         virkeys->take_focus();}
         xywh {45 106 36 17} labelsize 10 align 1 maximum 16 textsize 10
         code0 {o->value(virkeys->midich + 1);}
+        class WidgetSpinner
       }
       Fl_Slider pitchwheel {
         callback {//

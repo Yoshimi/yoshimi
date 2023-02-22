@@ -79,7 +79,8 @@ eff = eff_;
         khzval = -1;} {}
   }
   Function {draw_freq_line(float freq, int type)} {} {
-    code {fl_color(FL_GRAY);
+    code {//
+        fl_color(FL_GRAY);
         float freqx = getfreqpos(freq);
 
         if (type == 0)
@@ -87,7 +88,7 @@ eff = eff_;
             if (active_r())
                 fl_color(FL_WHITE);
             else
-                fl_color(205, 205, 205);
+                fl_color(FL_GRAY);
         }
 
         if (freqx > 0.0 && freqx < 1.0)

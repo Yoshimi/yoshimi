@@ -98,9 +98,9 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
 
         //draw the equivalent bandwidth
         if (active)
-            fl_color(220,220,220);
+            fl_color(52);
         else
-            fl_color(160,165,165);
+            fl_color(47);
         float scale =  lx / 430.0f;
         fl_line_style(0, int(1 * scale));
         int rbw = (int)(realbw * (lx - 1.0) / 2.0);
@@ -108,9 +108,9 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_line(ox+i, oy, ox+i, oy + ly - 1);
 
         if (active)
-            fl_color(200, 200, 200);
+            fl_color(49);
         else
-            fl_color(160, 160, 160);
+            fl_color(46);
         for (int i = 1; i < 10; i++)
         {
             int kx = (int)(lx / 10.0 * i);
@@ -122,7 +122,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_line(ox, oy + ly - ky, ox + lx, oy + ly - ky - 1);
         }
 
-        fl_color(120, 120, 120);
+        fl_color(40);
         fl_line(ox + lx / 2, oy, ox + lx / 2, oy + ly);
 
         //draw the graph
@@ -133,12 +133,11 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         {
              int val = int((ly - 2) * profile[i]);
               if (active)
-                fl_color(180, 210, 240);
+                fl_color(237);
             else
-                fl_color(150, 150, 155);
+                fl_color(45);
             if (val != 0)
                 fl_line(ox + i, oy + ly, ox + i, oy + ly - val);
-
         }
 
         int oi = 0;
@@ -150,9 +149,9 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             float nv = (ly - 2) * profile[i];
 
             if (active)
-                fl_color(0, 0, 100);
+                fl_color(136);
             else
-                fl_color(150, 150, 150);
+                fl_color(44);
             if (i > 0)
                 fl_line(oi, oy + ly - ov, ni, oy + ly - nv);
             oi = ni;
@@ -160,9 +159,9 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         }
 
         if (active)
-            fl_color(0, 100, 220);
+            fl_color(227);
         else
-            fl_color(150, 160, 170);
+            fl_color(44);
         fl_line(ox + lx / 2 - rbw, oy, ox + lx / 2 - rbw, oy + ly - 1);
         fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
         fl_line_style(0, 1);} {}
@@ -190,9 +189,9 @@ this->pars=pars;} {}
         fl_line_style(0, 1 * scale);
         for (int i = 1; i < maxharmonic; i++)
         {
-            fl_color(200, 200, 200);
+            fl_color(49);
             if (i % 10 == 0)
-                fl_color(160, 160, 160);
+                fl_color(46);
             int kx = (int)(lx / (float)maxharmonic * i);
             fl_line(ox + kx, oy, ox + kx, oy + ly);
         }
@@ -228,7 +227,7 @@ this->pars=pars;} {}
             spectrum[kx] = spc[i] / max + 1e-9;
         }
 
-        fl_color(180, 0, 0);
+        fl_color(120);
 
         if (pars->Pmode == 2)
         {
@@ -269,7 +268,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {open : {public PresetsUI_}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be after panwidth} {in_source in_header

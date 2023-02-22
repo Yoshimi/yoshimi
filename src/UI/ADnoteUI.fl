@@ -266,7 +266,7 @@ else
     char str[15];
     snprintf(str, sizeof(str), "V%d", pars->VoicePar[nvoice].PVoice + 1);
     noiselabel->copy_label(str);
-    noiselabel->labelcolor(EXTVOICE_COLOUR);
+    noiselabel->labelcolor(157);
     noiselabel->show();
 }
 else if (pars->VoicePar[nvoice].Pextoscil >= 0)
@@ -274,7 +274,7 @@ else if (pars->VoicePar[nvoice].Pextoscil >= 0)
     char str[15];
     snprintf(str, sizeof(str), "O%d", pars->VoicePar[nvoice].Pextoscil + 1);
     noiselabel->copy_label(str);
-    noiselabel->labelcolor(EXTOSC_COLOUR);
+    noiselabel->labelcolor(238);
     noiselabel->show();
 }
 else if (pars->VoicePar[nvoice].Type == 1)
@@ -324,7 +324,7 @@ else
     code {if (pars->VoicePar[nvoice].PFMEnabled == NONE)
 {
     modlabel->copy_label("OFF");
-    modlabel->labelcolor(MODOFF_COLOUR);
+    modlabel->labelcolor(41);
     modlabel->deactivate();
     modlabel->show();
 }
@@ -336,7 +336,7 @@ else
         char str[15];
         snprintf(str, sizeof(str), "V%d", pars->VoicePar[nvoice].PFMVoice + 1);
         modlabel->copy_label(str);
-        modlabel->labelcolor(EXTVOICE_COLOUR);
+        modlabel->labelcolor(157);
         modlabel->show();
     }
     else if (pars->VoicePar[nvoice].PextFMoscil >= 0)
@@ -344,7 +344,7 @@ else
         char str[15];
         snprintf(str, sizeof(str), "M%d", pars->VoicePar[nvoice].PextFMoscil + 1);
         modlabel->copy_label(str);
-        modlabel->labelcolor(EXTOSC_COLOUR);
+        modlabel->labelcolor(238);
         modlabel->show();
     }
     else
@@ -1623,7 +1623,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     char str[15];
     snprintf(str, sizeof(str), "Voice %d", pars->VoicePar[nvoice].PVoice + 1);
     osclabel->copy_label(str);
-    osclabel->labelcolor(EXTVOICE_COLOUR);
+    osclabel->labelcolor(157);
     osclabel->show();
     noiselabel->hide();
 }
@@ -1632,7 +1632,7 @@ else if (pars->VoicePar[nvoice].Type == 0 && pars->VoicePar[nvoice].Pextoscil >=
     char str[15];
     snprintf(str, sizeof(str), "Osc. %d", pars->VoicePar[nvoice].Pextoscil + 1);
     osclabel->copy_label(str);
-    osclabel->labelcolor(EXTOSC_COLOUR);
+    osclabel->labelcolor(238);
     osclabel->show();
     noiselabel->hide();
 }
@@ -1669,7 +1669,7 @@ else
     char str[15];
     snprintf(str, sizeof(str), "Voice %d", pars->VoicePar[nvoice].PFMVoice + 1);
     modvoicelabel->copy_label(str);
-    modvoicelabel->labelcolor(EXTVOICE_COLOUR);
+    modvoicelabel->labelcolor(157);
     modvoicelabel->show();
 }
 else if (pars->VoicePar[nvoice].PextFMoscil >= 0)
@@ -1677,7 +1677,7 @@ else if (pars->VoicePar[nvoice].PextFMoscil >= 0)
     char str[15];
     snprintf(str, sizeof(str), "Mod. %d", pars->VoicePar[nvoice].PextFMoscil + 1);
     modvoicelabel->copy_label(str);
-    modvoicelabel->labelcolor(EXTOSC_COLOUR);
+    modvoicelabel->labelcolor(238);
     modvoicelabel->show();
 }
 else

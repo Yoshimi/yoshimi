@@ -857,16 +857,16 @@ switch (res)
     switch(engine)
     {
         case 1:
-            col = ADD_COLOUR;
+            col = 214;
             break;
         case 2:
-            col = SUB_COLOUR;
+            col = 236;
             break;
         case 4:
-            col = PAD_COLOUR;
+            col = 158;
             break;
         default:
-            col = BASE_COLOUR;
+            col = 17;
             break;
     }
     return col;} {}

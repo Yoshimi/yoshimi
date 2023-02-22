@@ -151,7 +151,7 @@ return(nearestpoint);} {}
     if (active_r())
         fl_color(FL_BLACK);
     else
-        fl_color(MODOFF_COLOUR);
+        fl_color(41);
     if (!active_r()) currentpoint=-1;
 
     fl_rectf(ox,oy,lx,ly);

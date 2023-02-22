@@ -192,8 +192,9 @@ class VUMeter {: {public Fl_Box}
             // compute RMS - end
 
             // draw db level
-            fl_rectf(ox, oy, oldpeakl, VULENY, VU_LEVEL);
-            fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY, VU_LEVEL);
+            fl_color(229);
+            fl_rectf(ox, oy, oldpeakl, VULENY);
+            fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY);
 
             // fill with black
             fl_rectf(ox + oldpeakl, oy, VULENX - oldpeakl, VULENY, FL_BLACK);
@@ -204,9 +205,13 @@ class VUMeter {: {public Fl_Box}
             for (int i = 1; i < 1 - MIN_DB; ++i)
             {
                 int tx = VULENX + (int)(tmp * i);
-                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, VU_DB);
+                fl_color(220);
+                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2);
                 if (i % 5 == 0)
-                    fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, VU_5DB);
+                {
+                    fl_color(230);
+                    fl_rectf(ox + tx, oy, 1, VULENY + ly / 2);
+                }
                 if (i % 10 == 0)
                     fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, FL_CYAN);
             }
@@ -261,7 +266,8 @@ class VUMeter {: {public Fl_Box}
     float Vpeak = fetchData(0, MAIN::control::readPartPeak, TOPLEVEL::section::main, actualpart);
     if (Vpeak < 0) // its inactive
     {
-        fl_rectf(ox, oy, lx, ly, VU_OFF);
+        fl_color(45);
+        fl_rectf(ox, oy, lx, ly);
     }
     else
     {
@@ -280,7 +286,8 @@ class VUMeter {: {public Fl_Box}
         db = db * ly - 2;
         panelpart.oldpeak[actualpart] = int(db);
         fl_rectf(ox, oy,mid, ly, FL_BLACK);
-        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart], VU_LEVEL);
+        fl_color(229);
+        fl_rectf(ox, oy + ly - panelpart.oldpeak[actualpart], mid, panelpart.oldpeak[actualpart]);
         if (panelpart.clip[actualpart])
             fl_rectf(ox, oy, mid, 4, FL_RED);
 
@@ -293,7 +300,8 @@ class VUMeter {: {public Fl_Box}
         db = db * ly - 2;
         panelpart.oldpeakR[actualpart] = int(db);
         fl_rectf(ox + mid, oy,lx - mid, ly, FL_BLACK);
-        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart], VU_LEVEL);
+        fl_color(229);
+        fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
         if (panelpart.clipR[actualpart])
             fl_rectf(ox + mid, oy, lx - mid, 4, FL_RED);
 
@@ -303,13 +311,20 @@ class VUMeter {: {public Fl_Box}
         {
             int ty = ly + int(tmp * i);
             if (i % 5 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, VU_DB);
+            {
+                fl_color(220);
+                fl_rectf(ox, oy + ly - ty, lx, 1);
+            }
             if (i % 10 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, VU_5DB);
+            {
+                fl_color(230);
+                fl_rectf(ox, oy + ly - ty, lx, 1);
+            }
         }
         fl_rectf(x() + mid, oy, 4, ly, FL_GRAY);
     }
-    fl_rectf(x() + mid, oy, 4, ly, MODOFF_COLOUR);} {}
+    fl_color(42);
+    fl_rectf(x() + mid, oy, 4, ly);} {}
   }
   Function {draw()} {} {
     code {//
@@ -638,19 +653,19 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     partpad->damage(1);
     int engine = findengines(npart);
     if (engine & 1)
-        partadd->color(ADD_COLOUR);
+        partadd->color(214);
     else
         partadd->color(FL_BACKGROUND_COLOR);
     if (engine & 2)
-        partsub->color(SUB_COLOUR);
+        partsub->color(236);
     else
         partsub->color(FL_BACKGROUND_COLOR);
     if (engine & 4)
-        partpad->color(PAD_COLOUR);
+        partpad->color(158);
     else
         partpad->color(FL_BACKGROUND_COLOR);
     if (synth->part[npart | *plgroup]->PyoshiType)
-        partname->labelcolor(YOSHI_COLOUR);
+        partname->labelcolor(219);
     else
         partname->labelcolor(FL_BLACK);
     partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());} {}

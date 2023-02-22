@@ -98,22 +98,6 @@ typedef unsigned int  uint;
 #define NO_MSG 255 // these two may become different
 #define UNUSED 255
 
-// GUI colours
-#define ADD_COLOUR 0xdfafbf00
-#define BASE_COLOUR 0xfdf6e600
-#define SUB_COLOUR 0xafcfdf00
-#define PAD_COLOUR 0xcdddad00
-#define YOSHI_COLOUR 0x0000e100
-#define EXTOSC_COLOUR 0x8fbfdf00
-#define EXTVOICE_COLOUR 0x9fdf8f00
-#define MODOFF_COLOUR 0x80808000
-#define WHITE_KEY_COLOUR 0xFAF0E600
-#define WHITE_KEY_PRESSED 0xBEB4AA00
-#define VU_DB 0x00A0C800
-#define VU_5DB 0x00E6F000
-#define VU_LEVEL 0x00C8FF00
-#define VU_OFF 0x8C8C8C00
-
 // these were previously (pointlessly) user configurable
 #define NUM_VOICES 8
 #define POLYPHONY 60 // per part!

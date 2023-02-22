@@ -192,7 +192,7 @@ static void *mainThread(void *arg)
             boxLb.box(FL_EMBOSSED_FRAME);
             boxLb.labelsize(16);
             boxLb.labelfont(FL_BOLD);
-            boxLb.labelcolor(YOSHI_COLOUR);
+            boxLb.labelcolor(0x0000e100);
         }
         winSplash.border(false);
         if (splashSet && bShowGui)

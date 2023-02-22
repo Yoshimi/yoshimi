@@ -417,6 +417,7 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
+      setColourTable(0);
       make_window();
       bool foundWindows = Showmaster();
 
@@ -466,6 +467,24 @@ class MasterUI {: {private GuiUpdates}
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
+  }
+  Function {setColourTable(int table)} {} {
+    code {//
+        switch (table)
+        {
+            case 0: // classic
+            {
+                Fl::set_color(17, 253, 246, 230); // instrument basic background
+                Fl::set_color(219, 0, 0, 225); // yoshimi instrument type
+                Fl::set_color(157, 159, 223, 143); // external voice
+                Fl::set_color(238, 143, 191, 223); // external oscillator
+                Fl::set_color(158, 205, 221, 173); // padsynth background
+                Fl::set_color(214, 223, 175, 191); // addsynth background
+                Fl::set_color(236, 175, 207, 223); // subsynth background
+                Fl::set_color(237, 180, 210, 240); // padsynth profile fill
+            }
+            break;
+        }} {}
   }
   Function {Showmaster()} {return_type bool
   } {
@@ -2782,7 +2801,6 @@ Alan Calvert started the project}
             case MIDI::control::noteOff:
                 break;
             case MIDI::control::controller:
-                //cout << " Value " << value_int << "  kit " << int(kititem) << "  npart " << int(npart) << endl;
                 if (engine <= 119 && engine == synth->getRuntime().channelSwitchCC)
                 { // it's a valid channel switch
                     int newch = partMidiCh->value() - 1;
@@ -3593,19 +3611,19 @@ Alan Calvert started the project}
   Function {updateEngines(int engine, string instrumentName)} {} {
     code {//
         if (engine & 1) // addsynth
-        instrumentaddbox->color(ADD_COLOUR);
+        instrumentaddbox->color(214);
     else
-        instrumentaddbox->color(BASE_COLOUR);
+        instrumentaddbox->color(17);
 
     if (engine & 2) // subsynth
-        instrumentsubbox->color(SUB_COLOUR);
+        instrumentsubbox->color(236);
     else
-        instrumentsubbox->color(BASE_COLOUR);
+        instrumentsubbox->color(17);
 
     if (engine & 4) // padsynth
-        instrumentpadbox->color(PAD_COLOUR);
+        instrumentpadbox->color(158);
     else
-        instrumentpadbox->color(BASE_COLOUR);
+        instrumentpadbox->color(17);
 
     instrumentaddbox->damage(1);
     instrumentsubbox->damage(1);
@@ -3617,15 +3635,15 @@ Alan Calvert started the project}
     {
         int num = npart % NUM_MIDI_CHANNELS;
         if (engine & 1)
-            panellistitem[num]->partadd->color(ADD_COLOUR);
+            panellistitem[num]->partadd->color(214);
         else
             panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
         if (engine & 2)
-            panellistitem[num]->partsub->color(SUB_COLOUR);
+            panellistitem[num]->partsub->color(236);
         else
             panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
         if (engine & 4)
-            panellistitem[num]->partpad->color(PAD_COLOUR);
+            panellistitem[num]->partpad->color(158);
         else
             panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
 
@@ -4361,9 +4379,10 @@ bpmfallback->format(format);} {}
     nextInst->labelsize(size11);
     valueInst->textsize(size11);
     cancelInst->labelsize(size11);
+    SystemEffectsGrp->labelsize(size12);
+    InsertionEffectsGrp->labelsize(size12);
     if (syseffectui->visible())
-    {
-        SystemEffectsGrp->labelsize(size12);
+    {;
         syseffnocounter->labelsize(size11);
             syseffnocounter->textsize(size11);
         sysefftype->labelsize(size11);
@@ -4377,7 +4396,6 @@ bpmfallback->format(format);} {}
     }
     else
     {
-        InsertionEffectsGrp->labelsize(size12);
         inseffnocounter->labelsize(size11);
             inseffnocounter->textsize(size11);
         insefftype->labelsize(size11);

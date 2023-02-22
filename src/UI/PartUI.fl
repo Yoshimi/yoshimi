@@ -460,7 +460,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           }
           Fl_Box addbox {
             xywh {8 226 84 18} box FLAT_BOX
-            code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
+            code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(214); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button adeditbutton {
             label Edit
@@ -490,7 +490,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           }
           Fl_Box subbox {
             xywh {103 226 84 18} box FLAT_BOX
-            code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
+            code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(236); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button subeditbutton {
             label Edit
@@ -520,7 +520,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           }
           Fl_Box padbox {
             xywh {198 226 84 18} box FLAT_BOX
-            code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(FL_BACKGROUND_COLOR);}
+            code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(158); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button padeditbutton {
             label Edit
@@ -2136,7 +2136,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         engine |= 1;
         adsynenabledcheck->value(1);
         adeditbutton->activate();
-        addbox->color(ADD_COLOUR);
+        addbox->color(214);
     }
     else
     {
@@ -2150,7 +2150,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         engine |= 2;
         subsynenabledcheck->value(1);
         subeditbutton->activate();
-        subbox->color(SUB_COLOUR);
+        subbox->color(236);
     }
     else
     {
@@ -2164,7 +2164,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         engine |= 4;
         padsynenabledcheck->value(1);
         padeditbutton->activate();
-        padbox->color(PAD_COLOUR);
+        padbox->color(158);
     }
     else
     {
@@ -2248,22 +2248,22 @@ class PartUI {: {public Fl_Group, PartUI_}
             engine |= 4;
     }
     if (engine & 1)
-        synth->getGuiMaster()->instrumentaddbox->color(ADD_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(214);
     else
-        synth->getGuiMaster()->instrumentaddbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentaddbox->color(17);
 
     if (engine & 2)
-        synth->getGuiMaster()->instrumentsubbox->color(SUB_COLOUR);
+        synth->getGuiMaster()->instrumentsubbox->color(236);
     else
-        synth->getGuiMaster()->instrumentsubbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentsubbox->color(17);
 
     if (engine & 4)
-        synth->getGuiMaster()->instrumentpadbox->color(PAD_COLOUR);
+        synth->getGuiMaster()->instrumentpadbox->color(158);
     else
-        synth->getGuiMaster()->instrumentpadbox->color(BASE_COLOUR);
+        synth->getGuiMaster()->instrumentpadbox->color(17);
 
     if (part->PyoshiType)
-        synth->getGuiMaster()->instrumentlabel->labelcolor(YOSHI_COLOUR);
+        synth->getGuiMaster()->instrumentlabel->labelcolor(219);
     else
         synth->getGuiMaster()->instrumentlabel->labelcolor(FL_BLACK);
     if (text == "")
