@@ -1835,7 +1835,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         copyright->value(part->info.Pauthor.c_str());
         commentField->value(part->info.Pcomments.c_str());
         string name = part->Poriginal;
-        if (!name.empty() && part->Pname != name)
+        if (!name.empty() && name != UNTITLED && part->Pname != name)
         {
             originaltext->copy_label(name.c_str());
             originalname->show();

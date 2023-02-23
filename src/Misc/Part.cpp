@@ -184,7 +184,7 @@ void Part::setNoteMap(int keyshift)
 void Part::defaultsinstrument(void)
 {
     Pname = DEFAULT_NAME;
-    Poriginal = "";
+    Poriginal = UNTITLED;
     PyoshiType = 0;
     info.Ptype = 0;
     info.Pauthor.clear();
@@ -1379,7 +1379,7 @@ bool Part::saveXML(string filename, bool yoshiFormat)
     }
     if (Pname < "!") // this shouldn't be possible
         Pname = UNTITLED;
-    else if (Poriginal.empty() && Pname != UNTITLED)
+    else if ((Poriginal.empty() || Poriginal == UNTITLED) && Pname != UNTITLED)
         Poriginal = Pname;
 
     if (yoshiFormat)
@@ -1489,20 +1489,20 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             Pname = xml->getparstr("file");
 
         if (Poriginal == DEFAULT_NAME) // it's an old one
-            Poriginal = "";
+            Poriginal = UNTITLED;
         if (Pname.empty()) // it's an older state file
         {
-            if (Poriginal. empty())
+            if (Poriginal.empty() || Poriginal == UNTITLED)
                 Pname = DEFAULT_NAME;
             else
                 Pname = Poriginal;
         }
-        else if (Poriginal.empty()) // it's one from zyn
+        else if (Poriginal.empty() || Poriginal == UNTITLED) // it's one from zyn
             Poriginal = Pname;
         if (Pname.empty() && Poriginal == UNTITLED)
         {
             Pname = UNTITLED;
-            Poriginal = "";
+            Poriginal = UNTITLED;
         }
         xml->exitbranch();
     }

@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-2-23 Will
+bn 2180
+BugFix: If an instrument is loaded with an empty 'original' name
+there may be undefined behaviour and possible crash when saving.
+
 2023-2-22 Will
 bn 2179
 BugFix: sys/ins text not resizing

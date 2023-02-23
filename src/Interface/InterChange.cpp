@@ -1582,7 +1582,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
                 if (write)
                 {
                     part->Pname = text;
-                    if (part->Poriginal.empty())
+                    if (part->Poriginal.empty() || part->Poriginal == UNTITLED)
                         part->Poriginal = text;
                     guiTo = true;
                 }
