@@ -417,7 +417,16 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
-      setColourTable(0);
+      setColourTable("classic");
+      string name = file::localDir() + "/themes";
+      file::createDir(name);
+      string colourText;
+      for (int i = 0; i < (COLOURLIST + 3); ++i)
+      {
+          colourText += (colourData[i] + char(10));
+      }
+      name += "/classic";
+      file::saveText(colourText, name);
       make_window();
       bool foundWindows = Showmaster();
 
@@ -468,23 +477,64 @@ class MasterUI {: {private GuiUpdates}
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
-  Function {setColourTable(int table)} {} {
+  Function {setColourTable(string table)} {} {
     code {//
-        switch (table)
+        string dirname = file::localDir() + "/themes/";
+        string colourText = loadText(dirname + table);
+        std::size_t nextPos = 1;
+
+        bool ok =  true;
+        std::cout << std::endl;
+        for (int i = 0; i < COLOURLIST; ++ i)
         {
-            case 0: // classic
+            nextPos = colourText.find(char(10));
+            if (nextPos == std::string::npos)
             {
-                Fl::set_color(17, 253, 246, 230); // instrument basic background
-                Fl::set_color(219, 0, 0, 225); // yoshimi instrument type
-                Fl::set_color(157, 159, 223, 143); // external voice
-                Fl::set_color(238, 143, 191, 223); // external oscillator
-                Fl::set_color(158, 205, 221, 173); // padsynth background
-                Fl::set_color(214, 223, 175, 191); // addsynth background
-                Fl::set_color(236, 175, 207, 223); // subsynth background
-                Fl::set_color(237, 180, 210, 240); // padsynth profile fill
+                ok = false;
+                break;
             }
-            break;
-        }} {}
+            setColourLine(colourText.substr(0, nextPos), i);
+            colourText = colourText.substr(nextPos + 1);
+        }
+        if (!ok)
+            std::cout << "failed" << std::endl;
+        //Fl::set_color(graph_Harmonics_grid, 30, 70, 255); // for testing
+        ;
+    } {}
+  }
+  Function {setColourLine(string text, int item)} {return_type bool
+  } {
+    code {//
+        //std::cout << ">" << text << "<" << std::endl;
+        size_t nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int red = string2int(text.substr(0, nextPos));
+        if (red < 0 || red > 255)
+            return false;
+        //std::cout << "red " << red << std::endl;
+
+        text = text.substr(nextPos + 1);
+        nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int green = string2int(text.substr(0, nextPos));
+        if (green < 0 || green > 255)
+            return false;
+        //std::cout << "green " << green << std::endl;
+
+        text = text.substr(nextPos + 1);
+        nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int blue = string2int(text.substr(0, nextPos));
+        if (blue < 0 || blue > 255)
+            return false;
+        //std::cout << "blue " << blue << std::endl;
+
+        Fl::set_color(colourNumbers[item], red, green, blue);
+
+        return true;} {}
   }
   Function {Showmaster()} {return_type bool
   } {
@@ -879,7 +929,7 @@ class MasterUI {: {private GuiUpdates}
           label {Virtual Keyboard}
           callback {//
           virkeyboard->ShowKbd();}
-          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
@@ -889,7 +939,7 @@ class MasterUI {: {private GuiUpdates}
           panelType &= 3;
           updatepanel();
           panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button mainmidilearn {
           label {Midi Learn}
@@ -901,7 +951,7 @@ class MasterUI {: {private GuiUpdates}
           label Vectors
           callback {//
           vectorui->Show(synth);}
-          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
         }
         Fl_Button undo {
           label Undo
@@ -961,7 +1011,7 @@ class MasterUI {: {private GuiUpdates}
             label {Send to}
             callback {//
     showSysEffSends();}
-            xywh {275 156 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
+            xywh {275 156 62 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Button sysCopy {
             label C
@@ -3611,19 +3661,19 @@ Alan Calvert started the project}
   Function {updateEngines(int engine, string instrumentName)} {} {
     code {//
         if (engine & 1) // addsynth
-        instrumentaddbox->color(214);
+        instrumentaddbox->color(add_back);
     else
-        instrumentaddbox->color(17);
+        instrumentaddbox->color(instr_back);
 
     if (engine & 2) // subsynth
-        instrumentsubbox->color(236);
+        instrumentsubbox->color(sub_back);
     else
-        instrumentsubbox->color(17);
+        instrumentsubbox->color(instr_back);
 
     if (engine & 4) // padsynth
-        instrumentpadbox->color(158);
+        instrumentpadbox->color(pad_back);
     else
-        instrumentpadbox->color(17);
+        instrumentpadbox->color(instr_back);
 
     instrumentaddbox->damage(1);
     instrumentsubbox->damage(1);
@@ -3635,15 +3685,15 @@ Alan Calvert started the project}
     {
         int num = npart % NUM_MIDI_CHANNELS;
         if (engine & 1)
-            panellistitem[num]->partadd->color(214);
+            panellistitem[num]->partadd->color(add_back);
         else
             panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
         if (engine & 2)
-            panellistitem[num]->partsub->color(236);
+            panellistitem[num]->partsub->color(sub_back);
         else
             panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
         if (engine & 4)
-            panellistitem[num]->partpad->color(158);
+            panellistitem[num]->partpad->color(pad_back);
         else
             panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
 

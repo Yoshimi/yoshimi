@@ -145,7 +145,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     bankID = bk;
     lastSeen = last;
     if (bank->engines_used(rt, bk, nslot) & 8)
-        labelcolor(219);
+        labelcolor(yoshi_ins_typ);
     else
         labelcolor(FL_BLACK);} {}
   }
@@ -511,17 +511,17 @@ class BankUI {: {public BankProcess_, RootProcess_}
         Fl_Button addpatch {
           label Add
           xywh {473 550 47 16} box FLAT_BOX labelsize 12 align 32
-          code0 {o->color(214);}
+          code0 {o->color(add_back);}
         }
         Fl_Button subpatch {
           label Sub
           xywh {520 550 47 16} box FLAT_BOX labelsize 12 align 32
-          code0 {o->color(236);}
+          code0 {o->color(sub_back);}
         }
         Fl_Button padpatch {
           label Pad
           xywh {567 550 47 16} box FLAT_BOX color 29 labelsize 12 align 32
-          code0 {o->color(158);}
+          code0 {o->color(pad_back);}
         }
         Fl_Button {} {
           xywh {474 549 139 17} box THIN_UP_FRAME labelsize 12

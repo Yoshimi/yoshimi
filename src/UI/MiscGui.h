@@ -1,7 +1,7 @@
 /*
     MiscGui.h - common link between GUI and synth
 
-    Copyright 2016-2021 Will Godfrey & others
+    Copyright 2016-2023 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -286,5 +286,63 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     }
     //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
+const int graph_back = 56;
+const int graph_grid = 217;
+const int graph_Harmonics_grid = 216;
+const int graph_line = 63;
+const int EQ_back = 96;
+const int EQ_back_off = 97;
+const int EQ_line =  95;
+const int EQ_line_off =  94;
+const int yoshi_ins_typ = 219;
+const int instr_back = 17;
+const int add_back = 214;
+const int sub_back = 236;
+const int pad_back = 158;
+const int pad_prof_fill = 231;
+const int ext_voice = 157;
+const int ext_osc = 238;
+
+const int COLOURLIST = 16;
+const unsigned char colourNumbers [COLOURLIST] = {
+    graph_back,
+    graph_grid,
+    graph_Harmonics_grid,
+    graph_line,
+    EQ_back,
+    EQ_back_off,
+    EQ_line,
+    EQ_line_off,
+    yoshi_ins_typ,
+    instr_back,
+    add_back,
+    sub_back,
+    pad_back,
+    pad_prof_fill,
+    ext_voice,
+    ext_osc,
+};
+
+static std::string colourData [] = {
+    "0,0,0, Common graph background",
+    "40,120,190, Common graph grid",
+    "30,70,255, Grid for harmonics graph",
+    "0,255,0, Common graph line",
+    "0,70,150, EQ graph background",
+    "80,120,160, EQ background disabled",
+    "255,255,0, EQ graph line",
+    "200,200,80, EQ graph line disabled",
+    "0,0,225, Yoshimi instrument type",
+    "253,246,230, Instrument background",
+    "223,175,191, AddSynth background",
+    "175,207,223, SubSynth background",
+    "205,221,173, PadSynth background",
+    "180,210,240, PadSynth profile fill",
+    "159,223,143, Ext voice",
+    "143,191,223, Ext osc",
+    "R,G,B, (no spaces)",
+    "Do not edit this. It will be overwritten.",
+    "Copy as template for other named themes.",
+};
 
 #endif

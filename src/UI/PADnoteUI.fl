@@ -132,11 +132,11 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         for (int i = 0; i < lx; i += step)
         {
              int val = int((ly - 2) * profile[i]);
-              if (active)
-                fl_color(237);
-            else
+             if (active)
+                fl_color(pad_prof_fill);
+             else
                 fl_color(45);
-            if (val != 0)
+             if (val != 0)
                 fl_line(ox + i, oy + ly, ox + i, oy + ly - val);
         }
 

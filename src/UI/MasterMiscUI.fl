@@ -653,19 +653,19 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     partpad->damage(1);
     int engine = findengines(npart);
     if (engine & 1)
-        partadd->color(214);
+        partadd->color(add_back);
     else
         partadd->color(FL_BACKGROUND_COLOR);
     if (engine & 2)
-        partsub->color(236);
+        partsub->color(sub_back);
     else
         partsub->color(FL_BACKGROUND_COLOR);
     if (engine & 4)
-        partpad->color(158);
+        partpad->color(pad_back);
     else
         partpad->color(FL_BACKGROUND_COLOR);
     if (synth->part[npart | *plgroup]->PyoshiType)
-        partname->labelcolor(219);
+        partname->labelcolor(yoshi_ins_typ);
     else
         partname->labelcolor(FL_BLACK);
     partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());} {}

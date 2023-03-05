@@ -136,10 +136,11 @@ class OscilSpectrum {: {public Fl_Box}
     max = max * 1.05;
 
     // draw
-    if (this->active_r())
-        fl_color(this->parent()->selection_color());
-    else
-        fl_color(this->parent()->color());
+    fl_color(graph_Harmonics_grid);
+    /*if (this->active_r())
+       fl_color(this->parent()->selection_color());
+    else // never seen this inactive!
+        fl_color(this->parent()->color());*/
 
     for (int i = 1; i < maxdb / 10; ++i)
     {
@@ -278,7 +279,7 @@ class Oscilloscope {: {public Fl_Box}
 
     if (damage() != 1)
     {
-        fl_color(FL_BLACK);
+        fl_color(graph_back);
         fl_rectf(ox, oy, lx, ly);
     }
 
@@ -297,9 +298,9 @@ class Oscilloscope {: {public Fl_Box}
     if (frame > 20)
     {
         if (this->active_r())
-            fl_color(this->parent()->labelcolor());
+            fl_color(graph_grid);//fl_color(this->parent()->labelcolor());
         else
-            fl_color(this->parent()->color());
+            fl_color(graph_back);//fl_color(this->parent()->color());
         int GX = 16;
         if (lx < GX * 3)
             GX = -1;
@@ -321,9 +322,10 @@ class Oscilloscope {: {public Fl_Box}
     // draw the function
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
     if (this->active_r())
-        fl_color(this->parent()->selection_color());
+        fl_color(graph_line);
+
     else
-        fl_color(this->parent()->labelcolor());
+        fl_color(graph_grid);//fl_color(this->parent()->labelcolor());
     int ph = int((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
     int lastx, lasty, nextx, nexty;
     for (int i = 1; i < lx; ++i)
@@ -490,7 +492,7 @@ o->hide();}
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group waveformgroup {
-          xywh {10 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+          xywh {10 85 350 190} box THIN_DOWN_BOX color 7 selection_color 71 labelcolor 179
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp, synth);}
         } {}
@@ -1266,10 +1268,10 @@ o->hide();}
     waveformgroup->redraw();
     harmonicgroup->redraw();
     oldosc->redraw();
-    if (cbwidget!=NULL) {
+    if (cbwidget!=NULL)
+    {
         cbwidget->do_callback();
-;
-};} {}
+    }} {}
   }
   Function {waveRtext()} {} {
     code {//
