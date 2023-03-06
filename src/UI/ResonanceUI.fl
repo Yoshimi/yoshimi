@@ -119,7 +119,7 @@ class ResonanceGraph {: {public Fl_Box}
     float freqx;
     fl_line_style(0, int(1 * ly/256));
 
-    fl_color(FL_BLACK);
+    fl_color(graph_back);
     fl_rectf(ox,oy,lx,ly);
 
 

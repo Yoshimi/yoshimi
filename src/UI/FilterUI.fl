@@ -116,7 +116,7 @@ class FormantFilterGraph {: {public Fl_Box}
         float scale = lx / float(points);
         fl_line_style(0, 1 * scale); // part of new resizable code
 
-        fl_color(FL_BLACK);
+        fl_color(graph_back);
         fl_rectf(ox, oy, lx, ly);
 
         //draw the lines

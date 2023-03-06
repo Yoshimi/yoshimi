@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-3-6 Will
+bn 2182
+'classic' theme now run directly in Master and only saved
+at startup if it's missing - purely to provide a template.
+
 2023-3-5 Will
 bn 2181
 Further work on colour themes.

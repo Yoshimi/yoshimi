@@ -11,7 +11,7 @@ comment {Envelope.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2022 Will Godfrey
+Copyright 2016-2023 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -149,7 +149,7 @@ return(nearestpoint);} {}
     int npoints=env->Penvpoints;
 
     if (active_r())
-        fl_color(FL_BLACK);
+        fl_color(graph_back);
     else
         fl_color(41);
     if (!active_r()) currentpoint=-1;

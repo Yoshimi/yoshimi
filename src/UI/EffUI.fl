@@ -238,7 +238,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     } {
       Fl_Text_Display noeffect {
         label {No Effects Applied}
-        xywh {120 35 10 20} box NO_BOX labelfont 1 labelcolor 37 align 8
+        xywh {120 35 10 20} box NO_BOX labelfont 1 labelcolor 0 align 8
       }
     }
   }

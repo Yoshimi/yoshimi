@@ -181,12 +181,12 @@ class FilerLine {: {public Fl_Group}
         }
       }
       Fl_Button name {
-        xywh {25 0 415 21} box NO_BOX color 7 labelsize 12 align 20
+        xywh {25 0 415 21} box NO_BOX color 7 labelsize 12 labelcolor 64 align 20
       }
       Fl_Button nametop {
         callback {//std::cout << "pressed " << n << std::endl;
 lineitem = n;}
-        xywh {0 1 420 18} box NO_BOX
+        xywh {0 1 420 18} box NO_BOX labelcolor 64
       }
     }
   }
@@ -419,14 +419,17 @@ class MasterUI {: {private GuiUpdates}
       yoshiLog = new ConsoleUI(synth);
       setColourTable("classic");
       string name = file::localDir() + "/themes";
-      file::createDir(name);
-      string colourText;
-      for (int i = 0; i < (COLOURLIST + 3); ++i)
+      string fullName = name + "/classic";
+      if (!file::isRegularFile(fullName))
       {
-          colourText += (colourData[i] + char(10));
+          file::createDir(name);
+          string colourText;
+          for (int i = 0; i < (COLOURLIST + 3); ++i)
+          {
+              colourText += (colourData[i] + char(10));
+          }
+          file::saveText(colourText, fullName);
       }
-      name += "/classic";
-      file::saveText(colourText, name);
       make_window();
       bool foundWindows = Showmaster();
 
@@ -479,12 +482,16 @@ class MasterUI {: {private GuiUpdates}
   }
   Function {setColourTable(string table)} {} {
     code {//
+        if (table == "classic")
+        {
+            setClassicTable();
+            return;
+        }
         string dirname = file::localDir() + "/themes/";
         string colourText = loadText(dirname + table);
         std::size_t nextPos = 1;
 
         bool ok =  true;
-        std::cout << std::endl;
         for (int i = 0; i < COLOURLIST; ++ i)
         {
             nextPos = colourText.find(char(10));
@@ -498,21 +505,27 @@ class MasterUI {: {private GuiUpdates}
         }
         if (!ok)
             std::cout << "failed" << std::endl;
-        //Fl::set_color(graph_Harmonics_grid, 30, 70, 255); // for testing
-        ;
-    } {}
+        //Fl::set_color(EQ_back, 0, 70, 150); // for testing
+        ;} {}
+  }
+  Function {setClassicTable()} {} {
+    code {//
+        for (int i = 0; i < COLOURLIST; ++ i)
+        {
+            setColourLine(colourData[i], i);
+        }
+        //Fl::set_color(57, 0, 200, 0); // for testing
+        ;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
   } {
     code {//
-        //std::cout << ">" << text << "<" << std::endl;
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
         int red = string2int(text.substr(0, nextPos));
         if (red < 0 || red > 255)
             return false;
-        //std::cout << "red " << red << std::endl;
 
         text = text.substr(nextPos + 1);
         nextPos = text.find(",");
@@ -521,16 +534,11 @@ class MasterUI {: {private GuiUpdates}
         int green = string2int(text.substr(0, nextPos));
         if (green < 0 || green > 255)
             return false;
-        //std::cout << "green " << green << std::endl;
 
         text = text.substr(nextPos + 1);
-        nextPos = text.find(",");
-        if (nextPos == std::string::npos)
-            return false;
-        int blue = string2int(text.substr(0, nextPos));
+        int blue = string2int(text); // don't need comma test here
         if (blue < 0 || blue > 255)
             return false;
-        //std::cout << "blue " << blue << std::endl;
 
         Fl::set_color(colourNumbers[item], red, green, blue);
 
@@ -850,7 +858,7 @@ class MasterUI {: {private GuiUpdates}
             }
             break;
       }}
-        xywh {-7 0 395 25} labelsize 12 textsize 12
+        xywh {-7 0 395 25} labelsize 12 labelcolor 64 textsize 12 textcolor 64
         code0 {//
         o->add("&Yoshimi  /&About...");
         o->add("&Yoshimi  /&New Instance");
@@ -892,7 +900,7 @@ class MasterUI {: {private GuiUpdates}
           label Detune
           callback {//
           send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Global Fine Detune} xywh {280 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
+          tooltip {Global Fine Detune} xywh {280 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
           class WidgetPDial
@@ -908,19 +916,19 @@ class MasterUI {: {private GuiUpdates}
               else
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}}
           tooltip {Clear all dynamic settings
-(+Ctrl includes MIDI-learn)} xywh {7 60 68 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+(+Ctrl includes MIDI-learn)} xywh {7 60 68 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 labelcolor 64 align 16
         }
         Fl_Button mainstop {
           label {Stop!}
           callback {//
     send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Cease all sound immediately!} xywh {7 30 68 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {7 30 68 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 labelcolor 64 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
           send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
-          tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
+          tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
           class WidgetPDial
@@ -929,7 +937,7 @@ class MasterUI {: {private GuiUpdates}
           label {Virtual Keyboard}
           callback {//
           virkeyboard->ShowKbd();}
-          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
@@ -939,31 +947,31 @@ class MasterUI {: {private GuiUpdates}
           panelType &= 3;
           updatepanel();
           panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button mainmidilearn {
           label {Midi Learn}
           callback {//
                 midilearnui->showLearn();}
-          tooltip {Message Log} xywh {83 90 106 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Message Log} xywh {83 90 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button vectors {
           label Vectors
           callback {//
           vectorui->Show(synth);}
-          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button undo {
           label Undo
           callback {//
         send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          tooltip {Revert last change} xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Revert last change} xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button redo {
           label Redo
           callback {//
         send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
-          tooltip {Re-apply last change} xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Re-apply last change} xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
       }
       Fl_Tabs sysinsgroup {
@@ -973,17 +981,17 @@ class MasterUI {: {private GuiUpdates}
             showSysEfxUI();
         else if (o->value() == InsertionEffectsGrp)
             showInsEfxUI();}
-        xywh {3 118 379 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
+        xywh {3 118 379 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 labelcolor 64 align 5
       } {
         Fl_Group SystemEffectsGrp {
           label {  System Effects  }
-          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
+          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4
         } {
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, o->value() - 1);}
-            xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
+            xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 maximum 4 textfont 1 textsize 11 textcolor 64
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
             class WidgetSpinner
@@ -992,7 +1000,7 @@ class MasterUI {: {private GuiUpdates}
             label Type
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
-            xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 16 textfont 1 textsize 11
+            xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 16 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
             code1 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {}
@@ -1004,14 +1012,14 @@ class MasterUI {: {private GuiUpdates}
                 else
                     sysefftype->deactivate();
             send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
-            xywh {247 159 16 15} down_box DOWN_BOX value 1 labelfont 1 labelsize 11 align 4
+            xywh {247 159 16 15} down_box DOWN_BOX value 1 selection_color 64 labelfont 1 labelsize 11 labelcolor 64 align 4
             class Fl_Check_Button2
           }
           Fl_Button sysEffSend {
             label {Send to}
             callback {//
     showSysEffSends();}
-            xywh {275 156 62 20} box THIN_UP_BOX labelfont 1 labelsize 11
+            xywh {275 156 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button sysCopy {
             label C
@@ -1028,13 +1036,13 @@ class MasterUI {: {private GuiUpdates}
         }
         Fl_Group InsertionEffectsGrp {
           label { Insertion Effects }
-          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
+          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
             label Effect
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, o->value() - 1);}
-            xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
+            xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 20 maximum 8 textfont 1 textsize 11 textcolor 64
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
             class WidgetSpinner
@@ -1043,7 +1051,7 @@ class MasterUI {: {private GuiUpdates}
             label Type
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
-            xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textfont 1 textsize 11
+            xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
             code1 {o->value(synth->insefx[ninseff]->geteffect());}
             code2 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -1052,7 +1060,7 @@ class MasterUI {: {private GuiUpdates}
             label {To }
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectDestination, o->value() - 2, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
-            xywh {242 156 96 20} down_box BORDER_BOX labelfont 1 labelsize 11 textfont 1 textsize 11
+            xywh {242 156 96 20} down_box BORDER_BOX labelfont 1 labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
           } {}
@@ -1071,21 +1079,21 @@ class MasterUI {: {private GuiUpdates}
         }
       }
       Fl_Group syseffectuigroup {
-        xywh {3 188 379 95} box FLAT_BOX color 48 labeltype NO_LABEL
+        xywh {3 188 379 95} box FLAT_BOX color 48 labeltype NO_LABEL labelcolor 64
         code0 {o->show();}
       } {
         Fl_Group syseffectui {
-          xywh {3 188 379 95} labeltype NO_LABEL
+          xywh {3 188 379 95} labeltype NO_LABEL labelcolor 64
           code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
           class EffUI
         } {}
       }
       Fl_Group inseffectuigroup {
-        xywh {3 188 379 95} box FLAT_BOX color 48
+        xywh {3 188 379 95} box FLAT_BOX color 48 labelcolor 64
         code0 {o->hide();}
       } {
         Fl_Group inseffectui {
-          xywh {3 188 379 95} color 52
+          xywh {3 188 379 95} color 52 labelcolor 64
           code0 {o->init(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
@@ -1109,7 +1117,7 @@ class MasterUI {: {private GuiUpdates}
             setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
             send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {340 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {340 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
             class WidgetPDial
           }
@@ -1120,7 +1128,7 @@ class MasterUI {: {private GuiUpdates}
                 setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
             send_data(0, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {292 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {292 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::panning, npart));}
             class WidgetPDial
           }
@@ -1128,7 +1136,7 @@ class MasterUI {: {private GuiUpdates}
             label {Vel.Offs}
             callback {//
             send_data(0, PART::control::velocityOffset, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {244 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {244 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::velocityOffset, npart));}
             class WidgetPDial
           }
@@ -1136,11 +1144,11 @@ class MasterUI {: {private GuiUpdates}
             label {Vel.Sense}
             callback {//
             send_data(0, PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {196 327 32 32} labelsize 10 maximum 127 step 1
+            xywh {196 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
           }
-          Fl_Group instrumentGroup {
+          Fl_Group instrumentGroup {open
             xywh {136 292 195 24} box PLASTIC_UP_BOX color 228
           } {
             Fl_Box instrumentaddbox {
@@ -1152,13 +1160,12 @@ class MasterUI {: {private GuiUpdates}
             Fl_Box instrumentpadbox {
               xywh {264 297 63 14} box FLAT_BOX color 17
             }
-            Fl_Button instrumentlabel {
+            Fl_Box instrumentlabel {
               label {Simple Sound}
-              callback {//}
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {139 295 187 16} box NO_BOX labelsize 12 align 16
+              xywh {139 295 187 16} selection_color 64 labelsize 12 labelcolor 64 align 16
             }
             Fl_Box instrumentFrame {
-              xywh {139 296 188 16} box PLASTIC_DOWN_FRAME color 237
+              xywh {139 296 188 16} box PLASTIC_DOWN_FRAME color 237 labelcolor 64
             }
             Fl_Button buttontop {
               callback {//
@@ -1179,7 +1186,7 @@ class MasterUI {: {private GuiUpdates}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box NO_BOX labeltype NO_LABEL labelsize 12 align 16
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box NO_BOX selection_color 64 labeltype NO_LABEL labelsize 12 labelcolor 64 align 16
             }
           }
           Fl_Spinner partMidiCh {
@@ -1191,13 +1198,13 @@ class MasterUI {: {private GuiUpdates}
               tmp &= (NUM_MIDI_CHANNELS - 1);
               o->value(tmp +1);
           }
-          o->textcolor(FL_BLACK);
+          o->textcolor(gen_text);
           if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
               setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
 
           send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
-            tooltip {MIDI channel for this part} xywh {34 350 40 19} labelsize 11 maximum 16 textsize 11
-            code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
+            tooltip {MIDI channel for this part} xywh {34 350 40 19} labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
+            code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(FL_WHITE);}
             class WidgetSpinner
           }
           Fl_Button partEdit {
@@ -1292,29 +1299,29 @@ class MasterUI {: {private GuiUpdates}
             //lastkey = -1;
             partui->Showedit();
        // }}
-            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12
+            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button partControllers {
             label Controllers
             callback {//
           partui->Showctl();}
-            tooltip {MIDI Controller range settings} xywh {8 373 86 22} box PLASTIC_UP_BOX color 228 labelsize 12
+            tooltip {MIDI Controller range settings} xywh {8 373 86 22} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64
           }
           Fl_Button partMidiCCs {
             label {Midi CCs}
             callback {//
           partui->Showctlmidi();}
-            tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12
+            tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64
           }
           Fl_Box modepatch {
             label Mode
-            xywh {155 328 32 17} box FLAT_BOX color 29 labelsize 11
+            xywh {155 328 32 17} box FLAT_BOX color 29 labelsize 11 labelcolor 64
           }
           Fl_Choice partKeymode {
             callback {//
                 updateModepatch(o->value() > 1 && partui->drumMode->value() != 0);
                 send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
+            tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 8 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
             code1 {int tmp = synth->ReadPartKeyMode(npart); if (tmp > 1) o->value(2); else o->value(tmp);}
             code3 {o->value(fetchData(0, PART::control::keyMode, npart));}
@@ -1326,7 +1333,7 @@ class MasterUI {: {private GuiUpdates}
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelsize 11 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelsize 11 labelcolor 64 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
           }
@@ -1342,7 +1349,7 @@ class MasterUI {: {private GuiUpdates}
           }
 
           send_data(0, PART::control::minNote, tmp, TOPLEVEL::type::Integer, npart);}
-            tooltip {Minimum note the part receives} xywh {59 402 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+            tooltip {Minimum note the part receives} xywh {59 402 42 20} labelsize 10 labelcolor 64 minimum 0 maximum 127 textsize 11 textcolor 64
             code0 {o->value(fetchData(0, PART::control::minNote, npart));}
             class WidgetSpinner
           }
@@ -1358,7 +1365,7 @@ class MasterUI {: {private GuiUpdates}
           }
 
           send_data(0, PART::control::maxNote, tmp, TOPLEVEL::type::Integer, npart);}
-            tooltip {Maximum note the part receives} xywh {59 434 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+            tooltip {Maximum note the part receives} xywh {59 434 42 20} labelsize 10 labelcolor 64 minimum 0 maximum 127 textsize 11 textcolor 64
             code0 {o->value(fetchData(0, PART::control::maxNote, npart));}
             class WidgetSpinner
           }
@@ -1371,7 +1378,7 @@ class MasterUI {: {private GuiUpdates}
               minKeyCount->value(lastnote);
               send_data(0, PART::control::minToLastKey, 1, TOPLEVEL::type::Integer, npart);
           }}
-            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX labelsize 10
+            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX labelsize 10 labelcolor 64
           }
           Fl_Button setNormal {
             label R
@@ -1379,7 +1386,7 @@ class MasterUI {: {private GuiUpdates}
           minKeyCount->value(0);
           maxKeyCount->value(127);
           send_data(0, PART::control::resetMinMaxKey, 1, TOPLEVEL::type::Integer, npart);}
-            tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {105 421 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+            tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {105 421 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button setMaxToLast {
             label Set
@@ -1390,13 +1397,13 @@ class MasterUI {: {private GuiUpdates}
               maxKeyCount->value(lastnote);
               send_data(0, PART::control::maxToLastKey, 1, TOPLEVEL::type::Integer, npart);
           }}
-            tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX labelsize 10
+            tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX labelsize 10 labelcolor 64
           }
           Fl_Spinner partKeyShift {
             label {Key Shift}
             callback {//
           send_data(TOPLEVEL::action::lowPrio, PART::control::keyShift, o->value(), TOPLEVEL::type::Integer, npart);}
-            xywh {195 403 38 20} labelsize 10 minimum -36 maximum 36 textsize 11
+            xywh {195 403 38 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textsize 11 textcolor 64
             code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);}
             code1 {o->value(fetchData(0, PART::control::keyShift, npart));}
             class WidgetSpinner
@@ -1405,24 +1412,24 @@ class MasterUI {: {private GuiUpdates}
             label {Key Limit}
             callback {//
           send_data(0, PART::control::maxNotes, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Maximum keys for this part} xywh {195 435 38 20} labelsize 10 value 20 textsize 11
+            tooltip {Maximum keys for this part} xywh {195 435 38 20} labelsize 10 labelcolor 64 value 20 textsize 11 textcolor 64
             code0 {o->range(1, POLYPHONY); // enough for one part!}
             code1 {o->value(fetchData(0, PART::control::maxNotes, npart));}
             class WidgetSpinner
           }
           Fl_Group sysEffBox {
-            xywh {240 400 134 58} box ENGRAVED_FRAME
+            xywh {240 400 134 58} box ENGRAVED_FRAME labelcolor 64
           } {
             Fl_Text_Display sysEffName {
               label {Send to System Effect}
-              xywh {255 440 103 1} box NO_BOX labelsize 11 align 2
+              xywh {255 440 103 1} box NO_BOX selection_color 64 labelsize 11 labelcolor 64 align 2 textcolor 64
             }
             Fl_Dial sysEff1 {
               label 1
               callback {//
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect1, o->value(), TOPLEVEL::type::Integer, npart);}
-              xywh {246 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              xywh {246 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect1, npart));}
               class WidgetPDial
             }
@@ -1431,7 +1438,7 @@ class MasterUI {: {private GuiUpdates}
               callback {//
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect2, o->value(), TOPLEVEL::type::Integer, npart);}
-              xywh {278 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              xywh {278 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect2, npart));}
               class WidgetPDial
             }
@@ -1440,7 +1447,7 @@ class MasterUI {: {private GuiUpdates}
               callback {//
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect3, o->value(), TOPLEVEL::type::Integer, npart);}
-              xywh {310 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              xywh {310 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect3, npart));}
               class WidgetPDial
             }
@@ -1449,7 +1456,7 @@ class MasterUI {: {private GuiUpdates}
               callback {//
 
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect4, o->value(), TOPLEVEL::type::Integer, npart);}
-              xywh {342 415 25 25} labelfont 1 labelsize 10 align 1 maximum 127 step 1
+              xywh {342 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect4, npart));}
               class WidgetPDial
             }
@@ -1473,7 +1480,7 @@ class MasterUI {: {private GuiUpdates}
         }
 
         send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, npart);}
-          xywh {58 326 20 20} down_box DOWN_BOX align 4
+          xywh {58 326 20 20} down_box DOWN_BOX labelcolor 64 align 4
           code0 {o->value(fetchData(0,  PART::control::enable, npart));}
           class Fl_Check_Button2
         }
@@ -1502,14 +1509,14 @@ class MasterUI {: {private GuiUpdates}
         else
             o->label("Mono");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11
+        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11 labelcolor 64
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Shift pitch +/- N semitones} xywh {328 88 43 20} labelsize 10 minimum -36 maximum 36 textfont 1 textsize 12
+        tooltip {Shift pitch +/- N semitones} xywh {328 88 43 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textfont 1 textsize 12 textcolor 64
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
         class WidgetSpinner
@@ -1518,7 +1525,7 @@ class MasterUI {: {private GuiUpdates}
         label {F. BPM}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::bpmFallback, o->value(), 0, TOPLEVEL::section::main);}
-        tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {316 116 56 20} labelsize 10 minimum 0 maximum 0 value 120 textfont 1 textsize 12
+        tooltip {Fallback BPM (Beats Per Minute). This is only used if the MIDI driver does not provide its own BPM information.} xywh {316 116 56 20} labelsize 10 labelcolor 64 minimum 0 maximum 0 value 120 textfont 1 textsize 12 textcolor 64
         code0 {o->range(BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);}
         code1 {o->step(1.0); o->type(FL_FLOAT_INPUT);}
         code2 {setBpmFallbackValue(synth->PbpmFallback);}
@@ -1530,7 +1537,7 @@ class MasterUI {: {private GuiUpdates}
         int nval = o->value() - 1;
         activePart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 293 40 22} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
+        xywh {36 293 40 22} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -1548,7 +1555,7 @@ class MasterUI {: {private GuiUpdates}
                 tmp = 32;
         }
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Set the number of available parts} xywh {93 293 40 22} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
+        tooltip {Set the number of available parts} xywh {93 293 40 22} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
         code0 {o->value(partmax);}
         class WidgetSpinner
       }
@@ -1557,7 +1564,7 @@ class MasterUI {: {private GuiUpdates}
         callback {//
                        send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Relative values when panned to extremes:
-   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX color 41 selection_color 0 labelsize 12 textfont 1 textsize 12 textcolor 255
+   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX color 41 selection_color 64 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("Cut: 0dB, -6dB");o->add("Default: +3dB, -3dB");o->add("Boost: +6dB, 0dB");}
         code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {}
@@ -1708,7 +1715,7 @@ Alan Calvert started the project}
       code1 {o->size_range(syseffDW, syseffDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group syseffgroup {
-        xywh {9 46 109 172} box FLAT_BOX
+        xywh {9 46 109 172} box FLAT_BOX labelcolor 64
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
                 for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; neff2++)}
@@ -1716,6 +1723,7 @@ Alan Calvert started the project}
                 syseffsend[neff1][neff2] =
                     new SysEffSend(o->x()+(neff2 - 1) * 35, o->y() + 20 + neff1 * 52, 30, 30);
                 syseffsend[neff1][neff2]->label("aaa");
+                syseffsend[neff1][neff2]->labelcolor(64);
                 syseffsend[neff1][neff2]->init(neff1, neff2, synth);
                 syseffsend[neff1][neff2]->setValueType(VC_FXSysSend);
             }}
@@ -1726,11 +1734,11 @@ Alan Calvert started the project}
     saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), false, "Master-systemeffectsend");
     syseffsendwindow->hide();
     syseffSeen = false;}
-        xywh {20 216 80 25} box THIN_UP_BOX
+        xywh {20 216 80 25} box THIN_UP_BOX labelcolor 64
       }
       Fl_Box syseffname {
         label {Send output of system effect  to other system effects}
-        xywh {5 5 110 35} labelsize 10 align 192
+        xywh {5 5 110 35} labelsize 10 labelcolor 64 align 192
       }
     }
     Fl_Window panelwindow {
@@ -1752,13 +1760,13 @@ Alan Calvert started the project}
         label {Change to 1 x 16}
         callback {//
         changepanelstyle(1);}
-        xywh {360 290 130 25} box THIN_UP_BOX
+        xywh {360 290 130 25} box THIN_UP_BOX labelcolor 64
       }
       Fl_Button todeep {
         label {Change to 2 x 8}
         callback {//
         changepanelstyle(2);}
-        xywh {831 290 120 25} box THIN_UP_BOX
+        xywh {831 290 120 25} box THIN_UP_BOX labelcolor 64
       }
       Fl_Choice Panelgroups {
         label {Part Group}
@@ -1767,7 +1775,7 @@ Alan Calvert started the project}
         panelgroup = result * NUM_MIDI_CHANNELS;
         for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             panellistitem[i]->refresh();}
-        xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12 textcolor 64
         code0 {o->add("1 to 16");o->add("17 to 32");o->add("33 to 48");o->add("49 to 64");}
         code1 {o->value(panelgroup / NUM_MIDI_CHANNELS);}
       } {}
@@ -1777,7 +1785,7 @@ Alan Calvert started the project}
         panelgroup = o->value() * NUM_MIDI_CHANNELS;
         for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             panellistitem[i]->refresh();}
-        xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        xywh {5 300 86 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12
         code0 {o->add("1 to 16");o->add("17 to 32");}
         code1 {if (panelgroup ==  NUM_MIDI_CHANNELS) o->value(1); else o->value(0);}
       } {}
@@ -1785,7 +1793,7 @@ Alan Calvert started the project}
         label CC
         callback {//
         CSpend->show();}
-        xywh {209 300 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
+        xywh {209 300 50 18} labelsize 12 labelcolor 64 align 1 minimum 0 maximum 127 value 115 textsize 12 textcolor 64
         code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
         code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
         class WidgetSpinner
@@ -1816,13 +1824,13 @@ Alan Calvert started the project}
         {
             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloCC, CSspinner->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);
         }}
-        tooltip {Click to set} xywh {276 290 70 25} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+        tooltip {Click to set} xywh {276 290 70 25} box PLASTIC_UP_BOX color 90 labelsize 12 labelcolor 64 hide
       }
       Fl_Choice channelswitch {
         label Solo
         callback {//
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::soloType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {114 300 74 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {114 300 74 18} down_box BORDER_BOX labelsize 12 labelcolor 64 align 1 textsize 12 textcolor 64
         code0 {o->add("Off");o->add("Row");o->add("Column");o->add("Loop");o->add("TwoWay");o->add("Channel");}
         code1 {o->value(synth->getRuntime().channelSwitchType);}
         code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
@@ -1834,7 +1842,7 @@ Alan Calvert started the project}
     panelType |= 4;
     saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
     panelwindow->hide();}
-        xywh {975 290 60 25} box THIN_UP_BOX labelfont 1
+        xywh {975 290 60 25} box THIN_UP_BOX labelfont 1 labelcolor 64
       }
     }
     Fl_Window message {
@@ -2698,7 +2706,7 @@ Alan Calvert started the project}
             case PART::control::midiChannel:
             {
                 int tmp = value_int;
-                int textCol = FL_BLACK;
+                int textCol = gen_text;
                 if (tmp >= NUM_MIDI_CHANNELS)
                 {
                     if (tmp >= NUM_MIDI_CHANNELS * 2)
@@ -2896,7 +2904,7 @@ Alan Calvert started the project}
                     partMidiCh->value(newch + 1);
 
                     if (newch < NUM_MIDI_CHANNELS)
-                        partMidiCh->textcolor(FL_BLACK);
+                        partMidiCh->textcolor(gen_text);
                     else
                         partMidiCh->textcolor(FL_WHITE);
                     updatepanel();
@@ -3772,7 +3780,7 @@ Alan Calvert started the project}
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partMidiCh->value(partui->part->Prcvchn + 1);
-        partMidiCh->textcolor(FL_BLACK);
+        partMidiCh->textcolor(gen_text);
     }
     else
     {
@@ -4058,12 +4066,12 @@ Alan Calvert started the project}
     code {//
     if (_npart == npart)
         partMidiCh->value(_value);
-    partMidiCh->textcolor(FL_BLACK);} {}
+    partMidiCh->textcolor(gen_text);} {}
   }
   Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
     panellistitem[_npart]->partrcv->value(_value);
-    panellistitem[_npart]->partrcv->textcolor(FL_BLACK);
+    panellistitem[_npart]->partrcv->textcolor(gen_text);
     panellistitem[_npart]->partrcv->redraw();} {}
   }
   Function {setLogging(bool isConsole)} {} {

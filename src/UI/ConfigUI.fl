@@ -233,7 +233,7 @@ alsaTab->hide();}
           } {}
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
-            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
+            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 0 align 128
             code0 {if (synth->getUniqueId() != 0) o->hide();}
           }
         }
@@ -401,7 +401,7 @@ or when that loads it will revert to the previous value} xywh {190 250 27 25} do
           }
           Fl_Box switchesNote {
             label {* Changing these settings requires a restart}
-            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 38 align 128
+            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 0 align 128
           }
         }
         Fl_Group jackTab {
@@ -449,7 +449,7 @@ or when that loads it will revert to the previous value} xywh {190 250 27 25} do
           }
           Fl_Box jackNote {
             label {Changing settings requires a restart}
-            xywh {60 276 267 17} labelfont 1 labelsize 12 labelcolor 38 align 128
+            xywh {60 276 267 17} labelfont 1 labelsize 12 labelcolor 0 align 128
           }
         }
         Fl_Group alsaTab {
@@ -509,7 +509,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           }
           Fl_Box alsaNote {
             label {Changing settings requires a restart}
-            xywh {60 276 267 17} labelfont 1 labelsize 12 labelcolor 38 align 128
+            xywh {60 276 267 17} labelfont 1 labelsize 12 labelcolor 0 align 128
           }
         }
         Fl_Group midiTab {

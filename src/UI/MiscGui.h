@@ -286,7 +286,8 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     }
     //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
-const int graph_back = 56;
+const int gen_text = 64;
+const int graph_back = 57;
 const int graph_grid = 217;
 const int graph_Harmonics_grid = 216;
 const int graph_line = 63;
@@ -303,8 +304,9 @@ const int pad_prof_fill = 231;
 const int ext_voice = 157;
 const int ext_osc = 238;
 
-const int COLOURLIST = 16;
+const int COLOURLIST = 17;
 const unsigned char colourNumbers [COLOURLIST] = {
+    gen_text,
     graph_back,
     graph_grid,
     graph_Harmonics_grid,
@@ -324,6 +326,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
 };
 
 static std::string colourData [] = {
+    "0,0,0, General text",
     "0,0,0, Common graph background",
     "40,120,190, Common graph grid",
     "30,70,255, Grid for harmonics graph",
@@ -341,7 +344,7 @@ static std::string colourData [] = {
     "159,223,143, Ext voice",
     "143,191,223, Ext osc",
     "R,G,B, (no spaces)",
-    "Do not edit this. It will be overwritten.",
+    "Do not edit this. It may be overwritten.",
     "Copy as template for other named themes.",
 };
 
