@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -417,7 +417,7 @@ class MasterUI {open : {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
-      setColourTable("classic");
+      setColourTable(synth->getRuntime().guiTheme);
       string name = file::localDir() + "/themes";
       string fullName = name + "/classic.clr";
       if (!file::isRegularFile(fullName))
@@ -428,7 +428,7 @@ class MasterUI {open : {private GuiUpdates}
           {
               colourText += (colourData[i] + char(10));
           }
-          for (int i = 0; i < 3; ++i)
+          for (int i = 0; i < COLOURINFO; ++i)
           {
               colourText += (colourInfo[i] + char(10));
           }
@@ -493,6 +493,12 @@ class MasterUI {open : {private GuiUpdates}
             return;
         }
         string dirname = file::localDir() + "/themes/";
+        string fullName = dirname + table + ".clr";
+        if (!file::isRegularFile(fullName))
+        {
+            setClassicTable();
+            return;
+        }
         string colourText = loadText(dirname + table + ".clr");
         std::size_t nextPos = 1;
 
@@ -518,12 +524,14 @@ class MasterUI {open : {private GuiUpdates}
         {
             setColourLine(colourData[i], i);
         }
-        //Fl::set_color(144, 0, 245, 245); // for testing
+        //Fl::set_color(gen_text_back, 220, 245, 245); // for testing
         ;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
   } {
     code {//
+        if (text.at(0) == char(35))
+            return true; // don't change this colour
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
@@ -605,7 +613,7 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {371 427 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {193 425 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -1568,7 +1576,7 @@ class MasterUI {open : {private GuiUpdates}
         callback {//
                        send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Relative values when panned to extremes:
-   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX color 41 selection_color 64 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
+   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX selection_color 64 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("Cut: 0dB, -6dB");o->add("Default: +3dB, -3dB");o->add("Boost: +6dB, 0dB");}
         code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {}

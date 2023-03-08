@@ -1,6 +1,14 @@
 yoshimi 2.2.3 M
 
 2023-3-8 Will
+bn 2184
+Themes can now now be manually changed by copyiong and editing
+the 'classic' theme in:
+/home/will/.local/share/yoshimi/themes
+
+Then changing the last entry in:
+.config/yoshimi/yoshimi.config
+
 bn 2183
 All 'normal' text theme done.
 Also most graph colours.

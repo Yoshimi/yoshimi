@@ -488,6 +488,11 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
 
+    guiTheme = xml->getparstr("gui_theme_name");
+    if (guiTheme.empty())
+        guiTheme = "classic";
+    //std::cout << "theme >" << guiTheme << "<" << std::endl;
+
     // get preset dirs
     int count = 0;
     bool found = false;

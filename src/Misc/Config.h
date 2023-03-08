@@ -107,6 +107,8 @@ class Config
         static unsigned int  activeInstance;
         static int           showCLIcontext;
 
+        string        guiTheme;
+
         bool          runSynth;
         bool          isLittleEndian;
         bool          finishedCLI;

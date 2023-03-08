@@ -290,7 +290,7 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
 // don't mess with greyscale colours!
 const int gen_text_back = 7;
 const int gen_text = 64;
-const int eff_text = 175;
+const int gen_opp_text = 175;
 const int graph_back = 57;
 const int graph_pad_back = 254;
 const int graph_grid = 217;
@@ -316,7 +316,7 @@ const int COLOURLIST = 23;
 const unsigned char colourNumbers [COLOURLIST] = {
     gen_text_back,
     gen_text,
-    eff_text,
+    gen_opp_text,
     graph_back,
     graph_pad_back,
     graph_grid,
@@ -342,7 +342,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
 static std::string colourData [] = {
     "255,255,255, General text background",
     "0,0,0, General text",
-    "255,255,0, Effect preset text",
+    "255,255,0, General opposite text",
     "0,0,0, Common graph background",
     "245,245,245, Padsynth harmonics bachground",
     "40,120,190, Common graph grid",
@@ -364,10 +364,13 @@ static std::string colourData [] = {
     "159,223,143, Ext voice",
     "143,191,223, Ext osc",
 };
+
+const int COLOURINFO = 4;
 static std::string colourInfo [] = {
     "R,G,B, (no spaces)",
     "Do not edit this. It may be overwritten.",
     "Copy as template for other named themes.",
+    "'#' at line start = ignore this one."
 };
 
 #endif
