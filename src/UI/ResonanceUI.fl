@@ -124,7 +124,7 @@ class ResonanceGraph {: {public Fl_Box}
 
 
     //draw the lines
-    fl_color(FL_GRAY);
+    fl_color(graph_resonance_grid);
 
     fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
 
@@ -165,7 +165,7 @@ class ResonanceGraph {: {public Fl_Box}
 
     //draw the data
     fl_line_style(0, int(2 * ly/256));
-    fl_color(FL_RED);
+    fl_color(reson_graph_line);
     float ix = ox;
     int oix = int(ix);
     int iy;
@@ -311,13 +311,13 @@ class ResonanceUI {: PresetsUI_
       } {
         Fl_Value_Output khzvalue {
           label kHz
-          xywh {435 264 40 18} labelsize 12 align 8 minimum 0.001 maximum 48 textfont 1 textsize 12
+          xywh {435 264 40 18} labelsize 12 labelcolor 64 align 8 minimum 0.001 maximum 48 textfont 1 textsize 12 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {//this widget must be before the calling widgets}
         }
         Fl_Value_Output dbvalue {
           label dB
-          xywh {435 283 40 18} labelsize 12 align 8 minimum -150 maximum 150 textfont 1 textsize 12
+          xywh {435 283 40 18} labelsize 12 labelcolor 64 align 8 minimum -150 maximum 150 textfont 1 textsize 12 textcolor 64
           code0 {o->step(0.1, 1);}
           code1 {//this widget must be before the calling widgets}
         }
@@ -331,19 +331,19 @@ class ResonanceUI {: PresetsUI_
           label Clear
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::clearGraph, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Clear the resonance function} xywh {507 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12
+          tooltip {Clear the resonance function} xywh {507 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button smoothbutton {
           label Smooth
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::smoothGraph, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Smooth the resonance function} xywh {507 283 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
+          tooltip {Smooth the resonance function} xywh {507 283 66 18} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Value_Output maxdbvo {
           label {Max dB}
           callback {//
           o->value(respar->PmaxdB);}
-          tooltip {The Maximum amplitude (dB)} xywh {55 282 22 18} box THIN_DOWN_BOX labelsize 12 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12
+          tooltip {The Maximum amplitude (dB)} xywh {55 282 22 18} box THIN_DOWN_BOX labelsize 12 labelcolor 64 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12 textcolor 64
           code0 {o->value(respar->PmaxdB);}
         }
         Fl_Slider maxdb {
@@ -352,14 +352,14 @@ class ResonanceUI {: PresetsUI_
               o->value(20);
 
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer);}
-          xywh {77 283 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
+          xywh {77 283 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 minimum 1 maximum 90 step 1 value 30
           code0 {o->value(respar->PmaxdB);}
           class mwheel_slider_rev
         }
         Fl_Value_Output centerfreqvo {
           label {C.f.}
           callback {o->value(respar->getcenterfreq()/1000.0);}
-          tooltip {Center Frequency (kHz)} xywh {210 264 33 18} labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 12
+          tooltip {Center Frequency (kHz)} xywh {210 264 33 18} labelsize 12 labelcolor 64 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 12 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(respar->getcenterfreq()/1000.0);}
         }
@@ -369,14 +369,14 @@ class ResonanceUI {: PresetsUI_
               o->value(64);
 
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::centerFrequency, o->value(), TOPLEVEL::type::Integer);}
-          xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
+          xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(respar->Pcenterfreq);}
           class mwheel_slider_rev
         }
         Fl_Value_Output octavesfreqvo {
           label {Oct.}
           callback {o->value(respar->getoctavesfreq());}
-          tooltip {No. of octaves} xywh {210 282 33 18} labelsize 12 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 12
+          tooltip {No. of octaves} xywh {210 282 33 18} labelsize 12 labelcolor 64 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 12 textcolor 64
           code0 {o->value(respar->getoctavesfreq());}
         }
         Fl_Slider octavesfreq {
@@ -385,7 +385,7 @@ class ResonanceUI {: PresetsUI_
               o->value(64);
 
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::octaves, o->value(), TOPLEVEL::type::Integer);}
-          xywh {243 283 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
+          xywh {243 283 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(respar->Poctavesfreq);}
           class mwheel_slider_rev
         }
@@ -396,19 +396,19 @@ class ResonanceUI {: PresetsUI_
           label Rnd1
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 0, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 264 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 264 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Button rnd2 {
           label Rnd2
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 1, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 277 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 277 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Button rnd3 {
           label Rnd3
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 2, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 290 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10
+          tooltip {Randomize the resonance function} xywh {583 290 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Box {} {
           xywh {104 263 18 18} box THIN_UP_BOX color 237
@@ -417,13 +417,13 @@ class ResonanceUI {: PresetsUI_
           label { Prot.1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX labelsize 12
+          tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
           code0 {o->value(respar->Pprotectthefundamental);}
           class Fl_Check_Button2
         }
         Fl_Text_Display interpk {
           label InterpPk
-          xywh {364 280 62 0} box NO_BOX labelsize 12 align 33 textsize 12
+          xywh {364 280 62 0} box NO_BOX labelsize 12 labelcolor 64 align 33 textsize 12
         }
         Fl_Box {} {
           tooltip {Interpolate the peaks (left button smooth, right button linear)} xywh {359 264 72 37} box THIN_DOWN_FRAME
@@ -432,13 +432,13 @@ class ResonanceUI {: PresetsUI_
           label S
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::interpolatePeaks, 0, TOPLEVEL::type::Integer);}
-          tooltip {Smooth interpolation} xywh {365 282 14 14} labelfont 1 labelsize 12
+          tooltip {Smooth interpolation} xywh {365 282 14 14} labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button lbutton {
           label L
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::interpolatePeaks, 1, TOPLEVEL::type::Integer);}
-          tooltip {Linear interpolation} xywh {411 282 14 14} labelfont 1 labelsize 12
+          tooltip {Linear interpolation} xywh {411 282 14 14} labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button cbutton {
           label C
@@ -458,18 +458,18 @@ class ResonanceUI {: PresetsUI_
         label { Enable}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer);}
-        xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12
+        xywh {6 265 78 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 12 labelcolor 64
         code0 {o->value(respar->Penabled);}
         class Fl_Check_Button2
       }
       Fl_Box applybox {
-        xywh {696 261 80 24} box THIN_UP_BOX color 237
+        xywh {696 261 80 24} box THIN_UP_BOX color 237 labelcolor 65
       }
       Fl_Button applybutton {
         label Apply
         callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button resClose {
         label Close
@@ -485,7 +485,7 @@ class ResonanceUI {: PresetsUI_
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
           }}
-        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX labelsize 12
+        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
     }
   }

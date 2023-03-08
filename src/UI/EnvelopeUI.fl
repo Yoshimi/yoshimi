@@ -162,7 +162,7 @@ return(nearestpoint);} {}
     ly -= 10;
 
     //draw the lines
-    fl_color(FL_GRAY);
+    fl_color(graph_resonance_grid);
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
     //draws the envelope points and lines
@@ -356,7 +356,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
     } {
       Fl_Box freeedit {
         label Envelope
-        xywh {5 5 565 145} box FLAT_BOX color 0
+        xywh {5 5 565 145} box FLAT_BOX color 57 labelcolor 64
         code0 {o->init(env, npart, kititem, engine, group);}
         class EnvelopeFreeEdit
       }
@@ -374,7 +374,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         }
 
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11
+        tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11 labelcolor 64
       }
       Fl_Button addpoint {
         label {Add point}
@@ -389,7 +389,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         int offset = env->Penvdt[curpoint];
 
         send_data(TOPLEVEL::action::forceUpdate, group, curpoint, value, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointAdd, offset);}
-        xywh {112 155 80 20} box THIN_UP_BOX labelsize 11
+        xywh {112 155 80 20} box THIN_UP_BOX labelsize 11 labelcolor 64
         code0 {if (env->Pfreemode==0) o->hide();}
       }
       Fl_Button deletepoint {
@@ -404,14 +404,14 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
             return;
 
 send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Write, TOPLEVEL::insert::envelopePointDelete);}
-        xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
+        xywh {200 155 80 20} box THIN_UP_BOX labelsize 11 labelcolor 64
         code0 {if (env->Pfreemode==0) o->hide();}
       }
       Fl_Counter sustaincounter {
         label Sust
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainPoint, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Sustain (0 is disabled)} xywh {315 158 40 15} type Simple labelsize 11 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 12
+        tooltip {Sustain (0 is disabled)} xywh {315 158 40 15} type Simple selection_color 64 labelsize 11 labelcolor 64 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 12 textcolor 64
         code0 {o->value(env->Penvsustain);}
         code1 {if (env->Pfreemode==0) o->hide();}
         code2 {o->maximum(env->Penvpoints-2);}
@@ -420,7 +420,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label {Str.}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
+        tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
         code2 {o->setValueType(VC_EnvStretch);}
@@ -430,7 +430,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label L
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Linear Envelope} xywh {415 151 30 15} down_box DOWN_BOX labelsize 10
+        tooltip {Linear Envelope} xywh {415 151 30 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
         class Fl_Check_Button2
@@ -439,7 +439,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label frcR
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Forced Release} xywh {415 165 40 15} down_box DOWN_BOX labelsize 10
+        tooltip {Forced Release} xywh {415 165 40 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
         class Fl_Check_Button2
@@ -458,24 +458,24 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label Close
         callback {freemodeeditwindow->hide();
 saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "xEnvelope-free " + to_string(engine) + " " + to_string(group));}
-        xywh {519 155 44 20} box THIN_UP_BOX labelsize 12
+        xywh {519 155 44 20} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
     }
   }
   Function {make_ADSR_window()} {} {
     Fl_Window envADSR {
-      xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
+      xywh {1185 87 205 70} type Double color 50 labelfont 1 labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group e1name {
         label {Amplitude Env}
-        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
+        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Dial e1adt {
           label {A.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -484,7 +484,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {D.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
           class WidgetPDial
@@ -493,7 +493,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.dt }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -502,7 +502,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {S.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeAmpSusVal);}
           code1 {o->value(env->PS_val);}
           class WidgetPDial
@@ -511,7 +511,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Forced Release} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced Release} xywh {180 35 20 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 6
           code0 {o->value(env->Pforcedrelease);}
           class Fl_Check_Button2
         }
@@ -519,7 +519,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label Stretch
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
@@ -529,13 +529,13 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           callback {//
           showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
+          tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Check_Button e1linearenvelope {
           label L
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
+          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 4
           code0 {o->value(env->Plinearenvelope);}
           class Fl_Check_Button2
         }
@@ -555,18 +555,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {make_ASR_window()} {} {
     Fl_Window envASR {
-      xywh {1183 190 210 70} type Double hide
+      xywh {1183 190 210 70} type Double labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group e2name {
         label {Frequency Env}
-        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
+        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Dial e2aval {
           label {A.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PA_val);}
           class WidgetPDial
@@ -575,7 +575,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {A.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -584,7 +584,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.val }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PR_val);}
           class WidgetPDial
@@ -593,7 +593,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -602,7 +602,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label { Stretch}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
@@ -611,7 +611,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 6
           code0 {o->value(env->Pforcedrelease);}
           class Fl_Check_Button2
         }
@@ -631,24 +631,24 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         callback {//
       showfree();
       send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
+        tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
       }
     }
   }
   Function {make_ADSRfilter_window()} {} {
     Fl_Window envADSRfilter {
-      xywh {1121 294 275 70} type Double color 50 labelfont 1 hide
+      xywh {1121 294 275 70} type Double color 50 labelfont 1 labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group e3name {
         label {Filter Envelope}
-        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
+        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Dial e3aval {
           label {A.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PA_val);}
           class WidgetPDial
@@ -657,7 +657,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {A.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -666,7 +666,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {D.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PD_val);}
           class WidgetPDial
@@ -675,7 +675,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {D.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
           class WidgetPDial
@@ -684,7 +684,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -693,7 +693,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.val }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PR_val);}
           class WidgetPDial
@@ -702,7 +702,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label { Stretch}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
@@ -711,7 +711,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 6
           code0 {o->value(env->Pforcedrelease);}
           class Fl_Check_Button2
         }
@@ -720,7 +720,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           callback {//
           showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-          xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
+          xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Button e3C {
           label C
@@ -737,18 +737,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {make_ASRbw_window()} {} {
     Fl_Window envASRbw {
-      xywh {1209 649 210 70} type Double hide
+      xywh {1209 649 210 70} type Double labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group e4name {
         label {BandWidth Env}
-        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
+        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Dial e4aval {
           label {A.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
@@ -757,7 +757,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {A.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -766,7 +766,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
@@ -775,7 +775,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -784,7 +784,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label Stretch
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
@@ -793,7 +793,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label frcR
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::forcedRelease, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 6
           code0 {o->value(env->Pforcedrelease);}
           class Fl_Check_Button2
         }
@@ -813,23 +813,23 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         callback {//
         showfree();
         send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-        xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
+        xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
       }
     }
   }
   Function {make_free_window()} {} {
     Fl_Window envfree {
-      xywh {874 240 205 70} type Double color 50 labelfont 1 hide resizable
+      xywh {874 240 205 70} type Double color 50 labelfont 1 labelcolor 56 hide resizable
       class Fl_Group
     } {
       Fl_Group envfreegroup {
-        label {Amplitude Env}
-        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17 resizable
+        label {Amplitude Env} open
+        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17 resizable
       } {
         Fl_Box freeeditsmall {
           label Envelope
           callback {envfree->redraw();}
-          xywh {5 20 195 45} box FLAT_BOX color 0 resizable
+          xywh {5 20 195 45} box FLAT_BOX color 57 labelcolor 64 resizable
           code0 {o->init(env, npart, kititem, engine, group);}
           class EnvelopeFreeEdit
         }
@@ -848,7 +848,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         label E
         callback {showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-        xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
+        xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
       }
     }
   }

@@ -11,7 +11,7 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2022 Will Godfrey and others.
+Copyright 2016-2023 Will Godfrey and others.
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -471,33 +471,33 @@ class OscilEditor {: {public PresetsUI_}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
 o->hide();}
-      xywh {11 26 735 595} type Double labelsize 12 hide resizable
+      xywh {99 41 735 595} type Double labelsize 12 hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
       code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Box applybox {
-        xywh {298 278 64 24} box THIN_UP_BOX color 237
+        xywh {298 278 64 24} box THIN_UP_BOX color 237 labelcolor 104
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Button applybutton {
         label Apply
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group waveformgroup {
-          xywh {10 85 350 190} box THIN_DOWN_BOX color 7 selection_color 71 labelcolor 179
+          xywh {10 85 350 190} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp, synth);}
         } {}
         Fl_Group harmonicgroup {
-          xywh {10 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63
+          xywh {10 30 350 50} box THIN_DOWN_BOX color 57 selection_color 218 labelcolor 63
           code0 {OscilSpectrum *spc=new OscilSpectrum(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,0, synth);}
         } {}
@@ -522,7 +522,7 @@ o->hide();}
       }
       Fl_Box oscilname {
         label Oscillator
-        xywh {120 10 110 20} labelfont 1 labelsize 12
+        xywh {120 10 110 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Value_Slider rndslider {
         label {Phase Randomness}
@@ -531,49 +531,49 @@ o->hide();}
               o->value(0);
 
           send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscillator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+        tooltip {Oscillator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 104 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 104
         code0 {if (forPAD) o->hide();}
         class mwheel_val_slider_rev
       }
       Fl_Group basefuncdisplaygroup {
-        xywh {365 5 360 300} box ENGRAVED_FRAME
+        xywh {365 5 360 300} box ENGRAVED_FRAME labelcolor 64
       } {
         Fl_Group basewave {
-          xywh {370 85 350 190} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+          xywh {370 85 350 190} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp,1, synth);}
         } {}
         Fl_Dial bfslider {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionParameter, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
+          tooltip {Base Function Parameter} xywh {520 280 20 20} labelcolor 64 minimum -64 maximum 63 step 1
           class WidgetPDial
         }
         Fl_Choice bftype {
           label {Base Function}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionType, o->value(), TOPLEVEL::type::Integer);}
-          xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 11
+          xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 labelcolor 64 align 1 textfont 1 textsize 11 textcolor 64
           code0 {o->add("Sine");o->add("Triangle");o->add("Pulse");o->add("Saw");o->add("Power");o->add("Gauss");o->add("Diode");o->add("AbsSine");o->add("PulseSine");o->add("StrchSine");o->add("Chirp");o->add("AbsStrSine");o->add("Chebyshev");o->add("Square");o->add("Spike");o->add("Circle");o->add("HyperSec");o->add("User");}
         } {}
         Fl_Box basename {
           label {Base Function}
-          xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
+          xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Group baseharm {
-          xywh {370 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63
+          xywh {370 30 350 50} box THIN_DOWN_BOX color 57 selection_color 218 labelcolor 63
           code0 {OscilSpectrum *spc=new OscilSpectrum (o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,1, synth);}
         } {}
         Fl_Box parname {
           label {Par.}
-          xywh {460 285 30 16} box FLAT_BOX labelsize 11
+          xywh {460 285 30 16} box FLAT_BOX labelsize 11 labelcolor 64
         }
         Fl_Value_Output bfparval {
-          xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1 textfont 1 textsize 12
+          xywh {490 285 28 15} labelsize 12 labelcolor 64 align 20 minimum -63 maximum 63 step 1 textfont 1 textsize 12 textcolor 64
         }
         Fl_Group basefuncmodulation {
-          xywh {550 276 169 25} box ENGRAVED_BOX
+          xywh {550 276 169 25} box ENGRAVED_BOX labelcolor 64
           code0 {if ((oscil->Pcurrentbasefunc == OSCILLATOR::wave::sine)||(oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)) basefuncmodulation->deactivate();}
         } {
           Fl_Group baseFuncPars {
@@ -602,7 +602,7 @@ o->hide();}
             label {B.F.Mod.}
             callback {//
             send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationType, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+            tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 textfont 1 textsize 10 textcolor 64
             code0 {o->add("None");o->add("Rev");o->add("Sine");o->add("Powr");}
           } {}
         }
@@ -614,7 +614,7 @@ o->hide();}
         label {Mag.Type}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::magType, o->value(), TOPLEVEL::type::Integer);}
-        xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
+        xywh {70 280 65 20} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
         code0 {o->add("Linear");o->add("-40dB");o->add("-60dB");o->add("-80dB");o->add("-100dB");}
       } {}
       Fl_Button useasbase {
@@ -623,7 +623,7 @@ o->hide();}
         if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\nThis action is not easily reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::useAsBaseFunction, autoclearbutton->value() > 0, TOPLEVEL::type::Integer);}
-        tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11
+        tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button oscilClose {
         label Close
@@ -638,7 +638,7 @@ o->hide();}
             else
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->show();
         }}
-        tooltip {Right click: also reopen previous} xywh {668 565 62 25} box THIN_UP_BOX
+        tooltip {Right click: also reopen previous} xywh {668 565 62 25} box THIN_UP_BOX labelcolor 64
       }
       Fl_Button clearHarm {
         label Clear
@@ -646,26 +646,26 @@ o->hide();}
         if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\n This action can't be reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
+        xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Group {} {
-        xywh {135 308 150 30} box ENGRAVED_BOX
+        xywh {135 308 150 30} box ENGRAVED_BOX labelcolor 64
       } {
         Fl_Choice wshbutton {
           label {Wsh.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeType, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 textfont 1 textsize 10 textcolor 64
           code0 {o->add("None");o->add("Atan");o->add("Asym1");o->add("Powr");o->add("Sine");o->add("Qnts");o->add("Zigzg");o->add("Limt");o->add("LimtU");o->add("");o->add("ILimt");o->add("Clip");o->add("Asym2");o->add("Powr2");o->add("Sgm");}
         } {}
         Fl_Dial wshpar {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::waveshapeParameter, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
+          tooltip {Waveshaping Parameter} xywh {260 313 20 20} labelcolor 64 minimum -64 maximum 63 step 1
           class WidgetPDial
         }
         Fl_Value_Output wsparval {
-          xywh {228 316 25 15} labelsize 12 minimum -63 maximum 63 step 1
+          xywh {228 316 25 15} labelsize 12 labelcolor 64 minimum -63 maximum 63 step 1 textcolor 64
         }
       }
       Fl_Light_Button autoclearbutton {
@@ -673,10 +673,10 @@ o->hide();}
         callback {// not used directly now
         (void) o; // suppress warning
         //send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::autoClear, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
+        tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10 labelcolor 104
       }
       Fl_Group filterGroup {
-        xywh {285 308 155 30} box ENGRAVED_BOX
+        xywh {285 308 155 30} box ENGRAVED_BOX labelcolor 64
       } {
         Fl_Dial filtervalue1 {
           callback {//
@@ -702,7 +702,7 @@ o->hide();}
         label Filter
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::filterType, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+        tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("None");o->add("LP1");o->add("HP1a");o->add("HP1b");o->add("BP1");o->add("BS1");o->add("LP2");o->add("HP2");o->add("BP2");o->add("BS2");o->add("Cosn");o->add("Sine");o->add("LSh");o->add("S");}
       } {}
       Fl_Group {} {
@@ -712,7 +712,7 @@ o->hide();}
           label {Sp.adj.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::spectrumAdjustType, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 textfont 1 textsize 10 textcolor 64
           code0 {o->add("None");o->add("Pow");o->add("ThrsD");o->add("ThrsU");}
         } {}
         Fl_Dial sadjpar {
@@ -723,37 +723,37 @@ o->hide();}
         }
       }
       Fl_Group {} {
-        xywh {665 340 65 65} box ENGRAVED_BOX
+        xywh {665 340 65 65} box ENGRAVED_BOX labelcolor 64
       } {
         Fl_Counter harmonicshiftcounter {
           label {Harmonic Shift}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::harmonicShift, o->value(), TOPLEVEL::type::Integer);}
-          xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
+          xywh {670 365 55 15} type Simple selection_color 64 labelsize 10 labelcolor 64 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10 textcolor 64
         }
         Fl_Check_Button harmonicshiftpre {
           label {Shift 1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::shiftBeforeWaveshapeAndFilter, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {668 383 56 20} down_box DOWN_BOX labelsize 10 align 24
+          tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {668 383 56 20} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 24
           class Fl_Check_Button2
         }
       }
       Fl_Group adaptiveGroup {
-        xywh {665 410 65 90} box ENGRAVED_FRAME
+        xywh {665 410 65 90} box ENGRAVED_FRAME labelcolor 64
       } {
         Fl_Dial adhrpow {
           label pow
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsPower, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
+          tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 labelcolor 64 maximum 200 step 1
           class WidgetPDial
         }
         Fl_Dial adhrbf {
           label baseF
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsBase, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
+          tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 labelcolor 64 maximum 255 step 1
           class WidgetPDial
         }
         Fl_Slider adhrpar {
@@ -762,7 +762,7 @@ o->hide();}
               o->value(50);
 
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsParameter, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
+          tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 100 step 1 value 50
           class mwheel_slider_rev
         }
       }
@@ -770,28 +770,28 @@ o->hide();}
         label {Adpt.Harm.}
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsType, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {The type of the adaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textfont 1 textsize 10
+        tooltip {The type of the adaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 129 when 6 textfont 1 textsize 10 textcolor 64
         code0 {o->add("OFF");o->add("ON");o->add("Square");o->add("2xSub");o->add("2xAdd");o->add("3xSub");o->add("3xAdd");o->add("4xSub");o->add("4xAdd");}
       } {}
       Fl_Group modulationGroup {
-        xywh {440 308 154 30} box ENGRAVED_BOX
+        xywh {440 308 154 30} box ENGRAVED_BOX labelcolor 64
       } {
         Fl_Dial modpar1 {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationParameter1, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} labelcolor 64 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial modpar2 {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationParameter2, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} labelcolor 64 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial modpar3 {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationParameter3, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} labelcolor 64 maximum 127 step 1
           class WidgetPDial
         }
       }
@@ -799,7 +799,7 @@ o->hide();}
         label {Mod.}
         callback {//
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::modulationType, o->value(), TOPLEVEL::type::Integer);}
-        tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+        tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("None");o->add("Rev");o->add("Sine");o->add("Powr");}
       } {}
       Fl_Button tosine {
@@ -809,7 +809,7 @@ o->hide();}
             return;
 
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 525 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
+        xywh {670 525 55 15} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button oscilC {
         label C

@@ -68,11 +68,11 @@ class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
-      xywh {125 238 635 30} type Double box ENGRAVED_BOX hide
+      xywh {125 238 635 30} type Double box ENGRAVED_BOX labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
-        xywh {38 1 593 25} box FLAT_BOX
+        xywh {38 1 593 25} box FLAT_BOX labelcolor 64
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
         Fl_Value_Slider voicevolume {
@@ -82,7 +82,7 @@ class ADvoicelistitem {: {public Fl_Group}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->value(vol);
 
             collect_data(synth, vol, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
-          tooltip Volume xywh {155 4 122 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 maximum 127 step 1
+          tooltip Volume xywh {155 4 122 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 maximum 127 step 1 textcolor 64
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
           code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
           class mwheel_slider_rev
@@ -93,7 +93,7 @@ class ADvoicelistitem {: {public Fl_Group}
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
 
     collect_data(synth, enab, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
-          tooltip {Resonance On/Off} xywh {305 5 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
+          tooltip {Resonance On/Off} xywh {305 5 15 17} down_box DOWN_BOX selection_color 64 labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 labelcolor 64 align 4
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           class Fl_Check_Button2
         }
@@ -104,7 +104,7 @@ class ADvoicelistitem {: {public Fl_Group}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
 
             collect_data(synth, lfodepth, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
-          tooltip {Frequency LFO amount} xywh {535 4 95 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1 deactivate
+          tooltip {Frequency LFO amount} xywh {535 4 95 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 align 5 maximum 127 step 1 textcolor 64 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
           class mwheel_slider_rev
@@ -119,7 +119,7 @@ class ADvoicelistitem {: {public Fl_Group}
             }
 
             collect_data(synth, panning, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
-          tooltip {Voice panning} xywh {282 4 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
+          tooltip {Voice panning} xywh {282 4 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->VoicePar[nvoice].PPanning);}
           class WidgetPDial
@@ -160,7 +160,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Value_Output detunevalueoutput {
           callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
-          xywh {326 4 40 20} box THIN_DOWN_BOX labelsize 10 align 0 minimum -5000 maximum 5000 textsize 11
+          xywh {326 4 40 20} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 0 minimum -5000 maximum 5000 textsize 11 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(getDetune(pars->VoicePar[nvoice].PDetuneType, 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
         }
@@ -168,7 +168,7 @@ class ADvoicelistitem {: {public Fl_Group}
           callback {//
             int detune = lrint(o->value());
             collect_data(synth, detune, TOPLEVEL::action::forceUpdate, TOPLEVEL::type::Write, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
-          tooltip {Fine Detune (cents)} xywh {365 4 164 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
+          tooltip {Fine Detune (cents)} xywh {365 4 164 20} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           class mwheel_slider_rev
         }
@@ -179,19 +179,19 @@ class ADvoicelistitem {: {public Fl_Group}
               synth->getGuiMaster()->partui->adnoteui->set_voice(true);
               if ((Fl::event_button() == 3))
                   synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();}
-          tooltip {Right click: also close this} xywh {42 4 40 20} box THIN_UP_BOX labelfont 1 labelsize 12
+          tooltip {Right click: also close this} xywh {42 4 40 20} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Group enabledpatch {
         label 1
-        xywh {4 4 34 18} box UP_BOX color 237 labelfont 1 align 20
+        xywh {4 4 34 18} box UP_BOX color 237 labelfont 1 labelcolor 64 align 20
         code0 {char tmp[12]; snprintf(tmp, 12, "%d", nvoice + 1); o->label(strdup(tmp));}
       } {}
       Fl_Check_Button voiceenabled {
         callback {//
             bool enab = _SYS_::F2B(o->value());
             collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
-        xywh {18 7 15 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL
+        xywh {18 7 15 15} down_box DOWN_BOX selection_color 64 labeltype EMBOSSED_LABEL labelcolor 64
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
         class Fl_Check_Button2
       }
@@ -405,12 +405,12 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {329 157 805 610} type Double box NO_BOX hide resizable
+      xywh {394 110 805 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
       Fl_Box {} {
-        xywh {8 69 277 66} box PLASTIC_UP_BOX color 223
+        xywh {8 69 277 66} box PLASTIC_UP_BOX color 223 labelcolor 64
       }
       Fl_Group voiceparametersgroup {
         xywh {0 0 805 615} box THIN_UP_FRAME color 48
@@ -421,11 +421,11 @@ class ADvoiceUI {: {public Fl_Group}
         } {
           Fl_Group voiceFMparametersgroup {
             label MODULATOR
-            xywh {575 5 230 565} box THIN_UP_FRAME color 48 labelfont 1 labelsize 12 align 17
+            xywh {575 5 230 565} box THIN_UP_FRAME color 48 labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
             Fl_Group modfrequency {
               label {Mod FREQUENCY}
-              xywh {580 204 220 161} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+              xywh {580 204 220 161} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
             } {
               Fl_Group voiceFMfreqenvgroup {
                 label {ADSynth Modulator - Frequency Envelope}
@@ -443,7 +443,7 @@ class ADvoiceUI {: {public Fl_Group}
                         voiceFMfreqenvgroup->activate();
                     o->redraw();
                     send_data(0, ADDVOICE::control::enableModulatorFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Enable Frequency Envelope} xywh {590 295 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+                tooltip {Enable Frequency Envelope} xywh {590 295 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
                 class Fl_Check_Button2
               }
@@ -451,7 +451,7 @@ class ADvoiceUI {: {public Fl_Group}
                 label {Coarse Det.}
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorCoarseDetune, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Coarse Detune} xywh {730 270 60 15} labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+                tooltip {Coarse Detune} xywh {730 270 60 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune % 1024;}
                 code1 {if (k >= 512) k-= 1024;}
                 code2 {o->value(k);}
@@ -461,7 +461,7 @@ class ADvoiceUI {: {public Fl_Group}
                 label Octave
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorOctave, o->value(), TOPLEVEL::type::Integer);}
-                tooltip Octave xywh {670 270 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+                tooltip Octave xywh {670 270 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune / 1024;}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
@@ -469,14 +469,14 @@ class ADvoiceUI {: {public Fl_Group}
               Fl_Value_Output fmdetunevalueoutput {
                 label Detune
                 callback {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+                xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
                 code0 {o->step(0.01, 1);}
                 code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
               }
               Fl_Slider ModDetune {
                 callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFrequency, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Fine Detune (cents)} xywh {623 239 168 16} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
+                tooltip {Fine Detune (cents)} xywh {623 239 168 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
                 class mwheel_slider_rev
               }
@@ -484,14 +484,14 @@ class ADvoiceUI {: {public Fl_Group}
                 label {Detune Type}
                 callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneType, o->value(), TOPLEVEL::type::Integer);}
-                xywh {585 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
+                xywh {585 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
                 code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
                 code1 {o->value(pars->VoicePar[nvoice].PFMDetuneType);}
               } {}
               Fl_Check_Button detuneFromBaseOsc {
                 label {Follow voice}
                 callback {send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFromBaseOsc, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Apply all detuning in the voice oscillator to the modulator as well.} xywh {630 220 95 15} down_box DOWN_BOX labelsize 11
+                tooltip {Apply all detuning in the voice oscillator to the modulator as well.} xywh {630 220 95 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetuneFromBaseOsc);}
                 code1 {if (pars->VoicePar[nvoice].PFMFixedFreq) o->deactivate();}
                 class Fl_Check_Button2
@@ -500,14 +500,14 @@ class ADvoiceUI {: {public Fl_Group}
                 label 440Hz
                 callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs440Hz, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Set the modulator base frequency to 440Hz} xywh {726 220 55 15} down_box DOWN_BOX labelfont 1 labelsize 11
+                tooltip {Set the modulator base frequency to 440Hz} xywh {726 220 55 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64
                 code0 {o->value(pars->VoicePar[nvoice].PFMFixedFreq);}
                 class Fl_Check_Button2
               }
             }
             Fl_Group Modampgrp {
               label {Mod AMPLITUDE}
-              xywh {580 55 220 149} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+              xywh {580 55 220 149} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
             } {
               Fl_Value_Slider ModVolume {
                 label Vol
@@ -541,7 +541,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                         voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(0, ADDVOICE::control::enableModulatorAmplitudeEnvelope, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Enable Amplitude Envelope} xywh {590 134 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+                tooltip {Enable Amplitude Envelope} xywh {590 134 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
                 class Fl_Check_Button2
               }
@@ -555,15 +555,15 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               }
             }
             Fl_Group modOscDisplay {
-              xywh {580 365 220 200}
+              xywh {580 365 220 200} labelcolor 64
             } {
               Fl_Group modoscil {
                 label {                       }
-                xywh {580 365 220 200} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+                xywh {580 365 220 200} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
               } {
                 Fl_Text_Display ModLocalOsc {
                   label {Local Oscillator}
-                  xywh {598 385 95 2} box NO_BOX labelfont 1 labelsize 12
+                  xywh {598 385 95 2} box NO_BOX labelfont 1 labelsize 12 labelcolor 64
                 }
                 Fl_Button changeFMoscilbutton {
                   label Waveform
@@ -577,14 +577,14 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     oscedit = new OscilEditor(pars->VoicePar[nv].POscilFM, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {712 370 72 18} box THIN_UP_BOX labelfont 1 labelsize 10
+                  xywh {712 370 72 18} box THIN_UP_BOX labelfont 1 labelsize 10 labelcolor 64
                   code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider ModPhase {
                   label Phase
                   callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
-                  tooltip {Phase offset} xywh {711 402 74 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+                  tooltip {Phase offset} xywh {711 402 74 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   class mwheel_slider_rev
@@ -593,13 +593,13 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   label Use
                   callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorSource, o->value() - 1, TOPLEVEL::type::Integer);}
-                  tooltip {Use an earlier oscillator for this modulator. Only the base oscillator is used, not other voice parameters.} xywh {607 402 75 16} down_box BORDER_BOX selection_color 49 labelsize 10 align 1 textfont 1 textsize 10
+                  tooltip {Use an earlier oscillator for this modulator. Only the base oscillator is used, not other voice parameters.} xywh {607 402 75 16} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                   code0 {o->add("Internal");}
                   code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Mod.%2d", i + 1); o->add(tmp);};}
                   code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
                 } {}
                 Fl_Group fmoscil {
-                  xywh {580 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+                  xywh {580 425 220 140} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
                   code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 125,"");}
                   code1 {update_fmoscil();}
                 } {}
@@ -615,7 +615,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Source
               callback {//
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 9 textfont 1
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -631,14 +631,14 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);}
-            xywh {580 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textfont 1 textsize 11
+            xywh {580 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 labelcolor 64 align 5 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
             code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
             code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
           } {}
           Fl_Group freqencygrp {
             label FREQUENCY
-            xywh {5 280 570 120} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+            xywh {5 280 570 120} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
             Fl_Group voicefreqenvgroup {
               label {ADSynth Voice - Frequency Envelope}
@@ -656,7 +656,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                       voicefreqenvgroup->activate();
                   o->redraw();
                   send_data(0, ADDVOICE::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Enable Frequency Envelope} xywh {14 330 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+              tooltip {Enable Frequency Envelope} xywh {14 330 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
               code0 {o->value(pars->VoicePar[nvoice].PFreqEnvelopeEnabled);}
               class Fl_Check_Button2
             }
@@ -684,7 +684,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
     o->redraw();
 
     send_data(0, ADDVOICE::control::enableFrequencyLFO, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Enable Frequency LFO} xywh {220 330 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+              tooltip {Enable Frequency LFO} xywh {220 330 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
               code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
               class Fl_Check_Button2
             }
@@ -692,7 +692,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Octave
               callback {//
                   send_data(0, ADDVOICE::control::octave, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Octave xywh {510 306 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11
+              tooltip Octave xywh {510 306 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune / 1024;}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
@@ -701,7 +701,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label {Coarse Det.}
               callback {//
                   send_data(0, ADDVOICE::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Coarse Detune} xywh {496 375 68 16} labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+              tooltip {Coarse Detune} xywh {496 375 68 16} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune % 1024;}
               code1 {if (k >= 512) k -= 1024;}
               code2 {o->value(k);}
@@ -710,7 +710,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             Fl_Value_Output detunevalueoutput {
               label Detune
               callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
-              xywh {10 306 38 16} box THIN_DOWN_BOX labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+              xywh {10 306 38 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
             }
@@ -726,7 +726,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label {Detune Type}
               callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneType, o->value(), TOPLEVEL::type::Integer);}
-              xywh {495 340 75 17} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {495 340 75 17} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
               code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
             } {}
@@ -734,7 +734,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneType, o->value
               label Bend
               callback {//
 send_data(0, ADDVOICE::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Pitch bend scaling for this voice} xywh {70 284 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {Pitch bend scaling for this voice} xywh {70 284 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
               code1 {o->setValueType(VC_PitchBend);}
               class WidgetPDial
@@ -748,7 +748,7 @@ send_data(0, ADDVOICE::control::pitchBendAdjustment, o->value(), TOPLEVEL::type:
                   else
                       fixedfreqetdial->activate();
                   send_data(0, ADDVOICE::control::baseFrequencyAs440Hz, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Set the voice base frequency to 440Hz} xywh {400 286 55 15} down_box DOWN_BOX labelfont 1 labelsize 11
+              tooltip {Set the voice base frequency to 440Hz} xywh {400 286 55 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64
               code0 {o->value(pars->VoicePar[nvoice].Pfixedfreq);}
               class Fl_Check_Button2
             }
@@ -756,7 +756,7 @@ send_data(0, ADDVOICE::control::pitchBendAdjustment, o->value(), TOPLEVEL::type:
               label {Eq.T.}
               callback {//
 send_data(0, ADDVOICE::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {460 284 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {460 284 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
               code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
               code2 {o->setValueType(VC_FixedFreqET);}
@@ -766,7 +766,7 @@ send_data(0, ADDVOICE::control::equalTemperVariation, o->value(), TOPLEVEL::type
               label Offset
               callback {//
 send_data(0, ADDVOICE::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Offset of the frequency in Hz.} xywh {130 284 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {Offset of the frequency in Hz.} xywh {130 284 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
               code1 {o->setValueType(VC_FreqOffsetHz);}
               class WidgetPDial
@@ -782,13 +782,13 @@ send_data(0, ADDVOICE::control::pitchBendOffset, o->value(), TOPLEVEL::type::Int
               Fl_Group oscParamBox {
                 label {Local
 Oscillator}
-                xywh {5 478 80 128} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+                xywh {5 478 80 128} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
               } {
                 Fl_Choice UseOsc {
                   label Use
                   callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorSource, o->value() - 1, TOPLEVEL::type::Integer);}
-                  tooltip {Use an earlier oscillator for this voice. Only the base oscillator is used, not other voice parameters.} xywh {9 526 72 18} down_box BORDER_BOX selection_color 49 labelsize 10 align 1 textfont 1 textsize 10
+                  tooltip {Use an earlier oscillator for this voice. Only the base oscillator is used, not other voice parameters.} xywh {9 526 72 18} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                   code0 {o->add("Internal");}
                   code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Osc. %2d", i + 1); o->add(tmp);};}
                   code3 {o->value(pars->VoicePar[nvoice].Pextoscil + 1);}
@@ -805,21 +805,21 @@ Oscillator}
     oscedit = new OscilEditor(pars->VoicePar[nv].POscil, oscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addVoice1);
     if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {9 548 72 22} box THIN_UP_BOX labelfont 1 labelsize 11
+                  xywh {9 548 72 22} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
                   code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider VoiceOscPhase {
                   label Phase
                   callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
-                  tooltip {Phase offset} xywh {9 586 72 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+                  tooltip {Phase offset} xywh {9 586 72 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].Poscilphase);}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   class mwheel_slider_rev
                 }
               }
               Fl_Group voiceoscil {
-                xywh {90 462 485 145} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+                xywh {90 462 485 145} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
                 code0 {osc = new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 130, "");}
                 code1 {update_voiceoscil();}
               } {}
@@ -840,7 +840,7 @@ Oscillator}
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(0, ADDVOICE::control::enableResonance, enab, TOPLEVEL::type::Integer);}
-            tooltip {Resonance On/Off} xywh {238 49 17 19} down_box DOWN_BOX labelsize 12 align 1
+            tooltip {Resonance On/Off} xywh {238 49 17 19} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
             class Fl_Check_Button2
           }
@@ -853,7 +853,7 @@ Oscillator}
               label Size
               callback {//
 send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Number of unison sub-voices} xywh {98 434 40 16} box THIN_UP_BOX color 29 labelsize 10 align 1 minimum 2 maximum 50 value 2 textsize 11
+              tooltip {Number of unison sub-voices} xywh {98 434 40 16} box THIN_UP_BOX color 29 labelsize 10 labelcolor 64 align 1 minimum 2 maximum 50 value 2 textsize 11 textcolor 64
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
@@ -863,7 +863,7 @@ send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer)
               label Stereo
               callback {//
 send_data(0, ADDVOICE::control::unisonStereoSpread, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Stereo Spread} xywh {356 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Stereo Spread} xywh {356 422 28 28} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               class WidgetPDial
             }
@@ -871,7 +871,7 @@ send_data(0, ADDVOICE::control::unisonStereoSpread, o->value(), TOPLEVEL::type::
               label {Vib.}
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Vibratto xywh {396 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip Vibratto xywh {396 422 28 28} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibrato);}
               class WidgetPDial
             }
@@ -879,7 +879,7 @@ send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::
               label Invert
               callback {//
     send_data(0, ADDVOICE::control::unisonPhaseInvert, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Phase Invert} xywh {484 426 78 18} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 11
+              tooltip {Phase Invert} xywh {484 426 78 18} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 11 textcolor 64
               code0 {o->add("None");o->add("Random");o->add("50%");o->add("33%");o->add("25%");o->add("20%");}
               code1 {o->value(pars->VoicePar[nvoice].Unison_invert_phase);}
             } {}
@@ -888,14 +888,14 @@ send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::
               callback {//
                   unisonspreadoutput->do_callback();
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::unisonFrequencySpread, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Frequency Spread of the Unison} xywh {181 434 120 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1 value 64
+              tooltip {Frequency Spread of the Unison} xywh {181 434 120 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1 value 64
               code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
               class mwheel_slider_rev
             }
             Fl_Value_Output unisonspreadoutput {
               label {(cents)}
               callback {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
-              xywh {145 434 38 16} box THIN_DOWN_BOX labelsize 10 align 5 maximum 1000 textsize 10
+              xywh {145 434 38 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 maximum 1000 textsize 10 textcolor 64
               code0 {o->step(0.1, 1);}
               code1 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
             }
@@ -903,7 +903,7 @@ send_data(0, ADDVOICE::control::unisonVibratoDepth, o->value(), TOPLEVEL::type::
               label {V.speed}
               callback {//
 send_data(0, ADDVOICE::control::unisonVibratoSpeed, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Vibratto Average Speed} xywh {436 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Vibratto Average Speed} xywh {436 422 28 28} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibrato_speed);}
               class WidgetPDial
             }
@@ -911,21 +911,21 @@ send_data(0, ADDVOICE::control::unisonVibratoSpeed, o->value(), TOPLEVEL::type::
               label {Ph.rnd}
               callback {//
 send_data(0, ADDVOICE::control::unisonPhaseRandomise, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Phase randomness} xywh {316 422 28 28} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Phase randomness} xywh {316 422 28 28} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_phase_randomness);}
               class WidgetPDial
             }
             Fl_Box unisName {
               label UNISON
               callback {//}
-              xywh {186 402 73 25} labelfont 1 labelsize 12
+              xywh {186 402 73 25} labelfont 1 labelsize 12 labelcolor 64
             }
           }
           Fl_Check_Button UnisonEn {
             label On
             callback {//
 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->value(), TOPLEVEL::type::Integer);}
-            xywh {94 408 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+            xywh {94 408 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
             code0 {int tmp = (pars->VoicePar[nvoice].Unison_size);}
             code1 {o->value(tmp > 1);}
             class Fl_Check_Button2
@@ -933,7 +933,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
         }
         Fl_Group amplitudegroup {
           label AMPLITUDE
-          xywh {5 68 285 212} box UP_FRAME labelfont 1 labelsize 12 align 17
+          xywh {5 68 285 212} box UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
         } {
           Fl_Dial voicevolume {
             label Volume
@@ -941,7 +941,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                 int vol = lrint(o->value());
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicevolume->value(vol);
                 send_data(0, ADDVOICE::control::volume, vol, TOPLEVEL::type::Integer);}
-            tooltip Volume xywh {30 86 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            tooltip Volume xywh {30 86 33 33} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->setValueType(VC_ADDVoiceVolume);}
             code1 {o->value(pars->VoicePar[nvoice].PVolume);}
             class WidgetPDial
@@ -950,7 +950,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             label {Vel Sens}
             callback {//
                 send_data(0, ADDVOICE::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {86 87 33 33} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {86 87 33 33} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             code1 {o->setValueType(VC_AmpVelocitySense);}
             class WidgetPDial
@@ -960,7 +960,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             callback {//
     int pan = lrint(o->value());
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::panning, pan, TOPLEVEL::type::Integer);}
-            tooltip {Voice panning} xywh {160 86 33 33} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+            tooltip {Voice panning} xywh {160 86 33 33} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 6 maximum 127 step 1
             code0 {o->setValueType(VC_PanningStd);}
             code1 {o->value(pars->VoicePar[nvoice].PPanning);}
             class WidgetPDial
@@ -969,7 +969,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             label Width
             callback {//
     send_data(0, ADDVOICE::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Voice random width} xywh {235 86 33 33} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+            tooltip {Voice random width} xywh {235 86 33 33} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
             code0 {o->setValueType(VC_PanningRandom);}
             code1 {o->value(pars->VoicePar[nvoice].PWidth);}
             class WidgetPDial
@@ -983,7 +983,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
         else
             voicewidth->activate();
         send_data(0, ADDVOICE::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
-            tooltip {Enable random panning} xywh {205 94 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+            tooltip {Enable random panning} xywh {205 94 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
             code0 {o->value(pars->VoicePar[nvoice].PRandom);}
             code1 {if (o->value() == 0) voicewidth->deactivate(); else voicewidth->activate();}
             class Fl_Check_Button2
@@ -1004,7 +1004,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                     voiceampenvgroup->activate();
                 o->redraw();
                 send_data(0, ADDVOICE::control::enableAmplitudeEnvelope, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Amplitude Envelope} xywh {14 139 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+            tooltip {Enable Amplitude Envelope} xywh {14 139 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
             class Fl_Check_Button2
           }
@@ -1024,7 +1024,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                     voiceamplfogroup->activate();
                 o->redraw();
                 send_data(0, ADDVOICE::control::enableAmplitudeLFO, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Amplitude LFO} xywh {14 210 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+            tooltip {Enable Amplitude LFO} xywh {14 210 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
             class Fl_Check_Button2
           }
@@ -1032,7 +1032,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             label Minus
             callback {//
 send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Reverse phase relative to other voices} xywh {10 75 50 10} down_box DOWN_BOX labelsize 12
+            tooltip {Reverse phase relative to other voices} xywh {10 75 50 10} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PVolumeminus);}
             class Fl_Check_Button2
           }
@@ -1042,7 +1042,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
         }
         Fl_Group voicefiltergroup {
           label {FILTER      }
-          xywh {290 35 285 245} box UP_FRAME labelfont 1 labelsize 12 align 17
+          xywh {290 35 285 245} box UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
           Fl_Group voicefilter {
@@ -1062,7 +1062,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterEnvelope, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Filter Envelope} xywh {300 140 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+            tooltip {Enable Filter Envelope} xywh {300 140 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PFilterEnvelopeEnabled);}
             class Fl_Check_Button2
           }
@@ -1077,7 +1077,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterLFO, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Filter LFO} xywh {300 210 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+            tooltip {Enable Filter LFO} xywh {300 210 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
             class Fl_Check_Button2
           }
@@ -1092,7 +1092,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label Delay
             callback {//
                 send_data(0, ADDVOICE::control::delay, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Time before the voice activates} xywh {76 50 124 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
+            tooltip {Time before the voice activates} xywh {76 50 124 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 1 maximum 127 step 1 textcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
             code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
             class mwheel_slider_rev
@@ -1102,7 +1102,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           label {Bypass Global}
           callback {//
 send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::Integer);}
-          xywh {450 41 14 14} down_box DOWN_BOX labelsize 12 align 8
+          xywh {450 41 14 14} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 8
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
           class Fl_Check_Button2
         }
@@ -1111,13 +1111,13 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
           callback {//
               bypassfiltercheckbutton->redraw();
               send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable Filter} xywh {294 41 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+          tooltip {Enable Filter} xywh {294 41 38 14} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
           code0 {o->value(pars->VoicePar[nvoice].PFilterEnabled);}
           class Fl_Check_Button2
         }
         Fl_Group extvoicegroup {
           label Voice
-          xywh {5 400 80 76} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+          xywh {5 400 80 76} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
         } {
           Fl_Choice ExtOsc {
             label Source
@@ -1133,7 +1133,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                   }
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, 0, TOPLEVEL::type::Integer);
                   send_data(0, ADDVOICE::control::externalOscillator, o->value() - 1, TOPLEVEL::type::Integer);}
-            tooltip {Use an earlier voice as input to this voice. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the signal further.} xywh {8 430 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
+            tooltip {Use an earlier voice as input to this voice. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the signal further.} xywh {8 430 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
             code0 {o->add("Local");}
             code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
             code2 {o->value(pars->VoicePar[nvoice].PVoice + 1);}
@@ -1143,7 +1143,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             callback {//
               int x = int(o->value());
               send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, x, TOPLEVEL::type::Integer);}
-            tooltip {Oscillator Type (sound/noise)} xywh {8 454 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 when 6 textfont 1 textsize 10
+            tooltip {Oscillator Type (sound/noise)} xywh {8 454 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 when 6 textfont 1 textsize 10 textcolor 64
             code0 {o->add("Sound");o->add("Whit Ns");o->add("Pink Ns");o->add("Spot Ns");}
             code1 {o->value(pars->VoicePar[nvoice].Type);}
             code2 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
@@ -1162,13 +1162,13 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         label On
         callback {//
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableVoice, o->value(), TOPLEVEL::type::Integer);}
-        xywh {12 41 50 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1
+        xywh {12 41 50 20} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelcolor 64
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
         class Fl_Check_Button2
       }
       Fl_Group Vname {
         label VOICE
-        xywh {476 10 63 16} labelfont 1 align 0
+        xywh {476 10 63 16} labelfont 1 labelcolor 64 align 0
       } {}
     }
   }
@@ -1934,14 +1934,14 @@ class ADnoteUI {: {public PresetsUI_}
     globalSeen = false;
     resui->resonancewindow->hide();
     o->hide();}
-      xywh {890 430 575 405} type Double hide resizable
+      xywh {693 95 575 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group globalfreq {
         label FREQUENCY
-        xywh {5 255 570 115} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
+        xywh {5 255 570 115} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Group freqenv {
           label {ADSynth Global - Frequency Envelope}
@@ -1953,7 +1953,7 @@ class ADnoteUI {: {public PresetsUI_}
           label Octave
           callback {//
     send_data(0, ADDSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Octave xywh {495 275 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+          tooltip Octave xywh {495 275 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
         }
@@ -1961,7 +1961,7 @@ class ADnoteUI {: {public PresetsUI_}
           label {Coarse det.}
           callback {//
     send_data(0, ADDSYNTH::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Coarse Detune} xywh {500 345 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+          tooltip {Coarse Detune} xywh {500 345 60 20} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k = pars->GlobalPar.PCoarseDetune % 1024; if (k >= 512) k -= 1024;}
           code2 {o->value(k);}
           code3 {o->lstep(10);}
@@ -1976,14 +1976,14 @@ class ADnoteUI {: {public PresetsUI_}
           callback {//
             detunevalueoutput->do_callback();
             send_data(0, ADDSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Fine Detune (cents)} xywh {57 275 433 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
+          tooltip {Fine Detune (cents)} xywh {57 275 433 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->GlobalPar.PDetune - 8192);}
           class mwheel_slider_rev
         }
         Fl_Value_Output detunevalueoutput {
           label Detune
           callback {o->value(getDetune(pars->GlobalPar.PDetuneType,0,pars->GlobalPar.PDetune));}
-          xywh {12 275 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+          xywh {12 275 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));}
         }
@@ -1991,7 +1991,7 @@ class ADnoteUI {: {public PresetsUI_}
           label {Detune Type}
           callback {//
     send_data(0, ADDSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
-          xywh {495 313 75 17} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 11
+          xywh {495 313 75 17} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 11 textcolor 64
           code0 {o->add("L35 cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->GlobalPar.PDetuneType-1);}
         } {}
@@ -1999,7 +1999,7 @@ class ADnoteUI {: {public PresetsUI_}
           label relBW
           callback {//
     send_data(0, ADDSYNTH::control::relativeBandwidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Bandwidth - modify the relative fine detune of the voices} xywh {545 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Bandwidth - modify the relative fine detune of the voices} xywh {545 270 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
           class WidgetPDial
         }
@@ -2009,13 +2009,13 @@ class ADnoteUI {: {public PresetsUI_}
       }
       Fl_Group amplitudegrp {
         label AMPLITUDE
-        xywh {5 7 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
+        xywh {5 7 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Dial globalvolume {
           label Volume
           callback {//
 send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Volume xywh {30 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip Volume xywh {30 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->GlobalPar.PVolume);}
           class WidgetPDial
@@ -2023,7 +2023,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
         Fl_Dial vsns {
           label {Vel Sens}
           callback {send_data(0, ADDSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {85 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {85 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
@@ -2032,7 +2032,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           label Pan
           callback {//
     send_data(0, ADDSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Global panning} xywh {155 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Global panning} xywh {155 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->GlobalPar.PPanning);}
           class WidgetPDial
@@ -2041,7 +2041,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           label Width
           callback {//
     send_data(0, ADDSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Global random width} xywh {235 23 35 35} box ROUND_UP_BOX labelsize 10 maximum 63 step 1 value 63
+          tooltip {Global random width} xywh {235 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->GlobalPar.PWidth);}
           class WidgetPDial
@@ -2055,7 +2055,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
         else
             globalwidth->activate();
         send_data(0, ADDSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
-          tooltip {Enable random panning} xywh {205 32 15 15} down_box DOWN_BOX color 48 labelsize 11 align 1
+          tooltip {Enable random panning} xywh {205 32 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
           code0 {o->value(pars->GlobalPar.PRandom);}
           code1 {if (o->value() == 0) globalwidth->deactivate(); else globalwidth->activate();}
           class Fl_Check_Button2
@@ -2064,7 +2064,7 @@ send_data(0, ADDSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           label {D.Pop}
           callback {//
 send_data(0, ADDSYNTH::control::dePop, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Pop Suppression} xywh {130 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Pop Suppression} xywh {130 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
           class WidgetPDial
         }
@@ -2072,7 +2072,7 @@ send_data(0, ADDSYNTH::control::dePop, o->value(), TOPLEVEL::type::Integer);}
           label {P.Str.}
           callback {//
 send_data(0, ADDSYNTH::control::punchStrength, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Punch Strength} xywh {170 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Punch Strength} xywh {170 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
           class WidgetPDial
         }
@@ -2080,7 +2080,7 @@ send_data(0, ADDSYNTH::control::punchStrength, o->value(), TOPLEVEL::type::Integ
           label {P.t.}
           callback {//
 send_data(0, ADDSYNTH::control::punchDuration, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Punch Time (duration)} xywh {200 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Punch Time (duration)} xywh {200 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
           class WidgetPDial
         }
@@ -2088,7 +2088,7 @@ send_data(0, ADDSYNTH::control::punchDuration, o->value(), TOPLEVEL::type::Integ
           label {P.Stc.}
           callback {//
 send_data(0, ADDSYNTH::control::punchStretch, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Punch Stretch} xywh {230 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Punch Stretch} xywh {230 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
           class WidgetPDial
         }
@@ -2096,7 +2096,7 @@ send_data(0, ADDSYNTH::control::punchStretch, o->value(), TOPLEVEL::type::Intege
           label {P.Vel.}
           callback {//
 send_data(0, ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Punch Velocity Sensing} xywh {260 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {Punch Velocity Sensing} xywh {260 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
           class WidgetPDial
         }
@@ -2116,7 +2116,7 @@ send_data(0, ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integ
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());
 send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Disable individual Harmonic Amplitude randomisation for voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
+          tooltip {Disable individual Harmonic Amplitude randomisation for voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
           class Fl_Check_Button2
         }
@@ -2126,7 +2126,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
       }
       Fl_Group filtergrp {
         label FILTER
-        xywh {290 5 285 250} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
+        xywh {290 5 285 250} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Group filterenv {
           label {ADSynth Global - Filter Envelope}
@@ -2154,7 +2154,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         label { Stereo}
         callback {//
 send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-        xywh {8 220 61 15} down_box DOWN_BOX color 237 labelsize 11
+        xywh {8 220 61 15} down_box DOWN_BOX color 237 selection_color 64 labelsize 11 labelcolor 64
         code0 {o->value(pars->GlobalPar.PStereo);}
         class Fl_Check_Button2
       }
@@ -2180,7 +2180,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
 
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12
+        tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button showvoicepars {
         label {Show Voice Parameters}
@@ -2188,7 +2188,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     set_voice(false);
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12
+        tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalclose {
         label Close
@@ -2204,7 +2204,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
                 else
                     synth->getGuiMaster()->partui->instrumenteditwindow->show();
             }}
-        tooltip {Right click: also reopen previous} xywh {517 375 54 25} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {517 375 54 25} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button resonance {
         label Resonance
@@ -2213,7 +2213,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     resui->Show();
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12
+        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalcopy {
         label C
@@ -2230,7 +2230,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
-      xywh {618 93 805 610} type Double hide resizable
+      xywh {465 95 805 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
@@ -2254,7 +2254,7 @@ o->hide();}
                 else
                     ShowGlobal();
             }}
-        tooltip {Right click: also reopen previous} xywh {695 575 90 25} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {695 575 90 25} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button Vcopy {
         label C
@@ -2269,49 +2269,49 @@ o->hide();}
       Fl_Button g1 {
         label 1
         callback {setVoiceTabs(0, !o->value());}
-        xywh {8 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {8 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(1);}
       }
       Fl_Button g2 {
         label 2
         callback {setVoiceTabs(1, !o->value());}
-        xywh {60 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {60 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g3 {
         label 3
         callback {setVoiceTabs(2, !o->value());}
-        xywh {112 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {112 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g4 {
         label {4 }
         callback {setVoiceTabs(3, !o->value());}
-        xywh {164 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {164 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g5 {
         label 5
         callback {setVoiceTabs(4, !o->value());}
-        xywh {216 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {216 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g6 {
         label 6
         callback {setVoiceTabs(5, !o->value());}
-        xywh {268 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {268 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g7 {
         label 7
         callback {setVoiceTabs(6, !o->value());}
-        xywh {320 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {320 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button g8 {
         label 8
         callback {setVoiceTabs(7, !o->value());}
-        xywh {372 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 231 labelfont 1
+        xywh {372 3 50 32} box PLASTIC_THIN_UP_BOX down_box PLASTIC_THIN_UP_BOX selection_color 223 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Group voiceTabBar {
@@ -2324,34 +2324,34 @@ o->hide();}
     saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-list");
 listSeen = false;
 o->hide();}
-      xywh {101 233 705 260} type Double hide resizable
+      xywh {101 233 705 260} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
       code1 {listDW = 705; listDH = 260;}
       code2 {o->size_range(listDW,listDH,0,0,0,0,1);}
     } {
       Fl_Text_Display listNo {
         label {No.}
-        xywh {24 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {24 15 30 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listVolume {
         label Volume
-        xywh {230 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {230 15 30 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listDetune {
         label Detune
-        xywh {458 15 25 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {458 15 25 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listPan {
         label Pan
-        xywh {298 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {298 15 30 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listVibrato {
         label {Vibrato Depth}
-        xywh {618 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {618 15 30 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listResonance {
         label Res
-        xywh {329 15 25 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {329 15 25 10} box NO_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Button listClose {
         label Close
@@ -2362,10 +2362,10 @@ o->hide();}
 
             if (Fl::event_button() == 3)
                 ShowGlobal();}
-        tooltip {Right click: also reopen previous} xywh {582 235 62 20} labelfont 1 labelsize 12
+        tooltip {Right click: also reopen previous} xywh {582 235 62 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Group {} {
-        xywh {5 15 695 214} box THIN_UP_BOX
+        xywh {5 15 695 214} box THIN_UP_BOX labelcolor 64
       } {
         Fl_Group {} {
           xywh {17 27 668 200}
@@ -2379,11 +2379,11 @@ o->hide();}
       }
       Fl_Text_Display listWave {
         label Wave
-        xywh {105 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {105 15 30 10} box NO_BOX labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
       Fl_Text_Display listModulator {
         label Mod
-        xywh {145 15 30 10} box NO_BOX labelfont 1 labelsize 11
+        xywh {145 15 30 10} box NO_BOX labelfont 1 labelsize 11 labelcolor 64 textcolor 64
       }
     }
   }
@@ -2443,9 +2443,9 @@ o->hide();}
   }
   Function {setTabColour(int num)} {} {
     code {//
-    int set = 16;
+    int set = 42;
     if (pars->VoicePar[num].Enabled)
-        set = 0;
+        set = gen_text;
 
     switch (num)
     {

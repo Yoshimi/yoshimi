@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {
-Copyright 2016-2021, Will Godfrey
+Copyright 2016-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -64,7 +64,6 @@ decl {\#include <vector>
     using std::to_string;} {private global
 }
 
-
 class VectorUI {} {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
@@ -76,13 +75,13 @@ class VectorUI {} {
       code1 {o->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Spinner setbasechan {
-        class WidgetSpinner
         label {Base Channel}
         callback {//
         BaseChan = o->value() - 1;
         updateAll(false);}
-        tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
+        tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 labelcolor 64 maximum 16 textsize 12 textcolor 64
         code0 {o->value(BaseChan + 1);}
+        class WidgetSpinner
       }
       Fl_Menu_Button options {
         label Options
@@ -142,7 +141,7 @@ switch (res)
         send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::erase, 0, TOPLEVEL::type::Integer);
         break;
 }}
-        xywh {275 12 74 20} labelsize 12 textsize 12
+        xywh {275 12 74 20} labelsize 12 labelcolor 64 textsize 12 textcolor 64
         code0 {(void) o; // suppress warning}
         code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
         code2 {o->add("Load");o->add("Save");o->add("Recent");o->add("Clear Ch");o->add("Clear All");}
@@ -150,7 +149,7 @@ switch (res)
       } {}
       Fl_Group Xgroup {
         label X
-        xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
+        xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
       } {
         Fl_Box AddBackL {
           xywh {21 53 53 19} box FLAT_BOX color 50
@@ -162,7 +161,7 @@ switch (res)
           xywh {127 53 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display XinstL {
-          xywh {20 69 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          xywh {20 69 160 1} box NO_BOX labelsize 12 labelcolor 64 align 97 textsize 12 textcolor 64
         }
         Fl_Button XL {
           callback {//
@@ -181,18 +180,18 @@ switch (res)
           xywh {127 115 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display XinstR {
-          xywh {20 131 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          xywh {20 131 160 1} box NO_BOX labelsize 12 labelcolor 64 align 97 textsize 12 textcolor 64
         }
         Fl_Button XR {
           callback {//
           (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS;
           bankui->Show();}
-          tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
         Fl_Text_Display Xfeat {
           label Features
-          xywh {233 101 97 14} box NO_BOX labelfont 1 textsize 12
+          xywh {233 101 97 14} box NO_BOX labelfont 1 labelcolor 64 textsize 12 textcolor 64
         }
         Fl_Choice Xfeat1 {
           label 1
@@ -202,7 +201,7 @@ switch (res)
           else
               bitSet(Xf, 0);
           send_data(0, VECTOR::control::Xfeature0, o->value(), TOPLEVEL::type::Integer);}
-          xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
+          xywh {208 53 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 align 8 textsize 12 textcolor 64
           code0 {o->add("off");o->add("vol");}
         } {}
         Fl_Choice Xfeat2 {
@@ -217,7 +216,7 @@ switch (res)
                   bitSet(Xf, 4);
           }
           send_data(0, VECTOR::control::Xfeature1, o->value(), TOPLEVEL::type::Integer);}
-          xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 textsize 12
+          xywh {302 53 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textsize 12 textcolor 64
           code0 {o->add("off");o->add("pan");o->add("panR");}
         } {}
         Fl_Choice Xfeat3 {
@@ -232,7 +231,7 @@ switch (res)
                   bitSet(Xf, 5);
           }
           send_data(0, VECTOR::control::Xfeature2, o->value(), TOPLEVEL::type::Integer);}
-          xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
+          xywh {208 115 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 align 8 textsize 12 textcolor 64
           code0 {o->add("off");o->add("filt");o->add("filtR");}
         } {}
         Fl_Choice Xfeat4 {
@@ -247,12 +246,11 @@ switch (res)
                   bitSet(Xf, 6);
           }
           send_data(0, VECTOR::control::Xfeature3, o->value(), TOPLEVEL::type::Integer);}
-          xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 textsize 12
+          xywh {302 115 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textsize 12 textcolor 64
           code0 {o->add("off");o->add("mod");o->add("modR");}
         } {}
       }
       Fl_Spinner Xcontrol {
-        class WidgetSpinner
         label Controller
         callback {//
         int tmp = o->value();
@@ -275,9 +273,10 @@ switch (res)
 
         Xcc =  tmp;
         send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::Xcontroller, tmp, TOPLEVEL::type::Integer);}
-        tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
+        tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 labelcolor 64 minimum 0 maximum 119 value 0 textsize 12 textcolor 64
         code0 {//
         o->value(Xcc);}
+        class WidgetSpinner
       }
       Fl_Button Closevector {
         label Close
@@ -286,11 +285,11 @@ switch (res)
         vectorwindow->hide();
         setVisible(synth, false, "Vector");
         vectorSeen = false;}
-        xywh {310 265 57 20} labelfont 13 labelsize 12
+        xywh {310 265 57 20} labelfont 13 labelsize 12 labelcolor 64
       }
       Fl_Group Ygroup {
         label Y
-        xywh {8 152 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 align 0 deactivate
+        xywh {8 152 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
       } {
         Fl_Box AddBackU {
           xywh {21 163 53 19} box FLAT_BOX color 50
@@ -302,14 +301,14 @@ switch (res)
           xywh {127 163 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display YinstU {
-          private xywh {20 179 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          private xywh {20 179 160 1} box NO_BOX labelsize 12 labelcolor 64 align 97 textsize 12 textcolor 64
         }
         Fl_Button YU {
           callback {//
           (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 2;
           bankui->Show();}
-          tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
         Fl_Box AddBackD {
           xywh {21 225 53 19} box FLAT_BOX color 50
@@ -321,18 +320,18 @@ switch (res)
           xywh {127 225 53 19} box FLAT_BOX color 50
         }
         Fl_Text_Display YinstD {
-          private xywh {20 241 160 1} box NO_BOX labelsize 12 align 97 textsize 12
+          private xywh {20 241 160 1} box NO_BOX labelsize 12 labelcolor 64 align 97 textsize 12 textcolor 64
         }
         Fl_Button YD {
           callback {//
           (void) o; // suppress warning
           synth->getGuiMaster()->activePart = BaseChan + NUM_MIDI_CHANNELS * 3;
           bankui->Show();}
-          tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 labelcolor 64 align 64
         }
         Fl_Text_Display Yfeat {
           label Features
-          xywh {233 211 97 14} box NO_BOX labelfont 1 textsize 12
+          xywh {233 211 97 14} box NO_BOX labelfont 1 labelcolor 64 textsize 12 textcolor 64
         }
         Fl_Choice Yfeat1 {
           label 1
@@ -342,7 +341,7 @@ switch (res)
           else
               bitSet(Yf, 0);
           send_data(0, VECTOR::control::Yfeature0, o->value(), TOPLEVEL::type::Integer);}
-          xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
+          xywh {208 163 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 align 8 textsize 12 textcolor 64
           code0 {o->add("off");o->add("vol");}
         } {}
         Fl_Choice Yfeat2 {
@@ -357,7 +356,7 @@ switch (res)
                   bitSet(Yf, 4);
           }
           send_data(0, VECTOR::control::Yfeature1, o->value(), TOPLEVEL::type::Integer);}
-          xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 textsize 12
+          xywh {302 163 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textsize 12 textcolor 64
           code0 {o->add("off");o->add("pan");o->add("panR");}
         } {}
         Fl_Choice Yfeat3 {
@@ -372,7 +371,7 @@ switch (res)
                   bitSet(Yf, 5);
           }
           send_data(0, VECTOR::control::Yfeature2, o->value(), TOPLEVEL::type::Integer);}
-          xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 align 8 textsize 12
+          xywh {208 225 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 align 8 textsize 12 textcolor 64
           code0 {o->add("off");o->add("filt");o->add("filtR");}
         } {}
         Fl_Choice Yfeat4 {
@@ -387,12 +386,11 @@ switch (res)
                   bitSet(Yf, 6);
           }
           send_data(0, VECTOR::control::Yfeature3, o->value(), TOPLEVEL::type::Integer);}
-          xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 textsize 12
+          xywh {302 225 58 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textsize 12 textcolor 64
           code0 {o->add("off");o->add("mod");o->add("modR");}
         } {}
       }
       Fl_Spinner Ycontrol {
-        class WidgetSpinner
         label Controller
         callback {//
         int tmp = o->value();
@@ -415,8 +413,9 @@ switch (res)
 
         Ycc =  tmp;
         send_data(TOPLEVEL::action::forceUpdate, VECTOR::control::Ycontroller, tmp, TOPLEVEL::type::Integer);}
-        tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
+        tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 labelcolor 64 minimum 0 maximum 119 value 0 textsize 12 textcolor 64 deactivate
         code0 {o->value(Ycc);}
+        class WidgetSpinner
       }
       Fl_Button Loaded {
         label {No Name}
@@ -425,7 +424,7 @@ switch (res)
         string tmp = input_text(synth, "Vector name:", loadlabel[BaseChan]);
         if (tmp != loadlabel[BaseChan])
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan, textMsgBuffer.push(tmp));}
-        tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Last saved or loaded vector file - click to change} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
       }
     }
   }

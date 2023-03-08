@@ -286,11 +286,19 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     }
     //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
+
+// don't mess with greyscale colours!
+const int gen_text_back = 7;
 const int gen_text = 64;
+const int eff_text = 175;
 const int graph_back = 57;
+const int graph_pad_back = 254;
 const int graph_grid = 217;
+const int graph_resonance_grid = 246;
 const int graph_Harmonics_grid = 216;
 const int graph_line = 63;
+const int reson_graph_line = 131;
+const int formant_graph_line = 132;
 const int EQ_back = 96;
 const int EQ_back_off = 97;
 const int EQ_line =  95;
@@ -304,13 +312,19 @@ const int pad_prof_fill = 231;
 const int ext_voice = 157;
 const int ext_osc = 238;
 
-const int COLOURLIST = 17;
+const int COLOURLIST = 23;
 const unsigned char colourNumbers [COLOURLIST] = {
+    gen_text_back,
     gen_text,
+    eff_text,
     graph_back,
+    graph_pad_back,
     graph_grid,
+    graph_resonance_grid,
     graph_Harmonics_grid,
     graph_line,
+    reson_graph_line,
+    formant_graph_line,
     EQ_back,
     EQ_back_off,
     EQ_line,
@@ -326,11 +340,17 @@ const unsigned char colourNumbers [COLOURLIST] = {
 };
 
 static std::string colourData [] = {
+    "255,255,255, General text background",
     "0,0,0, General text",
+    "255,255,0, Effect preset text",
     "0,0,0, Common graph background",
+    "245,245,245, Padsynth harmonics bachground",
     "40,120,190, Common graph grid",
+    "180,180,180, Grid for resonance graph",
     "30,70,255, Grid for harmonics graph",
     "0,255,0, Common graph line",
+    "255,0,0, Formant graph line",
+    "255,0,0, Resonance graph line",
     "0,70,150, EQ graph background",
     "80,120,160, EQ background disabled",
     "255,255,0, EQ graph line",
@@ -343,6 +363,8 @@ static std::string colourData [] = {
     "180,210,240, PadSynth profile fill",
     "159,223,143, Ext voice",
     "143,191,223, Ext osc",
+};
+static std::string colourInfo [] = {
     "R,G,B, (no spaces)",
     "Do not edit this. It may be overwritten.",
     "Copy as template for other named themes.",

@@ -182,7 +182,7 @@ class FormantFilterGraph {: {public Fl_Box}
         }
 
         // draw the data
-        fl_color(FL_RED);
+        fl_color(formant_graph_line);
 
         pars->formantfilterH(*nvowel, points, graphpoints);
 
@@ -403,17 +403,17 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   }
   Function {make_window()} {} {
     Fl_Window filterui {
-      xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
+      xywh {460 79 275 75} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
+        xywh {0 0 275 75} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::analogType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
+          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 6 textfont 1 textsize 10 textcolor 64
           code1 {o->value(pars->Ptype);}
           code2 {o->add("Low1");o->add("High1");o->add("Low2");o->add("High2");o->add("Band2");o->add("Stop2");o->add("Peak2");o->add("LShelf2");o->add("HShelf2");}
         } {}
@@ -421,7 +421,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label FilterType
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stateVariableType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
+          tooltip {The Filter type} xywh {5 43 58 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 6 textfont 1 textsize 10 textcolor 64
           code1 {o->value(pars->Ptype);}
           code2 {o->add("Low");o->add("High");o->add("Band");o->add("Stop");}
         } {}
@@ -429,7 +429,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label Category
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::baseType, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textfont 1 textsize 10
+          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 6 textfont 1 textsize 10 textcolor 64
           code0 {o->value(pars->Pcategory);}
           code1 {o->add("analog");o->add("formant");o->add("StVarF");}
         } {}
@@ -437,7 +437,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label { C.Freq}
           callback {//
           send_data(0, FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pfreq);}
           code1 {o->setValueType(getFilterFreqType(filtertype->value()));}
           class WidgetPDial
@@ -446,7 +446,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label Q
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1 deactivate
+          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1 deactivate
           code0 {o->value(pars->Pq);}
           code1 {updateVCforQ();}
           code2 {if (filtertype->value() == TOPLEVEL::filter::Low1 && analogfiltertypechoice->value() < TOPLEVEL::filter::Low2) o->deactivate(); else o->activate();}
@@ -456,7 +456,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label {Freq.tr.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code1 {o->value(pars->Pfreqtrack);}
           class WidgetPDial
         }
@@ -464,7 +464,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label {V.Sns.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
         }
@@ -472,7 +472,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label { VF.Sns.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_FilterVelocitySense);}
           code1 {o->setGraphicsType(VC_FilterVelocitySense);}
           class WidgetPDial
@@ -481,7 +481,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label Gain
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
           code1 {o->setValueType(VC_FilterGain);}
           class WidgetPDial
@@ -490,12 +490,12 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label {St.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value() - 1, TOPLEVEL::type::Write);}
-          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {78 10 31 15} type Simple labelsize 10 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10
+          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {78 10 31 15} type Simple selection_color 64 labelsize 10 labelcolor 64 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10 textcolor 64
         }
       }
       Fl_Text_Display filterparamslabel {
         label Parameters
-        xywh {135 14 50 4} box NO_BOX labelfont 1 labelsize 10
+        xywh {135 14 50 4} box NO_BOX labelfont 1 labelsize 10 labelcolor 64
       }
       Fl_Button editbutton {
         label Edit
@@ -519,7 +519,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     formantSeen = true;
     formantRtext();
     formantparswindow->show();}
-        xywh {5 40 52 26} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        xywh {5 40 52 26} box PLASTIC_UP_BOX labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button filtC {
         label C
@@ -535,16 +535,16 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         callback {//
         int tmp = (o->value() != 0);
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTrackingRange, tmp, TOPLEVEL::type::Write);}
-        tooltip {Set frequency tracking range to 0%-200%} xywh {236 10 16 16} down_box DOWN_BOX align 24
+        tooltip {Set frequency tracking range to 0%-200%} xywh {236 10 16 16} down_box DOWN_BOX selection_color 64 labelcolor 64 align 24
         class Fl_Check_Button2
       }
       Fl_Text_Display freqtracknormal {
         label {- /+}
-        xywh {242 24 44 4} box NO_BOX labelsize 10 textsize 10
+        xywh {242 24 44 4} box NO_BOX selection_color 64 labelsize 10 labelcolor 64 textsize 10 textcolor 64
       }
       Fl_Text_Display freqtrackchecked {
         label {0/+}
-        xywh {242 24 44 4} box NO_BOX labelsize 10 textsize 10 hide
+        xywh {242 24 44 4} box NO_BOX selection_color 64 labelsize 10 labelcolor 64 textsize 10 textcolor 64 hide
       }
     }
   }
@@ -574,7 +574,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           update_formant_window();
           formantfiltergraph->redraw();
           //send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantNumber, o->value(), TOPLEVEL::type::Write);}
-            xywh {545 80 40 15} type Simple labelfont 1 labelsize 10 align 4 minimum 1 maximum 127 step 1 value 1 textsize 10
+            xywh {545 80 40 15} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 4 minimum 1 maximum 127 step 1 value 1 textsize 10 textcolor 64
             code0 {o->bounds(1,FF_MAX_FORMANTS);}
             code1 {o->value(nformant + 1);}
           }
@@ -583,13 +583,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           nvowel = int(o->value() - 1);
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelNumber, nvowel, TOPLEVEL::type::Write);}
-            xywh {545 55 40 20} type Simple labelfont 1 labelsize 10 align 4 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11
+            xywh {545 55 40 20} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 4 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11 textcolor 64
             code0 {o->bounds(1,FF_MAX_VOWELS);}
             code1 {o->value(nvowel + 1);}
           }
           Fl_Box vowelpatch {
             label {Vowel no.}
-            xywh {487 56 56 18} box FLAT_BOX labelfont 1 labelsize 10
+            xywh {487 56 56 18} box FLAT_BOX labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Group formantparsgroup {
             xywh {490 105 95 50} box ENGRAVED_FRAME
@@ -598,21 +598,21 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
               label Freq
               callback {//
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+              tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               class WidgetPDial
             }
             Fl_Dial formant_q_dial {
               label Q
               callback {//
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantQ, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+              tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               class WidgetPDial
             }
             Fl_Dial formant_amp_dial {
               label Amp
               callback {//
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+              tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               class WidgetPDial
             }
           }
@@ -632,7 +632,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequenceSize, nseqsize, TOPLEVEL::type::Write);}
-            xywh {614 62 54 18} type Simple labelfont 1 labelsize 10 align 5 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11
+            xywh {614 62 54 18} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 5 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11 textcolor 64
             code0 {o->bounds(1,FF_MAX_SEQUENCE);}
             code1 {o->value(nseqsize);}
           }
@@ -647,7 +647,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           }
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::sequencePosition, nseqpos, TOPLEVEL::type::Write);}
-            tooltip {Current position in the sequence} xywh {596 98 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 1 maximum 127 step 1 value 1 textsize 10
+            tooltip {Current position in the sequence} xywh {596 98 40 15} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 9 minimum 1 maximum 127 step 1 value 1 textsize 10 textcolor 64
             code0 {o->bounds(1,FF_MAX_SEQUENCE);}
             code1 {o->value(nseqpos + 1);}
           }
@@ -657,14 +657,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           nVoCount = o->value() - 1;
 
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::vowelPositionInSequence, nVoCount, TOPLEVEL::type::Write, nseqpos);}
-            tooltip {Vowel number at the sequence position} xywh {648 98 40 15} type Simple labelsize 10 align 1 minimum 1 maximum 127 step 1 value 1 textsize 10
+            tooltip {Vowel number at the sequence position} xywh {648 98 40 15} type Simple selection_color 64 labelsize 10 labelcolor 64 align 1 minimum 1 maximum 127 step 1 value 1 textsize 10 textcolor 64
             code0 {o->bounds(1,FF_MAX_VOWELS);}
           }
           Fl_Check_Button neginput {
             label {Neg.Input}
             callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::negateInput, o->value(), TOPLEVEL::type::Write);}
-            tooltip {Negate the input from LFO/envelopes/etc.} xywh {628 132 60 20} down_box DOWN_BOX labelsize 10
+            tooltip {Negate the input from LFO/envelopes/etc.} xywh {628 132 60 20} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
             code0 {o->value(pars->Psequencereversed);}
             class Fl_Check_Button2
           }
@@ -690,14 +690,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           }
 
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::numberOfFormants,nFoCount, TOPLEVEL::type::Write);}
-          xywh {485 19 65 20} type Simple labelsize 12 align 1 minimum 1 maximum 127 step 1 value 1 textsize 12
+          xywh {485 19 65 20} type Simple selection_color 64 labelsize 12 labelcolor 64 align 1 minimum 1 maximum 127 step 1 value 1 textsize 12 textcolor 64
           code0 {o->bounds(1,FF_MAX_FORMANTS);}
         }
         Fl_Dial frsldial {
           label {Fr.Sl.}
           callback {//
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantSlowness, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
+          tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->Pformantslowness);}
           code1 {o->setValueType(VC_FormFilterSlowness);}
           class WidgetPDial
@@ -705,14 +705,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Value_Output centerfreqvo {
           label {C.f.}
           callback {o->value(pars->getcenterfreq()/1000.0);}
-          tooltip {Center Frequency (kHz)} xywh {512 164 35 16} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 11
+          tooltip {Center Frequency (kHz)} xywh {512 164 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 11 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(pars->getcenterfreq()/1000.0);}
         }
         Fl_Value_Output octavesfreqvo {
           label {Oct.}
           callback {o->value(pars->getoctavesfreq());}
-          tooltip {No. of octaves} xywh {512 185 35 16} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 127 value 5 textfont 1 textsize 11
+          tooltip {No. of octaves} xywh {512 185 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 127 value 5 textfont 1 textsize 11 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(pars->getoctavesfreq());}
         }
@@ -721,7 +721,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         if (Fl::event_button() == 3)
             o->value(64);
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, o->value(), TOPLEVEL::type::Write);}
-          xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
+          xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pcenterfreq);}
           class mwheel_slider_rev
         }
@@ -730,7 +730,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         if (Fl::event_button() == 3)
             o->value(64);
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, o->value(), TOPLEVEL::type::Write);}
-          xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
+          xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Poctavesfreq);}
           class mwheel_slider_rev
         }
@@ -738,7 +738,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label {Vw.Cl.}
           callback {//
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantClearness, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
+          tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code0 {o->value(pars->Pvowelclearness);}
           code1 {o->setValueType(VC_FormFilterClearness);}
           code2 {o->setGraphicsType(VC_FormFilterClearness);}
@@ -756,7 +756,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     formantSeen = false,
     formantparswindow->hide();
     lastformantW = 0;}
-          xywh {643 170 50 25} box THIN_UP_BOX
+          xywh {643 170 50 25} box THIN_UP_BOX labelcolor 64
         }
         Fl_Button formCopy {
           label C
@@ -770,7 +770,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
         Fl_Box formvowel {
           label Vowel
-          xywh {635 8 55 15}
+          xywh {635 8 55 15} labelcolor 64
         }
         Fl_Box {} {
           xywh {630 4 64 40} box EMBOSSED_FRAME

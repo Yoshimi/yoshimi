@@ -583,7 +583,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           }
           else
               noEntries->show();}
-          xywh {70 15 159 20} down_box BORDER_BOX labelfont 1 labelsize 12 textfont 1 textsize 12
+          xywh {70 15 159 20} down_box BORDER_BOX labelfont 1 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
           code0 {fillSearchChoice();}
         } {}
       }

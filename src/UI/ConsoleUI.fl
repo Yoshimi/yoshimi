@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0304
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2015-2021, Will Godfrey
+Copyright 2015-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <set>} {public local
@@ -56,8 +56,7 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
   }
 }
 
-class ConsoleUI {open
-} {
+class ConsoleUI {} {
   Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
@@ -68,13 +67,12 @@ class ConsoleUI {open
       code1 {o->size_range(logDW,logDH);}
     } {
       Fl_Text_Display logText {
-        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelsize 13 when 1 textfont 4 textsize 12 textcolor 35 resizable
+        xywh {0 0 385 185} color 54 selection_color 64 labeltype NO_LABEL labelsize 13 labelcolor 64 when 1 textfont 4 textsize 12 textcolor 64 resizable
         class ConsoleTextDisplay
       }
     }
   }
-  Function {ConsoleUI(SynthEngine *_synth)} {open
-  } {
+  Function {ConsoleUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
     bufsize = 8192;
@@ -83,8 +81,7 @@ class ConsoleUI {open
     lastlogW = 0;
     textSize = 12;
     logText->buffer(txtbuf);
-    setLogText(synth->getRuntime().consoleTextSize);} {selected
-    }
+    setLogText(synth->getRuntime().consoleTextSize);} {}
   }
   Function {~ConsoleUI()} {} {
     code {//

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
@@ -77,19 +77,19 @@ pars=NULL;} {}
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {916 422 275 70} type Double color 50 labelfont 1 labelsize 12 hide resizable
+      xywh {916 422 275 70} type Double color 50 labelfont 1 labelsize 12 labelcolor 64 hide resizable
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
         label LFO
-        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
+        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17
       } {
         Fl_Check_Button bpm {
           label BPM
           callback {send_data(0, group, LFOINSERT::control::bpm, o->value(), TOPLEVEL::type::Integer);
 updateLFOFreqType();
 updateBpmControls();}
-          tooltip {Lock LFO frequency to a multiple of the BPM.} xywh {230 5 45 15} down_box DOWN_BOX labelsize 10
+          tooltip {Lock LFO frequency to a multiple of the BPM.} xywh {230 5 45 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
           class Fl_Check_Button2
         }
         Fl_Check_Button continous {
@@ -98,14 +98,14 @@ updateBpmControls();}
           send_data(0, group, LFOINSERT::control::continuous, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Continuous LFO
 
-Run the LFO continuously even when the sound is not playing. If BPM is on, then the LFO phase will be locked to the song position.} xywh {230 20 15 15} down_box DOWN_BOX labelsize 10
+Run the LFO continuously even when the sound is not playing. If BPM is on, then the LFO phase will be locked to the song position.} xywh {230 20 15 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
           class Fl_Check_Button2
         }
         Fl_Dial freq {
           label {Freq.}
           callback {//
           send_data(0, group, LFOINSERT::control::speed, o->value(), 0);}
-          tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
+          tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 step 1e-05
           class WidgetPDial
         }
         Fl_Dial intensity {
@@ -115,7 +115,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && group == 1) // special case to sync voice list vibrato
               synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(depth);
           send_data(0, group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
-          tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
           class WidgetPDial
         }
@@ -123,7 +123,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label Delay
           callback {//
           send_data(0, group, LFOINSERT::control::delay, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
           class WidgetPDial
         }
@@ -131,7 +131,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label Start
           callback {//
           send_data(0, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(pars->Pbpm ? VC_LFOstartphase : VC_LFOstartphaseRand);}
           class WidgetPDial
         }
@@ -139,14 +139,14 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label Type
           callback {//
           send_data(0, group, LFOINSERT::control::type, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO function} xywh {220 50 50 15} down_box BORDER_BOX labelsize 9 align 1 textfont 1 textsize 10
+          tooltip {LFO function} xywh {220 50 50 15} down_box BORDER_BOX labelsize 9 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
           code0 {o->add("Sine");o->add("Tri");o->add("Squr");o->add("R.up");o->add("R.dn");o->add("E1dn");o->add("E2dn");o->add("S&&H");o->add("RSqU");o->add("RSqD");}
         } {}
         Fl_Dial randomness {
           label {Amp. }
           callback {//
           send_data(0, group, LFOINSERT::control::amplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO Amplitude Randomness} xywh {145 30 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {LFO Amplitude Randomness} xywh {145 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
@@ -154,7 +154,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label {  Freq.}
           callback {//
           send_data(0, group, LFOINSERT::control::frequencyRandomness, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO Frequency Randomness} xywh {170 30 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          tooltip {LFO Frequency Randomness} xywh {170 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
@@ -162,7 +162,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           label {Str.}
           callback {//
           send_data(0, group, LFOINSERT::control::stretch, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {LFO frequency stretch} xywh {200 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {LFO frequency stretch} xywh {200 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code1 {o->setValueType(VC_LFOStretch);}
           class WidgetPDial
         }
@@ -180,7 +180,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         }
         Fl_Group randgroup {
           label {Rand.}
-          xywh {140 49 55 15} labelsize 11 align 16
+          xywh {140 49 55 15} labelsize 11 labelcolor 64 align 16
         } {}
       }
     }

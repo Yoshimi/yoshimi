@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -419,15 +419,20 @@ class MasterUI {: {private GuiUpdates}
       yoshiLog = new ConsoleUI(synth);
       setColourTable("classic");
       string name = file::localDir() + "/themes";
-      string fullName = name + "/classic";
+      string fullName = name + "/classic.clr";
       if (!file::isRegularFile(fullName))
       {
           file::createDir(name);
           string colourText;
-          for (int i = 0; i < (COLOURLIST + 3); ++i)
+          for (int i = 0; i < (COLOURLIST); ++i)
           {
               colourText += (colourData[i] + char(10));
           }
+          for (int i = 0; i < 3; ++i)
+          {
+              colourText += (colourInfo[i] + char(10));
+          }
+
           file::saveText(colourText, fullName);
       }
       make_window();
@@ -488,7 +493,7 @@ class MasterUI {: {private GuiUpdates}
             return;
         }
         string dirname = file::localDir() + "/themes/";
-        string colourText = loadText(dirname + table);
+        string colourText = loadText(dirname + table + ".clr");
         std::size_t nextPos = 1;
 
         bool ok =  true;
@@ -505,7 +510,6 @@ class MasterUI {: {private GuiUpdates}
         }
         if (!ok)
             std::cout << "failed" << std::endl;
-        //Fl::set_color(EQ_back, 0, 70, 150); // for testing
         ;} {}
   }
   Function {setClassicTable()} {} {
@@ -514,7 +518,7 @@ class MasterUI {: {private GuiUpdates}
         {
             setColourLine(colourData[i], i);
         }
-        //Fl::set_color(57, 0, 200, 0); // for testing
+        //Fl::set_color(144, 0, 245, 245); // for testing
         ;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
@@ -1148,7 +1152,7 @@ class MasterUI {: {private GuiUpdates}
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
             class WidgetPDial
           }
-          Fl_Group instrumentGroup {open
+          Fl_Group instrumentGroup {
             xywh {136 292 195 24} box PLASTIC_UP_BOX color 228
           } {
             Fl_Box instrumentaddbox {
@@ -1333,7 +1337,7 @@ class MasterUI {: {private GuiUpdates}
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelsize 11 labelcolor 64 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
           }
@@ -1480,7 +1484,7 @@ class MasterUI {: {private GuiUpdates}
         }
 
         send_data(0, PART::control::enable, o->value(), TOPLEVEL::type::Integer, npart);}
-          xywh {58 326 20 20} down_box DOWN_BOX labelcolor 64 align 4
+          xywh {58 326 20 20} down_box DOWN_BOX selection_color 64 labelcolor 64 align 4
           code0 {o->value(fetchData(0,  PART::control::enable, npart));}
           class Fl_Check_Button2
         }
@@ -1626,18 +1630,18 @@ Copyright 2012-2013, Jeremy Jongepier and others
 Copyright 2014-2021, Will Godfrey and others
 LV2 plugin Copyright 2014, Andrew Deryabin
 Splash Image Copyright 2017, Jesper Lloyd}
-          xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11
+          xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11 labelcolor 64
         }
         Fl_Box about3 {
           label {This is free software, and comes with ABSOLUTELY NO
 WARRANTY; you may redistribute it and/or modify it
 under the terms of GPL version 2, or (at your option)
 any later version.}
-          xywh {10 190 340 53} labelsize 11
+          xywh {10 190 340 53} labelsize 11 labelcolor 64
         }
         Fl_Box about4 {
           label { version}
-          xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 145
+          xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 216
           code0 {//
             o->copy_label((string("Yoshimi version ")
                            + string(YOSHIMI_VERSION)).c_str());}
@@ -1647,7 +1651,7 @@ any later version.}
           callback {//
                  contributors->show();
                  aboutFirst->hide();}
-          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} labelsize 11
+          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} labelsize 11 labelcolor 64
         }
       }
       Fl_Group contributors {
@@ -1676,7 +1680,7 @@ Alan Calvert started the project}
           Iain King-Speir
           Tobias Kortkamp
           }
-          xywh {25 70 155 200} labelsize 12
+          xywh {25 70 155 200} labelsize 12 labelcolor 64
         }
         Fl_Box cont3 {
           label {
@@ -1695,7 +1699,7 @@ Alan Calvert started the project}
 
 
           }
-          xywh {194 70 155 200} labelsize 12
+          xywh {194 70 155 200} labelsize 12 labelcolor 64
         }
       }
       Fl_Button aboutClose {
@@ -1704,7 +1708,7 @@ Alan Calvert started the project}
         aboutFirst->show();
         contributors->hide();
         aboutwindow->hide();}
-        xywh {305 253 43 22} box THIN_UP_BOX labelsize 11
+        xywh {305 253 43 22} box THIN_UP_BOX labelsize 11 labelcolor 64
       }
     }
     Fl_Window syseffsendwindow {
@@ -1847,21 +1851,21 @@ Alan Calvert started the project}
     }
     Fl_Window message {
       label Yoshimi
-      xywh {58 81 290 85} type Double labelsize 12 hide resizable
+      xywh {58 81 290 85} type Double labelsize 12 labelcolor 64 hide resizable
       code0 {o->copy_label(synth->makeUniqueName("").c_str());}
       code1 {msgDW = o->w(); msgDH = o->h();}
       code2 {o->size_range(290, 85, 0, 0, 0, 0, 1);}
     } {
       Fl_Box words {
         label {?}
-        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
+        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 labelcolor 64 align 149
       }
       Fl_Button yesdoit {
         label Yes
         callback {//
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::refreshDefaults, 1, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
                 closebutton->do_callback();}
-        xywh {49 60 70 20} hide
+        xywh {49 60 70 20} labelcolor 64 hide
       }
       Fl_Button cancel {
         label Cancel
@@ -1871,7 +1875,7 @@ Alan Calvert started the project}
                 else
                     send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
                 closebutton->do_callback();}
-        xywh {130 60 70 20} hide
+        xywh {130 60 70 20} labelcolor 64 hide
       }
       Fl_Button closebutton {
         label Close
@@ -1880,7 +1884,7 @@ Alan Calvert started the project}
                 cancel->hide();
                 message->hide();
                 msgSeen = false;}
-        xywh {211 60 70 20}
+        xywh {211 60 70 20} labelcolor 64
       }
     }
     Fl_Window querywindow {
@@ -1894,21 +1898,21 @@ Alan Calvert started the project}
         label Yes
         callback {//
     querywindow->hide();}
-        xywh {205 80 60 20}
+        xywh {205 80 60 20} labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button noQ {
         label No
         callback {//
     querywindow->hide();}
-        xywh {276 80 60 20}
+        xywh {276 80 60 20} labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button cancelQ {
         label Cancel
         callback {//
     querywindow->hide();}
-        xywh {348 80 66 20} labelfont 1
+        xywh {348 80 66 20} labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Box typeQ {
@@ -1917,7 +1921,7 @@ Alan Calvert started the project}
       }
       Fl_Box textQ {
         label {text goes here}
-        xywh {65 11 345 63} align 128
+        xywh {65 11 345 63} labelcolor 64 align 128
       }
     }
     Fl_Window textwindow {
@@ -1925,13 +1929,13 @@ Alan Calvert started the project}
       callback {//
       saveWin(synth, o->w(), o->h(), o->x(), o->y(), false, "Master-textin");
       o->hide();}
-      xywh {222 50 270 60} type Double hide resizable
+      xywh {222 50 270 60} type Double labelcolor 64 hide resizable
       code0 {textinDW = o->w(); textinDH = o->h();}
       code1 {o->size_range(textinDW, textinDH, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Input textLine {
         label {input:}
-        xywh {20 23 230 25} align 1
+        xywh {20 23 230 25} labelcolor 64 align 1 textcolor 64
       }
     }
     Fl_Window filerwindow {
@@ -1970,7 +1974,7 @@ Alan Calvert started the project}
             o->value(name.c_str());
             fillfiler(type_name);
         }}
-        tooltip {Current path to use(editable)} xywh {10 20 448 25} labelfont 1 labelsize 12 align 1 textfont 1 textsize 12
+        tooltip {Current path to use(editable)} xywh {10 20 448 25} labelfont 1 labelsize 12 labelcolor 64 align 1 textfont 1 textsize 12 textcolor 64
       }
       Fl_Button filerback {
         label Up
@@ -1984,17 +1988,17 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler(type_name);}
-        tooltip {Go up one directory in path} xywh {463 21 78 24} labelfont 1 labelsize 12
+        tooltip {Go up one directory in path} xywh {463 21 78 24} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Group faveGroup {
         label Favourites
-        xywh {458 116 85 60} box ENGRAVED_FRAME
+        xywh {458 116 85 60} box ENGRAVED_FRAME labelcolor 64
       } {}
       Fl_Button filerfave {
         label {Show List}
         callback {//
         setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} labelfont 1 labelsize 12
+        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button faveadd {
         label Add
@@ -2011,7 +2015,7 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} labelfont 1 labelsize 12
+        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button filerclose {
         label Close
@@ -2020,17 +2024,17 @@ Alan Calvert started the project}
         filerdone = true;
         filernewname->value("Exit");
         saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
-        xywh {463 320 78 20} labelfont 1 labelsize 12
+        xywh {463 320 78 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Group filernamegroup {
         label Name
-        xywh {10 50 533 26} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 2
+        xywh {10 50 533 26} box ENGRAVED_FRAME labelfont 1 labelsize 12 labelcolor 64 align 2
       } {
         Fl_Input filernewname {
           callback {//
       if (Fl::event_key() == FL_Enter)
           fileruse->do_callback();}
-          tooltip {Name of file item to load or save} xywh {14 53 444 20} labelsize 12 align 2 textfont 1 textsize 12
+          tooltip {Name of file item to load or save} xywh {14 53 444 20} labelsize 12 labelcolor 64 align 2 textfont 1 textsize 12 textcolor 64
         }
       }
       Fl_Button fileruse {
@@ -2047,7 +2051,7 @@ Alan Calvert started the project}
             filerfound = filerpath + leaf;
         // error picked up in main loop
         filerdone = true;}
-        tooltip {Apply this name to the path and load/save} xywh {464 53 74 20} labelfont 1 labelsize 12
+        tooltip {Apply this name to the path and load/save} xywh {464 53 74 20} labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -2057,41 +2061,41 @@ Alan Calvert started the project}
     else
         filerOpt1->activate();
     fillfiler(type_name);}
-        tooltip {Hide sub directories so that files are easier to see} xywh {490 204 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Hide sub directories so that files are easier to see} xywh {490 204 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt1 {
         label {. (dot) Dirs}
         callback {//
     fillfiler(type_name);}
-        tooltip {Show hidden paths} xywh {490 244 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Show hidden paths} xywh {490 244 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt2 {
         label {. (dot) Files}
         callback {//
     fillfiler(type_name);}
-        tooltip {Show hidden files} xywh {490 284 18 18} down_box DOWN_BOX labelsize 12 align 1
+        tooltip {Show hidden files} xywh {490 284 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt16 {
         label {Hide Files}
         callback {//
     ;}
-        xywh {490 130 18 18} down_box DOWN_BOX labelsize 12 align 1 hide
+        xywh {490 130 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1 hide
         class Fl_Check_Button2
       }
       Fl_Group filerframe {
-        xywh {4 4 542 88} box ENGRAVED_FRAME
+        xywh {4 4 542 88} box ENGRAVED_FRAME labelcolor 64
       } {}
       Fl_Group filershort {
-        xywh {4 4 542 74} box ENGRAVED_FRAME
+        xywh {4 4 542 74} box ENGRAVED_FRAME labelcolor 64
       } {}
       Fl_Group favourites {
-        xywh {4 49 542 299} box FLAT_BOX hide
+        xywh {4 49 542 299} box FLAT_BOX labelcolor 64 hide
       } {
         Fl_Group favename {
-          xywh {4 49 542 42} box ENGRAVED_FRAME
+          xywh {4 49 542 42} box ENGRAVED_FRAME labelcolor 64
         } {}
         Fl_Browser favebrowse {
           callback {//
@@ -2107,7 +2111,7 @@ Alan Calvert started the project}
         }
         clearfavelist();
         setfavecolour(result);}
-          xywh {5 91 540 251} type Select box FLAT_BOX color 26 labelsize 12 textfont 1 textsize 12
+          xywh {5 91 540 251} type Select box FLAT_BOX color 26 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         }
         Fl_Button favecancel {
           label Back
@@ -2120,7 +2124,7 @@ Alan Calvert started the project}
     filerclose->activate();
     filerscroll->show();
     favourites->hide();}
-          tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12
+          tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button favedefault {
           label {Make Default}
@@ -2128,7 +2132,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->move(1, pos);}
-          tooltip {Set selected entry as the default (move to top)} xywh {287 61 110 20} labelfont 1 labelsize 12
+          tooltip {Set selected entry as the default (move to top)} xywh {287 61 110 20} labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button favedelete {
           label Delete
@@ -2138,7 +2142,7 @@ Alan Calvert started the project}
     setfavecolour(1);
     if (pos > 0)
         favebrowse->remove(pos);}
-          tooltip {Remove selected entry} xywh {156 61 70 20} labelfont 1 labelsize 12
+          tooltip {Remove selected entry} xywh {156 61 70 20} labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button faveset {
           label Set
@@ -2154,11 +2158,11 @@ Alan Calvert started the project}
     fileroldpath->value(filerpath.c_str());
     fillfiler(type_name);
     favecancel->do_callback();}
-          tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12
+          tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Scroll filerscroll {
-        xywh {10 96 444 244} type VERTICAL color 7
+        xywh {10 96 444 244} type VERTICAL color 7 labelcolor 64
       } {}
     }
   }
