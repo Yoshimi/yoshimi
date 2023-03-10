@@ -524,7 +524,8 @@ class MasterUI {: {private GuiUpdates}
         {
             setColourLine(colourData[i], i);
         }
-        //Fl::set_color(gen_text_back, 220, 245, 245); // for testing
+        //Fl::set_color(128, 200, 0, 0); // for testing
+        //Fl::set_color(159, 225, 225, 225); // for testing
         ;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool

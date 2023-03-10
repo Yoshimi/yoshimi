@@ -80,15 +80,15 @@ eff = eff_;
   }
   Function {draw_freq_line(float freq, int type)} {} {
     code {//
-        fl_color(FL_GRAY);
+        fl_color(EQ_grid);
         float freqx = getfreqpos(freq);
 
         if (type == 0)
         {
             if (active_r())
-                fl_color(FL_WHITE);
+                fl_color(EQ_major_grid);
             else
-                fl_color(FL_GRAY);
+                fl_color(EQ_grid);
         }
 
         if (freqx > 0.0 && freqx < 1.0)
@@ -107,7 +107,7 @@ eff = eff_;
         fl_rectf(ox, oy, lx, ly);
 
         // draw the lines
-        fl_color(FL_GRAY);
+        fl_color(EQ_grid);
         fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
         freqx = getfreqpos(1000.0);
@@ -150,10 +150,10 @@ eff = eff_;
 
         fl_line_style(0, int(2 * lx / 190.0f));
         // draw the frequency response
-        if (active_r())
+        //if (active_r())
             fl_color(EQ_line);
-        else
-            fl_color(EQ_line_off);
+        //else
+            //fl_color(EQ_line_off);
         oiy = getresponse(ly, getfreqx(0.0));
         float half_samplerate_f = synth->samplerate_f * 0.5f;
         int oix = 0;
@@ -378,7 +378,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 64 labelcolor 64 labelsize 11 textfont 1 textsize 10 textcolor 175
+        xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
         code0 {o->add("Echo 1");o->add("Echo 2");o->add("Echo 3");o->add("Echo 4");o->add("Simple Echo");o->add("Canyon");o->add("Panning Echo 1");o->add("Panning Echo 2");o->add("Feedback Echo 3");}
       } {}
       Fl_Dial echop0 {

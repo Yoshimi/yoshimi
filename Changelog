@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-3-10 Will
+bn 2185
+PadSynth graphics theme complete, others partially.
+Revised PadSynth drawing code.
+
 2023-3-8 Will
 bn 2184
 Themes can now now be manually changed by copyiong and editing
