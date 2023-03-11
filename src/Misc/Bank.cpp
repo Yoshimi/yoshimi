@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2014-2021, Will Godfrey & others
+    Copyright 2014-2023, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -42,7 +42,6 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
-#include "ConfBuild.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
@@ -1161,7 +1160,7 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 
 void Bank::updateShare(string bankdirs[], string baseDir, string shareID)
 {
-    saveText(to_string(BUILD_NUMBER), shareID);
+    saveText(to_string(synth->getRuntime().build_ID), shareID);
     string next = "/Will_Godfrey_Companion";
     string destinationDir = baseDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
     if (!isDirectory(destinationDir))
@@ -1650,7 +1649,7 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     if (isDirectory(foundLocal))
     {
         string shareID = foundLocal + "version";
-        if (loadText(shareID) != to_string(BUILD_NUMBER))
+        if (loadText(shareID) != to_string(synth->getRuntime().build_ID))
             updateShare(bankdirs, foundLocal, shareID);
     }
     return newRoots;

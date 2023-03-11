@@ -119,7 +119,6 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
-            addparstr("gui_theme_name", synth->getRuntime().guiTheme.c_str());
         endbranch();
         return;
     }

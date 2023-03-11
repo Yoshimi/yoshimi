@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2022, Will Godfrey & others
+    Copyright 2014-2023, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -94,6 +94,7 @@ class Config
         int           load2part;
         string        midiLearnLoad;
         string        rootDefine;
+        unsigned int  build_ID;
         bool          stateChanged;
         string        StateFile;
         bool          restoreJackSession;
@@ -107,6 +108,7 @@ class Config
         static unsigned int  activeInstance;
         static int           showCLIcontext;
 
+        unsigned int  guiThemeID;
         string        guiTheme;
 
         bool          runSynth;

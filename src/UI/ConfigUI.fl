@@ -53,6 +53,9 @@ decl {\#include "Misc/FileMgrFuncs.h"} {private local
 decl {\#include "Misc/NumericFuncs.h"} {private local
 }
 
+decl {\#include "Misc/FormatFuncs.h"} {private local
+}
+
 decl {\#include "Misc/TextMsgBuffer.h"
 
     namespace { // Implementation details...
@@ -1072,6 +1075,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {ConfigUI(SynthEngine *_synth)} {} {
     code {//
             synth = _synth;
+            manageThemes();
             make_window();
             readpresetcfg();
             configSeen = false;
@@ -1090,6 +1094,111 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");
         configwindow->hide();
         delete configwindow;} {}
+  }
+  Function {manageThemes()} {} {
+    code {//
+      //std::cout << "in theme manager" << std::endl;
+      string themeDir = file::localDir() + "/themes/";
+      file::createDir(themeDir);
+      file::createDir(themeDir+"ID");
+      int theme_ID = func::string2int(file::loadText(themeDir+"ID/version"));
+      int build_ID = synth->getRuntime().build_ID;
+      string currentTheme = file::loadText(themeDir+"ID/current");
+      if (!currentTheme.empty())
+      {
+          while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
+              currentTheme.pop_back();
+      }
+      if (!file::isRegularFile(themeDir + currentTheme))
+          currentTheme = "";
+      if (build_ID != theme_ID || currentTheme.empty())
+      {
+          currentTheme = "classic.clr";
+          //std::cout << "C " << currentTheme << std::endl;
+          theme_ID = build_ID;
+          string colourText;
+          file::saveText(to_string(theme_ID), themeDir+"ID/version");
+          for (int i = 0; i < (COLOURLIST); ++i)
+          {
+              colourText += (colourData[i] + char(10));
+          }
+          for (int i = 0; i < COLOURINFO; ++i)
+          {
+              colourText += (colourInfo[i] + char(10));
+          }
+          file::saveText(currentTheme, themeDir+"ID/current");
+          file::saveText(colourText, themeDir+"classic.clr");
+      }
+      //std::cout << "theme>" << currentTheme << std::endl;
+      setColourTable(currentTheme);} {}
+  }
+  Function {setColourTable(string table)} {} {
+    code {//
+        if (table == "classic.clr")
+        {
+            setClassicTable();
+            return;
+        }
+        string dirname = file::localDir() + "/themes/";
+        string fullName = dirname + table;
+        //std::cout << "here>" << fullName << std::endl;
+        string colourText = loadText(dirname + table);
+        std::size_t nextPos = 1;
+
+        bool ok =  true;
+        for (int i = 0; i < COLOURLIST; ++ i)
+        {
+            nextPos = colourText.find(char(10));
+            if (nextPos == std::string::npos)
+            {
+                ok = false;
+                break;
+            }
+            setColourLine(colourText.substr(0, nextPos), i);
+            colourText = colourText.substr(nextPos + 1);
+        }
+        if (!ok)
+            std::cout << "failed" << std::endl;
+        ;} {}
+  }
+  Function {setClassicTable()} {} {
+    code {//
+        for (int i = 0; i < COLOURLIST; ++ i)
+        {
+            setColourLine(colourData[i], i);
+        }
+        //Fl::set_color(128, 200, 0, 0); // for testing
+        //Fl::set_color(159, 225, 225, 225); // for testing
+        ;} {}
+  }
+  Function {setColourLine(string text, int item)} {return_type bool
+  } {
+    code {//
+        if (text.at(0) == char(35))
+            return true; // don't change this colour
+        size_t nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int red = string2int(text.substr(0, nextPos));
+        if (red < 0 || red > 255)
+            return false;
+
+        text = text.substr(nextPos + 1);
+        nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int green = string2int(text.substr(0, nextPos));
+        if (green < 0 || green > 255)
+            return false;
+
+        text = text.substr(nextPos + 1);
+        int blue = string2int(text); // don't need comma test here
+        if (blue < 0 || blue > 255)
+            return false;
+
+        Fl::set_color(colourNumbers[item], red, green, blue);
+
+        return true;} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//

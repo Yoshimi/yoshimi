@@ -417,24 +417,6 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
-      setColourTable(synth->getRuntime().guiTheme);
-      string name = file::localDir() + "/themes";
-      string fullName = name + "/classic.clr";
-      if (!file::isRegularFile(fullName))
-      {
-          file::createDir(name);
-          string colourText;
-          for (int i = 0; i < (COLOURLIST); ++i)
-          {
-              colourText += (colourData[i] + char(10));
-          }
-          for (int i = 0; i < COLOURINFO; ++i)
-          {
-              colourText += (colourInfo[i] + char(10));
-          }
-
-          file::saveText(colourText, fullName);
-      }
       make_window();
       bool foundWindows = Showmaster();
 
@@ -484,78 +466,6 @@ class MasterUI {: {private GuiUpdates}
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
-  }
-  Function {setColourTable(string table)} {} {
-    code {//
-        if (table == "classic")
-        {
-            setClassicTable();
-            return;
-        }
-        string dirname = file::localDir() + "/themes/";
-        string fullName = dirname + table + ".clr";
-        if (!file::isRegularFile(fullName))
-        {
-            setClassicTable();
-            return;
-        }
-        string colourText = loadText(dirname + table + ".clr");
-        std::size_t nextPos = 1;
-
-        bool ok =  true;
-        for (int i = 0; i < COLOURLIST; ++ i)
-        {
-            nextPos = colourText.find(char(10));
-            if (nextPos == std::string::npos)
-            {
-                ok = false;
-                break;
-            }
-            setColourLine(colourText.substr(0, nextPos), i);
-            colourText = colourText.substr(nextPos + 1);
-        }
-        if (!ok)
-            std::cout << "failed" << std::endl;
-        ;} {}
-  }
-  Function {setClassicTable()} {} {
-    code {//
-        for (int i = 0; i < COLOURLIST; ++ i)
-        {
-            setColourLine(colourData[i], i);
-        }
-        //Fl::set_color(128, 200, 0, 0); // for testing
-        //Fl::set_color(159, 225, 225, 225); // for testing
-        ;} {}
-  }
-  Function {setColourLine(string text, int item)} {return_type bool
-  } {
-    code {//
-        if (text.at(0) == char(35))
-            return true; // don't change this colour
-        size_t nextPos = text.find(",");
-        if (nextPos == std::string::npos)
-            return false;
-        int red = string2int(text.substr(0, nextPos));
-        if (red < 0 || red > 255)
-            return false;
-
-        text = text.substr(nextPos + 1);
-        nextPos = text.find(",");
-        if (nextPos == std::string::npos)
-            return false;
-        int green = string2int(text.substr(0, nextPos));
-        if (green < 0 || green > 255)
-            return false;
-
-        text = text.substr(nextPos + 1);
-        int blue = string2int(text); // don't need comma test here
-        if (blue < 0 || blue > 255)
-            return false;
-
-        Fl::set_color(colourNumbers[item], red, green, blue);
-
-        return true;} {}
   }
   Function {Showmaster()} {return_type bool
   } {

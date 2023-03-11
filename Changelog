@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-3-11 Will
+bn 2186
+Theme control now entirely within ConfigUI.fl
+Related data stored in .local/share/yoshimi/themes
+
 2023-3-10 Will
 bn 2185
 PadSynth graphics theme complete, others partially.
