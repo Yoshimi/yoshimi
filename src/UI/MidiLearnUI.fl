@@ -8,7 +8,7 @@ comment {MidiLearnUI.h} {not_in_source in_header
 comment {MidiLearnUI.cc} {in_source not_in_header
 }
 
-comment {Copyright (C) 2016-2022, Will Godfrey
+comment {Copyright (C) 2016-2023, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -75,7 +75,7 @@ class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnkititem {
-      xywh {8 649 825 20} type Double hide
+      xywh {357 541 825 20} type Double hide
       class Fl_Group
     } {
       Fl_Group midilearnkititemgroup {
@@ -83,24 +83,24 @@ class MidiLearnKitItem {: {public Fl_Group}
       } {
         Fl_Spinner CCcounter {
           callback {send_data(0, MIDILEARN::control::CCorChannel);}
-          tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
+          tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 labelcolor 64 minimum 0 maximum 129 value 14 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {114 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {114 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
         }
         Fl_Button nrpn {
           label {8888 h}
-          tooltip {NRPN value} xywh {76 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
+          tooltip {NRPN value} xywh {76 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 labelcolor 64 hide
         }
         Fl_Light_Button sevenbit {
           callback {send_data(0, MIDILEARN::control::sevenBit);}
-          tooltip {Set for 7bit NRPN} xywh {59 0 13 15} box NO_BOX color 28 selection_color 1 hide
+          tooltip {Set for 7bit NRPN} xywh {59 0 13 15} box NO_BOX color 28 selection_color 1 labelcolor 64 hide
         }
         Fl_Choice channelchoice {
           callback {send_data(0, 48);}
-          tooltip {Incoming channel} xywh {137 0 39 15} down_box BORDER_BOX selection_color 49 labelsize 12 textsize 12
+          tooltip {Incoming channel} xywh {137 0 39 15} down_box BORDER_BOX selection_color 49 labelsize 12 labelcolor 64 textsize 12 textcolor 64
         } {
           MenuItem chan1 {
             label 1
@@ -174,13 +174,13 @@ class MidiLearnKitItem {: {public Fl_Group}
         Fl_Check_Button compresscheck {
           callback {//
           send_data(0, MIDILEARN::control::limit);}
-          tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
+          tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelcolor 64 align 4
           class Fl_Check_Button2
         }
         Fl_Check_Button blockcheck {
           callback {//
           send_data(0, MIDILEARN::control::block);}
-          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelcolor 64 align 4
           class Fl_Check_Button2
         }
         Fl_Light_Button activity {
@@ -189,32 +189,32 @@ class MidiLearnKitItem {: {public Fl_Group}
               o->value(0);
           else
               o->value(1);}
-          xywh {180 0 13 15} box NO_BOX color 15 selection_color 2
+          xywh {180 0 13 15} box NO_BOX color 15 selection_color 2 labelcolor 64
         }
         Fl_Spinner minval {
           callback {send_data(0, MIDILEARN::control::minimum);}
-          tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 0 textsize 12
+          tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 labelcolor 64 minimum 0 step 0.5 value 0 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
         }
         Fl_Spinner maxval {
           callback {//
           send_data(0, MIDILEARN::control::maximum);}
-          tooltip {Maximum % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
+          tooltip {Maximum % to pass on} xywh {261 0 52 15} type Float labelsize 12 labelcolor 64 minimum 0 step 0.5 value 100 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {303 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {303 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
         }
         Fl_Button commandName {
           label text
           callback {//
           send_data(0, MIDILEARN::control::deleteLine);}
-          tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
+          tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 labelcolor 64 align 64
         }
       }
       Fl_Check_Button mutecheck {
@@ -224,7 +224,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         else
             midilearnkititemgroup->activate();
         send_data(0, MIDILEARN::control::mute);}
-        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 align 4
+        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelcolor 64 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
         class Fl_Check_Button2
       }
@@ -351,7 +351,7 @@ class MidiLearnUI {} {
       callback {close->do_callback();}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide resizable
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {925 728 820 285} type Double hide resizable
       code0 {send_data(TOPLEVEL::action::lowPrio, MIDILEARN::control::sendRefreshRequest, 0, 3);}
       code1 {learnDW = o->w(); learnDH = o->h();}
       code2 {o->size_range(learnDW, learnDH, 0, 0, 0, 0, 1);}
@@ -363,39 +363,39 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       } {}
       Fl_Box none {
         label {No Entries}
-        xywh {290 131 206 44} labelsize 32
+        xywh {290 131 206 44} labelsize 32 labelcolor 64
       }
       Fl_Box mutebox {
         label Mute
-        xywh {18 0 41 15} labelfont 1 labelsize 11 align 18
+        xywh {18 0 41 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box ccbox {
         label CC
-        xywh {80 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {80 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box chanbox {
         label Chan
-        xywh {139 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {139 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box blockbox {
         label Block
-        xywh {355 0 50 15} labelfont 1 labelsize 11 align 18
+        xywh {355 0 50 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box limitbox {
         label Limit
-        xywh {310 0 48 15} labelfont 1 labelsize 11 align 18
+        xywh {310 0 48 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box controlbox {
         label {Control Function}
-        xywh {530 0 130 15} labelfont 1 labelsize 11 align 18
+        xywh {530 0 130 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box minbox {
         label {Min %}
-        xywh {200 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {200 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box maxbox {
         label {Max %}
-        xywh {263 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {263 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Button close {
         label Close
@@ -403,7 +403,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), false, "Midi-learn");
     midilearnwindow->hide();
     learnSeen = false;}
-        xywh {730 262 63 20} box THIN_UP_BOX
+        xywh {730 262 63 20} box THIN_UP_BOX labelcolor 64
       }
       Fl_Button load {
         label Load
@@ -412,7 +412,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         if (filename.empty())
             return;
         loadMidi(filename);}
-        tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button save {
         label Save
@@ -423,7 +423,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) filename));
         recent->activate();
         setWindowTitle(findLeafName(filename));}
-        tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+        tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64 deactivate
       }
       Fl_Button clear {
         label Clear
@@ -434,14 +434,14 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         send_data(0, MIDILEARN::control::clearAll,0,0);
         o->deactivate();
         setWindowTitle();}
-        tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+        tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64 deactivate
       }
       Fl_Button recent {
         label Recent
         callback {//
         synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
         synth->getGuiMaster()->paramsui->Show(TOPLEVEL::XML::MLearn);}
-        tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
         code0 {vector<string> &listType = *synth->getHistory(TOPLEVEL::XML::MLearn);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }

@@ -845,7 +845,7 @@ Oscillator}
             class Fl_Check_Button2
           }
           Fl_Group unisongroup {
-            xywh {90 402 484 56} box PLASTIC_UP_BOX color 231 deactivate
+            xywh {90 402 484 56} box PLASTIC_UP_BOX color 223 deactivate
             code0 {int tmp = pars->VoicePar[nvoice].Unison_size; if (tmp > 1) o->activate();}
             code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if (pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {

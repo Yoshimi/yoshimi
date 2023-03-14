@@ -162,19 +162,16 @@ return(nearestpoint);} {}
     ly -= 10;
 
     //draw the lines
-    fl_color(graph_resonance_grid);
+    fl_color(env_line);//graph_resonance_grid);
     fl_line(ox + 2, oy + ly / 2, ox + lx - 2, oy + ly / 2);
 
     //draws the envelope points and lines
     fl_line_style(0, int(2 *scale));
-    Fl_Color alb = FL_WHITE;
-    if (!active_r())
-        alb = FL_GRAY;
-    fl_color(alb);
     int oldxx = 0;
     int xx = 0;
     int oldyy = 0;
     int yy = getpointy(0);
+    fl_color(env_ctl);
     fl_rectf(ox - 3, oy + yy - 3, 6, 6);
     for (int i = 1; i < npoints; i++)
     {
@@ -183,10 +180,11 @@ return(nearestpoint);} {}
         xx = getpointx(i);
         yy = getpointy(i);
         if (i == currentpoint)
-            fl_color(FL_RED);
+            fl_color(env_line_sel);
         else
-            fl_color(alb);
+            fl_color(env_line);
         fl_line(ox + oldxx, oy + oldyy, ox + xx, oy + yy);
+        fl_color(env_ctl);
         fl_rectf(ox+xx-3,oy+yy-3,6,6);
     };
 
@@ -194,14 +192,15 @@ return(nearestpoint);} {}
     fl_line_style(0, int(1 * scale));
     if (lastpoint>=0)
     {
-        fl_color(FL_CYAN);
+        fl_color(env_ctl_sel);
         fl_rectf(ox+getpointx(lastpoint)-5,oy+getpointy(lastpoint)-5,10,10);
     };
 
     //draw the sustain position
+    fl_line_style(0, int(2.5 *scale));
     if (env->Penvsustain>0)
     {
-        fl_color(FL_YELLOW);
+        fl_color(env_sus);
         xx = getpointx(env->Penvsustain);
         fl_line(ox + xx, oy + 0, ox + xx, oy + ly);
     };
@@ -211,13 +210,13 @@ return(nearestpoint);} {}
     float time = 0.0;
     if (currentpoint <= 0)
     {
-        fl_color(alb);
+        fl_color(env_ctl);
         for (int i = 1; i < npoints; i++)
             time += env->getdt(i);
     }
     else
     {
-        fl_color(FL_RED);
+        fl_color(env_line_sel);
         time = env->getdt(currentpoint);
     };
     char tmpstr[40];
@@ -253,7 +252,7 @@ return(nearestpoint);} {}
                 valDesc = "unknown env. type";
         }
         strcpy(tmpstr, valDesc.c_str());
-        fl_color(FL_CYAN);
+        fl_color(env_ctl_sel);
         fl_draw(tmpstr, ox + lx - 30, oy, 30, 25, FL_ALIGN_RIGHT, NULL, 0);
 }
 fl_line_style(0,1);} {}
@@ -458,7 +457,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label Close
         callback {freemodeeditwindow->hide();
 saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "xEnvelope-free " + to_string(engine) + " " + to_string(group));}
-        xywh {519 155 44 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {519 155 44 20} box THIN_UP_BOX selection_color 64 labelsize 12 labelcolor 64
       }
     }
   }

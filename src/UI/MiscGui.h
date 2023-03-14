@@ -28,6 +28,8 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
+#include "UI/Themes.h"
+
 using file::saveText;
 using file::loadText;
 using func::string2int;
@@ -286,122 +288,5 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
     }
     //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
-
-// don't mess with greyscale colours!
-const int gen_text_back = 7;
-const int gen_text = 64;
-const int gen_opp_text = 175;
-const int graph_back = 57;
-const int graph_pad_back = 254;
-const int graph_grid = 217;
-const int graph_resonance_grid = 246;
-const int graph_Harmonics_grid = 216;
-const int graph_line = 63;
-const int reson_graph_line = 131;
-const int formant_graph_line = 132;
-const int EQ_back = 96;
-const int EQ_back_off = 97;
-const int EQ_grid = 147;
-const int EQ_major_grid = 155;
-const int EQ_line =  95;
-const int EQ_line_off =  94;
-const int yoshi_ins_typ = 219;
-const int instr_back = 17;
-const int add_back = 214;
-const int sub_back = 236;
-const int pad_back = 158;
-const int pad_equiv_back = 159;
-const int pad_grid = 163;
-const int pad_grid_centre = 162;
-const int pad_prof_band = 227;
-const int pad_prof_fill = 231;
-const int pad_prof_line = 136;
-const int pad_prof_inactive = 137;
-const int pad_harmonic_line = 128;
-const int ext_voice = 157;
-const int ext_osc = 238;
-
-const int COLOURLIST = 32;
-const unsigned char colourNumbers [COLOURLIST] = {
-    gen_text_back,
-    gen_text,
-    gen_opp_text,
-    graph_back,
-    graph_pad_back,
-    graph_grid,
-    graph_resonance_grid,
-    graph_Harmonics_grid,
-    graph_line,
-    reson_graph_line,
-    formant_graph_line,
-    EQ_back,
-    EQ_back_off,
-    EQ_grid,
-    EQ_major_grid,
-    EQ_line,
-    EQ_line_off,
-    yoshi_ins_typ,
-    instr_back,
-    add_back,
-    sub_back,
-    pad_back,
-    pad_equiv_back,
-    pad_grid,
-    pad_grid_centre,
-    pad_prof_band,
-    pad_prof_fill,
-    pad_prof_line,
-    pad_prof_inactive,
-    pad_harmonic_line,
-    ext_voice,
-    ext_osc,
-};
-
-static std::string colourData [] = {
-    "255,255,255, General text background",
-    "0,0,0, General text",
-    "255,255,255, General opposite text",
-    "0,0,0, Waveform, resonance, formant graph background",
-    "245,245,245, Padsynth harmonics background",
-    "40,120,190, Waveform graph grid",
-    "180,180,180, Resonance graph grid",
-    "30,70,255, Harmonics graph grid",
-    "0,255,0, Waveform graph line",
-    "255,0,0, Formant graph line",
-    "255,0,0, Resonance graph line",
-    "0,70,150, EQ graph background",
-    "80,120,160, EQ background disabled",
-    "200, 200, 200, EQ graph grid",
-    "255, 255, 255, EQ graph major grid",
-    "255,255,0, EQ graph line",
-    "200,200,80, EQ graph line disabled",
-    "0,0,225, Yoshimi instrument type",
-    "253,246,230, Instrument background",
-    "223,175,191, AddSynth background",
-    "175,207,223, SubSynth background",
-    "205,221,173, PadSynth profile background",
-    "225,225,225, PadSynth profile equivalent background",
-    "180, 180, 180, Padsynth profile grid",
-    "90, 90, 90, Padsynth profile centre mark",
-    "90,120,250, PadSynth profile equivalent markers",
-    "180,210,240, PadSynth profile fill",
-    "0,0,120, PadSynth profile line",
-    "150,150,150, PadSynth profile line disabled",
-    "200,0,0, PadSynth harmonic line",
-    "159,223,143, External voice",
-    "143,191,223, External oscillator",
-};
-
-const int COLOURINFO = 8;
-static std::string colourInfo [] = {
-    "------------------",
-    "R,G,B, (no spaces)",
-    "Do not edit this. It may be overwritten.",
-    "Copy as template for other named themes,",
-    "but don't add or remove lines above dashes.",
-    "This would corrupt the colour map.",
-    "Instead place '#' at line start for default.",
-    "Add your own notes here:",
-};
 
 #endif

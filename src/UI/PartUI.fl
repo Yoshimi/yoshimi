@@ -805,7 +805,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     }
     Fl_Window ctlwindow {
       label Controllers
-      callback {ctlclose->do_callback();} open
+      callback {ctlclose->do_callback();}
       xywh {568 179 505 130} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
       code1 {ctlDW = o->w(); ctlDH = o->h();}
@@ -945,7 +945,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
       }
       Fl_Group ctlportamento {
-        label Portamento open
+        label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10 labelcolor 64
       } {
         Fl_Box ctlx100 {

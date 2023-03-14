@@ -1,5 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-3-14 Will
+bn 2187
+Moved theme definitions from MiscGui.h to (new) Themes.h
+Commented user theme line now sets 'classic', not default
+Added greyscale range control
+Added tooltip colour control
+Improved theme lists, with some error trapping
+
 2023-3-11 Will
 bn 2186
 Theme control now entirely within ConfigUI.fl

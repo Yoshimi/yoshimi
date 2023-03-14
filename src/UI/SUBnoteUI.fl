@@ -257,7 +257,7 @@ class SUBnoteUI {: {public PresetsUI_}
       }
       Fl_Group freqsettingsui {
         label FREQUENCY
-        xywh {440 5 290 135} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+        xywh {440 5 290 135} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
         Fl_Group freqenvelopegroup {
           label {SUBsynth - Frequency Envelope}
@@ -457,7 +457,7 @@ class SUBnoteUI {: {public PresetsUI_}
       } {}
       Fl_Group globalfiltergroup {
         label { FILTER }
-        xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
+        xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
         code0 {if (pars->PGlobalFilterEnabled==0) o->deactivate();}
       } {
         Fl_Group filterenv {

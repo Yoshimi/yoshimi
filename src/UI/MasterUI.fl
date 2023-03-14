@@ -417,6 +417,8 @@ class MasterUI {: {private GuiUpdates}
       vectorui = new VectorUI(synth, bankui, paramsui);
       midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI(synth);
+      Fl_Tooltip::color(tooltip_back);
+      Fl_Tooltip::textcolor(tooltip_text);
       make_window();
       bool foundWindows = Showmaster();
 
@@ -1419,7 +1421,7 @@ class MasterUI {: {private GuiUpdates}
         }
         Fl_Button {} {
           callback {vumeter->init(-1, synth);}
-          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 463 376 30} box NO_BOX
+          tooltip {Click here to clear VU peak reading and overload warning.} xywh {5 463 376 30} box NO_BOX labelcolor 64
         }
       }
       Fl_Button mastermono {

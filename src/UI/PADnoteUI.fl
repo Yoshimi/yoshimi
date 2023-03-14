@@ -162,8 +162,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_color(pad_prof_inactive);
         fl_line(ox + lx / 2 - rbw, oy, ox + lx / 2 - rbw, oy + ly - 1);
         fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
-        fl_line_style(0, 1);
-        } {}
+        fl_line_style(0, 1);} {}
   }
   decl {PADnoteParameters *pars;} {public local
   }
@@ -267,7 +266,7 @@ this->pars=pars;} {}
   }
 }
 
-class PADnoteUI {open : {public PresetsUI_}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be after panwidth} {in_source in_header
@@ -275,7 +274,7 @@ class PADnoteUI {open : {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {284 27 580 440} type Double hide resizable
+      xywh {706 603 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -291,7 +290,7 @@ class PADnoteUI {open : {public PresetsUI_}
             {
                 applybox->show();
                 applybutton->show();}}
-        xywh {0 0 580 405}
+        xywh {0 0 580 405} labelcolor 64
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
@@ -305,7 +304,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label {Base Type}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseType, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Base shape used to widen and spread each harmonic.} xywh {15 42 75 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
+              tooltip {Base shape used to widen and spread each harmonic.} xywh {15 42 75 15} down_box BORDER_BOX labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
               code0 {o->add("Gauss");o->add("Square");o->add("DoubleExp");}
               code1 {o->value(pars->PProfile.base.type);}
             } {}
@@ -313,7 +312,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Width
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Spread of a single peak within the profile.} xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Spread of a single peak within the profile.} xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.base.pwidth);}
               class WidgetPDial
             }
@@ -321,7 +320,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Repeat
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::frequencyMultiplier, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Repeat the same base shape multiple times in the generated profile.} xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Repeat the same base shape multiple times in the generated profile.} xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.freqmult);}
               class WidgetPDial
             }
@@ -329,7 +328,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Str
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Modulate and spread the base shape} xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Modulate and spread the base shape} xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.modulator.pstretch);}
               class WidgetPDial
             }
@@ -337,7 +336,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Freq
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorFrequency, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Frequency of peaks within modulation of base shape.} xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Frequency of peaks within modulation of base shape.} xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.modulator.freq);}
               class WidgetPDial
             }
@@ -345,7 +344,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Scale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::size, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Squeeze or stretch the profile as a whole. Note: effective only when Autoscale is off} xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Squeeze or stretch the profile as a whole. Note: effective only when Autoscale is off} xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.width);}
               class WidgetPDial
             }
@@ -353,18 +352,18 @@ class PADnoteUI {open : {public PresetsUI_}
               label Profile
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::harmonicSidebands, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Which part of the profile to use: Full, or only the upper or lower half.} xywh {10 147 80 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
+              tooltip {Which part of the profile to use: Full, or only the upper or lower half.} xywh {10 147 80 15} down_box BORDER_BOX labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
               code0 {o->add("Full");o->add("Upper Half");o->add("Lower Half");}
               code1 {o->value(pars->PProfile.onehalf);}
             } {}
             Fl_Group ampgroup {
-              xywh {10 164 80 105} box BORDER_BOX
+              xywh {10 164 80 105} box BORDER_BOX labelcolor 64
             } {
               Fl_Choice hpampmode {
                 label AmpMode
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMode, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {How to combine secondary modulation with the profile: Sum: XFade, Mult: Filter, Div1: profile/modulator, Div2: modulator/profile} xywh {15 209 70 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
+                tooltip {How to combine secondary modulation with the profile: Sum: XFade, Mult: Filter, Div1: profile/modulator, Div2: modulator/profile} xywh {15 209 70 15} down_box BORDER_BOX labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                 code0 {o->add("Sum");o->add("Mult");o->add("Div1");o->add("Div2");}
                 code1 {o->value(pars->PProfile.amp.mode);}
               } {}
@@ -372,7 +371,7 @@ class PADnoteUI {open : {public PresetsUI_}
                 label Par1
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralWidth, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Squeeze or spread the secondary modulating shape.} xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+                tooltip {Squeeze or spread the secondary modulating shape.} xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
                 code0 {o->value(pars->PProfile.amp.par1);}
                 class WidgetPDial
               }
@@ -380,7 +379,7 @@ class PADnoteUI {open : {public PresetsUI_}
                 label Par2
                 callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralAmplitude, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Degree to fade or combine secondary modulation with the harmonic profile.} xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+                tooltip {Degree to fade or combine secondary modulation with the harmonic profile.} xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
                 code0 {o->value(pars->PProfile.amp.par2);}
                 class WidgetPDial
               }
@@ -389,7 +388,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label AmpMultiplier
               callback {//
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::amplitudeMultiplier, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Apply a secondary amplitude modulation on top of the profile built thus far.} xywh {15 179 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              tooltip {Apply a secondary amplitude modulation on top of the profile built thus far.} xywh {15 179 70 15} down_box BORDER_BOX labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
               code0 {o->add("Off");o->add("Gauss");o->add("Sine");o->add("Flat");}
               code1 {o->value(pars->PProfile.amp.type);}
               code2 {if (_SYS_::F2B(o->value())) ampgroup->activate(); else ampgroup->deactivate();}
@@ -398,7 +397,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Autoscale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Automatically stretch the profile, so that all shapes yield the same perceptual blurring effect.} xywh {10 274 74 15} down_box DOWN_BOX labelsize 11
+              tooltip {Automatically stretch the profile, so that all shapes yield the same perceptual blurring effect.} xywh {10 274 74 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 65
               code0 {o->value(pars->PProfile.autoscale);}
               class Fl_Check_Button2
             }
@@ -478,7 +477,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Par1
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
+              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
               class WidgetPDial
             }
@@ -486,7 +485,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label Par2
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
+              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
               class WidgetPDial
             }
@@ -494,7 +493,7 @@ class PADnoteUI {open : {public PresetsUI_}
               label ForceH
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
+              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->setValueType(VC_percent255);}
               class WidgetPDial

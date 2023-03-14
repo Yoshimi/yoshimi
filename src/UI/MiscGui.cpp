@@ -1250,7 +1250,7 @@ void custom_graph_dimensions(ValueType vt, int& w, int& h)
 
 inline void grid(int x, int y, int w, int h, int sections)
 {
-        fl_color(FL_GRAY);
+        fl_color(tooltip_grid);
 
         int j = 1;
         int gDist = h / sections;
@@ -1284,7 +1284,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         /* Grid */
         grid(x0,y0,_w,_h, 4);
         /*Function curve*/
-        fl_color(FL_BLUE);
+        fl_color(tooltip_curve);
         if ((int)val == 127)
         {   // in this case velF will always return 1.0
             y = y0 - _h;
@@ -1307,7 +1307,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
     {
         p = power<10>((val - 32.0f) / 48.0f); //clearness param
         grid(x0,y0,_w,_h,10);
-        fl_color(FL_BLUE);
+        fl_color(tooltip_curve);
         fl_begin_line();
         x = 0;
         float frac = 1.0f / (float)_w;
@@ -1347,10 +1347,10 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         for (i = 0; i < 4; i++) /* 10x / 10%, 100x / 1% ... */
         {
             y = ry * (i + 1);
-            fl_color(FL_GRAY);
+            fl_color(tooltip_grid);
             fl_line(x0, cy - y, x0 + _w, cy - y);
             fl_line(x0, cy + y, x0 + _w, cy + y);
-            fl_color(FL_BLACK);
+            fl_color(tooltip_faint_text);
             fl_draw(xMarkers[i].c_str(), x0 - 28, (cy - y - 4), 24, 12,
                     Fl_Align(FL_ALIGN_RIGHT));
             fl_draw(xMarkers[i + 4].c_str(), x0 - 28, (cy + y - 4), 24, 12,
@@ -1359,7 +1359,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
 
         /* Hz lines */
 
-        fl_color(FL_GRAY); /* Lighter inner lines*/
+        fl_color(tooltip_grid); /* Lighter inner lines*/
 
         for (i = 10;i != 0; i *= 10)
         {
@@ -1379,9 +1379,9 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         for (i = 0; i < 4; i++) /* 20, 100, 1k, 10k */
         {
             x = x0 + (i == 0 ?  0 : ((float)i + 1 - lg1020) * rx);
-            fl_color(44); /* Darker boundary lines */
+            fl_color(tooltip_major_grid); /* Darker boundary lines */
             fl_line(x, y0, x, y0 - _h);
-            fl_color(FL_BLACK);
+            fl_color(tooltip_text);
             fl_draw(hzMarkers[i].c_str(), x - 20, y0 + 4, 40, 12,
                     Fl_Align(FL_ALIGN_CENTER));
         }
@@ -1393,7 +1393,7 @@ void custom_graphics(ValueType vt, float val,int W,int H)
         fl_line(x0 - margin, cy, x0 + _w, cy);
 
         /* Function curve */
-        fl_color(FL_BLUE);
+        fl_color(tooltip_curve);
         if ((int)val == 0)
         {
             fl_line(x0, cy, x0 + _w, cy);

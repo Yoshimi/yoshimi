@@ -29,6 +29,9 @@ This file is derivative of ZynAddSubFX original code.
 decl {\#include <cmath>} {public local
 }
 
+decl {\#include <iostream>} {public local
+}
+
 decl {\#include "Misc/Config.h"} {public local
 }
 
@@ -1097,7 +1100,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {manageThemes()} {} {
     code {//
-      //std::cout << "in theme manager" << std::endl;
       string themeDir = file::localDir() + "/themes/";
       file::createDir(themeDir);
       file::createDir(themeDir+"ID");
@@ -1111,71 +1113,150 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       }
       if (!file::isRegularFile(themeDir + currentTheme))
           currentTheme = "";
-      if (build_ID != theme_ID || currentTheme.empty())
+      if (build_ID != theme_ID || currentTheme.empty() || !file::isRegularFile(themeDir + "classic.clr"))
       {
           currentTheme = "classic.clr";
-          //std::cout << "C " << currentTheme << std::endl;
           theme_ID = build_ID;
           string colourText;
           file::saveText(to_string(theme_ID), themeDir+"ID/version");
-          for (int i = 0; i < (COLOURLIST); ++i)
-          {
-              colourText += (colourData[i] + char(10));
-          }
-          for (int i = 0; i < COLOURINFO; ++i)
-          {
-              colourText += (colourInfo[i] + char(10));
-          }
+          int info = 0;
+          do {
+              colourText += (colourPreamble[info] + char(10));
+              ++info;
+          } while(colourPreamble[info] != "END");
+
+          int data = 0;
+          do {
+              colourText += (colourData[data] + char(10));
+              ++data;
+          }  while(colourData[data] != "END");
+
           file::saveText(currentTheme, themeDir+"ID/current");
           file::saveText(colourText, themeDir+"classic.clr");
       }
-      //std::cout << "theme>" << currentTheme << std::endl;
-      setColourTable(currentTheme);} {}
+
+      if (currentTheme == "classic.clr")
+          setClassicTable();
+      else
+          setUserTable(currentTheme);} {}
   }
-  Function {setColourTable(string table)} {} {
+  Function {setClassicTable()} {return_type bool
+  } {
     code {//
-        if (table == "classic.clr")
+        int lineCount = 0;
+        while (colourData[lineCount].substr(0, 7) != "-------")
         {
-            setClassicTable();
-            return;
+            setColourLine(colourData[lineCount + 1], lineCount); // we don't want the greyscale line!
+            ++ lineCount;
         }
+        //Fl::set_color(env_sus, 0, 200, 0); // for testing
+        //Fl::set_color(env_line_sel, 0, 225, 0); // for testing
+        return true;} {}
+  }
+  Function {setUserTable(string table)} {return_type bool
+  } {
+    code {//
         string dirname = file::localDir() + "/themes/";
         string fullName = dirname + table;
-        //std::cout << "here>" << fullName << std::endl;
         string colourText = loadText(dirname + table);
-        std::size_t nextPos = 1;
-
         bool ok =  true;
-        for (int i = 0; i < COLOURLIST; ++ i)
+        std::size_t nextPos;
+
+        // strip out preamble text
+        string text = "";
+        int lineCount = 0;
+        while (text.substr(0, 7) != "-------")
         {
             nextPos = colourText.find(char(10));
-            if (nextPos == std::string::npos)
+            if (nextPos == std::string::npos || lineCount > 100)
             {
                 ok = false;
                 break;
             }
-            setColourLine(colourText.substr(0, nextPos), i);
-            colourText = colourText.substr(nextPos + 1);
+            else
+            {
+                text = colourText.substr(0, nextPos);
+                colourText = colourText.substr(nextPos + 1);
+            }
+            ++lineCount;
         }
         if (!ok)
-            std::cout << "failed" << std::endl;
-        ;} {}
+            return false; // invalid file
+
+        nextPos = colourText.find(char(10));
+        setGreyScale(colourText.substr(0, nextPos));
+        colourText = colourText.substr(nextPos + 1);
+
+        lineCount = 0;
+        do {
+            nextPos = colourText.find(char(10));
+            if (nextPos == std::string::npos || lineCount > 1000)
+            {
+                ok = false;
+                break;
+            }
+            text = colourText.substr(0, nextPos);
+            //std::cout << text << std::endl;
+            if (text.at(0) == char(35))
+            {
+                setColourLine(colourData[lineCount + 1], lineCount); // don't change this colour
+            }
+            else
+            {
+                setColourLine(colourText.substr(0, nextPos), lineCount);
+            }
+            ++lineCount;
+            colourText = colourText.substr(nextPos + 1);
+        } while(colourText.substr(0, 7) != "-------");
+
+        //Fl::set_color(56, 0, 0, 255); // for testing
+        return true;} {}
   }
-  Function {setClassicTable()} {} {
+  Function {setGreyScale(string text)} {return_type bool
+  } {
     code {//
-        for (int i = 0; i < COLOURLIST; ++ i)
+        if (text.at(0) == char(35))
+            return true; // keep default scale
+        size_t nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int min = string2int(text.substr(0, nextPos));
+        if (min < 0 || min > 255)
+            return false;
+
+        text = text.substr(nextPos + 1);
+        nextPos = text.find(",");
+        if (nextPos == std::string::npos)
+            return false;
+        int max = string2int(text.substr(0, nextPos));
+        if (max < 0 || max > 255)
+            return false;
+
+        float greyRange;
+        if (max > min)
         {
-            setColourLine(colourData[i], i);
+           greyRange =  (max - min) / 23;
+           for (int i = 0; i < 24; ++i)
+           {
+                int diff = (min + int(i * greyRange));
+                Fl::set_color(i + 32, diff, diff, diff);
+           }
         }
-        //Fl::set_color(128, 200, 0, 0); // for testing
-        //Fl::set_color(159, 225, 225, 225); // for testing
-        ;} {}
+        else
+        {
+           greyRange = (min - max) / 23;
+           for (int i = 0; i < 24; ++i)
+           {
+               int diff = min - (int(i * greyRange));
+               Fl::set_color(i + 32, diff, diff, diff);
+               printf(" %d", diff);
+           }
+       }
+       return true;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
   } {
     code {//
-        if (text.at(0) == char(35))
-            return true; // don't change this colour
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
@@ -1197,7 +1278,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             return false;
 
         Fl::set_color(colourNumbers[item], red, green, blue);
-
         return true;} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
