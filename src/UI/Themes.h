@@ -28,6 +28,12 @@
 
 // The following are ordered by value for easy number tracking
 // Where possible they are fairly close to FLTK defaults
+const int knob_low = 244;
+const int knob_high = 207;
+const int knob_ring = 144;
+const int knob_lit = 199;
+const int knob_point = 145;
+
 const int gen_text_back = 7;
 const int instr_back = 17;
 const int graph_back = 57;
@@ -74,8 +80,13 @@ const int graph_pad_back = 254;
 
 // The following are ordered as they are in theme lists
 // They are grouped mainly by function
-const int COLOURLIST = 43;
+const int COLOURLIST = 48;
 const unsigned char colourNumbers [COLOURLIST] = {
+    knob_low,
+    knob_high,
+    knob_ring,
+    knob_lit,
+    knob_point,
     tooltip_back,
     tooltip_grid,
     tooltip_major_grid,
@@ -129,11 +140,15 @@ static std::string colourPreamble [] = {
     "Instead place # at start of line for default setting.",
     "------------------ data start marker",
     "END",
-};
-// Do not change the last two text lines!
+}; // Do not change the last two text lines!
 
 static std::string colourData [] = {
     "#0, 255, gray scale min-max (can be reversed) following lines RGB",
+    "186, 198, 211, Knob shadow",
+    "231, 235, 239, Knob highlight",
+    "51, 51, 51, Knob ring",
+    "0, 197, 255, Knob ring lit",
+    "61, 61, 61, Knob_pointer",
     "255,255,210, Tooltip background",
     "180,180,180, Tooltip grid",
     "50,50,50, Tooltip major grid",
@@ -180,7 +195,7 @@ static std::string colourData [] = {
     "------------------ data end marker",
     "Add your own notes here:",
     "END",
-// Do not change the last three text lines!
-};
+
+}; // Do not change the last three text lines!
 
 #endif

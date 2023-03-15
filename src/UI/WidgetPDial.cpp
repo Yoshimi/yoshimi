@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Copyright 2020 - 2021, Will Godfrey & others
+    Copyright 2020 - 2023, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -187,27 +187,48 @@ void WidgetPDial::draw()
     double rCout = 13.0/35;
     double rHand = 8.0/35;
     double rGear = 15.0/35;
+
+    unsigned char r,g,b;
     //drawing base dark circle
+    Fl::get_color(knob_ring, r, g, b); // 51,51,51
     if (active_r())
     {
-        cairo_pattern_create_rgb(51.0/255,51.0/255,51.0/255);
+        /*
+        cairo_pattern_create_rgb(r/255.0,g/255.0,b/255.0);
+        The above line seems to be wrong and draws black
+        regardless of the selection.
+        The line below works.
+        Will G.
+        */
+        cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
     } else {
         cairo_set_source_rgb(cr,0.4,0.4,0.4);
     }
     cairo_arc(cr,0,0,dh,0,2*PI);
     cairo_fill(cr);
+
     cairo_pattern_t* pat;
+    Fl::get_color(knob_low, r, g, b);
+    float R1 = r/255.0; // 186
+    float G1 = g/255.0; // 198
+    float B1 = b/255.0; // 211
+
+    Fl::get_color(knob_high, r, g, b);
+    float R2 = r/255.0; // 231
+    float G2 = g/255.0; // 235
+    float B2 = b/255.0; // 239
+
     //drawing the inner circle:
     pat = cairo_pattern_create_linear(0.5*dh,0.5*dh,0,-0.5*dh);
-    cairo_pattern_add_color_stop_rgba (pat, 0, 0.8*186.0/255, 0.8*198.0/255, 0.8*211.0/255, 1);
-    cairo_pattern_add_color_stop_rgba (pat, 1, 231.0/255, 235.0/255, 239.0/255, 1);
+    cairo_pattern_add_color_stop_rgba (pat, 0, 0.8*R1, 0.8*G1, 0.8*B1, 1);
+    cairo_pattern_add_color_stop_rgba (pat, 1, R2, G2, B2, 1);
     cairo_set_source (cr, pat);
     cairo_arc(cr,0,0,d*rCout,0,2*PI);
     cairo_fill(cr);
     //drawing the outer circle:
     pat = cairo_pattern_create_radial(2.0/35*d,6.0/35*d,2.0/35*d,0,0,d*rCint);
-    cairo_pattern_add_color_stop_rgba (pat, 0, 231.0/255, 235.0/255, 239.0/255, 1);
-    cairo_pattern_add_color_stop_rgba (pat, 1, 186.0/255, 198.0/255, 211.0/255, 1);
+    cairo_pattern_add_color_stop_rgba (pat, 0, R2, G2, B2, 1);
+    cairo_pattern_add_color_stop_rgba (pat, 1, R1, G1, B1, 1);
     cairo_set_source (cr, pat);
     cairo_arc(cr,0,0,d*rCint,0,2*PI);
     cairo_fill(cr);
@@ -217,7 +238,8 @@ void WidgetPDial::draw()
         linewidth = 2;
     if (active_r())
     {
-        cairo_set_source_rgb(cr,0,197.0/255,245.0/255); //light blue
+        Fl::get_color(knob_lit, r, g, b); // 0, 197, 255
+        cairo_set_source_rgb(cr,r/255.0,g/255.0, b/255.0); //light blue
     } else {
         cairo_set_source_rgb(cr,0.6,0.7,0.8);
     }
@@ -228,7 +250,8 @@ void WidgetPDial::draw()
     //drawing the hand:
     if (active_r())
     {
-        cairo_set_source_rgb(cr,61.0/255,61.0/255,61.0/255);
+        Fl::get_color(knob_point, r, g, b); // 61, 61, 61
+        cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
     } else {
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);
     }
