@@ -1,5 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-3-17 Will
+bn 2189
+Improved knob appearance
+Changed effect preset colours
+Copy/Paste colours done
+Note:
+ Many buttons use relative colours so will inter-relate
+
 2023-3-14 Will
 bn 2188
 All parts of knobs are now themeable :) :)

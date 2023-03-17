@@ -524,12 +524,12 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       Fl_Button filtC {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
-        xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 198
       }
       Fl_Button filtP {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
-        xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 198
       }
       Fl_Check_Button freqtrackoffset {
         callback {//
@@ -761,12 +761,12 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Button formCopy {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvowel);}
-          xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+          xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
         }
         Fl_Button formPaste {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvowel);}
-          xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+          xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
         }
         Fl_Box formvowel {
           label Vowel

@@ -173,8 +173,11 @@ void WidgetPDial::draw()
     int cx = x(), cy = y(), sx = w(), sy = h();
     double d = (sx>sy)?sy:sx; // d = the smallest side -2
     double dh = d/2;
-    fl_color(170,170,170);
-    fl_pie(cx - 2, cy - 2, d + 4, d + 4, 0, 360);
+       /*
+        * doing away with the fixed outer band. It's out of place now!
+        * fl_color(170,170,170);
+        * fl_pie(cx - 2, cy - 2, d + 4, d + 4, 0, 360);
+        */
     double val = (value() - minimum()) / (maximum() - minimum());
     cairo_t *cr;
     cairo_surface_t* Xsurface = cairo_xlib_surface_create
@@ -193,12 +196,12 @@ void WidgetPDial::draw()
     Fl::get_color(knob_ring, r, g, b); // 51,51,51
     if (active_r())
     {
-        /*
-        cairo_pattern_create_rgb(r/255.0,g/255.0,b/255.0);
-        The above line seems to be wrong and draws black
-        regardless of the selection.
-        The line below works.
-        Will G.
+       /*
+        * cairo_pattern_create_rgb(r/255.0,g/255.0,b/255.0);
+        * The above line seems to be wrong and draws black
+        * regardless of the selection.
+        * The line below works.
+        * Will G.
         */
         cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
     } else {

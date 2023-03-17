@@ -847,12 +847,12 @@ class PADnoteUI {: {public PresetsUI_}
       Fl_Button padCopy {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
-        xywh {415 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {415 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
       }
       Fl_Button padPaste {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
-        xywh {449 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {449 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
       }
       Fl_Button padClose {
         label Close

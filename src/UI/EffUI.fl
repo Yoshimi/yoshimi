@@ -244,7 +244,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
-      xywh {880 45 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 labelcolor 64 align 33 hide
+      xywh {839 53 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 labelcolor 64 align 33 hide
       class Fl_Group
     } {
       Fl_Text_Display revname {
@@ -255,14 +255,14 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
-        xywh {115 13 90 15} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {115 13 90 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Cathedral 1");o->add("Cathedral 2");o->add("Cathedral 3");o->add("Hall 1");o->add("Hall 2");o->add("Room 1");o->add("Room 2");o->add("Basement");o->add("Tunnel");o->add("Echoed 1");o->add("Echoed 2");o->add("Very Long 1");o->add("Very Long 2");}
       } {}
       Fl_Choice revp10 {
         label Type
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
-        xywh {240 13 75 15} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        send_data(TOPLEVEL::action::forceUpdate, 10, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        xywh {240 13 75 15} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Random");o->add("Freeverb");o->add("Bandwidth");}
       } {}
       Fl_Dial revp0 {
@@ -378,7 +378,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {102 13 96 15} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Echo 1");o->add("Echo 2");o->add("Echo 3");o->add("Echo 4");o->add("Simple Echo");o->add("Canyon");o->add("Panning Echo 1");o->add("Panning Echo 2");o->add("Feedback Echo 3");}
       } {}
       Fl_Dial echop0 {
@@ -464,7 +464,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
-        xywh {121 13 96 16} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {121 13 96 16} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Chorus 1");o->add("Chorus 2");o->add("Chorus 3");o->add("Celeste 1");o->add("Celeste 2");o->add("Flange 1");o->add("Flange 2");o->add("Flange 3");o->add("Flange 4");o->add("Flange 5");}
       } {}
       Fl_Choice chorusp4 {
@@ -599,7 +599,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
-        xywh {65 21 82 15} box UP_BOX down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 175
+        xywh {65 21 82 15} box UP_BOX down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Phaser 1");o->add("Phaser 2");o->add("Phaser 3");o->add("Phaser 4");o->add("Phaser 5");o->add("Phaser 6");o->add("APhaser 1");o->add("APhaser 2");o->add("APhaser 3");o->add("APhaser 4");o->add("APhaser 5");o->add("APhaser 6");}
       } {}
       Fl_Choice phaserp4 {
@@ -757,7 +757,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
-        xywh {135 13 96 15} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {135 13 96 15} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Alienwah 1");o->add("Alienwah 2");o->add("Alienwah 3");o->add("Alienwah 4");}
       } {}
       Fl_Choice awp4 {
@@ -877,7 +877,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::distortion), TOPLEVEL::type::Integer);}
-        xywh {139 13 96 16} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {139 13 96 16} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("Overdrive 1");o->add("Overdrive 2");o->add("Exciter 1");o->add("Exciter 2");o->add("Guitar Amp");o->add("Quantize");}
       } {}
       Fl_Choice distp5 {
@@ -1061,7 +1061,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Preset
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, 16, o->value(), (EFFECT::type::dynFilter), TOPLEVEL::type::Integer);}
-        xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 175
+        xywh {132 13 90 16} down_box BORDER_BOX selection_color 64 labelsize 11 labelcolor 64 textfont 1 textsize 10 textcolor 64
         code0 {o->add("WahWah");o->add("AutoWah");o->add("Sweep");o->add("VocalMorph1");o->add("VocalMorph2");}
       } {}
       Fl_Choice dfp4 {
@@ -1216,9 +1216,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     unsigned char eqband =  getData->data.parameter;
     unsigned char secondary = getData->data.offset;
 
-    int textCol = 14;
+    int textCol = eff_preset;
     if (fetchData(0, EFFECT::control::changed, getData->data.part, efftype, effnum) != 0)
-    textCol = FL_BLUE;
+        textCol = eff_preset_changed;
     //std::cout << "colour " << textCol << std::endl;
     switch(efftype)
     {
@@ -1275,7 +1275,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            revp->color(textCol);
+            revp->textcolor(textCol);
             revp->redraw();
             break;
 
@@ -1314,7 +1314,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            echop->color(textCol);
+            echop->textcolor(textCol);
             echop->redraw();
             break;
 
@@ -1371,7 +1371,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            chorusp->color(textCol);
+            chorusp->textcolor(textCol);
             chorusp->redraw();
             break;
 
@@ -1457,7 +1457,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            phaserp->color(textCol);
+            phaserp->textcolor(textCol);
             phaserp->redraw();
             break;
 
@@ -1517,7 +1517,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            awp->color(textCol);
+            awp->textcolor(textCol);
             awp->redraw();
             break;
 
@@ -1561,7 +1561,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            distp->color(textCol);
+            distp->textcolor(textCol);
             distp->redraw();
             break;
 
@@ -1670,7 +1670,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     refresh();
                     break;
             }
-            dfp->color(textCol);
+            dfp->textcolor(textCol);
             dfp->redraw();
             break;
     }} {}
@@ -1965,39 +1965,39 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {UpdatePresetColour(int changed, int efftype)} {} {
     code {//
-    int textCol = 14;
+    int textCol = eff_preset;
     if (changed)
-         textCol = FL_BLUE;
+         textCol = eff_preset_changed;
     switch (efftype + EFFECT::type::none)
     {
         case EFFECT::type::reverb:
-            revp->color(textCol);
+            revp->textcolor(textCol);
             revp->redraw();
             break;
         case EFFECT::type::echo:
-            echop->color(textCol);
+            echop->textcolor(textCol);
             echop->redraw();
             break;
         case EFFECT::type::chorus:
-            chorusp->color(textCol);
+            chorusp->textcolor(textCol);
             chorusp->redraw();
             break;
         case EFFECT::type::phaser:
-            phaserp->color(textCol);
+            phaserp->textcolor(textCol);
             phaserp->redraw();
             break;
         case EFFECT::type::alienWah:
-            awp->color(textCol);
+            awp->textcolor(textCol);
             awp->redraw();
             break;
         case EFFECT::type::distortion:
-            distp->color(textCol);
+            distp->textcolor(textCol);
             distp->redraw();
             break;
         case EFFECT::type::eq:
             break;
         case EFFECT::type::dynFilter:
-            dfp->color(textCol);
+            dfp->textcolor(textCol);
             dfp->redraw();
             break;
     }

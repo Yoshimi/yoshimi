@@ -647,7 +647,7 @@ class PartUI {: {public Fl_Group, PartUI_}
          if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Revert to default instrument
- +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 1 labelfont 1 labelcolor 64
+ +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
       }
       Fl_Button editClose {
         label Close
@@ -715,14 +715,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         label C
         callback {//
         synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
-        xywh {346 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {346 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
       }
       Fl_Button effPaste {
         label P
         callback {//
         synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
         synth->getRuntime().effectChange = npart | (ninseff << (EFFECT::type::dynFilter - EFFECT::type::none)); // temporary fix - for what?}
-        xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
       }
       Fl_Check_Button bypasseff {
         label Bypass

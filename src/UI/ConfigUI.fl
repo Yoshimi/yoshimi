@@ -1135,10 +1135,20 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           file::saveText(colourText, themeDir+"classic.clr");
       }
 
+      /*
+        unsigned char r,g,b; // for testing
+        Fl::get_color(179, r, g, b);
+        std::cout << "r " << int(r) << " g " << int(g) << " b " << int(b) << std::endl;
+      */
+
       if (currentTheme == "classic.clr")
           setClassicTable();
       else
-          setUserTable(currentTheme);} {}
+          setUserTable(currentTheme);
+      //Fl::set_color(188, 80, 0, 0); // for testing
+      //Fl::set_color(189, 0, 80, 255); // for testing
+      ;
+      } {}
   }
   Function {setClassicTable()} {return_type bool
   } {
@@ -1149,8 +1159,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             setColourLine(colourData[lineCount + 1], lineCount); // we don't want the greyscale line!
             ++ lineCount;
         }
-        //Fl::set_color(env_sus, 0, 200, 0); // for testing
-        //Fl::set_color(env_line_sel, 0, 225, 0); // for testing
         return true;} {}
   }
   Function {setUserTable(string table)} {return_type bool
@@ -1208,8 +1216,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             ++lineCount;
             colourText = colourText.substr(nextPos + 1);
         } while(colourText.substr(0, 7) != "-------");
-
-        //Fl::set_color(56, 0, 0, 255); // for testing
         return true;} {}
   }
   Function {setGreyScale(string text)} {return_type bool
@@ -1238,8 +1244,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
            greyRange =  (max - min) / 23;
            for (int i = 0; i < 24; ++i)
            {
-                int diff = (min + int(i * greyRange));
+                int diff = (min + int(i * greyRange)) + 1;
                 Fl::set_color(i + 32, diff, diff, diff);
+                //std::cout << diff << std::endl;
            }
         }
         else
@@ -1247,12 +1254,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
            greyRange = (min - max) / 23;
            for (int i = 0; i < 24; ++i)
            {
-               int diff = min - (int(i * greyRange));
+               int diff = (min - int(i * greyRange)) - 1 ;
                Fl::set_color(i + 32, diff, diff, diff);
-               printf(" %d", diff);
+               //std::cout << diff << std::endl;
            }
        }
-       return true;} {}
+return true;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
   } {

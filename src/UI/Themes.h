@@ -28,11 +28,6 @@
 
 // The following are ordered by value for easy number tracking
 // Where possible they are fairly close to FLTK defaults
-const int knob_low = 244;
-const int knob_high = 207;
-const int knob_ring = 144;
-const int knob_lit = 199;
-const int knob_point = 145;
 
 const int gen_text_back = 7;
 const int instr_back = 17;
@@ -42,6 +37,8 @@ const int gen_text = 64;
 const int env_line_sel = 81;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
+const int warning_button = 89;
+const int warning_background = 91;
 const int env_sus = 92;
 const int EQ_line_off = 94;
 const int EQ_line = 95;
@@ -53,6 +50,8 @@ const int reson_graph_line = 131;
 const int formant_graph_line = 132;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
+const int knob_ring = 144;
+const int knob_point = 145;
 const int tooltip_grid = 146;
 const int EQ_grid = 147;
 const int EQ_major_grid = 155;
@@ -63,6 +62,12 @@ const int pad_grid_centre = 162;
 const int pad_grid = 163;
 const int gen_opp_text = 175;
 const int tooltip_curve = 177;
+const int CP_background = 179;
+const int eff_preset = 188;
+const int eff_preset_changed = 189;
+const int CP_text = 198;
+const int knob_lit = 199;
+const int knob_high = 207;
 const int tooltip_back = 215;
 const int add_back = 214;
 const int graph_grid = 217;
@@ -73,6 +78,7 @@ const int pad_prof_fill = 231;
 const int sub_back = 236;
 const int ext_osc = 238;
 const int env_ctl_sel = 239;
+const int knob_low = 244;
 const int graph_resonance_grid = 245;
 const int env_line = 246;
 const int env_ctl = 253;
@@ -80,13 +86,17 @@ const int graph_pad_back = 254;
 
 // The following are ordered as they are in theme lists
 // They are grouped mainly by function
-const int COLOURLIST = 48;
+const int COLOURLIST = 54;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
     knob_ring,
     knob_lit,
     knob_point,
+    warning_button,
+    warning_background,
+    CP_background,
+    CP_text,
     tooltip_back,
     tooltip_grid,
     tooltip_major_grid,
@@ -114,6 +124,8 @@ const unsigned char colourNumbers [COLOURLIST] = {
     env_sus,
     env_line,
     env_line_sel,
+    eff_preset,
+    eff_preset_changed,
     yoshi_ins_typ,
     instr_back,
     add_back,
@@ -146,9 +158,13 @@ static std::string colourData [] = {
     "#0, 255, gray scale min-max (can be reversed) following lines RGB",
     "186, 198, 211, Knob shadow",
     "231, 235, 239, Knob highlight",
-    "51, 51, 51, Knob ring",
-    "0, 197, 255, Knob ring lit",
-    "61, 61, 61, Knob_pointer",
+    "51,51,51, Knob ring",
+    "0,197,255, Knob ring lit",
+    "61,61,61, Knob pointer",
+    "220,0,0, Warning type button",
+    "250,150,90, Warning background patch",
+    "0,109,191, Copy/Paste background",
+    "255,255,255, Copy/Paste text",
     "255,255,210, Tooltip background",
     "180,180,180, Tooltip grid",
     "50,50,50, Tooltip major grid",
@@ -176,6 +192,8 @@ static std::string colourData [] = {
     "255,255,0, Envelope sustain line",
     "255,255,255, Envelope line",
     "255,0,0, Envelope line selected",
+    "80,0,0, Effect preset",
+    "0,80,255, Effect preset changed",
     "0,0,225, Yoshimi instrument type",
     "253,246,230, Instrument background",
     "223,175,191, AddSynth background",
