@@ -405,7 +405,7 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {394 110 805 610} type Double box NO_BOX hide resizable
+      xywh {471 233 805 610} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -451,7 +451,7 @@ class ADvoiceUI {: {public Fl_Group}
                 label {Coarse Det.}
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorCoarseDetune, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Coarse Detune} xywh {730 270 60 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+                tooltip {Coarse Detune} xywh {723 270 73 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune % 1024;}
                 code1 {if (k >= 512) k-= 1024;}
                 code2 {o->value(k);}
@@ -461,7 +461,7 @@ class ADvoiceUI {: {public Fl_Group}
                 label Octave
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorOctave, o->value(), TOPLEVEL::type::Integer);}
-                tooltip Octave xywh {670 270 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+                tooltip Octave xywh {667 270 52 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune / 1024;}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
@@ -692,7 +692,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label Octave
               callback {//
                   send_data(0, ADDVOICE::control::octave, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Octave xywh {510 306 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
+              tooltip Octave xywh {504 306 55 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune / 1024;}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
@@ -701,7 +701,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               label {Coarse Det.}
               callback {//
                   send_data(0, ADDVOICE::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Coarse Detune} xywh {496 375 68 16} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+              tooltip {Coarse Detune} xywh {493 375 78 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune % 1024;}
               code1 {if (k >= 512) k -= 1024;}
               code2 {o->value(k);}
@@ -1961,7 +1961,7 @@ class ADnoteUI {: {public PresetsUI_}
           label {Coarse det.}
           callback {//
     send_data(0, ADDSYNTH::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Coarse Detune} xywh {500 345 60 20} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip {Coarse Detune} xywh {495 346 77 15} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k = pars->GlobalPar.PCoarseDetune % 1024; if (k >= 512) k -= 1024;}
           code2 {o->value(k);}
           code3 {o->lstep(10);}

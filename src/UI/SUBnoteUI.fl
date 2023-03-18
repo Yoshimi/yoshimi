@@ -284,7 +284,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label Octave
           callback {//
           send_data (0, SUBSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Octave xywh {446 18 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip Octave xywh {445 18 52 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
         }
@@ -361,7 +361,7 @@ class SUBnoteUI {: {public PresetsUI_}
               k += 1024;
 
           send_data (0, SUBSYNTH::control::coarseDetune, k, TOPLEVEL::type::Integer);}
-          tooltip {Coarse Detune} xywh {658 111 60 20} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip {Coarse Detune} xywh {654 111 74 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;}
           code2 {o->value(k);}
           code3 {o->lstep(10);}
@@ -403,7 +403,7 @@ class SUBnoteUI {: {public PresetsUI_}
           code0 {o->setValueType(VC_SubBandwidth);}
           code1 {o->useCustomTip(true);}
           code2 {o->value(pars->Pbandwidth);}
-          class mwheel_val_slider_rev
+          class mwheel_slider_rev
         }
         Fl_Value_Slider bwidthscale {
           label {Bandwidth Scale}
@@ -413,7 +413,7 @@ class SUBnoteUI {: {public PresetsUI_}
           code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
           code1 {o->useCustomTip(true);}
           code2 {o->value(pars->Pbwscale-64);}
-          class mwheel_val_slider_rev
+          class mwheel_slider_rev
         }
       }
       Fl_Group spreadGroup {
@@ -494,7 +494,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label {Filter Stages}
           callback {//
           send_data (0, SUBSYNTH::control::filterStages, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {How many times the noise is filtered} xywh {520 421 45 15} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 1 minimum 1 maximum 5 step 1 value 1 textsize 10 textcolor 64
+          tooltip {How many times the noise is filtered} xywh {513 421 66 15} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 1 minimum 1 maximum 5 step 1 value 1 textsize 10 textcolor 64
           code0 {o->value(pars->Pnumstages);}
         }
         Fl_Choice magtype {

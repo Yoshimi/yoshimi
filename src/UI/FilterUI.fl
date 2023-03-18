@@ -490,7 +490,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           label {St.}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::stages, o->value() - 1, TOPLEVEL::type::Write);}
-          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {78 10 31 15} type Simple selection_color 64 labelsize 10 labelcolor 64 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10 textcolor 64
+          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {73 10 41 15} type Simple selection_color 64 labelsize 10 labelcolor 64 align 8 minimum 1 maximum 5 step 1 value 1 textfont 1 textsize 10 textcolor 64
         }
       }
       Fl_Text_Display filterparamslabel {

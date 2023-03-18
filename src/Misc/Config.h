@@ -97,6 +97,7 @@ class Config
         unsigned int  build_ID;
         bool          stateChanged;
         string        StateFile;
+        string        remoteGuiTheme;
         bool          restoreJackSession;
         string        jackSessionFile;
         int           lastXMLmajor;

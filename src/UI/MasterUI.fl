@@ -1862,7 +1862,7 @@ Alan Calvert started the project}
     Fl_Window filerwindow {
       label Yoshimi
       callback {//
-        filerclose->do_callback();}
+        filerclose->do_callback();} open
       xywh {236 77 550 350} type Double hide resizable
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
@@ -2032,7 +2032,7 @@ Alan Calvert started the project}
         }
         clearfavelist();
         setfavecolour(result);}
-          xywh {5 91 540 251} type Select box FLAT_BOX color 26 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
+          xywh {5 91 540 251} type Select box FLAT_BOX color 206 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         }
         Fl_Button favecancel {
           label Back

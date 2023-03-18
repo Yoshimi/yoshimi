@@ -1432,6 +1432,13 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             }
             break;
 
+        case 'T':
+            if (!line.empty())
+            {
+                settings->remoteGuiTheme = line;
+            }
+            break;
+
         case 'u':
             if (!line.empty())
             {

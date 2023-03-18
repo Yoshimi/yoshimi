@@ -59,7 +59,7 @@ class mwheel_val_slider : public Fl_Value_Slider {
 
 class mwheel_val_slider_rev : public mwheel_val_slider {
  public:
-  mwheel_val_slider_rev(int x, int y, int w, int h, const char *l=0) ;
+  mwheel_val_slider_rev(int x, int y, int w, int h, const char *l=0);
 };
 
 /*
@@ -68,14 +68,14 @@ class mwheel_val_slider_rev : public mwheel_val_slider {
 */
 class mwheel_slider : public mwheel_val_slider {
  public:
-  mwheel_slider(int x, int y, int w, int h, const char *l=0) ;
+  mwheel_slider(int x, int y, int w, int h, const char *l=0);
   void draw();
   int handle(int);
 };
 
 class mwheel_slider_rev : public mwheel_slider {
  public:
-  mwheel_slider_rev(int x, int y, int w, int h, const char *l=0) ;
+  mwheel_slider_rev(int x, int y, int w, int h, const char *l=0);
 };
 
 #endif

@@ -2,6 +2,9 @@
 version 1.0308
 header_name {.h}
 code_name {.cpp}
+decl {\#include <cmath>} {public local
+}
+
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
@@ -24,9 +27,6 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 } {selected in_source in_header
-}
-
-decl {\#include <cmath>} {public local
 }
 
 decl {\#include <iostream>} {public local
@@ -1100,55 +1100,124 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {manageThemes()} {} {
     code {//
+      if (!checkVersions())
+      {
+          setClassicTable();
+          return;
+      }
+
+      if (findRemote())
+          return;
+
       string themeDir = file::localDir() + "/themes/";
-      file::createDir(themeDir);
-      file::createDir(themeDir+"ID");
-      int theme_ID = func::string2int(file::loadText(themeDir+"ID/version"));
-      int build_ID = synth->getRuntime().build_ID;
+
       string currentTheme = file::loadText(themeDir+"ID/current");
-      if (!currentTheme.empty())
+      string fileName = themeDir+ currentTheme;
+      while (fileName.at(fileName.length() - 1) < '!') // tidy up
+          fileName.pop_back();
+      if (file::isRegularFile(fileName))
       {
-          while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
-              currentTheme.pop_back();
+            setUserTable(fileName);
+            return;
       }
-      if (!file::isRegularFile(themeDir + currentTheme))
-          currentTheme = "";
-      if (build_ID != theme_ID || currentTheme.empty() || !file::isRegularFile(themeDir + "classic.clr"))
-      {
-          currentTheme = "classic.clr";
-          theme_ID = build_ID;
-          string colourText;
-          file::saveText(to_string(theme_ID), themeDir+"ID/version");
-          int info = 0;
-          do {
-              colourText += (colourPreamble[info] + char(10));
-              ++info;
-          } while(colourPreamble[info] != "END");
+      else
+          setClassicTable();
 
-          int data = 0;
-          do {
-              colourText += (colourData[data] + char(10));
-              ++data;
-          }  while(colourData[data] != "END");
-
-          file::saveText(currentTheme, themeDir+"ID/current");
-          file::saveText(colourText, themeDir+"classic.clr");
-      }
-
-      /*
+/*
         unsigned char r,g,b; // for testing
-        Fl::get_color(179, r, g, b);
+        Fl::get_color(62, r, g, b);
         std::cout << "r " << int(r) << " g " << int(g) << " b " << int(b) << std::endl;
-      */
+*/
 
       if (currentTheme == "classic.clr")
           setClassicTable();
       else
           setUserTable(currentTheme);
-      //Fl::set_color(188, 80, 0, 0); // for testing
+      unsigned char r,g,b; // temp
+      Fl::get_color(gen_text, r, g, b); // temp
+      Fl::set_color(0, r, g, b); // temp
+      //Fl::set_color(0, 180, 50, 220); // for testing
       //Fl::set_color(189, 0, 80, 255); // for testing
-      ;
-      } {}
+      ;} {}
+  }
+  Function {checkVersions()} {return_type bool
+  } {
+    code {//
+        string themeDir = file::localDir() + "/themes/";
+        file::createDir(themeDir);
+        file::createDir(themeDir + "ID");
+        int build_ID = synth->getRuntime().build_ID;
+        int theme_ID = 0;
+        string defaultName = "classic.clr";
+        bool ok = true;
+        if (!file::isRegularFile(themeDir + defaultName))
+            ok = false;
+        if (ok)
+        {
+            if(!file::isRegularFile(themeDir +"ID/version"))
+                ok = false;
+            else
+                theme_ID = func::string2int(file::loadText(themeDir + "ID/version"));
+            //std::cout << "ok " << int(ok) << "  " << theme_ID << std::endl;
+        }
+        if (ok)
+        {
+            if (build_ID != theme_ID)
+                ok = false;
+            //std::cout << "build " << build_ID << " theme " << theme_ID << std::endl;
+        }
+        if (ok)
+        {
+            string filename = themeDir +"ID/" + "current";
+            if(!file::isRegularFile(filename))
+                ok = false;
+            //std::cout << "ok " << int(ok) << "  >" << filename << "<" << std::endl;
+        }
+
+        if (ok)
+            return true;
+
+        file::saveText(to_string(build_ID), themeDir + "ID/version");
+        string res = themeDir + "ID/version";
+        std::cout << "version>" << res << std::endl;
+        string colourText;
+        int info = 0;
+        do {
+            colourText += (colourPreamble[info] + char(10));
+            ++info;
+            if (info > 100)
+            {
+                std::cout << "failed preamble" << std::endl;
+            }
+        } while(colourPreamble[info] != "END");
+
+        int data = 0;
+        do {
+            colourText += (colourData[data] + char(10));
+            ++data;
+            if (data > 200)
+            {
+                std::cout << "failed data" << std::endl;
+            }
+        }  while(colourData[data] != "END");
+
+        file::saveText(defaultName + char(10), themeDir + "ID/current");
+        file::saveText(colourText, themeDir + defaultName);
+        return false;} {}
+  }
+  Function {findRemote()} {return_type bool
+  } {
+    code {//
+       bool ok = true;
+       string currentTheme = synth->getRuntime().remoteGuiTheme;
+       if ((!file::isRegularFile(currentTheme)))
+           return false;
+       if (!currentTheme.empty())
+       {
+           setUserTable(currentTheme);
+           ok = true;
+       }
+       return ok;} {}
   }
   Function {setClassicTable()} {return_type bool
   } {
@@ -1164,9 +1233,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {setUserTable(string table)} {return_type bool
   } {
     code {//
-        string dirname = file::localDir() + "/themes/";
-        string fullName = dirname + table;
-        string colourText = loadText(dirname + table);
+        string colourText = loadText(table);
         bool ok =  true;
         std::size_t nextPos;
 
@@ -1267,6 +1334,13 @@ return true;} {}
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
+        if (nextPos > 5)
+        {
+            unsigned int hexNumber;
+            sscanf(text.c_str(), "%x", &hexNumber);
+            Fl::set_color(colourNumbers[item],hexNumber * 256);
+            return true;
+        }
         int red = string2int(text.substr(0, nextPos));
         if (red < 0 || red > 255)
             return false;

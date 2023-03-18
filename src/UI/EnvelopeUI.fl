@@ -534,7 +534,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label L
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::linearEnvelope, o->value(), TOPLEVEL::type::Write);}
-          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 4
+          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64 align 8
           code0 {o->value(env->Plinearenvelope);}
           class Fl_Check_Button2
         }

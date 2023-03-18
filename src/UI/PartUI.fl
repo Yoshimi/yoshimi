@@ -436,7 +436,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
-      xywh {705 199 395 385} type Double hide resizable
+      xywh {354 165 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = 395; editDH = 385;}
@@ -583,7 +583,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Input copyright {
           callback {//
            send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentCopyright, 0, TOPLEVEL::type::Integer, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
-          xywh {5 49 385 55} type Multiline color 26 labelsize 12 labelcolor 64 align 9 textcolor 64
+          xywh {5 49 385 55} type Multiline color 182 labelsize 12 labelcolor 64 align 9 textcolor 64
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pauthor.c_str());}
         }
@@ -591,7 +591,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Comments
           callback {//
           send_data(TOPLEVEL::action::lowPrio, PART::control::instrumentComments, 0, TOPLEVEL::type::Integer, npart, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(o->value())));}
-          xywh {5 123 385 91} type Multiline color 26 labelsize 12 labelcolor 64 align 5 textcolor 64
+          xywh {5 123 385 91} type Multiline color 182 labelsize 12 labelcolor 64 align 5 textcolor 64
           code0 {o->maximum_size(MAX_INFO_TEXT_SIZE);}
           code1 {o->value(part->info.Pcomments.c_str());}
         }
@@ -617,8 +617,8 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random detune of whole part in cents} xywh {12 342 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 labelcolor 64 align 8 maximum 50 step 1 textcolor 64
-        code1 {o->setValueType(VC_PartHumaniseDetune);//o->useCustomTip(true);}
-        class mwheel_val_slider_rev
+        code1 {o->setValueType(VC_PartHumaniseDetune);o->useCustomTip(true);}
+        class mwheel_slider_rev
       }
       Fl_Value_Slider velocityhumanise {
         label Velocity
@@ -627,7 +627,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random velocity attenuation of whole part} xywh {12 362 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 labelcolor 64 align 8 maximum 50 step 1 textcolor 64
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
-        class mwheel_val_slider_rev
+        class mwheel_slider_rev
       }
       Fl_Button instrumentReset {
         label Reset
@@ -903,7 +903,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label {PWheel Rng (cents)}
         callback {//
         send_data(0, PART::control::pitchWheelRange, o->value(), TOPLEVEL::type::Integer, npart);}
-        tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 labelcolor 64 align 1 minimum -6400 maximum 6400 step 1 textcolor 64
+        tooltip {Pitch Wheel Bend Range (cents)} xywh {168 16 119 18} color 237 selection_color 0 labelsize 10 labelcolor 64 align 1 minimum -6400 maximum 6400 step 1 textcolor 64
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
       }
@@ -945,7 +945,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
       }
       Fl_Group ctlportamento {
-        label Portamento
+        label Portamento open
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10 labelcolor 64
       } {
         Fl_Box ctlx100 {
@@ -972,7 +972,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           label Thresh
           callback {//
           send_data(0, PART::control::portamentoThreshold, o->value(), TOPLEVEL::type::Integer, npart);}
-          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 minimum 0 maximum 127 step 1 textcolor 64
+          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {388 20 72 16} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 minimum 0 maximum 127 step 1 textcolor 64
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {

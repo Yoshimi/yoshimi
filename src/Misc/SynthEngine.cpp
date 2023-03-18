@@ -361,7 +361,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.LogError("interChange init failed");
         goto bail_out;
     }
-
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
     return true;

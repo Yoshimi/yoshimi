@@ -274,7 +274,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {706 603 580 440} type Double hide resizable
+      xywh {298 207 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -578,7 +578,7 @@ class PADnoteUI {: {public PresetsUI_}
           }
         }
         Fl_Group envelopes {
-          label {Envelopes and &LFOs}
+          label {Envelopes and &LFOs} open
           xywh {0 20 580 385} box ENGRAVED_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Box {} {
@@ -730,7 +730,7 @@ class PADnoteUI {: {public PresetsUI_}
             } {}
           }
           Fl_Group frequencygrp {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 275 570 125} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Group freqenv {
@@ -800,7 +800,7 @@ class PADnoteUI {: {public PresetsUI_}
               label Octave
               callback {//
               send_data(0, PADSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Octave xywh {510 305 45 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+              tooltip Octave xywh {504 305 62 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
               code2 {o->value(k);}
@@ -809,7 +809,7 @@ class PADnoteUI {: {public PresetsUI_}
               label {Detune Type}
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);}
-              xywh {495 345 75 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
+              xywh {495 342 75 15} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType - 1);}
             } {}
@@ -817,7 +817,7 @@ class PADnoteUI {: {public PresetsUI_}
               label {Coarse det.}
               callback {//
               send_data(0, PADSYNTH::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Coarse Detune} xywh {500 375 60 20} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+              tooltip {Coarse Detune} xywh {495 375 76 15} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k=pars->PCoarseDetune%1024;}
               code1 {if (k>=512) k-=1024;}
               code2 {o->value(k);}
@@ -1231,7 +1231,7 @@ class PADnoteUI {: {public PresetsUI_}
                 bwdial->activate();
                 bwcents->activate();
                 hprofile->activate();
-                hprofile->color(54);
+                hprofile->color(254);
                 bwscale->activate();
             }
             else

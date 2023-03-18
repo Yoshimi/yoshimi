@@ -169,7 +169,17 @@ mwheel_slider::mwheel_slider(int x, int y, int w, int h, const char *l)
 
 void mwheel_slider::draw()
 {
+    /*
+     * Colour control here is a pretty nasty hack but I can't
+     * find any better way to do it :(
+     * Will G.
+     */
+    unsigned char r,g,b;
+    Fl::get_color(slider_track, r, g, b);
+    Fl::set_color(0, r, g, b);
     Fl_Slider::draw();
+    Fl::get_color(gen_text, r, g, b);
+    Fl::set_color(0, r, g, b);
 }
 
 int mwheel_slider::handle(int event)

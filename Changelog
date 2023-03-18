@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-3-18 Will
+bn 2190
+Remote sourced themes can now be loaded from the CLI at startup.
+Most slider tracks now match general text and numeric entry arrows.
+
 2023-3-17 Will
 bn 2189
 Improved knob appearance
@@ -8,7 +13,7 @@ Copy/Paste colours done
 Note:
  Many buttons use relative colours so will inter-relate
 
-2023-3-14 Will
+2023-3-15 Will
 bn 2188
 All parts of knobs are now themeable :) :)
 

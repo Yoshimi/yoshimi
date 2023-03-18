@@ -58,6 +58,7 @@ namespace { // constants used in the implementation
         {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
         {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscillator size", 0},
         {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
+        {"load-guitheme",     'T',  "<file>",     0,  "load .clr file", 0},
         {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
         #if defined(JACK_SESSION)
             {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},
@@ -92,6 +93,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'l': base->settings.push_back("l:" + string(arg)); break;
         case 'L': base->settings.push_back("L:" + string(arg)); break;
         case 'M': base->settings.push_back("M:" + string(arg)); break;
+        case 'T': base->settings.push_back("T:" + string(arg)); break;
         case 'A':
             if (arg)
                 base->settings.push_back("A:" + string(arg));

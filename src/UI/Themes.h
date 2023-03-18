@@ -32,6 +32,7 @@
 const int gen_text_back = 7;
 const int instr_back = 17;
 const int graph_back = 57;
+const int slider_track = 62;
 const int graph_line = 63;
 const int gen_text = 64;
 const int env_line_sel = 81;
@@ -63,10 +64,12 @@ const int pad_grid = 163;
 const int gen_opp_text = 175;
 const int tooltip_curve = 177;
 const int CP_background = 179;
+const int instr_info_back = 182;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
 const int CP_text = 198;
 const int knob_lit = 199;
+const int filer_text_back = 206;
 const int knob_high = 207;
 const int tooltip_back = 215;
 const int add_back = 214;
@@ -86,13 +89,14 @@ const int graph_pad_back = 254;
 
 // The following are ordered as they are in theme lists
 // They are grouped mainly by function
-const int COLOURLIST = 54;
+const int COLOURLIST = 57;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
     knob_ring,
     knob_lit,
     knob_point,
+    slider_track,
     warning_button,
     warning_background,
     CP_background,
@@ -103,6 +107,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     tooltip_curve,
     tooltip_text,
     tooltip_faint_text,
+    filer_text_back,
     gen_text_back,
     gen_text,
     gen_opp_text,
@@ -127,6 +132,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     eff_preset,
     eff_preset_changed,
     yoshi_ins_typ,
+    instr_info_back,
     instr_back,
     add_back,
     sub_back,
@@ -141,7 +147,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_prof_inactive,
     pad_harmonic_line,
     ext_voice,
-    ext_osc,
+    ext_osc
 };
 
 static std::string colourPreamble [] = {
@@ -151,16 +157,17 @@ static std::string colourPreamble [] = {
     "This would corrupt the colour map.",
     "Instead place # at start of line for default setting.",
     "------------------ data start marker",
-    "END",
+    "END"
 }; // Do not change the last two text lines!
 
 static std::string colourData [] = {
-    "#0, 255, gray scale min-max (can be reversed) following lines RGB",
-    "186, 198, 211, Knob shadow",
-    "231, 235, 239, Knob highlight",
+    "0,255, gray scale min-max (can be reversed)",
+    "186,198,211, Knob shadow (R,G,B or rrggbb)",
+    "e7ebef, Knob highlight (231,235,239)",
     "51,51,51, Knob ring",
     "0,197,255, Knob ring lit",
     "61,61,61, Knob pointer",
+    "0,0,0, Slider track",
     "220,0,0, Warning type button",
     "250,150,90, Warning background patch",
     "0,109,191, Copy/Paste background",
@@ -171,6 +178,7 @@ static std::string colourData [] = {
     "0,0,255, Tooltip curve",
     "0,0,0, Tooltip text",
     "150,150,150, Tooltip faint text",
+    "240,250,230, Filer favourites background",
     "255,255,255, General text background",
     "0,0,0, General text",
     "255,255,255, General opposite text",
@@ -183,8 +191,8 @@ static std::string colourData [] = {
     "255,0,0, Resonance graph line",
     "0,70,150, EQ graph background",
     "80,120,160, EQ background disabled",
-    "200, 200, 200, EQ graph grid",
-    "255, 255, 255, EQ graph major grid",
+    "200,200,200, EQ graph grid",
+    "255,255,255, EQ graph major grid",
     "255,255,0, EQ graph line",
     "200,200,80, EQ graph line disabled",
     "255,255,255, Envelope control point",
@@ -195,14 +203,15 @@ static std::string colourData [] = {
     "80,0,0, Effect preset",
     "0,80,255, Effect preset changed",
     "0,0,225, Yoshimi instrument type",
+    "240,250,230, Instrument info background",
     "253,246,230, Instrument background",
     "223,175,191, AddSynth background",
     "175,207,223, SubSynth background",
     "205,221,173, PadSynth background",
     "245,245,245, Padsynth harmonics background",
     "225,225,225, PadSynth profile equivalent background",
-    "180, 180, 180, Padsynth profile grid",
-    "90, 90, 90, Padsynth profile centre mark",
+    "180,180,180, Padsynth profile grid",
+    "90,90,90, Padsynth profile centre mark",
     "90,120,250, PadSynth profile equivalent markers",
     "180,210,240, PadSynth profile fill",
     "0,0,120, PadSynth profile line",
@@ -212,8 +221,9 @@ static std::string colourData [] = {
     "143,191,223, External oscillator",
     "------------------ data end marker",
     "Add your own notes here:",
-    "END",
-
-}; // Do not change the last three text lines!
+    "Copyright © 2020 A. N. Other",
+    "The default theme",
+    "END"
+}; // Do not change the last five text lines!
 
 #endif
