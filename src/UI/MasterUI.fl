@@ -906,11 +906,11 @@ class MasterUI {: {private GuiUpdates}
             showSysEfxUI();
         else if (o->value() == InsertionEffectsGrp)
             showInsEfxUI();}
-        xywh {3 118 379 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 labelcolor 64 align 5
+        xywh {3 118 379 68} box PLASTIC_UP_BOX color 44 selection_color 223 labeltype NO_LABEL labelsize 12 labelcolor 64 align 5
       } {
         Fl_Group SystemEffectsGrp {
           label {  System Effects  }
-          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4
+          xywh {3 146 379 40} color 223 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4
         } {
           Fl_Spinner syseffnocounter {
             label Effect
@@ -961,7 +961,7 @@ class MasterUI {: {private GuiUpdates}
         }
         Fl_Group InsertionEffectsGrp {
           label { Insertion Effects }
-          xywh {3 146 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4 hide
+          xywh {3 146 379 40} color 223 selection_color 31 labelfont 1 labelsize 12 labelcolor 64 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
             label Effect
@@ -1240,7 +1240,7 @@ class MasterUI {: {private GuiUpdates}
           }
           Fl_Box modepatch {
             label Mode
-            xywh {155 328 32 17} box FLAT_BOX color 29 labelsize 11 labelcolor 64
+            xywh {155 328 32 17} box FLAT_BOX labelsize 11 labelcolor 64
           }
           Fl_Choice partKeymode {
             callback {//
@@ -1494,7 +1494,7 @@ class MasterUI {: {private GuiUpdates}
         code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {}
       Fl_Group setInstance {
-        xywh {82 57 193 60} box PLASTIC_UP_BOX color 221 hide
+        xywh {82 57 193 60} box PLASTIC_UP_BOX color 223 hide
       } {
         Fl_Button {} {
           xywh {84 59 188 57} box NO_BOX
@@ -1838,7 +1838,7 @@ Alan Calvert started the project}
       }
       Fl_Box typeQ {
         label {?}
-        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40 labelcolor 217
+        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40 labelcolor 218
       }
       Fl_Box textQ {
         label {text goes here}
@@ -3639,7 +3639,7 @@ Alan Calvert started the project}
   Function {updateModepatch(bool inactive)} {} {
     code {//
         if (inactive)
-            modepatch->color(91);
+            modepatch->color(warning_background);
         else
             modepatch->color(FL_BACKGROUND_COLOR);
         modepatch->redraw();} {}

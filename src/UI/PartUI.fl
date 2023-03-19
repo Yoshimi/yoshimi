@@ -471,7 +471,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {12 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {12 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -501,7 +501,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {107 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {107 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -531,7 +531,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {202 280 80 32} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {202 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -542,7 +542,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 227 94 28} box PLASTIC_UP_BOX color 230 selection_color 220 labelfont 1 labelcolor 64 align 128
+          tooltip {Right click: also close this} xywh {295 227 94 28} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
         }
         Fl_Button effects {
           label Effects
@@ -551,7 +551,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 258 94 28} box PLASTIC_UP_BOX color 230 labelfont 1 labelcolor 64
+          tooltip {Right click: also close this} xywh {295 258 94 28} box PLASTIC_UP_BOX color 223 labelfont 1 labelcolor 64
         }
         Fl_Button editAT {
           label Aftertouch
@@ -560,7 +560,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 2;
                 if ((Fl::event_button() == 3))
                     instrumenteditwindow->hide();}
-          xywh {295 290 94 28} box PLASTIC_UP_BOX color 230 labelfont 1 labelcolor 64
+          xywh {295 290 94 28} box PLASTIC_UP_BOX color 223 labelfont 1 labelcolor 64
         }
       }
       Fl_Group {} {
@@ -613,8 +613,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Value_Slider humanise {
         label Detune
-        callback {//
-
+        callback {//;
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random detune of whole part in cents} xywh {12 342 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 labelcolor 64 align 8 maximum 50 step 1 textcolor 64
         code1 {o->setValueType(VC_PartHumaniseDetune);o->useCustomTip(true);}
@@ -1041,7 +1040,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 1;
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
-        xywh {245 105 130 20} box PLASTIC_THIN_UP_BOX color 230 labelcolor 64
+        xywh {245 105 130 20} box PLASTIC_THIN_UP_BOX color 223 labelcolor 64
       }
       Fl_Button ctlclose {
         label Close

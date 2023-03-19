@@ -1,5 +1,11 @@
 yoshimi 2.2.3 M
 
+2023-3-19 Will
+bn 2191
+Cleanups on theme management.
+Rationalise panel colours.
+VU colours controlled.
+
 2023-3-18 Will
 bn 2190
 Remote sourced themes can now be loaded from the CLI at startup.

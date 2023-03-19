@@ -174,6 +174,16 @@ void mwheel_slider::draw()
      * find any better way to do it :(
      * Will G.
      */
+
+/*
+    //Slider peg colour
+    // This bit not ready. Only works for zero, need any default
+    if (this->value() > 0.5 || this->value() < -0.5)
+        this->selection_color(6);
+    else
+        this->selection_color(15);
+*/
+
     unsigned char r,g,b;
     Fl::get_color(slider_track, r, g, b);
     Fl::set_color(0, r, g, b);

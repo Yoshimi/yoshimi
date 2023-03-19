@@ -233,7 +233,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_null_window()} {} {
     Fl_Window effnullwindow {
-      xywh {912 927 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
+      xywh {912 927 380 95} type Double box PLASTIC_THIN_UP_BOX color 223 hide
       class Fl_Group
     } {
       Fl_Text_Display noeffect {
@@ -244,7 +244,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
-      xywh {839 53 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 labelcolor 64 align 33 hide
+      xywh {839 53 380 95} type Double box PLASTIC_UP_BOX color 223 labelsize 12 labelcolor 64 align 33 hide
       class Fl_Group
     } {
       Fl_Text_Display revname {
@@ -367,7 +367,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_echo_window()} {} {
     Fl_Window effechowindow {
-      xywh {782 171 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
+      xywh {782 171 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Text_Display echoname {
@@ -453,7 +453,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_chorus_window()} {} {
     Fl_Window effchoruswindow {
-      xywh {712 188 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {712 188 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display chorusname {
@@ -567,7 +567,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Flange
         callback {//
         send_data(0, 10, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
-        xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 230 selection_color 64 labelfont 1 labelsize 10 labelcolor 64 hide deactivate
+        xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 223 selection_color 64 labelfont 1 labelsize 10 labelcolor 64 hide deactivate
         code0 {o->value(eff->geteffectpar(10));}
         class Fl_Check_Button2
       }
@@ -575,7 +575,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Subtract
         callback {//
         send_data(0, 11, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
-        tooltip {Inverts the output} xywh {300 19 70 16} down_box DOWN_BOX color 230 selection_color 64 labelsize 11 labelcolor 64
+        tooltip {Inverts the output} xywh {300 19 70 16} down_box DOWN_BOX color 223 selection_color 64 labelsize 11 labelcolor 64
         class Fl_Check_Button2
       }
       Fl_Check_Button chorusp17 {
@@ -588,7 +588,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_phaser_window()} {} {
     Fl_Window effphaserwindow {
-      xywh {878 419 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      xywh {878 419 380 95} type Double box PLASTIC_UP_BOX color 223 labelsize 11 hide
       class Fl_Group
     } {
       Fl_Text_Display phasername {
@@ -707,7 +707,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {Sub.}
         callback {//
         send_data(0, 10, o->value(), (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
-        tooltip {Inverts the output} xywh {356 42 17 16} down_box DOWN_BOX color 230 selection_color 64 labelsize 11 labelcolor 64 align 4
+        tooltip {Inverts the output} xywh {356 42 17 16} down_box DOWN_BOX color 223 selection_color 64 labelsize 11 labelcolor 64 align 4
         class Fl_Check_Button2
       }
       Fl_Dial phaserp11 {
@@ -746,7 +746,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
-      xywh {877 543 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {877 543 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display alienname {
@@ -866,7 +866,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_distortion_window()} {} {
     Fl_Window effdistortionwindow {
-      xywh {879 667 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {879 667 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display distname {
@@ -974,7 +974,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {753 685 380 100} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {753 685 380 100} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display eqname {
@@ -1050,7 +1050,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
-      xywh {877 915 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {877 915 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display dfname {

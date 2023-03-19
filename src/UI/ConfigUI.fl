@@ -148,10 +148,10 @@ jackTab->hide();
 alsaTab->hide();}
         xywh {246 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
-      Fl_Group configTabs {
+      Fl_Group configTabs {open
         xywh {5 5 385 298} labelcolor 64
       } {
-        Fl_Group mainTab {
+        Fl_Group mainTab {open
           xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64
         } {
           Fl_Choice buff_size {
@@ -208,7 +208,7 @@ alsaTab->hide();}
             callback {//
                         send_data(0, CONFIG::control::logTextSize, o->value(), TOPLEVEL::type::Integer);
                         synth->getGuiMaster()->yoshiLog->setLogText(o->value());}
-            tooltip {Console Font Size} xywh {285 202 64 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12 textcolor 64
+            tooltip {Console Font Size} xywh {260 202 90 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 11 maximum 100 step 1 value 12 textfont 1 textsize 12 textcolor 64
             code1 {o->value(synth->getRuntime().consoleTextSize);}
             code2 {if (synth->getRuntime().toConsole) o->activate(); else o->deactivate();}
           }
@@ -216,7 +216,7 @@ alsaTab->hide();}
             label {XML Compression Level}
             callback {//
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {285 154 64 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12 textcolor 64
+            tooltip {gzip compression level (0 - uncompressed)} xywh {260 154 90 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12 textcolor 64
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -1100,44 +1100,46 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {manageThemes()} {} {
     code {//
+      int colour2find = 0;
+      if (colour2find > 0) // for testing
+      {
+          unsigned char rt,gt,bt;
+          Fl::get_color(colour2find, rt, gt, bt);
+          std::cout << "r " << int(rt) << " g " << int(gt) << " b " << int(bt) << std::endl;
+      }
       if (!checkVersions())
       {
           setClassicTable();
           return;
       }
 
-      if (findRemote())
+      if (findRemote()) // externally CLI sourced
           return;
 
       string themeDir = file::localDir() + "/themes/";
 
       string currentTheme = file::loadText(themeDir+"ID/current");
-      string fileName = themeDir+ currentTheme;
-      while (fileName.at(fileName.length() - 1) < '!') // tidy up
-          fileName.pop_back();
-      if (file::isRegularFile(fileName))
+      while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
+          currentTheme.pop_back(); // deals with spurious trailing whitespace
+      //std::cout << "current >" << currentTheme << "<" << std::endl;
+      if (currentTheme != "classic.clr")
       {
-            setUserTable(fileName);
-            return;
+          string fileName = themeDir+ currentTheme;
+          if (file::isRegularFile(fileName))
+          {
+                setUserTable(fileName);
+                return;
+          }
       }
-      else
-          setClassicTable();
+      setClassicTable();
 
-/*
-        unsigned char r,g,b; // for testing
-        Fl::get_color(62, r, g, b);
-        std::cout << "r " << int(r) << " g " << int(g) << " b " << int(b) << std::endl;
-*/
-
-      if (currentTheme == "classic.clr")
-          setClassicTable();
-      else
-          setUserTable(currentTheme);
+      /*
       unsigned char r,g,b; // temp
       Fl::get_color(gen_text, r, g, b); // temp
       Fl::set_color(0, r, g, b); // temp
-      //Fl::set_color(0, 180, 50, 220); // for testing
-      //Fl::set_color(189, 0, 80, 255); // for testing
+      */
+
+      //Fl::set_color(56, 255, 255, 255); // for testing
       ;} {}
   }
   Function {checkVersions()} {return_type bool

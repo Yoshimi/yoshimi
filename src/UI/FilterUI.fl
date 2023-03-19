@@ -808,7 +808,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         if (vowelseen)
             vowelpatch->color(FL_BACKGROUND_COLOR);
         else
-             vowelpatch->color(91);
+             vowelpatch->color(warning_background);
         vowelpatch->redraw();} {}
   }
   Function {refresh()} {} {

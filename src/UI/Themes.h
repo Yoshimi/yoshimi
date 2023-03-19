@@ -26,8 +26,14 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 
-// The following are ordered by value for easy number tracking
-// Where possible they are fairly close to FLTK defaults
+/*
+  The following are ordered by value for easy number tracking.
+  Where possible they are fairly close to FLTK defaults.
+
+  Fluid's colour chooser doesn't recognise our named colour numbers
+  so most of these are written in numerically. As designing layouts
+  without Fluid is seriously hard work we have to go with it.
+*/
 
 const int gen_text_back = 7;
 const int instr_back = 17;
@@ -49,6 +55,7 @@ const int tooltip_major_grid = 105;
 const int pad_harmonic_line = 128;
 const int reson_graph_line = 131;
 const int formant_graph_line = 132;
+const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
 const int knob_ring = 144;
@@ -61,12 +68,15 @@ const int pad_back = 158;
 const int pad_equiv_back = 159;
 const int pad_grid_centre = 162;
 const int pad_grid = 163;
+const int VU_over = 168;
 const int gen_opp_text = 175;
 const int tooltip_curve = 177;
+const int VU_bar_1dB = 178;
 const int CP_background = 179;
 const int instr_info_back = 182;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
+const int keyb_mod_bar = 230; // not currently redefinable
 const int CP_text = 198;
 const int knob_lit = 199;
 const int filer_text_back = 206;
@@ -76,6 +86,9 @@ const int add_back = 214;
 const int graph_grid = 217;
 const int graph_Harmonics_grid = 216;
 const int yoshi_ins_typ = 219;
+const int VU_bar_5dB = 222;
+const int VU_bar_10dB = 223;
+const int VU_level = 229;
 const int pad_prof_band = 227;
 const int pad_prof_fill = 231;
 const int sub_back = 236;
@@ -84,12 +97,20 @@ const int env_ctl_sel = 239;
 const int knob_low = 244;
 const int graph_resonance_grid = 245;
 const int env_line = 246;
+const int midi_text_back = 247;
 const int env_ctl = 253;
 const int graph_pad_back = 254;
+const int VU_text = 255;
 
-// The following are ordered as they are in theme lists
-// They are grouped mainly by function
-const int COLOURLIST = 57;
+/*
+  The following are ordered as they are in theme lists.
+  They are grouped mainly by function.
+
+  All new definitions mast be placed at the end of the list
+  and should use colours as close as possible to the colour
+  table so that new work doesn't mess up existing themes.
+*/
+const int COLOURLIST = 65;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -147,7 +168,15 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_prof_inactive,
     pad_harmonic_line,
     ext_voice,
-    ext_osc
+    ext_osc,
+    VU_bar_1dB,
+    VU_bar_5dB,
+    VU_bar_10dB,
+    VU_level,
+    VU_rms,
+    VU_over,
+    VU_text,
+    midi_text_back,
 };
 
 static std::string colourPreamble [] = {
@@ -219,6 +248,14 @@ static std::string colourData [] = {
     "200,0,0, PadSynth harmonic line",
     "159,223,143, External voice",
     "143,191,223, External oscillator",
+    "0,145,255, VU 1dB marker",
+    "63,218,255, VU 5dB marker",
+    "0,255,255, VU 10dB marker",
+    "63,182,255, VU level",
+    "255,255,0, VU rms",
+    "255,0,0,VU overload",
+    "255,254,254,254, VU_text",
+    "191,255,255, midilearn text background",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

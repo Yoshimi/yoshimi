@@ -66,7 +66,7 @@ decl {\#define WHITE_KEY_COLOUR 0xFAF0E600} {public local
 decl {\#define WHITE_KEY_PRESSED 0xBEB4AA00} {public local
 }
 
-decl {\#define BLACK_KEY_COLOUR 0x00000000} {public local
+decl {\#define BLACK_KEY_COLOUR 0x01010100} {public local
 }
 
 decl {\#define BLACK_KEY_PRESSED 0x70807000} {public local
@@ -136,7 +136,7 @@ class VirKeys {: {public Fl_Box}
         fl_color(WHITE_KEY_COLOUR);
         fl_rectf(ox, oy, lx, ly);
 
-        fl_color(FL_BLACK);
+        fl_color(BLACK_KEY_COLOUR);
         fl_line(ox, oy, ox + lx, oy);
         fl_line(ox, oy + ly, ox + lx, oy + ly);
         for (i = 0; i < N_OCT * 7 + 1; ++i)
@@ -169,7 +169,7 @@ class VirKeys {: {public Fl_Box}
                 fl_color(BLACK_KEY_COLOUR);
             else
                 fl_color(BLACK_KEY_PRESSED);
-            fl_rectf(ox + (kv + 7 * noct) * (*keyWhite) - (*keyBlack) / 2 + 2, oy + 2,
+            fl_rectf(ox + 1 + (kv + 7 * noct) * (*keyWhite) - (*keyBlack) / 2, oy + 2,
                         (*keyBlack) - 3, ly * 3 / 5 - 5);
         }
     }} {}
@@ -433,7 +433,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         }
         virkeys->take_focus();
         send_data(TOPLEVEL::action::fromMIDI, 2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, midictl);}
-        tooltip {Controller value} xywh {628 10 18 112} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
+        tooltip {Controller value} xywh {628 10 18 112} type {Vert Fill} box ENGRAVED_BOX color 230 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         code1 {o->setValueType(VC_plainReverse); o->useCustomTip(true);}
         class mwheel_slider

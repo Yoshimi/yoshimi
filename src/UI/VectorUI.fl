@@ -149,7 +149,7 @@ switch (res)
       } {}
       Fl_Group Xgroup {
         label X
-        xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
+        xywh {8 42 360 104} box PLASTIC_THIN_UP_BOX color 223 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
       } {
         Fl_Box AddBackL {
           xywh {21 53 53 19} box FLAT_BOX color 50
@@ -289,7 +289,7 @@ switch (res)
       }
       Fl_Group Ygroup {
         label Y
-        xywh {8 152 360 104} box PLASTIC_THIN_UP_BOX color 221 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
+        xywh {8 152 360 104} box PLASTIC_THIN_UP_BOX color 223 labelfont 1 labelsize 16 labelcolor 64 align 0 deactivate
       } {
         Fl_Box AddBackU {
           xywh {21 163 53 19} box FLAT_BOX color 50

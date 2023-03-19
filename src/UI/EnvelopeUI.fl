@@ -349,9 +349,9 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
     Fl_Window freemodeeditwindow {
       label Envelope
       callback {freeClose->do_callback();}
-      xywh {614 158 575 180} type Double hide resizable
+      xywh {614 158 575 180} type Double resizable
       code0 {freeDW = o->w(); freeDH = o->h();}
-      code1 {o->size_range(freeDW, freeDH, 0, 0, 0, 0, 1);}
+      code1 {o->size_range(freeDW, freeDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box freeedit {
         label Envelope
@@ -818,12 +818,12 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {make_free_window()} {} {
     Fl_Window envfree {
-      xywh {874 240 205 70} type Double color 50 labelfont 1 labelcolor 56 hide resizable
+      xywh {874 240 205 70} type Double color 50 labelfont 1 labelcolor 64 hide resizable
       class Fl_Group
     } {
       Fl_Group envfreegroup {
-        label {Amplitude Env} open
-        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 64 align 17 resizable
+        label {Amplitude Env}
+        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 labelcolor 66 align 17 resizable
       } {
         Fl_Box freeeditsmall {
           label Envelope

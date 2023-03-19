@@ -192,7 +192,7 @@ class VUMeter {: {public Fl_Box}
             // compute RMS - end
 
             // draw db level
-            fl_color(229);
+            fl_color(VU_level);
             fl_rectf(ox, oy, oldpeakl, VULENY);
             fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY);
 
@@ -205,26 +205,26 @@ class VUMeter {: {public Fl_Box}
             for (int i = 1; i < 1 - MIN_DB; ++i)
             {
                 int tx = VULENX + (int)(tmp * i);
-                fl_color(220);
+                fl_color(VU_bar_1dB);
                 fl_rectf(ox + tx, oy, 1, VULENY + ly / 2);
                 if (i % 5 == 0)
                 {
-                    fl_color(230);
+                    fl_color(VU_bar_5dB);
                     fl_rectf(ox + tx, oy, 1, VULENY + ly / 2);
                 }
                 if (i % 10 == 0)
-                    fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, FL_CYAN);
+                    fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, VU_bar_10dB);
             }
 
             // mellow yellow rms indicator
             if (irmsdbl)
-                fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, FL_YELLOW);
+                fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, VU_rms);
             if (irmsdbr)
-                fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, FL_YELLOW);
+                fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, VU_rms);
 
             // see red if clipped
             if (clipped & 1)
-                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, FL_RED);
+                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, VU_over);
             else
                 fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, graph_back);
 
@@ -240,7 +240,7 @@ class VUMeter {: {public Fl_Box}
             if ((maxdbl > NO_DB))
             {
                 fl_font(FL_HELVETICA | FL_BOLD, 9);
-                fl_color(FL_WHITE);
+                fl_color(VU_text);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
                     lx - VULENX - 4, VULENY - 2, FL_ALIGN_RIGHT, NULL, 0);
@@ -249,7 +249,7 @@ class VUMeter {: {public Fl_Box}
             if ((maxdbr > NO_DB))
             {
                 fl_font(FL_HELVETICA | FL_BOLD, 9);
-                fl_color(FL_WHITE);
+                fl_color(VU_text);
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
@@ -300,10 +300,10 @@ class VUMeter {: {public Fl_Box}
         db = db * ly - 2;
         panelpart.oldpeakR[actualpart] = int(db);
         fl_rectf(ox + mid, oy,lx - mid, ly, graph_back);
-        fl_color(229);
+        fl_color(VU_level);
         fl_rectf(ox + mid, oy + ly - panelpart.oldpeakR[actualpart], lx - mid, panelpart.oldpeakR[actualpart]);
         if (panelpart.clipR[actualpart])
-            fl_rectf(ox + mid, oy, lx - mid, 4, FL_RED);
+            fl_rectf(ox + mid, oy, lx - mid, 4, VU_over);
 
         // draw the scales
         float tmp = ly * 1.0 / MIN_DB;
@@ -312,12 +312,12 @@ class VUMeter {: {public Fl_Box}
             int ty = ly + int(tmp * i);
             if (i % 5 == 0)
             {
-                fl_color(220);
+                fl_color(VU_bar_1dB); // actually 5dB here
                 fl_rectf(ox, oy + ly - ty, lx, 1);
             }
             if (i % 10 == 0)
             {
-                fl_color(230);
+                fl_color(VU_bar_10dB);
                 fl_rectf(ox, oy + ly - ty, lx, 1);
             }
         }
@@ -636,7 +636,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if ((int)bankui->cbwig->value() != (setpart + 1))
         panellistitemgroup->color(FL_BACKGROUND_COLOR);
     else
-        panellistitemgroup->color(230);
+        panellistitemgroup->color(223);
     panellistitemgroup->redraw();
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
