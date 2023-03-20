@@ -944,7 +944,7 @@ class MasterUI {: {private GuiUpdates}
             label {Send to}
             callback {//
     showSysEffSends();}
-            xywh {275 156 62 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
+            xywh {275 156 62 20} box EMBOSSED_BOX color 221 labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button sysCopy {
             label C
@@ -1074,7 +1074,7 @@ class MasterUI {: {private GuiUpdates}
             class WidgetPDial
           }
           Fl_Group instrumentGroup {
-            xywh {136 292 195 24} box PLASTIC_UP_BOX color 228
+            xywh {136 292 195 24} box EMBOSSED_BOX color 198
           } {
             Fl_Box instrumentaddbox {
               xywh {139 297 62 14} box FLAT_BOX color 17
@@ -1090,7 +1090,7 @@ class MasterUI {: {private GuiUpdates}
               xywh {139 295 187 16} selection_color 64 labelsize 12 labelcolor 64 align 16
             }
             Fl_Box instrumentFrame {
-              xywh {139 296 188 16} box PLASTIC_DOWN_FRAME color 237 labelcolor 64
+              xywh {139 296 188 16} box DOWN_FRAME color 237 labelcolor 64
             }
             Fl_Button buttontop {
               callback {//
@@ -1572,7 +1572,7 @@ any later version.}
           callback {//
                  contributors->show();
                  aboutFirst->hide();}
-          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} labelsize 11 labelcolor 64
+          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
         }
       }
       Fl_Group contributors {
@@ -1936,7 +1936,7 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} box ENGRAVED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button filerclose {
         label Close

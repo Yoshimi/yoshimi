@@ -1130,7 +1130,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Button filter {
         label Filter
         callback {Showfilt();}
-        xywh {325 12 37 16} box PLASTIC_THIN_UP_BOX labelsize 11 labelcolor 64
+        xywh {325 12 37 16} box EMBOSSED_BOX color 221 labelsize 11 labelcolor 64
       }
       Fl_Group {} {
         xywh {277 37 99 53} box EMBOSSED_BOX color 181

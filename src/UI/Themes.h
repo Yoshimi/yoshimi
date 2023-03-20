@@ -77,8 +77,7 @@
   208 - 213
   216
   218
-  220
-  221
+  220*
   223 - 226
   228
   232 - 235
@@ -140,6 +139,7 @@ const int tooltip_back = 215;
 const int graph_grid = 217;
 const int graph_Harmonics_grid = 216;
 const int yoshi_ins_typ = 219;
+const int alt_links = 221;
 const int VU_bar_5dB = 222;
 const int pad_prof_band = 227;
 const int VU_level = 229;
@@ -164,7 +164,7 @@ const int VU_text = 255;
   and should use colours as close as possible to the colour
   table so that new work doesn't mess up existing themes.
 */
-const int COLOURLIST = 66;
+const int COLOURLIST = 67;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -232,6 +232,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     VU_text,
     midi_text_back,
     links,
+    alt_links,
 };
 
 static std::string colourPreamble [] = {
@@ -311,7 +312,8 @@ static std::string colourData [] = {
     "255,0,0,VU overload",
     "255,254,254,254, VU_text",
     "191,255,255, midilearn text background",
-    "127,200,191, link buttons"
+    "127,200,191, link buttons",
+    "180, 180, 200, alternative link buttons",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

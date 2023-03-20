@@ -179,7 +179,7 @@ class ADvoicelistitem {: {public Fl_Group}
               synth->getGuiMaster()->partui->adnoteui->set_voice(true);
               if ((Fl::event_button() == 3))
                   synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();}
-          tooltip {Right click: also close this} xywh {42 4 40 20} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Right click: also close this} xywh {42 4 40 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Group enabledpatch {
@@ -805,7 +805,7 @@ Oscillator}
     oscedit = new OscilEditor(pars->VoicePar[nv].POscil, oscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addVoice1);
     if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {9 548 72 22} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
+                  xywh {9 548 72 22} box EMBOSSED_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
                   code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider VoiceOscPhase {
@@ -2180,7 +2180,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
 
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {191 375 121 25} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Right click: also close this} xywh {191 375 121 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button showvoicepars {
         label {Show Voice Parameters}
@@ -2188,7 +2188,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     set_voice(false);
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {5 375 180 25} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Right click: also close this} xywh {5 375 180 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalclose {
         label Close
@@ -2213,7 +2213,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     resui->Show();
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalcopy {
         label C

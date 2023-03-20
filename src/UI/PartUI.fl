@@ -184,7 +184,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::addSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {422 4 40 15} box THIN_UP_BOX labelsize 11 labelcolor 64
+          xywh {422 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
@@ -201,7 +201,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::subSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {490 4 40 15} box THIN_UP_BOX labelsize 11 labelcolor 64
+          xywh {490 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
@@ -218,7 +218,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::padSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {560 4 40 15} box THIN_UP_BOX labelsize 11 labelcolor 64
+          xywh {560 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
@@ -944,7 +944,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
       }
       Fl_Group ctlportamento {
-        label Portamento open
+        label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10 labelcolor 64
       } {
         Fl_Box ctlx100 {
@@ -1040,7 +1040,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 1;
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
-        xywh {245 105 130 20} box PLASTIC_THIN_UP_BOX color 223 labelcolor 64
+        xywh {245 105 130 20} box EMBOSSED_BOX color 198 labelcolor 64
       }
       Fl_Button ctlclose {
         label Close

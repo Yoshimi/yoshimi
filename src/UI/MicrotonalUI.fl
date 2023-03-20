@@ -64,7 +64,7 @@ class MicrotonalUI {} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
-      callback {scaleClose->do_callback();}
+      callback {scaleClose->do_callback();} open
       xywh {364 315 410 485} type Double hide resizable
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
@@ -78,11 +78,11 @@ class MicrotonalUI {} {
       } {
         Fl_Text_Display invertlabel {
           label Invert
-          xywh {273 7 5 24} box NO_BOX selection_color 64 labelfont 1 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
+          xywh {273 7 5 24} box NO_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
         }
         Fl_Text_Display keyslabel {
           label keys
-          xywh {273 18 5 30} box NO_BOX labelfont 1 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
+          xywh {273 18 5 30} box NO_BOX labelfont 3 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
         }
         Fl_Check_Button invertKeys {
           callback {//
@@ -96,7 +96,7 @@ class MicrotonalUI {} {
         }
         Fl_Text_Display centerlabel {
           label Center
-          xywh {336 17 50 8} box NO_BOX labelsize 11 labelcolor 64
+          xywh {336 17 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
         }
         Fl_Spinner centerinvertcounter {
           callback {//
@@ -119,7 +119,7 @@ class MicrotonalUI {} {
         }
         Fl_Text_Display notelabel {
           label Note
-          xywh {191 20 50 6} box NO_BOX labelsize 11 labelcolor 64 textcolor 64
+          xywh {191 20 50 6} box NO_BOX labelfont 3 labelsize 11 labelcolor 64 textcolor 64
         }
         Fl_Spinner anotecounter {
           callback {//
@@ -180,7 +180,7 @@ class MicrotonalUI {} {
       Fl_Box {} {
         xywh {210 165 22 22} box UP_BOX color 237 selection_color 64 labelcolor 64
       }
-      Fl_Group microtonalgroup {open
+      Fl_Group microtonalgroup {
         xywh {3 49 402 432} box ENGRAVED_FRAME
         code0 {if (microtonal->Penabled==0) o->deactivate();}
       } {
@@ -203,7 +203,7 @@ class MicrotonalUI {} {
         }
         Fl_Text_Display shiftlabel {
           label Shift
-          xywh {318 65 50 8} box NO_BOX labelsize 11 labelcolor 64
+          xywh {318 65 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
         }
         Fl_Spinner scaleShift {
           callback {//
@@ -234,7 +234,7 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .scl file (tunnings)} xywh {85 417 100 20} box THIN_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .scl file (tunnings)} xywh {85 417 100 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Group Keymap {
@@ -250,11 +250,11 @@ class MicrotonalUI {} {
           }
           Fl_Text_Display first1 {
             label First
-            xywh {197 214 50 8} box NO_BOX labelsize 11 labelcolor 64
+            xywh {197 214 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
           }
           Fl_Text_Display first2 {
             label note
-            xywh {198 224 50 8} box NO_BOX labelsize 11 labelcolor 64
+            xywh {198 224 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
           }
           Fl_Spinner firstnotecounter {
             callback {//
@@ -281,11 +281,11 @@ class MicrotonalUI {} {
           }
           Fl_Text_Display middle1 {
             label Middle
-            xywh {197 279 50 8} box NO_BOX labelsize 11 labelcolor 64
+            xywh {197 279 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
           }
           Fl_Text_Display middle2 {
             label note
-            xywh {198 289 50 8} box NO_BOX labelsize 11 labelcolor 64
+            xywh {198 289 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
           }
           Fl_Spinner middlenotecounter {
             callback {//
@@ -321,11 +321,11 @@ class MicrotonalUI {} {
           }
           Fl_Text_Display last1 {
             label Last
-            xywh {197 344 50 8} box NO_BOX labelsize 11 labelcolor 65 textcolor 64
+            xywh {197 344 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 65 textcolor 64
           }
           Fl_Text_Display last2 {
             label note
-            xywh {198 354 50 8} box NO_BOX labelsize 11 labelcolor 64 textcolor 64
+            xywh {198 354 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64 textcolor 64
           }
           Fl_Spinner lastnotecounter {
             callback {//
@@ -361,7 +361,7 @@ class MicrotonalUI {} {
                 return;
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box THIN_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Check_Button mappingenabledbutton {
@@ -370,7 +370,7 @@ class MicrotonalUI {} {
           o->show();
 
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 selection_color 64 labelcolor 64 align 33
+          tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 selection_color 64 labelfont 3 labelcolor 64 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) Keymap->deactivate();}
           class Fl_Check_Button2

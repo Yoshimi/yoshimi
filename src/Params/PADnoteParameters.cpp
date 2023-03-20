@@ -1459,7 +1459,6 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case PADSYNTH::control::applyChanges:
-            type |= learnable;
             def = 1;
             max = 1;
             break;

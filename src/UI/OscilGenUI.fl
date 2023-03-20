@@ -477,10 +477,6 @@ o->hide();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
       code3 {o->size_range(waveDW, waveDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Box applybox {
-        xywh {298 278 64 24} box THIN_UP_BOX color 237 labelcolor 104
-        code0 {if (!forPAD) o->hide();}
-      }
       Fl_Button applybutton {
         label Apply
         callback {//

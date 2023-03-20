@@ -462,9 +462,6 @@ class ResonanceUI {: PresetsUI_
         code0 {o->value(respar->Penabled);}
         class Fl_Check_Button2
       }
-      Fl_Box applybox {
-        xywh {696 261 80 24} box THIN_UP_BOX color 237 labelcolor 65
-      }
       Fl_Button applybutton {
         label Apply
         callback {//
@@ -580,7 +577,6 @@ class ResonanceUI {: PresetsUI_
     engine = engine_;
     make_window();
     resSeen = false;
-    applybox->hide();
     applybutton->hide();
     refresh();} {}
   }

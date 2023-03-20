@@ -274,7 +274,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {298 207 580 440} type Double hide resizable
+      xywh {179 181 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -283,17 +283,15 @@ class PADnoteUI {: {public PresetsUI_}
         callback {//
             if (o->value() != harmonicstructuregroup)
             {
-                applybox->hide();
                 applybutton->hide();
             }
             else
             {
-                applybox->show();
                 applybutton->show();}}
         xywh {0 0 580 405} labelcolor 64
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure}
+          label {Harmonic Structure} open
           xywh {0 20 580 385} box ENGRAVED_FRAME labelsize 12 labelcolor 64
         } {
           Fl_Group bwprofilegroup {
@@ -418,11 +416,10 @@ class PADnoteUI {: {public PresetsUI_}
             callback {//
             resui->resonancewindow->redraw();
             resui->Show();
-            resui->applybox->show();
             resui->applybutton->show();
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
-            xywh {451 246 85 20} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+            xywh {451 246 85 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button waveform {
             label Waveform
@@ -434,7 +431,7 @@ class PADnoteUI {: {public PresetsUI_}
             oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2, forPAD);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
-            tooltip {Right click: also close this} xywh {451 272 85 20} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+            tooltip {Right click: also close this} xywh {451 272 85 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Dial bwdial {
             label BandWidth
@@ -564,7 +561,7 @@ class PADnoteUI {: {public PresetsUI_}
               show_randWalk();
               if ((Fl::event_button() == 3))
                   padnotewindow->hide();}
-            xywh {425 217 94 20} labelfont 1 labelsize 12 labelcolor 64
+            xywh {425 217 94 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Group hprofile {
             xywh {100 45 475 90} box FLAT_BOX color 254 selection_color 218 labelcolor 63
@@ -833,10 +830,7 @@ class PADnoteUI {: {public PresetsUI_}
         if (filename.empty())
             return;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}
-        tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
-      }
-      Fl_Box applybox {
-        xywh {236 407 139 31} box THIN_UP_BOX color 237 selection_color 29
+        tooltip {Export samples as wav file} xywh {15 410 123 24} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button applybutton {
         label {Apply Changes}
