@@ -1031,7 +1031,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label {Reset all controllers}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer, npart);}
-        xywh {5 105 210 20} box THIN_UP_BOX labelcolor 64
+        xywh {5 105 210 20} box PLASTIC_UP_BOX color 228 labelcolor 64
       }
       Fl_Button aftertouch {
         label Aftertouch
@@ -1087,7 +1087,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 channelmodulation->value(0);
                 channelvolume->value(0);
                 setATchannel(PART::aftertouchType::off, true);}
-        xywh {55 40 48 20} labelcolor 64
+        xywh {55 40 48 20} box PLASTIC_UP_BOX color 228 labelcolor 64
       }
       Fl_Check_Button channelfiltercutoff {
         label {Filter Cutoff}
@@ -1184,7 +1184,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 polypitchBminus->deactivate();
                 polymodulation->value(0);
                 setATkey(PART::aftertouchType::off, true);}
-        xywh {300 40 48 20} labelcolor 64
+        xywh {300 40 48 20} box PLASTIC_UP_BOX color 228 labelcolor 64
       }
       Fl_Check_Button polyfiltercutoff {
         label {Filter Cutoff}

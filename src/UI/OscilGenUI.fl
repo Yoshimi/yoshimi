@@ -642,7 +642,7 @@ o->hide();}
         if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\n This action can't be reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
+        xywh {670 505 55 15} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Group {} {
         xywh {135 308 150 30} box ENGRAVED_BOX labelcolor 64
@@ -805,7 +805,7 @@ o->hide();}
             return;
 
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 525 55 15} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
+        xywh {670 525 55 15} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button oscilC {
         label C

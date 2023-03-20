@@ -78,8 +78,7 @@
   216
   218
   220*
-  223 - 226
-  228
+  224 - 226
   232 - 235
   237
   240 - 243
@@ -141,7 +140,9 @@ const int graph_Harmonics_grid = 216;
 const int yoshi_ins_typ = 219;
 const int alt_links = 221;
 const int VU_bar_5dB = 222;
+const int panels = 223;
 const int pad_prof_band = 227;
+const int actions = 228;
 const int VU_level = 229;
 const int keyb_mod_bar = 230; // not currently redefinable
 const int pad_prof_fill = 231;
@@ -156,15 +157,16 @@ const int env_ctl = 253;
 const int graph_pad_back = 254;
 const int VU_text = 255;
 
+
 /*
   The following are ordered as they are in theme lists.
   They are grouped mainly by function.
 
-  All new definitions mast be placed at the end of the list
+  All new definitions must be placed at the end of the list
   and should use colours as close as possible to the colour
   table so that new work doesn't mess up existing themes.
 */
-const int COLOURLIST = 67;
+const int COLOURLIST = 69;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -233,6 +235,8 @@ const unsigned char colourNumbers [COLOURLIST] = {
     midi_text_back,
     links,
     alt_links,
+    actions,
+    panels,
 };
 
 static std::string colourPreamble [] = {
@@ -240,15 +244,15 @@ static std::string colourPreamble [] = {
     "Instead, copy as template for other named themes.",
     "Don't add or remove lines between and including dashes.",
     "This would corrupt the colour map.",
-    "Instead place # at start of line for default setting.",
+    "Instead place @ at start of line for default setting.",
     "------------------ data start marker",
     "END"
 }; // Do not change the last two text lines!
 
 static std::string colourData [] = {
     "0,255, gray scale min-max (can be reversed)",
-    "186,198,211, Knob shadow (R,G,B or rrggbb)",
-    "e7ebef, Knob highlight (231,235,239)",
+    "186,198,211, Knob shadow (R,G,B or #rrggbb)",
+    "#e7ebef, Knob highlight (231,235,239)",
     "51,51,51, Knob ring",
     "0,197,255, Knob ring lit",
     "61,61,61, Knob pointer",
@@ -309,11 +313,13 @@ static std::string colourData [] = {
     "140,180,220, VU 10dB marker",
     "63,182,255, VU level",
     "255,255,0, VU rms",
-    "255,0,0,VU overload",
+    "255,0,0,VU Overload",
     "255,254,254,254, VU_text",
-    "191,255,255, midilearn text background",
-    "127,200,191, link buttons",
-    "180, 180, 200, alternative link buttons",
+    "191,255,255, Midilearn text background",
+    "127,200,191, Link buttons",
+    "180,180,200, Alternative link buttons",
+    "63,145,255, Action buttons",
+    "0,255,255, Panels",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1303,7 +1303,7 @@ class MasterUI {: {private GuiUpdates}
               minKeyCount->value(lastnote);
               send_data(0, PART::control::minToLastKey, 1, TOPLEVEL::type::Integer, npart);
           }}
-            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX labelsize 10 labelcolor 64
+            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX color 187 labelsize 10 labelcolor 64
           }
           Fl_Button setNormal {
             label R
@@ -1311,7 +1311,7 @@ class MasterUI {: {private GuiUpdates}
           minKeyCount->value(0);
           maxKeyCount->value(127);
           send_data(0, PART::control::resetMinMaxKey, 1, TOPLEVEL::type::Integer, npart);}
-            tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {105 421 30 16} box PLASTIC_UP_BOX labelfont 1 labelsize 11 labelcolor 64
+            tooltip {Reset the minimum key to 0 and maximum key to 127} xywh {105 421 30 16} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button setMaxToLast {
             label Set
@@ -1322,7 +1322,7 @@ class MasterUI {: {private GuiUpdates}
               maxKeyCount->value(lastnote);
               send_data(0, PART::control::maxToLastKey, 1, TOPLEVEL::type::Integer, npart);
           }}
-            tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX labelsize 10 labelcolor 64
+            tooltip {Set maximum note to the last note played} xywh {105 439 30 16} box PLASTIC_UP_BOX color 228 labelsize 10 labelcolor 64
           }
           Fl_Spinner partKeyShift {
             label {Key Shift}
@@ -1936,7 +1936,7 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} box ENGRAVED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button filerclose {
         label Close

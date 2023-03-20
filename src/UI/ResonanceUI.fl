@@ -331,13 +331,13 @@ class ResonanceUI {: PresetsUI_
           label Clear
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::clearGraph, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Clear the resonance function} xywh {507 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Clear the resonance function} xywh {507 264 66 15} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button smoothbutton {
           label Smooth
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::smoothGraph, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Smooth the resonance function} xywh {507 283 66 18} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Smooth the resonance function} xywh {507 283 66 18} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Value_Output maxdbvo {
           label {Max dB}
@@ -432,13 +432,13 @@ class ResonanceUI {: PresetsUI_
           label S
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::interpolatePeaks, 0, TOPLEVEL::type::Integer);}
-          tooltip {Smooth interpolation} xywh {365 282 14 14} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Smooth interpolation} xywh {365 282 28 14} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button lbutton {
           label L
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::interpolatePeaks, 1, TOPLEVEL::type::Integer);}
-          tooltip {Linear interpolation} xywh {411 282 14 14} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Linear interpolation} xywh {398 282 28 14} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button cbutton {
           label C

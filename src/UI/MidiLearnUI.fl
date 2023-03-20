@@ -351,7 +351,7 @@ class MidiLearnUI {} {
       callback {close->do_callback();}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider/button to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {925 728 820 285} type Double hide resizable
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {976 497 820 285} type Double hide resizable
       code0 {send_data(TOPLEVEL::action::lowPrio, MIDILEARN::control::sendRefreshRequest, 0, 3);}
       code1 {learnDW = o->w(); learnDH = o->h();}
       code2 {o->size_range(learnDW, learnDH, 0, 0, 0, 0, 1);}
@@ -412,7 +412,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         if (filename.empty())
             return;
         loadMidi(filename);}
-        tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Load complete learned list} xywh {30 264 70 18} box EMBOSSED_BOX down_box DOWN_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button save {
         label Save
@@ -423,7 +423,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         send_data(0, MIDILEARN::control::saveList, 0, 0, 0, 0, 0, 0, textMsgBuffer.push((string) filename));
         recent->activate();
         setWindowTitle(findLeafName(filename));}
-        tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64 deactivate
+        tooltip {Save complete learned list} xywh {130 264 70 18} box EMBOSSED_BOX down_box DOWN_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 deactivate
       }
       Fl_Button clear {
         label Clear
@@ -441,7 +441,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         callback {//
         synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
         synth->getGuiMaster()->paramsui->Show(TOPLEVEL::XML::MLearn);}
-        tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Load from recently seen list} xywh {230 264 70 18} box EMBOSSED_BOX down_box DOWN_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
         code0 {vector<string> &listType = *synth->getHistory(TOPLEVEL::XML::MLearn);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }

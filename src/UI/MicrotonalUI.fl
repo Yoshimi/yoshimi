@@ -64,7 +64,7 @@ class MicrotonalUI {} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
-      callback {scaleClose->do_callback();} open
+      callback {scaleClose->do_callback();}
       xywh {364 315 410 485} type Double hide resizable
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
@@ -381,7 +381,7 @@ class MicrotonalUI {} {
           send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::retune, 1, TOPLEVEL::type::Integer);}
-          tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelcolor 64
+          tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box PLASTIC_UP_BOX color 228 labeltype EMBOSSED_LABEL labelfont 1 labelcolor 64
         }
       }
       Fl_Text_Display enablelabel {

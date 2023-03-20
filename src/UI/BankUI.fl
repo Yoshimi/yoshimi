@@ -326,7 +326,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {Hide(0);}
-      xywh {219 96 780 570} type Double labelsize 12 labelcolor 64 hide resizable
+      xywh {598 119 780 570} type Double labelsize 12 labelcolor 64 hide resizable
       code0 {instDW = o->w(), instDH = o->h();}
       code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
@@ -348,7 +348,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             alert(synth, "Active part disabled");
         else
             ShowSearch();}
-        tooltip {Select instrument from list, by type} xywh {230 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Select instrument from list, by type} xywh {230 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button insRoots {
         label Roots
@@ -361,7 +361,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
-        tooltip {Show root paths. Right click: also close this} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {350 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button insBanks {
         label Banks
@@ -374,7 +374,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
-        tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Text_Display insT1 {
         label {This column uses MIDI}
@@ -447,7 +447,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               mode = 2;
           removeselection();}
-          xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12 labelcolor 64
+          xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 3 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button readbutton {
           label SELECT
@@ -455,7 +455,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               mode = 1;
           removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12 labelcolor 64
+          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 101 labelfont 9 labelsize 12 labelcolor 64
           code0 {o->value(1);}
         }
         Fl_Light_Button clearbutton {
@@ -464,7 +464,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               mode = 3;
           removeselection();}
-          xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12 labelcolor 64
+          xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 1 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button swapbutton {
           label SWAP
@@ -472,7 +472,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               mode = 4;
           removeselection();}
-          xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12 labelcolor 64
+          xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button renamebutton {
           label RENAME
@@ -480,7 +480,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               mode = 5;
           removeselection();}
-          xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12 labelcolor 64
+          xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 5 labelfont 9 labelsize 12 labelcolor 64
         }
       }
       Fl_Text_Display insT3 {
@@ -607,7 +607,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;}
-        tooltip {Show root paths. Right click: also close this} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {248 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button bankcurrent {
         label {current bank}
@@ -621,7 +621,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (Fl::event_button() == 3)
         {
             Hide(1);}}
-        tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Group bankgroup {
         xywh {2 30 776 499} labelsize 12
@@ -684,7 +684,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 1;
           removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labelfont 9 labelsize 12 labelcolor 64
+          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 101 labelfont 9 labelsize 12 labelcolor 64
           code0 {o->value(1);}
         }
         Fl_Light_Button rootrenamebutton {
@@ -693,7 +693,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 5;
           removeselection();}
-          xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labelfont 9 labelsize 12 labelcolor 64
+          xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 5 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button rootwritebutton {
           label ADD
@@ -701,7 +701,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 2;
           removeselection();}
-          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 3 labelfont 9 labelsize 12 labelcolor 64
+          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 3 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button rootclearbutton {
           label DELETE
@@ -709,7 +709,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 3;
           removeselection();}
-          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labelfont 9 labelsize 12 labelcolor 64
+          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 1 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button rootswapbutton {
           label SWAP
@@ -717,7 +717,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 4;
           removeselection();}
-          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labelfont 9 labelsize 12 labelcolor 64
+          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Light_Button rootimportbutton {
           label IMPORT
@@ -725,7 +725,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 6;
           removeselection();}
-          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 93 labelfont 8 labelsize 9 labelcolor 64
+          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 93 labelfont 8 labelsize 9 labelcolor 64
         }
         Fl_Light_Button rootexportbutton {
           label EXPORT
@@ -733,7 +733,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           if (_SYS_::F2B(o->value()))
               r_mode = 7;
           removeselection();}
-          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 78 labelfont 8 labelsize 9 labelcolor 64
+          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 78 labelfont 8 labelsize 9 labelcolor 64
         }
       }
       Fl_Button bankClose {
@@ -797,7 +797,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::addNamedRoot, 0, TOPLEVEL::type::Write, TOPLEVEL::section::bank, newdef, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
         Pend->hide();}
-        xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 labelcolor 64 align 128
+        xywh {10 225 75 35} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button removerootdirbutton {
         label {Remove root dir...}
@@ -811,7 +811,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         activatebutton_rootdir(false);
         rescan_for_banks();
         Pend->hide();}
-        xywh {94 225 75 35} box THIN_UP_BOX labelsize 12 labelcolor 64 align 128 deactivate
+        xywh {94 225 75 35} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64 align 128 deactivate
         code0 {o->deactivate();}
       }
       Fl_Button makedefaultrootdirbutton {
@@ -825,7 +825,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         activatebutton_rootdir(false);
         Pend->hide();}
-        xywh {178 225 75 35} box THIN_UP_BOX labelsize 12 labelcolor 64 align 128 deactivate
+        xywh {178 225 75 35} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64 align 128 deactivate
         code0 {o->deactivate();}
       }
       Fl_Button showdefaultrootdirbutton {
@@ -839,7 +839,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;}
-        tooltip {Right click: also close this} xywh {262 225 75 35} box THIN_UP_BOX labelsize 12 labelcolor 64 align 128
+        tooltip {Right click: also close this} xywh {262 225 75 35} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64 align 128
       }
       Fl_Spinner changeIDbutton {
         label {New ID}
