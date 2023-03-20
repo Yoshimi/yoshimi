@@ -443,12 +443,12 @@ class ResonanceUI {: PresetsUI_
         Fl_Button cbutton {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(respar);}
-          xywh {635 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+          xywh {635 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
         Fl_Button pbutton {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(respar,this);}
-          xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+          xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
       }
       Fl_Box {} {

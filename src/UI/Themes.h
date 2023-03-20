@@ -35,15 +35,68 @@
   without Fluid is seriously hard work we have to go with it.
 */
 
+
+/*
+  reserved(*) / spare colours
+  55*
+  56
+  58 - 61
+  65*
+  68 - 70
+  71*
+  72
+  75*
+  76 - 77
+  78*
+  79 - 80
+  82 - 87
+  88*
+  90*
+  93*
+  98 - 100
+  101*
+  102 - 103
+  104*
+  got to here!
+  106 - 127
+  129 - 130
+  133
+  134
+  138 - 143
+  148 - 154
+  156
+  160
+  161
+  164 - 167
+  176
+  180
+  181
+  183 - 187
+  191 - 196
+  200 - 205
+  208 - 213
+  216
+  218
+  220
+  221
+  223 - 226
+  228
+  232 - 235
+  237
+  240 - 243
+  248 - 252
+*/
+
+
 const int gen_text_back = 7;
 const int instr_back = 17;
 const int graph_back = 57;
 const int slider_track = 62;
 const int graph_line = 63;
 const int gen_text = 64;
-const int env_line_sel = 81;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
+const int env_line_sel = 81;
 const int warning_button = 89;
 const int warning_background = 91;
 const int env_sus = 92;
@@ -76,20 +129,21 @@ const int CP_background = 179;
 const int instr_info_back = 182;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
-const int keyb_mod_bar = 230; // not currently redefinable
-const int CP_text = 198;
+const int VU_bar_10dB = 190;
+const int CP_text = 197;
+const int links = 198;
 const int knob_lit = 199;
 const int filer_text_back = 206;
 const int knob_high = 207;
-const int tooltip_back = 215;
 const int add_back = 214;
+const int tooltip_back = 215;
 const int graph_grid = 217;
 const int graph_Harmonics_grid = 216;
 const int yoshi_ins_typ = 219;
 const int VU_bar_5dB = 222;
-const int VU_bar_10dB = 223;
-const int VU_level = 229;
 const int pad_prof_band = 227;
+const int VU_level = 229;
+const int keyb_mod_bar = 230; // not currently redefinable
 const int pad_prof_fill = 231;
 const int sub_back = 236;
 const int ext_osc = 238;
@@ -110,7 +164,7 @@ const int VU_text = 255;
   and should use colours as close as possible to the colour
   table so that new work doesn't mess up existing themes.
 */
-const int COLOURLIST = 65;
+const int COLOURLIST = 66;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -177,6 +231,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     VU_over,
     VU_text,
     midi_text_back,
+    links,
 };
 
 static std::string colourPreamble [] = {
@@ -250,12 +305,13 @@ static std::string colourData [] = {
     "143,191,223, External oscillator",
     "0,145,255, VU 1dB marker",
     "63,218,255, VU 5dB marker",
-    "0,255,255, VU 10dB marker",
+    "140,180,220, VU 10dB marker",
     "63,182,255, VU level",
     "255,255,0, VU rms",
     "255,0,0,VU overload",
     "255,254,254,254, VU_text",
     "191,255,255, midilearn text background",
+    "127,200,191, link buttons"
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

@@ -436,7 +436,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
-      xywh {354 165 395 385} type Double hide resizable
+      xywh {802 258 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = 395; editDH = 385;}
@@ -471,7 +471,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {12 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {12 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -501,7 +501,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {107 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {107 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -531,7 +531,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {202 280 80 32} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {202 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -542,7 +542,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 227 94 28} box PLASTIC_UP_BOX color 223 selection_color 220 labelfont 1 labelcolor 64 align 128
+          tooltip {Right click: also close this} xywh {295 227 94 28} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
         }
         Fl_Button effects {
           label Effects
@@ -551,7 +551,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 258 94 28} box PLASTIC_UP_BOX color 223 labelfont 1 labelcolor 64
+          tooltip {Right click: also close this} xywh {295 258 94 28} box EMBOSSED_BOX color 198 labelfont 1 labelcolor 64
         }
         Fl_Button editAT {
           label Aftertouch
@@ -560,7 +560,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 2;
                 if ((Fl::event_button() == 3))
                     instrumenteditwindow->hide();}
-          xywh {295 290 94 28} box PLASTIC_UP_BOX color 223 labelfont 1 labelcolor 64
+          xywh {295 290 94 28} box EMBOSSED_BOX color 198 labelfont 1 labelcolor 64
         }
       }
       Fl_Group {} {
@@ -714,14 +714,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         label C
         callback {//
         synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
-        xywh {346 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {346 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button effPaste {
         label P
         callback {//
         synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
         synth->getRuntime().effectChange = npart | (ninseff << (EFFECT::type::dynFilter - EFFECT::type::none)); // temporary fix - for what?}
-        xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {346 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Check_Button bypasseff {
         label Bypass

@@ -2218,12 +2218,12 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       Fl_Button globalcopy {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
-        xywh {455 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {455 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button globalpaste {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
-        xywh {485 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {485 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
     }
     Fl_Window ADnoteVoice {
@@ -2259,12 +2259,12 @@ o->hide();}
       Fl_Button Vcopy {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvoice);}
-        xywh {600 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {600 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button Vpaste {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);}
-        xywh {630 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+        xywh {630 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button g1 {
         label 1

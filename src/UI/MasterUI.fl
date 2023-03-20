@@ -862,7 +862,7 @@ class MasterUI {: {private GuiUpdates}
           label {Virtual Keyboard}
           callback {//
           virkeyboard->ShowKbd();}
-          tooltip {Virtual Keyboard} xywh {83 60 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
+          tooltip {Virtual Keyboard} xywh {83 60 106 24} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
@@ -872,19 +872,19 @@ class MasterUI {: {private GuiUpdates}
           panelType &= 3;
           updatepanel();
           panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {83 30 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
+          tooltip {Mixer Panel Window} xywh {83 30 106 24} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button mainmidilearn {
           label {Midi Learn}
           callback {//
                 midilearnui->showLearn();}
-          tooltip {Message Log} xywh {83 90 106 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
+          tooltip {Message Log} xywh {83 90 106 24} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button vectors {
           label Vectors
           callback {//
           vectorui->Show(synth);}
-          tooltip {Vector Setup Window} xywh {197 30 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
+          tooltip {Vector Setup Window} xywh {197 30 68 24} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button undo {
           label Undo
@@ -944,19 +944,19 @@ class MasterUI {: {private GuiUpdates}
             label {Send to}
             callback {//
     showSysEffSends();}
-            xywh {275 156 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
+            xywh {275 156 62 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button sysCopy {
             label C
             callback {presetsui->copy(synth->sysefx[nsyseff]);}
-            xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+            xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
           Fl_Button sysPaste {
             label P
             callback {//
             presetsui->paste(synth->sysefx[nsyseff], syseffectui);
             synth->getRuntime().effectChange = TOPLEVEL::section::systemEffects + (nsyseff << 8); // temporary fix}
-            xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+            xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
         }
         Fl_Group InsertionEffectsGrp {
@@ -992,14 +992,14 @@ class MasterUI {: {private GuiUpdates}
           Fl_Button insCopy {
             label C
             callback {presetsui->copy(synth->insefx[ninseff]);}
-            xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+            xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
           Fl_Button insPaste {
             label P
             callback {//
             presetsui->paste(synth->insefx[ninseff], inseffectui);
             synth->getRuntime().effectChange = TOPLEVEL::section::insertEffects + (ninseff << 8); // temporary fix}
-            xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 198
+            xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
         }
       }
@@ -1224,19 +1224,19 @@ class MasterUI {: {private GuiUpdates}
             //lastkey = -1;
             partui->Showedit();
        // }}
-            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
+            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button partControllers {
             label Controllers
             callback {//
           partui->Showctl();}
-            tooltip {MIDI Controller range settings} xywh {8 373 86 22} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64
+            tooltip {MIDI Controller range settings} xywh {8 373 86 22} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64
           }
           Fl_Button partMidiCCs {
             label {Midi CCs}
             callback {//
           partui->Showctlmidi();}
-            tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64
+            tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64
           }
           Fl_Box modepatch {
             label Mode
@@ -1862,7 +1862,7 @@ Alan Calvert started the project}
     Fl_Window filerwindow {
       label Yoshimi
       callback {//
-        filerclose->do_callback();} open
+        filerclose->do_callback();}
       xywh {236 77 550 350} type Double hide resizable
       code0 {filerDW = o->w(); filerDH = o->h();}
       code1 {o->size_range(filerDW, filerDH, 0, 0, 0, 0, 1);} modal
@@ -1919,7 +1919,7 @@ Alan Calvert started the project}
         label {Show List}
         callback {//
         setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button faveadd {
         label Add

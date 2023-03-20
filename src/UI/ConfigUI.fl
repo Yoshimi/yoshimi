@@ -1118,7 +1118,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
       string themeDir = file::localDir() + "/themes/";
 
-      string currentTheme = file::loadText(themeDir+"ID/current");
+      string currentTheme = file::loadText(themeDir+"ID/current.txt");
       while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
           currentTheme.pop_back(); // deals with spurious trailing whitespace
       //std::cout << "current >" << currentTheme << "<" << std::endl;
@@ -1139,7 +1139,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl::set_color(0, r, g, b); // temp
       */
 
-      //Fl::set_color(56, 255, 255, 255); // for testing
+      //Fl::set_color(198, 127, 200, 191); // for testing
       ;} {}
   }
   Function {checkVersions()} {return_type bool
@@ -1170,7 +1170,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         if (ok)
         {
-            string filename = themeDir +"ID/" + "current";
+            string filename = themeDir +"ID/" + "current.txt";
             if(!file::isRegularFile(filename))
                 ok = false;
             //std::cout << "ok " << int(ok) << "  >" << filename << "<" << std::endl;
@@ -1203,7 +1203,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
         }  while(colourData[data] != "END");
 
-        file::saveText(defaultName + char(10), themeDir + "ID/current");
+        file::saveText(defaultName + char(10), themeDir + "ID/current.txt");
         file::saveText(colourText, themeDir + defaultName);
         return false;} {}
   }
