@@ -454,7 +454,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable ADsynth} xywh {12 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+            tooltip {enable/disable ADsynth} xywh {12 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 3 labelsize 11 labelcolor 226
             code1 {o->value(part->kit[0].Padenabled);}
             class Fl_Check_Button2
           }
@@ -484,7 +484,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable SUBsynth} xywh {107 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+            tooltip {enable/disable SUBsynth} xywh {107 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 3 labelsize 11 labelcolor 226
             code1 {o->value(part->kit[0].Psubenabled);}
             class Fl_Check_Button2
           }
@@ -514,7 +514,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable PADsynth} xywh {202 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+            tooltip {enable/disable PADsynth} xywh {202 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 1 labelsize 11 labelcolor 226
             code1 {o->value(part->kit[0].Ppadenabled);}
             class Fl_Check_Button2
           }
@@ -727,7 +727,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         label Bypass
         callback {//
         send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelsize 12 labelcolor 64
+        tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
         class Fl_Check_Button2
       }

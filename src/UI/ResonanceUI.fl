@@ -302,7 +302,7 @@ class ResonanceUI {: PresetsUI_
     Fl_Window resonancewindow {
       label Resonance
       callback {resClose->do_callback();}
-      xywh {235 45 780 305} type Double hide resizable
+      xywh {860 62 780 305} type Double hide resizable
       code0 {resDW = o->w();resDH = o->h();}
       code1 {resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);}
     } {
@@ -389,35 +389,29 @@ class ResonanceUI {: PresetsUI_
           code0 {o->value(respar->Poctavesfreq);}
           class mwheel_slider_rev
         }
-        Fl_Box {} {
-          xywh {580 262 48 41} box THIN_UP_BOX color 237
-        }
         Fl_Button rnd1 {
           label Rnd1
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 0, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 264 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
+          tooltip {Randomize the resonance function} xywh {583 264 42 11} box PLASTIC_THIN_UP_BOX color 228 labelfont 3 labelsize 10 labelcolor 226
         }
         Fl_Button rnd2 {
           label Rnd2
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 1, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 277 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
+          tooltip {Randomize the resonance function} xywh {583 277 42 11} box PLASTIC_THIN_UP_BOX color 228 labelfont 3 labelsize 10 labelcolor 226
         }
         Fl_Button rnd3 {
           label Rnd3
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::randomType, 2, TOPLEVEL::type::Integer);}
-          tooltip {Randomize the resonance function} xywh {583 290 42 11} box THIN_UP_BOX color 29 labelfont 1 labelsize 10 labelcolor 64
-        }
-        Fl_Box {} {
-          xywh {104 263 18 18} box THIN_UP_BOX color 237
+          tooltip {Randomize the resonance function} xywh {583 290 42 11} box PLASTIC_THIN_UP_BOX color 228 labelfont 3 labelsize 10 labelcolor 226
         }
         Fl_Check_Button p1st {
           label { Prot.1st}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::protectFundamental, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
+          tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226
           code0 {o->value(respar->Pprotectthefundamental);}
           class Fl_Check_Button2
         }
@@ -451,14 +445,11 @@ class ResonanceUI {: PresetsUI_
           xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
       }
-      Fl_Box {} {
-        xywh {4 263 18 18} box THIN_UP_BOX color 237
-      }
       Fl_Check_Button enabled {
         label { Enable}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::enableResonance, o->value(), TOPLEVEL::type::Integer);}
-        xywh {6 265 78 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 12 labelcolor 64
+        xywh {6 265 78 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226
         code0 {o->value(respar->Penabled);}
         class Fl_Check_Button2
       }

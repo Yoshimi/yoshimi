@@ -810,12 +810,12 @@ o->hide();}
       Fl_Button oscilC {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(oscil);}
-        xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button oscilP {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(oscil,this);}
-        xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Scroll frame {
         xywh {5 340 660 250} type HORIZONTAL box ENGRAVED_FRAME

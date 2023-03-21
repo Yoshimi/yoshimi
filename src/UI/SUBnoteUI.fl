@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -161,7 +161,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {selected : {public PresetsUI_}
+class SUBnoteUI {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
@@ -173,7 +173,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
     o->hide();}
-      xywh {354 26 735 470} type Double labelcolor 64 hide resizable
+      xywh {870 61 735 470} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
       code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
@@ -276,15 +276,18 @@ class SUBnoteUI {selected : {public PresetsUI_}
           o->show();
           freqsettingsui->redraw();
           send_data (0, SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
-          xywh {445 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
+          xywh {445 67 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
           class Fl_Check_Button2
         }
-        Fl_Counter octave {
+        Fl_Text_Display octavetext {
           label Octave
+          xywh {446 19 50 7} box NO_BOX labelfont 3 labelsize 10 labelcolor 226
+        }
+        Fl_Counter octave {
           callback {//
           send_data (0, SUBSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
-          tooltip Octave xywh {445 18 52 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip Octave xywh {445 18 52 15} type Simple selection_color 49 labelfont 3 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
         }
@@ -391,7 +394,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
           o->show();
           bandwidthsettingsui->redraw();
           send_data (0, SUBSYNTH::control::enableBandwidthEnvelope, o->value(), TOPLEVEL::type::Integer);}
-          xywh {225 67 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
+          xywh {225 67 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
           code0 {o->value(pars->PBandWidthEnvelopeEnabled);}
           class Fl_Check_Button2
         }
@@ -483,7 +486,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
         o->show();
         globalfiltergroup->redraw();
         send_data (0, SUBSYNTH::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
-        xywh {446 227 36 13} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
+        xywh {446 227 36 13} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
         code0 {o->value(pars->PGlobalFilterEnabled);}
         class Fl_Check_Button2
       }
@@ -514,14 +517,11 @@ class SUBnoteUI {selected : {public PresetsUI_}
           code1 {o->value(pars->Pstart);}
         } {}
       }
-      Fl_Box {} {
-        xywh {441 414 16 17} box THIN_UP_BOX color 237
-      }
       Fl_Check_Button stereo {
         label { Stereo}
         callback {//
         send_data (0, SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-        xywh {442 415 59 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 10 labelcolor 64
+        xywh {442 415 59 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
         code0 {o->value(pars->Pstereo);}
         class Fl_Check_Button2
       }
@@ -689,7 +689,7 @@ class SUBnoteUI {selected : {public PresetsUI_}
 
     freqsettingsui->labelsize(size11);
     freqee->labelsize(size);
-    octave->labelsize(size);
+    octavetext->labelsize(size);
         octave->textsize(size11);
     bend->labelsize(size);
     offset->labelsize(size);

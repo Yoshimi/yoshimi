@@ -274,7 +274,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {179 181 580 440} type Double hide resizable
+      xywh {325 57 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -291,7 +291,7 @@ class PADnoteUI {: {public PresetsUI_}
         xywh {0 0 580 405} labelcolor 64
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure} open
+          label {Harmonic Structure}
           xywh {0 20 580 385} box ENGRAVED_FRAME labelsize 12 labelcolor 64
         } {
           Fl_Group bwprofilegroup {
@@ -575,7 +575,7 @@ class PADnoteUI {: {public PresetsUI_}
           }
         }
         Fl_Group envelopes {
-          label {Envelopes and &LFOs} open
+          label {Envelopes and &LFOs}
           xywh {0 20 580 385} box ENGRAVED_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Box {} {
@@ -635,15 +635,12 @@ class PADnoteUI {: {public PresetsUI_}
               code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
               class Fl_Check_Button2
             }
-            Fl_Box {} {
-              xywh {14 248 18 18} box THIN_UP_BOX color 237
-            }
             Fl_Check_Button stereo {
               label { Stereo}
               callback {//
               pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
               send_data(0, PADSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
-              xywh {16 249 61 15} down_box DOWN_BOX color 237 selection_color 64 labelsize 11 labelcolor 64
+              xywh {16 249 61 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 11 labelcolor 226
               code0 {o->value(pars->PStereo);}
               class Fl_Check_Button2
             }
@@ -727,7 +724,7 @@ class PADnoteUI {: {public PresetsUI_}
             } {}
           }
           Fl_Group frequencygrp {
-            label FREQUENCY open
+            label FREQUENCY
             xywh {5 275 570 125} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Group freqenv {
@@ -793,11 +790,14 @@ class PADnoteUI {: {public PresetsUI_}
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
             }
-            Fl_Counter octave {
+            Fl_Text_Display octavetext {
               label Octave
+              xywh {511 305 50 11} box NO_BOX labelfont 3 labelsize 10 labelcolor 226
+            }
+            Fl_Counter octave {
               callback {//
               send_data(0, PADSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Octave xywh {504 305 62 15} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+              tooltip Octave xywh {504 305 62 15} type Simple selection_color 49 labelsize 10 labelcolor 64 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
               code2 {o->value(k);}
@@ -1143,7 +1143,7 @@ class PADnoteUI {: {public PresetsUI_}
     detune->labelsize(size);
         detunevalueoutput->labelsize(size);
             detunevalueoutput->textsize(size);
-    octave->labelsize(size);
+    octavetext->labelsize(size);
         octave->textsize(size11);
     detunetype->labelsize(size);
         detunetype->textsize(size);

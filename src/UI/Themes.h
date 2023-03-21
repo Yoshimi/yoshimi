@@ -57,11 +57,14 @@
   101*
   102 - 103
   104*
-  got to here!
-  106 - 127
-  129 - 130
+  106 - 123
+  124*
+  125 - 127
+  129
+  130*
   133
   134
+  got to here!
   138 - 143
   148 - 154
   156
@@ -76,9 +79,10 @@
   200 - 205
   208 - 213
   216
-  218
+  218*
   220*
-  224 - 226
+  224
+  225
   232 - 235
   237
   240 - 243
@@ -141,6 +145,7 @@ const int yoshi_ins_typ = 219;
 const int alt_links = 221;
 const int VU_bar_5dB = 222;
 const int panels = 223;
+const int learnable_text = 226;
 const int pad_prof_band = 227;
 const int actions = 228;
 const int VU_level = 229;
@@ -166,7 +171,7 @@ const int VU_text = 255;
   and should use colours as close as possible to the colour
   table so that new work doesn't mess up existing themes.
 */
-const int COLOURLIST = 69;
+const int COLOURLIST = 70;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -237,6 +242,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     alt_links,
     actions,
     panels,
+    learnable_text,
 };
 
 static std::string colourPreamble [] = {
@@ -320,6 +326,7 @@ static std::string colourData [] = {
     "180,180,200, Alternative link buttons",
     "63,145,255, Action buttons",
     "0,255,255, Panels",
+    "0,0,255, Learnable text",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

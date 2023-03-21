@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -526,7 +526,7 @@ class MasterUI {open : {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {193 425 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {91 418 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -937,7 +937,7 @@ class MasterUI {open : {private GuiUpdates}
                 else
                     sysefftype->deactivate();
             send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
-            xywh {247 159 16 15} down_box DOWN_BOX value 1 selection_color 64 labelfont 1 labelsize 11 labelcolor 64 align 4
+            xywh {247 156 20 20} down_box DOWN_BOX value 1 selection_color 64 labelfont 3 labelcolor 226 align 4
             class Fl_Check_Button2
           }
           Fl_Button sysEffSend {
@@ -1251,14 +1251,11 @@ class MasterUI {open : {private GuiUpdates}
             code1 {int tmp = synth->ReadPartKeyMode(npart); if (tmp > 1) o->value(2); else o->value(tmp);}
             code3 {o->value(fetchData(0, PART::control::keyMode, npart));}
           } {}
-          Fl_Box portamento_patch {
-            xywh {81 351 18 18} box THIN_UP_BOX color 237
-          }
           Fl_Check_Button partPortamento {
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 11 labelcolor 226 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
           }
@@ -1434,7 +1431,7 @@ class MasterUI {open : {private GuiUpdates}
         else
             o->label("Mono");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 1 labelsize 11 labelcolor 64
+        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 3 labelsize 11 labelcolor 226
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
@@ -4307,6 +4304,7 @@ bpmfallback->format(format);} {}
     int size = int(10 * mainScale);
     int size11 = int(11 * mainScale);
     int size12 = int(12 * mainScale);
+    int size14 = int(14 * mainScale);
 
     mastermenu->textsize(size12);
 
@@ -4342,7 +4340,7 @@ bpmfallback->format(format);} {}
     sysEff4->labelsize(size);
     sysEffName->labelsize(size);
 
-    partEnable->labelsize(14 * mainScale);
+    partEnable->labelsize(size14);
 
     mainreset->labelsize(size11);
     mainstop->labelsize(size11);
@@ -4371,7 +4369,7 @@ bpmfallback->format(format);} {}
         sysefftype->labelsize(size11);
             sysefftype->textsize(size11);
 
-        SysEffOn->labelsize(size11);
+        SysEffOn->labelsize(size14);
         sysEffSend->labelsize(size11);
         sysCopy->labelsize(size11);
         sysPaste->labelsize(size11);

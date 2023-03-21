@@ -527,7 +527,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         realvalue = o->value();
     synth->getGuiMaster()->partVol->value(realvalue);
     send_data(0, PART::control::volume, realvalue, TOPLEVEL::type::Integer);}
-          xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
+          xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX labelcolor 49 minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
           class mwheel_slider

@@ -69,20 +69,17 @@ class MicrotonalUI {} {
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
     } {
-      Fl_Box {} {
-        xywh {254 14 22 22} box UP_BOX color 237
-      }
       Fl_Group {} {
         tooltip {Center where the note's freqs. are inverted
 (not when keymapped)} xywh {248 2 156 48} box ENGRAVED_FRAME
       } {
         Fl_Text_Display invertlabel {
           label Invert
-          xywh {273 7 5 24} box NO_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
+          xywh {273 7 5 24} box NO_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226 align 136 textsize 11 textcolor 64
         }
         Fl_Text_Display keyslabel {
           label keys
-          xywh {273 18 5 30} box NO_BOX labelfont 3 labelsize 12 labelcolor 64 align 136 textsize 11 textcolor 64
+          xywh {273 18 5 30} box NO_BOX labelfont 3 labelsize 12 labelcolor 226 align 136 textsize 11 textcolor 64
         }
         Fl_Check_Button invertKeys {
           callback {//
@@ -91,12 +88,9 @@ class MicrotonalUI {} {
           code0 {o->value(microtonal->Pinvertupdown);}
           class Fl_Check_Button2
         }
-        Fl_Box {} {
-          xywh {335 17 56 27} box THIN_UP_BOX color 237 labelcolor 64
-        }
         Fl_Text_Display centerlabel {
           label Center
-          xywh {336 17 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+          xywh {336 17 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
         }
         Fl_Spinner centerinvertcounter {
           callback {//
@@ -114,12 +108,9 @@ class MicrotonalUI {} {
           label {Ref.}
           xywh {155 20 50 8} box NO_BOX labelfont 1 labelsize 12 labelcolor 64
         }
-        Fl_Box {} {
-          xywh {188 19 54 25} box THIN_UP_BOX color 237 labelcolor 64
-        }
         Fl_Text_Display notelabel {
           label Note
-          xywh {191 20 50 6} box NO_BOX labelfont 3 labelsize 11 labelcolor 64 textcolor 64
+          xywh {191 20 50 6} box NO_BOX labelfont 3 labelsize 11 labelcolor 226 textcolor 64
         }
         Fl_Spinner anotecounter {
           callback {//
@@ -177,9 +168,6 @@ class MicrotonalUI {} {
           xywh {166 20 14 18} box NO_BOX labelcolor 64 hide
         }
       }
-      Fl_Box {} {
-        xywh {210 165 22 22} box UP_BOX color 237 selection_color 64 labelcolor 64
-      }
       Fl_Group microtonalgroup {
         xywh {3 49 402 432} box ENGRAVED_FRAME
         code0 {if (microtonal->Penabled==0) o->deactivate();}
@@ -198,12 +186,9 @@ class MicrotonalUI {} {
           xywh {10 104 391 25} labelfont 1 labelsize 11 labelcolor 64 align 5 textcolor 64
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
-        Fl_Box {} {
-          xywh {315 65 56 27} box THIN_UP_BOX color 237 labelcolor 64
-        }
         Fl_Text_Display shiftlabel {
           label Shift
-          xywh {318 65 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+          xywh {318 65 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
         }
         Fl_Spinner scaleShift {
           callback {//
@@ -245,16 +230,13 @@ class MicrotonalUI {} {
             tooltip {You must retune if you change this.} xywh {251 147 146 258} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
             code0 {updateMappingInput();}
           }
-          Fl_Box {} {
-            xywh {199 225 50 25} box THIN_UP_BOX color 237 selection_color 64 labelcolor 64
-          }
           Fl_Text_Display first1 {
             label First
-            xywh {197 214 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+            xywh {197 214 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Text_Display first2 {
             label note
-            xywh {198 224 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+            xywh {198 224 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Spinner firstnotecounter {
             callback {//
@@ -276,16 +258,13 @@ class MicrotonalUI {} {
             code1 {o->value(oldFirst);}
             class WidgetSpinner
           }
-          Fl_Box {} {
-            xywh {199 290 50 25} box THIN_UP_BOX color 237 labelcolor 64
-          }
           Fl_Text_Display middle1 {
             label Middle
-            xywh {197 279 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+            xywh {197 279 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Text_Display middle2 {
             label note
-            xywh {198 289 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64
+            xywh {198 289 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Spinner middlenotecounter {
             callback {//
@@ -316,16 +295,13 @@ class MicrotonalUI {} {
             code1 {o->value(oldMid);}
             class WidgetSpinner
           }
-          Fl_Box {} {
-            xywh {199 354 50 25} box THIN_UP_BOX color 237 labelcolor 64
-          }
           Fl_Text_Display last1 {
             label Last
-            xywh {197 344 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 65 textcolor 64
+            xywh {197 344 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226 textcolor 64
           }
           Fl_Text_Display last2 {
             label note
-            xywh {198 354 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 64 textcolor 64
+            xywh {198 354 50 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226 textcolor 64
           }
           Fl_Spinner lastnotecounter {
             callback {//
@@ -370,7 +346,7 @@ class MicrotonalUI {} {
           o->show();
 
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::enableKeyboardMap, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 selection_color 64 labelfont 3 labelcolor 64 align 33
+          tooltip {Enable the Mapping (otherwise the mapping is linear)} xywh {212 166 20 21} down_box DOWN_BOX color 50 selection_color 64 labelfont 3 labelcolor 226 align 33
           code0 {o->value(microtonal->Pmappingenabled);}
           code1 {if (microtonal->Pmappingenabled==0) Keymap->deactivate();}
           class Fl_Check_Button2
@@ -391,9 +367,6 @@ class MicrotonalUI {} {
       Fl_Text_Display microtonallabel {
         label Microtonal
         xywh {40 40 50 8} box NO_BOX labelfont 1 labelsize 12 labelcolor 64
-      }
-      Fl_Box {} {
-        xywh {2 13 22 22} box UP_BOX color 237
       }
       Fl_Check_Button enableMicrotonal {
         callback {//
