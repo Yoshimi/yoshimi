@@ -74,7 +74,7 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {821 82 390 330} type Double hide resizable
+      xywh {723 24 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -88,10 +88,12 @@ patch2->hide();
 patch3->hide();
 patch4->hide();
 patch5->hide();
+patch6->hide();
 switchesTab->hide();
 jackTab->hide();
 alsaTab->hide();
-midiTab->hide();}
+midiTab->hide();
+themeTab->hide();}
         xywh {5 5 91 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab2 {
@@ -101,10 +103,13 @@ patch2->show();
 patch1->hide();
 patch3->hide();
 patch4->hide();
-patch5->hide();mainTab->hide();
+patch5->hide();
+patch6->hide();
+mainTab->hide();
 jackTab->hide();
 alsaTab->hide();
-midiTab->hide();}
+midiTab->hide();
+themeTab->hide();}
         xywh {98 5 66 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab3 {
@@ -114,10 +119,13 @@ patch3->show();
 patch1->hide();
 patch2->hide();
 patch4->hide();
-patch5->hide();mainTab->hide();
+patch5->hide();
+patch6->hide();
+mainTab->hide();
 switchesTab->hide();
 alsaTab->hide();
-midiTab->hide();}
+midiTab->hide();
+themeTab->hide();}
         xywh {166 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab4 {
@@ -128,10 +136,12 @@ patch1->hide();
 patch2->hide();
 patch3->hide();
 patch5->hide();
+patch6->hide();
 mainTab->hide();
 switchesTab->hide();
 jackTab->hide();
-midiTab->hide();}
+midiTab->hide();
+themeTab->hide();}
         xywh {206 5 38 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Button Tab5 {
@@ -142,17 +152,34 @@ patch1->hide();
 patch2->hide();
 patch3->hide();
 patch4->hide();
+patch6->hide();
 mainTab->hide();
 switchesTab->hide();
 jackTab->hide();
-alsaTab->hide();}
+alsaTab->hide();
+themeTab->hide();}
         xywh {246 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
+      }
+      Fl_Button Tab6 {
+        label {&Theme}
+        callback {themeTab->show();
+patch6->show();
+patch1->hide();
+patch2->hide();
+patch3->hide();
+patch4->hide();
+mainTab->hide();
+switchesTab->hide();
+jackTab->hide();
+alsaTab->hide();
+midiTab->hide();}
+        xywh {305 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Group configTabs {
         xywh {5 5 385 298} labelcolor 64
       } {
         Fl_Group mainTab {
-          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Choice buff_size {
             label {* Internal Buffer Size}
@@ -411,7 +438,7 @@ or when that loads it will revert to the previous value} xywh {190 250 27 25} do
           }
         }
         Fl_Group jackTab {
-          xywh {5 25 385 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Input jackSource {
             label {Jack MIDI Source}
@@ -459,7 +486,7 @@ or when that loads it will revert to the previous value} xywh {190 250 27 25} do
           }
         }
         Fl_Group alsaTab {
-          xywh {5 25 384 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
+          xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Choice alsaType {
             label {Alsa Connection Type}
@@ -542,7 +569,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             BankRoot->value(BankRootvalue);
                             BankRoot->activate();
                         }*/}
-          tooltip {MIDI CC preferences} xywh {5 25 381 275} box THIN_UP_BOX labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 382 277} box THIN_UP_BOX labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -727,14 +754,76 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             class Fl_Check_Button2
           }
         }
-      }
-      Fl_Button close {
-        label {Close Unsaved}
-        callback {//
-         configwindow->hide();
-         configSeen = false;
-         saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {275 305 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        Fl_Group themeTab {
+          callback {//}
+          xywh {5 25 382 277} box THIN_UP_BOX hide
+        } {
+          Fl_Button themeSet {
+            label {Set theme}
+            callback {//
+        synth->getRuntime().remoteGuiTheme = file::localDir() + "/themes/demo.clr";
+        findRemote();
+        synth->getRuntime().remoteGuiTheme = "";
+        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+
+        close->do_callback();}
+            xywh {200 80 100 20} labelsize 12 labelcolor 64
+          }
+          Fl_Button themeImport {
+            label {Import Theme}
+            callback {//
+        /* synth->getRuntime().remoteGuiTheme = file::localDir() + "/themes/demo.clr";
+        findRemote();
+        synth->getRuntime().remoteGuiTheme = "";
+        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+
+        close->do_callback();
+        */
+        string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::Themes);
+        if (filename.empty())
+        {
+            std::cout << "not here" << std::endl;
+            return;
+        }
+        filename += EXTEN::theme;
+        string newfile = file::localDir() + "/themes/" + file::findLeafName(filename) + EXTEN::theme;
+       // std::cout << "old file>" << filename << std::endl;
+        //std::cout << "file>" << newfile << std::endl;
+        int result = file::copyFile(filename, newfile,1);
+        if (result == 0)
+        {
+            if (choice(synth, "", "Yes", "No", "Try now"))
+                themeSet->do_callback();
+        }
+        else
+        {
+           std::cout << "failed " << result << std::endl;
+        }}
+            xywh {200 120 100 20} labelsize 12 labelcolor 64
+          }
+          Fl_Box themeNote {
+            label {Setting a theme will perform a reset.}
+            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 64 align 128
+          }
+        }
+        Fl_Box patch1 {
+          xywh {6 24 89 3} box FLAT_BOX labelcolor 64
+        }
+        Fl_Box patch2 {
+          xywh {98 24 65 3} box FLAT_BOX labelcolor 64
+        }
+        Fl_Box patch3 {
+          xywh {166 24 37 3} box FLAT_BOX labelcolor 64
+        }
+        Fl_Box patch4 {
+          xywh {206 24 37 3} box FLAT_BOX labelcolor 64
+        }
+        Fl_Box patch5 {
+          xywh {246 24 57 3} box FLAT_BOX labelcolor 64
+        }
+        Fl_Box patch6 {
+          xywh {305 24 57 3} box FLAT_BOX labelcolor 64
+        }
       }
       Fl_Button save {
         label {Save and Close}
@@ -743,22 +832,15 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {155 305 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {150 306 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
-      Fl_Box patch1 {
-        xywh {6 24 89 3} box FLAT_BOX labelcolor 64
-      }
-      Fl_Box patch2 {
-        xywh {98 24 65 3} box FLAT_BOX labelcolor 64
-      }
-      Fl_Box patch3 {
-        xywh {166 24 37 3} box FLAT_BOX labelcolor 64
-      }
-      Fl_Box patch4 {
-        xywh {206 24 37 3} box FLAT_BOX labelcolor 64
-      }
-      Fl_Box patch5 {
-        xywh {246 24 57 3} box FLAT_BOX labelcolor 64
+      Fl_Button close {
+        label {Close Unsaved}
+        callback {//
+         configwindow->hide();
+         configSeen = false;
+         saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
+        xywh {270 306 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
     }
     Fl_Window presets {
@@ -1101,8 +1183,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {manageThemes()} {} {
     code {//
 
-     // Note: Fluid screws up text with control values and ?@# in some
-     // contexts so we enter them as char(n)
+     // Note: Fluid screws up text with control values and ?@     // contexts so we enter them as char(n)
 
       int colour2find = 0;
       if (colour2find > 0) // for testing
@@ -1142,7 +1223,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl::get_color(gen_text, r, g, b); // temp
       Fl::set_color(0, r, g, b); // temp
       */
-      //Fl::set_color(226, 0, 0, 255); // for testing
+      //Fl::set_color(90, 255, 72, 0); // for testing
       ;} {}
   }
   Function {checkVersions()} {return_type bool
@@ -1701,6 +1782,12 @@ return true;} {}
     ignoreReset->labelsize(size);
     midiMon->labelsize(size);
     midiLearned->labelsize(size);
+//
+    Tab6->labelsize(size);
+    themeSet->labelsize(size);
+    themeImport->labelsize(size);
+    
+    themeNote->labelsize(size);
 //
     close->labelsize(size);
     save->labelsize(size);

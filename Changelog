@@ -1,9 +1,20 @@
 yoshimi 2.2.3 M
 
+2023-3-23 Will
+bn 2194
+Added Formant, and Formant ghost markers to themes.
+Applied missing change to LH overload markers.
+Removed (pointless) change of Unison size label colour.
+Found more adjacent colour numbers - unified them.
+revised kit item positions and added bold italic 'On' labels
+instead of using pale blue surrounds.
+More notes at the top of the 'Themes.h file.
+Started work on a 'themes' tab in configUL.fl
+
 2023-3-21 Will
 bn 2193
-Learnable check boxes, numer roller et. now identified with
-strong blue bold italic text, not with a pale bluse surround.
+Learnable check boxes, numer roller etc. now identified with
+strong blue bold italic text, not with a pale blue surround.
 Kit edit window not done yet.
 
 2023-3-20 Will

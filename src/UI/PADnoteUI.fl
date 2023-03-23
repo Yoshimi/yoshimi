@@ -395,13 +395,13 @@ class PADnoteUI {: {public PresetsUI_}
               label Autoscale
               callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::autoscale, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Automatically stretch the profile, so that all shapes yield the same perceptual blurring effect.} xywh {10 274 74 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 65
+              tooltip {Automatically stretch the profile, so that all shapes yield the same perceptual blurring effect.} xywh {10 274 74 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
               code0 {o->value(pars->PProfile.autoscale);}
               class Fl_Check_Button2
             }
           }
           Fl_Group {} {
-            xywh {100 155 315 135} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179 align 6
+            xywh {100 155 315 135} box THIN_DOWN_BOX color 57 labelcolor 49 align 6
             code0 {osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 130,"");}
             code1 {osc->init(pars->oscilgen.get(), synth);}
           } {}
@@ -506,7 +506,7 @@ class PADnoteUI {: {public PresetsUI_}
             code2 {if (int(o->value()) > 0) {hrgroup->activate(); if (int(o->value() < 7)) hrpospar2->activate(); else hrpospar2->deactivate();} else hrgroup->deactivate();}
           } {}
           Fl_Group overtonepos {
-            xywh {5 350 570 45} box FLAT_BOX color 254 selection_color 218 labelcolor 63
+            xywh {5 350 570 45} box FLAT_BOX color 254 labelcolor 49
             code0 {PADnoteOvertonePosition *opui=new PADnoteOvertonePosition(o->x(),o->y(),o->w(),o->h(),"");}
             code1 {opui->init(pars);}
           } {}

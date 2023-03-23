@@ -360,8 +360,8 @@ class Oscilharmonic {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window harmonic {
-      private xywh {329 192 25 225} type Double box NO_BOX labelsize 10 hide
-      class Fl_Group
+      private xywh {329 192 25 225} type Double box NO_BOX labelsize 10
+      class Fl_Group visible
     } {
       Fl_Slider mag {
         callback {//
@@ -471,7 +471,7 @@ class OscilEditor {: {public PresetsUI_}
       callback {saveWin(synth, osceditUI->w(), osceditUI->h(), osceditUI->x(), osceditUI->y(), false, "Waveform " + to_string(waveType));
 OSCseen = false;
 o->hide();}
-      xywh {99 41 735 595} type Double labelsize 12 hide resizable
+      xywh {188 91 735 595} type Double labelsize 12 hide resizable
       code0 {string tname;}
       code1 {setWindowTitle();}
       code2 {waveDW = o->w() * 9 / 10; waveDH = o->h() * 9 / 10;}
@@ -488,12 +488,12 @@ o->hide();}
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group waveformgroup {
-          xywh {10 85 350 190} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
+          xywh {10 85 350 190} box THIN_DOWN_BOX color 57 labelcolor 49
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp, synth);}
         } {}
         Fl_Group harmonicgroup {
-          xywh {10 30 350 50} box THIN_DOWN_BOX color 57 selection_color 218 labelcolor 63
+          xywh {10 30 350 50} box THIN_DOWN_BOX color 57 labelcolor 49
           code0 {OscilSpectrum *spc=new OscilSpectrum(o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,0, synth);}
         } {}
@@ -527,7 +527,7 @@ o->hide();}
               o->value(0);
 
           send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Oscillator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 104 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 104
+        tooltip {Oscillator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
         code0 {if (forPAD) o->hide();}
         class mwheel_val_slider_rev
       }
@@ -535,7 +535,7 @@ o->hide();}
         xywh {365 5 360 300} box ENGRAVED_FRAME labelcolor 64
       } {
         Fl_Group basewave {
-          xywh {370 85 350 190} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
+          xywh {370 85 350 190} box THIN_DOWN_BOX color 57 labelcolor 49
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp,1, synth);}
         } {}
@@ -557,7 +557,7 @@ o->hide();}
           xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Group baseharm {
-          xywh {370 30 350 50} box THIN_DOWN_BOX color 57 selection_color 218 labelcolor 63
+          xywh {370 30 350 50} box THIN_DOWN_BOX color 57 labelcolor 49
           code0 {OscilSpectrum *spc=new OscilSpectrum (o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscilSmp,1, synth);}
         } {}
@@ -604,7 +604,7 @@ o->hide();}
         }
       }
       Fl_Output Warning {
-        xywh {224 8 248 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 1
+        xywh {224 8 248 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 129
       }
       Fl_Choice magtype {
         label {Mag.Type}

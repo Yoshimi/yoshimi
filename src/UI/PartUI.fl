@@ -82,7 +82,7 @@ class PartKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window partkititem {
-      xywh {433 86 670 20} type Double box NO_BOX hide
+      xywh {141 95 670 20} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -92,7 +92,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Check_Button mutedcheck {
           callback {//
           send_data(0, PART::control::kitItemMute, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {60 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {60 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Pmuted);}
           class Fl_Check_Button2
         }
@@ -191,7 +191,7 @@ class PartKitItem {: {public Fl_Group}
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {400 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {403 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Padenabled);}
           class Fl_Check_Button2
         }
@@ -201,14 +201,14 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::subSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {490 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          xywh {497 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {470 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {478 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Psubenabled);}
           class Fl_Check_Button2
         }
@@ -218,14 +218,14 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::padSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {560 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          xywh {570 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {540 4 15 15} box THIN_UP_BOX down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 65
+          xywh {551 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 65
           code0 {o->value(part->kit[n].Ppadenabled);}
           class Fl_Check_Button2
         }
@@ -348,7 +348,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
     instrumentkitlist->hide();
     kitSeen = false;}
-      xywh {341 129 670 370} type Double hide resizable
+      xywh {386 389 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
       code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
@@ -367,7 +367,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Box kitmute {
         label Mute
-        xywh {55 0 25 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+        xywh {56 15 22 8} labelfont 3 labelsize 11 labelcolor 226 align 1
       }
       Fl_Box kitID {
         label Name
@@ -379,19 +379,31 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Box kitmaxkey {
         label {Max key}
-        xywh {345 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+        xywh {339 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display addON {
+        label On
+        xywh {399 15 22 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
       }
       Fl_Box kitadd {
-        label ADsynth
-        xywh {410 0 50 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+        label ADD
+        xywh {428 0 34 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display subON {
+        label On
+        xywh {473 15 22 9} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
       }
       Fl_Box kitsub {
-        label SUBsynth
-        xywh {470 0 60 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+        label SUB
+        xywh {497 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display padON {
+        label On
+        xywh {546 15 22 10} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
       }
       Fl_Box kitpad {
-        label PADsynth
-        xywh {540 0 60 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+        label PAD
+        xywh {570 0 37 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Box kitfxnum {
         label {FX.r.}
@@ -471,7 +483,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {12 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {12 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -501,7 +513,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {107 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {107 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -531,7 +543,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {202 280 80 32} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {202 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -542,7 +554,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 227 94 28} box EMBOSSED_BOX color 198 selection_color 220 labelfont 1 labelcolor 64 align 128
+          tooltip {Right click: also close this} xywh {295 227 94 28} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
         }
         Fl_Button effects {
           label Effects
@@ -2645,8 +2657,11 @@ class PartUI {: {public Fl_Group, PartUI_}
     kitID->labelsize(size11);
     kitminkey->labelsize(size11);
     kitmaxkey->labelsize(size11);
+    addON->labelsize(size11);
     kitadd->labelsize(size11);
+    subON->labelsize(size11);
     kitsub->labelsize(size11);
+    padON->labelsize(size11);
     kitpad->labelsize(size11);
     kitfxnum->labelsize(size11);
     kitMode->labelsize(size11);

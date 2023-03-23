@@ -76,6 +76,7 @@ const string vector =        ".xvy";
 const string mlearn =        ".xly";
 const string MSwave =        ".wav";
 const string lists =         ".list";
+const string theme =         ".clr";
 
 }//(End)namespace EXTEN
 
@@ -376,7 +377,7 @@ inline bool copyFile(const string& source, const string& destination, char optio
         return 1;
     std::ofstream outfile (destination, std::ios::out|std::ios::binary);
     if (!outfile.is_open())
-        return 1;
+        return 3;
 
     std::streampos size = infile.tellg();
     char *memblock = new char [size];

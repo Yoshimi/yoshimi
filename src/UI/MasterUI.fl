@@ -177,7 +177,7 @@ class FilerLine {: {public Fl_Group}
           xywh {3 4 18 16} box PLASTIC_THIN_UP_BOX color 183
         }
         Fl_Box {} {
-          xywh {5 7 14 1} box DOWN_BOX selection_color 181
+          xywh {5 7 14 1} box DOWN_BOX
         }
       }
       Fl_Button name {
@@ -526,7 +526,7 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {91 418 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {367 302 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -1090,7 +1090,7 @@ class MasterUI {: {private GuiUpdates}
               xywh {139 295 187 16} selection_color 64 labelsize 12 labelcolor 64 align 16
             }
             Fl_Box instrumentFrame {
-              xywh {139 296 188 16} box DOWN_FRAME color 237 labelcolor 64
+              xywh {139 296 188 16} box DOWN_FRAME labelcolor 49
             }
             Fl_Button buttontop {
               callback {//
@@ -1300,7 +1300,7 @@ class MasterUI {: {private GuiUpdates}
               minKeyCount->value(lastnote);
               send_data(0, PART::control::minToLastKey, 1, TOPLEVEL::type::Integer, npart);
           }}
-            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX color 187 labelsize 10 labelcolor 64
+            tooltip {Set minimum note to the last note played} xywh {105 403 30 16} box PLASTIC_UP_BOX color 228 labelsize 10 labelcolor 64
           }
           Fl_Button setNormal {
             label R
@@ -1412,7 +1412,7 @@ class MasterUI {: {private GuiUpdates}
       } {
         Fl_Box vumeter {
           label {VU-Meter}
-          xywh {3 461 379 34} color 48 selection_color 75
+          xywh {3 461 379 34} color 48
           code0 {o->init(-1, synth);}
           class VUMeter
         }
@@ -1431,7 +1431,7 @@ class MasterUI {: {private GuiUpdates}
         else
             o->label("Mono");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 130 labelfont 3 labelsize 11 labelcolor 226
+        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 91 labelfont 3 labelsize 11 labelcolor 226
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
@@ -2141,7 +2141,7 @@ Alan Calvert started the project}
     }
     else
     {
-        if (extension == TOPLEVEL::XML::ScalaTune || extension == TOPLEVEL::XML::ScalaMap)
+        if (extension == TOPLEVEL::XML::ScalaTune || extension == TOPLEVEL::XML::ScalaMap || extension == TOPLEVEL::XML::Themes)
             fileruse->copy_label("< Import");
 
         else if (dosave)
@@ -2231,6 +2231,12 @@ Alan Calvert started the project}
             case TOPLEVEL::XML::Bank:
                 fileroldpath->copy_label("Path to Instrument Banks");
                 break;
+            case TOPLEVEL::XML::Themes:
+             filerext = EXTEN::theme;
+                fileroldpath->copy_label("Path to UI themes");
+                type_name = "clr";
+                break;
+
         }
     }
     if (!title.empty())
@@ -2345,6 +2351,7 @@ Alan Calvert started the project}
         filerscroll->clear();     //       detaches child widgets from the FL_Scroll
         lineno = 0;
         //std::cout << "*** list start ***" << std::endl;
+        //std::cout << "ext " << filerext << std::endl;
         while(!tofetch.empty())
         {
             size_t pos = tofetch.find("\\n");

@@ -68,7 +68,7 @@ class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
-      xywh {125 238 635 30} type Double box ENGRAVED_BOX labelcolor 64 hide
+      xywh {705 176 635 30} type Double box ENGRAVED_BOX labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
@@ -126,7 +126,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Group voiceoscil {
           callback {update_voiceoscil();}
-          xywh {88 4 30 20} box THIN_DOWN_FRAME color 32 selection_color 71 labelcolor 179
+          xywh {88 4 30 20} box THIN_DOWN_FRAME color 32 labelcolor 49
           code0 {osc = new Oscilloscope(o->x(), o->y(), o->w(), o->h(), 20, "");}
           code1 {update_voiceoscil();}
         } {}
@@ -148,7 +148,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Group modoscil {
           callback {update_modoscil();}
-          xywh {122 4 30 20} box THIN_DOWN_FRAME color 32 selection_color 71 labelcolor 179
+          xywh {122 4 30 20} box THIN_DOWN_FRAME color 32 labelcolor 49
           code0 {modosc = new Oscilloscope(o->x(), o->y(), o->w(), o->h(), 20, "");}
           code1 {update_modoscil();}
         } {}
@@ -602,7 +602,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                   code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
                 } {}
                 Fl_Group fmoscil {
-                  xywh {580 425 220 140} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
+                  xywh {580 425 220 140} box THIN_DOWN_BOX color 57 labelcolor 179
                   code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 125,"");}
                   code1 {update_fmoscil();}
                 } {}
@@ -627,7 +627,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
           }
           Fl_Text_Display modtypetext {
             label {Type:}
-            xywh {572 32 50 8} labelfont 3 labelsize 11 labelcolor 226
+            xywh {572 32 50 8} selection_color 49 labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Choice ModType {
             callback {//
@@ -828,7 +828,7 @@ Oscillator}
                 }
               }
               Fl_Group voiceoscil {
-                xywh {90 462 485 145} box THIN_DOWN_BOX color 57 selection_color 71 labelcolor 179
+                xywh {90 462 485 145} box THIN_DOWN_BOX color 57 labelcolor 49
                 code0 {osc = new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 130, "");}
                 code1 {update_voiceoscil();}
               } {}
@@ -856,13 +856,12 @@ Oscillator}
           Fl_Group unisongroup {
             xywh {90 402 484 56} box PLASTIC_UP_BOX color 223 deactivate
             code0 {int tmp = pars->VoicePar[nvoice].Unison_size; if (tmp > 1) o->activate();}
-            code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if (pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {
             Fl_Spinner unisonsize {
               label Size
               callback {//
 send_data(0, ADDVOICE::control::unisonSize, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Number of unison sub-voices} xywh {98 434 40 16} box THIN_UP_BOX color 29 labelsize 10 align 1 minimum 2 maximum 50 value 2 textsize 11 textcolor 65
+              tooltip {Number of unison sub-voices} xywh {98 434 40 16} box THIN_UP_BOX color 29 labelsize 10 align 1 minimum 2 maximum 50 value 2 textsize 11 textcolor 64
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
@@ -1126,7 +1125,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         }
         Fl_Group extvoicegroup {
           label Voice
-          xywh {5 400 80 76} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
+          xywh {5 400 80 76} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 49 align 17
         } {
           Fl_Choice ExtOsc {
             label Source
@@ -1365,18 +1364,6 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             {
                 tmp = int(value);
                 unisonsize->value(tmp);
-                int colr = FL_BLACK;
-                int i = 0;
-                while (pars->ADnote_unison_sizes[i] != 0)
-                {
-                    if (pars->ADnote_unison_sizes[i] == tmp)
-                    {
-                        colr = FL_RED;
-                        break;
-                    }
-                    ++ i;
-                }
-                unisonsize->labelcolor(colr);
                 unisongroup->redraw();
                 UnisonEn->redraw();
             }
@@ -1396,22 +1383,8 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             else
             {
                 unisongroup->activate();
-                int colr = FL_BLACK;
-                int i = -1;
-                while (true)
-                {
-                    ++i;
-                    if (pars->ADnote_unison_sizes[i] == 0)
-                        break;
-                    if (pars->ADnote_unison_sizes[i] == int(unisonsize->value()))
-                    {
-                        colr = FL_RED;
-                        break;
-                    }
-                }
-                unisonsize->labelcolor(colr);
                 unisongroup->redraw();
-                 UnisonEn->redraw();
+                UnisonEn->redraw();
             }
             break;
 
@@ -1523,7 +1496,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             if (tmp < 0)
             {
                 tmp = voice;
-                changeFMoscilbutton->labelcolor(FL_BLACK);
+                changeFMoscilbutton->labelcolor(gen_text);
             }
             else
                 changeFMoscilbutton->labelcolor(FL_BLUE);
@@ -1581,7 +1554,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             if (tmp < 0)
             {
                 tmp = voice;
-                changevoiceoscilbutton->labelcolor(FL_BLACK);
+                changevoiceoscilbutton->labelcolor(gen_text);
             }
             else
                 changevoiceoscilbutton->labelcolor(FL_BLUE);

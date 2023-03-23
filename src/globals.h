@@ -277,7 +277,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         MasterConfig,
         Bank,
         History,
-        PresetDirs
+        PresetDirs,
+        Themes
     };
 }
 

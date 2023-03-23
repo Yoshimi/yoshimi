@@ -158,7 +158,7 @@ class FormantFilterGraph {: {public Fl_Box}
         }
 
         fl_line_style(0, 2 * scale);
-        fl_color(FL_YELLOW);
+        fl_color(formant_marker);
         fl_font(FL_HELVETICA, 10 * scale);
         if (*nformant < pars->Pnumformants)
         {
@@ -177,7 +177,7 @@ class FormantFilterGraph {: {public Fl_Box}
 
         if (hoverFormant >= 0 && hoverFormant != *nformant)
         {
-            fl_color(fl_darker(FL_YELLOW));
+            fl_color(formant_ghost_marker);
             draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[hoverFormant].freq));
         }
 

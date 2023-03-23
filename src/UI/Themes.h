@@ -31,40 +31,35 @@
   Where possible they are fairly close to FLTK defaults.
 
   Fluid's colour chooser doesn't recognise our named colour numbers
-  so most of these are written in numerically. As designing layouts
-  without Fluid is seriously hard work we have to go with it.
+  so most of these are written in numerically.
+  As designing layouts without Fluid is seriously hard work we have
+  to go with it.
 */
 
 
 /*
-  reserved(*) / spare colours
-  55*
+  Reserved(*) / spare colours
+  Ideally there should be no reserved colours, as that means we are
+  not managing them!
+
   56
   58 - 61
-  65*
-  68 - 70
-  71*
-  72
-  75*
-  76 - 77
-  78*
+  65
+  68 - 72
+  75 - 77
+  78* bank ?
   79 - 80
   82 - 87
-  88*
-  90*
-  93*
+  88* bank ?
+  93* root import light
   98 - 100
-  101*
+  101* root/bank read light
   102 - 103
-  104*
+  104
   106 - 123
-  124*
+  124* filer icon fake lines
   125 - 127
-  129
-  130*
-  133
-  134
-  got to here!
+  130
   138 - 143
   148 - 154
   156
@@ -73,18 +68,22 @@
   164 - 167
   176
   180
-  181
-  183 - 187
+  181* dynfilter filter button
+  183* filer dir icon
+  184
+  185
+  186
+  187
   191 - 196
   200 - 205
   208 - 213
   216
-  218*
-  220*
+  218
+  220
   224
   225
   232 - 235
-  237
+  237* various down boxes
   240 - 243
   248 - 252
 */
@@ -100,6 +99,7 @@ const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
 const int env_line_sel = 81;
 const int warning_button = 89;
+const int pending_button = 90;
 const int warning_background = 91;
 const int env_sus = 92;
 const int EQ_line_off = 94;
@@ -108,8 +108,11 @@ const int EQ_back = 96;
 const int EQ_back_off = 97;
 const int tooltip_major_grid = 105;
 const int pad_harmonic_line = 128;
+const int warning_text = 129;
 const int reson_graph_line = 131;
 const int formant_graph_line = 132;
+const int formant_ghost_marker = 133;
+const int formant_marker = 134;
 const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
@@ -139,8 +142,8 @@ const int filer_text_back = 206;
 const int knob_high = 207;
 const int add_back = 214;
 const int tooltip_back = 215;
-const int graph_grid = 217;
 const int graph_Harmonics_grid = 216;
+const int graph_grid = 217;
 const int yoshi_ins_typ = 219;
 const int alt_links = 221;
 const int VU_bar_5dB = 222;
@@ -167,11 +170,11 @@ const int VU_text = 255;
   The following are ordered as they are in theme lists.
   They are grouped mainly by function.
 
-  All new definitions must be placed at the end of the list
-  and should use colours as close as possible to the colour
-  table so that new work doesn't mess up existing themes.
+  All new definitions must be placed at the end of the list table
+  so that new work doesn't mess up existing themes.
+  Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 70;
+const int COLOURLIST = 74;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -198,8 +201,8 @@ const unsigned char colourNumbers [COLOURLIST] = {
     graph_resonance_grid,
     graph_Harmonics_grid,
     graph_line,
-    reson_graph_line,
     formant_graph_line,
+    reson_graph_line,
     EQ_back,
     EQ_back_off,
     EQ_grid,
@@ -243,6 +246,10 @@ const unsigned char colourNumbers [COLOURLIST] = {
     actions,
     panels,
     learnable_text,
+    formant_marker,
+    formant_ghost_marker,
+    warning_text,
+    pending_button,
 };
 
 static std::string colourPreamble [] = {
@@ -327,6 +334,10 @@ static std::string colourData [] = {
     "63,145,255, Action buttons",
     "0,255,255, Panels",
     "0,0,255, Learnable text",
+    "255,255,0, Formant marker",
+    "150,150,0, Formant ghost marker",
+    "255,0,0, Warning text",
+    "255,720,0, Pending button",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",
