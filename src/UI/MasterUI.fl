@@ -1808,9 +1808,9 @@ Alan Calvert started the project}
     Fl_Window querywindow {
       label Yoshimi user_data_type {void *}
       callback {cancelQ->do_callback();}
-      xywh {5 207 420 105} type Double hide resizable
+      xywh {5 207 420 105} type Double resizable
       code0 {queryDW = 420; queryDH = 105;}
-      code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal
+      code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal visible
     } {
       Fl_Button yesQ {
         label Yes
@@ -1835,7 +1835,7 @@ Alan Calvert started the project}
       }
       Fl_Box typeQ {
         label {?}
-        xywh {8 26 45 45} box THIN_DOWN_BOX color 7 labelfont 9 labelsize 40 labelcolor 218
+        xywh {8 26 45 45} box THIN_DOWN_BOX color 191 labelfont 9 labelsize 40 labelcolor 218
       }
       Fl_Box textQ {
         label {text goes here}

@@ -342,109 +342,6 @@ class PartKitItem {: {public Fl_Group}
 class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
-    Fl_Window instrumentkitlist {
-      label {Instrument Kit}
-      callback {//
-    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
-    instrumentkitlist->hide();
-    kitSeen = false;}
-      xywh {386 389 670 370} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());}
-      code2 {kitDW = o->w(); kitDH = o->h();}
-      code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
-    } {
-      Fl_Group kitlist {
-        xywh {4 20 662 324} box THIN_UP_FRAME
-      } {
-        Fl_Pack kitpack {
-          xywh {0 21 670 322}
-          code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){partkititem[i]=new PartKitItem(0,0,670,20,"");partkititem[i]->init(part, i, npart, this);}}
-        } {}
-      }
-      Fl_Box kitnum {
-        label {No.}
-        xywh {10 0 25 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Box kitmute {
-        label Mute
-        xywh {56 15 22 8} labelfont 3 labelsize 11 labelcolor 226 align 1
-      }
-      Fl_Box kitID {
-        label Name
-        xywh {137 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Box kitminkey {
-        label {Min key}
-        xywh {235 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Box kitmaxkey {
-        label {Max key}
-        xywh {339 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Text_Display addON {
-        label On
-        xywh {399 15 22 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
-      }
-      Fl_Box kitadd {
-        label ADD
-        xywh {428 0 34 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Text_Display subON {
-        label On
-        xywh {473 15 22 9} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
-      }
-      Fl_Box kitsub {
-        label SUB
-        xywh {497 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Text_Display padON {
-        label On
-        xywh {546 15 22 10} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
-      }
-      Fl_Box kitpad {
-        label PAD
-        xywh {570 0 37 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Box kitfxnum {
-        label {FX.r.}
-        xywh {620 0 30 15} labelfont 1 labelsize 11 labelcolor 64 align 18
-      }
-      Fl_Choice kitMode {
-        label Mode
-        callback {//
-        int tmp = o->value();
-        partKitOn = tmp > 0;
-        if (partKitOn)
-            kitlist->activate();
-        else
-            kitlist->deactivate();
-
-        send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer, npart);}
-        tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
-        code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade");}
-        code1 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
-        code2 {partKitOn = o->value() > 0;}
-        code3 {if (!partKitOn) kitlist->deactivate();}
-      } {}
-      Fl_Check_Button drumMode {
-        label {Drum mode}
-        callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer, npart);}
-        tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
-        code0 {o->value(part->Pdrummode);}
-        class Fl_Check_Button2
-      }
-      Fl_Button kitClose {
-        label Close
-        callback {//
-        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
-        instrumentkitlist->hide();
-        kitSeen = false;
-        if ((Fl::event_button() == 3))
-        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX labelcolor 64
-      }
-    }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
@@ -526,7 +423,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             callback {//
 
             send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {enable/disable PADsynth} xywh {202 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 1 labelsize 11 labelcolor 226
+            tooltip {enable/disable PADsynth} xywh {202 252 80 24} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 selection_color 64 labelfont 3 labelsize 11 labelcolor 226
             code1 {o->value(part->kit[0].Ppadenabled);}
             class Fl_Check_Button2
           }
@@ -676,6 +573,109 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Text_Display originaltext {
         label text
         xywh {198 108 1 15} box NO_BOX labelfont 1 labelsize 12 labelcolor 4 align 8 textsize 11 hide
+      }
+    }
+    Fl_Window instrumentkitlist {
+      label {Instrument Kit}
+      callback {//
+    saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
+    instrumentkitlist->hide();
+    kitSeen = false;}
+      xywh {386 389 670 370} type Double hide resizable
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());}
+      code2 {kitDW = o->w(); kitDH = o->h();}
+      code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
+    } {
+      Fl_Group kitlist {
+        xywh {4 20 662 324} box THIN_UP_FRAME
+      } {
+        Fl_Pack kitpack {
+          xywh {0 21 670 322}
+          code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){partkititem[i]=new PartKitItem(0,0,670,20,"");partkititem[i]->init(part, i, npart, this);}}
+        } {}
+      }
+      Fl_Box kitnum {
+        label {No.}
+        xywh {10 0 25 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Box kitmute {
+        label Mute
+        xywh {56 15 22 8} labelfont 3 labelsize 11 labelcolor 226 align 1
+      }
+      Fl_Box kitID {
+        label Name
+        xywh {137 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Box kitminkey {
+        label {Min key}
+        xywh {235 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Box kitmaxkey {
+        label {Max key}
+        xywh {339 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display addON {
+        label On
+        xywh {399 15 22 8} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
+      }
+      Fl_Box kitadd {
+        label ADD
+        xywh {428 0 34 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display subON {
+        label On
+        xywh {473 15 22 9} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
+      }
+      Fl_Box kitsub {
+        label SUB
+        xywh {497 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Text_Display padON {
+        label On
+        xywh {546 15 22 10} box NO_BOX labelfont 3 labelsize 11 labelcolor 226
+      }
+      Fl_Box kitpad {
+        label PAD
+        xywh {570 0 37 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Box kitfxnum {
+        label {FX.r.}
+        xywh {620 0 30 15} labelfont 1 labelsize 11 labelcolor 64 align 18
+      }
+      Fl_Choice kitMode {
+        label Mode
+        callback {//
+        int tmp = o->value();
+        partKitOn = tmp > 0;
+        if (partKitOn)
+            kitlist->activate();
+        else
+            kitlist->deactivate();
+
+        send_data(0, PART::control::kitMode, tmp, TOPLEVEL::type::Integer, npart);}
+        tooltip {Single = only 1st item in defined note range sounds} xywh {41 348 88 19} down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
+        code0 {o->add("Off");o->add("Multi");o->add("Single");o->add("Crossfade");}
+        code1 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
+        code2 {partKitOn = o->value() > 0;}
+        code3 {if (!partKitOn) kitlist->deactivate();}
+      } {}
+      Fl_Check_Button drumMode {
+        label {Drum mode}
+        callback {//
+        send_data(TOPLEVEL::action::forceUpdate, PART::control::drumMode, o->value(), TOPLEVEL::type::Integer, npart);}
+        tooltip {Disables microtonal tuning} xywh {285 350 15 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
+        code0 {o->value(part->Pdrummode);}
+        class Fl_Check_Button2
+      }
+      Fl_Button kitClose {
+        label Close
+        callback {//
+        saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
+        instrumentkitlist->hide();
+        kitSeen = false;
+        if ((Fl::event_button() == 3))
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX labelcolor 64
       }
     }
     Fl_Window partfx {

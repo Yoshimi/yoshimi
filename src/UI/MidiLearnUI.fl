@@ -434,7 +434,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         send_data(0, MIDILEARN::control::clearAll,0,0);
         o->deactivate();
         setWindowTitle();}
-        tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 labelcolor 64 deactivate
+        tooltip {Remove all entries} xywh {330 264 70 18} box PLASTIC_THIN_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 12 labelcolor 64 deactivate
       }
       Fl_Button recent {
         label Recent

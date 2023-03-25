@@ -360,8 +360,8 @@ class Oscilharmonic {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window harmonic {
-      private xywh {329 192 25 225} type Double box NO_BOX labelsize 10
-      class Fl_Group visible
+      private xywh {329 192 25 225} type Double box NO_BOX labelsize 10 hide
+      class Fl_Group
     } {
       Fl_Slider mag {
         callback {//
@@ -642,7 +642,7 @@ o->hide();}
         if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\n This action can't be reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::clearHarmonics, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 505 55 15} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
+        xywh {670 505 55 16} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Group {} {
         xywh {135 308 150 30} box ENGRAVED_BOX labelcolor 64
@@ -669,7 +669,7 @@ o->hide();}
         callback {// not used directly now
         (void) o; // suppress warning
         //send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::autoClear, o->value(), TOPLEVEL::type::Integer);}
-        tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10 labelcolor 104
+        tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10 labelcolor 64
       }
       Fl_Group filterGroup {
         xywh {285 308 155 30} box ENGRAVED_BOX labelcolor 64
@@ -805,7 +805,7 @@ o->hide();}
             return;
 
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::convertToSine, o->value(), TOPLEVEL::type::Integer);}
-        xywh {670 525 55 15} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
+        xywh {670 525 55 16} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button oscilC {
         label C

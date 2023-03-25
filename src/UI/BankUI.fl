@@ -166,7 +166,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     int engine = bank->engines_used(rootID, bankID, nslot);
     if (*nselected == nslot)
     {
-        acol = 6;
+        acol = 6; // selected item background
         scol = 6;
         pcol = 6;
     }
@@ -174,13 +174,13 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     {
         if (nslot < 128)
         {
-            acol = 46;
+            acol = 46; // normal background
             scol = 46;
             pcol = 46;
         }
         else
         {
-            acol = 16;
+            acol = 16; // extended instruments background
             scol = 16;
             pcol = 16;
         }
@@ -188,19 +188,19 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     else
     {
         if (nslot < 128)
-            bcol = 51;
+            bcol = 51; // 'occupied' normal background
         else
-            bcol = 17;
+            bcol = 17; // 'occupied' extended instruments background
         if (engine & 1)
-            acol = 214;
+            acol = add_back;
         else
             acol = bcol;
         if (engine & 2)
-            scol = 236;
+            scol = sub_back;
         else
             scol = bcol;
         if (engine & 4)
-            pcol = 158;
+            pcol = pad_back;
         else
             pcol = bcol;
 
@@ -326,7 +326,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window instrumentuiwindow {
       label Bank
       callback {Hide(0);}
-      xywh {598 119 780 570} type Double labelsize 12 labelcolor 64 hide resizable
+      xywh {687 245 780 570} type Double labelsize 12 labelcolor 64 hide resizable
       code0 {instDW = o->w(), instDH = o->h();}
       code1 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
@@ -361,7 +361,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
-        tooltip {Show root paths. Right click: also close this} xywh {350 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {364 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button insBanks {
         label Banks
@@ -441,46 +441,56 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Group modeselect {
         xywh {5 528 458 42} box ENGRAVED_BOX labelsize 12
       } {
-        Fl_Light_Button writebutton {
-          label SAVE
-          callback {//
-          if (_SYS_::F2B(o->value()))
-              mode = 2;
-          removeselection();}
-          xywh {190 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 3 labelfont 9 labelsize 12 labelcolor 64
+        Fl_Box selectPatch {
+          xywh {11 555 83 9} box RFLAT_BOX color 2 labelcolor 49
         }
-        Fl_Light_Button readbutton {
+        Fl_Button readbutton {
           label SELECT
           callback {//
-          if (_SYS_::F2B(o->value()))
-              mode = 1;
+              setHighlight(1);
+
           removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 101 labelfont 9 labelsize 12 labelcolor 64
-          code0 {o->value(1);}
+          xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button clearbutton {
-          label DELETE
-          callback {//
-          if (_SYS_::F2B(o->value()))
-              mode = 3;
-          removeselection();}
-          xywh {280 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 1 labelfont 9 labelsize 12 labelcolor 64
+        Fl_Box renamePatch {
+          xywh {100 555 83 9} box RFLAT_BOX color 5 labelcolor 49
         }
-        Fl_Light_Button swapbutton {
-          label SWAP
-          callback {//
-          if (_SYS_::F2B(o->value()))
-              mode = 4;
-          removeselection();}
-          xywh {370 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 228 labelfont 9 labelsize 12 labelcolor 64
-        }
-        Fl_Light_Button renamebutton {
+        Fl_Button renamebutton {
           label RENAME
           callback {//
-          if (_SYS_::F2B(o->value()))
-              mode = 5;
+              setHighlight(5);
           removeselection();}
-          xywh {100 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 5 labelfont 9 labelsize 12 labelcolor 64
+          xywh {100 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
+        }
+        Fl_Box savePatch {
+          xywh {190 555 83 9} box RFLAT_BOX color 3 labelcolor 49
+        }
+        Fl_Button writebutton {
+          label SAVE
+          callback {//
+              setHighlight(2);
+          removeselection();}
+          xywh {190 534 85 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
+        }
+        Fl_Box deletPatch {
+          xywh {280 555 83 9} box RFLAT_BOX color 1 labelcolor 49
+        }
+        Fl_Button clearbutton {
+          label DELETE
+          callback {//
+              setHighlight(3);
+          removeselection();}
+          xywh {280 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
+        }
+        Fl_Box swapPatch {
+          xywh {370 555 83 9} box RFLAT_BOX color 4 labelcolor 49
+        }
+        Fl_Button swapbutton {
+          label SWAP
+          callback {//
+              setHighlight(4);
+          removeselection();}
+          xywh {370 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
       }
       Fl_Text_Display insT3 {
@@ -533,7 +543,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window searchwin {
       label {Bank Search}
       callback {Hide(3);}
-      xywh {680 177 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
+      xywh {1044 153 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       code0 {searchDW = o->w(); searchDH = o->h();}
       code1 {searchwin->size_range(searchDW, searchDH, 0, 0, 0, 0, 1);}
     } {
@@ -566,7 +576,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       }
       Fl_Text_Display noEntries {
         label {No Entries}
-        xywh {70 195 177 0} labelfont 1 labelsize 30 labelcolor 88 textsize 12 hide deactivate
+        xywh {70 195 177 0} labelfont 1 labelsize 30 labelcolor 129 textsize 12 hide deactivate
       }
       Fl_Group {} {
         xywh {25 1 210 35} labelsize 12
@@ -591,7 +601,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window bankuiwindow {
       label Root
       callback {Hide(1);}
-      xywh {374 135 780 570} type Double labelsize 12 labelcolor 64 hide resizable
+      xywh {794 24 780 570} type Double labelsize 12 labelcolor 64 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
       code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
@@ -676,64 +686,78 @@ class BankUI {: {public BankProcess_, RootProcess_}
         } {}
       }
       Fl_Group rootmodeselect {
-        xywh {5 528 570 42} box ENGRAVED_BOX labelsize 12
+        xywh {5 528 635 42} box ENGRAVED_BOX labelsize 12
       } {
-        Fl_Light_Button rootreadbutton {
+        Fl_Box rootSelectPatch {
+          xywh {11 555 83 9} box RFLAT_BOX color 2 labelcolor 49
+        }
+        Fl_Button rootreadbutton {
           label SELECT
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 1;
-          removeselection();}
-          xywh {10 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 101 labelfont 9 labelsize 12 labelcolor 64
+          setRootHighlight(1);
+          removeRootselection();}
+          xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX selection_color 228 labelfont 9 labelsize 12 labelcolor 64
           code0 {o->value(1);}
         }
-        Fl_Light_Button rootrenamebutton {
+        Fl_Box rootRenamePatch {
+          xywh {100 555 83 9} box RFLAT_BOX color 5 labelcolor 49
+        }
+        Fl_Button rootrenamebutton {
           label RENAME
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 5;
-          removeselection();}
-          xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 5 labelfont 9 labelsize 12 labelcolor 64
+          setRootHighlight(5);
+          removeRootselection();}
+          xywh {100 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button rootwritebutton {
+        Fl_Box rootSavePatch {
+          xywh {190 555 83 9} box RFLAT_BOX color 3 labelcolor 49
+        }
+        Fl_Button rootwritebutton {
           label ADD
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 2;
-          removeselection();}
-          xywh {200 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 3 labelfont 9 labelsize 12 labelcolor 64
+          setRootHighlight(2);
+          removeRootselection();}
+          xywh {190 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button rootclearbutton {
+        Fl_Box rootDeletPatch {
+          xywh {280 555 83 9} box RFLAT_BOX color 1 labelcolor 49
+        }
+        Fl_Button rootclearbutton {
           label DELETE
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 3;
-          removeselection();}
-          xywh {295 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 1 labelfont 9 labelsize 12 labelcolor 64
+          setRootHighlight(3);
+          removeRootselection();}
+          xywh {280 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button rootswapbutton {
+        Fl_Box rootSwapPatch {
+          xywh {370 555 83 9} box RFLAT_BOX color 4 labelcolor 49
+        }
+        Fl_Button rootswapbutton {
           label SWAP
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 4;
-          removeselection();}
-          xywh {390 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 228 labelfont 9 labelsize 12 labelcolor 64
+          setRootHighlight(4);
+          removeRootselection();}
+          xywh {370 534 85 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button rootimportbutton {
+        Fl_Box rootImportPatch {
+          xywh {460 555 83 9} box RFLAT_BOX color 93 labelcolor 49
+        }
+        Fl_Button rootimportbutton {
           label IMPORT
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 6;
-          removeselection();}
-          xywh {485 533 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 93 labelfont 8 labelsize 9 labelcolor 64
+          setRootHighlight(6);
+          removeRootselection();}
+          xywh {460 533 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
-        Fl_Light_Button rootexportbutton {
+        Fl_Box rootExportPatch {
+          xywh {550 555 83 9} box RFLAT_BOX color 78 labelcolor 49
+        }
+        Fl_Button rootexportbutton {
           label EXPORT
           callback {//
-          if (_SYS_::F2B(o->value()))
-              r_mode = 7;
-          removeselection();}
-          xywh {485 550 85 15} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX color 228 selection_color 78 labelfont 8 labelsize 9 labelcolor 64
+          setRootHighlight(7);
+          removeRootselection();}
+          xywh {550 533 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
       }
       Fl_Button bankClose {
@@ -755,7 +779,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             else
                 bankFrom = 0;}
-        tooltip {Right click: also reopen previous} xywh {647 538 70 24} box THIN_UP_BOX labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {672 538 70 24} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
     }
     Fl_Window rootuiwindow {
@@ -880,6 +904,68 @@ class BankUI {: {public BankProcess_, RootProcess_}
         tooltip {Right click: also reopen previous} xywh {402 225 51 35} box THIN_UP_BOX labelsize 12 labelcolor 64
       }
     }
+  }
+  Function {setHighlight(int button)} {} {
+    code {//
+        mode = button;
+        selectPatch->hide();
+        renamePatch->hide();
+        savePatch->hide();
+        deletPatch->hide();
+        swapPatch->hide();
+        switch(button)
+        {
+            case 1:
+                selectPatch->show();
+            break;
+            case 5:
+                renamePatch->show();
+            break;
+            case 2:
+                savePatch->show();
+            break;
+            case 3:
+                deletPatch->show();
+            break;
+            case 4:
+                swapPatch->show();
+            break;
+        }} {}
+  }
+  Function {setRootHighlight(int button)} {} {
+    code {//
+        r_mode = button;
+        rootSelectPatch->hide();
+        rootRenamePatch->hide();
+        rootSavePatch->hide();
+        rootDeletPatch->hide();
+        rootSwapPatch->hide();
+        rootImportPatch->hide();
+        rootExportPatch->hide();
+        switch(button)
+        {
+            case 1:
+                rootSelectPatch->show();
+            break;
+            case 5:
+                rootRenamePatch->show();
+            break;
+            case 2:
+                rootSavePatch->show();
+            break;
+            case 3:
+                rootDeletPatch->show();
+            break;
+            case 4:
+                rootSwapPatch->show();
+            break;
+            case 6:
+                rootImportPatch->show();
+            break;
+            case 7:
+                rootExportPatch->show();
+            break;
+        }} {}
   }
   Function {fillSearchChoice()} {} {
     code {//
@@ -1035,7 +1121,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     bankS = 0;
     rootFrom = 0;
     bankFrom = 0;
-    instFrom = 0;} {}
+    instFrom = 0;
+    setHighlight(mode);
+    setRootHighlight(r_mode);} {}
   }
   Function {~BankUI()} {return_type virtual
   } {
@@ -1063,9 +1151,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rescan_for_banks();
     set_bank_slot();
     ShowInst();
-    readbutton->value(1);
     mode = 1;
     removeselection();
+    setHighlight(mode);
     refreshmainwindow();} {}
   }
   Function {ShowInst()} {} {
@@ -1098,8 +1186,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     checkSane(X, Y, W, H, bankDW, bankDH);
 
     bankuiwindow->resize(X, Y, W, H);
-    bankuiwindow->show();
     lastbankW = 0;
+    bankuiwindow->show();
     bankSeen = true;} {}
   }
   Function {ShowRoot()} {} {
@@ -1115,8 +1203,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     checkSane(X, Y, W, H, rootDW, rootDH);
 
     rootuiwindow->resize(X, Y, W, H);
-    rootuiwindow->show();
     lastrootW = 0;
+    rootuiwindow->show();
     rootSeen = true;} {}
   }
   Function {ShowSearch()} {} {
@@ -1137,8 +1225,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
         fillBrowser(1);
         unsearched = false;
     }
-    searchwin->show();
     lastsearchW = 0;
+    searchwin->show();
     searchSeen = true;} {}
   }
   Function {Hide(int type = 0)} {} {
@@ -1215,7 +1303,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 else if (newname != thisname)
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot, UNUSED, synth->textMsgBuffer.push(newname));
             }
-            setread();
+            mode = 1;
         }
 
         if (mode == 2)
@@ -1224,7 +1312,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             if (synth->part[curPart]->Pname == DEFAULT_NAME)
             {
                 alert(synth, "Can't store instrument with default name");
-                setread();
+                mode = 1;
                 doit = false;
             }
             else if (synth->part[curPart]->info.Ptype == 0)
@@ -1236,14 +1324,14 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 if (choice(synth, "", "Yes", "No", "Overwrite the slot no." + to_string(slot + 1) + "?") < 2)
                 {
-                    setread();
+                    mode = 1;
                     doit = false;
                 }
             }
             if (doit)
             {
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::saveInstrument, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot);
-                setread();
+                mode = 1;
             }
         }
 
@@ -1254,7 +1342,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 if (choice(synth, "", "Yes", "No", "Clear the slot no. " + to_string(slot + 1) + "?") > 1)
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::deleteInstrument, slot, TOPLEVEL::type::Write, TOPLEVEL::section::bank);
             }
-            setread();
+            mode = 1;
         }
 
         if (mode == 4)
@@ -1264,7 +1352,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             {
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::selectSecondInstrumentAndSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, slot);
                 nselected = -1;
-                setread();
+                mode = 1;
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
@@ -1273,6 +1361,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 nselected = slot;
             }
         }
+        setHighlight(mode);
         if (mode != 4)
             refreshinstrumentwindow();} {}
   }
@@ -1293,7 +1382,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (what == 3)
             Hide(1);
 
-        cbwig->do_callback();
+        cbwig->do_callback(); // what does this do?
 
         ShowInst();
         set_bank_slot(); // needed by 'old' menu selector
@@ -1306,7 +1395,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         string dirname = setfiler(synth,"Path for Bank Export", thisname, true, TOPLEVEL::XML::Bank);
         if (dirname.length() > 2)
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::exportBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
-        setrootread();
+        r_mode = 1;
     }
 
     if (r_mode == 6)
@@ -1314,7 +1403,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         string dirname = setfiler(synth,"Bank to Import", "", false, TOPLEVEL::XML::Bank);
         if (dirname.length() > 2)
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::importBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(string(dirname)));
-        setrootread();
+        r_mode = 1;
     }
 
     if (r_mode == 5 && !thisname.empty())
@@ -1322,14 +1411,14 @@ class BankUI {: {public BankProcess_, RootProcess_}
         string tmp = input_text(synth, "Bank name:", thisname);
         if (tmp != thisname)
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::renameBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(tmp));
-        setrootread();
+        r_mode = 1;
     }
 
     if (r_mode == 2)
     {   // Create new bank and save to file
         if (!thisname.empty())
         {
-            setrootread();
+            r_mode = 1;
             alert(synth, "Bank " + to_string(slot) + " already in use for " + thisname);
             return;
         }
@@ -1337,25 +1426,28 @@ class BankUI {: {public BankProcess_, RootProcess_}
         dirname = input_text(synth, "New empty Bank:", "");
         if (!dirname.empty())
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::createBank, slot, TOPLEVEL::type::Integer | TOPLEVEL::type::Write, TOPLEVEL::section::bank, slot, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
-        setrootread();
+        r_mode = 1;
         refreshmainwindow();
     }
 
-    if (r_mode == 3 && !thisname.empty())
+    if (r_mode == 3)
     {
-        if (choice(synth, "", "Yes", "No", "Completely clear " + thisname + "?") > 1)
+        if(!thisname.empty())
         {
-            int clearit = true;
-            int count = bank->getBankSize(slot, rt);
-            if (count > 1)
-                clearit = choice(synth, "Yes", "", "STOP!", "There are " + to_string(count) + " instruments in this bank\\nThey will be permanently deleted") == 3;
-            if (clearit)
+            if (choice(synth, "", "Yes", "No", "Completely clear " + thisname + "?") > 1)
             {
-                send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::deleteBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                int clearit = true;
+                int count = bank->getBankSize(slot, rt);
+                if (count > 1)
+                    clearit = choice(synth, "Yes", "", "STOP!", "There are " + to_string(count) + " instruments in this bank\\nThey will be permanently deleted") == 3;
+                if (clearit)
+                {
+                    send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::deleteBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+                }
             }
         }
-        setrootread();
         refreshmainwindow();
+        r_mode = 1;
     }
 
     if (r_mode == 4)
@@ -1367,7 +1459,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::selectSecondBankAndSwap, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::bank, slot);
                 rselected = -1;
                 rescan_for_banks();
-                setrootread();
+                r_mode = 1;
                 done = true;
             }
             if ((rselected < 0 || what == 2) && !done)
@@ -1376,27 +1468,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
                 rselected = slot;
                 rs[slot]->rootrefresh(bt, rt);
             }
-    }} {}
-  }
-  Function {setread()} {} {
-    code {//
-    mode = 1;
-    readbutton->value(1);
-    writebutton->value(0);
-    clearbutton->value(0);
-    swapbutton->value(0);
-    renamebutton->value(0);} {}
-  }
-  Function {setrootread()} {} {
-    code {//
-    r_mode = 1;
-    rootreadbutton->value(1);
-    rootwritebutton->value(0);
-    rootimportbutton->value(0);
-    rootexportbutton->value(0);
-    rootclearbutton->value(0);
-    rootswapbutton->value(0);
-    rootrenamebutton->value(0);} {}
+    }
+    setRootHighlight(r_mode);} {}
   }
   Function {refreshmainwindow()} {} {
     code {//
@@ -1538,8 +1611,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     rootclearbutton->labelsize(size);
     rootswapbutton->labelsize(size);
     rootrenamebutton->labelsize(size);
-    rootimportbutton->labelsize(int(9 * dScale));
-    rootexportbutton->labelsize(int(9 * dScale));
+    rootimportbutton->labelsize(size);
+    rootexportbutton->labelsize(size);
 
     bankClose->labelsize(size);
     int lineX;
@@ -1606,7 +1679,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
             int ns = nselected;
             nselected = -1;
             bs[ns]->refresh(fetchData(0, BANK::control::selectBank, TOPLEVEL::section::bank), fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank), fetchData(0, BANK::control::lastSeenInBank, TOPLEVEL::section::bank));
-        }
+        }} {}
+  }
+  Function {removeRootselection()} {} {
+    code {//
         if (rselected >= 0)
         {
             int rsel = rselected;

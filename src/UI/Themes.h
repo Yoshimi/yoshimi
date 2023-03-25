@@ -42,18 +42,32 @@
   Ideally there should be no reserved colours, as that means we are
   not managing them!
 
+  1*  root/bank 'delete' lights
+  2*  root/bank 'select' lights
+  3*  root 'add' bank 'save' lights
+  4*  root/bank 'swap' lights
+  5*  root/bank 'rename' lights
+  6*  root/bank slot first swap selection
+
+  16* bank extended instruments background
+  17* bank 'occupied' extended instruments background
+
+  46* root/bank slot normal background
+
+  51* 'occupied' normal background
+
   56
   58 - 61
   65
   68 - 72
   75 - 77
-  78* bank ?
+  78* bank root 'export' light
   79 - 80
   82 - 87
-  88* bank ?
-  93* root import light
+  88
+  93* bank root 'import' light
   98 - 100
-  101* root/bank read light
+  101
   102 - 103
   104
   106 - 123
@@ -74,18 +88,19 @@
   185
   186
   187
-  191 - 196
+  192 - 196
   200 - 205
   208 - 213
   216
-  218
+  218* query '?' text
   220
   224
   225
   232 - 235
   237* various down boxes
   240 - 243
-  248 - 252
+  248 - 251
+  252*  bank current bank highlight
 */
 
 
@@ -135,6 +150,7 @@ const int instr_info_back = 182;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
 const int VU_bar_10dB = 190;
+const int query_back = 191;
 const int CP_text = 197;
 const int links = 198;
 const int knob_lit = 199;
@@ -174,7 +190,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 74;
+const int COLOURLIST = 75;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -250,6 +266,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     formant_ghost_marker,
     warning_text,
     pending_button,
+    query_back,
 };
 
 static std::string colourPreamble [] = {
@@ -338,6 +355,7 @@ static std::string colourData [] = {
     "150,150,0, Formant ghost marker",
     "255,0,0, Warning text",
     "255,720,0, Pending button",
+    "255,255,255, Query/Alert background",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

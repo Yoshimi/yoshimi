@@ -1,5 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-3-25 Will
+bn 2195
+BugFix: both bank and instrument windows could have
+  two buttons highlighted
+Some considerable refactoring of BankUI.fl
+Bank windows have colour bars under buttons, not radio buttons.
+More identification and unification of colour numbers.
+
 2023-3-23 Will
 bn 2194
 Added Formant, and Formant ghost markers to themes.
