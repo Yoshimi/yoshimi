@@ -347,7 +347,7 @@ class VirKeyboard {} {
       label {Yoshimi Virtual Keyboard}
       callback {//
       virtClose->do_callback();}
-      tooltip {+ Shift to hold or release keys} xywh {1085 88 650 130} type Double hide resizable
+      tooltip {+ Shift to hold or release keys} xywh {1092 64 650 130} type Double hide resizable
       code0 {virtDW = o->w(); virtDH = o->h();}
       code1 {o->size_range(virtDW, virtDH, 0, 0, 0, 0, 1);}
     } {
@@ -433,7 +433,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         }
         virkeys->take_focus();
         send_data(TOPLEVEL::action::fromMIDI, 2, oldcontrol, TOPLEVEL::type::Integer, virkeys->midich, midictl);}
-        tooltip {Controller value} xywh {628 10 18 112} type {Vert Fill} box ENGRAVED_BOX color 230 labelsize 8 align 5 maximum 127 step 1 value 64
+        tooltip {Controller value} xywh {628 10 18 112} type {Vert Fill} box ENGRAVED_BOX color 230 selection_color 65 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         code1 {o->setValueType(VC_plainReverse); o->useCustomTip(true);}
         class mwheel_slider
@@ -491,8 +491,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
             o->damage();
         }
         virkeys->take_focus();
-        send_data(0, MIDI::control::controller, -old, TOPLEVEL::type::Integer, virkeys->midich, MIDI::CC::pitchWheelInner)}
-        tooltip {Pitch Wheel} xywh {6 10 18 112} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
+        send_data(0, MIDI::control::controller, -old, TOPLEVEL::type::Integer, virkeys->midich, MIDI::CC::pitchWheelInner);}
+        tooltip {Pitch Wheel} xywh {6 10 18 112} color 65 selection_color 143 labelsize 8 labelcolor 64 align 1 minimum -8192 maximum 8191 step 1
         code0 {o->value(virkeys->pitchWh);}
         code1 {o->setValueType(VC_pitchWheel); o->useCustomTip(true);}
         class mwheel_slider

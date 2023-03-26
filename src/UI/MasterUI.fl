@@ -1808,9 +1808,9 @@ Alan Calvert started the project}
     Fl_Window querywindow {
       label Yoshimi user_data_type {void *}
       callback {cancelQ->do_callback();}
-      xywh {5 207 420 105} type Double resizable
+      xywh {5 207 420 105} type Double hide resizable
       code0 {queryDW = 420; queryDH = 105;}
-      code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal visible
+      code1 {o->size_range(queryDW, queryDH, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Button yesQ {
         label Yes

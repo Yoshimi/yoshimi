@@ -32,8 +32,8 @@
 
   Fluid's colour chooser doesn't recognise our named colour numbers
   so most of these are written in numerically.
-  As designing layouts without Fluid is seriously hard work we have
-  to go with it.
+  Designing layouts without Fluid is seriously hard work so we have
+  to go with it :(
 */
 
 
@@ -54,11 +54,10 @@
 
   46* root/bank slot normal background
 
-  51* 'occupied' normal background
+  51* bank 'occupied' normal background
 
   56
   58 - 61
-  65
   68 - 72
   75 - 77
   78* bank root 'export' light
@@ -82,7 +81,6 @@
   164 - 167
   176
   180
-  181* dynfilter filter button
   183* filer dir icon
   184
   185
@@ -110,6 +108,7 @@ const int graph_back = 57;
 const int slider_track = 62;
 const int graph_line = 63;
 const int gen_text = 64;
+const int keyb_slider_back = 65;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
 const int env_line_sel = 81;
@@ -131,6 +130,7 @@ const int formant_marker = 134;
 const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
+const int keyb_pitch_peg = 143; // not currently redefinable
 const int knob_ring = 144;
 const int knob_point = 145;
 const int tooltip_grid = 146;
@@ -146,6 +146,7 @@ const int gen_opp_text = 175;
 const int tooltip_curve = 177;
 const int VU_bar_1dB = 178;
 const int CP_background = 179;
+const int dynfilter_button = 181;
 const int instr_info_back = 182;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
@@ -190,7 +191,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 75;
+const int COLOURLIST = 80;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -267,6 +268,10 @@ const unsigned char colourNumbers [COLOURLIST] = {
     warning_text,
     pending_button,
     query_back,
+    dynfilter_button,
+    keyb_slider_back,
+    keyb_pitch_peg,
+    keyb_mod_bar,
 };
 
 static std::string colourPreamble [] = {
@@ -356,6 +361,10 @@ static std::string colourData [] = {
     "255,0,0, Warning text",
     "255,720,0, Pending button",
     "255,255,255, Query/Alert background",
+    "0,182,191, Dynfilter filter button",
+    "127,127,127, Keyboard slider backgrounds",
+    "0,255,0, Keyboard pitchwheel peg",
+    "63,127,255, Keyboard Mod Wheel",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

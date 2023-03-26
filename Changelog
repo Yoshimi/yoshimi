@@ -1,5 +1,9 @@
 yoshimi 2.2.3 M
 
+2023-3-26 Will
+bn 2196
+Themes can be entirely managed within the Config window :)
+
 2023-3-25 Will
 bn 2195
 BugFix: both bank and instrument windows could have

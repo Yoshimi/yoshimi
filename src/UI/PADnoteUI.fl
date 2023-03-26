@@ -656,7 +656,7 @@ class PADnoteUI {: {public PresetsUI_}
               label {P.Str.}
               callback {//
               send_data(0, PADSYNTH::control::punchStrength, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Punch Strength} xywh {170 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 65 align 1 maximum 127 step 1
+              tooltip {Punch Strength} xywh {170 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchStrength);}
               class WidgetPDial
             }

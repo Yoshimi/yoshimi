@@ -74,7 +74,7 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {723 24 390 330} type Double hide resizable
+      xywh {1157 24 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -168,11 +168,14 @@ patch1->hide();
 patch2->hide();
 patch3->hide();
 patch4->hide();
+patch5->hide();
 mainTab->hide();
 switchesTab->hide();
 jackTab->hide();
 alsaTab->hide();
-midiTab->hide();}
+midiTab->hide();
+fillThemes();
+;}
         xywh {305 5 58 22} box THIN_UP_FRAME selection_color 47 labelsize 12 labelcolor 64
       }
       Fl_Group configTabs {
@@ -758,27 +761,47 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           callback {//}
           xywh {5 25 382 277} box THIN_UP_BOX hide
         } {
-          Fl_Button themeSet {
-            label {Set theme}
+          Fl_Browser theme_browser {
+            label Themes
             callback {//
-        synth->getRuntime().remoteGuiTheme = file::localDir() + "/themes/demo.clr";
-        findRemote();
-        synth->getRuntime().remoteGuiTheme = "";
-        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+        if (!o->value())
+            return;
+        int result = o->value();
+        if (result < 0)
+            return;
+        string line = string(o->text(result));
+        //std::cout << "here >" << line << std::endl;
+        if (line == "classic")
+        {
+            setClassicTable();
+        }
+        else
+        {
+            string fileName = file::localDir()+ "/themes/" + line + EXTEN::theme;
+            setUserTable(fileName);
 
-        close->do_callback();}
-            xywh {200 80 100 20} labelsize 12 labelcolor 64
+            //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
+        }
+        curentTheme->copy_label(line.c_str());
+        curTheme = line;
+        while (defTheme.at(defTheme.length() - 1) < '!') // tidy up
+            defTheme.pop_back(); // deals with spurious trailing whitespace
+        std::cout <<">" << line << "<" << std::endl;
+        std::cout <<">" << defTheme << "<" << std::endl;
+       if (line == defTheme)
+        {
+            nuTheme->hide();
+        }
+        else
+        {
+            nuTheme->show();
+        }
+        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+            xywh {40 50 190 215} type Select labelcolor 64 align 1 textcolor 64
           }
           Fl_Button themeImport {
             label {Import Theme}
             callback {//
-        /* synth->getRuntime().remoteGuiTheme = file::localDir() + "/themes/demo.clr";
-        findRemote();
-        synth->getRuntime().remoteGuiTheme = "";
-        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-
-        close->do_callback();
-        */
         string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::Themes);
         if (filename.empty())
         {
@@ -787,22 +810,50 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         filename += EXTEN::theme;
         string newfile = file::localDir() + "/themes/" + file::findLeafName(filename) + EXTEN::theme;
-       // std::cout << "old file>" << filename << std::endl;
-        //std::cout << "file>" << newfile << std::endl;
         int result = file::copyFile(filename, newfile,1);
         if (result == 0)
         {
-            if (choice(synth, "", "Yes", "No", "Try now"))
-                themeSet->do_callback();
+            fillThemes();
         }
         else
         {
            std::cout << "failed " << result << std::endl;
         }}
-            xywh {200 120 100 20} labelsize 12 labelcolor 64
+            xywh {255 75 100 20} labelsize 12 labelcolor 64
+          }
+          Fl_Box defaltLabel {
+            label {Default Theme}
+            xywh {288 115 35 17} labelsize 12 labelcolor 64
+          }
+          Fl_Box defaltTheme {
+            label {Default Theme}
+            xywh {255 132 100 20} box THIN_DOWN_BOX labelsize 12 labelcolor 64
+          }
+          Fl_Group nuTheme {
+            xywh {242 158 123 106} hide
+          } {
+            Fl_Box curentLabel {
+              label {Current Theme}
+              xywh {288 168 35 17} labelsize 12 labelcolor 64
+            }
+            Fl_Box curentTheme {
+              label {Current Theme}
+              xywh {255 187 100 20} box THIN_DOWN_BOX labelsize 12 labelcolor 64
+            }
+            Fl_Button asDefalt {
+              label {Make Default}
+              callback {//
+        string name = curTheme + EXTEN::theme;
+        string file = file::localDir() + "/themes/ID/current.txt";
+        file::saveText(name, file);
+        defTheme = curTheme;
+        defaltTheme->copy_label(defTheme.c_str());
+        nuTheme->hide();}
+              xywh {255 220 100 20} box ENGRAVED_BOX labelsize 12 labelcolor 104
+            }
           }
           Fl_Box themeNote {
-            label {Setting a theme will perform a reset.}
+            label {Setting a theme will perform a full reset.}
             xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 64 align 128
           }
         }
@@ -1166,7 +1217,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             configSeen = false;
             presetsSeen = false;
             selectedRootID = -1;
-            Tab1->do_callback();} {}
+            Tab1->do_callback();
+            string name = file::loadText(file::localDir() + "/themes/ID/current.txt");
+            size_t pos = name.rfind('.');
+            defTheme = name.substr(0, pos);
+            curTheme = defTheme;} {}
   }
   Function {~ConfigUI()} {} {
     code {//
@@ -1179,6 +1234,35 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");
         configwindow->hide();
         delete configwindow;} {}
+  }
+  Function {fillThemes()} {return_type int
+  } {
+    code {//
+        string sourceDir = file::localDir() + "/themes/";
+        std::list<string> themes;
+        int count = file::listDir(&themes, sourceDir);
+        if (count == 0)
+            return 0;
+        themes.sort();
+        theme_browser->clear();
+        std::list<string>::iterator itr = themes.begin();
+        while (itr != themes.end())
+        {
+            //std::cout << *itr << std::endl;
+            string text = file::findExtension(*itr);
+            if (text == ".clr")
+            {
+                text = *itr;
+                size_t pos = text.find(".clr");
+                text = text.substr(0, pos);
+                theme_browser->add(text.c_str());
+            }
+            ++itr;
+        }
+        defaltTheme->copy_label(defTheme.c_str());
+        curentTheme->copy_label(curTheme.c_str());
+        return count;
+        ;} {}
   }
   Function {manageThemes()} {} {
     code {//
@@ -1223,7 +1307,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       Fl::get_color(gen_text, r, g, b); // temp
       Fl::set_color(0, r, g, b); // temp
       */
-      //Fl::set_color(90, 255, 72, 0); // for testing
+      //Fl::set_color(4, 255, 0, 0); // for testing
       ;} {}
   }
   Function {checkVersions()} {return_type bool
@@ -1308,8 +1392,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {setClassicTable()} {return_type bool
   } {
     code {//
+        setGreyScale(colourData[0]);
         int lineCount = 0;
-        while (colourData[lineCount].substr(0, 7) != "-------")
+        while (colourData[lineCount + 1].substr(0, 7) != "-------")
         {
             setColourLine(colourData[lineCount + 1], lineCount); // we don't want the greyscale line!
             ++ lineCount;
@@ -1380,7 +1465,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
         if (text.at(0) == char(64))
+        {
+            setGreyScale(colourData[0]);
             return true; // keep default scale
+        }
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
@@ -1784,10 +1872,17 @@ return true;} {}
     midiLearned->labelsize(size);
 //
     Tab6->labelsize(size);
-    themeSet->labelsize(size);
     themeImport->labelsize(size);
-    
+    theme_browser->labelsize(size);
+        theme_browser->textsize(size);
+    themeImport->labelsize(size);
+    defaltLabel->labelsize(size);
+    defaltTheme->labelsize(size);
+    curentLabel->labelsize(size);
+    curentTheme->labelsize(size);
+    asDefalt->labelsize(size);
     themeNote->labelsize(size);
+
 //
     close->labelsize(size);
     save->labelsize(size);
@@ -1850,5 +1945,9 @@ return true;} {}
   decl {bool configSeen;} {private local
   }
   decl {bool presetsSeen;} {private local
+  }
+  decl {string defTheme;} {private local
+  }
+  decl {string curTheme;} {private local
   }
 }
