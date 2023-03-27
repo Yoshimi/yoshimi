@@ -733,6 +733,17 @@ class SUBnoteUI {: {public PresetsUI_}
 
     SUBparameters->redraw();} {}
   }
+  Function {theme()} {} {
+    code {//
+        if(SUBparameters->visible())
+        {
+            SUBparameters->hide();
+            SUBparameters->show();
+        }
+        if (filterui->formantparswindow->visible())
+            filterui->theme();
+        ;} {}
+  }
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;

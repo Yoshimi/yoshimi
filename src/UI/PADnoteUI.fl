@@ -1158,6 +1158,37 @@ class PADnoteUI {: {public PresetsUI_}
 
     padnotewindow->redraw();} {}
   }
+  Function {theme()} {} {
+    code {//
+        if (padnotewindow->visible())
+        {
+            padnotewindow->hide();
+            padnotewindow->show();
+        }
+        if (randWalkWindow)
+        {
+            if (randWalkWindow->visible())
+            {
+                randWalkWindow->hide();
+                randWalkWindow->show();
+            }
+        }
+        if (oscui)
+        {
+            if (oscui->osceditUI->visible())
+            {
+                oscui->osceditUI->hide();
+                oscui->osceditUI->show();
+            }
+        }
+        if (resui->resonancewindow->visible())
+        {
+            resui->resonancewindow->hide();
+            resui->resonancewindow->show();
+        }
+        filterui->theme();
+        ;} {}
+  }
   Function {send_data(int action, int control, float value, int type, int insert = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
     unsigned char partnum = npart;

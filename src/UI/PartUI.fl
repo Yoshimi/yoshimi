@@ -2441,6 +2441,59 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (padnoteui)
         padnoteui->padRtext();} {}
   }
+  Function {theme()} {} {
+    code {//
+        if (instrumenteditwindow->visible())
+        {
+            instrumenteditwindow->hide();
+            instrumenteditwindow->show();
+        }
+        if (partfx->visible())
+        {
+            partfx->hide();
+            partfx->show();
+            if (insefftype->value() == (EFFECT::type::dynFilter - EFFECT::type::none))
+            {
+                if(inseffectui->filterwindow != NULL)
+                {
+                    if(inseffectui->filterwindow->visible())
+                    {
+                        inseffectui->filterwindow->hide();
+                        inseffectui->filterwindow->show();
+                    }
+                    if(inseffectui->fwin_filterui)
+                        inseffectui->fwin_filterui->theme();
+                }
+            }
+        }
+        if (instrumentkitlist->visible())
+        {
+            instrumentkitlist->hide();
+            instrumentkitlist->show();
+        }
+        if (ctlwindow->visible())
+        {
+            ctlwindow->hide();
+            ctlwindow->show();
+        }
+        if (ctlmidi->visible())
+        {
+            ctlmidi->hide();
+            ctlmidi->show();
+        }
+        if (aftertouchcontrol->visible())
+        {
+            aftertouchcontrol->hide();
+            aftertouchcontrol->show();
+        }
+        if (adnoteui)
+            adnoteui->theme();
+        if (subnoteui)
+            subnoteui->theme();
+        if (padnoteui)
+            padnoteui->theme();
+        ;} {}
+  }
   Function {editRtext()} {} {
     code {//
     if (lasteditW == instrumenteditwindow->w())

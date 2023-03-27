@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {open : {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -488,7 +488,8 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -4570,6 +4571,102 @@ bpmfallback->format(format);} {}
     textLine->labelsize(size14);
     textLine->textsize(size14);
     textwindow->redraw();} {}
+  }
+  Function {theme()} {} {
+    code {//
+        masterwindow->hide();
+        masterwindow->show();
+        if (yoshiLog->logConsole->visible())
+        {
+            yoshiLog->logConsole->hide();
+            yoshiLog->logConsole->show();
+        }
+        if (panelwindow->visible())
+        {
+            panelwindow->hide();
+            panelwindow->show();
+        }
+        if (message->visible())
+        {
+            message->hide();
+            message->show();
+        }
+        if (syseffsendwindow->visible())
+        {
+            syseffsendwindow->hide();
+            syseffsendwindow->show();
+        }
+        if (syseffectui != NULL)
+        {
+            if (syseffectui->filterwindow != NULL)
+            {
+                    if (syseffectui->filterwindow->visible())
+                    {
+                        syseffectui->filterwindow->hide();
+                        syseffectui->filterwindow->show();
+                    }
+                    if(syseffectui->fwin_filterui)
+                        syseffectui->fwin_filterui->theme();
+            }
+
+        }
+        if (inseffectui != NULL)
+        {
+            if (inseffectui->filterwindow != NULL)
+            {
+                    if (inseffectui->filterwindow->visible())
+                    {
+                        inseffectui->filterwindow->hide();
+                        inseffectui->filterwindow->show();
+                    }
+                    if(inseffectui->fwin_filterui)
+                        inseffectui->fwin_filterui->theme();
+            }
+        }
+
+        if (vectorui->vectorwindow->visible())
+        {
+            vectorui->vectorwindow->hide();
+            vectorui->vectorwindow->show();
+        }
+        if (microtonalui->microtonaluiwindow->visible())
+        {
+            microtonalui->microtonaluiwindow->hide();
+            microtonalui->microtonaluiwindow->show();
+        }
+        if (midilearnui->midilearnwindow->visible())
+        {
+            midilearnui->midilearnwindow->hide();
+            midilearnui->midilearnwindow->show();
+        }
+        if (virkeyboard->virkeyboardwindow->visible())
+        {
+            virkeyboard->virkeyboardwindow->hide();
+            virkeyboard->virkeyboardwindow->show();
+        }
+        if (aboutwindow->visible())
+        {
+            aboutwindow->hide();
+            aboutwindow->show();
+        }
+        if (paramsui->Recent->visible())
+        {
+            paramsui->Recent->hide();
+            paramsui->Recent->show();
+        }
+        if (configui->configwindow->visible())
+        {
+            configui->configwindow->hide();
+            configui->configwindow->show();
+        }
+        if (configui->presets->visible())
+        {
+            configui->presets->hide();
+            configui->presets->show();
+        }
+        bankui->theme();
+        partui->theme();
+        ;} {}
   }
   decl {ConfigUI *configui;} {public local
   }

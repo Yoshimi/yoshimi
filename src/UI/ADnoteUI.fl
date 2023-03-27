@@ -1843,6 +1843,24 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
 
   modvoicelabel->labelsize(int(40 * dScale));} {}
   }
+  Function {voicetheme()} {} {
+    code {//
+        if (ADnoteVoiceParameters->visible())
+        {
+            ADnoteVoiceParameters->hide();
+            ADnoteVoiceParameters->show();
+        }
+        if (oscedit)
+        {
+            if (oscedit->osceditUI->visible())
+            {
+                oscedit->osceditUI->hide();
+                oscedit->osceditUI->show();
+            }
+        }
+        voicefilter->theme();
+        ;} {}
+  }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
         synth = parameters->getSynthEngine();
@@ -2704,6 +2722,27 @@ o->hide();}
         filterenv->wincheck();
     if (freqenv)
         freqenv->wincheck();} {}
+  }
+  Function {theme()} {} {
+    code {//
+        if(ADnoteGlobalParameters->visible())
+        {
+            ADnoteGlobalParameters->hide();
+            ADnoteGlobalParameters->show();
+        }
+        if (ADnoteVoiceList->visible())
+        {
+            ADnoteVoiceList->hide();
+            ADnoteVoiceList->show();
+        }
+        if (resui->resonancewindow->visible())
+        {
+            resui->resonancewindow->hide();
+            resui->resonancewindow->show();
+        }
+        filterui->theme();
+        advoice->voicetheme();
+        ;} {}
   }
   Function {addRtext()} {} {
     code {//

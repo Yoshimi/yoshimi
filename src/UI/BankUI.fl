@@ -1497,6 +1497,43 @@ class BankUI {: {public BankProcess_, RootProcess_}
         bs[i]->refresh(bk, rt, last);
     }} {}
   }
+  Function {theme()} {} {
+      code {//
+          if (instrumentSeen)
+          {
+              if(instrumentuiwindow->visible())
+              {
+                  instrumentuiwindow->hide();
+                  instrumentuiwindow->show();
+              }
+          }
+          if (searchSeen)
+          {
+              if(searchwin->visible())
+              {
+                  searchwin->hide();
+                  searchwin->show();
+              }
+          }
+          if (bankSeen)
+          {
+              if(bankuiwindow->visible())
+              {
+                  bankuiwindow->hide();
+                  bankuiwindow->show();
+              }
+          }
+          if (rootSeen)
+          {
+              if(rootuiwindow->visible())
+              {
+                  rootuiwindow->hide();
+                  rootuiwindow->show();
+              }
+          }
+         ;} {}
+  }
+
   Function {wincheck()} {} {
     code {//
     if (instrumentSeen)

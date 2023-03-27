@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -380,7 +380,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -895,6 +895,18 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             freqtrackoffset->labelsize(size);
             freqtracknormal->labelsize(size);
             freqtrackchecked->labelsize(size);} {}
+  }
+  Function {theme()} {} {
+    code {//
+        if(formantparswindow)
+        {
+        	if(formantparswindow->visible())
+        	{
+        	    formantparswindow->hide();
+        	    formantparswindow->show();
+        	}
+        }
+        ;} {}
   }
   Function {formantRtext()} {} {
     code {//

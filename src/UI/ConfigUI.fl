@@ -759,7 +759,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         Fl_Group themeTab {
           callback {//}
-          xywh {5 25 382 277} box THIN_UP_BOX hide
+          xywh {5 25 382 277} box THIN_UP_BOX
         } {
           Fl_Browser theme_browser {
             label Themes
@@ -782,12 +782,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
             //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
         }
-        curentTheme->copy_label(line.c_str());
+        currentTheme->copy_label(line.c_str());
         curTheme = line;
         while (defTheme.at(defTheme.length() - 1) < '!') // tidy up
             defTheme.pop_back(); // deals with spurious trailing whitespace
-        std::cout <<">" << line << "<" << std::endl;
-        std::cout <<">" << defTheme << "<" << std::endl;
+        //std::cout <<"line>" << line << "<" << std::endl;
+        //std::cout <<"def>" << defTheme << "<" << std::endl;
        if (line == defTheme)
         {
             nuTheme->hide();
@@ -796,7 +796,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         {
             nuTheme->show();
         }
-        send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+        synth->getGuiMaster()->theme();
+        //send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
             xywh {40 50 190 215} type Select labelcolor 64 align 1 textcolor 64
           }
           Fl_Button themeImport {
@@ -819,42 +820,38 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         {
            std::cout << "failed " << result << std::endl;
         }}
-            xywh {255 75 100 20} labelsize 12 labelcolor 64
+            xywh {255 75 100 20} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64
           }
-          Fl_Box defaltLabel {
+          Fl_Box storedLabel {
             label {Default Theme}
             xywh {288 115 35 17} labelsize 12 labelcolor 64
           }
-          Fl_Box defaltTheme {
+          Fl_Box storedTheme {
             label {Default Theme}
-            xywh {255 132 100 20} box THIN_DOWN_BOX labelsize 12 labelcolor 64
+            xywh {255 132 100 20} box THIN_DOWN_BOX color 7 labelsize 12 labelcolor 64
           }
           Fl_Group nuTheme {
             xywh {242 158 123 106} hide
           } {
-            Fl_Box curentLabel {
+            Fl_Box currentLabel {
               label {Current Theme}
               xywh {288 168 35 17} labelsize 12 labelcolor 64
             }
-            Fl_Box curentTheme {
+            Fl_Box currentTheme {
               label {Current Theme}
-              xywh {255 187 100 20} box THIN_DOWN_BOX labelsize 12 labelcolor 64
+              xywh {255 187 100 20} box THIN_DOWN_BOX color 7 labelsize 12 labelcolor 64
             }
-            Fl_Button asDefalt {
+            Fl_Button setAsStored {
               label {Make Default}
               callback {//
         string name = curTheme + EXTEN::theme;
         string file = file::localDir() + "/themes/ID/current.txt";
         file::saveText(name, file);
         defTheme = curTheme;
-        defaltTheme->copy_label(defTheme.c_str());
+        storedTheme->copy_label(defTheme.c_str());
         nuTheme->hide();}
-              xywh {255 220 100 20} box ENGRAVED_BOX labelsize 12 labelcolor 104
+              xywh {255 220 100 20} box PLASTIC_THIN_UP_BOX color 228 labelsize 12 labelcolor 64
             }
-          }
-          Fl_Box themeNote {
-            label {Setting a theme will perform a full reset.}
-            xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 64 align 128
           }
         }
         Fl_Box patch1 {
@@ -1259,8 +1256,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             ++itr;
         }
-        defaltTheme->copy_label(defTheme.c_str());
-        curentTheme->copy_label(curTheme.c_str());
+        storedTheme->copy_label(defTheme.c_str());
+        currentTheme->copy_label(curTheme.c_str());
         return count;
         ;} {}
   }
@@ -1268,6 +1265,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     code {//
 
      // Note: Fluid screws up text with control values and ?@     // contexts so we enter them as char(n)
+
+      /*unsigned char RR,GG,BB;
+      for (int i = 0; i < 256; ++i)
+      {
+          Fl::get_color(i, RR, GG, BB);
+          std::cout << '"'<< int(RR) << "," << int(GG) << "," << int(BB) << '"' << "," << std::endl;
+      }*/
 
       int colour2find = 0;
       if (colour2find > 0) // for testing
@@ -1876,13 +1880,11 @@ return true;} {}
     theme_browser->labelsize(size);
         theme_browser->textsize(size);
     themeImport->labelsize(size);
-    defaltLabel->labelsize(size);
-    defaltTheme->labelsize(size);
-    curentLabel->labelsize(size);
-    curentTheme->labelsize(size);
-    asDefalt->labelsize(size);
-    themeNote->labelsize(size);
-
+    storedLabel->labelsize(size);
+    storedTheme->labelsize(size);
+    currentLabel->labelsize(size);
+    currentTheme->labelsize(size);
+    setAsStored->labelsize(size);
 //
     close->labelsize(size);
     save->labelsize(size);
