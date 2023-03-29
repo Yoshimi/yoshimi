@@ -259,7 +259,7 @@ class PartKitItem {: {public Fl_Group}
         code0 {snprintf(label,10,"%d",(n&15)+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->hide();}
-        code3 {if (o->value() == 0) labelbutton->color(FL_WHITE);}
+        code3 {if (o->value() == 0) labelbutton->color(gen_text_back);}
         class Fl_Check_Button2
       }
     }

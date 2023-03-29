@@ -1,5 +1,14 @@
 yoshimi 2.2.3 M
 
+2023-3-29 Will
+bn 2198
+The native colourtable is now stored at startup.
+    This can be set with '@' begining the greyscale line.
+    On any other line it makes just that one native.
+Added example file search to FileMgrFuncs.h
+    Used for copying in 'demo.clr' but may be extended.
+More small tweaks.
+
 2023-3-27 Will
 bn 2197
 All open windows now update when the theme is changed.

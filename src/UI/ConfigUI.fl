@@ -1232,6 +1232,23 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         configwindow->hide();
         delete configwindow;} {}
   }
+  Function {fillNative()} {} {
+    code {//
+        for (int i = 0; i < 256; ++i)
+        {
+            getNativeLine(i);
+        }
+        ;} {}
+  }
+  Function {getNativeLine(int line)} {} {
+    code {//
+        unsigned char rt, gt, bt;
+        Fl::get_color(line, rt, gt, bt);
+        nativeTable[line] = int(rt);
+        nativeTable[line + 256] = int(gt);
+        nativeTable[line + 512] = int(bt);
+        ;} {}
+  }
   Function {fillThemes()} {return_type int
   } {
     code {//
@@ -1263,9 +1280,26 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {manageThemes()} {} {
     code {//
+        static bool seen = false;
+        if (!seen)
+        {
+            fillNative();
+            seen = true;
 
-     // Note: Fluid screws up text with control values and ?@     // contexts so we enter them as char(n)
+            //if (!file::isRegularFile(file::localDir() + "/themes/demo.clr"))
+            // we are forcing this while the demo file is being developed
+            {
+                string demo = file::findExampleFile("themes/demo.clr");
+                if (!demo.empty())
+                    file::copyFile(demo, file::localDir() + "/themes/demo.clr", 1);
+            }
 
+        }
+
+       // Note: Fluid screws up text with control values and @
+       // contexts so we enter them as char(n)
+
+      // prints the native colour table
       /*unsigned char RR,GG,BB;
       for (int i = 0; i < 256; ++i)
       {
@@ -1306,12 +1340,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       }
       setClassicTable();
 
-      /*
-      unsigned char r,g,b; // temp
-      Fl::get_color(gen_text, r, g, b); // temp
-      Fl::set_color(0, r, g, b); // temp
-      */
       //Fl::set_color(4, 255, 0, 0); // for testing
+
       ;} {}
   }
   Function {checkVersions()} {return_type bool
@@ -1388,11 +1418,32 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
            return false;
        if (!currentTheme.empty())
        {
-           setUserTable(currentTheme);
-           ok = true;
+           int errLine = setUserTable(currentTheme);
+           if (errLine != -1)
+           {
+               std::cout << "Failed at line " << errLine << std::endl;
+               ok = false;
+           }
        }
        return ok;} {}
   }
+  Function {setNativeTable()} {} {
+    code {//
+        //std::cout << nativeTable[7] << " " << nativeTable[256+7] << " " << nativeTable[512+7] << std::endl;
+        for (int i = 0; i < 256; ++i)
+            setNativeLine(i);
+        ;} {}
+  }
+    Function {setNativeLine(int line)} {} {
+    code {//;
+        unsigned char R, G, B;
+        R = nativeTable[line];
+        G = nativeTable[line + 256];
+        B = nativeTable[line + 512];
+        Fl::set_color(line, R, G, B);
+        ;} {}
+  }
+
   Function {setClassicTable()} {return_type bool
   } {
     code {//
@@ -1405,22 +1456,23 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         return true;} {}
   }
-  Function {setUserTable(string table)} {return_type bool
+  Function {setUserTable(string table)} {return_type int
   } {
     code {//
         string colourText = loadText(table);
-        bool ok =  true;
+        int ok =  -1;
         std::size_t nextPos;
 
         // strip out preamble text
         string text = "";
         int lineCount = 0;
+        int totalCount = 0;
         while (text.substr(0, 7) != "-------")
         {
             nextPos = colourText.find(char(10));
             if (nextPos == std::string::npos || lineCount > 100)
             {
-                ok = false;
+                ok = totalCount;
                 break;
             }
             else
@@ -1429,38 +1481,45 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 colourText = colourText.substr(nextPos + 1);
             }
             ++lineCount;
+            ++ totalCount;
         }
         if (!ok)
             return false; // invalid file
 
-        if (colourText.at(0) == char(63)) // all native colour table
+        if (colourText.at(0) == char(64)) // all native colour table
+        {
+            setNativeTable();
             return true;
+        }
 
         nextPos = colourText.find(char(10));
         setGreyScale(colourText.substr(0, nextPos));
         colourText = colourText.substr(nextPos + 1);
-
         lineCount = 0;
         do {
             nextPos = colourText.find(char(10));
             if (nextPos == std::string::npos || lineCount > 1000)
             {
-                ok = false;
+                ok = totalCount;
                 break;
             }
             text = colourText.substr(0, nextPos);
             //std::cout << text << std::endl;
-            if (text.at(0) == char(64))
-            {
-                setColourLine(colourData[lineCount + 1], lineCount); // use 'classic' data
-            }
-            else if (text.at(0) != char(63))
+
+            if (text.at(0) != char(64))
             {
                 setColourLine(colourText.substr(0, nextPos), lineCount);
             }
-            // else use default colour table entry
+            else
+            {
+
+                int actual_line = colourNumbers[lineCount];
+                //std::cout << "line " << lineCount << " actual " << actual_line << " " << text << std::endl;
+                setNativeLine(actual_line);
+            }
 
             ++lineCount;
+            ++totalCount;
             colourText = colourText.substr(nextPos + 1);
         } while(colourText.substr(0, 7) != "-------");
         return true;} {}
@@ -1951,5 +2010,7 @@ return true;} {}
   decl {string defTheme;} {private local
   }
   decl {string curTheme;} {private local
+  }
+  decl {int nativeTable[768];} {private local
   }
 }

@@ -58,7 +58,8 @@
 
   56
   58 - 61
-  68 - 72
+  68 - 79
+  72
   75 - 77
   78* bank root 'export' light
   79 - 80
@@ -79,6 +80,8 @@
   160
   161
   164 - 167
+  169 - 173
+  174* filer icon background
   176
   180
   183* filer dir icon
@@ -108,6 +111,7 @@ const int graph_back = 57;
 const int slider_track = 62;
 const int graph_line = 63;
 const int gen_text = 64;
+const int spectrum_line = 71;
 const int keyb_slider_back = 65;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
@@ -130,7 +134,7 @@ const int formant_marker = 134;
 const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
-const int keyb_pitch_peg = 143; // not currently redefinable
+const int keyb_pitch_peg = 143;
 const int knob_ring = 144;
 const int knob_point = 145;
 const int tooltip_grid = 146;
@@ -169,7 +173,7 @@ const int learnable_text = 226;
 const int pad_prof_band = 227;
 const int actions = 228;
 const int VU_level = 229;
-const int keyb_mod_bar = 230; // not currently redefinable
+const int keyb_mod_bar = 230;
 const int pad_prof_fill = 231;
 const int sub_back = 236;
 const int ext_osc = 238;
@@ -191,7 +195,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 80;
+const int COLOURLIST = 81;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -272,6 +276,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     keyb_slider_back,
     keyb_pitch_peg,
     keyb_mod_bar,
+    spectrum_line,
 };
 
 static std::string colourPreamble [] = {
@@ -279,7 +284,6 @@ static std::string colourPreamble [] = {
     "Instead, copy as template for other named themes.",
     "Don't add or remove lines between and including dashes.",
     "This would corrupt the colour map.",
-    "Instead place @ at start of line for default setting.",
     "------------------ data start marker",
     "END"
 }; // Do not change the last two text lines!
@@ -324,8 +328,8 @@ static std::string colourData [] = {
     "255,255,0, Envelope sustain line",
     "255,255,255, Envelope line",
     "255,0,0, Envelope line selected",
-    "80,0,0, Effect preset",
-    "0,80,255, Effect preset changed",
+    "0,0,0, Effect preset",
+    "0,0,255, Effect preset changed",
     "0,0,225, Yoshimi instrument type",
     "240,250,230, Instrument info background",
     "253,246,230, Instrument background",
@@ -340,7 +344,7 @@ static std::string colourData [] = {
     "180,210,240, PadSynth profile fill",
     "0,0,120, PadSynth profile line",
     "150,150,150, PadSynth profile line disabled",
-    "200,0,0, PadSynth harmonic line",
+    "200,0,0, PadSynth spectrum harmonic",
     "159,223,143, External voice",
     "143,191,223, External oscillator",
     "0,145,255, VU 1dB marker",
@@ -365,6 +369,7 @@ static std::string colourData [] = {
     "127,127,127, Keyboard slider backgrounds",
     "0,255,0, Keyboard pitchwheel peg",
     "63,127,255, Keyboard Mod Wheel",
+    "0,255,0, Waveform spectrum harmonic",
     "------------------ data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

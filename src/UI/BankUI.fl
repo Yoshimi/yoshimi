@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -601,10 +601,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window bankuiwindow {
       label Root
       callback {Hide(1);}
-      xywh {794 24 780 570} type Double labelsize 12 labelcolor 64 hide resizable
+      xywh {794 24 780 570} type Double labelsize 12 labelcolor 64 resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
-      code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
+      code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);} visible
     } {
       Fl_Button bankroot {
         label Roots
@@ -696,8 +696,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           callback {//
           setRootHighlight(1);
           removeRootselection();}
-          xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX selection_color 228 labelfont 9 labelsize 12 labelcolor 64
-          code0 {o->value(1);}
+          xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box rootRenamePatch {
           xywh {100 555 83 9} box RFLAT_BOX color 5 labelcolor 49
@@ -1498,7 +1497,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     }} {}
   }
   Function {theme()} {} {
-      code {//
+    code {//
           if (instrumentSeen)
           {
               if(instrumentuiwindow->visible())
@@ -1533,7 +1532,6 @@ class BankUI {: {public BankProcess_, RootProcess_}
           }
          ;} {}
   }
-
   Function {wincheck()} {} {
     code {//
     if (instrumentSeen)

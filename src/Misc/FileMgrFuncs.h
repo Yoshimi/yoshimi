@@ -164,6 +164,7 @@ inline bool isDirectory(const string& chkpath)
     return false;
 }
 
+
 /* performs specific OS command
  * optionally returning a multi-line response
  */
@@ -831,6 +832,42 @@ inline string configDir(void)
     }
     return config;
 }
+
+/*
+ * Tries to find the most relevant entry for example files.
+ * "leafname" can include a subdirectory such as "themes/demo"
+ * The build path is likely to be the most recent but either
+ * of .local or the distro install path could be next.
+ */
+inline string findExampleFile(string leafname)
+{
+    string dir = localPath();
+    string fullname = "";
+    if (!dir.empty())
+    {
+        string tmp = dir + "/examples/" + leafname;
+        if (isRegularFile(tmp))
+            fullname = tmp;
+    }
+    if (fullname.empty())
+    {
+        dir = localDir();
+        if (!dir.empty())
+        {
+            string tmp = dir + "/themes/" + leafname;
+            if (isRegularFile(tmp))
+                fullname = tmp;
+        }
+        if (fullname.empty())
+        {
+            string tmp = "/usr/share/yoshimi/examples/" + leafname;
+            if (isRegularFile(tmp))
+                fullname = tmp;
+        }
+    }
+    return fullname;
+}
+
 
 }//(End)namespace file
 #endif /*FILEMGR_H*/

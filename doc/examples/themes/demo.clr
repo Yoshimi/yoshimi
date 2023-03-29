@@ -1,0 +1,90 @@
+Do not edit this. It may be overwritten.
+Instead, copy as template for other named themes.
+Don't add or remove lines between and including dashes.
+This would corrupt the colour map.
+------------------ data start marker
+0,120, gray scale min-max (can be reversed)
+100,100,230, Knob shadow (R,G,B or #rrggbb)
+255,230,230, Knob highlight
+0,0,100, Knob ring
+200,180,100, Knob ring lit
+200,60,60, Knob_pointer
+0,150,150, Slider track
+255,100,100, Warning type button
+180,90,70, Warning background patch
+0,109,191, Copy/Paste background
+250,150,0, Copy/Paste text
+255,210,210, Tooltip background
+180,180,180, Tooltip grid
+50,50,50, Tooltip major grid
+0,0,255, Tooltip curve
+0,0,200, Tooltip text
+150,150,150, Tooltip faint text
+0,140,130, Filer favourites background
+100,50,100, General text background
+255,250,0, General text
+255,255,255, General opposite text
+0,0,0, General graph background
+0,230,200, Waveform graph grid
+50,180,180, Resonance graph grid
+0,230,200, Harmonics graph grid
+255,165,0, Waveform graph line
+255,127,0, Formant graph line
+255,200,55, Resonance graph line
+0,70,150, EQ graph background
+80,120,160, EQ background disabled
+200,200,0, EQ graph grid
+255,255 0, EQ graph major grid
+0,255,0, EQ graph line
+200,200,80, EQ graph line disabled
+255,255,255, Envelope control point
+0,255,255, Envelope control point selected
+255,255,0, Envelope sustain line
+255,255,255, Envelope line
+255,0,0, Envelope line selected
+255,255,0, Effect preset
+0,255,255, Effect preset changed
+0,0,225, Yoshimi instrument type
+100,140,130, Instrument info background
+113,96,100, Instrument background
+122,075,091, AddSynth background
+075,107,123, SubSynth background
+105,121,073, PadSynth background
+80,105,105, Padsynth harmonics background
+0,100,100, PadSynth profile equivalent background
+180,180, 180, Padsynth profile grid
+90,90,90, Padsynth profile centre mark
+255,0,0, PadSynth profile equivalent markers
+190,190,140, PadSynth profile fill
+255,210,120, PadSynth profile line
+150,150,150, PadSynth profile line disabled
+0,255,255, PadSynth spectrum harmonic
+159,223,143, External voice
+143,191,223, External oscillator
+0,145,255, VU 1dB marker
+63,218,255, VU 5dB marker
+100,220,120, VU 10dB marker
+63,182,255, VU level
+255,255,0, VU rms
+255,0,240,VU overload
+255,215,80, VU_text
+100,140,130, Midilearn text background
+100,000,150, Link buttons
+0,80,100, Alternative link buttons
+0,255,0, Action buttons
+255,255,127, Panels
+200,120,255, Learnable text
+200,255,200, Formant marker
+100,155,100, Formant ghost marker
+255,200,100, Warning text
+255,0,255, Pending button
+150,255,255, Query/Alert background
+0,182,191, Dynfilter filter button
+127,127,127, Keyboard slider backgrounds
+0,255,0, Keyboard pitchwheel peg
+63,127,255, Keyboard Mod Wheel
+255,165,0, Waveform spectrum harmonic
+------------------ data end marker
+Add your own notes here:
+Copyright © 2023 Will Godfrey
+Dark Psycho!

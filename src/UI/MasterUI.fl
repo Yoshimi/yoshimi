@@ -297,7 +297,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {private GuiUpdates}
+class MasterUI {: {private GuiUpdates}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1130,7 +1130,7 @@ class MasterUI {open : {private GuiUpdates}
 
           send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
             tooltip {MIDI channel for this part} xywh {34 350 40 19} labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
-            code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(FL_WHITE);}
+            code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(gen_opp_text);}
             class WidgetSpinner
           }
           Fl_Button partEdit {
@@ -2836,7 +2836,7 @@ Alan Calvert started the project}
                     if (newch < NUM_MIDI_CHANNELS)
                         partMidiCh->textcolor(gen_text);
                     else
-                        partMidiCh->textcolor(FL_WHITE);
+                        partMidiCh->textcolor(gen_opp_text);
                     updatepanel();
                 }
                 else if (isForUs)
@@ -3714,7 +3714,7 @@ Alan Calvert started the project}
     }
     else
     {
-         partMidiCh->textcolor(FL_WHITE);
+         partMidiCh->textcolor(gen_opp_text);
          partMidiCh->redraw();
     }
     partSwitch(next);} {}

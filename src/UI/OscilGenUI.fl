@@ -160,6 +160,7 @@ class OscilSpectrum {: {public Fl_Box}
         fl_color(this->parent()->color());
 
     // draws the spectrum
+    fl_color(spectrum_line);
     for (int i = 0; i < n; ++i)
     {
         int tmp = i * GX + 2;
