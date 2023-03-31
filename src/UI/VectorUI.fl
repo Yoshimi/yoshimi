@@ -285,7 +285,7 @@ switch (res)
         vectorwindow->hide();
         setVisible(synth, false, "Vector");
         vectorSeen = false;}
-        xywh {310 265 57 20} labelfont 13 labelsize 12 labelcolor 64
+        xywh {310 265 57 20} color 196 labelfont 13 labelsize 12 labelcolor 64
       }
       Fl_Group Ygroup {
         label Y

@@ -635,7 +635,7 @@ o->hide();}
             else
                 synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->show();
         }}
-        tooltip {Right click: also reopen previous} xywh {668 565 62 25} box THIN_UP_BOX labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {668 565 62 25} box THIN_UP_BOX color 196 labelcolor 64
       }
       Fl_Button clearHarm {
         label Clear

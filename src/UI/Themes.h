@@ -42,11 +42,6 @@
   Ideally there should be no reserved colours, as that means we are
   not managing them!
 
-  1*  root/bank 'delete' lights
-  2*  root/bank 'select' lights
-  3*  root 'add' bank 'save' lights
-  4*  root/bank 'swap' lights
-  5*  root/bank 'rename' lights
   6*  root/bank slot first swap selection
 
   16* bank extended instruments background
@@ -54,56 +49,46 @@
 
   46* root/bank slot normal background
 
-  51* bank 'occupied' normal background
+  51* root/bank 'occupied' normal background
 
   56
   58 - 61
   68 - 79
   72
   75 - 77
-  78* bank root 'export' light
   79 - 80
   82 - 87
-  88
-  93* bank root 'import' light
   98 - 100
   101
-  102 - 103
+  102 - 102
   104
   106 - 123
   124* filer icon fake lines
   125 - 127
-  130
   138 - 143
   148 - 154
   156
   160
   161
   164 - 167
-  169 - 173
+  169 - 172
   174* filer icon background
-  176
   180
   183* filer dir icon
   184
   185
   186
   187
-  192 - 196
+  192 - 195
   200 - 205
-  208 - 213
-  216
+  209 - 213
   218* query '?' text
-  220
-  224
-  225
   232 - 235
   237* various down boxes
   240 - 243
   248 - 251
   252*  bank current bank highlight
 */
-
 
 const int gen_text_back = 7;
 const int instr_back = 17;
@@ -115,18 +100,23 @@ const int spectrum_line = 71;
 const int keyb_slider_back = 65;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
+const int bank_export = 78;
 const int env_line_sel = 81;
+const int bank_delete = 88;
 const int warning_button = 89;
 const int pending_button = 90;
 const int warning_background = 91;
 const int env_sus = 92;
+const int bank_import = 93;
 const int EQ_line_off = 94;
 const int EQ_line = 95;
 const int EQ_back = 96;
 const int EQ_back_off = 97;
+const int bank_select = 103;
 const int tooltip_major_grid = 105;
 const int pad_harmonic_line = 128;
 const int warning_text = 129;
+const int midi_ignored = 130;
 const int reson_graph_line = 131;
 const int formant_graph_line = 132;
 const int formant_ghost_marker = 133;
@@ -134,6 +124,7 @@ const int formant_marker = 134;
 const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
+const int midi_solo_release = 139;
 const int keyb_pitch_peg = 143;
 const int knob_ring = 144;
 const int knob_point = 145;
@@ -146,7 +137,9 @@ const int pad_equiv_back = 159;
 const int pad_grid_centre = 162;
 const int pad_grid = 163;
 const int VU_over = 168;
+const int bank_add_save = 173;
 const int gen_opp_text = 175;
+const int bank_swap = 176;
 const int tooltip_curve = 177;
 const int VU_bar_1dB = 178;
 const int CP_background = 179;
@@ -156,19 +149,24 @@ const int eff_preset = 188;
 const int eff_preset_changed = 189;
 const int VU_bar_10dB = 190;
 const int query_back = 191;
+const int close_button = 196;
 const int CP_text = 197;
 const int links = 198;
 const int knob_lit = 199;
 const int filer_text_back = 206;
 const int knob_high = 207;
+const int bank_rename = 208;
 const int add_back = 214;
 const int tooltip_back = 215;
 const int graph_Harmonics_grid = 216;
 const int graph_grid = 217;
 const int yoshi_ins_typ = 219;
+const int solo_select = 220;
 const int alt_links = 221;
 const int VU_bar_5dB = 222;
 const int panels = 223;
+const int contrib = 224;
+const int name_derived = 225;
 const int learnable_text = 226;
 const int pad_prof_band = 227;
 const int actions = 228;
@@ -186,7 +184,6 @@ const int env_ctl = 253;
 const int graph_pad_back = 254;
 const int VU_text = 255;
 
-
 /*
   The following are ordered as they are in theme lists.
   They are grouped mainly by function.
@@ -195,7 +192,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 81;
+const int COLOURLIST = 94;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -277,6 +274,20 @@ const unsigned char colourNumbers [COLOURLIST] = {
     keyb_pitch_peg,
     keyb_mod_bar,
     spectrum_line,
+    bank_select,
+    bank_rename,
+    bank_add_save,
+    bank_delete,
+    bank_swap,
+    bank_import,
+    bank_export,
+    close_button,
+    contrib,
+    name_derived,
+    solo_select,
+    midi_solo_release,
+    midi_ignored,
+
 };
 
 static std::string colourPreamble [] = {
@@ -363,14 +374,27 @@ static std::string colourData [] = {
     "255,255,0, Formant marker",
     "150,150,0, Formant ghost marker",
     "255,0,0, Warning text",
-    "255,720,0, Pending button",
+    "255,120,0, Pending button",
     "255,255,255, Query/Alert background",
     "0,182,191, Dynfilter filter button",
     "127,127,127, Keyboard slider backgrounds",
     "0,255,0, Keyboard pitchwheel peg",
     "63,127,255, Keyboard Mod Wheel",
     "0,255,0, Waveform spectrum harmonic",
-    "------------------ data end marker",
+    "0,255,0, Bank/instrument select lit",
+    "255,0,255, Bank/instrument rename lit",
+    "255,255,0, Bank/instrument add/save lit",
+    "255,0,0, Bank/instrument delete lit",
+    "0,0,255, Bank/instrument swap lit",
+    "255,180,0, Bank import lit",
+    "180,240,255, Bank export lit",
+    "127,145,191, Close button",
+    "0,0,255, About heading",
+    "0,0,255, Part name derived",
+    "0,0,255, solo selected",
+    "0,180,180, midi/solo release",
+    "255,0,0, midi ignored",
+    "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",
     "The default theme",

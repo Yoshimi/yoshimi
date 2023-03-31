@@ -403,7 +403,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), false, "Midi-learn");
     midilearnwindow->hide();
     learnSeen = false;}
-        xywh {730 262 63 20} box THIN_UP_BOX labelcolor 64
+        xywh {730 262 63 20} box THIN_UP_BOX color 196 labelcolor 64
       }
       Fl_Button load {
         label Load

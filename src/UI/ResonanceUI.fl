@@ -473,7 +473,7 @@ class ResonanceUI {: PresetsUI_
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
           }}
-        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
   }

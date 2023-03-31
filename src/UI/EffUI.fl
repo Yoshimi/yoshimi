@@ -1186,7 +1186,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
     saveWin(synth, filterwindow->w(), filterwindow->h(), filterwindow->x(), filterwindow->y(), false, "xFilter-dynamic " + to_string(npart));
     filterwindow->hide();}
-        xywh {124 86 46 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {124 86 46 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
   }

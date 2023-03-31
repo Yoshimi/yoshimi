@@ -442,7 +442,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         xywh {5 528 458 42} box ENGRAVED_BOX labelsize 12
       } {
         Fl_Box selectPatch {
-          xywh {11 555 83 9} box RFLAT_BOX color 2 labelcolor 49
+          xywh {11 555 83 9} box RFLAT_BOX color 103 labelcolor 49
         }
         Fl_Button readbutton {
           label SELECT
@@ -453,7 +453,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box renamePatch {
-          xywh {100 555 83 9} box RFLAT_BOX color 5 labelcolor 49
+          xywh {100 555 83 9} box RFLAT_BOX color 208 labelcolor 49
         }
         Fl_Button renamebutton {
           label RENAME
@@ -463,7 +463,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {100 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box savePatch {
-          xywh {190 555 83 9} box RFLAT_BOX color 3 labelcolor 49
+          xywh {190 555 83 9} box RFLAT_BOX color 173 labelcolor 49
         }
         Fl_Button writebutton {
           label SAVE
@@ -473,7 +473,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {190 534 85 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box deletPatch {
-          xywh {280 555 83 9} box RFLAT_BOX color 1 labelcolor 49
+          xywh {280 555 83 9} box RFLAT_BOX color 88 labelcolor 49
         }
         Fl_Button clearbutton {
           label DELETE
@@ -483,7 +483,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {280 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box swapPatch {
-          xywh {370 555 83 9} box RFLAT_BOX color 4 labelcolor 49
+          xywh {370 555 83 9} box RFLAT_BOX color 176 labelcolor 49
         }
         Fl_Button swapbutton {
           label SWAP
@@ -515,7 +515,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         instFrom = 0; // to avoid later confusion!
         Hide(0);
         saveWin(synth, instrumentuiwindow->w(), instrumentuiwindow->h(), instrumentuiwindow->x(), instrumentuiwindow->y(), false, "Bank-instrument");}
-        tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {665 539 70 24} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
       Fl_Group {} {
         xywh {468 528 151 42} box ENGRAVED_FRAME labelsize 12 labelcolor 64
@@ -568,7 +568,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         label Close
         callback {//
         Hide(3);}
-        xywh {228 451 65 24} labelsize 12 labelcolor 64 align 192
+        xywh {228 451 65 24} color 196 labelsize 12 labelcolor 64 align 192
       }
       Fl_Button searchT {
         label {Root Bank Instrument}
@@ -689,7 +689,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         xywh {5 528 635 42} box ENGRAVED_BOX labelsize 12
       } {
         Fl_Box rootSelectPatch {
-          xywh {11 555 83 9} box RFLAT_BOX color 2 labelcolor 49
+          xywh {11 555 83 9} box RFLAT_BOX color 103 labelcolor 49
         }
         Fl_Button rootreadbutton {
           label SELECT
@@ -699,7 +699,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {10 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box rootRenamePatch {
-          xywh {100 555 83 9} box RFLAT_BOX color 5 labelcolor 49
+          xywh {100 555 83 9} box RFLAT_BOX color 208 labelcolor 49
         }
         Fl_Button rootrenamebutton {
           label RENAME
@@ -709,7 +709,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {100 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box rootSavePatch {
-          xywh {190 555 83 9} box RFLAT_BOX color 3 labelcolor 49
+          xywh {190 555 83 9} box RFLAT_BOX color 173 labelcolor 49
         }
         Fl_Button rootwritebutton {
           label ADD
@@ -719,7 +719,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {190 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box rootDeletPatch {
-          xywh {280 555 83 9} box RFLAT_BOX color 1 labelcolor 49
+          xywh {280 555 83 9} box RFLAT_BOX color 88 labelcolor 49
         }
         Fl_Button rootclearbutton {
           label DELETE
@@ -729,7 +729,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
           xywh {280 534 85 25} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 labelfont 9 labelsize 12 labelcolor 64
         }
         Fl_Box rootSwapPatch {
-          xywh {370 555 83 9} box RFLAT_BOX color 4 labelcolor 49
+          xywh {370 555 83 9} box RFLAT_BOX color 176 labelcolor 49
         }
         Fl_Button rootswapbutton {
           label SWAP
@@ -778,7 +778,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             else
                 bankFrom = 0;}
-        tooltip {Right click: also reopen previous} xywh {672 538 70 24} box THIN_UP_BOX labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {672 538 70 24} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
     Fl_Window rootuiwindow {
@@ -900,7 +900,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         else
             rootFrom = 0;
         Hide(2);}
-        tooltip {Right click: also reopen previous} xywh {402 225 51 35} box THIN_UP_BOX labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {402 225 51 35} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
   }

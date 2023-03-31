@@ -96,7 +96,7 @@ class ParametersUI {} {
         callback {//
     saveWin(synth, Recent->w(), Recent->h(), Recent->x(), Recent->y(), false, "Master-recent");
     Recent->hide();}
-        xywh {83 159 57 20} labelfont 13 labelsize 12 labelcolor 64
+        xywh {83 159 57 20} color 196 labelfont 13 labelsize 12 labelcolor 64
       }
       Fl_Text_Display emptytext {
         label {No Entries}

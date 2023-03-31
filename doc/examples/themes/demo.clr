@@ -34,7 +34,7 @@ This would corrupt the colour map.
 0,70,150, EQ graph background
 80,120,160, EQ background disabled
 200,200,0, EQ graph grid
-255,255 0, EQ graph major grid
+255,255,0, EQ graph major grid
 0,255,0, EQ graph line
 200,200,80, EQ graph line disabled
 255,255,255, Envelope control point
@@ -44,7 +44,7 @@ This would corrupt the colour map.
 255,0,0, Envelope line selected
 255,255,0, Effect preset
 0,255,255, Effect preset changed
-0,0,225, Yoshimi instrument type
+200,200,255, Yoshimi instrument type
 100,140,130, Instrument info background
 113,96,100, Instrument background
 122,075,091, AddSynth background
@@ -52,7 +52,7 @@ This would corrupt the colour map.
 105,121,073, PadSynth background
 80,105,105, Padsynth harmonics background
 0,100,100, PadSynth profile equivalent background
-180,180, 180, Padsynth profile grid
+180,180,180, Padsynth profile grid
 90,90,90, Padsynth profile centre mark
 255,0,0, PadSynth profile equivalent markers
 190,190,140, PadSynth profile fill
@@ -84,7 +84,20 @@ This would corrupt the colour map.
 0,255,0, Keyboard pitchwheel peg
 63,127,255, Keyboard Mod Wheel
 255,165,0, Waveform spectrum harmonic
------------------- data end marker
+0,255,0, Bank/instrument select lit
+255,0,255, Bank/instrument rename lit
+255,255,0, Bank/instrument add/save lit
+255,0,0, Bank/instrument delete lit
+0,0,255, Bank/instrument swap lit
+255,180,0, Bank import lit
+180,240,255, Bank export lit
+70,120,70, Close button
+100,255,155, About heading
+100,100,255, Part name derived
+0,255,255, solo selected
+0,0,255, midi/solo release
+255,0,0, midi ignored
+================== data end marker
 Add your own notes here:
 Copyright © 2023 Will Godfrey
 Dark Psycho!

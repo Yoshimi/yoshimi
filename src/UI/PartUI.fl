@@ -564,7 +564,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                   editSeen = false;
                   lasteditW = 0;
                   instrumenteditwindow->hide();}
-        xywh {282 358 100 24} box THIN_UP_BOX labelfont 1 labelcolor 64
+        xywh {282 358 100 24} box THIN_UP_BOX color 196 labelfont 1 labelcolor 64
       }
       Fl_Text_Display originalname {
         label {Derived From}
@@ -572,7 +572,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Text_Display originaltext {
         label text
-        xywh {198 108 1 15} box NO_BOX labelfont 1 labelsize 12 labelcolor 4 align 8 textsize 11 hide
+        xywh {198 108 1 15} box NO_BOX labelfont 1 labelsize 12 labelcolor 225 align 8 textsize 11 hide
       }
     }
     Fl_Window instrumentkitlist {
@@ -675,7 +675,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         kitSeen = false;
         if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {569 348 63 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
     Fl_Window partfx {
@@ -753,7 +753,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         partfx->hide();
         if ((Fl::event_button() == 3))
             synth->getGuiMaster()->partui->instrumenteditwindow->show();}
-        tooltip {Right click: also reopen previous} xywh {307 136 60 20} box THIN_UP_BOX labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {307 136 60 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
     comment {ctlmidi, ctlwindow, aftertouch control MUST be that order} {in_source in_header
@@ -811,7 +811,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
                 ctlmidiSeen = false;
                 ctlmidi->hide();}
-        xywh {309 35 50 20} box THIN_UP_BOX labelcolor 64
+        xywh {309 35 50 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
     Fl_Window ctlwindow {
@@ -1061,7 +1061,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         ctlSeen = false;
         lastctlW = 0;
         ctlwindow->hide();}
-        xywh {405 105 95 20} box THIN_UP_BOX labelcolor 64
+        xywh {405 105 95 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
     Fl_Window aftertouchcontrol {
@@ -1281,7 +1281,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
         atSeen = 0;
         aftertouchcontrol->hide();}
-        xywh {420 154 50 20} box THIN_UP_BOX labelcolor 64
+        xywh {420 154 50 20} box THIN_UP_BOX color 196 labelcolor 64
       }
     }
   }

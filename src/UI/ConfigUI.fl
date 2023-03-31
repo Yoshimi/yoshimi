@@ -759,7 +759,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         Fl_Group themeTab {
           callback {//}
-          xywh {5 25 382 277} box THIN_UP_BOX
+          xywh {5 25 382 277} box THIN_UP_BOX hide
         } {
           Fl_Browser theme_browser {
             label Themes
@@ -770,7 +770,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         if (result < 0)
             return;
         string line = string(o->text(result));
-        //std::cout << "here >" << line << std::endl;
         if (line == "classic")
         {
             setClassicTable();
@@ -778,7 +777,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         else
         {
             string fileName = file::localDir()+ "/themes/" + line + EXTEN::theme;
-            setUserTable(fileName);
+            int errLine = setUserTable(fileName);
+            if (errLine != -1)
+                themeError(errLine);
 
             //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
         }
@@ -786,8 +787,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         curTheme = line;
         while (defTheme.at(defTheme.length() - 1) < '!') // tidy up
             defTheme.pop_back(); // deals with spurious trailing whitespace
-        //std::cout <<"line>" << line << "<" << std::endl;
-        //std::cout <<"def>" << defTheme << "<" << std::endl;
+
        if (line == defTheme)
         {
             nuTheme->hide();
@@ -806,7 +806,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::Themes);
         if (filename.empty())
         {
-            std::cout << "not here" << std::endl;
+            synth->getRuntime().Log("Can't find " + filename);
             return;
         }
         filename += EXTEN::theme;
@@ -818,7 +818,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         else
         {
-           std::cout << "failed " << result << std::endl;
+           synth->getRuntime().Log("Failed to install " + filename);
         }}
             xywh {255 75 100 20} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64
           }
@@ -880,7 +880,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {150 306 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
       Fl_Button close {
         label {Close Unsaved}
@@ -888,7 +888,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {270 306 105 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {270 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
     Fl_Window presets {
@@ -1262,7 +1262,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         std::list<string>::iterator itr = themes.begin();
         while (itr != themes.end())
         {
-            //std::cout << *itr << std::endl;
             string text = file::findExtension(*itr);
             if (text == ".clr")
             {
@@ -1296,8 +1295,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
         }
 
-       // Note: Fluid screws up text with control values and @
-       // contexts so we enter them as char(n)
+       /*
+        * Note: Fluid screws up text with control values and @
+        * so we enter them as char(n)
+        */
 
       // prints the native colour table
       /*unsigned char RR,GG,BB;
@@ -1328,19 +1329,21 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       string currentTheme = file::loadText(themeDir+"ID/current.txt");
       while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
           currentTheme.pop_back(); // deals with spurious trailing whitespace
-      //std::cout << "current >" << currentTheme << "<" << std::endl;
+
       if (currentTheme != "classic.clr")
       {
           string fileName = themeDir+ currentTheme;
           if (file::isRegularFile(fileName))
           {
-                setUserTable(fileName);
+                int errLine = setUserTable(fileName);
+                if (errLine != -1)
+                    themeError(errLine);
                 return;
           }
       }
       setClassicTable();
 
-      //Fl::set_color(4, 255, 0, 0); // for testing
+      //Fl::set_color(196, 127, 145, 191); // for testing
 
       ;} {}
   }
@@ -1362,20 +1365,17 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 ok = false;
             else
                 theme_ID = func::string2int(file::loadText(themeDir + "ID/version"));
-            //std::cout << "ok " << int(ok) << "  " << theme_ID << std::endl;
         }
         if (ok)
         {
             if (build_ID != theme_ID)
-                ok = false;
-            //std::cout << "build " << build_ID << " theme " << theme_ID << std::endl;
+                ok = false;;
         }
         if (ok)
         {
             string filename = themeDir +"ID/" + "current.txt";
             if(!file::isRegularFile(filename))
                 ok = false;
-            //std::cout << "ok " << int(ok) << "  >" << filename << "<" << std::endl;
         }
 
         if (ok)
@@ -1383,7 +1383,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
         file::saveText(to_string(build_ID), themeDir + "ID/version");
         string res = themeDir + "ID/version";
-        std::cout << "version>" << res << std::endl;
+        //std::cout << "version>" << res << std::endl;
         string colourText;
         int info = 0;
         do {
@@ -1415,13 +1415,15 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
        bool ok = true;
        string currentTheme = synth->getRuntime().remoteGuiTheme;
        if ((!file::isRegularFile(currentTheme)))
+       {
            return false;
+       }
        if (!currentTheme.empty())
        {
            int errLine = setUserTable(currentTheme);
            if (errLine != -1)
            {
-               std::cout << "Failed at line " << errLine << std::endl;
+               themeError(errLine);
                ok = false;
            }
        }
@@ -1429,12 +1431,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {setNativeTable()} {} {
     code {//
-        //std::cout << nativeTable[7] << " " << nativeTable[256+7] << " " << nativeTable[512+7] << std::endl;
         for (int i = 0; i < 256; ++i)
             setNativeLine(i);
         ;} {}
   }
-    Function {setNativeLine(int line)} {} {
+  Function {setNativeLine(int line)} {} {
     code {//;
         unsigned char R, G, B;
         R = nativeTable[line];
@@ -1443,7 +1444,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         Fl::set_color(line, R, G, B);
         ;} {}
   }
-
   Function {setClassicTable()} {return_type bool
   } {
     code {//
@@ -1460,92 +1460,124 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
         string colourText = loadText(table);
-        int ok =  -1;
         std::size_t nextPos;
 
         // strip out preamble text
         string text = "";
         int lineCount = 0;
-        int totalCount = 0;
+        int totalCount = 1;
         while (text.substr(0, 7) != "-------")
         {
             nextPos = colourText.find(char(10));
-            if (nextPos == std::string::npos || lineCount > 100)
+            if (nextPos == std::string::npos)
             {
-                ok = totalCount;
-                break;
+                return -2;
             }
-            else
-            {
-                text = colourText.substr(0, nextPos);
-                colourText = colourText.substr(nextPos + 1);
-            }
+
+            text = colourText.substr(0, nextPos);
+            colourText = colourText.substr(nextPos + 1);
             ++lineCount;
-            ++ totalCount;
+            ++totalCount;
         }
-        if (!ok)
-            return false; // invalid file
+        if (text.substr(0, 7) != "-------")
+            return -2;
+        int dataStart = totalCount;
 
         if (colourText.at(0) == char(64)) // all native colour table
         {
             setNativeTable();
-            return true;
+            return -1; // doesn't matter if there's no more to the file
         }
 
         nextPos = colourText.find(char(10));
-        setGreyScale(colourText.substr(0, nextPos));
+        if (!setGreyScale(colourText.substr(0, nextPos)))
+        {
+            return totalCount;
+        }
+
+        ++totalCount; // allow for greyscale line
         colourText = colourText.substr(nextPos + 1);
         lineCount = 0;
+        bool ok = true;
         do {
-            nextPos = colourText.find(char(10));
-            if (nextPos == std::string::npos || lineCount > 1000)
+            if ((totalCount - dataStart) >= COLOURLIST)
             {
-                ok = totalCount;
-                break;
+                return -3; // missing marker
             }
-            text = colourText.substr(0, nextPos);
-            //std::cout << text << std::endl;
 
-            if (text.at(0) != char(64))
+            nextPos = colourText.find(char(10));
+            if (nextPos == std::string::npos)
             {
-                setColourLine(colourText.substr(0, nextPos), lineCount);
+                return -4; // too short and no marker!
+            }
+
+            text = colourText.substr(0, nextPos);
+            if (text.at(0) == char(64))
+            {
+                int actual_line = colourNumbers[lineCount];
+                setNativeLine(actual_line);
             }
             else
             {
+                ok = setColourLine(colourText.substr(0, nextPos), lineCount);
+            }
 
-                int actual_line = colourNumbers[lineCount];
-                //std::cout << "line " << lineCount << " actual " << actual_line << " " << text << std::endl;
-                setNativeLine(actual_line);
+            if (!ok)
+            {
+                if (colourText.substr(0, 7) == "-------")
+                    return -4; // old style too short
+                return totalCount;
             }
 
             ++lineCount;
             ++totalCount;
             colourText = colourText.substr(nextPos + 1);
-        } while(colourText.substr(0, 7) != "-------");
-        return true;} {}
+        } while(colourText.substr(0, 7) != "=======");
+
+        if ((totalCount - dataStart) < COLOURLIST)
+        {
+            return -4; // too short
+        }
+        return -1;
+        ;} {}
   }
   Function {setGreyScale(string text)} {return_type bool
   } {
     code {//
-        if (text.at(0) == char(64))
-        {
-            setGreyScale(colourData[0]);
-            return true; // keep default scale
-        }
         size_t nextPos = text.find(",");
         if (nextPos == std::string::npos)
+        {
             return false;
+        }
+
+        if (!isdigit(text.at(0)))
+        {
+            return false;
+        }
+
         int min = string2int(text.substr(0, nextPos));
         if (min < 0 || min > 255)
+        {
             return false;
+        }
 
         text = text.substr(nextPos + 1);
         nextPos = text.find(",");
         if (nextPos == std::string::npos)
+        {
             return false;
+        }
+
+        if (!isdigit(text.at(0)))
+        {
+            return false;
+        }
+
         int max = string2int(text.substr(0, nextPos));
         if (max < 0 || max > 255)
+        {
             return false;
+        }
 
         float greyRange;
         if (max > min)
@@ -1555,7 +1587,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
            {
                 int diff = (min + int(i * greyRange)) + 1;
                 Fl::set_color(i + 32, diff, diff, diff);
-                //std::cout << diff << std::endl;
            }
         }
         else
@@ -1565,10 +1596,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
            {
                int diff = (min - int(i * greyRange)) - 1 ;
                Fl::set_color(i + 32, diff, diff, diff);
-               //std::cout << diff << std::endl;
            }
        }
-return true;} {}
+  return true;
+  ;} {}
   }
   Function {setColourLine(string text, int item)} {return_type bool
   } {
@@ -1584,6 +1615,8 @@ return true;} {}
             Fl::set_color(colourNumbers[item],hexNumber * 256);
             return true;
         }
+        if (!isdigit(text.at(0)))
+            return false;
         int red = string2int(text.substr(0, nextPos));
         if (red < 0 || red > 255)
             return false;
@@ -1592,17 +1625,22 @@ return true;} {}
         nextPos = text.find(",");
         if (nextPos == std::string::npos)
             return false;
+        if (!isdigit(text.at(0)))
+            return false;
         int green = string2int(text.substr(0, nextPos));
         if (green < 0 || green > 255)
             return false;
 
         text = text.substr(nextPos + 1);
+        if (!isdigit(text.at(0)))
+            return false;
         int blue = string2int(text); // don't need comma test here
         if (blue < 0 || blue > 255)
             return false;
 
         Fl::set_color(colourNumbers[item], red, green, blue);
-        return true;} {}
+        return true;
+        ;} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
     code {//
@@ -1616,6 +1654,18 @@ return true;} {}
                 removepresetbutton->deactivate();
                 makedefaultpresetbutton->deactivate();
             }} {}
+  }
+  Function {themeError(int errLine)} {} {
+    code {//
+        if (errLine == -2)
+            synth->getRuntime().Log("Theme: Missing data start marker");
+        else if (errLine == -3)
+            synth->getRuntime().Log("Theme: Missing data end marker");
+        else if (errLine == -4)
+            synth->getRuntime().Log("Theme: Short file");
+        else
+            synth->getRuntime().Log("Theme: Failed at line " + std::to_string(errLine));
+        ;} {}
   }
   Function {recoverID()} {return_type int
   } {

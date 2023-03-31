@@ -124,7 +124,7 @@ o->hide();}
         callback {//
         copywin->hide();
         saveWin(synth, copywin->w(), copywin->h(), copywin->x(), copywin->y(), false,"PresetWin");}
-        xywh {160 385 80 35} box THIN_UP_BOX labelcolor 64 align 192
+        xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
       }
       Fl_Box copytype {
         label {Type:}
@@ -216,7 +216,7 @@ o->hide();}
         callback {//
         pastewin->hide();
         saveWin(synth, pastewin->w(), pastewin->h(), pastewin->x(), pastewin->y(), false,"PresetWin");}
-        xywh {160 385 80 35} box THIN_UP_BOX labelcolor 64 align 192
+        xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
       }
       Fl_Box pastetypetext {
         xywh {55 5 200 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 labelcolor 64 align 20

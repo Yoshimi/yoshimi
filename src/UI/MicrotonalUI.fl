@@ -381,7 +381,7 @@ class MicrotonalUI {} {
     saveWin(synth, microtonaluiwindow->w(), microtonaluiwindow->h(), microtonaluiwindow->x(), microtonaluiwindow->y(), false, "Scales");
     microtonaluiwindow->hide();
     lastscaleSeen = false;}
-        xywh {315 447 67 28} box THIN_UP_BOX down_box THIN_DOWN_BOX labelcolor 64
+        xywh {315 447 67 28} box THIN_UP_BOX down_box THIN_DOWN_BOX color 196 labelcolor 64
       }
     }
   }

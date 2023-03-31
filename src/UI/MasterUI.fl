@@ -488,8 +488,7 @@ class MasterUI {: {private GuiUpdates}
 
     return (fetchO != 0);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1025,7 +1024,7 @@ class MasterUI {: {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -1129,7 +1128,7 @@ class MasterUI {: {private GuiUpdates}
               setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
 
           send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
-            tooltip {MIDI channel for this part} xywh {34 350 40 19} labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
+            tooltip {MIDI channel for this part} xywh {34 350 40 19} color 7 selection_color 65 labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
             code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(gen_opp_text);}
             class WidgetSpinner
           }
@@ -1529,12 +1528,12 @@ Instance from 1 to 31}
     }
     Fl_Window aboutwindow {
       label {About Yoshimi}
-      xywh {46 64 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide resizable
+      xywh {46 64 365 290} type Double color 7 labelfont 13 labelsize 13 labelcolor 64 when 0 hide resizable
       code0 {aboutDW = 365; aboutDH = 290;}
       code1 {o->size_range(aboutDW,aboutDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group aboutFirst {
-        xywh {0 0 365 290}
+        xywh {0 0 365 290} color 7 labelcolor 64
       } {
         Fl_Box about1 {
           label {Yoshimi
@@ -1549,7 +1548,7 @@ Copyright 2012-2013, Jeremy Jongepier and others
 Copyright 2014-2021, Will Godfrey and others
 LV2 plugin Copyright 2014, Andrew Deryabin
 Splash Image Copyright 2017, Jesper Lloyd}
-          xywh {25 90 315 91} color 51 selection_color 30 labelfont 13 labelsize 11 labelcolor 64
+          xywh {25 90 315 91} labelfont 13 labelsize 11 labelcolor 64
         }
         Fl_Box about3 {
           label {This is free software, and comes with ABSOLUTELY NO
@@ -1560,7 +1559,7 @@ any later version.}
         }
         Fl_Box about4 {
           label { version}
-          xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 216
+          xywh {61 254 240 20} labelfont 1 labelsize 12 labelcolor 224
           code0 {//
             o->copy_label((string("Yoshimi version ")
                            + string(YOSHIMI_VERSION)).c_str());}
@@ -1570,17 +1569,17 @@ any later version.}
           callback {//
                  contributors->show();
                  aboutFirst->hide();}
-          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          tooltip {Yoshimi's little band of helpers} xywh {15 253 43 22} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64
         }
       }
       Fl_Group contributors {
-        xywh {5 5 355 280} box FLAT_BOX color 7 labelcolor 7 hide
+        xywh {5 5 355 280} box FLAT_BOX color 7 labelcolor 64 hide
       } {
         Fl_Box cont1 {
           label {Some people who have helped Yoshimi
  in various ways since
 Alan Calvert started the project}
-          xywh {12 8 340 57} color 7 labelfont 9 labelsize 15 labelcolor 4
+          xywh {12 8 340 57} labelfont 9 labelsize 15 labelcolor 224
         }
         Fl_Box cont2 {
           label {
@@ -1627,7 +1626,7 @@ Alan Calvert started the project}
         aboutFirst->show();
         contributors->hide();
         aboutwindow->hide();}
-        xywh {305 253 43 22} box THIN_UP_BOX labelsize 11 labelcolor 64
+        xywh {305 253 43 22} box THIN_UP_BOX color 196 labelfont 1 labelsize 11 labelcolor 64
       }
     }
     Fl_Window syseffsendwindow {
@@ -1657,7 +1656,7 @@ Alan Calvert started the project}
     saveWin(synth, syseffsendwindow->w(), syseffsendwindow->h(), syseffsendwindow->x(), syseffsendwindow->y(), false, "Master-systemeffectsend");
     syseffsendwindow->hide();
     syseffSeen = false;}
-        xywh {20 216 80 25} box THIN_UP_BOX labelcolor 64
+        xywh {20 216 80 25} box THIN_UP_BOX color 196 labelcolor 64
       }
       Fl_Box syseffname {
         label {Send output of system effect  to other system effects}
@@ -1765,7 +1764,7 @@ Alan Calvert started the project}
     panelType |= 4;
     saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
     panelwindow->hide();}
-        xywh {975 290 60 25} box THIN_UP_BOX labelfont 1 labelcolor 64
+        xywh {975 290 60 25} box THIN_UP_BOX color 196 labelfont 1 labelcolor 64
       }
     }
     Fl_Window message {
@@ -1803,7 +1802,7 @@ Alan Calvert started the project}
                 cancel->hide();
                 message->hide();
                 msgSeen = false;}
-        xywh {211 60 70 20} labelcolor 64
+        xywh {211 60 70 20} color 196 labelcolor 64
       }
     }
     Fl_Window querywindow {
@@ -1943,7 +1942,7 @@ Alan Calvert started the project}
         filerdone = true;
         filernewname->value("Exit");
         saveWin(synth, filerwindow->w(), filerwindow->h(), filerwindow->x(), filerwindow->y(), false, "Master-filer");}
-        xywh {463 320 78 20} labelfont 1 labelsize 12 labelcolor 64
+        xywh {463 320 78 20} color 196 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Group filernamegroup {
         label Name
@@ -2640,9 +2639,9 @@ Alan Calvert started the project}
                 if (tmp >= NUM_MIDI_CHANNELS)
                 {
                     if (tmp >= NUM_MIDI_CHANNELS * 2)
-                        textCol = FL_RED;
+                        textCol = midi_ignored;
                     else
-                        textCol = FL_DARK_CYAN;
+                        textCol = gen_text;
                     tmp = (tmp % NUM_MIDI_CHANNELS);
                 }
                 partMidiCh->textcolor(textCol);
@@ -2833,10 +2832,10 @@ Alan Calvert started the project}
                     }
                     partMidiCh->value(newch + 1);
 
-                    if (newch < NUM_MIDI_CHANNELS)
+                    //if (newch < NUM_MIDI_CHANNELS)
                         partMidiCh->textcolor(gen_text);
-                    else
-                        partMidiCh->textcolor(gen_opp_text);
+                    //else
+                        //partMidiCh->textcolor(midi_solo_release);
                     updatepanel();
                 }
                 else if (isForUs)
@@ -3714,8 +3713,9 @@ Alan Calvert started the project}
     }
     else
     {
-         partMidiCh->textcolor(gen_opp_text);
-         partMidiCh->redraw();
+        //partMidiCh->textcolor(midi_solo_release);
+        partMidiCh->textcolor(gen_text);
+        partMidiCh->redraw();
     }
     partSwitch(next);} {}
   }

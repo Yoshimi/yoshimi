@@ -864,7 +864,7 @@ class PADnoteUI {: {public PresetsUI_}
             else
                 synth->getGuiMaster()->partui->instrumenteditwindow->show();
         }}
-        tooltip {Right click: also reopen previous} xywh {505 410 61 24} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {505 410 61 24} box THIN_UP_BOX color 196 labelfont 1 labelsize 12 labelcolor 64
       }
     }
   }
@@ -954,7 +954,7 @@ class PADnoteUI {: {public PresetsUI_}
               randSeen = false;
               if ((Fl::event_button() == 3))
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();}
-          xywh {175 124 50 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+          xywh {175 124 50 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
         }
       }
     }

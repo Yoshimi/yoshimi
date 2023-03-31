@@ -419,7 +419,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         saveWin(synth, virkeyboardwindow->w(), virkeyboardwindow->h(), virkeyboardwindow->x(), virkeyboardwindow->y(), false, "Midi-virtualkeyboard");
         virtSeen = false;
     	lastvirtW = 0;}
-        xywh {452 101 55 20} box THIN_UP_BOX labelsize 12
+        xywh {452 101 55 20} box THIN_UP_BOX color 196 labelsize 12
       }
       Fl_Slider controlslider {
         callback {//

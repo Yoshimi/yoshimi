@@ -1,7 +1,7 @@
 /*
     CmdOptions.cpp
 
-    Copyright 2021, Will Godfrey.
+    Copyright 2021-2023, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -51,14 +51,14 @@ namespace { // constants used in the implementation
         {"jack-midi",         'j',  "<device>",   1,  "use jack midi input", 0},
         {"autostart-jack",    'k',  NULL,         0,  "auto start jack server", 0},
         {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio", 0},
-        {"load",              'l',  "<file>",     0,  "load .xmz file", 0},
-        {"load-instrument",   'L',  "<file>[@part]",     0,  "load .xiz file (to specified part)", 0},
-        {"load-midilearn",    'M',  "<file>",     0,  "load .xly file", 0},
+        {"load",              'l',  "<file>",     0,  "load .xmz parameters file", 0},
+        {"load-instrument",   'L',  "<file>[@part]",     0,  "load .xiz instrument file (no space)@n to given part", 0},
+        {"load-midilearn",    'M',  "<file>",     0,  "load .xly midi-learn file", 0},
         {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname", 0},
         {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate", 0},
         {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscillator size", 0},
-        {"state",             'S',  "<file>",     1,  stateText.c_str(), 0},
-        {"load-guitheme",     'T',  "<file>",     0,  "load .clr file", 0},
+        {"state",             'S',  "<file>",     1,  "load .state complete machine setup file", 0},
+        {"load-guitheme",     'T',  "<file>",     0,  "load .clr GUI theme file", 0},
         {"null",               13,  NULL,         0,  "use Null-backend without audio/midi", 0},
         #if defined(JACK_SESSION)
             {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid", 0},

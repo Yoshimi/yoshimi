@@ -457,7 +457,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
         label Close
         callback {freemodeeditwindow->hide();
 saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(), false, "xEnvelope-free " + to_string(engine) + " " + to_string(group));}
-        xywh {519 155 44 20} box THIN_UP_BOX selection_color 64 labelsize 12 labelcolor 64
+        xywh {519 155 44 20} box THIN_UP_BOX color 196 selection_color 64 labelsize 12 labelcolor 64
       }
     }
   }

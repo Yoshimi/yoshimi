@@ -756,7 +756,7 @@ class FilterUI {selected : {public Fl_Group,PresetsUI_}
     formantSeen = false,
     formantparswindow->hide();
     lastformantW = 0;}
-          xywh {643 170 50 25} box THIN_UP_BOX labelcolor 64
+          xywh {643 170 50 25} box THIN_UP_BOX color 196 labelcolor 64
         }
         Fl_Button formCopy {
           label C
