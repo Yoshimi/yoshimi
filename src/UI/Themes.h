@@ -56,7 +56,7 @@
   68 - 79
   72
   75 - 77
-  79 - 80
+  79
   82 - 87
   98 - 100
   101
@@ -96,10 +96,10 @@ const int graph_back = 57;
 const int slider_track = 62;
 const int graph_line = 63;
 const int gen_text = 64;
-const int spectrum_line = 71;
 const int keyb_slider_back = 65;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
+const int spectrum_line = 71;
 const int bank_export = 78;
 const int env_line_sel = 81;
 const int bank_delete = 88;
@@ -183,6 +183,8 @@ const int midi_text_back = 247;
 const int env_ctl = 253;
 const int graph_pad_back = 254;
 const int VU_text = 255;
+const int slider_peg_default = 70;
+const int slider_peg_changed = 80;
 
 /*
   The following are ordered as they are in theme lists.

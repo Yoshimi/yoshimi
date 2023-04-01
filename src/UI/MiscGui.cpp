@@ -627,8 +627,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
 }
 
-// static string freqBPMStr(float val)
-// This has been moved as bpm2text in Misc/NumericFuncs.h with other BPM shared functions
+// for setting slider peg colour
+int setSlider(int current, int normal)
+{
+    if (current == normal)
+        return slider_peg_default;
+    else
+       return slider_peg_changed;
+}
 
 
 string convert_value(ValueType type, float val)

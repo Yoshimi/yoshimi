@@ -686,7 +686,7 @@ class PADnoteUI {: {public PresetsUI_}
             }
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope}
-              xywh {10 95 250 70} box FLAT_BOX color 51 labelsize 12 align 144
+              xywh {10 95 275 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, 2, 0);}
               class EnvelopeUI
             } {}

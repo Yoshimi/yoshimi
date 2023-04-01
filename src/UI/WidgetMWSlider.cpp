@@ -176,12 +176,8 @@ void mwheel_slider::draw()
      */
 
 /*
-    //Slider peg colour
-    // This bit not ready. Only works for zero, need any default
-    if (this->value() > 0.5 || this->value() < -0.5)
-        this->selection_color(6);
-    else
-        this->selection_color(15);
+    // Slider peg colour - don't need to hack this bit!
+    // Found it easy enough to do it in the main code.
 */
 
     unsigned char r,g,b;

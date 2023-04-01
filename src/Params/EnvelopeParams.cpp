@@ -62,7 +62,7 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
         Penvdt[i] = 32;
         Penvval[i] = 64;
     }
-    Penvdt[0] = 0; // no used
+    Penvdt[0] = 0; // not used
     store2defaults();
 }
 
@@ -377,6 +377,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                 case ENVELOPEINSERT::control::points:
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
+                    type &= ~learnable;
                     def = 2;
                     break;
                 default:
@@ -430,6 +431,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                 case ENVELOPEINSERT::control::points:
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
+                    type &= ~learnable;
                     def = 1;
                     break;
                 default:
@@ -488,6 +490,7 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                 case ENVELOPEINSERT::control::points:
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
+                    type &= ~learnable;
                     def = 2;
                     break;
                 default:

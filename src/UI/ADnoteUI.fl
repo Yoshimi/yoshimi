@@ -515,17 +515,21 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               Fl_Value_Slider ModVolume {
                 label Vol
                 callback {//
+                    o->selection_color(setSlider(o->value(),90));
                     send_data(0, ADDVOICE::control::modulatorAmplitude, o->value(), TOPLEVEL::type::Integer);}
                 tooltip Volume xywh {585 70 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
+                code1 {o->selection_color(setSlider(o->value(),90));}
                 class mwheel_val_slider_rev
               }
               Fl_Value_Slider ModVsense {
                 label {V.Sns}
                 callback {//
+                    o->selection_color(setSlider(o->value(),64));
                     send_data(0, ADDVOICE::control::modulatorVelocitySense, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {585 90 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVelocityScaleFunction);}
+                code1 {o->selection_color(setSlider(o->value(),64));}
                 class mwheel_val_slider_rev
               }
               Fl_Group voiceFMampenvgroup {
@@ -551,9 +555,11 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
               Fl_Value_Slider ModFdamp {
                 label {F.Damp}
                 callback {//
+                    o->selection_color(setSlider(o->value(),0));
                     send_data(0, ADDVOICE::control::modulatorHFdamping, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Modulator Damp at Higher frequency} xywh {585 110 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum -64 maximum 63 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolumeDamp-64);}
+                code1 {o->selection_color(setSlider(o->value(),0));}
                 class mwheel_val_slider_rev
               }
             }
@@ -586,10 +592,12 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 Fl_Slider ModPhase {
                   label Phase
                   callback {//
+                    o->selection_color(setSlider(o->value(),0));
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
                   tooltip {Phase offset} xywh {711 402 74 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
+                  code2 {o->selection_color(setSlider(o->value(),0));}
                   class mwheel_slider_rev
                 }
                 Fl_Choice ExtModOsc {
@@ -820,10 +828,12 @@ Oscillator}
                 Fl_Slider VoiceOscPhase {
                   label Phase
                   callback {//
+                o->selection_color(setSlider(o->value(),0));
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorPhase, o->value(), TOPLEVEL::type::Integer);}
                   tooltip {Phase offset} xywh {9 586 72 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(64-pars->VoicePar[nvoice].Poscilphase);}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
+                  code2 {o->selection_color(setSlider(o->value(),0));}
                   class mwheel_slider_rev
                 }
               }
@@ -998,7 +1008,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
           }
           Fl_Group voiceampenvgroup {
             label {ADSynth Voice - Amplitude Envelope}
-            xywh {10 135 205 70} box FLAT_BOX color 51 align 144
+            xywh {10 135 275 70} box FLAT_BOX color 51 align 144
             code0 {o->init(pars->VoicePar[nvoice].AmpEnvelope, npart, kititem, nvoice + PART::engine::addVoice1, 0);}
             code1 {if (!pars->VoicePar[nvoice].PAmpEnvelopeEnabled) o->deactivate();}
             class EnvelopeUI
@@ -1099,10 +1109,12 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
           Fl_Value_Slider Delay {
             label Delay
             callback {//
+                o->selection_color(setSlider(o->value(),0));
                 send_data(0, ADDVOICE::control::delay, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Time before the voice activates} xywh {76 50 124 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 1 maximum 127 step 1 textcolor 64
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
             code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
+            code2 {o->selection_color(setSlider(o->value(),0));}
             class mwheel_slider_rev
           }
         }
@@ -1420,14 +1432,17 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::modulatorAmplitude:
             ModVolume->value(value);
+            ModVolume->selection_color(setSlider(ModVolume->value(),90));
             break;
 
         case ADDVOICE::control::modulatorVelocitySense:
             ModVsense->value(value);
+            ModVsense->selection_color(setSlider(ModVsense->value(),64));
             break;
 
         case ADDVOICE::control::modulatorHFdamping:
             ModFdamp->value(value);
+            ModFdamp->selection_color(setSlider(ModFdamp->value(),0));
             break;
 
         case ADDVOICE::control::enableModulatorAmplitudeEnvelope:
@@ -1484,6 +1499,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         case ADDVOICE::control::modulatorOscillatorPhase:
             ModPhase->value(value);
             oscFM->phase = 64 - lrint(value);
+            ModPhase->selection_color(setSlider(ModPhase->value(),0));
             update_fmoscil();
             oscFM->redraw();
             modoscil->redraw();
@@ -1509,6 +1525,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::delay:
             Delay->value(value);
+            Delay->selection_color(setSlider(Delay->value(),0));
             break;
 
         case ADDVOICE::control::enableVoice:
@@ -1543,6 +1560,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             tmp = (int)value;
             VoiceOscPhase->value(tmp);
             osc->phase = 64 - tmp;
+            VoiceOscPhase->selection_color(setSlider(VoiceOscPhase->value(),0));
             update_voiceoscil();
             voiceoscil->redraw();
             osclabel->redraw();
@@ -2105,7 +2123,7 @@ send_data(0, ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integ
         }
         Fl_Group ampenv {
           label {ADSynth Global - Amplitude Envelope}
-          xywh {10 75 205 70} box FLAT_BOX color 51 labelsize 12 align 144
+          xywh {10 75 275 70} box FLAT_BOX color 51 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 0, 0);}
           class EnvelopeUI
         } {}

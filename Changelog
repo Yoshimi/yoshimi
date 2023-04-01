@@ -1,5 +1,14 @@
 yoshimi 2.2.3 M
 
+2023-4-1 Will
+bn 2200
+BugFix: Envelope freemode sustain was set learnable.
+Corrected freemode add/delete button types.
+Controllers pitchwheel & threshold not marked learnable.
+Adjusted amplitude envelope panel width to match others.
+Started marking default slider position with peg colour.
+    Only a few bits of AddSynth voice done so far.
+
 2023-3-31 Will
 bn 2199
 Error check on theme files now very pedantic reporting

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of original ZynAddSubFX code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <stdlib.h>} {public local
@@ -341,7 +341,8 @@ class VirKeys {: {public Fl_Box}
   }
 }
 
-class VirKeyboard {} {
+class VirKeyboard {selected
+} {
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
@@ -394,11 +395,13 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         callback {//
         if (Fl::event_button() == 3)
             o->value(100);
-        virkeys->midivel=(int) o->value();
+        virkeys->midivel=int(o->value());
+        o->selection_color(setSlider(o->value(), 100));
         virkeys->take_focus();}
         tooltip Velocity xywh {96 106 110 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
-        class mwheel_val_slider_rev
+        code1 {o->selection_color(setSlider(o->value(), 100));}
+        class mwheel_slider_rev
       }
       Fl_Counter octave {
         label Octave

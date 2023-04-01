@@ -72,7 +72,7 @@ decl {\#include "Interface/TextLists.h"} {public local
 }
 
 class PartUI_ {} {
-  Function {showparameters(int /* kititem */,int /* engine */)} {open return_type virtual
+  Function {showparameters(int /* kititem */,int /* engine */)} {return_type virtual
   } {
     code {;} {}
   }
@@ -119,7 +119,7 @@ class PartKitItem {: {public Fl_Group}
           }
 
           send_data(0, PART::control::minNote, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {225 4 55 15} type Simple labelcolor 64 minimum 0 maximum 128 step 1 textfont 1 textsize 12 textcolor 64
+          xywh {225 4 55 15} type Simple labelcolor 64 minimum 0 maximum 127 step 1 textfont 1 textsize 12 textcolor 64
           code0 {o->value(part->kit[n].Pminkey);}
         }
         Fl_Button setmin {
@@ -175,7 +175,7 @@ class PartKitItem {: {public Fl_Group}
               o->value(tmp);
           }
           send_data(0, PART::control::maxNote, tmp, TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {335 4 55 15} type Simple labelcolor 64 minimum 0 maximum 128 step 1 textfont 1 textsize 12 textcolor 64
+          xywh {335 4 55 15} type Simple labelcolor 64 minimum 0 maximum 127 step 1 textfont 1 textsize 12 textcolor 64
           code0 {o->value(part->kit[n].Pmaxkey);}
         }
         Fl_Button adeditbutton {
@@ -581,7 +581,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
     instrumentkitlist->hide();
     kitSeen = false;}
-      xywh {386 389 670 370} type Double hide resizable
+      xywh {313 409 670 370} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Kit List").c_str());}
       code2 {kitDW = o->w(); kitDH = o->h();}
       code3 {o->size_range(kitDW, kitDH, 0, 0, 0, 0, 1);}
@@ -910,11 +910,14 @@ class PartUI {: {public Fl_Group, PartUI_}
         code0 {o->value(part->PbreathControl == 2);}
         class Fl_Check_Button2
       }
-      Fl_Counter pwheelbrng {
+      Fl_Box pwheelrnglabel {
         label {PWheel Rng (cents)}
+        xywh {170 1 117 16} labelfont 3 labelsize 10 labelcolor 226
+      }
+      Fl_Counter pwheelbrng {
         callback {//
         send_data(0, PART::control::pitchWheelRange, o->value(), TOPLEVEL::type::Integer, npart);}
-        tooltip {Pitch Wheel Bend Range (cents)} xywh {168 16 119 18} color 237 selection_color 0 labelsize 10 labelcolor 64 align 1 minimum -6400 maximum 6400 step 1 textcolor 64
+        tooltip {Pitch Wheel Bend Range (cents)} xywh {168 16 119 18} labelcolor 64 align 1 minimum -6400 maximum 6400 step 1 textcolor 64
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
       }
@@ -955,13 +958,17 @@ class PartUI {: {public Fl_Group, PartUI_}
           class WidgetPDial
         }
       }
+      Fl_Box threshlabel {
+        label Thresh
+        xywh {400 36 48 14} labelfont 3 labelsize 10 labelcolor 226
+      }
       Fl_Group ctlportamento {
         label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10 labelcolor 64
       } {
         Fl_Box ctlx100 {
           label {x100 cnt.}
-          xywh {400 50 55 15} labelsize 10 labelcolor 64 align 16
+          xywh {400 47 55 15} labelfont 3 labelsize 10 labelcolor 226 align 16
         }
         Fl_Dial prtime {
           label time
@@ -980,10 +987,9 @@ class PartUI {: {public Fl_Group, PartUI_}
           class WidgetPDial
         }
         Fl_Counter thresh {
-          label Thresh
           callback {//
           send_data(0, PART::control::portamentoThreshold, o->value(), TOPLEVEL::type::Integer, npart);}
-          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {388 20 72 16} type Simple color 237 selection_color 64 labelsize 10 labelcolor 64 minimum 0 maximum 127 step 1 textcolor 64
+          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {388 20 72 16} type Simple labelcolor 64 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {
@@ -2578,7 +2584,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     fmamp->labelsize(size);
     sustain->labelsize(size);
     breath->labelsize(size);
-    pwheelbrng->labelsize(size);
+    pwheelrnglabel->labelsize(size);
     pwheelbrng->textsize(size14);
     filtq->labelsize(size);
     fltcut->labelsize(size);
@@ -2591,7 +2597,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlx100->labelsize(size);
     prtime->labelsize(size);
     timedu->labelsize(size);
-    thresh->labelsize(size);
+    threshlabel->labelsize(size);
     thresh->textsize(size14);
     thtype->labelsize(size);
     propta->labelsize(size);
