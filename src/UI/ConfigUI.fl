@@ -1285,8 +1285,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             fillNative();
             seen = true;
 
-            //if (!file::isRegularFile(file::localDir() + "/themes/demo.clr"))
-            // we are forcing this while the demo file is being developed
+            if (!file::isRegularFile(file::localDir() + "/themes/demo.clr"))
             {
                 string demo = file::findExampleFile("themes/demo.clr");
                 if (!demo.empty())
@@ -1368,8 +1367,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         if (ok)
         {
-            if (build_ID != theme_ID)
-                ok = false;;
+            if (build_ID > theme_ID)
+                ok = false;
         }
         if (ok)
         {

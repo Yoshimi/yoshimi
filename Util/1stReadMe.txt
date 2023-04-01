@@ -13,8 +13,3 @@ You will need to give the full filepath for both "MakeSplash.sh" and your image 
 midiListgen.cpp
 This is a source file used to build a program that generates an HTML formatted list of MIDI note names, numbers and frequencies. It is highly accurate and was used to generate the list used in the guide.
 
-
-switch_time.cpp
-This is a source file used to test the behaviour of large switch statements. The difference is significant, and more noticeable on slower single core processors. Compiling with all optimisations on makes and even greater difference.
-
-Updated to suppress compiler warnings.

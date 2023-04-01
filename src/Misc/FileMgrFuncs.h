@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2019-2022 Will Godfrey and others.
+    Copyright 2019-2023 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -855,6 +855,12 @@ inline string findExampleFile(string leafname)
         if (!dir.empty())
         {
             string tmp = dir + "/themes/" + leafname;
+            if (isRegularFile(tmp))
+                fullname = tmp;
+        }
+        if (fullname.empty())
+        {
+            string tmp = "/usr/local/share/yoshimi/examples/" + leafname;
             if (isRegularFile(tmp))
                 fullname = tmp;
         }
