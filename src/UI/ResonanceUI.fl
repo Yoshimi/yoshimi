@@ -252,7 +252,7 @@ class ResonanceGraph {: {public Fl_Box}
                 }
                 else
                 {
-                send_data(action, sn, 64, TOPLEVEL::type::Integer);
+                    send_data(action, sn, 64, TOPLEVEL::type::Integer);
                 }
             }
         }
@@ -350,10 +350,11 @@ class ResonanceUI {: PresetsUI_
           callback {//
           if (Fl::event_button() == 3)
               o->value(20);
-
+          o->selection_color(setSlider(o->value(),20));
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::maxDb, o->value(), TOPLEVEL::type::Integer);}
-          xywh {77 283 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 minimum 1 maximum 90 step 1 value 30
+          tooltip {The volume range} xywh {77 283 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 minimum 1 maximum 90 step 1 value 30
           code0 {o->value(respar->PmaxdB);}
+          code1 {o->selection_color(setSlider(o->value(),20));}
           class mwheel_slider_rev
         }
         Fl_Value_Output centerfreqvo {
@@ -367,10 +368,11 @@ class ResonanceUI {: PresetsUI_
           callback {//
           if (Fl::event_button() == 3)
               o->value(64);
-
+          o->selection_color(setSlider(o->value(),64));
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::centerFrequency, o->value(), TOPLEVEL::type::Integer);}
-          xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
+          tooltip {Shift the center frequency} xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(respar->Pcenterfreq);}
+          code1 {o->selection_color(setSlider(o->value(),64));}
           class mwheel_slider_rev
         }
         Fl_Value_Output octavesfreqvo {
@@ -383,10 +385,11 @@ class ResonanceUI {: PresetsUI_
           callback {//
           if (Fl::event_button() == 3)
               o->value(64);
-
+          o->selection_color(setSlider(o->value(),64));
           send_data(TOPLEVEL::action::forceUpdate, RESONANCE::control::octaves, o->value(), TOPLEVEL::type::Integer);}
-          xywh {243 283 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
+          tooltip {Expand the frequency range} xywh {243 283 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(respar->Poctavesfreq);}
+          code1 {o->selection_color(setSlider(o->value(),64));}
           class mwheel_slider_rev
         }
         Fl_Button rnd1 {
@@ -493,7 +496,6 @@ class ResonanceUI {: PresetsUI_
     unsigned char control = getData->data.control;
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
-
     if (eng != engine)
         return;
 
@@ -509,18 +511,21 @@ class ResonanceUI {: PresetsUI_
             case RESONANCE::control::maxDb:
                 maxdb->value(value);
                 maxdbvo->value(value);
+                maxdb->selection_color(setSlider(maxdb->value(),20));
                 break;
 
             case RESONANCE::control::centerFrequency:
                 centerfreq->value(value);
                 value = 10000.0 * power<10>(- (1.0f - value / 127.0f) * 2.0f);
                 centerfreqvo->value(value/1000.0);
+                centerfreq->selection_color(setSlider(value,0));
                 rg->redraw();
                 break;
 
             case RESONANCE::control::octaves:
                 octavesfreq->value(value);
                 octavesfreqvo->value(0.25 + 10.0 * value / 127.0);
+                octavesfreq->selection_color(setSlider(value,0));
                 rg->redraw();
                 break;
 
@@ -596,7 +601,9 @@ class ResonanceUI {: PresetsUI_
     centerfreqvo->value(respar->getcenterfreq()/1000.0);
     octavesfreqvo->value(respar->getoctavesfreq());
     centerfreq->value(respar->Pcenterfreq);
+    centerfreq->selection_color(setSlider(centerfreq->value(),64));
     octavesfreq->value(respar->Poctavesfreq);
+    octavesfreq->selection_color(setSlider(octavesfreq->value(),64));
     p1st->value(respar->Pprotectthefundamental);
     rg->redraw();} {}
   }

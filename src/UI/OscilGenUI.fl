@@ -375,12 +375,16 @@ class Oscilharmonic {: {public Fl_Group}
         }
         else
             x = 64 - (int)o->value();
-
+        if (n == 0)
+             o->selection_color(setSlider(o->value(),-63));
+        else
+            o->selection_color(setSlider(o->value(),0));
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
         xywh {0 1 15 122} type {Vert Knob} box FLAT_BOX minimum -63 maximum 64 step 1
         code0 {o->value(64 - oscil->Phmag[n]);}
         code1 {o->setValueType(VC_WaveHarmonicMagnitude); o->useCustomTip(true);}
-        class PSlider
+        code2 {if (n == 0) o->selection_color(setSlider(o->value(),-63)); else o->selection_color(setSlider(o->value(),0));}
+        class mwheel_slider
       }
       Fl_Slider phase {
         callback {//
@@ -389,12 +393,14 @@ class Oscilharmonic {: {public Fl_Group}
             o->value(0);
         else
             x = 64 - (int)o->value();
-
+        o->selection_color(setSlider(o->value(),0));
+ 
         send_data(TOPLEVEL::action::forceUpdate, TOPLEVEL::insert::harmonicPhase, n, x, TOPLEVEL::type::Integer);}
         xywh {0 140 15 82} type {Vert Knob} box FLAT_BOX minimum 64 maximum -63 step 1
         code0 {o->value(64 - oscil->Phphase[n]);}
         code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
-        class PSlider
+        code2 {o->selection_color(setSlider(o->value(),0));}
+        class mwheel_slider
       }
       Fl_Box magblock {
         xywh {15 60 5 5} box FLAT_BOX color 39
@@ -524,10 +530,11 @@ o->hide();}
       Fl_Value_Slider rndslider {
         label {Phase Randomness}
         callback {//
-          if (Fl::event_button() == 3)
-              o->value(0);
+             if (Fl::event_button() == 3)
+                 o->value(0);
+             o->selection_color(setSlider(o->value(),0));
 
-          send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
+             send_data(0, OSCILLATOR::control::phaseRandomness, o->value(), TOPLEVEL::type::Integer);}
         tooltip {Oscillator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 287 100 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
         code0 {if (forPAD) o->hide();}
         class mwheel_val_slider_rev
@@ -849,14 +856,20 @@ o->hide();}
     int tmp;
     bool set = true;
     bool baseSet = false;
+    int value_int = int(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        h[control]->mag->value(64 - value);
+        int temp = 64;
+        if (control == 0)
+            temp = 127;
+        h[control]->mag->value(64 - value_int);
+        h[control]->mag->selection_color(setSlider(value_int,temp));
     }
 
     else if (insert == TOPLEVEL::insert::harmonicPhase)
     {
-        h[control]->phase->value(64 - value);
+        h[control]->phase->value(64 - value_int);
+        h[control]->phase->selection_color(setSlider(value_int,64));
     }
 
     else
@@ -865,6 +878,7 @@ o->hide();}
         {
             case OSCILLATOR::control::phaseRandomness:
                 rndslider->value(value);
+                rndslider->selection_color(setSlider(value,0));
                 break;
 
             case OSCILLATOR::control::magType:
@@ -1137,6 +1151,7 @@ o->hide();}
     code {//
     magtype->value(oscil->Phmagtype);
     rndslider->value(oscil->Prand-64);
+    rndslider->selection_color(setSlider(rndslider->value(),0));
 
     hrndtype->value(oscil->Pamprandtype);
     if (hrndtype->value() == 0)

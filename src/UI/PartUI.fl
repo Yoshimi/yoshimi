@@ -522,19 +522,22 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Value_Slider humanise {
         label Detune
-        callback {//;
+        callback {//
+        o->selection_color(setSlider(o->value(),0));
         send_data(0, PART::control::humanise, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random detune of whole part in cents} xywh {12 342 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 labelcolor 64 align 8 maximum 50 step 1 textcolor 64
         code1 {o->setValueType(VC_PartHumaniseDetune);o->useCustomTip(true);}
+        code2 {o->selection_color(setSlider(o->value(),0));}
         class mwheel_slider_rev
       }
       Fl_Value_Slider velocityhumanise {
         label Velocity
         callback {//
-
+        o->selection_color(setSlider(o->value(),0));
         send_data(0, PART::control::humanvelocity, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Random velocity attenuation of whole part} xywh {12 362 202 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 labelcolor 64 align 8 maximum 50 step 1 textcolor 64
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
+        code2 {o->selection_color(setSlider(o->value(),0));}
         class mwheel_slider_rev
       }
       Fl_Button instrumentReset {
@@ -1473,10 +1476,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::humanise:
             humanise->value(valInt);
+            humanise->selection_color(setSlider(humanise->value(),0));
             break;
 
         case PART::control::humanvelocity:
             velocityhumanise->value(valInt);
+            velocityhumanise->selection_color(setSlider(velocityhumanise->value(),0));
             break;
 
 

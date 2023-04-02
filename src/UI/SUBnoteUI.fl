@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -56,7 +56,7 @@ decl {\#include "PresetsUI.h"} {public local
 decl {\#include "OscilGenUI.h"} {public local
 }
 
-decl {\#include "Params/SUBnoteParameters.h"} {public local
+decl {\#include "Params/SUBnoteParameters.h"} {selected public local
 }
 
 decl {\#include "Misc/SynthEngine.h"} {public global
@@ -87,12 +87,16 @@ class SUBnoteharmonic {: {public Fl_Group}
                 x = 127;
             o->value(x);
         }
-
+        if (n == 0)
+            o->selection_color(setSlider(o->value(),127));
+        else
+            o->selection_color(setSlider(o->value(),0));
         send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
         tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX labelcolor 64 minimum 127 maximum 0 step 1 value 127
         code0 {o->value(pars->Phmag[n]);}
         code1 {o->setValueType(VC_SubHarmonicMagnitude); o->useCustomTip(true);}
-        class PSlider
+        code2 {if (n == 0) o->selection_color(setSlider(o->value(),127)); else o->selection_color(setSlider(o->value(),0));}
+        class mwheel_slider
       }
       Fl_Slider bw {
         callback {//
@@ -101,13 +105,14 @@ class SUBnoteharmonic {: {public Fl_Group}
             x = 64 + lrint(o->value());
         else
             o->value(0);
-
+        o->selection_color(setSlider(o->value(),0));
         send_data(0, TOPLEVEL::insert::harmonicBandwidth, n, x, TOPLEVEL::type::Integer);}
         tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 128} type {Vert Knob} box FLAT_BOX labelcolor 64 minimum 63 maximum -64 step 1
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
         code2 {o->value(pars->Phrelbw[n] - 64);}
-        class PSlider
+        code3 {o->selection_color(setSlider(o->value(),0));}
+        class mwheel_slider
       }
       Fl_Box h_dash {
         xywh {16 227 10 3} box FLAT_BOX color 39
@@ -401,21 +406,25 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Value_Slider bandwidth {
           label Bandwidth
           callback {//
+          o->selection_color(setSlider(o->value(),40));
           send_data (0, SUBSYNTH::control::bandwidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Base bandwidth, approximate} xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1 textcolor 64
           code0 {o->setValueType(VC_SubBandwidth);}
           code1 {o->useCustomTip(true);}
           code2 {o->value(pars->Pbandwidth);}
+          code3 {o->selection_color(setSlider(o->value(),40));}
           class mwheel_slider_rev
         }
         Fl_Value_Slider bwidthscale {
           label {Bandwidth Scale}
           callback {//
+          o->selection_color(setSlider(o->value(),0));
           send_data (0, SUBSYNTH::control::bandwidthScale, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Freq-dep. bw. scaling} xywh {344 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textcolor 64
           code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
           code1 {o->useCustomTip(true);}
           code2 {o->value(pars->Pbwscale-64);}
+          code3 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
         }
       }
@@ -755,14 +764,20 @@ class SUBnoteUI {: {public PresetsUI_}
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
     bool val_bool = _SYS_::F2B(value);
+    int value_int = int(value);
     if (insert == TOPLEVEL::insert::harmonicAmplitude)
     {
-        h[control]->mag->value((int) value);
+        h[control]->mag->value(value_int);
+        int temp = 127;
+        if (control > 0)
+            temp = 0;
+        h[control]->mag->selection_color(setSlider(value_int,temp));
         return;
     }
     if (insert == TOPLEVEL::insert::harmonicBandwidth)
     {
-        h[control]->bw->value((int)value - 64);
+        h[control]->bw->value(value_int - 64);
+        h[control]->bw->selection_color(setSlider(value_int,64));
         return;
     }
 
@@ -792,10 +807,12 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::bandwidth:
             bandwidth->value(value);
+            bandwidth->selection_color(setSlider(value,40));
             break;
 
         case SUBSYNTH::control::bandwidthScale:
             bwidthscale->value(value);
+            bwidthscale->selection_color(setSlider(value,0));
             break;
 
         case SUBSYNTH::control::enableBandwidthEnvelope:
