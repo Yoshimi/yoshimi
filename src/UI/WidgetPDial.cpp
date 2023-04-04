@@ -253,7 +253,9 @@ void WidgetPDial::draw()
     //drawing the hand:
     if (active_r())
     {
-        Fl::get_color(knob_point, r, g, b); // 61, 61, 61
+        if (selection_color() == 8)
+            selection_color(knob_point);
+        Fl::get_color(selection_color(), r, g, b); // 61, 61, 61
         cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
     } else {
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);

@@ -526,9 +526,9 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {367 302 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {367 302 385 500} type Double labelfont 13 labelsize 12 resizable
       code0 {mainDW = 385; mainDH = 470;}
-      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
+      code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Box keyHandle {
         label keyhandler
@@ -852,10 +852,12 @@ class MasterUI {: {private GuiUpdates}
         Fl_Dial mastervolumedial {
           label Volume
           callback {//
+          o->selection_color(setKnob(o->value(),90));
           send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
           tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
+          code2 {o->selection_color(setKnob(o->value(),90));}
           class WidgetPDial
         }
         Fl_Button mainvirtkeyb {
@@ -1024,7 +1026,7 @@ class MasterUI {: {private GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -2612,6 +2614,7 @@ Alan Calvert started the project}
             }
             case PART::control::volume:
                 partVol->value(value);
+                panellistitem[panelpart]->partvolume->selection_color(setSlider(value,96));
                 if (panelVisible)
                     panellistitem[panelpart]->partvolume->value(value);
                 seen = true;
@@ -2976,6 +2979,7 @@ Alan Calvert started the project}
     {
         case MAIN::control::volume:
             mastervolumedial->value(value);
+            mastervolumedial->selection_color(setKnob(value,90));
             break;
 
         case MAIN::control::partNumber:
@@ -3986,7 +3990,8 @@ Alan Calvert started the project}
   }
   Function {setPanelPartVolWidget(int _npart, float _value)} {} {
     code {//
-    panellistitem[_npart]->partvolume->value(_value);} {}
+    panellistitem[_npart]->partvolume->value(_value);
+    panellistitem[_npart]->partvolume->selection_color(setSlider(_value,96));} {}
   }
   Function {setPanelPartPanWidget(int _npart, float _value)} {} {
     code {//

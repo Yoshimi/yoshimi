@@ -778,9 +778,11 @@ class PADnoteUI {: {public PresetsUI_}
             }
             Fl_Slider detune {
               callback {//
+              o->selection_color(setSlider(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Fine Detune (cents)} xywh {57 305 433 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
+              code1 {o->selection_color(setSlider(o->value(),0));}
               class mwheel_slider_rev
             }
             Fl_Value_Output detunevalueoutput {
@@ -1292,6 +1294,7 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::detuneFrequency:
             detune->value(lrint(value));
+            detune->selection_color(setSlider(value,0));
             detunevalueoutput->do_callback();
             break;
 

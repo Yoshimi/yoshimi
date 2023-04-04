@@ -134,7 +134,8 @@ int choice(SynthEngine *synth, string one, string two, string three, string mess
 string setfiler(SynthEngine *synth, string title, string name, bool save, int extension);
 string input_text(SynthEngine *synth, string label, string text);
 
-int setSlider(int current, int normal);
+int setSlider(float current, float normal);
+int setKnob(float current, float normal);
 
 string convert_value(ValueType type, float val);
 

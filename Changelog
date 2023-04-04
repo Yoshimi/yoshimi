@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-4-4 Will
+bn 2202
+All slider peg colours done.
+Starting on knob pointers.
+
 2023-4-2 Will
 bn 2201
 BugFix: WidgetMWSilder doubling callback entries

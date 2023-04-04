@@ -764,9 +764,10 @@ o->hide();}
           callback {//
           if (Fl::event_button() == 3)
               o->value(50);
-
+	  o->selection_color(setSlider(o->value(),50));
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::adaptiveHarmonicsParameter, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 100 step 1 value 50
+          code0 {o->selection_color(setSlider(o->value(),50));}
           class mwheel_slider_rev
         }
       }
@@ -1046,6 +1047,7 @@ o->hide();}
 
             case OSCILLATOR::control::adaptiveHarmonicsParameter:
                 adhrpar->value(value);
+                adhrpar->selection_color(setSlider(value,50));
                 break;
 
             case OSCILLATOR::control::adaptiveHarmonicsBase:

@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -56,7 +56,7 @@ decl {\#include "PresetsUI.h"} {public local
 decl {\#include "OscilGenUI.h"} {public local
 }
 
-decl {\#include "Params/SUBnoteParameters.h"} {selected public local
+decl {\#include "Params/SUBnoteParameters.h"} {public local
 }
 
 decl {\#include "Misc/SynthEngine.h"} {public global
@@ -340,9 +340,11 @@ class SUBnoteUI {: {public PresetsUI_}
         }
         Fl_Slider detune {
           callback {//
+          o->selection_color(setSlider(o->value(),0));
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
+          code1 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
         }
         Fl_Value_Output detunevalueoutput {
@@ -826,6 +828,7 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::detuneFrequency:
             detune->value(value);
+            detune->selection_color(setSlider(value,0));
             detunevalueoutput->do_callback();
             break;
 

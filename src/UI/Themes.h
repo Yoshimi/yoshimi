@@ -194,7 +194,7 @@ const int slider_peg_changed = 80;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 94;
+const int COLOURLIST = 96;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -289,6 +289,8 @@ const unsigned char colourNumbers [COLOURLIST] = {
     solo_select,
     midi_solo_release,
     midi_ignored,
+    slider_peg_default,
+    slider_peg_changed,
 
 };
 
@@ -380,7 +382,7 @@ static std::string colourData [] = {
     "255,255,255, Query/Alert background",
     "0,182,191, Dynfilter filter button",
     "127,127,127, Keyboard slider backgrounds",
-    "0,255,0, Keyboard pitchwheel peg",
+    "180,0,0, Knob pointer changed",
     "63,127,255, Keyboard Mod Wheel",
     "0,255,0, Waveform spectrum harmonic",
     "0,255,0, Bank/instrument select lit",
@@ -396,6 +398,8 @@ static std::string colourData [] = {
     "0,0,255, solo selected",
     "0,180,180, midi/solo release",
     "255,0,0, midi ignored",
+    "63,218,0, Slider peg",
+    "191,0,0, Slider peg changed",
     "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

@@ -525,11 +525,13 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     }
     else
         realvalue = o->value();
+    o->selection_color(setSlider(o->value(),96));
     synth->getGuiMaster()->partVol->value(realvalue);
     send_data(0, PART::control::volume, realvalue, TOPLEVEL::type::Integer);}
           xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX labelcolor 49 minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
+          code2 {o->selection_color(setSlider(o->value(),96));}
           class mwheel_slider
         }
         Fl_Dial partpanning {
@@ -613,6 +615,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     setPartLabel(setpart);
 
     partvolume->value(synth->part[setpart]->Pvolume);
+    partvolume->selection_color(setSlider(partvolume->value(),96));
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
 

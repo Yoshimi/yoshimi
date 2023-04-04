@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -380,7 +380,7 @@ return Fl_Box::handle(event);} {}
   }
 }
 
-class FilterUI {selected : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -552,7 +552,7 @@ class FilterUI {selected : {public Fl_Group,PresetsUI_}
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
       callback {formClose->do_callback();}
-      xywh {176 99 700 205} type Double labelfont 1 labelsize 12 hide resizable
+      xywh {186 150 700 205} type Double labelfont 1 labelsize 12 hide resizable
       code0 {formantDW = o->w(); formantDH = o->h();}
       code1 {o->size_range(formantDW, formantDH, 0, 0, 0, 0, 1);}
     } {
@@ -720,18 +720,22 @@ class FilterUI {selected : {public Fl_Group,PresetsUI_}
           callback {//
         if (Fl::event_button() == 3)
             o->value(64);
+        o->selection_color(setSlider(o->value(),64));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, o->value(), TOPLEVEL::type::Write);}
           xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pcenterfreq);}
+          code1 {o->selection_color(setSlider(o->value(),64));}
           class mwheel_slider_rev
         }
         Fl_Slider octknob {
           callback {//
         if (Fl::event_button() == 3)
             o->value(64);
+        o->selection_color(setSlider(o->value(),64));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, o->value(), TOPLEVEL::type::Write);}
           xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Poctavesfreq);}
+          code1 {o->selection_color(setSlider(o->value(),64));}
           class mwheel_slider_rev
         }
         Fl_Dial wvknob {
@@ -811,7 +815,8 @@ class FilterUI {selected : {public Fl_Group,PresetsUI_}
              vowelpatch->color(warning_background);
         vowelpatch->redraw();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open
+  } {
     code {//
         int categ = pars->Pcategory;
         int parstype = pars->Ptype;
@@ -1111,12 +1116,14 @@ class FilterUI {selected : {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::formantCenter:
             cfknob->value(value);
+            cfknob->selection_color(setSlider(value,64));
             centerfreqvo->do_callback();
             formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::formantOctave:
             octknob->value(value);
+            octknob->selection_color(setSlider(value,64));
             octavesfreqvo->do_callback();
             formantfiltergraph->redraw();
             break;

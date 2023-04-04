@@ -478,9 +478,11 @@ class ADvoiceUI {: {public Fl_Group}
               }
               Fl_Slider ModDetune {
                 callback {//
+                    o->selection_color(setSlider(o->value(),0));
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFrequency, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Fine Detune (cents)} xywh {623 239 168 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
+                code1 {o->selection_color(setSlider(o->value(),0));}
                 class mwheel_slider_rev
               }
               Fl_Choice ModDetuneType {
@@ -651,7 +653,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
           } {}
           Fl_Group freqencygrp {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 280 570 120} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -734,9 +736,11 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             Fl_Slider Detune {
               callback {//
                 int detune = lrint(o->value());
+                o->selection_color(setSlider(o->value(),0));
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneFrequency, detune, TOPLEVEL::type::Integer);}
               tooltip {Fine Detune (cents)} xywh {48 306 442 16} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->VoicePar[nvoice].PDetune-8192);}
+              code1 {o->selection_color(setSlider(o->value(),0));}
               class mwheel_slider_rev
             }
             Fl_Choice FreqDetunetype {
@@ -1296,8 +1300,11 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::detuneFrequency:
             if (voice == nvoice)
+            {
                 Detune->value(value);
-            detunevalueoutput->do_callback();
+                Detune->selection_color(setSlider(value,0));
+                detunevalueoutput->do_callback();
+            }
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicedetune->value(value);
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->detunevalueoutput->do_callback();
             break;
@@ -1455,6 +1462,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
 
         case ADDVOICE::control::modulatorDetuneFrequency:
             ModDetune->value(value);
+            ModDetune->selection_color(setSlider(value,0));
             fmdetunevalueoutput->do_callback();
             break;
 
@@ -1995,10 +2003,12 @@ class ADnoteUI {: {public PresetsUI_}
         } {}
         Fl_Slider freq {
           callback {//
+            o->selection_color(setSlider(o->value(),0));
             detunevalueoutput->do_callback();
             send_data(0, ADDSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Fine Detune (cents)} xywh {57 275 433 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->GlobalPar.PDetune - 8192);}
+          code1 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
         }
         Fl_Value_Output detunevalueoutput {
@@ -2534,6 +2544,7 @@ o->hide();}
 
         case ADDSYNTH::control::detuneFrequency:
             freq->value(value);
+            freq->selection_color(setSlider(value,0));
             detunevalueoutput->do_callback();
             break;
 

@@ -627,13 +627,24 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
 }
 
+
 // for setting slider peg colour
-int setSlider(int current, int normal)
+int setSlider(float current, float normal)
 {
-    if (current == normal)
+    if (lrint(current) == lrint(normal))
         return slider_peg_default;
     else
        return slider_peg_changed;
+}
+
+
+// for setting knob pointer colour
+int setKnob(float current, float normal)
+{
+    if (lrint(current) == lrint(normal))
+        return knob_point;
+    else
+       return keyb_pitch_peg;
 }
 
 
