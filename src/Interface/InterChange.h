@@ -94,8 +94,6 @@ class InterChange : private DataText
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;
 
-        unsigned int tick; // needs to be read by synth
-
     private:
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);

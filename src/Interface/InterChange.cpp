@@ -102,7 +102,6 @@ InterChange::InterChange(SynthEngine *_synth) :
     returnsBuffer(),
     syncWrite(false),
     lowPrioWrite(false),
-    tick(0),
     sortResultsThreadHandle(0),
     swapRoot1(UNUSED),
     swapBank1(UNUSED),
@@ -157,22 +156,6 @@ void *InterChange::sortResultsThread(void)
 {
     while (synth->getRuntime().runSynth)
     {
-        /*
-         * To maintain portability we synthesise a very simple low accuracy
-         * timer based on the loop time of this function. As it makes no system
-         * calls apart from usleep() it is lightweight and should have no thread
-         * safety issues. It is used mostly for low priority timeouts.
-         */
-        ++ tick;
-
-        /*if (!(tick & 8191))
-        {
-            if (tick & 16383)
-                std::cout << "Tick" << std::endl;
-            else
-                std::cout << "Tock" << std::endl;
-        }*/
-
         CommandBlock getData;
 
         /* It is possible that several operations initiated from

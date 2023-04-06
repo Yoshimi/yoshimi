@@ -656,8 +656,11 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
      * loop and twoway are increment counters
      * we assume nobody can repeat a switch press within 60mS!
      */
-            if ((interchange.tick - CHtimer) > 511) // approx 60mS
-                CHtimer = interchange.tick;
+            timespec now_struct;
+            clock_gettime(CLOCK_MONOTONIC, &now_struct);
+            int64_t now_ms = int64_t(now_struct.tv_sec) * 1000 + int64_t(now_struct.tv_nsec) / 1000000;
+            if ((now_ms - CHtimer) > 60)
+                CHtimer = now_ms;
             else
                 return 0; // de-bounced
         }
