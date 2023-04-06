@@ -117,6 +117,8 @@ InterChange::InterChange(SynthEngine *_synth) :
     undoStart = false;
     cameFrom = envControl::input;
     undoMarker.data.part = TOPLEVEL::section::undoMark;
+
+    sem_init(&sortResultsThreadSemaphore, 0, 0);
 }
 
 
@@ -145,6 +147,10 @@ bool InterChange::Init()
     }
 }
 
+void InterChange::spinSortResultsThread()
+{
+    sem_post(&sortResultsThreadSemaphore);
+}
 
 void *InterChange::_sortResultsThread(void *arg)
 {
@@ -180,8 +186,8 @@ void *InterChange::sortResultsThread(void)
             else
                 resolveReplies(&getData);
         }
-            usleep(80); // actually gives around 120 uS
 
+        sem_wait(&sortResultsThreadSemaphore);
     }
     return NULL;
 }
@@ -189,9 +195,14 @@ void *InterChange::sortResultsThread(void)
 
 InterChange::~InterChange()
 {
-    if (sortResultsThreadHandle)
+    if (sortResultsThreadHandle) {
+        // Get it to quit.
+        spinSortResultsThread();
         pthread_join(sortResultsThreadHandle, 0);
+    }
     undoRedoClear();
+
+    sem_destroy(&sortResultsThreadSemaphore);
 }
 
 
@@ -211,7 +222,7 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
     }
     if (synth->audioOut.load() == _SYS_::mute::Idle)
     {
-        synth->audioOut.store(_SYS_::mute::Pending);
+        synth->audioOutStore(_SYS_::mute::Pending);
     }
 }
 
@@ -1979,6 +1990,7 @@ void InterChange::returns(CommandBlock *getData)
     }
     if (!decodeLoopback.write(getData->bytes))
         synth->getRuntime().Log("Unable to write to decodeLoopback buffer");
+    spinSortResultsThread();
 }
 
 

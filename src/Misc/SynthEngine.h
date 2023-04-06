@@ -168,6 +168,7 @@ class SynthEngine
         unsigned char legatoPart;
         void setPartMap(int npart);
         void setAllPartMaps(void);
+        void audioOutStore(uint8_t num);
 
         bool masterMono;
         bool fileCompatible;

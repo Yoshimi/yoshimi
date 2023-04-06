@@ -33,6 +33,8 @@
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
+#include <semaphore.h>
+
 #include <list>
 
 class DataText;
@@ -77,6 +79,9 @@ class InterChange : private DataText
         RingBuffer <10, log2 (commandBlockSize)> fromMIDI;
         RingBuffer <10, log2 (commandBlockSize)> returnsBuffer;
         RingBuffer <4, log2 (commandBlockSize)> muteQueue;
+
+        sem_t sortResultsThreadSemaphore;
+        void spinSortResultsThread();
 
         void generateSpecialInstrument(int npart, std::string name);
         void mediate(void);
