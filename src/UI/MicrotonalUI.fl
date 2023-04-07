@@ -219,7 +219,7 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .scl file (tunnings)} xywh {85 417 100 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .scl file (tunnings)} xywh {85 417 100 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Group Keymap {
@@ -337,7 +337,7 @@ class MicrotonalUI {} {
                 return;
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Check_Button mappingenabledbutton {

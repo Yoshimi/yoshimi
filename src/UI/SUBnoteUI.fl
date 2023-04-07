@@ -178,7 +178,7 @@ class SUBnoteUI {: {public PresetsUI_}
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
     o->hide();}
-      xywh {870 61 735 470} type Double labelcolor 64 hide resizable
+      xywh {350 57 735 470} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
       code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
@@ -198,7 +198,7 @@ class SUBnoteUI {: {public PresetsUI_}
       }
       Fl_Group ampgrp {
         label AMPLITUDE
-        xywh {5 6 215 135} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
+        xywh {5 5 215 135} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
         Fl_Dial vol {
           label Volume

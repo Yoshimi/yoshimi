@@ -68,7 +68,7 @@ class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceListItem {
-      xywh {705 176 635 30} type Double box ENGRAVED_BOX labelcolor 64 hide
+      xywh {705 176 635 30} type Double box GTK_THIN_UP_BOX labelcolor 64 hide
       class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
@@ -179,7 +179,7 @@ class ADvoicelistitem {: {public Fl_Group}
               synth->getGuiMaster()->partui->adnoteui->set_voice(true);
               if ((Fl::event_button() == 3))
                   synth->getGuiMaster()->partui->adnoteui->ADnoteVoiceList->hide();}
-          tooltip {Right click: also close this} xywh {42 4 40 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Right click: also close this} xywh {42 4 40 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Group enabledpatch {
@@ -405,7 +405,7 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {857 133 805 615} type Double box NO_BOX hide resizable
+      xywh {327 141 805 615} type Double box NO_BOX hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -588,7 +588,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     oscedit = new OscilEditor(pars->VoicePar[nv].POscilFM, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {712 370 72 18} box THIN_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+                  xywh {712 370 72 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
                   code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider ModPhase {
@@ -637,7 +637,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
           }
           Fl_Text_Display modtypetext {
             label {Type:}
-            xywh {572 32 50 8} selection_color 49 labelfont 3 labelsize 11 labelcolor 226
+            xywh {572 32 50 8} box NO_BOX selection_color 49 labelfont 3 labelsize 11 labelcolor 226
           }
           Fl_Choice ModType {
             callback {//
@@ -653,7 +653,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
           } {}
           Fl_Group freqencygrp {
-            label FREQUENCY open
+            label FREQUENCY
             xywh {5 280 570 120} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -826,7 +826,7 @@ Oscillator}
     oscedit = new OscilEditor(pars->VoicePar[nv].POscil, oscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addVoice1);
     if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
-                  xywh {9 548 72 22} box EMBOSSED_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
+                  xywh {9 548 72 22} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
                   code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
                 }
                 Fl_Slider VoiceOscPhase {
@@ -1960,7 +1960,7 @@ class ADnoteUI {: {public PresetsUI_}
     globalSeen = false;
     resui->resonancewindow->hide();
     o->hide();}
-      xywh {147 84 575 405} type Double hide resizable
+      xywh {147 84 580 405} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
@@ -1977,7 +1977,7 @@ class ADnoteUI {: {public PresetsUI_}
         } {}
         Fl_Text_Display octavetext {
           label Octave
-          xywh {493 275 50 8} labelfont 3 labelsize 10 labelcolor 226
+          xywh {493 275 50 8} box NO_BOX labelfont 3 labelsize 10 labelcolor 226
         }
         Fl_Counter octave {
           callback {//
@@ -2040,7 +2040,7 @@ class ADnoteUI {: {public PresetsUI_}
       }
       Fl_Group amplitudegrp {
         label AMPLITUDE
-        xywh {5 7 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
+        xywh {5 5 285 250} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Dial globalvolume {
           label Volume
@@ -2208,7 +2208,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
 
             if (Fl::event_button() == 3)
                 ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {191 375 121 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Right click: also close this} xywh {191 375 121 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button showvoicepars {
         label {Show Voice Parameters}
@@ -2216,7 +2216,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     set_voice(false);
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Right click: also close this} xywh {5 375 180 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Right click: also close this} xywh {5 375 180 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalclose {
         label Close
@@ -2241,7 +2241,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
     resui->Show();
     if ((Fl::event_button() == 3))
         ADnoteGlobalParameters->hide();}
-        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Resonance. Right click: also close this} xywh {318 375 90 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalcopy {
         label C

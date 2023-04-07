@@ -419,7 +419,7 @@ class PADnoteUI {: {public PresetsUI_}
             resui->applybutton->show();
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
-            xywh {451 246 85 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+            xywh {451 246 85 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button waveform {
             label Waveform
@@ -431,7 +431,7 @@ class PADnoteUI {: {public PresetsUI_}
             oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2, forPAD);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
-            tooltip {Right click: also close this} xywh {451 272 85 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+            tooltip {Right click: also close this} xywh {451 272 85 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Dial bwdial {
             label BandWidth
@@ -561,7 +561,7 @@ class PADnoteUI {: {public PresetsUI_}
               show_randWalk();
               if ((Fl::event_button() == 3))
                   padnotewindow->hide();}
-            xywh {425 217 94 20} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+            xywh {425 217 94 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Group hprofile {
             xywh {100 45 475 90} box FLAT_BOX color 254 selection_color 218 labelcolor 63
@@ -576,14 +576,14 @@ class PADnoteUI {: {public PresetsUI_}
         }
         Fl_Group envelopes {
           label {Envelopes and &LFOs}
-          xywh {0 20 580 385} box ENGRAVED_BOX labelsize 12 labelcolor 64 hide
+          xywh {0 20 580 385} box GTK_THIN_UP_BOX labelsize 12 labelcolor 64 hide
         } {
           Fl_Box {} {
             xywh {10 27 275 68} box PLASTIC_UP_BOX color 223 labelcolor 64
           }
           Fl_Group ampgrp {
             label AMPLITUDE
-            xywh {5 27 285 250} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
+            xywh {5 25 285 250} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Dial volume {
               label Volume
@@ -832,7 +832,7 @@ class PADnoteUI {: {public PresetsUI_}
         if (filename.empty())
             return;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::exportPadSynthSamples, 0, TOPLEVEL::type::Integer, npart, textMsgBuffer.push(filename));}
-        tooltip {Export samples as wav file} xywh {15 410 123 24} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Export samples as wav file} xywh {15 410 123 24} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button applybutton {
         label {Apply Changes}

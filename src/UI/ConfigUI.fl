@@ -820,7 +820,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         {
            synth->getRuntime().Log("Failed to install " + filename);
         }}
-            xywh {255 75 100 20} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64
+            xywh {255 75 100 20} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64
           }
           Fl_Box storedLabel {
             label {Default Theme}
@@ -914,7 +914,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate,CONFIG::control::addPresetRootDir, 0, TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
                     if (presetbrowse->size() >= MAX_PRESET_DIRS)
                         o->deactivate();}
-        xywh {10 220 85 35} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64 align 128
+        xywh {10 220 85 35} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button removepresetbutton {
         label {Remove preset dir...}

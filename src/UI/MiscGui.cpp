@@ -96,6 +96,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
+    //synth->CBtest(&putData);
     if (action == TOPLEVEL::action::fromMIDI)
         type = type | 1; // faking MIDI from virtual keyboard
     else

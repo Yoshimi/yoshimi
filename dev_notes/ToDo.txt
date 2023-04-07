@@ -4,7 +4,13 @@ BUG! If jack is selected for audio but there are no physical ports Yoshimi quits
 
 BUG! stand-alone GUI freezes and no further system changes if new instance started while instrument change in progress.
 
+Bug: in GUI 'paste' doesn't set formant window Center Frequency or Octave, but 'Copy' correctly saves them. CLI OK both ways.
+
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
+
+Worked round:
+CLI PadSynth waveform fails if voiceNumber > 0.
+Forcing voiceNumber to 0 fixes this, but shouldn't be needed, and is incovenient for users
 
 GUI Oddity. Press spacebar on startup and you disable part 1 AddSynth engine.
 From then on repeats the last action.

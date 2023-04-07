@@ -348,7 +348,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             alert(synth, "Active part disabled");
         else
             ShowSearch();}
-        tooltip {Select instrument from list, by type} xywh {230 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Select instrument from list, by type} xywh {230 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button insRoots {
         label Roots
@@ -361,7 +361,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
-        tooltip {Show root paths. Right click: also close this} xywh {364 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {364 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button insBanks {
         label Banks
@@ -374,7 +374,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
             setVisible(synth, false, "Bank-instrument");
         }
         instFrom = 0;}
-        tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show banks in current root. Right click: also close this} xywh {496 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Text_Display insT1 {
         label {This column uses MIDI}
@@ -439,7 +439,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         } {}
       }
       Fl_Group modeselect {
-        xywh {5 528 458 42} box ENGRAVED_BOX labelsize 12
+        xywh {5 528 458 42} box GTK_THIN_UP_BOX labelsize 12
       } {
         Fl_Box selectPatch {
           xywh {11 555 83 9} box RFLAT_BOX color 103 labelcolor 49
@@ -520,19 +520,19 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Group {} {
         xywh {468 528 151 42} box ENGRAVED_FRAME labelsize 12 labelcolor 64
       } {
-        Fl_Button addpatch {
+        Fl_Box addpatch {
           label Add
-          xywh {473 550 47 16} box FLAT_BOX labelsize 12 labelcolor 64 align 32
+          xywh {475 550 46 16} box FLAT_BOX labelsize 12 labelcolor 64 align 32
           code0 {o->color(add_back);}
         }
-        Fl_Button subpatch {
+        Fl_Box subpatch {
           label Sub
           xywh {520 550 47 16} box FLAT_BOX labelsize 12 labelcolor 64 align 32
           code0 {o->color(sub_back);}
         }
-        Fl_Button padpatch {
+        Fl_Box padpatch {
           label Pad
-          xywh {567 550 47 16} box FLAT_BOX color 29 labelsize 12 labelcolor 64 align 32
+          xywh {567 550 46 16} box FLAT_BOX color 29 labelsize 12 labelcolor 64 align 32
           code0 {o->color(pad_back);}
         }
         Fl_Button {} {
@@ -601,10 +601,10 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Fl_Window bankuiwindow {
       label Root
       callback {Hide(1);}
-      xywh {794 24 780 570} type Double labelsize 12 labelcolor 64 resizable
+      xywh {794 24 780 570} type Double labelsize 12 labelcolor 64 hide resizable
       code0 {o->copy_label(bank->getRootFileTitle(fetchData(0, BANK::control::selectRoot, TOPLEVEL::section::bank)).c_str());}
       code1 {bankDW = o->w();bankDH = o->h();}
-      code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);} visible
+      code2 {o->size_range((instDW * 8 / 10), (instDH * 8 / 10), 0,0,0,0,1);}
     } {
       Fl_Button bankroot {
         label Roots
@@ -617,7 +617,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;}
-        tooltip {Show root paths. Right click: also close this} xywh {248 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show root paths. Right click: also close this} xywh {248 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button bankcurrent {
         label {current bank}
@@ -631,7 +631,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         if (Fl::event_button() == 3)
         {
             Hide(1);}}
-        tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box EMBOSSED_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
+        tooltip {Show instruments in current bank. Right click: also close this} xywh {627 5 93 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64 align 128
       }
       Fl_Group bankgroup {
         xywh {2 30 776 499} labelsize 12
@@ -686,7 +686,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         } {}
       }
       Fl_Group rootmodeselect {
-        xywh {5 528 635 42} box ENGRAVED_BOX labelsize 12
+        xywh {5 528 635 42} box GTK_THIN_UP_BOX labelsize 12
       } {
         Fl_Box rootSelectPatch {
           xywh {11 555 83 9} box RFLAT_BOX color 103 labelcolor 49
@@ -820,7 +820,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::addNamedRoot, 0, TOPLEVEL::type::Write, TOPLEVEL::section::bank, newdef, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(dirname));
         Pend->hide();}
-        xywh {10 225 75 35} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64 align 128
+        xywh {10 225 75 35} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64 align 128
       }
       Fl_Button removerootdirbutton {
         label {Remove root dir...}
@@ -862,7 +862,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         }
         else
             rootFrom = 0;}
-        tooltip {Right click: also close this} xywh {262 225 75 35} box EMBOSSED_BOX color 198 labelsize 12 labelcolor 64 align 128
+        tooltip {Right click: also close this} xywh {262 225 75 35} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64 align 128
       }
       Fl_Spinner changeIDbutton {
         label {New ID}

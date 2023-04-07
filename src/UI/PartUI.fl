@@ -184,7 +184,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::addSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {422 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          xywh {422 4 40 15} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Check_Button adcheck {
@@ -201,7 +201,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::subSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {497 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          xywh {497 4 40 15} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
         Fl_Check_Button subcheck {
@@ -218,7 +218,7 @@ class PartKitItem {: {public Fl_Group}
           partui->showparameters(n,PART::engine::padSynth);
           if ((Fl::event_button() == 3))
               synth->getGuiMaster()->partui->instrumentkitlist->hide();}
-          xywh {570 4 40 15} box EMBOSSED_BOX color 198 labelsize 11 labelcolor 64
+          xywh {570 4 40 15} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
         Fl_Check_Button padcheck {
@@ -352,7 +352,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 222 395 100} box ENGRAVED_BOX
+        xywh {0 222 395 100} box GTK_THIN_UP_BOX
       } {
         Fl_Group ADD {
           label ADDsynth
@@ -380,7 +380,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {12 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {12 280 80 32} box GTK_THIN_UP_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
@@ -410,7 +410,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {107 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {107 280 80 32} box GTK_THIN_UP_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
@@ -440,7 +440,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             if ((Fl::event_button() == 3))
             {
                 instrumenteditwindow->hide();}}
-            tooltip {Right click: also close this} xywh {202 280 80 32} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
+            tooltip {Right click: also close this} xywh {202 280 80 32} box GTK_THIN_UP_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
@@ -451,7 +451,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 227 94 28} box EMBOSSED_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
+          tooltip {Right click: also close this} xywh {295 227 94 28} box GTK_THIN_UP_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
         }
         Fl_Button effects {
           label Effects
@@ -460,7 +460,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           if ((Fl::event_button() == 3))
           {
               instrumenteditwindow->hide();}}
-          tooltip {Right click: also close this} xywh {295 258 94 28} box EMBOSSED_BOX color 198 labelfont 1 labelcolor 64
+          tooltip {Right click: also close this} xywh {295 258 94 28} box GTK_THIN_UP_BOX color 198 labelfont 1 labelcolor 64
         }
         Fl_Button editAT {
           label Aftertouch
@@ -469,7 +469,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 2;
                 if ((Fl::event_button() == 3))
                     instrumenteditwindow->hide();}
-          xywh {295 290 94 28} box EMBOSSED_BOX color 198 labelfont 1 labelcolor 64
+          xywh {295 290 94 28} box GTK_THIN_UP_BOX color 198 labelfont 1 labelcolor 64
         }
       }
       Fl_Group {} {
@@ -942,7 +942,7 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
       Fl_Group ctlresonance {
         label Resonance
-        xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10 labelcolor 64 align 5
+        xywh {290 15 45 85} box GTK_THIN_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 5
       } {
         Fl_Dial cfdpth {
           label CFdpth
@@ -1061,7 +1061,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 atSeen = 1;
                 if ((Fl::event_button() == 3))
                     ctlwindow->hide();}
-        xywh {245 105 130 20} box EMBOSSED_BOX color 198 labelcolor 64
+        xywh {245 105 130 20} box GTK_THIN_UP_BOX color 198 labelcolor 64
       }
       Fl_Button ctlclose {
         label Close

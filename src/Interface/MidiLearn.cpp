@@ -989,6 +989,7 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
         return false;
     }
     LearnBlock entry;
+    CommandBlock allData;
     midi_list.clear();
     int ID = 0;
     int status;
@@ -1037,11 +1038,11 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.frame.data.parameter = xml->getpar255("Parameter", 0);
                 entry.frame.data.offset = xml->getpar255("Secondary_Parameter", 0);
 
-                CommandBlock allData;
 if (fromString)
 {
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
+                //synth->CBtest(&allData);
 }
 if (fromString & 2)
 {
@@ -1108,6 +1109,7 @@ if (fromString == 3)
         }
     }
     xml->exitbranch(); // MIDILEARN
+    //synth->CBtest(&allData);
     return true;
 }
 

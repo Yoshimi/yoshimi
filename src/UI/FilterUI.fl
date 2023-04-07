@@ -519,7 +519,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     formantSeen = true;
     formantRtext();
     formantparswindow->show();}
-        xywh {5 40 52 26} box EMBOSSED_BOX selection_color 221 labelfont 1 labelsize 11 labelcolor 64
+        xywh {5 40 52 26} box GTK_THIN_UP_BOX selection_color 221 labelfont 1 labelsize 11 labelcolor 64
       }
       Fl_Button filtC {
         label C

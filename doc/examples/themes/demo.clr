@@ -5,10 +5,10 @@ This would corrupt the colour map.
 ------------------ data start marker
 0,120, gray scale min-max (can be reversed)
 100,100,230, Knob shadow (R,G,B or #rrggbb)
-255,230,230, Knob highlight
+255,230,230, Knob highlight (231,235,239)
 0,0,100, Knob ring
 200,180,100, Knob ring lit
-40,100,160, Knob_pointer
+40,100,160, Knob pointer
 0,150,150, Slider track
 255,100,100, Warning type button
 180,90,70, Warning background patch
@@ -97,6 +97,8 @@ This would corrupt the colour map.
 0,255,255, solo selected
 0,0,255, midi/solo release
 255,0,0, midi ignored
+63,218,0, Slider peg
+191,0,0, Slider peg changed
 ================== data end marker
 Add your own notes here:
 Copyright © 2023 Will Godfrey
