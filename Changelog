@@ -1,7 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-4-8 Will
+bn 2204
+Made including globals.h explicit in effects
+All addsynth, subsynth knobs now recognise the default
+    position (not their inserts)
+
 2023-4-7 Will
-bn 2202
+bn 2203
 Main window knobs now recognise the default position.
 From requests, changed link buttons to gtk style up buttons.
 

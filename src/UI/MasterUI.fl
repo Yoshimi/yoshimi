@@ -2732,18 +2732,22 @@ Alan Calvert started the project}
 
             case PART::partToSystemEffect1:
                 sysEff1->value(value);
+                sysEff1->selection_color(setKnob(value,0));
                 seen = true;
                 break;
             case PART::partToSystemEffect2:
                 sysEff2->value(value);
+                sysEff2->selection_color(setKnob(value,0));
                 seen = true;
                 break;
             case PART::partToSystemEffect3:
                 sysEff3->value(value);
+                sysEff3->selection_color(setKnob(value,0));
                 seen = true;
                 break;
             case PART::partToSystemEffect4:
                 sysEff4->value(value);
+                sysEff4->selection_color(setKnob(value,0));
                 seen = true;
                 break;
 

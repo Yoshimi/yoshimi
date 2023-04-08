@@ -146,8 +146,9 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-    mag->value(pars->Phmag[n]);
-    bw->value(pars->Phrelbw[n] - 64);} {}
+        // a lot missing here :(
+        mag->value(pars->Phmag[n]);
+        bw->value(pars->Phrelbw[n] - 64);} {}
   }
   Function {~SUBnoteharmonic()} {} {
     code {//
@@ -178,7 +179,7 @@ class SUBnoteUI {: {public PresetsUI_}
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
     o->hide();}
-      xywh {350 57 735 470} type Double labelcolor 64 hide resizable
+      xywh {463 28 735 470} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {subDW = o->w();subDH=o->h();}
       code2 {SUBparameters->size_range(subDW, subDH, 0, 0, 0, 0, 1);}
@@ -203,28 +204,35 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial vol {
           label Volume
           callback {//
+          o->selection_color(setKnob(o->value(),96));
+
           send_data (0, SUBSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
           tooltip Volume xywh {20 20 29 29} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
+          code2 {o->selection_color(setKnob(o->value(),96));}
           class WidgetPDial
         }
         Fl_Dial vsns {
           label {Vel Sens}
           callback {//
+          o->selection_color(setKnob(o->value(),90));
           send_data (0, SUBSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Velocity sensing} xywh {66 20 29 29} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
+          code1 {o->selection_color(setKnob(o->value(),90));}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial pan {
           label Pan
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data (0, SUBSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
           tooltip Panning xywh {118 20 29 29} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->PPanning);}
+          code2 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
         Fl_Group ampenv {
@@ -236,10 +244,12 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial panwidth {
           label Width
           callback {//
+          o->selection_color(setKnob(o->value(),63));
           send_data (0, SUBSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Random Width} xywh {178 20 29 29} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PWidth);}
+          code2 {o->selection_color(setKnob(o->value(),63));}
           class WidgetPDial
         }
         Fl_Check_Button randompan {
@@ -299,19 +309,23 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial bend {
           label Bend
           callback {//
+          o->selection_color(setKnob(o->value(),88));
           send_data(0, SUBSYNTH::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Pitch bend range scaling} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           code1 {o->setValueType(VC_PitchBend);}
+          code2 {o->selection_color(setKnob(o->value(),88));}
           class WidgetPDial
         }
         Fl_Dial offset {
           label Offset
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data(0, SUBSYNTH::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           code1 {o->setValueType(VC_FreqOffsetHz);}
+          code2 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
         Fl_Check_Button hz440 {
@@ -331,11 +345,13 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial fixedfreqetdial {
           label {Eq.T.}
           callback {//
+          o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
           tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {675 21 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
           code2 {o->setValueType(VC_FixedFreqET);}
+          code3 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
         Fl_Slider detune {
@@ -437,26 +453,32 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Dial spreadpar1 {
           label Par1
           callback {//
+          o->selection_color(setKnob(o->value(),0));
           send_data (TOPLEVEL::action::forceUpdate, SUBSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
           xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
+          code1 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
         Fl_Dial spreadpar2 {
           label Par2
           callback {//
+          o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
           xywh {625 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
+          code1 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
         Fl_Dial spreadpar3 {
           label ForceH
           callback {//
+          o->selection_color(setKnob(o->value(),0));
           send_data (0, SUBSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Move towards closest harmonic} xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->setValueType(VC_percent255);}
+          code2 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
       }
@@ -787,14 +809,19 @@ class SUBnoteUI {: {public PresetsUI_}
     {
         case SUBSYNTH::control::volume:
             vol->value(value);
+            vol->selection_color(setKnob(value,96));
+
             break;
 
         case SUBSYNTH::control::velocitySense:
             vsns->value(value);
+            vsns->selection_color(setKnob(value,90));
+
             break;
 
         case SUBSYNTH::control::panning:
             pan->value(value);
+            pan->selection_color(setKnob(value,64));
             break;
         case SUBSYNTH::control::enableRandomPan:
             randompan->value(val_bool);
@@ -805,6 +832,7 @@ class SUBnoteUI {: {public PresetsUI_}
             break;
         case SUBSYNTH::control::randomWidth:
             panwidth->value(value);
+            panwidth->selection_color(setKnob(value,63));
             break;
 
         case SUBSYNTH::control::bandwidth:
@@ -834,6 +862,7 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::equalTemperVariation:
             fixedfreqetdial->value(value);
+            fixedfreqetdial->selection_color(setKnob(value,0));
             break;
 
         case SUBSYNTH::control::baseFrequencyAs440Hz:
@@ -858,10 +887,12 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::pitchBendAdjustment:
             bend->value(value);
+            bend->selection_color(setKnob(value,88));
             break;
 
         case SUBSYNTH::control::pitchBendOffset:
             offset->value(value);
+            offset->selection_color(setKnob(value,64));
             break;
 
         case SUBSYNTH::control::enableFrequencyEnvelope:
@@ -875,14 +906,17 @@ class SUBnoteUI {: {public PresetsUI_}
 
         case SUBSYNTH::control::overtoneParameter1:
             spreadpar1->value((unsigned int) value);
+            spreadpar1->selection_color(setKnob(value,0));
             break;
 
         case SUBSYNTH::control::overtoneParameter2:
             spreadpar2->value((unsigned int) value);
+            spreadpar2->selection_color(setKnob(value,0));
             break;
 
         case SUBSYNTH::control::overtoneForceHarmonics:
             spreadpar3->value((unsigned int) value);
+            spreadpar3->selection_color(setKnob(value,0));
             break;
 
         case SUBSYNTH::control::overtonePosition:

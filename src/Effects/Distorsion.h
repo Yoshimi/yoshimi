@@ -28,6 +28,7 @@
 #ifndef DISTORSION_H
 #define DISTORSION_H
 
+#include "globals.h"
 #include "Misc/WaveShapeSamples.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"

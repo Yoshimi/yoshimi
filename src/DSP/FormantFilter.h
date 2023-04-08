@@ -27,6 +27,7 @@
 #define FORMANT_FILTER_H
 
 #include "Misc/Alloc.h"
+#include "globals.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "Params/FilterParams.h"

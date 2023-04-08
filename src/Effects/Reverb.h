@@ -28,6 +28,7 @@
 #ifndef REVERB_H
 #define REVERB_H
 
+#include "globals.h"
 #include "Misc/Alloc.h"
 #include "Effects/Effect.h"
 

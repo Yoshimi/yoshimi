@@ -28,6 +28,7 @@
 #ifndef EQ_H
 #define EQ_H
 
+#include "globals.h"
 #include "Misc/SynthEngine.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
