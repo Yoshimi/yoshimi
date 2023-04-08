@@ -168,6 +168,7 @@ class SynthEngine
         unsigned char legatoPart;
         void setPartMap(int npart);
         void setAllPartMaps(void);
+        void audioOutStore(uint8_t num);
 
         bool masterMono;
         bool fileCompatible;
@@ -309,7 +310,7 @@ class SynthEngine
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
 
-        int CHtimer;
+        int64_t CHtimer;
 
         int64_t LFOtime; // used by Pcontinous without Pbpm
         float songBeat; // used by Pbpm without Pcontinous

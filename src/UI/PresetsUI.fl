@@ -181,7 +181,7 @@ o->hide();}
             pastewin->hide();
             return;
         }
-        synth->audioOut.store(_SYS_::mute::Request);
+        synth->audioOutStore(_SYS_::mute::Request);
         while (synth->audioOut.load() == _SYS_::mute::Request)
             usleep (1000); // wait for full mute
         p->paste(n);
@@ -195,20 +195,20 @@ o->hide();}
             // be done directly - trying to get rid of these!
         }
         if (synth->audioOut.load() == _SYS_::mute::Immediate)
-            synth->audioOut.store(_SYS_::mute::Complete);}
+            synth->audioOutStore(_SYS_::mute::Complete);}
         xywh {10 355 160 20} box THIN_UP_BOX labelcolor 64
       }
       Fl_Button pastebutton {
         label {Paste from Clipboard}
         callback {//
-        synth->audioOut.store(_SYS_::mute::Request);
+        synth->audioOutStore(_SYS_::mute::Request);
         while (synth->audioOut.load() == _SYS_::mute::Request)
             usleep (1000); // wait for full mute
         p->paste(0);
         pastewin->hide();
         pui->refresh();
         if (synth->audioOut.load() == _SYS_::mute::Immediate)
-            synth->audioOut.store(_SYS_::mute::Complete);}
+            synth->audioOutStore(_SYS_::mute::Complete);}
         xywh {25 385 90 35} box THIN_UP_BOX labelcolor 64 align 192
       }
       Fl_Button pastecancel {

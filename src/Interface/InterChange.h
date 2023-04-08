@@ -33,6 +33,8 @@
 #include "Params/OscilParameters.h"
 #include "Synth/Resonance.h"
 
+#include <semaphore.h>
+
 #include <list>
 
 class DataText;
@@ -78,6 +80,9 @@ class InterChange : private DataText
         RingBuffer <10, log2 (commandBlockSize)> returnsBuffer;
         RingBuffer <4, log2 (commandBlockSize)> muteQueue;
 
+        sem_t sortResultsThreadSemaphore;
+        void spinSortResultsThread();
+
         void generateSpecialInstrument(int npart, std::string name);
         void mediate(void);
         void historyActionCheck(CommandBlock *getData);
@@ -93,8 +98,6 @@ class InterChange : private DataText
 
         std::atomic<bool> syncWrite;
         std::atomic<bool> lowPrioWrite;
-
-        unsigned int tick; // needs to be read by synth
 
     private:
         void *sortResultsThread(void);

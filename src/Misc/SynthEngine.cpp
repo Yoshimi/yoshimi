@@ -215,7 +215,7 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
-    audioOut.store(_SYS_::mute::Active);
+    audioOutStore(_SYS_::mute::Active);
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
 
@@ -508,6 +508,12 @@ void SynthEngine::setAllPartMaps(void)
         part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
 }
 
+void SynthEngine::audioOutStore(uint8_t num)
+{
+    audioOut.store(num);
+    interchange.spinSortResultsThread();
+}
+
 
 /* for automated testing: brings all existing pseudo random generators
  * within this SyntEngine into a reproducible state, based on given seed;
@@ -656,8 +662,11 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
      * loop and twoway are increment counters
      * we assume nobody can repeat a switch press within 60mS!
      */
-            if ((interchange.tick - CHtimer) > 511) // approx 60mS
-                CHtimer = interchange.tick;
+            timespec now_struct;
+            clock_gettime(CLOCK_MONOTONIC, &now_struct);
+            int64_t now_ms = int64_t(now_struct.tv_sec) * 1000 + int64_t(now_struct.tv_nsec) / 1000000;
+            if ((now_ms - CHtimer) > 60)
+                CHtimer = now_ms;
             else
                 return 0; // de-bounced
         }
@@ -2054,14 +2063,14 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         case _SYS_::mute::Pending:
             // set by resolver
             fadeLevel = 1.0f;
-            audioOut.store(_SYS_::mute::Fading);
+            audioOutStore(_SYS_::mute::Fading);
             sound = _SYS_::mute::Fading;
             //std::cout << "here fading" << std:: endl;
             break;
         case _SYS_::mute::Fading:
             if (fadeLevel < 0.001f)
             {
-                audioOut.store(_SYS_::mute::Active);
+                audioOutStore(_SYS_::mute::Active);
                 sound = _SYS_::mute::Active;
                 fadeLevel = 0;
             }
@@ -2071,12 +2080,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             break;
         case _SYS_::mute::Complete:
             // set by resolver and paste
-            audioOut.store(_SYS_::mute::Idle);
+            audioOutStore(_SYS_::mute::Idle);
             //std::cout << "here complete" << std:: endl;
             break;
         case _SYS_::mute::Request:
             // set by paste routine
-            audioOut.store(_SYS_::mute::Immediate);
+            audioOutStore(_SYS_::mute::Immediate);
             sound = _SYS_::mute::Active;
             //std::cout << "here requesting" << std:: endl;
             break;
