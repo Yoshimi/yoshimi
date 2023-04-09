@@ -1238,7 +1238,7 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
 
         case PADSYNTH::control::velocitySense:
             type |= learnable;
-            def = 72;
+            def = 64;
             break;
 
         case PADSYNTH::control::panning:

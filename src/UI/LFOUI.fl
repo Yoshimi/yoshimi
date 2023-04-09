@@ -11,7 +11,7 @@ comment {LFOUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2017-2020, Will Godfrey & others
+Copyright 2017-2023, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -113,8 +113,12 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           callback {//
           int depth = lrint(o->value());
           if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && group == 1) // special case to sync voice list vibrato
+          {
+              o->selection_color(setKnob(depth,40));
               synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(depth);
-          send_data(0, group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
+              synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->selection_color(setSlider(depth,40));
+          }
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
           class WidgetPDial
@@ -130,7 +134,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial startphase {
           label Start
           callback {//
-          send_data(0, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
+              send_data(0, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(pars->Pbpm ? VC_LFOstartphase : VC_LFOstartphaseRand);}
           class WidgetPDial
@@ -249,8 +253,12 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
 
         case LFOINSERT::control::depth:
             intensity->value(value);
+            intensity->selection_color(setKnob(value,40));
             if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && par == 1) // rather special to sync voice list vibrato
+            {
                 synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(value);
+                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->selection_color(setSlider(value,40));
+            }
             break;
 
         case LFOINSERT::control::delay:

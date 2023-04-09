@@ -78,13 +78,18 @@ class ADvoicelistitem {: {public Fl_Group}
         Fl_Value_Slider voicevolume {
           callback {//
             int vol = lrint(o->value());
-            if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
+            o->selection_color(setSlider(vol,100));
+            /*if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
+            {
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->value(vol);
+                synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->selection_color(setSlider(vol,100));
+            }*/
 
-            collect_data(synth, vol, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_data(synth, vol, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip Volume xywh {155 4 122 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 maximum 127 step 1 textcolor 64
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
-          code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
+          code1 {o->selection_color(setSlider(o->value(),100));}
+          code2 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
           class mwheel_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
@@ -100,28 +105,32 @@ class ADvoicelistitem {: {public Fl_Group}
         Fl_Value_Slider voicelistvibratto {
           callback {//
             int lfodepth = lrint(o->value());
-            if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
-                synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
+            o->selection_color(setSlider(lfodepth,40));
+            //if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
+                //synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
 
-            collect_data(synth, lfodepth, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
+            collect_data(synth, lfodepth, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {535 4 95 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 align 5 maximum 127 step 1 textcolor 64 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
+          code2 {o->selection_color(setSlider(o->value(),40));}
           class mwheel_slider_rev
         }
         Fl_Dial voicepanning {
           callback {//
             int panning = lrint(o->value());
-            if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
+            o->selection_color(setKnob(panning,64));
+            /*if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
             {
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicepan->value(panning);
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicerandompan->value(panning < 1);
-            }
+            }*/
 
-            collect_data(synth, panning, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_data(synth, panning, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Voice panning} xywh {282 4 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->VoicePar[nvoice].PPanning);}
+          code2 {o->selection_color(setSlider(o->value(),64));}
           class WidgetPDial
         }
         Fl_Group voiceoscil {
@@ -167,9 +176,11 @@ class ADvoicelistitem {: {public Fl_Group}
         Fl_Slider voicedetune {
           callback {//
             int detune = lrint(o->value());
+            o->selection_color(setSlider(detune,0));
             collect_data(synth, detune, TOPLEVEL::action::forceUpdate, TOPLEVEL::type::Write, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {365 4 164 20} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
+          code1 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
         }
         Fl_Button itemedit {
@@ -982,8 +993,8 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             callback {//
                 int vol = lrint(o->value());
                 o->selection_color(setKnob(vol,100));
-                synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicevolume->value(vol);
-                send_data(0, ADDVOICE::control::volume, vol, TOPLEVEL::type::Integer);}
+                //synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicevolume->value(vol);
+                send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::volume, vol, TOPLEVEL::type::Integer);}
             tooltip Volume xywh {30 86 33 33} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->setValueType(VC_ADDVoiceVolume);}
             code1 {o->value(pars->VoicePar[nvoice].PVolume);}
@@ -1257,6 +1268,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             voicevolume->value(value);
             voicevolume->selection_color(setKnob(value,100));
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicevolume->value(value);
+            synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicevolume->selection_color(setSlider(value,100));
             break;
 
         case ADDVOICE::control::velocitySense:
@@ -1268,6 +1280,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             voicepan->value(value);
             voicepan->selection_color(setKnob(value,64));
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicepanning->value(value);
+            synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicepanning->selection_color(setKnob(value,64));
             break;
 
         case ADDVOICE::control::enableRandomPan:
@@ -1338,6 +1351,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 detunevalueoutput->do_callback();
             }
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicedetune->value(value);
+            synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voicedetune->selection_color(setSlider(value,0));
             synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->detunevalueoutput->do_callback();
             break;
 

@@ -1,5 +1,16 @@
 yoshimi 2.2.3 M
 
+2023-4-9 Will
+bn 2205
+Changed PadSynth 'Apply' button type.
+Improved links between Addsynth voice, and list.
+Improved links between Addsynth list and Frequency LFO.
+Controllers Knob pointers done.
+Midi CCs pointers done.
+
+Note most refreshes on part load not done yet.
+
+
 2023-4-8 Will
 bn 2204
 Made including globals.h explicit in effects

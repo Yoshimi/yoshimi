@@ -274,7 +274,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {325 57 580 440} type Double hide resizable
+      xywh {1235 133 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -309,41 +309,51 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial hpbasepar1 {
               label Width
               callback {//
+              o->selection_color(setKnob(o->value(),80));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::baseWidth, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Spread of a single peak within the profile.} xywh {20 72 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.base.pwidth);}
+              code1 {o->selection_color(setKnob(o->value(),80));}
               class WidgetPDial
             }
             Fl_Dial hpfreqmult {
               label Repeat
               callback {//
+              o->selection_color(setKnob(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::frequencyMultiplier, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Repeat the same base shape multiple times in the generated profile.} xywh {55 72 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.freqmult);}
+              code1 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial hpmpar1 {
               label Str
               callback {//
+              o->selection_color(setKnob(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorStretch, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Modulate and spread the base shape} xywh {15 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.modulator.pstretch);}
+              code1 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial hpmfreq {
               label Freq
               callback {//
+              o->selection_color(setKnob(o->value(),30));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::modulatorFrequency, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Frequency of peaks within modulation of base shape.} xywh {40 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.modulator.freq);}
+              code1 {o->selection_color(setKnob(o->value(),30));}
               class WidgetPDial
             }
             Fl_Dial hpwidth {
               label Scale
               callback {//
+              o->selection_color(setKnob(o->value(),127));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::size, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Squeeze or stretch the profile as a whole. Note: effective only when Autoscale is off} xywh {65 112 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PProfile.width);}
+              code1 {o->selection_color(setKnob(o->value(),127));}
               class WidgetPDial
             }
             Fl_Choice hponehalf {
@@ -368,17 +378,21 @@ class PADnoteUI {: {public PresetsUI_}
               Fl_Dial hpamppar1 {
                 label Par1
                 callback {//
+                o->selection_color(setKnob(o->value(),80));
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralWidth, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Squeeze or spread the secondary modulating shape.} xywh {15 239 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
                 code0 {o->value(pars->PProfile.amp.par1);}
+                code1 {o->selection_color(setKnob(o->value(),80));}
                 class WidgetPDial
               }
               Fl_Dial hpamppar2 {
                 label Par2
                 callback {//
+                o->selection_color(setKnob(o->value(),64));
                 send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::spectralAmplitude, o->value(), TOPLEVEL::type::Integer);}
                 tooltip {Degree to fade or combine secondary modulation with the harmonic profile.} xywh {55 239 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
                 code0 {o->value(pars->PProfile.amp.par2);}
+                code1 {o->selection_color(setKnob(o->value(),64));}
                 class WidgetPDial
               }
             }
@@ -436,11 +450,13 @@ class PADnoteUI {: {public PresetsUI_}
           Fl_Dial bwdial {
             label BandWidth
             callback {//
+            o->selection_color(setKnob(o->value(),500));
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::bandwidth, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Effective Bandwidth of the harmonic profile in cents: Transition from the precise waveform to a sonic cloud.} xywh {20 307 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 1000 step 1
             code0 {o->value(pars->Pbandwidth);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
             code2 {o->setValueType(VC_BandWidth);}
+            code3 {o->selection_color(setKnob(o->value(),500));}
             class WidgetPDial
           }
           Fl_Value_Output bwcents {
@@ -473,26 +489,32 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial hrpospar1 {
               label Par1
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
+              code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial hrpospar2 {
               label Par2
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
+              code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial hrpospar3 {
               label ForceH
               callback {//
+              o->selection_color(setKnob(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->setValueType(VC_percent255);}
+              code2 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
           }
@@ -548,10 +570,12 @@ class PADnoteUI {: {public PresetsUI_}
           Fl_Dial xFadeDial {
             label Crossfade
             callback {//
+            o->selection_color(setKnob(int(o->value()),2301));
             send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::xFadeUpdate, logDial2millisec(o->value()), TOPLEVEL::type::Integer);}
             tooltip {cross fade after building new Wavetable} xywh {530 201 32 32} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 minimum -1 maximum 4301 step 1
             code0 {int dialSetting = millisec2logDial(pars->PxFadeUpdate);
                    o->value(dialSetting);}
+            code1 {o->selection_color(setKnob(o->value(),2301));}
             code2 {o->setValueType(VC_XFadeUpdate);}
             class WidgetPDial
           }
@@ -588,37 +612,45 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial volume {
               label Volume
               callback {//
+              o->selection_color(setKnob(o->value(),90));
               send_data(0, PADSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
               tooltip Volume xywh {30 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->setValueType(VC_InstrumentVolume);}
               code1 {o->value(pars->PVolume);}
+              code2 {o->selection_color(setKnob(o->value(),90));}
               class WidgetPDial
             }
             Fl_Dial vsns {
               label {Vel Sens}
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(0, PADSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Velocity Sensing Function (rightmost to disable)} xywh {85 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
               code1 {o->setValueType(VC_AmpVelocitySense);}
+              code2 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial pan {
               label Pan
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
               tooltip Panning xywh {155 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->setValueType(VC_PanningStd);}
               code1 {o->value(pars->PPanning);}
+              code2 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial panwidth {
               label Width
               callback {//
-    send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),63));
+        send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Random width} xywh {235 42 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
               code0 {o->setValueType(VC_PanningRandom);}
               code1 {o->value(pars->PWidth);}
+              code2 {o->selection_color(setKnob(o->value(),63));}
               class WidgetPDial
             }
             Fl_Check_Button randompan {
@@ -647,41 +679,51 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial dpop {
               label {D.Pop}
               callback {//
+              o->selection_color(setKnob(o->value(),20));
               send_data(0, PADSYNTH::control::dePop, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Pop Suppression} xywh {130 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->Fadein_adjustment);}
+              code1 {o->selection_color(setKnob(o->value(),20));}
               class WidgetPDial
             }
             Fl_Dial pstr {
               label {P.Str.}
               callback {//
+              o->selection_color(setKnob(o->value(),0));
               send_data(0, PADSYNTH::control::punchStrength, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Punch Strength} xywh {170 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchStrength);}
+              code1 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial pt {
               label {P.t.}
               callback {//
+              o->selection_color(setKnob(o->value(),60));
               send_data(0, PADSYNTH::control::punchDuration, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Punch Time (duration)} xywh {200 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchTime);}
+              code1 {o->selection_color(setKnob(o->value(),60));}
               class WidgetPDial
             }
             Fl_Dial pstc {
               label {P.Stc.}
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(0, PADSYNTH::control::punchStretch, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Punch Stretch} xywh {230 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchStretch);}
+              code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial pvel {
               label {P.Vel.}
               callback {//
+              o->selection_color(setKnob(o->value(),72));
               send_data(0, PADSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Punch Velocity Sensing} xywh {260 247 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchVelocitySensing);}
+              code1 {o->selection_color(setKnob(o->value(),72));}
               class WidgetPDial
             }
             Fl_Group ampenv {
@@ -742,19 +784,23 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial bend {
               label Bend
               callback {//
+              o->selection_color(setKnob(o->value(),88));
               send_data(0, PADSYNTH::control::pitchBendAdjustment, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Pitch bend range scaling} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->PBendAdjust);}
               code1 {o->setValueType(VC_PitchBend);}
+              code2 {o->selection_color(setKnob(o->value(),88));}
               class WidgetPDial
             }
             Fl_Dial offset {
               label Offset
               callback {//
+              o->selection_color(setKnob(o->value(),64));
               send_data(0, PADSYNTH::control::pitchBendOffset, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Offset of the frequency in Hz.} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->POffsetHz);}
               code1 {o->setValueType(VC_FreqOffsetHz);}
+              code2 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Check_Button hz440 {
@@ -769,11 +815,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Dial fixedfreqetdial {
               label {Eq.T.}
               callback {//
+              o->selection_color(setKnob(o->value(),0));
               send_data(0, PADSYNTH::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {465 280 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
               code0 {o->value(pars->PfixedfreqET);}
               code1 {if (pars->Pfixedfreq==0) o->deactivate();}
               code2 {o->setValueType(VC_FixedFreqET);}
+              code3 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Slider detune {
@@ -838,7 +886,7 @@ class PADnoteUI {: {public PresetsUI_}
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases} xywh {242 412 128 22} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases} xywh {242 412 128 22} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button padCopy {
         label C
@@ -1216,14 +1264,17 @@ class PADnoteUI {: {public PresetsUI_}
     {
         case PADSYNTH::control::volume:
             volume->value(value);
+            volume->selection_color(setKnob(value,90));
             break;
 
         case PADSYNTH::control::velocitySense:
             vsns->value(value);
+            vsns->selection_color(setKnob(value,64));
             break;
 
         case PADSYNTH::control::panning:
             pan->value(value);
+            pan->selection_color(setKnob(value,64));
             break;
         case PADSYNTH::control::enableRandomPan:
             randompan->value(value_bool);
@@ -1235,10 +1286,12 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::randomWidth:
             panwidth->value(value);
+            panwidth->selection_color(setKnob(value,63));
             break;
 
         case PADSYNTH::control::bandwidth:
             bwdial->value(value);
+            bwdial->selection_color(setKnob(lrint(value),500));
             result = powf(value / 1000.0f, 1.1f);
             result = power<10>(result * 4.0f) * 0.25f;
             bwcents->value(result);
@@ -1277,6 +1330,7 @@ class PADnoteUI {: {public PresetsUI_}
             {
                 int dialSetting = millisec2logDial(value);
                 xFadeDial->value(dialSetting);
+                xFadeDial->selection_color(setKnob(dialSetting,2301));
                 cbwidget->do_callback();
             }
             break;
@@ -1294,12 +1348,13 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::detuneFrequency:
             detune->value(lrint(value));
-            detune->selection_color(setSlider(value,0));
+            detune->selection_color(setSlider(lrint(value),0));
             detunevalueoutput->do_callback();
             break;
 
         case PADSYNTH::control::equalTemperVariation:
             fixedfreqetdial->value(lrint(value));
+            fixedfreqetdial->selection_color(setKnob(lrint(value),0));
             break;
 
         case PADSYNTH::control::baseFrequencyAs440Hz:
@@ -1324,26 +1379,31 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::pitchBendAdjustment:
             bend->value(lrint(value));
+            bend->selection_color(setKnob(lrint(value),88));
             break;
 
         case PADSYNTH::control::pitchBendOffset:
             offset->value(lrint(value));
+            offset->selection_color(setKnob(lrint(value),64));
             break;
 
         case PADSYNTH::control::overtoneParameter1:
             hrpospar1->value(lrint(value));
+            hrpospar1->selection_color(setKnob(lrint(value),64));
             overtonepos->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::overtoneParameter2:
             hrpospar2->value(lrint(value));
+            hrpospar2->selection_color(setKnob(lrint(value),64));
             overtonepos->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::overtoneForceHarmonics:
             hrpospar3->value(lrint(value));
+            hrpospar3->selection_color(setKnob(lrint(value),0));
             overtonepos->redraw();
             cbwidget->do_callback();
             break;
@@ -1366,30 +1426,35 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::baseWidth:
             hpbasepar1->value(lrint(value));
+            hpbasepar1->selection_color(setKnob(lrint(value),80));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::frequencyMultiplier:
             hpfreqmult->value(lrint(value));
+            hpfreqmult->selection_color(setKnob(lrint(value),0));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::modulatorStretch:
             hpmpar1->value(lrint(value));
+            hpmpar1->selection_color(setKnob(lrint(value),0));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::modulatorFrequency:
             hpmfreq->value(lrint(value));
+            hpmfreq->selection_color(setKnob(lrint(value),30));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::size:
             hpwidth->value(lrint(value));
+            hpwidth->selection_color(setKnob(lrint(value),127));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
@@ -1408,12 +1473,14 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::spectralWidth:
             hpamppar1->value(value);
+            hpamppar1->selection_color(setKnob(value,80));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
 
         case PADSYNTH::control::spectralAmplitude:
             hpamppar2->value(value);
+            hpamppar2->selection_color(setKnob(value,64));
             hprofile->redraw();
             cbwidget->do_callback();
             break;
@@ -1476,22 +1543,27 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::dePop:
             dpop->value(value);
+            dpop->selection_color(setKnob(value,20));
             break;
 
         case PADSYNTH::control::punchStrength:
             pstr->value(value);
+            pstr->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::punchDuration:
             pt->value(value);
+            pt->selection_color(setKnob(value,60));
             break;
 
         case PADSYNTH::control::punchStretch:
             pstc->value(value);
+            pstc->selection_color(setKnob(value,64));
             break;
 
         case PADSYNTH::control::punchVelocity:
             pvel->value(value);
+            pvel->selection_color(setKnob(value,72));
             break;
 
         case PADSYNTH::control::randWalkDetune:
@@ -1570,7 +1642,7 @@ class PADnoteUI {: {public PresetsUI_}
     make_window();
     padStatus.reset(new PADStatus(npart,kititem));
     // setup handler to indicate PADSynth wavetable build status
-    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuild Wave"); });
+    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuilt Wave"); });
     padStatus->on(PADStatus::FADING,  [&]() { applyButton(FL_YELLOW, "fading..."); });
     padStatus->on(PADStatus::PENDING, [&]() { applyButton(fl_color_average(FL_CYAN, FL_DARK_BLUE, 0.8), "pending Wave"); });
     padStatus->on(PADStatus::BUILDING,[&]() { applyButton(fl_color_average(FL_RED, FL_DARK_MAGENTA, 0.6), "rebuilding..."); });

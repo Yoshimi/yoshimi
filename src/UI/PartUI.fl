@@ -771,41 +771,51 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial modulation {
         label Modulation
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::midiModWheel, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial expression {
         label Expression
         callback {//
+        o->selection_color(setKnob(o->value(),127));
         send_data(0, PART::control::midiExpression,  o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip Expression xywh {80 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
+        code1 {o->selection_color(setKnob(o->value(),127));}
         class WidgetPDial
       }
       Fl_Dial filterq {
         label {Filter Q}
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::midiFilterQ, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial filtercutoff {
         label {Filter Cutoff}
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::midiFilterCutoff, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial masterbandwidth {
         label Bandwidth
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::midiBandwidth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.data);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Button ctlmidiclose {
@@ -820,7 +830,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window ctlwindow {
       label Controllers
       callback {ctlclose->do_callback();}
-      xywh {568 179 505 130} type Double hide resizable
+      xywh {418 167 505 130} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
       code1 {ctlDW = o->w(); ctlDH = o->h();}
       code2 {o->size_range(ctlDW, ctlDH, 0, 0, 0, 0, 1);}
@@ -828,9 +838,11 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial volrng {
         label {Vol Rng}
         callback {//
+        o->selection_color(setKnob(o->value(),96));
         send_data(0, PART::control::volumeRange, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 labelcolor 64 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
+        code1 {o->selection_color(setKnob(o->value(),96));}
         class WidgetPDial
       }
       Fl_Check_Button vol {
@@ -844,17 +856,21 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial panwidth {
         label PanWdth
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::panningWidth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 labelcolor 64 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial modwh {
         label ModWh
         callback {//
+        o->selection_color(setKnob(o->value(),80));
         send_data(0, PART::control::modWheelDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
+        code1 {o->selection_color(setKnob(o->value(),80));}
         class WidgetPDial
       }
       Fl_Check_Button expmwh {
@@ -868,9 +884,11 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial bwdpth {
         label BwDpth
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::bandwidthDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {BandWidth depth} xywh {132 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Check_Button expbw {
@@ -927,17 +945,21 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Dial filtq {
         label FltQ
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::filterQdepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial fltcut {
         label FltCut
         callback {//
+        o->selection_color(setKnob(o->value(),64));
         send_data(0, PART::control::filterCutoffDepth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
+        code1 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Group ctlresonance {
@@ -947,17 +969,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial cfdpth {
           label CFdpth
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data(0, PART::control::resonanceCenterFrequencyDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
+          code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
         Fl_Dial rbwdpth {
           label BWdpth
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data(0, PART::control::resonanceBandwidthDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
+          code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
       }
@@ -976,17 +1002,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial prtime {
           label time
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data(0, PART::control::portamentoTime, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
+          code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
         Fl_Dial timedu {
           label {t.dn/up}
           callback {//
+          o->selection_color(setKnob(o->value(),64));
           send_data(0, PART::control::portamentoTimeStretch, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
+          code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
         Fl_Counter thresh {
@@ -1006,17 +1036,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Dial propta {
           label {Prp.Rate}
           callback {//
+          o->selection_color(setKnob(o->value(),80));
           send_data(0, PART::control::proportionalPortamentoRate, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
+          code1 {o->selection_color(setKnob(o->value(),80));}
           class WidgetPDial
         }
         Fl_Dial proptb {
           label {Prp.Dpth}
           callback {//
+          o->selection_color(setKnob(o->value(),90));
           send_data(0, PART::control::proportionalPortamentoDepth, o->value(), TOPLEVEL::type::Integer, npart);}
           tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
+          code1 {o->selection_color(setKnob(o->value(),90));}
           class WidgetPDial
         }
         Fl_Check_Button rcv {
@@ -1539,6 +1573,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 // controllers
         case PART::control::volumeRange:
             volrng->value(valInt);
+            volrng->selection_color(setKnob(valInt,96));
             break;
 
         case PART::control::volumeEnable:
@@ -1547,10 +1582,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::panningWidth:
             panwidth->value(valInt);
+            panwidth->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::modWheelDepth:
             modwh->value(valInt);
+            modwh->selection_color(setKnob(valInt,80));
             break;
 
         case PART::control::exponentialModWheel:
@@ -1559,6 +1596,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::bandwidthDepth:
             bwdpth->value(valInt);
+            bwdpth->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::exponentialBandwidth:
@@ -1583,10 +1621,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::filterQdepth:
             filtq->value(valInt);
+            filtq->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::filterCutoffDepth:
             fltcut->value(valInt);
+            fltcut->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::breathControlEnable:
@@ -1595,18 +1635,22 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::resonanceCenterFrequencyDepth:
             cfdpth->value(valInt);
+            cfdpth->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::resonanceBandwidthDepth:
             rbwdpth->value(valInt);
+            rbwdpth->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::portamentoTime:
             prtime->value(valInt);
+            prtime->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::portamentoTimeStretch:
             timedu->value(valInt);
+            timedu->selection_color(setKnob(valInt,64));
             break;
 
         case PART::control::portamentoThreshold:
@@ -1633,10 +1677,12 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::proportionalPortamentoRate:
             propta->value(valInt);
+            propta->selection_color(setKnob(valInt,80));
             break;
 
         case PART::control::proportionalPortamentoDepth:
             proptb->value(valInt);
+            proptb->selection_color(setKnob(valInt,90));
             break;
 
         case PART::control::receivePortamento:
@@ -1645,18 +1691,23 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         case PART::control::midiModWheel:
             modulation->value(value);
+            modulation->selection_color(setKnob(value,64));
             break;
         case PART::control::midiExpression:
             expression->value(value);
+            expression->selection_color(setKnob(value,127));
             break;
         case PART::control::midiFilterQ:
             filterq->value(value);
+            filterq->selection_color(setKnob(value,64));
             break;
         case PART::control::midiFilterCutoff:
             filtercutoff->value(value);
+            filtercutoff->selection_color(setKnob(value,64));
             break;
         case PART::control::midiBandwidth:
             masterbandwidth->value(value);
+            masterbandwidth->selection_color(setKnob(value,64));
             break;
 
         case PART::control::instrumentCopyright:

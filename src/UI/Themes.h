@@ -370,7 +370,7 @@ static std::string colourData [] = {
     "255,0,0,VU Overload",
     "255,254,254,254, VU_text",
     "191,255,255, Midilearn text background",
-    "127,200,191, Link buttons",
+    "120,190,185, Link buttons",
     "180,180,200, Alternative link buttons",
     "63,145,255, Action buttons",
     "0,255,255, Panels",

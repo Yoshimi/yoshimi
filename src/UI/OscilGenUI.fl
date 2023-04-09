@@ -488,7 +488,7 @@ o->hide();}
         label Apply
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {
@@ -612,7 +612,7 @@ o->hide();}
         }
       }
       Fl_Output Warning {
-        xywh {224 8 248 20} box FLAT_BOX color 29 align 32 textfont 1 textcolor 129
+        xywh {224 8 248 20} box FLAT_BOX color 49 align 32 textfont 1 textcolor 129
       }
       Fl_Choice magtype {
         label {Mag.Type}

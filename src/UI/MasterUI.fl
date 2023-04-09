@@ -1055,11 +1055,9 @@ class MasterUI {: {private GuiUpdates}
           Fl_Dial partPan {
             label Panning
             callback {//
-            if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-                setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
             o->selection_color(setKnob(o->value(),64));
 
-            send_data(0, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {292 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::panning, npart));}
             code1 {o->selection_color(setKnob(o->value(),64));}
