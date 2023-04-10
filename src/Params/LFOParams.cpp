@@ -156,21 +156,21 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             {
                 case TOPLEVEL::insertType::amplitude:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.708000;
+                        def = 0.703125f;
                     else
-                        def = 0.62999f;
+                        def = 0.625f;
                     break;
                 case TOPLEVEL::insertType::frequency:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.393000f;
+                        def = 0.390625f;
                     else
-                        def = 0.550999f;
+                        def = 0.546875f;
                     break;
                 case TOPLEVEL::insertType::filter:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.393000f;
+                        def = 0.390625f;
                     else
-                        def = 0.62999f;
+                        def = 0.625f;
                     break;
             }
             break;

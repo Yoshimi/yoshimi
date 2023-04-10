@@ -90,4 +90,40 @@ class LFOlimit
         float getLFOlimits(CommandBlock *getData);
 };
 
+/*
+ * This is a new replacement for limits that can be directly
+ *  accessed anywhere that includes this header.
+ */
+struct LFOminmax{
+    float min;
+    float max;
+    float def;
+    bool learn;
+    bool integer;
+};
+namespace LFODEF{
+    const LFOminmax ampFreq {0,1,0.625,true,false};
+    const LFOminmax freqFreq {0,1,0.546875,true,false};
+    const LFOminmax filtFreq {0,1,0.625,true,false};
+    const LFOminmax voiceAmpFreq {0,1,0.703125,true,false};
+    const LFOminmax voiceFreqFreq {0,1,0.390625,true,false};
+    const LFOminmax voiceFiltFreq {0,1,0.390625,true,false};
+
+    const LFOminmax depth {0,127,0,true,true};
+    const LFOminmax voiceAmpDepth {0,127,32,true,true};
+    const LFOminmax voiceFreqDepth {0,127,40,true,true};
+    const LFOminmax voiceFiltDepth {0,127,20,true,true};
+
+    const LFOminmax start {0,127,64,true,true};
+    const LFOminmax voiceFreqStart {0,127,0,true,true};
+
+    const LFOminmax delay {0,127,0,true,true};
+    const LFOminmax voiceAmpDelay {0,127,30,true,true};
+
+
+    const LFOminmax ampRnd {0,127,0,true,true};
+    const LFOminmax freqRnd {0,127,0,true,true};
+
+    const LFOminmax stretch {0,127,64,true,true};
+}
 #endif

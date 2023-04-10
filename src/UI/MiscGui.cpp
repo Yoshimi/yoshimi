@@ -642,7 +642,7 @@ int setSlider(float current, float normal)
 // for setting knob pointer colour
 int setKnob(float current, float normal)
 {
-    if (lrint(current) == lrint(normal))
+    if ((current - normal) < 0.0005 && (normal - current) < 0.0005)
         return knob_point;
     else
        return keyb_pitch_peg;

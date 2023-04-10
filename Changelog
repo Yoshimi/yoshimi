@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-4-10 Will
+bn 2206
+Completed all LFO knob pointers.
+Also started developing new limits setting.
+
 2023-4-9 Will
 bn 2205
 Changed PadSynth 'Apply' button type.

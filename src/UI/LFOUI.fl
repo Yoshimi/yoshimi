@@ -104,7 +104,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial freq {
           label {Freq.}
           callback {//
-          send_data(0, group, LFOINSERT::control::speed, o->value(), 0);}
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::speed, o->value(), 0);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 step 1e-05
           class WidgetPDial
         }
@@ -114,10 +114,10 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
           int depth = lrint(o->value());
           if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && group == 1) // special case to sync voice list vibrato
           {
-              o->selection_color(setKnob(depth,40));
               synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(depth);
               synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->selection_color(setSlider(depth,40));
-          }
+          };
+
           send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::depth, depth, TOPLEVEL::type::Integer);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
@@ -126,7 +126,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial delay {
           label Delay
           callback {//
-          send_data(0, group, LFOINSERT::control::delay, o->value(), TOPLEVEL::type::Integer);}
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::delay, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
           class WidgetPDial
@@ -134,7 +134,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial startphase {
           label Start
           callback {//
-              send_data(0, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
+              send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::start, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(pars->Pbpm ? VC_LFOstartphase : VC_LFOstartphaseRand);}
           class WidgetPDial
@@ -149,7 +149,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial randomness {
           label {Amp. }
           callback {//
-          send_data(0, group, LFOINSERT::control::amplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::amplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Amplitude Randomness} xywh {145 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
@@ -157,7 +157,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial freqrand {
           label {  Freq.}
           callback {//
-          send_data(0, group, LFOINSERT::control::frequencyRandomness, o->value(), TOPLEVEL::type::Integer);}
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::frequencyRandomness, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO Frequency Randomness} xywh {170 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
           code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
@@ -165,7 +165,7 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Dial stretch {
           label {Str.}
           callback {//
-          send_data(0, group, LFOINSERT::control::stretch, o->value(), TOPLEVEL::type::Integer);}
+          send_data(TOPLEVEL::action::forceUpdate, group, LFOINSERT::control::stretch, o->value(), TOPLEVEL::type::Integer);}
           tooltip {LFO frequency stretch} xywh {200 30 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code1 {o->setValueType(VC_LFOStretch);}
           class WidgetPDial
@@ -248,29 +248,101 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
     switch(control)
     {
         case LFOINSERT::control::speed:
+        {
             freq->value(value);
-            break;
-
-        case LFOINSERT::control::depth:
-            intensity->value(value);
-            intensity->selection_color(setKnob(value,40));
-            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && par == 1) // rather special to sync voice list vibrato
+            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
             {
-                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(value);
-                synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->selection_color(setSlider(value,40));
+                switch (par)
+                {
+                    case 0:
+                        freq->selection_color(setKnob(value,LFODEF::voiceAmpFreq.def));
+                        break;
+                    case 1:
+                        freq->selection_color(setKnob(value,LFODEF::voiceFreqFreq.def));
+                        break;
+                    case 2:
+                        freq->selection_color(setKnob(value,LFODEF::voiceFiltFreq.def));
+                        break;
+                }
+            }
+            else
+            {
+                switch (par)
+                {
+                    case 0:
+                        freq->selection_color(setKnob(value,LFODEF::ampFreq.def));
+                        break;
+                    case 1:
+                        freq->selection_color(setKnob(value,LFODEF::freqFreq.def));
+                        break;
+                    case 2:
+                        freq->selection_color(setKnob(value,LFODEF::filtFreq.def));
+                        break;
+                }
             }
             break;
+        }
 
-        case LFOINSERT::control::delay:
-            delay->value(value);
+        case LFOINSERT::control::depth:
+        {
+            intensity->value(value);
+            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1)
+            {
+                switch (par) // all of these are different!
+                {
+                    case 0:
+                        intensity->selection_color(setKnob(value,LFODEF::voiceAmpDepth.def));
+                        break;
+                    case 1: // rather special to sync voice list vibrato
+
+                        intensity->selection_color(setKnob(value,LFODEF::voiceFreqDepth.def));
+                        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->value(value);
+                        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine - PART::engine::addVoice1]->voicelistvibratto->selection_color(setSlider(value,LFODEF::voiceFreqDepth.def));
+
+                    break;
+                    case 2:
+                        intensity->selection_color(setKnob(value,LFODEF::voiceFiltDepth.def));
+                        break;
+                }
+            }
+            else
+                intensity->selection_color(setKnob(value,LFODEF::depth.def));
             break;
+        }
 
         case LFOINSERT::control::start:
+        {
             startphase->value(value);
+            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && par == 1)
+                startphase->selection_color(setKnob(value,LFODEF::voiceFreqStart.def));
+            else
+                startphase->selection_color(setKnob(value,LFODEF::start.def));
             break;
+        }
+
+        case LFOINSERT::control::delay:
+        {
+            delay->value(value);
+            if (engine >= PART::engine::addVoice1 && engine < PART::engine::addMod1 && par == 0)
+                delay->selection_color(setKnob(value,LFODEF::voiceAmpDelay.def));
+            else
+                delay->selection_color(setKnob(value,LFODEF::delay.def));
+            break;
+        }
 
         case LFOINSERT::control::amplitudeRandomness:
             randomness->value(value);
+            randomness->selection_color(setKnob(value,LFODEF::ampRnd.def));
+            break;
+
+        case LFOINSERT::control::frequencyRandomness:
+            freqrand->value(value);
+            freqrand->selection_color(setKnob(value,LFODEF::freqRnd.def));
+            break;
+
+        case LFOINSERT::control::stretch:
+            stretch->value(value);
+            stretch->selection_color(setKnob(value,LFODEF::stretch.def));
             break;
 
         case LFOINSERT::control::type:
@@ -285,14 +357,6 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
             bpm->value(value != 0);
             updateLFOFreqType();
             updateBpmControls();
-            break;
-
-        case LFOINSERT::control::frequencyRandomness:
-            freqrand->value(value);
-            break;
-
-        case LFOINSERT::control::stretch:
-            stretch->value(value);
             break;
     }} {}
   }
