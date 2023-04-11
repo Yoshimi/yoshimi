@@ -439,7 +439,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial cfreqdial {
           label { C.Freq}
           callback {//
-          send_data(0, FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::centerFrequency, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pfreq);}
           code1 {o->setValueType(getFilterFreqType(filtertype->value()));}
@@ -448,7 +448,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial qdial {
           label Q
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1 deactivate
           code0 {o->value(pars->Pq);}
           code1 {updateVCforQ();}
@@ -458,7 +458,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial freqtrdial {
           label {Freq.tr.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code1 {o->value(pars->Pfreqtrack);}
           class WidgetPDial
@@ -466,7 +466,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial vsnsadial {
           label {V.Sns.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
@@ -474,7 +474,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial vsnsdial {
           label { VF.Sns.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_FilterVelocitySense);}
           code1 {o->setGraphicsType(VC_FilterVelocitySense);}
@@ -483,7 +483,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial gaindial {
           label Gain
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
           code1 {o->setValueType(VC_FilterGain);}
@@ -818,8 +818,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
              vowelpatch->color(warning_background);
         vowelpatch->redraw();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {//
         int categ = pars->Pcategory;
         int parstype = pars->Ptype;
@@ -994,9 +993,11 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
     bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
 
-    if (part != npart || (kititem != (EFFECT::type::dynFilter) && eng != engine))
+    bool dynFilt = (kititem == EFFECT::type::dynFilter);
+
+    if (part != npart || (!dynFilt && eng != engine))
         return;
-    if (kititem == (EFFECT::type::dynFilter))
+    if (dynFilt)
     {
         //cout << "Dyn filter seen part " << int(part)<< endl;
         if (part == TOPLEVEL::section::systemEffects)
@@ -1007,36 +1008,69 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
            synth->getGuiMaster()->partui->inseffectui->UpdatePresetColour(1, EFFECT::type::dynFilter - EFFECT::type::none); // normal part effect
     }
 
+    bool isAdd = (eng == PART::engine::addSynth);
+    bool isVoice = (eng >= PART::engine::addVoice1);
+    bool isSub = (eng == PART::engine::subSynth);
+    bool isPad = (eng == PART::engine::padSynth);
     switch(control)
     {
         case FILTERINSERT::control::centerFrequency:
+        {
             cfreqdial->value(value);
+            if (dynFilt)
+                cfreqdial->selection_color(setKnob(value,FILTDEF::dynFreq.def));
+            else if(isAdd)
+                cfreqdial->selection_color(setKnob(value,FILTDEF::addFreq.def));
+            else if(isVoice)
+                cfreqdial->selection_color(setKnob(value,FILTDEF::voiceFreq.def));
+            else if (isSub)
+                cfreqdial->selection_color(setKnob(value,FILTDEF::subFreq.def));
+            else if(isPad)
+                cfreqdial->selection_color(setKnob(value,FILTDEF::padFreq.def));
             break;
+        }
 
         case FILTERINSERT::control::Q:
+        {
             qdial->value(value);
+            if (dynFilt)
+                qdial->selection_color(setKnob(value,FILTDEF::dynQval.def));
+            else if (isVoice)
+                qdial->selection_color(setKnob(value,FILTDEF::voiceQval.def));
+            else
+                qdial->selection_color(setKnob(value,FILTDEF::qVal.def));
             if (filtertype->value() == 1)
                 formantfiltergraph->redraw();
             break;
+        }
 
         case FILTERINSERT::control::frequencyTracking:
             freqtrdial->value(value_int);
+            freqtrdial->selection_color(setKnob(value,FILTDEF::freqTrack.def));
             break;
 
         case FILTERINSERT::control::velocitySensitivity:
+        {
             vsnsadial->value(value);
+            if (isVoice)
+                vsnsadial->selection_color(setKnob(value,FILTDEF::voiceVelSense.def));
+            else
+                vsnsadial->selection_color(setKnob(value,FILTDEF::velSense.def));
             if (velsnsamp != NULL)
                 *velsnsamp = value_int;
             break;
+        }
 
         case FILTERINSERT::control::velocityCurve:
             vsnsdial->value(value);
+            vsnsdial->selection_color(setKnob(value,FILTDEF::velFuncSense.def));
             if (velsns != NULL)
                 *velsns = value_int;
             break;
 
         case FILTERINSERT::control::gain:
             gaindial->value(value);
+            gaindial->selection_color(setKnob(value,FILTDEF::gain.def));
             formantfiltergraph->redraw();
             break;
 

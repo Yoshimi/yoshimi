@@ -125,7 +125,7 @@ const int VU_rms = 135;
 const int pad_prof_line = 136;
 const int pad_prof_inactive = 137;
 const int midi_solo_release = 139;
-const int keyb_pitch_peg = 143;
+const int knob_point_change = 143;
 const int knob_ring = 144;
 const int knob_point = 145;
 const int tooltip_grid = 146;
@@ -273,7 +273,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     query_back,
     dynfilter_button,
     keyb_slider_back,
-    keyb_pitch_peg,
+    knob_point_change,
     keyb_mod_bar,
     spectrum_line,
     bank_select,

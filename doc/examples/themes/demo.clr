@@ -8,7 +8,7 @@ This would corrupt the colour map.
 255,230,230, Knob highlight (231,235,239)
 0,0,100, Knob ring
 200,180,100, Knob ring lit
-40,100,160, Knob pointer
+0,0,160, Knob pointer
 0,150,150, Slider track
 255,100,100, Warning type button
 180,90,70, Warning background patch
@@ -81,7 +81,7 @@ This would corrupt the colour map.
 150,255,255, Query/Alert background
 0,182,191, Dynfilter filter button
 127,127,127, Keyboard slider backgrounds
-200,150,0, Knob ponter changed
+200,80,0, Knob ponter changed
 63,127,255, Keyboard Mod Wheel
 255,165,0, Waveform spectrum harmonic
 0,255,0, Bank/instrument select lit

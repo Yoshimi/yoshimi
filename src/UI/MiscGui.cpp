@@ -645,7 +645,7 @@ int setKnob(float current, float normal)
     if ((current - normal) < 0.0005 && (normal - current) < 0.0005)
         return knob_point;
     else
-       return keyb_pitch_peg;
+       return knob_point_change;
 }
 
 

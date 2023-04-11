@@ -125,4 +125,26 @@ class filterLimit
         float getFilterLimits(CommandBlock *getData);
 };
 
+struct FILTminmax{
+    float min;
+    float max;
+    float def;
+    bool learn;
+    bool integer;
+};
+namespace FILTDEF{
+    const FILTminmax addFreq {0,127,94,true,true};
+    const FILTminmax voiceFreq {0,127,50,true,true};
+    const FILTminmax subFreq {0,127,80,true,true};
+    const FILTminmax padFreq {0,127,94,true,true};
+    const FILTminmax dynFreq {0,127,45,true,true};
+    const FILTminmax qVal {0,127,40,true,true};
+        const FILTminmax voiceQval {0,127,60,true,true};
+        const FILTminmax dynQval {0,127,64,true,true};
+    const FILTminmax velSense {0,127,64,true,true};
+        const FILTminmax voiceVelSense {0,127,0,true,true};
+    const FILTminmax velFuncSense {0,127,64,true,true};
+    const FILTminmax gain {0,127,64,true,true};
+    const FILTminmax freqTrack {0,127,64,true,true};
+}
 #endif
