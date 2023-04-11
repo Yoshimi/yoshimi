@@ -473,7 +473,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e1adt {
           label {A.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -482,7 +482,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e1ddt {
           label {D.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
@@ -491,7 +491,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e1rdt {
           label {R.dt }
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -500,7 +500,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e1sval {
           label {S.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::sustainLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeAmpSusVal);}
           code1 {o->value(env->PS_val);}
@@ -517,7 +517,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e1envstretch {
           label Stretch
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
@@ -564,7 +564,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e2aval {
           label {A.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PA_val);}
@@ -573,7 +573,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e2adt {
           label {A.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -582,7 +582,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e2rval {
           label {R.val }
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PR_val);}
@@ -591,7 +591,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e2rdt {
           label {R.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -600,7 +600,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e2envstretch {
           label { Stretch}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
@@ -646,7 +646,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3aval {
           label {A.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PA_val);}
@@ -655,7 +655,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3adt {
           label {A.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -664,7 +664,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3dval {
           label {D.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PD_val);}
@@ -673,7 +673,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3ddt {
           label {D.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::decayTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PD_dt);}
@@ -682,7 +682,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3rdt {
           label {R.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -691,7 +691,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3rval {
           label {R.val }
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeFilterVal);}
           code1 {o->value(env->PR_val);}
@@ -700,7 +700,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e3envstretch {
           label { Stretch}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
@@ -746,7 +746,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e4aval {
           label {A.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->setValueType(VC_EnvelopeBandwidthVal);}
@@ -755,7 +755,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e4adt {
           label {A.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
@@ -764,7 +764,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e4rval {
           label {R.val}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->setValueType(VC_EnvelopeBandwidthVal);}
@@ -773,7 +773,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e4rdt {
           label {R.dt}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
@@ -782,7 +782,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Dial e4envstretch {
           label Stretch
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
+          send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
@@ -864,14 +864,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     unsigned char insert = getData->data.insert;
     unsigned char param = getData->data.parameter;
     unsigned char offset = getData->data.offset;
-
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
     bool isFreemode = _SYS_::F2B(freemodebutton->value());
-    bool NotUs = ((getData->data.source & TOPLEVEL::action::noAction) != TOPLEVEL::action::fromGUI || (getData->data.source & TOPLEVEL::action::forceUpdate));
 
-    if (part != npart || (eng >= 128 && eng != engine))
+    bool isVoice = (eng >= PART::engine::addVoice1 && eng < PART::engine::addMod1);
+    bool isMod = (eng >= PART::engine::addMod1);
+    bool isSub = (eng == PART::engine::subSynth);
+
+    if (part != npart || (isVoice && eng != engine))
         return;
+
+    synth->CBtest(getData);
 
     if (insert == TOPLEVEL::insert::envelopePointAdd || insert == TOPLEVEL::insert::envelopePointDelete || insert == TOPLEVEL::insert::envelopePointChange)
     {
@@ -892,103 +896,166 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     switch(control)
     {
         case ENVELOPEINSERT::control::attackLevel:
-            if (NotUs)
             {
                 switch (param)
                 {
                     case TOPLEVEL::insertType::frequency:
                         e2aval->value(value);
+                        if (isVoice)
+                            e2aval->selection_color(setKnob(value,ENVDEF::voiceFreqAtValue.def));
+                        else if (isMod)
+                            e2aval->selection_color(setKnob(value,ENVDEF::modFreqAtValue.def));
+                        else if (isSub)
+                            e2aval->selection_color(setKnob(value,ENVDEF::subFreqAtValue.def));
+                        else
+                            e2aval->selection_color(setKnob(value,ENVDEF::freqAttackValue.def));
                         break;
                     case TOPLEVEL::insertType::filter:
                         e3aval->value(value);
+                        if (isVoice)
+                            e3aval->selection_color(setKnob(value,ENVDEF::voiceFiltAtValue.def));
+                        else
+                            e3aval->selection_color(setKnob(value,ENVDEF::filtAttackValue.def));
                         break;
                     case TOPLEVEL::insertType::bandwidth:
                         e4aval->value(value);
+                        e4aval->selection_color(setKnob(value,ENVDEF::subBandAttackValue.def));
                         break;
                 }
             }
             break;
 
         case ENVELOPEINSERT::control::attackTime:
-            if (NotUs)
             {
                 switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
-                        e1adt->value(value);
+                        e1adt->value(value_int);
+                        if (isMod)
+                            e1adt->selection_color(setKnob(value,ENVDEF::modAmpAttackTime.def));
+                        else
+                            e1adt->selection_color(setKnob(value,ENVDEF::ampAttackTime.def));
                         break;
                     case TOPLEVEL::insertType::frequency:
                         e2adt->value(value);
+                        if (isMod)
+                            e2adt->selection_color(setKnob(value,ENVDEF::modFreqAtTime.def));
+                        else if (isVoice)
+                            e2adt->selection_color(setKnob(value,ENVDEF::voiceFreqAtTime.def));
+                        else
+                            e2adt->selection_color(setKnob(value,ENVDEF::freqAttackTime.def));
                         break;
                     case TOPLEVEL::insertType::filter:
                         e3adt->value(value);
+                        if (isVoice)
+                            e3adt->selection_color(setKnob(value,ENVDEF::voiceFiltAtTime.def));
+                        else
+                            e3adt->selection_color(setKnob(value,ENVDEF::filtAttackTime.def));
                         break;
                     case TOPLEVEL::insertType::bandwidth:
                         e4adt->value(value);
+                        e4adt->selection_color(setKnob(value,ENVDEF::subBandAttackTime.def));
                         break;
                 }
             }
             break;
 
         case ENVELOPEINSERT::control::decayLevel:
-            if (param == TOPLEVEL::insertType::filter && NotUs)
+            if (param == TOPLEVEL::insertType::filter)
+            {
                 e3dval->value(value);
+                if (isVoice)
+                    e3dval->selection_color(setKnob(value,ENVDEF::voiceFiltDeValue.def));
+                else
+                    e3dval->selection_color(setKnob(value,ENVDEF::filtDecayValue.def));
+            }
             break;
 
         case ENVELOPEINSERT::control::decayTime:
-            if (NotUs)
             {
                 switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
-                        e1ddt->value(value);
+                        e1ddt->value(value_int);
+                        if (isMod)
+                            e1ddt->selection_color(setKnob(value,ENVDEF::modAmpDecayTime.def));
+                        else if (isVoice)
+                            e1ddt->selection_color(setKnob(value,ENVDEF::voiceAmpDecayTime.def));
+                        else
+                            e1ddt->selection_color(setKnob(value,ENVDEF::ampDecayTime.def));
                         break;
                     case TOPLEVEL::insertType::filter:
                         e3ddt->value(value);
+                        e3ddt->selection_color(setKnob(value,ENVDEF::filtDecayTime.def));
                         break;
                 }
             }
             break;
 
         case ENVELOPEINSERT::control::sustainLevel:
-            if (param == TOPLEVEL::insertType::amplitude && NotUs)
-                e1sval->value(value);
+            if (param == TOPLEVEL::insertType::amplitude)
+            {
+                e1sval->value(value_int);
+                e1sval->selection_color(setKnob(value,ENVDEF::ampSustainValue.def));
+            }
             break;
 
         case ENVELOPEINSERT::control::releaseTime:
-            if (NotUs)
             {
                 switch (param)
                 {
                     case TOPLEVEL::insertType::amplitude:
-                        e1rdt->value(value);
+                        e1rdt->value(value_int);
+                        if (isMod)
+                            e1rdt->selection_color(setKnob(value,ENVDEF::modAmpReleaseTime.def));
+                        else if (isVoice)
+                            e1rdt->selection_color(setKnob(value,ENVDEF::voiceAmpReleaseTime.def));
+                        else
+                            e1rdt->selection_color(setKnob(value,ENVDEF::ampReleaseTime.def));
                         break;
                     case TOPLEVEL::insertType::frequency:
                         e2rdt->value(value);
+                        if (isMod)
+                            e2rdt->selection_color(setKnob(value,ENVDEF::modFreqReleaseTime.def));
+                        else
+                            e2rdt->selection_color(setKnob(value,ENVDEF::freqReleaseTime.def));
                         break;
                     case TOPLEVEL::insertType::filter:
                         e3rdt->value(value);
+                        if (isVoice)
+                            e3rdt->selection_color(setKnob(value,ENVDEF::voiceFiltRelTime.def));
+                        else
+                            e3rdt->selection_color(setKnob(value,ENVDEF::filtReleaseTime.def));
                         break;
                     case TOPLEVEL::insertType::bandwidth:
                         e4rdt->value(value);
+                        e4rdt->selection_color(setKnob(value,ENVDEF::subBandReleaseTime.def));
                         break;
                 }
             }
             break;
 
         case ENVELOPEINSERT::control::releaseLevel:
-            if (NotUs)
             {
                 switch (param)
                 {
                     case TOPLEVEL::insertType::frequency:
                         e2rval->value(value);
+                        if (isMod)
+                            e2rval->selection_color(setKnob(value,ENVDEF::modFreqReleaseValue.def));
+                        else
+                            e2rval->selection_color(setKnob(value,ENVDEF::freqReleaseValue.def));
                         break;
                     case TOPLEVEL::insertType::filter:
                         e3rval->value(value);
+                        if (isVoice)
+                            e3rval->selection_color(setKnob(value,ENVDEF::voiceFiltRelValue.def));
+                        else
+                            e3rval->selection_color(setKnob(value,ENVDEF::filtReleaseValue.def));
                         break;
                     case TOPLEVEL::insertType::bandwidth:
                         e4rval->value(value);
+                        e4rval->selection_color(setKnob(value,ENVDEF::subBandReleaseValue.def));
                         break;
                 }
             }
@@ -998,19 +1065,26 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             switch (param)
             {
                 case TOPLEVEL::insertType::amplitude:
-                    e1envstretch->value(value);
+                    e1envstretch->value(value_int);
+                    e1envstretch->selection_color(setKnob(value,ENVDEF::ampStretch.def));
                     break;
                 case TOPLEVEL::insertType::frequency:
                     e2envstretch->value(value);
+                    if (isSub)
+                        e2envstretch->selection_color(setKnob(value,ENVDEF::subFreqStretch.def));
+                    else
+                        e2envstretch->selection_color(setKnob(value,ENVDEF::freqStretch.def));
                     break;
                 case TOPLEVEL::insertType::filter:
                     e3envstretch->value(value);
+                    e3envstretch->selection_color(setKnob(value,ENVDEF::filtStretch.def));
                     break;
                 case TOPLEVEL::insertType::bandwidth:
                     e4envstretch->value(value);
+                    e4envstretch->selection_color(setKnob(value,ENVDEF::subBandStretch.def));
                     break;
             }
-            envstretchdial->value(value);
+            //envstretchdial->value(value);
             change = false;
             break;
 
@@ -1048,7 +1122,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
             break;
 
         case ENVELOPEINSERT::control::sustainPoint:
-            if (isFreemode && NotUs)
+            if (isFreemode)
                 sustaincounter->value(value_int);
             break;
     }

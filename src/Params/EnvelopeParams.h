@@ -89,4 +89,56 @@ class envelopeLimit
         float getEnvelopeLimits(CommandBlock *getData);
 };
 
+struct ENVminmax{
+    float min;
+    float max;
+    float def;
+    bool learn;
+    bool integer;
+};
+namespace ENVDEF{
+    const ENVminmax ampAttackTime {0,127,0 ,true,true};
+        const ENVminmax modAmpAttackTime {0,127,80 ,true,true};
+    const ENVminmax ampDecayTime {0,127,40 ,true,true};
+        const ENVminmax voiceAmpDecayTime {0,127,100,true,true};
+        const ENVminmax modAmpDecayTime {0,127,90,true,true};
+    const ENVminmax ampSustainValue {0,127,127,true,true};
+    const ENVminmax ampReleaseTime {0,127,25,true,true};
+        const ENVminmax voiceAmpReleaseTime {0,127,100,true,true};
+        const ENVminmax modAmpReleaseTime {0,127,100,true,true};
+    const ENVminmax ampStretch {0,127,64 ,true,true};
+
+    const ENVminmax freqAttackValue {0,127,64,true,true};
+        const ENVminmax voiceFreqAtValue {0,127,30,true,true};
+        const ENVminmax modFreqAtValue {0,127,20,true,true};
+        const ENVminmax subFreqAtValue {0,127,30,true,true};
+    const ENVminmax freqAttackTime {0,127,50,true,true};
+        const ENVminmax voiceFreqAtTime {0,127,40,true,true};
+        const ENVminmax modFreqAtTime {0,127,90,true,true};
+    const ENVminmax freqReleaseTime {0,127,60,true,true};
+        const ENVminmax modFreqReleaseTime {0,127,80,true,true};
+    const ENVminmax freqReleaseValue {0,127,64,true,true};
+        const ENVminmax modFreqReleaseValue {0,127,40,true,true};
+    const ENVminmax freqStretch {0,127,0,true,true};
+        const ENVminmax subFreqStretch {0,127,64,true,true};
+
+    const ENVminmax subBandAttackValue {0,127,100,true,true};
+    const ENVminmax subBandAttackTime {0,127,70,true,true};
+    const ENVminmax subBandReleaseTime {0,127,60,true,true};
+    const ENVminmax subBandReleaseValue {0,127,64,true,true};
+    const ENVminmax subBandStretch {0,127,64,true,true};
+
+    const ENVminmax filtAttackValue {0,127,64,true,true};
+        const ENVminmax voiceFiltAtValue {0,127,90,true,true};
+    const ENVminmax filtAttackTime {0,127,40,true,true};
+        const ENVminmax voiceFiltAtTime {0,127,70,true,true};
+    const ENVminmax filtDecayValue {0,127,64,true,true};
+        const ENVminmax voiceFiltDeValue {0,127,40,true,true};
+    const ENVminmax filtDecayTime {0,127,70,true,true};
+    const ENVminmax filtReleaseTime {0,127,60,true,true};
+        const ENVminmax voiceFiltRelTime {0,127,10,true,true};
+    const ENVminmax filtReleaseValue {0,127,64,true,true};
+        const ENVminmax voiceFiltRelValue {0,127,40,true,true};
+    const ENVminmax filtStretch {0,127,0,true,true};
+}
 #endif
