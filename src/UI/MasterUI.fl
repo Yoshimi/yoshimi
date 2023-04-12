@@ -308,11 +308,7 @@ class MasterUI {: {private GuiUpdates}
       npart = 0;
       panelgroup = 0;
       panelScale = 1;
-      for (int i = 0; i < NUM_SYS_EFX; ++i)
-      {
-          for (int j = 0; j < NUM_SYS_EFX; ++j)
-              syseffsend[i][j] = NULL;
-      }
+
       microtonalui = NULL;
       bankui = NULL;
       virkeyboard = NULL;
@@ -1646,24 +1642,12 @@ Alan Calvert started the project}
     Fl_Window syseffsendwindow {
       label {Sys Send}
       callback {syseffClose->do_callback();}
-      xywh {43 63 120 245} type Double labelfont 13 labelsize 13 hide resizable
+      xywh {534 25 120 245} type Double labelfont 13 labelsize 13 hide resizable
       code0 {syseffDW = 120; syseffDH = 245;}
       code1 {o->size_range(syseffDW, syseffDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group syseffgroup {
-        xywh {9 46 109 172} box FLAT_BOX labelcolor 64
-        code0 {//
-            for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
-                for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; neff2++)}
-        code1 {{
-                syseffsend[neff1][neff2] =
-                    new SysEffSend(o->x()+(neff2 - 1) * 35, o->y() + 20 + neff1 * 52, 30, 30);
-                syseffsend[neff1][neff2]->label("aaa");
-                syseffsend[neff1][neff2]->labelcolor(64);
-                syseffsend[neff1][neff2]->init(neff1, neff2, synth);
-                syseffsend[neff1][neff2]->setValueType(VC_FXSysSend);
-                syseffsend[neff1][neff2]->selection_color(setKnob(syseffsend[neff1][neff2]->value(),0));
-            }}
+        xywh {4 46 112 160} box FLAT_BOX labelcolor 64
       } {}
       Fl_Button syseffClose {
         label Close
@@ -1676,6 +1660,60 @@ Alan Calvert started the project}
       Fl_Box syseffname {
         label {Send output of system effect  to other system effects}
         xywh {5 5 110 35} labelsize 10 labelcolor 64 align 192
+      }
+      Fl_Dial syseff01 {
+        label {1->2}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 1, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
+        xywh {9 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial syseff02 {
+        label {1->3}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 2, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
+        xywh {45 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial syseff03 {
+        label {1->4}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
+        xywh {83 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial syseff12 {
+        label {2->3}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 2, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,1,TOPLEVEL::insert::systemEffectSend);}
+        xywh {45 118 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial syseff13 {
+        label {2->4}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,1,TOPLEVEL::insert::systemEffectSend);}
+        xywh {83 118 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial syseff23 {
+        label {3->4}
+        callback {//
+        int val = lrint(o->value());
+        o->selection_color(setKnob(val,0));
+        send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,2,TOPLEVEL::insert::systemEffectSend);}
+        xywh {83 171 30 30} labelsize 10 align 1 maximum 127 step 1
+        class WidgetPDial
       }
     }
     Fl_Window panelwindow {
@@ -2765,7 +2803,6 @@ Alan Calvert started the project}
     code {//
     float value = getData->data.value;
     bool wasFromHere = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
-    bool force = getData->data.source & TOPLEVEL::action::forceUpdate;
     unsigned char control = getData->data.control;
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2923,14 +2960,49 @@ Alan Calvert started the project}
     }
     if (newpart == TOPLEVEL::section::systemEffects)
     {
-        if (insert == TOPLEVEL::insert::systemEffectSend)
+        if (insert == TOPLEVEL::insert::systemEffectSend && !wasFromHere)
         {
-            if (!wasFromHere || force == true)
+            switch (engine)
             {
-                syseffsend[engine][control]->value(value);
+                case 0:
+                    if(control == 1)
+                    {
+                        syseff01->value(value_int);
+                        syseff01->selection_color(setKnob(value_int,0));
+                    }
+                    else if(control == 2)
+                    {
+                        syseff02->value(value_int);
+                        syseff02->selection_color(setKnob(value_int,0));
+                    }
+                    else if(control == 3)
+                    {
+                        syseff03->value(value_int);
+                        syseff03->selection_color(setKnob(value_int,0));
+                    }
+                    break;
+                case 1:
+                    if(control == 2)
+                    {
+                        syseff12->value(value_int);
+                        syseff12->selection_color(setKnob(value_int,0));
+                    }
+                    else if(control == 3)
+                    {
+                        syseff13->value(value_int);
+                        syseff13->selection_color(setKnob(value_int,0));
+                    }
+                    break;
+                case 2:
+                    if(control == 3)
+                    {
+                        syseff23->value(value_int);
+                        syseff23->selection_color(setKnob(value_int,0));
+                    }
+                    break;
             }
-            syseffsend[engine][control]->selection_color(setKnob(value,0));
         }
+
         else
         {
             if (control == EFFECT::sysIns::effectNumber)
@@ -3474,12 +3546,7 @@ Alan Calvert started the project}
   }
   Function {updatesendwindow()} {} {
     code {//
-    for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
-        for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
-        {
-            syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);
-            syseffsend[neff1][neff2]->selection_color(setKnob(synth->Psysefxsend[neff1][neff2],0));
-        }
+
         ;} {}
   }
   Function {updatelistitem(int part)} {} {
@@ -4569,15 +4636,15 @@ bpmfallback->format(format);} {}
     syseffgroup->resize(int(9 * dScale), int(46 * dScale), int(109 * dScale), int(172 * dScale));
     syseffname->labelsize(size);
 
-    for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
-        for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
-        {
-            syseffsend[neff1][neff2]->labelsize(size);
-            syseffsend[neff1][neff2]->resize(int((-25 * dScale) + (35 * (neff2)) * dScale), int((66 * dScale) + (neff1 * dScale * 52)), int(35 * dScale), int(30 * dScale));
-        }
+
 
     syseffClose->labelsize(int(14 * dScale));
-
+    syseff01->labelsize(size);
+    syseff02->labelsize(size);
+    syseff03->labelsize(size);
+    syseff12->labelsize(size);
+    syseff13->labelsize(size);
+    syseff23->labelsize(size);
     syseffsendwindow->redraw();} {}
   }
   Function {queryRtext()} {} {
@@ -4746,8 +4813,6 @@ bpmfallback->format(format);} {}
   }
   decl {int partmax;} {
     comment {This is only public for vector control} public local
-  }
-  decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }

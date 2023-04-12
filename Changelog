@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-4-12 Will
+bn 2208
+Rebuilt GUI System effect sends.
+Their knob pointer colours now track.
+
 2023-4-11 Will
 bn 2207
 Freemode knob pointers now partly done.
