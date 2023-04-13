@@ -20,7 +20,7 @@
 
 */
 
-const int fromString = 1;
+const int fromString = 3;
 /*
  * 0 = use numbers
  * 1 = use string

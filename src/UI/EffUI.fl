@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -203,7 +203,7 @@ eff = eff_;
   }
 }
 
-class EffUI {: {public Fl_Group,public PresetsUI_}
+class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -242,8 +242,9 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       }
     }
   }
-  Function {make_reverb_window()} {} {
-    Fl_Window effreverbwindow {
+  Function {make_reverb_window()} {open
+  } {
+    Fl_Window effreverbwindow {open
       xywh {839 53 380 95} type Double box PLASTIC_UP_BOX color 223 labelsize 12 labelcolor 64 align 33 hide
       class Fl_Group
     } {
@@ -268,7 +269,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
       Fl_Dial revp0 {
         label Vol
         callback {//
-        send_data(0, 0, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revVol.def));
+        send_data(0, 0, o->value(), (EFFECT::type::reverb),0);}
         tooltip {Effect volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code1 {o->setValueType(VC_FXReverbVol);}
         class WidgetPDial
@@ -277,7 +279,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Pan
         callback {//
         int butt = 1;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::panning.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code1 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
@@ -286,7 +289,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Time
         callback {//
         int butt = 2;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revTime.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip {Duration of effect} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code1 {o->setValueType(VC_FXReverbTime);}
         class WidgetPDial
@@ -295,7 +299,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {I.del}
         callback {//
         int butt = 3;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revDelay.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip {Initial delay} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127
         code0 {o->setValueType(VC_FXReverbIDelay);}
         class WidgetPDial
@@ -304,7 +309,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {I.delfb}
         callback {//
         int butt = 4;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revFeedB.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip {Initial delay feedback} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code0 {o->setValueType(VC_percent128);}
         class WidgetPDial
@@ -313,7 +319,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label BW
         callback {//
         int butt = 12;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revBandW.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 deactivate
         code0 {if (eff->geteffectpar(10)==2) o->activate();}
         code1 {o->setValueType(VC_FXReverbBandwidth);}
@@ -323,7 +330,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {E/R}
         callback {//
         int butt = 6;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revER.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 deactivate
         class WidgetPDial
       }
@@ -331,7 +339,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label LPF
         callback {//
         int butt = 7;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revLPF.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip {Low pass filter} xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code0 {o->setValueType(VC_FXReverbLowPass);}
         class WidgetPDial
@@ -340,7 +349,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label HPF
         callback {//
         int butt = 8;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revHPF.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip {High pass filter} xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
         code0 {o->setValueType(VC_FXReverbHighPass);}
         class WidgetPDial
@@ -349,7 +359,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label Damp
         callback {//
         int butt = 9;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revDamp.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);}
         tooltip Dampening xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 minimum 64 maximum 127 step 1
         code0 {o->setValueType(VC_percent64_127);}
         class WidgetPDial
@@ -358,7 +369,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         label {R.S.}
         callback {//
         int butt = 11;
-        send_data(0, butt, o->value(), (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
+        o->selection_color(setKnob(o->value(),EFFDEF::revRoom.def));
+        send_data(0, butt, o->value(), (EFFECT::type::reverb), 0);} selected
         tooltip RoomSize xywh {342 8 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 minimum 1 maximum 127 step 1
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial

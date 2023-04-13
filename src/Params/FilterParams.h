@@ -146,5 +146,12 @@ namespace FILTDEF{
     const FILTminmax velFuncSense {0,127,64,true,true};
     const FILTminmax gain {0,127,64,true,true};
     const FILTminmax freqTrack {0,127,64,true,true};
+
+    const FILTminmax formSpeed {0,127,64,true,true};
+    const FILTminmax formClear {0,127,64,true,true};
+    const FILTminmax formFreq {0,127,-1,true,true}; // no default value
+    const FILTminmax formQ {0,127,64,true,true};
+    const FILTminmax formAmp {0,127,127,true,true};
+    const FILTminmax formStretch {0,127,40,true,true};
 }
 #endif
