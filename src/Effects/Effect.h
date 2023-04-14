@@ -66,37 +66,5 @@ class Effect
         SynthEngine *synth;
 };
 
-struct EFFminmax{
-    float min;
-    float max;
-    float def;
-    bool learn;
-    bool integer;
-};
-
-namespace EFFDEF{
-    const EFFminmax panning  {0,127,64,true,false};
-
-    const EFFminmax revVol {0,127,80,true,false};
-    const EFFminmax revDryW {0,127,40,true,false};
-    const EFFminmax revTime {0,127,63,true,false};
-    const EFFminmax revDelay {0,127,24,true,false};
-    const EFFminmax revFeedB {0,127,0,true,false};
-    const EFFminmax revBandW {0,127,20,true,false};
-    const EFFminmax revER {0,127,0,true,false}; // not currently in use
-    const EFFminmax revLPF {0,127,85,true,false};
-    const EFFminmax revHPF {0,127,5,true,false};
-    const EFFminmax revDamp {0,127,83,true,false};
-    const EFFminmax revRoom {0,127,64,true,false};
-
-    const EFFminmax echoVol {0,127,67,true,false};
-    const EFFminmax echoDryW {0,127,33,true,false};
-    const EFFminmax echoDelay {0,127,35,true,false};
-    const EFFminmax echoLRdel {0,127,64,true,false};
-    const EFFminmax echoLRcros {0,127,30,true,false};
-    const EFFminmax echoFeedB {0,127,59,true,false};
-    const EFFminmax echoDamp {0,127,0,true,false};
-}
-
 #endif
 

@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-4-14 Will
+bn 2210
+BugFix: Some envelope freemode controls inactive.
+Reverted initial effects limits work.
+
 2023-4-13 Will
 bn 2209
 Reinstated right click default of system effects.

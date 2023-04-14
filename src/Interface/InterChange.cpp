@@ -6575,21 +6575,59 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         getData->data.value = pars->Pfreemode;
         return;
     }
-    else if (getData->data.control == ENVELOPEINSERT::control::edit)
-        return; // only of interest to the GUI
+    //else if (getData->data.control == ENVELOPEINSERT::control::edit)
+        //return; // only of interest to the GUI
 
 
     int envpoints = pars->Penvpoints;
 
     if (pars->Pfreemode)
     {
-        if (insert == TOPLEVEL::insert::envelopePointAdd)
-            envelopePointAdd(getData, pars);
-        else if (insert == TOPLEVEL::insert::envelopePointDelete)
-            envelopePointDelete(getData, pars);
-        else if (insert == TOPLEVEL::insert::envelopePointChange)
-            envelopePointChange(getData, pars);
-        return;
+        bool doReturn = true;
+        switch (insert)
+        {
+            case TOPLEVEL::insert::envelopePointAdd:
+                envelopePointAdd(getData, pars);
+                break;
+            case TOPLEVEL::insert::envelopePointDelete:
+                envelopePointDelete(getData, pars);
+                break;
+            case TOPLEVEL::insert::envelopePointChange:
+                envelopePointChange(getData, pars);
+                break;
+            default:
+            {
+                if (getData->data.control == ENVELOPEINSERT::control::points)
+                {
+                    if (!pars->Pfreemode)
+                    {
+                        val = UNUSED;
+                        Xincrement = UNUSED;
+                    }
+                    else
+                    {
+                        val = envpoints;
+                        Xincrement = envpoints; // don't really need this now
+                    }
+                }
+                else if (getData->data.control == ENVELOPEINSERT::control::sustainPoint)
+                {
+                    if (write)
+                        pars->Penvsustain = val;
+                    else
+                        val = pars->Penvsustain;
+                }
+                else
+                    doReturn = false;
+            }
+            break;
+        }
+        if (doReturn) // some controls are common to both
+        {
+            getData->data.value = val;
+            getData->data.offset = Xincrement;
+            return;
+        }
     }
     else if (insert != TOPLEVEL::insert::envelopeGroup)
     {
@@ -6668,23 +6706,9 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         case ENVELOPEINSERT::control::edit:
             break;
 
-        case ENVELOPEINSERT::control::points:
-            if (!pars->Pfreemode)
-            {
-                val = UNUSED;
-                Xincrement = UNUSED;
-            }
-            else
-            {
-                val = envpoints;
-                Xincrement = envpoints; // don't really need this now
-            }
-            break;
-        case ENVELOPEINSERT::control::sustainPoint:
-            if (write)
-                pars->Penvsustain = val;
-            else
-                val = pars->Penvsustain;
+        default:
+            val = UNUSED;
+            Xincrement = UNUSED;
             break;
     }
     if (write)

@@ -418,7 +418,7 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       Fl_Dial envstretchdial {
         label {Str.}
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, o->value(), TOPLEVEL::type::Write);}
+        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
