@@ -274,10 +274,10 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {1235 133 580 440} type Double hide resizable
+      xywh {1235 133 580 440} type Double resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
-      code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
+      code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Tabs {} {
         callback {//
@@ -886,7 +886,7 @@ class PADnoteUI {: {public PresetsUI_}
         label {Apply Changes}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases} xywh {242 412 128 22} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild wavetable to render the currently defined spectrum and line shape; also re-randomise phases} xywh {242 412 128 22} box GTK_THIN_UP_BOX color 82 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button padCopy {
         label C
@@ -1642,11 +1642,11 @@ class PADnoteUI {: {public PresetsUI_}
     make_window();
     padStatus.reset(new PADStatus(npart,kititem));
     // setup handler to indicate PADSynth wavetable build status
-    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(FL_GRAY, "Rebuilt Wave"); });
-    padStatus->on(PADStatus::FADING,  [&]() { applyButton(FL_YELLOW, "fading..."); });
-    padStatus->on(PADStatus::PENDING, [&]() { applyButton(fl_color_average(FL_CYAN, FL_DARK_BLUE, 0.8), "pending Wave"); });
-    padStatus->on(PADStatus::BUILDING,[&]() { applyButton(fl_color_average(FL_RED, FL_DARK_MAGENTA, 0.6), "rebuilding..."); });
-    padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(FL_RED, "Apply Changes"); });} {}
+    padStatus->on(PADStatus::CLEAN,   [&]() { applyButton(pad_built, "Rebuilt Wave"); });
+    padStatus->on(PADStatus::FADING,  [&]() { applyButton(pad_fading, "fading..."); });
+    padStatus->on(PADStatus::PENDING, [&]() { applyButton(pad_pending, "pending Wave"); });
+    padStatus->on(PADStatus::BUILDING,[&]() { applyButton(pad_building, "rebuilding..."); });
+    padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(pad_apply, "Apply Changes"); });} {}
   }
   Function {~PADnoteUI()} {return_type virtual
   } {

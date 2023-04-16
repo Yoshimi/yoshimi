@@ -488,7 +488,7 @@ o->hide();}
         label Apply
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {301 281 58 18} box GTK_THIN_UP_BOX color 82 labelfont 1 labelsize 12 labelcolor 64
         code0 {if (!forPAD) o->hide();}
       }
       Fl_Group oscildisplaygroup {

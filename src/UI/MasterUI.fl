@@ -522,7 +522,7 @@ class MasterUI {: {private GuiUpdates}
 
                 synth->guiClosed(true);
             }}
-      xywh {367 302 385 500} type Double labelfont 13 labelsize 12 hide resizable
+      xywh {123 76 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
       code1 {masterwindow->size_range(394, 500, 0, 0, 0, 0, 1);}
     } {
@@ -1080,23 +1080,23 @@ class MasterUI {: {private GuiUpdates}
             class WidgetPDial
           }
           Fl_Group instrumentGroup {
-            xywh {136 292 195 24} box GTK_THIN_UP_BOX color 198
+            xywh {136 291 195 25} box GTK_THIN_UP_BOX color 198
           } {
             Fl_Box instrumentaddbox {
-              xywh {139 297 62 14} box FLAT_BOX color 17
+              xywh {140 296 60 15} box FLAT_BOX color 17
             }
             Fl_Box instrumentsubbox {
-              xywh {200 297 65 14} box FLAT_BOX color 17
+              xywh {200 296 65 15} box FLAT_BOX color 17
             }
             Fl_Box instrumentpadbox {
-              xywh {264 297 63 14} box FLAT_BOX color 17
+              xywh {264 296 63 15} box FLAT_BOX color 17
             }
             Fl_Box instrumentlabel {
               label {Simple Sound}
               xywh {139 295 187 16} selection_color 64 labelsize 12 labelcolor 64 align 16
             }
             Fl_Box instrumentFrame {
-              xywh {139 296 188 16} box DOWN_FRAME labelcolor 49
+              xywh {140 296 187 15} box THIN_DOWN_FRAME labelcolor 49
             }
             Fl_Button buttontop {
               callback {//
@@ -1117,7 +1117,7 @@ class MasterUI {: {private GuiUpdates}
                   send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, PART::control::instrumentName, 0, TOPLEVEL::type::Integer, activePart, UNUSED, UNUSED, UNUSED, id);
               }
           }}
-              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 292 195 24} box NO_BOX selection_color 64 labeltype NO_LABEL labelsize 12 labelcolor 64 align 16
+              tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {136 291 195 25} box NO_BOX selection_color 64 labeltype NO_LABEL labelsize 12 labelcolor 64 align 16
             }
           }
           Fl_Spinner partMidiCh {
@@ -1230,7 +1230,7 @@ class MasterUI {: {private GuiUpdates}
             //lastkey = -1;
             partui->Showedit();
        // }}
-            tooltip {View/change instrument sound and details} xywh {334 292 42 24} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+            tooltip {View/change instrument sound and details} xywh {334 291 42 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button partControllers {
             label Controllers
@@ -1469,7 +1469,7 @@ class MasterUI {: {private GuiUpdates}
         int nval = o->value() - 1;
         activePart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 293 40 22} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
+        xywh {36 292 40 23} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -1487,7 +1487,7 @@ class MasterUI {: {private GuiUpdates}
                 tmp = 32;
         }
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Set the number of available parts} xywh {93 293 40 22} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
+        tooltip {Set the number of available parts} xywh {93 292 40 23} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
         code0 {o->value(partmax);}
         class WidgetSpinner
       }

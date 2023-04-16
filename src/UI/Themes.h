@@ -57,12 +57,13 @@
   72
   75 - 77
   79
-  82 - 87
+  83 - 87
   98 - 100
   101
   102 - 102
   104
-  106 - 123
+  106 - 114
+  116 - 123
   124* filer icon fake lines
   125 - 127
   138 - 143
@@ -70,20 +71,18 @@
   156
   160
   161
-  164 - 167
+  164 - 166
   169 - 172
   174* filer icon background
   180
   183* filer dir icon
-  184
-  185
-  186
-  187
+  184 - 186
   192 - 195
-  200 - 205
+  200 - 201
+  203 - 205
   209 - 213
   218* query '?' text
-  232 - 235
+  233 - 235
   237* various down boxes
   240 - 243
   248 - 251
@@ -102,6 +101,7 @@ const int tooltip_faint_text = 67;
 const int spectrum_line = 71;
 const int bank_export = 78;
 const int env_line_sel = 81;
+const int pad_apply = 82;
 const int bank_delete = 88;
 const int warning_button = 89;
 const int pending_button = 90;
@@ -114,6 +114,7 @@ const int EQ_back = 96;
 const int EQ_back_off = 97;
 const int bank_select = 103;
 const int tooltip_major_grid = 105;
+const int pad_built = 115;
 const int pad_harmonic_line = 128;
 const int warning_text = 129;
 const int midi_ignored = 130;
@@ -136,6 +137,7 @@ const int pad_back = 158;
 const int pad_equiv_back = 159;
 const int pad_grid_centre = 162;
 const int pad_grid = 163;
+const int pad_fading = 167;
 const int VU_over = 168;
 const int bank_add_save = 173;
 const int gen_opp_text = 175;
@@ -145,6 +147,7 @@ const int VU_bar_1dB = 178;
 const int CP_background = 179;
 const int dynfilter_button = 181;
 const int instr_info_back = 182;
+const int pad_pending = 187;
 const int eff_preset = 188;
 const int eff_preset_changed = 189;
 const int VU_bar_10dB = 190;
@@ -153,6 +156,7 @@ const int close_button = 196;
 const int CP_text = 197;
 const int links = 198;
 const int knob_lit = 199;
+const int pad_building = 202;
 const int filer_text_back = 206;
 const int knob_high = 207;
 const int bank_rename = 208;
@@ -173,6 +177,7 @@ const int actions = 228;
 const int VU_level = 229;
 const int keyb_mod_bar = 230;
 const int pad_prof_fill = 231;
+const int alt_warn_tex = 232;
 const int sub_back = 236;
 const int ext_osc = 238;
 const int env_ctl_sel = 239;
@@ -194,7 +199,7 @@ const int slider_peg_changed = 80;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 96;
+const int COLOURLIST = 102;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -291,6 +296,12 @@ const unsigned char colourNumbers [COLOURLIST] = {
     midi_ignored,
     slider_peg_default,
     slider_peg_changed,
+    alt_warn_tex,
+    pad_apply,
+    pad_building,
+    pad_pending,
+    pad_fading,
+    pad_built,
 
 };
 
@@ -400,6 +411,12 @@ static std::string colourData [] = {
     "255,0,0, midi ignored",
     "63,218,0, Slider peg",
     "191,0,0, Slider peg changed",
+    "0,0,255, Alternative warning text",
+    "255,0,0, PadSynth apply changes",
+    "191,72,191, PadSynth building",
+    "0,160,160, PadSynth pending",
+    "255,255,0, PadSynth fading",
+    "150,150,150, PadSynth built",
     "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

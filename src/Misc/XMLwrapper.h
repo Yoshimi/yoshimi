@@ -52,6 +52,9 @@ class XMLwrapper
         void addparU(const std::string& name, unsigned int val); // add unsigned uinteger parameter: name, value
 
         void addpar(const std::string& name, int val); // add simple parameter: name, value
+
+        void addparcombi(const std::string& name, float val); // add hybrid float/int parameter: name, value
+
         void addparreal(const std::string& name, float val);
 
         void addpardouble(const std::string& name, double val);
@@ -102,6 +105,8 @@ class XMLwrapper
         unsigned int getparU(const std::string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
 
         int getpar(const std::string& name, int defaultpar, int min, int max);
+
+        float getparcombi(const std::string& name, float defaultpar, float min, float max);
 
         // the same as getpar, but the limits are 0 and 127
         int getpar127(const std::string& name, int defaultpar);

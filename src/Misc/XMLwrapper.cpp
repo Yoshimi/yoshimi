@@ -159,7 +159,6 @@ void XMLwrapper::checkfileinformation(const std::string& filename, unsigned int&
         synth->getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
         return;
-
     char *first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
     information.yoshiType = (first!= NULL);
     char *start = strstr(xmldata, "<INFORMATION>");
@@ -335,11 +334,12 @@ char *XMLwrapper::getXMLdata()
     switch (synth->getRuntime().xmlType)
     {
         case TOPLEVEL::XML::Instrument:
+        {
             addparbool("ADDsynth_used", (information.ADDsynth_used != 0));
             addparbool("SUBsynth_used", (information.SUBsynth_used != 0));
             addparbool("PADsynth_used", (information.PADsynth_used != 0));
             break;
-
+        }
         case TOPLEVEL::XML::Patch:
             addparstr("XMLtype", "Parameters");
             break;
@@ -406,6 +406,16 @@ void XMLwrapper::addparU(const std::string& name, unsigned int val)
 void XMLwrapper::addpar(const std::string& name, int val)
 {
     addparams2("par", "name", name.c_str(), "value", asString(val));
+}
+
+
+void XMLwrapper::addparcombi(const std::string& name, float val)
+{
+    union { float in; uint32_t out; } convert;
+    char buf[11];
+    convert.in = val;
+    sprintf(buf, "0x%8X", convert.out);
+    addparams3("par", "name", name.c_str(), "value", asString(lrint(val)), "exact_value", buf);
 }
 
 
@@ -644,6 +654,33 @@ int XMLwrapper::getpar(const std::string& name, int defaultpar, int min, int max
     else if (val > max)
         val = max;
     return val;
+}
+
+
+float XMLwrapper::getparcombi(const std::string& name, float defaultpar, float min, float max)
+{
+    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+        return defaultpar;
+    float result = 0;
+    const char *strval = mxmlElementGetAttr(node, "exact_value");
+    if (strval != NULL) {
+        union { float out; uint32_t in; } convert;
+        sscanf(strval+2, "%x", &convert.in);
+        result = convert.out;
+    }
+    else
+    {
+        strval = mxmlElementGetAttr(node, "value");
+        if (!strval)
+        return defaultpar;
+        result = string2float(std::string(strval));
+    }
+    if (result < min)
+        result = min;
+    else if (result > max)
+        result = max;
+    return result;
 }
 
 

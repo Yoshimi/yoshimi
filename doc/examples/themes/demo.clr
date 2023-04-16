@@ -99,6 +99,12 @@ This would corrupt the colour map.
 255,0,0, midi ignored
 63,218,0, Slider peg
 191,0,0, Slider peg changed
+140,255,0, Alternative Warning Text
+200,0,0, PadSynth apply changes
+160,30,160, PadSynth building
+0,140,140, PadSynth pending
+125,125,0, PadSynth fading
+100,100,100, PadSynth built
 ================== data end marker
 Add your own notes here:
 Copyright © 2023 Will Godfrey

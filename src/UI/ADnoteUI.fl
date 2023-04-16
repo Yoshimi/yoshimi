@@ -604,7 +604,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
                   xywh {712 370 72 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
-                  code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
+                  code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(alt_warn_tex);}
                 }
                 Fl_Slider ModPhase {
                   label Phase
@@ -848,7 +848,7 @@ Oscillator}
     if ((Fl::event_button() == 3))
         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
                   xywh {9 548 72 22} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 11 labelcolor 64
-                  code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
+                  code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(alt_warn_tex);}
                 }
                 Fl_Slider VoiceOscPhase {
                   label Phase
@@ -1577,7 +1577,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 changeFMoscilbutton->labelcolor(gen_text);
             }
             else
-                changeFMoscilbutton->labelcolor(FL_BLUE);
+                changeFMoscilbutton->labelcolor(alt_warn_tex);
             update_fmoscil();
             voiceFMparametersgroup->redraw();
             oscFM->redraw();
@@ -1637,7 +1637,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
                 changevoiceoscilbutton->labelcolor(gen_text);
             }
             else
-                changevoiceoscilbutton->labelcolor(FL_BLUE);
+                changevoiceoscilbutton->labelcolor(alt_warn_tex);
             changevoiceoscilbutton->redraw();
             update_voiceoscil();
             voiceoscil->redraw();

@@ -39,31 +39,31 @@ class EnvelopeParams : public Presets
     public:
         EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_, SynthEngine *_synth);
         ~EnvelopeParams() { }
-        void ADSRinit(char A_dt, char D_dt, char S_val, char R_dt);
-        void ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt);
-        void ASRinit(char A_val, char A_dt, char R_val, char R_dt);
-        void ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt,
-                             char R_dt, char R_val);
-        void ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt);
+        void ADSRinit(float A_dt, float D_dt, float S_val, float R_dt);
+        void ADSRinit_dB(float A_dt, float D_dt, float S_val, float R_dt);
+        void ASRinit(float A_val, float A_dt, float R_val, float R_dt);
+        void ADSRinit_filter(float A_val, float A_dt, float D_val, float D_dt,
+                             float R_dt, float R_val);
+        void ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt);
         void converttofree(void);
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
-        float getdt(char i);
+        float getdt(float i);
 
         // MIDI Parameters
         unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
         unsigned char Penvpoints;
-        unsigned char Penvsustain; // 127 pentru dezactivat
-        unsigned char Penvdt[MAX_ENVELOPE_POINTS];
-        unsigned char Penvval[MAX_ENVELOPE_POINTS];
+        float Penvsustain; // 127 pentru dezactivat
+        float Penvdt[MAX_ENVELOPE_POINTS];
+        float Penvval[MAX_ENVELOPE_POINTS];
         unsigned char Penvstretch; // 64=normal stretch (piano-like), 0=no stretch
         unsigned char Pforcedrelease; // 0 - OFF, 1 - ON
         unsigned char Plinearenvelope; // if the amplitude envelope is linear
 
-        unsigned char PA_dt, PD_dt, PR_dt,
+        float PA_dt, PD_dt, PR_dt,
                       PA_val, PD_val, PS_val, PR_val;
 
         int Envmode; // 1 for ADSR parameters (linear amplitude)
@@ -79,7 +79,7 @@ class EnvelopeParams : public Presets
         unsigned char Denvstretch;
         unsigned char Dforcedrelease;
         unsigned char Dlinearenvelope;
-        unsigned char DA_dt, DD_dt, DR_dt,
+        float DA_dt, DD_dt, DR_dt,
                       DA_val, DD_val, DS_val, DR_val;
 };
 
@@ -97,48 +97,48 @@ struct ENVminmax{
     bool integer;
 };
 namespace ENVDEF{
-    const ENVminmax ampAttackTime {0,127,0 ,true,true};
-        const ENVminmax modAmpAttackTime {0,127,80 ,true,true};
-    const ENVminmax ampDecayTime {0,127,40 ,true,true};
-        const ENVminmax voiceAmpDecayTime {0,127,100,true,true};
-        const ENVminmax modAmpDecayTime {0,127,90,true,true};
-    const ENVminmax ampSustainValue {0,127,127,true,true};
-    const ENVminmax ampReleaseTime {0,127,25,true,true};
-        const ENVminmax voiceAmpReleaseTime {0,127,100,true,true};
-        const ENVminmax modAmpReleaseTime {0,127,100,true,true};
+    const ENVminmax ampAttackTime {0,127,0 ,true,false};
+        const ENVminmax modAmpAttackTime {0,127,80 ,true,false};
+    const ENVminmax ampDecayTime {0,127,40 ,true,false};
+        const ENVminmax voiceAmpDecayTime {0,127,100,true,false};
+        const ENVminmax modAmpDecayTime {0,127,90,true,false};
+    const ENVminmax ampSustainValue {0,127,127,true,false};
+    const ENVminmax ampReleaseTime {0,127,25,true,false};
+        const ENVminmax voiceAmpReleaseTime {0,127,100,true,false};
+        const ENVminmax modAmpReleaseTime {0,127,100,true,false};
     const ENVminmax ampStretch {0,127,64 ,true,true};
 
-    const ENVminmax freqAttackValue {0,127,64,true,true};
-        const ENVminmax voiceFreqAtValue {0,127,30,true,true};
-        const ENVminmax modFreqAtValue {0,127,20,true,true};
-        const ENVminmax subFreqAtValue {0,127,30,true,true};
-    const ENVminmax freqAttackTime {0,127,50,true,true};
-        const ENVminmax voiceFreqAtTime {0,127,40,true,true};
-        const ENVminmax modFreqAtTime {0,127,90,true,true};
-    const ENVminmax freqReleaseTime {0,127,60,true,true};
-        const ENVminmax modFreqReleaseTime {0,127,80,true,true};
-    const ENVminmax freqReleaseValue {0,127,64,true,true};
-        const ENVminmax modFreqReleaseValue {0,127,40,true,true};
+    const ENVminmax freqAttackValue {0,127,64,true,false};
+        const ENVminmax voiceFreqAtValue {0,127,30,true,false};
+        const ENVminmax modFreqAtValue {0,127,20,true,false};
+        const ENVminmax subFreqAtValue {0,127,30,true,false};
+    const ENVminmax freqAttackTime {0,127,50,true,false};
+        const ENVminmax voiceFreqAtTime {0,127,40,true,false};
+        const ENVminmax modFreqAtTime {0,127,90,true,false};
+    const ENVminmax freqReleaseTime {0,127,60,true,false};
+        const ENVminmax modFreqReleaseTime {0,127,80,true,false};
+    const ENVminmax freqReleaseValue {0,127,64,true,false};
+        const ENVminmax modFreqReleaseValue {0,127,40,true,false};
     const ENVminmax freqStretch {0,127,0,true,true};
         const ENVminmax subFreqStretch {0,127,64,true,true};
 
-    const ENVminmax subBandAttackValue {0,127,100,true,true};
-    const ENVminmax subBandAttackTime {0,127,70,true,true};
-    const ENVminmax subBandReleaseTime {0,127,60,true,true};
-    const ENVminmax subBandReleaseValue {0,127,64,true,true};
-    const ENVminmax subBandStretch {0,127,64,true,true};
+    const ENVminmax subBandAttackValue {0,127,100,true,false};
+    const ENVminmax subBandAttackTime {0,127,70,true,false};
+    const ENVminmax subBandReleaseTime {0,127,60,true,false};
+    const ENVminmax subBandReleaseValue {0,127,64,true,false};
+    const ENVminmax subBandStretch {0,127,64,true,false};
 
-    const ENVminmax filtAttackValue {0,127,64,true,true};
-        const ENVminmax voiceFiltAtValue {0,127,90,true,true};
-    const ENVminmax filtAttackTime {0,127,40,true,true};
-        const ENVminmax voiceFiltAtTime {0,127,70,true,true};
-    const ENVminmax filtDecayValue {0,127,64,true,true};
-        const ENVminmax voiceFiltDeValue {0,127,40,true,true};
-    const ENVminmax filtDecayTime {0,127,70,true,true};
-    const ENVminmax filtReleaseTime {0,127,60,true,true};
-        const ENVminmax voiceFiltRelTime {0,127,10,true,true};
-    const ENVminmax filtReleaseValue {0,127,64,true,true};
-        const ENVminmax voiceFiltRelValue {0,127,40,true,true};
+    const ENVminmax filtAttackValue {0,127,64,true,false};
+        const ENVminmax voiceFiltAtValue {0,127,90,true,false};
+    const ENVminmax filtAttackTime {0,127,40,true,false};
+        const ENVminmax voiceFiltAtTime {0,127,70,true,false};
+    const ENVminmax filtDecayValue {0,127,64,true,false};
+        const ENVminmax voiceFiltDeValue {0,127,40,true,false};
+    const ENVminmax filtDecayTime {0,127,70,true,false};
+    const ENVminmax filtReleaseTime {0,127,60,true,false};
+        const ENVminmax voiceFiltRelTime {0,127,10,true,false};
+    const ENVminmax filtReleaseValue {0,127,64,true,false};
+        const ENVminmax voiceFiltRelValue {0,127,40,true,false};
     const ENVminmax filtStretch {0,127,0,true,true};
 }
 #endif

@@ -1,5 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-4-16 Will
+bn 2211
+Completed theme list.
+Changed PadSynth 'apply' button to gtk thin up type.
+Created a brief theme instruction file in /doc
+Created new backward compatible XML parcombi element
+Envelope controls now use floats and new combi storage.
+
 2023-4-14 Will
 bn 2210
 BugFix: Some envelope freemode controls inactive.

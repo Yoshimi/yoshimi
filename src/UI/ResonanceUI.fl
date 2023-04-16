@@ -464,7 +464,7 @@ class ResonanceUI {: PresetsUI_
         label Apply
         callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {700 265 74 17} box PLASTIC_THIN_UP_BOX down_box THIN_DOWN_BOX color 229 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {700 265 74 17} box GTK_THIN_UP_BOX down_box THIN_DOWN_BOX color 82 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button resClose {
         label Close

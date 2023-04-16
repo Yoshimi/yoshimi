@@ -6555,7 +6555,8 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
 void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
-    int val = int(getData->data.value) & 0x7f; // redo not currently restoring correct values
+    //int val = int(getData->data.value) & 0x7f; // redo not currently restoring correct values
+    float val = getData->data.value;
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     unsigned char insert = getData->data.insert;
     unsigned char Xincrement = getData->data.offset;

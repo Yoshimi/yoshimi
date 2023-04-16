@@ -67,7 +67,7 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
 }
 
 
-float EnvelopeParams::getdt(char i)
+float EnvelopeParams::getdt(float i)
 {
     float result = (power<2>(Penvdt[(int)i] / 127.0f * 12.0f) - 1.0f) * 10.0f; // milliseconds
     return result;
@@ -75,7 +75,7 @@ float EnvelopeParams::getdt(char i)
 
 
 // ADSR/ASR... initialisations
-void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
+void EnvelopeParams::ADSRinit(float A_dt, float D_dt, float S_val, float R_dt)
 {
     setpresettype("Penvamplitude");
     Envmode = PART::envelope::groupmode::amplitudeLin;
@@ -89,7 +89,7 @@ void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 }
 
 
-void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
+void EnvelopeParams::ADSRinit_dB(float A_dt, float D_dt, float S_val, float R_dt)
 {
     setpresettype("Penvamplitude");
     Envmode = PART::envelope::groupmode::amplitudeLog;
@@ -103,7 +103,7 @@ void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 }
 
 
-void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
+void EnvelopeParams::ASRinit(float A_val, float A_dt, float R_val, float R_dt)
 {
     setpresettype("Penvfrequency");
     Envmode = PART::envelope::groupmode::frequency;
@@ -117,7 +117,7 @@ void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 }
 
 
-void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt, char R_dt, char R_val)
+void EnvelopeParams::ADSRinit_filter(float A_val, float A_dt, float D_val, float D_dt, float R_dt, float R_val)
 {
     setpresettype("Penvfilter");
     Envmode = PART::envelope::groupmode::filter;
@@ -133,7 +133,7 @@ void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_d
 }
 
 
-void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
+void EnvelopeParams::ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt)
 {
     setpresettype("Penvbandwidth");
     Envmode = PART::envelope::groupmode::bandwidth;
@@ -219,13 +219,13 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
     xml->addpar("env_stretch",Penvstretch);
     xml->addparbool("forced_release",Pforcedrelease);
     xml->addparbool("linear_envelope",Plinearenvelope);
-    xml->addpar("A_dt",PA_dt);
-    xml->addpar("D_dt",PD_dt);
-    xml->addpar("R_dt",PR_dt);
-    xml->addpar("A_val",PA_val);
-    xml->addpar("D_val",PD_val);
-    xml->addpar("S_val",PS_val);
-    xml->addpar("R_val",PR_val);
+    xml->addparcombi("A_dt",PA_dt);
+    xml->addparcombi("D_dt",PD_dt);
+    xml->addparcombi("R_dt",PR_dt);
+    xml->addparcombi("A_val",PA_val);
+    xml->addparcombi("D_val",PD_val);
+    xml->addparcombi("S_val",PS_val);
+    xml->addparcombi("R_val",PR_val);
 
     if ((Pfreemode!=0)||(!xml->minimal))
     {
@@ -249,13 +249,13 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
     Pforcedrelease=xml->getparbool("forced_release",Pforcedrelease);
     Plinearenvelope=xml->getparbool("linear_envelope",Plinearenvelope);
 
-    PA_dt=xml->getpar127("A_dt",PA_dt);
-    PD_dt=xml->getpar127("D_dt",PD_dt);
-    PR_dt=xml->getpar127("R_dt",PR_dt);
-    PA_val=xml->getpar127("A_val",PA_val);
-    PD_val=xml->getpar127("D_val",PD_val);
-    PS_val=xml->getpar127("S_val",PS_val);
-    PR_val=xml->getpar127("R_val",PR_val);
+    PA_dt=xml->getparcombi("A_dt",PA_dt,0,127);
+    PD_dt=xml->getparcombi("D_dt",PD_dt,0,127);
+    PR_dt=xml->getparcombi("R_dt",PR_dt,0,127);
+    PA_val=xml->getparcombi("A_val",PA_val,0,127);
+    PD_val=xml->getparcombi("D_val",PD_val,0,127);
+    PS_val=xml->getparcombi("S_val",PS_val,0,127);
+    PR_val=xml->getparcombi("R_val",PR_val,0,127);
 
     for (int i=0;i<Penvpoints;i++)
     {
