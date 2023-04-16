@@ -1039,7 +1039,7 @@ class MasterUI {: {private GuiUpdates}
             label Volume
             callback {//
             if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-                o->selection_color(setKnob(o->value(),96));
+                o->selection_color(setSlider(o->value(),96));
             setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
             send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
@@ -2870,7 +2870,7 @@ Alan Calvert started the project}
                         if (engine == MIDI::CC::volume)
                         {
                             panellistitem[i]->partvolume->value(vol);
-                            panellistitem[i]->partvolume->selection_color(setKnob(vol,96));
+                            panellistitem[i]->partvolume->selection_color(setSlider(vol,96));
                         }
                         else if (engine == MIDI::CC::panning)
                         {

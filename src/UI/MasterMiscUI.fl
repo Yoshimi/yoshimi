@@ -621,6 +621,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     partvolume->value(synth->part[setpart]->Pvolume);
     partvolume->selection_color(setSlider(partvolume->value(),96));
     partpanning->value(synth->part[setpart]->Ppanning);
+    partpanning->selection_color(setKnob(partpanning->value(),64));
     int tmpch = synth->part[setpart]->Prcvchn;
 
     if (tmpch < NUM_MIDI_CHANNELS)

@@ -2036,10 +2036,15 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         ctlmidi->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());
         modulation->value(part->ctl->modwheel.data);
+            modulation->selection_color(setKnob(modulation->value(),64));
         expression->value(part->ctl->expression.data);
+            expression->selection_color(setKnob(expression->value(),127));
         filterq->value(part->ctl->filterq.data);
+            filterq->selection_color(setKnob(filterq->value(),64));
         filtercutoff->value(part->ctl->filtercutoff.data);
-        masterbandwidth->value(part->ctl->bandwidth.data);} {}
+            filtercutoff->selection_color(setKnob(filtercutoff->value(),64));
+        masterbandwidth->value(part->ctl->bandwidth.data);
+            masterbandwidth->selection_color(setKnob(masterbandwidth->value(),64));} {}
   }
   Function {ATrefresh()} {} {
     code {//
