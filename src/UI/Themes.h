@@ -42,14 +42,16 @@
   Ideally there should be no reserved colours, as that means we are
   not managing them!
 
-  6*  root/bank slot first swap selection
 
-  16* bank extended instruments background
-  17* bank 'occupied' extended instruments background
+  45* root/bank slot normal background
 
-  46* root/bank slot normal background
+  47* bank extended instruments background
 
-  51* root/bank 'occupied' normal background
+  50* root/bank 'occupied' normal background
+
+  55* bank 'occupied' extended instruments background
+
+  237*  root/bank slot first swap selection
 
   56
   58 - 61
@@ -69,8 +71,7 @@
   138 - 143
   148 - 154
   156
-  160
-  161
+  160 - 161
   164 - 166
   169 - 172
   174* filer icon background
@@ -83,10 +84,8 @@
   209 - 213
   218* query '?' text
   233 - 235
-  237* various down boxes
   240 - 243
   248 - 251
-  252*  bank current bank highlight
 */
 
 const int gen_text_back = 7;
@@ -98,8 +97,10 @@ const int gen_text = 64;
 const int keyb_slider_back = 65;
 const int tooltip_text = 66;
 const int tooltip_faint_text = 67;
+const int slider_peg_default = 70;
 const int spectrum_line = 71;
 const int bank_export = 78;
+const int slider_peg_changed = 80;
 const int env_line_sel = 81;
 const int pad_apply = 82;
 const int bank_delete = 88;
@@ -185,11 +186,10 @@ const int knob_low = 244;
 const int graph_resonance_grid = 245;
 const int env_line = 246;
 const int midi_text_back = 247;
+const int bank_highlight = 252;
 const int env_ctl = 253;
 const int graph_pad_back = 254;
 const int VU_text = 255;
-const int slider_peg_default = 70;
-const int slider_peg_changed = 80;
 
 /*
   The following are ordered as they are in theme lists.
@@ -199,7 +199,7 @@ const int slider_peg_changed = 80;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 102;
+const int COLOURLIST = 103;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -302,7 +302,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_pending,
     pad_fading,
     pad_built,
-
+    bank_highlight,
 };
 
 static std::string colourPreamble [] = {
@@ -417,6 +417,7 @@ static std::string colourData [] = {
     "0,160,160, PadSynth pending",
     "255,255,0, PadSynth fading",
     "150,150,150, PadSynth built",
+    "255,100,255, Current bank highlight",
     "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

@@ -92,7 +92,7 @@ class PartKitItem {: {public Fl_Group}
         Fl_Check_Button mutedcheck {
           callback {//
           send_data(0, PART::control::kitItemMute, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {60 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {60 4 15 15} down_box DOWN_BOX color 7 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Pmuted);}
           class Fl_Check_Button2
         }
@@ -191,7 +191,7 @@ class PartKitItem {: {public Fl_Group}
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableAdd, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {403 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {403 4 15 15} down_box DOWN_BOX color 7 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Padenabled);}
           class Fl_Check_Button2
         }
@@ -208,7 +208,7 @@ class PartKitItem {: {public Fl_Group}
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enableSub, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {478 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {478 4 15 15} down_box DOWN_BOX color 7 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Psubenabled);}
           class Fl_Check_Button2
         }
@@ -225,7 +225,7 @@ class PartKitItem {: {public Fl_Group}
           callback {//
 
           send_data(TOPLEVEL::action::forceUpdate, PART::control::enablePad, o->value(), TOPLEVEL::type::Integer, n, UNUSED, TOPLEVEL::insert::kitGroup);}
-          xywh {551 4 15 15} down_box DOWN_BOX color 237 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
+          xywh {551 4 15 15} down_box DOWN_BOX color 7 selection_color 64 labelfont 1 labelsize 11 labelcolor 64
           code0 {o->value(part->kit[n].Ppadenabled);}
           class Fl_Check_Button2
         }

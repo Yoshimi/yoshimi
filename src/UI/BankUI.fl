@@ -166,31 +166,31 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     int engine = bank->engines_used(rootID, bankID, nslot);
     if (*nselected == nslot)
     {
-        acol = 6; // selected item background
-        scol = 6;
-        pcol = 6;
+        acol = 237; // selected item background
+        scol = 237;
+        pcol = 237;
     }
     else if (bank->emptyslot(rootID, bankID, nslot))
     {
         if (nslot < 128)
         {
-            acol = 46; // normal background
-            scol = 46;
-            pcol = 46;
+            acol = 45; // normal background
+            scol = 45;
+            pcol = 45;
         }
         else
         {
-            acol = 16; // extended instruments background
-            scol = 16;
-            pcol = 16;
+            acol = 47; // extended instruments background
+            scol = 47;
+            pcol = 47;
         }
     }
     else
     {
         if (nslot < 128)
-            bcol = 51; // 'occupied' normal background
+            bcol = 50; // 'occupied' normal background
         else
-            bcol = 17; // 'occupied' extended instruments background
+            bcol = 55; // 'occupied' extended instruments background
         if (engine & 1)
             acol = add_back;
         else
@@ -1155,7 +1155,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
     setHighlight(mode);
     refreshmainwindow();} {}
   }
-  Function {ShowInst()} {} {
+  Function {ShowInst()} {open
+  } {
     code {//
 
     int X, Y, W, H, O;

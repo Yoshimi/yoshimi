@@ -153,5 +153,7 @@ namespace FILTDEF{
     const FILTminmax formQ {0,127,64,true,true};
     const FILTminmax formAmp {0,127,127,true,true};
     const FILTminmax formStretch {0,127,40,true,true};
+    const FILTminmax formCentre {0,127,64,true,true};
+    const FILTminmax formOctave {0,127,64,true,true};
 }
 #endif

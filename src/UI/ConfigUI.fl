@@ -1499,7 +1499,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         lineCount = 0;
         bool ok = true;
         do {
-            if ((totalCount - dataStart) >= COLOURLIST)
+            if ((totalCount - dataStart) == COLOURLIST && colourText.substr(0, 7) != "=======")
             {
                 return -3; // missing marker
             }
@@ -1507,7 +1507,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             nextPos = colourText.find(char(10));
             if (nextPos == std::string::npos)
             {
-                return -4; // too short and no marker!
+                return -4; // too short
             }
 
             text = colourText.substr(0, nextPos);

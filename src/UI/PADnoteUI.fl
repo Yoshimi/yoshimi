@@ -274,10 +274,10 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {1235 133 580 440} type Double resizable
+      xywh {1235 133 580 440} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
-      code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);} visible
+      code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Tabs {} {
         callback {//
@@ -1342,6 +1342,7 @@ class PADnoteUI {: {public PresetsUI_}
                 if (dialSetting >= 2300) dialSetting -= 2300;
                 else dialSetting = -1;
                 rebuildTrigger->value(dialSetting);
+                rebuildTrigger->selection_color(setKnob(dialSetting,-1));
                 cbwidget->do_callback();
             }
             break;
@@ -1568,22 +1569,27 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::randWalkDetune:
             randWalkDetune->value(value);
+            randWalkDetune->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkBandwidth:
             randWalkBandwidth->value(value);
+            randWalkBandwidth->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkFilterFreq:
             randWalkFilterFreq->value(value);
+            randWalkFilterFreq->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkProfileWidth:
             randWalkProfileWidth->value(value);
+            randWalkProfileWidth->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkProfileStretch:
             randWalkProfileStretch->value(value);
+            randWalkProfileStretch->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::applyChanges:

@@ -458,7 +458,7 @@ class ADvoiceUI {: {public Fl_Group}
                         voiceFMfreqenvgroup->activate();
                     o->redraw();
                     send_data(0, ADDVOICE::control::enableModulatorFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Enable Frequency Envelope} xywh {590 295 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+                tooltip {Enable Frequency Envelope} xywh {590 295 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
                 class Fl_Check_Button2
               }
@@ -565,7 +565,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                         voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(0, ADDVOICE::control::enableModulatorAmplitudeEnvelope, o->value(), TOPLEVEL::type::Integer);}
-                tooltip {Enable Amplitude Envelope} xywh {590 134 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+                tooltip {Enable Amplitude Envelope} xywh {590 134 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
                 class Fl_Check_Button2
               }
@@ -1065,7 +1065,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                     voiceampenvgroup->activate();
                 o->redraw();
                 send_data(0, ADDVOICE::control::enableAmplitudeEnvelope, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Amplitude Envelope} xywh {14 139 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+            tooltip {Enable Amplitude Envelope} xywh {14 139 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
             class Fl_Check_Button2
           }
@@ -1085,7 +1085,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
                     voiceamplfogroup->activate();
                 o->redraw();
                 send_data(0, ADDVOICE::control::enableAmplitudeLFO, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Amplitude LFO} xywh {14 210 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+            tooltip {Enable Amplitude LFO} xywh {14 210 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
             class Fl_Check_Button2
           }
@@ -1123,7 +1123,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterEnvelope, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Filter Envelope} xywh {300 140 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+            tooltip {Enable Filter Envelope} xywh {300 140 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
             code0 {o->value(pars->VoicePar[nvoice].PFilterEnvelopeEnabled);}
             class Fl_Check_Button2
           }
@@ -1138,7 +1138,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             label On
             callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableFilterLFO, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Enable Filter LFO} xywh {300 210 38 14} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
+            tooltip {Enable Filter LFO} xywh {300 210 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
             class Fl_Check_Button2
           }
@@ -1225,7 +1225,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
         label On
         callback {//
     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableVoice, o->value(), TOPLEVEL::type::Integer);}
-        xywh {12 41 50 20} down_box DOWN_BOX color 237 selection_color 64 labelfont 3 labelcolor 226
+        xywh {12 41 50 20} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelcolor 226
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
         class Fl_Check_Button2
       }

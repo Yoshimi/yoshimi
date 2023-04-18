@@ -755,23 +755,23 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Slider cfknob {
           callback {//
         if (Fl::event_button() == 3)
-            o->value(64);
-        o->selection_color(setSlider(o->value(),64));
+            o->value(FILTDEF::formCentre.def);
+        o->selection_color(setSlider(o->value(),FILTDEF::formCentre.def));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, o->value(), TOPLEVEL::type::Write);}
           xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Pcenterfreq);}
-          code1 {o->selection_color(setSlider(o->value(),64));}
+          code1 {o->selection_color(setSlider(o->value(),FILTDEF::formCentre.def));}
           class mwheel_slider_rev
         }
         Fl_Slider octknob {
           callback {//
         if (Fl::event_button() == 3)
-            o->value(64);
-        o->selection_color(setSlider(o->value(),64));
+            o->value(FILTDEF::formOctave.def);
+        o->selection_color(setSlider(o->value(),FILTDEF::formOctave.def));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, o->value(), TOPLEVEL::type::Write);}
           xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
           code0 {o->value(pars->Poctavesfreq);}
-          code1 {o->selection_color(setSlider(o->value(),64));}
+          code1 {o->selection_color(setSlider(o->value(),FILTDEF::formOctave.def));}
           class mwheel_slider_rev
         }
         Fl_Dial wvknob {
