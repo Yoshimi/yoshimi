@@ -106,6 +106,7 @@ This would corrupt the colour map.
 125,125,0, PadSynth fading
 100,100,100, PadSynth built
 100,100,255, Current Bank Highlight
+160,140,250, Instrument swapping
 ================== data end marker
 Add your own notes here:
 Copyright © 2023 Will Godfrey

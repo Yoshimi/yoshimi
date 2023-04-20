@@ -86,7 +86,7 @@ class PresetsUI {} {
       label {Copy to Clipboard/Preset}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
-      xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
+      xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser copybrowse {
@@ -131,7 +131,7 @@ o->hide();}
         xywh {10 5 40 15} labelsize 11 labelcolor 64 align 20
       }
       Fl_Box copytypetext {
-        xywh {50 5 205 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 labelcolor 64 align 20
+        xywh {50 5 205 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
       }
       Fl_Input presetname {
         callback {//
@@ -155,7 +155,7 @@ o->hide();}
       label {Paste from Clipboard/Preset}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
-      xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 238 hide resizable
+      xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser pastebrowse {
@@ -219,7 +219,7 @@ o->hide();}
         xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
       }
       Fl_Box pastetypetext {
-        xywh {55 5 200 15} box FLAT_BOX color 238 labelfont 1 labelsize 11 labelcolor 64 align 20
+        xywh {55 5 200 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
       }
       Fl_Box pastetype {
         label {Type:}

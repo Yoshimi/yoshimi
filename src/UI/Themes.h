@@ -51,8 +51,6 @@
 
   55* bank 'occupied' extended instruments background
 
-  237*  root/bank slot first swap selection
-
   56
   58 - 61
   68 - 79
@@ -180,6 +178,7 @@ const int keyb_mod_bar = 230;
 const int pad_prof_fill = 231;
 const int alt_warn_tex = 232;
 const int sub_back = 236;
+const int bank_swap_back = 237;
 const int ext_osc = 238;
 const int env_ctl_sel = 239;
 const int knob_low = 244;
@@ -199,7 +198,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 103;
+const int COLOURLIST = 104;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -281,13 +280,13 @@ const unsigned char colourNumbers [COLOURLIST] = {
     knob_point_change,
     keyb_mod_bar,
     spectrum_line,
-    bank_select,
-    bank_rename,
-    bank_add_save,
-    bank_delete,
-    bank_swap,
-    bank_import,
-    bank_export,
+    bank_select, // light
+    bank_rename, // light
+    bank_add_save, // light
+    bank_delete, // light
+    bank_swap, // light
+    bank_import, // light
+    bank_export, // light
     close_button,
     contrib,
     name_derived,
@@ -303,6 +302,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_fading,
     pad_built,
     bank_highlight,
+    bank_swap_back,
 };
 
 static std::string colourPreamble [] = {
@@ -418,6 +418,7 @@ static std::string colourData [] = {
     "255,255,0, PadSynth fading",
     "150,150,150, PadSynth built",
     "255,100,255, Current bank highlight",
+    "160,140,250, Instrument swapping",
     "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

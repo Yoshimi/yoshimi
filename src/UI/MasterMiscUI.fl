@@ -462,7 +462,7 @@ class Panellistitem {: {public Fl_Group}
         } {
           Fl_Box partVUMeter {
             label {V U}
-            xywh {30 65 26 110} box FLAT_BOX color 0 labelcolor 55 align 128
+            xywh {30 65 26 110} box FLAT_BOX labelcolor 55 align 128
             code0 {partVUMeter->init(npart, synth);}
             class VUMeter
           }

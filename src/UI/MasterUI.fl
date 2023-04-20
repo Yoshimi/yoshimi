@@ -839,13 +839,13 @@ class MasterUI {: {private GuiUpdates}
               else
                   send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterReset, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}}
           tooltip {Clear all dynamic settings
-(+Ctrl includes MIDI-learn)} xywh {7 60 68 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 labelcolor 64 align 16
+(+Ctrl includes MIDI-learn)} xywh {7 60 68 24} box PLASTIC_UP_BOX color 228 labelfont 1 labelsize 11 labelcolor 64 align 16
         }
         Fl_Button mainstop {
           label {Stop!}
           callback {//
     send_data(TOPLEVEL::action::muteAndLoop, MAIN::control::stopSound, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Cease all sound immediately!} xywh {7 30 68 24} box PLASTIC_UP_BOX color 89 selection_color 0 labelfont 1 labelsize 11 labelcolor 64 align 16
+          tooltip {Cease all sound immediately!} xywh {7 30 68 24} box PLASTIC_UP_BOX color 89 labelfont 1 labelsize 11 labelcolor 64 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -1134,7 +1134,7 @@ class MasterUI {: {private GuiUpdates}
               setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
 
           send_data(0, PART::control::midiChannel, tmp, TOPLEVEL::type::Integer, npart);}
-            tooltip {MIDI channel for this part} xywh {34 350 40 19} color 7 selection_color 65 labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
+            tooltip {MIDI channel for this part} xywh {34 350 40 19} color 7 labelsize 11 labelcolor 64 maximum 16 textsize 11 textcolor 64
             code0 {int num = fetchData(0,  PART::control::midiChannel, npart); o->value(num + 1); if (num < NUM_MIDI_CHANNELS) o->textcolor(gen_text); else o->textcolor(gen_opp_text);}
             class WidgetSpinner
           }
@@ -1252,7 +1252,7 @@ class MasterUI {: {private GuiUpdates}
             callback {//
                 updateModepatch(o->value() > 1 && partui->drumMode->value() != 0);
                 send_data(0, PART::control::keyMode, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 8 textfont 1 textsize 11 textcolor 64
+            tooltip {Poly, Mono or Legato mode} xywh {82 327 68 19} down_box BORDER_BOX labelsize 11 labelcolor 64 align 8 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Poly");o->add("Mono");o->add("Legato");}
             code1 {int tmp = synth->ReadPartKeyMode(npart); if (tmp > 1) o->value(2); else o->value(tmp);}
             code3 {o->value(fetchData(0, PART::control::keyMode, npart));}
@@ -1261,7 +1261,7 @@ class MasterUI {: {private GuiUpdates}
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 11 labelcolor 226 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelfont 3 labelsize 11 labelcolor 226 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
           }
@@ -1496,7 +1496,7 @@ class MasterUI {: {private GuiUpdates}
         callback {//
                        send_data(0, MAIN::control::panLawType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
         tooltip {Relative values when panned to extremes:
-   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX selection_color 64 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
+   Per side, Equivalent Mono} xywh {216 376 160 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("Cut: 0dB, -6dB");o->add("Default: +3dB, -3dB");o->add("Boost: +6dB, 0dB");}
         code1 {o->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));}
       } {}
@@ -2076,7 +2076,7 @@ Alan Calvert started the project}
         label {. (dot) Files}
         callback {//
     fillfiler(type_name);}
-        tooltip {Show hidden files} xywh {490 284 18 18} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 1
+        tooltip {Show hidden files} xywh {490 284 18 18} down_box DOWN_BOX labelsize 12 labelcolor 64 align 1
         class Fl_Check_Button2
       }
       Fl_Check_Button filerOpt16 {
@@ -2946,6 +2946,7 @@ Alan Calvert started the project}
                     {
                         case MIDI::CC::modulation:
                             partui->modulation->value(value);
+                            partui->modulation->selection_color(setKnob(value,64));
                             break;
                         case MIDI::CC::volume:
                             partVol->value(vol);
@@ -2957,6 +2958,7 @@ Alan Calvert started the project}
                             break;
                         case MIDI::CC::expression:
                             partui->expression->value(value);
+                            partui->expression->selection_color(setKnob(value,127));
                             break;
                         case MIDI::CC::legato:
                         {
@@ -2970,12 +2972,15 @@ Alan Calvert started the project}
                         }
                         case MIDI::CC::filterQ:
                             partui->filterq->value(value);
+                            partui->filterq->selection_color(setKnob(value,64));
                             break;
                         case MIDI::CC::filterCutoff:
                             partui->filtercutoff->value(value);
+                            partui->filtercutoff->selection_color(setKnob(value,64));
                             break;
                         case MIDI::CC::bandwidth:
                             partui->masterbandwidth->value(value);
+                            partui->masterbandwidth->selection_color(setKnob(value,64));
                             break;
                     }
                 }

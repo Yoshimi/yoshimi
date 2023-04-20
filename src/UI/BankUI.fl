@@ -166,9 +166,9 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     int engine = bank->engines_used(rootID, bankID, nslot);
     if (*nselected == nslot)
     {
-        acol = 237; // selected item background
-        scol = 237;
-        pcol = 237;
+        acol = bank_swap_back; // selected item background
+        scol = bank_swap_back;
+        pcol = bank_swap_back;
     }
     else if (bank->emptyslot(rootID, bankID, nslot))
     {
