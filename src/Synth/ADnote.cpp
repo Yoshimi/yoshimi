@@ -202,7 +202,7 @@ namespace{ // Array-cloning helper
         Arr const& oldArray = oldData.*arrMember;
         Arr&       newArray = newData.*arrMember;
 
-        newArray[voice].reset(new VAL[NUM_VOICES]);
+        newArray[voice].reset(new VAL[unisonSiz]);
         memcpy(newArray[voice].get(), oldArray[voice].get(), unisonSiz * sizeof(VAL));
     }
 }
