@@ -125,5 +125,11 @@ namespace LFODEF{
     const LFOminmax freqRnd {0,127,0,true,true};
 
     const LFOminmax stretch {0,127,64,true,true};
+
+    const LFOminmax type {0,9,0,false,true};
+}
+namespace LFOSWITCH{
+    const bool BPM = false;
+    const bool continuous = false;
 }
 #endif

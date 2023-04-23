@@ -140,5 +140,19 @@ namespace ENVDEF{
     const ENVminmax filtReleaseValue {0,127,64,true,false};
         const ENVminmax voiceFiltRelValue {0,127,40,true,false};
     const ENVminmax filtStretch {0,127,0,true,true};
+    const ENVminmax point {0,MAX_ENVELOPE_POINTS-1,2,false,true};
+        const ENVminmax freqPoint {0,MAX_ENVELOPE_POINTS-1,1,false,true};
+        const ENVminmax bandPoint {0,MAX_ENVELOPE_POINTS-1,1,false,true};
+    const ENVminmax count {0,MAX_ENVELOPE_POINTS-1,4,false,true};
+        const ENVminmax freqCount {0,MAX_ENVELOPE_POINTS-1,3,false,true};
+        const ENVminmax bandCount {0,MAX_ENVELOPE_POINTS-1,3,false,true};
+}
+namespace ENVSWITCH{
+    const bool defLinear = false;
+    const bool defForce = true;
+        const bool defForceVoiceFilt = false;
+        const bool defForceFreq = false;
+        const bool defForceBand = false;
+    const bool defFreeMode = false;
 }
 #endif

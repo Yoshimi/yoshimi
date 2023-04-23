@@ -147,6 +147,7 @@ namespace FILTDEF{
     const FILTminmax gain {0,127,64,true,true};
     const FILTminmax freqTrack {0,127,64,true,true};
 
+    const FILTminmax formCount {1,FF_MAX_FORMANTS,3,false,true};
     const FILTminmax formSpeed {0,127,64,true,true};
     const FILTminmax formClear {0,127,64,true,true};
     const FILTminmax formFreq {0,127,-1,true,true}; // no default value
@@ -155,5 +156,17 @@ namespace FILTDEF{
     const FILTminmax formStretch {0,127,40,true,true};
     const FILTminmax formCentre {0,127,64,true,true};
     const FILTminmax formOctave {0,127,64,true,true};
+    const FILTminmax formVowel {1,FF_MAX_SEQUENCE,1,false,true};
+    const FILTminmax sequenceSize{1,FF_MAX_SEQUENCE,3,false,true};
+
+    const FILTminmax stages {0,MAX_FILTER_STAGES-1,0,false,true};
+        const FILTminmax dynStages {0,MAX_FILTER_STAGES-1,1,false,true};
+    const FILTminmax category {0,2,0,false,true};
+    const FILTminmax analogType {0,8,2,false,true};
+    const FILTminmax stVarfType {0,3,0,false,true};
+}
+namespace FILTSWITCH{
+    const bool trackRange = false;
+    const bool sequenceReverse = false;
 }
 #endif

@@ -1,5 +1,13 @@
 yoshimi 2.2.3 M
 
+2023-4-23 Will
+bn 2214
+Merged in Legato bugfix from Kristian.
+BugFix: Format freeqency zeroing on right mouse click
+    it has no default value!
+Almost all magic numbers now properly identified in
+    envelopes, filters, LFOs.
+
 2023-4-20 Will
 bn 2213
 Completed updates to user guide images.

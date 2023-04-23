@@ -130,7 +130,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                         type = TOPLEVEL::type::Learnable;
                     }
                 }
-                else
+                else if (insert != TOPLEVEL::insert::filterGroup && control != FILTERINSERT::formantFrequency) // has no default value
                 {
                     putData.data.value = newValue;
                     type = TOPLEVEL::type::Write;

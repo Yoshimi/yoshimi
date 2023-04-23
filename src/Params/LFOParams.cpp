@@ -6,6 +6,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019, Will Godfrey
     Copyright 2020 Kristian Amlie
+    Copyright 2023 Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -74,9 +75,9 @@ void LFOParams::defaults(void)
     Prandomness = Drandomness;
     Pdelay = Ddelay;
     Pcontinous = Dcontinous;
-    Pbpm = 0;
-    Pfreqrand = 0;
-    Pstretch = 64;
+    Pbpm = LFOSWITCH::BPM;
+    Pfreqrand = LFODEF::freqRnd.def;
+    Pstretch = LFODEF::stretch.def;
 }
 
 
@@ -137,7 +138,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     int engine = getData->data.engine;
     int insertType = getData->data.parameter;
 
-    unsigned char type =0;
+    unsigned char type = 0;
 
     // LFO defaults
     int min = 0;
@@ -156,21 +157,21 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             {
                 case TOPLEVEL::insertType::amplitude:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.703125f;
+                        def = LFODEF::voiceAmpFreq.def;
                     else
-                        def = 0.625f;
+                        def = LFODEF::ampFreq.def;
                     break;
                 case TOPLEVEL::insertType::frequency:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.390625f;
+                        def = LFODEF::voiceFreqFreq.def;
                     else
-                        def = 0.546875f;
+                        def = LFODEF::freqFreq.def;
                     break;
                 case TOPLEVEL::insertType::filter:
                     if (engine >= PART::engine::addVoice1)
-                        def = 0.390625f;
+                        def = LFODEF::voiceFiltFreq.def;
                     else
-                        def = 0.625f;
+                        def = LFODEF::filtFreq.def;
                     break;
             }
             break;
@@ -180,43 +181,53 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
                 switch(insertType)
                 {
                     case TOPLEVEL::insertType::amplitude:
-                        def = 32;
+                        def = LFODEF::voiceAmpDepth.def;
                         break;
                     case TOPLEVEL::insertType::frequency:
-                        def = 40;
+                        def = LFODEF::voiceFreqDepth.def;
                         break;
                     case TOPLEVEL::insertType::filter:
-                        def = 20;
+                        def = LFODEF::voiceFiltDepth.def;
+                        break;
+                    default:
+                        def = LFODEF::depth.def; // is this ever used?
                         break;
                 }
             }
             break;
         case LFOINSERT::control::delay:
             if (engine >= PART::engine::addVoice1 && insertType == TOPLEVEL::insertType::amplitude)
-                def = 30;
+                def = LFODEF::voiceAmpDelay.def;
+            else
+                def = LFODEF::delay.def;
             break;
         case LFOINSERT::control::start:
             if (engine < PART::engine::addVoice1 || insertType != TOPLEVEL::insertType::frequency)
-                def = 64;
+                def = LFODEF::start.def;
             break;
         case LFOINSERT::control::amplitudeRandomness:
+            def = LFODEF::ampRnd.def;
             break;
         case LFOINSERT::control::type:
-            max = 9;
+            max = LFODEF::type.max;
+            def = LFODEF::type.def;
             type &= ~learnable;
             break;
         case LFOINSERT::control::continuous:
-            max = 1;
+            max = true;
+            def = LFOSWITCH::continuous;
             type &= ~learnable;
             break;
         case LFOINSERT::control::bpm:
-            max = 1;
+            max = true;
+            def = LFOSWITCH::BPM;
             type &= ~learnable;
             break;
         case LFOINSERT::control::frequencyRandomness:
+            def = LFODEF::freqRnd.def;
             break;
         case LFOINSERT::control::stretch:
-            def = 64;
+            def = LFODEF::stretch.def;
             break;
 
         default:

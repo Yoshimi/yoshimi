@@ -3,11 +3,11 @@ The list will initially have two entries 'classic' and 'demo'. These will be loc
 
 'classic' is a reference file which you can copy and use as a starting point for any new ones you may want to create, while 'demo' is a rather extreme example of what can be achieved. Clicking on any theme in the list will immediately apply it to all currently visible windows, and to any others as they are opened.
 
-The 'Import Theme' button uses the standard filer to load new themes into the themes directory. These are not applied immediately but will appear in the list next time the window is refreshed. Any time you chose a different theme to the one lested as default, an extra box will appear identifying the one now in use, along with a button to make it the default if you want to.
+The 'Import Theme' button uses the standard filer to load new themes into the themes directory. These are not applied immediately but will appear in the list next time the window is refreshed. Any time you chose a different theme to the one listed as default, the box identifying the one now in use will become active, along with the button for making it the default.
 
-The themes are plain text files with a list of colour numbers and brief descriptive text. The colour entries can be either R,G,B format or hexadecimal #rrggbb. There must be no spaces within the colours themselves. Any errors report the line number of the first offending entry.
+The themes are plain text files with a list of colour numbers and brief descriptive text. The colour entries can be either R,G,B format or hexadecimal #rrggbb. There must be no spaces within the colours themselves. If there are any errors, the line number of the first offending entry will be reported in the console window.
 
-When creating a new theme you are strongly advised to set your greyscale first, as most of the other entries will be affected by this. You can reverse the grey values so that highlights become shadows and vice-versa and entries with a grey element with also swap light to dark. The demo file sets this as 0,120, and changing it to 120,0, gives a very dark theme.
+When creating a new theme you are strongly advised to set your greyscale first, as most of the other entries will be affected by this. You can reverse the grey values so that highlights become shadows and vice-versa, and entries with a grey element will also swap light to dark. The demo file sets this as 0,120, and changing it to 120,0, gives a very dark theme.
 
 To set up a theme quickly, load it into any text editor. Make you change and save the file, but keep it open. As you can just reselect the same theme, you can immediately test it, make further changes, save again and reselect.
 

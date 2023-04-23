@@ -1178,7 +1178,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                 if (!fromUs)
                 {
                     formant_freq_dial->value(value);
-                     formant_freq_dial->selection_color(setKnob(value,value)); // has no default
+                    formant_freq_dial->selection_color(setKnob(value,value)); // has no default
                 }
                 formantfiltergraph->redraw();
             }

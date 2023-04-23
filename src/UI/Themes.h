@@ -42,13 +42,10 @@
   Ideally there should be no reserved colours, as that means we are
   not managing them!
 
-
+  These 4 are in the grey scale so will depend on theme settings.
   45* root/bank slot normal background
-
   47* bank extended instruments background
-
   50* root/bank 'occupied' normal background
-
   55* bank 'occupied' extended instruments background
 
   56
@@ -80,7 +77,6 @@
   200 - 201
   203 - 205
   209 - 213
-  218* query '?' text
   233 - 235
   240 - 243
   248 - 251
@@ -163,6 +159,7 @@ const int add_back = 214;
 const int tooltip_back = 215;
 const int graph_Harmonics_grid = 216;
 const int graph_grid = 217;
+const int query_text = 218;
 const int yoshi_ins_typ = 219;
 const int solo_select = 220;
 const int alt_links = 221;
@@ -198,7 +195,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 104;
+const int COLOURLIST = 105;
 const unsigned char colourNumbers [COLOURLIST] = {
     knob_low,
     knob_high,
@@ -303,6 +300,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_built,
     bank_highlight,
     bank_swap_back,
+    query_text,
 };
 
 static std::string colourPreamble [] = {
@@ -315,7 +313,7 @@ static std::string colourPreamble [] = {
 }; // Do not change the last two text lines!
 
 static std::string colourData [] = {
-    "0,255, gray scale min-max (can be reversed)",
+    "0,255, Grey scale min-max (can be reversed)",
     "186,198,211, Knob shadow (R,G,B or #rrggbb)",
     "#e7ebef, Knob highlight (231,235,239)",
     "51,51,51, Knob ring",
@@ -335,7 +333,7 @@ static std::string colourData [] = {
     "240,250,230, Filer favourites background",
     "255,255,255, General text background",
     "0,0,0, General text",
-    "255,255,255, General opposite text",
+    "255,255,255, Inverse text",
     "0,0,0, General graph background",
     "40,120,190, Waveform graph grid",
     "180,180,180, Resonance graph grid",
@@ -378,7 +376,7 @@ static std::string colourData [] = {
     "140,180,220, VU 10dB marker",
     "63,182,255, VU level",
     "255,255,0, VU rms",
-    "255,0,0,VU Overload",
+    "255,0,0,VU overload",
     "255,254,254,254, VU_text",
     "191,255,255, Midilearn text background",
     "120,190,185, Link buttons",
@@ -394,21 +392,21 @@ static std::string colourData [] = {
     "0,182,191, Dynfilter filter button",
     "127,127,127, Keyboard slider backgrounds",
     "180,0,0, Knob pointer changed",
-    "63,127,255, Keyboard Mod Wheel",
+    "63,127,255, Keyboard mod wheel",
     "0,255,0, Waveform spectrum harmonic",
-    "0,255,0, Bank/instrument select lit",
+    "0,255,0, Bank/Instrument select lit",
     "255,0,255, Bank/instrument rename lit",
-    "255,255,0, Bank/instrument add/save lit",
-    "255,0,0, Bank/instrument delete lit",
-    "0,0,255, Bank/instrument swap lit",
+    "255,255,0, Bank/Instrument add/save lit",
+    "255,0,0, Bank/Instrument delete lit",
+    "0,0,255, Bank/Instrument swap lit",
     "255,180,0, Bank import lit",
     "180,240,255, Bank export lit",
     "127,145,191, Close button",
     "0,0,255, About heading",
     "0,0,255, Part name derived",
-    "0,0,255, solo selected",
-    "0,180,180, midi/solo release",
-    "255,0,0, midi ignored",
+    "0,0,255, Solo selected",
+    "0,180,180, Midi/Solo release",
+    "255,0,0, Midi ignored",
     "63,218,0, Slider peg",
     "191,0,0, Slider peg changed",
     "0,0,255, Alternative warning text",
@@ -418,7 +416,8 @@ static std::string colourData [] = {
     "255,255,0, PadSynth fading",
     "150,150,150, PadSynth built",
     "255,100,255, Current bank highlight",
-    "160,140,250, Instrument swapping",
+    "160,140,250, Instrument being swapped",
+    "0,0,255, Alert/Query mark",
     "=================== data end marker",
     "Add your own notes here:",
     "Copyright © 2020 A. N. Other",

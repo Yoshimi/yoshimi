@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2019, Will Godfrey
+    Copyright 2019-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -22,7 +22,6 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2019
 */
 
 #include <cmath>
@@ -111,7 +110,7 @@ void EnvelopeParams::ASRinit(float A_val, float A_dt, float R_val, float R_dt)
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
-    Pfreemode = 0;
+    Pfreemode = ENVSWITCH::defFreeMode;
     converttofree();
     store2defaults();
 }
@@ -127,7 +126,7 @@ void EnvelopeParams::ADSRinit_filter(float A_val, float A_dt, float D_val, float
     PD_dt = D_dt;
     PR_dt = R_dt;
     PR_val = R_val;
-    Pfreemode = 0;
+    Pfreemode = ENVSWITCH::defFreeMode;
     converttofree();
     store2defaults();
 }
@@ -141,7 +140,7 @@ void EnvelopeParams::ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
-    Pfreemode = 0;
+    Pfreemode = ENVSWITCH::defFreeMode;
     converttofree();
     store2defaults();
 }
@@ -153,8 +152,8 @@ void EnvelopeParams::converttofree(void)
     switch (Envmode)
     {
         case PART::envelope::groupmode::amplitudeLin:
-        Penvpoints = 4;
-        Penvsustain = 2;
+        Penvpoints = ENVDEF::count.def;
+        Penvsustain = ENVDEF::point.def;
         Penvval[0] = 0;
         Penvdt[1] = PA_dt;
         Penvval[1] = 127;
@@ -165,8 +164,8 @@ void EnvelopeParams::converttofree(void)
         break;
 
     case PART::envelope::groupmode::amplitudeLog:
-        Penvpoints = 4;
-        Penvsustain = 2;
+        Penvpoints = ENVDEF::count.def;
+        Penvsustain = ENVDEF::point.def;
         Penvval[0] = 0;
         Penvdt[1] = PA_dt;
         Penvval[1] = 127;
@@ -177,8 +176,8 @@ void EnvelopeParams::converttofree(void)
         break;
 
     case PART::envelope::groupmode::frequency:
-        Penvpoints = 3;
-        Penvsustain = 1;
+        Penvpoints = ENVDEF::freqCount.def;
+        Penvsustain = ENVDEF::freqPoint.def;
         Penvval[0] = PA_val;
         Penvdt[1] = PA_dt;
         Penvval[1] = 64;
@@ -187,8 +186,8 @@ void EnvelopeParams::converttofree(void)
         break;
 
     case PART::envelope::groupmode::filter:
-        Penvpoints = 4;
-        Penvsustain = 2;
+        Penvpoints = ENVDEF::count.def;
+        Penvsustain = ENVDEF::point.def;
         Penvval[0] = PA_val;
         Penvdt[1] = PA_dt;
         Penvval[1] = PD_val;
@@ -199,8 +198,8 @@ void EnvelopeParams::converttofree(void)
         break;
 
     case PART::envelope::groupmode::bandwidth:
-        Penvpoints = 3;
-        Penvsustain = 1;
+        Penvpoints = ENVDEF::bandCount.def;
+        Penvsustain = ENVDEF::bandPoint.def;
         Penvval[0] = PA_val;
         Penvdt[1] = PA_dt;
         Penvval[1] = 64;
@@ -338,47 +337,52 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             {
                 case ENVELOPEINSERT::control::attackTime:
                     if (engine == PART::engine::addMod1)
-                        def = 80;
+                        def = ENVDEF::modAmpAttackTime.def;
                     else
-                        def = 0;
+                        def = ENVDEF::ampAttackTime.def;
                     break;
                 case ENVELOPEINSERT::control::decayTime:
                     if (engine == PART::engine::addVoice1)
-                        def = 100;
+                        def = ENVDEF::voiceAmpDecayTime.def;
                     else if (engine == PART::engine::addMod1)
-                        def = 90;
+                        def = ENVDEF::modAmpDecayTime.def;
                     else
-                        def = 40;
+                        def = ENVDEF::ampDecayTime.def;
                     break;
                 case ENVELOPEINSERT::control::sustainLevel:
-                    def = 127;
+                    def = ENVDEF::ampSustainValue.def;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
-                    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
-                        def = 100;
+                    if (engine == PART::engine::addVoice1)
+                        def = ENVDEF::voiceAmpReleaseTime.def;
+                    else if (engine == PART::engine::addMod1)
+                        def = ENVDEF::modAmpReleaseTime.def;
                     else
-                        def = 25;
+                        def = ENVDEF::ampReleaseTime.def;
                     break;
                 case ENVELOPEINSERT::control::stretch:
+                    def = ENVDEF::ampStretch.def;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
-                    def = 1;
+                    def = ENVSWITCH::defForce;
                     type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::linearEnvelope:
                     max = 1;
-                    def = 0;
+                    def = ENVSWITCH::defLinear;
                     type &= ~learnable;
                     break;
-                case ENVELOPEINSERT::control::edit:
-                    break;
+                //case ENVELOPEINSERT::control::edit:
+                    //break;
                 case ENVELOPEINSERT::control::enableFreeMode:
+                    def = ENVSWITCH::defFreeMode;
                     break;
                 case ENVELOPEINSERT::control::points:
+                    def = ENVDEF::count.def;
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
                     type &= ~learnable;
-                    def = 2;
+                    def = ENVDEF::point.def;
                     break;
                 default:
                     type |= TOPLEVEL::type::Error;
@@ -393,46 +397,56 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             {
                 case ENVELOPEINSERT::control::attackLevel:
                     if (engine == PART::engine::addMod1)
-                        def = 20;
-                    else if (engine == PART::engine::addVoice1 || engine == PART::engine::subSynth)
-                        def = 30;
+                        def = ENVDEF::modFreqAtValue.def;
+                    else if (engine == PART::engine::addVoice1)
+                        def = ENVDEF::voiceFreqAtValue.def;
+                    else if (engine == PART::engine::subSynth)
+                        def = ENVDEF::subFreqAtValue.def;
+                    else
+                        def = ENVDEF::freqAttackValue.def;
                     break;
                 case ENVELOPEINSERT::control::attackTime:
                     if (engine == PART::engine::addMod1)
-                        def = 90;
+                        def = ENVDEF::modFreqAtTime.def;
                     else if (engine == PART::engine::addVoice1)
-                        def = 40;
+                        def = ENVDEF::voiceFreqAtTime.def;
                     else
-                        def = 50;
+                        def = ENVDEF::freqAttackTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
                     if (engine == PART::engine::addMod1)
-                        def = 80;
+                        def = ENVDEF::modFreqReleaseTime.def;
                     else
-                        def = 60;
+                        def = ENVDEF::freqReleaseTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseLevel:
                     if (engine == PART::engine::addMod1)
-                        def = 40;
+                        def = ENVDEF::modFreqReleaseValue.def;
+                    else
+                        def = ENVDEF::freqReleaseValue.def;
                     break;
                 case ENVELOPEINSERT::control::stretch:
-                    if (engine != PART::engine::subSynth)
-                        def = 0;
+                    if (engine == PART::engine::subSynth)
+                        def = ENVDEF::subFreqStretch.def;
+                    else
+                        def = ENVDEF::freqStretch.def;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
                     max = 1;
-                    def = 0;
+                    def = ENVSWITCH::defForceFreq;
                     type &= ~learnable;
                     break;
-                case ENVELOPEINSERT::control::edit:
-                    break;
+                //case ENVELOPEINSERT::control::edit:
+                    //break;
                 case ENVELOPEINSERT::control::enableFreeMode:
+                    def = ENVSWITCH::defFreeMode;
                     break;
                 case ENVELOPEINSERT::control::points:
+                    def = ENVDEF::freqCount.def;
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
                     type &= ~learnable;
-                    def = 1;
+                    def = ENVDEF::freqPoint.def;
                     break;
                 default:
                     type |= TOPLEVEL::type::Error;
@@ -447,51 +461,59 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             {
                 case ENVELOPEINSERT::control::attackLevel:
                     if (engine == PART::engine::addVoice1)
-                        def = 90;
+                        def = ENVDEF::voiceFiltAtValue.def;
+                    else
+                        def = ENVDEF::filtAttackValue.def;
                     break;
                 case ENVELOPEINSERT::control::attackTime:
                     if (engine == PART::engine::addVoice1)
-                        def = 70;
+                        def = ENVDEF::voiceFiltAtTime.def;
                     else
-                        def = 40;
+                        def = ENVDEF::filtAttackTime.def;
                     break;
                 case ENVELOPEINSERT::control::decayLevel:
                     if (engine == PART::engine::addVoice1)
-                        def = 40;
+                        def = ENVDEF::voiceFiltDeValue.def;
+                    else
+                        def = ENVDEF::filtDecayValue.def;
                     break;
                 case ENVELOPEINSERT::control::decayTime:
-                    def = 70;
+                    def = ENVDEF::filtDecayTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
                     if (engine == PART::engine::addVoice1)
-                        def = 10;
+                        def = ENVDEF::voiceFiltRelTime.def;
                     else
-                        def = 60;
+                        def = ENVDEF::filtReleaseTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseLevel:
                     if (engine == PART::engine::addVoice1)
-                        def = 40;
+                        def = ENVDEF::voiceFiltRelValue.def;
+                    else
+                        def = ENVDEF::filtReleaseValue.def;
                     break;
                 case ENVELOPEINSERT::control::stretch:
-                    def = 0;
+                    def = ENVDEF::filtStretch.def;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
                     max = 1;
                     if (engine == PART::engine::addVoice1)
-                        def = 0;
+                        def = ENVSWITCH::defForceVoiceFilt;
                     else
-                        def = 1;
+                        def = ENVSWITCH::defForce;
                     type &= ~learnable;
                     break;
-                case ENVELOPEINSERT::control::edit:
-                    break;
+                //case ENVELOPEINSERT::control::edit:
+                    //break;
                 case ENVELOPEINSERT::control::enableFreeMode:
+                    def = ENVSWITCH::defFreeMode;
                     break;
                 case ENVELOPEINSERT::control::points:
+                    def = ENVDEF::count.def;
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
                     type &= ~learnable;
-                    def = 2;
+                    def = ENVDEF::point.def;
                     break;
                 default:
                     type |= TOPLEVEL::type::Error;
@@ -509,31 +531,35 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
             switch (control)
             {
                 case ENVELOPEINSERT::control::attackLevel:
-                    def = 100;
+                    def = ENVDEF::subBandAttackValue.def;
                     break;
                 case ENVELOPEINSERT::control::attackTime:
-                        def = 70;
+                        def = ENVDEF::subBandAttackTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseTime:
-                    def = 60;
+                    def = ENVDEF::subBandReleaseTime.def;
                     break;
                 case ENVELOPEINSERT::control::releaseLevel:
+                    def = ENVDEF::subBandReleaseValue.def;
                     break;
                 case ENVELOPEINSERT::control::stretch:
+                    def = ENVDEF::subBandStretch.def;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
                     max = 1;
-                    def = 0;
+                    def = ENVSWITCH::defForceBand;
                     type &= ~learnable;
                     break;
-                case ENVELOPEINSERT::control::edit:
-                    break;
+                //case ENVELOPEINSERT::control::edit:
+                    //break;
                 case ENVELOPEINSERT::control::enableFreeMode:
+                    def = ENVSWITCH::defFreeMode;
                     break;
                 case ENVELOPEINSERT::control::points:
+                    def = ENVDEF::bandCount.def;
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:
-                    def = 1;
+                    def = ENVDEF::bandPoint.def;
                     break;
                 default:
                     type |= TOPLEVEL::type::Error;

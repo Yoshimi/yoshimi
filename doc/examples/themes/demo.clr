@@ -3,7 +3,7 @@ Instead, copy as template for other named themes.
 Don't add or remove lines between and including dashes.
 This would corrupt the colour map.
 ------------------ data start marker
-0,120, gray scale min-max (can be reversed)
+0,120, Grey scale min-max (can be reversed)
 100,100,230, Knob shadow (R,G,B or #rrggbb)
 255,230,230, Knob highlight (231,235,239)
 0,0,100, Knob ring
@@ -23,7 +23,7 @@ This would corrupt the colour map.
 0,140,130, Filer favourites background
 100,50,100, General text background
 255,250,0, General text
-255,255,255, General opposite text
+255,255,255, Inverse text
 0,0,0, General graph background
 0,230,200, Waveform graph grid
 50,180,180, Resonance graph grid
@@ -78,35 +78,36 @@ This would corrupt the colour map.
 100,155,100, Formant ghost marker
 255,200,100, Warning text
 255,0,255, Pending button
-150,255,255, Query/Alert background
+80,155,100, Query/Alert background
 0,182,191, Dynfilter filter button
 127,127,127, Keyboard slider backgrounds
 200,80,0, Knob pointer changed
-63,127,255, Keyboard Mod Wheel
+63,127,255, Keyboard mod wheel
 255,165,0, Waveform spectrum harmonic
-0,255,0, Bank/instrument select lit
-255,0,255, Bank/instrument rename lit
-255,255,0, Bank/instrument add/save lit
-255,0,0, Bank/instrument delete lit
-0,0,255, Bank/instrument swap lit
+0,255,0, Bank/Instrument select lit
+255,0,255, Bank/Instrument rename lit
+255,255,0, Bank/Instrument add/save lit
+255,0,0, Bank/Instrument delete lit
+0,0,255, Bank/Instrument swap lit
 255,180,0, Bank import lit
 180,240,255, Bank export lit
 70,120,70, Close button
 100,255,155, About heading
 100,100,255, Part name derived
-0,255,255, solo selected
-0,0,255, midi/solo release
-255,0,0, midi ignored
+0,255,255, Solo selected
+0,0,255, Midi/Solo release
+255,0,0, Midi ignored
 63,218,0, Slider peg
 191,0,0, Slider peg changed
-140,255,0, Alternative Warning Text
+140,255,0, Alternative warning text
 200,0,0, PadSynth apply changes
 160,30,160, PadSynth building
 0,140,140, PadSynth pending
 125,125,0, PadSynth fading
 100,100,100, PadSynth built
-100,100,255, Current Bank Highlight
-160,140,250, Instrument swapping
+100,100,255, Current bank highlight
+160,140,250, Instrument being swapped
+255,0,0, Alert/Query mark
 ================== data end marker
 Add your own notes here:
 Copyright © 2023 Will Godfrey
