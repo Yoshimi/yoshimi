@@ -3184,6 +3184,7 @@ int SynthEngine::getalldata(char **data)
 {
     bool oldFormat = usingYoshiType;
     usingYoshiType = true; // make sure everything is saved
+    getRuntime().xmlType = TOPLEVEL::XML::State;
     XMLwrapper *xml = new XMLwrapper(this, true);
     add2XML(xml);
     midilearn.insertMidiListData(xml);
