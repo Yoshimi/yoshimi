@@ -1492,8 +1492,8 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             Poriginal = UNTITLED;
         if (Pname.empty()) // it's an older state file
         {
-            if (Poriginal.empty() || Poriginal == UNTITLED)
-                Pname = DEFAULT_NAME;
+            if (Poriginal.empty())
+                Pname = UNTITLED;
             else
                 Pname = Poriginal;
         }
