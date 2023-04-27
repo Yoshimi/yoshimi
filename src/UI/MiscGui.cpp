@@ -130,8 +130,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                         type = TOPLEVEL::type::Learnable;
                     }
                 }
-                else if (insert != TOPLEVEL::insert::filterGroup && control != FILTERINSERT::formantFrequency) // has no default value
-                {
+                else if (!(insert == TOPLEVEL::insert::filterGroup && control == FILTERINSERT::formantFrequency))
+                { // formant frequency has no default so do nothing!
                     putData.data.value = newValue;
                     type = TOPLEVEL::type::Write;
                     action |= TOPLEVEL::action::forceUpdate;
@@ -147,7 +147,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
 
     putData.data.type = type;
     putData.data.source = action;
-    //cout << "collect_data value " << value << "  action " << int(action)  << "  type " << int(type) << "  control " << int(control) << "  part " << int(part) << "  kit " << int(kititem) << "  engine " << int(engine) << "  insert " << int(insert)  << "  par " << int(parameter) << " offset " << int(offset) << " msg " << int(miscmsg) << endl;
+
     if (!synth->interchange.fromGUI.write(putData.bytes))
         synth->getRuntime().Log("Unable to write to fromGUI buffer.");
 }

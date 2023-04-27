@@ -524,7 +524,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         case MIDILEARN::control::findSize: // not using this yet
             break;
         case MIDILEARN::control::sendLearnMessage:
-            synth->getGuiMaster()->setmessage(UNUSED, false, textMsgBuffer.fetch(miscmsg), "Close", "Cancel");
+            synth->getGuiMaster()->setmessage(UNUSED, false, textMsgBuffer.fetch(miscmsg), "Cancel");
             break;
         case MIDILEARN::control::sendRefreshRequest:
             //midilearnwindow->show();

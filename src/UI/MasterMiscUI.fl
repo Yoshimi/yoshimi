@@ -516,18 +516,18 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         }
         Fl_Slider partvolume {
           callback {//
-    int realvalue;
+    float realvalue;
     if (Fl::event_button() == 3)
     {
         realvalue = 96;
-//        o->value(realvalue);
-//        o->redraw();
+        o->value(realvalue);
+        o->redraw();
     }
     else
         realvalue = o->value();
     o->selection_color(setSlider(realvalue,96));
 //   synth->getGuiMaster()->partVol->value(realvalue);
-    send_data(TOPLEVEL::action::forceUpdate, PART::control::volume, realvalue, TOPLEVEL::type::Integer);}
+    send_data(TOPLEVEL::action::forceUpdate, PART::control::volume, realvalue, 0);}
           xywh {9 65 20 110} type {Vert Knob} box THIN_DOWN_BOX labelcolor 49 minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
@@ -539,12 +539,14 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     float realvalue;
     // must be float, otherwise fine control only goes negative!
     if (Fl::event_button() == 3)
+    {
        realvalue = 64;
+       o->value(realvalue);
+    }
     else
         realvalue = o->value();
-
     o->selection_color(setKnob(realvalue,64));
-    send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, realvalue, TOPLEVEL::type::Integer);}
+    send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, realvalue, 0);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->setValueType(VC_PanningStd);}

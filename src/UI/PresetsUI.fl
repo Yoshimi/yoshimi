@@ -110,14 +110,14 @@ o->hide();}
             copywin->hide();
         }
         }}
-        xywh {145 355 110 20} box THIN_UP_BOX labelcolor 64
+        xywh {145 355 110 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Button copybutton {
         label {Copy to Clipboard}
         callback {//
         p->copy(NULL);
         copywin->hide();}
-        xywh {25 385 90 35} box THIN_UP_BOX labelcolor 64 align 192
+        xywh {25 385 90 35} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 align 192
       }
       Fl_Button copycancel {
         label Cancel
@@ -148,14 +148,14 @@ o->hide();}
             copybutton->activate();
             copypbutton->deactivate();
         }}
-        xywh {10 355 130 20} labelcolor 64 when 1 textcolor 64
+        xywh {10 355 130 24} labelcolor 64 when 1 textcolor 64
       }
     }
     Fl_Window pastewin {
       label {Paste from Clipboard/Preset}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
-      xywh {463 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
+      xywh {213 81 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser pastebrowse {
@@ -196,7 +196,7 @@ o->hide();}
         }
         if (synth->audioOut.load() == _SYS_::mute::Immediate)
             synth->audioOutStore(_SYS_::mute::Complete);}
-        xywh {10 355 160 20} box THIN_UP_BOX labelcolor 64
+        xywh {10 355 160 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Button pastebutton {
         label {Paste from Clipboard}
@@ -209,7 +209,7 @@ o->hide();}
         pui->refresh();
         if (synth->audioOut.load() == _SYS_::mute::Immediate)
             synth->audioOutStore(_SYS_::mute::Complete);}
-        xywh {25 385 90 35} box THIN_UP_BOX labelcolor 64 align 192
+        xywh {25 385 90 35} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 align 192
       }
       Fl_Button pastecancel {
         label Cancel
@@ -232,7 +232,7 @@ o->hide();}
         if (n != 0)
             p->deletepreset(n);
         rescan();}
-        xywh {180 355 75 20} box THIN_UP_BOX labelcolor 64
+        xywh {180 355 75 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
     }
   }

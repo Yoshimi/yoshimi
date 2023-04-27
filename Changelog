@@ -1,5 +1,15 @@
 yoshimi 2.2.3 M
 
+2023-4-26 Will
+bn 2215
+Confirmed LV2 bugfix from Kristian.
+BugFix: Part volume control wrong colour when stepping
+    to default with mouse wheel.
+BugFix: Blocking right click formant frequency default
+    was blocking all right click filter controls.
+BugFix: Mixer controls not setting default value.
+Found more buttons not using new styling :(
+
 2023-4-23 Will
 bn 2214
 Merged in Legato bugfix from Kristian.

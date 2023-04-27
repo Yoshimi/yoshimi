@@ -1039,7 +1039,7 @@ class MasterUI {: {private GuiUpdates}
             label Volume
             callback {//
             if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-                o->selection_color(setSlider(o->value(),96));
+                o->selection_color(setKnob(o->value(),96));
             setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
             send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
@@ -1765,13 +1765,13 @@ Alan Calvert started the project}
         label {Change to 1 x 16}
         callback {//
         changepanelstyle(1);}
-        xywh {360 290 130 25} box THIN_UP_BOX labelcolor 64
+        xywh {360 290 130 25} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Button todeep {
         label {Change to 2 x 8}
         callback {//
         changepanelstyle(2);}
-        xywh {831 290 120 25} box THIN_UP_BOX labelcolor 64
+        xywh {831 290 120 25} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Choice Panelgroups {
         label {Part Group}
@@ -1866,7 +1866,7 @@ Alan Calvert started the project}
         callback {//
                 send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, BANK::control::refreshDefaults, 1, TOPLEVEL::type::Integer, TOPLEVEL::section::bank);
                 closebutton->do_callback();}
-        xywh {49 60 70 20} labelcolor 64 hide
+        xywh {49 60 70 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 hide
       }
       Fl_Button cancel {
         label Cancel
@@ -1876,7 +1876,7 @@ Alan Calvert started the project}
                 else
                     send_data(0, MIDILEARN::control::cancelLearn, 0, 3, TOPLEVEL::section::midiLearn);
                 closebutton->do_callback();}
-        xywh {130 60 70 20} labelcolor 64 hide
+        xywh {130 60 70 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 hide
       }
       Fl_Button closebutton {
         label Close
@@ -1899,21 +1899,21 @@ Alan Calvert started the project}
         label Yes
         callback {//
     querywindow->hide();}
-        xywh {205 80 60 20} labelcolor 64
+        xywh {205 80 60 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button noQ {
         label No
         callback {//
     querywindow->hide();}
-        xywh {276 80 60 20} labelcolor 64
+        xywh {276 80 60 20} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Button cancelQ {
         label Cancel
         callback {//
     querywindow->hide();}
-        xywh {348 80 66 20} labelfont 1 labelcolor 64
+        xywh {348 80 66 20} color 196 labelfont 1 labelcolor 64
         code0 {o->value(0);}
       }
       Fl_Box typeQ {
@@ -1989,21 +1989,21 @@ Alan Calvert started the project}
             filerpath = "/";
         fileroldpath->value(filerpath.c_str());
         fillfiler(type_name);}
-        tooltip {Go up one directory in path} xywh {463 21 78 24} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Go up one directory in path} xywh {463 21 78 24} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Group faveGroup {
         label Favourites
         xywh {458 116 85 60} box ENGRAVED_FRAME labelcolor 64
-      } {}
-      Fl_Button filerfave {
-        label {Show List}
-        callback {//
+      } {
+        Fl_Button filerfave {
+          label {Show List}
+          callback {//
         setfavourites();}
-        tooltip {Examine, re-order or delete entries} xywh {463 121 75 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
-      }
-      Fl_Button faveadd {
-        label Add
-        callback {//
+          tooltip {Examine, re-order or delete entries} xywh {463 123 75 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        }
+        Fl_Button faveadd {
+          label Add
+          callback {//
     string name = string(fileroldpath->value());
     if (name.back() != '/')
         name += "/";
@@ -2016,11 +2016,14 @@ Alan Calvert started the project}
     filerpath = name;
     favebrowse->add(name.c_str());
     setfavourites();}
-        tooltip {Add the current path to the favourites list} xywh {463 151 75 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Add the current path to the favourites list} xywh {463 150 75 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        }
       }
       Fl_Button filerclose {
         label Close
         callback {//
+        if (favourites->visible())
+            favecancel->do_callback();
         filerfound.clear();
         filerdone = true;
         filernewname->value("Exit");
@@ -2052,7 +2055,7 @@ Alan Calvert started the project}
             filerfound = filerpath + leaf;
         // error picked up in main loop
         filerdone = true;}
-        tooltip {Apply this name to the path and load/save} xywh {464 53 74 20} labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Apply this name to the path and load/save} xywh {464 53 74 20} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Check_Button filerOpt8 {
         label {Hide Dirs}
@@ -2093,7 +2096,7 @@ Alan Calvert started the project}
         xywh {4 4 542 74} box ENGRAVED_FRAME labelcolor 64
       } {}
       Fl_Group favourites {
-        xywh {4 49 542 299} box FLAT_BOX labelcolor 64 hide
+        xywh {4 49 542 265} box FLAT_BOX labelcolor 64 hide
       } {
         Fl_Group favename {
           xywh {4 49 542 42} box ENGRAVED_FRAME labelcolor 64
@@ -2112,7 +2115,7 @@ Alan Calvert started the project}
         }
         clearfavelist();
         setfavecolour(result);}
-          xywh {5 91 540 251} type Select box FLAT_BOX color 206 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
+          xywh {5 91 540 220} type Select box FLAT_BOX color 206 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         }
         Fl_Button favecancel {
           label Back
@@ -2122,10 +2125,10 @@ Alan Calvert started the project}
     fileruse->activate();
     filerback->activate();
     filerfave->activate();
-    filerclose->activate();
     filerscroll->show();
+    faveGroup->show();
     favourites->hide();}
-          tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Cancel any selection and return to filer window} xywh {455 61 70 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button favedefault {
           label {Make Default}
@@ -2133,7 +2136,7 @@ Alan Calvert started the project}
     size_t pos = favebrowse->value();
     if (pos > 0)
         favebrowse->move(1, pos);}
-          tooltip {Set selected entry as the default (move to top)} xywh {287 61 110 20} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Set selected entry as the default (move to top)} xywh {287 61 110 20} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button favedelete {
           label Delete
@@ -2143,7 +2146,7 @@ Alan Calvert started the project}
     setfavecolour(1);
     if (pos > 0)
         favebrowse->remove(pos);}
-          tooltip {Remove selected entry} xywh {156 61 70 20} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Remove selected entry} xywh {156 61 70 20} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
         Fl_Button faveset {
           label Set
@@ -2159,7 +2162,7 @@ Alan Calvert started the project}
     fileroldpath->value(filerpath.c_str());
     fillfiler(type_name);
     favecancel->do_callback();}
-          tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} labelfont 1 labelsize 12 labelcolor 64
+          tooltip {Set the current path to the selected entry and exit} xywh {20 61 70 20} box PLASTIC_THIN_UP_BOX color 228 labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Scroll filerscroll {
@@ -2490,8 +2493,8 @@ Alan Calvert started the project}
     fileruse->deactivate();
     filerback->deactivate();
     filerfave->deactivate();
-    filerclose->deactivate();
     filerscroll->hide();
+    faveGroup->hide();
     favourites->show();} {}
   }
   Function {loadfavourites()} {} {
@@ -2669,7 +2672,7 @@ Alan Calvert started the project}
         if (panelVisible)
             panelpart = newpart % NUM_MIDI_CHANNELS;
 
-        bool seen = false;
+        bool seen = false;;
         switch (control)
         {
             case PART::control::enable:
@@ -2857,7 +2860,7 @@ Alan Calvert started the project}
 
         float vol = (value * synth->part[npart]->ctl->volume.data) / 127;
         if (control == MIDI::control::controller)
-        { // panel entries only
+        { // MIDI panel entries only
             for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
                 if (panellistitem[i]->partenabled->value() != 0)
@@ -3454,7 +3457,7 @@ Alan Calvert started the project}
     }
     if (three.empty())
     {
-        cancelQ->copy_label("OK");
+        cancelQ->copy_label("Close");
         typeQ->copy_label("!");
     }
     else
