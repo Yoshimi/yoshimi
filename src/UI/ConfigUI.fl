@@ -894,7 +894,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     Fl_Window presets {
       label Presets
       callback {pClose->do_callback();}
-      xywh {5 437 460 295} type Double hide resizable
+      xywh {5 437 460 270} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
       code1 {preDW = o->w();preDH = o->h();}
       code2 {o->size_range(preDW, preDH, 0, 0, 0, 0, 1);}
@@ -931,20 +931,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         xywh {220 220 85 35} box PLASTIC_UP_BOX color 228 labelsize 12 labelcolor 64 align 128
         code0 {o->deactivate();}
       }
-      Fl_Button pSave {
-        label {Save and Close}
-        callback {//
-                    synth->getRuntime().saveConfig();
-                    presets->hide();}
-        xywh {208 268 118 20} box THIN_UP_BOX labelsize 12 labelcolor 64
-      }
       Fl_Button pClose {
-        label {Close Unsaved}
+        label Close
         callback {//
         saveWin(synth, presets->w(), presets->h(), presets->x(), presets->y(), false, "Config-presets");
         presetsSeen = false;
         presets->hide();}
-        xywh {334 268 118 20} box THIN_UP_BOX labelsize 12 labelcolor 64
+        xywh {362 220 85 35} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
   }
@@ -2013,7 +2006,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     addpreset->labelsize(size);
     removepresetbutton->labelsize(size);
     makedefaultpresetbutton->labelsize(size);
-    pSave->labelsize(size);
     pClose->labelsize(size);
 
     presetbrowse->textsize(size);

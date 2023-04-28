@@ -1442,7 +1442,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             synth->getRuntime().presetsDirlist[i] = "";
             synth->getRuntime().presetsRootID = 0;
             newMsg = true;
-            synth->getRuntime().configChanged = true;
+            synth->getRuntime().savePresetsList();
             break;
         }
         case CONFIG::control::currentPresetRoot:

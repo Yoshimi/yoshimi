@@ -349,7 +349,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
     Fl_Window freemodeeditwindow {
       label Envelope
       callback {freeClose->do_callback();}
-      xywh {614 158 575 180} type Double hide resizable
+      xywh {1088 97 575 180} type Double hide resizable
       code0 {freeDW = o->w(); freeDH = o->h();}
       code1 {o->size_range(freeDW, freeDH, 0, 0, 0, 0, 1);}
     } {
@@ -359,7 +359,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         code0 {o->init(env, npart, kititem, engine, group);}
         class EnvelopeFreeEdit
       }
-      Fl_Light_Button freemodebutton {
+      Fl_Light_Button freemodebutto {
         label FreeMode
         callback {//
         if (env->Pfreemode != 0)
@@ -373,7 +373,24 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         }
 
         send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11 labelcolor 64
+        tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11 labelcolor 64 hide deactivate
+      }
+      Fl_Check_Button freemodebutton {
+        label FreeMode
+        callback {//
+        if (env->Pfreemode != 0)
+        {
+            bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
+            if (!answer)
+            {
+                o->value(1); // back as it was
+                return;
+            }
+        }
+
+        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write);}
+        tooltip {Enable or disable the freemode} xywh {10 157 93 17} down_box DOWN_BOX selection_color 64 labelcolor 64
+        class Fl_Check_Button2
       }
       Fl_Button addpoint {
         label {Add point}
@@ -1373,8 +1390,9 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);
         int size12 = int(12 * dScale);
+         int size14 = int(14 * dScale);
 
-        freemodebutton->labelsize(size11);
+        freemodebutton->labelsize(size14);
         addpoint->labelsize(size11);
         deletepoint->labelsize(size11);
         sustaincounter->labelsize(size11);

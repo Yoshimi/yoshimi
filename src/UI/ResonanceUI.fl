@@ -301,7 +301,7 @@ class ResonanceUI {: PresetsUI_
     Fl_Window resonancewindow {
       label Resonance
       callback {resClose->do_callback();}
-      xywh {860 62 780 305} type Double hide resizable
+      xywh {355 40 780 305} type Double hide resizable
       code0 {resDW = o->w();resDH = o->h();}
       code1 {resonancewindow->size_range(resDW, resDH, 0, 0, 0, 0, 1);}
     } {
@@ -444,12 +444,12 @@ class ResonanceUI {: PresetsUI_
         Fl_Button cbutton {
           label C
           callback {synth->getGuiMaster()->getPresetsUi()->copy(respar);}
-          xywh {635 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
+          xywh {704 264 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
         Fl_Button pbutton {
           label P
           callback {synth->getGuiMaster()->getPresetsUi()->paste(respar,this);}
-          xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
+          xywh {747 264 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
       }
       Fl_Check_Button enabled {
@@ -464,7 +464,7 @@ class ResonanceUI {: PresetsUI_
         label Apply
         callback {//
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::applyChanges, 1, TOPLEVEL::type::Integer);}
-        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {700 265 74 17} box GTK_THIN_UP_BOX down_box THIN_DOWN_BOX color 82 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Rebuild PADSynth wavetable to pick up changes} xywh {630 264 68 37} box GTK_THIN_UP_BOX down_box THIN_DOWN_BOX color 82 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button resClose {
         label Close
@@ -480,7 +480,7 @@ class ResonanceUI {: PresetsUI_
               else
                   synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
           }}
-        tooltip {Right click: also reopen previous} xywh {700 286 74 16} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
+        tooltip {Right click: also reopen previous} xywh {704 283 69 18} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
   }

@@ -401,7 +401,7 @@ static std::string colourData [] = {
     "0,0,255, Bank/Instrument swap lit",
     "255,180,0, Bank import lit",
     "180,240,255, Bank export lit",
-    "127,145,191, Close button",
+    "160,160,140, Close button",
     "0,0,255, About heading",
     "0,0,255, Part name derived",
     "0,0,255, Solo selected",

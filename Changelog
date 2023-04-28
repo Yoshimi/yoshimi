@@ -1,5 +1,14 @@
 yoshimi 2.2.3 M
 
+2023-4-28 Will
+bn 2216
+Changed freemode from light button to check button.
+Changed postions of Resonance C, P, Close, Apply.
+Changed colour of 'Close' buttons.
+Removed 'save and close' from presets window
+    preset dirs are not part of config.
+Updated User Guide
+
 2023-4-26 Will
 bn 2215
 Confirmed LV2 bugfix from Kristian.
