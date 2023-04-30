@@ -759,7 +759,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
         Fl_Group themeTab {
           callback {//}
-          xywh {5 25 382 277} box THIN_UP_BOX hide
+          xywh {5 25 382 277} box THIN_UP_BOX
         } {
           Fl_Browser theme_browser {
             label Themes
@@ -820,7 +820,33 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         {
            synth->getRuntime().Log("Failed to install " + filename);
         }}
-            xywh {255 75 100 20} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64
+            xywh {255 51 100 20} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64
+          }
+          Fl_Button themeExport {
+            label {Export Theme}
+            callback {//
+            string source = file::localDir() + "/themes/" + curTheme + EXTEN::theme;
+            string filename = setfiler(synth,"", curTheme, true, TOPLEVEL::XML::Themes);
+            size_t found = filename.find(file::localDir());
+            if (found!=std::string::npos)
+            {
+                alert(synth, "Can't export on top of internal themes");
+                return;
+            }
+            if (filename.empty())
+            {
+                synth->getRuntime().Log("Nothing to export " + filename);
+                return;
+            }
+            filename += EXTEN::theme;
+            //std::cout << "here>" << source << "  there>" << filename << std::endl;
+            bool result = file::copyFile(source, filename, 0);
+            if (result == 0)
+            {
+                synth->getRuntime().Log("Failed to export " + filename);
+            }
+        ;}
+            xywh {255 89 100 20} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64
           }
           Fl_Box storedLabel {
             label {Default Theme}
@@ -1978,6 +2004,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 //
     Tab6->labelsize(size);
     themeImport->labelsize(size);
+    themeExport->labelsize(size);
     theme_browser->labelsize(size);
         theme_browser->textsize(size);
     themeImport->labelsize(size);

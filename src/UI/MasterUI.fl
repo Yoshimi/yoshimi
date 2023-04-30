@@ -2228,7 +2228,12 @@ Alan Calvert started the project}
     else
     {
         if (extension == TOPLEVEL::XML::ScalaTune || extension == TOPLEVEL::XML::ScalaMap || extension == TOPLEVEL::XML::Themes)
-            fileruse->copy_label("< Import");
+        {
+            if (dosave)
+                fileruse->copy_label("< Export");
+            else
+                fileruse->copy_label("< Import");
+        }
 
         else if (dosave)
             fileruse->copy_label("< Save");

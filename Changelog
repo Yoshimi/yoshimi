@@ -1,6 +1,9 @@
 yoshimi 2.2.3 M
 
 2023-4-30 Will
+bn 2220
+Added export feature to theme control.
+Updated docs.
 bn 2219
 Defined formant frequency psuedo default for individual formants
     the first time they are set - saved with the instrument.
