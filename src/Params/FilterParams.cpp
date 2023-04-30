@@ -81,6 +81,7 @@ void FilterParams::defaults(int n)
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)
     {
         Pvowels[j].formants[i].freq = synth->randomINT() >> 24; // some random freqs
+        Pvowels[j].formants[i].firstF = Pvowels[j].formants[i].freq; // the only time we set this
         Pvowels[j].formants[i].q = FILTDEF::formQ.def;
         Pvowels[j].formants[i].amp = FILTDEF::formAmp.def;
     }
@@ -278,6 +279,7 @@ void FilterParams::add2XMLsection(XMLwrapper *xml,int n)
     for (int nformant = 0; nformant < FF_MAX_FORMANTS; ++nformant)
     {
         xml->beginbranch("FORMANT",nformant);
+        xml->addpar("first_freq",Pvowels[nvowel].formants[nformant].firstF);
         xml->addpar("freq",Pvowels[nvowel].formants[nformant].freq);
         xml->addpar("amp",Pvowels[nvowel].formants[nformant].amp);
         xml->addpar("q",Pvowels[nvowel].formants[nformant].q);
@@ -334,6 +336,8 @@ void FilterParams::getfromXMLsection(XMLwrapper *xml,int n)
     {
         if (xml->enterbranch("FORMANT",nformant) == 0)
             continue;
+        Pvowels[nvowel].formants[nformant].firstF =
+            xml->getpar127("first_freq",Pvowels[nvowel].formants[nformant].firstF);
         Pvowels[nvowel].formants[nformant].freq =
             xml->getpar127("freq",Pvowels[nvowel].formants[nformant].freq);
         Pvowels[nvowel].formants[nformant].amp =

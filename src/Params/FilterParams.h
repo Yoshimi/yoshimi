@@ -93,7 +93,7 @@ class FilterParams : public Presets
                                                 // func., and the number of octaves
         struct {
             struct {
-                unsigned char freq, amp, q; // frequency,amplitude,Q
+                unsigned char firstF, freq, amp, q; // frequency,amplitude,Q
             } formants[FF_MAX_FORMANTS];
         } Pvowels[FF_MAX_VOWELS];
 

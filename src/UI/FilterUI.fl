@@ -396,7 +396,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         nseqpos = 0;
         nseqsize = 3;
         nVoCount = 0;
-        nFoCount = 0;} {}
+        nFoCount = 0;
+        formFreqDef = -1;} {}
   }
   Function {~FilterUI()} {} {
     code {filterui->hide();
@@ -602,7 +603,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
               callback {//
             int val = lrint(o->value());
 
-            o->selection_color(setKnob(val,val)); // has no default
+            o->selection_color(setKnob(val,formFreqDef)); // has no default
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, val, TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               class WidgetPDial
@@ -834,7 +835,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   }
   Function {update_formant_window()} {} {
     code {//
+        formFreqDef = pars->Pvowels[nvowel].formants[nformant].firstF;
         formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
+        formant_freq_dial->selection_color(setKnob(formant_freq_dial->value(),formFreqDef));
+        formant_freq_dial->redraw();
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
         nseqsize = pars->Psequencesize;
@@ -1178,7 +1182,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                 if (!fromUs)
                 {
                     formant_freq_dial->value(value);
-                    formant_freq_dial->selection_color(setKnob(value,value)); // has no default
+                    formant_freq_dial->selection_color(setKnob(value,formFreqDef)); // has no default
                 }
                 formantfiltergraph->redraw();
             }
@@ -1247,7 +1251,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             nformant = value_int;
             update_formant_window();
             formantfiltergraph->redraw();
-            break;
+           break;
 
         case FILTERINSERT::control::sequenceSize:
             seqsize->value(value_int);
@@ -1359,5 +1363,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   decl {int lastformantW;} {private local
   }
   decl {bool formantSeen;} {private local
+  }
+  decl {int formFreqDef;} {private local
   }
 }
