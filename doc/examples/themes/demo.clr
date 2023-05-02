@@ -1,13 +1,9 @@
-Do not edit this. It may be overwritten.
-Instead, copy as template for other named themes.
-Don't add or remove lines between and including dashes.
-This would corrupt the colour map.
 ------------------ data start marker
-0,120, Grey scale min-max (can be reversed)
-255,255,127, Panels (R,G,B or #rrggbb)
+0,120, Grey scale min-max
+255,255,127, Panels
 0,0,0, RESERVED
 100,100,230, Knob shadow
-255,230,230, Knob highlight (231,235,239)
+255,230,230, Knob highlight
 0,0,100, Knob ring
 200,180,100, Knob ring lit
 0,0,160, Knob pointer default
@@ -119,6 +115,5 @@ This would corrupt the colour map.
 255,255,255, Envelope line
 255,0,0, Envelope line selected
 ================== data end marker
-Add your own notes here:
 Copyright © 2023 Will Godfrey
 Dark Psycho!

@@ -70,7 +70,7 @@ class VectorUI {} {
       label {Yoshimi : Vectors}
       callback {//
       Closevector->do_callback();}
-      xywh {694 296 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
+      xywh {382 256 375 295} type Double labelfont 13 labelsize 12 align 0 hide resizable
       code0 {vecDW = o->w();vecDH = o->h();}
       code1 {o->size_range(vecDW, vecDH, 0, 0, 0, 0, 1);}
     } {
@@ -424,7 +424,7 @@ switch (res)
         string tmp = input_text(synth, "Vector name:", loadlabel[BaseChan]);
         if (tmp != loadlabel[BaseChan])
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, VECTOR::control::name, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, BaseChan, textMsgBuffer.push(tmp));}
-        tooltip {Last saved or loaded vector file - click to change} xywh {45 264 198 22} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
+        tooltip {Last saved or loaded vector file - click to change the name} xywh {45 264 198 22} box DOWN_BOX color 7 labelfont 1 labelsize 12 labelcolor 64
       }
     }
   }
@@ -856,16 +856,16 @@ switch (res)
     switch(engine)
     {
         case 1:
-            col = 214;
+            col = add_back;
             break;
         case 2:
-            col = 236;
+            col = sub_back;
             break;
         case 4:
-            col = 158;
+            col = pad_back;
             break;
         default:
-            col = 17;
+            col = instr_back;
             break;
     }
     return col;} {}

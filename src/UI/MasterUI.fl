@@ -1083,13 +1083,13 @@ class MasterUI {: {private GuiUpdates}
             xywh {136 291 195 25} box GTK_THIN_UP_BOX color 198
           } {
             Fl_Box instrumentaddbox {
-              xywh {140 296 60 15} box FLAT_BOX color 17
+              xywh {140 296 60 15} box FLAT_BOX
             }
             Fl_Box instrumentsubbox {
-              xywh {200 296 65 15} box FLAT_BOX color 17
+              xywh {200 296 65 15} box FLAT_BOX
             }
             Fl_Box instrumentpadbox {
-              xywh {264 296 63 15} box FLAT_BOX color 17
+              xywh {264 296 63 15} box FLAT_BOX
             }
             Fl_Box instrumentlabel {
               label {Simple Sound}
