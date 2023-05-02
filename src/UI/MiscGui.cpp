@@ -321,8 +321,9 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         allowPartUpdate = true;
     }
-    if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count) // effects
-    {
+
+    if (npart != TOPLEVEL::section::main && kititem >= EFFECT::type::none && kititem < EFFECT::type::count) // effects
+    { // maybe we should go to main first?
         if (npart == TOPLEVEL::section::systemEffects)
         {
             if (engine != synth->getGuiMaster()->nsyseff)

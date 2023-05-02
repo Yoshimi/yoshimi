@@ -1,5 +1,9 @@
 yoshimi 2.2.3 M
 
+2023-5-02 Will
+bn 2221
+BugFix: GUI not updating when part loaded betweeen 16 and 25
+
 2023-4-30 Will
 bn 2220
 Added export feature to theme control.
