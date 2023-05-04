@@ -33,27 +33,6 @@ using func::power;
 using func::powFrac;
 using func::decibel;
 
-
-namespace { // Implementation details...
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 6;
-    int presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Overdrive 1
-        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
-        // Overdrive 2
-        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
-        // A. Exciter 1
-        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
-        // A. Exciter 2
-        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
-        // Guitar Amp
-        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
-        // Quantise
-        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
-    };
-}
-
-
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pvolume(50),
@@ -222,12 +201,12 @@ void Distorsion::setpreset(unsigned char npreset)
 {
     if (npreset < 0xf)
     {
-        if (npreset >= NUM_PRESETS)
-            npreset = NUM_PRESETS - 1;
-        for (int n = 0; n < PRESET_SIZE; ++n)
-            changepar(n, presets[npreset][n]);
+        if (npreset >= distNUM_PRESETS)
+            npreset = distNUM_PRESETS - 1;
+        for (int n = 0; n < distPRESET_SIZE; ++n)
+            changepar(n, distPresets[npreset][n]);
         if (insertion)
-            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+            changepar(0, distPresets[npreset][0] / 2); // lower the volume if this is insertion effect
         Ppreset = npreset;
     }
     else
@@ -236,9 +215,9 @@ void Distorsion::setpreset(unsigned char npreset)
         unsigned char param = npreset >> 4;
         if (param == 0xf)
             param = 0;
-        changepar(param, presets[preset][param]);
+        changepar(param, distPresets[preset][param]);
         if (insertion && (param == 0))
-            changepar(0, presets[preset][0] / 2);
+            changepar(0, distPresets[preset][0] / 2);
     }
     cleanup();
     Pchanged = false;
@@ -341,7 +320,7 @@ float Distlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
 
-    int def = presets[presetNum][control];
+    int def = distPresets[presetNum][control];
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)

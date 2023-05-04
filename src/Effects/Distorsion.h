@@ -33,6 +33,23 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
+    const int distPRESET_SIZE = 11;
+    const int distNUM_PRESETS = 6;
+    const int distPresets[distNUM_PRESETS][distPRESET_SIZE] = {
+        // Overdrive 1
+        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
+        // Overdrive 2
+        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
+        // A. Exciter 1
+        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
+        // A. Exciter 2
+        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
+        // Guitar Amp
+        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
+        // Quantise
+        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
+    };
+
 class SynthEngine;
 
 class Distorsion : public Effect, WaveShapeSamples

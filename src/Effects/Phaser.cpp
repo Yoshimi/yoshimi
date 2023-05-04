@@ -39,30 +39,6 @@ using func::invSignal;
 #define ONE_  0.99999f        // To prevent LFO ever reaching 1.0f for filter stability purposes
 #define ZERO_ 0.00001f        // Same idea as above.
 
-namespace {
-    const int PRESET_SIZE = 15;
-    const int NUM_PRESETS = 12;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // Phaser
-        // 0   1    2    3  4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 36,  0,   0, 64,  110, 64,  1,  0,   0, 20, 0, 0,  0 },
-        {64, 64, 35,  0,   0, 88,  40,  64,  3,  0,   0, 20, 0,  0, 0 },
-        {64, 64, 31,  0,   0, 66,  68,  107, 2,  0,   0, 20, 0,  0, 0 },
-        {39, 64, 22,  0,   0, 66,  67,  10,  5,  0,   1, 20, 0,  0, 0 },
-        {64, 64, 20,  0,   1, 110, 67,  78,  10, 0,   0, 20, 0,  0, 0 },
-        {64, 64, 53,  100, 0, 58,  37,  78,  3,  0,   0, 20, 0,  0, 0 },
-        // APhaser
-        // 0   1    2   3   4   5     6   7   8    9 10   11 12  13 14
-        {64, 64, 14,  0,   1, 64,  64,  40,  4,  10,  0, 110,1,  20, 1 },
-        {64, 64, 14,  5,   1, 64,  70,  40,  6,  10,  0, 110,1,  20, 1 },
-        {64, 64, 9,   0,   0, 64,  60,  40,  8,  10,  0, 40, 0,  20, 1 },
-        {64, 64, 14,  10,  0, 64,  45,  80,  7,  10,  1, 110,1,  20, 1 },
-        {25, 64, 127, 10,  0, 64,  25,  16,  8,  100, 0, 25, 0,  20, 1 },
-        {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20, 1 }
-    };
-}
-
-
 Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
@@ -399,10 +375,10 @@ void Phaser::setpreset(unsigned char npreset)
 {
     if (npreset < 0xf)
     {
-        if (npreset >= NUM_PRESETS)
-            npreset = NUM_PRESETS - 1;
-        for (int n = 0; n < PRESET_SIZE; ++n)
-            changepar(n, presets[npreset][n]);
+        if (npreset >= phaserNUM_PRESETS)
+            npreset = phaserNUM_PRESETS - 1;
+        for (int n = 0; n < phaserPRESET_SIZE; ++n)
+            changepar(n, phaserPresets[npreset][n]);
         // All presets use no BPM syncing.
         changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
@@ -413,7 +389,7 @@ void Phaser::setpreset(unsigned char npreset)
         unsigned char param = npreset >> 4;
         if (param == 0xf)
             param = 0;
-        changepar(param, presets[preset][param]);
+        changepar(param, phaserPresets[preset][param]);
     }
     Pchanged = false;
 }
@@ -546,7 +522,7 @@ float Phaserlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
 
-    int def = presets[presetNum][control];
+    int def = phaserPresets[presetNum][control];
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)

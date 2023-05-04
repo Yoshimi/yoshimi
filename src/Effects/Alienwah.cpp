@@ -29,19 +29,6 @@
 
 using std::complex;
 
-static const int PRESET_SIZE = 11;
-static const int NUM_PRESETS = 4;
-static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // AlienWah1
-        { 127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64 },
-        // AlienWah2
-        { 127, 64, 73, 106, 0, 101, 60, 105, 17, 0, 64 },
-        // AlienWah3
-        { 127, 64, 63, 0, 1, 100, 112, 105, 31, 0, 42 },
-        // AlienWah4
-        { 93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86 }
-};
-
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     lfo(_synth),
@@ -187,12 +174,12 @@ void Alienwah::setpreset(unsigned char npreset)
 {
     if (npreset < 0xf)
     {
-        if (npreset >= NUM_PRESETS)
-            npreset = NUM_PRESETS - 1;
-        for (int n = 0; n < PRESET_SIZE; ++n)
-            changepar(n, presets[npreset][n]);
+        if (npreset >= alienNUM_PRESETS)
+            npreset = alienNUM_PRESETS - 1;
+        for (int n = 0; n < alienPRESET_SIZE; ++n)
+            changepar(n, alienPresets[npreset][n]);
         if (insertion)
-            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+            changepar(0, alienPresets[npreset][0] / 2); // lower the volume if this is insertion effect
         // All presets use no BPM syncing.
         changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
@@ -203,9 +190,9 @@ void Alienwah::setpreset(unsigned char npreset)
         unsigned char param = npreset >> 4;
         if (param == 0xf)
             param = 0;
-        changepar(param, presets[preset][param]);
+        changepar(param, alienPresets[preset][param]);
         if (insertion && (param == 0))
-            changepar(0, presets[preset][0] / 2);
+            changepar(0, alienPresets[preset][0] / 2);
     }
     Pchanged = false;
 }
@@ -302,7 +289,7 @@ float Alienlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
 
-    int def = presets[presetNum][control];
+    int def = alienPresets[presetNum][control];
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)

@@ -33,20 +33,6 @@
 using func::power;
 using func::powFrac;
 
-static const int PRESET_SIZE = 7;
-static const int NUM_PRESETS = 9;
-static unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
-        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
-        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
-        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
-        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
-        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
-        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
-        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
-        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
-    };
-
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pdelay(60),
@@ -272,12 +258,12 @@ void Echo::setpreset(unsigned char npreset)
 {
     if (npreset < 0xf)
     {
-        if (npreset >= NUM_PRESETS)
-            npreset = NUM_PRESETS - 1;
-        for (int n = 0; n < PRESET_SIZE; ++n)
-            changepar(n, presets[npreset][n]);
+        if (npreset >= echoNUM_PRESETS)
+            npreset = echoNUM_PRESETS - 1;
+        for (int n = 0; n < echoPRESET_SIZE; ++n)
+            changepar(n, echoPresets[npreset][n]);
         if (insertion)
-            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+            changepar(0, echoPresets[npreset][0] / 2); // lower the volume if this is insertion effect
         // All presets use no BPM syncing.
         changepar(EFFECT::control::bpm, 0);
         Ppreset = npreset;
@@ -288,9 +274,9 @@ void Echo::setpreset(unsigned char npreset)
         unsigned char param = npreset >> 4;
         if (param == 0xf)
             param = 0;
-        changepar(param, presets[preset][param]);
+        changepar(param, echoPresets[preset][param]);
         if (insertion && (param == 0))
-            changepar(0, presets[preset][0] / 2);
+            changepar(0, echoPresets[preset][0] / 2);
     }
     Pchanged = false;
 }
@@ -374,7 +360,7 @@ float Echolimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
 
-    int def = presets[presetNum][control];
+    int def = echoPresets[presetNum][control];
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)

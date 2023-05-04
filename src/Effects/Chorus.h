@@ -31,6 +31,31 @@
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
+static const int chorusPRESET_SIZE = 12;
+static const int chorusNUM_PRESETS = 10;
+static const unsigned char chorusPresets[chorusNUM_PRESETS][chorusPRESET_SIZE] = {
+        // Chorus1
+        { 64, 64, 50, 0, 0, 90, 40, 85, 64, 119, 0, 0 },
+        // Chorus2
+        {64, 64, 45, 0, 0, 98, 56, 90, 64, 19, 0, 0 },
+        // Chorus3
+        {64, 64, 29, 0, 1, 42, 97, 95, 90, 127, 0, 0 },
+        // Celeste1
+        {64, 64, 26, 0, 0, 42, 115, 18, 90, 127, 0, 0 },
+        // Celeste2
+        {64, 64, 29, 117, 0, 50, 115, 9, 31, 127, 0, 1 },
+        // Flange1
+        {64, 64, 57, 0, 0, 60, 23, 3, 62, 0, 0, 0 },
+        // Flange2
+        {64, 64, 33, 34, 1, 40, 35, 3, 109, 0, 0, 0 },
+        // Flange3
+        {64, 64, 53, 34, 1, 94, 35, 3, 54, 0, 0, 1 },
+        // Flange4
+        {64, 64, 40, 0, 1, 62, 12, 19, 97, 0, 0, 0 },
+        // Flange5
+        {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
+};
+
 class SynthEngine;
 
 class Chorus : public Effect

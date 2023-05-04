@@ -129,8 +129,8 @@ void EQ::setpreset(unsigned char npreset)
     const int PRESET_SIZE = 1;
     const int NUM_PRESETS = 2;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        { 67 }, // EQ 1
-        { 67 }  // EQ 2
+        { EQmaster_def }, // EQ 1
+        { EQmaster_def }  // EQ 2
     };
 
     if (npreset >= NUM_PRESETS)
@@ -283,7 +283,7 @@ float EQlimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
-            def = 64;
+            def = EQmaster_def;
             break;
         case 1:
             max = 7;
@@ -294,9 +294,13 @@ float EQlimit::getlimits(CommandBlock *getData)
             canLearn = 0;
             break;
         case 11:
+            def = EQfreq_def;
+            break;
         case 12:
+            def = EQgain_def;
+            break;
         case 13:
-            def = 64;
+            def = EQq_def;
             break;
         case 14:
             max = 4;

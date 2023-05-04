@@ -35,6 +35,10 @@
 
 #include <memory>
 
+const unsigned char EQmaster_def = 67;
+const unsigned char EQfreq_def = 64;
+const unsigned char EQgain_def = 64;
+const unsigned char EQq_def = 64;
 
 class EQ : public Effect
 {
@@ -65,9 +69,9 @@ class EQ : public Effect
 
             FilterParam(SynthEngine& synth)
                 :Ptype{0}
-                ,Pfreq{64}
-                ,Pgain{64}
-                ,Pq{64}
+                ,Pfreq{EQfreq_def}
+                ,Pgain{EQgain_def}
+                ,Pq{EQq_def}
                 ,Pstages{0}
                 ,freq{0, synth.samplerate}
                 ,gain{0, synth.samplerate}

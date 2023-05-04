@@ -33,6 +33,20 @@
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
+static const int alienPRESET_SIZE = 11;
+static const int alienNUM_PRESETS = 4;
+static const unsigned char alienPresets[alienNUM_PRESETS][alienPRESET_SIZE] = {
+        // AlienWah1
+        { 127, 64, 70, 0, 0, 62, 60, 105, 25, 0, 64 },
+        // AlienWah2
+        { 127, 64, 73, 106, 0, 101, 60, 105, 17, 0, 64 },
+        // AlienWah3
+        { 127, 64, 63, 0, 1, 100, 112, 105, 31, 0, 42 },
+        // AlienWah4
+        { 93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86 }
+};
+
+
 class SynthEngine;
 
 class Alienwah : public Effect

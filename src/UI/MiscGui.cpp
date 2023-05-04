@@ -132,10 +132,13 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                 }
                 else if (!(insert == TOPLEVEL::insert::filterGroup && control == FILTERINSERT::formantFrequency))
                 { // formant frequency has no default so do nothing!
-                    putData.data.value = newValue;
-                    type = TOPLEVEL::type::Write;
-                    action |= TOPLEVEL::action::forceUpdate;
+                    if (insert != UNUSED || kititem < EFFECT::type::none || kititem >= EFFECT::type::count)
+                    { // effect defaults handled directly
+                        putData.data.value = newValue;
+                        type = TOPLEVEL::type::Write;
+                        action |= TOPLEVEL::action::forceUpdate;
                     // has to be write as it's 'set default'
+                    }
                 }
             }
             else if (buttons > 2)

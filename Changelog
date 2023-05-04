@@ -1,5 +1,10 @@
 yoshimi 2.2.3 M
 
+2023-5-04 Will
+bn 2222
+All effects show correct defaults for all presets and set
+appropriate colours - completes all knobs/sliders.
+
 2023-5-02 Will
 bn 2221
 BugFix: GUI not updating when part loaded betweeen 16 and 25

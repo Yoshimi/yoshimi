@@ -36,6 +36,20 @@
 // ALSA. Must be a number above 1.0f.
 #define ECHO_INACCURATE_BPM_THRESHOLD 1.02f
 
+static const int echoPRESET_SIZE = 7;
+static const int echoNUM_PRESETS = 9;
+static const unsigned char echoPresets[echoNUM_PRESETS][echoPRESET_SIZE] = {
+        { 67, 64, 35, 64, 30, 59, 0 },     // Echo 1
+        { 67, 64, 21, 64, 30, 59, 0 },     // Echo 2
+        { 67, 75, 60, 64, 30, 59, 10 },    // Echo 3
+        { 67, 60, 44, 64, 30, 0, 0 },      // Simple Echo
+        { 67, 60, 102, 50, 30, 82, 48 },   // Canyon
+        { 67, 64, 44, 17, 0, 82, 24 },     // Panning Echo 1
+        { 81, 60, 46, 118, 100, 68, 18 },  // Panning Echo 2
+        { 81, 60, 26, 100, 127, 67, 36 },  // Panning Echo 3
+        { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
+    };
+
 class SynthEngine;
 
 class Echo : public Effect

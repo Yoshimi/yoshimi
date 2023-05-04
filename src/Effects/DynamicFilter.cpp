@@ -27,21 +27,6 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/DynamicFilter.h"
 
-static const int PRESET_SIZE = 10;
-static const int NUM_PRESETS = 5;
-static const char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // WahWah
-        { 110, 64, 80, 0, 0, 64, 0, 90, 0, 60 },
-        // AutoWah
-        {110, 64, 70, 0, 0, 80, 70, 0, 0, 60 },
-        // Sweep
-        {100, 64, 30, 0, 0, 50, 80, 0, 0, 60 },
-        // VocalMorph1
-        { 110, 64, 80, 0, 0, 64, 0, 64, 0, 60 },
-        // VocalMorph1
-        {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
-};
-
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0, _synth),
     lfo(_synth),
@@ -173,10 +158,10 @@ void DynamicFilter::setpreset(unsigned char npreset)
 {
     if (npreset < 0xf)
     {
-        if (npreset >= NUM_PRESETS)
-            npreset = NUM_PRESETS - 1;
-        for (int n = 0; n < PRESET_SIZE; ++n)
-            changepar(n, presets[npreset][n]);
+        if (npreset >= dynNUM_PRESETS)
+            npreset = dynNUM_PRESETS - 1;
+        for (int n = 0; n < dynPRESET_SIZE; ++n)
+            changepar(n, dynPresets[npreset][n]);
 
         filterpars->defaults();
 
@@ -269,7 +254,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
         }
 
         if (insertion == 0)
-            changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
+            changepar(0, dynPresets[npreset][0] * 0.5f); // lower the volume if this is
                                                   // system effect
         // All presets use no BPM syncing.
         changepar(EFFECT::control::bpm, 0);
@@ -283,9 +268,9 @@ void DynamicFilter::setpreset(unsigned char npreset)
         unsigned char param = npreset >> 4;
         if (param == 0xf)
             param = 0;
-        changepar(param, presets[preset][param]);
+        changepar(param, dynPresets[preset][param]);
         if ((insertion == 0) && (param == 0))
-            changepar(0, presets[preset][0] * 0.5f);
+            changepar(0, dynPresets[preset][0] * 0.5f);
     }
     Pchanged = false;
 }
@@ -391,7 +376,7 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
 
-    int def = presets[presetNum][control];
+    int def = dynPresets[presetNum][control];
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)
