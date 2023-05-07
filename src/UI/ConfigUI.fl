@@ -806,7 +806,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::Themes);
         if (filename.empty())
         {
-            synth->getRuntime().Log("Can't find " + filename);
+            //synth->getRuntime().Log("Can't find " + filename);
             return;
         }
         filename += EXTEN::theme;
@@ -835,13 +835,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             if (filename.empty())
             {
-                synth->getRuntime().Log("Nothing to export " + filename);
+                //synth->getRuntime().Log("Nothing to export " + filename);
                 return;
             }
             filename += EXTEN::theme;
-            //std::cout << "here>" << source << "  there>" << filename << std::endl;
-            bool result = file::copyFile(source, filename, 0);
-            if (result == 0)
+            if (file::copyFile(source, filename, 0))
             {
                 synth->getRuntime().Log("Failed to export " + filename);
             }
@@ -1469,7 +1467,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         int lineCount = 0;
         while (colourData[lineCount + 1].substr(0, 7) != "-------")
         {
-            setColourLine(colourData[lineCount + 1], lineCount); // we don't want the greyscale line!
+            setColourLine(colourData[lineCount + 1], lineCount, 1); // we don't want the greyscale line!
             ++ lineCount;
         }
         return true;} {}
@@ -1508,7 +1506,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         }
 
         nextPos = colourText.find(char(10));
-        if (!setGreyScale(colourText.substr(0, nextPos)))
+        int scaletype = setGreyScale(colourText.substr(0, nextPos));
+        if (scaletype == 0)
         {
             return totalCount;
         }
@@ -1537,7 +1536,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             else
             {
-                ok = setColourLine(colourText.substr(0, nextPos), lineCount);
+                ok = setColourLine(colourText.substr(0, nextPos), lineCount, scaletype);
             }
 
             if (!ok)
@@ -1559,7 +1558,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         return -1;
         ;} {}
   }
-  Function {setGreyScale(string text)} {return_type bool
+  Function {setGreyScale(string text)} {return_type int
   } {
     code {//
         size_t nextPos = text.find(",");
@@ -1576,27 +1575,29 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         int min = string2int(text.substr(0, nextPos));
         if (min < 0 || min > 255)
         {
-            return false;
+            return 0;
         }
 
         text = text.substr(nextPos + 1);
         nextPos = text.find(",");
         if (nextPos == std::string::npos)
         {
-            return false;
+            return 0;
         }
 
         if (!isdigit(text.at(0)))
         {
-            return false;
+            return 0;
         }
 
         int max = string2int(text.substr(0, nextPos));
         if (max < 0 || max > 255)
         {
-            return false;
+            return 0;
         }
 
+        if (min == 127 && max == 127)
+            return 2; // this sets a totally grey colourmap - useful for testing
         float greyRange;
         if (max > min)
         {
@@ -1616,10 +1617,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                Fl::set_color(i + 32, diff, diff, diff);
            }
        }
-  return true;
+  return 1;
   ;} {}
   }
-  Function {setColourLine(string text, int item)} {return_type bool
+  Function {setColourLine(string text, int item, int type)} {return_type bool
   } {
     code {//
         size_t nextPos = text.find(",");
@@ -1655,7 +1656,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         int blue = string2int(text); // don't need comma test here
         if (blue < 0 || blue > 255)
             return false;
-
+        if (type == 2)
+        {
+            int grey = (red+green+blue)/3;
+            red = green = blue = grey;
+        }
         Fl::set_color(colourNumbers[item], red, green, blue);
         return true;
         ;} {}
@@ -1687,7 +1692,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {recoverID()} {return_type int
   } {
-    code {//
+    code {// No longer using this. Why not?
             if (selectedRootID >= 0)
             {
                 return selectedRootID;

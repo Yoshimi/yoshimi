@@ -34,7 +34,7 @@ namespace { // constants used in the implementation
         "Copyright 2002-2009 Nasca Octavian Paul and others, "
         "Copyright 2009-2011 Alan Calvert, "
         "Copyright 2012-2013 Jeremy Jongepier and others, "
-        "Copyright 2014-2021 Will Godfrey and others";
+        "Copyright 2014-2023 Will Godfrey and others";
 
     string stateText = "load saved state, defaults to '$HOME/" + EXTEN::config + "/yoshimi/yoshimi-0.state'";
 

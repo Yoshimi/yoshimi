@@ -1,4 +1,4 @@
-.TH yoshimi 1 " 2023" "yoshimi 2.2.3"
+.TH yoshimi 1 " 2023" "yoshimi 2.3.0"
 .SH NAME
 yoshimi \- a software music synthesiser
 .SH SYNOPSIS
@@ -20,7 +20,9 @@ Another addition is the ability to load a list of MIDI-learned settings from the
 .PP
 Recent improvements are key and channel aftertouch, fully resizable windows, MIDI sync for LFOs and Panning extensions. Also,inclusion of MIDI-sync for all LFOs, and all relevant Effects.
 .PP
-The latest development a comprehensive revision of the PadSynth engine, with additional morphing of the wavetables. There is also support for Undo/Redo.
+Another recent development was a comprehensive revision of the PadSynth engine, with additional morphing of the wavetables. There is also support for Undo/Redo.
+.PP
+The latest developments are backward commpatible high resoluting controls for significant areas and a comprehensive theme management system enabling user defined GUI colour choices.
 .SH COMMANDS
 .TP
 .BR \-? ", " \-\-help " Shows command syntax."
@@ -53,7 +55,7 @@ Attempting 'c' and 'i' will produce a warning, and although it is possible to ru
 .TP
 .BR \-l ", " \-\-load=<file> " Load .xmz patch set."
 .TP
-.BR \-L ", " \-\-load-instrument=<file> " Load .xiz instrument file."
+.BR \-L ", " \-\-load-instrument=<file>[@part] " Load .xiz instrument file (no space)@n to given part".
 .TP
 .BR \-M ", " \-\-load-midilearn=<file> " Load .xly learned list file."
 .TP

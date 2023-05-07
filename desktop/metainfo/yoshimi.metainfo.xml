@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2016-2022 Yoshimi project <willgodfrey@musically.me.uk> -->
+<!-- Copyright 2016-2023 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop-application">
   <id>net.sourceforge.projects.yoshimi.desktop</id>
   <metadata_license>CC-BY-4.0</metadata_license>
@@ -7,7 +7,8 @@
   <content_rating type="oars-1.1" />
   <name>Yoshimi</name>
   <summary>A Software Synthesizer for Linux</summary>
-  <icon>https://a.fsdn.com/allura/p/yoshimi/icon</icon>
+  <icon type="remote" width="64" height="64">https://a.fsdn.com/allura/p/yoshimi/icon</icon>
+  <icon type="local" width="64" height="64">/usr/share/pixmaps/yoshimi.png</icon>
   <description>
     <p>
     Yoshimi is a MIDI software synthesizer for Linux. It synthesizes in real time, can run polyphonic and/or monophonic in multiple simultaneous patches in one or more MIDI channels and has broad microtonal capability. It includes extensive additive, subtractive, and PAD synth capabilities which can be run simultaneously within the same patch. It also has comprehensive effects capabilities.
@@ -27,9 +28,14 @@
     <p>
     Version 2.2.0 sees a major revision of the PadSynth engine allowing significant morphing of the wavetables in real-time.
     </p>
+    <p>
+    Version 2.3.0 has backward compatible high resolution controls where relevant and comprehensive GUI theme management enabling user defined colours.
+    </p>
   </description>
+   <launchable type="desktop-id">yoshimi.desktop</launchable>
+
   <releases>
-​    <release type="stable" version="2.2.3" date="2023-2-13" />
+​    <release type="stable" version="2.3.0" date="2023-5-6" />
 ​  </releases>
   <provides>
     <binary>yoshimi</binary>

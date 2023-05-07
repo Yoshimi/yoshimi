@@ -602,8 +602,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
               label Freq
               callback {//
             int val = lrint(o->value());
+            if (Fl::event_button() == 3)
+            {
+                val = formFreqDef;
+                o->value(val);
+            }
 
-            o->selection_color(setKnob(val,formFreqDef)); // has no default
+            o->selection_color(setKnob(val,formFreqDef)); // has pseudo default
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, val, TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               class WidgetPDial
