@@ -51,16 +51,16 @@ class EnvelopeParams : public Presets
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
-        float getdt(float i);
+        float getdt(size_t i);
 
         // MIDI Parameters
-        unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
-        unsigned char Penvpoints;
-        float Penvsustain; // 127 pentru dezactivat
+        unsigned char Pfreemode;       // 1 if it is in free mode or 0 if it is in ADSR or ASR mode (comment from original author)
+        size_t Penvpoints;             // stays < MAX_ENVELOPE_POINTS
+        size_t Penvsustain;            // 0 means disabled  -- see Envelope::envout()
         float Penvdt[MAX_ENVELOPE_POINTS];
         float Penvval[MAX_ENVELOPE_POINTS];
-        unsigned char Penvstretch; // 64=normal stretch (piano-like), 0=no stretch
-        unsigned char Pforcedrelease; // 0 - OFF, 1 - ON
+        unsigned char Penvstretch;     // 64=normal stretch (piano-like), 0=no stretch
+        unsigned char Pforcedrelease;  // 0 - OFF, 1 - ON
         unsigned char Plinearenvelope; // if the amplitude envelope is linear
 
         float PA_dt, PD_dt, PR_dt,

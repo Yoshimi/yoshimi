@@ -42,7 +42,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq_, SynthEngine *_synth
     envpoints = envpars->Penvpoints;
     if (envpoints > MAX_ENVELOPE_POINTS)
         envpoints = MAX_ENVELOPE_POINTS;
-    envsustain = (envpars->Penvsustain == 0) ? -1 : envpars->Penvsustain;
+    envsustain =  envpars->Penvsustain;
     forcedrelase = envpars->Pforcedrelease;
     linearenvelope = envpars->Plinearenvelope;
 
@@ -133,7 +133,7 @@ float Envelope::envout(void)
 
     if (keyreleased && forcedrelase)
     {   // do the forced release
-        int tmp = (envsustain < 0) ? (envpoints - 1) : (envsustain + 1);
+        size_t tmp = (envsustain == 0) ? (envpoints - 1) : (envsustain + 1);
         // if there is no sustain point, use the last point for release
 
         float envdt = bufferdt * 1000.0f / (_envpars->getdt(tmp) * envstretch);
@@ -151,7 +151,7 @@ float Envelope::envout(void)
             currentpoint = envsustain + 2;
             forcedrelase = 0;
             t = 0.0f;
-            if (currentpoint >= envpoints || envsustain < 0)
+            if (currentpoint >= envpoints || envsustain == 0)
                 envfinish = 1;
         }
         return out;

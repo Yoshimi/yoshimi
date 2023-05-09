@@ -66,9 +66,9 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
 }
 
 
-float EnvelopeParams::getdt(float i)
+float EnvelopeParams::getdt(size_t i)
 {
-    float result = (power<2>(Penvdt[(int)i] / 127.0f * 12.0f) - 1.0f) * 10.0f; // milliseconds
+    float result = (power<2>(Penvdt[i] / 127.0f * 12.0f) - 1.0f) * 10.0f; // milliseconds
     return result;
 }
 
@@ -228,11 +228,11 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
 
     if ((Pfreemode!=0)||(!xml->minimal))
     {
-        for (int i=0;i<Penvpoints;i++)
+        for (size_t i=0; i<Penvpoints; ++i)
         {
             xml->beginbranch("POINT",i);
-            if (i!=0) xml->addpar("dt",Penvdt[i]);
-            xml->addpar("val",Penvval[i]);
+            if (i > 0) xml->addparcombi("dt",Penvdt[i]);
+            xml->addparcombi("val",Penvval[i]);
             xml->endbranch();
         }
     }
@@ -256,11 +256,11 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
     PS_val=xml->getparcombi("S_val",PS_val,0,127);
     PR_val=xml->getparcombi("R_val",PR_val,0,127);
 
-    for (int i=0;i<Penvpoints;i++)
+    for (size_t i=0;i<Penvpoints;i++)
     {
         if (xml->enterbranch("POINT",i)==0) continue;
-        if (i!=0) Penvdt[i]=xml->getpar127("dt",Penvdt[i]);
-        Penvval[i]=xml->getpar127("val",Penvval[i]);
+        if (i > 0) Penvdt[i]=xml->getparcombi("dt",Penvdt[i], 0,127);
+        Penvval[i]=xml->getparcombi("val",Penvval[i], 0,127);
         xml->exitbranch();
     }
 
