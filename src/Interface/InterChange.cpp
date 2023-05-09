@@ -6580,7 +6580,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
         //return; // only of interest to the GUI
 
 
-    int envpoints = pars->Penvpoints;
+    size_t envpoints = pars->Penvpoints;
 
     if (pars->Pfreemode)
     {
@@ -6614,7 +6614,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 else if (getData->data.control == ENVELOPEINSERT::control::sustainPoint)
                 {
                     if (write)
-                        pars->Penvsustain = val;
+                        pars->Penvsustain = val<0? 0 : val;
                     else
                         val = pars->Penvsustain;
                 }
@@ -6728,7 +6728,7 @@ void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
     unsigned char Xincrement = getData->data.offset;
     float val = getData->data.value;
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    int envpoints = pars->Penvpoints;
+    size_t envpoints = pars->Penvpoints;
 
 
         if (!write || point == 0 || point >= envpoints)
@@ -6746,7 +6746,8 @@ void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
                     addFixed2undo(getData);
 
                 pars->Penvpoints += 1;
-                for (int i = envpoints; i >= point; -- i)
+                assert (0 < point && point < envpoints);
+                for (size_t i = envpoints; i >= point; -- i)
                 {
                     pars->Penvdt[i + 1] = pars->Penvdt[i];
                     pars->Penvval[i + 1] = pars->Penvval[i];
@@ -6779,8 +6780,10 @@ void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
         }
         else
         {
+            assert (0 < point && point < envpoints);
+            assert (3 < envpoints);
             envpoints -= 1;
-            for (int i = point; i < envpoints; ++ i)
+            for (size_t i = point; i < envpoints; ++ i)
             {
                 pars->Penvdt[i] = pars->Penvdt[i + 1];
                 pars->Penvval[i] = pars->Penvval[i + 1];
@@ -6801,7 +6804,7 @@ void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *par
     unsigned char Xincrement = getData->data.offset;
     float val = getData->data.value;
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    int envpoints = pars->Penvpoints;
+    size_t envpoints = pars->Penvpoints;
 
         if (!write || point == 0 || point >= envpoints)
         {
@@ -6815,7 +6818,7 @@ void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *par
             if (envpoints < MAX_ENVELOPE_POINTS)
             {
                 pars->Penvpoints += 1;
-                for (int i = envpoints; i >= point; -- i)
+                for (size_t i = envpoints; i >= point; -- i)
                 {
                     pars->Penvdt[i + 1] = pars->Penvdt[i];
                     pars->Penvval[i + 1] = pars->Penvval[i];
@@ -6856,8 +6859,10 @@ void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *par
                 getData->data.value = pars->Penvval[point];
                 addFixed2undo(getData);
             }
+            assert (0 < point && point < envpoints);
+            assert (3 < envpoints);
             envpoints -= 1;
-            for (int i = point; i < envpoints; ++ i)
+            for (size_t i = point; i < envpoints; ++ i)
             {
                 pars->Penvdt[i] = pars->Penvdt[i + 1];
                 pars->Penvval[i] = pars->Penvval[i + 1];
@@ -6877,7 +6882,7 @@ void InterChange::envelopePointChange(CommandBlock *getData, EnvelopeParams *par
     unsigned char Xincrement = getData->data.offset;
     float val = getData->data.value;
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    int envpoints = pars->Penvpoints;
+    size_t envpoints = pars->Penvpoints;
 
     if (point >= envpoints)
     {

@@ -415,7 +415,7 @@ void XMLwrapper::addparcombi(const std::string& name, float val)
     char buf[11];
     convert.in = val;
     sprintf(buf, "0x%8X", convert.out);
-    addparams3("par", "name", name.c_str(), "value", asString(lrint(val)), "exact_value", buf);
+    addparams3("par", "name", name.c_str(), "value", asString(lrintf(val)), "exact_value", buf);
 }
 
 

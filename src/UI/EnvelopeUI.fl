@@ -95,17 +95,17 @@ pair=NULL;} {}
   Function {setpair(Fl_Box *pair_)} {} {
     code {pair = pair_;} {}
   }
-  Function {getpointx(int n)} {return_type int
+  Function {getpointx(size_t n)} {return_type int
   } {
     code {//
     int lx = w()-10;
-    int npoints = env->Penvpoints;
+    size_t npoints = env->Penvpoints;
     float sum=0;
-    for (int i = 1; i < npoints; i++)
+    for (size_t i = 1; i < npoints; i++)
         sum += (env->getdt(i) + 1);
 
     float sumbefore = 0; // the sum of all points before the computed point
-    for (int i = 1; i <= n; i++)
+    for (size_t i = 1; i <= n; i++)
         sumbefore += (env->getdt(i) + 1);
 
     return((int) (sumbefore / (float) sum * lx));} {}
@@ -116,17 +116,17 @@ pair=NULL;} {}
 
 return((int) ((1.0 - env->Penvval[n] / 127.0) * ly));} {}
   }
-  Function {getnearest(int x,int y)} {return_type int
+  Function {getnearest(int x,int y)} {return_type size_t
   } {
     code {//
     x -= 5;
     y -= 5;
 
-int nearestpoint = 0;
-int nearestval = 1000000; // a big value
-for (int i = 0; i < env->Penvpoints; i++)
+size_t nearestpoint = 0;
+size_t nearestval = 1000000; // a big value
+for (size_t i = 0; i < env->Penvpoints; i++)
 {
-   int distance = abs(x - getpointx(i)) + abs(y - getpointy(i));
+   size_t distance = abs(x - getpointx(i)) + abs(y - getpointy(i));
    if (distance < nearestval)
    {
      nearestpoint = i;
@@ -146,7 +146,7 @@ return(nearestpoint);} {}
     int ly = h();
     if (env->Pfreemode==0)
         env->converttofree();
-    int npoints=env->Penvpoints;
+    size_t npoints=env->Penvpoints;
 
     if (active_r())
         fl_color(graph_back);
@@ -173,13 +173,13 @@ return(nearestpoint);} {}
     int yy = getpointy(0);
     fl_color(env_ctl);
     fl_rectf(ox - 3, oy + yy - 3, 6, 6);
-    for (int i = 1; i < npoints; i++)
+    for (size_t i = 1; i < npoints; i++)
     {
         oldxx = xx;
         oldyy = yy;
         xx = getpointx(i);
         yy = getpointy(i);
-        if (i == currentpoint)
+        if (int(i) == currentpoint)
             fl_color(env_line_sel);
         else
             fl_color(env_line);
@@ -211,7 +211,7 @@ return(nearestpoint);} {}
     if (currentpoint <= 0)
     {
         fl_color(env_ctl);
-        for (int i = 1; i < npoints; i++)
+        for (size_t i = 1; i < npoints; i++)
             time += env->getdt(i);
     }
     else
@@ -414,7 +414,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         int curpoint = freeedit->lastpoint;
         if (curpoint < 1)
             return;
-        if (curpoint >= env->Penvpoints-1)
+        if (curpoint >= int(env->Penvpoints-1))
             return;
         if (env->Penvpoints <= 3)
             return;
