@@ -33,7 +33,7 @@ using func::asDecibel;
 using func::power;
 
 
-FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
+FilterParams::FilterParams(unsigned char Ptype_, float Pfreq_, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
     Presets(_synth),
     changed(false),
     Dtype(Ptype_),
@@ -279,10 +279,10 @@ void FilterParams::add2XMLsection(XMLwrapper *xml,int n)
     for (int nformant = 0; nformant < FF_MAX_FORMANTS; ++nformant)
     {
         xml->beginbranch("FORMANT",nformant);
-        xml->addpar("first_freq",Pvowels[nvowel].formants[nformant].firstF);
-        xml->addpar("freq",Pvowels[nvowel].formants[nformant].freq);
-        xml->addpar("amp",Pvowels[nvowel].formants[nformant].amp);
-        xml->addpar("q",Pvowels[nvowel].formants[nformant].q);
+        xml->addparcombi("first_freq",Pvowels[nvowel].formants[nformant].firstF);
+        xml->addparcombi("freq",Pvowels[nvowel].formants[nformant].freq);
+        xml->addparcombi("amp",Pvowels[nvowel].formants[nformant].amp);
+        xml->addparcombi("q",Pvowels[nvowel].formants[nformant].q);
         xml->endbranch();
     }
 }
@@ -293,20 +293,20 @@ void FilterParams::add2XML(XMLwrapper *xml)
     //filter parameters
     xml->addpar("category",Pcategory);
     xml->addpar("type",Ptype);
-    xml->addpar("freq",Pfreq);
-    xml->addpar("q",Pq);
+    xml->addparcombi("freq",Pfreq);
+    xml->addparcombi("q",Pq);
     xml->addpar("stages",Pstages);
-    xml->addpar("freq_track",Pfreqtrack);
+    xml->addparcombi("freq_track",Pfreqtrack);
     xml->addparbool("freqtrackoffset",Pfreqtrackoffset);
-    xml->addpar("gain",Pgain);
+    xml->addparcombi("gain",Pgain);
 
     //formant filter parameters
     if ((Pcategory==1)||(!xml->minimal))
     {
         xml->beginbranch("FORMANT_FILTER");
         xml->addpar("num_formants",Pnumformants);
-        xml->addpar("formant_slowness",Pformantslowness);
-        xml->addpar("vowel_clearness",Pvowelclearness);
+        xml->addparcombi("formant_slowness",Pformantslowness);
+        xml->addparcombi("vowel_clearness",Pvowelclearness);
         xml->addpar("center_freq",Pcenterfreq);
         xml->addpar("octaves_freq",Poctavesfreq);
         for (int nvowel=0;nvowel<FF_MAX_VOWELS;nvowel++)
@@ -316,7 +316,7 @@ void FilterParams::add2XML(XMLwrapper *xml)
             xml->endbranch();
         }
         xml->addpar("sequence_size",Psequencesize);
-        xml->addpar("sequence_stretch",Psequencestretch);
+        xml->addparcombi("sequence_stretch",Psequencestretch);
         xml->addparbool("sequence_reversed",Psequencereversed);
         for (int nseq=0;nseq<FF_MAX_SEQUENCE;nseq++)
         {
@@ -337,13 +337,13 @@ void FilterParams::getfromXMLsection(XMLwrapper *xml,int n)
         if (xml->enterbranch("FORMANT",nformant) == 0)
             continue;
         Pvowels[nvowel].formants[nformant].firstF =
-            xml->getpar127("first_freq",Pvowels[nvowel].formants[nformant].firstF);
+            xml->getparcombi("first_freq",Pvowels[nvowel].formants[nformant].firstF,FILTDEF::formFreq.min,FILTDEF::formFreq.max);
         Pvowels[nvowel].formants[nformant].freq =
-            xml->getpar127("freq",Pvowels[nvowel].formants[nformant].freq);
+            xml->getparcombi("freq",Pvowels[nvowel].formants[nformant].freq,FILTDEF::formFreq.min,FILTDEF::formFreq.max);
         Pvowels[nvowel].formants[nformant].amp =
-            xml->getpar127("amp",Pvowels[nvowel].formants[nformant].amp);
+            xml->getparcombi("amp",Pvowels[nvowel].formants[nformant].amp,FILTDEF::formAmp.min,FILTDEF::formAmp.max);
         Pvowels[nvowel].formants[nformant].q =
-            xml->getpar127("q",Pvowels[nvowel].formants[nformant].q);
+            xml->getparcombi("q",Pvowels[nvowel].formants[nformant].q,FILTDEF::formQ.min,FILTDEF::formQ.max);
         xml->exitbranch();
     }
 }
@@ -354,19 +354,19 @@ void FilterParams::getfromXML(XMLwrapper *xml)
     // filter parameters
     Pcategory = xml->getpar127("category",Pcategory);
     Ptype = xml->getpar127("type",Ptype);
-    Pfreq = xml->getpar127("freq",Pfreq);
-    Pq = xml->getpar127("q",Pq);
+    Pfreq = xml->getparcombi("freq",Pfreq,FILTDEF::addFreq.min,FILTDEF::addFreq.max);
+    Pq = xml->getparcombi("q",Pq,FILTDEF::qVal.min,FILTDEF::qVal.max);
     Pstages = xml->getpar127("stages",Pstages);
-    Pfreqtrack = xml->getpar127("freq_track",Pfreqtrack);
+    Pfreqtrack = xml->getparcombi("freq_track",Pfreqtrack,FILTDEF::freqTrack.min,FILTDEF::freqTrack.max);
     Pfreqtrackoffset = xml->getparbool("freqtrackoffset", Pfreqtrackoffset);
-    Pgain = xml->getpar127("gain",Pgain);
+    Pgain = xml->getparcombi("gain",Pgain,FILTDEF::gain.min,FILTDEF::gain.max);
 
     // formant filter parameters
     if (xml->enterbranch("FORMANT_FILTER"))
     {
         Pnumformants = xml->getpar127("num_formants",Pnumformants);
-        Pformantslowness = xml->getpar127("formant_slowness",Pformantslowness);
-        Pvowelclearness = xml->getpar127("vowel_clearness",Pvowelclearness);
+        Pformantslowness = xml->getparcombi("formant_slowness",Pformantslowness,FILTDEF::formSpeed.min,FILTDEF::formSpeed.max);
+        Pvowelclearness = xml->getparcombi("vowel_clearness",Pvowelclearness,FILTDEF::formClear.min,FILTDEF::formClear.max);
         Pcenterfreq = xml->getpar127("center_freq",Pcenterfreq);
         Poctavesfreq = xml->getpar127("octaves_freq",Poctavesfreq);
 
@@ -378,7 +378,7 @@ void FilterParams::getfromXML(XMLwrapper *xml)
             xml->exitbranch();
         }
         Psequencesize = xml->getpar127("sequence_size",Psequencesize);
-        Psequencestretch = xml->getpar127("sequence_stretch",Psequencestretch);
+        Psequencestretch = xml->getparcombi("sequence_stretch",Psequencestretch,FILTDEF::formStretch.min,FILTDEF::formStretch.max);
         Psequencereversed = xml->getparbool("sequence_reversed",Psequencereversed);
         for (int nseq = 0; nseq < FF_MAX_SEQUENCE;nseq++)
         {
@@ -407,7 +407,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
     float def = 64;
-    type |= TOPLEVEL::type::Integer;
+    //type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
@@ -422,6 +422,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
                 def = FILTDEF::voiceFreq.def;
             else
                 def = FILTDEF::padFreq.def;
+            type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::Q:
             if (engine >= PART::engine::addVoice1)
@@ -430,6 +431,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
                 def = FILTDEF::dynQval.def;
             else
                 def = FILTDEF::qVal.def;
+            type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::frequencyTracking:
             def = FILTDEF::freqTrack.def;
@@ -483,10 +485,12 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         case FILTERINSERT::control::formantFrequency:
             if (request == TOPLEVEL::type::Default)
                 type |= TOPLEVEL::type::Error;
-            // it's random so inhibit default
+            // it's random so inhibit default *** change this!
+            type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::formantQ:
             def = FILTDEF::formQ.def;
+            type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::formantAmplitude:
             def = FILTDEF::formAmp.def;
@@ -496,6 +500,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             break;
         case FILTERINSERT::control::formantCenter:
             def = FILTDEF::formCentre.def;
+            type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::formantOctave:
             def = FILTDEF::formOctave.def;

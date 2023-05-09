@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018 - 2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -22,7 +22,6 @@
 
     This file is a derivative of a ZynAddSubFX original.
 
-    Modified July 2018
 */
 
 #ifndef FILTER_PARAMS_H
@@ -43,7 +42,7 @@ class SynthEngine;
 class FilterParams : public Presets
 {
     public:
-        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
+        FilterParams(unsigned char Ptype_, float Pfreq, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
         ~FilterParams() { }
 
         void add2XML(XMLwrapper *xml);
@@ -67,38 +66,38 @@ class FilterParams : public Presets
 
         void formantfilterH(int nvowel, int nfreqs, float *freqs); // used by UI
 
-        float getformantfreq(unsigned char freq) // Transforms a parameter to
+        float getformantfreq(float freq) // Transforms a parameter to
             { return getfreqx(freq / 127.0f); }  // the real value
-        float getformantamp(unsigned char amp)
+        float getformantamp(float amp)
             { return decibel<-80>(1.0f - amp / 127.0f); }
-        float getformantq(unsigned char q)
+        float getformantq(float q)
             { return power<25>((q - 32.0f) / 64.0f); }
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)
-        unsigned char Pfreq;      // Frequency (64-central frequency)
-        unsigned char Pq;         // Q parameters (resonance or bandwidth)
+        float Pfreq;              // Frequency (64-central frequency)
+        float Pq;                 // Q parameters (resonance or bandwidth)
         unsigned char Pstages;    // filter stages+1
-        unsigned char Pfreqtrack; // how the filter frequency is changing
+        float Pfreqtrack;         // how the filter frequency is changing
                                   // according the note frequency
         unsigned char Pfreqtrackoffset;  // Shift range for freq tracking
-        unsigned char Pgain;      // filter's output gain
+        float Pgain;      // filter's output gain
 
         // Formant filter parameters
         unsigned char Pnumformants;     // how many formants are used
         unsigned char Pformantslowness; // how slow varies the formants
         unsigned char Pvowelclearness;  // how vowels are kept clean (how much try
                                         // to avoid "mixed" vowels)
-        unsigned char Pcenterfreq,Poctavesfreq; // the centre frequency of the res.
-                                                // func., and the number of octaves
+        unsigned char Pcenterfreq;      // the centre frequency of the res. func.
+        unsigned char Poctavesfreq;     // the number of octaves
         struct {
             struct {
-                unsigned char firstF, freq, amp, q; // frequency,amplitude,Q
+                float firstF, freq, amp, q; // frequency,amplitude,Q
             } formants[FF_MAX_FORMANTS];
         } Pvowels[FF_MAX_VOWELS];
 
         unsigned char Psequencesize;     // how many vowels are in the sequence
-        unsigned char Psequencestretch;  // how the sequence is stretched (how
+        float Psequencestretch;  // how the sequence is stretched (how
                                          // the input from filter envelopes/LFOs/etc.
                                          // is "stretched")
         unsigned char Psequencereversed; // if the input from filter envelopes/LFOs/etc.
@@ -114,8 +113,8 @@ class FilterParams : public Presets
 
         // stored default parameters
         unsigned char Dtype;
-        unsigned char Dfreq;
-        unsigned char Dq;
+        float Dfreq;
+        float Dq;
         unsigned char Dfreqtrackoffset;
 };
 
@@ -133,27 +132,27 @@ struct FILTminmax{
     bool integer;
 };
 namespace FILTDEF{
-    const FILTminmax addFreq {0,127,94,true,true};
-    const FILTminmax voiceFreq {0,127,50,true,true};
-    const FILTminmax subFreq {0,127,80,true,true};
-    const FILTminmax padFreq {0,127,94,true,true};
-    const FILTminmax dynFreq {0,127,45,true,true};
-    const FILTminmax qVal {0,127,40,true,true};
-        const FILTminmax voiceQval {0,127,60,true,true};
-        const FILTminmax dynQval {0,127,64,true,true};
-    const FILTminmax velSense {0,127,64,true,true};
-        const FILTminmax voiceVelSense {0,127,0,true,true};
+    const FILTminmax addFreq {0,127,94,true,false};
+    const FILTminmax voiceFreq {0,127,50,true,false};
+    const FILTminmax subFreq {0,127,80,true,false};
+    const FILTminmax padFreq {0,127,94,true,false};
+    const FILTminmax dynFreq {0,127,45,true,false};
+    const FILTminmax qVal {0,127,40,true,false};
+        const FILTminmax voiceQval {0,127,60,true,false};
+        const FILTminmax dynQval {0,127,64,true,false};
+    const FILTminmax velSense {0,127,64,true,false};
+        const FILTminmax voiceVelSense {0,127,0,true,false};
     const FILTminmax velFuncSense {0,127,64,true,true};
-    const FILTminmax gain {0,127,64,true,true};
+    const FILTminmax gain {0,127,64,true,false};
     const FILTminmax freqTrack {0,127,64,true,true};
 
     const FILTminmax formCount {1,FF_MAX_FORMANTS,3,false,true};
-    const FILTminmax formSpeed {0,127,64,true,true};
-    const FILTminmax formClear {0,127,64,true,true};
-    const FILTminmax formFreq {0,127,-1,true,true}; // no default value
-    const FILTminmax formQ {0,127,64,true,true};
-    const FILTminmax formAmp {0,127,127,true,true};
-    const FILTminmax formStretch {0,127,40,true,true};
+    const FILTminmax formSpeed {0,127,64,true,false};
+    const FILTminmax formClear {0,127,64,true,false};
+    const FILTminmax formFreq {0,127,-1,true,false}; // pseudo default value
+    const FILTminmax formQ {0,127,64,true,false};
+    const FILTminmax formAmp {0,127,127,true,false};
+    const FILTminmax formStretch {0,127,40,true,false};
     const FILTminmax formCentre {0,127,64,true,true};
     const FILTminmax formOctave {0,127,64,true,true};
     const FILTminmax formVowel {1,FF_MAX_SEQUENCE,1,false,true};

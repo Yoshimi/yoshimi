@@ -1,4 +1,14 @@
-yoshimi 2.3.0 rc1
+yoshimi 2.3.0 rc2
+
+2023-5-9 Will
+bn 2224
+BugFix: Slider not retuning to default on right mose click
+    directly over the peg.
+Added greyscale tint to themes.
+Adjusted knob and slider colours for better contrast.
+Changed some filter controls to floats and new combi storage.
+Knowb show correct colours when loading instruments.
+Merged in envelope adjustments from Hermann.
 
 2023-5-7 Will
 bn 2223

@@ -133,7 +133,8 @@ int mwheel_val_slider::_handle(int res, int event)
     }
     case FL_PUSH:
         Fl::belowmouse(this);
-        //do_callback(); // this caused two calls to be made!
+        if (Fl::event_button() == 3)
+            do_callback(); // this causes two calls with other buttons
         res = 1;
         break;
     }

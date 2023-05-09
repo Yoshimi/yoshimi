@@ -440,8 +440,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial cfreqdial {
           label { C.Freq}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::centerFrequency, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::centerFrequency, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->value(pars->Pfreq);}
           code1 {o->setValueType(getFilterFreqType(filtertype->value()));}
           class WidgetPDial
@@ -449,8 +449,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial qdial {
           label Q
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1 deactivate
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 deactivate
           code0 {o->value(pars->Pq);}
           code1 {updateVCforQ();}
           code2 {if (filtertype->value() == TOPLEVEL::filter::Low1 && analogfiltertypechoice->value() < TOPLEVEL::filter::Low2) o->deactivate(); else o->activate();}
@@ -459,24 +459,24 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial freqtrdial {
           label {Freq.tr.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::frequencyTracking, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code1 {o->value(pars->Pfreqtrack);}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
           label {V.Sns.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocitySensitivity, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
           label { VF.Sns.}
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::velocityCurve, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_FilterVelocitySense);}
           code1 {o->setGraphicsType(VC_FilterVelocitySense);}
           class WidgetPDial
@@ -484,8 +484,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial gaindial {
           label Gain
           callback {//
-          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::gain, o->value(), TOPLEVEL::type::Write);}
+          tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->value(pars->Pgain);}
           code1 {o->setValueType(VC_FilterGain);}
           class WidgetPDial
@@ -601,7 +601,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             Fl_Dial formant_freq_dial {
               label Freq
               callback {//
-            int val = lrint(o->value());
+            float val = o->value();
             if (Fl::event_button() == 3)
             {
                 val = formFreqDef;
@@ -610,13 +610,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
             o->selection_color(setKnob(val,formFreqDef)); // has pseudo default
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, val, TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
               class WidgetPDial
             }
             Fl_Dial formant_q_dial {
               label Q
               callback {//
-            int val = lrint(o->value());
+            float val = o->value();
             if (Fl::event_button() == 3)
             {
                 val = FILTDEF::formQ.def;
@@ -624,13 +624,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             }
             o->selection_color(setKnob(val,FILTDEF::formQ.def));
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantQ, val, TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
               class WidgetPDial
             }
             Fl_Dial formant_amp_dial {
               label Amp
               callback {//
-            int val = lrint(o->value());
+            float val = o->value();
             if (Fl::event_button() == 3)
             {
                 val = FILTDEF::formAmp.def;
@@ -638,7 +638,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             }
             o->selection_color(setKnob(val,FILTDEF::formAmp.def));
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantAmplitude, val, TOPLEVEL::type::Write, nformant, nvowel);}
-              tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
               class WidgetPDial
             }
           }
@@ -697,7 +697,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           Fl_Dial strchdial {
             label Stretch
             callback {//
-          int val = lrint(o->value());
+          float val = o->value();
           if (Fl::event_button() == 3)
           {
               val = FILTDEF::formStretch.def;
@@ -706,7 +706,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
           o->selection_color(setKnob(val,FILTDEF::formStretch.def));
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantStretch,val, TOPLEVEL::type::Write);}
-            tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 5 maximum 127 step 1
+            tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 5 maximum 127
             code0 {o->value(pars->Psequencestretch);}
             code1 {o->setValueType(VC_FormFilterStretch);}
             class WidgetPDial
@@ -730,7 +730,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial frsldial {
           label {Fr.Sl.}
           callback {//
-        int val = lrint(o->value());
+        float val = o->value();
         if (Fl::event_button() == 3)
         {
             val = FILTDEF::formSpeed.def;
@@ -739,7 +739,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         o->selection_color(setKnob(val,FILTDEF::formSpeed.def));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantSlowness, val, TOPLEVEL::type::Write);}
-          tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
+          tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127
           code0 {o->value(pars->Pformantslowness);}
           code1 {o->setValueType(VC_FormFilterSlowness);}
           class WidgetPDial
@@ -783,7 +783,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial wvknob {
           label {Vw.Cl.}
           callback {//
-        int val = lrint(o->value());
+        float val = o->value();
         if (Fl::event_button() == 3)
         {
             val = FILTDEF::formClear.def;
@@ -792,7 +792,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         o->selection_color(setKnob(val,FILTDEF::formClear.def));
         send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantClearness, val, TOPLEVEL::type::Write);}
-          tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
+          tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127
           code0 {o->value(pars->Pvowelclearness);}
           code1 {o->setValueType(VC_FormFilterClearness);}
           code2 {o->setGraphicsType(VC_FormFilterClearness);}
@@ -919,6 +919,44 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                 break;
             }
         }
+
+        if (kititem == EFFECT::type::dynFilter)
+        {
+            cfreqdial->selection_color(setKnob(cfreqdial->value(),FILTDEF::dynFreq.def));
+            qdial->selection_color(setKnob(qdial->value(),FILTDEF::dynQval.def));
+        }
+        else
+        {    if (engine == PART::engine::addSynth)
+                cfreqdial->selection_color(setKnob(cfreqdial->value(),FILTDEF::addFreq.def));
+            if (engine >= PART::engine::addVoice1)
+                qdial->selection_color(setKnob(qdial->value(),FILTDEF::voiceQval.def));
+            else
+                qdial->selection_color(setKnob(qdial->value(),FILTDEF::qVal.def));
+        }
+
+        freqtrdial->selection_color(setKnob(freqtrdial->value(),FILTDEF::freqTrack.def));
+
+        if (engine >= PART::engine::addVoice1)
+            vsnsadial->selection_color(setKnob(vsnsadial->value(),FILTDEF::voiceVelSense.def));
+        else
+            vsnsadial->selection_color(setKnob(vsnsadial->value(),FILTDEF::velSense.def));
+
+        vsnsdial->selection_color(setKnob(vsnsdial->value(),FILTDEF::velFuncSense.def));
+
+        gaindial->selection_color(setKnob(gaindial->value(),FILTDEF::gain.def));
+
+        frsldial->selection_color(setKnob(frsldial->value(),FILTDEF::formSpeed.def));
+
+        wvknob->selection_color(setKnob(wvknob->value(),FILTDEF::formClear.def));
+
+        //formant_freq_dial->selection_color(setKnob(value,formFreqDef))
+
+        formant_q_dial->selection_color(setKnob(formant_q_dial->value(),FILTDEF::formQ.def));
+
+        formant_amp_dial->selection_color(setKnob(formant_amp_dial->value(),FILTDEF::formAmp.def));
+
+        strchdial->selection_color(setKnob(strchdial->value(),FILTDEF::formStretch.def));
+
         filterparamswindow->redraw();} {}
   }
   Function {filterRtext(float dScale)} {} {
@@ -1039,7 +1077,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
     bool isCurrent =  (param == nformant && offset == nvowel);
 
-    int value_int = lrint(value);
+    int value_int = lrintf(value);
 
     bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
 
@@ -1095,7 +1133,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
 
         case FILTERINSERT::control::frequencyTracking:
-            freqtrdial->value(value_int);
+            freqtrdial->value(value);
             freqtrdial->selection_color(setKnob(value,FILTDEF::freqTrack.def));
             break;
 
@@ -1107,7 +1145,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             else
                 vsnsadial->selection_color(setKnob(value,FILTDEF::velSense.def));
             if (velsnsamp != NULL)
-                *velsnsamp = value_int;
+                *velsnsamp = value;
             break;
         }
 
@@ -1115,7 +1153,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             vsnsdial->value(value);
             vsnsdial->selection_color(setKnob(value,FILTDEF::velFuncSense.def));
             if (velsns != NULL)
-                *velsns = value_int;
+                *velsns = value;
             break;
 
         case FILTERINSERT::control::gain:
@@ -1132,7 +1170,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::baseType:
             filtertype->value(value_int);
-            cfreqdial->setValueType(getFilterFreqType(value_int));
+            cfreqdial->setValueType(getFilterFreqType(value));
             updateVCforQ();
             refresh();
             break;
@@ -1152,7 +1190,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         case FILTERINSERT::control::frequencyTrackingRange:
             freqtrackoffset->value(value_int);
-            freqtrdial->setValueType(getFilterFreqTrackType(value_int));
+            freqtrdial->setValueType(getFilterFreqTrackType(value));
             if (value_int)
             {
                 freqtracknormal->hide();
