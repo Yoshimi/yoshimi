@@ -107,7 +107,7 @@ class FormantFilterGraph {: {public Fl_Box}
     code {//
         float freqx = pars->getfreqpos(freq);
         if (freqx > 0.0 && freqx < 1.0)
-            fl_line(x() + (int) (freqx * w()), y(), x() + (int)(freqx * w()), y() + h());} {}
+            fl_line(x() + int(freqx * w()), y(), x() + int(freqx * w()), y() + h());} {}
   }
   Function {draw()} {} {
     code {//
@@ -127,7 +127,7 @@ class FormantFilterGraph {: {public Fl_Box}
 
         freqx = pars->getfreqpos(1000.0);
         if (freqx > 0.0 && freqx < 1.0)
-            fl_line(ox + (int)(freqx * lx), oy, ox + (int)(freqx * lx), oy + ly);
+            fl_line(ox + int(freqx * lx), oy, ox + int(freqx * lx), oy + ly);
 
         for (i = 1; i < 10; ++i)
         {
@@ -156,7 +156,7 @@ class FormantFilterGraph {: {public Fl_Box}
             GY = -1;
         for (i = 1; i < GY; ++i)
         {
-            int tmp = (int)(ly / (float)GY * i);
+            int tmp = int(ly / (float)GY * i);
             fl_line(ox + 2, oy + tmp, ox + lx - 2, oy + tmp);
         }
 
@@ -172,7 +172,7 @@ class FormantFilterGraph {: {public Fl_Box}
                 (pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq) / 1000.0))
                     + " kHz";
             fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 2 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
-            tmpstr = asString((int)
+            tmpstr = asString(int
                 (asDecibel(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain()))
                           + " dB";
             fl_draw(tmpstr.c_str(), ox + 2 * scale, oy + 15 * scale, 40 * scale, 12 * scale, FL_ALIGN_LEFT, NULL, 0);
@@ -190,11 +190,11 @@ class FormantFilterGraph {: {public Fl_Box}
         pars->formantfilterH(*nvowel, points, graphpoints);
 
         int lastpos = ox;
-        oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
+        oiy = int((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < points; ++i)
         {
             int nextpos = ox + int(i * scale);
-            int iy = (int) ((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
+            int iy = int((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
             if (iy >= 0 && oiy >= 0 && iy < ly && oiy < lx)
                 fl_line(lastpos, oy + ly - oiy, nextpos, oy + ly - iy);
             oiy = iy;
@@ -207,10 +207,10 @@ class FormantFilterGraph {: {public Fl_Box}
 
         pars->formantfilterH(*nvowel, lx, graphpoints);
 
-        oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
+        oiy = int((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < lx; ++i)
         {
-            int iy = (int) ((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
+            int iy = int((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
             if (iy >= 0 && oiy >= 0 && iy < ly && oiy < lx)
                 fl_line(ox + i - 1, oy + ly - oiy, ox, oy + ly - iy);
             oiy = iy;
@@ -245,7 +245,7 @@ switch(event)
   case FL_MOVE: // find formant closest to cursor
   {
       int minDiff = INT_MAX;
-      int relPos = (int)(127.0f * ((float) Fl::event_x() / w()));
+      int relPos = int(127.0f * ((float) Fl::event_x() / w()));
       for (int i = 0; i < pars->Pnumformants; ++i)
       {
           int diff = abs(pars->Pvowels[*nvowel].formants[i].freq - relPos);
@@ -747,37 +747,37 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Value_Output centerfreqvo {
           label {C.f.}
           callback {o->value(pars->getcenterfreq()/1000.0);}
-          tooltip {Center Frequency (kHz)} xywh {512 164 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 11 textcolor 64
+          tooltip {Center Frequency (kHz)} xywh {512 164 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 127 step 0.1 value 64 textfont 1 textsize 11 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(pars->getcenterfreq()/1000.0);}
         }
         Fl_Value_Output octavesfreqvo {
           label {Oct.}
-          callback {o->value(pars->getoctavesfreq());}
-          tooltip {No. of octaves} xywh {512 185 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 127 value 5 textfont 1 textsize 11 textcolor 64
-          code0 {o->step(0.01, 1);}
+          callback {o->value(lrintf(pars->getoctavesfreq()));}
+          tooltip {No. of octaves} xywh {512 185 35 16} box THIN_DOWN_BOX labelsize 12 labelcolor 64 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 11 textcolor 64
+          code0 {o->step(1, 1);}
           code1 {o->value(pars->getoctavesfreq());}
         }
         Fl_Slider cfknob {
           callback {//
         if (Fl::event_button() == 3)
-            o->value(FILTDEF::formCentre.def);
-        o->selection_color(setSlider(o->value(),FILTDEF::formCentre.def));
-        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, o->value(), TOPLEVEL::type::Write);}
-          xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
-          code0 {o->value(pars->Pcenterfreq);}
-          code1 {o->selection_color(setSlider(o->value(),FILTDEF::formCentre.def));}
+            o->value(FILTDEF::formCentre.def*5);
+        o->selection_color(setSlider(o->value(),FILTDEF::formCentre.def*5));
+        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantCenter, o->value()/5, TOPLEVEL::type::Write);}
+          xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 635 step 1 value 1
+          code0 {o->value(pars->Pcenterfreq*5);}
+          code1 {o->selection_color(setSlider(pars->Pcenterfreq,FILTDEF::formCentre.def));}
           class mwheel_slider_rev
         }
         Fl_Slider octknob {
           callback {//
         if (Fl::event_button() == 3)
-            o->value(FILTDEF::formOctave.def);
-        o->selection_color(setSlider(o->value(),FILTDEF::formOctave.def));
-        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, o->value(), TOPLEVEL::type::Write);}
-          xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 127 step 1
-          code0 {o->value(pars->Poctavesfreq);}
-          code1 {o->selection_color(setSlider(o->value(),FILTDEF::formOctave.def));}
+            o->value(FILTDEF::formOctave.def*5);
+        o->selection_color(setSlider(o->value(),FILTDEF::formOctave.def*5));
+        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantOctave, o->value()/5, TOPLEVEL::type::Write);}
+          xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 maximum 635 step 1 value 5
+          code0 {o->value(pars->Poctavesfreq*5);}
+          code1 {o->selection_color(setSlider(pars->Poctavesfreq,FILTDEF::formOctave.def));}
           class mwheel_slider_rev
         }
         Fl_Dial wvknob {
@@ -1264,14 +1264,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             break;
 
         case FILTERINSERT::control::formantCenter:
-            cfknob->value(value);
+            cfknob->value(value*5);
             cfknob->selection_color(setSlider(value,64));
             centerfreqvo->do_callback();
             formantfiltergraph->redraw();
             break;
 
         case FILTERINSERT::control::formantOctave:
-            octknob->value(value);
+            octknob->value(value*5);
             octknob->selection_color(setSlider(value,64));
             octavesfreqvo->do_callback();
             formantfiltergraph->redraw();

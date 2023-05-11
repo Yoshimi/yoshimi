@@ -38,37 +38,37 @@ class SynthEngine;
 class LFOParams : public Presets
 {
     public:
-        LFOParams(float Pfreq_, unsigned char Pintensity_, unsigned char Pstartphase_,
-                  unsigned char PLFOtype_, unsigned char Prandomness_,
-                  unsigned char Pdelay_, unsigned char Pcontinous, int fel_, SynthEngine *_synth);
+        LFOParams(float Pfreq_, float Pintensity_, float Pstartphase_,
+                  unsigned char PLFOtype_, float Prandomness_,
+                  float Pdelay_, unsigned char Pcontinous, int fel_, SynthEngine *_synth);
         ~LFOParams() { }
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void setPfreq(int32_t n);
         void getfromXML(XMLwrapper *xml);
-        void setPintensity(unsigned char n) { Pintensity = n; presetsUpdated(); }
-        void setPstartphase(unsigned char n) { Pstartphase = n; }
+        void setPintensity(float n) { Pintensity = n; presetsUpdated(); }
+        void setPstartphase(float n) { Pstartphase = n; }
         void setPLFOtype(unsigned char n) { PLFOtype = n; presetsUpdated(); }
-        void setPrandomness(unsigned char n) { Prandomness = n; presetsUpdated(); }
-        void setPfreqrand(unsigned char n) { Pfreqrand = n; presetsUpdated(); }
-        void setPdelay(unsigned char n) { Pdelay = n; }
+        void setPrandomness(float n) { Prandomness = n; presetsUpdated(); }
+        void setPfreqrand(float n) { Pfreqrand = n; presetsUpdated(); }
+        void setPdelay(float n) { Pdelay = n; }
         void setPbpm(unsigned char n) { Pbpm = n; }
         void setPcontinous(unsigned char n) { Pcontinous = n; presetsUpdated(); }
-        void setPstretch(unsigned char n) { Pstretch = n; presetsUpdated(); }
+        void setPstretch(float n) { Pstretch = n; presetsUpdated(); }
 
         // MIDI Parameters
         int32_t PfreqI;
         float Pfreq;
-        unsigned char Pintensity;
-        unsigned char Pstartphase;
+        float Pintensity;
+        float Pstartphase;
         unsigned char PLFOtype;
-        unsigned char Prandomness;
-        unsigned char Pfreqrand;
-        unsigned char Pdelay;
+        float Prandomness;
+        float Pfreqrand;
+        float Pdelay;
         unsigned char Pbpm;
         unsigned char Pcontinous;
-        unsigned char Pstretch;
+        float Pstretch;
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
@@ -109,22 +109,22 @@ namespace LFODEF{
     const LFOminmax voiceFreqFreq {0,1,0.390625,true,false};
     const LFOminmax voiceFiltFreq {0,1,0.390625,true,false};
 
-    const LFOminmax depth {0,127,0,true,true};
-    const LFOminmax voiceAmpDepth {0,127,32,true,true};
-    const LFOminmax voiceFreqDepth {0,127,40,true,true};
-    const LFOminmax voiceFiltDepth {0,127,20,true,true};
+    const LFOminmax depth {0,127,0,true,false};
+    const LFOminmax voiceAmpDepth {0,127,32,true,false};
+    const LFOminmax voiceFreqDepth {0,127,40,true,false};
+    const LFOminmax voiceFiltDepth {0,127,20,true,false};
 
-    const LFOminmax start {0,127,64,true,true};
-    const LFOminmax voiceFreqStart {0,127,0,true,true};
+    const LFOminmax start {0,127,64,true,false};
+    const LFOminmax voiceFreqStart {0,127,0,true,false};
 
-    const LFOminmax delay {0,127,0,true,true};
-    const LFOminmax voiceAmpDelay {0,127,30,true,true};
+    const LFOminmax delay {0,127,0,true,false};
+    const LFOminmax voiceAmpDelay {0,127,30,true,false};
 
 
-    const LFOminmax ampRnd {0,127,0,true,true};
-    const LFOminmax freqRnd {0,127,0,true,true};
+    const LFOminmax ampRnd {0,127,0,true,false};
+    const LFOminmax freqRnd {0,127,0,true,false};
 
-    const LFOminmax stretch {0,127,64,true,true};
+    const LFOminmax stretch {0,127,64,true,false};
 
     const LFOminmax type {0,9,0,false,true};
 }

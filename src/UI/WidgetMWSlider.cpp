@@ -120,8 +120,8 @@ int mwheel_val_slider::_handle(int res, int event)
         if (Fl::event_state(FL_CTRL) != 0)
         {
             step_size *= step();
-            if (range > 256) // Scale stepping for large ranges
-                step_size *= 50;
+            if (range > 2560) // Scale stepping for large ranges
+                step_size *= 10;
         } else {
             step_size *= range / 20;
         }

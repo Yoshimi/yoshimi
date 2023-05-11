@@ -1,13 +1,24 @@
-yoshimi 2.3.0 rc2
+yoshimi 2.3.0 rc3
+
+2023-5-11 Will
+bn 2225
+Found some missing envelope settings :(
+Finalised Envelope pointer colours.
+Changed some LFO controls to floats and new combi storage.
+Knobs show correct colours when loading instruments.
+Changed slider large step range for higher resolution.
+Changed Resonance sliders to floats and new combi storage.
+Improved formant filter centre frequency and octave stepping.
+Updated docs and guides.
 
 2023-5-9 Will
 bn 2224
-BugFix: Slider not retuning to default on right mose click
+BugFix: Sliders not returning to default on right mouse click
     directly over the peg.
 Added greyscale tint to themes.
 Adjusted knob and slider colours for better contrast.
 Changed some filter controls to floats and new combi storage.
-Knowb show correct colours when loading instruments.
+Knobs show correct colours when loading instruments.
 Merged in envelope adjustments from Hermann.
 
 2023-5-7 Will

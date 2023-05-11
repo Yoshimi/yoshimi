@@ -570,7 +570,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     }
   }
   Function {make_ASR_window()} {} {
-    Fl_Window envASR {
+    Fl_Window envASR {open
       xywh {1183 190 210 70} type Double labelcolor 64 hide
       class Fl_Group
     } {
@@ -582,7 +582,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {A.val}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PA_val);}
           class WidgetPDial
@@ -591,7 +591,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {A.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::attackTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -600,7 +600,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.val }
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseLevel, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_EnvelopeFreqVal);}
           code1 {o->value(env->PR_val);}
           class WidgetPDial
@@ -609,7 +609,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label {R.dt}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::releaseTime, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -618,7 +618,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           label { Stretch}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::stretch, lrint(o->value()), TOPLEVEL::type::Write);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
           code0 {o->value(env->Penvstretch);}
           code1 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
@@ -1259,41 +1259,122 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         {
             case(PART::envelope::groupmode::amplitudeLin):
             case(PART::envelope::groupmode::amplitudeLog):
+            {
                 e1adt->value(env->PA_dt);
+                if (engine >= PART::addMod1)
+                    e1adt->selection_color(setKnob(e1adt->value(),ENVDEF::modAmpAttackTime.def));
+                else
+                    e1adt->selection_color(setKnob(e1adt->value(),ENVDEF::ampAttackTime.def));
                 e1ddt->value(env->PD_dt);
+                if (engine >= PART::addMod1)
+                    e1ddt->selection_color(setKnob(e1ddt->value(),ENVDEF::modAmpDecayTime.def));
+                else if (engine >= PART::addVoice1)
+                    e1ddt->selection_color(setKnob(e1ddt->value(),ENVDEF::voiceAmpDecayTime.def));
+                else
+                    e1ddt->selection_color(setKnob(e1ddt->value(),ENVDEF::ampDecayTime.def));
                 e1sval->value(env->PS_val);
+                e1sval->selection_color(setKnob(e1sval->value(),ENVDEF::ampSustainValue.def));
                 setAmpSusVType(env->Plinearenvelope);
                 e1rdt->value(env->PR_dt);
+                if (engine >= PART::addMod1)
+                    e1rdt->selection_color(setKnob(e1rdt->value(),ENVDEF::modAmpReleaseTime.def));
+                else if (engine >= PART::addVoice1)
+                    e1rdt->selection_color(setKnob(e1rdt->value(),ENVDEF::voiceAmpReleaseTime.def));
+                else
+                    e1rdt->selection_color(setKnob(e1rdt->value(),ENVDEF::ampReleaseTime.def));
                 e1envstretch->value(env->Penvstretch);
+                e1envstretch->selection_color(setKnob(e1envstretch->value(),ENVDEF::ampStretch.def));
                 e1linearenvelope->value(env->Plinearenvelope);
                 e1forcedrelease->value(env->Pforcedrelease);
                 break;
+            }
             case(PART::envelope::groupmode::frequency):
+            {
                 e2aval->value(env->PA_val);
+                if (engine >= PART::addMod1)
+                     e2aval->selection_color(setKnob(e2aval->value(),ENVDEF::modFreqAtValue.def));
+                else if (engine >= PART::addVoice1)
+                     e2aval->selection_color(setKnob(e2aval->value(),ENVDEF::voiceFreqAtValue.def));
+                else if (engine == PART::subSynth)
+                     e2aval->selection_color(setKnob(e2aval->value(),ENVDEF::subFreqAtValue.def));
+                else
+                     e2aval->selection_color(setKnob(int(e2aval->value()),ENVDEF::freqAttackValue.def));
+
                 e2adt->value(env->PA_dt);
+                if (engine >= PART::addMod1)
+                    e2adt->selection_color(setKnob(e2adt->value(),ENVDEF::modFreqAtTime.def));
+                else if (engine >= PART::addVoice1)
+                    e2adt->selection_color(setKnob(e2adt->value(),ENVDEF::voiceFreqAtTime.def));
+                else
+                    e2adt->selection_color(setKnob(e2adt->value(),ENVDEF::freqAttackTime.def));
                 e2rdt->value(env->PR_dt);
+                if (engine >= PART::addMod1)
+                    e2rdt->selection_color(setKnob(e2rdt->value(),ENVDEF::modFreqReleaseTime.def));
+                else
+                    e2rdt->selection_color(setKnob(e2rdt->value(),ENVDEF::freqReleaseTime.def));
                 e2rval->value(env->PR_val);
+                if (engine >= PART::addMod1)
+                    e2rval->selection_color(setKnob(e2rval->value(),ENVDEF::modFreqReleaseValue.def));
+                else
+                    e2rval->selection_color(setKnob(e2rval->value(),ENVDEF::freqReleaseValue.def));
                 e2envstretch->value(env->Penvstretch);
+                if (engine == PART::subSynth)
+                    e2envstretch->selection_color(setKnob(e2envstretch->value(),ENVDEF::subFreqStretch.def));
+                else
+                    e2envstretch->selection_color(setKnob(e2envstretch->value(),ENVDEF::freqStretch.def));
                 e2forcedrelease->value(env->Pforcedrelease);
                 break;
+            }
             case(PART::envelope::groupmode::filter):
+            {
                 e3aval->value(env->PA_val);
+                if (engine >= PART::addVoice1 && engine < PART::addMod1)
+                    e3aval->selection_color(setKnob(e3aval->value(),ENVDEF::voiceFiltAtValue.def));
+                else
+                    e3aval->selection_color(setKnob(e3aval->value(),ENVDEF::filtAttackValue.def));
                 e3adt->value(env->PA_dt);
+                if (engine >= PART::addVoice1)
+                    e3adt->selection_color(setKnob(e3adt->value(),ENVDEF::voiceFiltAtTime.def));
+                else
+                    e3adt->selection_color(setKnob(e3adt->value(),ENVDEF::filtAttackTime.def));
+
                 e3dval->value(env->PD_val);
+                if (engine >= PART::addVoice1 && engine < PART::addMod1)
+                    e3dval->selection_color(setKnob(e3dval->value(),ENVDEF::voiceFiltDeValue.def));
+                else
+                    e3dval->selection_color(setKnob(e3dval->value(),ENVDEF::filtDecayValue.def));
                 e3ddt->value(env->PD_dt);
+                e3ddt->selection_color(setKnob(e3ddt->value(),ENVDEF::filtDecayTime.def));
                 e3rdt->value(env->PR_dt);
+                if (engine >= PART::addVoice1 && engine < PART::addMod1)
+                    e3rdt->selection_color(setKnob(e3rdt->value(),ENVDEF::voiceFiltRelTime.def));
+                else
+                    e3rdt->selection_color(setKnob(e3rdt->value(),ENVDEF::filtReleaseTime.def));
                 e3rval->value(env->PR_val);
+                if (engine >= PART::addVoice1 && engine < PART::addMod1)
+                    e3rval->selection_color(setKnob(e3rval->value(),ENVDEF::voiceFiltRelValue.def));
+                else
+                    e3rval->selection_color(setKnob(e3rval->value(),ENVDEF::filtReleaseValue.def));
                 e3envstretch->value(env->Penvstretch);
+                e3envstretch->selection_color(setKnob(e3envstretch->value(),ENVDEF::filtStretch.def));
                 e3forcedrelease->value(env->Pforcedrelease);
                 break;
+            }
             case(PART::envelope::groupmode::bandwidth):
+            {
                 e4aval->value(env->PA_val);
+                e4aval->selection_color(setKnob(e4aval->value(),ENVDEF::subBandAttackValue.def));
                 e4adt->value(env->PA_dt);
+                e4adt->selection_color(setKnob(e4adt->value(),ENVDEF::subBandAttackTime.def));
                 e4rdt->value(env->PR_dt);
+                e4rdt->selection_color(setKnob(e4rdt->value(),ENVDEF::subBandReleaseTime.def));
                 e4rval->value(env->PR_val);
+                e4rval->selection_color(setKnob(e4rval->value(),ENVDEF::subBandReleaseValue.def));
                 e4envstretch->value(env->Penvstretch);
+                e4envstretch->selection_color(setKnob(e4envstretch->value(),ENVDEF::subBandStretch.def));
                 e4forcedrelease->value(env->Pforcedrelease);
                 break;
+            }
             default:
                 break;
         }

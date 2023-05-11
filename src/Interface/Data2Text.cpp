@@ -2849,7 +2849,8 @@ string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bo
 
 string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 {
-    int value_int = int(getData->data.value);
+    float value = getData->data.value;
+    int value_int = int(value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2888,7 +2889,6 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
         case LFOINSERT::control::speed:
             if (getData->data.offset == 1 && addValue == true)
             {
-                float value = getData->data.value;
                 contstr += bpm2text(value);
                 showValue = false;
             }

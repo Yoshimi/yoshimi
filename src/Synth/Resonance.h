@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2018 Will Godfrey
+    Copyright 2018-2023 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -22,7 +22,6 @@
 
     This file is a derivative of a ZynAddSubFX original
 
-    Modified October 2018
 */
 
 #ifndef RESONANCE_H
@@ -57,10 +56,10 @@ class Resonance : public Presets
         void sendcontroller(unsigned short int ctl, float par);
 
         // parameters
-        unsigned char Penabled;                 //if the ressonance is enabled
-        unsigned char Prespoints[MAX_RESONANCE_POINTS];	// how many points define the resonance function
-        unsigned char PmaxdB;			        // how many dB the signal may be amplified
-        unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res. func., and the number of octaves
+        unsigned char Penabled;                 //if the resonance is enabled
+        unsigned char Prespoints[MAX_RESONANCE_POINTS]; // how many points define the resonance function
+        float PmaxdB;                           // how many dB the signal may be amplified
+        float Pcenterfreq,Poctavesfreq;         // the center frequency of the res. func., and the number of octaves
         unsigned char Pprotectthefundamental;   // the fundamental (1-st harmonic) is not damped, even it resonance function is low
 
         // controllers

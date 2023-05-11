@@ -5987,19 +5987,19 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     {
         case RESONANCE::control::maxDb:
             if (write)
-                respar->PmaxdB = value_int;
+                respar->PmaxdB = value;
             else
                 value = respar->PmaxdB;
             break;
         case RESONANCE::control::centerFrequency:
             if (write)
-                respar->Pcenterfreq = value_int;
+                respar->Pcenterfreq = value;
             else
                 value = respar->Pcenterfreq;
             break;
         case RESONANCE::control::octaves:
             if (write)
-                respar->Poctavesfreq = value_int;
+                respar->Poctavesfreq = value;
             else
                 value = respar->Poctavesfreq;
             break;

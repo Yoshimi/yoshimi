@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
-    Copyright 2018-2019 Will Godfrey
+    Copyright 2018-2023 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -245,9 +245,9 @@ void Resonance::add2XML(XMLwrapper *xml)
 
     if ((Penabled==0)&&(xml->minimal)) return;
 
-    xml->addpar("max_db",PmaxdB);
-    xml->addpar("center_freq",Pcenterfreq);
-    xml->addpar("octaves_freq",Poctavesfreq);
+    xml->addparcombi("max_db",PmaxdB);
+    xml->addparcombi("center_freq",Pcenterfreq);
+    xml->addparcombi("octaves_freq",Poctavesfreq);
     xml->addparbool("protect_fundamental_frequency",Pprotectthefundamental);
     xml->addpar("resonance_points",MAX_RESONANCE_POINTS);
     for (int i=0;i<MAX_RESONANCE_POINTS;i++)
@@ -263,9 +263,9 @@ void Resonance::getfromXML(XMLwrapper *xml)
 {
     Penabled=xml->getparbool("enabled",Penabled);
 
-    PmaxdB=xml->getpar127("max_db",PmaxdB);
-    Pcenterfreq=xml->getpar127("center_freq",Pcenterfreq);
-    Poctavesfreq=xml->getpar127("octaves_freq",Poctavesfreq);
+    PmaxdB=xml->getparcombi("max_db",PmaxdB,0,127);
+    Pcenterfreq=xml->getparcombi("center_freq",Pcenterfreq,0,127);
+    Poctavesfreq=xml->getparcombi("octaves_freq",Poctavesfreq,0,127);
     Pprotectthefundamental=xml->getparbool("protect_fundamental_frequency",Pprotectthefundamental);
     for (int i=0;i<MAX_RESONANCE_POINTS;i++)
     {
@@ -284,12 +284,12 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
     int insert = getData->data.insert;
 
     unsigned char type = 0;
+    type |= TOPLEVEL::type::Integer;
 
     // resonance defaults
     int min = 0;
     int max = 1;
     int def = 0;
-    type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
 
     if (insert == TOPLEVEL::insert::resonanceGraphInsert)
@@ -325,17 +325,20 @@ float ResonanceLimits::getLimits(CommandBlock *getData)
     {
         case RESONANCE::control::maxDb:
             type |= learnable;
+            type &= ~TOPLEVEL::type::Integer;
             min = 1;
             max = 90;
             def = 20;
             break;
         case RESONANCE::control::centerFrequency:
             type |= learnable;
+            type &= ~TOPLEVEL::type::Integer;
             max = 127;
             def = 64;
             break;
         case RESONANCE::control::octaves:
             type |= learnable;
+            type &= ~TOPLEVEL::type::Integer;
             max = 127;
             def = 64;
             break;

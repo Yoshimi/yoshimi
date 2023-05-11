@@ -1623,7 +1623,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
     }
     if ((cmd == -1) && input.matchnMove(2, "rcenter"))
     {
-        value = string2int127(input);
+        value = string2float(input);
         cmd = PART::control::resonanceCenterFrequencyDepth;
     }
     if ((cmd == -1) && input.matchnMove(2, "rband"))
@@ -1946,9 +1946,15 @@ int CmdInterpreter::filterSelect(Parser& input, unsigned char controlType)
                 cmd = FILTERINSERT::control::negateInput;
             }
             else if (input.matchnMove(2, "center"))
+            {
                 cmd = FILTERINSERT::control::formantCenter;
+                value = string2float(input);
+            }
             else if (input.matchnMove(1, "range"))
+            {
                 cmd = FILTERINSERT::control::formantOctave;
+                value = string2float(input);
+            }
             else if (input.matchnMove(1, "expand"))
                 cmd = FILTERINSERT::control::formantStretch;
             else if (input.matchnMove(1, "lucidity"))
@@ -4957,7 +4963,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
 
 int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
 {
-    int value = input.toggle();
+    float value = input.toggle();
     int cmd = -1;
     engine = contextToEngines(context);
     int insert = TOPLEVEL::insert::resonanceGroup;
@@ -4991,16 +4997,16 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
         cmd = RESONANCE::control::maxDb;
-        value = string2int(input);
+        value = string2float(input);
     }
     else if (input.matchnMove(2, "center"))
     {
-        value = string2int(input);
+        value = string2float(input);
         cmd = RESONANCE::control::centerFrequency;
     }
     else if (input.matchnMove(1, "octaves"))
     {
-        value = string2int(input);
+        value = string2float(input);
         cmd = RESONANCE::control::octaves;
     }
     else if (input.matchnMove(1, "interpolate"))

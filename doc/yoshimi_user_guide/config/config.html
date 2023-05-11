@@ -137,7 +137,27 @@
     <br><br>
     Classic is a duplicate of the internally generated normal style. This can be copied to a differently named one, then edited to your preference. Demo is a rather extreme example of what is possible.
     If you wish to develop your own themes you must follow the format exactly. If an error is seen Yoshimi reports the actual text line, and doesn't attempt any further lines.
-    More details can be found in the  <a href="https://github.com/Yoshimi/yoshimi-doc/raw/master/pdf/yoshimi-advanced-reference-manual.pdf">Advanced Reference Manual</a>
+    <br>
+    Below are the first few lines from the 'classic' file:
+    <div class = "code">
+Do not edit this. It may be overwritten.
+Instead, copy as template for other named themes.
+Don't add or remove lines between and including dashes.
+This would corrupt the colour map.
+------------------ data start marker
+0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
+0,255,255, Panels (R,G,B or #rrggbb)
+0,0,0, RESERVED
+186,198,211, Knob shadow (#bac6d3)
+231,235,239, Knob highlight (#e7ebef)
+51,51,51, Knob ring
+0,197,255, Knob ring lit
+    </div>
+    If the greyscale min-max entries are both 127 yoshimi becomes monochrome and all features are scaled according to the average of their R,G,B settings. This is useful for seeing how a theme might look under bad light.
+    <br>
+    Alternatively you can add three R,G,B values to the greyscale line which will give a colour tint to parts that have a grey content.
+    <br><br>
+    Further details can be found in the  <a href="https://github.com/Yoshimi/yoshimi-doc/raw/master/pdf/yoshimi-advanced-reference-manual.pdf">Advanced Reference Manual</a>
     <br><br>
     With the 'Import' button you can also fetch themes that have been downloaded from elsewhere. These will become available next time the window is refreshed. Alternatively with the 'Export' button you can make a copy of the current theme to a more accessible location.<br>Using these two options together, along with a text editor enables you to make changes to an existing theme very quickly.<br>Keep in mind the 'classic' theme is a reference file, and is not what is actually used for that theme.
     </p>

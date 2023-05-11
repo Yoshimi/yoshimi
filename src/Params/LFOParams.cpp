@@ -35,9 +35,9 @@
 using func::power;
 
 
-LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
-                     unsigned char Pstartphase_, unsigned char PLFOtype_,
-                     unsigned char Prandomness_, unsigned char Pdelay_,
+LFOParams::LFOParams(float Pfreq_, float Pintensity_,
+                     float Pstartphase_, unsigned char PLFOtype_,
+                     float Prandomness_, float Pdelay_,
                      unsigned char Pcontinous_, int fel_, SynthEngine *_synth) :
     Presets(_synth),
     fel(fel_),
@@ -99,13 +99,13 @@ void LFOParams::add2XML(XMLwrapper *xml)
         freqF = func::quantizedLFOfreqBPM(freqF);
     xml->addpar("freqI", freqF * float(Fmul2I));
     xml->addparreal("freq", freqF);
-    xml->addpar("intensity", Pintensity);
-    xml->addpar("start_phase", Pstartphase);
+    xml->addparcombi("intensity", Pintensity);
+    xml->addparcombi("start_phase", Pstartphase);
     xml->addpar("lfo_type", PLFOtype);
-    xml->addpar("randomness_amplitude", Prandomness);
-    xml->addpar("randomness_frequency", Pfreqrand);
-    xml->addpar("delay", Pdelay);
-    xml->addpar("stretch", Pstretch);
+    xml->addparcombi("randomness_amplitude", Prandomness);
+    xml->addparcombi("randomness_frequency", Pfreqrand);
+    xml->addparcombi("delay", Pdelay);
+    xml->addparcombi("stretch", Pstretch);
     xml->addparbool("continous",    Pcontinous);
     xml->addparbool("bpm", Pbpm);
 }
@@ -118,13 +118,13 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     PfreqI = xml->getparreal("freq", Pfreq, 0.0, 1.0) * float(Fmul2I);
     setPfreq(PfreqI);
 
-    Pintensity = xml->getpar127("intensity", Pintensity);
-    Pstartphase = xml->getpar127("start_phase", Pstartphase);
+    Pintensity = xml->getparcombi("intensity", Pintensity,0,127);
+    Pstartphase = xml->getparcombi("start_phase", Pstartphase,0,127);
     PLFOtype = xml->getpar127("lfo_type", PLFOtype);
-    Prandomness = xml->getpar127("randomness_amplitude", Prandomness);
-    Pfreqrand = xml->getpar127("randomness_frequency", Pfreqrand);
-    Pdelay = xml->getpar127("delay", Pdelay);
-    Pstretch = xml->getpar127("stretch", Pstretch);
+    Prandomness = xml->getparcombi("randomness_amplitude", Prandomness,0,127);
+    Pfreqrand = xml->getparcombi("randomness_frequency", Pfreqrand,0,127);
+    Pdelay = xml->getparcombi("delay", Pdelay,0,127);
+    Pstretch = xml->getparcombi("stretch", Pstretch,0,127);
     Pcontinous = xml->getparbool("continous", Pcontinous);
     Pbpm = xml->getparbool("bpm", Pbpm);
     presetsUpdated();
