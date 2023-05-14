@@ -1,13 +1,14 @@
 [Desktop Entry]
+Type=Application
+Version=1.0
 Name=Yoshimi
-GenericName=Synthesizer
-GenericName[fr]=Synthétiseur
 Comment=Real Time Synthesizer
 Comment[fr]=Synthétiseur temps-réel
-Icon=yoshimi
-Type=Application
+GenericName=Synthesizer
+GenericName[fr]=Synthétiseur
 Exec=yoshimi
 TryExec=yoshimi
+Icon=yoshimi
 Terminal=false
 StartupNotify=true
 Categories=Music;Midi;AudioVideo;X-Sound;Audio;X-Multitrack;X-Alsa;X-Jack;

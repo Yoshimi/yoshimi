@@ -1407,6 +1407,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   }
   decl {bool formantSeen;} {private local
   }
-  decl {int formFreqDef;} {private local
+  decl {float formFreqDef;} {private local
   }
 }

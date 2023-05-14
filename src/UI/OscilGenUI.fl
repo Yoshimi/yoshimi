@@ -443,10 +443,13 @@ class Oscilharmonic {: {public Fl_Group}
     end();
     harmonic->show();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh(int def = 0)} {} {
     code {//
     mag->value(64 - oscil->Phmag[n]);
-    phase->value(64 - oscil->Phphase[n]);} {}
+    mag->selection_color(setSlider(mag->value(),def));
+    phase->value(64 - oscil->Phphase[n]);
+    phase->selection_color(setSlider(phase->value(),0));
+    ;} {}
   }
   Function {~Oscilharmonic()} {} {
     code {//
@@ -517,8 +520,10 @@ o->hide();}
           } {}
           Fl_Dial hrnddial {
             callback {//
+            o->selection_color(setKnob(o->value(),64));
             send_data(0, OSCILLATOR::control::harmonicAmplitudeRandomness, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Oscillator's harmonic randomness parameter} xywh {338 280 18 18} maximum 127 step 1
+            code0 {o->selection_color(setKnob(o->value(),64));}
             class WidgetPDial
           }
         }
@@ -547,10 +552,12 @@ o->hide();}
           code0 {Oscilloscope *osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(), 170,"");}
           code1 {osc->init(oscilSmp,1, synth);}
         } {}
-        Fl_Dial bfslider {
+        Fl_Dial bfknob {
           callback {//
+          o->selection_color(setKnob(o->value(),0));
           send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseFunctionParameter, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Base Function Parameter} xywh {520 280 20 20} labelcolor 64 minimum -64 maximum 63 step 1
+          code0 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
         Fl_Choice bftype {
@@ -585,20 +592,26 @@ o->hide();}
           } {
             Fl_Dial bfmodpar1 {
               callback {//
+            o->selection_color(setKnob(o->value(),64));
             send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationParameter1, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
+              code0 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial bfmodpar2 {
               callback {//
+            o->selection_color(setKnob(o->value(),64));
             send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationParameter2, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
+              code0 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
             }
             Fl_Dial bfmodpar3 {
               callback {//
+            o->selection_color(setKnob(o->value(),32));
             send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::baseModulationParameter3, o->value(), TOPLEVEL::type::Integer);}
               tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
+              code0 {o->selection_color(setKnob(o->value(),32));}
               class WidgetPDial
             }
           }
@@ -870,7 +883,7 @@ o->hide();}
     else if (insert == TOPLEVEL::insert::harmonicPhase)
     {
         h[control]->phase->value(64 - value_int);
-        h[control]->phase->selection_color(setSlider(value_int,64));
+        h[control]->phase->selection_color(setSlider(64 - value_int,64));
     }
 
     else
@@ -888,6 +901,7 @@ o->hide();}
 
             case OSCILLATOR::control::harmonicAmplitudeRandomness:
                 hrnddial->value(value);
+                hrnddial->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::harmonicRandomnessType:
@@ -899,7 +913,8 @@ o->hide();}
                 break;
 
             case OSCILLATOR::control::baseFunctionParameter:
-                bfslider->value(value);
+                bfknob->value(value);
+                bfknob->selection_color(setKnob(value,0));
                 bfparval->value(value);
                 baseSet = true;
                 break;
@@ -908,12 +923,12 @@ o->hide();}
                 bftype->value(value);
                 if (value < OSCILLATOR::wave::triangle || oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
                 {
-                    bfslider->deactivate();
+                    bfknob->deactivate();
                     basefuncmodulation->deactivate();
                 }
                 else
                 {
-                    bfslider->activate();
+                    bfknob->activate();
                     basefuncmodulation->activate();
                 }
                 baseSet = true;
@@ -921,18 +936,21 @@ o->hide();}
 
             case OSCILLATOR::control::baseModulationParameter1:
                 bfmodpar1->value(value);
+                bfmodpar1->selection_color(setKnob(value,64));
                 baseSet = true;
                 redrawoscil();
                 break;
 
             case OSCILLATOR::control::baseModulationParameter2:
                 bfmodpar2->value(value);
+                bfmodpar2->selection_color(setKnob(value,64));
                 baseSet = true;
                 redrawoscil();
                 break;
 
             case OSCILLATOR::control::baseModulationParameter3:
                 bfmodpar3->value(value);
+                bfmodpar3->selection_color(setKnob(value,32));
                 baseSet = true;
                 redrawoscil();
                 break;
@@ -956,7 +974,9 @@ o->hide();}
                     for (int i = 0; i<MAX_AD_HARMONICS; ++i)
                     {
                         h[i]->mag->value(0);
+                        h[i]->mag->selection_color(setSlider(0,0)); // we can fake these
                         h[i]->phase->value(0);
+                        h[i]->phase->selection_color(setSlider(0,0));
                     }
                     harmonicshiftcounter->value(0);
                     h[0]->mag->value(0);
@@ -970,6 +990,7 @@ o->hide();}
 
             case OSCILLATOR::control::waveshapeParameter:
                 wshpar->value(value);
+                wshpar->selection_color(setKnob(value,0));
                 wsparval->value(value);
                 break;
 
@@ -983,10 +1004,12 @@ o->hide();}
 
             case OSCILLATOR::control::filterParameter1:
                 filtervalue1->value(value);
+                filtervalue1->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::filterParameter2:
                 filtervalue2->value(value);
+                filtervalue2->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::filterBeforeWaveshape:
@@ -1003,14 +1026,17 @@ o->hide();}
 
             case OSCILLATOR::control::modulationParameter1:
                 modpar1->value(value);
+                modpar1->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::modulationParameter2:
                 modpar2->value(value);
+                modpar2->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::modulationParameter3:
                 modpar3->value(value);
+                modpar3->selection_color(setKnob(value,32));
                 break;
 
             case OSCILLATOR::control::modulationType:
@@ -1023,6 +1049,7 @@ o->hide();}
 
             case OSCILLATOR::control::spectrumAdjustParameter:
                 sadjpar->value(value);
+                sadjpar->selection_color(setKnob(value,64));
                 break;
 
             case OSCILLATOR::control::spectrumAdjustType:
@@ -1052,10 +1079,12 @@ o->hide();}
 
             case OSCILLATOR::control::adaptiveHarmonicsBase:
                 adhrbf->value(value);
+                adhrbf->selection_color(setKnob(value,128));
                 break;
 
             case OSCILLATOR::control::adaptiveHarmonicsPower:
                 adhrpow->value(value);
+                adhrpow->selection_color(setKnob(value,100));
                 break;
 
             case OSCILLATOR::control::adaptiveHarmonicsType:
@@ -1070,7 +1099,9 @@ o->hide();}
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
                     h[i]->mag->value(0);
+                    h[i]->mag->selection_color(setSlider(0,0)); // we can fake these
                     h[i]->phase->value(0);
+                    h[i]->phase->selection_color(setSlider(0,0));
                 }
                 h[0]->mag->value(-63);
                 // This is somewhat counter-intuitive.
@@ -1079,7 +1110,8 @@ o->hide();}
 
             case OSCILLATOR::control::convertToSine:
                 bftype->value(0);
-                for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+                h[0]->refresh(-63);
+                for (int i = 1; i < MAX_AD_HARMONICS; ++i)
                     h[i]->refresh();
                 baseSet = true;
                 set = false;
@@ -1161,17 +1193,19 @@ o->hide();}
     else
         hrnddial->activate();
     hrnddial->value(oscil->Pamprandpower);
+    hrnddial->selection_color(setKnob(hrnddial->value(),64));
 
     if (oscil->Pcurrentbasefunc > OSCILLATOR::wave::hyperSec)
         bftype->value(OSCILLATOR::wave::user);
     else
         bftype->value(oscil->Pcurrentbasefunc);
     if (bftype->value() == OSCILLATOR::wave::sine)
-        bfslider->deactivate();
+        bfknob->deactivate();
     else
-        bfslider->activate();
+        bfknob->activate();
     bfparval->value(oscil->Pbasefuncpar-64);
-    bfslider->value(oscil->Pbasefuncpar-64);
+    bfknob->value(oscil->Pbasefuncpar-64);
+    bfknob->selection_color(setKnob(bfknob->value(),0));
 
     bfmodtype->value(oscil->Pbasefuncmodulation);
     if (bfmodtype->value() == 0)
@@ -1179,8 +1213,11 @@ o->hide();}
     else
         baseFuncPars->activate();
     bfmodpar1->value(oscil->Pbasefuncmodulationpar1);
+    bfmodpar1->selection_color(setKnob(bfmodpar1->value(),64));
     bfmodpar2->value(oscil->Pbasefuncmodulationpar2);
+    bfmodpar2->selection_color(setKnob(bfmodpar2->value(),64));
     bfmodpar3->value(oscil->Pbasefuncmodulationpar3);
+    bfmodpar3->selection_color(setKnob(bfmodpar3->value(),32));
 
     wshbutton->value(oscil->Pwaveshapingfunction);
     if (wshbutton->value() == 0)
@@ -1189,6 +1226,7 @@ o->hide();}
         wshpar->activate();
     wsparval->value(oscil->Pwaveshaping-64);
     wshpar->value(oscil->Pwaveshaping-64);
+    wshpar->selection_color(setKnob(wshpar->value(),0));
 
     fltbutton->value(oscil->Pfiltertype);
     if (fltbutton->value() == 0)
@@ -1196,7 +1234,9 @@ o->hide();}
     else
         filterGroup->activate();
     filtervalue1->value(oscil->Pfilterpar1);
+    filtervalue1->selection_color(setKnob(filtervalue1->value(),64));
     filtervalue2->value(oscil->Pfilterpar2);
+    filtervalue2->selection_color(setKnob(filtervalue2->value(),64));
     filterpref->value(oscil->Pfilterbeforews);
 
     modtype->value(oscil->Pmodulation);
@@ -1205,8 +1245,11 @@ o->hide();}
     else
         modulationGroup->activate();
     modpar1->value(oscil->Pmodulationpar1);
+    modpar1->selection_color(setKnob(modpar1->value(),64));
     modpar2->value(oscil->Pmodulationpar2);
+    modpar2->selection_color(setKnob(modpar2->value(),64));
     modpar3->value(oscil->Pmodulationpar3);
+    modpar3->selection_color(setKnob(modpar3->value(),32));
 
     sabutton->value(oscil->Psatype);
     if (sabutton->value() == 0)
@@ -1214,7 +1257,7 @@ o->hide();}
     else
         sadjpar->activate();
     sadjpar->value(oscil->Psapar);
-
+    sadjpar->selection_color(setKnob(sadjpar->value(),64));
     harmonicshiftcounter->value(oscil->Pharmonicshift);
     harmonicshiftpre->value(oscil->Pharmonicshiftfirst);
 
@@ -1224,10 +1267,13 @@ o->hide();}
     else
         adaptiveGroup->activate();
     adhrbf->value(oscil->Padaptiveharmonicsbasefreq);
+    adhrbf->selection_color(setKnob(adhrbf->value(),128));
     adhrpow->value(oscil->Padaptiveharmonicspower);
+    adhrpow->selection_color(setKnob(adhrpow->value(),100));
     adhrtype->value(oscil->Padaptiveharmonicspar);
 
-    for (int i=0;i<MAX_AD_HARMONICS;i++)
+    h[0]->refresh(-63);
+    for (int i=1;i<MAX_AD_HARMONICS;i++)
         h[i]->refresh();
 
     oscilSmp->prepare();

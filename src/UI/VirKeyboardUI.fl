@@ -400,6 +400,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         tooltip Velocity xywh {96 106 110 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
         code1 {o->selection_color(setSlider(o->value(), 100));}
+        code3 {o->setValueType(VC_plainValue);o->useCustomTip(true);}
         class mwheel_slider_rev
       }
       Fl_Counter octave {

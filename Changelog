@@ -1,4 +1,14 @@
-yoshimi 2.3.0 rc3
+yoshimi 2.3.0 rc4
+
+2023-5-14 Will
+bn 2226
+BugFix: V.keyboard not showing velocity setting in tooltip.
+BugFix: Formant filter frequency reset not using float.
+Formant filter now stores current frequency as pseudo default.
+Small adjustment to yoshimi.desktop file.
+Reinstated appdata file for older distros.
+Updated docs.
+Set version as 2.3.0 rc4
 
 2023-5-11 Will
 bn 2225

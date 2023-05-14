@@ -72,7 +72,7 @@
         <b>Formant</b> The formant being edited.
       </li>
       <li>
-        <b>Freq</b> The frequency of the current formant. Uniquely this has no default value, and will be set randomly at the time the filter is created.
+        <b>Freq</b> The frequency of the current formant. Uniquely this has no default value. From Yoshimi V2.3.0 there is a  <a href="#pseudo">pseudo default</a>.
       </li>
       <li>
         <b>Q</b> The current formant's Q factor.
@@ -120,6 +120,15 @@
     If your mouse has extra buttons on the sides (many haven't) these can be used to switch between the formants instead of moving the mouse across to the next one.
     <br><br>
     This is especially useful for controlling most of the formant features one-handed, quickly, while also playing on a keyboard.
+    </p>
+    <p>
+    <a id="pseudo"></a>
+    <h4>The Formant Pseudo Default</h4>
+    When a formant filter is first created the frequency control for each of the individual formants will be set randomly. However, with Yoshimi versions V2.3.0 and later, this setting becomes a pseudo default and the knob pointer colour will behave accordingly.
+    <br>
+    An extra wrinkle is that if this has been changed and the instrument is then saved, the saved copy will have the <em>current</em> value marked as the default, without affecting the running version.
+    <br>
+    Also, keep in mind that a reset, or switching to a different filter type always clears all filter settings and the formant freqency controls will gain new random values.
     </p>
     <!--<a href="../navigation/navigation.html">Next</a> (Navigation, Controls, Defaults)-->
   </body>

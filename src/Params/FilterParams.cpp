@@ -279,7 +279,6 @@ void FilterParams::add2XMLsection(XMLwrapper *xml,int n)
     for (int nformant = 0; nformant < FF_MAX_FORMANTS; ++nformant)
     {
         xml->beginbranch("FORMANT",nformant);
-        xml->addparcombi("first_freq",Pvowels[nvowel].formants[nformant].firstF);
         xml->addparcombi("freq",Pvowels[nvowel].formants[nformant].freq);
         xml->addparcombi("amp",Pvowels[nvowel].formants[nformant].amp);
         xml->addparcombi("q",Pvowels[nvowel].formants[nformant].q);
@@ -336,10 +335,11 @@ void FilterParams::getfromXMLsection(XMLwrapper *xml,int n)
     {
         if (xml->enterbranch("FORMANT",nformant) == 0)
             continue;
-        Pvowels[nvowel].formants[nformant].firstF =
-            xml->getparcombi("first_freq",Pvowels[nvowel].formants[nformant].firstF,FILTDEF::formFreq.min,FILTDEF::formFreq.max);
         Pvowels[nvowel].formants[nformant].freq =
             xml->getparcombi("freq",Pvowels[nvowel].formants[nformant].freq,FILTDEF::formFreq.min,FILTDEF::formFreq.max);
+        Pvowels[nvowel].formants[nformant].firstF =Pvowels[nvowel].formants[nformant].freq;
+        // the saved setting becomes the new pseudo default value.
+
         Pvowels[nvowel].formants[nformant].amp =
             xml->getparcombi("amp",Pvowels[nvowel].formants[nformant].amp,FILTDEF::formAmp.min,FILTDEF::formAmp.max);
         Pvowels[nvowel].formants[nformant].q =
