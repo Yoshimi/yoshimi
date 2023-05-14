@@ -1,6 +1,13 @@
-yoshimi 2.3.0 rc4
+yoshimi 2.3.0 rc5
 
 2023-5-14 Will
+bn 2227
+BugFix: adaptive harmonics parameter not updating GUI.
+Reverted some recent envelope changes.
+Added missing knob default indicators in oscilgen.
+Changed ambiguous warning re. use-as-base button.
+Set version as 2.3.0 rc5
+
 bn 2226
 BugFix: V.keyboard not showing velocity setting in tooltip.
 BugFix: Formant filter frequency reset not using float.

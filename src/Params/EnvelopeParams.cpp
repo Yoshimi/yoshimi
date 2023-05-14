@@ -231,7 +231,8 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
         for (size_t i=0; i<Penvpoints; ++i)
         {
             xml->beginbranch("POINT",i);
-            if (i > 0) xml->addparcombi("dt",Penvdt[i]);
+            if (i > 0)
+                xml->addparcombi("dt",Penvdt[i]);
             xml->addparcombi("val",Penvval[i]);
             xml->endbranch();
         }
@@ -259,7 +260,8 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
     for (size_t i=0;i<Penvpoints;i++)
     {
         if (xml->enterbranch("POINT",i)==0) continue;
-        if (i > 0) Penvdt[i]=xml->getparcombi("dt",Penvdt[i], 0,127);
+        if (i > 0)
+            Penvdt[i]=xml->getparcombi("dt",Penvdt[i], 0,127);
         Penvval[i]=xml->getparcombi("val",Penvval[i], 0,127);
         xml->exitbranch();
     }

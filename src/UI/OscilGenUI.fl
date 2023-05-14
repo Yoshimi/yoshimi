@@ -637,7 +637,7 @@ o->hide();}
       Fl_Button useasbase {
         label {Use as base}
         callback {//
-        if (choice(synth, "", "Yes", "No", "Clear the harmonics settings?\\nThis action is not easily reversed and may cause strange Undo/Redo behaviour.") < 2)
+        if (choice(synth, "", "Yes", "No", "Make this a base function?\\nThis action is not easily reversed and may cause strange Undo/Redo behaviour.") < 2)
             return;
         send_data(TOPLEVEL::action::forceUpdate, OSCILLATOR::control::useAsBaseFunction, autoclearbutton->value() > 0, TOPLEVEL::type::Integer);}
         tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64
@@ -978,8 +978,8 @@ o->hide();}
                         h[i]->phase->value(0);
                         h[i]->phase->selection_color(setSlider(0,0));
                     }
+                    h[0]->mag->value(-63);
                     harmonicshiftcounter->value(0);
-                    h[0]->mag->value(0);
                     wshbutton->value(0);
                     fltbutton->value(0);
                     sabutton->value(0);
@@ -1270,7 +1270,8 @@ o->hide();}
     adhrbf->selection_color(setKnob(adhrbf->value(),128));
     adhrpow->value(oscil->Padaptiveharmonicspower);
     adhrpow->selection_color(setKnob(adhrpow->value(),100));
-    adhrtype->value(oscil->Padaptiveharmonicspar);
+    adhrpar->value(oscil->Padaptiveharmonicspar);
+    adhrpar->selection_color(setSlider(adhrpar->value(),50));
 
     h[0]->refresh(-63);
     for (int i=1;i<MAX_AD_HARMONICS;i++)

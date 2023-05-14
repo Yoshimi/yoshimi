@@ -235,7 +235,7 @@ class ADvoicelistitem {: {public Fl_Group}
         voiceenabled->value(pars->VoicePar[nvoice].Enabled);
         voiceresonanceenabled->value(pars->VoicePar[nvoice].Presonance);
         voicevolume->value(pars->VoicePar[nvoice].PVolume);
-        voicevolume->selection_color(setKnob(voicevolume->value(),100));
+        voicevolume->selection_color(setSlider(voicevolume->value(),100));
         voicedetune->value(pars->VoicePar[nvoice].PDetune - 8192);
         //voicedetune->selection_color(setSlider(voicedetune->value(),100));
         voicepanning->value(pars->VoicePar[nvoice].PPanning);
