@@ -668,7 +668,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
     xml->addpar("invert_up_down_center", Pinvertupdowncenter);
 
     xml->addparbool("enabled", Penabled);
-    xml->addpar("global_fine_detune", lrint(Pglobalfinedetune));
+    xml->addparcombi("global_fine_detune", Pglobalfinedetune);
 
     xml->addpar("a_note", PrefNote);
     xml->addparreal("a_freq", PrefFreq);
@@ -728,7 +728,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
     Pinvertupdowncenter=xml->getpar127("invert_up_down_center", Pinvertupdowncenter);
 
     Penabled=xml->getparbool("enabled", Penabled);
-    Pglobalfinedetune = xml->getpar127("global_fine_detune", Pglobalfinedetune);
+    Pglobalfinedetune = xml->getparcombi("global_fine_detune", Pglobalfinedetune, 0, 127);
 
     PrefNote = xml->getpar127("a_note", PrefNote);
     PrefFreq = xml->getparreal("a_freq", PrefFreq, 1.0, 10000.0);

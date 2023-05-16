@@ -821,8 +821,8 @@ class MasterUI {: {private GuiUpdates}
           label Detune
           callback {//
           o->selection_color(setKnob(o->value(),64));
-          send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-          tooltip {Global Fine Detune} xywh {280 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 step 1 value 64
+          send_data(TOPLEVEL::action::lowPrio, MAIN::control::detune, o->value(), 0, TOPLEVEL::section::main);}
+          tooltip {Global Fine Detune} xywh {280 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
           code2 {o->selection_color(setKnob(o->value(),64));}
@@ -852,7 +852,7 @@ class MasterUI {: {private GuiUpdates}
           callback {//
           o->selection_color(setKnob(o->value(),90));
           send_data(0, MAIN::control::volume, o->value(), 0, TOPLEVEL::section::main);}
-          tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127 step 1
+          tooltip {Master Volume} xywh {331 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 labelcolor 64 maximum 127
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
           code2 {o->selection_color(setKnob(o->value(),90));}

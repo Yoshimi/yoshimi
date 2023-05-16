@@ -130,7 +130,7 @@ int WidgetPDial::handle(int event)
         my = - Fl::event_dy();
         dragsize = 25.0f;
         if (Fl::event_state(FL_CTRL) != 0)
-            dragsize *= 10;
+            dragsize *= 5; // halved this for better fine resolution
         value(limit(value() + my / dragsize * (max - min), min, max));
         value_damage();
         if (this->when() != 0)

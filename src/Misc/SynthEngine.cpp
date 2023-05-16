@@ -3113,7 +3113,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     xml->beginbranch("MASTER");
     xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("panning_law", Runtime.panLaw);
-    xml->addpar("volume", Pvolume);
+    xml->addparcombi("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
     xml->addparreal("bpm_fallback", PbpmFallback);
     xml->addpar("channel_switch_type", Runtime.channelSwitchType);
@@ -3260,7 +3260,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     }
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     Runtime.panLaw = xml->getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
-    setPvolume(xml->getpar127("volume", Pvolume));
+    setPvolume(xml->getparcombi("volume", Pvolume, 0, 127));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
     PbpmFallback = xml->getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);

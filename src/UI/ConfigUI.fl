@@ -74,7 +74,7 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {1157 24 390 330} type Double hide resizable
+      xywh {1226 24 390 330} type Double hide resizable
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -850,9 +850,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             label {Default Theme}
             xywh {288 115 35 17} labelsize 12 labelcolor 64
           }
-          Fl_Box storedTheme {
+          Fl_Button storedTheme {
             label {Default Theme}
-            xywh {255 132 100 20} box THIN_DOWN_BOX color 7 labelsize 12 labelcolor 64
+            xywh {255 132 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 align 64
           }
           Fl_Group nuTheme {
             xywh {242 158 123 106} deactivate
@@ -860,10 +860,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             Fl_Box currentLabel {
               label {Current Theme}
               xywh {288 168 35 17} labelsize 12 labelcolor 64
-            }
-            Fl_Box currentTheme {
-              label {Current Theme}
-              xywh {255 187 100 20} box THIN_DOWN_BOX color 7 labelsize 12 labelcolor 64
             }
             Fl_Button setAsStored {
               label {Make Default}
@@ -875,6 +871,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         storedTheme->copy_label(defTheme.c_str());
         nuTheme->deactivate();}
               xywh {255 220 100 20} box PLASTIC_THIN_UP_BOX color 228 labelsize 12 labelcolor 64
+            }
+            Fl_Button currentTheme {
+              label {Current Theme}
+              xywh {255 187 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 labelcolor 64 align 64
             }
           }
         }

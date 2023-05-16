@@ -320,7 +320,6 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
     float def = 64;
-    type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
@@ -366,10 +365,12 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                     def = ENVDEF::ampStretch.def;
                     break;
                 case ENVELOPEINSERT::control::forcedRelease:
+                    type |= TOPLEVEL::type::Integer;
                     def = ENVSWITCH::defForce;
                     type &= ~learnable;
                     break;
                 case ENVELOPEINSERT::control::linearEnvelope:
+                    type |= TOPLEVEL::type::Integer;
                     max = 1;
                     def = ENVSWITCH::defLinear;
                     type &= ~learnable;
@@ -377,9 +378,11 @@ float envelopeLimit::getEnvelopeLimits(CommandBlock *getData)
                 //case ENVELOPEINSERT::control::edit:
                     //break;
                 case ENVELOPEINSERT::control::enableFreeMode:
+                    type |= TOPLEVEL::type::Integer;
                     def = ENVSWITCH::defFreeMode;
                     break;
                 case ENVELOPEINSERT::control::points:
+                    type |= TOPLEVEL::type::Integer;
                     def = ENVDEF::count.def;
                     break;
                 case ENVELOPEINSERT::control::sustainPoint:

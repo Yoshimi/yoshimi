@@ -407,7 +407,6 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
     float def = 64;
-    //type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
@@ -449,6 +448,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             def = FILTDEF::gain.def;
             break;
         case FILTERINSERT::control::stages:
+            type |= TOPLEVEL::type::Integer;
             if (effType == EFFECT::type::dynFilter)
                 def = FILTDEF::dynStages.def;
             else
@@ -457,21 +457,25 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             type &= ~learnable;
             break;
         case FILTERINSERT::control::baseType:
+            type |= TOPLEVEL::type::Integer;
             max = FILTDEF::category.max;
             def = FILTDEF::category.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::analogType:
+            type |= TOPLEVEL::type::Integer;
             max = FILTDEF::analogType.max;
             def = FILTDEF::analogType.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::stateVariableType:
+            type |= TOPLEVEL::type::Integer;
             max = FILTDEF::stVarfType.max;
             def = FILTDEF::stVarfType.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::frequencyTrackingRange:
+            type |= TOPLEVEL::type::Integer;
             max = true;
             def = FILTSWITCH::trackRange;
             type &= ~learnable;
@@ -506,36 +510,43 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             def = FILTDEF::formOctave.def;
             break;
         case FILTERINSERT::control::numberOfFormants:
+            type |= TOPLEVEL::type::Integer;
             min = FILTDEF::formCount.min;
             max = FILTDEF::formCount.max;
             def = FILTDEF::formCount.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::vowelNumber:
+            type |= TOPLEVEL::type::Integer;
             max = FILTDEF::formVowel.max;
             def = FILTDEF::formVowel.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::formantNumber:
+            type |= TOPLEVEL::type::Integer;
             max = FILTDEF::formCount.max;
             def = FILTDEF::formCount.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::sequenceSize:
+            type |= TOPLEVEL::type::Integer;
             min = FILTDEF::sequenceSize.min;
             max = FILTDEF::sequenceSize.max;
             def = FILTDEF::sequenceSize.def;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::sequencePosition:
+            type |= TOPLEVEL::type::Integer;
             def = 0;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::vowelPositionInSequence:
+            type |= TOPLEVEL::type::Integer;
             max = 5;
             type &= ~learnable;
             break;
         case FILTERINSERT::control::negateInput:
+            type |= TOPLEVEL::type::Integer;
             max = true;
             def =FILTSWITCH::sequenceReverse;
             type &= ~learnable;

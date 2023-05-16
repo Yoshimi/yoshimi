@@ -1,4 +1,15 @@
-yoshimi 2.3.0 rc5
+yoshimi 2.3.0 rc6
+
+2023-5-16 Will
+bn 2228
+Applied patch from Hermann for correct Envelope behaviour.
+Changed Master volume and fine detune to parcombi.
+Changed Default and Current theme boxes to unresponsive buttons.
+Updated Envelope Limits.
+Updated LFO Limits.
+Updated Filter Limits.
+Applied corrections to User Guide.
+Set version as 2.3.0 rc6
 
 2023-5-14 Will
 bn 2227

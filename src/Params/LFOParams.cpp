@@ -176,6 +176,7 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             }
             break;
         case LFOINSERT::control::depth:
+        type &= ~TOPLEVEL::type::Integer;
             if (engine >= PART::engine::addVoice1)
             {
                 switch(insertType)
@@ -196,16 +197,19 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             }
             break;
         case LFOINSERT::control::delay:
+            type &= ~TOPLEVEL::type::Integer;
             if (engine >= PART::engine::addVoice1 && insertType == TOPLEVEL::insertType::amplitude)
                 def = LFODEF::voiceAmpDelay.def;
             else
                 def = LFODEF::delay.def;
             break;
         case LFOINSERT::control::start:
+            type &= ~TOPLEVEL::type::Integer;
             if (engine < PART::engine::addVoice1 || insertType != TOPLEVEL::insertType::frequency)
                 def = LFODEF::start.def;
             break;
         case LFOINSERT::control::amplitudeRandomness:
+            type &= ~TOPLEVEL::type::Integer;
             def = LFODEF::ampRnd.def;
             break;
         case LFOINSERT::control::type:
@@ -224,9 +228,11 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
             type &= ~learnable;
             break;
         case LFOINSERT::control::frequencyRandomness:
+            type &= ~TOPLEVEL::type::Integer;
             def = LFODEF::freqRnd.def;
             break;
         case LFOINSERT::control::stretch:
+            type &= ~TOPLEVEL::type::Integer;
             def = LFODEF::stretch.def;
             break;
 

@@ -55,8 +55,8 @@ class EnvelopeParams : public Presets
 
         // MIDI Parameters
         unsigned char Pfreemode;       // 1 if it is in free mode or 0 if it is in ADSR or ASR mode (comment from original author)
-        unsigned char Penvpoints;      // stays < MAX_ENVELOPE_POINTS
-        float Penvsustain;            // 0 means disabled  -- see Envelope::envout()
+        size_t Penvpoints;             // stays < MAX_ENVELOPE_POINTS
+        size_t Penvsustain;            // 0 means disabled  -- see Envelope::envout()
         float Penvdt[MAX_ENVELOPE_POINTS];
         float Penvval[MAX_ENVELOPE_POINTS];
         unsigned char Penvstretch;     // 64=normal stretch (piano-like), 0=no stretch
