@@ -2,7 +2,7 @@
     MidiLearn.cpp
 
     Copyright 2016-2020, Will Godfrey
-    Copyright 2021, Will Godfrey, Rainer Hans Liffers
+    Copyright 2021-2023, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -20,7 +20,7 @@
 
 */
 
-const int fromString = 3;
+const int fromString = 1;
 /*
  * 0 = use numbers
  * 1 = use string

@@ -28,7 +28,7 @@ This would corrupt the colour map.
 0,0,0, General text
 255,255,255, Inverse text
 0,0,255, About window heading text
-0,0,0, RESERVED
+0,255,0, Midilearn activity indicator
 191,255,255, Midilearn text background
 50,50,200, Learnable text
 0,0,255, Solo selected

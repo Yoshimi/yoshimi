@@ -92,7 +92,7 @@ const int slider_peg_default = 70;
 const int spectrum_line = 71;
 const int reserved_1 = 72;
 const int bank_export = 78;
-const int reserved_2 = 79;
+const int midi_active = 79;
 const int slider_peg_changed = 80;
 const int env_line_sel = 81;
 const int pad_apply = 82;
@@ -229,7 +229,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     gen_text,
     gen_opp_text,
     contrib,
-    reserved_2,
+    midi_active,
     midi_text_back,
     learnable_text,
     solo_select,
@@ -356,7 +356,7 @@ static std::string colourData [] = {
     "0,0,0, General text",
     "255,255,255, Inverse text",
     "0,0,255, About window heading text",
-    "0,0,0, RESERVED",
+    "0,255,0, Midilearn activity indicator",
     "191,255,255, Midilearn text background",
     "0,0,255, Learnable text",
     "0,0,255, Solo selected",

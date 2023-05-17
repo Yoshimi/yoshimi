@@ -83,20 +83,25 @@ class MidiLearnKitItem {: {public Fl_Group}
       } {
         Fl_Spinner CCcounter {
           callback {send_data(0, MIDILEARN::control::CCorChannel);}
-          tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 labelcolor 64 minimum 0 maximum 129 value 14 textsize 12 textcolor 64
+          tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
-          callback {// does nothing - hides spinner arrows}
-          xywh {114 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
+          callback {// does nothing - hides CC arrows}
+          xywh {112 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Button nrpn {
           label {8888 h}
           tooltip {NRPN value} xywh {76 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 labelcolor 64 hide
         }
-        Fl_Light_Button sevenbit {
-          callback {send_data(0, MIDILEARN::control::sevenBit);}
-          tooltip {Set for 7bit NRPN} xywh {59 0 13 15} box NO_BOX color 28 selection_color 1 labelcolor 64 hide
+        Fl_Button sevenbit {
+          callback {//
+              if (o->value() != 0)
+                  o->value(0);
+              else
+                  o->value(1);
+              send_data(0, MIDILEARN::control::sevenBit);}
+          tooltip {Set for 7bit NRPN} xywh {61 1 10 13} box DOWN_BOX color 44 selection_color 91 labelcolor 64 hide
         }
         Fl_Choice channelchoice {
           callback {send_data(0, 48);}
@@ -183,32 +188,32 @@ class MidiLearnKitItem {: {public Fl_Group}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelcolor 64 align 4
           class Fl_Check_Button2
         }
-        Fl_Light_Button activity {
+        Fl_Button activity {
           callback {//
           if (o->value() != 0)
               o->value(0);
           else
               o->value(1);}
-          xywh {180 0 13 15} box NO_BOX color 15 selection_color 2 labelcolor 64
+          tooltip {MIDI incoming} xywh {181 1 10 13} box DOWN_BOX color 44 selection_color 79
         }
         Fl_Spinner minval {
           callback {send_data(0, MIDILEARN::control::minimum);}
-          tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 labelcolor 64 minimum 0 step 0.5 value 0 textsize 12 textcolor 64
+          tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 0 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
-          callback {// does nothing - hides spinner arrows}
-          xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
+          callback {// does nothing - hides Min arrows}
+          xywh {238 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Spinner maxval {
           callback {//
           send_data(0, MIDILEARN::control::maximum);}
-          tooltip {Maximum % to pass on} xywh {261 0 52 15} type Float labelsize 12 labelcolor 64 minimum 0 step 0.5 value 100 textsize 12 textcolor 64
+          tooltip {Maximum % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12 textcolor 64
           class WidgetSpinner
         }
         Fl_Button {} {
-          callback {// does nothing - hides spinner arrows}
-          xywh {303 0 15 16} box FLAT_BOX down_box FLAT_BOX labelcolor 64
+          callback {// does nothing - hides Max arrows}
+          xywh {302 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Button commandName {
           label text
@@ -337,7 +342,7 @@ class MidiLearnKitItem {: {public Fl_Group}
         minval->textsize(size12);
     maxval->labelsize(size12);
         maxval->textsize(size12);
-    mutecheck->labelsize(size12);
+    mutecheck->labelsize(size14);
     commandName->labelsize(int(10 * dScale));
 
      midilearnkititem->redraw();} {}

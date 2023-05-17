@@ -1,4 +1,12 @@
-yoshimi 2.3.0 rc6
+yoshimi 2.3.0 rc7
+
+2023-5-17 Will
+bn 2229
+Changed MIDI-learn 7bit NRPN warning colour to warning background.
+Created "Midilearn activity indicator" entry in themes.
+Correction to User Guide AlienWah Delay description.
+Added instruments to banks from Art Horan.
+Set version as 2.3.0 rc7
 
 2023-5-16 Will
 bn 2228
