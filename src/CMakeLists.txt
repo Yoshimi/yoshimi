@@ -51,10 +51,10 @@ add_definitions(-Wextra)
 add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.3.0 rc7")
+set (YOSHIMI_VERSION "2.3.0 rc8")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
-add_definitions (-DMIN_CONFIG_MINOR=0)
+add_definitions (-DMIN_CONFIG_MINOR=3)
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -353,12 +353,12 @@ if (BuildWithFLTK)
         set (sourcefile "${basename}.cpp")
         set (headerfile "${basename}.h")
         add_custom_command(
-          OUTPUT ${sourcefile}
-          WORKING_DIRECTORY ${guitmp}
-          COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
-          COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${sourcefile} ..
-          COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${headerfile} ..
-          DEPENDS ${fluidfile}
+            OUTPUT ${sourcefile}
+            WORKING_DIRECTORY ${guitmp}
+            COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${sourcefile} ..
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${headerfile} ..
+            DEPENDS ${fluidfile}
         )
         set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
         set (FltkUI_headers ${FltkUI_headers} "${headerfile}")

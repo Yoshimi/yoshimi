@@ -1,4 +1,5 @@
-Version 2.2.3
+Version 2.2.3 - Painted Bunting
+A very colourful singer.
 
 The most obvious development here is the changes made to the Graphics UI. Link buttons are now quite distinct from action ones, with respect to the colour and outline. Also Learnable buttons and switches now have a different colour and text font - people were unaware of many that were learnable.
 
