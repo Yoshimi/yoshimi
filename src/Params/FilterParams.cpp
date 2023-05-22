@@ -400,6 +400,12 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int control = getData->data.control;
     int effType = getData->data.kit;
     int engine = getData->data.engine;
+    int dynPreset = 0;
+    if (effType == EFFECT::type::dynFilter)
+    {
+        dynPreset = getData->data.offset;
+        //std::cout << "pres " << dynPreset << std::endl;
+    }
 
     unsigned char type = 0;
 
@@ -414,7 +420,26 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     {
         case FILTERINSERT::control::centerFrequency:
             if (effType == EFFECT::type::dynFilter)
-                def = FILTDEF::dynFreq.def;
+            {
+                switch (dynPreset)
+                {
+                    case 0:
+                        def = FILTDEF::dynFreq0.def;
+                        break;
+                    case 1:
+                        def = FILTDEF::dynFreq1.def;
+                        break;
+                    case 2:
+                        def = FILTDEF::dynFreq2.def;
+                        break;
+                    case 3:
+                        def = FILTDEF::dynFreq3.def;
+                        break;
+                    case 4:
+                        def = FILTDEF::dynFreq4.def;
+                        break;
+                }
+            }
             else if (engine == PART::engine::subSynth)
                 def = FILTDEF::subFreq.def;
             else if (engine >= PART::engine::addVoice1)
@@ -424,10 +449,31 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             type &= ~TOPLEVEL::type::Integer;
             break;
         case FILTERINSERT::control::Q:
-            if (engine >= PART::engine::addVoice1)
+            if (effType == EFFECT::type::dynFilter)
+            {
+                switch (dynPreset)
+                {
+                    case 0:
+                        def = FILTDEF::dynQval0.def;
+                        break;
+                    case 1:
+                        def = FILTDEF::dynQval1.def;
+                        break;
+                    case 2:
+                        def = FILTDEF::dynQval2.def;
+                        break;
+                    case 3:
+                        def = FILTDEF::dynQval3.def;
+                        break;
+                    case 4:
+                        def = FILTDEF::dynQval4.def;
+                        break;
+
+                }
+            }
+            else if (engine >= PART::engine::addVoice1)
                 def = FILTDEF::voiceQval.def;
-            else if (effType == EFFECT::type::dynFilter)
-                def = FILTDEF::dynQval.def;
+
             else
                 def = FILTDEF::qVal.def;
             type &= ~TOPLEVEL::type::Integer;

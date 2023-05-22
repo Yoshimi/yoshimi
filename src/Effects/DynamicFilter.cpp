@@ -170,8 +170,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
             case 0:
                 filterpars->Pcategory = 0;
                 filterpars->Ptype = 2;
-                filterpars->Pfreq = 45;
-                filterpars->Pq = 64;
+                filterpars->Pfreq = FILTDEF::dynFreq0.def;
+                filterpars->Pq = FILTDEF::dynQval0.def;
                 filterpars->Pstages = 1;
                 filterpars->Pgain = 64;
                 break;
@@ -179,8 +179,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
             case 1:
                 filterpars->Pcategory = 2;
                 filterpars->Ptype = 0;
-                filterpars->Pfreq = 72;
-                filterpars->Pq = 64;
+                filterpars->Pfreq = FILTDEF::dynFreq1.def;
+                filterpars->Pq = FILTDEF::dynQval1.def;
                 filterpars->Pstages = 0;
                 filterpars->Pgain = 64;
                 break;
@@ -188,8 +188,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
             case 2:
                 filterpars->Pcategory = 0;
                 filterpars->Ptype = 4;
-                filterpars->Pfreq = 64;
-                filterpars->Pq = 64;
+                filterpars->Pfreq = FILTDEF::dynFreq2.def;
+                filterpars->Pq = FILTDEF::dynQval2.def;
                 filterpars->Pstages = 2;
                 filterpars->Pgain = 64;
                 break;
@@ -197,8 +197,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
             case 3:
                 filterpars->Pcategory = 1;
                 filterpars->Ptype = 0;
-                filterpars->Pfreq = 50;
-                filterpars->Pq = 70;
+                filterpars->Pfreq = FILTDEF::dynFreq3.def;
+                filterpars->Pq = FILTDEF::dynQval3.def;
                 filterpars->Pstages = 1;
                 filterpars->Pgain = 64;
 
@@ -228,8 +228,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
             case 4:
                 filterpars->Pcategory = 1;
                 filterpars->Ptype = 0;
-                filterpars->Pfreq = 64;
-                filterpars->Pq = 70;
+                filterpars->Pfreq = FILTDEF::dynFreq4.def;
+                filterpars->Pq = FILTDEF::dynQval4.def;
                 filterpars->Pstages = 1;
                 filterpars->Pgain = 64;
 

@@ -1,6 +1,9 @@
 yoshimi 2.3.0 rc8
 
 2023-5-22 Will
+bn 2232
+BugFix: Dynfilter not setting filter knob colours or postions.
+
 bn 2231
 BugFix: Not setting default preset when effect type changed.
 

@@ -7377,6 +7377,22 @@ float InterChange::returnLimits(CommandBlock *getData)
     if (insert == TOPLEVEL::insert::filterGroup)
     {
         filterLimit filterLimits;
+        if (kititem == EFFECT::type::dynFilter)
+        {
+            /*
+             * This is somewhat convoluted!
+             * Only for dynFilter we need to find the preset number.
+             * Default frequency and Q are different over the 5 presets.
+             */
+            CommandBlock tempData;
+            memcpy(tempData.bytes, getData->bytes, sizeof(CommandBlock));
+            tempData.data.type = 0;
+            tempData.data.source = 0;
+            tempData.data.insert = UNUSED;
+            tempData.data.control = EFFECT::control::preset;
+            commandEffects(&tempData);
+            getData->data.offset = tempData.data.value;
+        }
         return filterLimits.getFilterLimits(getData);
     }
     // should prolly move other inserts up here
