@@ -101,7 +101,7 @@ This would corrupt the colour map.
 0,0,0, RESERVED
 255,255,0, Formant filter marker
 150,150,0, Formant filter ghost marker
-0,182,191, Dynfilter filter button
+0,182,191, Dynfilter filter insert
 0,70,150, EQ graph background
 80,120,160, EQ background disabled
 200,200,200, EQ graph grid

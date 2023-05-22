@@ -2216,7 +2216,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             dfp->textcolor(textCol);
             dfp->redraw();
             break;
-    }} {}
+    };} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {//
@@ -2238,6 +2238,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     int px=this->parent()->x();
     int py=this->parent()->y();
 
+    lastEff = -1;
     presetNum = 0;
     effnullwindow->position(px,py);
     effreverbwindow->position(px,py);
@@ -2272,7 +2273,13 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         delete(filterwindow);
         filterwindow=NULL;
     }
-    switch(eff->geteffect() + EFFECT::type::none) // get effect not yet converted
+    int nextEff = eff->geteffect() + EFFECT::type::none; // get effect not yet converted
+    if (lastEff != nextEff)
+    {
+        presetNum = 0;
+        //std::cout << "EFF changed" << std::endl;
+    }
+    switch(nextEff)
     {
         case EFFECT::type::reverb:
             revp->value(eff->getpreset());
@@ -2578,6 +2585,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             effnullwindow->show();
             break;
     }
+    lastEff = nextEff;
     this->show();} {}
   }
   Function {refresh()} {} {
@@ -2874,6 +2882,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   decl {float filtDW;} {private local
   }
   decl {float filtDH;} {private local
+  }
+  decl {int lastEff;} {private local
   }
   decl {int presetNum;} {private local
   }

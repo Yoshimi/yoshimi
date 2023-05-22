@@ -1,8 +1,13 @@
 yoshimi 2.3.0 rc8
 
+2023-5-22 Will
+bn 2231
+BugFix: Not setting default preset when effect type changed.
+
 2023-5-17 Will
 bn 2230
 BugFix: Effect preset text not setting 'normal' colour.
+Set version as 2.3.0 rc8
 
 2023-5-17 Will
 bn 2229

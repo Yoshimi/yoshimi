@@ -99,7 +99,7 @@
 0,0,0, RESERVED
 200,255,200, Formant filter marker
 100,155,100, Formant filter ghost marker
-0,182,191, Dynfilter filter button
+0,182,191, Dynfilter filter insert
 0,70,150, EQ graph background
 80,120,160, EQ background disabled
 200,200,0, EQ graph grid
