@@ -607,7 +607,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                 val = formFreqDef;
                 o->value(val);
             }
-
             o->selection_color(setKnob(val,formFreqDef)); // has pseudo default
             send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantFrequency, val, TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
@@ -843,9 +842,10 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         formFreqDef = pars->Pvowels[nvowel].formants[nformant].firstF;
         formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_freq_dial->selection_color(setKnob(formant_freq_dial->value(),formFreqDef));
-        formant_freq_dial->redraw();
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
+        formant_q_dial->selection_color(setKnob( formant_q_dial->value(),FILTDEF::formQ.def));
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
+        formant_amp_dial->selection_color(setKnob( formant_amp_dial->value(),FILTDEF::formAmp.def));
         nseqsize = pars->Psequencesize;
         seqsize->value(nseqsize);
 
@@ -1119,6 +1119,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         return;
     if (dynFilt)
     {
+        std::cout << "here " << value << std::endl;
         dynPreset = fetchData(0, EFFECT::control::preset, npart, kititem, engine);
 
         if (part == TOPLEVEL::section::systemEffects)
@@ -1133,6 +1134,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     bool isVoice = (eng >= PART::engine::addVoice1);
     bool isSub = (eng == PART::engine::subSynth);
     bool isPad = (eng == PART::engine::padSynth);
+
     switch(control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -1158,6 +1160,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                         cfreqdial->selection_color(setKnob(value,FILTDEF::dynFreq4.def));
                         break;
                 }
+                formantfiltergraph->redraw();
             }
             else if(isAdd)
                 cfreqdial->selection_color(setKnob(value,FILTDEF::addFreq.def));
@@ -1173,6 +1176,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case FILTERINSERT::control::Q:
         {
             qdial->value(value);
+
             if (dynFilt)
             {
                 switch (dynPreset)
@@ -1193,6 +1197,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
                         qdial->selection_color(setKnob(value,FILTDEF::dynQval4.def));
                         break;
                 }
+                formantfiltergraph->redraw();
             }
             else if (isVoice)
                 qdial->selection_color(setKnob(value,FILTDEF::voiceQval.def));
