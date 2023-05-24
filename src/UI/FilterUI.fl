@@ -1119,7 +1119,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         return;
     if (dynFilt)
     {
-        std::cout << "here " << value << std::endl;
+        //std::cout << "is dyn " << value << std::endl;
         dynPreset = fetchData(0, EFFECT::control::preset, npart, kititem, engine);
 
         if (part == TOPLEVEL::section::systemEffects)
