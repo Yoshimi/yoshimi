@@ -7391,7 +7391,7 @@ float InterChange::returnLimits(CommandBlock *getData)
             tempData.data.insert = UNUSED;
             tempData.data.control = EFFECT::control::preset;
             commandEffects(&tempData);
-            getData->data.offset = tempData.data.value;
+            getData->data.spare1 = tempData.data.value;
         }
         return filterLimits.getFilterLimits(getData);
     }

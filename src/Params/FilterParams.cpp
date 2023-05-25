@@ -403,7 +403,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int dynPreset = 0;
     if (effType == EFFECT::type::dynFilter)
     {
-        dynPreset = getData->data.offset;
+        dynPreset = getData->data.spare1;
         //std::cout << "pres " << dynPreset << std::endl;
     }
 
