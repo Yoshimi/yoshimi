@@ -629,14 +629,11 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             Fl_Dial formant_amp_dial {
               label Amp
               callback {//
-            float val = o->value();
+            float val = findDynDef(2);
             if (Fl::event_button() == 3)
-            {
-                val = FILTDEF::formAmp.def;
                 o->value(val);
-            }
-            o->selection_color(setKnob(val,FILTDEF::formAmp.def));
-            send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantAmplitude, val, TOPLEVEL::type::Write, nformant, nvowel);}
+            o->selection_color(setKnob(o->value(),val));
+            send_data(0, FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
               class WidgetPDial
             }
@@ -782,15 +779,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         Fl_Dial wvknob {
           label {Vw.Cl.}
           callback {//
-        float val = o->value();
+        float val = findDynClearDef();
         if (Fl::event_button() == 3)
         {
-            val = FILTDEF::formClear.def;
             o->value(val);
         }
 
-        o->selection_color(setKnob(val,FILTDEF::formClear.def));
-        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantClearness, val, TOPLEVEL::type::Write);}
+        o->selection_color(setKnob(o->value(),val));
+        send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantClearness, o->value(), TOPLEVEL::type::Write);}
           tooltip {Vowel "clearness" (transition between vowels)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127
           code0 {o->value(pars->Pvowelclearness);}
           code1 {o->setValueType(VC_FormFilterClearness);}
@@ -845,7 +841,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_q_dial->selection_color(setKnob( formant_q_dial->value(),FILTDEF::formQ.def));
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
-        formant_amp_dial->selection_color(setKnob( formant_amp_dial->value(),FILTDEF::formAmp.def));
+        formant_amp_dial->selection_color(setKnob( formant_amp_dial->value(),findDynDef(2)));
         nseqsize = pars->Psequencesize;
         seqsize->value(nseqsize);
 
@@ -922,6 +918,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         if (kititem == EFFECT::type::dynFilter)
         {
+            dynFilt = true;
             dynPreset = fetchData(0, EFFECT::control::preset, npart, kititem, engine);
             switch (dynPreset)
             {
@@ -979,13 +976,13 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
         frsldial->selection_color(setKnob(frsldial->value(),FILTDEF::formSpeed.def));
 
-        wvknob->selection_color(setKnob(wvknob->value(),FILTDEF::formClear.def));
+        wvknob->selection_color(setKnob(wvknob->value(),findDynClearDef()));
 
         //formant_freq_dial->selection_color(setKnob(value,formFreqDef))
 
         formant_q_dial->selection_color(setKnob(formant_q_dial->value(),FILTDEF::formQ.def));
 
-        formant_amp_dial->selection_color(setKnob(formant_amp_dial->value(),FILTDEF::formAmp.def));
+        formant_amp_dial->selection_color(setKnob(formant_amp_dial->value(),findDynDef(2)));
 
         strchdial->selection_color(setKnob(strchdial->value(),FILTDEF::formStretch.def));
 
@@ -1027,11 +1024,11 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     code {//
         if(formantparswindow)
         {
-        	if(formantparswindow->visible())
-        	{
-        	    formantparswindow->hide();
-        	    formantparswindow->show();
-        	}
+            if(formantparswindow->visible())
+            {
+                formantparswindow->hide();
+                formantparswindow->show();
+            }
         }
         ;} {}
   }
@@ -1113,7 +1110,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
 
     bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
 
-    bool dynFilt = (kititem == EFFECT::type::dynFilter);
+    dynFilt = (kititem == EFFECT::type::dynFilter);
 
     if (part != npart || (!dynFilt && eng != engine))
         return;
@@ -1291,7 +1288,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             if (!fromUs)
             {
                 wvknob->value(value);
-                wvknob->selection_color(setKnob(value,FILTDEF::formClear.def));
+                wvknob->selection_color(setKnob(value,findDynClearDef()));
             }
             break;
 
@@ -1396,6 +1393,86 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             break;
     }} {}
   }
+  Function {findDynDef(int type)} {return_type float
+  } {
+    code {// currently only handles amp (type 2)
+                float val = FILTDEF::formAmp.def; // standard default
+                if (dynFilt)
+                {
+                    //std::cout << "is dyn" << std::endl;
+                    if (dynPreset == 3)
+                    {
+                        if (nvowel == 0)
+                        {
+                            switch (nformant)
+                            {
+                                case 0:
+                                    val = DYNform::Preset3V0F0.amp;
+                                    break;
+                                case 1:
+                                    val = DYNform::Preset3V0F1.amp;
+                                    break;
+                                case 2:
+                                    val = DYNform::Preset3V0F2.amp;
+                                    break;
+                            }
+                        }
+                        else if (nvowel == 1)
+                        {
+                            switch (nformant)
+                            {
+                                case 0:
+                                    val = DYNform::Preset3V1F0.amp;
+                                    break;
+                                case 1:
+                                    val = DYNform::Preset3V1F1.amp;
+                                    break;
+                                case 2:
+                                    val = DYNform::Preset3V1F2.amp;
+                                    break;
+                            }
+                        }
+                    }
+
+                    else if (dynPreset == 4)
+                    {
+                        if (nvowel == 0)
+                        {
+                            switch (nformant)
+                            {
+                                case 0:
+                                    val = DYNform::Preset4V0F0.amp;
+                                    break;
+                                case 1:
+                                    val = DYNform::Preset4V0F1.amp;
+                                    break;
+                            }
+                        }
+                        else if (nvowel == 1)
+                        {
+                            switch (nformant)
+                            {
+                                case 0:
+                                    val = DYNform::Preset4V1F0.amp;
+                                    break;
+                                case 1:
+                                    val = DYNform::Preset4V1F1.amp;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                return val;
+;} {}
+  }
+  Function {findDynClearDef()} {return_type float
+  } {
+    code {//
+           if (dynFilt && dynPreset == 4)
+               return 0;
+           return FILTDEF::formClear.def;;
+;} {}
+  }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//
     pars=filterpars_;
@@ -1405,6 +1482,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     npart = npart_;
     kititem = kititem_;
     engine = engine_;
+    dynFilt = false;
     dynPreset = 0;
     lastformantX = 0;
     lastformantY = 0;
@@ -1471,6 +1549,8 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
   decl {int kititem;} {private local
   }
   decl {int engine;} {private local
+  }
+  decl {bool dynFilt;} {private local
   }
   decl {int dynPreset;} {private local
   }

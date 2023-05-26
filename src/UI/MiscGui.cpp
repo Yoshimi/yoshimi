@@ -130,8 +130,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                         type = TOPLEVEL::type::Learnable;
                     }
                 }
-                else if (!(insert == TOPLEVEL::insert::filterGroup && control == FILTERINSERT::formantFrequency))
-                { // formant frequency has no default so do nothing!
+                else if (!((insert == TOPLEVEL::insert::filterGroup) && (control == FILTERINSERT::formantFrequency || control == FILTERINSERT::formantAmplitude))) // this needs improving
+                { // formant frequency and amplitude are handled directly
                     if (insert != UNUSED || kititem < EFFECT::type::none || kititem >= EFFECT::type::count)
                     { // effect defaults handled directly
                         putData.data.value = newValue;

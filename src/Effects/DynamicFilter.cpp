@@ -204,25 +204,25 @@ void DynamicFilter::setpreset(unsigned char npreset)
 
                 filterpars->Psequencesize = 2;
                 // "I"
-                filterpars->Pvowels[0].formants[0].freq = 34;
-                filterpars->Pvowels[0].formants[0].amp = 127;
-                filterpars->Pvowels[0].formants[0].q = 64;
-                filterpars->Pvowels[0].formants[1].freq = 99;
-                filterpars->Pvowels[0].formants[1].amp = 122;
-                filterpars->Pvowels[0].formants[1].q = 64;
-                filterpars->Pvowels[0].formants[2].freq = 108;
-                filterpars->Pvowels[0].formants[2].amp = 112;
-                filterpars->Pvowels[0].formants[2].q = 64;
+                filterpars->Pvowels[0].formants[0].freq = DYNform::Preset3V0F0.freq;//34;
+                filterpars->Pvowels[0].formants[0].amp = DYNform::Preset3V0F0.amp;//127;
+                filterpars->Pvowels[0].formants[0].q = DYNform::Preset3V0F0.q;//64;
+                filterpars->Pvowels[0].formants[1].freq = DYNform::Preset3V0F1.freq;//99;
+                filterpars->Pvowels[0].formants[1].amp = DYNform::Preset3V0F1.amp;//122;
+                filterpars->Pvowels[0].formants[1].q = DYNform::Preset3V0F1.q;//64;
+                filterpars->Pvowels[0].formants[2].freq = DYNform::Preset3V0F2.freq;//108;
+                filterpars->Pvowels[0].formants[2].amp = DYNform::Preset3V0F2.amp;//112;
+                filterpars->Pvowels[0].formants[2].q = DYNform::Preset3V0F2.q;//64;
                 // "A"
-                filterpars->Pvowels[1].formants[0].freq = 61;
-                filterpars->Pvowels[1].formants[0].amp = 127;
-                filterpars->Pvowels[1].formants[0].q = 64;
-                filterpars->Pvowels[1].formants[1].freq = 71;
-                filterpars->Pvowels[1].formants[1].amp = 121;
-                filterpars->Pvowels[1].formants[1].q = 64;
-                filterpars->Pvowels[1].formants[2].freq = 99;
-                filterpars->Pvowels[1].formants[2].amp = 117;
-                filterpars->Pvowels[1].formants[2].q = 64;
+                filterpars->Pvowels[1].formants[0].freq = DYNform::Preset3V1F0.freq;//61;
+                filterpars->Pvowels[1].formants[0].amp = DYNform::Preset3V1F0.amp;//127;
+                filterpars->Pvowels[1].formants[0].q = DYNform::Preset3V1F0.q;//64;
+                filterpars->Pvowels[1].formants[1].freq = DYNform::Preset3V1F1.freq;//71;
+                filterpars->Pvowels[1].formants[1].amp = DYNform::Preset3V1F1.amp;//121;
+                filterpars->Pvowels[1].formants[1].q = DYNform::Preset3V1F1.q;//64;
+                filterpars->Pvowels[1].formants[2].freq = DYNform::Preset3V1F2.freq;//99;
+                filterpars->Pvowels[1].formants[2].amp = DYNform::Preset3V1F2.amp;//117;
+                filterpars->Pvowels[1].formants[2].q = DYNform::Preset3V1F1.q;//64;
                 break;
 
             case 4:
@@ -237,19 +237,19 @@ void DynamicFilter::setpreset(unsigned char npreset)
                 filterpars->Pnumformants = 2;
                 filterpars->Pvowelclearness = 0;
 
-                filterpars->Pvowels[0].formants[0].freq = 70;
-                filterpars->Pvowels[0].formants[0].amp = 127;
-                filterpars->Pvowels[0].formants[0].q = 64;
-                filterpars->Pvowels[0].formants[1].freq = 80;
-                filterpars->Pvowels[0].formants[1].amp = 122;
-                filterpars->Pvowels[0].formants[1].q = 64;
+                filterpars->Pvowels[0].formants[0].freq = DYNform::Preset4V0F0.freq;//70;
+                filterpars->Pvowels[0].formants[0].amp = DYNform::Preset4V0F0.amp;//127;
+                filterpars->Pvowels[0].formants[0].q = DYNform::Preset4V0F0.q;//64;
+                filterpars->Pvowels[0].formants[1].freq = DYNform::Preset4V0F1.freq;//80;
+                filterpars->Pvowels[0].formants[1].amp = DYNform::Preset4V0F1.amp;//122;
+                filterpars->Pvowels[0].formants[1].q = DYNform::Preset4V0F1.q;//64;
 
-                filterpars->Pvowels[1].formants[0].freq = 20;
-                filterpars->Pvowels[1].formants[0].amp = 127;
-                filterpars->Pvowels[1].formants[0].q = 64;
-                filterpars->Pvowels[1].formants[1].freq = 100;
-                filterpars->Pvowels[1].formants[1].amp = 121;
-                filterpars->Pvowels[1].formants[1].q = 64;
+                filterpars->Pvowels[1].formants[0].freq = DYNform::Preset4V1F0.freq;//20;
+                filterpars->Pvowels[1].formants[0].amp = DYNform::Preset4V1F0.amp;//127;
+                filterpars->Pvowels[1].formants[0].q = DYNform::Preset4V1F0.q;//64;
+                filterpars->Pvowels[1].formants[1].freq = DYNform::Preset4V1F1.freq;//100;
+                filterpars->Pvowels[1].formants[1].amp = DYNform::Preset4V1F1.amp;//121;
+                filterpars->Pvowels[1].formants[1].q = DYNform::Preset4V1F1.q;//64;
                 break;
         }
 

@@ -176,6 +176,27 @@ namespace FILTDEF{
     const FILTminmax analogType {0,8,2,false,true};
     const FILTminmax stVarfType {0,3,0,false,true};
 }
+
+struct DYNinsert{
+    float freq;
+    float amp;
+    float q;
+};
+
+namespace DYNform{
+    const DYNinsert Preset3V0F0 {34,127,64};
+    const DYNinsert Preset3V0F1 {99,122,64};
+    const DYNinsert Preset3V0F2 {108,112,64};
+    const DYNinsert Preset3V1F0 {61,127,64};
+    const DYNinsert Preset3V1F1 {71,121,64};
+    const DYNinsert Preset3V1F2 {99,117,64};
+
+    const DYNinsert Preset4V0F0 {70,127,64};
+    const DYNinsert Preset4V0F1 {80,122,64};
+    const DYNinsert Preset4V1F0 {20,127,64};
+    const DYNinsert Preset4V1F1 {100,121,64};
+};
+
 namespace FILTSWITCH{
     const bool trackRange = false;
     const bool sequenceReverse = false;
