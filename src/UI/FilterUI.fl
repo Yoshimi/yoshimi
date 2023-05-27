@@ -632,7 +632,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             if (Fl::event_button() == 3)
                 o->value(val);
             o->selection_color(setKnob(o->value(),val));
-            send_data(0, FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
+            send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::formantAmplitude, o->value(), TOPLEVEL::type::Write, nformant, nvowel);}
               tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127
               class WidgetPDial
             }

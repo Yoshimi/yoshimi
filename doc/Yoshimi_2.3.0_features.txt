@@ -1,7 +1,7 @@
 Version 2.2.3 - Painted Bunting
 A very colourful singer.
 
-The most obvious development here is the changes made to the Graphics UI. Link buttons are now quite distinct from action ones, with respect to the colour and outline. Also Learnable buttons and switches now have a different colour and text font - people were unaware of many that were learnable.
+The most obvious development here is the changes made to the Graphics UI. Link buttons are now quite distinct from action ones with respect to both the colour and outline. Also Learnable buttons and switches now have a different colour and text font - people were unaware of many that were learnable.
 
 You now have clear indication when control knobs and sliders are moved from their default positions. Knob pointers will change from black to red, and sliders now all have a green 'core', which will also turn red when not at the default position.
 
