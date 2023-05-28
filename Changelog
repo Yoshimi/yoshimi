@@ -2,6 +2,9 @@ yoshimi 2.3.0 rc9
 
 2023-5-28 Will
 bn 2238
+
+Corrected 'Mono' button colour.
+
 Corrected envelope 'E' button style.
 Added theme control to AddVoice tab 'unused' colour.
 

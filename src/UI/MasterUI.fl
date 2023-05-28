@@ -1441,7 +1441,7 @@ class MasterUI {: {private GuiUpdates}
         else
             o->label("Mono");
         send_data(0, MAIN::control::mono,  tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 91 labelfont 3 labelsize 11 labelcolor 226
+        tooltip {Master Mono/Stereo switch} xywh {7 90 68 24} box PLASTIC_UP_BOX down_box PLASTIC_UP_BOX color 228 selection_color 89 labelfont 3 labelsize 11 labelcolor 226
         code0 {o->value(synth->masterMono);}
       }
       Fl_Spinner masterkeyshift {
