@@ -74,7 +74,7 @@
 200,200,255, Yoshimi instrument type
 100,140,130, Instrument info background
 113,96,100, Instrument background
-0,0,0, RESERVED
+0,0,0, AddVoice off
 122,075,091, AddSynth background
 159,223,143, External voice
 143,191,223, External oscillator

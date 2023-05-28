@@ -545,7 +545,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           callback {//
           showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-          tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+          tooltip {Envelope window} xywh {185 5 15 15} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Check_Button e1linearenvelope {
           label L
@@ -647,7 +647,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         callback {//
       showfree();
       send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+        tooltip {Envelope window} xywh {190 5 15 15} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 10 labelcolor 64
       }
     }
   }
@@ -736,7 +736,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
           callback {//
           showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-          xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+          xywh {255 5 15 15} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 10 labelcolor 64
         }
         Fl_Button e3C {
           label C
@@ -829,7 +829,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         callback {//
         showfree();
         send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
-        xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
+        xywh {190 5 15 15} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 10 labelcolor 64
       }
     }
   }

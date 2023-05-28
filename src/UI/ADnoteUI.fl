@@ -2336,7 +2336,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       label {ADsynth Voice Parameters}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
-      xywh {465 95 805 610} type Double hide resizable
+      xywh {460 96 805 610} type Double hide resizable
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
@@ -2549,7 +2549,7 @@ o->hide();}
   }
   Function {setTabColour(int num)} {} {
     code {//
-    int set = 42;
+    int set = 169;//42;
     if (pars->VoicePar[num].Enabled)
         set = gen_text;
 
