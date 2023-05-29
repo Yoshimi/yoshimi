@@ -1,36 +1,38 @@
+Do not edit this. It may be overwritten.
+Instead, copy as template for other named themes.
 Don't add or remove lines between and including dashes.
 This would corrupt the colour map.
 ------------------ data start marker
-0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
-0,200,255, Panels (R,G,B, or #rrggbb,)
+25,65, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
+0,255,255, Panels (R,G,B or #rrggbb)
 0,0,0, RESERVED
-186,198,211, Knob shadow
-#e7ebef, Knob highlight (231,235,239)
+186,198,211, Knob shadow (#bac6d3)
+231,235,239, Knob highlight (#e7ebef)
 51,51,51, Knob ring
 0,197,255, Knob ring lit
 61,61,61, Knob pointer default
-170,60,50, Knob pointer changed
-0,0,0, Slider track
-0,0,0, Slider peg default
-200,80,60, Slider peg changed
+225,75,75, Knob pointer changed
+186,186,186, Slider track
+63,218,0 Slider peg default
+255,0,0, Slider peg changed
 127,127,127, Keyboard slider backgrounds
 63,127,255, Keyboard mod wheel fill
 0,0,0, RESERVED
-160,180,220, Link buttons
-180,180,200, Inverse link buttons
-63,145,255, Action buttons
-160,160,160, Close button
+40,40,150, Link buttons
+40,40,150, Inverse link buttons
+40,40,150, Action buttons
+102,0,0, Close button
 220,0,0, Warning type button
 250,150,90, Warning background patch
 255,0,0, Warning text
-0,0,255, Inverse warning text
-255,255,255, General text background
-0,0,0, General text
-255,255,255, Inverse text
-0,0,255, About window heading text
+0,0,55, Inverse warning text
+0,0,0, General text background
+255,255,255, General text
+0,0,0, Inverse text
+0,0,0, About window heading text
 0,255,0, Midilearn activity indicator
-191,255,255, Midilearn text background
-50,50,200, Learnable text
+0,51,51, Midilearn text background
+255,255,255, Learnable text
 0,0,255, Solo selected
 0,180,180, Midi/Solo release
 255,0,0, Midi ignored
@@ -55,13 +57,13 @@ This would corrupt the colour map.
 240,250,230, Filer favourites background
 0,0,0, RESERVED
 0,255,0, Bank/Instrument select lit
-255,0,255, Bank/instrument rename lit
-255,255,0, Bank/Instrument add/save lit
-255,0,0, Bank/Instrument delete lit
-0,0,255, Bank/Instrument swap lit
-255,180,0, Bank import lit
-180,240,255, Bank export lit
-255,100,255, Current bank highlight
+0,255,0, Bank/instrument rename lit
+0,255,0, Bank/Instrument add/save lit
+0,255,0, Bank/Instrument delete lit
+0,255,0, Bank/Instrument swap lit
+0,255,0, Bank import lit
+0,255,0, Bank export lit
+0,102,0, Current bank highlight
 160,140,250, Instrument being swapped
 0,0,255, Instrument original name
 0,0,0, RESERVED
@@ -73,17 +75,17 @@ This would corrupt the colour map.
 0,255,0, Waveform spectrum harmonic
 255,0,0, Formant graph line
 255,0,0, Resonance graph line
-0,0,225, Yoshimi instrument type
-240,250,230, Instrument info background
-253,246,230, Instrument background
-127,127,127, AddVoice off
-223,175,191, AddSynth background
+255,255,0, Yoshimi instrument type
+64,64,64, Instrument info background
+64,64,64, Instrument background
+128,128,128, RESERVED
+102,0,102, AddSynth background
 159,223,143, External voice
 143,191,223, External oscillator
-175,207,223, SubSynth background
-205,221,173, PadSynth background
-245,245,245, Padsynth harmonics background
-225,225,225, PadSynth profile equivalent background
+0,0,102, SubSynth background
+0,102,0, PadSynth background
+0,0,0, Padsynth harmonics background
+0,0,0, PadSynth profile equivalent background
 180,180,180, Padsynth profile grid
 90,90,90, Padsynth profile centre mark
 90,120,250, PadSynth profile equivalent markers
@@ -96,20 +98,20 @@ This would corrupt the colour map.
 191,72,191, PadSynth building
 0,160,160, PadSynth pending
 255,255,0, PadSynth fading
-150,150,150, PadSynth built
+87,87,255, PadSynth built
 255,120,0, Pending button
 0,0,0, RESERVED
 255,255,0, Formant filter marker
 150,150,0, Formant filter ghost marker
-0,182,191, Dynfilter filter insert
+0,182,191, Dynfilter filter button
 0,70,150, EQ graph background
 80,120,160, EQ background disabled
 200,200,200, EQ graph grid
 255,255,255, EQ graph major grid
 255,255,0, EQ graph line
 200,200,80, EQ graph line disabled
-0,0,0, Effect preset
-0,0,255, Effect preset changed
+255,255,255, Effect preset
+255,51,51, Effect preset changed
 0,0,0, RESERVED
 255,255,255, Envelope control point
 0,255,255, Envelope control point selected
@@ -118,5 +120,4 @@ This would corrupt the colour map.
 255,0,0, Envelope line selected
 =================== data end marker
 Add your own notes here:
-Copyright © 2020 A. N. Other
-The default theme
+Dark Theme by Largos

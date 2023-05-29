@@ -1,25 +1,25 @@
-Don't add or remove lines between and including dashes.
-This would corrupt the colour map.
+All grey classic (127,127)
+
 ------------------ data start marker
-0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
-0,200,255, Panels (R,G,B, or #rrggbb,)
+127,127, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
+0,255,255, Panels (R,G,B or #rrggbb)
 0,0,0, RESERVED
-186,198,211, Knob shadow
-#e7ebef, Knob highlight (231,235,239)
+186,198,211, Knob shadow (#bac6d3)
+231,235,239, Knob highlight (#e7ebef)
 51,51,51, Knob ring
 0,197,255, Knob ring lit
 61,61,61, Knob pointer default
-170,60,50, Knob pointer changed
+225,75,75, Knob pointer changed
 0,0,0, Slider track
-0,0,0, Slider peg default
-200,80,60, Slider peg changed
+0,170,0, Slider peg default
+255,80,80, Slider peg changed
 127,127,127, Keyboard slider backgrounds
 63,127,255, Keyboard mod wheel fill
 0,0,0, RESERVED
-160,180,220, Link buttons
+120,190,185, Link buttons
 180,180,200, Inverse link buttons
 63,145,255, Action buttons
-160,160,160, Close button
+160,160,140, Close button
 220,0,0, Warning type button
 250,150,90, Warning background patch
 255,0,0, Warning text
@@ -30,7 +30,7 @@ This would corrupt the colour map.
 0,0,255, About window heading text
 0,255,0, Midilearn activity indicator
 191,255,255, Midilearn text background
-50,50,200, Learnable text
+0,0,255, Learnable text
 0,0,255, Solo selected
 0,180,180, Midi/Solo release
 255,0,0, Midi ignored
@@ -76,7 +76,7 @@ This would corrupt the colour map.
 0,0,225, Yoshimi instrument type
 240,250,230, Instrument info background
 253,246,230, Instrument background
-127,127,127, AddVoice off
+127,127,127, AddVoice tab off
 223,175,191, AddSynth background
 159,223,143, External voice
 143,191,223, External oscillator
@@ -117,6 +117,6 @@ This would corrupt the colour map.
 255,255,255, Envelope line
 255,0,0, Envelope line selected
 =================== data end marker
-Add your own notes here:
-Copyright © 2020 A. N. Other
-The default theme
+
+Temporarily setting a theme all grey is
+useful for testing contrast.

@@ -1,10 +1,17 @@
-Version 2.2.3
+Version 2.3.0 - Painted Bunting
 
-The Formant editor window has been made a bit more user friendly.
-The Command line can now use Yoshimi's Copy/Paste feature and stored presets.
-There are also minor bugfixes and general updates.
+There's been a major overhaul of the graphics for better visibility.
 
-Full details are in /doc/Yoshimi_2.2.3_features.txt
+We've added a very complete user-definable colour theme system.
+
+There is indication when any rotary control or slider is not at its default.
+
+Many controls are now high resolution yet both forward and backward compatible
+with older Yoshimi versions.
+
+All the documentation has been revised.
+
+Full details are in /doc/Yoshimi_2.3.0_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

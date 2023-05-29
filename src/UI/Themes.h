@@ -404,7 +404,7 @@ static std::string colourData [] = {
     "0,0,225, Yoshimi instrument type",
     "240,250,230, Instrument info background",
     "253,246,230, Instrument background",
-    "127,127,127, AddVoice off",
+    "127,127,127, AddVoice tab off",
     "223,175,191, AddSynth background",
     "159,223,143, External voice",
     "143,191,223, External oscillator",
