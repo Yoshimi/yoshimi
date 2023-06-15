@@ -1,0 +1,52 @@
+Yoshimi responds to the following messages.
+
+
+  0 or 32: Bank Change (user selectable and does *not* force a program change)
+  1: Modulation Wheel
+  2: Breath Control
+  6: Data MSB
+  7: Volume
+ 10: Panning
+ 11: Expression
+ 38: Data LSB
+ 64: Sustain pedal
+ 65: Portamento
+ 68: Legato pedal
+ 71: Filter Q (Sound Timbre)
+ 74: Filter Cutoff (Brightness)
+ 75: BandWidth *
+ 76: FM amplitude *
+ 77: Resonance Center Frequency *
+ 78: Resonance Bandwith *
+ 96: Data Increment
+ 97: Data Decrement
+ 98: NRPN LSB
+ 99: NRPN MSB
+120: All Sounds OFF
+121: Reset All Controllers
+123: All Notes OFF
+
+* different to the official GM spec.
+
+Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
+There is also an option for making Program Change enable a part if it's currently disabled.
+
+Key pressure (aftertouch) is internally translated as CC 642 but currently implemented as channel pressure.
+
+Channel pressure is internally translated as CC 641 and is accessed by MIDI learn further translated as CC 129.
+
+Pitch Bend is internally translated as CC 640 and is accessed by MIDI learn further translated as CC 128.
+
+
+The modulation wheel only affects AddSynth and PadSynth, and then only the frequency LFO depth. Just to make it more confusing, it changes the level from 0 up to it's current (gui) setting only. Therefore if the LFO depth is set to zero the Mod Wheel will have no effect.
+
+User selectable CC for Bank Root Path change.
+
+For more details of bank changes see Banks.txt
+
+Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
+
+Further details on NRPNs are in Using_NRPNs.txt
+
+*** UPDATE ***
+Key pressure is now recognised uniquely for aftertouch.

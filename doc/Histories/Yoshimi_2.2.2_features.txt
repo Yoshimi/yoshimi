@@ -1,0 +1,17 @@
+Version 2.2.2
+
+There are also a number of code improvements and a some bug fixes. Also the reproted metadata has been expanded.
+
+The user guide and various docs have been updated.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

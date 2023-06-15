@@ -1,0 +1,36 @@
+V 1.4.0 'Diamond Dove' highlights
+
+About 18 months ago vector control became a 'thing' for Yoshimi and later, was first demonstrated to a handful of people at LAC 2015. At that time it was only acessible via NRPNs. Then about 6 months ago it became available to command line users as well, and 3 months ago vector saving and loading became possible.
+
+Now however, there is a shiny new window so the poor disadvantaged pointer-pushers can also have full control. This is currently reached via the 'Yoshimi' tab, but we may move it to its own button. Also, saving and loading vectors is now preserved in the recent histories file so you can quickly restore these - the same as you can for saved patch sets, scales and states.
+
+Vector entry via NRPNs and the CLI have also been upgraded slightly, so they will now automatically set the right number of parts available, and enable the required ones with the correct incoming channel number.
+
+Some other usability enhancements:
+
+Some people don't like our splash window - Boo!
+You can now disable it in settings {mutter}{mutter}
+
+Many people didn't realise there were two types of resonance interpolation, detirmined by whether you click the left or right mouse button. This has now been split into two with better tooltips.
+
+Jack audio autoconnect is now configurable in the GUI and stored so you don't have to set it with a startup argument.
+
+In MIDI settings you can now tell Yoshimi to ignore the 'reset all controllers' message - various bits of hardware and software can send these at the most inappropriate times.
+
+A right click on a button for a child window now closes the parent and a right click on that child's close button re-opens the parent. Use this a few times and you'll wonder how you managed without. Actually, this has been possible for a long time with Root/Bank/Instrument windows :)
+
+A right click on the track of any slider, or on any rotary knob will return it to its home position.
+
+There has been some shuffling in the GUI to make the different windows more consistent and easier to recognise. This has also enabled us to increase the size of the smallest control knobs. Most sliders are now indented - it makes them more obvious.
+
+Scroll wheel behaviour on both knobs and sliders has also been adjusted to be more consistent. By itself movement is pretty fast, but hold down the ctrl key, and you'll get very fine resolution.
+
+Other matters:
+
+Yoshimi now has a build number, and this appears in the startup log. That's probably only of interest to those building the master, or for reporting bugs - whatever they are :P
+
+Actually, there are the usual bugfixes (ancient and modern) and we've also made a small improvement in the way we handle an all-jack environment.
+
+The compatibility work we did for V1.3.8 ensured the all-important instrument files were correct, but we didn't have time to implement all of the controls. These are now in place.
+
+Currently there is quite a lot of preparatory work under way but its not ready for prime time. It's still really proof of concept.

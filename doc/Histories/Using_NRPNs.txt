@@ -1,0 +1,46 @@
+
+NRPN MSB is CC 99, and LSB is CC 98
+
+It's generally advisable to set NRPN MSB before LSB
+However, once MSB has been set you can set a chain of LSBs if they share the same MSB.
+
+The data CCs associated with these are 6 for MSB and 38 for LSB.
+
+Only when an NRPN has been set can the data values be entered (they will be ignored otherwise).
+
+If a supported control is identified these data values will be stored locally (if needed) so that other NRPNs can be set.
+
+Whenever either byte of the NRPN is changed, the data values will be cleared (but stored settings will not be affected).
+
+If either NRPN byte is set to 127, both data values are cleared and then ignored again.
+
+In Yoshimi NRPNs are not themselves channel sensitive but the final results will often be sent to whichever is the current channel.
+
+Yoshimi also supports the curious 14 bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
+
+In these notes, where practical we also list the 14 bit values in square brackets.
+
+After this, for running values, once Dhigh and Dlow have been set if you change either of these, the other will be assumed.
+
+e.g. Starting with Dhigh = 6 and Dlow = 20
+
+Change Dlow to 15 and Yoshimi will regard this as a command Dhigh 6 + Dlow 15
+Alternatively change Dhigh to 2 and Yoshimi will regard this as a command Dhigh 2 + Dlow 20
+This can be useful but may have unintended consequences!
+
+If in doubt, change/resend either of the NRPN bytes and both data bytes will be cleared.
+
+Additionally there is 96 for data increment and 97 for decrement.
+
+Data increment and decrement operation enables you to directly change the data LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.
+
+Although data increment and decrement are only active if a valid NRPN has been set, they are otherwise quite independent single CCs.
+
+e.g.
+
+start value     command value   result
+LSB     5           inc 20      25
+MSB     7           inc 68      11
+LSB     128(off)    inc 1       1
+MSB     126         dec 74      116
+MSB     128(off)    dec 65      127

@@ -1,0 +1,20 @@
+
+Some people have been confused about how to use an 'external' Mod Oscillator, so here is an example:
+
+Open the adsynth editing window and show voice parameters.
+
+For 'Type' set Ring this will activate the mod oscillator.
+
+Click on 'Waveform' and set the waveshape to triangle.
+
+Now switch to voice number 2 and enable it.
+
+Again select type as Ring (or any of the others).
+
+You can now use internal for this voice or select Mod. 1
+
+Change the internal one to, say Square
+
+Rinse and repeat for voice 3, and you will find you can use its internal or either of the two previous ones.
+
+

@@ -1,4 +1,4 @@
-This is intended primarily for direct transfers of text between non-RT threads, or operations that tend to be text heavy. Although synchronised and using TextMsgBuffer, these do not normally enter the Command functions. TextMsgBuffer is used to carry the ID of the message from TextMsgBuffer::push().
+This was intended primarily for direct transfers of text between non-RT threads, or operations that tend to be text heavy. Although synchronised and using TextMsgBuffer, these do not normally enter the Command functions. TextMsgBuffer is used to carry the ID of the message from TextMsgBuffer::push().
 
 It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.
 

@@ -48,7 +48,7 @@ misMsg      text message number
 
 For NRPNs, CC has bit 16 set. This is so that even one with a current value less than 127 won't be mistaken for a normal CC when being matched.
 
-Currently there is a limit of 200 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI may be restricted to 'viewing groups' of 128 lines. This would allow a much greater number.
+Currently there is a limit of 400 independent learned lines due to the use of miscMsg to update the GUI when loading complete learned lists. In the future, the GUI may be restricted to 'viewing groups' of 128 lines. This would allow a much greater number.
 
 
 Control numbers:

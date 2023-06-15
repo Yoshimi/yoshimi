@@ -1,0 +1,33 @@
+V 2.1.0 - A Marsh Warbler (that can change it's warble speed)
+
+In this release (in the 'doc' directory) the new HTML user guide is the default, and it is also the one fetched from the Yoshimi drop-down menu.
+
+It now includes an appendix.
+This has the common Note names, their MIDI note numbers, and actual frequencies.
+It also has a complete list of the specific CCs and NRPNS that Yoshimi recognises.
+
+Midi Sync has now been applied to all the effects where it is relevant - such as the Echo delay time.
+
+NRPNs have been extended so that you can now set the System Effect sends. Related to that, you can also set the Part to System Effect sends.
+
+We've changed some of the CLI command names slightly so they are better identified, and a few can have shorter abbreviations.
+
+It is now possible for developers to make precise, repeatable tests of actual sound produced, so that in future we can ensure that no unintended changes are made.
+
+The new file manager has been made more consistent and the performance improved.
+
+There are also a few more small general improvements, along with bugfixes.
+
+As usual, we welcome all suggestions and assistance - especially regarding documentation!
+
+Yoshimi source code is available from either:
+    https://sourceforge.net/projects/yoshimi
+Or:
+    https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+    https://www.freelists.org/archive/yoshimi
+To post, email to:
+    yoshimi@freelists.org

@@ -1464,11 +1464,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
         setGreyScale(colourData[0]);
-        int lineCount = 0;
-        while (colourData[lineCount + 1].substr(0, 7) != "-------")
+        for (int lineCount = 0; lineCount < COLOURLIST; ++ lineCount)
         {
-            setColourLine(colourData[lineCount + 1], lineCount, 1); // we don't want the greyscale line!
-            ++ lineCount;
+            if (setColourLine(colourData[lineCount + 1], lineCount, 1) != 0) // we don't want the greyscale line!
+            {
+                synth->getRuntime().Log("Corrupted Classic theme data.");
+                return false;
+            }
         }
         return true;} {}
   }
@@ -1519,7 +1521,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         lineCount = 0;
         int test = 0;
         do {
-            if ((totalCount - dataStart) == COLOURLIST && colourText.substr(0, 7) != "=======")
+            if ((totalCount - dataStart) > COLOURLIST && colourText.substr(0, 7) != "=======")
             {
                 return -3; // missing marker
             }
@@ -1553,7 +1555,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             colourText = colourText.substr(nextPos + 1);
         } while(colourText.substr(0, 7) != "=======");
 
-        if ((totalCount - dataStart) < COLOURLIST)
+        //std::cout << "lines " << lineCount << std::endl;
+
+        if ((totalCount - dataStart) <= COLOURLIST)
         {
             return -4; // too short
         }

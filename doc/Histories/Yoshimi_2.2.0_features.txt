@@ -1,0 +1,43 @@
+Version 2.2.0 - Blackcap (a very smooth singer)
+
+A major feature is the revision of the PadSynth engine including a new mode control in 'Settings' giving 'Muted', 'Background' and 'Auto-Apply'
+
+* 'Muted' is the old form where the part is disabled while the wavetable is being built.
+
+* 'Background' (the new default) allows you to continue using the existing wavetable until the new one is built, then makes it available to apply - this will then be done seamlessly.
+
+* 'Auto-Apply' as the name suggests will seamlessly apply the wavetable once it is ready.
+
+In the Padsynth engine itself there is a new control allowing you to set how long it takes for the new wavetable to fade in. This can be up to 60 seconds.
+
+Also, there is a New experimental 'Retrigger' window with various morphing controls.
+The retrigger control itself set the time when a regeneration will take place. At this time the other controls will be applied by a random amount between zero and the control setting.
+With a retrigger time of around 500mS and small values set for the other controls, there will be minor changes to the wavetable giving subtle 'movement' to the sound. Larger values can be used for specific and more abrupt effects.
+
+
+In the main window there are Undo/Redo buttons for comprehensive Undo/Redo operations. We've had to make some changes to the main window layout to accomodate those sensibly. At the same time we took the opportunity to make other changes that had previously been requested.
+
+* A new control allows you to set an internal Midi Clock over a wide range if Yoshimi can't see an incoming one - useful for synced LFOs.
+
+We've swapped over the positions of the MIDI channel spinbox and the checkbox for enabling the part, and this is more obviously an on/off control.
+
+* The instrument selector button is now far more obviously a button, and with an editable core.
+
+* The Edit button is now the same colour as all the other buttons, making it more obvious.
+
+
+There has also been a very thorough revision of our documentation, including the Advanced Reference Manual.
+
+Not forgetting, the usual bugfixes and minor detail enhancements.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

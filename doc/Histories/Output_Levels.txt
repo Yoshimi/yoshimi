@@ -1,0 +1,14 @@
+Audio Output and Levels
+
+At the bottom of the main window there is a pair of horizontal grids representing a bargraph type display. The upper one is for the left hand channel and the lower one for the right hand one. The grid divisions each represent 1dB, and the brighter divisions are therefore 5dB. The thicker bright divisions therefore being 10dB. The overall scale range is -48dB to 0dB.
+
+As the output level rises pale blue strips will light up in these grids. These fast responding bars are the peak levels and should never be allowed to go above 0dB, otherwise the output is likely to be clipped and distorted. There is also a pair of boxes on the end of these grids which will show the highest peak level seen. If clipping has happened the box background will change from black to red.
+
+To clear clip and peak level indication click on this area.
+
+As well as the peak level, the display shows a much slower responding RMS level, as a yellow line on top of the blue bar. This gives and indication of the apparent accoustic power.
+
+
+If you open the mixer panel window you will see vertical bargraphs for each individual part. On these, the faint bars are 5dB steps and the bright ones 10dB. The peak level isn't shown numerically, but if you exceed 0dB a thick red line will appear at the top of the bargraph. This is also cleared from the box in the main window, or by clicking on these bargrphs.
+
+{more}

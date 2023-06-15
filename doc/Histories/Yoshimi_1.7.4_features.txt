@@ -1,0 +1,17 @@
+V 1.7.4
+
+There are no new features in this release. It is really another maintenance one, with a few more bugfixes and code refinements.
+
+However, there is a check for when you save an instrument but haven't set a type. This asks you to do so, and also recommends including copyright information. You can ignore this and save without these, but then it will be very difficult to identify your patch on a search, and impossible to acknowledge you on any songs that use it.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
     std::string Config = file::loadText(Home + "/.config/yoshimi/yoshimi.config");
     if (Config.empty())
     {
-        std::cout << "Not there" << std::endl;
+        std::cout << "Config not there" << std::endl;
 #ifdef GUI_FLTK
         showSplash = true;
 #endif

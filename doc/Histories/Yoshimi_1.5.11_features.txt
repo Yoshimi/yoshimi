@@ -1,0 +1,26 @@
+1.5.11 Waxwing
+A colourful international bird
+
+(requested)
+The Mixer panel now presents parts with separate left and right VU meters. As well as showing stereo balance, the reading becomes more accurate. We also no longer show 'fake' VU levels when a part is inactive. Finally, if you click on a part VU meter it will clear the red limit warning for just that part.
+
+(requested)
+We also now have a mono/stereo button in the main window so you can quickly swap between the two and compare while running a project. The switch is instantaneous and very quiet. Sounds can easily be 'lost' when switching from stereo to mono, and there are many occasions where your listener will be effectively listening in mono by virtue of distance. This setting is not saved and will always default to stereo on all resets.
+
+If any controls in an effect have been changed from the listed preset, the colour of the preset background is changed from the faded cyan to a strong blue. Previously you had no indication that the preset didn't have it's default settings, so when switching between different ones to compare the results, you might not notice that when re-selected it had reverted to the defaults.
+
+When an AddSynth voice or modulator is using the oscillator from a lower numbered one and you then enter the waveform editor, you now see a warning in red at the top of the window. This tells you which oscillator you are *actually* editing.
+
+In the microtonal section the 'A' note frequency range has been fixed as 329Hz to 660Hz (slightly more than an octave).  Previously it was 1Hz to 2kHz, which enabled you to inavertently produce no audible sound (while still showing apparent output). This could potentially cause problems for some audio systems. Combined with key shifting, detunes and internal octave changes, this still gives you far more range and flexibility than any commercial synth.
+
+There are many controls in Yoshimi that operate only when others are in particular states. We now ensure that *all* of these are shown as inactive when not available. Previously many of these seemed to be active yet (confusingly) had no effect.
+
+
+There are a number of new tooltips, as well as some improved ones. Also warnings and informational messages have been updated.
+
+If your setup includes autoloading multiple instances with complex state or patch files, it can take several seconds for the main window to show. To reassure users, there is now a small information window that opens instantly, and only remains visible until the main window is displayed. CLI users have had a text message to this effect for several major point releases!
+
+On a first time start there is now a small window overlaying the centre of the main one. This prompts you to check settings via the Yoshimi drop-down menu. It also recommends the manual, which is accessible from the same menu.
+
+
+The code continues to be refined, and bugs hunted down - some surprisingly ancient and a few others embarrassingly recent.

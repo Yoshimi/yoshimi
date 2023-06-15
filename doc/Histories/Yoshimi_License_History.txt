@@ -1,0 +1,25 @@
+Software licenses are are something I *really* don't want to get involved in - I have much better things to do with my time - but I found I was obliged to do so.
+
+It is possible I'm the only person who knows all the following events, as I was the one that instigated them!
+
+The first time I saw ZynAddSubFX source files they were licensed as GPL V2. At that time Zyn had a number of very serious problems, and not much was being done about them. Somewhat naively I asked Lars Luthman if he would help, as he had offered a couple of small patches previously. His response was that he would not do any significant work, as he did not agree with the GPL V2 only license.
+
+I then contacted Paul, explaining the situation and asking if he would consider a change in the license to V2 or later. I was actually a bit surprised that he immediately agreed. When I next looked at the sources, the licenses on the files had indeed been updated, so I passed this information on.
+
+Unfortunately Paul forgot to update the website, but I wasn't especially concerned as it was only the files themselves that really mattered.
+
+While developing Yoshimi after the initial fork, Cal queried the license situation. I told him of the conversations I'd had, and passed him a copy of the email I'd got from Paul. Later on, Cal - in good faith - wrote new sources and placed them under GPL V3. This would be quite compatible with V2 or later, but not with V2 strict.
+
+What I didn't notice until very much later was that Paul had only updated half of the text in the sources, leaving the actual licence in an ambiguous state.
+
+To the best of my knowledge, V3 is not compatible with V2 strict, but V2 or later is. However the *complete* project then becomes downgraded to V2 strict - although the V2 or later sources (such as all the new root/bank code) can independently be freely merged into V3 code.
+
+I doubt anyone would actually make an issue of this. However, to safeguard Yoshimi as a whole, I took it upon myself to change Cal's code to V2 or later. I believe it retains the spirit of his wishes, and the only person with standing to object -  his daughter - has been totally supportive of the work currently being done on Yoshimi.
+
+Any source code I add will be GPL V2 or later.
+
+Update.
+
+The original change discussion has now been located and the license for both Zyn and Yoshi is confirmed as GPL V2 or later.
+
+Anyone wanting to confirm this should look at the Zyn user list archives August 2007 and September 2007.

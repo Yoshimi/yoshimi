@@ -1,0 +1,8 @@
+
+Note: NRPN MSB is CC 99, and LSB is CC 98
+
+A new concept is shortform NRPNs. This is where instead of the NRPN setting up for data entry of values, the NRPN is of itself the entire command. With a suitable sequencer like Rosegarden, you have just a two byte MSB/LSB value. The MSB is the actual command, and the LSB is the value. If you are using a sequencer that insists on a data pair as well, then just send any values - they will be ignored.
+
+There are only three of these defined so far, two are for silent channel switching of parts. See Channel_Switcher.txt for details.
+
+The third is for shutting Yoshimi down via MIDI and for this you set both MSB and LSB to 68 (0x44).

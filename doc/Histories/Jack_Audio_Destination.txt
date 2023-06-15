@@ -1,0 +1,13 @@
+When using Jack, Yoshimi can make individual parts available, either by themselves, or working with the main Left and Right outputs at the same time.
+
+The individual part outputs will have the part effects, and any insertion effects that are linked to them, but not the system effects.
+
+We used to register all parts with jack by default, but that got a bit silly once we had 64 parts available, so we changed to an 'on demand' model.
+
+If you open the mixer panel window you'll see a field just above the Edit button. This determines the audio destination on a part-by-part basis, defaulting to just the main L+R pair. The direct part outputs are only exposed on parts that are active, and have the destination set to either 'part' or 'both'.
+
+Once activated they will remain in place for the entire session, even if the part is later disabled or routed to main only. This is so that other programs won't see links suddenly disappear - although they will become silent.
+
+This setting is preserved in Yoshimi's patch sets and will be re-instated when next loaded.
+
+As of Yoshimi 1.4.0, in the Jack settings tab there is a new checkbox for auto-connecting the main L & R outputs. With this set there is no longer a need to set it manually on startup.

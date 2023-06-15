@@ -201,7 +201,7 @@ const int VU_text = 255;
   so that new work doesn't mess up existing themes.
   Ideally, use colours as close as possible to the colour table.
 */
-const int COLOURLIST = 115;
+const int COLOURLIST = 114;
 const unsigned char colourNumbers [COLOURLIST] = {
     panels,
     reserved_0,

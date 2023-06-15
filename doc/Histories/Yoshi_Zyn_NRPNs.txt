@@ -1,0 +1,186 @@
+Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any MIDI channel.
+
+The parameters are:
+
+- NRPN MSB sets the system/insertion effects (4 for system effects or 8 for insertion effects)
+
+- NRPN LSB sets the number of the effect (first effect is 0)
+
+- Data entry MSB sets the parameter number of effect to change(see below). A yoshimi extension is listed after the parameter descriptions.
+
+- Data entry LSB sets the parameter of the effect
+
+If the effect/parameter doesn't exists or is set to none, then the NRPN is ignored.
+
+A full example is at the end of this file.
+
+
+
+WARNING: Changing of some of the effect parameters produces clicks when sounds passes thru these effects. Some parameters produce clicks when they are changed very fast.
+
+Here are the effects parameter number (for Data entry coarse).
+The parameters that produces clicks have (AC) after their entry (Always Clicks).
+The parameter that produces clicks only when they are changed fast have a (FC) after the entry (Fast Clicks).
+Most parameters have the range from 0 to 127.
+When parameters have another range, it is written as [low...high] .
+
+Reverb
+~~~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - Reverb Time
+ 3 - Initial Delay (FC)
+ 4 - Initial Delay Feedback
+ 5 - reserved
+ 6 - reserved
+ 7 - Low Pass
+ 8 - High Pass
+ 9 - High Frequency Damping [64..127] 64 = no damping
+10 - Reverb Type [0..1] 0 - Random, 1 - Freeverb (AC)
+11 - Room Size (AC)
+
+Echo
+~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - Delay (AC)
+ 3 - Delay between left and right (AC)
+ 4 - Left/Right Crossing (FC)
+ 5 - Feedback
+ 6 - High Frequency Damp
+
+Chorus
+~~~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - LFO Frequency
+ 3 - LFO Randomness
+ 4 - LFO Type [0..1]
+ 5 - LFO Stereo Difference
+ 6 - LFO Depth
+ 7 - Delay
+ 8 - Feedback
+ 9 - Left/Right Crossing (FC)
+10 - reserved
+11 - Mode [0..1] (0=add, 1=subtract) (AC)
+
+Phaser
+~~~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - LFO Frequency
+ 3 - LFO Randomness
+ 4 - LFO Type [0..1]
+ 5 - LFO Stereo Difference
+ 6 - LFO Depth
+ 7 - Feedback
+ 8 - Number of stages [0..11] (AC)
+ 9 - Let/Right Crossing (FC)
+10 - Mode [0..1] (0=add, 1=subtract) (AC)
+11 - Phase
+
+AlienWah
+~~~~~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - LFO Frequency
+ 3 - LFO Randomness
+ 4 - LFO Type [0..1]
+ 5 - LFO Stereo Difference
+ 6 - LFO Depth
+ 7 - Feedback
+ 8 - Delay [0..100]
+ 9 - Left/Right Crossing (FC)
+10 - Phase
+
+Distortion
+~~~~~~~~~~
+ 0 - Volume or Dry/Wet (FC)
+ 1 - Pan (FC)
+ 2 - Left/Right Crossing
+ 3 - Drive (FC)
+ 4 - Level (FC)
+ 5 - Type [0..11]
+ 6 - Invert the signal (negate) [0..1]
+ 7 - Low Pass
+ 8 - High Pass
+ 9 - Mode [0.1] (0=mono,1=stereo)
+
+EQ
+~~
+ 0 - Gain (FC)
+
+All other settings of the EQ are shown in a different way. The N represent the band ("B." setting in the UI) and the first band is 0 (and not 1), as it is shown in the UI. Change the "N" with the band you like. If you want to change a band that doesn't exist, the NRPN will be ignored.
+
+10+N*5 - Change the mode of the filter [0..9] (AC)
+11+N*5 - Band's filter frequency
+12+N*5 - Band's filter gain
+13+N*5 - Band's filter Q (bandwidth or resonance)
+14+N*5 - reserved
+
+Example of setting the gain on the second band:
+
+The bands start counting from  0, so the second band is 1 => N = 1.
+The formula is 12 + N * 5 => 12 + 1 * 5 = 17
+So the number of effect parameter (for Data entry coarse) is 17.
+
+DynFilter
+~~~~~~~~~
+
+ 0 - Volume
+ 1 - Pan
+ 2 - LFO Frequency
+ 3 - LFO Randomness
+ 4 - LFO Type
+ 5 - LFO Stereo Difference
+ 6 - LFO Depth
+ 7 - Filter Amplitude
+ 8 - Fitler Amplitude Rate Change
+ 9 - Invert the signal (negate) [0..1]
+
+Click behaviour of DynFilter not tested.
+
+
+
+Yoshimi Extensions
+
+If the Data MSB bit 6 is set (64) then Data LSB sets the effect type instead of a parameter number.
+This must be set before making a parameter change.
+
+0 - Off
+1 - Reverb
+2 - Echo
+3 - Chorus
+4 - Phaser
+5 - AlienWah
+6 - Distortion
+7 - EQ
+8 - DynFilter
+
+
+For Insert effects, if the Data MSB bit 6 is set (64) and MSB bit 5 is set (32) - (total 96) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.
+
+A complete example:
+
+99 -   8 ~ insert effects
+98 -   3 ~ number 4 (as displayed)
+ 6 -  32 ~ set destination
+38 - 126 ~ Master Out
+99 -   8  *
+98 -   3  *
+ 6 -  64 ~ change effect
+38 -   4 ~ Alienwah
+99 -   8  *
+98 -   3  *
+ 6 -   0 ~ Dry/Wet
+38 -  30 ~ value
+
+* these repeats are not needed as far as Yoshimi is concerned, but some sequencers get unhappy without them.
+
+
+Change just a parameter on an exisiting system effect:
+
+99 -   4 ~ system effects
+98 -   0 ~ the first effect
+ 6 -   1 ~ Pan
+38 -  75 ~ value

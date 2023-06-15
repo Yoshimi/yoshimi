@@ -1,0 +1,22 @@
+The two items under the kit list are described below.
+
+Mode:
+'Off' means no kit is enabled, so you only have the Add, Sub, and Pad sounds in the Instrument Edit window.
+
+'Multi' means all the kit items will sound together regardless of their note ranges.
+
+'Single' means only the lowest numbered item will sound in a given note range. There will be no overlap.
+
+e.g.
+Item 3 has Min.k set to 0 and Max.k set to 60
+Item 4 has Min.k set to 40 and Max.k set to 127
+
+In single mode, only Item 3 will sound in the note range 0 to 60 and Item 4 will sound in the range 61 to 127.
+
+In multi mode, only Item 3 will sound in the range 0 to 40, both items will sound from 41 to 60, and only Item 4 will sound from 61 to 127.
+
+There is now a new mode called 'Crossfade' described in detail in:
+/doc/Part_Kit_Crossfade.txt
+
+Drum mode:
+If this is set then microtonal tuning is ignored for this kit, otherwise it could make drum sounds very unpredictable! Also, Legato mode is disabled.

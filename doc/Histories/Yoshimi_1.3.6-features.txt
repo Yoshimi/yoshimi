@@ -1,0 +1,32 @@
+One of the main features of this release is improved accessibility. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
+
+It has always been possible to run Yoshimi headless, but now real control is available. In the first place, when starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
+
+Once running, almost all dynamic setup (i.e. doesn't require a restart) can now be done within the terminal window. There is also extensive control of roots, banks, parts and instruments including the ability to list and set all of these. You can now do things like:
+
+Path add /home/music/yoshimi/banks
+Set part 4 program 130
+
+Additional controls that are frequently taken forgranted in the GUI but otherwise get forgotten are master key shift and master volume.
+
+Finally, we have the most important parts of vector control exposed to the command line.
+
+For all of this there is extensive error checking and feedback.
+
+
+In parallel with this there are more NRPNs so that you can perform some of these via automation. That arrangment looks positively steam-punk, but is actually very easy to use, requiring only a utility that can send MIDI CCs. NRPNs aren't special. They are simply a specific pattern of CCs. Yoshimi's implementation is very forgiving, doesn't mind if you stop halfway through (will just get on with other things while it waits) and will report exactly what it is doing.
+
+
+Another significant improvement is to the handling of ALSA audio, which is still very important for some people. Up till now we've been insisting on 2 channel 16 bit format. Tests have shown that virtually all motherboard sound chipsets will handle this, but many external ones don't. So now we initially request 32 bit 2 channel and work towards a compromise :) With external sound modules in mind, endian swaps are also implemented.
+
+
+Vector control has been extended so that there are four independent 'features' that each axis can control, One is fixed as volume (if enabled) but the others can be any valid CC and can also be reversed. The vector 'sweep' CCs are split out very early in the MIDI chain and the new CCs created are fed back in before any other processing. The result of this is that once we eventually get MIDI-learn implimented the control posibilities will expand dramatically - sorry about the extreme delay :(
+
+
+When using the GUI, there are additional style improvements and tweaks. Also, Yoshimi is a bit more informative when there are insurmountable problems, especially at start-up.
+
+
+In the 'examples' directory there is now a complete song set, 'OutThere.mid' and 'OutThere.xmz'. Together these produce a fairly complex 12 part tune that makes Yoshimi work quite hard.
+
+
+Finally, as well as document updates and the usual crop of bug-blatting, a couple of obscure regressions have been fixed.

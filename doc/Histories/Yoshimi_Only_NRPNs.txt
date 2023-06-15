@@ -1,0 +1,42 @@
+
+Shortform (doesn't use the data bytes)
+CC 99   CC 98
+MSB     LSB
+0x41    0-5     set solo switch type (0 = off)
+0x42    0-0x77  set solo incoming CC
+
+0x44    0x44    Shutdown Yoshimi gracefully
+0x44    0x45    Shutdown Yoshimi immediately and with exit value 16
+
+
+Full (requires data bytes)
+CC 99   CC 98
+MSB     LSB
+0x40    0       Direct part control
+                    (see Direct_Part_Control.txt)
+
+
+0x40    1       Vector control
+                    (see Vector_Control.txt)
+
+
+0x40    2       System settings
+                    (see Dynamic System Settings)
+
+
+0x60           Load numbered files from history lists
+
+        0   Instrument
+        1   Patch Set
+        2   Scale
+        3   State
+        4   Vector
+        5   MIDI Learn
+
+Dhi (6)
+    0-63 Part number for Instrument (>63 last seen by NRPNs)
+    0-15 Base channel for Vector    (>15 preferred channel in file)
+
+
+Dlo (38)
+    Entry number in list (0-24)

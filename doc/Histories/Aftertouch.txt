@@ -1,0 +1,19 @@
+This is a new pair of features. Both Channel and Key pressure are supported. It is accessed from the part 'Controllers' window where there is now a button marked 'Aftertouch'. This will open another new window.
+
+The effects that can currently be set are:
+Filter Cutoff
+Filter Q
+Pitch Bend
+Modulation
+
+You can set any combination of these and can have both channel and key types active, but not both with the same effect.
+
+Filter Cutoff and Filter Q are relative to the current setting, so if they is already set at maximum they will have no effect. These normally increase the frequency/Q, but if you set 'Down' they work in the opposite direction.
+
+The Pitch Bend effect normally goes upward with increasing pressure, but if you set 'Down' it instead works in the opposite direction. It assumes a starting value of zero, so would act abruptly if you are using the physical pitch bend control.
+
+Similarly, Modulation assumes the physical control is at zero. Its range is from zero to the setting of the part's frequency LFO Depth.
+
+These controls are set per part, but are actually per channel. The physical aftertouch action will affect all parts on that channel, but the effects can be different for each part (or remain off).
+
+These controls can both still be overridden by MIDI-learn. Like NRPNs, by default these will be set to block normal operation.
