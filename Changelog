@@ -1,4 +1,9 @@
-yoshimi 2.3.0.1
+yoshimi 2.3.0.2
+
+2023-6-16 Will
+bn 2242
+Forgot to set release version of CmakeLists.txt
+Set bugfix version 2.3.0.2
 
 2023-6-15 Will
 bn 2241
