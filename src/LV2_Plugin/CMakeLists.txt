@@ -97,11 +97,8 @@ foreach(basename ${FltkUI_names})
     set (headerfile "${basename}.h")
     add_custom_command(
       OUTPUT ${sourcefile}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "../${sourcefile}" .
-      COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different "../${headerfile}" .
+      COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
       DEPENDS ${fluidfile}
-      COMMENT "Copying generated fluid sources: ${headerfile}, ${sourcefile}"
     )
     set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
     set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
