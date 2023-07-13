@@ -1,5 +1,11 @@
-yoshimi 2.3.0.2
+yoshimi 2.3.0 M
 
+2023-7-13 Will
+bn 2243
+BugFix: controllers breath switch not updating across parts.
+BugFix: controllers knob colours not indicating default status across parts.
+Bugfix: humanise slider colours not indicating default status across parts.
+BugFix: SysfEff send knob colours not indicating default status across parts.
 Corrected LV2 CmakeLists.txt
 
 2023-6-16 Will

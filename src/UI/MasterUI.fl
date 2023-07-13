@@ -3848,9 +3848,13 @@ Alan Calvert started the project}
     partPortamento->value(synth->part[npart]->ctl->portamento.portamento);
 
     sysEff1->value(synth->Psysefxvol[0][npart]);
+        sysEff1->selection_color(setKnob(sysEff1->value(),0));
     sysEff2->value(synth->Psysefxvol[1][npart]);
+        sysEff2->selection_color(setKnob(sysEff2->value(),0));
     sysEff3->value(synth->Psysefxvol[2][npart]);
+        sysEff3->selection_color(setKnob(sysEff3->value(),0));
     sysEff4->value(synth->Psysefxvol[3][npart]);
+        sysEff4->selection_color(setKnob(sysEff4->value(),0));
 
     int tmp = synth->ReadPartKeyMode(npart);
     if (tmp > PART_MONO)

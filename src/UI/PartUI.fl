@@ -1921,7 +1921,9 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
         instrumentType->value(part->info.Ptype);
         humanise->value(fetchData(0, PART::control::humanise, npart));
-        velocityhumanise->value(fetchData(0, PART::control::humanvelocity, npart));} {}
+            humanise->selection_color(setSlider(humanise->value(),0));
+        velocityhumanise->value(fetchData(0, PART::control::humanvelocity, npart));
+            velocityhumanise->selection_color(setSlider(velocityhumanise->value(),0));} {}
   }
   Function {effectsrefresh()} {} {
     code {//
@@ -1998,24 +2000,34 @@ class PartUI {: {public Fl_Group, PartUI_}
     ctlwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
+        modwh->selection_color(setKnob(modwh->value(),80));
     expbw->value(part->ctl->bandwidth.exponential);
     bwdpth->value(part->ctl->bandwidth.depth);
+        bwdpth->selection_color(setKnob(bwdpth->value(),64));
     pwheelbrng->value(part->ctl->pitchwheel.bendrange);
     panwidth->value(part->ctl->panning.depth);
+        panwidth->selection_color(setKnob(panwidth->value(),64));
     filtq->value(part->ctl->filterq.depth);
+        filtq->selection_color(setKnob(filtq->value(),64));
     fltcut->value(part->ctl->filtercutoff.depth);
+        fltcut->selection_color(setKnob(fltcut->value(),64));
     volrng->value(part->ctl->volume.data);
+        volrng->selection_color(setKnob(volrng->value(),96));
     expr->value(part->ctl->expression.receive);
     fmamp->value(part->ctl->fmamp.receive);
     vol->value(part->ctl->volume.receive);
     sustain->value(part->ctl->sustain.receive);
+    breath->value(part->PbreathControl == 2);
 
     cfdpth->value(part->ctl->resonancecenter.depth);
+        cfdpth->selection_color(setKnob(cfdpth->value(),64));
     rbwdpth->value(part->ctl->resonancebandwidth.depth);
+        rbwdpth->selection_color(setKnob(rbwdpth->value(),64));
 
     rcv->value(part->ctl->portamento.receive);
     thresh->value(part->ctl->portamento.pitchthresh);
     propta->value(part->ctl->portamento.propRate);
+        propta->selection_color(setKnob(propta->value(),80));
     proprt->value(part->ctl->portamento.proportional);
     if (proprt->value())
     {
@@ -2028,9 +2040,13 @@ class PartUI {: {public Fl_Group, PartUI_}
         proptb->deactivate();
     }
     prtime->value(part->ctl->portamento.time);
+        prtime->selection_color(setKnob(prtime->value(),64));
     timedu->value(part->ctl->portamento.updowntimestretch);
+        timedu->selection_color(setKnob(timedu->value(),64));
     thtype->value(part->ctl->portamento.pitchthreshtype);
-    proptb->value(part->ctl->portamento.propDepth);} {}
+    proptb->value(part->ctl->portamento.propDepth);
+            proptb->selection_color(setKnob(proptb->value(),90));
+    } {}
   }
   Function {ctlmidirefresh()} {} {
     code {//
