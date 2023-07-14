@@ -4242,7 +4242,7 @@ void InterChange::commandControllers(CommandBlock *getData, bool write)
                 if (value_bool)
                     part->PbreathControl = MIDI::CC::breath;
                 else
-                    part->PbreathControl = 128; // impossible CC value
+                    part->PbreathControl = UNUSED; // impossible CC value
             else
                 value = part->PbreathControl;
             break;

@@ -773,6 +773,10 @@ class SUBnoteUI {: {public PresetsUI_}
             SUBparameters->hide();
             SUBparameters->show();
         }
+        ampenv->theme();
+        freqenvelopegroup->theme();
+        filterenv->theme();
+        bandwidthenvelopegroup->theme();
         if (filterui->formantparswindow->visible())
             filterui->theme();
         ;} {}

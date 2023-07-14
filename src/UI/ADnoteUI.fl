@@ -1938,7 +1938,14 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
                 oscedit->osceditUI->show();
             }
         }
+
+        voiceampenvgroup->theme();
+        voicefreqenvgroup->theme();
+        voicefilterenvgroup->theme();
         voicefilter->theme();
+
+        voiceFMampenvgroup->theme();
+        voiceFMfreqenvgroup->theme();
         ;} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
@@ -2870,6 +2877,9 @@ o->hide();}
             resui->resonancewindow->hide();
             resui->resonancewindow->show();
         }
+        ampenv->theme();
+        freqenv->theme();
+        filterenv->theme();
         filterui->theme();
         advoice->voicetheme();
         ;} {}

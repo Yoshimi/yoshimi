@@ -7,7 +7,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey
     Copyright 2021 Kristian Amlie & others
-    Copyright 2022 Ichthyostega & others
+    Copyright 2022-2023 Ichthyostega & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -161,7 +161,7 @@ void Part::defaults(int npart)
     Pkeylimit = PART_DEFAULT_LIMIT;
     Pfrand = 0;
     Pvelrand = 0;
-    PbreathControl = 2;
+    PbreathControl = MIDI::CC::breath;
     Peffnum = 0;
     setDestination(1);
     busy = false;
@@ -1357,7 +1357,7 @@ void Part::add2XML(XMLwrapper *xml, bool subset)
         xml->addpar("key_aftertouch", PkeyATchoice);
         xml->addpar("random_detune", Pfrand);
         xml->addpar("random_velocity", Pvelrand);
-        xml->addparbool("breath_disable", PbreathControl != 2);
+        xml->addparbool("breath_disable", PbreathControl != MIDI::CC::breath);
     }
     xml->endbranch();
 
@@ -1447,9 +1447,9 @@ int Part::loadXMLinstrument(string filename)
             Pvelrand = 50;
         PbreathControl = xml->getparbool("breath_disable", PbreathControl);
         if (PbreathControl)
-            PbreathControl = 255; // impossible value
+            PbreathControl = UNUSED; // impossible CC value
         else
-            PbreathControl = 2;
+            PbreathControl = MIDI::CC::breath;
     }
     xml->exitbranch();
     if (xml->enterbranch("CONTROLLER"))

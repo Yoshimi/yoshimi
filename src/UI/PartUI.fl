@@ -928,7 +928,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         callback {//
         send_data(0, 141, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Breath Control enable} xywh {225 38 60 18} box THIN_UP_BOX down_box DOWN_BOX selection_color 64 labelsize 10 labelcolor 64
-        code0 {o->value(part->PbreathControl == 2);}
+        code0 {o->value(part->PbreathControl == MIDI::CC::breath);}
         class Fl_Check_Button2
       }
       Fl_Box pwheelrnglabel {
@@ -2017,7 +2017,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     fmamp->value(part->ctl->fmamp.receive);
     vol->value(part->ctl->volume.receive);
     sustain->value(part->ctl->sustain.receive);
-    breath->value(part->PbreathControl == 2);
+    breath->value(part->PbreathControl == MIDI::CC::breath);
 
     cfdpth->value(part->ctl->resonancecenter.depth);
         cfdpth->selection_color(setKnob(cfdpth->value(),64));

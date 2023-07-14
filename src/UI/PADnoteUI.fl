@@ -1236,6 +1236,10 @@ class PADnoteUI {: {public PresetsUI_}
             resui->resonancewindow->hide();
             resui->resonancewindow->show();
         }
+
+        ampenv->theme();
+        freqenv->theme();
+        filterenv->theme();
         filterui->theme();
         ;} {}
   }
