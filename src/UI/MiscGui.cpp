@@ -132,7 +132,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char action, unsigne
                 }
                 else if (insert != TOPLEVEL::insert::filterGroup  || parameter == UNUSED)
                 {
-                    std::cout << "setting for button 3";
+                    //std::cout << "setting for button 3";
                     putData.data.value = newValue;
                     type = TOPLEVEL::type::Write;
                     action |= TOPLEVEL::action::forceUpdate;

@@ -1,5 +1,9 @@
 yoshimi 2.3.0 M
 
+2023-7-19 Will
+bn 2245
+Made some improvements to Copy/Paste GUI updates, particulalry from CLI.
+
 2023-7-14 Will
 bn 2244
 BugFix: Visible freemode windows not recognising theme changes.

@@ -146,9 +146,14 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-        // a lot missing here :(
         mag->value(pars->Phmag[n]);
-        bw->value(pars->Phrelbw[n] - 64);} {}
+        if (n == 0)
+            mag->selection_color(setSlider(pars->Phmag[n],127));
+        else
+            mag->selection_color(setSlider(pars->Phmag[n],0));
+        bw->value(pars->Phrelbw[n] - 64);
+        bw->selection_color(setSlider(pars->Phrelbw[n],64));
+        ;} {}
   }
   Function {~SUBnoteharmonic()} {} {
     code {//
@@ -167,7 +172,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_}
+class SUBnoteUI {open : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     comment {randompan MUST be placed after panwidth} {in_source in_header
@@ -960,10 +965,20 @@ class SUBnoteUI {: {public PresetsUI_}
         case SUBSYNTH::control::clearHarmonics:
             for (int i = 0; i < MAX_SUB_HARMONICS; i++)
             {
-                h[i]->mag->value(0);
+                if (i == 0)
+                {
+                    h[i]->mag->value(127);
+                    h[i]->mag->selection_color(setSlider(127,127));
+                }
+                else
+                {
+                    h[i]->mag->value(0);
+                    h[i]->mag->selection_color(setSlider(0,0));
+                }
                 h[i]->bw->value(0);
+                h[i]->bw->selection_color(setSlider(64,64));
             }
-            h[0]->mag->value(127);
+
             break;
 
         case SUBSYNTH::control::stereo:

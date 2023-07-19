@@ -1610,7 +1610,7 @@ class PADnoteUI {: {public PresetsUI_}
             case TOPLEVEL::insert::resonanceGroup:
             {
                 if (resui)
-                    resui->refresh();
+                        resui->refresh();
                 break;
             }
         }
@@ -1657,6 +1657,100 @@ class PADnoteUI {: {public PresetsUI_}
     padStatus->on(PADStatus::PENDING, [&]() { applyButton(pad_pending, "pending Wave"); });
     padStatus->on(PADStatus::BUILDING,[&]() { applyButton(pad_building, "rebuilding..."); });
     padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(pad_apply, "Apply Changes"); });} {}
+  }
+  Function {refresh(void)} {} {
+    code {//
+        volume->value(pars->PVolume);
+        vsns->value(pars->PAmpVelocityScaleFunction);
+        pan->value(pars->PPanning);
+        stereo->value((pars->PStereo) ? 1 : 0);
+
+        pstr->value(pars->PPunchStrength);
+        pt->value(pars->PPunchTime);
+        pstc->value(pars->PPunchStretch);
+        pvel->value(pars->PPunchVelocitySensing);
+
+        detunevalueoutput->value(getDetune(pars->PDetuneType,0,pars->PDetune));
+        detune->value(pars->PDetune-8192);
+
+        int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
+        octave->value(k);
+
+        detunetype->value(pars->PDetuneType-1);
+        k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
+        coarsedet->value(k);
+
+        hz440->value(pars->Pfixedfreq);
+        fixedfreqetdial->value(pars->PfixedfreqET);
+
+        amplfo->refresh();
+        freqlfo->refresh();
+        filterlfo->refresh();
+
+        ampenv->refresh();
+        freqenv->refresh();
+        filterenv->refresh();
+        filterui->refresh();
+
+        /* harmonic structure parameters */
+
+        resui->refresh();
+        if (oscui!=NULL) oscui->refresh();
+
+        hpbasetype->value(pars->PProfile.base.type);
+        hpbasepar1->value(pars->PProfile.base.pwidth);
+        hpfreqmult->value(pars->PProfile.freqmult);
+
+        hpmpar1->value(pars->PProfile.modulator.pstretch);
+        hpmfreq->value(pars->PProfile.modulator.freq);
+        hpwidth->value(pars->PProfile.width);
+
+        hponehalf->value(pars->PProfile.onehalf);
+        hpamptype->value(pars->PProfile.amp.type);
+        hpampmode->value(pars->PProfile.amp.mode);
+        hpamppar1->value(pars->PProfile.amp.par1);
+        hpamppar2->value(pars->PProfile.amp.par2);
+        hpautoscale->value(pars->PProfile.autoscale);
+
+        bwdial->value(pars->Pbandwidth);
+        if (pars->Pmode==0)
+        {
+           bwprofilegroup->activate();
+           bwdial->activate();
+           bwcents->activate();
+           hprofile->activate();
+           hprofile->color(54);
+           bwscale->activate();
+        }
+        else
+        {
+           bwprofilegroup->deactivate();
+           bwdial->deactivate();
+           bwcents->deactivate();
+           hprofile->deactivate();
+           hprofile->color(48);
+           bwscale->activate();
+        }
+
+        spectrummode->value(pars->Pmode);
+
+        qbasenote->value(pars->Pquality.basenote);
+        qsmpoct->value(pars->Pquality.smpoct);
+        qoct->value(pars->Pquality.oct);
+        qsamplesize->value(pars->Pquality.samplesize);
+
+        hrpostype->value(pars->Phrpos.type);
+        hrpospar1->value(pars->Phrpos.par1);
+        hrpospar2->value(pars->Phrpos.par2);
+        hrpospar3->value(pars->Phrpos.par3);
+
+        hprofile->redraw();
+        overtonepos->redraw();
+
+        osc->redraw();
+        //pars->applyparameters(false);
+        //applybutton->color(FL_GRAY);
+        //applybutton->parent()->redraw();} {}
   }
   Function {~PADnoteUI()} {return_type virtual
   } {

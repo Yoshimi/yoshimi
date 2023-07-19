@@ -1663,19 +1663,15 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
             break;
     }} {}
   }
-  Function {paste(CommandBlock *getData)} {} {
-    code {//
-       /* switch (getData->data.insert)
+  Function {paste()} {} {
+    code {//   
+        //std::cout << "in addvoice" << std::endl;
+        
+        if (oscedit->osceditUI->visible())
         {
-            case TOPLEVEL::insert::resonanceGroup:
-            {
-                if (resui)
-                    resui->refresh();
-                break;
-            }
-        }*/
-       getData->data.spare1 = getData->data.spare0; // suppress "unused" warning
-       //std::cout << "in addvoice" << std::endl;
+            //std::cout << "call osc" << std::endl;
+            oscedit->refresh();
+        }
         ;} {}
   }
   Function {update_osclabels()} {} {
@@ -1992,9 +1988,9 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
   }
   decl {fft::Calc *fft;} {private local
   }
-  decl {OscilGen *oscil;} {private local
+  decl {OscilGen *oscil;} {public local
   }
-  decl {OscilGen *oscilFM;} {private local
+  decl {OscilGen *oscilFM;} {public local
   }
   decl {Oscilloscope *osc;} {private local
   }

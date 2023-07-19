@@ -1739,6 +1739,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         int kititem = getData->data.kit;
         int engine = getData->data.engine;
+        int insert = getData->data.insert;
 
         if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count)
         {
@@ -1755,8 +1756,16 @@ class PartUI {: {public Fl_Group, PartUI_}
         if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
             int voiceNum = engine - PART::engine::addVoice1;
+//            std::cout << "kit " << kititem << std::endl;
+//            std::cout << "voicenum " << int(voiceNum) << "  actual " << int(adnoteui->nvoice) << std::endl;
             if (adnoteui->ADnoteVoice && voiceNum == adnoteui->nvoice)
             {
+                if (insert == TOPLEVEL::insert::oscillatorGroup)
+                {
+                    adnoteui->advoice->paste();
+                    return;
+                }
+
                 if(adnoteui->ADnoteVoice->visible())
                 {
                     //std::cout << "here" << std::endl;
@@ -1776,16 +1785,11 @@ class PartUI {: {public Fl_Group, PartUI_}
                 return;
             }
             //std::cout << "add top level " << engine << std::endl;
-            bool show = false;
             if (adnoteui != NULL)
             {
-                show = adnoteui->ADnoteGlobalParameters->visible();
-                delete adnoteui;
-                adnoteui = NULL;
+                if (adnoteui->ADnoteGlobalParameters->visible())
+                    adnoteui ->refresh();
             }
-            adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, 0);
-            if (show)
-                adnoteui ->ShowGlobal();
             return;
         }
         //std::cout << "Next section" << std::endl;
@@ -1794,16 +1798,11 @@ class PartUI {: {public Fl_Group, PartUI_}
         {
 
             //std::cout << "sub top level" << std::endl;
-            bool show = false;
             if (subnoteui != NULL)
             {
-                show = subnoteui->SUBparameters->visible();
-                delete subnoteui;
-                subnoteui = NULL;
+                if (subnoteui->SUBparameters->visible())
+                    subnoteui->refresh();
             }
-            subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, 0);
-            if (show)
-                subnoteui->Showsub();
             return;
         }
 
@@ -1816,17 +1815,11 @@ class PartUI {: {public Fl_Group, PartUI_}
                 return;
             }
             //std::cout << "pad top level" << std::endl;
-            bool show = false;
             if (padnoteui != NULL)
             {
-                show = padnoteui->padnotewindow->visible();
-                delete padnoteui;
-                padnoteui = NULL;
+                if( padnoteui->padnotewindow->visible())
+                    padnoteui->refresh();
             }
-            if (part->kit[kititem].padpars)
-            padnoteui = new PADnoteUI(part->kit[kititem].padpars);
-            if (show)
-                padnoteui->Showpad();
             return;
         }
 
@@ -2045,8 +2038,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         timedu->selection_color(setKnob(timedu->value(),64));
     thtype->value(part->ctl->portamento.pitchthreshtype);
     proptb->value(part->ctl->portamento.propDepth);
-            proptb->selection_color(setKnob(proptb->value(),90));
-    } {}
+            proptb->selection_color(setKnob(proptb->value(),90));} {}
   }
   Function {ctlmidirefresh()} {} {
     code {//

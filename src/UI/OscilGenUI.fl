@@ -1183,6 +1183,8 @@ o->hide();}
   }
   Function {refresh()} {} {
     code {//
+   // std::cout << "in oscedit" << std::endl;
+
     magtype->value(oscil->Phmagtype);
     rndslider->value(oscil->Prand-64);
     rndslider->selection_color(setSlider(rndslider->value(),0));
