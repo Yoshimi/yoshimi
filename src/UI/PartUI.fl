@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -339,7 +339,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumenteditwindow {
@@ -1735,7 +1735,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
     checkEngines();} {}
   }
-  Function {paste(CommandBlock *getData)} {} {
+  Function {paste(CommandBlock *getData)} {open
+  } {
     code {//
         int kititem = getData->data.kit;
         int engine = getData->data.engine;
@@ -1751,24 +1752,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
 
         if (kititem != lastkititem)
-            return; // only update engines if current kititem
-
+            return; // only update engines if current kititem;
         if (engine >= PART::engine::addVoice1 && engine < PART::engine::addVoiceModEnd)
         {
-            int voiceNum = engine - PART::engine::addVoice1;
-//            std::cout << "kit " << kititem << std::endl;
-//            std::cout << "voicenum " << int(voiceNum) << "  actual " << int(adnoteui->nvoice) << std::endl;
-            if (adnoteui->ADnoteVoice && voiceNum == adnoteui->nvoice)
+            int voiceNum = (engine - PART::engine::addVoice1);
+            //std::cout << "voice " << voiceNum << std::endl;
+            if (insert == TOPLEVEL::insert::oscillatorGroup)
             {
-                if (insert == TOPLEVEL::insert::oscillatorGroup)
-                {
-                    adnoteui->advoice->paste();
-                    return;
-                }
+                adnoteui->advoice->paste();
+                return;
+            }
 
+            if (voiceNum == adnoteui->nvoice)
+            {
                 if(adnoteui->ADnoteVoice->visible())
                 {
-                    //std::cout << "here" << std::endl;
                     adnoteui->editVoice(voiceNum);
                 }
             }
@@ -1823,7 +1821,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             return;
         }
 
-        std::cout << "invalid paste" << std::endl;} {}
+        std::cout << "invalid paste" << std::endl;} {selected
+    }
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

@@ -416,13 +416,22 @@ string UnifiedPresets::oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLo
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
+    std::cout << "engine " << int(getData->data.engine) << std::endl;
     string name = "Poscilgen";
 
     OscilParameters *sectionType;
 
     if (engineType >= (PART::engine::addVoice1))
     {
-        sectionType = synth->part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].POscil;
+        if (engineType >= PART::engine::addMod1)
+        {
+            engineType -= NUM_VOICES;
+            sectionType = synth->part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].POscilFM;
+        }
+        else
+        {
+            sectionType = synth->part[npart]->kit[kitItem].adpars->VoicePar[engineType - PART::engine::addVoice1].POscil;
+        }
     }
     else if (engineType == PART::engine::padSynth)
     {

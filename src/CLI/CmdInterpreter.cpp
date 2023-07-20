@@ -6211,7 +6211,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 void CmdInterpreter::presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     string name;
-    if (engine == PART::engine::addVoice1)
+    if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
     {
         engine += voiceNumber;
     }

@@ -1665,11 +1665,8 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
   }
   Function {paste()} {} {
     code {//   
-        //std::cout << "in addvoice" << std::endl;
-        
         if (oscedit->osceditUI->visible())
         {
-            //std::cout << "call osc" << std::endl;
             oscedit->refresh();
         }
         ;} {}
