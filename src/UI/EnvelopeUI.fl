@@ -338,7 +338,7 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
   }
   Function {~EnvelopeUI()} {} {
     code {//
-	if (freemodeeditwindow->x() > 4)
+        if (freemodeeditwindow->x() > 4)
             saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwindow->x(), freemodeeditwindow->y(),freemodeeditwindow->visible(), "xEnvelope-free " + to_string(engine) + " " + to_string(group));
         freemodeeditwindow->hide();
         delete (freemodeeditwindow);
@@ -1426,7 +1426,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     envwindow->show();} {}
   }
   Function {theme()} {} {
-    code {// 
+    code {//
         if (freeedit)
         {
             if (freeedit->visible())

@@ -19,6 +19,15 @@
 
  */
 
+/*                            **** WARNING ****
+ *
+ * Text2Data tracks many of these conversions - principally to be able to interpret
+ * MIDI-learn files.
+ *
+ * If you change any of the text you must check whether Text2Data uses them, and if
+ * it does, ensure that it carries *both* the old and new versions.
+ */
+
 #include "Interface/Data2Text.h"
 #include "Interface/TextLists.h"
 #include "Misc/SynthEngine.h"

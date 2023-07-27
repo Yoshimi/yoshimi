@@ -1664,7 +1664,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
     }} {}
   }
   Function {paste()} {} {
-    code {//   
+    code {//
         if (oscedit->osceditUI->visible())
         {
             oscedit->refresh();

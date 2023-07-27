@@ -32,8 +32,8 @@
 class WidgetSpinner : public Fl_Spinner {
   protected:
     Fl_Repeat_Button
-    		*up_button_,		// Up button
-    		*down_button_;		// Down button
+        *up_button_,        // Up button
+        *down_button_;      // Down button
 public:
   WidgetSpinner(int x,int y,int w,int h,const char *l = 0);
   void labelsize(int size) {

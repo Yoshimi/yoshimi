@@ -2,11 +2,15 @@
 
 Before doing this, check the "Dependencies" file and make sure you have all of the entries in place. You will need to do this as the root user.
 
+If you are running a fairly reacent debian distribution simply enter:
+apt build-dep yoshimi
+
+
 It's a normal CMake build.
 
 ---- Sample instructions to compile/build using ccmake on Linux, outside-source-tree -----
 
-This uses "yoshimi-1.5.1" as an example, and should work fine with all other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
+This uses "yoshimi-2.2.3" as an example, and should work fine with all other versions. It is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
 We will assume you have a home directory called 'user' and want Yoshimi to reside in a directory called 'software', but downloaded the archive to /home/user/download.
 
@@ -14,15 +18,15 @@ Working from a terminal window, extract source code archive:
 
     mkdir /home/user/software
     cd    /home/user/download
-    tar -jxvf /home/user/download/yoshimi-1.5.1.tar.bz2 -C/home/user/software
+    tar -jxvf /home/user/download/yoshimi-2.2.3.tar.bz2 -C/home/user/software
 
 Now there should be a directory:
 
-   /home/user/software/yoshimi-1.5.1
+   /home/user/software/yoshimi-2.2.3
 
 First move into this with:
 
-    cd /home/user/software/yoshimi-1.5.1
+    cd /home/user/software/yoshimi-2.2.3
 
 Now create a 'build' directory with:
 
@@ -32,8 +36,8 @@ and move into it with:
 
     cd build
 
-"/home/user/software/yoshimi-1.5.1/src" is the source code directory.
-"/home/user/software/yoshimi-1.5.1/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
+"/home/user/software/yoshimi-2.2.3/src" is the source code directory.
+"/home/user/software/yoshimi-2.2.3/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
 
 Run ccmake:
 
@@ -72,7 +76,7 @@ For more fine tuned building see INSTALL_CUSTOM
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options.  Alsa is the default for both audio and midi.  However, if this is not available Yoshimi will try for Jack.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
+Yoshimi builds with both Jack and Alsa audio and midi options.  Alsa is the default for midi. Jack is default for audio,  however if this is not available Yoshimi will try for Also.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface and Command Line Interface.
 
 ---- Instrument banks ----
 

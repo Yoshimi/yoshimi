@@ -12,7 +12,7 @@ This will ensure the guide has the correct version number.
     Ensure version number and dates are correct.
     Check for any changes in info or commands.
 
-/desktop/metainfo/yoshimi.appdata.xml
+/desktop/metainfo/yoshimi.metainfo.xml
     Ensure version number and dates are correct.
     Check urls for images are correct.
     Check contact details.

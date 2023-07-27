@@ -20,12 +20,12 @@
 
 */
 
-const int fromString = 1;
+const int fromText = 1;
 /*
- * 0 = use numbers
- * 1 = use string
- * 2 = use numbers report diff
- * 3 = use string report diff
+ * 0 = use legacy numbers
+ * 1 = decode from text
+ * 2 = use legacy numbers report difference
+ * 3 = decode from text report difference
  */
 
 #include "Interface/MidiLearn.h"
@@ -1038,13 +1038,13 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 entry.frame.data.parameter = xml->getpar255("Parameter", 0);
                 entry.frame.data.offset = xml->getpar255("Secondary_Parameter", 0);
 
-if (fromString)
+if (fromText)
 {
                 string test = xml->getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
                 //synth->CBtest(&allData);
 }
-if (fromString & 2)
+if (fromText >= 2)
 {
                 bool ok = true;
                 if (ID == 0)
@@ -1091,7 +1091,7 @@ if (fromString & 2)
                 }
                 cout << endl;
 }
-if (fromString == 3)
+if (fromText & 1)
 {
                 entry.frame.data.control = allData.data.control;
                 entry.frame.data.part = allData.data.part;
@@ -1112,4 +1112,3 @@ if (fromString == 3)
     //synth->CBtest(&allData);
     return true;
 }
-

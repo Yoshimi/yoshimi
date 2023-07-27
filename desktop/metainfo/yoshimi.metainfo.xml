@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2016-2023 Yoshimi project <willgodfrey@musically.me.uk> -->
 <component type="desktop-application">
-  <id>net.sourceforge.projects.yoshimi.desktop</id>
+  <id>net.sourceforge.projects.yoshimi_2247</id>
   <metadata_license>CC-BY-4.0</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <content_rating type="oars-1.1" />
