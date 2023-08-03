@@ -75,7 +75,7 @@ class ConfigUI {} {
       label {Yoshimi Settings}
       callback {close->do_callback();}
       xywh {1226 24 390 330} type Double hide resizable
-      code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), 0, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
       code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
@@ -248,7 +248,7 @@ fillThemes();
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
             tooltip {gzip compression level (0 - uncompressed)} xywh {260 154 90 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12 textcolor 64
             code0 {o->value(synth->getRuntime().GzipCompression);}
-            code1 {if (synth->getUniqueId() != 0) o->hide();}
+            code1 {if (current_ID != 0) o->hide();}
           }
           Fl_Choice instrument {
             label {Saved Instrument Format}
@@ -270,7 +270,7 @@ fillThemes();
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
             xywh {38 276 306 17} labelfont 1 labelsize 12 labelcolor 64 align 128
-            code0 {if (synth->getUniqueId() != 0) o->hide();}
+            code0 {if (current_ID != 0) o->hide();}
           }
         }
         Fl_Group switchesTab {
@@ -299,7 +299,7 @@ fillThemes();
                         send_data(0, CONFIG::control::showSplash, o->value(), TOPLEVEL::type::Integer);}
             xywh {190 80 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
-            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            code1 {if (current_ID != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button logXML {
@@ -340,7 +340,7 @@ fillThemes();
                             o->value(1);}
             tooltip {Enable starting with this graphical interface} xywh {190 160 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().showGui);}
-            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            code1 {if (current_ID != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button enableCLI {
@@ -349,7 +349,7 @@ fillThemes();
                         send_data(0, CONFIG::control::enableCLI, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Enable starting with interactive command line interface} xywh {190 180 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().showCli);}
-            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            code1 {if (current_ID != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button enableAuto {
@@ -358,7 +358,7 @@ fillThemes();
                         send_data(0, CONFIG::control::enableAutoInstance, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Allow main instance to start all those open when last closed.} xywh {190 200 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(synth->getRuntime().autoInstance);}
-            code1 {if (synth->getUniqueId() != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
+            code1 {if (current_ID != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button singleMaster {
@@ -1222,9 +1222,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     break;
     }} {}
   }
-  Function {ConfigUI(SynthEngine *_synth)} {} {
+  Function {ConfigUI(SynthEngine *_synth, int _current_ID)} {} {
     code {//
             synth = _synth;
+            current_ID = _current_ID;
             manageThemes();
             make_window();
             readpresetcfg();
@@ -2173,6 +2174,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             return textMsgBuffer.fetch(getData.data.miscmsg);} {}
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int current_ID;} {private local
   }
   decl {long selectedRootID;} {private local
   }

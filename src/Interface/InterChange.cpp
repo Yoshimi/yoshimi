@@ -1531,7 +1531,8 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
         break;
 
         case PADSYNTH::control::applyChanges:
-            if (not part->Pkitmode)
+            // it appears Pkitmode is not being recognised here :(
+            if (kititem >= NUM_KIT_ITEMS)//not part->Pkitmode)
                 kititem = 0;
             if (write)
             {
@@ -1684,6 +1685,26 @@ std::string InterChange::formatScales(std::string text)
 
 float InterChange::readAllData(CommandBlock *getData)
 {
+    if (getData->data.part == TOPLEVEL::instanceID)
+    {
+        return synth->getUniqueId();
+    }
+
+    if (getData->data.part == TOPLEVEL::windowTitle)
+    {
+        string name = "Yoshimi";
+        int ID = synth->getUniqueId();
+        if (ID > 0)
+            name += ("-" + to_string(ID));
+        name += (" : " + textMsgBuffer.fetch((int(getData->data.value))));
+        return textMsgBuffer.push(name);
+    /* usage example *
+           string name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Vectors"), 0, TOPLEVEL::windowTitle));
+
+           adds a space then 'Vectors' to "Yoshimi" plus the ID if it's greater than zero
+    */
+    }
+
     if (getData->data.type & TOPLEVEL::type::Limits) // these are static
     {
         /*

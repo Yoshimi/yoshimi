@@ -30,6 +30,13 @@ decl {\#include "Misc/Config.h"} {private global
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
@@ -39,7 +46,7 @@ decl {using std::vector;} {private global
 class ParametersUI {} {
   Function {make_window(void)} {} {
     Fl_Window Recent {
-      label {Recent Parameters}
+      label {Yoshimi : Parameters}
       callback {CloseRecent->do_callback();}
       xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide resizable
       code0 {paramDW = o->w(); paramDH = o->h();}
@@ -116,31 +123,30 @@ class ParametersUI {} {
 
     unsigned int name_start;
     unsigned int name_end;
-    string name;
-
+    string name = "Unknown";
     switch (H_type)
     {
         case TOPLEVEL::XML::Instrument:
-            Recent->label("Recent Instruments");
+            name = + "Instruments";
             break;
         case TOPLEVEL::XML::Scale:
-            Recent->label("Recent Scales");
+            name = "Scales";
             break;
         case TOPLEVEL::XML::MLearn:
-            Recent->label("Recent MIDI Learn Lists");
+            name = "Learn Lists";
             break;
         case TOPLEVEL::XML::Vector:
-            Recent->label("Recent Vectors");
+            name = "Vectors";
             break;
         case TOPLEVEL::XML::State:
-            Recent->label("Recent States");
+            name = "States";
             break;
         case TOPLEVEL::XML::Patch:
-            Recent->label("Recent Patch Sets");
+            name = "Patch Sets";
             break;
-        default:
-            Recent->label("Unknown!");
     }
+    name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push(name), 0, TOPLEVEL::windowTitle));
+    Recent->copy_label(name.c_str());
 
     vector<string> listType = *synth->getHistory(H_type);
     BrowseRecent->clear();
@@ -211,5 +217,7 @@ class ParametersUI {} {
   decl {int paramDH;} {private local
   }
   decl {int lastParamW;} {private local
+  }
+  decl {int ID;} {private local
   }
 }

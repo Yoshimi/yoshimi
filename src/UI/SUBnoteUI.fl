@@ -241,7 +241,7 @@ class SUBnoteUI {open : {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Group ampenv {
-          label {SUBsynth - Amplitude Envelope}
+          label {Yoshimi : SubSynth - Amplitude Envelope}
           xywh {10 65 205 70} box FLAT_BOX color 51 labelcolor 64 align 144
           code0 {o->init(pars->AmpEnvelope, npart, kititem, 1, 0);}
           class EnvelopeUI
@@ -280,7 +280,7 @@ class SUBnoteUI {open : {public PresetsUI_}
         xywh {440 5 290 135} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
         Fl_Group freqenvelopegroup {
-          label {SUBsynth - Frequency Envelope}
+          label {Yoshimi : SubSynth - Frequency Envelope}
           xywh {445 65 205 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->FreqEnvelope, npart, kititem, 1, 1);}
           code1 {if (pars->PFreqEnvelopeEnabled == 0) o->deactivate();}
@@ -406,7 +406,7 @@ class SUBnoteUI {open : {public PresetsUI_}
         xywh {220 5 220 135} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
       } {
         Fl_Group bandwidthenvelopegroup {
-          label {SUBsynth - BandWidth Envelope}
+          label {Yoshimi : SubSynth - BandWidth Envelope}
           xywh {225 65 210 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->BandWidthEnvelope, npart, kititem, 1, 3);}
           code1 {if (pars->PBandWidthEnvelopeEnabled==0) o->deactivate();}
@@ -502,13 +502,13 @@ class SUBnoteUI {open : {public PresetsUI_}
         code0 {if (pars->PGlobalFilterEnabled==0) o->deactivate();}
       } {
         Fl_Group filterenv {
-          label {SUBsynth - Filter Envelope}
+          label {Yoshimi : SubSynth - Filter Envelope}
           xywh {447 328 275 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, 1, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {
-          label {SUBsynth - Filter}
+          label {Yoshimi : SubSynth - Filter}
           xywh {447 246 275 75} box FLAT_BOX color 50 align 144
           code0 {o->init(pars->GlobalFilter,&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 1);}
           class FilterUI

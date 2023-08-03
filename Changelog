@@ -1,11 +1,19 @@
-yoshimi 2.3.0 M
+yoshimi 2.3.0.3
+
+2023-8-3 Will
+bn 2248
+BugFix: Crash in legacy PadSynth 'apply' code.
+BugFix: Some windows not recognised as Yoshim by some window managers.
+If V keyboard visible, selection from bank now gives it keyboard focus.
+Updated docs
+Set bugfix release 2.3.0.3
+
 2023-7-27 Will
 bn 2247
 BugFix: MIDI-learn using older number format instead of decoding the text.
 Changed ID in metainfo file to make it unique.
 Some small code cleanups.
 Doc updates.
-
 
 2023-7-20 Will
 bn 2246

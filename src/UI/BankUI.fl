@@ -541,7 +541,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       }
     }
     Fl_Window searchwin {
-      label {Bank Search}
+      label {Yoshimi : Bank Search}
       callback {Hide(3);}
       xywh {1044 153 305 485} type Double box PLASTIC_THIN_UP_BOX color 22 labelsize 12 hide resizable
       code0 {searchDW = o->w(); searchDH = o->h();}
@@ -1155,8 +1155,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     setHighlight(mode);
     refreshmainwindow();} {}
   }
-  Function {ShowInst()} {open
-  } {
+  Function {ShowInst()} {} {
     code {//
 
     int X, Y, W, H, O;
@@ -1288,6 +1287,8 @@ class BankUI {: {public BankProcess_, RootProcess_}
             }
             send_data(TOPLEVEL::action::forceUpdate, MAIN::control::loadInstrumentFromBank, slot, TOPLEVEL::type::Integer, TOPLEVEL::section::main, synth->getGuiMaster()->activePart);
             // Reads from slot
+            if (synth->getGuiMaster()->virkeyboard->virkeyboardwindow->visible())
+                synth->getGuiMaster()->virkeyboard->virkeys->take_focus();
             if (what == 3)
                 Hide(0);
             return;

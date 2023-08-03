@@ -1,7 +1,7 @@
 /*
     globals.h - general static definitions
 
-    Copyright 2018-2022, Will Godfrey & others
+    Copyright 2018-2023, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -160,7 +160,9 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         insertEffects,
         bank = 244, // F4
         config = 248, // F8
-        message = 250 // FA
+        message = 250, // FA
+        windowTitle = 253, // This is read-only and uses only 'value' as a text ID for TextMsgBuffer
+        instanceID = 254 // This is read-only and has no other parameters
     };
 
     namespace type {

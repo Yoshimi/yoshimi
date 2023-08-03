@@ -398,7 +398,7 @@ class MasterUI {: {private GuiUpdates}
   }
   Function {Init(const char *_label)} {} {
     code {//
-      instance = synth->getUniqueId();
+      current_ID = collect_readData(synth, 0, 0, TOPLEVEL::instanceID);
       file::createDir(file::configDir() + "/windows");
       panelType = 5;
       msgSeen = false;
@@ -407,7 +407,7 @@ class MasterUI {: {private GuiUpdates}
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
-      configui = new ConfigUI(synth);
+      configui = new ConfigUI(synth, current_ID);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       vectorui = new VectorUI(synth, bankui, paramsui);
@@ -425,7 +425,7 @@ class MasterUI {: {private GuiUpdates}
       partui->redraw();
 
       partui->checkEngines();
-      if (instance > 0)
+      if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
@@ -460,7 +460,7 @@ class MasterUI {: {private GuiUpdates}
           msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
           setmessage(UNUSED, true, msg, "Close");
       }
-      else if (instance == 0 && synth->getRuntime().banksChecked == false)
+      else if (current_ID == 0 && synth->getRuntime().banksChecked == false)
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
           setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
@@ -561,7 +561,7 @@ class MasterUI {: {private GuiUpdates}
                 query("", "", "", "Start new instances from host");
                 return;
             }
-            if (synth->getUniqueId() != 0)
+            if (current_ID != 0)
             {
                 query("", "", "", "Only main instance can start others");
                 return;
@@ -726,7 +726,7 @@ class MasterUI {: {private GuiUpdates}
         case 29: // default
             {
             string name = synth->getRuntime().defaultStateName;
-            name += ("-" + to_string(instance));
+            name += ("-" + to_string(current_ID));
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, MAIN::control::saveNamedState, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main, UNUSED, UNUSED, UNUSED, textMsgBuffer.push(name + ".state"));
 
             }
@@ -1537,7 +1537,7 @@ Instance from 1 to 31}
     comment {line spaces in boxes below are critical} {in_source in_header
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi}
+      label {Yoshimi : About}
       xywh {46 64 365 290} type Double color 7 labelfont 13 labelsize 13 labelcolor 64 when 0 hide resizable
       code0 {aboutDW = 365; aboutDH = 290;}
       code1 {o->size_range(aboutDW,aboutDH, 0, 0, 0, 0, 1);}
@@ -1640,7 +1640,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window syseffsendwindow {
-      label {Sys Send}
+      label {Yoshimi : Sys Send}
       callback {syseffClose->do_callback();}
       xywh {534 25 120 245} type Double labelfont 13 labelsize 13 hide resizable
       code0 {syseffDW = 120; syseffDH = 245;}
@@ -1747,7 +1747,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Mixer Panel}
+      label {Yoshimi : Mixer Panel}
       callback {Panelclose->do_callback();}
       xywh {421 26 1040 320} type Double labelfont 13 labelsize 13 hide resizable
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
@@ -1940,7 +1940,7 @@ Alan Calvert started the project}
       }
     }
     Fl_Window filerwindow {
-      label Yoshimi
+      label {Yoshimi : File Manager}
       callback {//
         filerclose->do_callback();}
       xywh {236 77 550 350} type Double hide resizable
@@ -4848,7 +4848,7 @@ bpmfallback->format(format);} {}
   }
   decl {MicrotonalUI *microtonalui;} {public local
   }
-  decl {VirKeyboard *virkeyboard;} {private local
+  decl {VirKeyboard *virkeyboard;} {public local
   }
   decl {int ninseff;} {public local
   }
@@ -4871,7 +4871,7 @@ bpmfallback->format(format);} {}
   }
   decl {string panelwindowlabel} {private local
   }
-  decl {int instance;} {private local
+  decl {int current_ID;} {private local
   }
   decl {int panelgroup;} {public local
   }

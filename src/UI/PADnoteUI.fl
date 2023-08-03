@@ -727,7 +727,7 @@ class PADnoteUI {: {public PresetsUI_}
               class WidgetPDial
             }
             Fl_Group ampenv {
-              label {PADSynth - Amplitude Envelope}
+              label {Yoshimi : PadSynth - Amplitude Envelope}
               xywh {10 95 275 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, 2, 0);}
               class EnvelopeUI
@@ -747,7 +747,7 @@ class PADnoteUI {: {public PresetsUI_}
             xywh {290 25 285 250} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Group filterenv {
-              label {PADSynth - Filter Envelope}
+              label {Yoshimi : PadSynth - Filter Envelope}
               xywh {295 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->FilterEnvelope.get(), npart, kititem, 2, 2);}
               class EnvelopeUI
@@ -759,7 +759,7 @@ class PADnoteUI {: {public PresetsUI_}
               class LFOUI
             } {}
             Fl_Group filterui {
-              label {PADsynth - Filter}
+              label {Yoshimi : PadSynth - Filter}
               xywh {295 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
               code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
               class FilterUI
@@ -770,7 +770,7 @@ class PADnoteUI {: {public PresetsUI_}
             xywh {5 275 570 125} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Group freqenv {
-              label {PADSynth - Frequency Envelope}
+              label {Yoshimi : PadSynth - Frequency Envelope}
               xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, 2, 1);}
               class EnvelopeUI
@@ -920,7 +920,7 @@ class PADnoteUI {: {public PresetsUI_}
   }
   Function {make_randWalkWindow()} {} {
     Fl_Window randWalkWindow {
-      label {PadSynth - Random Walk}
+      label {Yoshimi : PadSynth - Random Walk}
       xywh {858 154 240 155} type Double hide resizable
       code0 {randDW = o->w(); randDH = o->h();}
       code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}

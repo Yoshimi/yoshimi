@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -339,17 +339,17 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {open : {public Fl_Group, PartUI_}
+class PartUI {: {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
-      xywh {739 259 395 385} type Double hide resizable
+      xywh {739 259 395 385} type Double resizable
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
       code2 {editDW = 395; editDH = 385;}
-      code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
+      code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);} visible
     } {
       Fl_Group {} {
         xywh {0 222 395 100} box GTK_THIN_UP_BOX
@@ -1735,8 +1735,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
     checkEngines();} {}
   }
-  Function {paste(CommandBlock *getData)} {open
-  } {
+  Function {paste(CommandBlock *getData)} {} {
     code {//
         int kititem = getData->data.kit;
         int engine = getData->data.engine;
@@ -1821,8 +1820,7 @@ class PartUI {open : {public Fl_Group, PartUI_}
             return;
         }
 
-        std::cout << "invalid paste" << std::endl;} {selected
-    }
+        std::cout << "invalid paste" << std::endl;} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

@@ -443,7 +443,7 @@ class ADvoiceUI {: {public Fl_Group}
               xywh {580 204 220 161} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
             } {
               Fl_Group voiceFMfreqenvgroup {
-                label {ADSynth Modulator - Frequency Envelope}
+                label {Yoshimi : AddSynth Modulator - Frequency Envelope}
                 xywh {585 290 210 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMFreqEnvelope, npart, kititem, nvoice + PART::engine::addMod1, 1);}
                 code1 {if (pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled==0) o->deactivate();}
@@ -550,7 +550,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
                 class mwheel_val_slider_rev
               }
               Fl_Group voiceFMampenvgroup {
-                label {ADSynth Modulator - Amplitude Envelope}
+                label {Yoshimi : AddSynth Modulator - Amplitude Envelope}
                 xywh {585 129 210 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMAmpEnvelope, npart, kititem, nvoice + PART::engine::addMod1, 0);}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
@@ -672,7 +672,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorFrequencyAs
             xywh {5 280 570 120} box THIN_UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
             Fl_Group voicefreqenvgroup {
-              label {ADSynth Voice - Frequency Envelope}
+              label {Yoshimi : AddSynth Voice - Frequency Envelope}
               xywh {9 325 205 70} box FLAT_BOX color 51 align 144
               code0 {o->init(pars->VoicePar[nvoice].FreqEnvelope, npart, kititem, nvoice + PART::engine::addVoice1, 1);}
               code1 {if (pars->VoicePar[nvoice].PFreqEnvelopeEnabled==0) o->deactivate();}
@@ -1050,7 +1050,7 @@ send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::enableUnison, o->val
             class Fl_Check_Button2
           }
           Fl_Group voiceampenvgroup {
-            label {ADSynth Voice - Amplitude Envelope}
+            label {Yoshimi : AddSynth Voice - Amplitude Envelope}
             xywh {10 135 275 70} box FLAT_BOX color 51 align 144
             code0 {o->init(pars->VoicePar[nvoice].AmpEnvelope, npart, kititem, nvoice + PART::engine::addVoice1, 0);}
             code1 {if (!pars->VoicePar[nvoice].PAmpEnvelopeEnabled) o->deactivate();}
@@ -1113,7 +1113,7 @@ send_data(0, ADDVOICE::control::invertPhase, o->value(), TOPLEVEL::type::Integer
             class FilterUI
           } {}
           Fl_Group voicefilterenvgroup {
-            label {ADSynth Voice - Filter Envelope}
+            label {Yoshimi : AddSynth Voice - Filter Envelope}
             xywh {295 135 275 70} box FLAT_BOX color 51 align 144
             code0 {o->init(pars->VoicePar[nvoice].FilterEnvelope, npart, kititem, nvoice + PART::engine::addVoice1, 2);}
             code1 {if (pars->VoicePar[nvoice].PFilterEnvelopeEnabled==0) o->deactivate();}
@@ -2024,7 +2024,7 @@ class ADnoteUI {: {public PresetsUI_}
         xywh {5 255 570 115} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Group freqenv {
-          label {ADSynth Global - Frequency Envelope}
+          label {Yoshimi : AddSynth Global - Frequency Envelope}
           xywh {10 295 205 70} box FLAT_BOX color 51 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 0, 1);}
           class EnvelopeUI
@@ -2206,7 +2206,7 @@ class ADnoteUI {: {public PresetsUI_}
           class WidgetPDial
         }
         Fl_Group ampenv {
-          label {ADSynth Global - Amplitude Envelope}
+          label {Yoshimi : AddSynth Global - Amplitude Envelope}
           xywh {10 75 275 70} box FLAT_BOX color 51 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 0, 0);}
           class EnvelopeUI
@@ -2238,7 +2238,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         xywh {290 5 285 250} box THIN_UP_BOX labelfont 1 labelsize 12 labelcolor 64 align 17
       } {
         Fl_Group filterenv {
-          label {ADSynth Global - Filter Envelope}
+          label {Yoshimi : AddSynth Global - Filter Envelope}
           xywh {295 110 275 70} box FLAT_BOX color 51 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, 0, 2);}
           class EnvelopeUI
@@ -2250,7 +2250,7 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
           class LFOUI
         } {}
         Fl_Group filterui {
-          label {ADsynth Global - Filter}
+          label {Yoshimi : AddSynth Global - Filter}
           xywh {295 35 275 75} box FLAT_BOX color 50 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, 0);}
           class FilterUI

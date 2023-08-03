@@ -1622,7 +1622,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
   }
   Function {make_filter_window()} {} {
     Fl_Window filterwindow {
-      label {Filter Parameters for DynFilter Eff.}
+      label {Yoshimi : Filter Parameters for DynFilter Effect}
       callback {//
     filterclose->do_callback();}
       xywh {1109 779 285 110} type Double hide resizable
