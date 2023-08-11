@@ -71,6 +71,13 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 decl {\#include "Misc/NumericFuncs.h"
     using func::power;} {private local
 }
@@ -622,8 +629,8 @@ class ResonanceUI {: PresetsUI_
         tname = "AddSynth Resonance";
     else
         tname = "PadSynth Resonance ";
-    resonancewindow->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());
-    ;
+    resonancewindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Resonance"), npart, TOPLEVEL::windowTitle, kititem, engine)).c_str());
+
     int fetchW, fetchH, fetchX, fetchY, fetchO;
     loadWin(synth, fetchW, fetchH, fetchX, fetchY, fetchO, "Resonance " + to_string(engine));
     if(fetchW < resDW || fetchH < resDH)

@@ -1,4 +1,10 @@
-yoshimi 2.3.0.3
+yoshimi 2.3.0 M
+
+2023-8-11 Will
+bn 2249
+Unified window title creation
+Revised metadata and added hicolor png icons
+Improved error reporting in Data2Text
 
 2023-8-3 Will
 bn 2248

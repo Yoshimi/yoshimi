@@ -83,6 +83,13 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 decl {\#include "Misc/NumericFuncs.h"
     using func::decibel;
     using func::asDecibel;} {private local
@@ -1286,26 +1293,21 @@ o->hide();}
   }
   Function {setWindowTitle()} {} {
     code {//
-        string tname;
         string warnType = "";
         if (engine == 2)
         {
-            tname = "PadSynth Harmonic Content";
             Warning->hide();
         }
         else
         {
-            tname = "AddSynth Voice ";
             int sourceEngine = -1;
             if (engine < PART::engine::addMod1)
             {
-                tname = tname + to_string((engine - PART::engine::addVoice1) + 1);
                 sourceEngine = fetchData(0, ADDVOICE::control::voiceOscillatorSource,npart,kititem, engine);
                 warnType = "Voice " + to_string(sourceEngine + 1);
             }
             else
             {
-                tname = tname + to_string((engine - PART::engine::addMod1) + 1) +  " Modulation";
                 if (fetchData(0, ADDVOICE::control::externalModulator,npart,kititem, engine) == -1)
                 {
                     sourceEngine = fetchData(0, ADDVOICE::control::modulatorOscillatorSource,npart,kititem, engine);
@@ -1314,7 +1316,6 @@ o->hide();}
             }
             Warning->redraw();
 
-            tname += " Oscillator";
             if (sourceEngine > -1)
             {
                 Warning->show();
@@ -1324,7 +1325,7 @@ o->hide();}
             else
                 Warning->hide();
         }
-        osceditUI->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());} {}
+        osceditUI->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Oscillator"), npart, TOPLEVEL::windowTitle, kititem, engine)).c_str());} {}
   }
   Function {redrawoscil()} {} {
     code {//

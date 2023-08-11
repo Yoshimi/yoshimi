@@ -375,7 +375,7 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Vector";
             break;
     }
 
@@ -512,7 +512,7 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Microtonal";
             break;
 
     }
@@ -992,7 +992,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             break;
         }
         default:
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Config";
             break;
     }
 
@@ -1087,7 +1087,7 @@ string DataText::resolveBank(CommandBlock *getData, bool)
             break;
 
         default:
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Bank";
             break;
     }
     return ("Bank " + contstr);
@@ -1380,7 +1380,7 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Main";
             break;
     }
 
@@ -1851,7 +1851,7 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
         default:
             showValue = false;
             name = "";
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Part";
             break;
     }
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
@@ -1934,7 +1934,7 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised AddSynth";
             break;
     }
 
@@ -2189,7 +2189,7 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised AddVoice";
             break;
     }
 
@@ -2339,7 +2339,7 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised SubSynth";
             break;
     }
 
@@ -2563,12 +2563,12 @@ string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool add
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised PadSynth";
             break;
     }
-    if (contstr != "Unrecognised")
+    if (contstr != "Unrecognised PadSynth")
         contstr = "Harmonic Samples " + contstr;
-    if (write && contstr != "Unrecognised")
+    if (write && contstr != "Unrecognised PadSynth")
         contstr += padApply;
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + contstr);
 }
@@ -2755,7 +2755,7 @@ string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, b
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Oscillator";
             break;
     }
 
@@ -2848,7 +2848,7 @@ string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bo
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Resonance";
             break;
     }
 
@@ -2941,7 +2941,7 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised LFO";
             break;
     }
 
@@ -3020,7 +3020,7 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
                     contstr += "StVar";
                     break;
                 default:
-                    contstr += "unrecognised";
+                    contstr += "Unrecognised Filter Base";
                     break;
             }
             break;
@@ -3103,7 +3103,7 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Filter";
             break;
     }
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
@@ -3255,7 +3255,7 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 
         default:
             showValue = false;
-            contstr = "Unrecognised";
+            contstr = "Unrecognised Envelope";
             break;
     }
 
@@ -3616,7 +3616,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 
         default:
             showValue = false;
-            contstr = " Unrecognised";
+            contstr = " Unrecognised Effect";
             break;
     }
     //std::cout << "control " << int(control) << std::endl;

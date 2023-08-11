@@ -1692,17 +1692,7 @@ float InterChange::readAllData(CommandBlock *getData)
 
     if (getData->data.part == TOPLEVEL::windowTitle)
     {
-        string name = "Yoshimi";
-        int ID = synth->getUniqueId();
-        if (ID > 0)
-            name += ("-" + to_string(ID));
-        name += (" : " + textMsgBuffer.fetch((int(getData->data.value))));
-        return textMsgBuffer.push(name);
-    /* usage example *
-           string name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Vectors"), 0, TOPLEVEL::windowTitle));
-
-           adds a space then 'Vectors' to "Yoshimi" plus the ID if it's greater than zero
-    */
+        return buildWindowTitle(getData, synth);
     }
 
     if (getData->data.type & TOPLEVEL::type::Limits) // these are static
@@ -1776,6 +1766,81 @@ float InterChange::readAllData(CommandBlock *getData)
 
     synth->getRuntime().finishedCLI = true; // in case it misses lines above
     return tryData.data.value;
+}
+
+float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
+{
+    string sent_name = synth->textMsgBuffer.fetch((int(getData->data.value))); // catch this early
+    string name = "Yoshimi";
+    int ID = synth->getUniqueId();
+    if (ID > 0)
+        name += ("-" + to_string(ID));
+    name += " : ";
+    if (getData->data.engine == PART::engine::padSynth)
+        name += "PadSynth ";
+    else if (getData->data.engine == PART::engine::subSynth)
+        name += "SubSynth ";
+    else if (getData->data.engine < PART::engine::addVoiceModEnd)
+    {
+        name += "AddSynth ";
+        if (getData->data.engine >= PART::engine::addMod1)
+            name += "Modulator ";
+        else if (getData->data.engine >= PART::engine::addVoice1)
+        {
+            name += "Voice ";
+        }
+        if (getData->data.engine != PART::engine::addSynth)
+        {
+            name += to_string(int((getData->data.engine) & 7) + 1);
+            name += " ";
+        }
+    }
+    if (getData->data.insert == TOPLEVEL::insert::envelopeGroup)
+    {
+        int group = int(getData->data.parameter);
+        switch (group)
+        {
+            case TOPLEVEL::insertType::amplitude:
+                name += "Amplitude ";
+                break;
+            case TOPLEVEL::insertType::frequency:
+                name += "Frequency ";
+                break;
+            case TOPLEVEL::insertType::filter:
+                name += "Filter ";
+                break;
+            case TOPLEVEL::insertType::bandwidth:
+                name += "Bandwidth ";
+                break;
+        }
+    }
+    name += sent_name;
+    if (getData->data.control < NUM_MIDI_PARTS) // it's at part level
+    {
+        name += " - Part ";
+        name += to_string(int(getData->data.control) + 1);
+        name += " ";
+        name += synth->part[getData->data.control]->Pname;
+
+        if (synth->part[getData->data.control]->Pkitmode != 0)
+        {
+            int kititem = int(getData->data.kit);
+            name += ", Kit ";
+            if (kititem < NUM_KIT_ITEMS)
+            {
+                name += to_string(kititem + 1);
+                name += " ";
+                string kitname = synth->part[getData->data.control]->kit[kititem].Pname;
+                if (!kitname.empty())
+                {
+                    name += "- ";
+                    name += kitname;
+                }
+            }
+        }
+    }
+
+    return synth->textMsgBuffer.push(name);
 }
 
 
@@ -3995,7 +4060,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case PART::control::kitMode:
             if (write)
             {
-                if (value == 3) // crossfade
+                if (value_int == 3) // crossfade
                 {
                     part->Pkitmode = 1; // normal kit mode (multiple kit items playing)
                     part->Pkitfade = true;

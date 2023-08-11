@@ -90,6 +90,7 @@ class InterChange : private DataText
         void doClearPartInstrument(int npart);
         bool commandSend(CommandBlock *getData);
         float readAllData(CommandBlock *getData);
+        float buildWindowTitle(CommandBlock *getData, SynthEngine *synth);
         void resolveReplies(CommandBlock *getData);
         std::string resolveText(CommandBlock *getData, bool addValue);
         void testLimits(CommandBlock *getData);

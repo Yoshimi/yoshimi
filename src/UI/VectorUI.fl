@@ -567,8 +567,7 @@ switch (res)
     Ycc = 0;
     Yf = 0;
     make_window();
-    string name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Vectors"), 0, TOPLEVEL::windowTitle));
-    vectorwindow->copy_label(name.c_str());
+    vectorwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Vectors"), UNUSED, TOPLEVEL::windowTitle)).c_str());
     updateAll();
     vectorSeen = false;
     lastvectorW = 0;} {}

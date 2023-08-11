@@ -68,6 +68,13 @@ decl {\#include "MasterUI.h"} {private global
 decl {using std::to_string;} {private global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 class EnvelopeFreeEdit {: {public Fl_Box}
 } {
   Function {EnvelopeFreeEdit(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
@@ -862,7 +869,8 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
       }
       Fl_Button efE {
         label E
-        callback {showfree();
+        callback {//
+          showfree();
           send_data(0, group, ENVELOPEINSERT::control::edit, o->value(), TOPLEVEL::type::Write);}
         xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10 labelcolor 64
       }
@@ -1449,6 +1457,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     checkSane(fetchX, fetchY, fetchW, fetchH, freeDW, freeDH);
 
     freemodeeditwindow->resize(fetchX, fetchY, fetchW, fetchH);
+    freemodeeditwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Envelope"), npart, TOPLEVEL::windowTitle, kititem, engine, TOPLEVEL::insert::envelopeGroup, group)).c_str());
     freemodeeditwindow->show();
     envfreeRtext();} {}
   }

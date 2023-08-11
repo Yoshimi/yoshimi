@@ -35,24 +35,36 @@
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-​    <release type="stable" version="2.3.0" date="2023-5-29" />
-​  </releases>
+      <release type="stable" version="2.3.0" date="2023-5-29" />
+  </releases>
   <provides>
     <binary>yoshimi</binary>
   </provides>
 
   <screenshots>
     <screenshot type="default">
-       <image>https://a.fsdn.com/con/app/proj/yoshimi/screenshots/Main.png</image>
-       <caption>The main window showing Yoshimi running</caption>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/images/Main.png</image>
+       <caption>Yoshimi's main window</caption>
     </screenshot>
     <screenshot>
-       <image>https://a.fsdn.com/con/app/proj/yoshimi/screenshots/Mixer.png</image>
-       <caption>Yoshimi in action</caption>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/part/images/mixer.png</image>
+       <caption>The mixer panel with 16 parts loaded</caption>
     </screenshot>
     <screenshot>
-       <image>https://a.fsdn.com/con/app/proj/yoshimi/screenshots/MidiLearn.png</image>
-       <caption>The MIDI-learn window.</caption>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/add/images/voice.png</image>
+       <caption>An AddSynth Voice</caption>
+    </screenshot>
+    <screenshot>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/sub/images/sub.png</image>
+       <caption>The SubSynth window</caption>
+    </screenshot>
+    <screenshot>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/pad/images/padharmonic.png</image>
+       <caption>PadSynth Harmonic Structure</caption>
+    </screenshot>
+    <screenshot>
+       <image>https://yoshimi.sourceforge.io/docs/user-guide/mlearn/images/mlearn.png</image>
+       <caption>The MIDI Learn Window</caption>
     </screenshot>
   </screenshots>
   <categories>

@@ -52,7 +52,6 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     else if (request != UNUSED)
         action |= request;
     CommandBlock putData;
-
     putData.data.value = value;
     putData.data.type = type;
     putData.data.source = action;
@@ -71,7 +70,9 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
         result = putData.data.miscmsg;
     }
     else
+    {
         result = synth->interchange.readAllData(&putData);
+    }
     return result;
 
 }

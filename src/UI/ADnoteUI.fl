@@ -64,6 +64,13 @@ decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 class ADvoicelistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
@@ -421,7 +428,6 @@ class ADvoiceUI {: {public Fl_Group}
     Fl_Window ADnoteVoiceParameters {
       label Voice
       xywh {327 141 805 615} type Double box NO_BOX hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
       Fl_Box {} {
@@ -2015,7 +2021,7 @@ class ADnoteUI {: {public PresetsUI_}
     resui->resonancewindow->hide();
     o->hide();}
       xywh {468 231 580 405} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Global"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
     } {
@@ -2337,7 +2343,7 @@ send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"AddSynth-voice");
 o->hide();}
       xywh {460 96 805 610} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Voice"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {voiceDW = int(760 * 9 / 10); voiceDH = int(610 * 9 / 10);}
       code2 {o->size_range(voiceDW, voiceDH, 0, 0, 0, 0, 1);}
     } {
@@ -2431,7 +2437,7 @@ o->hide();}
 listSeen = false;
 o->hide();}
       xywh {101 233 705 260} type Double labelcolor 64 hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Voice List"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {listDW = 705; listDH = 260;}
       code2 {o->size_range(listDW,listDH,0,0,0,0,1);}
     } {
@@ -2801,8 +2807,6 @@ o->hide();}
         fetchH = addDH;
     }
     checkSane(fetchX, fetchY, fetchW, fetchH, addDW, addDH);
-
-
     lastglobalW = 0;
     ADnoteGlobalParameters->resize(fetchX, fetchY, fetchW, fetchH);
     ADnoteGlobalParameters->show();

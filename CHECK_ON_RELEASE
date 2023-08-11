@@ -1,6 +1,10 @@
 
 Ensure all new files have been added to commit!!!
 
+use /usr/bin/appstream-util validate {file} to check metadata
+get images from:
+https://yoshimi.sourceforge.io/docs/user-guide
+
 /src/CMakeLists.txt
     Ensure version number is correct.
     Disable extra compiler tests.

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -76,6 +76,9 @@ decl {\#include "Misc/TextMsgBuffer.h"
     namespace { // Implementation details...
         TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
     }} {private local
+}
+
+decl {\#include "Interface/TextLists.h"} {selected public local
 }
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
@@ -275,7 +278,7 @@ class PADnoteUI {: {public PresetsUI_}
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
       xywh {1235 133 580 440} type Double hide resizable
-      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("PadSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
     } {
