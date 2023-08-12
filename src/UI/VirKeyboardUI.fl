@@ -48,6 +48,13 @@ decl {\#include "Misc/Config.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
@@ -604,8 +611,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     midictl = 75;
     oldcontrol = 64;
     make_window();
-    keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
-    virkeyboardwindow->label(keyboardlabel.c_str());
+    virkeyboardwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Virtual Keyboard"), UNUSED, TOPLEVEL::windowTitle)).c_str());
     virtSeen = false;
     lastvirtW = 0;} {}
   }

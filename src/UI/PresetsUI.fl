@@ -90,11 +90,11 @@ class PresetsUI {} {
   }
   Function {make_window()} {} {
     Fl_Window copywin {
-      label {Yoshimi : Copy to -}
+      label {Yoshimi : Copy to}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {190 173 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
-      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy to-"), 0, TOPLEVEL::windowTitle)).c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy to - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser copybrowse {
@@ -164,7 +164,7 @@ o->hide();}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {213 81 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
-      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from-"), 0, TOPLEVEL::windowTitle)).c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser pastebrowse {

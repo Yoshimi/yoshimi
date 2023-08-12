@@ -949,68 +949,11 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 file::cmd2string("xdg-open " + found + "index.html &");
             }
             else
-                text = "Can't find manual :(";
-
-            if (found.empty())
-            {    // fall back to older PDF version
-                std::string manfile = synth->manualname();
-                std::string stub = manfile.substr(0, manfile.rfind("-"));
-
-                std::string path = "";
-                std::string lastdir = "";
-                std::string search = "/usr/share/doc/yoshimi";
-                path = manualSearch(search, stub);
-                //std::cout << "name1 " << path << std::endl;
-                found = path;
-                lastdir = search;
-
-                search = "/usr/local/share/doc/yoshimi";
-                path = manualSearch(search, stub);
-                //std::cout << "name2 " << path << std::endl;
-                if (path >= found)
-                {
-                    found = path;
-                    lastdir = search;
-                }
-
-                search = localPath();
-                if (!search.empty())
-                {
-                    path = manualSearch(search, stub);
-                    //std::cout << "name3 " << path << std::endl;
-                    if (path >= found)
-                    {
-                        found = path;
-                        lastdir = search;
-                    }
-                }
-
-                if (found.empty())
-                {
-                    getData->data.miscmsg = textMsgBuffer.push("Can't find PDF manual :(");
-                    returnsBuffer.write(getData->bytes);
-                }
-                else
-                {
-                    if (found.substr(0, found.rfind(".")) != manfile)
-                    getData->data.miscmsg = textMsgBuffer.push("Can't find last PDF. Looking for older one");
-                    returnsBuffer.write(getData->bytes);
-                }
-                std::string command = "xdg-open " + lastdir + "/" + found + "&";
-                if (!file::cmd2string(command))
-                {
-                    getData->data.miscmsg = textMsgBuffer.push("Can't find PDF reader :(");
-                    returnsBuffer.write(getData->bytes);
-                    found = "";
-                }
-            }
-            if (!found.empty())
             {
-                text = "";
-                getData->data.miscmsg = NO_MSG;
+                getData->data.miscmsg = textMsgBuffer.push("Can't find manual :(");
                 returnsBuffer.write(getData->bytes);
+                newMsg = true;
             }
-            newMsg = true;
             break;
 
         }
@@ -1771,27 +1714,43 @@ float InterChange::readAllData(CommandBlock *getData)
 float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
 {
     string sent_name = synth->textMsgBuffer.fetch((int(getData->data.value))); // catch this early
-    string name = "Yoshimi";
-    int ID = synth->getUniqueId();
-    if (ID > 0)
-        name += ("-" + to_string(ID));
-    name += " : ";
-    if (getData->data.engine == PART::engine::padSynth)
+    string name = synth->makeUniqueName("");
+    int section = getData->data.control;
+    int engine = getData->data.engine;
+    //std::cout << "sect " << section << std::endl;
+    if (section >= NUM_MIDI_PARTS)
+    {
+        if (section == TOPLEVEL::section::systemEffects)
+            name += "System Effect ";
+        else if (section == TOPLEVEL::section::insertEffects)
+            name += "Insert Effect ";
+        if (section != UNUSED)
+        {
+            name += to_string(engine + 1);
+            name += " - ";
+        }
+        if (getData->data.kit == EFFECT::type::dynFilter)
+            name += "DynFilter ";
+        name += sent_name;
+        return synth->textMsgBuffer.push(name);
+    }
+
+    if (engine == PART::engine::padSynth)
         name += "PadSynth ";
-    else if (getData->data.engine == PART::engine::subSynth)
+    else if (engine == PART::engine::subSynth)
         name += "SubSynth ";
-    else if (getData->data.engine < PART::engine::addVoiceModEnd)
+    else if (engine < PART::engine::addVoiceModEnd)
     {
         name += "AddSynth ";
         if (getData->data.engine >= PART::engine::addMod1)
             name += "Modulator ";
-        else if (getData->data.engine >= PART::engine::addVoice1)
+        else if (engine >= PART::engine::addVoice1)
         {
             name += "Voice ";
         }
-        if (getData->data.engine != PART::engine::addSynth)
+        if (engine != PART::engine::addSynth)
         {
-            name += to_string(int((getData->data.engine) & 7) + 1);
+            name += to_string((engine & 7) + 1);
             name += " ";
         }
     }
@@ -1815,14 +1774,14 @@ float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
         }
     }
     name += sent_name;
-    if (getData->data.control < NUM_MIDI_PARTS) // it's at part level
+    if (section < NUM_MIDI_PARTS) // it's at part level
     {
         name += " - Part ";
-        name += to_string(int(getData->data.control) + 1);
+        name += to_string(section + 1);
         name += " ";
-        name += synth->part[getData->data.control]->Pname;
+        name += synth->part[section]->Pname;
 
-        if (synth->part[getData->data.control]->Pkitmode != 0)
+        if (synth->part[section]->Pkitmode != 0)
         {
             int kititem = int(getData->data.kit);
             name += ", Kit ";
@@ -1830,7 +1789,7 @@ float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
             {
                 name += to_string(kititem + 1);
                 name += " ";
-                string kitname = synth->part[getData->data.control]->kit[kititem].Pname;
+                string kitname = synth->part[section]->kit[kititem].Pname;
                 if (!kitname.empty())
                 {
                     name += "- ";
@@ -1839,7 +1798,6 @@ float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
             }
         }
     }
-
     return synth->textMsgBuffer.push(name);
 }
 

@@ -786,7 +786,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       callback {Hide(2);}
       xywh {88 54 460 270} type Double labelsize 12 hide resizable
       code0 {readbankcfg();}
-      code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
+      code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Bank Root Paths"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code2 {rootDW = o->w(); rootDH = o->h();}
       code3 {o->size_range(rootDW, rootDH, 0,0,0,0,1);}
     } {

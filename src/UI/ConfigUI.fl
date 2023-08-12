@@ -75,7 +75,7 @@ class ConfigUI {} {
       label {Yoshimi Settings}
       callback {close->do_callback();}
       xywh {1226 24 390 330} type Double hide resizable
-      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), 0, TOPLEVEL::windowTitle)).c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
       code3 {o->size_range(confDW, confDH, 0, 0, 0, 0, 1);}
@@ -919,7 +919,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       label Presets
       callback {pClose->do_callback();}
       xywh {5 437 460 270} type Double hide resizable
-      code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Presets"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {preDW = o->w();preDH = o->h();}
       code2 {o->size_range(preDW, preDH, 0, 0, 0, 0, 1);}
     } {

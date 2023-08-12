@@ -1,5 +1,10 @@
 yoshimi 2.3.0 M
 
+2023-8-12 Will
+bn 2250
+Further improvements to window titles.
+Removed code for looking for PDF manual.
+
 2023-8-11 Will
 bn 2249
 Unified window title creation

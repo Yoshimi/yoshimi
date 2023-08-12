@@ -83,6 +83,13 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {class FilterUI;} {public global
 }
 
+decl {\#include "Misc/TextMsgBuffer.h"
+
+    namespace { // Implementation details...
+        TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+    }} {private local
+}
+
 decl {\#include "Misc/FormatFuncs.h"
     using func::asString;} {private local
 }
@@ -509,6 +516,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     if (type > 2)
         type = 3;
     //std::cout << "type open " << type << std::endl;
+    formantparswindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Formant Editor"), npart, TOPLEVEL::windowTitle, kititem, engine)).c_str());
     loadWin(synth, W, H, X, Y, O, "xFilter-formant " + std::to_string(type));
     if (W < formantDW || H < formantDH)
     {

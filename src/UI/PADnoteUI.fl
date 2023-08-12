@@ -926,7 +926,8 @@ class PADnoteUI {: {public PresetsUI_}
       label {Yoshimi : PadSynth - Random Walk}
       xywh {858 154 240 155} type Double hide resizable
       code0 {randDW = o->w(); randDH = o->h();}
-      code1 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}
+      code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Random Walk"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
+      code2 {o->size_range(randDW, randDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group randomProp {
         xywh {0 0 240 154}

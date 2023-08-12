@@ -124,10 +124,12 @@ class ParametersUI {} {
     unsigned int name_start;
     unsigned int name_end;
     string name = "Unknown";
+    int partNo = UNUSED;
     switch (H_type)
     {
         case TOPLEVEL::XML::Instrument:
             name = + "Instruments";
+            partNo = synth->getGuiMaster()->npart; // TODO find a better way!
             break;
         case TOPLEVEL::XML::Scale:
             name = "Scales";
@@ -145,7 +147,7 @@ class ParametersUI {} {
             name = "Patch Sets";
             break;
     }
-    name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push(name), 0, TOPLEVEL::windowTitle));
+    name = textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push(name), partNo, TOPLEVEL::windowTitle));
     Recent->copy_label(name.c_str());
 
     vector<string> listType = *synth->getHistory(H_type);

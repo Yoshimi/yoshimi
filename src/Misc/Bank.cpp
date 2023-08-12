@@ -92,7 +92,8 @@ Bank::Bank(SynthEngine *_synth) :
 
 string Bank::getBankFileTitle(size_t root, size_t bank)
 {
-    return synth->makeUniqueName("Root " + asString(root) + ", Bank " + asString(bank) + " - " + getBankPath(root, bank));
+    string name = synth->makeUniqueName("Root " + asString(root) + ", Bank " + asString(bank) + " - " + getBankPath(root, bank));
+    return name;
 }
 
 

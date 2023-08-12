@@ -630,7 +630,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
     code {//
     if (name > "")
         name = " - " + name;
-    midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
+    midilearnwindow->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("MIDI Learn" + name), UNUSED, TOPLEVEL::windowTitle)).c_str());} {}
   }
   Function {learnRtext()} {} {
     code {//
