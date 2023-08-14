@@ -227,23 +227,40 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
 string Microtonal::reformatline(string text)
 {
-    text.erase(remove_if (text.begin(), text.end(),
-     [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
-
+    //text.erase(remove_if (text.begin(), text.end(), [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
+    // above replaced as it screwed up comments in lines
+    string formattext = "";
+    char Chr;
+    bool comment = false;
+    for (size_t i = 0; i < text.length(); ++i)
+    {
+        Chr = text[i];
+        if ( Chr == '!')
+        {
+            if (!comment)
+                formattext += " ";
+            comment = true;
+        }
+        if (comment)
+            formattext += Chr;
+        else if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
+            formattext += Chr;
+    }
+    //std::cout << "Formatted >" << formattext << std::endl;
     size_t found;
-    found = text.find('.');
+    found = formattext.find('.');
     if (found < 4)
     {
         string tmp (4 - found, '0'); // leading zeros
-        text = tmp + text;
+        formattext = tmp + formattext;
     }
-    found = text.size();
+    found = formattext.size();
     if (found < 11)
     {
         string tmp  (11 - found, '0'); // trailing zeros
-        text += tmp;
+        formattext += tmp;
     }
-    return text;
+    return formattext;
 }
 
 
@@ -254,9 +271,11 @@ bool Microtonal::validline(const char *line)
     while (ok && line[idx] > 31)
     {
         char chr = line[idx];
+        if (chr == '!')
+            return true; // the rest of the line is a comment
         if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
         {
-            cout << "char " << int(chr) << endl;
+            cout << "char " << int(chr) << " line " << line << endl;
             ok = false;
         }
         ++ idx;
@@ -272,7 +291,6 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         return -2;
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0, tmp, tuning = 1.0;
-
     if (strstr(line, "/") == NULL)
     {
         if (strstr(line, ".") == NULL)
@@ -315,8 +333,9 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             tuning = x;
             break;
     }
-
-    tmpoctave[nline].text = reformatline(line);
+    //std::cout << "clean line >" << line << std::endl;
+    //tmpoctave[nline].text = reformatline(line);
+    //std::cout << "formatted line >" << line << std::endl;
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;
@@ -438,16 +457,18 @@ void Microtonal::tuningtoline(unsigned int n, char *line, int maxn)
         line[0] = '\0';
         return;
     }
-    if (octave[n].type == 1)
+    string text = octave[n].text;
+    if (text > " ")
+        //std::cout << text << std::endl;
+        snprintf(line, maxn, "%s", text.c_str());
+    else
     {
-        string text = octave[n].text;
-        if (text > " ")
-            snprintf(line, maxn, "%s", text.c_str());
-        else
+        if (octave[n].type == 1)
             snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+
+        if (octave[n].type == 2)
+            snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
     }
-    if (octave[n].type == 2)
-        snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
 }
 
 
@@ -473,6 +494,7 @@ int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t m
         line[0] = 0;
         C_lineInText(text, point, line, maxlen);
     } while (line[0] == '!');
+    //std::cout << "line >" << line << std::endl;
     if (line[0] < ' ')
         return -5;
     return 0;
@@ -659,6 +681,32 @@ int Microtonal::loadkbm(const string& filename)
 }
 
 
+string Microtonal::scale2scl()
+{
+    string text = "! ";
+    text += synth->microtonal.Pname;
+    text += "\n!\n ";
+    text += synth->microtonal.Pcomment;
+    text += "\n ";
+    text += to_string(synth->microtonal.octavesize);
+    text += "\n!\n";
+    for (size_t i = 0; i < synth->microtonal.octavesize; ++ i)
+    {
+        text += " ";
+        if (octave[i].type == 1)
+            text += synth->microtonal.octave[i].text;
+        else
+        {
+            text+= to_string(octave[i].x1);
+            text += "/";
+            text+= to_string(octave[i].x2);
+        }
+        text += "\n";
+    }
+    return text;
+}
+
+
 void Microtonal::add2XML(XMLwrapper *xml)
 {
     xml->addparstr("name", Pname.c_str());
@@ -698,6 +746,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
             }
             if (octave[i].type == 2)
             {
+                xml->addparstr("cents_text",octave[i].text);
                 xml->addpar("numerator", octave[i].x1);
                 xml->addpar("denominator", octave[i].x2);
             }
@@ -764,6 +813,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 
                 if (octave[i].x2)
                 {
+                    octave[i].text = text;
                     octave[i].type = 2;
                     octave[i].tuning = ((double)octave[i].x1) / octave[i].x2;
                 }

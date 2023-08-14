@@ -488,6 +488,15 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
             showValue = false;
             break;
 
+        case SCALES::control::exportScl:
+            contstr = "Tuning Export ";
+            showValue = false;
+            break;
+        case SCALES::control::exportKbm:
+            contstr = "Keymap Export ";
+            showValue = false;
+            break;
+
         case SCALES::control::name:
             contstr = "Name: ";
             if (addValue)

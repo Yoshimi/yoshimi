@@ -84,6 +84,9 @@ class Microtonal
         int texttotunings(const char *text);
         int texttomapping(const char *text);
 
+        string scale2scl(void);
+        string map2kbm(void);
+
         string Pname;
         string Pcomment;
 

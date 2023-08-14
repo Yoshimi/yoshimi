@@ -640,6 +640,21 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             }
             break;
 
+        case SCALES::control::exportScl:
+        {
+            string newtext = synth->microtonal.scale2scl();
+            string filename = text;
+            filename = setExtension(filename, EXTEN::scalaTuning);
+            saveText(newtext, filename);
+        }
+        break;
+        case SCALES::control::exportKbm:
+        {
+            // synth->microtonal.map2kbm()
+            ; // not yet
+        }
+        break;
+
         case SCALES::control::name:
             if (write)
             {

@@ -199,17 +199,17 @@ class MicrotonalUI {} {
         }
         Fl_Group Tuning {
           label {Tunings:}
-          xywh {7 144 190 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64 align 5
+          xywh {7 144 190 301} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64 align 5
         } {
           Fl_Input tuningsinput {
-            tooltip {You must retune if you change this.} xywh {10 147 182 258} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
+            tooltip {You must retune if you change this.} xywh {10 147 182 250} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
             code0 {updateTuningsInput();}
           }
           Fl_Value_Output octavesizeoutput {
             label {Notes / oct.}
             callback {//
                 o->value(microtonal->getoctavesize());}
-            tooltip {Notes/Octave} xywh {17 417 45 20} labelsize 10 labelcolor 64 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
+            tooltip {Notes/Octave} xywh {17 415 45 20} labelsize 10 labelcolor 64 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
             code0 {o->value(microtonal->getoctavesize());}
           }
           Fl_Button importscl {
@@ -219,15 +219,31 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .scl file (tunnings)} xywh {85 417 100 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .scl file (tunnings)} xywh {85 401 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
+          Fl_Button exportscl {
+            label {Export .scl file}
+            callback {//
+                int value = microtonal->texttotunings(tuningsinput->value());
+                if (value < 1)
+                {
+                    errors(value, true);
+                    return;
+                }
+                string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaTune);
+                if (filename.empty())
+                    return;
+
+                send_data(TOPLEVEL::action::lowPrio, SCALES::control::exportScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
+                tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            }
         }
         Fl_Group Keymap {
           label {Keyboard Map:}
           xywh {195 144 206 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64
         } {
           Fl_Input mappinginput {
-            tooltip {You must retune if you change this.} xywh {251 147 146 258} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
+            tooltip {You must retune if you change this.} xywh {251 147 146 250} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
             code0 {updateMappingInput();}
           }
           Fl_Text_Display first1 {
@@ -326,7 +342,7 @@ class MicrotonalUI {} {
           Fl_Value_Output mapsizeoutput {
             label {Map Size}
             callback {o->value(microtonal->Pmapsize);}
-            xywh {202 417 44 20} labelsize 10 labelcolor 104 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
+            xywh {202 415 44 20} labelsize 10 labelcolor 104 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
             code0 {o->value(microtonal->Pmapsize);}
           }
           Fl_Button importkbm {
@@ -337,7 +353,17 @@ class MicrotonalUI {} {
                 return;
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {285 417 104 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+          }
+          Fl_Button Exportkbm {
+            label {Export .kbm file}
+            callback {//
+            //string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaMap);
+            //if (filename.empty())
+               // return;
+
+            //send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
+            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 422 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Check_Button mappingenabledbutton {
