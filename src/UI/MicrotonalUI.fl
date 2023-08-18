@@ -47,6 +47,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetCheckButton.h"
+    \#include "Interface/TextLists.h"
     \#include "Params/Controller.h"} {public global
 }
 
@@ -218,7 +219,9 @@ class MicrotonalUI {} {
             string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaTune);
             if (filename.empty())
                 return;
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
+            send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
+            }
             tooltip {Import Scala .scl file (tunnings)} xywh {85 401 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button exportscl {
@@ -233,10 +236,10 @@ class MicrotonalUI {} {
                 string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaTune);
                 if (filename.empty())
                     return;
-
+                send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
                 send_data(TOPLEVEL::action::lowPrio, SCALES::control::exportScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-                tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
-            }
+            tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+          }
         }
         Fl_Group Keymap {
           label {Keyboard Map:}
@@ -352,18 +355,26 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
 
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
+            send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);}
             tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button Exportkbm {
             label {Export .kbm file}
             callback {//
-            //string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaMap);
-            //if (filename.empty())
-               // return;
+                /*int value = microtonal->keymaptotext();
+                if (value < 1)
+                {
+                    errors(value, true);
+                    return;
+                }*/
 
-            //send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
-            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 422 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
+            string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaMap);
+            if (filename.empty())
+                return;
+            send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::exportKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
+            tooltip {Export Scala .kbm file (keyboard mapping)} xywh {273 422 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Check_Button mappingenabledbutton {
@@ -510,7 +521,7 @@ class MicrotonalUI {} {
                 }
             }
             else if (wasFromUs)
-                errors(value_int, true);
+                errors(value_int, false);
             break;
 
         case SCALES::control::name:
@@ -681,43 +692,14 @@ class MicrotonalUI {} {
         message = "Tuning: ";
     else
         message = "Keymap: ";
-    switch (value)
-    {
-        case 0:
-            message += "Nothing entered";
-            break;
-        case -1:
-            message += "Value is too small";
-            break;
-        case -2:
-            if (type)
-                message += "Must be numbers (like 232.59)\\n or divisions (like 121/64)";
-            else
-                message += "Invalid characters";
-            break;
-        case -3:
-            message += "File not found";
-            break;
-        case -4:
-            message += "Empty file";
-            break;
-        case -5:
-            message += "Short or corrupted file";
-            break;
-        case -6:
-            if (type)
-                message += "Invalid octave size";
-            else
-                message += "Invalid keymap size";
-            break;
-        case -7:
-            message += "Invalid note number";
-            break;
-        case -8:
-            message += "Value out of range";
-            break;
-    }
-    alert(synth, message);} {}
+    /*  TODO sort this!
+     * no response to 'type' always Tuning"
+            we always see this:
+                "Must be numbers (like 232.59) or divisions (like 121/64)"
+            Keymap should see this
+                "Invalid characters"
+    */
+    alert(synth, message + scale_errors[0 - value]);} {}
   }
   decl {Microtonal *microtonal;} {private local
   }

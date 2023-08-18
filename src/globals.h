@@ -525,6 +525,21 @@ namespace SCALES // usage SCALES::control::refFrequency
         name = 64,
         comment
     };
+    enum errors : int {
+        outOfRange = -12,
+        badNoteNumber,
+        badMapSize,
+        badOctaveSize,
+        shortFile,
+        badFile,
+        emptyFile,
+        noFile,
+        badNumbers,
+        badChars,
+        valueTooBig,
+        valueTooSmall,
+        emptyEntry
+    };
 }
 
 namespace MAIN // usage MAIN::control::volume

@@ -941,6 +941,24 @@ static std::string scalelist [] = {
     "@end","@end"
 };
 
+static std::string scale_errors [] = {
+    "Nothing Entered",
+    "Value is too small",
+    "Value is too big",
+    "Invalid Character",
+    "Must be numbers (like 232.59) or divisions (like 121/64)",
+    "File not found",
+    "Empty file",
+    "Corrupted file",
+    "Short file",
+    "Invalid octave size",
+    "Invalid keymap size",
+    "Invalid note number",
+    "Value out of range",
+    "@end"
+
+};
+
 static std::string noteslist [] = { // from 21
     "(A0)", "(A#0)", "(B0)",
     "(C1)", "(C#1)", "(D1)", "(D#1)", "(E1)", "(F1)", "(F#1)", "(G1)", "(G#0)", "(A1)", "(A#1)", "(B1)",

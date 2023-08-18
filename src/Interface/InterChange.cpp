@@ -305,7 +305,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     unsigned char insert = getData->data.insert;
     //unsigned char parameter = getData->data.parameter;
     //unsigned char miscmsg = getData->data.miscmsg;
-
+//synth->CBtest(getData);
     while (syncWrite)
         usleep(10);
     bool write = (type & TOPLEVEL::type::Write);
@@ -590,35 +590,35 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
         case SCALES::control::tuning:
             text = formatScales(text);
             value = synth->microtonal.texttotunings(text.c_str());
-            if (value > 0)
-                synth->setAllPartMaps();
+            if (value <= 0)
+                synth->microtonal.defaults(1);
+            synth->setAllPartMaps();
             break;
         case SCALES::control::keyboardMap:
             text = formatScales(text);
             value = synth->microtonal.texttomapping(text.c_str());
-            if (value > 0)
-                synth->setAllPartMaps();
+            if (value <= 0)
+                synth->microtonal.defaults(2);
+            synth->setAllPartMaps();
             break;
 
         case SCALES::control::importScl:
             value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
-            if (value > 0)
+            if (value <= 0)
             {
-                text = "";
-                char *buf = new char[100];
-                for (int i = 0; i < value; ++ i)
-                {
-                    synth->microtonal.tuningtoline(i, buf, 100);
-                    if (i > 0)
-                        text += "\n";
-                    text += std::string(buf);
-                }
-                delete [] buf;
+                synth->microtonal.defaults(1);
             }
+            else
+            {
+                text = synth->microtonal.tuningtotext();
+            }
+            synth->setAllPartMaps();
             break;
         case SCALES::control::importKbm:
             value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
-            if (value > 0)
+            if (value <= 0)
+                synth->microtonal.defaults(2);
+            else
             {
                 text = "";
                 int map;
@@ -636,8 +636,8 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
                 getData->data.engine = synth->microtonal.Pfirstkey;
                 getData->data.insert = synth->microtonal.Pmiddlenote;
                 getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
-                synth->setAllPartMaps();
             }
+            synth->setAllPartMaps();
             break;
 
         case SCALES::control::exportScl:
@@ -645,13 +645,17 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             string newtext = synth->microtonal.scale2scl();
             string filename = text;
             filename = setExtension(filename, EXTEN::scalaTuning);
+            //std::cout << "file >" << filename << std::endl;
             saveText(newtext, filename);
         }
         break;
         case SCALES::control::exportKbm:
         {
-            // synth->microtonal.map2kbm()
-            ; // not yet
+            string newtext = synth->microtonal.map2kbm();
+            string filename = text;
+            filename = setExtension(filename, EXTEN::scalaKeymap);
+            //std::cout << "file >" << filename << std::endl;
+            saveText(newtext, filename);
         }
         break;
 
@@ -1604,6 +1608,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
 
 std::string InterChange::formatScales(std::string text)
 {
+    std::cout << "pre format "<< text << std::endl;
     text.erase(remove(text.begin(), text.end(), ' '), text.end());
     std::string delimiters = ",";
     size_t current;
@@ -1611,6 +1616,7 @@ std::string InterChange::formatScales(std::string text)
     size_t found;
     std::string word;
     std::string newtext = "";
+    std::cout << "in format " << text << std::endl;
     do
     {
         current = next + 1;
@@ -1637,6 +1643,7 @@ std::string InterChange::formatScales(std::string text)
             newtext += "\n";
     }
     while (next != string::npos);
+    std::cout << "post format "<< newtext << std::endl;
     return newtext;
 }
 

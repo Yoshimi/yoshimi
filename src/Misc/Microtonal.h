@@ -47,7 +47,7 @@ class Microtonal
     public:
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
-        void defaults(void);
+        void defaults(int type = 0);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
         float getLimits(CommandBlock *getData);

@@ -107,6 +107,8 @@ class CmdInterpreter
         int commandBank(Parser& input, unsigned char controlType, bool justEntered = false);
         int commandConfig(Parser& input, unsigned char controlType);
         int commandScale(Parser& input, unsigned char controlType);
+        int commandImportScale(Parser& input);
+        int commandExportScale(Parser& input);
         int addSynth(Parser& input, unsigned char controlType);
         int subSynth(Parser& input, unsigned char controlType);
         int padSynth(Parser& input, unsigned char controlType);

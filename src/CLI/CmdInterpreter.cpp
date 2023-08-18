@@ -3619,6 +3619,46 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 }
 
 
+int CmdInterpreter::commandImportScale(Parser& input)
+{
+    if (input.lineEnd(TOPLEVEL::type::Write)) // always must have a value here
+        return REPLY::what_msg;
+
+    size_t command = 0;
+    if (input.matchnMove(1, "tuning"))
+        command = SCALES::control::importScl;
+    else if (input.matchnMove(1, "keymap"))
+        command = SCALES::control::importKbm;
+    else
+        return REPLY::what_msg;
+
+    string name = string{input};
+    if (name.empty())
+        return REPLY::value_msg;
+
+    size_t miscmsg = textMsgBuffer.push(name);
+    return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+}
+
+
+int CmdInterpreter::commandExportScale(Parser& input)
+{
+    size_t command = 0;
+    if (input.matchnMove(1, "tuning"))
+        command = SCALES::control::exportScl;
+    else if (input.matchnMove(1, "keymap"))
+        command = SCALES::control::exportKbm;
+    else
+        return REPLY::what_msg;
+
+    string name = string{input};
+    if (name.empty())
+        return REPLY::value_msg;
+    size_t miscmsg = textMsgBuffer.push(name);
+    return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+}
+
+
 int CmdInterpreter::modulator(Parser& input, unsigned char controlType)
 {
     if (input.lineEnd(controlType))
@@ -6584,11 +6624,15 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         string replyMsg;
         if (input.matchnMove(3, "import"))
         {
+            if (bitTest(context, LEVEL::Scale))
+                return commandImportScale(input);
             type = MAIN::control::importBank;
             replyMsg = "import";
         }
         else if (input.matchnMove(3, "export"))
         {
+            if (bitTest(context, LEVEL::Scale))
+                return commandExportScale(input);
             type = MAIN::control::exportBank;
             replyMsg = "export";
         }

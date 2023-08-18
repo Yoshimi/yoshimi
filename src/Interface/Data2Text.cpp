@@ -533,42 +533,8 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
         || control == SCALES::control::importScl
         || control == SCALES::control::importKbm
         ))
-    { // errors :@(
-        switch (value)
-        {
-            case 0:
-                contstr += "Empty entry";
-                break;
-            case -1:
-                contstr += "Value too small";
-                break;
-            case -2:
-                contstr += "Invalid entry";
-                break;
-            case -3:
-                contstr += "File not found";
-                break;
-            case -4:
-                contstr += "Empty file";
-                break;
-            case -5:
-                contstr += "Short or corrupted file";
-                break;
-            case -6:
-                if (control == SCALES::control::tuning || control == SCALES::control::importScl)
-                    contstr += "Invalid octave size";
-                else
-                    contstr += "Invalid keymap size";
-                break;
-            case -7:
-                contstr += "Invalid note number";
-                break;
-            case -8:
-                contstr += "Out of range";
-                break;
-        }
-    }
-
+    // errors :@(
+    contstr += scale_errors[0-value];
     return ("Scales " + contstr);
 }
 

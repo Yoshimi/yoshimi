@@ -63,7 +63,7 @@ namespace { // local implementation details
     }
 
 
-    inline bool C_lineInText(std::string text, size_t &point, char *line, size_t length)
+    inline bool fetchLineFromText(std::string text, size_t &point, char *line, size_t length)
     {
         bool ok = true;
         std::string found = lineInText(text, point);
@@ -85,24 +85,36 @@ namespace { // local implementation details
 }//(End)implementation details
 
 
-void Microtonal::defaults(void)
+void Microtonal::defaults(int type)
 {
-    Pinvertupdown = 0;
-    Pinvertupdowncenter = 60;
-    octavesize = 12;
-    Penabled = 0;
-    PrefNote = 69;
-    PrefFreq = 440.0f;
-    Pscaleshift = 64;
+    if (type != 2) // not map
+    {
+        Pinvertupdown = 0;
+        Pinvertupdowncenter = 60;
+        octavesize = 12;
+        Penabled = 0;
+        PrefNote = 69;
+        PrefFreq = 440.0f;
+        Pscaleshift = 64;
+        octave[11].type = 2;
+        octave[11].x1 = 2;
+        octave[11].x2 = 1;
+        Pname = string("12tET");
+        Pcomment = string("Default Tuning");
 
-    Pfirstkey = 0;
-    Plastkey = 127;
-    Pmiddlenote = 60;
-    Pmapsize = 12;
-    Pmappingenabled = 0;
+    }
+    if (type != 1) // not tuning
+    {
+        Pfirstkey = 0;
+        Plastkey = 127;
+        Pmiddlenote = 60;
+        Pmapsize = 12;
+        Pmappingenabled = 0;
 
-    for (int i = 0; i < 128; ++i)
-        Pmapping[i] = i;
+        for (int i = 0; i < 128; ++i)
+            Pmapping[i] = i;
+        Pcomment = string("Default Map");
+    }
 
     for (size_t i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
@@ -112,12 +124,15 @@ void Microtonal::defaults(void)
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = tmpoctave[i].x2 = 0;
     }
-    octave[11].type = 2;
-    octave[11].x1 = 2;
-    octave[11].x2 = 1;
-    Pname = string("12tET");
-    Pcomment = string("Equal Temperament 12 notes per octave");
-    Pglobalfinedetune = 64.0;
+    if (type == 0)
+    {
+        octave[11].type = 2;
+        octave[11].x1 = 2;
+        octave[11].x2 = 1;
+        Pname = string("12tET");
+        Pcomment = string("Equal Temperament 12 notes per octave");
+    }
+    Pglobalfinedetune = 64.0; // always set this
 }
 
 
@@ -275,7 +290,7 @@ bool Microtonal::validline(const char *line)
             return true; // the rest of the line is a comment
         if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
         {
-            cout << "char " << int(chr) << " line " << line << endl;
+            //cout << "char " << int(chr) << " line " << line << endl;
             ok = false;
         }
         ++ idx;
@@ -288,12 +303,13 @@ bool Microtonal::validline(const char *line)
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     if (!validline(line))
-        return -2;
+        return SCALES::errors::badNumbers;
     int x1 = -1, x2 = -1, type = -1;
-    double x = -1.0, tmp, tuning = 1.0;
-    if (strstr(line, "/") == NULL)
+    double x = -1.0;
+    double tuning = 1.0;
+    if (!strstr(line, "/"))
     {
-        if (strstr(line, ".") == NULL)
+        if (!strstr(line, "."))
         {   // M case (M=M/1)
             sscanf(line, "%d", &x1);
             x2 = 1;
@@ -303,7 +319,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         {   // double number case
             x = stod(string(line));
             if (x < 0.000001)
-                return -1;
+                return SCALES::errors::valueTooSmall;
             type = 1; // double type(cents)
         }
     }
@@ -311,7 +327,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     {   // M/N case
         sscanf(line, "%d/%d", &x1, &x2);
         if (x1 < 0 || x2 < 0)
-            return -2;
+            return SCALES::errors::badNumbers;
         if (!x2)
             x2 = 1;
         type = 2; // division
@@ -320,27 +336,23 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     if (x1 <= 0)
         x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
 
-    switch (type)
+    if (type == 1)
     {
-        case 1:
             x1 = (int) floor(x);
-            tmp = fmod(x, 1.0);
+            double tmp = fmod(x, 1.0);
             x2 = int(floor(tmp * 1e6));
             tuning = pow(2.0, x / 1200.0);
-            break;
-        case 2:
-            x = ((double)x1) / x2;
-            tuning = x;
-            break;
+            tmpoctave[nline].text = reformatline(line);
     }
-    //std::cout << "clean line >" << line << std::endl;
-    //tmpoctave[nline].text = reformatline(line);
-    //std::cout << "formatted line >" << line << std::endl;
+    else if (type == 2)
+            tuning = double(x1) / x2;
+    else
+        std::cout << "unrecognised type" << std::endl;
+
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;
     tmpoctave[nline].x2 = x2;
-
     return 0; // ok
 }
 
@@ -429,7 +441,7 @@ int Microtonal::texttomapping(const char *text)
         std::swap(Pmapping, tmpMap);
     }
     else
-        return -6;
+        return SCALES::errors::badMapSize;
     return tx;
 }
 
@@ -458,17 +470,15 @@ void Microtonal::tuningtoline(unsigned int n, char *line, int maxn)
         return;
     }
     string text = octave[n].text;
-    if (text > " ")
-        //std::cout << text << std::endl;
-        snprintf(line, maxn, "%s", text.c_str());
-    else
+    if (octave[n].type == 1)
     {
-        if (octave[n].type == 1)
+        if (text > " ")
+            snprintf(line, maxn, "%s", text.c_str());
+        else
             snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
-
-        if (octave[n].type == 2)
-            snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
     }
+    else if (octave[n].type == 2)
+        snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
 }
 
 
@@ -492,11 +502,10 @@ int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t m
 {
     do {
         line[0] = 0;
-        C_lineInText(text, point, line, maxlen);
-    } while (line[0] == '!');
-    //std::cout << "line >" << line << std::endl;
+        fetchLineFromText(text, point, line, maxlen);
+    } while (line[0] == '!'); // skip over these
     if (line[0] < ' ')
-        return -5;
+        return SCALES::errors::shortFile;
     return 0;
 }
 
@@ -506,7 +515,7 @@ int Microtonal::loadscl(const string& filename)
 {
     string text = loadText(filename);
     if (text == "")
-        return -3;
+        return SCALES::errors::noFile;
     char tmp[BUFFSIZ];
     size_t point = 0;
     int err = 0;
@@ -514,7 +523,7 @@ int Microtonal::loadscl(const string& filename)
 
     // loads the short description
     if (loadLine(text, point, tmp, BUFFSIZ))
-        err = -4;
+        err = SCALES::errors::emptyFile;
     if (err == 0)
     {
         for (int i = 0; i < 500; ++i)
@@ -524,14 +533,14 @@ int Microtonal::loadscl(const string& filename)
         Pcomment = string(tmp);
         // loads the number of the notes
         if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -5;
+            err = SCALES::errors::badFile;
     }
     if (err == 0)
     {
         nnotes = MAX_OCTAVE_SIZE;
         sscanf(&tmp[0], "%d", &nnotes);
         if (size_t(nnotes) > MAX_OCTAVE_SIZE || nnotes < 2)
-            err = -6;
+            err = SCALES::errors::badOctaveSize;
     }
     if (err == 0)
     {
@@ -550,7 +559,8 @@ int Microtonal::loadscl(const string& filename)
 
     octavesize = nnotes;
     std::swap(octave, tmpoctave);
-    synth->setAllPartMaps();
+
+    //synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaTune);
     return nnotes;
 }
@@ -561,21 +571,21 @@ int Microtonal::loadkbm(const string& filename)
 {
     string text = loadText(filename);
     if (text == "")
-        return -3;
+        return SCALES::errors::noFile;
     char tmp[BUFFSIZ];
     size_t point = 0;
     int err = 0;
     int tmpMapSize;
     // loads the mapsize
     if (loadLine(text, point, tmp, BUFFSIZ))
-        err = -4;
+        err = SCALES::errors::shortFile;
     else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
-        err = -2;
+        err = SCALES::errors::badChars;
 
     if (err == 0)
     {
         if (tmpMapSize < 1 || tmpMapSize > 127)
-            err = -6;
+            err = SCALES::errors::badMapSize;
     }
 
     int tmpFirst;
@@ -583,9 +593,9 @@ int Microtonal::loadkbm(const string& filename)
     {
         // loads first MIDI note to retune
         if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -5;
+            err = SCALES::errors::badFile;
         else if (!sscanf(&tmp[0], "%d", &tmpFirst))
-            return -6;
+            return SCALES::errors::badOctaveSize;
         else if (tmpFirst < 0 || tmpFirst > 127)
             err = -7;
     }
@@ -595,11 +605,11 @@ int Microtonal::loadkbm(const string& filename)
     {
         // loads last MIDI note to retune
        if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -5;
+            err = SCALES::errors::badFile;
         else if (!sscanf(&tmp[0], "%d", &tmpLast))
-            return -6;
+            return SCALES::errors::badOctaveSize;
         else if (tmpLast < 0 || tmpLast > 127)
-            err = -7;
+            err = SCALES::errors::badNoteNumber;
     }
 
     int tmpMid;
@@ -607,11 +617,11 @@ int Microtonal::loadkbm(const string& filename)
     {
         // loads the middle note where scale from scale degree=0
        if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -5;
+            err = SCALES::errors::badFile;
         else if (!sscanf(&tmp[0], "%d", &tmpMid))
-            return -6;
+            return SCALES::errors::badMapSize;
         else if (tmpMid < 0 || tmpMid > 127)
-            err = -7;
+            err = -SCALES::errors::badNoteNumber;
     }
 
     int tmpNote;
@@ -619,9 +629,9 @@ int Microtonal::loadkbm(const string& filename)
     {
         // loads the reference note
        if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -5;
+            err = SCALES::errors::badFile;
         else if (!sscanf(&tmp[0], "%d", &tmpNote))
-            return -6;
+            return SCALES::errors::badOctaveSize;
         else if (tmpNote < 0 || tmpNote > 127)
             err = -7;
     }
@@ -631,21 +641,21 @@ int Microtonal::loadkbm(const string& filename)
     {
         // loads the reference freq.
         if (loadLine(text, point, tmp, BUFFSIZ))
-            err = -6;
+            err = SCALES::errors::badOctaveSize;
         else
         {
 
             if (!sscanf(&tmp[0], "%f", &tmpPrefFreq))
-                err = -6;
+                err = SCALES::errors::badOctaveSize;
             else if (tmpPrefFreq < 1 || tmpPrefFreq > 20000)
-                err = -8;
+                err = SCALES::errors::outOfRange;
         }
     }
 
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
     if (loadLine(text, point, tmp, BUFFSIZ))
-        err = -6;
+        err = SCALES::errors::badMapSize;
 
     // load the mappings
     int tmpMap [128];
@@ -656,7 +666,7 @@ int Microtonal::loadkbm(const string& filename)
         {
             if (loadLine(text, point, tmp, BUFFSIZ))
             {
-                err = -5;
+                err = SCALES::errors::shortFile;
                 break;
             }
             if (!sscanf(&tmp[0], "%d", &x))
@@ -703,6 +713,38 @@ string Microtonal::scale2scl()
         }
         text += "\n";
     }
+    return text;
+}
+
+string Microtonal::map2kbm()
+{
+    string text = "! Scala keymap\n";
+    text += "!\n";
+    text += "! map size\n";
+    text += to_string(Pmapsize);
+    text += "\n!\n";
+    text += "! first note\n";
+    text += to_string(Pfirstkey);
+    text += "\n!\n";
+    text += "! last note\n";
+    text += to_string(Plastkey);
+    text += "\n!\n";
+    text += "! middle note\n";
+    text += to_string(Pmiddlenote);
+    text += "\n!\n";
+    text += "! reference note\n";
+    text += to_string(PrefNote);
+    text += "\n!\n";
+    text += "! reference frequency\n";
+    text += to_string(PrefFreq);
+    text += "\n!\n";
+    text += "! formal octave\n";
+    text += to_string(octavesize);
+    text += "\n!\n";
+    text += "! mapped notes\n";
+    text += keymaptotext();
+    text += "\n";
+    //std::cout << "map >" << text << std::endl;
     return text;
 }
 

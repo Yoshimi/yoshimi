@@ -1,5 +1,12 @@
 yoshimi 2.3.0 M
 
+{branch microtonal}
+BugFix: Tuning/Keymap import not recognised.
+Revised and simplified Scales error reporting.
+Revised much of microtonal.cpp
+Enabled partial recognitions of extra comments in files.
+Implimented .scl and .kbm exporting (currently GUI only).
+
 2023-8-12 Will
 bn 2250
 Further improvements to window titles.
