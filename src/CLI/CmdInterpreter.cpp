@@ -3655,7 +3655,8 @@ int CmdInterpreter::commandExportScale(Parser& input)
     if (name.empty())
         return REPLY::value_msg;
     size_t miscmsg = textMsgBuffer.push(name);
-    return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+    std::cout << "name >" << name << std::endl;
+    return sendDirect(synth, TOPLEVEL::action::lowPrio, 1, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
 }
 
 

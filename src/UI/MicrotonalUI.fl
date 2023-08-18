@@ -72,7 +72,7 @@ class MicrotonalUI {} {
     } {
       Fl_Group {} {
         tooltip {Center where the note's freqs. are inverted
-(not when keymapped)} xywh {248 2 156 48} box ENGRAVED_FRAME
+(not when keymapped)} xywh {248 2 157 48} box ENGRAVED_FRAME
       } {
         Fl_Text_Display invertlabel {
           label Invert
@@ -126,7 +126,7 @@ class MicrotonalUI {} {
           refFreq = o->value();
           afreqset->show();
           AsetBack->show();}
-          tooltip {The frequency of the reference note (default: A4=440.0)} xywh {114 20 55 20} labelsize 11 labelcolor 64 align 1 minimum 30 maximum 1100 value 440 textfont 1 textsize 10 textcolor 64
+          tooltip {The frequency of the reference note -'return' to apply (default: A4=440.0)} xywh {114 20 55 20} labelsize 11 labelcolor 64 align 1 minimum 30 maximum 1100 value 440 textfont 1 textsize 10 textcolor 64
           code0 {o->step(0.001, 1);}
           code1 {refFreq = microtonal->PrefFreq;}
           code2 {o->value(refFreq);}
@@ -177,14 +177,14 @@ class MicrotonalUI {} {
           label {Name:}
           callback {//
           send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::name, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(o->value())));}
-          xywh {10 64 285 25} labelfont 1 labelsize 11 labelcolor 64 align 5 textcolor 64
+          xywh {7 64 285 25} labelfont 1 labelsize 11 labelcolor 64 align 5 textcolor 64
           code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Description:}
           callback {//
           send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::comment, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(string(o->value())));}
-          xywh {10 104 391 25} labelfont 1 labelsize 11 labelcolor 64 align 5 textcolor 64
+          xywh {7 104 394 25} labelfont 1 labelsize 11 labelcolor 64 align 5 textcolor 64
           code0 {o->value(microtonal->Pcomment.c_str());}
         }
         Fl_Text_Display shiftlabel {
@@ -200,7 +200,7 @@ class MicrotonalUI {} {
         }
         Fl_Group Tuning {
           label {Tunings:}
-          xywh {7 144 190 301} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64 align 5
+          xywh {7 144 190 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64 align 5
         } {
           Fl_Input tuningsinput {
             tooltip {You must retune if you change this.} xywh {10 147 182 250} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
@@ -220,8 +220,7 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
-            send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
-            }
+            send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);}
             tooltip {Import Scala .scl file (tunnings)} xywh {85 401 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button exportscl {
@@ -236,14 +235,14 @@ class MicrotonalUI {} {
                 string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaTune);
                 if (filename.empty())
                     return;
-                send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
+                apply();
                 send_data(TOPLEVEL::action::lowPrio, SCALES::control::exportScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Group Keymap {
           label {Keyboard Map:}
-          xywh {195 144 206 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64
+          xywh {196 144 205 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64
         } {
           Fl_Input mappinginput {
             tooltip {You must retune if you change this.} xywh {251 147 146 250} type Multiline labelfont 1 labelsize 11 labelcolor 64 align 5 when 2 textcolor 64
@@ -359,20 +358,13 @@ class MicrotonalUI {} {
             send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);}
             tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
-          Fl_Button Exportkbm {
+          Fl_Button exportkbm {
             label {Export .kbm file}
             callback {//
-                /*int value = microtonal->keymaptotext();
-                if (value < 1)
-                {
-                    errors(value, true);
-                    return;
-                }*/
-
             string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaMap);
             if (filename.empty())
                 return;
-            send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
+            apply();
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::exportKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Export Scala .kbm file (keyboard mapping)} xywh {273 422 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
@@ -390,11 +382,18 @@ class MicrotonalUI {} {
         }
         Fl_Button applybutton {
           label Retune
-          callback {apply();
+          callback {//
+          apply();
           send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::retune, 1, TOPLEVEL::type::Integer);}
-          tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {152 447 107 28} box PLASTIC_UP_BOX color 228 labeltype EMBOSSED_LABEL labelfont 1 labelcolor 64
+          tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {169 448 107 28} box PLASTIC_UP_BOX color 228 labeltype EMBOSSED_LABEL labelfont 1 labelcolor 64
+        }
+        Fl_Button clearbutton {
+          label {Clear All}
+          callback {//
+          send_data(TOPLEVEL::action::forceUpdate, SCALES::control::clearAll, 0, TOPLEVEL::type::Integer);}
+          tooltip {Return to default scale settings} xywh {25 448 107 28} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
         }
       }
       Fl_Text_Display enablelabel {
@@ -418,7 +417,7 @@ class MicrotonalUI {} {
     saveWin(synth, microtonaluiwindow->w(), microtonaluiwindow->h(), microtonaluiwindow->x(), microtonaluiwindow->y(), false, "Scales");
     microtonaluiwindow->hide();
     lastscaleSeen = false;}
-        xywh {315 447 67 28} box THIN_UP_BOX down_box THIN_DOWN_BOX color 196 labelcolor 64
+        xywh {315 448 67 28} box THIN_UP_BOX down_box THIN_DOWN_BOX color 196 labelcolor 64
       }
     }
   }
@@ -534,6 +533,7 @@ class MicrotonalUI {} {
         case SCALES::control::clearAll:
             microtonaluiwindow->hide();
             make_window();
+            showScales();
             break;
 }} {}
   }
@@ -636,6 +636,7 @@ class MicrotonalUI {} {
     tuningsinput->textsize(size14);
     octavesizeoutput->textsize(size14);
     importscl->labelsize(size);
+    exportscl->labelsize(size);
     Keymap->labelsize(size11);
     mappinginput->textsize(size14);
     first1->labelsize(size11);
@@ -649,8 +650,10 @@ class MicrotonalUI {} {
         lastnotecounter->textsize(size11);
     mapsizeoutput->textsize(size14);
     importkbm->labelsize(size);
+    exportkbm->labelsize(size);
     mappingenabledbutton->labelsize(size14);
     applybutton->labelsize(size14);
+    clearbutton->labelsize(size14);
     enablelabel->labelsize(size12);
     microtonallabel->labelsize(size12);
     enableMicrotonal->labelsize(size14);

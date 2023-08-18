@@ -1,10 +1,16 @@
 yoshimi 2.3.0 M
 
+2023-8-18 Will
+bn 2251
+Scales GUI now has a 'Clear All' button.
+CLI can now export tunings and keymaps.
+Some additional microtonal cleanups.
+
 {branch microtonal}
 BugFix: Tuning/Keymap import not recognised.
 Revised and simplified Scales error reporting.
 Revised much of microtonal.cpp
-Enabled partial recognitions of extra comments in files.
+Enabled partial recognition of extra comments in files.
 Implimented .scl and .kbm exporting (currently GUI only).
 
 2023-8-12 Will
