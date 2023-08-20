@@ -1,5 +1,16 @@
 yoshimi 2.3.0 M
 
+{branch microtonal}
+Removed frequent swaps between variabe 'x' and variable tmp'x'
+    on error the complete default is set so it's pointless.
+Extended recognition of comments active text.
+
+2023-8-19 Will
+bn 2252
+Merged in microtonal branch.
+Added CLI list entries.
+Updated user guide.
+
 2023-8-18 Will
 bn 2251
 Scales GUI now has a 'Clear All' button.

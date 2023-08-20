@@ -72,6 +72,7 @@ class Microtonal
 
         unsigned char Pmappingenabled; // Mapping ON/OFF
         int Pmapping[128];             // Mapping (keys)
+        string PmapComment[128];       // comments for mapping (if they exist)
 
         float Pglobalfinedetune;
 
@@ -111,9 +112,9 @@ class Microtonal
             unsigned int x1; // the real tuning is x1 / x2
             unsigned int x2;
             string text;
+            string comment;
         };
         Octave octave[MAX_OCTAVE_SIZE];
-        Octave tmpoctave[MAX_OCTAVE_SIZE];
 
         SynthEngine *synth;
 };

@@ -41,15 +41,32 @@ using file::loadText;
 using file::findLeafName;
 using std::cout;
 using std::endl;
+using std::string;
+using std::to_string;
+using std::to_string;
 
 
 namespace { // local implementation details
 
-    const size_t BUFFSIZ = 500;      // for loading KBM or SCL settings from a file
-    const size_t MAX_LINE_SIZE = 80; // for converting text to mappings or tunings
+    const size_t BUFFSIZ = 1024;      // for loading KBM or SCL settings from a file
+    const size_t MAX_LINE_SIZE = 256; // for converting text to mappings or tunings
+    // sizes increased to allow for more comments
 
 
-    inline std::string lineInText(std::string text, size_t &point)
+    inline void prepareText(string &text)
+    {
+        size_t pos = 0;
+        while (text[pos] == ' ') // skip leading spaces
+            pos += 1;
+
+        while (text[pos] == '0' && isdigit(text[pos + 1])) // skip leading zeros
+            pos += 1;
+        text = text.substr(pos, text.length());
+
+    }
+
+
+    inline string lineInText(string text, size_t &point)
     {
         size_t len = text.length();
         if (point >= len - 1)
@@ -57,22 +74,24 @@ namespace { // local implementation details
         size_t it = 0;
         while (it < len - point && text.at(point + it) >= ' ')
             ++it;
-        std::string line = text.substr(point, it);
+        string line = text.substr(point, it);
         point += (it + 1);
         return line;
     }
 
 
-    inline bool fetchLineFromText(std::string text, size_t &point, char *line, size_t length)
+    inline bool fetchLineFromText(string text, size_t &point, char *line, size_t length)
     {
         bool ok = true;
-        std::string found = lineInText(text, point);
+        string found = lineInText(text, point);
+        prepareText(found);
         if (found == "")
             line[0] = 0;
         else if (found.length() < (length - 1))
         {
             strcpy(line, found.c_str());
             line[length] = 0;
+            // cout << "fetch " << line << endl;
         }
         else
         {
@@ -118,11 +137,11 @@ void Microtonal::defaults(int type)
 
     for (size_t i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].text = reformatline(std::to_string((i % octavesize + 1) * 100)+ ".0");
-        octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
-        octave[i].type = tmpoctave[i].type = 1;
-        octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
-        octave[i].x2 = tmpoctave[i].x2 = 0;
+        octave[i].text = reformatline(to_string((i % octavesize + 1) * 100)+ ".0");
+        octave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
+        octave[i].type = 1;
+        octave[i].x1 = (i % octavesize + 1) * 100;
+        octave[i].x2 = 0;
     }
     if (type == 0)
     {
@@ -261,7 +280,7 @@ string Microtonal::reformatline(string text)
         else if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
             formattext += Chr;
     }
-    //std::cout << "Formatted >" << formattext << std::endl;
+    //cout << "Formatted >" << formattext << endl;
     size_t found;
     found = formattext.find('.');
     if (found < 4)
@@ -342,17 +361,17 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             double tmp = fmod(x, 1.0);
             x2 = int(floor(tmp * 1e6));
             tuning = pow(2.0, x / 1200.0);
-            tmpoctave[nline].text = reformatline(line);
+            octave[nline].text = reformatline(line);
     }
     else if (type == 2)
             tuning = double(x1) / x2;
     else
-        std::cout << "unrecognised type" << std::endl;
+        cout << "unrecognised type" << endl;
 
-    tmpoctave[nline].tuning = tuning;
-    tmpoctave[nline].type = type;
-    tmpoctave[nline].x1 = x1;
-    tmpoctave[nline].x2 = x2;
+    octave[nline].tuning = tuning;
+    octave[nline].type = type;
+    octave[nline].x1 = x1;
+    octave[nline].x2 = x2;
     return 0; // ok
 }
 
@@ -390,14 +409,6 @@ int Microtonal::texttotunings(const char *text)
     if (!nl)
         return 0; // the input is empty
     octavesize = nl;
-    for (i = 0; i < octavesize; ++i)
-    {
-        octave[i].text = tmpoctave[i].text;
-        octave[i].tuning = tmpoctave[i].tuning;
-        octave[i].type = tmpoctave[i].type;
-        octave[i].x1 = tmpoctave[i].x1;
-        octave[i].x2 = tmpoctave[i].x2;
-    }
     return octavesize; // ok
 }
 
@@ -456,7 +467,12 @@ string Microtonal::keymaptotext(void)
         if (Pmapping[i] == -1)
             text += "x";
         else
-            text += std::to_string(Pmapping[i]);
+            text += to_string(Pmapping[i]);
+        if (!PmapComment[i].empty())
+        {
+            text += " ! ";
+            text += PmapComment[i];
+        }
     }
     return text;
 }
@@ -485,13 +501,18 @@ void Microtonal::tuningtoline(unsigned int n, char *line, int maxn)
 string Microtonal::tuningtotext()
 {
     string text;
-    char *buff = new char[100];
+    char *buff = new char[BUFFSIZ];
     for (size_t i = 0; i < octavesize; ++i)
     {
         if (i > 0)
             text += "\n";
-        tuningtoline(i, buff, 100);
+        tuningtoline(i, buff, MAX_LINE_SIZE);
         text += string(buff);
+        if (!octave[i].comment.empty())
+        {
+            text += " ! ";
+            text += octave[i].comment;
+        }
     }
     delete [] buff;
     return text;
@@ -527,8 +548,10 @@ int Microtonal::loadscl(const string& filename)
     if (err == 0)
     {
         for (int i = 0; i < 500; ++i)
+        {
             if (tmp[i] < 32)
                 tmp[i] = 0;
+        }
         Pname = findLeafName(filename);
         Pcomment = string(tmp);
         // loads the number of the notes
@@ -558,7 +581,6 @@ int Microtonal::loadscl(const string& filename)
         return err;
 
     octavesize = nnotes;
-    std::swap(octave, tmpoctave);
 
     //synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaTune);
@@ -657,8 +679,6 @@ int Microtonal::loadkbm(const string& filename)
     if (loadLine(text, point, tmp, BUFFSIZ))
         err = SCALES::errors::badMapSize;
 
-    // load the mappings
-    int tmpMap [128];
     int x;
     if (err == 0)
     {
@@ -669,17 +689,23 @@ int Microtonal::loadkbm(const string& filename)
                 err = SCALES::errors::shortFile;
                 break;
             }
+            string alt = string (tmp);
+            size_t pos = alt.find('!');
+            if (pos != std::string::npos)
+            {
+                PmapComment[nline] = alt.substr(pos + 1, alt.length());
+            }
             if (!sscanf(&tmp[0], "%d", &x))
                 x = -1;
-            tmpMap[nline] = x;
+            Pmapping[nline] = x;
         }
+
     }
     if (err < 0)
         return err;
 
     Pmappingenabled = 1;
     Pmapsize = tmpMapSize;
-    std::swap(Pmapping, tmpMap);
     Pfirstkey = tmpFirst;
     Plastkey = tmpLast;
     Pmiddlenote = tmpMid;
@@ -710,6 +736,11 @@ string Microtonal::scale2scl()
             text+= to_string(octave[i].x1);
             text += "/";
             text+= to_string(octave[i].x2);
+        }
+        if (!octave[i].comment.empty())
+        {
+            text += " ! ";
+            text += octave[i].comment;
         }
         text += "\n";
     }
@@ -744,7 +775,7 @@ string Microtonal::map2kbm()
     text += "! mapped notes\n";
     text += keymaptotext();
     text += "\n";
-    //std::cout << "map >" << text << std::endl;
+    //cout << "map >" << text << endl;
     return text;
 }
 
@@ -790,8 +821,9 @@ void Microtonal::add2XML(XMLwrapper *xml)
             {
                 xml->addparstr("cents_text",octave[i].text);
                 xml->addpar("numerator", octave[i].x1);
-                xml->addpar("denominator", octave[i].x2);
+                xml->addpar("denominator", octave[i].x2);;
             }
+            xml->addparstr("comment" , octave[i].comment);
             xml->endbranch();
         }
         xml->endbranch();
@@ -803,6 +835,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
         {
             xml->beginbranch("KEYMAP", i);
             xml->addpar("degree", Pmapping[i]);
+            xml->addparstr("comment", PmapComment[i]);
             xml->endbranch();
         }
         xml->endbranch();
@@ -866,6 +899,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     octave[i].x1 = (int) floor(x);
                     octave[i].x2 = (int) (floor(fmod(x, 1.0) * 1e6));
                 }
+                octave[i].comment = xml->getparstr("comment");
                 xml->exitbranch();
             }
             xml->exitbranch();
@@ -880,6 +914,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                 if (!xml->enterbranch("KEYMAP", i))
                     continue;
                 Pmapping[i] = xml->getpar("degree", Pmapping[i], -1, 127);
+                PmapComment[i] = xml->getparstr("comment");
                 xml->exitbranch();
             }
             xml->exitbranch();
