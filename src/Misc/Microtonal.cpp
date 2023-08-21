@@ -131,7 +131,10 @@ void Microtonal::defaults(int type)
         Pmappingenabled = 0;
 
         for (int i = 0; i < 128; ++i)
+        {
             Pmapping[i] = i;
+            PmapComment[i] = "";
+        }
         Pcomment = string("Default Map");
     }
 
@@ -142,6 +145,7 @@ void Microtonal::defaults(int type)
         octave[i].type = 1;
         octave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = 0;
+        octave[i].comment = "";
     }
     if (type == 0)
     {
@@ -262,22 +266,15 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 string Microtonal::reformatline(string text)
 {
     //text.erase(remove_if (text.begin(), text.end(), [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
+
     // above replaced as it screwed up comments in lines
+
     string formattext = "";
     char Chr;
-    bool comment = false;
     for (size_t i = 0; i < text.length(); ++i)
     {
         Chr = text[i];
-        if ( Chr == '!')
-        {
-            if (!comment)
-                formattext += " ";
-            comment = true;
-        }
-        if (comment)
-            formattext += Chr;
-        else if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
+        if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
             formattext += Chr;
     }
     //cout << "Formatted >" << formattext << endl;
@@ -305,13 +302,8 @@ bool Microtonal::validline(const char *line)
     while (ok && line[idx] > 31)
     {
         char chr = line[idx];
-        if (chr == '!')
-            return true; // the rest of the line is a comment
         if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
-        {
-            //cout << "char " << int(chr) << " line " << line << endl;
             ok = false;
-        }
         ++ idx;
     }
     return ok;
@@ -321,52 +313,59 @@ bool Microtonal::validline(const char *line)
 // Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
-    if (!validline(line))
+    string last = string(line);
+    char local [MAX_LINE_SIZE];
+    strcpy(local, line);
+    size_t pos = last.find("!");
+    if (pos != string::npos)
+    {
+        last = last.substr(pos + 1, last.length());
+        octave[nline].comment = func::trimEnds(last);
+    }
+    else
+        octave[nline].comment = "";
+    local[pos] = 0;
+
+    if (!validline(local))
         return SCALES::errors::badNumbers;
+
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0;
     double tuning = 1.0;
-    if (!strstr(line, "/"))
+    if (strstr(local, "."))
     {
-        if (!strstr(line, "."))
-        {   // M case (M=M/1)
-            sscanf(line, "%d", &x1);
-            x2 = 1;
-            type = 2; // division
-        }
-        else
-        {   // double number case
-            x = stod(string(line));
+            x = stod(string(local));
             if (x < 0.000001)
                 return SCALES::errors::valueTooSmall;
             type = 1; // double type(cents)
-        }
-    }
-    else
-    {   // M/N case
-        sscanf(line, "%d/%d", &x1, &x2);
-        if (x1 < 0 || x2 < 0)
-            return SCALES::errors::badNumbers;
-        if (!x2)
-            x2 = 1;
-        type = 2; // division
-    }
-
-    if (x1 <= 0)
-        x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
-
-    if (type == 1)
-    {
-            x1 = (int) floor(x);
+            x1 = int(floor(x));
             double tmp = fmod(x, 1.0);
             x2 = int(floor(tmp * 1e6));
             tuning = pow(2.0, x / 1200.0);
-            octave[nline].text = reformatline(line);
+            octave[nline].text = reformatline(local);
     }
-    else if (type == 2)
-            tuning = double(x1) / x2;
     else
-        cout << "unrecognised type" << endl;
+    {
+        if (strstr(local, "/"))
+        {
+            sscanf(local, "%d/%d", &x1, &x2);
+            if (x1 < 0 || x2 < 0)
+                return SCALES::errors::badNumbers;
+            if (!x2)
+                x2 = 1;
+            type = 2; // division
+        }
+        else
+        {
+            sscanf(local, "%d", &x1);
+            x2 = 1;
+            type = 2; // division by 1
+        }
+
+        if (x1 <= 0)
+        x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
+        tuning = double(x1) / x2;
+    }
 
     octave[nline].tuning = tuning;
     octave[nline].type = type;
@@ -418,7 +417,6 @@ int Microtonal::texttomapping(const char *text)
 {
     unsigned int i, k = 0;
     char *lin;
-    int tmpMap [128];
     lin = new char[MAX_LINE_SIZE + 1];
     memset(lin, 0xff, MAX_LINE_SIZE);
     int tx = 0;
@@ -431,15 +429,23 @@ int Microtonal::texttomapping(const char *text)
                 break;
         }
         lin[i] = 0;
-        if (!strlen(lin))
-            continue;
+        char* pos = strchr(lin,  '!');
+        if (pos)
+        {
+            *pos = 0; // the rest doesn't want this
+                ++ pos;
+            PmapComment[tx] = func::trimEnds(string(pos));
+        }
+        else
+            PmapComment[tx] = "";
 
         int tmp = 0;
         if (!sscanf(lin, "%d", &tmp))
             tmp = -1;
         if (tmp < -1)
             tmp = -1;
-        tmpMap[tx] = tmp;
+        Pmapping[tx] = tmp;
+
 
         if ((tx++) > 127)
             break;
@@ -449,7 +455,6 @@ int Microtonal::texttomapping(const char *text)
     if (tx)
     {
         Pmapsize = tx;
-        std::swap(Pmapping, tmpMap);
     }
     else
         return SCALES::errors::badMapSize;
@@ -689,17 +694,15 @@ int Microtonal::loadkbm(const string& filename)
                 err = SCALES::errors::shortFile;
                 break;
             }
-            string alt = string (tmp);
-            size_t pos = alt.find('!');
-            if (pos != std::string::npos)
-            {
-                PmapComment[nline] = alt.substr(pos + 1, alt.length());
-            }
+
             if (!sscanf(&tmp[0], "%d", &x))
                 x = -1;
             Pmapping[nline] = x;
+            string alt = string (tmp);
+            size_t pos = alt.find('!');
+            if (pos != std::string::npos)
+                PmapComment[nline] = func::trimEnds(alt.substr(pos + 1, alt.length()));
         }
-
     }
     if (err < 0)
         return err;
@@ -775,7 +778,6 @@ string Microtonal::map2kbm()
     text += "! mapped notes\n";
     text += keymaptotext();
     text += "\n";
-    //cout << "map >" << text << endl;
     return text;
 }
 
@@ -869,6 +871,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
             octavesize = xml->getpar127("octave_size", octavesize);
             for (size_t i = 0; i < octavesize; ++i)
             {
+                octave[i].text = "";
                 if (!xml->enterbranch("DEGREE", i))
                     continue;
                 string text = xml->getparstr("cents_text");
@@ -899,6 +902,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     octave[i].x1 = (int) floor(x);
                     octave[i].x2 = (int) (floor(fmod(x, 1.0) * 1e6));
                 }
+                octave[i].comment = "";
                 octave[i].comment = xml->getparstr("comment");
                 xml->exitbranch();
             }

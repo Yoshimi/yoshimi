@@ -346,5 +346,17 @@ inline std::string nextLine(std::string& list) // this is destructive
     return line;
 }
 
+
+inline std::string trimEnds(std::string line)
+{
+    size_t pos = line.find_first_not_of(" \t");
+    line.erase(0, pos);
+
+    pos = line.find_last_not_of(" \t");
+    if (string::npos != pos)
+        line.erase(pos + 1);
+    return line;
+}
+
 }//(End)namespace func
 #endif /*FORMATFUNCS_H*/

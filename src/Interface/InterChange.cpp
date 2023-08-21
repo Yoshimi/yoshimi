@@ -485,10 +485,12 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                 getData->data.control = SCALES::control::name;
                 getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pname);
                 returnsBuffer.write(getData->bytes);
+
                 getData->data.control = SCALES::control::comment;
                 getData->data.miscmsg = textMsgBuffer.push(synth->microtonal.Pcomment);
                 ok &= returnsBuffer.write(getData->bytes);
             }
+
             if (switchNum == TOPLEVEL::section::main && control == MAIN::control::loadNamedState)
                 synth->midilearn.updateGui();
                 /*
@@ -631,6 +633,9 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
                         text += 'x';
                     else
                         text += std::to_string(map);
+                    string comment = synth->microtonal.PmapComment[i];
+                    if (!comment.empty())
+                        text += (" ! " + comment);
                 }
                 getData->data.kit = synth->microtonal.PrefNote;
                 getData->data.engine = synth->microtonal.Pfirstkey;
@@ -1608,7 +1613,6 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
 
 std::string InterChange::formatScales(std::string text)
 {
-    std::cout << "pre format "<< text << std::endl;
     text.erase(remove(text.begin(), text.end(), ' '), text.end());
     std::string delimiters = ",";
     size_t current;
@@ -1616,7 +1620,6 @@ std::string InterChange::formatScales(std::string text)
     size_t found;
     std::string word;
     std::string newtext = "";
-    std::cout << "in format " << text << std::endl;
     do
     {
         current = next + 1;
@@ -1643,7 +1646,6 @@ std::string InterChange::formatScales(std::string text)
             newtext += "\n";
     }
     while (next != string::npos);
-    std::cout << "post format "<< newtext << std::endl;
     return newtext;
 }
 

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016-2019, Will Godfrey
+    Copyright 2016-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -96,7 +96,8 @@ class Microtonal
         bool saveXML(const string& filename);
         bool loadXML(const string& filename);
 
-    private:
+    //private:
+        // TODO made these public until we have better ways to transfer data to/from GUI
         string reformatline(string text);
         bool validline(const char *line);
         int linetotunings(unsigned int nline, const char *line);

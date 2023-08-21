@@ -1,9 +1,13 @@
 yoshimi 2.3.0 M
 
+bn 2253
 {branch microtonal}
 Removed frequent swaps between variabe 'x' and variable tmp'x'
-    on error the complete default is set so it's pointless.
+  if there's an error the complete default is set so it's pointless.
+
 Extended recognition of comments active text.
+
+All operations seem correct.
 
 2023-8-19 Will
 bn 2252
