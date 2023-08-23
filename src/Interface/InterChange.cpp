@@ -597,7 +597,7 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             synth->setAllPartMaps();
             break;
         case SCALES::control::keyboardMap:
-            text = formatScales(text);
+            text = formatKeys(text);
             value = synth->microtonal.texttomapping(text.c_str());
             if (value <= 0)
                 synth->microtonal.defaults(2);
@@ -861,25 +861,36 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             break;
         }
        case MAIN::control::loadNamedScale:
-           if (synth->loadMicrotonal(text))
-           {
-                synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
+       {
+            string filename = setExtension(text, EXTEN::scale);
+            int err = synth->microtonal.loadXML(filename);
+            if (err == 0)
+            {
+                synth->addHistory(filename, TOPLEVEL::XML::Scale);
                 text = "ed " + text;
             }
             else
+            {
                 text = " FAILED " + text;
+                if (err < 0)
+                    text += (" " + scale_errors [0 - err]);
+            }
             newMsg = true;
             break;
+       }
         case MAIN::control::saveNamedScale:
-            if (synth->saveMicrotonal(text))
+        {
+            string filename = setExtension(text, EXTEN::scale);
+            if (synth->microtonal.saveXML(filename))
             {
-                synth->addHistory(setExtension(text, EXTEN::scale), TOPLEVEL::XML::Scale);
+                synth->addHistory(filename, TOPLEVEL::XML::Scale);
                 text = "d " + text;
             }
             else
                 text = " FAILED " + text;
             newMsg = true;
             break;
+        }
         case MAIN::control::loadNamedState:
             vectorClear(NUM_MIDI_CHANNELS);
             if (synth->loadStateAndUpdate(text))
@@ -1613,7 +1624,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
 
 std::string InterChange::formatScales(std::string text)
 {
-    text.erase(remove(text.begin(), text.end(), ' '), text.end());
+    //text = func::trimEnds(text);
     std::string delimiters = ",";
     size_t current;
     size_t next = -1;
@@ -1624,7 +1635,7 @@ std::string InterChange::formatScales(std::string text)
     {
         current = next + 1;
         next = text.find_first_of(delimiters, current );
-        word = text.substr(current, next - current );
+        word = func::trimEnds(text.substr(current, next - current));
 
         found = word.find('.');
         if (found != string::npos)
@@ -1641,6 +1652,32 @@ std::string InterChange::formatScales(std::string text)
                 word += tmp;
             }
         }
+        newtext += word;
+        if (next != string::npos)
+            newtext += "\n";
+    }
+    while (next != string::npos);
+    return newtext;
+}
+
+
+std::string InterChange::formatKeys(std::string text)
+{
+    std::string delimiters = ",";
+    size_t current;
+    size_t next = -1;
+    std::string word;
+    std::string newtext = "";
+    do
+    {
+        current = next + 1;
+        next = text.find_first_of(delimiters, current );
+        word = func::trimEnds(text.substr(current, next - current));
+        if (word[0] < '0' || word[0] > '9')
+        {
+            word = "x";
+        }
+        std::cout << "word" << word << std::endl;
         newtext += word;
         if (next != string::npos)
             newtext += "\n";

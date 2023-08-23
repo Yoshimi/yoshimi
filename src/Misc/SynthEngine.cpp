@@ -7,7 +7,7 @@
     Copyright 2009, James Morris
     Copyright 2014-2020, Will Godfrey & others
 
-    Copyright 2022, Will Godfrey, Rainer Hans Liffers
+    Copyright 2022-2023, Will Godfrey, Rainer Hans Liffers
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -2492,16 +2492,6 @@ bool SynthEngine::loadPatchSetAndUpdate(string fname)
     return result;
 }
 
-
-bool SynthEngine::loadMicrotonal(const string& fname)
-{
-    return microtonal.loadXML(setExtension(fname, EXTEN::scale));
-}
-
-bool SynthEngine::saveMicrotonal(const string& fname)
-{
-    return microtonal.saveXML(setExtension(fname, EXTEN::scale));
-}
 
 bool SynthEngine::installBanks()
 {

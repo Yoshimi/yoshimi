@@ -530,7 +530,7 @@ namespace SCALES // usage SCALES::control::refFrequency
         badNoteNumber,
         badMapSize,
         badOctaveSize,
-        shortFile,
+        missingEntry,
         badFile,
         emptyFile,
         noFile,

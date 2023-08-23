@@ -116,6 +116,7 @@ class InterChange : private DataText
         int indirectConfig(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         int indirectPart(CommandBlock *getData, SynthEngine *synth, unsigned char &newMsg, bool &guiTo, std::string &text);
         std::string formatScales(std::string text);
+        std::string formatKeys(std::string text);
 
         unsigned int swapRoot1;
         unsigned int swapBank1;

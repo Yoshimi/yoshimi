@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2022, Will Godfrey & others
+    Copyright 2014-2023, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -107,8 +107,6 @@ class SynthEngine
         bool loadStateAndUpdate(const string& filename);
         bool saveState(const string& filename);
         bool loadPatchSetAndUpdate(string filename);
-        bool loadMicrotonal(const string& fname);
-        bool saveMicrotonal(const string& fname);
         bool installBanks(void);
         bool saveBanks(void);
         void newHistory(string name, int group);

@@ -235,7 +235,7 @@ class MicrotonalUI {} {
                 string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaTune);
                 if (filename.empty())
                     return;
-                apply();
+                retune();
                 send_data(TOPLEVEL::action::lowPrio, SCALES::control::exportScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
@@ -364,7 +364,7 @@ class MicrotonalUI {} {
             string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaMap);
             if (filename.empty())
                 return;
-            apply();
+            retune();
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::exportKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Export Scala .kbm file (keyboard mapping)} xywh {273 422 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
@@ -380,10 +380,10 @@ class MicrotonalUI {} {
           code1 {if (microtonal->Pmappingenabled==0) Keymap->deactivate();}
           class Fl_Check_Button2
         }
-        Fl_Button applybutton {
+        Fl_Button retunebutton {
           label Retune
           callback {//
-          apply();
+          retune();
           send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::retune, 1, TOPLEVEL::type::Integer);}
@@ -670,7 +670,7 @@ class MicrotonalUI {} {
     importkbm->labelsize(size);
     exportkbm->labelsize(size);
     mappingenabledbutton->labelsize(size14);
-    applybutton->labelsize(size14);
+    retunebutton->labelsize(size14);
     clearbutton->labelsize(size14);
     enablelabel->labelsize(size12);
     microtonallabel->labelsize(size12);
@@ -679,7 +679,7 @@ class MicrotonalUI {} {
 
     microtonaluiwindow->redraw();} {}
   }
-  Function {apply()} {} {
+  Function {retune()} {} {
     code {//
     int value = microtonal->texttotunings(tuningsinput->value());
     if (value < 1)

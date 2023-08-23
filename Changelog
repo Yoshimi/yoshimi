@@ -1,5 +1,11 @@
 yoshimi 2.3.0 M
 
+2023-8-19 Will
+bn 2254
+Revised error handling loading both .kbd and complete scale files.
+Further corner cases importing and exporting fixed.
+Rationalised some labels so they reflect their function better.
+
 bn 2253
 {branch microtonal}
 Removed frequent swaps between variabe 'x' and variable tmp'x'

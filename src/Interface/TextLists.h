@@ -952,7 +952,7 @@ static std::string scale_errors [] = {
     "File not found",
     "Empty file",
     "Corrupted file",
-    "Short file",
+    "Missing entry",
     "Invalid octave size",
     "Invalid keymap size",
     "Invalid note number",

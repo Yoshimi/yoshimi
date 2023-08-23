@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2021, Will Godfrey
+    Copyright 2017-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -201,7 +201,8 @@ float Microtonal::getNoteFreq(int note, int keyshift)
             return -1.0f;
         // Compute how many mapped keys are from middle note to reference note
         // and find out the proportion between the freq. of middle note and "A" note
-        int tmp = PrefNote - Pmiddlenote, minus = 0;
+        int tmp = PrefNote - Pmiddlenote;
+        int minus = 0;
         if (tmp < 0)
         {
             tmp   = -tmp;
@@ -426,32 +427,31 @@ int Microtonal::texttomapping(const char *text)
         {
             lin[i] = text[k++];
             if (lin[i] < 0x20)
+            {
                 break;
+            }
         }
         lin[i] = 0;
-        char* pos = strchr(lin,  '!');
-        if (pos)
+
+        string alt = func::trimEnds(lin);
+
+        size_t pos = alt.find('!');
+        if (pos != string::npos)
         {
-            *pos = 0; // the rest doesn't want this
-                ++ pos;
-            PmapComment[tx] = func::trimEnds(string(pos));
+            PmapComment[tx] = func::trimEnds(alt.substr(pos + 1, alt.length()));
         }
         else
             PmapComment[tx] = "";
 
-        int tmp = 0;
-        if (!sscanf(lin, "%d", &tmp))
-            tmp = -1;
-        if (tmp < -1)
-            tmp = -1;
-        Pmapping[tx] = tmp;
-
-
-        if ((tx++) > 127)
-            break;
+        if (alt.empty() || alt[0] < '0' || alt[0] > '9')
+        {
+            alt = 'x';
+            Pmapping[tx] = -1;
+        }
+        else
+            Pmapping[tx] = stoi(alt);
+        tx++;
     }
-    delete [] lin;
-
     if (tx)
     {
         Pmapsize = tx;
@@ -531,7 +531,7 @@ int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t m
         fetchLineFromText(text, point, line, maxlen);
     } while (line[0] == '!'); // skip over these
     if (line[0] < ' ')
-        return SCALES::errors::shortFile;
+        return SCALES::errors::missingEntry;
     return 0;
 }
 
@@ -605,7 +605,7 @@ int Microtonal::loadkbm(const string& filename)
     int tmpMapSize;
     // loads the mapsize
     if (loadLine(text, point, tmp, BUFFSIZ))
-        err = SCALES::errors::shortFile;
+        err = SCALES::errors::badFile;
     else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
         err = SCALES::errors::badChars;
 
@@ -691,14 +691,24 @@ int Microtonal::loadkbm(const string& filename)
         {
             if (loadLine(text, point, tmp, BUFFSIZ))
             {
-                err = SCALES::errors::shortFile;
+                err = SCALES::errors::missingEntry;
                 break;
             }
-
-            if (!sscanf(&tmp[0], "%d", &x))
-                x = -1;
-            Pmapping[nline] = x;
             string alt = string (tmp);
+            if (alt[0] < '0' || alt[0] > '9') // catches all possibilities!
+            {
+                x = -1;
+            }
+            else
+            {
+                x = std::stoi(alt);
+                if (x >= tmpMapSize)
+                {
+                    err = SCALES::errors::valueTooBig;
+                    break;
+                }
+            }
+            Pmapping[nline] = x;
             size_t pos = alt.find('!');
             if (pos != std::string::npos)
                 PmapComment[nline] = func::trimEnds(alt.substr(pos + 1, alt.length()));
@@ -754,25 +764,25 @@ string Microtonal::map2kbm()
 {
     string text = "! Scala keymap\n";
     text += "!\n";
-    text += "! map size\n";
+//    text += "! map size\n";
     text += to_string(Pmapsize);
     text += "\n!\n";
-    text += "! first note\n";
+//    text += "! first note\n";
     text += to_string(Pfirstkey);
     text += "\n!\n";
-    text += "! last note\n";
+//    text += "! last note\n";
     text += to_string(Plastkey);
     text += "\n!\n";
-    text += "! middle note\n";
+//    text += "! middle note\n";
     text += to_string(Pmiddlenote);
     text += "\n!\n";
-    text += "! reference note\n";
+//    text += "! reference note\n";
     text += to_string(PrefNote);
     text += "\n!\n";
-    text += "! reference frequency\n";
+//    text += "! reference frequency\n";
     text += to_string(PrefFreq);
     text += "\n!\n";
-    text += "! formal octave\n";
+//    text += "! formal octave\n";
     text += to_string(octavesize);
     text += "\n!\n";
     text += "! mapped notes\n";
@@ -845,8 +855,9 @@ void Microtonal::add2XML(XMLwrapper *xml)
 }
 
 
-void Microtonal::getfromXML(XMLwrapper *xml)
+int Microtonal::getfromXML(XMLwrapper *xml)
 {
+    int err = 0;
     Pname = xml->getparstr("name");
     Pcomment = xml->getparstr("comment");
 
@@ -919,12 +930,18 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     continue;
                 Pmapping[i] = xml->getpar("degree", Pmapping[i], -1, 127);
                 PmapComment[i] = xml->getparstr("comment");
+                if (Pmapping[i] >= Pmapsize)
+                {
+                    err = SCALES::errors::valueTooBig;
+                    break;
+                }
                 xml->exitbranch();
             }
             xml->exitbranch();
         }
         xml->exitbranch();
     }
+    return err;
 }
 
 
@@ -943,30 +960,36 @@ bool Microtonal::saveXML(const string& filename)
 }
 
 
-bool Microtonal::loadXML(const string& filename)
+int Microtonal::loadXML(const string& filename)
 {
+    int err = 0;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)
     {
         synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper", _SYS_::LogError);
-        return false;
+        return 1;
     }
     if (!xml->loadXMLfile(filename))
     {
         delete xml;
-        return false;
+        return 1;
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
         synth->getRuntime().Log(filename + " is not a scale file", _SYS_::LogError);
         delete xml;
-        return false;
+        return 1;
     }
-    getfromXML(xml);
+    err = getfromXML(xml);
+    if (err != 0)
+    {
+        delete xml;
+        return err;
+    }
     synth->setAllPartMaps();
     xml->exitbranch();
     delete xml;
-    return true;
+    return 0;
 }
 
 float Microtonal::getLimits(CommandBlock *getData)

@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
-
-    Modified February 2019
 */
 
 #ifndef MICROTONAL_H
@@ -92,9 +90,9 @@ class Microtonal
         string Pcomment;
 
         void add2XML(XMLwrapper *xml);
-        void getfromXML(XMLwrapper *xml);
+        int getfromXML(XMLwrapper *xml);
         bool saveXML(const string& filename);
-        bool loadXML(const string& filename);
+        int loadXML(const string& filename);
 
     //private:
         // TODO made these public until we have better ways to transfer data to/from GUI
