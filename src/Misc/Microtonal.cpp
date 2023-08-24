@@ -296,15 +296,17 @@ string Microtonal::reformatline(string text)
 }
 
 
-bool Microtonal::validline(const char *line)
+bool Microtonal::validline(string line)
 {
-    int idx = 0;
+    size_t idx = 0;
     bool ok = true;
-    while (ok && line[idx] > 31)
+    while (ok && idx < line.length() && line[idx] != '!')
     {
         char chr = line[idx];
         if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
+        {
             ok = false;
+        }
         ++ idx;
     }
     return ok;
@@ -312,59 +314,54 @@ bool Microtonal::validline(const char *line)
 
 
 // Convert a line to tunings; returns 0 if ok
-int Microtonal::linetotunings(unsigned int nline, const char *line)
+int Microtonal::linetotunings(unsigned int nline, string text)
 {
-    string last = string(line);
-    char local [MAX_LINE_SIZE];
-    strcpy(local, line);
-    size_t pos = last.find("!");
+    size_t pos = text.find("!"); // pull out any comment first
     if (pos != string::npos)
     {
-        last = last.substr(pos + 1, last.length());
+        string last = text.substr(pos + 1, text.length());
         octave[nline].comment = func::trimEnds(last);
     }
     else
         octave[nline].comment = "";
-    local[pos] = 0;
 
-    if (!validline(local))
+    if (!validline(text))
         return SCALES::errors::badNumbers;
+    text = func::trimEnds(text); // just to be sure
 
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0;
     double tuning = 1.0;
-    if (strstr(local, "."))
+    if (text.find('.') != string::npos)
     {
-            x = stod(string(local));
-            if (x < 0.000001)
-                return SCALES::errors::valueTooSmall;
-            type = 1; // double type(cents)
-            x1 = int(floor(x));
-            double tmp = fmod(x, 1.0);
-            x2 = int(floor(tmp * 1e6));
-            tuning = pow(2.0, x / 1200.0);
-            octave[nline].text = reformatline(local);
+        x = stod(text);
+        if (x < 0.000001)
+            return SCALES::errors::valueTooSmall;
+        type = 1; // double type(cents)
+        x1 = int(floor(x));
+        double tmp = fmod(x, 1.0);
+        x2 = int(floor(tmp * 1e6));
+        tuning = pow(2.0, x / 1200.0);
+        octave[nline].text = reformatline(text);
     }
     else
     {
-        if (strstr(local, "/"))
-        {
-            sscanf(local, "%d/%d", &x1, &x2);
-            if (x1 < 0 || x2 < 0)
-                return SCALES::errors::badNumbers;
-            if (!x2)
-                x2 = 1;
-            type = 2; // division
+        size_t found = text.find('/');
+        if (found == 0)
+            return SCALES::errors::badNumbers;
+        x1 = stoi(text.substr(0, found));
+        if (x1 < 1)
+            x1 = 1;
+        if (found != string::npos && found < (text.length()))
+        {;
+            if (text.length() > found + 1)
+                x2 = func::string2int(text.substr(found + 1, text.length()));
+                // this function can handle non-numbers - return as zero
         }
-        else
-        {
-            sscanf(local, "%d", &x1);
+        if (x2 < 1)
             x2 = 1;
-            type = 2; // division by 1
-        }
+        type = 2; // division
 
-        if (x1 <= 0)
-        x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
         tuning = double(x1) / x2;
     }
 
@@ -379,31 +376,30 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 // Convert the text to tunings
 int Microtonal::texttotunings(const char *text)
 {
-    size_t i;
-    unsigned int k = 0, nl = 0;
-    char *lin;
-
-    lin = new char[MAX_LINE_SIZE + 1];
-    while (k < strlen(text))
+    size_t nl = 0;
+    string page = string(text);
+    string line;
+    while (!page.empty())
     {
-        for (i = 0; i < MAX_LINE_SIZE; ++i)
+        size_t pos = page.find('\n');
+        if (pos != string::npos)
         {
-            lin[i] = text[k++];
-            if (lin[i] < 0x20)
-                break;
+            line = page.substr(0, pos);
+            page = page.substr(pos + 1, page.length());
         }
-        lin[i] = '\0';
-        if (!strlen(lin))
-            continue;
-        int err = linetotunings(nl, lin);
+        else
+        {
+            line = page;
+            page = "";
+        }
+
+        int err = linetotunings(nl, line);
         if (err != 0)
-        {
-            delete [] lin;
-            return err; // Parse error
-        }
-        nl++;
+           return err; // Parse error
+        ++ nl;
     }
-    delete [] lin;
+
+
     if (nl > MAX_OCTAVE_SIZE)
         nl = MAX_OCTAVE_SIZE;
     if (!nl)
@@ -416,40 +412,38 @@ int Microtonal::texttotunings(const char *text)
 // Convert the text to mapping
 int Microtonal::texttomapping(const char *text)
 {
-    unsigned int i, k = 0;
-    char *lin;
-    lin = new char[MAX_LINE_SIZE + 1];
-    memset(lin, 0xff, MAX_LINE_SIZE);
     int tx = 0;
-    while (k < strlen(text))
+    string page = string(text);
+    string line;
+    while (!page.empty())
     {
-        for (i = 0; i < MAX_LINE_SIZE; ++i)
-        {
-            lin[i] = text[k++];
-            if (lin[i] < 0x20)
-            {
-                break;
-            }
-        }
-        lin[i] = 0;
-
-        string alt = func::trimEnds(lin);
-
-        size_t pos = alt.find('!');
+        size_t pos = page.find('\n');
         if (pos != string::npos)
         {
-            PmapComment[tx] = func::trimEnds(alt.substr(pos + 1, alt.length()));
+            line = page.substr(0, pos);
+            page = page.substr(pos + 1, page.length());
+        }
+        else
+        {
+            line = page;
+            page = "";
+        }
+
+        pos = line.find('!');
+        if (pos != string::npos)
+        {
+            PmapComment[tx] = func::trimEnds(line.substr(pos + 1, line.length()));
         }
         else
             PmapComment[tx] = "";
 
-        if (alt.empty() || alt[0] < '0' || alt[0] > '9')
+        if (line.empty() || line[0] < '0' || line[0] > '9')
         {
-            alt = 'x';
+            line = 'x';
             Pmapping[tx] = -1;
         }
         else
-            Pmapping[tx] = stoi(alt);
+            Pmapping[tx] = stoi(line);
         tx++;
     }
     if (tx)
@@ -577,7 +571,7 @@ int Microtonal::loadscl(const string& filename)
         {
             err = loadLine(text, point, tmp, BUFFSIZ);
             if (err == 0)
-                err = linetotunings(nline, &tmp[0]);
+                err = linetotunings(nline, string(&tmp[0]));
             if (err < 0)
                 break;
         }
@@ -587,7 +581,6 @@ int Microtonal::loadscl(const string& filename)
 
     octavesize = nnotes;
 
-    //synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaTune);
     return nnotes;
 }
@@ -694,14 +687,14 @@ int Microtonal::loadkbm(const string& filename)
                 err = SCALES::errors::missingEntry;
                 break;
             }
-            string alt = string (tmp);
-            if (alt[0] < '0' || alt[0] > '9') // catches all possibilities!
+            string line = string (tmp);
+            if (line[0] < '0' || line[0] > '9') // catches all possibilities!
             {
                 x = -1;
             }
             else
             {
-                x = std::stoi(alt);
+                x = std::stoi(line);
                 if (x >= tmpMapSize)
                 {
                     err = SCALES::errors::valueTooBig;
@@ -709,9 +702,9 @@ int Microtonal::loadkbm(const string& filename)
                 }
             }
             Pmapping[nline] = x;
-            size_t pos = alt.find('!');
+            size_t pos = line.find('!');
             if (pos != std::string::npos)
-                PmapComment[nline] = func::trimEnds(alt.substr(pos + 1, alt.length()));
+                PmapComment[nline] = func::trimEnds(line.substr(pos + 1, line.length()));
         }
     }
     if (err < 0)

@@ -97,8 +97,8 @@ class Microtonal
     //private:
         // TODO made these public until we have better ways to transfer data to/from GUI
         string reformatline(string text);
-        bool validline(const char *line);
-        int linetotunings(unsigned int nline, const char *line);
+        bool validline(string line);
+        int linetotunings(unsigned int nline, string text);
         int loadLine(const string& text, size_t &point, char *line, size_t maxlen);
         // loads a line from the text file,
         // ignoring the lines beginning with "!"

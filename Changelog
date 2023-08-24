@@ -1,6 +1,11 @@
 yoshimi 2.3.0 M
 
-2023-8-19 Will
+2023-8-24 Will
+bn 2255
+texttotunings and texttomapping immediately convert to C++ strings
+linetotunings entirlet C++ strings;
+
+2023-8-23 Will
 bn 2254
 Revised error handling loading both .kbd and complete scale files.
 Further corner cases importing and exporting fixed.
