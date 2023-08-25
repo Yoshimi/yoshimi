@@ -543,13 +543,8 @@ class MicrotonalUI {} {
     tuningsinput->cut(0, tuningsinput->maximum_size());
     for (int i = 0; i < microtonal->getoctavesize(); ++i)
     {
-        /*if (i != 0)
-            tuningsinput->insert("\\n");
-        microtonal->tuningtoline(i, tmpbuf, 100);*/
-
         string line = "";
-        microtonal->tuningtoline(i, tmpbuf, 100);
-        line = string(tmpbuf);
+        microtonal->tuningtoline(i, line);
         if (!microtonal->octave[i].comment.empty())
         {
             line += " ! ";

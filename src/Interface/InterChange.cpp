@@ -320,6 +320,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         string name = synth->unifiedpresets.section(synth, getData);
         if (type == TOPLEVEL::type::Adjust) // list (actually zero)
         {
+            // this seems impossible but somehow works!
+            // it's used by the CLI to list stored paste entries.
             textMsgBuffer.push(name);
         }
         else if (type & TOPLEVEL::type::Learnable) // load

@@ -332,23 +332,11 @@ int Microtonal::linetotunings(unsigned int nline, string text)
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0;
     double tuning = 1.0;
-    if (text.find('.') != string::npos)
+
+    size_t found = text.find('/');
+    if (found != string::npos)
     {
-        x = stod(text);
-        if (x < 0.000001)
-            return SCALES::errors::valueTooSmall;
-        type = 1; // double type(cents)
-        x1 = int(floor(x));
-        double tmp = fmod(x, 1.0);
-        x2 = int(floor(tmp * 1e6));
-        tuning = pow(2.0, x / 1200.0);
-        octave[nline].text = reformatline(text);
-    }
-    else
-    {
-        size_t found = text.find('/');
-        if (found == 0)
-            return SCALES::errors::badNumbers;
+        // this has to be first as a comment might have a dot
         x1 = stoi(text.substr(0, found));
         if (x1 < 1)
             x1 = 1;
@@ -364,6 +352,20 @@ int Microtonal::linetotunings(unsigned int nline, string text)
 
         tuning = double(x1) / x2;
     }
+    else if (text.find('.') != string::npos)
+    {
+        x = stod(text);
+        if (x < 0.000001)
+            return SCALES::errors::valueTooSmall;
+        type = 1; // double type(cents)
+        x1 = int(floor(x));
+        double tmp = fmod(x, 1.0);
+        x2 = int(floor(tmp * 1e6));
+        tuning = pow(2.0, x / 1200.0);
+        octave[nline].text = reformatline(text);
+    }
+    else
+        return SCALES::errors::badNumbers;
 
     octave[nline].tuning = tuning;
     octave[nline].type = type;
@@ -476,44 +478,45 @@ string Microtonal::keymaptotext(void)
     return text;
 }
 
+
 // Convert tuning to text line
-void Microtonal::tuningtoline(unsigned int n, char *line, int maxn)
+void Microtonal::tuningtoline(unsigned int n, string& line)
 {
+    line = "";
     if (n > octavesize || n > MAX_OCTAVE_SIZE)
-    {
-        line[0] = '\0';
         return;
-    }
+
     string text = octave[n].text;
-    if (octave[n].type == 1)
+    if (octave[n].type == 2)
+    {
+        line = (to_string(octave[n].x1) + "/" + to_string(octave[n].x2));
+    }
+    else if (octave[n].type == 1)
     {
         if (text > " ")
-            snprintf(line, maxn, "%s", text.c_str());
+            line = text;
         else
-            snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+            line = (to_string(octave[n].x1) + "." + to_string(octave[n].x2));
     }
-    else if (octave[n].type == 2)
-        snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
 }
 
 
 string Microtonal::tuningtotext()
 {
     string text;
-    char *buff = new char[BUFFSIZ];
+    string line;
     for (size_t i = 0; i < octavesize; ++i)
     {
         if (i > 0)
             text += "\n";
-        tuningtoline(i, buff, MAX_LINE_SIZE);
-        text += string(buff);
+        tuningtoline(i, line);
+        text += line;
         if (!octave[i].comment.empty())
         {
             text += " ! ";
             text += octave[i].comment;
         }
     }
-    delete [] buff;
     return text;
 }
 
@@ -530,37 +533,56 @@ int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t m
 }
 
 
+int Microtonal::getLineFromText(string& text, string& line)
+{
+    line = "";
+    do {
+        size_t pos = text.find('\n');
+        if (pos != string::npos)
+        {
+            line = text.substr(0, pos);
+            text = text.substr(pos + 1, text.length());
+        }
+        else
+        {
+            line = text;
+            text = "";
+        }
+    } while (line[0] == '!'); // don't want comment lines
+    if (line.length() < 1)
+        return SCALES::errors::missingEntry;
+
+    func::trimEnds(line);
+    return 0;
+}
+
+
 // Loads the tunings from a scl file
 int Microtonal::loadscl(const string& filename)
 {
     string text = loadText(filename);
     if (text == "")
         return SCALES::errors::noFile;
-    char tmp[BUFFSIZ];
-    size_t point = 0;
+    string line = "";
     int err = 0;
-    int nnotes;
-
+    int nnotes = 0;
     // loads the short description
-    if (loadLine(text, point, tmp, BUFFSIZ))
+    if (getLineFromText(text, line))
+    {
         err = SCALES::errors::emptyFile;
+    }
     if (err == 0)
     {
-        for (int i = 0; i < 500; ++i)
-        {
-            if (tmp[i] < 32)
-                tmp[i] = 0;
-        }
         Pname = findLeafName(filename);
-        Pcomment = string(tmp);
+        Pcomment = string(line);
         // loads the number of the notes
-        if (loadLine(text, point, tmp, BUFFSIZ))
+        if (getLineFromText(text, line))
             err = SCALES::errors::badFile;
     }
     if (err == 0)
     {
         nnotes = MAX_OCTAVE_SIZE;
-        sscanf(&tmp[0], "%d", &nnotes);
+        nnotes = func::string2int(line);
         if (size_t(nnotes) > MAX_OCTAVE_SIZE || nnotes < 2)
             err = SCALES::errors::badOctaveSize;
     }
@@ -569,9 +591,9 @@ int Microtonal::loadscl(const string& filename)
     // load the tunings
         for (int nline = 0; nline < nnotes; ++nline)
         {
-            err = loadLine(text, point, tmp, BUFFSIZ);
+            err = getLineFromText(text, line);
             if (err == 0)
-                err = linetotunings(nline, string(&tmp[0]));
+                err = linetotunings(nline, line);
             if (err < 0)
                 break;
         }
@@ -979,9 +1001,9 @@ int Microtonal::loadXML(const string& filename)
         delete xml;
         return err;
     }
-    synth->setAllPartMaps();
     xml->exitbranch();
     delete xml;
+    synth->setAllPartMaps();
     return 0;
 }
 

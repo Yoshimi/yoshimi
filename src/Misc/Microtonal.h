@@ -75,7 +75,7 @@ class Microtonal
         float Pglobalfinedetune;
 
         int getoctavesize(void);
-        void tuningtoline(unsigned int n, char *line, int maxn);
+        void tuningtoline(unsigned int n, string& line);
         string tuningtotext(void);
         string keymaptotext(void);
         int loadscl(const string& filename); // load the tunings from a .scl file
@@ -100,6 +100,7 @@ class Microtonal
         bool validline(string line);
         int linetotunings(unsigned int nline, string text);
         int loadLine(const string& text, size_t &point, char *line, size_t maxlen);
+        int getLineFromText(string& text, string& line);
         // loads a line from the text file,
         // ignoring the lines beginning with "!"
         size_t octavesize;
