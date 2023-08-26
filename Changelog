@@ -1,5 +1,13 @@
 yoshimi 2.3.0 M
 
+2023-8-26 Will
+bn 2257
+loadkbm now uses getLineFromText
+Removed (now redundant) loadLine() and associated functions
+Removed a number of redundant .c_str() conversions
+Created inline SplitLine()
+Made validline() inline
+
 2023-8-25 Will
 bn 2256
 linetotunings entirely C++ strings

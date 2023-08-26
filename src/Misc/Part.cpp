@@ -1268,7 +1268,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
         xml->addparbool("enabled", kit[i].Penabled);
         if (kit[i].Penabled)
         {
-            xml->addparstr("name", kit[i].Pname.c_str());
+            xml->addparstr("name", kit[i].Pname);
 
             xml->addparbool("muted", kit[i].Pmuted);
             xml->addpar("min_key", kit[i].Pminkey);

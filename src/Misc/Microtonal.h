@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016-2023, Will Godfrey
+    Copyright 2016-2023, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -80,8 +80,8 @@ class Microtonal
         string keymaptotext(void);
         int loadscl(const string& filename); // load the tunings from a .scl file
         int loadkbm(const string& filename); // load the mapping from .kbm file
-        int texttotunings(const char *text);
-        int texttomapping(const char *text);
+        int texttotunings(string page);
+        int texttomapping(string page);
 
         string scale2scl(void);
         string map2kbm(void);
@@ -96,12 +96,10 @@ class Microtonal
 
     //private:
         // TODO made these public until we have better ways to transfer data to/from GUI
+        int getLineFromText(string& page, string& line);
         string reformatline(string text);
-        bool validline(string line);
         int linetotunings(unsigned int nline, string text);
-        int loadLine(const string& text, size_t &point, char *line, size_t maxlen);
-        int getLineFromText(string& text, string& line);
-        // loads a line from the text file,
+        // extracts a line from a text file,
         // ignoring the lines beginning with "!"
         size_t octavesize;
 

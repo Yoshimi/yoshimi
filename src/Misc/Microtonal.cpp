@@ -43,65 +43,82 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::to_string;
-using std::to_string;
-
 
 namespace { // local implementation details
 
-    const size_t BUFFSIZ = 1024;      // for loading KBM or SCL settings from a file
-    const size_t MAX_LINE_SIZE = 256; // for converting text to mappings or tunings
-    // sizes increased to allow for more comments
-
-
-    inline void prepareText(string &text)
+    inline void splitLine(string& page, string& line)
     {
-        size_t pos = 0;
-        while (text[pos] == ' ') // skip leading spaces
-            pos += 1;
-
-        while (text[pos] == '0' && isdigit(text[pos + 1])) // skip leading zeros
-            pos += 1;
-        text = text.substr(pos, text.length());
-
-    }
-
-
-    inline string lineInText(string text, size_t &point)
-    {
-        size_t len = text.length();
-        if (point >= len - 1)
-            return "";
-        size_t it = 0;
-        while (it < len - point && text.at(point + it) >= ' ')
-            ++it;
-        string line = text.substr(point, it);
-        point += (it + 1);
-        return line;
-    }
-
-
-    inline bool fetchLineFromText(string text, size_t &point, char *line, size_t length)
-    {
-        bool ok = true;
-        string found = lineInText(text, point);
-        prepareText(found);
-        if (found == "")
-            line[0] = 0;
-        else if (found.length() < (length - 1))
+        size_t pos = page.find('\n');
+        if (pos != string::npos)
         {
-            strcpy(line, found.c_str());
-            line[length] = 0;
-            // cout << "fetch " << line << endl;
+            line = page.substr(0, pos);
+            page = page.substr(pos + 1, page.length());
         }
         else
         {
-            ok = false;
-            line[0] = 0;
+            line = page;
+            page = "";
+            func::trimEnds(line);
+        }
+        return;
+    }
+
+    inline bool validline(string line)
+    {
+        size_t idx = 0;
+        bool ok = true;
+        while (ok && idx < line.length() && line[idx] != '!')
+        {
+            char chr = line[idx];
+            if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
+            {
+                ok = false;
+            }
+            ++ idx;
         }
         return ok;
     }
+}
 
-}//(End)implementation details
+
+int Microtonal::getLineFromText(string& page, string& line)
+{
+    line = "";
+    do {
+        splitLine(page, line);
+    } while (line[0] == '!'); // don't want comment lines
+    if (line.length() < 1)
+        return SCALES::errors::missingEntry;
+    return 0;
+}
+
+
+string Microtonal::reformatline(string text)
+{
+    string formattext = "";
+    char Chr;
+    for (size_t i = 0; i < text.length(); ++i)
+    {
+        Chr = text[i];
+        if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
+            formattext += Chr;
+    }
+    //cout << "Formatted >" << formattext << endl;
+    size_t found;
+    found = formattext.find('.');
+    if (found < 4)
+    {
+        string tmp (4 - found, '0'); // leading zeros
+        formattext = tmp + formattext;
+    }
+    found = formattext.size();
+    if (found < 11)
+    {
+        string tmp  (11 - found, '0'); // trailing zeros
+        formattext += tmp;
+    }
+    return formattext;
+}
 
 
 void Microtonal::defaults(int type)
@@ -264,55 +281,6 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 }
 
 
-string Microtonal::reformatline(string text)
-{
-    //text.erase(remove_if (text.begin(), text.end(), [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
-
-    // above replaced as it screwed up comments in lines
-
-    string formattext = "";
-    char Chr;
-    for (size_t i = 0; i < text.length(); ++i)
-    {
-        Chr = text[i];
-        if (Chr == '.' || Chr == '/' || (Chr >= '0' && Chr <= '9'))
-            formattext += Chr;
-    }
-    //cout << "Formatted >" << formattext << endl;
-    size_t found;
-    found = formattext.find('.');
-    if (found < 4)
-    {
-        string tmp (4 - found, '0'); // leading zeros
-        formattext = tmp + formattext;
-    }
-    found = formattext.size();
-    if (found < 11)
-    {
-        string tmp  (11 - found, '0'); // trailing zeros
-        formattext += tmp;
-    }
-    return formattext;
-}
-
-
-bool Microtonal::validline(string line)
-{
-    size_t idx = 0;
-    bool ok = true;
-    while (ok && idx < line.length() && line[idx] != '!')
-    {
-        char chr = line[idx];
-        if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
-        {
-            ok = false;
-        }
-        ++ idx;
-    }
-    return ok;
-}
-
-
 // Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, string text)
 {
@@ -376,10 +344,9 @@ int Microtonal::linetotunings(unsigned int nline, string text)
 
 
 // Convert the text to tunings
-int Microtonal::texttotunings(const char *text)
+int Microtonal::texttotunings(string page)
 {
     size_t nl = 0;
-    string page = string(text);
     string line;
     while (!page.empty())
     {
@@ -412,26 +379,14 @@ int Microtonal::texttotunings(const char *text)
 
 
 // Convert the text to mapping
-int Microtonal::texttomapping(const char *text)
+int Microtonal::texttomapping(string page)
 {
     int tx = 0;
-    string page = string(text);
     string line;
     while (!page.empty())
     {
-        size_t pos = page.find('\n');
-        if (pos != string::npos)
-        {
-            line = page.substr(0, pos);
-            page = page.substr(pos + 1, page.length());
-        }
-        else
-        {
-            line = page;
-            page = "";
-        }
-
-        pos = line.find('!');
+        splitLine(page, line);
+        size_t pos = line.find('!');
         if (pos != string::npos)
         {
             PmapComment[tx] = func::trimEnds(line.substr(pos + 1, line.length()));
@@ -521,42 +476,6 @@ string Microtonal::tuningtotext()
 }
 
 
-int Microtonal::loadLine(const string& text, size_t &point, char *line, size_t maxlen)
-{
-    do {
-        line[0] = 0;
-        fetchLineFromText(text, point, line, maxlen);
-    } while (line[0] == '!'); // skip over these
-    if (line[0] < ' ')
-        return SCALES::errors::missingEntry;
-    return 0;
-}
-
-
-int Microtonal::getLineFromText(string& text, string& line)
-{
-    line = "";
-    do {
-        size_t pos = text.find('\n');
-        if (pos != string::npos)
-        {
-            line = text.substr(0, pos);
-            text = text.substr(pos + 1, text.length());
-        }
-        else
-        {
-            line = text;
-            text = "";
-        }
-    } while (line[0] == '!'); // don't want comment lines
-    if (line.length() < 1)
-        return SCALES::errors::missingEntry;
-
-    func::trimEnds(line);
-    return 0;
-}
-
-
 // Loads the tunings from a scl file
 int Microtonal::loadscl(const string& filename)
 {
@@ -614,106 +533,72 @@ int Microtonal::loadkbm(const string& filename)
     string text = loadText(filename);
     if (text == "")
         return SCALES::errors::noFile;
-    char tmp[BUFFSIZ];
-    size_t point = 0;
-    int err = 0;
-    int tmpMapSize;
+
+    string line = "";
     // loads the mapsize
-    if (loadLine(text, point, tmp, BUFFSIZ))
-        err = SCALES::errors::badFile;
-    else if (!sscanf(&tmp[0], "%d",&tmpMapSize))
-        err = SCALES::errors::badChars;
+    if (getLineFromText(text, line))
+        return SCALES::errors::badFile;
+    int tmpMapSize = func::string2int(line);
+    if (tmpMapSize < 1 || tmpMapSize > 127)
+            return SCALES::errors::badMapSize;
 
-    if (err == 0)
-    {
-        if (tmpMapSize < 1 || tmpMapSize > 127)
-            err = SCALES::errors::badMapSize;
-    }
-
-    int tmpFirst;
-    if (err == 0)
-    {
-        // loads first MIDI note to retune
-        if (loadLine(text, point, tmp, BUFFSIZ))
-            err = SCALES::errors::badFile;
-        else if (!sscanf(&tmp[0], "%d", &tmpFirst))
-            return SCALES::errors::badOctaveSize;
-        else if (tmpFirst < 0 || tmpFirst > 127)
-            err = -7;
-    }
+    int tmpFirst = 0;
+    // loads first MIDI note to retune
+    if (getLineFromText(text, line))
+        return SCALES::errors::badFile;
+    tmpFirst = func::string2int(line);
+    if (tmpFirst < 0 || tmpFirst > 127)
+        return SCALES::errors::badNoteNumber;
 
     int tmpLast;
-    if (err == 0)
-    {
         // loads last MIDI note to retune
-       if (loadLine(text, point, tmp, BUFFSIZ))
-            err = SCALES::errors::badFile;
-        else if (!sscanf(&tmp[0], "%d", &tmpLast))
-            return SCALES::errors::badOctaveSize;
-        else if (tmpLast < 0 || tmpLast > 127)
-            err = SCALES::errors::badNoteNumber;
-    }
+    if (getLineFromText(text, line))
+        return SCALES::errors::badFile;
+    tmpLast = func::string2int(line);
+    if (tmpLast < 0 || tmpLast > 127)
+        return SCALES::errors::badNoteNumber;
 
     int tmpMid;
-    if (err == 0)
-    {
         // loads the middle note where scale from scale degree=0
-       if (loadLine(text, point, tmp, BUFFSIZ))
-            err = SCALES::errors::badFile;
-        else if (!sscanf(&tmp[0], "%d", &tmpMid))
-            return SCALES::errors::badMapSize;
-        else if (tmpMid < 0 || tmpMid > 127)
-            err = -SCALES::errors::badNoteNumber;
-    }
+    if (getLineFromText(text, line))
+        return SCALES::errors::badFile;
+    tmpMid = func::string2int(line);
+    if (tmpMid < 0 || tmpMid > 127)
+        return SCALES::errors::badNoteNumber;
 
-    int tmpNote;
-    if (err == 0)
-    {
-        // loads the reference note
-       if (loadLine(text, point, tmp, BUFFSIZ))
-            err = SCALES::errors::badFile;
-        else if (!sscanf(&tmp[0], "%d", &tmpNote))
-            return SCALES::errors::badOctaveSize;
-        else if (tmpNote < 0 || tmpNote > 127)
-            err = -7;
-    }
+    int tmpRefNote;
+    // loads the reference note
+    if (getLineFromText(text, line))
+    return SCALES::errors::badFile;
+    tmpRefNote = func::string2int(line);
+    if (tmpRefNote < 0 || tmpRefNote > 127)
+        return SCALES::errors::badNoteNumber;
 
-    float tmpPrefFreq;
-    if (err == 0)
-    {
-        // loads the reference freq.
-        if (loadLine(text, point, tmp, BUFFSIZ))
-            err = SCALES::errors::badOctaveSize;
-        else
-        {
-
-            if (!sscanf(&tmp[0], "%f", &tmpPrefFreq))
-                err = SCALES::errors::badOctaveSize;
-            else if (tmpPrefFreq < 1 || tmpPrefFreq > 20000)
-                err = SCALES::errors::outOfRange;
-        }
-    }
+    float tmpRefFreq;
+    // loads the reference freq.
+    if (getLineFromText(text, line))
+        return SCALES::errors::badFile;
+    tmpRefFreq = func::string2float(line);
+    if (tmpRefFreq < 1)
+        return SCALES::errors::valueTooSmall;
+    if (tmpRefFreq > 20000)
+        return SCALES::errors::valueTooBig;
 
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
-    if (loadLine(text, point, tmp, BUFFSIZ))
-        err = SCALES::errors::badMapSize;
+    if (getLineFromText(text, line))
+        return SCALES::errors::badMapSize;
 
-    int x;
-    if (err == 0)
+    int x = 0;
+    int err = 0;
+    for (int nline = 0; nline < tmpMapSize; ++nline)
     {
-        for (int nline = 0; nline < tmpMapSize; ++nline)
+        if (getLineFromText(text, line))
+            err = SCALES::errors::badFile;
+        else
         {
-            if (loadLine(text, point, tmp, BUFFSIZ))
-            {
-                err = SCALES::errors::missingEntry;
-                break;
-            }
-            string line = string (tmp);
             if (line[0] < '0' || line[0] > '9') // catches all possibilities!
-            {
                 x = -1;
-            }
             else
             {
                 x = std::stoi(line);
@@ -723,12 +608,13 @@ int Microtonal::loadkbm(const string& filename)
                     break;
                 }
             }
-            Pmapping[nline] = x;
-            size_t pos = line.find('!');
-            if (pos != std::string::npos)
-                PmapComment[nline] = func::trimEnds(line.substr(pos + 1, line.length()));
         }
+        Pmapping[nline] = x;
+        size_t pos = line.find('!');
+        if (pos != std::string::npos)
+            PmapComment[nline] = func::trimEnds(line.substr(pos + 1, line.length()));
     }
+
     if (err < 0)
         return err;
 
@@ -737,8 +623,8 @@ int Microtonal::loadkbm(const string& filename)
     Pfirstkey = tmpFirst;
     Plastkey = tmpLast;
     Pmiddlenote = tmpMid;
-    PrefNote = tmpNote;
-    PrefFreq = tmpPrefFreq;
+    PrefNote = tmpRefNote;
+    PrefFreq = tmpRefFreq;
     synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaMap);
     return tmpMapSize;
@@ -809,8 +695,8 @@ string Microtonal::map2kbm()
 
 void Microtonal::add2XML(XMLwrapper *xml)
 {
-    xml->addparstr("name", Pname.c_str());
-    xml->addparstr("comment", Pcomment.c_str());
+    xml->addparstr("name", Pname);
+    xml->addparstr("comment", Pcomment);
 
     xml->addparbool("invert_up_down", Pinvertupdown);
     xml->addpar("invert_up_down_center", Pinvertupdowncenter);

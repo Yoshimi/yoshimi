@@ -65,7 +65,7 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
         nextWord(source);
         if (isdigit(source[0]))
         {
-            allData.data.value = strtof(source.c_str(), NULL);
+            allData.data.value = string2float(source, NULL);
             // need a ring buffer to write allData CommandBlock
         }
         else

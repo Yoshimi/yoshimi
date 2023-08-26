@@ -593,14 +593,14 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
     {
         case SCALES::control::tuning:
             text = formatScales(text);
-            value = synth->microtonal.texttotunings(text.c_str());
+            value = synth->microtonal.texttotunings(text);
             if (value <= 0)
                 synth->microtonal.defaults(1);
             synth->setAllPartMaps();
             break;
         case SCALES::control::keyboardMap:
             text = formatKeys(text);
-            value = synth->microtonal.texttomapping(text.c_str());
+            value = synth->microtonal.texttomapping(text);
             if (value <= 0)
                 synth->microtonal.defaults(2);
             synth->setAllPartMaps();

@@ -939,7 +939,7 @@ bool MidiLearn::insertMidiListData(XMLwrapper *xml)
                 xml->addpar("Insert", it->frame.data.insert);
                 xml->addpar("Parameter", it->frame.data.parameter);
                 xml->addpar("Secondary_Parameter", it->frame.data.offset);
-                xml->addparstr("Command_Name",findName(it).c_str());
+                xml->addparstr("Command_Name",findName(it));
                 xml->endbranch();
             xml->endbranch();
             ++it;

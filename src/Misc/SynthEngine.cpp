@@ -998,7 +998,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     int npart = int(getData->data.kit);
     string fname = textMsgBuffer.fetch(getData->data.miscmsg);
     fname = setExtension(fname, EXTEN::yoshInst);
-    if (!isRegularFile(fname.c_str()))
+    if (!isRegularFile(fname))
         fname = setExtension(fname, EXTEN::zynInst);
     string name = findLeafName(fname);
     if (name < "!")
@@ -1006,7 +1006,7 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
         name = "Invalid instrument name " + name;
         ok = false;
     }
-    if (ok && !isRegularFile(fname.c_str()))
+    if (ok && !isRegularFile(fname))
     {
         name = "Can't find " + fname;
         ok = false;
@@ -1206,7 +1206,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
     {
         // JBS: make that a class member variable
         string page_filename = "/tmp/yoshimi-pager-" + asString(getpid()) + ".log";
-        ofstream fout(page_filename.c_str(),(ios_base::out | ios_base::trunc));
+        ofstream fout(page_filename,(ios_base::out | ios_base::trunc));
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             fout << *it << endl;
         fout.close();

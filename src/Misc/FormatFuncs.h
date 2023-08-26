@@ -350,10 +350,11 @@ inline std::string nextLine(std::string& list) // this is destructive
 inline std::string trimEnds(std::string line)
 {
     size_t pos = line.find_first_not_of(" \t");
-    line.erase(0, pos);
+    if (pos != string::npos)
+        line.erase(0, pos);
 
     pos = line.find_last_not_of(" \t");
-    if (string::npos != pos)
+    if (pos != string::npos)
         line.erase(pos + 1);
     return line;
 }
