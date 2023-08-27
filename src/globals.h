@@ -514,14 +514,11 @@ namespace SCALES // usage SCALES::control::refFrequency
         highKey,
         tuning = 32,
         clearAll,
-        retune, // GUI only
-        // all the above directly alter the tuning. retune must be the last
-
         keyboardMap,
         importScl = 48,
         importKbm,
-        exportScl, // not yet
-        exportKbm, // not yet
+        exportScl,
+        exportKbm,
         name = 64,
         comment
     };

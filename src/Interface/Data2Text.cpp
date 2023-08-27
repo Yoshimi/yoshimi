@@ -100,10 +100,6 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     yesno = false;
     string commandName;
 
-   // this is unique and placed here to avoid Xruns
-    if (npart == TOPLEVEL::section::scales && control <= SCALES::control::retune)
-        synth->setAllPartMaps();
-
     if (npart == TOPLEVEL::section::vector)
     {
         commandName = resolveVector(getData, addValue);
@@ -507,10 +503,6 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
             contstr = "Description: ";
             if (addValue)
                 contstr += textMsgBuffer.fetch(getData->data.miscmsg, false);
-            showValue = false;
-            break;
-        case SCALES::control::retune:
-            contstr = "Retune";
             showValue = false;
             break;
 

@@ -1,5 +1,11 @@
 yoshimi 2.3.0 M
 
+2023-8-27 Will
+bn 2258
+BugFix: Importing keymap not setting 'last' note value
+Both keymaps and tunings do setAllPartMaps() directly so
+SCALES:control::retune is now redundant, and removed.
+
 2023-8-26 Will
 bn 2257
 loadkbm now uses getLineFromText

@@ -67,7 +67,7 @@ namespace { // local implementation details
     {
         size_t idx = 0;
         bool ok = true;
-        while (ok && idx < line.length() && line[idx] != '!')
+        while (ok && idx < line.length() && line[idx] > '!')
         {
             char chr = line[idx];
             if (chr != ' ' && chr != '.' && chr != '/' && (chr < '0' || chr > '9'))
@@ -284,9 +284,12 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 // Convert a line to tunings; returns 0 if ok
 int Microtonal::linetotunings(unsigned int nline, string text)
 {
-    size_t pos = text.find("!"); // pull out any comment first
+    text = func::trimEnds(text); // just to be sure
+    size_t pos = text.find_first_of(" !"); // pull out any comment first
     if (pos != string::npos)
     {
+        if (text[pos + 1] == '!')
+                pos += 1; // don't want 2 comment markers
         string last = text.substr(pos + 1, text.length());
         octave[nline].comment = func::trimEnds(last);
     }
@@ -295,32 +298,12 @@ int Microtonal::linetotunings(unsigned int nline, string text)
 
     if (!validline(text))
         return SCALES::errors::badNumbers;
-    text = func::trimEnds(text); // just to be sure
 
     int x1 = -1, x2 = -1, type = -1;
     double x = -1.0;
     double tuning = 1.0;
 
-    size_t found = text.find('/');
-    if (found != string::npos)
-    {
-        // this has to be first as a comment might have a dot
-        x1 = stoi(text.substr(0, found));
-        if (x1 < 1)
-            x1 = 1;
-        if (found != string::npos && found < (text.length()))
-        {;
-            if (text.length() > found + 1)
-                x2 = func::string2int(text.substr(found + 1, text.length()));
-                // this function can handle non-numbers - return as zero
-        }
-        if (x2 < 1)
-            x2 = 1;
-        type = 2; // division
-
-        tuning = double(x1) / x2;
-    }
-    else if (text.find('.') != string::npos)
+    if (text.find('.') != string::npos)
     {
         x = stod(text);
         if (x < 0.000001)
@@ -333,7 +316,24 @@ int Microtonal::linetotunings(unsigned int nline, string text)
         octave[nline].text = reformatline(text);
     }
     else
-        return SCALES::errors::badNumbers;
+    {
+        x1 = func::string2int(text);
+        if (x1 < 1)
+            x1 = 1;
+        size_t found = text.find('/');
+        if (found != string::npos && found < (text.length()))
+        {
+            if (text.length() > found + 1)
+                x2 = func::string2int(text.substr(found + 1, text.length()));
+        }
+        else
+            x2 = 1;
+        if (x2 < 1)
+            x2 = 1;
+        type = 2; // division
+
+        tuning = double(x1) / x2;
+    }
 
     octave[nline].tuning = tuning;
     octave[nline].type = type;
@@ -521,7 +521,7 @@ int Microtonal::loadscl(const string& filename)
         return err;
 
     octavesize = nnotes;
-
+    synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaTune);
     return nnotes;
 }
@@ -610,9 +610,13 @@ int Microtonal::loadkbm(const string& filename)
             }
         }
         Pmapping[nline] = x;
-        size_t pos = line.find('!');
+        size_t pos = line.find_first_of(" !");
         if (pos != std::string::npos)
+        {
+            if (line[pos + 1] == '!')
+                pos += 1; // don't want 2 comment markers
             PmapComment[nline] = func::trimEnds(line.substr(pos + 1, line.length()));
+        }
     }
 
     if (err < 0)
@@ -972,9 +976,6 @@ float Microtonal::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case SCALES::control::comment:
-            max = 1;
-            break;
-        case SCALES::control::retune:
             max = 1;
             break;
         case SCALES::control::clearAll:

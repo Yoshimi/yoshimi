@@ -220,7 +220,7 @@ class MicrotonalUI {} {
             if (filename.empty())
                 return;
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
-            send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);}
+            ;}
             tooltip {Import Scala .scl file (tunnings)} xywh {85 401 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button exportscl {
@@ -355,7 +355,7 @@ class MicrotonalUI {} {
                 return;
 
             send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
-            send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);}
+            ;}
             tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button exportkbm {
@@ -386,7 +386,7 @@ class MicrotonalUI {} {
           retune();
           send_data(0, SCALES::control::tuning, 1, TOPLEVEL::type::Integer);
           send_data(0, SCALES::control::keyboardMap, 1, TOPLEVEL::type::Integer);
-          send_data(0, SCALES::control::retune, 1, TOPLEVEL::type::Integer);}
+          ;}
           tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mapping"} xywh {169 448 107 28} box PLASTIC_UP_BOX color 228 labeltype EMBOSSED_LABEL labelfont 1 labelcolor 64
         }
         Fl_Button clearbutton {

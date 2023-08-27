@@ -642,7 +642,7 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
                 getData->data.kit = synth->microtonal.PrefNote;
                 getData->data.engine = synth->microtonal.Pfirstkey;
                 getData->data.insert = synth->microtonal.Pmiddlenote;
-                getData->data.parameter |= synth->microtonal.Plastkey; // need to keep top bit
+                getData->data.parameter = synth->microtonal.Plastkey;
             }
             synth->setAllPartMaps();
             break;
@@ -2927,9 +2927,6 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             // done elsewhere
             break;
 
-        case SCALES::control::retune:
-            // done elsewhere
-            break;
         case SCALES::control::clearAll: // Clear scales
             synth->microtonal.defaults();
             break;
