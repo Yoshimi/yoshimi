@@ -235,7 +235,6 @@ class MicrotonalUI {} {
                 string filename = setfiler(synth,"", "", true, TOPLEVEL::XML::ScalaTune);
                 if (filename.empty())
                     return;
-                retune();
                 send_data(TOPLEVEL::action::lowPrio, SCALES::control::exportScl, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));}
             tooltip {Export Scala .scl file (tunnings)} xywh {85 422 100 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
@@ -436,12 +435,9 @@ class MicrotonalUI {} {
     float value = getData->data.value;
     bool wasFromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     unsigned char control = getData->data.control;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
-
     unsigned char miscmsg = getData->data.miscmsg;
+
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
     string msg;
@@ -505,19 +501,21 @@ class MicrotonalUI {} {
             break;
         case SCALES::control::keyboardMap:
         case SCALES::control::importKbm:
-            msg = (textMsgBuffer.fetch(miscmsg)); // must always fetch it
             if (value_int > 0)
             {
-                mappinginput->value(msg.c_str());
-                mapsizeoutput->value(value_int);
-                if (control == SCALES::control::importKbm)
-                {
-                    anotecounter->value(kititem);
-                    firstnotecounter->value(engine);
-                    middlenotecounter->value(insert);
-                    lastnotecounter->value(parameter);
-                    afreqinput->value(fetchData(0, SCALES::control::refFrequency, TOPLEVEL::section::scales));
-                }
+                msg = (textMsgBuffer.fetch(parameter));
+                int mapsize = func::string2int(splitline(msg));
+                mapsizeoutput->value(mapsize);
+                firstnotecounter->value(func::string2int(splitline(msg)));
+                lastnotecounter->value(func::string2int(splitline(msg)));
+                middlenotecounter->value(func::string2int(splitline(msg)));
+                anotecounter->value(func::string2int(splitline(msg)));
+                afreqinput->value(func::string2float(splitline(msg)));
+                octavesizeoutput->value(func::string2float(splitline(msg)));
+                string map;
+                for (int i = 0; i < mapsize; ++i)
+                    map += (splitline(msg) + char(10));
+                mappinginput->value(map.c_str());
             }
             else if (wasFromUs)
                 errors(value_int, false);
@@ -578,6 +576,27 @@ class MicrotonalUI {} {
         mappinginput->insert(tmpbuf);
     }
     delete [] tmpbuf;} {}
+  }
+  Function {splitline(string& page)} {return_type string
+  } {
+    code {//
+        const char ch = 10;
+        string line = "";
+        do{
+            size_t pos = page.find(ch);
+            if (pos != string::npos)
+            {
+                line = page.substr(0, pos);
+                page = page.substr(pos + 1, page.length());
+            }
+            else
+            {
+                line = page;
+                page = "";
+                func::trimEnds(line);
+            }
+        } while (line[0] == '!'); // don't want comment lines
+        return line;} {}
   }
   Function {MicrotonalUI(Microtonal *microtonal_, SynthEngine *synth_)} {} {
     code {//
@@ -690,7 +709,6 @@ class MicrotonalUI {} {
         errors(value, false);
         return;
     }
-    synth->setAllPartMaps();
     mapsizeoutput->do_callback();
     anotecounter->do_callback();} {}
   }

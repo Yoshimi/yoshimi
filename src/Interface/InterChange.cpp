@@ -596,14 +596,12 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             value = synth->microtonal.texttotunings(text);
             if (value <= 0)
                 synth->microtonal.defaults(1);
-            synth->setAllPartMaps();
             break;
         case SCALES::control::keyboardMap:
             text = formatKeys(text);
             value = synth->microtonal.texttomapping(text);
             if (value <= 0)
                 synth->microtonal.defaults(2);
-            synth->setAllPartMaps();
             break;
 
         case SCALES::control::importScl:
@@ -616,7 +614,6 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 text = synth->microtonal.tuningtotext();
             }
-            synth->setAllPartMaps();
             break;
         case SCALES::control::importKbm:
             value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
@@ -639,12 +636,8 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
                     if (!comment.empty())
                         text += (" ! " + comment);
                 }
-                getData->data.kit = synth->microtonal.PrefNote;
-                getData->data.engine = synth->microtonal.Pfirstkey;
-                getData->data.insert = synth->microtonal.Pmiddlenote;
-                getData->data.parameter = synth->microtonal.Plastkey;
+                getData->data.parameter = textMsgBuffer.push(synth->microtonal.map2kbm());
             }
-            synth->setAllPartMaps();
             break;
 
         case SCALES::control::exportScl:
@@ -2895,9 +2888,9 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                     value_int = synth->microtonal.Pmiddlenote + 1;
                     getData->data.value = value_int;
                 }
-                else if (value_int > 127)
+                else if (value_int >= MAX_OCTAVE_SIZE)
                 {
-                    value_int = 127;
+                    value_int = MAX_OCTAVE_SIZE - 1;
                     getData->data.value = value_int;
                 }
                 synth->microtonal.Plastkey = value_int;
@@ -2929,6 +2922,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
         case SCALES::control::clearAll: // Clear scales
             synth->microtonal.defaults();
+            synth->setAllPartMaps();
             break;
     }
 

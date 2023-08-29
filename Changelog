@@ -1,5 +1,12 @@
 yoshimi 2.3.0 M
 
+2023-8-29 Will
+bn 2259
+Small microtonal related cleanups.
+Importing/loading keymaps into the UI now uses text messages.
+Still a lot of direct calls :(
+
+
 2023-8-27 Will
 bn 2258
 BugFix: Importing keymap not setting 'last' note value

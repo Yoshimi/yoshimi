@@ -5971,7 +5971,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
         int pitch = string2int(input);
         input.skipChars();
-        if (pitch < 0 || pitch > 127)
+        if (pitch < 0 || pitch >= MAX_OCTAVE_SIZE)
             return REPLY::range_msg;
 
         int velocity = string2int(input);

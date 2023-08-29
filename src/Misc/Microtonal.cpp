@@ -374,6 +374,7 @@ int Microtonal::texttotunings(string page)
     if (!nl)
         return 0; // the input is empty
     octavesize = nl;
+    synth->setAllPartMaps();
     return octavesize; // ok
 }
 
@@ -409,6 +410,7 @@ int Microtonal::texttomapping(string page)
     }
     else
         return SCALES::errors::badMapSize;
+    synth->setAllPartMaps();
     return tx;
 }
 
@@ -472,6 +474,7 @@ string Microtonal::tuningtotext()
             text += octave[i].comment;
         }
     }
+    synth->setAllPartMaps();
     return text;
 }
 
@@ -539,7 +542,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
         return SCALES::errors::badFile;
     int tmpMapSize = func::string2int(line);
-    if (tmpMapSize < 1 || tmpMapSize > 127)
+    if (tmpMapSize < 1 || tmpMapSize >= MAX_OCTAVE_SIZE)
             return SCALES::errors::badMapSize;
 
     int tmpFirst = 0;
@@ -547,7 +550,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
         return SCALES::errors::badFile;
     tmpFirst = func::string2int(line);
-    if (tmpFirst < 0 || tmpFirst > 127)
+    if (tmpFirst < 0 || tmpFirst >= MAX_OCTAVE_SIZE)
         return SCALES::errors::badNoteNumber;
 
     int tmpLast;
@@ -555,7 +558,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
         return SCALES::errors::badFile;
     tmpLast = func::string2int(line);
-    if (tmpLast < 0 || tmpLast > 127)
+    if (tmpLast < 0 || tmpLast >= MAX_OCTAVE_SIZE)
         return SCALES::errors::badNoteNumber;
 
     int tmpMid;
@@ -563,7 +566,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
         return SCALES::errors::badFile;
     tmpMid = func::string2int(line);
-    if (tmpMid < 0 || tmpMid > 127)
+    if (tmpMid < 0 || tmpMid >= MAX_OCTAVE_SIZE)
         return SCALES::errors::badNoteNumber;
 
     int tmpRefNote;
@@ -571,7 +574,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
     return SCALES::errors::badFile;
     tmpRefNote = func::string2int(line);
-    if (tmpRefNote < 0 || tmpRefNote > 127)
+    if (tmpRefNote < 0 || tmpRefNote >= MAX_OCTAVE_SIZE)
         return SCALES::errors::badNoteNumber;
 
     float tmpRefFreq;

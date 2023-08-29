@@ -37,7 +37,7 @@ class XMLwrapper;
 using std::string;
 using func::power;
 
-const size_t MAX_OCTAVE_SIZE = 128;
+const int MAX_OCTAVE_SIZE = 128;
 
 
 class Microtonal
@@ -69,8 +69,8 @@ class Microtonal
         int Pmapsize;
 
         unsigned char Pmappingenabled; // Mapping ON/OFF
-        int Pmapping[128];             // Mapping (keys)
-        string PmapComment[128];       // comments for mapping (if they exist)
+        int Pmapping[MAX_OCTAVE_SIZE];             // Mapping (keys)
+        string PmapComment[MAX_OCTAVE_SIZE];       // comments for mapping (if they exist)
 
         float Pglobalfinedetune;
 
@@ -94,13 +94,14 @@ class Microtonal
         bool saveXML(const string& filename);
         int loadXML(const string& filename);
 
-    //private:
-        // TODO made these public until we have better ways to transfer data to/from GUI
+    private:
         int getLineFromText(string& page, string& line);
         string reformatline(string text);
         int linetotunings(unsigned int nline, string text);
-        // extracts a line from a text file,
-        // ignoring the lines beginning with "!"
+        // extracts a line from a text file, ignoring the lines beginning with "!"
+
+    public:
+        // TODO made these public until we have better ways to transfer data to/from GUI
         size_t octavesize;
 
         struct Octave {
