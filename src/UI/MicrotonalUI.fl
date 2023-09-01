@@ -258,21 +258,15 @@ class MicrotonalUI {} {
           Fl_Spinner firstnotecounter {
             callback {//
             int tmp = int (o->value());
-            int max = middlenotecounter->value() - 1;
+            int max = middlenotecounter->value();
             if (tmp > max)
-            {
-                if (oldFirst == max)
-                tmp = 0;
-                else
-                    tmp = max;
-                o->value(tmp);
-            }
-            oldFirst = tmp;
-
+                    tmp = 0;
+            else if (tmp < 0)
+                tmp = max;
+            o->value(tmp);
             send_data(0, SCALES::control::lowKey, tmp, TOPLEVEL::type::Integer);}
-            tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 125 textfont 1 textsize 11 textcolor 64
-            code0 {oldFirst = microtonal->Pfirstkey;}
-            code1 {o->value(oldFirst);}
+            tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 textfont 1 textsize 11 textcolor 64
+            code0 {o->value(microtonal->Pfirstkey);}
             class WidgetSpinner
           }
           Fl_Text_Display middle1 {
@@ -286,30 +280,17 @@ class MicrotonalUI {} {
           Fl_Spinner middlenotecounter {
             callback {//
             int tmp = int(o->value());
-            int min = firstnotecounter->value() + 1;
-            int max = lastnotecounter->value() - 1;
+            int min = firstnotecounter->value();
+            int max = lastnotecounter->value();
             if (tmp < min)
-            {
-                if (oldMid == min)
-                    tmp = max;
-                else
-                    tmp = min;
-                o->value(tmp);
-            }
+                tmp = max;
             else if (tmp > max)
-            {
-                if (oldMid == max)
-                    tmp = min;
-                else
-                    tmp = max;
-                o->value(tmp);
-            }
-            oldMid = tmp;
+                tmp = min;
+            o->value(tmp);
 
             send_data(0, SCALES::control::middleKey, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 labelcolor 64 align 1 maximum 126 value 60 textfont 1 textsize 11 textcolor 64
-            code0 {oldMid = microtonal->Pmiddlenote;}
-            code1 {o->value(oldMid);}
+            tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 value 60 textfont 1 textsize 11 textcolor 64
+            code0 {o->value(microtonal->Pmiddlenote);}
             class WidgetSpinner
           }
           Fl_Text_Display last1 {
@@ -323,21 +304,16 @@ class MicrotonalUI {} {
           Fl_Spinner lastnotecounter {
             callback {//
             int tmp = int(o->value());
-            int min = middlenotecounter->value() + 1;
+            int min = middlenotecounter->value();
             if (tmp < min)
-            {
-                if (oldLast == min)
-                    tmp = 127;
-                else
-                    tmp = min;
-                o->value(tmp);
-            }
-            oldLast = tmp;
+                tmp = 127;
+            else if (tmp > 127)
+                tmp = min;
+            o->value(tmp);
 
             send_data(0, SCALES::control::highKey, tmp, TOPLEVEL::type::Integer);}
-            tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 11 labelcolor 64 align 1 minimum 2 maximum 127 value 127 textfont 1 textsize 11 textcolor 64
-            code0 {oldLast = microtonal->Plastkey;}
-            code1 {o->value(oldLast);}
+            tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 128 value 127 textfont 1 textsize 11 textcolor 64
+            code0 {o->value(microtonal->Plastkey);}
             class WidgetSpinner
           }
           Fl_Value_Output mapsizeoutput {
@@ -345,17 +321,6 @@ class MicrotonalUI {} {
             callback {o->value(microtonal->Pmapsize);}
             xywh {202 415 44 20} labelsize 10 labelcolor 104 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
             code0 {o->value(microtonal->Pmapsize);}
-          }
-          Fl_Button importkbm {
-            label {Import .kbm file}
-            callback {//
-            string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaMap);
-            if (filename.empty())
-                return;
-
-            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
-            ;}
-            tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
           }
           Fl_Button exportkbm {
             label {Export .kbm file}
@@ -393,6 +358,17 @@ class MicrotonalUI {} {
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, SCALES::control::clearAll, 0, TOPLEVEL::type::Integer);}
           tooltip {Return to default scale settings} xywh {25 448 107 28} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
+        }
+        Fl_Button importkbm {
+          label {Import .kbm file}
+          callback {//
+            string filename = setfiler(synth,"", "", false, TOPLEVEL::XML::ScalaMap);
+            if (filename.empty())
+                return;
+
+            send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, SCALES::control::importKbm, 0, TOPLEVEL::type::Integer, UNUSED, textMsgBuffer.push(filename));
+            ;}
+          tooltip {Import Scala .kbm file (keyboard mapping)} xywh {273 401 104 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
         }
       }
       Fl_Text_Display enablelabel {
@@ -503,6 +479,9 @@ class MicrotonalUI {} {
         case SCALES::control::importKbm:
             if (value_int > 0)
             {
+                mappingenabledbutton->value(true);
+                checkInvert();
+                Keymap->activate();
                 msg = (textMsgBuffer.fetch(parameter));
                 int mapsize = func::string2int(splitline(msg));
                 mapsizeoutput->value(mapsize);
@@ -704,7 +683,7 @@ class MicrotonalUI {} {
     octavesizeoutput->do_callback();
 
     value = microtonal->texttomapping(mappinginput->value());
-    if (value < 1)
+    if (value < 0)
     {
         errors(value, false);
         return;
@@ -714,7 +693,7 @@ class MicrotonalUI {} {
   }
   Function {checkInvert()} {} {
     code {//
-    if ((enableMicrotonal->value() && mappingenabledbutton->value()) || !invertKeys->value())
+    if (!enableMicrotonal->value() || !invertKeys->value())
         centerinvertcounter->deactivate();
     else
         centerinvertcounter->activate();} {}

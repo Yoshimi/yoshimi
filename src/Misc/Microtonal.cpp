@@ -142,7 +142,7 @@ void Microtonal::defaults(int type)
     if (type != 1) // not tuning
     {
         Pfirstkey = 0;
-        Plastkey = 127;
+        Plastkey = MAX_OCTAVE_SIZE - 1;
         Pmiddlenote = 60;
         Pmapsize = 12;
         Pmappingenabled = 0;
@@ -383,33 +383,30 @@ int Microtonal::texttotunings(string page)
 int Microtonal::texttomapping(string page)
 {
     int tx = 0;
-    string line;
-    while (!page.empty())
-    {
-        splitLine(page, line);
-        size_t pos = line.find('!');
-        if (pos != string::npos)
+    if (page[0] >= ' ')
+    {string line;
+        while (!page.empty())
         {
-            PmapComment[tx] = func::trimEnds(line.substr(pos + 1, line.length()));
-        }
-        else
-            PmapComment[tx] = "";
+            splitLine(page, line);
+            size_t pos = line.find('!');
+            if (pos != string::npos)
+            {
+                PmapComment[tx] = func::trimEnds(line.substr(pos + 1, line.length()));
+            }
+            else
+                PmapComment[tx] = "";
 
-        if (line.empty() || line[0] < '0' || line[0] > '9')
-        {
-            line = 'x';
-            Pmapping[tx] = -1;
+            if (line.empty() || line[0] < '0' || line[0] > '9')
+            {
+                line = 'x';
+                Pmapping[tx] = -1;
+            }
+            else
+                Pmapping[tx] = stoi(line);
+            tx++;
         }
-        else
-            Pmapping[tx] = stoi(line);
-        tx++;
     }
-    if (tx)
-    {
-        Pmapsize = tx;
-    }
-    else
-        return SCALES::errors::badMapSize;
+    Pmapsize = tx;
     synth->setAllPartMaps();
     return tx;
 }
@@ -417,19 +414,22 @@ int Microtonal::texttomapping(string page)
 
 string Microtonal::keymaptotext(void)
 {
-    string text;
-    for (int i = 0; i < Pmapsize; ++i)
+    string text = "";
+    if (Pmapsize > 0)
     {
-        if (i > 0)
-            text += "\n";
-        if (Pmapping[i] == -1)
-            text += "x";
-        else
-            text += to_string(Pmapping[i]);
-        if (!PmapComment[i].empty())
+        for (int i = 0; i < Pmapsize; ++i)
         {
-            text += " ! ";
-            text += PmapComment[i];
+            if (i > 0)
+                text += "\n";
+            if (Pmapping[i] == -1)
+                text += "x";
+            else
+                text += to_string(Pmapping[i]);
+            if (!PmapComment[i].empty())
+            {
+                text += " ! ";
+                text += PmapComment[i];
+            }
         }
     }
     return text;
@@ -542,7 +542,7 @@ int Microtonal::loadkbm(const string& filename)
     if (getLineFromText(text, line))
         return SCALES::errors::badFile;
     int tmpMapSize = func::string2int(line);
-    if (tmpMapSize < 1 || tmpMapSize >= MAX_OCTAVE_SIZE)
+    if (tmpMapSize < 0 || tmpMapSize >= MAX_OCTAVE_SIZE)
             return SCALES::errors::badMapSize;
 
     int tmpFirst = 0;
@@ -587,6 +587,20 @@ int Microtonal::loadkbm(const string& filename)
     if (tmpRefFreq > 20000)
         return SCALES::errors::valueTooBig;
 
+    Pmappingenabled = 1;
+    Pmapsize = tmpMapSize;
+    Pfirstkey = tmpFirst;
+    Plastkey = tmpLast;
+    Pmiddlenote = tmpMid;
+    PrefNote = tmpRefNote;
+    PrefFreq = tmpRefFreq;
+    if (tmpMapSize == 0)
+    {
+        synth->setAllPartMaps();
+        synth->addHistory(filename, TOPLEVEL::XML::ScalaMap);
+        return 1;
+    }
+
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
     if (getLineFromText(text, line))
@@ -625,13 +639,7 @@ int Microtonal::loadkbm(const string& filename)
     if (err < 0)
         return err;
 
-    Pmappingenabled = 1;
     Pmapsize = tmpMapSize;
-    Pfirstkey = tmpFirst;
-    Plastkey = tmpLast;
-    Pmiddlenote = tmpMid;
-    PrefNote = tmpRefNote;
-    PrefFreq = tmpRefFreq;
     synth->setAllPartMaps();
     synth->addHistory(filename, TOPLEVEL::XML::ScalaMap);
     return tmpMapSize;
@@ -692,10 +700,14 @@ string Microtonal::map2kbm()
     text += "\n!\n";
 //    text += "! formal octave\n";
     text += to_string(octavesize);
-    text += "\n!\n";
-    text += "! mapped notes\n";
-    text += keymaptotext();
     text += "\n";
+    if (Pmapsize != 0)
+    {
+        text += "!\n";
+        text += "! mapped notes\n";
+        text += keymaptotext();
+        text += "\n";
+    }
     return text;
 }
 
@@ -911,7 +923,7 @@ float Microtonal::getLimits(CommandBlock *getData)
     // microtonal defaults
     int min = 0;
     float def = 0;
-    int max = 127;
+    int max = MAX_OCTAVE_SIZE - 1;
     type |= TOPLEVEL::type::Integer;
     unsigned char learnable = TOPLEVEL::type::Learnable;
 
@@ -959,7 +971,7 @@ float Microtonal::getLimits(CommandBlock *getData)
             type |= learnable;
             break;
         case SCALES::control::highKey:
-            def = 127;
+            def = MAX_OCTAVE_SIZE - 1;
             type |= learnable;
             break;
 

@@ -617,9 +617,9 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
             break;
         case SCALES::control::importKbm:
             value = synth->microtonal.loadkbm(setExtension(text,EXTEN::scalaKeymap));
-            if (value <= 0)
+            if (value < 0)
                 synth->microtonal.defaults(2);
-            else
+            else if (value > 0)
             {
                 text = "";
                 int map;
@@ -2852,9 +2852,9 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                     value_int = 0;
                     getData->data.value = value_int;
                 }
-                else if (value_int >= synth->microtonal.Pmiddlenote)
+                else if (value_int > synth->microtonal.Pmiddlenote)
                 {
-                    value_int = synth->microtonal.Pmiddlenote - 1;
+                    value_int = synth->microtonal.Pmiddlenote;
                     getData->data.value = value_int;
                 }
                 synth->microtonal.Pfirstkey = value_int;
@@ -2865,14 +2865,14 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
         case SCALES::control::middleKey:
             if (write)
             {
-                if (value_int <= synth->microtonal.Pfirstkey)
+                if (value_int < synth->microtonal.Pfirstkey)
                 {
-                    value_int = synth->microtonal.Pfirstkey + 1;
+                    value_int = synth->microtonal.Pfirstkey;
                     getData->data.value = value_int;
                 }
-                else if (value_int >= synth->microtonal.Plastkey)
+                else if (value_int > synth->microtonal.Plastkey)
                 {
-                    value_int = synth->microtonal.Plastkey - 1;
+                    value_int = synth->microtonal.Plastkey;
                     getData->data.value = value_int;
                 }
                 synth->microtonal.Pmiddlenote = value_int;
@@ -2883,9 +2883,9 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
         case SCALES::control::highKey:
             if (write)
             {
-                if (value_int <= synth->microtonal.Pmiddlenote)
+                if (value_int < synth->microtonal.Pmiddlenote)
                 {
-                    value_int = synth->microtonal.Pmiddlenote + 1;
+                    value_int = synth->microtonal.Pmiddlenote;
                     getData->data.value = value_int;
                 }
                 else if (value_int >= MAX_OCTAVE_SIZE)

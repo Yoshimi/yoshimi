@@ -1,5 +1,12 @@
 yoshimi 2.3.0 M
 
+2023-9-1 Will
+bn 2260
+Corrected behaviour of 'Invert keys' button.
+Enabled keyboard import if microtonal active but keymap inactive.
+Now correctly identifies map size zero as no map, not an error.
+
+
 2023-8-29 Will
 bn 2259
 Small microtonal related cleanups.

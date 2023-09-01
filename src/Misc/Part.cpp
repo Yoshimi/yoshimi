@@ -173,11 +173,27 @@ void Part::defaults(int npart)
 
 void Part::setNoteMap(int keyshift)
 {
-    for (int i = 0; i < 128; ++i)
-        if (Pdrummode)
-            PnoteMap[128 - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
+    for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
+        if (microtonal->Pmapsize == 0)
+        {// force the default unmapped scale but retain reference note etc.
+            microtonal->Pmapsize = MAX_OCTAVE_SIZE - 1;
+            if (Pdrummode)
+                PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
+            else
+            {
+                PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+            }
+            microtonal->Pmapsize = 0;
+        }
         else
-            PnoteMap[128 - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+        {
+            if (Pdrummode)
+                PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
+            else
+            {
+                PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+            }
+        }
 }
 
 
@@ -201,7 +217,7 @@ void Part::defaultsinstrument(void)
         kit[n].Penabled = 0;
         kit[n].Pmuted = 0;
         kit[n].Pminkey = 0;
-        kit[n].Pmaxkey = 127;
+        kit[n].Pmaxkey = MAX_OCTAVE_SIZE - 1;
         kit[n].Padenabled = 0;
         kit[n].Psubenabled = 0;
         kit[n].Ppadenabled = 0;
