@@ -1,8 +1,10 @@
 yoshimi 2.3.0 M
 
-Corrected microtonal keymap wraparound for zero mapsize
-    when middle note is not zero.
+2023-9-1 Will
+bn 2261
 Enabling or disabling microtonal always disables the keymap.
+Removed keymap array swap - wasn't any benefit, just confusing.
+Zero mapsize 'safe' but can be weird, so not actually correct :(
 
 2023-9-1 Will
 bn 2260

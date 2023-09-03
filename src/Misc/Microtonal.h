@@ -37,9 +37,6 @@ class XMLwrapper;
 using std::string;
 using func::power;
 
-const int MAX_OCTAVE_SIZE = 128;
-
-
 class Microtonal
 {
     public:

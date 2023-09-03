@@ -494,18 +494,13 @@ void SynthEngine::defaults(void)
 void SynthEngine::setPartMap(int npart)
 {
     part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
-    part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
 }
 
 
 void SynthEngine::setAllPartMaps(void)
 {
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-        part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
-
-    // we swap all maps together after they've been changed
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-        part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
+    //for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        setPartMap(0);
 }
 
 void SynthEngine::audioOutStore(uint8_t num)

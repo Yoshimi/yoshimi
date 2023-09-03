@@ -76,6 +76,7 @@ typedef unsigned int  uint;
 #define MAX_RESONANCE_POINTS 256
 #define MAX_KEY_SHIFT 36
 #define MIN_KEY_SHIFT -36
+#define MAX_OCTAVE_SIZE 128
 #define A_MIN 30.0f
 #define A_DEF 440.0f
 #define A_MAX 1100.0f

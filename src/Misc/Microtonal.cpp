@@ -213,7 +213,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
     float freq;
     // if the mapping is enabled
-    if (Pmappingenabled)
+    if (Pmappingenabled && Pmapsize > 0) // added check to stop crash
     {
         if ((note < Pfirstkey) || (note > Plastkey))
             return -1.0f;
@@ -242,7 +242,6 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         int degoct = (note - Pmiddlenote + Pmapsize * 200)
                       / Pmapsize - 200;
         int degkey = (note - Pmiddlenote + Pmapsize * 100) % Pmapsize;
-        degkey = Pmapping[degkey];
         if (degkey < 0) // this key is not mapped
             return -1.0f;
 
