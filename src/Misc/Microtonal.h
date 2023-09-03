@@ -68,6 +68,8 @@ class Microtonal
         // Map size
         int Pmapsize;
 
+        int PformalOctaveSize;
+
         unsigned char Pmappingenabled; // Mapping ON/OFF
         int Pmapping[MAX_OCTAVE_SIZE];             // Mapping (keys)
         string PmapComment[MAX_OCTAVE_SIZE];       // comments for mapping (if they exist)

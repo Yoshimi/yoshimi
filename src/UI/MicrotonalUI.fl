@@ -439,6 +439,8 @@ class MicrotonalUI {} {
 
         case SCALES::control::enableMicrotonal:
             enableMicrotonal->value(value_bool);
+            mappingenabledbutton->value(false);
+            Keymap->deactivate();
             checkInvert();
             if (value_bool)
                 microtonalgroup->activate();
@@ -466,11 +468,10 @@ class MicrotonalUI {} {
 
         case SCALES::control::tuning:
         case SCALES::control::importScl:
-            msg = (textMsgBuffer.fetch(miscmsg)); // must always fetch it
+            msg = (textMsgBuffer.fetch(miscmsg));
             if (value_int > 0)
             {
                 tuningsinput->value(msg.c_str());
-                octavesizeoutput->value(value_int);
             }
             else if (wasFromUs)
                 errors(value_int, true);

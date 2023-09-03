@@ -1,5 +1,9 @@
 yoshimi 2.3.0 M
 
+Corrected microtonal keymap wraparound for zero mapsize
+    when middle note is not zero.
+Enabling or disabling microtonal always disables the keymap.
+
 2023-9-1 Will
 bn 2260
 Corrected behaviour of 'Invert keys' button.

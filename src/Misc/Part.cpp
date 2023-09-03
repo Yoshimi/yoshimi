@@ -174,14 +174,21 @@ void Part::defaults(int npart)
 void Part::setNoteMap(int keyshift)
 {
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
-        if (microtonal->Pmapsize == 0)
+        if (microtonal->Pmapsize == 0 && microtonal->Pmappingenabled > 0)
         {// force the default unmapped scale but retain reference note etc.
             microtonal->Pmapsize = MAX_OCTAVE_SIZE - 1;
             if (Pdrummode)
                 PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
             else
             {
-                PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+                if (i < microtonal->Pmiddlenote)
+                {
+                    PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift  + synth->Pkeyshift - 64  - MAX_OCTAVE_SIZE);
+                }
+                else
+                {
+                    PnoteMap[MAX_OCTAVE_SIZE - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+                }
             }
             microtonal->Pmapsize = 0;
         }

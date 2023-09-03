@@ -2833,7 +2833,11 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
         case SCALES::control::enableMicrotonal:
             if (write)
+            {
                 synth->microtonal.Penabled = value_bool;
+                synth->microtonal.Pmappingenabled = false;
+                synth->setAllPartMaps();
+            }
             else
                 value = synth->microtonal.Penabled;
             break;

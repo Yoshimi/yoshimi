@@ -145,6 +145,7 @@ void Microtonal::defaults(int type)
         Plastkey = MAX_OCTAVE_SIZE - 1;
         Pmiddlenote = 60;
         Pmapsize = 12;
+        PformalOctaveSize = 12;
         Pmappingenabled = 0;
 
         for (int i = 0; i < 128; ++i)
@@ -382,6 +383,9 @@ int Microtonal::texttotunings(string page)
 // Convert the text to mapping
 int Microtonal::texttomapping(string page)
 {
+    size_t pos = page.find_last_not_of(" \t\n");
+    if (pos != string::npos)
+        page.erase(pos + 1);
     int tx = 0;
     if (page[0] >= ' ')
     {string line;
@@ -594,6 +598,9 @@ int Microtonal::loadkbm(const string& filename)
     Pmiddlenote = tmpMid;
     PrefNote = tmpRefNote;
     PrefFreq = tmpRefFreq;
+    if (getLineFromText(text, line))
+        return SCALES::errors::badMapSize;
+    PformalOctaveSize = func::string2int(line);
     if (tmpMapSize == 0)
     {
         synth->setAllPartMaps();
@@ -603,15 +610,23 @@ int Microtonal::loadkbm(const string& filename)
 
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
-    if (getLineFromText(text, line))
-        return SCALES::errors::badMapSize;
+    // TODO The above is wrong!
+
+    std::cout << "form " << PformalOctaveSize << std::endl;
 
     int x = 0;
     int err = 0;
     for (int nline = 0; nline < tmpMapSize; ++nline)
     {
-        if (getLineFromText(text, line))
-            err = SCALES::errors::badFile;
+        if (getLineFromText(text, line)) // EOF
+        {
+        // It's permissible for source file to have fewer entries than the
+        // map size so we fill the rest as silent.
+            Pmapping[nline] = -1;
+            PmapComment[nline] = "";
+            continue;
+        }
+
         else
         {
             if (line[0] < '0' || line[0] > '9') // catches all possibilities!
@@ -633,6 +648,10 @@ int Microtonal::loadkbm(const string& filename)
             if (line[pos + 1] == '!')
                 pos += 1; // don't want 2 comment markers
             PmapComment[nline] = func::trimEnds(line.substr(pos + 1, line.length()));
+        }
+        else
+        {
+            PmapComment[nline] = "";
         }
     }
 
@@ -699,7 +718,7 @@ string Microtonal::map2kbm()
     text += to_string(PrefFreq);
     text += "\n!\n";
 //    text += "! formal octave\n";
-    text += to_string(octavesize);
+    text += to_string(PformalOctaveSize);
     text += "\n";
     if (Pmapsize != 0)
     {
@@ -762,6 +781,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
 
         xml->beginbranch("KEYBOARD_MAPPING");
         xml->addpar("map_size", Pmapsize);
+        xml->addpar("formal_octave_size", PformalOctaveSize);
         xml->addpar("mapping_enabled", Pmappingenabled);
         for (int i = 0; i < Pmapsize; ++i)
         {
@@ -843,6 +863,7 @@ int Microtonal::getfromXML(XMLwrapper *xml)
         if (xml->enterbranch("KEYBOARD_MAPPING"))
         {
             Pmapsize = xml->getpar127("map_size", Pmapsize);
+            PformalOctaveSize = xml->getpar127("formal_octave_size", PformalOctaveSize);
             Pmappingenabled = xml->getpar127("mapping_enabled", Pmappingenabled);
             for (int i = 0; i < Pmapsize; ++i)
             {
