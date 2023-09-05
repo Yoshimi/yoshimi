@@ -173,9 +173,19 @@ void Microtonal::defaults(int type)
         Pname = string("12tET");
         Pcomment = string("Equal Temperament 12 notes per octave");
     }
-    Pglobalfinedetune = 64.0; // always set this
+    setglobalfinedetune(64.0); // always set this
 }
 
+void Microtonal::setglobalfinedetune(float control)
+{
+    Pglobalfinedetune = control;
+    // compute global fine detune, -64.0 .. 63.0 cents
+    globalfinedetunerap =
+        (Pglobalfinedetune > 64.0f || Pglobalfinedetune < 64.0f)
+            ? power<2>((Pglobalfinedetune - 64.0f) / 1200.0f)
+            : 1.0f;
+    // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
+}
 
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
@@ -188,16 +198,8 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     if ((Pinvertupdown != 0) && ((Pmappingenabled == 0) || (Penabled == 0)))
         note = Pinvertupdowncenter * 2 - note;
 
-    // compute global fine detune, -64.0 .. 63.0 cents
-    float globalfinedetunerap =
-        (Pglobalfinedetune > 64.0f || Pglobalfinedetune < 64.0f)
-            ? power<2>((Pglobalfinedetune - 64.0f) / 1200.0f)
-            : 1.0f;
-    // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
-
     if (!Penabled)
         return getFixedNoteFreq(note + keyshift) * globalfinedetunerap;
-
 
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
@@ -212,11 +214,8 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     }
 
     float freq;
-    // if the mapping is enabled
-    if (Pmappingenabled && Pmapsize > 0) // added check to stop crash
+    if (Pmappingenabled && Pmapsize > 0) // added check to stop crash till it's sorted properly
     {
-        if ((note < Pfirstkey) || (note > Plastkey))
-            return -1.0f;
         // Compute how many mapped keys are from middle note to reference note
         // and find out the proportion between the freq. of middle note and "A" note
         int tmp = PrefNote - Pmiddlenote;
@@ -804,7 +803,7 @@ int Microtonal::getfromXML(XMLwrapper *xml)
     Pinvertupdowncenter=xml->getpar127("invert_up_down_center", Pinvertupdowncenter);
 
     Penabled=xml->getparbool("enabled", Penabled);
-    Pglobalfinedetune = xml->getparcombi("global_fine_detune", Pglobalfinedetune, 0, 127);
+    setglobalfinedetune(xml->getparcombi("global_fine_detune", Pglobalfinedetune, 0, 127));
 
     PrefNote = xml->getpar127("a_note", PrefNote);
     PrefFreq = xml->getparreal("a_freq", PrefFreq, 1.0, 10000.0);

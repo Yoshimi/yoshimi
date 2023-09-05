@@ -72,6 +72,8 @@ class Microtonal
         string PmapComment[MAX_OCTAVE_SIZE];       // comments for mapping (if they exist)
 
         float Pglobalfinedetune;
+        float globalfinedetunerap;
+        void setglobalfinedetune(float control);
 
         int getoctavesize(void);
         void tuningtoline(unsigned int n, string& line);

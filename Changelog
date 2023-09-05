@@ -1,6 +1,13 @@
 yoshimi 2.3.0 M
 
-2023-9-1 Will
+2023-9-5 Will
+bn 2262
+Moved setting global fine detune out of setting part maps.
+    It only needs to change when the control is moved!
+Testing for first and last note now done in part.
+    You no longer need to do a retune if these are changed.
+
+2023-9-3 Will
 bn 2261
 Enabling or disabling microtonal always disables the keymap.
 Removed keymap array swap - wasn't any benefit, just confusing.

@@ -697,7 +697,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             {
                 add2undo(getData, noteSeen);
                 valuef = getData->data.value;
-                synth->microtonal.Pglobalfinedetune =valuef;
+                synth->microtonal.setglobalfinedetune(valuef);
                 synth->setAllPartMaps();
             }
             else

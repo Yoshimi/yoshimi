@@ -544,6 +544,9 @@ void Part::NoteOn(int note, int velocity, bool renote)
     if (note < Pminkey || note > Pmaxkey)
         return;
 
+    if (microtonal->Pmappingenabled && (note < microtonal->Pfirstkey || note > microtonal->Plastkey))
+        return; //outside mapped range
+
     // Legato and MonoNote used vars:
     bool isLegatoMode = false;    // legato mode is determined applicable.
     bool performLegato = false;   // the current note actually applies legato.
