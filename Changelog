@@ -1,5 +1,9 @@
 yoshimi 2.3.0 M
 
+2023-9-6 Will
+bn 2263
+BugFix: Left some test code in place.
+
 2023-9-5 Will
 bn 2262
 Moved setting global fine detune out of setting part maps.

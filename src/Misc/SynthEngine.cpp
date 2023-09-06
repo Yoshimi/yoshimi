@@ -499,8 +499,8 @@ void SynthEngine::setPartMap(int npart)
 
 void SynthEngine::setAllPartMaps(void)
 {
-    //for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-        setPartMap(0);
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        setPartMap(npart);
 }
 
 void SynthEngine::audioOutStore(uint8_t num)
