@@ -1,5 +1,10 @@
 yoshimi 2.3.0 M
 
+2023-9-7 Will
+bn 2264
+BugFix: Had inadvertently deleted a line in mapping :(
+Further general Microtonal cleanups.
+
 2023-9-6 Will
 bn 2263
 BugFix: Left some test code in place.

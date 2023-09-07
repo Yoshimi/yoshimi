@@ -2789,7 +2789,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
-
+    bool retune = false;
     switch (control)
     {
         case SCALES::control::refFrequency:
@@ -2800,6 +2800,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                 else if (value < 1)
                     value = 1;
                 synth->microtonal.PrefFreq = value;
+                retune = true;
             }
             else
                 value = synth->microtonal.PrefFreq;
@@ -2808,25 +2809,37 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
         case SCALES::control::refNote:
             if (write)
+            {
                 synth->microtonal.PrefNote = value_int;
+                retune = true;
+            }
             else
                 value = synth->microtonal.PrefNote;
             break;
         case SCALES::control::invertScale:
             if (write)
+            {
                 synth->microtonal.Pinvertupdown = value_bool;
+                retune = true;
+            }
             else
                 value = synth->microtonal.Pinvertupdown;
             break;
         case SCALES::control::invertedScaleCenter:
             if (write)
+            {
                 synth->microtonal.Pinvertupdowncenter = value_int;
+                retune = true;
+            }
             else
                 value = synth->microtonal.Pinvertupdowncenter;
             break;
         case SCALES::control::scaleShift:
             if (write)
+            {
                 synth->microtonal.Pscaleshift = value_int + 64;
+                retune = true;
+            }
             else
                 value = synth->microtonal.Pscaleshift - 64;
             break;
@@ -2836,7 +2849,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             {
                 synth->microtonal.Penabled = value_bool;
                 synth->microtonal.Pmappingenabled = false;
-                synth->setAllPartMaps();
+                retune = true;
             }
             else
                 value = synth->microtonal.Penabled;
@@ -2844,7 +2857,10 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
         case SCALES::control::enableKeyboardMap:
             if (write)
+            {
                 synth->microtonal.Pmappingenabled = value_bool;
+                retune = true;
+            }
             else
                value = synth->microtonal.Pmappingenabled;
             break;
@@ -2880,6 +2896,7 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
                     getData->data.value = value_int;
                 }
                 synth->microtonal.Pmiddlenote = value_int;
+                retune = true;
             }
             else
                 value = synth->microtonal.Pmiddlenote;
@@ -2926,11 +2943,15 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 
         case SCALES::control::clearAll: // Clear scales
             synth->microtonal.defaults();
-            synth->setAllPartMaps();
+            retune = true;
             break;
     }
-
-    if (!write)
+    if (write)
+    {
+        if (retune)
+            synth->setAllPartMaps();
+    }
+    else
         getData->data.value = value;
 }
 

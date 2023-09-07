@@ -227,8 +227,10 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         }
         int deltanote = 0;
         for (int i = 0; i < tmp; ++i)
+        {
             if (Pmapping[i % Pmapsize] >= 0)
                 deltanote++;
+        }
         float rap_anote_middlenote =
             (deltanote == 0) ? (1.0f) : (octave[(deltanote - 1) % octavesize].tuning);
         if (deltanote != 0)
@@ -241,8 +243,11 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         int degoct = (note - Pmiddlenote + Pmapsize * 200)
                       / Pmapsize - 200;
         int degkey = (note - Pmiddlenote + Pmapsize * 100) % Pmapsize;
+        degkey = Pmapping[degkey];
         if (degkey < 0) // this key is not mapped
+        {
             return -1.0f;
+        }
 
         // invert the keyboard upside-down if it is asked for
         // TODO: do the right way by using Pinvertupdowncenter
