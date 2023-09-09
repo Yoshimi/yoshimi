@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2022, Will Godfrey
+    Copyright 2014-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -92,17 +92,42 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         root = mxmlNewElement(tree, "ZynAddSubFX-data");
         mxmlElementSetAttr(root, "version-major", "2");
         mxmlElementSetAttr(root, "version-minor", "4");
+        mxmlElementSetAttr(root, "version-revision", "1");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
         information.yoshiType = 0;
     }
 
     node = root;
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
-    std::string tmp = YOSHIMI_VERSION;
-    std::string::size_type pos1 = tmp.find('.'); // != string::npos
-    std::string::size_type pos2 = tmp.find('.',pos1+1);
-    mxmlElementSetAttr(root, "Yoshimi-major", tmp.substr(0, pos1).c_str());
-    mxmlElementSetAttr(root, "Yoshimi-minor", tmp.substr(pos1+1, pos2-pos1-1).c_str());
+    std::string version = YOSHIMI_VERSION;
+    size_t pos = version.find(' ');
+    if (pos != string::npos)
+        version = version.substr(0, pos); // might be an rc or M version.
+
+    std::string major = "2";
+    std::string minor = "0";
+    std::string revision = "0";
+
+    pos = version.find('.');
+    if (pos == string::npos)
+        major = version;
+    else
+    {
+        major = version.substr(0, pos);
+        version = version.substr(pos + 1, version.length());
+
+        pos = version.find('.');
+        if (pos == string::npos)
+            minor = version;
+        else
+        {
+            minor = version.substr(0, pos);
+            revision = version.substr(pos + 1, version.length());
+        }
+    }
+    mxmlElementSetAttr(root, "Yoshimi-major", major.c_str());
+    mxmlElementSetAttr(root, "Yoshimi-minor", minor.c_str());
+    mxmlElementSetAttr(root, "Yoshimi-revision", revision.c_str());
 
     info = addparams0("INFORMATION"); // specifications
 
@@ -517,6 +542,10 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     {
         xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
         xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+        if(mxmlElementGetAttr(root, "version-revision") != NULL)
+            xml_version.revision = string2int(mxmlElementGetAttr(root, "version-revision"));
+        else
+            xml_version.revision = 0;
     }
     if (mxmlElementGetAttr(root, "Yoshimi-major"))
     {
@@ -535,6 +564,10 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
+        if (mxmlElementGetAttr(root, "Yoshimi-revision") != NULL)
+            xml_version.y_revision = string2int(mxmlElementGetAttr(root, "Yoshimi-revision"));
+        else
+            xml_version.y_revision = 0;
 
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_minor));
     }
@@ -550,11 +583,22 @@ bool XMLwrapper::loadXMLfile(const std::string& filename)
         { // we were giving the wrong value :(
             xml_version.major = 2;
             xml_version.minor = 4;
+            xml_version.revision = 1;
         }
         if (zynfile)
-            synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
+        {
+            string text = "ZynAddSubFX version major " + asString(xml_version.major) + ", minor " + asString(xml_version.minor);
+            if (xml_version.revision > 0)
+                text += (", revision " + asString(xml_version.revision));
+            synth->getRuntime().Log(text);
+        }
         if (yoshitoo)
-            synth->getRuntime().Log("Yoshimi version major " + asString(xml_version.y_major) + "   minor " + asString(xml_version.y_minor));
+        {
+            string text = "Yoshimi version major " + asString(xml_version.y_major) + ", minor " + asString(xml_version.y_minor);
+            if (xml_version.y_revision > 0)
+                text += (", revision " + asString(xml_version.y_revision));
+            synth->getRuntime().Log(text);
+        }
     }
     return true;
 }

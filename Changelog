@@ -1,4 +1,12 @@
-yoshimi 2.3.0 M
+yoshimi 2.3.1 rc1
+
+2023-9-9 Will
+bn 2266
+Forgot to update banks version :(
+Fixed regression: version change not updating bank details,
+Yoshimi now reports instrument file minor point versions.
+Small XML cleanups.
+Set rc version 2.3.1 rc1
 
 2023-9-8 Will
 bn 2265
