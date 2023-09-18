@@ -3528,30 +3528,22 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
     else if (input.matchnMove(2, "description"))
         command = SCALES::control::comment;
 
-    if (command >= SCALES::control::tuning && command <= SCALES::control::comment)
+    if (command != UNUSED)
     {
-        if (controlType != TOPLEVEL::type::Write && command <= SCALES::control::importKbm)
+        if (controlType != TOPLEVEL::type::Write)
         {
             Runtime.Log("Write only - use 'list'");
             return REPLY::done_msg;
-        }
-        if (command == SCALES::control::tuning || command == SCALES::control::keyboardMap)
-        {
-            if (input.matchnMove(3, "import"))
-            {
-                if (command == SCALES::control::tuning)
-                    command = SCALES::control::importScl;
-                else
-                    command = SCALES::control::importKbm;
-            }
         }
         name = string{input};
         if (name == "" && controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
         action = TOPLEVEL::action::lowPrio;
         miscmsg = textMsgBuffer.push(name);
+        return sendNormal(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
-    else
+
+
     {
         int min = 0;
         int max = 127;
@@ -3587,6 +3579,11 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
             command = SCALES::control::enableKeyboardMap;
             max = 1;
         }
+        else if (input.matchnMove(2, "size"))
+        {
+            command = SCALES::control::keymapSize;
+            action = TOPLEVEL::action::lowPrio;
+        }
         else if (input.matchnMove(2, "first"))
             command = SCALES::control::lowKey;
         else if (input.matchnMove(2, "middle"))
@@ -3612,10 +3609,12 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
                 value = string2float(input);
                 if (value < min || value > max)
                     return REPLY::value_msg;
+                std::cout << "here" << std::endl;
+                miscmsg = UNUSED;
             }
         }
     }
-    return sendNormal(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+    return sendDirect(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
 }
 
 

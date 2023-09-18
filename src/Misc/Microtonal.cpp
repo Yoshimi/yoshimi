@@ -295,6 +295,11 @@ int Microtonal::linetotunings(unsigned int nline, string text)
         if (text[pos + 1] == '!')
                 pos += 1; // don't want 2 comment markers
         string last = text.substr(pos + 1, text.length());
+        int i = 0;
+        while (last[i] <= '!')
+            ++i;
+        if (i > 0)
+            last = last.substr(i, text.length());
         octave[nline].comment = func::trimEnds(last);
     }
     else
@@ -310,6 +315,7 @@ int Microtonal::linetotunings(unsigned int nline, string text)
     if (text.find('.') != string::npos)
     {
         x = stod(text);
+        //printf(">%f\n",x);
         if (x < 0.000001)
             return SCALES::errors::valueTooSmall;
         type = 1; // double type(cents)
@@ -390,8 +396,9 @@ int Microtonal::texttomapping(string page)
     if (pos != string::npos)
         page.erase(pos + 1);
     int tx = 0;
-    if (page[0] >= ' ')
-    {string line;
+    if (page[0] >= ' ' && Pmapsize > 0)
+    {
+        string line;
         while (!page.empty())
         {
             splitLine(page, line);
@@ -410,10 +417,14 @@ int Microtonal::texttomapping(string page)
             }
             else
                 Pmapping[tx] = stoi(line);
-            tx++;
+            ++tx;
         }
     }
-    Pmapsize = tx;
+    while (tx < Pmapsize)
+    {
+        Pmapping[tx] = -1;
+        ++tx;
+    }
     synth->setAllPartMaps();
     return tx;
 }
@@ -457,6 +468,7 @@ void Microtonal::tuningtoline(unsigned int n, string& line)
     }
     else if (octave[n].type == 1)
     {
+        //printf(">%f\n",octave[n].tuning);
         if (text > " ")
             line = text;
         else
@@ -613,10 +625,7 @@ int Microtonal::loadkbm(const string& filename)
 
     // the scale degree(which is the octave) is not loaded
     // it is obtained by the tunings with getoctavesize() method
-    // TODO The above is wrong!
-
-    std::cout << "form " << PformalOctaveSize << std::endl;
-
+    // TODO this is wrong!
     int x = 0;
     int err = 0;
     for (int nline = 0; nline < tmpMapSize; ++nline)
@@ -847,14 +856,27 @@ int Microtonal::getfromXML(XMLwrapper *xml)
                 {
                     octave[i].text = text;
                     octave[i].type = 2;
-                    octave[i].tuning = ((double)octave[i].x1) / octave[i].x2;
+                    octave[i].tuning = double(octave[i].x1) / octave[i].x2;
                 }
                 else {
                     octave[i].type = 1;
                     //populate fields for display
-                    double x = log(octave[i].tuning) / LOG_2 * 1200.0;
-                    octave[i].x1 = (int) floor(x);
-                    octave[i].x2 = (int) (floor(fmod(x, 1.0) * 1e6));
+                    double x = (log(octave[i].tuning) / LOG_2) * 1200.0;
+                    octave[i].x1 = int(floor(x));
+                    // this is a fudge to get round wierd values of x2
+                    // it's only used if we don't have the text stored
+                    double tmp = fmod(x, 1.0);
+                    if (tmp < 0.0001)
+                        octave[i].x2 = 0;
+                    else if (tmp > 0.9999)
+                    {
+                        octave[i].x2 = 0;
+                        octave[i].x1 += 1;
+                    }
+                    else
+                        octave[i].x2 = int(floor(tmp * 1e6));
+
+                    //octave[i].x2 = int(floor(fmod(x, 1.0) * 1e6));
                 }
                 octave[i].comment = "";
                 octave[i].comment = xml->getparstr("comment");

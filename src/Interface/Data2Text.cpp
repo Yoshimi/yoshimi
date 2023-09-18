@@ -475,6 +475,9 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
             contstr = "Keymap ";
             showValue = false;
             break;
+        case SCALES::control::keymapSize:
+            contstr = "Keymap Size ";
+            break;
         case SCALES::control::importScl:
             contstr = "Tuning Import ";
             showValue = false;

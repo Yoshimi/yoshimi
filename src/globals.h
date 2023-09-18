@@ -516,6 +516,7 @@ namespace SCALES // usage SCALES::control::refFrequency
         tuning = 32,
         clearAll,
         keyboardMap,
+        keymapSize,
         importScl = 48,
         importKbm,
         exportScl,

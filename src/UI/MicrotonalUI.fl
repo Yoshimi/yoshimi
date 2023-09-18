@@ -316,11 +316,11 @@ class MicrotonalUI {} {
             code0 {o->value(microtonal->Plastkey);}
             class WidgetSpinner
           }
-          Fl_Value_Output mapsizeoutput {
+          Fl_Spinner mapsizecounter {
             label {Map Size}
-            callback {o->value(microtonal->Pmapsize);}
-            xywh {202 415 44 20} labelsize 10 labelcolor 104 align 5 maximum 500 step 1 value 12 textfont 1 textcolor 64
+            tooltip {The actual kemap size. This can be greater or smaller than the number of entries in the map} xywh {203 415 42 18} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 127 value 0 textfont 1 textsize 11 textcolor 64
             code0 {o->value(microtonal->Pmapsize);}
+            class WidgetSpinner
           }
           Fl_Button exportkbm {
             label {Export .kbm file}
@@ -413,7 +413,6 @@ class MicrotonalUI {} {
     unsigned char control = getData->data.control;
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
-
     int value_int = lrint(value);
     bool value_bool = _SYS_::F2B(value);
     string msg;
@@ -477,15 +476,20 @@ class MicrotonalUI {} {
                 errors(value_int, true);
             break;
         case SCALES::control::keyboardMap:
+        { // this only uses the mapped notes
+            msg = (textMsgBuffer.fetch(miscmsg));
+            mappinginput->value(msg.c_str());
+        }
+        break;
         case SCALES::control::importKbm:
             if (value_int > 0)
-            {
+            { // this sets ALL mapping entries
                 mappingenabledbutton->value(true);
                 checkInvert();
                 Keymap->activate();
                 msg = (textMsgBuffer.fetch(parameter));
                 int mapsize = func::string2int(splitline(msg));
-                mapsizeoutput->value(mapsize);
+                mapsizecounter->value(mapsize);
                 firstnotecounter->value(func::string2int(splitline(msg)));
                 lastnotecounter->value(func::string2int(splitline(msg)));
                 middlenotecounter->value(func::string2int(splitline(msg)));
@@ -660,7 +664,7 @@ class MicrotonalUI {} {
     last1->labelsize(size11);
     last2->labelsize(size11);
         lastnotecounter->textsize(size11);
-    mapsizeoutput->textsize(size14);
+    mapsizecounter->textsize(size11);
     importkbm->labelsize(size);
     exportkbm->labelsize(size);
     mappingenabledbutton->labelsize(size14);
@@ -683,13 +687,13 @@ class MicrotonalUI {} {
     }
     octavesizeoutput->do_callback();
 
+    send_data(TOPLEVEL::action::lowPrio, SCALES::control::keymapSize, mapsizecounter->value(), TOPLEVEL::type::Integer);
     value = microtonal->texttomapping(mappinginput->value());
     if (value < 0)
     {
         errors(value, false);
         return;
     }
-    mapsizeoutput->do_callback();
     anotecounter->do_callback();} {}
   }
   Function {checkInvert()} {} {

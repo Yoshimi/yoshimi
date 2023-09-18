@@ -604,6 +604,18 @@ int InterChange::indirectScales(CommandBlock *getData, SynthEngine *synth, unsig
                 synth->microtonal.defaults(2);
             break;
 
+        case SCALES::control::keymapSize:
+            if (write)
+            {
+                synth->microtonal.Pmapsize = int(value);
+                synth->setAllPartMaps();
+            }
+            else
+            {
+                value = synth->microtonal.Pmapsize;
+            }
+            break;
+
         case SCALES::control::importScl:
             value = synth->microtonal.loadscl(setExtension(text,EXTEN::scalaTuning));
             if (value <= 0)
@@ -1672,7 +1684,6 @@ std::string InterChange::formatKeys(std::string text)
         {
             word = "x";
         }
-        std::cout << "word" << word << std::endl;
         newtext += word;
         if (next != string::npos)
             newtext += "\n";
@@ -2924,6 +2935,10 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             // done elsewhere
             break;
         case SCALES::control::keyboardMap:
+            // done elsewhere
+            break;
+
+        case SCALES::control::keymapSize:
             // done elsewhere
             break;
 

@@ -1,4 +1,11 @@
-yoshimi 2.3.1 rc1
+yoshimi 2.3.1 rc2
+
+2023-9-18 Will
+bn 2267
+Further refinements to microtonal code.
+Keymap size now explicitly set (not defined by map entries).
+Updated /dev_notes/Yoshimi Control Numbers.ods
+Set rc version 2.3.1 rc2
 
 2023-9-9 Will
 bn 2266

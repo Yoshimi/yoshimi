@@ -937,6 +937,7 @@ static std::string scalelist [] = {
     "Keymap <s1> [s2]",   "CSV keymap (n1, n2, n3, etc.)",
     "","s1 = 'IMPort' from s2 named file",
     "","s1 = 'EXPort' to s2 named file",
+    "SIze <n>",           "actual keymap size",
     "NAme <s>",           "internal name for this scale",
     "DEscription <s>",    "description of this scale",
     "CLEar",              "clear all settings and revert to standard scale",
