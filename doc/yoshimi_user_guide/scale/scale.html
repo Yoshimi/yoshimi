@@ -50,6 +50,7 @@
     <b>Last note</b> The highest note in the mapping. Higher values are ignored.
     </li>
     </ul>
+    <b>Map Size</b> is the number of notes actually mapped before a wrap around. This can be different to the number of map entries. If it is greater, the unmapped ones are regarded as silent. If it is smaller, the extra entries are ignored. If it is zero, then no mapping is performed but all the above controls are still active.
     <ul>
     <li>
     <b>Import .scl file</b> Imports the Scala-compatible tuning elements of a scale.
@@ -82,10 +83,10 @@
     <b>Description</b> An optional description of the scale.
     </li>
     <li>
-    <b>Tunings</b> Lines of tunings either in cents as floating point numbers, or ratios such as 5/4. The number of lines determines the notes per octave (as displayed below).
+    <b>Tunings</b> Lines of tunings either in cents as floating point numbers, or ratios such as 5/4.
     </li>
     <li>
-    <b>Keyboard Map</b> The mapping of the tunings to actual keys. They can be in any order. Two keys can have the same tunings, and an 'x' denotes the key not being used at all. The map size (shown below) is set by the number of lines and can be quite different to the tunings.
+    <b>Keyboard Map</b> The mapping of the tunings to actual keys. They can be in any order. Two keys can have the same tunings, and an 'x' denotes the key not being used at all.
     </li>
     </ul>
     </p>
