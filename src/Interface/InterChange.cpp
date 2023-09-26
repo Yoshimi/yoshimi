@@ -7800,7 +7800,7 @@ float InterChange::returnLimits(CommandBlock *getData)
     min = 0;
     max = 127;
     def = 0;
-    Log("Unidentified Limit reguest: using dummy defaults");
+    Log("Unidentified Limit request: using dummy defaults");
 
     switch (request)
     {

@@ -1,4 +1,11 @@
-yoshimi 2.3.1 rc2
+yoshimi 2.3.1 rc3
+
+2023-9-26 Will
+bn 2268
+Revised and simplified CLI scales code.
+Register and save formal octave size, but unused.
+Improved CLI handling of scale name and comment fields.
+Set rc version 2.3.1 rc3
 
 2023-9-20 Will
 Updated HTML user guide microtonal entry.

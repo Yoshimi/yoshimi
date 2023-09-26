@@ -3512,9 +3512,16 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
     if (input.lineEnd(controlType))
         return REPLY::done_msg;
     Config &Runtime = synth->getRuntime();
+    int enable = input.toggle();
+    if (enable > -1)
+    {
+        int result = sendNormal(synth, TOPLEVEL::action::lowPrio, enable, controlType, SCALES::control::enableMicrotonal, TOPLEVEL::section::scales);
+        if (input.lineEnd(controlType))
+            return result;
+    }
+
     float value = 0;
     unsigned char command = UNUSED;
-    unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
 
     string name;
@@ -3530,7 +3537,7 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
 
     if (command != UNUSED)
     {
-        if (controlType != TOPLEVEL::type::Write)
+        if (controlType != TOPLEVEL::type::Write &&(command == SCALES::control::tuning || command == SCALES::control::keyboardMap))
         {
             Runtime.Log("Write only - use 'list'");
             return REPLY::done_msg;
@@ -3538,83 +3545,74 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
         name = string{input};
         if (name == "" && controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
-        action = TOPLEVEL::action::lowPrio;
         miscmsg = textMsgBuffer.push(name);
-        return sendNormal(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
     }
 
-
+    int min = 0;
+    int max = 127;
+    unsigned char action = 0;
+    if (input.matchnMove(2, "frequency"))
     {
-        int min = 0;
-        int max = 127;
-        if (input.matchnMove(2, "frequency"))
-        {
-            command = SCALES::control::refFrequency;
-            min = 1;
-            max = 20000;
-            controlType &= ~TOPLEVEL::type::Integer; // float
-        }
-        else if (input.matchnMove(2, "note"))
-            command = SCALES::control::refNote;
-        else if (input.matchnMove(1, "invert"))
-        {
-            command = SCALES::control::invertScale;
-            max = 1;
-        }
-        else if (input.matchnMove(2, "center"))
-            command = SCALES::control::invertedScaleCenter;
-        else if (input.matchnMove(2, "shift"))
-        {
-            command = SCALES::control::scaleShift;
-            min = -63;
-            max = 64;
-        }
-        else if (input.matchnMove(2, "scale"))
-        {
-            command = SCALES::control::enableMicrotonal;
-            max = 1;
-        }
-        else if (input.matchnMove(2, "mapping"))
-        {
-            command = SCALES::control::enableKeyboardMap;
-            max = 1;
-        }
-        else if (input.matchnMove(2, "size"))
-        {
-            command = SCALES::control::keymapSize;
-            action = TOPLEVEL::action::lowPrio;
-        }
-        else if (input.matchnMove(2, "first"))
-            command = SCALES::control::lowKey;
-        else if (input.matchnMove(2, "middle"))
-            command = SCALES::control::middleKey;
-        else if (input.matchnMove(1, "last"))
-            command = SCALES::control::highKey;
-        else if (input.matchnMove(3, "CLEar"))
-        {
-            input.skip(-1); // sneaky way to force a zero :)
-            command = SCALES::control::clearAll;
-        }
-        else
-            return REPLY::todo_msg;
+        command = SCALES::control::refFrequency;
+        min = 1;
+        max = 20000;
+        controlType &= ~TOPLEVEL::type::Integer; // float
+    }
+    else if (input.matchnMove(2, "note"))
+        command = SCALES::control::refNote;
+    else if (input.matchnMove(1, "invert"))
+    {
+        command = SCALES::control::invertScale;
+        max = 1;
+    }
+    else if (input.matchnMove(2, "center"))
+        command = SCALES::control::invertedScaleCenter;
+    else if (input.matchnMove(2, "shift"))
+    {
+        command = SCALES::control::scaleShift;
+        min = -63;
+        max = 64;
+    }
+    else if (input.matchnMove(2, "mapping"))
+    {
+        command = SCALES::control::enableKeyboardMap;
+        max = 1;
+    }
+    else if (input.matchnMove(2, "size"))
+    {
+        command = SCALES::control::keymapSize;
+        action = TOPLEVEL::action::lowPrio;
+    }
+    else if (input.matchnMove(2, "first"))
+        command = SCALES::control::lowKey;
+    else if (input.matchnMove(2, "middle"))
+        command = SCALES::control::middleKey;
+    else if (input.matchnMove(1, "last"))
+        command = SCALES::control::highKey;
+    else if (input.matchnMove(3, "CLEar"))
+    {
+        input.skip(-1); // sneaky way to force a zero :)
+        command = SCALES::control::clearAll;
+    }
+    else
+        return REPLY::todo_msg;
 
-        if (controlType == TOPLEVEL::type::Write)
+    if (controlType == TOPLEVEL::type::Write)
+    {
+        if (input.lineEnd(controlType))
+            return REPLY::value_msg;
+        if ((input.toggle() == 1))
+            value = 1;
+        else
         {
-            if (input.lineEnd(controlType))
+            value = string2float(input);
+            if (value < min || value > max)
                 return REPLY::value_msg;
-            if ((input.toggle() == 1))
-                value = 1;
-            else//if (input.isdigit())
-            {
-                value = string2float(input);
-                if (value < min || value > max)
-                    return REPLY::value_msg;
-                std::cout << "here" << std::endl;
-                miscmsg = UNUSED;
-            }
         }
     }
-    return sendDirect(synth, action, value, controlType, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+
+    return sendDirect(synth, action, value, controlType, command, TOPLEVEL::section::scales);
 }
 
 
