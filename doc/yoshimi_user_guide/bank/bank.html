@@ -11,7 +11,7 @@
     <a id="top"></a>
     <h2 style="text-align: center">Instrument Banks</h2>
     <p>
-    Pre-designed instrument patches are immediately available in <em>banks</em>. These in turn are contained within a bank <em>root</em>. These bank roots are themselves contained in a root <em>path</em>. The entire structure bearing a direct relationship to MIDI Program Change, Bank LSB and Bank MSB controllers. For normal work that gives up to 128 Instruments in 128 banks in 128 Roots. Yoshimi actually has an extra 32 Instruments in each bank which are only accessible to MIDI using a custom extended program change control.
+    Pre-designed instrument patches are immediately available in <em>banks</em>. These in turn are contained within a bank <em>root</em>. These bank roots are themselves contained in a root <em>path</em>. The entire structure bearing a direct relationship to MIDI Program Change, Bank LSB and Bank MSB controllers respectively. For normal work that gives up to 128 Instruments in 128 banks in 128 Roots - potentially over 2 million! Yoshimi actually has an extra 32 Instruments in each bank which are only accessible to MIDI using a custom extended program change control.
     <br><br>
     Note that Yoshimi uses the standard MIDI numbers, starting from 1 for program (instrument) changes, and 0 for banks and roots.
     <br><br>
@@ -33,13 +33,13 @@
     If the virtual keyboard is visible, then it will be given keyboard focus so you can use it to quickly try out different sounds.
     </p>
     <p>
-    The buttons on the bottom row determine what action is to be performed when clicking on an instrument. The square 'LEDs' show which is the currently active one, and by default it will be <b>Select</b>.
+    The buttons on the bottom row determine what action is to be performed when clicking on an instrument. The coloured underscore shows which is the currently active one, and by default it will be <b>Select</b>.
     <br><br>
     With these buttons, you set the operation you want to perform <em>before</em> clicking on an entry, and regardless of whether the action is successful or not, it will always return to 'Select' Also, the next four buttons will only work where you have filesystem write permission, as they all make actual file changes.
     <br><br>
-    <b>Rename</b> When chosen, clicking on an instrument entry a small editable window will be opened with the existing name. Changing this will change the name here and the actual filename. It will <em>not</em> change the current part.
+    <b>Rename</b> When chosen, clicking on an instrument entry a small editable window will be opened with the existing name. Changing this will change the name here and the actual filename. It will <em>not</em> change the name of the current part.
     <br><br>
-    <b>Save</b> On clicking on a table slot will save the currently selected part to that location. If there is already an entry there, you will be asked if you want to overwrite it. It will not save the default 'Simple Sound'.
+    <b>Save</b> Clicking on a table slot will save the currently selected part to that location. If there is already an entry there, you will be asked if you want to overwrite it. It will not save the default 'Simple Sound'. There would be no point, as that can easily be recovered by clearing the instrument.
     <br><br>
     <b>Delete</b> This asks for confirmation before permanently removing the selected Instrument.
     <br><br>

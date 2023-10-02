@@ -1,17 +1,22 @@
-Version 2.3.0 - Painted Bunting
+Version 2.3.1
 
-There's been a major overhaul of the graphics for better visibility.
+Microtonal tunings and keymaps can now be exported as well as imported.
 
-We've added a very complete user-definable colour theme system.
+Zero size keymaps are handled correctly.
 
-There is indication when any rotary control or slider is not at its default.
+The virtual keyboard now retains focus while selecting different instruments in a bank.
 
-Many controls are now high resolution yet both forward and backward compatible
-with older Yoshimi versions.
+Window title bar text has been made more consistent.
 
-All the documentation has been revised.
+Some of the MIDI example files have been revised.
 
-Full details are in /doc/Yoshimi_2.3.0_features.txt
+Improved metadata.
+
+More bugfixes, including a very obscure PadSynth one.
+
+Small corrections and updates in the User Guide.
+
+Full details are in /doc/Yoshimi_2.3.1_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi
@@ -22,5 +27,6 @@ Full build instructions are in 'INSTALL'.
 
 Our list archive is at:
 https://www.freelists.org/archive/yoshimi
+
 To post, email to:
 yoshimi@freelists.org

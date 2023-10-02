@@ -1,0 +1,36 @@
+Version 2.3.1
+
+There have been improvements in the handling of microtonal scales.
+First off, you can now export scales and keymaps.
+
+We were not handlng Scala imports that have comments attached to the numeric entries.
+This has been fixed, and these are now saved in our XML files.
+
+We've corrected the handling of zero size keymaps. This sets the same map series as if
+there was no mapping, but the First, Middle, Last key entries are still active.
+
+Unfortunately these changes are not backward compatible, but Yoshimi will still correctly
+handle older files.
+
+If the virtual keyboard is visible, selecting instruments from a bank will pass focus back
+to it. This means you can quickly try out various instruments without any external kit attached.
+
+Window title bars are now more consistent in both style and content. There had been a number of
+them with poor descriptions and a few with none!
+
+We've revised some of the MIDI example files so that they use bank root 5. This should always point to a copy of the default bank set.
+
+As usual there are a few bugfixes including an extremely obscure crash in PadSynth which only
+occurred with a somewhat contrived setup.
+
+Yoshimi source code is available from either:
+https://sourceforge.net/projects/yoshimi
+Or:
+https://github.com/Yoshimi/yoshimi
+
+Full build instructions are in 'INSTALL'.
+
+Our list archive is at:
+https://www.freelists.org/archive/yoshimi
+To post, email to:
+yoshimi@freelists.org

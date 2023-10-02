@@ -31,11 +31,14 @@
     <p>
     Version 2.3.0 has backward compatible high resolution controls where relevant and comprehensive GUI theme management enabling user defined colours.
     </p>
+    <p>
+    Version 2.3.1 has improved microtonal scales and the ability to export .scl and .kbm files.
+    </p>
   </description>
    <launchable type="desktop-id">yoshimi.desktop</launchable>
 
   <releases>
-      <release type="stable" version="2.3.0" date="2023-5-29" />
+      <release type="stable" version="2.3.1" date="2023-10-04" />
   </releases>
   <provides>
     <binary>yoshimi</binary>

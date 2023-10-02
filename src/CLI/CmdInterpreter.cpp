@@ -1727,7 +1727,7 @@ int CmdInterpreter::midiControllers(Parser& input, unsigned char controlType)
         value = 0;
     if (cmd > -1)
         return sendNormal(synth, 0, value, controlType, cmd, npart);
-    return REPLY::available_msg;
+    return REPLY::unrecognised_msg;
 }
 
 
@@ -3074,7 +3074,7 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         if (input.matchnMove(1, "rename"))
         {
             if (controlType != TOPLEVEL::type::Write)
-                return REPLY::available_msg;
+                return REPLY::writeOnly_msg;
             if (!input.isdigit())
                 return REPLY::value_msg;
             int tmp = string2int(input) - 1; // could be up to 160
@@ -3090,7 +3090,7 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
         if (input.matchnMove(1, "save"))
         {
             if (controlType != TOPLEVEL::type::Write)
-                return REPLY::available_msg;
+                return REPLY::writeOnly_msg;
             if (!input.isdigit())
                 return REPLY::value_msg;
             int tmp = string2int(input) - 1; // could be up to 160
@@ -3282,9 +3282,9 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         value = input.toggle();
         if (value == -1 && input.matchnMove(2, "prompt"))
             value = 2;
-        if (value == -1)
+        if (value == -1 && controlType == TOPLEVEL::type::Write)
             return REPLY::value_msg;
-        command = CONFIG::control::exposeStatus;
+        return sendDirect(synth, TOPLEVEL::action::fromCLI, value, controlType, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
     }
 
     else if (input.matchnMove(1, "jack"))
@@ -3515,10 +3515,12 @@ int CmdInterpreter::commandScale(Parser& input, unsigned char controlType)
     int enable = input.toggle();
     if (enable > -1)
     {
-        int result = sendNormal(synth, TOPLEVEL::action::lowPrio, enable, controlType, SCALES::control::enableMicrotonal, TOPLEVEL::section::scales);
+        int result = sendDirect(synth, 0, enable, controlType, SCALES::control::enableMicrotonal, TOPLEVEL::section::scales);
         if (input.lineEnd(controlType))
             return result;
     }
+    if(readControl(synth, 0, SCALES::control::enableMicrotonal, TOPLEVEL::section::scales) < 1)
+        return REPLY::inactive_msg;
 
     float value = 0;
     unsigned char command = UNUSED;
@@ -3622,13 +3624,16 @@ int CmdInterpreter::commandImportScale(Parser& input)
         return REPLY::what_msg;
 
     size_t command = 0;
+
     if (input.matchnMove(1, "tuning"))
         command = SCALES::control::importScl;
     else if (input.matchnMove(1, "keymap"))
         command = SCALES::control::importKbm;
     else
-        return REPLY::what_msg;
-
+    {
+        synth->getRuntime().Log("Specify TUNing or KEYmap");
+        return REPLY::done_msg;
+    }
     string name = string{input};
     if (name.empty())
         return REPLY::value_msg;
@@ -4267,7 +4272,7 @@ int CmdInterpreter::addSynth(Parser& input, unsigned char controlType)
         cmd = ADDSYNTH::control::randomGroup;
     }
     if (cmd == -1)
-        return REPLY::available_msg;
+        return REPLY::unrecognised_msg;
 
     return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::addSynth);
 }
@@ -4549,7 +4554,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         }
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::subSynth);
     }
-    return REPLY::available_msg;
+    return REPLY::unrecognised_msg;
 }
 
 
@@ -4995,7 +5000,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
             value = string2int(input);
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth);
     }
-    return REPLY::available_msg;
+    return REPLY::unrecognised_msg;
 }
 
 
@@ -5109,7 +5114,7 @@ int CmdInterpreter::resonance(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine, insert, point);
     }
 
-    return REPLY::available_msg;
+    return REPLY::unrecognised_msg;
 }
 
 
@@ -5334,7 +5339,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, PART::engine::padSynth, insert, parameter);
     }
     if (cmd == -1)
-        return REPLY::available_msg;
+        return REPLY::unrecognised_msg;
     if (value == -1)
         value = string2float(input);
     return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
@@ -5957,7 +5962,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
 
         if (controlType != TOPLEVEL::type::Write)
-            return REPLY::available_msg;
+            return REPLY::writeOnly_msg;
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
 
@@ -5985,7 +5990,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     if (input.matchnMove(4, "seed"))
     {
         if (controlType != TOPLEVEL::type::Write)
-            return REPLY::available_msg;
+            return REPLY::writeOnly_msg;
         int seed = string2int(input);
         if (seed < 0)
             seed = 0;
@@ -6516,7 +6521,8 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         return Reply{sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main)};
     if (input.matchnMove(1, "list"))
     {
-        if (input.matchnMove(1, "group"))
+        // we've added the 's' as people tended to autmatically assume it was needed.
+        if (input.matchnMove(1, "groups"))
             return Reply{commandGroup(input)};
         return Reply{commandList(input)};
     }

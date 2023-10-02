@@ -921,6 +921,9 @@ static std::string vectlist [] = {
 };
 
 static std::string scalelist [] = {
+    "<ON/OFF>",           "enables/disables microtonal scales",
+    "IMPort <s1> <s2>",   "Import Scala file s2 to s1 TUNing or KEYmap",
+    "EXPort <s1> <s2>",   "Export s1 TUNing or KEYmap to Scala file s2",
     "FRequency <n>",      "Reference note actual frequency",
     "NOte <n>",           "Reference note number",
     "Invert [s]",         "invert entire scale (ON, {other})",
@@ -932,11 +935,7 @@ static std::string scalelist [] = {
     "MIddle <n>",         "middle note number to map",
     "Last <n>",           "last note number to map",
     "Tuning <s1> [s2]",   "CSV tuning values (n1.n1 or n1/n1 , n2.n2 or n2/n2 , etc.)",
-    "","s1 = 'IMPort' from s2 named file",
-    "","s1 = 'EXPort' to s2 named file",
     "Keymap <s1> [s2]",   "CSV keymap (n1, n2, n3, etc.)",
-    "","s1 = 'IMPort' from s2 named file",
-    "","s1 = 'EXPort' to s2 named file",
     "SIze <n>",           "actual keymap size",
     "NAme <s>",           "internal name for this scale",
     "DEscription <s>",    "description of this scale",

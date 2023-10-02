@@ -1,0 +1,11 @@
+Arram_Koth_Finale.mid
+
+This MIDI file will completely set up a running version of Yoshimi, and play the last part of the Arram Koth theme. It will set banks and load instruments as needed.
+
+If the Reports window is visible this will show what control actions are taking place.
+
+The only requirement is that bank root number 5 points to the default set of banks, as this is the one that will be selected.
+
+aplaymidi -p yoshimi /usr/local/share/doc/yoshimi/examples/Arram_Koth_Finale.mid
+
+Depending how Yoshimi was installed, 'examples' may be at a different location.

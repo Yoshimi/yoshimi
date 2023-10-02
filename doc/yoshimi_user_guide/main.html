@@ -35,7 +35,7 @@
     <p>
     <img src="images/instrument.png" alt="Instrument Menu" class="small">
     <h3>Instrument</h3>
-    <b>Show Stored</b> This will open a window with the currently selected <a href="bank/bank.html#bank">Bank</a> of instruments. A selection from this will be loaded to the current part.
+    <b>Show Stored</b> This will open a window with the currently selected <a href="bank/bank.html#bank">Bank</a> of instruments. A selection from this can be loaded to the current part.
     <br><br>
     <b>Load External</b> You can use this to load an instrument from outside Yoshimi, using the filer (which will be opened for loading). Again this will go to the current part.
     <br><br>
@@ -65,7 +65,7 @@
     <p>
     <img src="images/path.png" alt="Path Menu" class="small">
     <h3>Path</h3>
-    <b>Bank Root Dirs</b> You can manage the order and MIDI IDs of individual bank roots in the <a href="bank/bank.html#path">Root Path</a> window this opens, as well as create new empty ones.
+    <b>Bank Root Dirs</b> You can manage the order and MIDI IDs of individual bank roots in the <a href="bank/bank.html#path">Root Path</a> window this opens. You can also create new empty ones.
     <br><br>
     <b>Preset Dirs</b> This opens a window that allows you to manage the directories used for storing Copy/Paste <a href="preset/preset.html">Presets</a>. You can create new ones, set the current one or remove them.
     </p>
@@ -89,7 +89,7 @@
     <br><br>
     <b>Load</b> Opens a window for loading combined scale and keymap files.
     <br><br>
-    <b>Save</b> Saves the currently set complete microtonal scale file.
+    <b>Save</b> Saves the currently defined complete microtonal scale file.
     <br><br>
     <b>Recent Scales</b> Lists up to 25 recently seen scales.
     </p>
@@ -113,7 +113,7 @@
     <br><br>
     <b>Virtual keyboard</b> opens the window displaying this in the same way as a first time startup.
     <br><br>
-    <b>Midi Learn</b> opens the window for loading, saving and editing these learned controls.
+    <b>Midi Learn</b> opens the window for loading, saving and editing learned controls.
     <br><br>
     <b>Vectors</b> also opens another window, this time for combined control of up to four parts.
     <br><br>
@@ -134,14 +134,14 @@
     <br><br>
     <b>Volume</b> is the master volume control for the main audio output pair. It doesn't affect any individual part outputs you might have set (if using Jack audio, or LV2).
     <br><br>
-    <b>Key Shift</b> allows you to step the overall key up or down in semitone steps as much as three octaves.
+    <b>Key Shift</b> allows you to step the overall key up or down in semitone steps by as much as three octaves.
     <br><br>
     <b>F. BPM</b> This provides a reference MIDI clock within Yoshimi that will be used if there is none being sent from your external keyboard/controller.
     </P>
     <a id="system"></a>
     <img src="images/system.png" alt="The System Effects Insert" class="image">
     <p>
-    Next there is a short tabbed insert. By default this shows the <em>System</em> effects. These are applied to the whole of the main Left/Right audio outputs and immediately below it is the currently selected one. These are described in <a href="effects/effects.html">Effects.</a> The sources for system effects are shown at the bottom of the main window, and are from the output of <a href="part/part.html">Parts</a>.
+    Next there is a short tabbed insert. By default this shows the <em>System</em> effects. These are applied to the whole of the main Left/Right audio outputs and immediately below it is the currently selected one. These are described in <a href="effects/effects.html">Effects.</a>
     </p>
     <p>
     The spinbox selects the effect being managed. You can have up to four of these, and the menu selects which actual effect will be used.
@@ -156,6 +156,9 @@
     This provides the ability to form very complex effect chains. With all controls at zero, each effect passes its output direct to the main L/R pair, but if (for example) you set the control marked <b>1-&gt3;</b> about halfway, that effect will be combined with the normal input to effect 3 as well as being sent out directly.
     <br><br>
     Similarly, this combined effect can then be passed on to effect 4 with the <b>3-&gt4;</b> control, and effect 4 could also be getting some from effect 2 via <b>2-&gt4;</b>.
+    <br><br>
+    The sources for system effects are shown at the bottom of the main window, and are from the output of the currently displayed <a href="part/part.html">Part</a>.
+
     </p>
     <img src="images/boundry.png" alt="divider" class="wideline">
     <p>
