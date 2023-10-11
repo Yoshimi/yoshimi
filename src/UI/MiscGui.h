@@ -245,8 +245,16 @@ inline void setVisible(SynthEngine *synth, bool v, std::string filename)
 
 inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool halfsize = false)
 {
-    int maxW = Fl::w() - 5; // wiggle room
-    int maxH = Fl::h() - 30; // space for minimal titlebar
+    int minX, minY, maxW, maxH;
+    Fl::screen_xywh(minX, minY, maxW, maxH, x, y, w, h);
+
+    // Pretend that this is the center screen, which makes calculations easier.
+    // We will reverse this at the bottom.
+    x -= minX;
+    y -= minY;
+
+    maxW -= 5; // wiggle room
+    maxH -= 30; // space for minimal titlebar
 
     if ((w / defW) != (h / defH)) // ratio
         w = h / defH * defW; // doesn't matter which one we pick!
@@ -289,6 +297,11 @@ inline void checkSane(int& x, int& y, int& w, int& h, int defW, int defH, bool h
         if (y < 30)
             y = 30;
     }
+
+    // Restore position relative to screen position.
+    x += minX;
+    y += minY;
+
     //std::cout << "x " << x << "  y " << y << "  w " << w << "  h " << h << std::endl;
 }
 
