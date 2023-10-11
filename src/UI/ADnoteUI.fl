@@ -2826,8 +2826,8 @@ o->hide();}
             fetchW = voiceDW;
             fetchH = voiceDH;
         }
-        ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
         checkSane(fetchX, fetchY, fetchW, fetchH, voiceDW, voiceDH);
+        ADnoteVoice->resize(fetchX, fetchY, fetchW, fetchH);
     }
 
     ADnoteVoice->redraw();
