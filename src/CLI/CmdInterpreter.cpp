@@ -6253,6 +6253,12 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 
 void CmdInterpreter::presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
+    /*
+     * Types:
+     *  Learnable  = load (paste)
+     *  Write      = save (copy)
+     *  Adjust     = list
+     */
     string name;
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
     {

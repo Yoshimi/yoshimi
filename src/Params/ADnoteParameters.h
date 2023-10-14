@@ -198,6 +198,7 @@ class ADnoteParameters : public Presets
         ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth);
         ~ADnoteParameters();
         void defaults(void);
+        void voiceDefaults(int n) {defaults(n);};
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         float getLimits(CommandBlock *getData);

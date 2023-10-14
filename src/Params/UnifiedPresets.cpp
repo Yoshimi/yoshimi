@@ -32,9 +32,6 @@
 
 
 using std::string;
-using std::cout;
-using std::endl;
-
 
 /*
  * type flags (set)
@@ -160,7 +157,9 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
         return name;
 
     if (engineType >= PART::engine::addVoice1 && engineType < PART::engine::addVoiceModEnd)
+    {
         return "Padsythn"; // all voice and modulator level have the same extension
+    }
 
     switch (engineType)
     {
@@ -314,19 +313,19 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
     {
         name = "Padsythn";
         ADnoteParameters *sectionType = synth->part[npart]->kit[kitItem].adpars;
-
+        size_t voice = engineType - PART::engine::addVoice1;
 
         if (isLoad)
         {
-            sectionType->defaults();
+            sectionType->voiceDefaults(voice);
             xml->enterbranch(name);
-            sectionType->getfromXMLsection(xml, engineType - PART::engine::addVoice1);
+            sectionType->getfromXMLsection(xml, voice);
             xml->exitbranch();
         }
         else
         {
             xml->beginbranch(name);
-            sectionType->add2XMLsection(xml, engineType - PART::engine::addVoice1);
+            sectionType->add2XMLsection(xml, voice);
             xml->endbranch();
         }
     }
@@ -416,7 +415,6 @@ string UnifiedPresets::oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLo
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
-    std::cout << "engine " << int(getData->data.engine) << std::endl;
     string name = "Poscilgen";
 
     OscilParameters *sectionType;

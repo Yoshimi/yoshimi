@@ -148,6 +148,9 @@ void Microtonal::defaults(int type)
         PformalOctaveSize = 12;
         Pmappingenabled = 0;
 
+        // suppress 'unused' warning till we know what to do with it!
+        PformalOctaveSize = PformalOctaveSize;
+
         for (int i = 0; i < 128; ++i)
         {
             Pmapping[i] = i;

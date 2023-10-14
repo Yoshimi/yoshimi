@@ -1,4 +1,8 @@
-yoshimi 2.3.1
+yoshimi 2.3.1 M
+
+2023-10-14 Will
+bn 2270
+BugFix: unified presets 'load addvoice' clearing whole of addsynth :(
 
 2023-10-02 Will
 bn 2269
