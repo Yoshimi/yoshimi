@@ -318,30 +318,13 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     if (control == TOPLEVEL::control::copyPaste)
     {
         string name = synth->unifiedpresets.section(synth, getData);
+        /*
+         * for Paste (load) 'name' is the type of the preset being loaded
+         * for List 'name' lists all the stored presets of the wanted preset type
+         * */
         if (type == TOPLEVEL::type::Adjust) // list (actually zero)
         {
-            // this seems impossible but somehow works!
-            // it's used by the CLI to list stored paste entries.
             textMsgBuffer.push(name);
-        }
-        else if (type & TOPLEVEL::type::Learnable) // load
-        {
-            // this comes *after* the relative section has been loaded.
-            if (getData->data.part == TOPLEVEL::section::systemEffects)
-            {
-                synth->syseffEnable[synth->syseffnum] = getData->data.spare0;
-            }
-            else if (getData->data.part == TOPLEVEL::section::insertEffects)
-            {
-                int tmp = getData->data.spare0;
-                if (tmp >=254)
-                    tmp = tmp - 256;
-                synth->Pinsparts[value] = tmp;
-            }
-            else if (getData->data.part <= TOPLEVEL::section::part64)
-            {
-                synth->partonoffWrite(getData->data.part, 2);
-            }
         }
 #ifdef GUI_FLTK
         toGUI.write(getData->bytes);
@@ -2171,28 +2154,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         }
     }
 
-    unsigned char value = getData->data.value;
+    //unsigned char value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     if ((getData->data.source & TOPLEVEL::action::muteAndLoop) == TOPLEVEL::action::lowPrio)
     {
-        if (control == TOPLEVEL::control::copyPaste && (type & TOPLEVEL::type::Learnable))
-        {
-            if (getData->data.part == TOPLEVEL::section::systemEffects)
-            {
-                getData->data.spare0 = synth->syseffEnable[value];
-                synth->syseffEnable[synth->syseffnum] = 0; // off
-            }
-            else if (getData->data.part == TOPLEVEL::section::insertEffects)
-            {
-                getData->data.spare0 = synth->Pinsparts[value];
-                synth->Pinsparts[value] = -1; // effectively off
-            }
-            else if (getData->data.part <= TOPLEVEL::section::part64)
-            {
-                synth->partonoffWrite(getData->data.part, -1); // off
-            }
-        }
         return true; // indirect transfer
     }
 

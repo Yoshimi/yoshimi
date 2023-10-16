@@ -1,5 +1,11 @@
 yoshimi 2.3.1 M
 
+[presets]
+Removed overcautious section disabling and re-enabling.
+
+Changed all references to 'MIDI-Learn' in this file to the same format.
+It was getting hard to keep track of them.
+
 2023-10-14 Will
 bn 2270
 BugFix: unified presets 'load addvoice' clearing whole of addsynth :(
@@ -165,7 +171,7 @@ Set bugfix release 2.3.0.3
 
 2023-7-27 Will
 bn 2247
-BugFix: MIDI-learn using older number format instead of decoding the text.
+BugFix: MIDI-Learn using older number format instead of decoding the text.
 Changed ID in metainfo file to make it unique.
 Some small code cleanups.
 Doc updates.
@@ -261,7 +267,7 @@ Set version as 2.3.0 rc8
 
 2023-5-17 Will
 bn 2229
-Changed MIDI-learn 7bit NRPN warning colour to warning background.
+Changed MIDI-Learn 7bit NRPN warning colour to warning background.
 Created "Midilearn activity indicator" entry in themes.
 Correction to User Guide AlienWah Delay description.
 Added instruments to banks from Art Horan.
@@ -413,7 +419,7 @@ bn 2209
 Reinstated right click default of system effects.
 Format filter knob pointer done.
 Started work on Effect defaults.
-Set MIDI-learn to auto correct old control numbers.
+Set MIDI-Learn to auto correct old control numbers.
 
 2023-4-12 Will
 bn 2208
@@ -467,9 +473,9 @@ Almost all slider peg colours converted.
 
 2023-4-1 Will
 bn 2200
-BugFix: Envelope freemode sustain was set learnable.
+BugFix: Envelope freemode sustain was set Learnable.
 Corrected freemode add/delete button types.
-Controllers pitchwheel & threshold not marked learnable.
+Controllers pitchwheel & threshold not marked Learnable.
 Adjusted amplitude envelope panel width to match others.
 Started marking default slider position with peg colour.
     Only a few bits of AddSynth voice done so far.
@@ -648,22 +654,22 @@ Improved CLI access the formant filter.
 
 2023-2-1 Will
 bn 2173
-BugFix: MIDI-learn and CLI mixing up EQ filter bands.
+BugFix: MIDI-Learn and CLI mixing up EQ filter bands.
 In CLI Changed EQ Band control name to Number to avoid
     confusion with Bank controls.
-BugFix MIDI-learn changing the GUI of whichever part is visible
+BugFix MIDI-Learn changing the GUI of whichever part is visible
     while correctly changing the actual parameters.
 
 2023-1-31 Will
 bn 2172
-BugFix: MIDI-learn saving but not recognising saved effects controls.
+BugFix: MIDI-Learn saving but not recognising saved effects controls.
 
 2023-1-29
 bn 2171
 Further cleanups on CLI
 EQ Band numbers now start from 1.
 Halted further improvements to deal with serious fault with
-MIDI-learn and all effects.
+MIDI-Learn and all effects.
 
 2023-1-28
 bn 2170
@@ -728,7 +734,7 @@ Modifed TextMsgBuffer.h to provide non-destructive read.
 
 2022-10-22 Will
 bn2159
-* moved down top few control values for MIDI-learn
+* moved down top few control values for MIDI-Learn
 * moved partBusy control from part section to top level
 * removed some (now redundant) code
 
@@ -781,7 +787,7 @@ bn2151a
 
 2022-8-17 Will
 bn2151
-* Fixed MIDI-learn regressions.
+* Fixed MIDI-Learn regressions.
   Settings saved, but not received.
 * Suppressed clang compliler warnings.
 * Doc updates.
@@ -1151,7 +1157,7 @@ Resolved warnings shown in Clang.
 
 2021-11-29 Will
 * Filer window path deactivated if in favourites.
-* Disabled difference reporting in midi learn.
+* Disabled difference reporting in MIDI-Learn.
 * Final doc and user guide updates.
 * Set release version 2.1.2
 
@@ -1189,7 +1195,7 @@ Resolved warnings shown in Clang.
 
 2021-11-16 Will
 * BugFix: CLI padsynth waveform and resonance not setting 'apply'
-* New MIDI-learn style enabled.
+* New MIDI-Learn style enabled.
 
 2021-11-12 Will
 * BugFix: Crash loading scala keymap file
@@ -1198,7 +1204,7 @@ Resolved warnings shown in Clang.
 
 2021-11-12 Will
 * All Dat2Text engines now independent of numeric positions.
-* Unified control names for MIDI learn.
+* Unified control names for MIDI-Learn.
 
 2021-11-11 Will
 * BugFix: Data2Text making assumptions about control numbers.
@@ -1207,7 +1213,7 @@ Resolved warnings shown in Clang.
 * Updated user guide.
 
 2021-11-4 Will
-* Loading a state file now always clears the MIDI learn list.
+* Loading a state file now always clears the MIDI-Learn list.
 
 2021-10-27 Will
 * BugFix: crash with corrupted history file.
@@ -1307,7 +1313,7 @@ BugFix: Not resetting part effect number to zero
 * Added missing ALSA connection type to config list report.
 
 2021-9-10 Will
-* Commented out legit filename test in MidiLearn.cpp
+* Commented out legit filename test in MIDI-Learn.cpp
   This was falsely adjusting valid filenames.
 
 2021-9-7 Will
@@ -1381,7 +1387,7 @@ BugFix: Not resetting part effect number to zero
 * Updated guide.
 
 2021-8-14 Will
-* Bugfix: MIDI_Learn not loading/saving files.
+* Bugfix: MIDI-Learn not loading/saving files.
   Not handling spaces in path or leafname.
 * Various doc updates.
 
@@ -1483,7 +1489,7 @@ BugFix: Not resetting part effect number to zero
 * User guide formant filter done except graph usage.
 
 2021-7-17 Will
-* Initialised LearnBlock in MIDIlearn.
+* Initialised LearnBlock in MIDI-Learn.
 * Capitalised some GUI filter/effects control names.
 * Corrected spelling in User Guide.
   Also made small additions and adjustments.
@@ -1523,7 +1529,7 @@ BugFix: Not resetting part effect number to zero
 * Completed Scales in guide.
 
 2021-6-20 Will
-* Small improvement to vector and midi learn in guide.
+* Small improvement to vector and MIDI-Learn in guide.
 * Completed Resonance in guide.
 
 2021-6-19 Will
@@ -1555,7 +1561,7 @@ BugFix: Not resetting part effect number to zero
 * Added more cross-links in guide.
 
 2021-6-7 Will
-* MIDI learn guide almost complete.
+* MIDI-Learn guide almost complete.
 * Small corrections to Vectors.
 * Further small adustments and corrections to guide.
 
@@ -1567,13 +1573,13 @@ BugFix: Not resetting part effect number to zero
 
 * Completed Vectors.
 * Completed Solo.
-* Started MIDI learn guide.
+* Started MIDI-Learn guide.
 
 2021-6-5 Will
 * More work on User guide vectors.
 
 2021-6-4 Will
-* User guide work on Midi learn and Vectors.
+* User guide work on MIDI-Learn and Vectors.
 
 2021-6-1 Will
 * Merged in user guide updates from Lorenzo
@@ -1617,7 +1623,7 @@ BugFix: Not resetting part effect number to zero
 * Made small range check in CLI formant filter.
 * Added CLI option to start scripts from any level.
 * BugFix: Earlier Effects fix not handling no FLTK.
-* BugFix: MIDI_learn FLTK not checked.
+* BugFix: MIDI-Learn FLTK not checked.
 
 2021-5-6 Will
 * Replaced ringbuffer with improved code from Rainer
@@ -1712,7 +1718,7 @@ Made small change to config initial sequence re argp.
   Was previously confusingly numeric output.
 
 2021-3-20 Will
-* BugFix: GUI out of sync on MIDI-learned mod type change.
+* BugFix: GUI out of sync on MIDI-Learned mod type change.
 
 * BugFix: Right click on mixer Edit using wrong part entry.
 * Added 'Scaffold Pole' to Companion bank.
@@ -1721,9 +1727,9 @@ Made small change to config initial sequence re argp.
 * A few spelling checks in the Gui.
 
 2021-3-11 Will
-* BugFix: crash when locking midilearn history from GUI.
+* BugFix: crash when locking MIDI-Learn history from GUI.
   Caused by placement of presets in the XML list.
-  Now moved after midilearn.
+  Now moved after MIDI-Learn.
 
 2021-3-9 Will
 * Completed GUI filter frequency correction.
@@ -1798,7 +1804,7 @@ Made small change to config initial sequence re argp.
 * set version as 2.0 rc1.
 
 2021-2-14 Will
-* Increased MIDI-learn list limit to 400 lines.
+* Increased MIDI-Learn list limit to 400 lines.
   Added 10mS sleeps every 32 lines on loading.
   Still less than 1S for a full list and estimate
   less than 200uS for actioning ones at the end.
@@ -2215,8 +2221,8 @@ BugFix: GUI not setting kit item names.
 * Doc Updates.
 
 2020-7-2 Will
-* System Effect Enable now MIDI-learnable.
-* Part Effect Bypass  now MIDI-learnable.
+* System Effect Enable now MIDI-Learnable.
+* Part Effect Bypass  now MIDI-Learnable.
 * Unified all float to bool conversions.
 * Some minor style cleanups.
 
@@ -2444,7 +2450,7 @@ BugFix: GUI not setting kit item names.
 * Added Volume to channel aftertouch.
 
 2020-4-2 Will
-* BugFix: MIDI-learn initialsing killing GUI startup warnings.
+* BugFix: MIDI-Learn initialsing killing GUI startup warnings.
 * Imroved first time startup messages and bank actions.
 
 2020-3-31 Will
@@ -2462,8 +2468,8 @@ BugFix: GUI not setting kit item names.
   Some tidying yet to do.
 
 2020-3-29 Will
-* Fixed regresssion. Loading MIDIlearn not displaying.
-* MIDIlearn and Vector added to improved GUI windowing.
+* Fixed regresssion. Loading MIDI-Learn not displaying.
+* MIDI-Learn and Vector added to improved GUI windowing.
 * Mixer, Banks, VertKeyb added to improved GUI windowing.
 * Console, Scales added to improved GUI windowing.
 * ADnote, PADnote, Subnote added to improved GUI windowing.
@@ -2480,7 +2486,7 @@ BugFix: GUI not setting kit item names.
 * Moved panning law from config to patch sets.
 
 2020-3-26 Will
-* Aftertouch fully MIDI-learnable.
+* Aftertouch fully MIDI-Learnable.
   Also blocks normal control action by default.
 * AT GUI follows standard right button close practice.
 * Updated docs.
@@ -2500,7 +2506,7 @@ BugFix: GUI not setting kit item names.
   This enusres all parts independently see it.
 
 2020-3-19 Will
-* Stop state file opening an empty MIDI learn window.
+* Stop state file opening an empty MIDI-Learn window.
 
 2020-3-18 Will
 * Merged in revised legato code from Iain.
@@ -2551,7 +2557,7 @@ BugFix: GUI not setting kit item names.
 
 2020-3-1 Will
 * Improved code for spacing new bank IDs.
-* BugFix: LV2 not updating MIDI-learn GUI.
+* BugFix: LV2 not updating MIDI-Learn GUI.
   Reinstated original window control, but now with
   correct action being set!
 
@@ -2566,7 +2572,7 @@ BugFix: GUI not setting kit item names.
   subsynth instrument.
 
 2020-2-13 Will
-* BugFix: MIDI-learn crash if accessing non-exisitent effect.
+* BugFix: MIDI-Learn crash if accessing non-exisitent effect.
   This need more work to correctly report to the CLI.
 * Suppressed test message in filterUI.
 * Updated docs.
@@ -2690,12 +2696,12 @@ BugFix: GUI not setting kit item names.
 * Set version as 1.7.0 rc6
 
 2020-1-7 Will
-* More MIDI_learn refinements.
+* More MIDI-Learn refinements.
 * Corrected wrongly reported NRPN values.
 * Set version as 1.7.0 rc5
 
 2020-1-6 Will
-* BugFix: Editing MIDI-learn lost NRPN status.
+* BugFix: Editing MIDI-Learn lost NRPN status.
 * Removed legacy NRPN detection.
 * Revised MIDI-Learn internal data blocks.
   Uses resolveAll function, not embedded text.
@@ -2703,7 +2709,7 @@ BugFix: GUI not setting kit item names.
 * Set version as 1.7.0 rc4
 
 2020-1-6 Will
-* BugFix: State load not updating MIDI_learn GUI.
+* BugFix: State load not updating MIDI-Learn GUI.
 * Removed legacy min/max double check.
   It created a corner case error when
   min/max are reversed.
@@ -2711,7 +2717,7 @@ BugFix: GUI not setting kit item names.
 
 2020-1-2 Will
 * Merged in filter bugfix.
-* BugFix: M-learn window not auto opening.
+* BugFix: MIDI-Learn window not auto opening.
 * Included new user guide.
 * Set version as 1.7.0 rc2
 
@@ -3059,11 +3065,11 @@ BugFix: GUI not setting kit item names.
 * Set version as 1.6.0 rc4
 
 2019-8-22 Will
-* Fixed effects regression (not midi-learning)
+* Fixed effects regression (not MIDI-Learning)
   Found by Jesper, and caused by the change from numeric a
-  value for the learn fag being changed to an enum with a
+  value for the learn flag being changed to an enum with a
   different value.
-* Identified midi-learn GUI message control number.
+* Identified MIDI-Learn GUI message control number.
 * BugFix: CLI not setting resonance point 1.
   Further resonance issues to resolve.
 * Set version as 1.6.0 rc2
@@ -3216,7 +3222,7 @@ BugFix: GUI not setting kit item names.
   Size could have been needlessly greater than incoming.
 
 2019-7-9 Will
-* NRPN for load from history now includes MIDI learn.
+* NRPN for load from history now includes MIDI-Learn.
 * Found more magic numbers to convert in Resonance.
 * Improved Resonance CLI responses.
 
@@ -3244,7 +3250,7 @@ BugFix: GUI not setting kit item names.
 2019-6-26 Will
 * Added in missing new files :(
 * Refinements to data->text conversions.
-  Specifically so that MIDI-learn text doesn't include
+  Specifically so that MIDI-Learn text doesn't include
   the current value or such as 'on/off' responses.
 * Removed some bank message transfer conversions.
   These are now entirely within one low priority context
@@ -3255,16 +3261,16 @@ BugFix: GUI not setting kit item names.
 * Moved data->text conversions to new file 'Data2Text'.
 
 2019-6-24 Will
-* Swapped menu entry Yoshimi/MIDI Learn ~ button-Reports.
+* Swapped menu entry Yoshimi/MIDI-Learn ~ button-Reports.
 * Improved MIDI-Learn internal links.
 * Partially separated text replies from respondents.
-* BugFix: voicelist enable calling MIDI_learn.
+* BugFix: voicelist enable calling MIDI-Learn.
 
 2019-6-22 Will
 * Clarifed system mute controls.
   Also added extra sanity checks.
 * Implemented new NRPN for load from history.
-  Not MLearn yet and Instruments only 16 parts.
+  Not MIDI-Learn yet and Instruments only 16 parts.
 * Updated NRPN docs.
 * Improved history NRPNs.
   Easier to use and greater flexibilty.
@@ -3318,7 +3324,7 @@ BugFix: GUI not setting kit item names.
 2019-6-3 Will
 * Applied modulation patch from Kristian.
 * BugFix: Message list clearing was too agressive.
-  This prevented state loads from including mide-learn
+  This prevented state loads from including MIDI-Learn
   control names.
 * BugFix: Load instrument by name failed for yoshi type.
   Unless there was also a zyn type.
@@ -3343,7 +3349,7 @@ BugFix: GUI not setting kit item names.
 * BugFix: Start message lockup only on Gnome or KDE
 
 2019-5-26 Will
-* BugFix: CLI load MIDI-learn list from history failed.
+* BugFix: CLI load MIDI-Learn list from history failed.
 * Moved some parameters out of par2.
 * Updated docs.
 
@@ -3595,7 +3601,7 @@ BugFix: GUI not setting kit item names.
 * Resets and state/patch loads clear mono/stero switch.
 
 2019-3-26 Will
-* BugFix: MIDI-learn now learn correct effect numbers.
+* BugFix: MIDI-Learn now learn correct effect numbers.
   GUI still not updated correctly yet.
 
 2019-3-23 Will
@@ -3771,7 +3777,7 @@ BugFix: GUI not setting kit item names.
 
 2019-1-22 Will
 * BugFix: missing 'else' so CLI filter not seeing L1/H1.
-* Implemented loading MIDI learn fro CLI.
+* Implemented loading MIDI-Learn fro CLI.
   Currently it seems you can only set one command line
   argument. Observed priority is .state .xmz .xiz .xly
   Need to see if this can be made recursive.
@@ -4090,7 +4096,7 @@ BugFix: GUI not setting kit item names.
 * Set version as 1.5.9 release
 
 2018-9-23 Will
-* BugFix: CLI not setting midilearn mute.
+* BugFix: CLI not setting MIDI-Learn mute.
 * Enabled comments in CLI script.
   Also added more error checks.
 * Typo corrections:(
@@ -4242,7 +4248,7 @@ BugFix: GUI not setting kit item names.
 * All CLI kit mode controls active.
 * Extended CLI parts help to include new controls.
 * Improved many enable/disable settings.
-* Revised and simplified CLI Mlearn section.
+* Revised and simplified CLI MIDI-Learn section.
 
 2018-8-24 Will
 * Temporary fix to banks selection anomally
@@ -4281,7 +4287,7 @@ BugFix: GUI not setting kit item names.
 2018-8-17 Will
 * Implemented read most CLI min, max, default
   for formally defined ones.
-* Implemented most CLI Mlearn initialisation
+* Implemented most CLI MIDI-Learn initialisation
   for formally defined ones.
   Can't cancel from CLI though and non-learnable
   ones appear to learn.
@@ -4333,7 +4339,7 @@ BugFix: GUI not setting kit item names.
   Envelope defaults still to do.
 
 2018-8-4 Will
-* BugFix: MIDI-learn Cancel.
+* BugFix: MIDI-Learn Cancel.
   It was only pretending to :(
 * Updated Microtonal.cpp limits.
 * MicrotonalUI.fl converted to enums.
@@ -4367,12 +4373,12 @@ BugFix: GUI not setting kit item names.
 2018-8-1 Will
 * Partly implemented envelope limits.
   Not defaults.
-* MIDI-learn test now using limits and
+* MIDI-Learn test now using limits and
   not the GUI version.
 
 2018-7-31 Will
 * Implemented filter limits.
-* Added MIDI-learn to filter limits.
+* Added MIDI-Learn to filter limits.
 
 2018-7-30 Will
 * Implemented LFO limits.
@@ -4405,7 +4411,7 @@ BugFix: GUI not setting kit item names.
 * Converted envelope controls to enums.
 
 2018-7-25 Will
-* Converted MIDIlearn controls to enums.
+* Converted MIDI-Learn controls to enums.
 
 2018-7-24 Will
 * Revised enum namespace terminology.
@@ -4637,7 +4643,7 @@ BugFix: GUI not setting kit item names.
 2018-4-25 Will
 * Code cleanups.
 * Added error checking and limits to scales (microtonal).
-* Enabled MIDI-learn for some scales settings.
+* Enabled MIDI-Learn for some scales settings.
 * Doc updates and corrections.
 * Added highlights to learnable controls.
 
@@ -4836,7 +4842,7 @@ BugFix: GUI not setting kit item names.
 2018-2-3 Will
 [LIMITS] First refactoring of this.
          Quite a few ommisions.
-         Seems to be correct for MIDI-learn
+         Seems to be correct for MIDI-Learn
          but may still be some errors.
 [LIMITS] Made some corrections and optimisations.
 [LIMITS] Last? optimisations.
@@ -4857,7 +4863,7 @@ BugFix: GUI not setting kit item names.
 * Some doc updates.
 
 2018-1-29 Will
-* BugFix: Part effects not MIDI-learned correctly :(
+* BugFix: Part effects not MIDI-Learned correctly :(
   This is a quick 'n dirty fix. The whole of the
   limits structure needs refactoring!
 
@@ -4922,7 +4928,7 @@ BugFix: GUI not setting kit item names.
 2017-12-31 Will
 * Removed some redundant threadmessage code.
 * Listed proposed new root & bank commands.
-* Last 2017 bugfix! MIDI-learn block didn't :(
+* Last 2017 bugfix! MIDI-Learn block didn't :(
 
 2017-12-30 Will
 * Moved all key shifts out of RBP thread.
@@ -4935,7 +4941,7 @@ BugFix: GUI not setting kit item names.
   Now centred on master window an only
   recognises config files.
 * Moved other use of message window to master ui.
-* BugFix: MIDI-learn init was killing message window.
+* BugFix: MIDI-Learn init was killing message window.
 
 2017-12-28 Will
 * Reinstated safe version of localpath().
@@ -4945,7 +4951,7 @@ BugFix: GUI not setting kit item names.
 * Refactored bank removal code.
 * Improved bank import reporting.
 * Updated docs.
-* Master reset can now clear MIDI-learn.
+* Master reset can now clear MIDI-Learn.
 * Moved panic stop out of RBP thread.
   This will eventually be cleared completely.
 
@@ -4981,7 +4987,7 @@ BugFix: GUI not setting kit item names.
 * Merged in BSD bugfixes from Tobias
 * Changed source location of user manual.
   Separate lines in CMake no longer needed.
-* MIDI-learn now has a threshold setting for switches.
+* MIDI-Learn now has a threshold setting for switches.
 * BugFix: More missing GUI messages found :(
 * BugFix: CLI not updating scale name or description.
 
@@ -4998,7 +5004,7 @@ BugFix: GUI not setting kit item names.
 * Possible resolution of splash screen problem.
 
 2017-12-11 Will
-* Set max MIDI-learn lines to 200.
+* Set max MIDI-Learn lines to 200.
 * Included current Advanced User Guide.
 * Added wildcard for .xiy and .xiz files in FLTK.
 * Updated docs.
@@ -5118,7 +5124,7 @@ BugFix: GUI not setting kit item names.
   Still not completely thread safe.
 * Updated docs.
 * More refinements to CLI.
-* Tidied up some MIDI-learn messages.
+* Tidied up some MIDI-Learn messages.
 
 2017-11-17 Will
 * Added error reports to several I/O ring buffers.
@@ -5307,7 +5313,7 @@ BugFix: GUI not setting kit item names.
 2017-9-13 Will
 * BugFix: reset not clearing master bandwidth.
 * Master bandwidth added to MIDI controls.
-* Master bandwidth now MIDI-learnable.
+* Master bandwidth now MIDI-Learnable.
 * Docs updated.
 * Corrected MIDI controls tooltips.
 
@@ -5365,7 +5371,7 @@ BugFix: GUI not setting kit item names.
   But could be improved.
 
 2017-8-29 Will
-* All rotary controllers now MIDI learnable.
+* All rotary controllers now MIDI-Learnable.
 
 2017-8-28 Will
 * CLI can now save PadSynth sample sets.
@@ -5412,7 +5418,7 @@ BugFix: GUI not setting kit item names.
 * Minor correction to CLI vector level.
 * CLI now updates most of envelope graph.
   freemode still to do.
-* Revised CLI MIDI learn for own context level.
+* Revised CLI MIDI-Learn for own context level.
 * GUI test reports are now specific to button 2 & 3.
 * Set Version 1.5.3 rc2.
 * Further small updates to CLI.
@@ -5751,7 +5757,7 @@ BugFix: GUI not setting kit item names.
 2017-5-11 Will
 * Reset all controllers now clears the portamento switch.
 * Added SubnoteUI correction from Rob.
-* Minor change to saved Midi-learned files.
+* Minor change to saved MIDI-Learned files.
   Supresses artificial top bit when saving, making file more
   understandable, but loading restores it for learn comparisons.
 * More AddSynth Voice & SubSyth switches learnable.
@@ -5766,14 +5772,14 @@ BugFix: GUI not setting kit item names.
 * Removed unnecessary Gui checks from Add & Sub.
 
 2017-5-7 Will
-* Improved Midi-learn loading behaviour.
+* Improved MIDI-Learn loading behaviour.
 * Gui Updates no longer called from synth.
-* Midi-learnable switches now have colour IDs.
+* MIDI-Learnable switches now have colour IDs.
 * Set master as 1.5.2 rc2
 * Updated docs.
 
 2017-5-5 Will
-* More 'switches' Midi-learnable:
+* More 'switches' MIDI-Learnable:
   AddVoice enable and modulator selection.
   All engine stereo and octave.
 * Set master as 1.5.2 rc1
@@ -5784,15 +5790,15 @@ BugFix: GUI not setting kit item names.
   This catches controls that still write direct.
 
 2017-5-2 Will
-* Fixed Gui anomally when loading states with Midi-learn.
+* Fixed Gui anomally when loading states with MIDI-Learn.
   The way we fetch Gui updates needs improving greatly.
   Currently we use the VU timer and call across from synth.
-* LV2 state now includes Midi-learn data.
+* LV2 state now includes MIDI-Learn data.
 
 2017-5-1 Will
 * State load now correctly updates main window title.
 * More float -> int range adustments
-  especially Midi-learn limits and conversions.
+  especially MIDI-Learn limits and conversions.
 
 2017-4-30 Will
 * Improved float -> int conversions.
@@ -5801,8 +5807,8 @@ BugFix: GUI not setting kit item names.
 2017-4-29 Will
 * Corrected some Gui engine enable/colour anomalies.
   Needs more work to rationalise duplications.
-* Enabled engine switches for Midi-learn.
-* Enabled some controllers for Midi_learn.
+* Enabled engine switches for MIDI-Learn.
+* Enabled some controllers for Midi-Learn.
   pan width
   bandwidth depth
   pitchwheel range
@@ -5820,27 +5826,27 @@ BugFix: GUI not setting kit item names.
 * Small change to crossfade example.
 
 2017-4-23 Will
-* Reverted Midi-learn Gui change again
+* Reverted MIDI-Learn Gui change again
   It was just moving the problem to any window that was open :(
 
 2017-4-22 Will
-* If State file has Midi-learn data it closes the window.
+* If State file has MIDI-Learn data it closes the window.
   This evades the issue rather than solving it :(
   However no other load source shows the problem.
 
 2017-4-21 Will
-* Reverted Midi-learn Gui change - caused other problems.
+* Reverted MIDI-Learn Gui change - caused other problems.
 
 2017-4-20 Will
 * Improved handling of Vectors in state load
-* Loading large Midi-learn lists was overloading Gui
+* Loading large MIDI-Learn lists was overloading Gui
   so reduced Gui update rate.
 * Misc image updates.
 
 2017-4-18 Will
 * Corrected AddSynth sound/noise display.
 * Included AddSynthVoiceList in new controls method.
-* Midi-learn data added to saved state file.
+* MIDI-Learn data added to saved state file.
 
 2017-4-17 Will
 * Implemented Gui change can redraw *after* command set.
@@ -5860,21 +5866,21 @@ BugFix: GUI not setting kit item names.
 
 2017-4-15 Will
 * Implemented Gui access to 7 bit NRPNs.
-* Revised Midi-learn window.
+* Revised MIDI-Learn window.
 * Corrected some Cli numbering.
 
 2017-4-14 Will
 * Revised Gui new instance selection.
   Only 1 menu entry needed now.
-* Revised Midi-learn min/max - now percentages.
+* Revised MIDI-Learn min/max - now percentages.
   Resolution is now 0.5% :)
 
 2017-4-13 Will
-* Revised Cli access to Midi-learn.
+* Revised Cli access to MIDI-Learn.
 * Implemented 7bit NRPNs (not Gui changeable).
 * Updated docs.
-* Bugfix: Loading Midi-learn files was setting learn mode.
-* Bugfix: CLI error when changing Midi-learned channels.
+* Bugfix: Loading MIDI-Learn files was setting learn mode.
+* Bugfix: CLI error when changing MIDI-Learned channels.
 
 2017-4-9 Will
 * Bugfix: Wrong size buffer used for jack audio
@@ -5894,7 +5900,7 @@ BugFix: GUI not setting kit item names.
 2017-3-26 Will
 * Corrected anomaly with some float to bool conversions.
   Changed varable in 'interchange' to make this clearer.
-* Activated Midi-learn for portamento enable & rate.
+* Activated MIDI-Learn for portamento enable & rate.
 * Set master as 1.5.1 rc5
 
 2017-3-22 Will
@@ -5998,10 +6004,10 @@ BugFix: GUI not setting kit item names.
 2017-3-12 Jesper
 * Bugfix: Segfault from tooltip text handling in slider
   when creating new instances of yoshimi.
-* Bugfix: All dials on the EQ effects can now be midi-learned.
+* Bugfix: All dials on the EQ effects can now be MIDI-Learned.
 
 2017-3-12 Will
-* Added more reliable way of detecting Midi-learn NRPNs.
+* Added more reliable way of detecting MIDI-Learn NRPNs.
 * Bugfix: Splash was ignoring switch settings :(
 
 2017-3-11 Will
@@ -6009,7 +6015,7 @@ BugFix: GUI not setting kit item names.
 * Fixed regression - exit was always claiming config changed.
 * Fixed regression - wrong font sizes in 'settings'.
 * BugFiX: Cli wasn't seeing value for freemode X offset.
-* Bugfix: Midi-learn led didn't work if channel set to all.
+* Bugfix: MIDI-Learn led didn't work if channel set to all.
 * Version colour in Splash window now defined as RGB.
 
 2017-3-10 Will
@@ -6019,7 +6025,7 @@ BugFix: GUI not setting kit item names.
 
 2017-3-9 Will
 * Improvements to Cli part limits.
-* Successful Midi-learn now opens editing window.
+* Successful MIDI-Learn now opens editing window.
 * PadSynth limits done.
 * Reduced internal multiplier for all limits.
   Just one went over short int size :(
@@ -6039,7 +6045,7 @@ BugFix: GUI not setting kit item names.
 2017-3-5 Will
 * Controller & Midi control limits done.
 * Complete limit definitions for main & part include type.
-  i.e. integer/float & whether midi learnable.
+  i.e. integer/float & whether MIDI-Learnable.
 * Doc updates.
 * Bugfix: missed a couple of 'break' statements in a switch.
 * Added a special case for enable default on part 1.
@@ -6091,7 +6097,7 @@ BugFix: GUI not setting kit item names.
   I hope!
 
 2017-2-19 Will
-* Bugfix: Midi-learn wasn't reloading the correct ranges.
+* Bugfix: MIDI-Learn wasn't reloading the correct ranges.
 * Found more Cli numbers to adjust :(
 * Started changing Cli *input* numbers to match Gui ones.
 * Got as far as 'commandPart'.
@@ -6168,7 +6174,7 @@ BugFix: GUI not setting kit item names.
 * Main volume now interpolated. No zipper noise :)
 
 2017-2-2 Will
-* Midi learn files now include the text of the
+* MIDI-Learn files now include the text of the
   command name for each line.
 * Removed remaining forced 'part enable' except in part.
 * Improved and extended partonoff options.
@@ -6180,20 +6186,20 @@ BugFix: GUI not setting kit item names.
 * Corrected NRPN warning message.
   nHigh had always been reported wrongly :(
 * Corrected GUI activity light error.
-* Midi-learn can now operate in place for LV2.
+* MIDI-Learn can now operate in place for LV2.
 * Updated docs.
 
 2017-1-31 Will
 * Small clean-up in GUI panel controls.
 * Removed unnecessary callback in GUI part kitlist.
-* Midi-learn NRPN's done, but some non-harmful GUI
+* MIDI-Learn NRPN's done, but some non-harmful GUI
   activty light errors.
 
 2017 - 1 30 Will
-* Initial prep for midi-learn NRPNs :)
+* Initial prep for MIDI-Learn NRPNs :)
 
 2017-1-29 Will
-* Bugfix: Some limits wrongly set for midi-learn.
+* Bugfix: Some limits wrongly set for MIDI-Learn.
           Revised defaults settings.
 * Bugfix: More wrong limits :(
 
@@ -6272,8 +6278,8 @@ BugFix: GUI not setting kit item names.
 
 2017-1-12 Will
 * Improved reliability of window positioning.
-* Midi learn window now remembered.
-* Midi learn messages now placed by relative control.
+* MIDI-Learn window now remembered.
+* MIDI-Learn messages now placed by relative control.
 * AddSynth voice and voice list now fully in sync :)
 
 2017-1-11 Will
@@ -6297,7 +6303,7 @@ BugFix: GUI not setting kit item names.
 
 2017-1-5 Will
 * Removed redundant startup messages from splash screen.
-* Exposed the following to Midi learn and direct access.
+* Exposed the following to MIDI-Learn and direct access.
   Modulation
   Expression
   Filter Q
@@ -6313,13 +6319,13 @@ BugFix: GUI not setting kit item names.
 2017-1-3 Will
 * Added part number to invalid kititem  warning.
 * Midi now recognises channel aftertouch.
-* Prep for NRPN Midi learn.
+* Prep for NRPN MIDI-Learn.
 * LFO titles no longer overlap C/P.
 
 2017-1-2 Will
-* Enabled MIDI learning of pitchwheel.
+* Enabled MIDI-Learning of pitchwheel.
   Comes in as CC 640 but seen as 128.
-* Optimised Midi learn editing to reduce line moves.
+* Optimised MIDI-Learn editing to reduce line moves.
 
 2016-12-30 Will
 * Improved layout of Filters GUI insert.
@@ -6331,13 +6337,13 @@ BugFix: GUI not setting kit item names.
 yoshimi 1.5.0
 
 2016-12-17 Will
-* Added warning for undefined kits in Midi learn.
+* Added warning for undefined kits in MIDI-Learn.
 * Finalised all code and docs for release.
 * Set version 1.5.0
 
 2016-12-16 Will
-* Changed Midi learn spinboxes to number entries.
-* Adjusted Midi learn window dimensions.
+* Changed MIDI-Learn spinboxes to number entries.
+* Adjusted MIDI-Learn window dimensions.
 * Corrected tooltips, spellings and acromyms.
 * Set version to 1.5.0 rc5
 
@@ -6347,8 +6353,8 @@ yoshimi 1.5.0
 * Set version to 1.5.0 rc4
 
 2016-12-13 Will
-* Midi learn can now be cancelled.
-* Set Yoshimi (instance) in midi-learn message windows.
+* MIDI-Learn can now be cancelled.
+* Set Yoshimi (instance) in MIDI-Learn message windows.
 * Corrected tooltip for oscillator harmonic randomness.
 * More doc updates.
 * Set version to 1.5.0 rc3
@@ -6367,53 +6373,53 @@ yoshimi 1.5.0
 * Doc updates.
 
 2016-12-11 Will
-* Implemented message window for midi learning.
-* Corrected GUI access to midi-learn general opps.
+* Implemented message window for MIDI-Learning.
+* Corrected GUI access to MIDI-Learn general opps.
 * Set version to 1.5.0 rc1
 
 2016-12-10 Will
-* Bugfix: CLI was trapping the wrong midi-learn control.
-* CLI now change midi-learn mute, limit, block switches.
-* Added load/save messages to midi-learn.
+* Bugfix: CLI was trapping the wrong MIDI-Learn control.
+* CLI now change MIDI-Learn mute, limit, block switches.
+* Added load/save messages to MIDI-Learn.
 
 2016-12-9 Will
-* Bugfix: CLI load midi-learn from list had missing return.
-* Implemented CLI midi-learn line & list removal.
-* CLI can now list individual midi learn lines in detail.
-* Sent midi-learn general ops through ring buffer.
-* CLI can now change midi-learn CC, chan, min, max.
+* Bugfix: CLI load MIDI-Learn from list had missing return.
+* Implemented CLI MIDI-Learn line & list removal.
+* CLI can now list individual MIDI-Learn lines in detail.
+* Sent MIDI-Learn general ops through ring buffer.
+* CLI can now change MIDI-Learn CC, chan, min, max.
 
 2016-12-8 Will
-* Implemented 'activity' LED for midi-learn.
+* Implemented 'activity' LED for MIDI-Learn.
 * CLI history lists now numbered.
-* Implemented CLI midi-learn load & save.
+* Implemented CLI MIDI-Learn load & save.
 * Updated docs.
 
 2016-12-7 Will
 * Added new file to dev_notes: System_Values.txt
-* Added list file leafname to midi-learn window title.
+* Added list file leafname to MIDI-Learn window title.
 * Updated docs.
 
 2016-12-6 Will
-* Started implementing CLI access to midi-learn.
+* Started implementing CLI access to MIDI-Learn.
   Also replaced 'changeLine(' with 'generalOpps(' as it
   is more appropriate now.
 
 2016-12-5 Will
 * Small optimsation in crossfade.
-* Tidied up code in Interchange and MIdilearn.
+* Tidied up code in Interchange and MIDI-Learn.
 * All sliders/knobs mid-learnable except 'Controllers'.
 
 2016-12-5 Jörn
 * More tooltips updates.
 
 2016-12-5 Will
-* Bugfix: midi-learn scroll bar wasn't working.
-* Most sliders/rotary controls now available to midi-learn.
+* Bugfix: MIDI-Learn scroll bar wasn't working.
+* Most sliders/rotary controls now available to MIDI-Learn.
 
 2016-12-4 Will
-* Implemented full midi-learn save, load/recent.
-* Set windows of vectors and midi-learn to Yoshimi defaults.
+* Implemented full MIDI-Learn save, load/recent.
+* Set windows of vectors and MIDI-Learn to Yoshimi defaults.
 * Simplified history type selection in parameters window.
 * Bugfix: segfault clicking empty parameters window :(
 * Updated docs.
@@ -6425,7 +6431,7 @@ yoshimi 1.5.0
 * Started defining a standardised limits routine.
   This will return min, max, default for any control.
 * Bugfix: LV2 was trapping unknown CCs instead of allowing
-  them to be passed on to midi-learn!
+  them to be passed on to MIDI-Learn!
 * More work on limits.
 
 2016-12-2 Merge from : Jörn
@@ -6433,41 +6439,41 @@ yoshimi 1.5.0
 * Some code style consistency adjustments.
 
 2016-11-30 Will
-* First draft of midi-learn saving.
-* Bugfix: Had to remove fltk midi-learn warning.
+* First draft of MIDI-Learn saving.
+* Bugfix: Had to remove fltk MIDI-Learn warning.
   It goes into a loop on spinboxes :(
-* midi-learn load and save both working with default name
+* MIDI-Learn load and save both working with default name
   "testmidi" in /home/{user}.
 
 2016-11-29 Will
-* Corrected anomaly when changing midi-learn channel numbers.
+* Corrected anomaly when changing MIDI-Learn channel numbers.
 * Changed 'doublefreqtrack' to 'freqtrackoffset'.
 
 2016-11-28 Merge from : Jörn
 * Added button to filter tracking, offsetting range for 0 200%.
 
 2016-11-27 Will
-* midi-learn menu changed to buttons.
-* midi-learn clear all implemented.
+* MIDI-Learn menu changed to buttons.
+* MIDI-Learn clear all implemented.
 * Running learned controls can now go 'in_place' for LV2.
 
 2016-11-26 Will
-* Small midi-learn / Interchange optimisations.
+* Small MIDI-Learn / Interchange optimisations.
 * Direct access global fine detune now goes through ring buffer
-  to stop Xruns - particularly with midi-learn.
-* Enabled midi-learn of part effect sends.
+  to stop Xruns - particularly with MIDI-Learn.
+* Enabled MIDI-Learn of part effect sends.
 * BugFix: reinstated direct control of effects.
   GUI not updated :(
-* Enabled midi-learn of effects.
+* Enabled MIDI-Learn of effects.
 * Effects GUI now updated for all except some dynfilter knobs.
 
 2016-11-25 Will
-* Implemented the 'delete' function in midi-learn.
+* Implemented the 'delete' function in MIDI-Learn.
 * More doc updates!
 
 2016-11-24 Will
-* Enabled all midi-learn editors except CC and channel.
-* All midi-learn editors now working :)
+* Enabled all MIDI-Learn editors except CC and channel.
+* All MIDI-Learn editors now working :)
 * Bugfix: Odd control combinations segfaulted - cured.
 * Bugfix: Curing old bug in direct access that segaulted on
   invalid kit access stopped all access to kits. Now done.
@@ -6479,43 +6485,43 @@ yoshimi 1.5.0
 * Number of lines temporarily limited to 128.
 
 2016-11-22 Will
-* Enabled midi-learn from CLI direct access.
+* Enabled MIDI-Learn from CLI direct access.
 * Normal CLI can also list current learned lines.
 * Implemented (forgotten) AddSynth direct -> gui envelopes
   but still not freemode.
 * Updated docs.
 
 2016-11-21 Will
-* Partially set up routing for midi learn messages.
+* Partially set up routing for MIDI-Learn messages.
 * BugFix: Wrong ID for kits allowed part messages to drop
   through causing a segfault.
 * Some optimisations in Interchange.cpp
-* Filters and envelopes can now be midi-learned but envelopes
+* Filters and envelopes can now be MIDI-Learned but envelopes
   don't update the GUI.
 
 2016-11-20 Will
-* Midi learn window now accessible but non-functional.
-* Midi learn Gui now has some internal test structure.
+* MIDI-Learn window now accessible but non-functional.
+* MIDI-Learn Gui now has some internal test structure.
 * Updated docs.
 * Resolved issue with learned controls not all updating :)
 
 2016-11-19 Will
-* Made a few corrections and extensions to midi learn.
+* Made a few corrections and extensions to MIDI-Learn.
 * Started documenting this.
-* Bugfix: reverted change that had killed midi learn :(
-* More midi learn refinements.
+* Bugfix: reverted change that had killed MIDI-Learn :(
+* More MIDI-Learn refinements.
   Tested limits & status (but no interface yet).
 * Created potential GUI based on part kits.
 
 2016-11-18 Will
-* Started midi learn. Basic entries in place - not active.
+* Started MIDI-Learn. Basic entries in place - not active.
   LV2 behaviour not tested yet.
 * Bugfix: Vector window wasn't updated on part change.
-* Many controls now midi learnable - can't be deleted.
+* Many controls now MIDI-Learnable - can't be deleted.
 
 2016-11-16 Will
 * Added 'CoolSound' demo vector definition file to examples.
-* Small change to ID GUI controls as MIDI-learnable.
+* Small change to ID GUI controls as MIDI-Learnable.
 * Updated docs.
 
 2016-11-13
@@ -6891,7 +6897,7 @@ yoshimi 1.4.1
 * Updated LV2 for new MiscGui files.
 
 2016-8-8 Will
-* Defined direct commands for 'set default' and 'MIDI learn'.
+* Defined direct commands for 'set default' and 'MIDI-Learn'.
 * Activated CLI ID.
 * Updated docs.
 
