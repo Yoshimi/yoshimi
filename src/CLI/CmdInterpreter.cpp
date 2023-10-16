@@ -6946,6 +6946,45 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         if  (input.matchnMove(3, "section"))
         {
+            if (section < NUM_MIDI_PARTS)
+            {
+                int thisKit = kitNumber;
+                int result = 0;
+                int insert = UNUSED;
+                if (kitMode)
+                    insert = TOPLEVEL::insert::kitGroup;
+                else
+                    thisKit = UNUSED;
+                int thisEngine = engine;
+                int voiceNumber = 0;
+                if (thisEngine >= PART::engine::addVoice1 && thisEngine < PART::engine::addVoiceModEnd)
+                {
+                    voiceNumber = (thisEngine - PART::engine::addVoice1) & 7;
+                    thisEngine = PART::engine::addVoice1;
+                    if (engine >= PART::engine::addMod1)
+                        engine -= 8; // there is no separate modulator entry for copy/past
+                }
+                switch (thisEngine)
+                {
+                    case PART::engine::addSynth:
+                        result = readControl(synth, 0, PART::control::enableAdd, section, thisKit, PART::engine::addSynth, insert);
+                        break;
+                    case PART::engine::addVoice1:
+                        result = readControl(synth, 0, ADDVOICE::control::enableVoice, npart, kitNumber, PART::engine::addVoice1 + voiceNumber);
+                        break;
+                    case PART::engine::subSynth:
+                        result = readControl(synth, 0, PART::control::enableSub, section, thisKit, PART::engine::subSynth, insert);
+                        break;
+                    case PART::engine::padSynth:
+                        result = readControl(synth, 0, PART::control::enablePad, section, thisKit, PART::engine::padSynth, insert);
+                        break;
+                    default:
+                        result = true; // we don't need to check the rest.
+                        break;
+                }
+                if (!result)
+                    return REPLY::inactive_msg;
+            }
             if (filterVowelNumber != UNUSED)
                 presetsControl(0, TOPLEVEL::type::Learnable, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
             else
@@ -7039,7 +7078,12 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             if (filterVowelNumber != UNUSED)
                 presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
             else
+            {
+                if (engine >= PART::engine::addMod1 && engine < PART::engine::addVoiceModEnd)
+                    engine -= 8;  // there is no separate modulator entry for copy/past
+
                 presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
+            }
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))
