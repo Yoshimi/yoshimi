@@ -502,6 +502,7 @@ class MicrotonalUI {} {
                 afreqinput->value(func::string2float(splitline(msg)));
                 //octavesizeoutput->value(func::string2float(splitline(msg))); // temporarily disabled
                 int formalOctave = func::string2float(splitline(msg));
+                formalOctave = formalOctave; // suppress warning
                 string map;
                 for (int i = 0; i < mapsize; ++i)
                     map += (splitline(msg) + char(10));

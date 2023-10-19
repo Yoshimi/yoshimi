@@ -2555,10 +2555,10 @@ int CmdInterpreter::commandList(Parser& input)
     {
         if (insertType == TOPLEVEL::insert::envelopeGroup || insertType == TOPLEVEL::insert::LFOgroup)
         {
-            presetsControl(0, TOPLEVEL::type::Adjust, section, kitNumber, engine, insertType, insertGroup, UNUSED);
+            presetsControl(0, TOPLEVEL::type::List, section, kitNumber, engine, insertType, insertGroup, UNUSED);
             return REPLY::done_msg;
         }
-        presetsControl(0, TOPLEVEL::type::Adjust, section, kitNumber, engine, insertType, filterFormantNumber, filterVowelNumber);
+        presetsControl(0, TOPLEVEL::type::List, section, kitNumber, engine, insertType, filterFormantNumber, filterVowelNumber);
         return REPLY::done_msg;
     }
 
@@ -6254,11 +6254,13 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
 void CmdInterpreter::presetsControl(float value, unsigned char type, unsigned char section, unsigned char kitNumber, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     /*
-     * Types:
-     *  Learnable  = load (paste)
-     *  Write      = save (copy)
-     *  Adjust     = list
-     */
+        type flags (set)
+            List  - all entries of section type
+            Copy  - from section to file
+            Paste - from file to section
+
+        no name given - from/to clipboard))
+    */
     string name;
     if (engine == PART::engine::addVoice1 || engine == PART::engine::addMod1)
     {
@@ -6274,7 +6276,7 @@ void CmdInterpreter::presetsControl(float value, unsigned char type, unsigned ch
             insert = TOPLEVEL::insert::filterGroup;
         }
     }
-    if (type == TOPLEVEL::type::Adjust)
+    if (type == TOPLEVEL::type::List)
     {
         string name = readControlText(synth, TOPLEVEL::action::lowPrio, TOPLEVEL::control::copyPaste, section, kitNumber, engine, insert, parameter, offset);
         copypasteList(name);
@@ -6986,9 +6988,9 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                     return REPLY::inactive_msg;
             }
             if (filterVowelNumber != UNUSED)
-                presetsControl(0, TOPLEVEL::type::Learnable, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
+                presetsControl(0, TOPLEVEL::type::Paste, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
             else
-                presetsControl(0, TOPLEVEL::type::Learnable, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
+                presetsControl(0, TOPLEVEL::type::Paste, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
             return Reply::DONE;
         }
         if  (input.matchnMove(1, "default"))
@@ -7076,13 +7078,13 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         if  (input.matchnMove(3, "section"))
         {
             if (filterVowelNumber != UNUSED)
-                presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
+                presetsControl(0, TOPLEVEL::type::Copy, section,  kitNumber,  engine,  insertType, filterFormantNumber, filterVowelNumber, textMsgBuffer.push(string{input}));
             else
             {
                 if (engine >= PART::engine::addMod1 && engine < PART::engine::addVoiceModEnd)
                     engine -= 8;  // there is no separate modulator entry for copy/past
 
-                presetsControl(0, TOPLEVEL::type::LearnRequest, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
+                presetsControl(0, TOPLEVEL::type::Copy, section,  kitNumber,  engine,  insertType, insertGroup, UNUSED, textMsgBuffer.push(string{input}));
             }
             return Reply::DONE;
         }

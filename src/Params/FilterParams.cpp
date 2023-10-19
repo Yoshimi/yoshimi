@@ -533,7 +533,8 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
             def = FILTDEF::formClear.def;
             break;
         case FILTERINSERT::control::formantFrequency:
-            type |= TOPLEVEL::type::Error;
+            if (request == TOPLEVEL::type::Default)
+                type |= TOPLEVEL::type::Error;
             // it's pseudo random so inhibit default *** change this!
             type &= ~TOPLEVEL::type::Integer;
             break;

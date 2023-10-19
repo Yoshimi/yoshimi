@@ -1,6 +1,13 @@
 yoshimi 2.3.1 M
 
 [presets]
+bn 2271
+BugFix: Formant filter reporting wrong vowel numbers (off by 1)
+Fixed regression: CLI and MIDI-Learn not setting formant frequency
+Set specific type entries for presets "list, copy, paste"
+Corrected metainfo icon type local->stock
+
+[presets]
 BugFix: CLI attempting to copy/save nonexistent addSynth Mod elements!
 CLI has more checks for sections being active.
 

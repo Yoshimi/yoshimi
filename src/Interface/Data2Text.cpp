@@ -3053,6 +3053,11 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
             break;
         case FILTERINSERT::control::vowelNumber:
             contstr = "Vowel Num";
+            if (addValue)
+            {
+                contstr += " Value " + to_string(value_int + 1);
+            }
+            showValue = false;
             break;
         case FILTERINSERT::control::formantNumber:
             contstr = "Formant Num";
@@ -3078,7 +3083,7 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
     }
     if (control >= FILTERINSERT::control::formantFrequency && control <= FILTERINSERT::control::formantAmplitude)
     {
-        contstr = "Vowel " + to_string(nvowel) + " Formant " + to_string(nformant + 1) + " "+ contstr;
+        contstr = "Vowel " + to_string(nvowel + 1) + " Formant " + to_string(nformant + 1) + " "+ contstr;
     }
     else if (control == FILTERINSERT::control::sequencePosition)
     {

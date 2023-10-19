@@ -34,11 +34,12 @@
 using std::string;
 
 /*
- * type flags (set)
- * (none)        - list
- * LearnRequest  - save / store
- * Learnable     - load / fetch
- * no name given - from/to clipboard))
+   type flags (set)
+        List  - all entries of section type
+        Copy  - from section to file
+        Paste - from file to section
+
+   no name given - from/to clipboard))
  */
 
 string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
@@ -59,18 +60,18 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
         return name;
     }
     int type = getData->data.type;
-    if (type == TOPLEVEL::type::Adjust)
+    if (type == TOPLEVEL::type::List)
     {
         list(dirname, name);
     }
     else
     {
-        if (type & TOPLEVEL::type::LearnRequest)
+        if (type & TOPLEVEL::type::Copy)
         {
             saveUnif(getData);
             name = "";
         }
-        else if (type & TOPLEVEL::type::Learnable)
+        else if (type & TOPLEVEL::type::Paste)
         {
             load(getData);
         }
