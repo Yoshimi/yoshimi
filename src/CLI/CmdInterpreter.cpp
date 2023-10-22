@@ -1124,6 +1124,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
         effClass = TOPLEVEL::section::insertEffects;
     else
         effClass = TOPLEVEL::section::systemEffects;
+    int effSend = 0; // only used to check insert effects
 
     if (bitTest(context, LEVEL::Part))
     {
@@ -1135,7 +1136,10 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     {
         nFXavail = NUM_INS_EFX;
         nFX = readControl(synth, 0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects);
+
+        effSend = readControl(synth, 0, EFFECT::sysIns::effectDestination, TOPLEVEL::section::insertEffects);
         nFXtype = synth->insefx[nFX]->geteffect();
+
     }
     else
     {
@@ -1212,6 +1216,12 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
     }
     if (effType)
     {
+        if (effSend == -1)
+        {
+            synth->getRuntime().Log("Insert effect " + asString(nFX + 1) + " unrouted");
+            synth->getRuntime().Log("Use 'SEnd Master, Off or part number'");
+            return REPLY::done_msg;
+        }
         //cout << "nfx " << nFX << endl;
         nFXpreset = 0; // always set this on type change
         if (bitTest(context, LEVEL::Part))
@@ -1468,7 +1478,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
         if (input.lineEnd(controlType))
             return REPLY::parameter_msg;
 
-        if (!bitTest(context, LEVEL::InsFX))
+        if (!bitTest(context, LEVEL::InsFX)) // system effects
         {
             par = string2int(input) - 1;
             input.skipChars();
@@ -1476,7 +1486,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 return REPLY::value_msg;
             value = string2int127(input);
         }
-        else if (isWrite) // system effects
+        else if (isWrite)
         {
             if (input.matchnMove(1, "master"))
                 value = -2;
@@ -1488,36 +1498,38 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                 if (value >= Runtime.NumAvailableParts || value < 0)
                     return REPLY::range_msg;
             }
+            effSend = value;
+            std::cout << "here" << std::endl;
         }
 
         if (!isWrite)
             value = 1; // dummy
         int control;
-        int partno;
+        int section;
         engine = nFX;
         int insert = UNUSED;
 
         if (bitTest(context, LEVEL::Part))
         {
-            partno = npart;
+            section = npart;
             control = PART::control::partToSystemEffect1 + par;
             engine = UNUSED;
         }
         else if (bitTest(context, LEVEL::InsFX))
         {
-            partno = TOPLEVEL::section::insertEffects;
+            section = TOPLEVEL::section::insertEffects;
             control = EFFECT::sysIns::effectDestination;
         }
         else
         {
             if (par <= nFX || par >= NUM_SYS_EFX)
                 return REPLY::range_msg;
-            partno = TOPLEVEL::section::systemEffects;
+            section = TOPLEVEL::section::systemEffects;
             control = EFFECT::sysIns::toEffect1 + par - 1; // TODO this needs sorting
             engine = nFX;
             insert = TOPLEVEL::insert::systemEffectSend;
         }
-        return sendNormal(synth, 0, value, controlType, control, partno, UNUSED, engine, insert);
+        return sendNormal(synth, 0, value, controlType, control, section, UNUSED, engine, insert);
     }
 
     if (input.matchnMove(3, "preset"))
@@ -1529,15 +1541,15 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
          * However, all of this should really be in src/Effects
          * not here *and* in the gui code!
          */
-        int partno;
+        int section;
         nFXpreset = string2int127(input) - 1;
         if (bitTest(context, LEVEL::Part))
-            partno = npart;
+            section = npart;
         else if (bitTest(context, LEVEL::InsFX))
-            partno = TOPLEVEL::section::insertEffects;
+            section = TOPLEVEL::section::insertEffects;
         else
-            partno = TOPLEVEL::section::systemEffects;
-        return sendNormal(synth, 0, nFXpreset, controlType, EFFECT::control::preset, partno, EFFECT::type::none + nFXtype, nFX);
+            section = TOPLEVEL::section::systemEffects;
+        return sendNormal(synth, 0, nFXpreset, controlType, EFFECT::control::preset, section, EFFECT::type::none + nFXtype, nFX);
     }
     return REPLY::op_msg;
 }
@@ -6085,7 +6097,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return commandScale(input, controlType);
     }
 
-    if (input.matchnMove(1, "part"))
+    if (context == LEVEL::Top && input.matchnMove(1, "part"))
     {
         nFX = 0; // just to be sure
         // TODO get correct part number
@@ -6125,7 +6137,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         return commandTest(input, controlType);
     }
 
-    if ((context == LEVEL::Top || bitTest(context, LEVEL::InsFX)) && input.matchnMove(3, "system"))
+    if (context == LEVEL::Top && input.matchnMove(3, "system"))
     {
         section = TOPLEVEL::section::systemEffects;
         bitSet(context,LEVEL::AllFX);
@@ -6136,7 +6148,7 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
         nFXtype = synth->sysefx[nFX]->geteffect();
         return effects(input, controlType);
     }
-    if ((context == LEVEL::Top || bitTest(context, LEVEL::AllFX)) && !bitTest(context, LEVEL::Part) && input.matchnMove(3, "insert"))
+    if (context == LEVEL::Top && input.matchnMove(3, "insert"))
     {
         section = TOPLEVEL::section::insertEffects;
         bitSet(context,LEVEL::AllFX);

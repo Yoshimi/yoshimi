@@ -1,5 +1,11 @@
 yoshimi 2.3.1 M
 
+2023-10-22 Will
+bn 2272
+Merged in 'presets' updates.
+Disabled CLI direct swap across sys,ins,part effects - causing confusion!
+CLI now gives reminder to route insert effects before chosing the effect.
+
 [presets]
 bn 2271
 BugFix: Formant filter reporting wrong vowel numbers (off by 1)
