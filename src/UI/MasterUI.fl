@@ -4439,6 +4439,7 @@ bpmfallback->format(format);} {}
         configui->presetsRtext();
 
     presetsui->presetsRtext();
+    presetsui->UpresetsRtext();
     bankui->wincheck();
     partui->wincheck();} {}
   }

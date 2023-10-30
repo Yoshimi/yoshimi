@@ -578,14 +578,16 @@ class SUBnoteUI {: {public PresetsUI_}
       }
       Fl_Button subCopy {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);
-//synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::subSynth);}
+        callback {
+        //synth->getGuiMaster()->getPresetsUi()->copy(pars);
+        synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::subSynth);}
         xywh {540 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subPaste {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
-//synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::subSynth);}
+        callback {
+        //synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+        synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::subSynth);}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subClose {

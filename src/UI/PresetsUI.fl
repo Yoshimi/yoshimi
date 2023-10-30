@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>} {public local
@@ -70,7 +70,8 @@ class PresetsUI_ {} {
   }
 }
 
-class PresetsUI {} {
+class PresetsUI {open
+} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -78,11 +79,19 @@ class PresetsUI {} {
     make_window();
     copyW = 0;
     pasteW = 0;
+    UcopyW = 0;
+    UpasteW = 0;
     presetsDW = 265; // these are shared between both
     presetsDH = 430;} {}
   }
   Function {~PresetsUI()} {} {
     code {//
+    saveWin(synth, Ucopywin->w(), Ucopywin->h(), Ucopywin->x(), Ucopywin->y(), false,"PresetWin");
+    Ucopywin->hide();
+    delete(Ucopywin);
+    Upastewin->hide();
+    delete(Upastewin);
+
     copywin->hide();
     delete(copywin);
     pastewin->hide();
@@ -246,7 +255,7 @@ o->hide();}
     }
     Fl_Window Ucopywin {
       label {Yoshimi : Copy to}
-      callback {//saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {200 183 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy to - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
@@ -268,7 +277,7 @@ o->hide();}
       Fl_Button Ucopypbutton {
         label {Copy to Preset}
         callback {// to file
-            
+
             string name = string(Upresetname->value());
             if (!name.empty())
             {
@@ -291,7 +300,7 @@ o->hide();}
         callback {//
 
        Ucopywin->hide();
-//       saveWin(synth, copywin->w(), copywin->h(), copywin->x(), copywin->y(), false,"PresetWin");}
+       saveWin(synth, Ucopywin->w(), Ucopywin->h(), Ucopywin->x(), Ucopywin->y(), false,"PresetWin");}
         xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
       }
       Fl_Box Ucopytype {
@@ -322,7 +331,7 @@ o->hide();}
     }
     Fl_Window Upastewin {
       label Yoshimi
-      callback {//saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
+      callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
@@ -353,7 +362,7 @@ o->hide();}
 
             if (Upastebrowse->value() <= 0)
             return;
-            
+
             string name = Upastebrowse->text(Upastebrowse->value());
             if (!name.empty())
             {
@@ -377,7 +386,7 @@ o->hide();}
         callback {//
 
         Upastewin->hide();
-        //saveWin(synth, pastewin->w(), pastewin->h(), pastewin->x(), pastewin->y(), false,"PresetWin");}
+        saveWin(synth, Upastewin->w(), Upastewin->h(), Upastewin->x(), Upastewin->y(), false,"PresetWin");}
         xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
       }
       Fl_Box Upastetypetext {
@@ -405,8 +414,8 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-    
-    CommandBlock putData;
+
+   /* CommandBlock putData;
     putData.data.value = 0;
     putData.data.type = TOPLEVEL::type::List;
     putData.data.source = TOPLEVEL::action::lowPrio;
@@ -422,6 +431,8 @@ o->hide();}
     int value = synth->interchange.readAllData(&putData);
 
     string names = textMsgBuffer.fetch(value);
+    */
+    string names = Usetup();
     if (names.empty())
         return;
 
@@ -454,8 +465,8 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-    
-    CommandBlock putData;
+
+    /*CommandBlock putData;
     putData.data.value = 0;
     putData.data.type = TOPLEVEL::type::List;
     putData.data.source = TOPLEVEL::action::lowPrio;
@@ -470,7 +481,8 @@ o->hide();}
 //    synth->CBtest(&putData);
     int value = synth->interchange.readAllData(&putData);
 
-    string names = textMsgBuffer.fetch(value);
+    string names = textMsgBuffer.fetch(value);*/
+    string names = Usetup();
     if (names.empty())
         return;
 
@@ -493,6 +505,39 @@ o->hide();}
     while(pos != string::npos);
 
     Upastewin->show();} {}
+  }
+  Function {Usetup()} {return_type string
+  } {
+    code {//
+    int  W, H, X, Y, O;
+    loadWin(synth, W, H, X, Y, O, "PresetWin");
+    if (W < presetsDW || H < presetsDH)
+    {
+        W = presetsDW;
+        H = presetsDH;
+    }
+    checkSane(X, Y, W, H, presetsDW, presetsDH, true);
+
+    Ucopywin->resize(X, Y, W, H);
+    Upastewin->resize(X, Y, W, H);
+    UpresetsRtext();
+
+    CommandBlock putData;
+    putData.data.value = 0;
+    putData.data.type = TOPLEVEL::type::List;
+    putData.data.source = TOPLEVEL::action::lowPrio;
+    putData.data.control = TOPLEVEL::control::copyPaste;
+    putData.data.part = npart;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.offset = offset;
+    putData.data.miscmsg = UNUSED;//miscmsg;
+//    synth->CBtest(&putData);
+    int value = synth->interchange.readAllData(&putData);
+
+    return textMsgBuffer.fetch(value);} {}
   }
   Function {copy(Presets *p)} {} {
     code {//
@@ -580,7 +625,8 @@ o->hide();}
     code {//
         collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
   }
-  Function {presetsRtext()} {} {
+  Function {presetsRtext()} {open
+  } {
     code {//
     if (copywin->visible())
     {
@@ -627,7 +673,60 @@ o->hide();}
 
             pastewin->redraw();
         }
-    }} {}
+    } {}} {}
+  }
+  Function {UpresetsRtext()} {open
+  } {
+    code {//
+
+    if (Ucopywin->visible())
+    {
+        if (UcopyW != Ucopywin->w())
+        {
+            UcopyW = Ucopywin->w();
+            pasteW = 0;
+
+            float dScale = Ucopywin->w() / float(presetsDW);
+
+            int size14 = int(14 * dScale);
+            int size11 = int(11 * dScale);
+
+            Ucopybrowse->textsize(size14);
+            Ucopypbutton->labelsize(size14);
+            Ucopybutton->labelsize(size14);
+            Ucopycancel->labelsize(size14);
+            Upresetname->textsize(size14);
+            Ucopytype->labelsize(size11);
+            Ucopytypetext->labelsize(size11);
+
+            Ucopywin->redraw();
+        }
+    }
+    else if (Upastewin->visible())
+    {
+        if (UpasteW != Upastewin->w())
+        {
+            UpasteW = Upastewin->w();
+            UcopyW = 0;
+
+            float dScale = Upastewin->w() / float(presetsDW);
+
+            int size14 = int(14 * dScale);
+            int size11 = int(11 * dScale);
+
+            Upastebrowse->textsize(size14);
+            Upastepbutton->labelsize(size14);
+            Upastebutton->labelsize(size14);
+            Upastecancel->labelsize(size14);
+            Udeletepbutton->labelsize(size14);
+            Upastetype->labelsize(size11);
+            Upastetypetext->labelsize(size11);
+
+            Upastewin->redraw();
+        }
+
+    } {}} {selected
+    }
   }
   decl {Presets *p;} {public local
   }
@@ -642,6 +741,10 @@ o->hide();}
   decl {int copyW;} {private local
   }
   decl {int pasteW;} {private local
+  }
+  decl {int UcopyW;} {private local
+  }
+  decl {int UpasteW;} {private local
   }
   decl {int npart;} {private local
   }

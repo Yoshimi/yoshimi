@@ -1,6 +1,9 @@
 yoshimi 2.3.1 M
 
 [presets]
+window/text sizes now correct
+
+[presets]
 bn 2273
 Trial of GUI unified presets with subSynth
 Not yet done:
