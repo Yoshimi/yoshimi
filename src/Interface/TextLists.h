@@ -1031,6 +1031,30 @@ static std::string testlist [] = {
     "@end","@end"
 };
 
+
+static std::string presetgroups [] = {
+    "Pfilter",          "Filter",
+    "Pfiltern",         "Formant Editor",
+    "Peffect",          "Effect",
+    "Pfilter",          "Filter 2",
+    "Pfiltern",         "Formant Editor 2",
+    "Poscilgen",        "Waveform",
+    "Presonance",       "Resonance",
+    "Plfoamplitide",    "Amplitude LFO",
+    "Plfofrequency",    "Frequency LFO",
+    "Plfofilter",       "Filter LFO",
+    "Penvamplitude",    "Amplitude Envelope",
+    "Penvfrequency",    "Frequency Envelope",
+    "Penvfilter",       "Filter Envelope",
+    "Penvbandwidth",    "Bandwidth Envelope",
+    "Padsythn",         "Addsynth Voice",
+    "Padsyth",          "Addsynth",
+    "Psubsyth",         "Subsynth",
+    "Ppadsyth",         "Padsynth",
+    "@end","@end"
+};
+
+
 static std::string replies [] = {
     "OK",
     "Done",

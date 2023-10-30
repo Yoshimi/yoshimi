@@ -187,7 +187,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
             Write = 64,
             Integer = 128 // false = float
         };
-        const int List = Adjust; // all entries
+        const int List = Adjust; // all entries of this group
+        const int Group = Default; //
         const int Copy = LearnRequest; // to file
         const int Paste = Learnable; // to section
     }

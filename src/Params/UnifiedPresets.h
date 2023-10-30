@@ -32,17 +32,25 @@
 using std::to_string;
 using std::vector;
 
+inline string listpos(int count, int human)
+{
+    return presetgroups[count * 2 + human];
+}
+
+
 class SynthEngine;
 
 class UnifiedPresets
 {
     private:
+        int human;
+        string listpos(int count);
         vector<std::string> presetList;
         SynthEngine *synth;
 
     public:
         string section(SynthEngine *synth, CommandBlock *getData);
-        string findPresetType(CommandBlock *getData);
+        string findPresetType(CommandBlock *getData, int _human = 0);
         void list(string dirname, string& name);
         string findXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
         string resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);

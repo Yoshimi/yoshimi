@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>} {public local
@@ -70,8 +70,7 @@ class PresetsUI_ {} {
   }
 }
 
-class PresetsUI {open
-} {
+class PresetsUI {} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -279,10 +278,6 @@ o->hide();}
         callback {// to file
 
             string name = string(Upresetname->value());
-            if (!name.empty())
-            {
-                std::cout << name << std::endl;
-            }
             int miscMsg = textMsgBuffer.push(name);
             send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Copy, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);}
         xywh {145 355 110 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
@@ -309,6 +304,7 @@ o->hide();}
       }
       Fl_Box Ucopytypetext {
         xywh {50 5 205 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
+        code0 {o->label(group.c_str());}
       }
       Fl_Input Upresetname {
         callback {//
@@ -364,10 +360,6 @@ o->hide();}
             return;
 
             string name = Upastebrowse->text(Upastebrowse->value());
-            if (!name.empty())
-            {
-                std::cout << name << std::endl;
-            }
             int miscMsg = textMsgBuffer.push(name);
             send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);
             Upastewin->hide();}
@@ -391,6 +383,7 @@ o->hide();}
       }
       Fl_Box Upastetypetext {
         xywh {55 5 200 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
+        code0 {o->label(group.c_str());}
       }
       Fl_Box Upastetype {
         label {Type:}
@@ -414,24 +407,6 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-
-   /* CommandBlock putData;
-    putData.data.value = 0;
-    putData.data.type = TOPLEVEL::type::List;
-    putData.data.source = TOPLEVEL::action::lowPrio;
-    putData.data.control = TOPLEVEL::control::copyPaste;
-    putData.data.part = npart;
-    putData.data.kit = kititem;
-    putData.data.engine = engine;
-    putData.data.insert = insert;
-    putData.data.parameter = parameter;
-    putData.data.offset = offset;
-    putData.data.miscmsg = UNUSED;//miscmsg;
-//    synth->CBtest(&putData);
-    int value = synth->interchange.readAllData(&putData);
-
-    string names = textMsgBuffer.fetch(value);
-    */
     string names = Usetup();
     if (names.empty())
         return;
@@ -465,23 +440,6 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-
-    /*CommandBlock putData;
-    putData.data.value = 0;
-    putData.data.type = TOPLEVEL::type::List;
-    putData.data.source = TOPLEVEL::action::lowPrio;
-    putData.data.control = TOPLEVEL::control::copyPaste;
-    putData.data.part = npart;
-    putData.data.kit = kititem;
-    putData.data.engine = engine;
-    putData.data.insert = insert;
-    putData.data.parameter = parameter;
-    putData.data.offset = offset;
-    putData.data.miscmsg = UNUSED; // miscmsg;
-//    synth->CBtest(&putData);
-    int value = synth->interchange.readAllData(&putData);
-
-    string names = textMsgBuffer.fetch(value);*/
     string names = Usetup();
     if (names.empty())
         return;
@@ -536,6 +494,9 @@ o->hide();}
     putData.data.miscmsg = UNUSED;//miscmsg;
 //    synth->CBtest(&putData);
     int value = synth->interchange.readAllData(&putData);
+
+    group = synth->unifiedpresets.findPresetType(&putData, 1);
+//    std::cout << ">" << group << "<" << std::endl;;
 
     return textMsgBuffer.fetch(value);} {}
   }
@@ -625,8 +586,7 @@ o->hide();}
     code {//
         collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
   }
-  Function {presetsRtext()} {open
-  } {
+  Function {presetsRtext()} {} {
     code {//
     if (copywin->visible())
     {
@@ -675,8 +635,7 @@ o->hide();}
         }
     } {}} {}
   }
-  Function {UpresetsRtext()} {open
-  } {
+  Function {UpresetsRtext()} {} {
     code {//
 
     if (Ucopywin->visible())
@@ -725,8 +684,7 @@ o->hide();}
             Upastewin->redraw();
         }
 
-    } {}} {selected
-    }
+    } {}} {}
   }
   decl {Presets *p;} {public local
   }
@@ -757,5 +715,7 @@ o->hide();}
   decl {int offset;} {private local
   }
   decl {int parameter;} {private local
+  }
+  decl {string group;} {private local
   }
 }

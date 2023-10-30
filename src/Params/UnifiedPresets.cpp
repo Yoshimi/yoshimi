@@ -24,6 +24,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/TextMsgBuffer.h"
 #include "Misc/FileMgrFuncs.h"
+#include "Interface/TextLists.h"
 #include "Effects/EffectMgr.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -36,6 +37,7 @@ using std::string;
 /*
    type flags (set)
         List  - all entries of section type
+        Group - preset extensin and name
         Copy  - from section to file
         Paste - from file to section
 
@@ -79,9 +81,14 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
     return name;
 }
 
-
-string UnifiedPresets::findPresetType(CommandBlock *getData)
+string UnifiedPresets::listpos(int count)
 {
+    return presetgroups[count * 2 + human];
+}
+
+string UnifiedPresets::findPresetType(CommandBlock *getData, int _human)
+{
+    human = _human;
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
@@ -97,12 +104,12 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
         if (insert == TOPLEVEL::insert::filterGroup)
         {
             if (offset == UNUSED)
-                return "Pfilter";
+                return listpos(0);//"Pfilter";
             else
-                return "Pfiltern";
+                return listpos(1);//"Pfiltern";
         }
         else
-            return "Peffect";
+            return listpos(2);//"Peffect";
     }
 
     switch (insert)
@@ -110,29 +117,29 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
         case TOPLEVEL::insert::filterGroup:
             {
                 if (offset == UNUSED)
-                    name = "Pfilter";
+                    name = listpos(3);//"Pfilter";
                 else
-                    name = "Pfiltern";
+                    name = listpos(4);//"Pfiltern";
             }
             break;
 
         case TOPLEVEL::insert::oscillatorGroup:
-            name = "Poscilgen";
+            name = listpos(5);//"Poscilgen";
             break;
         case TOPLEVEL::insert::resonanceGroup:
-            name = "Presonance";
+            name = listpos(6);//"Presonance";
             break;
         case TOPLEVEL::insert::LFOgroup:
             switch (parameter)
             {
                 case 0:
-                    name = "Plfoamplitude";
+                    name = listpos(7);//"Plfoamplitude";
                     break;
                 case 1:
-                    name = "Plfofrequency";
+                    name = listpos(8);//"Plfofrequency";
                     break;
                 case 2:
-                    name = "Plfofilter";
+                    name = listpos(9);//"Plfofilter";
                     break;
             }
             break;
@@ -140,16 +147,16 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
             switch (parameter)
             {
                 case 0:
-                    name = "Penvamplitude";
+                    name = listpos(10);//"Penvamplitude";
                     break;
                 case 1:
-                    name = "Penvfrequency";
+                    name = listpos(11);//"Penvfrequency";
                     break;
                 case 2:
-                    name = "Penvfilter";
+                    name = listpos(12);//"Penvfilter";
                     break;
                 case 3:
-                    name = "Penvbandwidth";
+                    name = listpos(13);//"Penvbandwidth";
                     break;
             }
             break;
@@ -159,19 +166,19 @@ string UnifiedPresets::findPresetType(CommandBlock *getData)
 
     if (engineType >= PART::engine::addVoice1 && engineType < PART::engine::addVoiceModEnd)
     {
-        return "Padsythn"; // all voice and modulator level have the same extension
+        return listpos(14);//"Padsythn"; // all voice and modulator level have the same extension
     }
 
     switch (engineType)
     {
         case PART::engine::addSynth:
-            name = "Padsyth";
+            name = listpos(15);//"Padsyth";
             break;
         case PART::engine::subSynth:
-            name = "Psubsyth";
+            name = listpos(16);//presetgroups[32+human];//"Psubsyth";
             break;
         case PART::engine::padSynth:
-            name = "Ppadsyth";
+            name = listpos(17);//"Ppadsyth";
             break;
     }
     return name;
