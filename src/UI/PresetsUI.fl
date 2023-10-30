@@ -244,6 +244,255 @@ o->hide();}
         xywh {180 355 75 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
     }
+    Fl_Window Ucopywin {
+      label {Yoshimi : Copy to}
+      callback {//saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
+o->hide();}
+      xywh {200 183 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy to - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
+      code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
+    } {
+      Fl_Browser Ucopybrowse {
+        callback {//
+
+        if (o->value())
+        {
+            int result = o->value();
+            if (result > 0)
+            {
+                Upresetname->insert(o->text(result));
+            }
+        }}
+        xywh {10 25 245 320} type Select labelcolor 64 textcolor 64
+      }
+      Fl_Button Ucopypbutton {
+        label {Copy to Preset}
+        callback {// to file
+            
+            string name = string(Upresetname->value());
+            if (!name.empty())
+            {
+                std::cout << name << std::endl;
+            }
+            int miscMsg = textMsgBuffer.push(name);
+            send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Copy, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);}
+        xywh {145 355 110 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
+      }
+      Fl_Button Ucopybutton {
+        label {Copy to Clipboard}
+        callback {// to clipboard
+
+        send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Copy, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, UNUSED);
+        Ucopywin->hide();}
+        xywh {25 385 90 35} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 align 192
+      }
+      Fl_Button Ucopycancel {
+        label Cancel
+        callback {//
+
+       Ucopywin->hide();
+//       saveWin(synth, copywin->w(), copywin->h(), copywin->x(), copywin->y(), false,"PresetWin");}
+        xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
+      }
+      Fl_Box Ucopytype {
+        label {Type:}
+        xywh {10 5 40 15} labelsize 11 labelcolor 64 align 20
+      }
+      Fl_Box Ucopytypetext {
+        xywh {50 5 205 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
+      }
+      Fl_Input Upresetname {
+        callback {//
+
+        const char *tmp = o->value();
+        if (tmp == NULL)
+        tmp = "";
+        if (strlen(tmp) > 0)
+        {
+            Ucopybutton->deactivate();
+            Ucopypbutton->activate();
+        }
+        else
+        {
+            Ucopybutton->activate();
+            Ucopypbutton->deactivate();
+        }}
+        xywh {10 355 130 24} labelcolor 64 when 1 textcolor 64
+      }
+    }
+    Fl_Window Upastewin {
+      label Yoshimi
+      callback {//saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
+o->hide();}
+      xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
+      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
+      code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
+    } {
+      Fl_Browser Upastebrowse {
+        callback {//
+
+        if (o->value())
+        {
+            int result = o->value();
+            if (result > 0)
+            {
+                Upastepbutton->activate();
+                Udeletepbutton->activate();
+            }
+        }
+        else
+        {
+            Upastepbutton->deactivate();
+            Udeletepbutton->deactivate();
+        }}
+        xywh {10 25 245 320} type Hold labelcolor 64 textcolor 64
+      }
+      Fl_Button Upastepbutton {
+        label {Paste from Preset}
+        callback {// from preset
+
+            if (Upastebrowse->value() <= 0)
+            return;
+            
+            string name = Upastebrowse->text(Upastebrowse->value());
+            if (!name.empty())
+            {
+                std::cout << name << std::endl;
+            }
+            int miscMsg = textMsgBuffer.push(name);
+            send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);
+            Upastewin->hide();}
+        xywh {10 355 160 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
+      }
+      Fl_Button Upastebutton {
+        label {Paste from Clipboard}
+        callback {// from clipboard
+
+          send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, UNUSED);
+          Upastewin->hide();}
+        xywh {25 385 90 35} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64 align 192
+      }
+      Fl_Button Upastecancel {
+        label Cancel
+        callback {//
+
+        Upastewin->hide();
+        //saveWin(synth, pastewin->w(), pastewin->h(), pastewin->x(), pastewin->y(), false,"PresetWin");}
+        xywh {160 385 80 35} box THIN_UP_BOX color 196 labelcolor 64 align 192
+      }
+      Fl_Box Upastetypetext {
+        xywh {55 5 200 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
+      }
+      Fl_Box Upastetype {
+        label {Type:}
+        xywh {15 5 40 15} labelsize 11 labelcolor 64 align 20
+      }
+      Fl_Button Udeletepbutton {
+        label Delete
+        callback {//
+
+;}
+        xywh {180 355 75 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
+      }
+    }
+  }
+  Function {Ucopy(int _npart, int _kititem, int _engine = UNUSED, int _insert =  UNUSED, int _parameter = UNUSED, int _offset = UNUSED, int _miscMsg = UNUSED)} {} {
+    code {//
+
+    npart = _npart;
+    kititem = _kititem;
+    engine = _engine;
+    insert = _insert;
+    parameter = _parameter;
+    offset = _offset;
+    
+    CommandBlock putData;
+    putData.data.value = 0;
+    putData.data.type = TOPLEVEL::type::List;
+    putData.data.source = TOPLEVEL::action::lowPrio;
+    putData.data.control = TOPLEVEL::control::copyPaste;
+    putData.data.part = npart;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.offset = offset;
+    putData.data.miscmsg = UNUSED;//miscmsg;
+//    synth->CBtest(&putData);
+    int value = synth->interchange.readAllData(&putData);
+
+    string names = textMsgBuffer.fetch(value);
+    if (names.empty())
+        return;
+
+    size_t pos = 0;
+    unsigned char ch = 10;
+    Ucopybrowse->clear();
+    Ucopybutton->activate();
+    Ucopypbutton->deactivate();
+    do {
+        pos = names.find(ch);
+        if (pos != string::npos)
+        {
+    	    string line = names.substr(0, pos);
+    	    names = names.substr(pos + 1, names.length());
+    	    Ucopybrowse->add(line.c_str());
+        }
+        else
+    	    Ucopybrowse->add(names.c_str());
+    }
+    while(pos != string::npos);
+
+    Ucopywin->show();} {}
+  }
+  Function {Upaste(int _npart, int _kititem, int _engine = UNUSED, int _insert =  UNUSED, int _parameter = UNUSED, int _offset = UNUSED, int _miscMsg = UNUSED)} {} {
+    code {//
+
+    npart = _npart;
+    kititem = _kititem;
+    engine = _engine;
+    insert = _insert;
+    parameter = _parameter;
+    offset = _offset;
+    
+    CommandBlock putData;
+    putData.data.value = 0;
+    putData.data.type = TOPLEVEL::type::List;
+    putData.data.source = TOPLEVEL::action::lowPrio;
+    putData.data.control = TOPLEVEL::control::copyPaste;
+    putData.data.part = npart;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.offset = offset;
+    putData.data.miscmsg = UNUSED; // miscmsg;
+//    synth->CBtest(&putData);
+    int value = synth->interchange.readAllData(&putData);
+
+    string names = textMsgBuffer.fetch(value);
+    if (names.empty())
+        return;
+
+    size_t pos = 0;
+    unsigned char ch = 10;
+    Upastebrowse->clear();
+    Upastepbutton->deactivate();
+    Udeletepbutton->deactivate();
+    do {
+        pos = names.find(ch);
+        if (pos != string::npos)
+        {
+    	    string line = names.substr(0, pos);
+    	    names = names.substr(pos + 1, names.length());
+    	    Upastebrowse->add(line.c_str());
+        }
+        else
+    	    Upastebrowse->add(names.c_str());
+    }
+    while(pos != string::npos);
+
+    Upastewin->show();} {}
   }
   Function {copy(Presets *p)} {} {
     code {//
@@ -327,6 +576,10 @@ o->hide();}
   Function {Hide()} {} {
     code {copywin->hide();} {}
   }
+  Function {send_data(float value, int action, int type, int control, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {} {
+    code {//
+        collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
+  }
   Function {presetsRtext()} {} {
     code {//
     if (copywin->visible())
@@ -389,5 +642,17 @@ o->hide();}
   decl {int copyW;} {private local
   }
   decl {int pasteW;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
+  }
+  decl {int engine;} {private local
+  }
+  decl {int insert;} {private local
+  }
+  decl {int offset;} {private local
+  }
+  decl {int parameter;} {private local
   }
 }

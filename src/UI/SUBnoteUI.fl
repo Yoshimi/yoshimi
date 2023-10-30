@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -179,9 +179,10 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
 }
 
-class SUBnoteUI {: {public PresetsUI_}
+class SUBnoteUI {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     comment {randompan MUST be placed after panwidth} {in_source in_header
     }
     Fl_Window SUBparameters {
@@ -190,7 +191,7 @@ class SUBnoteUI {: {public PresetsUI_}
     if (subSeen)
         saveWin(synth,o->w(), SUBparameters->h(),o->x(), o->y(), false, "SubSynth");
     subSeen = false;
-    o->hide();}
+    o->hide();} open
       xywh {463 28 735 470} type Double labelcolor 64 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("SubSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {subDW = o->w();subDH=o->h();}
@@ -578,12 +579,14 @@ class SUBnoteUI {: {public PresetsUI_}
       }
       Fl_Button subCopy {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->copy(pars);
+synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::subSynth);} selected
         xywh {540 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subPaste {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::subSynth);}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subClose {

@@ -1,5 +1,13 @@
 yoshimi 2.3.1 M
 
+[presets]
+bn 2273
+Trial of GUI unified presets with subSynth
+Not yet done:
+    delete
+    title bar
+    preset group
+
 2023-10-22 Will
 bn 2272
 Merged in 'presets' updates.
