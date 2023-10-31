@@ -48,6 +48,14 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
     //synth->CBtest(getData, false);
+    int type = getData->data.type;
+    int value = getData->data.value;
+    if (type == TOPLEVEL::type::List && value == 1)
+    {
+        string group = findPresetType(getData, value);
+        value = synth->textMsgBuffer.push(group);
+        return findPresetType(getData, value); // human readble extension
+    }
 
     string name = findPresetType(getData);
     if (name.empty())
@@ -61,7 +69,7 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
         name = "Directory empty";
         return name;
     }
-    int type = getData->data.type;
+
     if (type == TOPLEVEL::type::List)
     {
         list(dirname, name);
@@ -75,7 +83,10 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
         }
         else if (type & TOPLEVEL::type::Paste)
         {
-            load(getData);
+            if (value == 0)
+                load(getData);
+            else
+                remove(getData);
         }
     }
     return name;
@@ -813,5 +824,15 @@ bool UnifiedPresets::load(CommandBlock *getData)
     xml->loadXMLfile(filename);
     findXML(xml, getData, true);
     delete xml;
+    return false;
+}
+
+bool UnifiedPresets::remove(CommandBlock *getData)
+{
+    string type = findPresetType(getData);
+    string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
+    string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
+    string filename = dirname + "/" + name + "." + type;
+    std::cout << filename << std::endl;
     return false;
 }

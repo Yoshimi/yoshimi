@@ -60,6 +60,7 @@ class UnifiedPresets
         string envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
         bool saveUnif(CommandBlock *getData);
         bool load(CommandBlock *getData);
+        bool remove(CommandBlock *getData);
 };
 
 #endif

@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -78,7 +78,7 @@ decl {\#include "Misc/TextMsgBuffer.h"
     }} {private local
 }
 
-decl {\#include "Interface/TextLists.h"} {selected public local
+decl {\#include "Interface/TextLists.h"} {public local
 }
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
@@ -893,12 +893,14 @@ class PADnoteUI {: {public PresetsUI_}
       }
       Fl_Button padCopy {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->copy(pars);
+    synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::padSynth)}
         xywh {415 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button padPaste {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+  synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::padSynth)}
         xywh {449 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button padClose {

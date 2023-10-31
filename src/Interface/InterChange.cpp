@@ -321,8 +321,9 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         /*
          * for Paste (load) 'name' is the type of the preset being loaded
          * for List 'name' lists all the stored presets of the wanted preset type
+         *  alternatively it is the group type
          * */
-        if (type == TOPLEVEL::type::Adjust) // list (actually zero)
+        if (type == TOPLEVEL::type::List)
         {
             textMsgBuffer.push(name);
         }

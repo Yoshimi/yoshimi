@@ -187,10 +187,12 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
             Write = 64,
             Integer = 128 // false = float
         };
-        const int List = Adjust; // all entries of this group
-        const int Group = Default; //
-        const int Copy = LearnRequest; // to file
-        const int Paste = Learnable; // to section
+
+        // copy/paste preset types
+        const int List = Adjust; // fetch all entries of this group, alternatively group type
+        const int Delete = Minimum; // remove entry
+        const int Copy = LearnRequest; // from section to file
+        const int Paste = Learnable; // from file to section
     }
 
     namespace action {

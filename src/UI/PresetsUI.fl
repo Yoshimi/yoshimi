@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>} {public local
@@ -70,7 +70,8 @@ class PresetsUI_ {} {
   }
 }
 
-class PresetsUI {} {
+class PresetsUI {open
+} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -96,7 +97,8 @@ class PresetsUI {} {
     pastewin->hide();
     delete(pastewin);} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window copywin {
       label {Yoshimi : Copy to}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
@@ -304,7 +306,7 @@ o->hide();}
       }
       Fl_Box Ucopytypetext {
         xywh {50 5 205 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
-        code0 {o->label(group.c_str());}
+        code0 {o->label(groupName.c_str());}
       }
       Fl_Input Upresetname {
         callback {//
@@ -328,7 +330,7 @@ o->hide();}
     Fl_Window Upastewin {
       label Yoshimi
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
-o->hide();}
+o->hide();} open
       xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
@@ -383,7 +385,7 @@ o->hide();}
       }
       Fl_Box Upastetypetext {
         xywh {55 5 200 15} box FLAT_BOX color 7 labelfont 1 labelsize 11 labelcolor 64 align 20
-        code0 {o->label(group.c_str());}
+        code0 {o->label(groupName.c_str());}
       }
       Fl_Box Upastetype {
         label {Type:}
@@ -392,8 +394,9 @@ o->hide();}
       Fl_Button Udeletepbutton {
         label Delete
         callback {//
-
-;}
+string name = Upastebrowse->text(Upastebrowse->value());
+int miscMsg = textMsgBuffer.push(name);
+send_data(1, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);} selected
         xywh {180 355 75 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
     }
@@ -407,7 +410,7 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-    string names = Usetup();
+    string names = Ufetch();
     if (names.empty())
         return;
 
@@ -420,12 +423,12 @@ o->hide();}
         pos = names.find(ch);
         if (pos != string::npos)
         {
-    	    string line = names.substr(0, pos);
-    	    names = names.substr(pos + 1, names.length());
-    	    Ucopybrowse->add(line.c_str());
+            string line = names.substr(0, pos);
+            names = names.substr(pos + 1, names.length());
+            Ucopybrowse->add(line.c_str());
         }
         else
-    	    Ucopybrowse->add(names.c_str());
+            Ucopybrowse->add(names.c_str());
     }
     while(pos != string::npos);
 
@@ -440,7 +443,7 @@ o->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
-    string names = Usetup();
+    string names = Ufetch();
     if (names.empty())
         return;
 
@@ -453,18 +456,17 @@ o->hide();}
         pos = names.find(ch);
         if (pos != string::npos)
         {
-    	    string line = names.substr(0, pos);
-    	    names = names.substr(pos + 1, names.length());
-    	    Upastebrowse->add(line.c_str());
+            string line = names.substr(0, pos);
+            names = names.substr(pos + 1, names.length());
+            Upastebrowse->add(line.c_str());
         }
         else
-    	    Upastebrowse->add(names.c_str());
+            Upastebrowse->add(names.c_str());
     }
     while(pos != string::npos);
-
     Upastewin->show();} {}
   }
-  Function {Usetup()} {return_type string
+  Function {Ufetch()} {return_type string
   } {
     code {//
     int  W, H, X, Y, O;
@@ -491,13 +493,13 @@ o->hide();}
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.offset = offset;
-    putData.data.miscmsg = UNUSED;//miscmsg;
-//    synth->CBtest(&putData);
+    putData.data.miscmsg = UNUSED;
+    //synth->CBtest(&putData);
     int value = synth->interchange.readAllData(&putData);
 
-    group = synth->unifiedpresets.findPresetType(&putData, 1);
-//    std::cout << ">" << group << "<" << std::endl;;
-
+    putData.data.value = 1;
+    int Ugroup = synth->interchange.readAllData(&putData);
+    groupName = textMsgBuffer.fetch(Ugroup);
     return textMsgBuffer.fetch(value);} {}
   }
   Function {copy(Presets *p)} {} {
@@ -716,6 +718,6 @@ o->hide();}
   }
   decl {int parameter;} {private local
   }
-  decl {string group;} {private local
+  decl {string groupName;} {private local
   }
 }
