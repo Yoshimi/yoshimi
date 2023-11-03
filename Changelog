@@ -1,5 +1,11 @@
 yoshimi 2.3.1 M
 
+2023-11-03 Will
+bn 2275
+GUI unified presets complete for AddSynth, AddVoice, SubSynth, Padsynth
+Started building HTML version of Control values to replace .ods version
+    (with additions and corrections)
+
 2023-10-31 Will
 bn 2274
 Further revisions to unified presets, now also applied to Padsynth.

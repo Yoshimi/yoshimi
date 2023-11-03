@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>} {public local
@@ -70,8 +70,7 @@ class PresetsUI_ {} {
   }
 }
 
-class PresetsUI {open
-} {
+class PresetsUI {} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
@@ -97,8 +96,7 @@ class PresetsUI {open
     pastewin->hide();
     delete(pastewin);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window copywin {
       label {Yoshimi : Copy to}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
@@ -281,7 +279,8 @@ o->hide();}
 
             string name = string(Upresetname->value());
             int miscMsg = textMsgBuffer.push(name);
-            send_data(0, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Copy, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);}
+            send_data(0, TOPLEVEL::action::lowPrio, TOPLEVEL::type::Copy, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);
+            Ucopywin->hide();}
         xywh {145 355 110 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
       Fl_Button Ucopybutton {
@@ -330,7 +329,7 @@ o->hide();}
     Fl_Window Upastewin {
       label Yoshimi
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
-o->hide();} open
+o->hide();}
       xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
@@ -396,7 +395,8 @@ o->hide();} open
         callback {//
 string name = Upastebrowse->text(Upastebrowse->value());
 int miscMsg = textMsgBuffer.push(name);
-send_data(1, TOPLEVEL::action::forceUpdate | TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);} selected
+send_data(1, TOPLEVEL::action::lowPrio, TOPLEVEL::type::Paste, TOPLEVEL::control::copyPaste, npart, kititem, engine, insert, parameter, offset, miscMsg);
+Upastewin->hide();}
         xywh {180 355 75 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
     }

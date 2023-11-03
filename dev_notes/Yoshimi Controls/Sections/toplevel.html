@@ -1,0 +1,119 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>Top Level</title>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>TOPLEVEL::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>windowTitle</td>
+        <td>0~254</td>
+        <td>0~63</td>
+        <td>252</td>
+        <td>0~15</td>
+        <td>0~2,8+(0~7)</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Builds window title incorporating text if passed in</td>
+      </tr>
+      <tr>
+        <td>copyPaste</td>
+        <td>0/1</td>
+        <td>251</td>
+        <td>0~63,241,242</td>
+        <td>0~15</td>
+        <td>0~2,8+(0~7)</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No</td>
+        <td>Perform section List, Copy/ Paste</td>
+      </tr>
+      <tr>
+        <td>partBusy</td>
+        <td>Ret. 0~1</td>
+        <td>252</td>
+        <td>0~63</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Blocks further action. Internally set, so read only</td>
+      </tr>
+      <tr>
+        <td>unrecognised</td>
+        <td>~ ~</td>
+        <td>253</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>Invalid entry in text to data interpreter</td>
+      </tr>
+      <tr>
+        <td>textMessage</td>
+        <td>~ ~</td>
+        <td>254</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>msg No.</td>
+        <td>Just sends a message</td>
+      </tr>
+      <tr>
+        <td>forceExit</td>
+        <td>~ ~</td>
+        <td>255</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>Force exit at any time from any section</td>
+      </tr>
+      <tr>
+        <td>instance ID</td>
+        <td>Ret. 0~31</td>
+        <td>~ ~</td>
+        <td>254</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>~ ~</td>
+        <td>Returns numeric ID of current instance (read only)</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

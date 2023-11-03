@@ -190,9 +190,8 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
         // copy/paste preset types
         const int List = Adjust; // fetch all entries of this group, alternatively group type
-        const int Delete = Minimum; // remove entry
         const int Copy = LearnRequest; // from section to file
-        const int Paste = Learnable; // from file to section
+        const int Paste = Learnable; // from file to section, alternatively delete entry
     }
 
     namespace action {
@@ -205,7 +204,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
             // space for any other sources
             noAction = 15, // internal use (also a mask for the above)
             // remaining used bit-wise
-            forceUpdate = 32,
+            forceUpdate = 32, // currently only used by the GUI
             loop = 64, // internal use
             lowPrio = 128,
             muteAndLoop = 192
@@ -371,7 +370,7 @@ namespace BANK // usage BANK::control::
         selectBank = 16, // in root, by ID or read ID + name
         renameBank, // or read just the name
         createBank,
-        deleteBank, // not yet - currently 'remove' at top level
+        deleteBank, // not yet (currently done in main)
         findBankSize,
         selectFirstBankToSwap,
         selectSecondBankAndSwap,

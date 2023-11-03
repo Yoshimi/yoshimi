@@ -832,7 +832,7 @@ bool UnifiedPresets::remove(CommandBlock *getData)
     string type = findPresetType(getData);
     string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
     string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
-    string filename = dirname + "/" + name + "." + type;
-    std::cout << filename << std::endl;
+    string filename = dirname + "/" + name + "." + type + EXTEN::presets;
+    file::deleteFile(filename);
     return false;
 }

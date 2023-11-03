@@ -1,0 +1,288 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>Banks and Instruments</title>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>BANK::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>readInstrumentName</td>
+        <td>~ ~</td>
+        <td>0</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>findInstrumentName</td>
+        <td>0~159</td>
+        <td>1</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>renameInstrument</td>
+        <td>~ ~</td>
+        <td>2</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>saveInstrument</td>
+        <td>~ ~</td>
+        <td>3</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>deleteInstrument</td>
+        <td>0~159</td>
+        <td>4</td>
+        <td>244</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>selectFirstInstrumentToSwap</td>
+        <td>~ ~</td>
+        <td>5</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>selectSecondInstrumentAndSwap</td>
+        <td>~ ~</td>
+        <td>6</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>selectBank</td>
+        <td>0~127</td>
+        <td>16</td>
+        <td>244</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>renameBank</td>
+        <td>0~127</td>
+        <td>17</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>createBank</td>
+        <td>~ ~</td>
+        <td>18</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>deleteBank</td>
+        <td>~ ~</td>
+        <td>19</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>not yet (currently in main)</td>
+      </tr>
+      <tr>
+        <td>findBankSize</td>
+        <td>Ret. size</td>
+        <td>20</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>selectFirstBankToSwap</td>
+        <td>~ ~</td>
+        <td>21</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>selectSecondBankAndSwap</td>
+        <td>~ ~</td>
+        <td>22</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>importBank</td>
+        <td>0~127</td>
+        <td>23</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>not yet (currently in main)</td>
+      </tr>
+      <tr>
+        <td>exportBank</td>
+        <td>0~127</td>
+        <td>24</td>
+        <td>244</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>not yet (currently in main)</td>
+      </tr>
+      <tr>
+        <td>selectRoot</td>
+        <td>0~127</td>
+        <td>32</td>
+        <td>244</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>changeRootId</td>
+        <td>0~127</td>
+        <td>33</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ret. msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>addNamedRoot</td>
+        <td>0</td>
+        <td>34</td>
+        <td>244</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>deselectRoot</td>
+        <td>0</td>
+        <td>35</td>
+        <td>244</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

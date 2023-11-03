@@ -2372,12 +2372,14 @@ o->hide();}
       }
       Fl_Button Vcopy {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvoice);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->copy(pars,nvoice);
+            synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, nvoice + PART::engine::addVoice1);}
         xywh {600 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button Vpaste {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);}
+        callback {//synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);
+            synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, nvoice + PART::engine::addVoice1);}
         xywh {630 580 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button g1 {

@@ -1,0 +1,210 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>Main</title>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>MAIN::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>mono</td>
+        <td>0,1</td>
+        <td>0</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Master mono/stereo switch</td>
+      </tr>
+      <tr>
+        <td>volume</td>
+        <td>0~127</td>
+        <td>1</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Volume</td>
+      </tr>
+      <tr>
+        <td>partNumber</td>
+        <td>0~63</td>
+        <td>14</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Part number</td>
+      </tr>
+      <tr>
+        <td>availableParts</td>
+        <td>16,32,64</td>
+        <td>15</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Number of available parts</td>
+      </tr>
+      <tr>
+        <td>panLawType</td>
+        <td>0~2</td>
+        <td>16</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Panning law ~ cut,normal,boot (not effects)</td>
+      </tr>
+      <tr>
+        <td>detune</td>
+        <td>0~127</td>
+        <td>32</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Detune frequency</td>
+      </tr>
+      <tr>
+        <td>keyShift</td>
+        <td>-36~36</td>
+        <td>35</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Key shift</td>
+      </tr>
+      <tr>
+        <td>bpmFallBack</td>
+        <td>32~480</td>
+        <td>36</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Default BPM for MIDI clock</td>
+      </tr>
+      <tr>
+        <td>reseed</td>
+        <td>0~16777215</td>
+        <td>40</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set random seed value</td>
+      </tr>
+      <tr>
+        <td>soloType</td>
+        <td>0~5</td>
+        <td>48</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Channel switcher type (solo) ~ off,row,column,loop,twoway,channel</td>
+      </tr>
+      <tr>
+        <td>soloCC</td>
+        <td>14~119</td>
+        <td>49</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Channel switcher incomming CC</td>
+      </tr>
+      <tr>
+        <td>exportBank</td>
+        <td>0~127</td>
+        <td>60</td>
+        <td>240</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Export bank ID at root ID to named directory via miscmsg</td>
+      </tr>
+      <tr>
+        <td>importBank</td>
+        <td>0~127</td>
+        <td>61</td>
+        <td>240</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Import named directory to bank ID at root ID via miscmsg</td>
+      </tr>
+      <tr>
+        <td>deleteBank</td>
+        <td>0~127</td>
+        <td>62</td>
+        <td>240</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Delete bank (and all intruments) at root ID</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
