@@ -504,7 +504,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         }
         o->selection_color(setSlider(o->value(),0));
         virkeys->take_focus();
-        send_data(0, MIDI::control::controller, -old, TOPLEVEL::type::Integer, virkeys->midich, MIDI::CC::pitchWheelInner);}
+        send_data(0, MIDI::control::controller, -old, TOPLEVEL::type::Integer, virkeys->midich, MIDI::CC::pitchWheelAdjusted);}
         tooltip {Pitch Wheel} xywh {6 10 18 112} color 65 selection_color 64 labelsize 8 labelcolor 64 align 1 minimum -8192 maximum 8191 step 1
         code0 {o->value(virkeys->pitchWh);}
         code1 {o->setValueType(VC_pitchWheel); o->useCustomTip(true);}

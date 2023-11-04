@@ -121,14 +121,14 @@ bool MidiLearn::runMidiLearn(int _value, unsigned short int CC, unsigned char ch
  * equivalent of 0 to 127 under all conditions
  */
         float value; // needs to be refetched each loop
-        if (CC >= MIDI::CC::identNRPN || CC == MIDI::CC::pitchWheelInner)
+        if (CC >= MIDI::CC::identNRPN || CC == MIDI::CC::pitchWheelAdjusted)
         {
             if (status & 16) // 7 bit NRPN
                 value = float(_value & 0x7f);
             else
                 value = _value / 128.999f; // convert from 14 bit
         }
-        else if (CC != MIDI::CC::keyPressureInner)
+        else if (CC != MIDI::CC::keyPressureAdjusted)
             value = float(_value);
         else
             value = float(_value >> 8);
@@ -704,7 +704,7 @@ void MidiLearn::insertLine(unsigned short int CC, unsigned char chan)
     }
 
     unsigned char status = 0;
-    if (CC >= MIDI::CC::channelPressureInner)
+    if (CC >= MIDI::CC::channelPressureAdjusted)
         status |= 1; // set 'block'
     if (CC >= MIDI::CC::identNRPN)
         status |= 8; // mark as NRPN

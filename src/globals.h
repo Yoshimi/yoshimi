@@ -476,14 +476,14 @@ namespace MIDI // usage MIDI::control::noteOn
         resetAllControllers,
         allNotesOff = 123,
 
-        pitchWheelInner = 128,
-        channelPressureInner,
-        keyPressureInner,
+        pitchWheelAdjusted = 128,
+        channelPressureAdjusted,
+        keyPressureAdjusted,
         soloType,
         soloCC,
 
         // the following are generated internally for MIDI-learn and
-        // are deliberately well outside the range on normal MIDI
+        // are deliberately well outside the range of normal MIDI
         pitchWheel = 640, // seen as 128
         channelPressure,  // 129
         keyPressure,      // 130
@@ -542,7 +542,7 @@ namespace SCALES // usage SCALES::control::refFrequency
         badChars,
         valueTooBig,
         valueTooSmall,
-        emptyEntry
+        emptyEntry // 0
     };
 }
 

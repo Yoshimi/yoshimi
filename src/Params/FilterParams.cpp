@@ -401,6 +401,7 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int effType = getData->data.kit;
     int engine = getData->data.engine;
     int dynPreset = 0;
+
     if (effType == EFFECT::type::dynFilter)
     {
         dynPreset = getData->data.spare1;

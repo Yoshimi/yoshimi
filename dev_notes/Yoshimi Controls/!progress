@@ -1,10 +1,19 @@
-toplevel ~ done
-
-bank ~ done, but anomalies to check :(
-
-main ~ done up to delete Bank
-
-resonance ~ done
-
-vector ~ done
-
+toplevel        ~ done
+config          ~
+main            ~ done
+bank            ~ done
+part            ~
+addsynth        ~
+addvoice        ~
+subsynth        ~
+padsynth        ~
+LFOinser        ~
+filterinsert    ~
+envelopeinsert  ~
+oscillator      ~
+resonance       ~ done
+effect          ~
+vector          ~ done
+scales          ~
+midilearn       ~ done
+midi            ~ done

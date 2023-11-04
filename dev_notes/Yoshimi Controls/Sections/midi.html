@@ -1,0 +1,214 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>midi (incomming)</title>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <style>
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  padding: 5pt;
+  height: 20px;
+}
+
+.left {
+  width: 50pt;
+  text-align: right;
+}
+
+.right {
+  width: 90%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+
+</head>
+
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>MIDI::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit<br>Channel</th>
+        <th>engine<br>Char 1</th>
+        <th>insert<br>Char 2</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>noteOn</td>
+        <td>0~127</td>
+        <td>217</td>
+        <td>0~15</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Note On, Char 1 = number, Char 2 = velocity</td>
+      </tr>
+      <tr>
+        <td>noteOff</td>
+        <td>~ ~</td>
+        <td>217</td>
+        <td>0~15</td>
+        <td>0~127</td>
+        <td>0</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Note Off, Char 1 = number</td>
+      </tr>
+      <tr>
+        <td>controller</td>
+        <td>-8192~8192</td>
+        <td>217</td>
+        <td>0~15</td>
+        <td>0~127</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Controller, Char 1 = type (controller number)</td>
+      </tr>
+      <tr>
+        <td>instrument</td>
+        <td>0~159</td>
+        <td>217</td>
+        <td>0~15</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Program Change, 128 to 159 = extended form</td>
+      </tr>
+      <tr>
+        <td>bankChange</td>
+        <td>0</td>
+        <td>217</td>
+        <td>0~15</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Bank / Root change</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Recognised MIDI controls</h3>
+  (not to be confused with part controls)<br>
+
+<div class="row">
+  <div class="column left">
+    <b>Value</b><br>
+    0<br>
+    1<br>
+    2<br>
+    6<br>
+    7<br>
+    10<br>
+    11<br>
+    32<br>
+    38<br>
+    64<br>
+    65<br>
+    68<br>
+    71<br>
+    74<br>
+    75<br>
+    76<br>
+    77<br>
+    78<br>
+    96<br>
+    97<br>
+    98<br>
+    99<br>
+    120<br>
+    121<br>
+    123<br>
+    <br>
+    <br>
+    128<br>
+    129<br>
+    130<br>
+    131<br>
+    132<br>
+    <br>
+    <br>
+    640<br>
+    641<br>
+    642<br>
+    999<br>
+    0x7fff<br>
+    0x8000<br>
+  </div>
+  <div class="column right">
+    <b>Control</b><br>
+    bankSelectMSB<br>
+    modulation<br>
+    breath<br>
+    dataMSB<br>
+    volume<br>
+    panning<br>
+    expression<br>
+    bankSelectLSB<br>
+    dataLSB<br>
+    sustain<br>
+    portamento<br>
+    legato<br>
+    filterQ<br>
+    filterCutoff<br>
+    bandwidth<br>
+    fmamp<br>
+    resonanceCenter<br>
+    resonanceBandwidth<br>
+    dataINC<br>
+    dataDEC<br>
+    nrpnLSB<br>
+    nrpnMSB<br>
+    allSoundOff<br>
+    resetAllControllers<br>
+    allNotesOff<br>
+    <br>
+    <b>Translated values</b><br>
+    pitchWheelAdjusted<br>
+    channelPressureAdjusted<br>
+    keyPressureAdjusted<br>
+    soloType<br>
+    soloCC<br>
+    <br>
+    <b>The following are generated internally for MIDI-learn and are deliberately well outside the range of normal MIDI</b><br>
+    pitchWheel <em>(seen as 128)</em><br>
+    channelPressure <em>(seen as 129)</em><br>
+    keyPressure <em>(seen as 130)</em><br>
+    programchange<br>
+    maxNRPN<br>
+    identNRPN<br>
+  </div>
+</div>
+
+</body>
+</html>

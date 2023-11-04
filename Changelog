@@ -1,4 +1,8 @@
 yoshimi 2.3.1 M
+2023-11-04 Will
+bn 2276
+Changed midi CC conversion names from ~Inner to more meaningful ~Adjusted
+Further work on HTML Yoshimi Controls (not now updating old .ods file)
 
 2023-11-03 Will
 bn 2275

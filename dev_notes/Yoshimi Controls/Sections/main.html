@@ -150,7 +150,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Channel switcher type (solo) ~ off,row,column,loop,twoway,channel</td>
+        <td>Channel switcher type (solo)<br>off, row, column, loop, twoway, channel</td>
       </tr>
       <tr>
         <td>soloCC</td>
@@ -203,6 +203,344 @@
         <td>255</td>
         <td>255</td>
         <td>Delete bank (and all intruments) at root ID</td>
+      </tr>
+      <tr>
+        <td>loadInstrumentFromBank</td>
+        <td>0~159</td>
+        <td>76</td>
+        <td>240</td>
+        <td>0~63</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Load instrument to part from bank and/or root</td>
+      </tr>
+      <tr>
+        <td>loadInstrumentByName</td>
+        <td>~ ~</td>
+        <td>77</td>
+        <td>240</td>
+        <td>0~63</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Load instrument to part by name via miscmsg</td>
+      </tr>
+      <tr>
+        <td>saveNamedInstrument</td>
+        <td>0~63,255</td>
+        <td>78</td>
+        <td>240</td>
+        <td>0~127,255</td>
+        <td>0~127,255</td>
+        <td>0~159</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save named instrument from part via miscmsg</td>
+      </tr>
+      <tr>
+        <td>loadNamedPatchset</td>
+        <td>0~63</td>
+        <td>79</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Msg No.</td>
+        <td>Load named patchset via miscmsg</td>
+      </tr>
+      <tr>
+        <td>saveNamedPatchset</td>
+        <td>~ ~</td>
+        <td>80</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save named patchset via miscmsg</td>
+      </tr>
+      <tr>
+        <td>loadNamedVector</td>
+        <td>~ ~</td>
+        <td>84</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0~15,255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Load named vector to channel (insert) via miscmsg</td>
+      </tr>
+      <tr>
+        <td>saveNamedVector</td>
+        <td>~ ~</td>
+        <td>85</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0~15</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save named vector from channel (insert) via miscmsg</td>
+      </tr>
+      <tr>
+        <td>loadNamedScale</td>
+        <td>~ ~</td>
+        <td>88</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Load named scale via miscmsg</td>
+      </tr>
+      <tr>
+        <td>saveNamedScale</td>
+        <td>~ ~</td>
+        <td>89</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save named scale via miscmsg</td>
+      </tr>
+      <tr>
+        <td>loadNamedState</td>
+        <td>~ ~</td>
+        <td>92</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Load named state via miscmsg</td>
+      </tr>
+      <tr>
+        <td>saveNamedState</td>
+        <td>~ ~</td>
+        <td>93</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save named state via miscmsg</td>
+      </tr>
+      <tr>
+        <td>readLastSeen</td>
+        <td>0~5</td>
+        <td>94</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>ret. msg No.</td>
+        <td>Finds the full file spec of the most recent entry or empty string if none</td>
+      </tr>
+      <tr>
+        <td>loadFileFromList</td>
+        <td>~ ~</td>
+        <td>95</td>
+        <td>240</td>
+        <td>0~5</td>
+        <td>0~24</td>
+        <td>0~15</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Load file from group in history list (to base channel for vectors)</td>
+      </tr>
+      <tr>
+        <td>defaultPart</td>
+        <td>?</td>
+        <td>96</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set part to default instrument (simple Sound)</td>
+      </tr>
+      <tr>
+        <td>exportPadSynthSamples</td>
+        <td>~ ~</td>
+        <td>97</td>
+        <td>240</td>
+        <td>0~15</td>
+        <td>255</td>
+        <td>0~63</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Export PadSynth samples to named prefix via miscMsg (from Pad window)</td>
+      </tr>
+      <tr>
+        <td>masterReset</td>
+        <td>~ ~</td>
+        <td>98</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reset (clear all)</td>
+      </tr>
+      <tr>
+        <td>masterResetAndMLearn</td>
+        <td>~ ~</td>
+        <td>99</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reset including MIDI learn</td>
+      </tr>
+      <tr>
+        <td>openManual</td>
+        <td>~ ~</td>
+        <td>100</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>128</td>
+        <td>255</td>
+        <td>ret. msg No.</td>
+        <td>Returns text for info window on failure</td>
+      </tr>
+      <tr>
+        <td>startInstance</td>
+        <td>1~31</td>
+        <td>104</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Create new numbered instance (not LV2)</td>
+      </tr>
+      <tr>
+        <td>stopInstance</td>
+        <td>1~31</td>
+        <td>105</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Close numbered instance (not LV2)</td>
+      </tr>
+      <tr>
+        <td>undo</td>
+        <td>~ ~</td>
+        <td>106</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Revert last action</td>
+      </tr>
+      <tr>
+        <td>redo</td>
+        <td>~ ~</td>
+        <td>107</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reinstate last reverted action</td>
+      </tr>
+      <tr>
+        <td>stopSound</td>
+        <td>~ ~</td>
+        <td>128</td>
+        <td>240</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Stop (cease all sound)</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>readPartPeak</td>
+        <td>~ ~</td>
+        <td>200</td>
+        <td>240</td>
+        <td>0~63</td>
+        <td>0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Read part's left or right instananeous peak level</td>
+      </tr>
+      <tr>
+        <td>readMainLRpeak</td>
+        <td>~ ~</td>
+        <td>201</td>
+        <td>240</td>
+        <td>0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Read main left or right instananeous peak level</td>
+      </tr>
+      <tr>
+        <td>readMainLRrms</td>
+        <td>~ ~</td>
+        <td>202</td>
+        <td>240</td>
+        <td>0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Read main left or right RMS value</td>
       </tr>
     </tbody>
   </table>

@@ -6,6 +6,7 @@
 </head>
 
 <body>
+<div id=note>Note: 'offset' is always 255. This was not available when MIDI learn was created so 'type' was used.</div>
   <table>
     <thead>
       <tr>
@@ -17,89 +18,310 @@
         <th>engine</th>
         <th>insert</th>
         <th>param<br>eter</th>
-        <th>offset</th>
+        <th>type</th>
         <th>miscmsg</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>block</td>
+        <td>0~400</td>
+        <td>0</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0,1</td>
+        <td>msg No.</td>
+        <td>Set 'block', stop any other respose to this CC</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>limit</td>
+        <td>0~400</td>
+        <td>1</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0,2</td>
+        <td>msg No.</td>
+        <td>Set 'limit' othewise 'compress'incoming value</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>mute</td>
+        <td>0~400</td>
+        <td>2</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0,4</td>
+        <td>msg No.</td>
+        <td>Set 'mute', isable this line</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>nrpn</td>
+        <td>~ ~</td>
+        <td>3</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0,8</td>
+        <td>255</td>
+        <td>auto set as NRPN</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>sevenBit</td>
+        <td>0~400</td>
+        <td>4</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0,16</td>
+        <td>msg No.</td>
+        <td>Set 7bit NRPN mode</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>minimum</td>
+        <td>0~400</td>
+        <td>5</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0~200</td>
+        <td>255</td>
+        <td>0</td>
+        <td>msg No.</td>
+        <td>Set minimim translated CCvalue</td>
+      </tr>
+      <tr>
+        <td>maximum</td>
+        <td>0~400</td>
+        <td>6</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0~200</td>
+        <td>0</td>
+        <td>msg No.</td>
+        <td>Set maximim translated CCvalue</td>
+      </tr>
+      <tr>
+        <td>ignoreMove</td>
+        <td>0~400</td>
+        <td>7</td>
+        <td>216</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>0</td>
+        <td>255</td>
+        <td>?</td>
+      </tr>
+      <tr>
+        <td>deleteLine</td>
+        <td>~ ~</td>
+        <td>8</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Remove selected line</td>
+      </tr>
+      <tr>
+        <td>nrpnDetected</td>
+        <td>~ ~</td>
+        <td>9</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>?</td>
+      </tr>
+      <tr>
+        <td>showGUI</td>
+        <td>~ ~</td>
+        <td>14</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>GUI only</td>
+      </tr>
+      <tr>
+        <td>hideGUI</td>
+        <td>~ ~</td>
+        <td>15</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>GUI only</td>
+      </tr>
+      <tr>
+        <td>CCorChannel</td>
+        <td>0~400</td>
+        <td>16</td>
+        <td>216</td>
+        <td>0~119</td>
+        <td>0~15,16</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>msg No.</td>
+        <td>Set CC or channel and rewrite line possibly moving it in the list (16, any channel)</td>
+      </tr>
+      <tr>
+        <td>findSize</td>
+        <td>0</td>
+        <td>20</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Find currentlist size</td>
+      </tr>
+      <tr>
+        <td>sendLearnMessage</td>
+        <td>0</td>
+        <td>21</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>msg No.</td>
+        <td>Send learned message to GUI</td>
+      </tr>
+      <tr>
+        <td>sendRefreshRequest</td>
+        <td>0</td>
+        <td>22</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>GUI refresh request</td>
+      </tr>
+      <tr>
+        <td>reportActivity</td>
+        <td>~ ~</td>
+        <td>24</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Toggle GUI activity marker</td>
+      </tr>
+      <tr>
+        <td>clearAll</td>
+        <td>0</td>
+        <td>96</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Clear entire list</td>
+      </tr>
+      <tr>
+        <td>loadList</td>
+        <td>0</td>
+        <td>128</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Load list from file</td>
+      </tr>
+      <tr>
+        <td>loadFromRecent</td>
+        <td>0~400</td>
+        <td>129</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Load numbered list from recent history</td>
+      </tr>
+      <tr>
+        <td>saveList</td>
+        <td>0</td>
+        <td>130</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>msg No.</td>
+        <td>Save list to file</td>
+      </tr>
+      <tr>
+        <td>cancelLearn</td>
+        <td>0</td>
+        <td>131</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Cancel MIDI learn</td>
+      </tr>
+      <tr>
+        <td>learned</td>
+        <td>~ ~</td>
+        <td>132</td>
+        <td>216</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>0</td>
+        <td>255</td>
+        <td>Send message</td>
       </tr>
     </tbody>
   </table>
