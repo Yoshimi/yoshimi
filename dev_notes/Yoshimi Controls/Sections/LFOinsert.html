@@ -6,6 +6,18 @@
 </head>
 
 <body>
+    <div class=leftnote>
+    Engine is 0 for AddSynth global<br>
+    Engine is 8+(0~7) for AddSynth voices<br>
+    Engine is 16+(0~7) for AddSynth modulators<br>
+    Engine is 2 for PadSynth
+    <div class=rightnote>
+    Parameter is 0 for Amplitude LFO<br>
+    Parameter is 1 for Frequency LFO<br>
+    Parameter is 2 for Filter LFO
+    </div>
+    </div>
+
   <table>
     <thead>
       <tr>
@@ -24,82 +36,134 @@
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>speed</td>
+        <td>0.0~1.0</td>
+        <td>0</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Frequency</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>depth</td>
+        <td>0~127</td>
+        <td>1</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Depth</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>delay</td>
+        <td>0~127</td>
+        <td>2</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Delay</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>start</td>
+        <td>0~127</td>
+        <td>3</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Start</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>amplitudeRandomness</td>
+        <td>0~127</td>
+        <td>4</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Amplitude randomness</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>type</td>
+        <td>0~6</td>
+        <td>5</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
+        <td>Envelope shape</td>
+      </tr>
+      <tr>
+        <td>continuous</td>
+        <td>0,1</td>
+        <td>6</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Continuous</td>
+      </tr>
+      <tr>
+        <td>bpm</td>
+        <td>0,1</td>
+        <td>7</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Sync frequency to MIDI clock</td>
+      </tr>
+      <tr>
+        <td>frequencyRandomness</td>
+        <td>0~127</td>
+        <td>8</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Frequency randomness</td>
+      </tr>
+      <tr>
+        <td>stretch</td>
+        <td>0~127</td>
+        <td>9</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>0</td>
+        <td>0~2</td>
+        <td>255</td>
+        <td>255</td>
+        <td>LF/HF stretch ratio</td>
       </tr>
     </tbody>
   </table>

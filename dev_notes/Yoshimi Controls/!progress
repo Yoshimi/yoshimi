@@ -1,19 +1,19 @@
 toplevel        ~ done
-config          ~
+config          ~ done
 main            ~ done
 bank            ~ done
 part            ~
-addsynth        ~
+addsynth        ~ done
 addvoice        ~
 subsynth        ~
 padsynth        ~
-LFOinser        ~
-filterinsert    ~
-envelopeinsert  ~
+LFOinsert       ~ done
+filterinsert    ~ done
+envelopeinsert  ~ done
 oscillator      ~
 resonance       ~ done
 effect          ~
 vector          ~ done
-scales          ~
+scales          ~ done
 midilearn       ~ done
 midi            ~ done

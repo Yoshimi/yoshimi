@@ -24,17 +24,108 @@
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>oscillatorSize</td>
+        <td>256~16384</td>
+        <td>0</td>
+        <td>248</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>255</td>
+        <td>255</td>
+        <td>Oscillator size (powers of 2)</td>
+      </tr>
+      <tr>
+        <td>bufferSize</td>
+        <td>16~4096</td>
+        <td>1</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Internal Buffer size (powers of 2)</td>
+      </tr>
+      <tr>
+        <td>padSynthInterpolation</td>
+        <td>0,1</td>
+        <td>2</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>PadSynth interploation -- linear, cubic</td>
+      </tr>
+      <tr>
+        <td>virtualKeyboardLayout</td>
+        <td>0~3</td>
+        <td>3</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Virtual keyboard layout<br>QWERTY, Dvorak, OWERTY, AZERTY</td>
+      </tr>
+      <tr>
+        <td>XMLcompressionLevel</td>
+        <td>0~9</td>
+        <td>4</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>XMK compression level</td>
+      </tr>
+      <tr>
+        <td>reportsDestination</td>
+        <td>0,1</td>
+        <td>5</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reports destination -- Console, terminal</td>
+      </tr>
+      <tr>
+        <td>logTextSize</td>
+        <td>0~100</td>
+        <td>6</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Font size for console window</td>
+      </tr>
+      <tr>
+        <td>savedInstrumentFormat</td>
+        <td>1~3</td>
+        <td>7</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Saved instrument format -- Legacy, Yoshimi, Both</td>
       </tr>
       <tr>
         <td></td>
@@ -43,11 +134,193 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>defaultStateStart</td>
+        <td>0,1</td>
+        <td>16</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Start with default state</td>
+      </tr>
+      <tr>
+        <td>hideNonFatalErrors</td>
+        <td>0,1</td>
+        <td>17</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Hide non-fatal errors</td>
+      </tr>
+      <tr>
+        <td>showSplash</td>
+        <td>0,1</td>
+        <td>18</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Show splash screen at start</td>
+      </tr>
+      <tr>
+        <td>logInstrumentLoadTimes</td>
+        <td>0,1</td>
+        <td>19</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Report time to load an instrument</td>
+      </tr>
+      <tr>
+        <td>logXMLheaders</td>
+        <td>0,1</td>
+        <td>20</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Show first few lines of XML file when loaded</td>
+      </tr>
+      <tr>
+        <td>saveAllXMLdata</td>
+        <td>0,1</td>
+        <td>21</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Include disabled data in XML files when saving </td>
+      </tr>
+      <tr>
+        <td>enableGUI</td>
+        <td>0,1</td>
+        <td>22</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable GUI</td>
+      </tr>
+      <tr>
+        <td>enableCLI</td>
+        <td>0,1</td>
+        <td>23</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable CLI</td>
+      </tr>
+      <tr>
+        <td>enableAutoInstance</td>
+        <td>0,1</td>
+        <td>24</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable auto start of stand-alone child instances</td>
+      </tr>
+      <tr>
+        <td>enableSinglePath</td>
+        <td>0,1</td>
+        <td>25</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Make later external starts open new instance of first one instead</td>
+      </tr>
+      <tr>
+        <td>historyLock</td>
+        <td>0,1</td>
+        <td>26</td>
+        <td>248</td>
+        <td>0~5</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Lock given history file group against changes.</td>
+      </tr>
+      <tr>
+        <td>exposeStatus</td>
+        <td>0~2</td>
+        <td>27</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Show CLI context level -- off, on, prompt</td>
+      </tr>
+      <tr>
+        <td>enableHighlight</td>
+        <td>0,1</td>
+        <td>28</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Highigh latest instrument loaded in GUI</td>
+      </tr>
+      <tr>
+        <td>handlePadSynthBuild</td>
+        <td>0~2</td>
+        <td>29</td>
+        <td>248</td>
+        <td>255</td>
+        <td>2</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set PadSynth build method<br>Legacy, Background Auto-apply</td>
       </tr>
       <tr>
         <td></td>
@@ -56,11 +329,76 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>jackMidiSource</td>
+        <td>~ ~</td>
+        <td>32</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Jack MIDI cource</td>
+        </tr>
+      <tr>
+        <td>jackPreferredMidi</td>
+        <td>0,1</td>
+        <td>33</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set as preferred MIDI</td>
+      </tr>
+      <tr>
+        <td>jackServer</td>
+        <td>~ ~</td>
+        <td>34</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Jack server</td>
+      </tr>
+      <tr>
+        <td>jackPreferredAudio</td>
+        <td>0,1</td>
+        <td>35</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set as preferred audio</td>
+      </tr>
+      <tr>
+        <td>jackAutoConnectAudio</td>
+        <td>0,1</td>
+        <td>36</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Autoconnect audio</td>
       </tr>
       <tr>
         <td></td>
@@ -69,11 +407,115 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>alsaMidiSource</td>
+        <td>~ ~</td>
+        <td>48</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Alsa comma separated MIDI sources</td>
+      </tr>
+      <tr>
+        <td>alsaPreferredMidi</td>
+        <td>0,1</td>
+        <td>49</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set as preferred MIDI</td>
+      </tr>
+      <tr>
+        <td>alsaMidiType</td>
+        <td>0~2</td>
+        <td>50</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Alsa MIDI acquisition type<br>Fixed, Search, External</td>
+      </tr>
+      <tr>
+        <td>alsaAudioDevice</td>
+        <td>~ ~</td>
+        <td>51</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Alsa audio device</td>
+      </tr>
+      <tr>
+        <td>alsaPreferredAudio</td>
+        <td>0,1</td>
+        <td>52</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set as preferred audio</td>
+      </tr>
+      <tr>
+        <td>alsaSampleRate</td>
+        <td>0~3</td>
+        <td>53</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Alsa audio sample rate<br>192000, 96000, 48000, 44100</td>
+      </tr>
+      <tr>
+        <td>readAudio</td>
+        <td>~ ~</td>
+        <td>54</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Read audio destination</td>
+      </tr>
+      <tr>
+        <td>readMidi</td>
+        <td>~ ~</td>
+        <td>55</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Read MIDI source</td>
       </tr>
       <tr>
         <td></td>
@@ -82,11 +524,50 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>addPresetRootDir</td>
+        <td>~ ~</td>
+        <td>60</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Add a new preset root directory</td>
+      </tr>
+      <tr>
+        <td>removePresetRootDir</td>
+        <td>0~127</td>
+        <td>61</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>ret. msg No.</td>
+        <td>Remove selected preset root</td>
+      </tr>
+      <tr>
+        <td>currentPresetRootDir</td>
+        <td>0~127</td>
+        <td>62</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Select root director yas current one</td>
       </tr>
       <tr>
         <td></td>
@@ -95,12 +576,141 @@
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>bankRootCC</td>
+        <td>0,32,other</td>
+        <td>65</td>
+        <td>248</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>
-        </td>
+        <td>255</td>
+        <td>255</td>
+        <td>Bank root CC -- MSB, LSB, Off</td>
+      </tr>
+      <tr>
+        <td>bankCC</td>
+        <td>0,32,other</td>
+        <td>67</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Bank CC -- MSB, LSB, Off</td>
+      </tr>
+      <tr>
+        <td>enableProgramChange</td>
+        <td>0,1</td>
+        <td>68</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable MIDI program change</td>
+      </tr>
+      <tr>
+        <td>extendedProgramChange</td>
+        <td>0~119,other</td>
+        <td>71</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>ret. msg No.</td>
+        <td>Set CC for extended MIDI program change<br>ret. 255 = in use by (text) miscMsg</td>
+      </tr>
+      <tr>
+        <td>ignoreResetAllCCs</td>
+        <td>0,1</td>
+        <td>72</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ignore MIDI reset all CCs command</td>
+      </tr>
+      <tr>
+        <td>logIncomingCCs</td>
+        <td>0,1</td>
+        <td>73</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Identify incomming MIDI CCs</td>
+      </tr>
+      <tr>
+        <td>showLearnEditor</td>
+        <td>0,1</td>
+        <td>74</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Show MIDI-learn editor when Making new entries</td>
+      </tr>
+      <tr>
+        <td>enableNRPNs</td>
+        <td>0,1</td>
+        <td>74</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable recognition of NRPNs</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>saveCurrentConfig</td>
+        <td>~ ~</td>
+        <td>80</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Save the complete configuration regardless of whether or not it has changed (dummy text)</td>
       </tr>
     </tbody>
   </table>

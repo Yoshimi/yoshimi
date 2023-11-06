@@ -24,82 +24,264 @@
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>enableMictrotonal</td>
+        <td>0,1</td>
+        <td>0</td>
+        <td>232</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enabble/disable mictotonal scales</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>refFrequency</td>
+        <td>329~660</td>
+        <td>1</td>
+        <td>232</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>ret. 0~127</td>
+        <td>255</td>
+        <td>Reference frequency<br>(also returns ref. note number)</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>refNote</td>
+        <td>0~127</td>
+        <td>2</td>
+        <td>232</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reference note number</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>invertScale</td>
+        <td>0,1</td>
+        <td>3</td>
+        <td>232</td>
+        <td>255</td>
+        <<td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Invert keys</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>invertedScaleCenter</td>
+        <td>0~127</td>
+        <td>4</td>
+        <td>232</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>255</td>
+        <td>255</td>
+        <td>Center point of inverted scale</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>scaleShift</td>
+        <td>-63~64</td>
+        <td>5</td>
+        <td>232</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>255</td>
+        <td>255</td>
+        <td>Shift scale range</td>
+      </tr>
+      <tr>
+        <td>enableKeyboardMap</td>
+        <td>0,1</td>
+        <td>16</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable/disable keyboard mapping</td>
+      </tr>
+      <tr>
+        <td>lowKey</td>
+        <td>0~127</td>
+        <td>17</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Keyboard first note to map</td>
+      </tr>
+      <tr>
+        <td>middleKey</td>
+        <td>0~127</td>
+        <td>18</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Keyboard middle reference</td>
+      </tr>
+      <tr>
+        <td>highKey</td>
+        <td>0~127</td>
+        <td>19</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>keyboard last note to map</td>
+      </tr>
+      <tr>
+        <td>tuning</td>
+        <td>ret. size,err</td>
+        <td>32</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>List of tunings</td>
+      </tr>
+      <tr>
+        <td>keyboardMap</td>
+        <td>ret. size,err</td>
+        <td>33</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Keyboard Map</td>
+      </tr>
+      <tr>
+        <td>keymapSize</td>
+        <td>0~127</td>
+        <td>34</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Actual size of keymap (0 = full linear map)</td>
+      </tr>
+      <tr>
+        <td>importScl</td>
+        <td>ret. size,err</td>
+        <td>48</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Import .scl file</td>
+      </tr>
+      <tr>
+        <td>importKbm</td>
+        <td>ret. size,err</td>
+        <td>49</td>
+        <td>232</td>
+        <td>ret. A note</td>
+        <td>ret. min</td>
+        <td>ret. mid</td>
+        <td>ret max</td>
+        <td>255</td>
+        <td>msg No.</td>
+        <td>Import .kbm file (A frequency is read after import)</td>
+      </tr>
+      <tr>
+        <td>exportScl</td>
+        <td>~ ~</td>
+        <td>50</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Export tunings to .scl file</td>
+      </tr>
+      <tr>
+        <td>exportKbm</td>
+        <td>~ ~</td>
+        <td>51</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Export keymap to .kbm file</td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>~ ~</td>
+        <td>64</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set scale name</td>
+      </tr>
+      <tr>
+        <td>comment</td>
+        <td>~ ~</td>
+        <td>65</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set comment field</td>
+      </tr>
+      <tr>
+        <td>clearAll</td>
+        <td>~ ~</td>
+        <td>96</td>
+        <td>232</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set default values</td>
       </tr>
     </tbody>
   </table>

@@ -32,21 +32,21 @@
         <td>0~159</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Read instrument name -- bank, root, instrument</td>
       </tr>
       <tr>
         <td>findInstrumentName</td>
-        <td>0~159</td>
+        <td>0~159<br>~ ~</td>
         <td>1</td>
         <td>244</td>
-        <td>0~127</td>
-        <td>0~127</td>
+        <td>0~127<br>255</td>
+        <td>0~127<br>255</td>
         <td>255</td>
+        <td>255<br>0~15</td>
         <td>255</td>
-        <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Find instrument name -- bank, root, instrument<br> next in list or '*' if list end</td>
       </tr>
       <tr>
         <td>renameInstrument</td>
@@ -59,7 +59,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Rename instument -- bank, root, instrument</td>
       </tr>
       <tr>
         <td>saveInstrument</td>
@@ -72,7 +72,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Save instrument -- bank, root, instrument</td>
       </tr>
       <tr>
         <td>deleteInstrument</td>
@@ -85,7 +85,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Delete instrument from slot in current bank</td>
       </tr>
       <tr>
         <td>selectFirstInstrumentToSwap</td>
@@ -97,8 +97,8 @@
         <td>0~159</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Swap instruments (select first)<br>bank, root, instrument</td>
       </tr>
       <tr>
         <td>selectSecondInstrumentAndSwap</td>
@@ -110,8 +110,8 @@
         <td>0~159</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Swap instruments (select seconsd and swap)<br>bank, root, instrument</td>
       </tr>
       <tr>
         <td>selectBank</td>
@@ -124,7 +124,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Select bank in current root</td>
       </tr>
       <tr>
         <td>renameBank</td>
@@ -137,7 +137,7 @@
         <td>255</td>
         <td>255</td>
         <td>msg No.</td>
-        <td></td>
+        <td>Rename bank (always returns root ID)</td>
       </tr>
       <tr>
         <td>createBank</td>
@@ -150,7 +150,7 @@
         <td>255</td>
         <td>255</td>
         <td>msg No.</td>
-        <td></td>
+        <td>Create bank -- new ID, root ID or current root</td>
       </tr>
       <tr>
         <td>deleteBank</td>
@@ -163,11 +163,11 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>not yet (currently in main)</td>
+        <td>Delete bank -- new ID, root ID or current root<br>not yet (currently in main)</td>
       </tr>
       <tr>
         <td>findBankSize</td>
-        <td>Ret. size</td>
+        <td>ret. size</td>
         <td>20</td>
         <td>244</td>
         <td>0~127,255</td>
@@ -176,7 +176,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Find number of instruments in bank(ID),<br>root (ID or current root)</td>
       </tr>
       <tr>
         <td>selectFirstBankToSwap</td>
@@ -188,8 +188,8 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Swap banks (select first)</td>
       </tr>
       <tr>
         <td>selectSecondBankAndSwap</td>
@@ -201,8 +201,8 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Swap banks (select second and swap)</td>
       </tr>
       <tr>
         <td>importBank</td>
@@ -215,7 +215,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>not yet (currently in main)</td>
+        <td>Import bank<br>not yet (currently in main)</td>
       </tr>
       <tr>
         <td>exportBank</td>
@@ -228,7 +228,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>not yet (currently in main)</td>
+        <td>Export bank<br>not yet (currently in main)</td>
       </tr>
       <tr>
         <td>selectRoot</td>
@@ -241,7 +241,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td></td>
+        <td>Select root or read current one</td>
       </tr>
       <tr>
         <td>changeRootId</td>
@@ -253,8 +253,8 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Ret. msg No.</td>
-        <td></td>
+        <td>ret. msg No.</td>
+        <td>Change root ID (always returns old ID)</td>
       </tr>
       <tr>
         <td>addNamedRoot</td>
@@ -267,7 +267,8 @@
         <td>255</td>
         <td>255</td>
         <td>msg No.</td>
-        <td></td>
+        <td>Add named root to given ID via miscmsg<br>kit < 255 create and install bank / instrument<br>
+        ret. value = 255 -- not found</td>
       </tr>
       <tr>
         <td>deselectRoot</td>
@@ -280,7 +281,7 @@
         <td>255</td>
         <td>255</td>
         <td>msg No.</td>
-        <td></td>
+        <td>Does not change actual directory contents<br>ret. value = 255 -- not found</td>
       </tr>
     </tbody>
   </table>

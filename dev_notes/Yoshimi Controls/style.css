@@ -1,25 +1,46 @@
 body {
-    background-color: #fff3df;
-    min-width: 1440px;
-    width: 100%;
-    margin: auto;
-    font-family: Arial, Helvetica;
-    font-size: 12pt;
+  background-color: #fff3df;
+  width: 1060pt;
+  margin: auto;
+  font-family: Arial, Helvetica;
+  font-size: 12pt;
 }
 
 table {
-    table-layout: fixed;
-    width: 100%;
-    border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 #note {
-    color: #7f0000;
-    text-align: center;
+  color: #7f0000;
+  text-align: center;
 }
 
+div.leftnote {
+  color: #7f0000;
+  font-size: 9pt;
+  position: relative;
+  top: 2px;
+  left: 45%;
+  width: 330pt;
+  height: 43pt;
+}
+
+div.rightnote {
+  color: #7f0000;
+  font-size: 9pt;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 140pt;
+  height: 40pt;
+}
+
+
+
 thead th:nth-child(1) {
-  width: 19%;
+  width: 20%;
 }
 
 thead th:nth-child(2) {
@@ -27,7 +48,7 @@ thead th:nth-child(2) {
 }
 
 thead th:nth-child(3) {
-  width: 5%;
+  width: 4%;
 }
 
 thead th:nth-child(4) {
@@ -47,11 +68,11 @@ thead th:nth-child(7) {
 }
 
 thead th:nth-child(8) {
-  width: 5%;
+  width: 4%;
 }
 
 thead th:nth-child(9) {
-  width: 5%;
+  width: 4%;
 }
 
 thead th:nth-child(10) {

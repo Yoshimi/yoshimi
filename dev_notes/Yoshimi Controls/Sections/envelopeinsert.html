@@ -6,6 +6,14 @@
 </head>
 
 <body>
+    <div class=leftnote>
+    <div class=rightnote>
+    Parameter is 0 for Amplitude<br>
+    Parameter is 1 for Frequency<br>
+    Parameter is 2 for Filter<br>
+    Parameter is 3 for Bandwidth
+    </div>
+    </div>
   <table>
     <thead>
       <tr>
@@ -24,17 +32,160 @@
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>attackLevel</td>
+        <td>0,127</td>
+        <td>0</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
         <td>255</td>
         <td>255</td>
+        <td>Attack value</td>
+      </tr>
+      <tr>
+        <td>attackTime</td>
+        <td>0,127</td>
+        <td>1</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
         <td>255</td>
         <td>255</td>
+        <td>Attack time</td>
+      </tr>
+      <tr>
+        <td>decayLevel</td>
+        <td>0,127</td>
+        <td>2</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Decay value</td>
+      </tr>
+      <tr>
+        <td>decayTime</td>
+        <td>0,127</td>
+        <td>3</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Decay time</td>
+      </tr>
+      <tr>
+        <td>sustainLevel</td>
+        <td>0,127</td>
+        <td>4</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Sustain value</td>
+      </tr>
+      <tr>
+        <td>releaseTime</td>
+        <td>0,127</td>
+        <td>5</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Release time</td>
+      </tr>
+      <tr>
+        <td>releaseLevel</td>
+        <td>0,127</td>
+        <td>6</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Release value</td>
+      </tr>
+      <tr>
+        <td>stretch</td>
+        <td>0~127</td>
+        <td>7</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Stretch</td>
+      </tr>
+      <tr>
+        <td>forcedRelease</td>
+        <td>0,1</td>
+        <td>16</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Forced release</td>
+      </tr>
+      <tr>
+        <td>linearEnvelope</td>
+        <td>0,1</td>
+        <td>17</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Envelope is linear</td>
+      </tr>
+      <tr>
+        <td>edit</td>
         <td></td>
+        <td>24</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>local to GUI --- needs investigating!!!</td>
+      </tr>
+      <tr>
+        <td>enableFreeMode</td>
+        <td>0,1</td>
+        <td>32</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable freemode</td>
       </tr>
       <tr>
         <td></td>
@@ -43,11 +194,49 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      <tr>
+        <td>stretch</td>
+        <td>0~127</td>
+        <td>7</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Freemode stretch</td>
+      </tr>
+      <tr>
+        <td>forcedRelease</td>
+        <td>0,1</td>
+        <td>16</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Freemode forced release</td>
+      </tr>
+      <tr>
+        <td>linearEnvelope</td>
+        <td>0,1</td>
+        <td>17</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Freemode envelope is linear</td>
       </tr>
       <tr>
         <td></td>
@@ -56,50 +245,76 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      <tr>
+      <tr>
+        <td>points</td>
+        <td>~ ~</td>
+        <td>34</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Returns 'offset' number of defined points</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>sustainPoint</td>
+        <td>0~39</td>
+        <td>35</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Sustain position (within number of defined points)</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>envelopePointAdd</td>
+        <td>0~127</td>
+        <td>0~39</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>0~127</td>
         <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Add point -- 'Control = point number<br>'offset' = X incremental value, 'Value' = Y value</td>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>envelopePointDelete</td>
+        <td>~ ~</td>
+        <td>0~39</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
         <td>255</td>
         <td>255</td>
+        <td>Delete point -- 'Control = point number<br>Returns 'value' number of points remaining</td>
+      </tr>
+      <tr>
+        <td>envelopePointChange</td>
+        <td>0~127</td>
+        <td>0~39</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>All</td>
+        <td>3</td>
+        <td>0~3</td>
+        <td>0~127</td>
         <td>255</td>
-        <td>255</td>
-        <td></td>
+        <td>Adjust -- 'Control = point number<br>'offset' = X incremental value, 'Value' = Y value</td>
       </tr>
     </tbody>
   </table>

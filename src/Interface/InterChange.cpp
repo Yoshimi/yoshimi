@@ -327,6 +327,13 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         {
             textMsgBuffer.push(name);
         }
+        else if (engine == PART::engine::padSynth && type == TOPLEVEL::type::Paste && insert != UNUSED)
+        {
+            int localKit = kititem;
+            if (localKit >= NUM_KIT_ITEMS)//not part->Pkitmode)
+                localKit = 0;
+            synth->part[switchNum]->kit[localKit].padpars->buildNewWavetable((getData->data.parameter == 0));
+        }
 #ifdef GUI_FLTK
         toGUI.write(getData->bytes);
 #endif
