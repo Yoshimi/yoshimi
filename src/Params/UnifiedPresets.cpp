@@ -30,6 +30,8 @@
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
 #include "Params/FilterParams.h"
+#include "Params/LFOParams.h"
+#include "Params/EnvelopeParams.h"
 
 
 using std::string;
@@ -47,17 +49,19 @@ using std::string;
 string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
-    //synth->CBtest(getData, false);
+    //synth->CBtest(getData,true);
     int type = getData->data.type;
     int value = getData->data.value;
     if (type == TOPLEVEL::type::List && value == 1)
     {
         string group = findPresetType(getData, value);
+        //std::cout << "here >" << group << std::endl;
         value = synth->textMsgBuffer.push(group);
         return findPresetType(getData, value); // human readble extension
     }
 
     string name = findPresetType(getData);
+    //std::cout << "found >" << name << "<" << std::endl;
     if (name.empty())
     {
         name = "No section presets in this context";

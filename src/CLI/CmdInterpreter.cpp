@@ -1499,7 +1499,6 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     return REPLY::range_msg;
             }
             effSend = value;
-            std::cout << "here" << std::endl;
         }
 
         if (!isWrite)

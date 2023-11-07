@@ -63,10 +63,11 @@ decl {\#include "MasterUI.h"} {private global
 class PresetsUI_ {} {
   Function {refresh()} {return_type {virtual void}
   } {
-    code {;} {}
+    code {//} {}
   }
   Function {~PresetsUI_()} {} {
-    code {;} {}
+    code {//
+    ;} {}
   }
 }
 
@@ -85,7 +86,11 @@ class PresetsUI {} {
   }
   Function {~PresetsUI()} {} {
     code {//
-    saveWin(synth, Ucopywin->w(), Ucopywin->h(), Ucopywin->x(), Ucopywin->y(), false,"PresetWin");
+     if (Upastewin->visible())
+         saveWin(synth, Upastewin->w(), Upastewin->h(), Upastewin->x(), Upastewin->y(), false,"PresetWin");
+     else if (Ucopywin->visible())
+           saveWin(synth, Ucopywin->w(), Ucopywin->h(), Ucopywin->x(), Ucopywin->y(), false,"PresetWin");
+
     Ucopywin->hide();
     delete(Ucopywin);
     Upastewin->hide();
@@ -419,6 +424,7 @@ Upastewin->hide();}
     Ucopybrowse->clear();
     Ucopybutton->activate();
     Ucopypbutton->deactivate();
+    Ucopytypetext->label(groupName.c_str());
     do {
         pos = names.find(ch);
         if (pos != string::npos)
@@ -452,6 +458,7 @@ Upastewin->hide();}
     Upastebrowse->clear();
     Upastepbutton->deactivate();
     Udeletepbutton->deactivate();
+    Upastetypetext->label(groupName.c_str());
     do {
         pos = names.find(ch);
         if (pos != string::npos)
@@ -500,6 +507,7 @@ Upastewin->hide();}
     putData.data.value = 1;
     int Ugroup = synth->interchange.readAllData(&putData);
     groupName = textMsgBuffer.fetch(Ugroup);
+    //std::cout << "In GUI >" << groupName << std::endl;
     return textMsgBuffer.fetch(value);} {}
   }
   Function {copy(Presets *p)} {} {

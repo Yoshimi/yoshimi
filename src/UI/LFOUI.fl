@@ -173,13 +173,17 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
         Fl_Button lfoC {
           label C
           callback {//
-          synth->getGuiMaster()->getPresetsUi()->copy(pars);}
+          //synth->getGuiMaster()->getPresetsUi()->copy(pars);
+          synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::LFOgroup, group);
+          ;}
           xywh {195 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Button lfoP {
           label P
           callback {//
-          synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
+          //synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+          synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::LFOgroup, group);
+          ;}
           xywh {212 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Group randgroup {

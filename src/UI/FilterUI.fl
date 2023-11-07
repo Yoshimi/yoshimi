@@ -535,12 +535,18 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       }
       Fl_Button filtC {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->copy(pars);
+            synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::filterGroup);
+            ;}
         xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
       }
       Fl_Button filtP {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+            synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::filterGroup);
+            ;}
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
       }
       Fl_Check_Button freqtrackoffset {
@@ -816,12 +822,20 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
         Fl_Button formCopy {
           label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvowel);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->copy(pars,nvowel);
+              synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::filterGroup,0, nvowel);
+              // dummy parameter always stores all possible formants
+              ;}
           xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
         Fl_Button formPaste {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvowel);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvowel);
+              synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::filterGroup,0, nvowel);
+              // dummy parameter always stores all possible formants
+              ;}
           xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
         Fl_Box formvowel {

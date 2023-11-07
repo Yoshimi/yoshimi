@@ -469,12 +469,18 @@ send_data(TOPLEVEL::action::forceUpdate, group, curpoint, 0, TOPLEVEL::type::Wri
       }
       Fl_Button freecopy {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->copy(env);
+            synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
         xywh {465 158 16 16} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
       }
       Fl_Button freepaste {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+            synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
         xywh {486 158 16 16} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
       }
       Fl_Button freeClose {
@@ -565,12 +571,17 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         Fl_Button e1C {
           label C
           callback {//
-          synth->getGuiMaster()->getPresetsUi()->copy(env);}
+            //synth->getGuiMaster()->getPresetsUi()->copy(env);
+            synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Button e1P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+            callback {
+                //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+                synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
       }
@@ -640,12 +651,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         }
         Fl_Button e2C {
           label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->copy(env);
+              synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Button e2P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+              synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
       }
@@ -747,12 +764,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         }
         Fl_Button e3C {
           label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->copy(env);
+              synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Button e3P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+              synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
       }
@@ -822,12 +845,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
         }
         Fl_Button e4C {
           label C
-          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->copy(env);
+              synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
         Fl_Button e4P {
           label P
-          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+          callback {
+              //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+              synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+              ;}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
         }
       }
@@ -859,12 +888,18 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
       }
       Fl_Button efC {
         label C
-        callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->copy(env);
+            synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
         xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button efP {
         label P
-        callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
+        callback {
+            //synth->getGuiMaster()->getPresetsUi()->paste(env,this);
+            synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::envelopeGroup, group);
+            ;}
         xywh {168 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button efE {

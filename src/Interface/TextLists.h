@@ -1033,14 +1033,14 @@ static std::string testlist [] = {
 
 
 static std::string presetgroups [] = {
-    "Pfilter",          "Filter",
-    "Pfiltern",         "Formant Editor",
+    "Pfilter",          "Filter", // dynfilter
+    "Pfiltern",         "Formant Filter Vowel", // dynfilter
     "Peffect",          "Effect",
-    "Pfilter",          "Filter 2",
-    "Pfiltern",         "Formant Editor 2",
+    "Pfilter",          "Filter",
+    "Pfiltern",         "Formant Filter Vowel",
     "Poscilgen",        "Waveform",
     "Presonance",       "Resonance",
-    "Plfoamplitide",    "Amplitude LFO",
+    "Plfoamplitude",    "Amplitude LFO",
     "Plfofrequency",    "Frequency LFO",
     "Plfofilter",       "Filter LFO",
     "Penvamplitude",    "Amplitude Envelope",
