@@ -1,5 +1,7 @@
 yoshimi 2.3.1 M
 
+Forgot to disable effects patch in Interchchange :(
+
 2023-11-07 Will
 bn 2278
 BugFix: Wrong spelling in lists for amplitude LFO.

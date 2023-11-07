@@ -1982,7 +1982,7 @@ void InterChange::mediate()
           TODO find a better place to put this out of the main process!
           */
 
-        int effpar = synth->getRuntime().effectChange;
+/*        int effpar = synth->getRuntime().effectChange;
         if (effpar > 0xffff)
         { std::cout << "In interchange temp fix" << std::endl;
 #ifdef GUI_FLTK
@@ -2016,7 +2016,7 @@ void InterChange::mediate()
 #endif
             synth->getRuntime().effectChange = UNUSED;
         } // end of temporary fix
-
+*/
     }
     while (more && synth->getRuntime().runSynth);
     syncWrite = false;
