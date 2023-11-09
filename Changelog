@@ -1,6 +1,12 @@
 yoshimi 2.3.1 M
 
-Forgot to disable effects patch in Interchchange :(
+2023-11-09 Will
+bn 2279
+HTML "Yoshimi Control Data" now complete to replace .ods file.
+Removed ambiguity in CBtest
+    default is to *not* display text from miscMsg
+Forgot to disable effects patch in Interchange :(
+
 
 2023-11-07 Will
 bn 2278

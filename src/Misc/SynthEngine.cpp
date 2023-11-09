@@ -3771,7 +3771,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
 }
 
 
-void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg)
+void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg) // default - don't read message
 {
     std::cout << "\n value " << candidate->data.value
             << "\n type " << int(candidate->data.type)
@@ -3784,6 +3784,6 @@ void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg)
             << "\n parameter " << int(candidate->data.parameter)
             << "\n offset " << int(candidate->data.offset)
             << std::endl;
-    if (!miscmsg)
+    if (miscmsg) // read this *without* deleting it
         std::cout << ">" << textMsgBuffer.fetch(candidate->data.miscmsg, false) << "<" << std::endl;
 }

@@ -1862,7 +1862,7 @@ float InterChange::buildWindowTitle(CommandBlock *getData, SynthEngine *synth)
 
 void InterChange::resolveReplies(CommandBlock *getData)
 {
-    //synth->CBtest(getData, false);
+    //synth->CBtest(getData, true);
 
     unsigned char source = getData->data.source & TOPLEVEL::action::noAction;
     // making sure there are no stray top bits.

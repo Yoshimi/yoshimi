@@ -1,0 +1,254 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>Effects</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <div class=effLeftnote>
+    Part number is 241 for system effects<br>
+    Part number is 242 for insertion effects<br>
+    Normal part numbers are 0 to 63
+    <div class=effRightnote>
+    Kit numbers are 16 +(0 to 8)<br>
+     for actual effect types <br>
+    16 (0) is no effect
+    </div>
+    </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>EFFECT::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>0~15</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>ret. 0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Depends on effect -(for EQ, parameter returns band number. Otherwise returns 1 if value different to default)</td>
+      </tr>
+      <tr>
+        <td>preset</td>
+        <td>?</td>
+        <td>16</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>ret. 0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Returns number of presets (not EQ) </td>
+      </tr>
+      <tr>
+        <td>bpm</td>
+        <td>?</td>
+        <td>17</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Ratio of BPM to actual speed</td>
+      </tr>
+      <tr>
+        <td>bpmStart</td>
+        <td>?</td>
+        <td>18</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>???</td>
+      </tr>
+      <tr>
+        <td>changed</td>
+        <td>~ ~</td>
+        <td>129</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Value changed (returns 1 if value different to default)</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="11">Insertion effect selector</td>
+      </tr>
+      <tr>
+        <td>effectNumber</td>
+        <td>0~7</td>
+        <td>4</td>
+        <td>242</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set effect number</td>
+      </tr>
+      <tr>
+        <td>effectType</td>
+        <td>0~8</td>
+        <td>5</td>
+        <td>242</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set effect type</td>
+      </tr>
+      <tr>
+        <td>effectdestination</td>
+        <td>-2~63</td>
+        <td>6</td>
+        <td>242</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set effect destinatio -- Master out = -2, Off = -1, Parts 0 to 63)</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="11">System effect selector</td>
+      </tr>
+      <tr>
+        <td>toEffect1</td>
+        <td>0~127</td>
+        <td>1</td>
+        <td>241</td>
+        <td>255</td>
+        <td>0~2</td>
+        <td>12</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>To effect (control) from effect(engine)</td>
+      </tr>
+      <tr>
+        <td>toEffect2</td>
+        <td>0~127</td>
+        <td>2</td>
+        <td>241</td>
+        <td>255</td>
+        <td>0~2</td>
+        <td>12</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>To effect (control) from effect(engine)</td>
+      </tr>
+      <tr>
+        <td>toeffect3</td>
+        <td>0~127</td>
+        <td>3</td>
+        <td>241</td>
+        <td>255</td>
+        <td>0~2</td>
+        <td>12</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>To effect (control) from effect(engine)</td>
+      </tr>
+      <tr>
+        <td>effectNumber</td>
+        <td>0~3</td>
+        <td>4</td>
+        <td>241</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set effect number</td>
+      </tr>
+      <tr>
+        <td>effectType</td>
+        <td>0~8</td>
+        <td>5</td>
+        <td>241</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set effect type</td>
+      </tr>
+      <tr>
+        <td>effectEnable</td>
+        <td>0,1</td>
+        <td>7</td>
+        <td>241</td>
+        <td>255</td>
+        <td>effect number</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Enable/disable effect (non destructively)</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

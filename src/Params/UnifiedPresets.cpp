@@ -55,13 +55,11 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
     if (type == TOPLEVEL::type::List && value == 1)
     {
         string group = findPresetType(getData, value);
-        //std::cout << "here >" << group << std::endl;
         value = synth->textMsgBuffer.push(group);
         return findPresetType(getData, value); // human readble extension
     }
 
     string name = findPresetType(getData);
-    //std::cout << "found >" << name << "<" << std::endl;
     if (name.empty())
     {
         name = "No section presets in this context";

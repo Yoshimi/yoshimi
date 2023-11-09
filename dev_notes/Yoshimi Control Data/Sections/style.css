@@ -10,6 +10,8 @@ table {
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
+  position: relative;
+  left: 1px;
 }
 
 #note {
@@ -28,6 +30,26 @@ div.leftnote {
 }
 
 div.rightnote {
+  color: #7f0000;
+  font-size: 9pt;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 140pt;
+  height: 40pt;
+}
+
+div.effLeftnote {
+  color: #7f0000;
+  font-size: 9pt;
+  position: relative;
+  top: 2px;
+  left: 25%;
+  width: 330pt;
+  height: 43pt;
+}
+
+div.effRightnote {
   color: #7f0000;
   font-size: 9pt;
   position: absolute;
@@ -68,7 +90,7 @@ thead th:nth-child(7) {
 }
 
 thead th:nth-child(8) {
-  width: 4%;
+  width: 5.5%;
 }
 
 thead th:nth-child(9) {
@@ -82,6 +104,16 @@ thead th:nth-child(10) {
 td {
     border: 1px solid blue;
     text-align: center;
+}
+
+div.titles {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  width: 100.1%; /* slightly oversize to hide right table border */
+  background-color: #fff3df;
+  color: black;
+  text-align: center;
 }
 
 a:link {

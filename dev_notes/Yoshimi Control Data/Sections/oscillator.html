@@ -1,0 +1,503 @@
+<!DOCTYPE html><html>
+<head>
+  <meta http-equiv="content~type" content="text/html; charset=UTF~8">
+  <title>Oscillator</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>OSCILLATOR::control:: +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>phaseRandomness</td>
+        <td>-64~63</td>
+        <td>0</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Phase randomness</td>
+      </tr>
+      <tr>
+        <td>magType</td>
+        <td>0~4</td>
+        <td>1</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Mag type -- Linear, -40dB, -60dB, -80dB, -100dB</td>
+      </tr>
+      <tr>
+        <td>harmonicRandomness</td>
+        <td>0~127</td>
+        <td>2</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>hrndDial (no label -- associated with following)</td>
+      </tr>
+      <tr>
+        <td>harmonicRandomnessType</td>
+        <td>0~2</td>
+        <td>3</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Harmonic amplitude type -- None, Power, Sine</td>
+      </tr>
+      <tr>
+        <td>baseFunctionParameter</td>
+        <td>-64~63</td>
+        <td>16</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function parameter</td>
+      </tr>
+      <tr>
+        <td>baseFunctionType</td>
+        <td>0~16</td>
+        <td>17</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function -- Sine, Triange, Pulse, Saw, Power, Gauss, Diode, AbsSine, PulseSine, StrtchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle, HyperSec</td>
+      </tr>
+      <tr>
+        <td>baseModulationParameter1</td>
+        <td>0~127</td>
+        <td>18</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function modualtion parameter 1</td>
+      </tr>
+      <tr>
+        <td>baseModulationParameter2</td>
+        <td>0~127</td>
+        <td>19</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function modualtion parameter 2</td>
+      </tr>
+      <tr>
+        <td>baseModulationParameter3</td>
+        <td>0~127</td>
+        <td>20</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function modualtion parameter 3</td>
+      </tr>
+      <tr>
+        <td>baseModulationType</td>
+        <td>0~3</td>
+        <td>21</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Base function modulation type -- None, Rev, Sine, Pow</td>
+      </tr>
+      <tr>
+        <td>autoClear</td>
+        <td>0,1</td>
+        <td>32</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Autoclear wneh base function (not used)</td>
+      </tr>
+      <tr>
+        <td>useAsBaseFunction</td>
+        <td>0,1</td>
+        <td>33</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Use as base function (if value is 1, assume<br>auto clear is set)</td>
+      </tr>
+      <tr>
+        <td>waveshapeParameter</td>
+        <td>-64~63</td>
+        <td>34</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Waveshape parameter</td>
+      </tr>
+      <tr>
+        <td>waveshapeType</td>
+        <td>0~14</td>
+        <td>35</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Waveshape -- None, Atan, Asym1, Pow, Sine, Qnts Zigzag, Lmt, LmtU, LmtL,Ilmt,Clip, Asym2, Pow2, Sgm</td>
+      </tr>
+      <tr>
+        <td>filterParameter1</td>
+        <td>0~127</td>
+        <td>36</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Filter parameter 1</td>
+      </tr>
+      <tr>
+        <td>filterParameter2</td>
+        <td>0~127</td>
+        <td>37</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Filter parameter 2</td>
+      </tr>
+      <tr>
+        <td>filterBeforeWaveshape</td>
+        <td>0,1</td>
+        <td>38</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Apply filter before waveshape</td>
+      </tr>
+      <tr>
+        <td>filterType</td>
+        <td>0~13</td>
+        <td>39</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Filter type -- None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, Sgm</td>
+      </tr>
+      <tr>
+        <td>modulationParameter1</td>
+        <td>0~127</td>
+        <td>40</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Modulation parameter 1</td>
+      </tr>
+      <tr>
+        <td>modulationParameter2</td>
+        <td>0~127</td>
+        <td>41</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Modulation parameter 2</td>
+      </tr>
+      <tr>
+        <td>modulationParameter3</td>
+        <td>0~127</td>
+        <td>42</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Modulation parameter 3</td>
+      </tr>
+      <tr>
+        <td>modulationType</td>
+        <td>0~3</td>
+        <td>43</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Modulation type -- None, Pow, ThrsD, THrsU</td>
+      </tr>
+      <tr>
+        <td>spectrumAdjustParameter</td>
+        <td>0~127</td>
+        <td>44</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Spectrum adjust parameter</td>
+      </tr>
+      <tr>
+        <td>spectrumAdjustType</td>
+        <td>0~3</td>
+        <td>45</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Spectrum adjust type -- None, Pow, ThrsD, ThrsU</td>
+      </tr>
+      <tr>
+        <td>harmonicShift</td>
+        <td>-64~64</td>
+        <td>64</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Harmonic shift</td>
+      </tr>
+      <tr>
+        <td>clearHarmonicShift</td>
+        <td>~ ~</td>
+        <td>65</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Clear harmonic shift (local to GUI)</td>
+      </tr>
+      <tr>
+        <td>shiftBeforeWaveshapeAndFilter</td>
+        <td>0,1</td>
+        <td>66</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Apply harmonic shift before waveshape and filter</td>
+      </tr>
+      <tr>
+        <td>adaptiveHarmonicsParameter</td>
+        <td>0~100</td>
+        <td>67</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Adaptive harmonics parameter</td>
+      </tr>
+      <tr>
+        <td>adaptiveHarmonicsBase</td>
+        <td>0~255</td>
+        <td>68</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Adaptive harmonics base frequency</td>
+      </tr>
+      <tr>
+        <td>adaptiveHarmonicsPower</td>
+        <td>0~200</td>
+        <td>69</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Adaptive harmonics power</td>
+      </tr>
+      <tr>
+        <td>adaptiveHarmonicsType</td>
+        <td>0~8</td>
+        <td>70</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Adaptive harmonics type -- Off, On, Square, 2xSub, 2xAdd, 3xSub, 3xAdd, 4xSub, 4xAdd</td>
+      </tr>
+      <tr>
+        <td>clearHarmonics</td>
+        <td>~ ~</td>
+        <td>96</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set harmonics Amplitude and phase to default</td>
+      </tr>
+      <tr>
+        <td>convertToSine</td>
+        <td>~ ~</td>
+        <td>97</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>6</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Translate harmonics to User base function and set defaults</td>
+      </tr>
+      <tr>
+        <td>harmonicAmplitude</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>7</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set harmonic point (control) amplitude</td>
+      </tr>
+      <tr>
+        <td>harmonicPhase</td>
+        <td>0~127</td>
+        <td>0~127</td>
+        <td>0~63</td>
+        <td>0~15</td>
+        <td>0,8+,16+,2</td>
+        <td>8</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Set harmonic point (control) phase</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="titles">
+  <table>
+    <thead>
+      <tr>
+        <th>PART::control +</th>
+        <th>value</th>
+        <th>control</th>
+        <th>part /<br>section</th>
+        <th>kit</th>
+        <th>engine</th>
+        <th>insert</th>
+        <th>param<br>eter</th>
+        <th>offset</th>
+        <th>miscmsg</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+  </table>
+  </div>
+</body>
+</html>
