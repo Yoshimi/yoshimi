@@ -49,7 +49,7 @@ using std::string;
 string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
-    //synth->CBtest(getData,true);
+    //synth->CBtest(getData, true);
     int type = getData->data.type;
     int value = getData->data.value;
     if (type == TOPLEVEL::type::List && value == 1)

@@ -37,16 +37,16 @@
       </tr>
       <tr>
         <td>copyPaste</td>
-        <td>0/1</td>
+        <td>0/1<br>ret. msg No.</td>
         <td>251</td>
         <td>0~63,241,242</td>
         <td>0~15</td>
-        <td>0~2,8+(0~7)</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
+        <td>0~2,8+(0~7),<br>255</td>
+        <td>0~2,255</td>
+        <td>0~3,255</td>
+        <td>0,255</td>
         <td>msg No.</td>
-        <td>Perform section List, Copy/ Paste</td>
+        <td>Perform actions List, Find type, Copy, Paste, Delete</td>
       </tr>
       <tr>
         <td>partBusy</td>
@@ -112,6 +112,38 @@
         <td>~ ~</td>
         <td>~ ~</td>
         <td>Returns numeric ID of current instance (read only)</td>
+      </tr>
+    </tbody>
+  </table>
+  <br><br>
+  copyPaste variatons. This uses the 'type' field slightly differently.<br><br>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:6%">Command</th>
+        <th style="width:3%">value</th>
+        <th style="width:3%">type</th>
+        <th style="width:88%;text-align:left">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border:none">List</td>
+        <td style="border:none">0,1</td>
+        <td style="border:none">0</td>
+        <td style="text-align:left;border:none">Returns a lists of all the presets for the current section, (if 'value' = 1 returns the preset type)
+      </tr>
+      <tr>
+        <td style="border:none">Copy</td>
+        <td style="border:none">0</td>
+        <td style="border:none">16</td>
+        <td style="text-align:left;border:none">Copies the selected preset to file, or to clipboard if no name given
+      </tr>
+      <tr>
+        <td style="border:none">Paste</td>
+        <td style="border:none">0,1</td>
+        <td style="border:none">32</td>
+        <td style="text-align:left;border:none">Pastes in the selected preset from file, or from clipboard if no name given, (if 'value' = 1 deletes the selected preset)
       </tr>
     </tbody>
   </table>

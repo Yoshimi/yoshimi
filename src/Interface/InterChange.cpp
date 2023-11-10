@@ -325,7 +325,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
          * */
         if (type == TOPLEVEL::type::List)
         {
-            textMsgBuffer.push(name);
+            getData->data.value = textMsgBuffer.push(name);
         }
         else if (engine == PART::engine::padSynth && type == TOPLEVEL::type::Paste && insert != UNUSED)
         {

@@ -3786,4 +3786,6 @@ void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg) // default - don
             << std::endl;
     if (miscmsg) // read this *without* deleting it
         std::cout << ">" << textMsgBuffer.fetch(candidate->data.miscmsg, false) << "<" << std::endl;
+    else
+        std::cout << " miscmsg " << int(candidate->data.miscmsg) << std::endl;
 }
