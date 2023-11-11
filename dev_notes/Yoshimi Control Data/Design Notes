@@ -1,0 +1,30 @@
+General design has been tested on Palemoon, Vivaldi, Brave and Firefox browsers.
+
+Layout of table cells is designed to be easy to follow while allowing maximum space for descriptions.
+
+Titles of data fields have exactly the same case as the actual commands.
+
+Currently 'type' and 'source' fields are not presented. In the previous version these had either not been filled in at all or only for a few commands - may be reviewed.
+
+General design and layout is set in a single css file - 'style.css'
+
+Pages are fixed width to keep the layout structure consistent and easy to maintain.
+
+A fixed location footer duplicate of table headers is only used for tables long enough to need scrolling - it would look odd with short tables!
+
+To divide sections in long tables an 'empty' table row is used. In some cases this it followed by a table row with a single full width cell acting as a heading.
+
+When editing files, table cells are arranged vertically rather than as the line they represent. They're much easier to edit that way!
+
+Mostly in the descriptions, line breaks <br> are used to avoid confusing natural wrap-rounds.
+
+'~ ~' is used to denote undefined values.
+For numbers in a range use 'nn1~nn2'. This is more compact and easier to read than using 'nn1 to nn2' For a specific group of numbers use 'nn1,nn2,nn3'
+
+Other examples:
+0~2,8+(0~7)
+
+0~63,241,242
+
+    0,1
+ret. msg No.
