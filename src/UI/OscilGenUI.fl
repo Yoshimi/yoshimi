@@ -838,13 +838,13 @@ o->hide();}
       }
       Fl_Button oscilC {
         label C
-        callback {//synth->getGuiMaster()->getPresetsUi()->copy(oscil);
+        callback {//
             synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::oscillatorGroup);}
         xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button oscilP {
         label P
-        callback {//synth->getGuiMaster()->getPresetsUi()->paste(oscil,this);
+        callback {//
             synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::oscillatorGroup);}
         xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }

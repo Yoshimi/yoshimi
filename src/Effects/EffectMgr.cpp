@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2017-2022, Will Godfrey
+    Copyright 2017-2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -39,7 +39,6 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     dryonly{false},
     efx{}
 {
-    setpresettype("Peffect");
     defaults();
 }
 

@@ -2,7 +2,7 @@
     FormatFuncs.h
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2022, Will Godfrey and others.
+    Copyright 2014-2023, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -350,11 +350,11 @@ inline std::string nextLine(std::string& list) // this is destructive
 inline std::string trimEnds(std::string line)
 {
     size_t pos = line.find_first_not_of(" \t");
-    if (pos != string::npos)
+    if (pos != std::string::npos)
         line.erase(0, pos);
 
     pos = line.find_last_not_of(" \t");
-    if (pos != string::npos)
+    if (pos != std::string::npos)
         line.erase(pos + 1);
     return line;
 }

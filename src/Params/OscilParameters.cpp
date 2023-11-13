@@ -6,6 +6,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019 Will Godfrey & others.
     Copyright 2019-2020 Kristian Amlie
+    Copyright 2023 Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -33,7 +34,6 @@ OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine *_synth) :
     Presets(_synth),
     basefuncSpectrum(fft.spectrumSize())
 {
-    setpresettype("Poscilgen");
     defaults();
 }
 

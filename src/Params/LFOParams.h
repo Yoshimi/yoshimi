@@ -6,6 +6,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2017-2019, Will Godfrey
     Copyright 2020 Kristian Amlie
+    Copyright 2023 Kristian Amlie
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -30,6 +31,7 @@
 
 #include <sys/types.h>
 
+#include "globals.h"
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
 

@@ -893,13 +893,13 @@ class PADnoteUI {: {public PresetsUI_}
       }
       Fl_Button padCopy {
         label C
-        callback {//synth->getGuiMaster()->getPresetsUi()->copy(pars);
+        callback {//
     synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::padSynth);}
         xywh {415 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button padPaste {
         label P
-        callback {//synth->getGuiMaster()->getPresetsUi()->paste(pars,this);
+        callback {//
   synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::padSynth);}
         xywh {449 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }

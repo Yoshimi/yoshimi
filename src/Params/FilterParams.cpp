@@ -41,7 +41,6 @@ FilterParams::FilterParams(unsigned char Ptype_, float Pfreq_, float Pq_, unsign
     Dq(Pq_),
     Dfreqtrackoffset(Pfreqtrackoffset_)
 {
-    setpresettype("Pfilter");
     defaults();
 }
 

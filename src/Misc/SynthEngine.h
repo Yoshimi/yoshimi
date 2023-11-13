@@ -45,7 +45,6 @@
 #include "Interface/MidiLearn.h"
 #include "Interface/MidiDecode.h"
 #include "Misc/Config.h"
-#include "Params/PresetsStore.h"
 #include "Params/UnifiedPresets.h"
 #include "globals.h"
 
@@ -85,7 +84,6 @@ class SynthEngine
         UnifiedPresets unifiedpresets;
     private:
         Config Runtime;
-        PresetsStore presetsstore;
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
@@ -262,7 +260,6 @@ class SynthEngine
         inline LV2PluginType getLV2PluginType() {return lv2PluginType;}
         inline bool getIsLV2Plugin() {return lv2PluginType != LV2PluginTypeNone; }
         inline Config &getRuntime() {return Runtime;}
-        inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
         SynthEngine *getSynthFromId(unsigned int uniqueId);
         void guiClosed(bool stopSynth);

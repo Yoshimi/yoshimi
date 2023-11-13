@@ -52,11 +52,12 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
     //synth->CBtest(getData, true);
     int type = getData->data.type;
     int value = getData->data.value;
-    if (type == TOPLEVEL::type::List && value == 1)
+    human = value; // used for listing. 'value may change before it is read
+    if (type == TOPLEVEL::type::List && human == 1)
     {
-        string group = findPresetType(getData, value);
+        string group = findPresetType(getData);
         value = synth->textMsgBuffer.push(group);
-        return findPresetType(getData, value); // human readble extension
+        return findPresetType(getData); // human friendly extension
     }
 
     string name = findPresetType(getData);
@@ -85,7 +86,7 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
         }
         else if (type & TOPLEVEL::type::Paste)
         {
-            if (value == 0)
+            if (human == 0)
                 load(getData);
             else
                 remove(getData);
@@ -96,12 +97,12 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 
 string UnifiedPresets::listpos(int count)
 {
+    //std::cout << count << "  " << presetgroups[count * 2 + human] << std::endl;;
     return presetgroups[count * 2 + human];
 }
 
-string UnifiedPresets::findPresetType(CommandBlock *getData, int _human)
+string UnifiedPresets::findPresetType(CommandBlock *getData)
 {
-    human = _human;
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
@@ -831,10 +832,12 @@ bool UnifiedPresets::load(CommandBlock *getData)
 
 bool UnifiedPresets::remove(CommandBlock *getData)
 {
+    human = 0; // we need the extension this time.
     string type = findPresetType(getData);
     string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
     string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     string filename = dirname + "/" + name + "." + type + EXTEN::presets;
+    //std::cout << "file >" << filename << std::endl;
     file::deleteFile(filename);
     return false;
 }

@@ -1047,10 +1047,10 @@ static std::string presetgroups [] = {
     "Penvfrequency",    "Frequency Envelope",
     "Penvfilter",       "Filter Envelope",
     "Penvbandwidth",    "Bandwidth Envelope",
-    "Padsythn",         "Addsynth Voice",
-    "Padsyth",          "Addsynth",
-    "Psubsyth",         "Subsynth",
-    "Ppadsyth",         "Padsynth",
+    "Padsythn",         "AddSynth Voice",
+    "Padsyth",          "AddSynth",
+    "Psubsyth",         "SubSynth",
+    "Ppadsyth",         "PadSynth",
     "@end","@end"
 };
 

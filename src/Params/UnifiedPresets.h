@@ -50,7 +50,7 @@ class UnifiedPresets
 
     public:
         string section(SynthEngine *synth, CommandBlock *getData);
-        string findPresetType(CommandBlock *getData, int _human = 0);
+        string findPresetType(CommandBlock *getData);
         void list(string dirname, string& name);
         string findXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
         string resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);

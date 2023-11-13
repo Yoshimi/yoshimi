@@ -6,6 +6,7 @@
     Copyright 2009, Alan Calvert
     Copyright 2017-2019, Will Godfrey
     Copyright 2020-2022 Kristian Amlie & others
+    Copyright 2023 Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -35,7 +36,6 @@ using func::power;
 
 SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
 {
-    setpresettype("Psubsyth");
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FreqEnvelope = new EnvelopeParams(64, 0, synth);

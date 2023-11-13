@@ -49,18 +49,6 @@ LFOParams::LFOParams(float Pfreq_, float Pintensity_,
     Ddelay(Pdelay_),
     Dcontinous(Pcontinous_)
 {
-    switch (fel)
-    {
-        case 0:
-            setpresettype("Plfofrequency");
-            break;
-        case 1:
-            setpresettype("Plfoamplitude");
-            break;
-        case 2:
-            setpresettype("Plfofilter");
-            break;
-    };
     defaults();
     presetsUpdated();
 }
@@ -83,7 +71,6 @@ void LFOParams::defaults(void)
 
 void LFOParams::setPfreq(int32_t n)
 {
-
     PfreqI = n;
     Pfreq = (power<2>((float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
     presetsUpdated();

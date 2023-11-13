@@ -2,7 +2,7 @@
 #   CMakeLists.txt (LV2)
 #
 #   Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
-#   Copyright 2018-2021, Will Godfrey & others
+#   Copyright 2018-2023, Will Godfrey & others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -57,13 +57,13 @@ file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.cpp  ../Params/EnvelopeParams.cpp
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp
     ../Params/SUBnoteParameters.cpp  ../Params/PADnoteParameters.cpp
-    ../Params/Controller.cpp  ../Params/Presets.cpp ../Params/PresetsStore.cpp  ../Params/UnifiedPresets.cpp
+    ../Params/Controller.cpp  ../Params/Presets.cpp  ../Params/UnifiedPresets.cpp
     ../Params/ADnoteParameters.h  ../Params/EnvelopeParams.h
     ../Params/FilterParams.h  ../Params/LFOParams.h
     ../Params/SUBnoteParameters.h
     ../Params/PADnoteParameters.h ../Params/PADStatus.h ../Params/RandomWalk.h
     ../Params/OscilParameters.cpp ../Params/OscilParameters.h
-    ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h ../Params/UnifiedPresets.h)
+    ../Params/Controller.h  ../Params/Presets.h ../Params/UnifiedPresets.h)
 file (GLOB yoshimi_synth_files
     ../Synth/ADnote.cpp  ../Synth/Envelope.cpp  ../Synth/LFO.cpp  ../Synth/OscilGen.cpp
     ../Synth/SUBnote.cpp  ../Synth/Resonance.cpp  ../Synth/PADnote.cpp

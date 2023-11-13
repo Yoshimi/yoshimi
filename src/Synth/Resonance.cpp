@@ -37,7 +37,6 @@ using func::power;
 
 Resonance::Resonance(SynthEngine *_synth) : Presets(_synth)
 {
-    setpresettype("Presonance");
     defaults();
 }
 

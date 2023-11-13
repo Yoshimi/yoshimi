@@ -450,14 +450,14 @@ class ResonanceUI {: PresetsUI_
         }
         Fl_Button cbutton {
           label C
-          callback {//synth->getGuiMaster()->getPresetsUi()->copy(respar);
+          callback {//
               synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::resonanceGroup);
               ;}
           xywh {704 264 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
         }
         Fl_Button pbutton {
           label P
-          callback {//synth->getGuiMaster()->getPresetsUi()->paste(respar,this);
+          callback {//
               synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::resonanceGroup);
               ;}
           xywh {747 264 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197

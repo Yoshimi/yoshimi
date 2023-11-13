@@ -76,7 +76,6 @@ float EnvelopeParams::getdt(size_t i)
 // ADSR/ASR... initialisations
 void EnvelopeParams::ADSRinit(float A_dt, float D_dt, float S_val, float R_dt)
 {
-    setpresettype("Penvamplitude");
     Envmode = PART::envelope::groupmode::amplitudeLin;
     PA_dt = A_dt;
     PD_dt = D_dt;
@@ -90,7 +89,6 @@ void EnvelopeParams::ADSRinit(float A_dt, float D_dt, float S_val, float R_dt)
 
 void EnvelopeParams::ADSRinit_dB(float A_dt, float D_dt, float S_val, float R_dt)
 {
-    setpresettype("Penvamplitude");
     Envmode = PART::envelope::groupmode::amplitudeLog;
     PA_dt = A_dt;
     PD_dt = D_dt;
@@ -104,7 +102,6 @@ void EnvelopeParams::ADSRinit_dB(float A_dt, float D_dt, float S_val, float R_dt
 
 void EnvelopeParams::ASRinit(float A_val, float A_dt, float R_val, float R_dt)
 {
-    setpresettype("Penvfrequency");
     Envmode = PART::envelope::groupmode::frequency;
     PA_val = A_val;
     PA_dt = A_dt;
@@ -118,7 +115,6 @@ void EnvelopeParams::ASRinit(float A_val, float A_dt, float R_val, float R_dt)
 
 void EnvelopeParams::ADSRinit_filter(float A_val, float A_dt, float D_val, float D_dt, float R_dt, float R_val)
 {
-    setpresettype("Penvfilter");
     Envmode = PART::envelope::groupmode::filter;
     PA_val = A_val;
     PA_dt = A_dt;
@@ -134,7 +130,6 @@ void EnvelopeParams::ADSRinit_filter(float A_val, float A_dt, float D_val, float
 
 void EnvelopeParams::ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt)
 {
-    setpresettype("Penvbandwidth");
     Envmode = PART::envelope::groupmode::bandwidth;
     PA_val = A_val;
     PA_dt = A_dt;

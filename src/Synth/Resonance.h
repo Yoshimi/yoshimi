@@ -27,6 +27,7 @@
 #ifndef RESONANCE_H
 #define RESONANCE_H
 
+#include "globals.h"
 #include "DSP/FFTwrapper.h"
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"

@@ -43,7 +43,6 @@ ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
     Presets(_synth),
     fft(fft_)
 {
-    setpresettype("Padsyth");
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0, synth);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
     GlobalPar.FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);

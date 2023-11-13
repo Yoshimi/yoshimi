@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
-    Copyright 2018, Will Godfrey
+    Copyright 2018,2023, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -21,8 +21,6 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is a derivative of the ZynAddSubFX original.
-
-    Modified February 2018
 */
 
 #ifndef EFFECTMGR_H
@@ -41,8 +39,6 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
-#include "Params/Presets.h"
-
 
 class EffectMgr : public Presets
 {

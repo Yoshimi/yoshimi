@@ -7,6 +7,7 @@
     Copyright 2017-2019 Will Godfrey
     Copyright 2020 Kristian Amlie & others
     Copyright 2022 Ichthyostega
+    Copyright 2023 Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -168,7 +169,6 @@ PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
     , sampleTime{0}
     , wavetablePhasePrng{}
 {
-    setpresettype("Ppadsyth");
     FreqEnvelope->ASRinit(64, 50, 64, 60);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);

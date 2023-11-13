@@ -1,5 +1,11 @@
 yoshimi 2.3.1 M
 
+2023-11-13 Will
+bn 2282
+BugFix: copy/paste GUI 'Type' field only correct on first call
+Removed all of old presets code except PresetsUpdate(
+Some cleanups and extra comments in UnifiedPresets
+
 2023-11-11 Will
 bn 2281
 Added 'design Notes' file to Yoshimi Control Data

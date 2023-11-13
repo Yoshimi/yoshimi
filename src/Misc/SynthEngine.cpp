@@ -130,9 +130,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     interchange(this),
     midilearn(this),
     mididecode(this),
-    //unifiedpresets(this),
     Runtime(this, allArgs, getIsLV2Plugin()),
-    presetsstore(this),
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
     fadeStepShort(0),
@@ -486,7 +484,6 @@ void SynthEngine::defaults(void)
     Runtime.noteOffSeen = 0;
 #endif
 
-    Runtime.effectChange = UNUSED; // temporary fix
     partonoffLock(0, 1); // enable the first part
 }
 

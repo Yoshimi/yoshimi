@@ -943,7 +943,6 @@ class MasterUI {: {private GuiUpdates}
           Fl_Button sysCopy {
             label C
             callback {//
-    //presetsui->copy(synth->sysefx[nsyseff]);
     synth->getGuiMaster()->getPresetsUi()->Ucopy(TOPLEVEL::section::systemEffects, 16);
 ;}
             xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
@@ -951,8 +950,7 @@ class MasterUI {: {private GuiUpdates}
           Fl_Button sysPaste {
             label P
             callback {//
-            //presetsui->paste(synth->sysefx[nsyseff], syseffectui);
-            //synth->getRuntime().effectChange = TOPLEVEL::section::systemEffects + (nsyseff << 8); // temporary fix
+            //
             synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::systemEffects, 16);
 ;}
             xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
@@ -999,8 +997,6 @@ class MasterUI {: {private GuiUpdates}
           Fl_Button insPaste {
             label P
             callback {//
-            //presetsui->paste(synth->insefx[ninseff], inseffectui);
-            //synth->getRuntime().effectChange = TOPLEVEL::section::insertEffects + (ninseff << 8); // temporary fix
             synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::insertEffects, 16);
 ;}
             xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
@@ -4448,7 +4444,6 @@ bpmfallback->format(format);} {}
     if (configui->presets->visible())
         configui->presetsRtext();
 
-    presetsui->presetsRtext();
     presetsui->UpresetsRtext();
     bankui->wincheck();
     partui->wincheck();} {}

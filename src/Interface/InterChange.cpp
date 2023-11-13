@@ -1974,49 +1974,6 @@ void InterChange::mediate()
             returns(&getData);
             more = true;
         }
-
-         /*
-          * temporary fix block
-          * this is just for preset paste
-
-          TODO find a better place to put this out of the main process!
-          */
-
-/*        int effpar = synth->getRuntime().effectChange;
-        if (effpar > 0xffff)
-        { std::cout << "In interchange temp fix" << std::endl;
-#ifdef GUI_FLTK
-            if (synth->getRuntime().showGui)
-            {
-                CommandBlock effData;
-                memset(&effData.bytes, 255, sizeof(effData));
-                unsigned char npart = effpar & 0xff;
-                unsigned char effnum = (effpar >> 8) & 0xff;
-                unsigned char efftype;
-                if (npart < NUM_MIDI_PARTS)
-                {
-                    efftype = synth->part[npart]->partefx[effnum]->geteffect();
-                    effData.data.control = PART::control::effectType;
-                }
-                else
-                {
-                    effData.data.control = EFFECT::sysIns::effectType;
-                    if (npart == TOPLEVEL::section::systemEffects)
-                        efftype = synth->sysefx[effnum]->geteffect();
-                    else
-                        efftype = synth->insefx[effnum]->geteffect();
-                }
-                effData.data.source = TOPLEVEL::action::fromGUI | TOPLEVEL::action::forceUpdate;
-                effData.data.type = TOPLEVEL::type::Write;
-                effData.data.value = efftype;
-                effData.data.part = npart;
-                effData.data.engine = effnum;
-                toGUI.write(effData.bytes);
-            }
-#endif
-            synth->getRuntime().effectChange = UNUSED;
-        } // end of temporary fix
-*/
     }
     while (more && synth->getRuntime().runSynth);
     syncWrite = false;
