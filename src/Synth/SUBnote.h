@@ -72,7 +72,7 @@ class SUBnote
 
         SynthEngine& synth;
         SUBnoteParameters& pars;
-        Presets::PresetsUpdate subNoteChange;
+        Presets::ParamsUpdate subNoteChange;
         Controller& ctl;
 
         Note note;

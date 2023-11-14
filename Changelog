@@ -1,5 +1,9 @@
 yoshimi 2.3.1 M
 
+Changed Presets internal name "presets" to "params"
+Changed "PresetsUpdate" to "ParamsUpdate"
+Changed "changePresets" to "changeParams"
+
 2023-11-14 Will
 bn 2283
 BugFix: copy/paste not recognising effect numbers

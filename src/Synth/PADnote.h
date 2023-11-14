@@ -75,7 +75,7 @@ class PADnote
 
         SynthEngine& synth;
         PADnoteParameters& pars;
-        Presets::PresetsUpdate padSynthUpdate;
+        Presets::ParamsUpdate padSynthUpdate;
         Controller& ctl;
 
         enum NoteStatus {

@@ -74,38 +74,38 @@ class Presets
                        // important is that it's different.
 
     public:
-        class PresetsUpdate
+        class ParamsUpdate
         {
             public:
-                PresetsUpdate(Presets const& presets_) :
-                    presets(&presets_),
-                    lastUpdated(presets->updatedAt)
+                ParamsUpdate(Presets const& params_) :
+                    params(&params_),
+                    lastUpdated(params->updatedAt)
                 {}
 
-                // Checks if presets have been updated and resets counter.
+                // Checks if params have been updated and resets counter.
                 bool checkUpdated()
                 {
-                    bool result = presets->updatedAt != lastUpdated;
-                    lastUpdated = presets->updatedAt;
+                    bool result = params->updatedAt != lastUpdated;
+                    lastUpdated = params->updatedAt;
                     return result;
                 }
 
                 void forceUpdate()
                 {
-                    lastUpdated = presets->updatedAt - 1;
+                    lastUpdated = params->updatedAt - 1;
                 }
 
-                void changePresets(Presets const& presets_)
+                void changeParams(Presets const& params_)
                 {
-                    if (presets != &presets_)
+                    if (params != &params_)
                     {
-                        presets = &presets_;
+                        params = &params_;
                         forceUpdate();
                     }
                 }
 
             private:
-                const Presets *presets;
+                const Presets *params;
                 int lastUpdated;
         };
 
