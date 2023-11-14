@@ -6,6 +6,7 @@ Changed "changePresets" to "changeParams"
 Changed "presetsUpdated" to "paramsChanged"
 Changed source file Presets.h to ParamCheck.h
 Changed source file Presets.cpp to ParamCheck.cpp
+Some small GUI cleanups
 
 2023-11-14 Will
 bn 2283

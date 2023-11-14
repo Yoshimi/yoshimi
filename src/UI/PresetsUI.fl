@@ -72,10 +72,7 @@ class PresetsUI {} {
   Function {PresetsUI(SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
-    p = NULL;
     make_window();
-    copyW = 0;
-    pasteW = 0;
     UcopyW = 0;
     UpasteW = 0;
     presetsDW = 265; // these are shared between both
@@ -416,10 +413,6 @@ Upastewin->hide();}
         }
 
     } {}} {}
-  }
-  decl {Presets *p;} {public local
-  }
-  decl {PresetsUI_ *pui;} {public local
   }
   decl {SynthEngine *synth;} {private local
   }
