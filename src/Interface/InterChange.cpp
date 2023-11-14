@@ -2253,7 +2253,7 @@ bool InterChange::processAdd(CommandBlock *getData, SynthEngine *synth)
     {
         case UNUSED:
             commandAdd(getData);
-            part->kit[kititem].adpars->presetsUpdated();
+            part->kit[kititem].adpars->paramsChanged();
             break;
         case TOPLEVEL::insert::LFOgroup:
             commandLFO(getData);
@@ -2270,7 +2270,7 @@ bool InterChange::processAdd(CommandBlock *getData, SynthEngine *synth)
         case TOPLEVEL::insert::resonanceGroup:
         case TOPLEVEL::insert::resonanceGraphInsert:
             commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
-            part->kit[kititem].adpars->presetsUpdated();
+            part->kit[kititem].adpars->paramsChanged();
             break;
         }
     return true;
@@ -2287,7 +2287,7 @@ bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
     {
         case UNUSED:
             commandAddVoice(getData);
-            part->kit[kititem].adpars->presetsUpdated();
+            part->kit[kititem].adpars->paramsChanged();
             break;
         case TOPLEVEL::insert::LFOgroup:
             commandLFO(getData);
@@ -2333,7 +2333,7 @@ bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
                 }
                 commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine].POscil);
             }
-            part->kit[kititem].adpars->presetsUpdated();
+            part->kit[kititem].adpars->paramsChanged();
             break;
     }
     return true;
@@ -2348,15 +2348,15 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
     {
         case UNUSED:
             commandSub(getData);
-            part->kit[kititem].subpars->presetsUpdated();
+            part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
             commandSub(getData);
-            part->kit[kititem].subpars->presetsUpdated();
+            part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::harmonicBandwidth:
             commandSub(getData);
-            part->kit[kititem].subpars->presetsUpdated();
+            part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::filterGroup:
             commandFilter(getData);
@@ -2397,7 +2397,7 @@ bool InterChange::processPad(CommandBlock *getData)
     {
         case UNUSED:
             needApply = commandPad(getData, pars);
-            pars.presetsUpdated();
+            pars.paramsChanged();
             break;
         case TOPLEVEL::insert::LFOgroup:
             commandLFO(getData);
@@ -2417,27 +2417,27 @@ bool InterChange::processPad(CommandBlock *getData)
             break;
         case TOPLEVEL::insert::oscillatorGroup:
             commandOscillator(getData,  pars.POscil.get());
-            pars.presetsUpdated();
+            pars.paramsChanged();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
             commandOscillator(getData,  pars.POscil.get());
-            pars.presetsUpdated();
+            pars.paramsChanged();
             needApply = true;
             break;
         case TOPLEVEL::insert::harmonicPhase:
             commandOscillator(getData,  pars.POscil.get());
-            pars.presetsUpdated();
+            pars.paramsChanged();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGroup:
             commandResonance(getData, pars.resonance.get());
-            pars.presetsUpdated();
+            pars.paramsChanged();
             needApply = true;
             break;
         case TOPLEVEL::insert::resonanceGraphInsert:
             commandResonance(getData, pars.resonance.get());
-            pars.presetsUpdated();
+            pars.paramsChanged();
             needApply = true;
             break;
     }
@@ -5755,7 +5755,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
             oscil->Phmag[control] = value_int;
             if (value_int == 64)
                 oscil->Phphase[control] = 64;
-            oscil->presetsUpdated();
+            oscil->paramsChanged();
         }
         else
             getData->data.value = oscil->Phmag[control];
@@ -5766,7 +5766,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
         if (write)
         {
             oscil->Phphase[control] = value_int;
-            oscil->presetsUpdated();
+            oscil->paramsChanged();
         }
         else
             getData->data.value = oscil->Phphase[control];
@@ -5858,7 +5858,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                     oscil->Pfiltertype = 0;
                     oscil->Psatype = 0;
                 }
-                oscil->presetsUpdated();
+                oscil->paramsChanged();
             }
             break;
 
@@ -5986,7 +5986,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                     oscil->Phphase[i]=64;
                 }
                 oscil->Phmag[0]=127;
-                oscil->presetsUpdated();
+                oscil->paramsChanged();
             }
             break;
         case OSCILLATOR::control::convertToSine:
@@ -5995,7 +5995,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilParameters *osci
                 fft::Calc fft(synth->oscilsize);
                 OscilGen gen(fft, NULL, synth, oscil);
                 gen.convert2sine();
-                oscil->presetsUpdated();
+                oscil->paramsChanged();
             }
             break;
     }
@@ -6252,7 +6252,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
     }
 
     if (write)
-        pars->presetsUpdated();
+        pars->paramsChanged();
     else
         getData->data.value = val;
 }
@@ -6529,7 +6529,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
     }
 
     if (write)
-        pars->presetsUpdated();
+        pars->paramsChanged();
     else
         getData->data.value = val;
 }
@@ -6788,7 +6788,7 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     }
     if (write)
     {
-        pars->presetsUpdated();
+        pars->paramsChanged();
     }
     getData->data.value = val;
     getData->data.offset = Xincrement;
@@ -6837,7 +6837,7 @@ void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
                 pars->Penvval[point] = val;
                 getData->data.value = val;
                 getData->data.offset = Xincrement;
-                pars->presetsUpdated();
+                pars->paramsChanged();
             }
             else
             {
@@ -6866,7 +6866,7 @@ void InterChange::envelopePointAdd(CommandBlock *getData, EnvelopeParams *pars)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
             getData->data.value = envpoints;
-            pars->presetsUpdated();
+            pars->paramsChanged();
         }
 
 }
@@ -6908,7 +6908,7 @@ void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *par
                 pars->Penvval[point] = val;
                 getData->data.value = val;
                 getData->data.offset = Xincrement;
-                pars->presetsUpdated();
+                pars->paramsChanged();
             }
             else
             {
@@ -6945,7 +6945,7 @@ void InterChange::envelopePointDelete(CommandBlock *getData, EnvelopeParams *par
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
             getData->data.value = envpoints;
-            pars->presetsUpdated();
+            pars->paramsChanged();
         }
 }
 
@@ -6976,7 +6976,7 @@ void InterChange::envelopePointChange(CommandBlock *getData, EnvelopeParams *par
         {
             pars->Penvdt[point] = Xincrement;
         }
-        pars->presetsUpdated();
+        pars->paramsChanged();
     }
     else
     {

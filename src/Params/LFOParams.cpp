@@ -50,7 +50,7 @@ LFOParams::LFOParams(float Pfreq_, float Pintensity_,
     Dcontinous(Pcontinous_)
 {
     defaults();
-    presetsUpdated();
+    paramsChanged();
 }
 
 
@@ -73,7 +73,7 @@ void LFOParams::setPfreq(int32_t n)
 {
     PfreqI = n;
     Pfreq = (power<2>((float(n) / float(Fmul2I)) * 10.0f) - 1.0f) / 12.0f;
-    presetsUpdated();
+    paramsChanged();
 }
 
 
@@ -114,7 +114,7 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pstretch = xml->getparcombi("stretch", Pstretch,0,127);
     Pcontinous = xml->getparbool("continous", Pcontinous);
     Pbpm = xml->getparbool("bpm", Pbpm);
-    presetsUpdated();
+    paramsChanged();
 }
 
 float LFOlimit::getLFOlimits(CommandBlock *getData)

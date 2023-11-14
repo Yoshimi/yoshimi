@@ -3,6 +3,7 @@ yoshimi 2.3.1 M
 Changed Presets internal name "presets" to "params"
 Changed "PresetsUpdate" to "ParamsUpdate"
 Changed "changePresets" to "changeParams"
+Changed "presetsUpdated" to "paramsChanged"
 
 2023-11-14 Will
 bn 2283

@@ -806,7 +806,7 @@ void PADnoteParameters::activate_wavetable()
     {                          // Note: don't pick up new waveTable while fading
         PADStatus::mark(PADStatus::CLEAN, synth->interchange, partID,kitID);
         futureBuild.swap(waveTable);
-        presetsUpdated();
+        paramsChanged();
         sampleTime = 0;
     }
     else
@@ -850,7 +850,7 @@ void PADnoteParameters::mute_and_rebuild_synchronous()
     {
         using std::swap;
         swap(waveTable, *result);
-        presetsUpdated();
+        paramsChanged();
         sampleTime = 0;
     }
 }

@@ -265,7 +265,7 @@ void OscilParameters::getfromXML(XMLwrapper *xml)
         }
     }
 
-    presetsUpdated();
+    paramsChanged();
 }
 
 float OscilParameters::getLimits(CommandBlock *getData)

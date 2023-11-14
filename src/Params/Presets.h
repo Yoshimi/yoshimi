@@ -109,7 +109,7 @@ class Presets
                 int lastUpdated;
         };
 
-        void presetsUpdated()
+        void paramsChanged()
         {
             updatedAt++;
             //std::cout << "update " << updatedAt << std::endl;

@@ -572,7 +572,7 @@ void SynthEngine::swapTestPADtable()
 
     using std::swap;
     swap(padSynth->waveTable, *testWavetable);
-    padSynth->presetsUpdated();
+    padSynth->paramsChanged();
     if (padSynth->PxFadeUpdate)
     {// rig a cross-fade for ongoing notes to pick up
         PADTables copy4fade{padSynth->Pquality};
