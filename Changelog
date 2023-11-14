@@ -1,5 +1,11 @@
 yoshimi 2.3.1 M
 
+2023-11-14 Will
+bn 2283
+BugFix: copy/paste not recognising effect numbers
+Title of copy/paste now indicates section
+Some GUI display cleanups
+
 2023-11-13 Will
 bn 2282
 BugFix: copy/paste GUI 'Type' field only correct on first call

@@ -100,7 +100,6 @@ class PresetsUI {} {
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {200 183 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
-      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy to - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser Ucopybrowse {
@@ -116,7 +115,7 @@ o->hide();}
         }}
         xywh {10 25 245 320} type Select labelcolor 64 textcolor 64
       }
-      Fl_Button Ucopypbutton {
+      Fl_Button UcopyPresbutton {
         label {Copy to Preset}
         callback {// to file
 
@@ -126,7 +125,7 @@ o->hide();}
             Ucopywin->hide();}
         xywh {145 355 110 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
-      Fl_Button Ucopybutton {
+      Fl_Button UcopyClipbutton {
         label {Copy to Clipboard}
         callback {// to clipboard
 
@@ -158,13 +157,13 @@ o->hide();}
         tmp = "";
         if (strlen(tmp) > 0)
         {
-            Ucopybutton->deactivate();
-            Ucopypbutton->activate();
+            UcopyClipbutton->deactivate();
+            UcopyPresbutton->activate();
         }
         else
         {
-            Ucopybutton->activate();
-            Ucopypbutton->deactivate();
+            UcopyClipbutton->activate();
+            UcopyPresbutton->deactivate();
         }}
         xywh {10 355 130 24} labelcolor 64 when 1 textcolor 64
       }
@@ -174,7 +173,6 @@ o->hide();}
       callback {saveWin(synth, o->w(), o->h(), o->x(), o->y(), false,"PresetWin");
 o->hide();}
       xywh {223 91 265 430} type Double box PLASTIC_THIN_UP_BOX color 7 hide resizable
-      code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste from - "), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {o->size_range(265, 430, 0, 0, 0, 0, 1);} modal
     } {
       Fl_Browser Upastebrowse {
@@ -185,18 +183,20 @@ o->hide();}
             int result = o->value();
             if (result > 0)
             {
-                Upastepbutton->activate();
+                UpastePresbutton->activate();
+                UpasteClipbutton->deactivate();
                 Udeletepbutton->activate();
             }
         }
         else
         {
-            Upastepbutton->deactivate();
+            UpastePresbutton->deactivate();
+            UpasteClipbutton->activate();
             Udeletepbutton->deactivate();
         }}
         xywh {10 25 245 320} type Hold labelcolor 64 textcolor 64
       }
-      Fl_Button Upastepbutton {
+      Fl_Button UpastePresbutton {
         label {Paste from Preset}
         callback {// from preset
 
@@ -209,7 +209,7 @@ o->hide();}
             Upastewin->hide();}
         xywh {10 355 160 24} box PLASTIC_THIN_UP_BOX color 228 labelcolor 64
       }
-      Fl_Button Upastebutton {
+      Fl_Button UpasteClipbutton {
         label {Paste from Clipboard}
         callback {// from clipboard
 
@@ -244,6 +244,18 @@ Upastewin->hide();}
       }
     }
   }
+  Function {setExten()} {return_type string
+  } {
+    code {//
+    string text = "";
+    if (npart == TOPLEVEL::systemEffects)
+        text = "system";
+    else if (npart == TOPLEVEL::insertEffects)
+        text = "insert";
+    else
+        text = "part " + to_string(npart + 1);
+    return text;} {}
+  }
   Function {Ucopy(int _npart, int _kititem, int _engine = UNUSED, int _insert =  UNUSED, int _parameter = UNUSED, int _offset = UNUSED)} {} {
     code {//
 
@@ -253,6 +265,7 @@ Upastewin->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
+    Ucopywin->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Copy from - " + setExten()), UNUSED, TOPLEVEL::windowTitle)).c_str());
     string names = Ufetch();
     if (names.empty())
         return;
@@ -260,8 +273,8 @@ Upastewin->hide();}
     size_t pos = 0;
     unsigned char ch = 10;
     Ucopybrowse->clear();
-    Ucopybutton->activate();
-    Ucopypbutton->deactivate();
+    UcopyClipbutton->activate();
+    UcopyPresbutton->deactivate();
     Ucopytypetext->label(groupName.c_str());
     do {
         pos = names.find(ch);
@@ -287,14 +300,15 @@ Upastewin->hide();}
     insert = _insert;
     parameter = _parameter;
     offset = _offset;
+    Upastewin->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Paste to - " + setExten()), UNUSED, TOPLEVEL::windowTitle)).c_str());
     string names = Ufetch();
     if (names.empty())
         return;
-
     size_t pos = 0;
     unsigned char ch = 10;
     Upastebrowse->clear();
-    Upastepbutton->deactivate();
+    UpastePresbutton->deactivate();
+    UpasteClipbutton->activate();
     Udeletepbutton->deactivate();
     Upastetypetext->label(groupName.c_str());
     do {
@@ -368,8 +382,8 @@ Upastewin->hide();}
             int size11 = int(11 * dScale);
 
             Ucopybrowse->textsize(size14);
-            Ucopypbutton->labelsize(size14);
-            Ucopybutton->labelsize(size14);
+            UcopyPresbutton->labelsize(size14);
+            UcopyClipbutton->labelsize(size14);
             Ucopycancel->labelsize(size14);
             Upresetname->textsize(size14);
             Ucopytype->labelsize(size11);
@@ -391,8 +405,8 @@ Upastewin->hide();}
             int size11 = int(11 * dScale);
 
             Upastebrowse->textsize(size14);
-            Upastepbutton->labelsize(size14);
-            Upastebutton->labelsize(size14);
+            UpastePresbutton->labelsize(size14);
+            UpasteClipbutton->labelsize(size14);
             Upastecancel->labelsize(size14);
             Udeletepbutton->labelsize(size14);
             Upastetype->labelsize(size11);

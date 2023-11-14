@@ -226,7 +226,6 @@ void UnifiedPresets::list(string dirname, string& name)
 
 string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLoad)
 {
-    int value = int(getData->data.value);
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
@@ -244,15 +243,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
             EffectMgr *sectionType;
             if (npart == TOPLEVEL::section::systemEffects)
             {
-                sectionType = synth->sysefx[value];
+                sectionType = synth->sysefx[engineType];
             }
             else if (npart == TOPLEVEL::section::insertEffects)
             {
-                sectionType = synth->insefx[value];
+                sectionType = synth->insefx[engineType];
             }
             else
             {
-                sectionType = synth->part[npart]->partefx[value];
+                sectionType = synth->part[npart]->partefx[engineType];
             }
             name = "Peffect";
 
