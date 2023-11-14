@@ -29,7 +29,7 @@
 #ifndef PAD_NOTE_PARAMETERS_H
 #define PAD_NOTE_PARAMETERS_H
 
-#include "Params/Presets.h"
+#include "Params/ParamCheck.h"
 #include "Misc/RandomGen.h"
 #include "Misc/BuildScheduler.h"
 #include "Params/RandomWalk.h"

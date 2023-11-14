@@ -316,7 +316,7 @@ set (Params_sources
     Params/ADnoteParameters.cpp  Params/EnvelopeParams.cpp
     Params/FilterParams.cpp  Params/LFOParams.cpp
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
-    Params/Controller.cpp  Params/Presets.cpp
+    Params/Controller.cpp  Params/ParamCheck.cpp
     Params/UnifiedPresets.cpp
     Params/OscilParameters.cpp
 )

@@ -32,7 +32,7 @@
 #include "Params/OscilParameters.h"
 #include "Params/FilterParams.h"
 #include "Params/LFOParams.h"
-#include "Params/Presets.h"
+#include "Params/ParamCheck.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "Misc/XMLwrapper.h"

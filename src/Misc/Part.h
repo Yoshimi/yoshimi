@@ -29,7 +29,7 @@
 
 #include "globals.h"
 #include "DSP/FFTwrapper.h"
-#include "Params/Presets.h"
+#include "Params/ParamCheck.h"
 #include "Misc/Alloc.h"
 
 #include <memory>

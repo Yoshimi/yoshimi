@@ -27,7 +27,7 @@
 #ifndef OSCIL_PARAMETERS_H
 #define OSCIL_PARAMETERS_H
 
-#include "Presets.h"
+#include "ParamCheck.h"
 #include "DSP/FFTwrapper.h"
 
 class OscilParameters : public Presets

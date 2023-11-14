@@ -27,7 +27,7 @@
 #define ENVELOPE_H
 
 #include "globals.h"
-#include "Params/Presets.h"
+#include "Params/ParamCheck.h"
 
 class EnvelopeParams;
 class SynthEngine;

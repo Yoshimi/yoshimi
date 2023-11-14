@@ -27,7 +27,7 @@
 #ifndef FILTER_PARAMS_H
 #define FILTER_PARAMS_H
 
-#include "Params/Presets.h"
+#include "Params/ParamCheck.h"
 #include "Misc/NumericFuncs.h"
 #include "globals.h"
 
