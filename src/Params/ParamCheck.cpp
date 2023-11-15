@@ -1,5 +1,5 @@
 /*
-    ParamCheck.cpp - Presets and Clipboard management
+    ParamCheck.cpp - Checks control changes and updates respective parameters
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@
 #include "Params/ParamCheck.h"
 
 
-Presets::Presets(SynthEngine *_synth) :
+ParamBase::ParamBase(SynthEngine *_synth) :
     nelement(-1),
     synth(_synth),
     updatedAt(0)

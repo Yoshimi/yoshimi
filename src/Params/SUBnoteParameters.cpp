@@ -34,7 +34,7 @@ using func::setAllPan;
 using func::power;
 
 
-SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
+SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : ParamBase(_synth)
 {
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);

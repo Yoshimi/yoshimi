@@ -57,7 +57,7 @@ class Filter
         void updateCurrentParameters();
 
         FilterParams *pars;
-        Presets::ParamsUpdate parsUpdate;
+        ParamBase::ParamsUpdate parsUpdate;
         Filter_ *filter;
         unsigned char category;
 

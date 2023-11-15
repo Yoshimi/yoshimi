@@ -33,7 +33,7 @@ class XMLwrapper;
 
 class SynthEngine;
 
-class EnvelopeParams : public Presets
+class EnvelopeParams : public ParamBase
 {
     public:
         EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_, SynthEngine *_synth);

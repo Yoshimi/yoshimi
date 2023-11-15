@@ -1,5 +1,5 @@
 /*
-    ParamCheck.h - Presets and Clipboard management
+    ParamCheck.h - Checks control changes and updates respective parameters
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -53,11 +53,11 @@ private:
 };
 
 
-class Presets
+class ParamBase
 {
     public:
-        Presets(SynthEngine *_synth);
-        virtual ~Presets() { }
+        ParamBase(SynthEngine *_synth);
+        virtual ~ParamBase() { }
         SynthEngine *getSynthEngine() {return synth;}
 
     private:
@@ -77,7 +77,7 @@ class Presets
         class ParamsUpdate
         {
             public:
-                ParamsUpdate(Presets const& params_) :
+                ParamsUpdate(ParamBase const& params_) :
                     params(&params_),
                     lastUpdated(params->updatedAt)
                 {}
@@ -95,7 +95,7 @@ class Presets
                     lastUpdated = params->updatedAt - 1;
                 }
 
-                void changeParams(Presets const& params_)
+                void changeParams(ParamBase const& params_)
                 {
                     if (params != &params_)
                     {
@@ -105,7 +105,7 @@ class Presets
                 }
 
             private:
-                const Presets *params;
+                const ParamBase *params;
                 int lastUpdated;
         };
 

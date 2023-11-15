@@ -37,7 +37,7 @@
 
 class SynthEngine;
 
-class LFOParams : public Presets
+class LFOParams : public ParamBase
 {
     public:
         LFOParams(float Pfreq_, float Pintensity_, float Pstartphase_,

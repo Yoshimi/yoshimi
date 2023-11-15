@@ -34,7 +34,7 @@ using func::power;
 
 
 FilterParams::FilterParams(unsigned char Ptype_, float Pfreq_, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
-    Presets(_synth),
+    ParamBase(_synth),
     changed(false),
     Dtype(Ptype_),
     Dfreq(Pfreq_),

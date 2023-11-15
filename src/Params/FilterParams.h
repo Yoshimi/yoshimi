@@ -39,7 +39,7 @@ using func::decibel;
 class XMLwrapper;
 class SynthEngine;
 
-class FilterParams : public Presets
+class FilterParams : public ParamBase
 {
     public:
         FilterParams(unsigned char Ptype_, float Pfreq, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);

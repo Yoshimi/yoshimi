@@ -30,7 +30,7 @@
 #include "Effects/EffectMgr.h"
 
 EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
-    Presets{_synth},
+    ParamBase{_synth},
     efxoutl{size_t(_synth->buffersize)},
     efxoutr{size_t(_synth->buffersize)},
     insertion{insertion_},

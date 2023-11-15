@@ -44,7 +44,7 @@ class Envelope
 
     private:
         EnvelopeParams *_envpars;
-        Presets::ParamsUpdate envUpdate;
+        ParamBase::ParamsUpdate envUpdate;
         size_t envpoints;
         size_t envsustain;   // 0 means disabled
         float envval[MAX_ENVELOPE_POINTS]; // [0.0 .. 1.0]

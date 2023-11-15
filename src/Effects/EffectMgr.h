@@ -40,7 +40,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
 
-class EffectMgr : public Presets
+class EffectMgr : public ParamBase
 {
     public:
        ~EffectMgr() = default;

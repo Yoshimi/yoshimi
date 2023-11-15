@@ -35,7 +35,7 @@
 using func::power;
 
 
-Resonance::Resonance(SynthEngine *_synth) : Presets(_synth)
+Resonance::Resonance(SynthEngine *_synth) : ParamBase(_synth)
 {
     defaults();
 }

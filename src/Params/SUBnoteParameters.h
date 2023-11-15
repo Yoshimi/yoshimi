@@ -35,7 +35,7 @@
 
 class SynthEngine;
 
-class SUBnoteParameters : public Presets
+class SUBnoteParameters : public ParamBase
 {
     public:
         SUBnoteParameters(SynthEngine *_synth);

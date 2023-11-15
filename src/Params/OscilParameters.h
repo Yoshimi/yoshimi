@@ -30,7 +30,7 @@
 #include "ParamCheck.h"
 #include "DSP/FFTwrapper.h"
 
-class OscilParameters : public Presets
+class OscilParameters : public ParamBase
 {
     public:
         OscilParameters(fft::Calc const& fft, SynthEngine *_synth);

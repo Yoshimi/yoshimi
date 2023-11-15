@@ -1,5 +1,7 @@
 yoshimi 2.3.1 M
 
+2023-11-15 Will
+bn 2284
 Changed Presets internal name "presets" to "params"
 Changed "PresetsUpdate" to "ParamsUpdate"
 Changed "changePresets" to "changeParams"
@@ -7,6 +9,7 @@ Changed "presetsUpdated" to "paramsChanged"
 Changed source file Presets.h to ParamCheck.h
 Changed source file Presets.cpp to ParamCheck.cpp
 Some small GUI cleanups
+Completed changes. Presets is now ParamBase
 
 2023-11-14 Will
 bn 2283

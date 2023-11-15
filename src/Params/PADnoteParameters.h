@@ -158,7 +158,7 @@ private:
 
 
 
-class PADnoteParameters : public Presets
+class PADnoteParameters : public ParamBase
 {
         static constexpr size_t SIZE_HARMONIC_PROFILE = 512;
         static constexpr size_t PROFILE_OVERSAMPLING = 16;

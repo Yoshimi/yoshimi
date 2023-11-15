@@ -192,7 +192,7 @@ struct ADnoteVoiceParam { // Voice parameters
 };
 
 
-class ADnoteParameters : public Presets
+class ADnoteParameters : public ParamBase
 {
     public:
         ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth);

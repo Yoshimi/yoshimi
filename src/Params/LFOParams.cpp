@@ -39,7 +39,7 @@ LFOParams::LFOParams(float Pfreq_, float Pintensity_,
                      float Pstartphase_, unsigned char PLFOtype_,
                      float Prandomness_, float Pdelay_,
                      unsigned char Pcontinous_, int fel_, SynthEngine *_synth) :
-    Presets(_synth),
+    ParamBase(_synth),
     fel(fel_),
     Dfreq(Pfreq_),
     Dintensity(Pintensity_),

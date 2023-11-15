@@ -158,7 +158,7 @@ class OscilGen : private WaveShapeSamples
                                      // than the hamonics set-up by the user, it may
                                      // contain time-domain data if the antialiasing
                                      // is turned off
-        Presets::ParamsUpdate oscilupdate;// whether the oscil is prepared, if
+        ParamBase::ParamsUpdate oscilupdate;// whether the oscil is prepared, if
                                            // not prepared we need to call
                                            // ::prepare() before ::get()
 

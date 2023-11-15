@@ -96,7 +96,7 @@ namespace{ // Implementation helpers...
 
 
 PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
-    : Presets(_synth)
+    : ParamBase(_synth)
     , Pmode{0}
     , Pquality{}
     , PProfile{}

@@ -34,7 +34,7 @@
 
 class SynthEngine;
 
-class Resonance : public Presets
+class Resonance : public ParamBase
 {
     public:
         Resonance(SynthEngine *_synth);

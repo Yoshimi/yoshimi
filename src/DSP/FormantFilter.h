@@ -53,7 +53,7 @@ class FormantFilter : public Filter_
         void updateCurrentParameters();
 
         FilterParams *pars;
-        Presets::ParamsUpdate parsUpdate;
+        ParamBase::ParamsUpdate parsUpdate;
 
         AnalogFilter *formant[FF_MAX_FORMANTS];
 

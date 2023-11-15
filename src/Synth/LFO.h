@@ -46,7 +46,7 @@ class LFO
         }
 
         LFOParams *lfopars;
-        Presets::ParamsUpdate lfoUpdate;
+        ParamBase::ParamsUpdate lfoUpdate;
         void Recompute(void);
         void RecomputeFreq(void);
         void computenextincrnd(void);
