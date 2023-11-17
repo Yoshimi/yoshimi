@@ -102,14 +102,10 @@ o->hide();}
       Fl_Browser Ucopybrowse {
         callback {//
 
-        if (o->value())
-        {
             int result = o->value();
-            if (result > 0)
-            {
-                Upresetname->insert(o->text(result));
-            }
-        }}
+            Upresetname->cut(0, 25);
+            Upresetname->insert(o->text(result));
+            Upresetname->position(0);}
         xywh {10 25 245 320} type Select labelcolor 64 textcolor 64
       }
       Fl_Button UcopyPresbutton {
@@ -154,15 +150,14 @@ o->hide();}
         tmp = "";
         if (strlen(tmp) > 0)
         {
-            UcopyClipbutton->deactivate();
             UcopyPresbutton->activate();
         }
         else
         {
-            UcopyClipbutton->activate();
             UcopyPresbutton->deactivate();
         }}
         xywh {10 355 130 24} labelcolor 64 when 1 textcolor 64
+        code0 {o->maximum_size(25);}
       }
     }
     Fl_Window Upastewin {
@@ -181,14 +176,12 @@ o->hide();}
             if (result > 0)
             {
                 UpastePresbutton->activate();
-                UpasteClipbutton->deactivate();
                 Udeletepbutton->activate();
             }
         }
         else
         {
             UpastePresbutton->deactivate();
-            UpasteClipbutton->activate();
             Udeletepbutton->deactivate();
         }}
         xywh {10 25 245 320} type Hold labelcolor 64 textcolor 64
@@ -270,7 +263,6 @@ Upastewin->hide();}
     size_t pos = 0;
     unsigned char ch = 10;
     Ucopybrowse->clear();
-    UcopyClipbutton->activate();
     UcopyPresbutton->deactivate();
     Ucopytypetext->label(groupName.c_str());
     do {
@@ -320,9 +312,13 @@ Upastewin->hide();}
             Upastebrowse->add(names.c_str());
     }
     while(pos != string::npos);
+    if (Ufetch(2).empty())
+        UpasteClipbutton->deactivate();
+    else
+        UpasteClipbutton->activate();
     Upastewin->show();} {}
   }
-  Function {Ufetch()} {return_type string
+  Function {Ufetch(int sent = 0)} {return_type string
   } {
     code {//
     int  W, H, X, Y, O;
@@ -339,7 +335,7 @@ Upastewin->hide();}
     UpresetsRtext();
 
     CommandBlock putData;
-    putData.data.value = 0;
+    putData.data.value = sent;
     putData.data.type = TOPLEVEL::type::List;
     putData.data.source = TOPLEVEL::action::lowPrio;
     putData.data.control = TOPLEVEL::control::copyPaste;
@@ -352,7 +348,10 @@ Upastewin->hide();}
     putData.data.miscmsg = UNUSED;
     //synth->CBtest(&putData);
     int value = synth->interchange.readAllData(&putData);
-
+    if (sent == 2)
+    {
+        return textMsgBuffer.fetch(value);
+    }
     putData.data.value = 1;
     int Ugroup = synth->interchange.readAllData(&putData);
     groupName = textMsgBuffer.fetch(Ugroup);

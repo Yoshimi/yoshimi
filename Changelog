@@ -1,5 +1,13 @@
 yoshimi 2.3.1 M
 
+2023-11-17 Will
+bn 2285
+Properly fixed CLI AddSynth voice number affecting PadSynth controls
+Paste clipboard button disabled if no entry for that section
+Small style cleanups in copy/paste
+Updated Yoshimi Control Data/toplevel.html
+Updated HTML guide for preset
+
 2023-11-15 Will
 bn 2284
 Changed Presets internal name "presets" to "params"

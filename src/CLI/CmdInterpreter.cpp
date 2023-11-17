@@ -4579,7 +4579,7 @@ int CmdInterpreter::padSynth(Parser& input, unsigned char controlType)
         insert = TOPLEVEL::insert::kitGroup;
     }
     int enable = (input.toggle());
-    // This is a part command, but looks like PadSynth the the CLI user
+    // This is a part command, but looks like PadSynth t0 the CLI user
     if (enable > -1)
         sendNormal(synth, 0, enable, controlType, PART::control::enablePad, npart, kit, UNUSED, insert);
 
@@ -5137,6 +5137,9 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
     int cmd = -1;
     engine = contextToEngines(context);
     unsigned char insert = TOPLEVEL::insert::oscillatorGroup;
+    int thisVoice = voiceNumber;
+    if (engine == PART::engine::padSynth)
+        thisVoice = 0; // we don't want voice offsets here.
 
     if (controlType == type_read && input.isAtEnd())
         value = 0; // dummy value
@@ -5177,7 +5180,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         }
         if (value == -1)
             value = string2int(input);
-        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
+        return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine + thisVoice, insert);
     }
 
     else if (input.matchnMove(2, "convert"))
@@ -5353,7 +5356,7 @@ int CmdInterpreter::waveform(Parser& input, unsigned char controlType)
         return REPLY::unrecognised_msg;
     if (value == -1)
         value = string2float(input);
-    return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine + voiceNumber, insert);
+    return sendNormal(synth, 0, value, controlType, cmd, npart, kitNumber, engine + thisVoice, insert);
 }
 
 
@@ -5609,7 +5612,6 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
     if (input.matchnMove(3, "padsynth"))
     {
         bitSet(context, LEVEL::PadSynth);
-        voiceNumber = 0; // TODO find out what *really* causes this to screw up!
         insertGroup = UNUSED;
         insertType = UNUSED;
         return padSynth(input, controlType);

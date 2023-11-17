@@ -39,7 +39,7 @@ using std::string;
 /*
    type flags (set)
         List  - all entries of section type
-        Group - preset extensin and name
+        Group - preset extension and name
         Copy  - from section to file
         Paste - from file to section
 
@@ -53,9 +53,20 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
     int type = getData->data.type;
     int value = getData->data.value;
     human = value; // used for listing. 'value may change before it is read
-    if (type == TOPLEVEL::type::List && human == 1)
+    if (type == TOPLEVEL::type::List && human > 0)
     {
         string group = findPresetType(getData);
+        if (human == 2)
+        {
+            /* here we abuse the list routines in order to find out
+             * if  there is a clipboard entry for this preset group
+            */
+            string filename = file::localDir() + "/clipboard/section." + group + EXTEN::presets;
+            if (file::isRegularFile(filename) == 0)
+            {
+                return ""; // no entry of this type
+            }
+        }
         value = synth->textMsgBuffer.push(group);
         return findPresetType(getData); // human friendly extension
     }
@@ -97,8 +108,11 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
 
 string UnifiedPresets::listpos(int count)
 {
-    //std::cout << count << "  " << presetgroups[count * 2 + human] << std::endl;;
-    return presetgroups[count * 2 + human];
+ // If human = 2 we want to get the extension not the freindly name
+    int test = 0;
+    if (human == 1)
+        test = 1;
+    return presetgroups[count * 2 + test];
 }
 
 string UnifiedPresets::findPresetType(CommandBlock *getData)
