@@ -1815,7 +1815,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             //std::cout << "pad top level" << std::endl;
             if (padnoteui != NULL)
             {
-                if( padnoteui->padnotewindow->visible())
+                if(padnoteui->padnotewindow->visible())
                     padnoteui->refresh();
             }
             return;

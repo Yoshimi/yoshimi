@@ -4,9 +4,6 @@ BUG! stand-alone GUI freezes and no further system changes if new instance start
 
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
-GUI Oddity. Press spacebar on startup and you disable part 1 AddSynth engine.
-From then on repeats the last action.
-
 Revise GUI voice list related to voice editor.
 
 Add dynfilter filter types to prompt.
@@ -32,8 +29,6 @@ RPNs (channel based)
 100,0 Pitch bend range
 100,1 Fine detune
 100,2 Coarse detune
-
-Improve Copy & Paste functionality.
 
 SYSEX - do we need it? If so, for what and how?
 

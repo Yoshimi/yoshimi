@@ -1,6 +1,12 @@
 yoshimi 2.3.1 M
 
 2023-11-17 Will
+bn 2286
+BugFix: Numerous PadSynth controls not updating on preset Paste
+BugFix: AddSynth slider not updating on preset Paste
+Fixed speeling Eras in guides :p
+
+2023-11-17 Will
 bn 2285
 Properly fixed CLI AddSynth voice number affecting PadSynth controls
 Paste clipboard button disabled if no entry for that section

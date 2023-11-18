@@ -37,7 +37,7 @@
       </tr>
       <tr>
         <td>copyPaste</td>
-        <td>0,1<br>ret. msg No.</td>
+        <td>0~2<br>ret. msg No.</td>
         <td>251</td>
         <td>0~63,241,242</td>
         <td>0~15</td>
@@ -115,18 +115,25 @@
       </tr>
     </tbody>
   </table>
-  <br><br>
-  copyPaste variatons. This uses the 'type' field slightly differently.<br><br>
+  <br>
+  <div class=comment>
+  &ensp;copyPaste variatons. This uses the 'type' field slightly differently.<br><br>
   <table>
     <thead>
       <tr>
-        <th style="width:6%">Command</th>
+        <th style="width:6%">Command></th>
         <th style="width:3%">value</th>
         <th style="width:3%">type</th>
         <th style="width:88%;text-align:left">Description</th>
       </tr>
     </thead>
     <tbody>
+    <tr>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+      </tr>
       <tr>
         <td style="border:none">List</td>
         <td style="border:none">0~2</td>
@@ -134,18 +141,31 @@
         <td style="text-align:left;border:none">Returns a lists of all the presets for the current section.<br>If 'value' = 1 returns a msgID for the preset type.<br>If 'value' = 2 only returns returns a msgID if there is a clipboard entry for that type.
       </tr>
       <tr>
+        <td style="border:none">&emsp;</td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+      </tr>
+      <tr>
         <td style="border:none">Copy</td>
         <td style="border:none">0</td>
         <td style="border:none">16</td>
-        <td style="text-align:left;border:none">Copies the selected preset to file, or to clipboard if no name given
+        <td style="text-align:left;border:none">Copies the selected preset to file, or to clipboard if no name given.
+      </tr>
+      <tr>
+        <td style="border:none">&emsp;</td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
+        <td style="border:none"></td>
       </tr>
       <tr>
         <td style="border:none">Paste</td>
         <td style="border:none">0,1</td>
         <td style="border:none">32</td>
-        <td style="text-align:left;border:none">Pastes in the selected preset from file, or from clipboard if no name given, (if 'value' = 1 deletes the selected preset)
+        <td style="text-align:left;border:none">Pastes in the selected preset from file, or from clipboard if no name given.<br>If 'value' = 1 deletes the selected preset.
       </tr>
     </tbody>
   </table>
+  </div>
 </body>
 </html>

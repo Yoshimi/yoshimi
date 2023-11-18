@@ -2774,7 +2774,8 @@ o->hide();}
         pvel->value(pars->GlobalPar.PPunchVelocitySensing);
         pvel->selection_color(setKnob(pvel->value(),72));
         detunevalueoutput->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));
-        freq->value(pars->GlobalPar.PDetune - 8192);
+        freq->value(pars->GlobalPar.PDetune -8192);
+        freq->selection_color(setSlider(freq->value(), 0));
 
         int k = pars->GlobalPar.PCoarseDetune / 1024;
         if (k >= 8)

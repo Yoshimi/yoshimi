@@ -494,7 +494,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter1, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
+              tooltip {Spread upper harmonics according to the 'OvertonesPosition' type.} xywh {470 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
               code0 {o->value(pars->Phrpos.par1);}
               code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
@@ -504,7 +504,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneParameter2, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
+              tooltip {Further variation on the harmonics spread: threshold (ShiftU/L), exponent (Power), frequency (Sine).} xywh {505 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
               code0 {o->value(pars->Phrpos.par2);}
               code1 {o->selection_color(setKnob(o->value(),64));}
               class WidgetPDial
@@ -514,7 +514,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),0));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::overtoneForceHarmonics, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1
+              tooltip {Increasingly force each partial towards the next regular harmonic position, reduce the noisiness.} xywh {540 315 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 255 step 1 deactivate
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->setValueType(VC_percent255);}
               code2 {o->selection_color(setKnob(o->value(),0));}
@@ -528,7 +528,7 @@ class PADnoteUI {: {public PresetsUI_}
             tooltip {Shift overtones to non-harmonic positions, to create metallic and noisy flavours.} xywh {370 315 85 20} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Harmonic");o->add("ShiftU");o->add("ShiftL");o->add("PowerU");o->add("PowerL");o->add("Sine");o->add("Power");o->add("Shift");}
             code1 {o->value(pars->Phrpos.type);}
-            code2 {if (int(o->value()) > 0) {hrgroup->activate(); if (int(o->value() < 7)) hrpospar2->activate(); else hrpospar2->deactivate();} else hrgroup->deactivate();}
+            code2 {if (int(o->value() > 0) && int(o->value() < 7)) hrpospar2->activate(); else hrpospar2->deactivate();}
           } {}
           Fl_Group overtonepos {
             xywh {5 350 570 45} box FLAT_BOX color 254 labelcolor 49
@@ -1423,14 +1423,19 @@ class PADnoteUI {: {public PresetsUI_}
             hrpostype->value(lrint(value));
             if (hrpostype->value() > 0)
             {
-                hrgroup->activate();
-                if (hrpostype->value() < 7)
-                    hrpospar2->activate();
-                else
+                hrpospar1->activate();
+                hrpospar3->activate();
+                if (hrpostype->value() == 7)
                     hrpospar2->deactivate();
+                else
+                    hrpospar2->activate();
             }
             else
-                hrgroup->deactivate();
+            {
+                hrpospar1->deactivate();
+                hrpospar2->deactivate();
+                hrpospar3->deactivate();
+            }
             overtonepos->redraw();
             cbwidget->do_callback();
             break;
@@ -1554,52 +1559,52 @@ class PADnoteUI {: {public PresetsUI_}
 
         case PADSYNTH::control::dePop:
             dpop->value(value);
-            dpop->selection_color(setKnob(value,20));
+                dpop->selection_color(setKnob(value,20));
             break;
 
         case PADSYNTH::control::punchStrength:
             pstr->value(value);
-            pstr->selection_color(setKnob(value,0));
+                pstr->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::punchDuration:
             pt->value(value);
-            pt->selection_color(setKnob(value,60));
+                pt->selection_color(setKnob(value,60));
             break;
 
         case PADSYNTH::control::punchStretch:
             pstc->value(value);
-            pstc->selection_color(setKnob(value,64));
+                pstc->selection_color(setKnob(value,64));
             break;
 
         case PADSYNTH::control::punchVelocity:
             pvel->value(value);
-            pvel->selection_color(setKnob(value,72));
+                pvel->selection_color(setKnob(value,72));
             break;
 
         case PADSYNTH::control::randWalkDetune:
             randWalkDetune->value(value);
-            randWalkDetune->selection_color(setKnob(value,0));
+                randWalkDetune->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkBandwidth:
             randWalkBandwidth->value(value);
-            randWalkBandwidth->selection_color(setKnob(value,0));
+                randWalkBandwidth->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkFilterFreq:
             randWalkFilterFreq->value(value);
-            randWalkFilterFreq->selection_color(setKnob(value,0));
+                randWalkFilterFreq->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkProfileWidth:
             randWalkProfileWidth->value(value);
-            randWalkProfileWidth->selection_color(setKnob(value,0));
+                randWalkProfileWidth->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::randWalkProfileStretch:
             randWalkProfileStretch->value(value);
-            randWalkProfileStretch->selection_color(setKnob(value,0));
+                randWalkProfileStretch->selection_color(setKnob(value,0));
             break;
 
         case PADSYNTH::control::applyChanges:
@@ -1667,17 +1672,25 @@ class PADnoteUI {: {public PresetsUI_}
   Function {refresh(void)} {} {
     code {//
         volume->value(pars->PVolume);
+            volume->selection_color(setKnob(volume->value(), 90));
         vsns->value(pars->PAmpVelocityScaleFunction);
+            vsns->selection_color(setKnob(vsns->value(), 64));
         pan->value(pars->PPanning);
+            pan->selection_color(setKnob(pan->value(), 64));
         stereo->value((pars->PStereo) ? 1 : 0);
 
         pstr->value(pars->PPunchStrength);
+            pstr->selection_color(setKnob(pstr->value(), 0));
         pt->value(pars->PPunchTime);
+            pt->selection_color(setKnob(pt->value(), 60));
         pstc->value(pars->PPunchStretch);
+            pstc->selection_color(setKnob(pstc->value(), 64));
         pvel->value(pars->PPunchVelocitySensing);
+            pvel->selection_color(setKnob(pan->value(), 72));
 
         detunevalueoutput->value(getDetune(pars->PDetuneType,0,pars->PDetune));
         detune->value(pars->PDetune-8192);
+            detune->selection_color(setSlider(detune->value(), 0));
 
         int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
         octave->value(k);
@@ -1688,6 +1701,7 @@ class PADnoteUI {: {public PresetsUI_}
 
         hz440->value(pars->Pfixedfreq);
         fixedfreqetdial->value(pars->PfixedfreqET);
+            fixedfreqetdial->selection_color(setKnob(fixedfreqetdial->value(), 0));
 
         amplfo->refresh();
         freqlfo->refresh();
@@ -1705,20 +1719,28 @@ class PADnoteUI {: {public PresetsUI_}
 
         hpbasetype->value(pars->PProfile.base.type);
         hpbasepar1->value(pars->PProfile.base.pwidth);
+            hpbasepar1->selection_color(setKnob(hpbasepar1->value(), 80));
         hpfreqmult->value(pars->PProfile.freqmult);
+            hpfreqmult->selection_color(setKnob(hpfreqmult->value(), 0));
 
         hpmpar1->value(pars->PProfile.modulator.pstretch);
+            hpmpar1->selection_color(setKnob(hpmpar1->value(), 0));
         hpmfreq->value(pars->PProfile.modulator.freq);
+            hpmfreq->selection_color(setKnob(hpmfreq->value(), 30));
         hpwidth->value(pars->PProfile.width);
+            hpwidth->selection_color(setKnob(hpwidth->value(), 127));
 
         hponehalf->value(pars->PProfile.onehalf);
         hpamptype->value(pars->PProfile.amp.type);
         hpampmode->value(pars->PProfile.amp.mode);
         hpamppar1->value(pars->PProfile.amp.par1);
+            hpamppar1->selection_color(setKnob(hpamppar1->value(), 80));
         hpamppar2->value(pars->PProfile.amp.par2);
+            hpamppar2->selection_color(setKnob(hpamppar2->value(), 64));
         hpautoscale->value(pars->PProfile.autoscale);
 
         bwdial->value(pars->Pbandwidth);
+            bwdial->selection_color(setKnob(bwdial->value(), 500));
         if (pars->Pmode==0)
         {
            bwprofilegroup->activate();
@@ -1746,12 +1768,50 @@ class PADnoteUI {: {public PresetsUI_}
         qsamplesize->value(pars->Pquality.samplesize);
 
         hrpostype->value(pars->Phrpos.type);
+        if (hrpostype->value() > 0)
+        {
+            hrpospar1->activate();
+            hrpospar3->activate();
+            if (hrpostype->value() == 7)
+                hrpospar2->deactivate();
+            else
+                hrpospar2->activate();
+        }
+        else
+        {
+            hrpospar1->deactivate();
+            hrpospar2->deactivate();
+            hrpospar3->deactivate();
+        }
         hrpospar1->value(pars->Phrpos.par1);
+            hrpospar1->selection_color(setKnob(hrpospar1->value(), 64));
         hrpospar2->value(pars->Phrpos.par2);
+            hrpospar2->selection_color(setKnob(hrpospar2->value(), 64));
         hrpospar3->value(pars->Phrpos.par3);
+            hrpospar3->selection_color(setKnob(hrpospar3->value(), 0));
 
         hprofile->redraw();
         overtonepos->redraw();
+        xFadeDial->value(millisec2logDial(pars->PxFadeUpdate));
+            xFadeDial->selection_color(setKnob(xFadeDial->value(),2301));
+
+        int dialSetting = millisec2logDial(pars->PrebuildTrigger);
+        if (dialSetting >= 2300)
+            dialSetting -= 2300;
+        else
+            dialSetting = -1;
+        rebuildTrigger->value(dialSetting);
+            rebuildTrigger->selection_color(setKnob(rebuildTrigger->value(),-1));
+        randWalkDetune->value(pars->PrandWalkDetune);
+            randWalkDetune->selection_color(setKnob(randWalkDetune->value(),0));
+        randWalkFilterFreq->value(pars->PrandWalkFilterFreq);
+            randWalkFilterFreq->selection_color(setKnob(randWalkFilterFreq->value(),0));
+        randWalkBandwidth->value(pars->PrandWalkBandwidth);
+            randWalkBandwidth->selection_color(setKnob(randWalkBandwidth->value(),0));
+        randWalkProfileWidth->value(pars->PrandWalkProfileWidth);
+            randWalkProfileWidth->selection_color(setKnob(randWalkProfileWidth->value(),0));
+        randWalkProfileStretch->value(pars->PrandWalkProfileStretch);
+            randWalkProfileStretch->selection_color(setKnob(randWalkProfileStretch->value(),0));
 
         osc->redraw();
         //pars->applyparameters(false);
