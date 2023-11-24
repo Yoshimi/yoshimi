@@ -1,5 +1,10 @@
 yoshimi 2.3.1 M
 
+2023-11-24 Will
+bn 2287
+BugFix: AddSynth Tabs not updating on 'Paste' action - never did!
+Small Control Data updates.
+
 2023-11-17 Will
 bn 2286
 BugFix: Numerous PadSynth controls not updating on preset Paste

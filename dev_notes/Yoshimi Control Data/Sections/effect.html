@@ -11,7 +11,7 @@
     Part number is 242 for insertion effects<br>
     Normal part numbers are 0 to 63
     <div class=effRightnote>
-    Kit numbers are 16 +(0 to 8)<br>
+    Kit numbers are 16 + (0 to 8)<br>
      for actual effect types <br>
     16 (0) is no effect
     </div>
@@ -34,10 +34,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td></td>
-        <td></td>
-        <td>0~15</td>
+    <tr>
+        <td>volume</td>
+        <td>0~127</td>
+        <td>0</td>
         <td>0~63,241,242</td>
         <td>16+(0~8)</td>
         <td>effect No.</td>
@@ -45,11 +45,38 @@
         <td>ret. 0,1</td>
         <td>255</td>
         <td>255</td>
-        <td>Depends on effect -(for EQ, parameter returns band number. Otherwise returns 1 if value different to default)</td>
+        <td>Effect volume or Left/Right ratio, Gain for EQ </td>
+      </tr>
+      <tr>
+        <td>panning</td>
+        <td>0~127</td>
+        <td>1</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect No.</td>
+        <td>255</td>
+        <td>ret. 0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Effect panning, Band number for EQ</td>
+      </tr>
+
+      <tr>
+        <td>(various)</td>
+        <td>0~?</td>
+        <td>2~14</td>
+        <td>0~63,241,242</td>
+        <td>16+(0~8)</td>
+        <td>effect No.</td>
+        <td>255</td>
+        <td>ret. 0,1</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Depends on effect (for EQ, parameter returns band number. Otherwise returns 1 if value different to default)</td>
       </tr>
       <tr>
         <td>preset</td>
-        <td>?</td>
+        <td>0~12,16<br>ret 0~12</td>
         <td>16</td>
         <td>0~63,241,242</td>
         <td>16+(0~8)</td>
@@ -58,7 +85,7 @@
         <td>ret. 0,1</td>
         <td>255</td>
         <td>255</td>
-        <td>Returns number of presets (not EQ) </td>
+        <td>Chooses the preset (not EQ)<br>Returns the current preset, or number of them (not EQ)</td>
       </tr>
       <tr>
         <td>bpm</td>
@@ -71,7 +98,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Ratio of BPM to actual speed</td>
+        <td>Lock LFO frequency to a multiple of BPM (not EQ)</td>
       </tr>
       <tr>
         <td>bpmStart</td>
@@ -97,7 +124,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Value changed (returns 1 if value different to default)</td>
+        <td>Value changed -- not EQ<br>returns 1 if value different to default</td>
       </tr>
       <tr>
         <td></td>

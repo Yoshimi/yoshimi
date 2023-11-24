@@ -1966,7 +1966,6 @@ if (pars->VoicePar[nvoice].PFMVoice >= 0) {
             ExtMod->deactivate();
             ExtModOsc->deactivate();
         }
-
         ADnoteVoiceParameters->show();} {}
   }
   Function {~ADvoiceUI()} {} {
@@ -2555,7 +2554,8 @@ o->hide();}
             if (edit)
                 editVoice(7);
             break;
-    }} {}
+    }
+    ;} {}
   }
   Function {setTabColour(int num)} {} {
     code {//
@@ -2703,7 +2703,6 @@ o->hide();}
                 break;
             }
         }
-
         ;} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
@@ -2795,11 +2794,14 @@ o->hide();}
         freqenv->refresh();
         filterenv->refresh();
         filterui->refresh();
+        editVoice(nvoice);
         for (int i = 0; i < NUM_VOICES; ++i)
+        {
+            setTabColour(i);
             voicelistitem[i]->refreshlist();
-
+        }
         resui->refresh();
-        editVoice(nvoice);} {}
+        ;} {}
   }
   Function {ShowGlobal()} {} {
     code {//
@@ -2819,7 +2821,6 @@ o->hide();}
   }
   Function {set_voice(bool type)} {} {
     code {//
-
     voicelistitem[nvoice]->refreshlist();
     int fetchW, fetchH, fetchX, fetchY, fetchO;
 
@@ -3043,9 +3044,9 @@ o->hide();}
   } {
     code {//
         nvoice = nvoice_;
-
         int adW = advoice->ADnoteVoiceParameters->w();
         int adH = advoice->ADnoteVoiceParameters->h();
+        bool lastVoiceState = advoice->voiceonbutton->value();
         advoice->hide();
         ADnoteVoice->remove(advoice);
         delete advoice;
@@ -3053,6 +3054,15 @@ o->hide();}
         advoice = new ADvoiceUI(0, 0, adW, adH);
         ADnoteVoice->add(advoice);
         advoice->init(pars, npart, kititem, nvoice);
+        /*
+        This is only needed to update the tab when a voice has been pasted,
+        but duplicates the action every time a different voice is selected.
+        Needs improvement!
+        */
+        if (advoice->voiceonbutton->value() != lastVoiceState)
+        {
+            setTabColour(nvoice);
+        }
         advoice->ADnoteVoiceParameters->size(adW, adH);
         advoice->show();
         addVoiceRtext();} {}

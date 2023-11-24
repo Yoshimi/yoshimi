@@ -1734,7 +1734,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
     }
     if (control == PART::control::enableAdd || control == PART::control::enableSub || control == PART::control::enablePad)
-    checkEngines();} {}
+        checkEngines();
+    ;} {}
   }
   Function {paste(CommandBlock *getData)} {} {
     code {//
