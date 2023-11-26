@@ -19,7 +19,7 @@ When editing files, table cells are arranged vertically rather than as the line 
 Mostly in the descriptions, line breaks <br> are used to avoid confusing natural wrap-rounds.
 
 '~ ~' is used to denote undefined values.
-For numbers in a range use 'nn1~nn2'. This is more compact and easier to read than using 'nn1 to nn2' For a specific group of numbers use 'nn1,nn2,nn3'
+For numbers in a range use 'nn1~nn2'. This is more compact than using 'nn1 to nn2' For a specific group of numbers use 'nn1,nn2 etc'
 
 Other examples:
 0~2,8+(0~7)

@@ -1,9 +1,17 @@
-yoshimi 2.3.1 M
+yoshimi 2.3.1.1 rc1
+
+2023-11-26 Will
+bn 2288
+Added missing details in Control Data filter section.
+    legacy PDF now held back (available from me if needed)
+Typo corrections in Control Data.
+Updates to files in dev-notes.
+Set bugfix version 2.3.1.1 rc1
 
 2023-11-24 Will
 bn 2287
 BugFix: AddSynth Tabs not updating on 'Paste' action - never did!
-Small Control Data updates.
+Small Control Data updates and clarifications.
 
 2023-11-17 Will
 bn 2286

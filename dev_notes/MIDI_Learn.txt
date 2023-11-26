@@ -78,14 +78,15 @@ These move a line, so a complete redraw is inititalsed.
 The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a list re-order first.
 
 
-0xf1 load list
-0xf2 load numbered item from recent history
-0xf5 save list
+0x80 load list
+0x81 load numbered item from recent history
+0x82 save list
+0x83 learned
 
 
 *** UPDATE ***
 
-Max MIDI-learn lines has been increased to 400.
+How Max MIDI-learn lines has been increased.
 
 This has been achieved by inserting a 10mS sleep every 32 lines while updating the GUI. This ensures the message buffer doesn't get overloaded. There was no other reason for the earlier limit. This still comes in at less that 1S for a full list load.
 

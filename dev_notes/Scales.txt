@@ -30,12 +30,16 @@ When setting scales/keymaps, or importing .scl/.kbm files the following error nu
 
  0  empty entry
 -1  value too small
--2  invalid characters
--3  no file
--4  empty file
--5  short/corrupted file
--6  invalid octave size / invalid map size
--7  invalid note number
--8  out of range
+-2  value too big
+-3  invalid characters
+-4  must be real numbers or divisions
+-5  no file
+-6  empty file
+-7  short/corrupted file
+-8  missing entry
+-9  invalid octave size
+-10 invalid map size
+-11 invalid note number
+-12 out of range
 
 

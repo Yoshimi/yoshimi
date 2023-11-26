@@ -12,7 +12,7 @@ Data MSB    Data LSB            Setting
     80        root        Set CC to control Root path change (>119 disables)
     81        bank        Set CC to control Bank change (>119 disables)
     82        >63         Enable Program change otherwise disable
-    83        >63         Now unused
+    83        >63         Reserved
     84        extended    Set CC control Extended program change (>119 disables)
     85        parts       Set number of available parts (16, 32 or 64)
     86        0           Save all dynamic settings

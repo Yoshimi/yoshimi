@@ -22,7 +22,7 @@ We now implement a build number. This is only bumped up when I push new commits 
 
 
 We won't normally accept fixes for spelling errors in the *code*
-For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
+For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'bigerizer' and 'derfingwotwiggles'.
 
 We do however accept some name changes where the original name is ambiguous or no longer appropriate.
 

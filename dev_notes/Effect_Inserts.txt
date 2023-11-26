@@ -8,8 +8,8 @@ Reverb
 2   Time (duration of effect)
 3   Delay
 4   Delay feedback
-5   Bandwidth (only got bandwidth type)
-6   {reserved}
+5   Bandwidth (only for bandwidth type)
+6   E/R{reserved}
 7   Low pass filter
 8   High pass filter
 9   Damping
