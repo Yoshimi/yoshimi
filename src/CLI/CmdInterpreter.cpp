@@ -6446,6 +6446,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         return Reply::DONE;
     }
+    if (input.matchnMove(2, "guide"))
+    {
+        synth->getRuntime().Log(readControlText(synth, TOPLEVEL::action::lowPrio, 0, TOPLEVEL::section::guideLocation, UNUSED));
+        return Reply::DONE;
+    }
 
     if (input.nextChar('/'))
     {

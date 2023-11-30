@@ -339,7 +339,7 @@ class PartKitItem {: {public Fl_Group}
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_}
+class PartUI {open : {public Fl_Group, PartUI_}
 } {
   Function {make_window()} {} {
     Fl_Window instrumenteditwindow {
@@ -2730,7 +2730,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {fxRtext()} {} {
     code {//
-    if (lastfxW < 12)
+    if (lastfxW < 6)
     {
         ++lastfxW;
         return;

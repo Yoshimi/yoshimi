@@ -227,72 +227,6 @@ void InterChange::muteQueueWrite(CommandBlock *getData)
 }
 
 
-std::string InterChange::findHtmlManual(void)
-{
-    string namestring = "doc/yoshimi/yoshimi_user_guide/files/yoshimi_user_guide_version";
-    string namelist = "";
-    if (isRegularFile("/usr/share/" + namestring))
-        namelist += ("/usr/share/" + namestring + "\n");
-    if (isRegularFile("/usr/local/share/" + namestring))
-        namelist += ("/usr/local/share/" + namestring + "\n");
-    if (namelist.empty())
-    {
-        if(!file::cmd2string("find /home/ -type f -name 'yoshimi_user_guide_version' 2>/dev/null", namelist))
-            return "";
-    }
-    //std::cout << namelist << std::endl;
-
-    size_t next = 0;
-    size_t lastversion = 0;
-    string found = "";
-    string name = "";
-    while (next != string::npos)
-    {
-        next = namelist.find("\n");
-        if (next != string::npos)
-        {
-            name = namelist.substr(0, next);
-
-            // check it's there and the most recent
-            size_t current = isRegularFile(name);
-            if (current > lastversion)
-            {
-                lastversion = current;
-                found = name;
-            }
-            namelist = namelist.substr( next +1);
-        }
-    }
-    return found;
-}
-
-
-std::string InterChange::manualSearch(std::string dir2search, std::string path2match)
-{
-    std::list<string> wanted;
-    listDir(&wanted, dir2search);
-    if (wanted.empty())
-    return "";
-    wanted.sort();
-
-    std::string path = "";
-    std::list<string>::reverse_iterator itr = wanted.rbegin();
-    while (itr != wanted.rend())
-    {
-        std::string tmp = *itr;
-        // some installs have a missing third digit so we trap it
-        if (tmp.find(path2match) != std::string::npos && tmp.rfind("2.0.pdf") == std::string::npos)
-        {
-            path = tmp;
-            itr = wanted.rend();
-        }
-        else
-            ++itr;
-    }
-    return path;
-}
-
-
 void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 {
     int value = lrint(getData->data.value);
@@ -430,7 +364,20 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
         case TOPLEVEL::section::config:
             value = indirectConfig(getData, synth, newMsg, guiTo, text);
             break;
-
+        case TOPLEVEL::section::guideLocation:
+        {
+            string man = synth->getRuntime().manualFile;
+            if (!man.empty())
+            {
+                size_t pos = man.find("files");
+                man = man.substr(0,pos);
+            }
+            else
+                man = "Can't find guide";
+            value = textMsgBuffer.push(man);
+            noForward = true;
+            break;
+        }
         case TOPLEVEL::section::message:
             newMsg = true;
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
@@ -504,7 +451,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
                (getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI)
             {
                 getData->data.control = TOPLEVEL::control::textMessage;
-                getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later has parameter types changed incompatibly with earlier versions, and with Yoshimi. It may not perform correctly.");
+                getData->data.miscmsg = textMsgBuffer.push("File from ZynAddSubFX 3.0 or later may have parameter types incompatible with earlier versions, and with Yoshimi so might perform strangely.");
                 returnsBuffer.write(getData->bytes);
             }
 #endif
@@ -970,10 +917,9 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             break;
         case MAIN::control::openManual: // display user guide
         {
-            // first try html version
             text = "";
             getData->data.control = TOPLEVEL::control::textMessage;
-            string found  = findHtmlManual();
+            string found  = synth->getRuntime().manualFile;
             if (!found.empty())
             {
 

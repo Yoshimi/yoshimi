@@ -1,22 +1,19 @@
-Version 2.3.1
+Version 2.3.1.1
 
-Microtonal tunings and keymaps can now be exported as well as imported.
+Copy/Paste has been improved and unified between CLI and GUI.
 
-Zero size keymaps are handled correctly.
-
-The virtual keyboard now retains focus while selecting different instruments in a bank.
-
-Window title bar text has been made more consistent.
-
-Some of the MIDI example files have been revised.
-
-Improved metadata.
-
-More bugfixes, including a very obscure PadSynth one.
+Improved discovery of most recent HTML guide location.
+    Also available to the CLI.
 
 Small corrections and updates in the User Guide.
 
-Full details are in /doc/Yoshimi_2.3.1_features.txt
+Various bugfixes.
+
+For developers:
+    Improved access to control data/descriptions, with updates.
+    Updated various explanatory texts.
+
+Full details are in /doc/Yoshimi_2.3.1.1_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

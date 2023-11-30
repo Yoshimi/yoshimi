@@ -1,10 +1,17 @@
-yoshimi 2.3.1.1 rc1
+yoshimi 2.3.1.1
+
+2023-11-30 Will
+bn 2289
+Revised HTML guide discovery.
+    Also provides guide location to CLI
+Updated Control Data.
+Set bugfix release 2.3.1.1
 
 2023-11-26 Will
 bn 2288
 Added missing details in Control Data filter section.
     legacy PDF now held back (available from me if needed)
-Typo corrections in Control Data.
+Typo corrections in Control Data files.
 Updates to files in dev-notes.
 Set bugfix version 2.3.1.1 rc1
 

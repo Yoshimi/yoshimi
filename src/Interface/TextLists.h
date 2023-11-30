@@ -128,6 +128,7 @@ namespace LISTS {
 static std::string basics [] = {
     "?  Help",       "show commands",
     "List",          "list current settings",
+    "GUide",         "show location of most recent HTML guide",
     "STop",          "all sound off",
     "RESet [s]",     "return to start-up conditions, 'ALL' clear MIDI-learn (if 'y')",
     "EXit [s]",      "tidy up and close Yoshimi (if 'y'), 'FOrce' instant exit regardless",

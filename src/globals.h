@@ -161,6 +161,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         insertEffects,
         bank = 244, // F4
         config = 248, // F8
+        guideLocation = 249,
         message = 250, // FA
         windowTitle = 252,
         /* The above is read-only and uses 'value' as the location of the

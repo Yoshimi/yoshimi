@@ -122,7 +122,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
         else
         {
             minor = version.substr(0, pos);
-            revision = version.substr(pos + 1, version.length());
+            version = version.substr(pos + 1, version.length());
+
+            pos = version.find('.');
+            if (pos == string::npos)
+                revision = version;
+            else
+                revision = version.substr(0, pos);
+            //revision = version.substr(pos + 1, version.length());
         }
     }
     mxmlElementSetAttr(root, "Yoshimi-major", major.c_str());
@@ -144,6 +151,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
+            addparstr("guide_version", synth->getRuntime().guideVersion);
+            addparstr("manual", synth->getRuntime().manualFile);
         endbranch();
         return;
     }

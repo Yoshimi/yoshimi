@@ -3162,8 +3162,9 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 }
 
 
-int SynthEngine::getalldata(char **data)
+int SynthEngine::getalldata(char **data) // to state from instance
 {
+    std::cout << "getstart" << std::endl;
     bool oldFormat = usingYoshiType;
     usingYoshiType = true; // make sure everything is saved
     getRuntime().xmlType = TOPLEVEL::XML::State;
@@ -3177,8 +3178,9 @@ int SynthEngine::getalldata(char **data)
 }
 
 
-void SynthEngine::putalldata(const char *data, int size)
+void SynthEngine::putalldata(const char *data, int size) // to instance from state
 {
+    std::cout << "putstart" << std::endl;
     while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
@@ -3194,6 +3196,7 @@ void SynthEngine::putalldata(const char *data, int size)
     midilearn.extractMidiListData(false, xml);
     setAllPartMaps();
     delete xml;
+    std::cout << "putend" << std::endl;
 }
 
 

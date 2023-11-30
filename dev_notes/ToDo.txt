@@ -12,18 +12,14 @@ CLI waveform (in voice) changes don't update GUI unless waveform window is open 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 Visible in carla apparently.
 
-first time find manual
-    find / 2>/dev/null -type d -name yoshimi_user_guide
-then test ~/files/yoshimi_user_guide_version
-pick one with highest value and put link in ./local/share/yoshimi
-use this for all calls for manual
+In themes, consider moving action for grey map *after* colours have been redefined.
 
 In filer show actual extension (xiz/xiy)
 
 In controllers provide dropdown menu for choice of modulation (LFO) function.
     Off
     Amplitude
-    Filter
+    Filter cutoff
     Frequency * (default)
 
 RPNs (channel based)

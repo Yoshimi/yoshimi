@@ -406,7 +406,6 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
         dynPreset = getData->data.spare1;
         //std::cout << "pres " << dynPreset << std::endl;
     }
-
     unsigned char type = 0;
 
     // filter defaults
