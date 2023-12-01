@@ -1,4 +1,4 @@
-Version 2.3.1.1
+Version 2.3.1.2
 
 Copy/Paste has been improved and unified between CLI and GUI.
 
@@ -13,7 +13,7 @@ For developers:
     Improved access to control data/descriptions, with updates.
     Updated various explanatory texts.
 
-Full details are in /doc/Yoshimi_2.3.1.1_features.txt
+Full details are in /doc/Yoshimi_2.3.1.2_features.txt
 
 Yoshimi source code is available from either:
 https://sourceforge.net/projects/yoshimi

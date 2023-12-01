@@ -3180,7 +3180,7 @@ int SynthEngine::getalldata(char **data) // to state from instance
 
 void SynthEngine::putalldata(const char *data, int size) // to instance from state
 {
-    std::cout << "putstart" << std::endl;
+//std::cout << "putstart" << std::endl;
     while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
@@ -3196,7 +3196,7 @@ void SynthEngine::putalldata(const char *data, int size) // to instance from sta
     midilearn.extractMidiListData(false, xml);
     setAllPartMaps();
     delete xml;
-    std::cout << "putend" << std::endl;
+//std::cout << "putend" << std::endl;
 }
 
 

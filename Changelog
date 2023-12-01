@@ -1,4 +1,10 @@
-yoshimi 2.3.1.1
+yoshimi 2.3.1.2
+
+2023-12-1 Will
+bn 2290
+Removed errant CR from text, disrupting manual discovery.
+Commented out some canaries.
+Set bugfix release 2.3.1.2
 
 2023-11-30 Will
 bn 2289

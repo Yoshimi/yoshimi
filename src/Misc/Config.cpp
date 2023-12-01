@@ -412,16 +412,21 @@ bool Config::loadConfig(void)
         if (pos != string::npos)
         {
             guideVersion = manual_source.substr(0,pos);
-            manualFile = manual_source.substr(pos + 1);
-            string currentV = string(YOSHIMI_VERSION);
 
-            if (currentV <= guideVersion && isRegularFile(manualFile))
+            manualFile = manual_source.substr(pos + 1);
+            size_t endCR = manualFile.rfind("\n");
+            if (endCR != string::npos)
+                manualFile = manualFile.substr(0,endCR);
+            string currentV = string(YOSHIMI_VERSION);
+//cout << "\nm >" << manualFile << "<" << endl;
+//cout << "\nc " << currentV << "\ng " << guideVersion << endl;
+            if (currentV == guideVersion && file::isRegularFile(manualFile) != 0)
                 man_ok = true;
         }
     }
+//cout << "OK " << int(man_ok) << endl;;
     if (!man_ok)
     {
-        configChanged = true;
         startThread(&findManualHandle, _findManual, this, false, 0, "CFG");
     }
     //cout << "Session Stage " << sessionStage << endl;

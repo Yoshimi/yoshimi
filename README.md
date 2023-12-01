@@ -4,7 +4,7 @@ Yoshimi is a software audio synthesizer, currently only available for Linux.
 
 ### Current version
 
-Version 2.3.1.1
+Version 2.3.1.2
 
 * Copy/Paste has been improved and unified between CLI and GUI.
 * Improved discovery of most recent HTML guide location.
@@ -16,7 +16,7 @@ For developers:
 * Updated various explanatory texts.
 * Various bugfixes.
 
-Full details are in [/doc/Yoshimi_2.3.1.1_features.txt](doc/Yoshimi_2.3.1.1_features.txt)
+Full details are in [/doc/Yoshimi_2.3.1.2_features.txt](doc/Yoshimi_2.3.1.2_features.txt)
 
 ### Building
 

@@ -1,4 +1,4 @@
-Version 2.3.1.1
+Version 2.3.1.2
 
 Although marked as a bugfix release, there are a few useful additions and improvements.
 
