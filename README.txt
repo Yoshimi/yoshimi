@@ -1,4 +1,4 @@
-Version 2.3.1.2
+Version 2.3.1.3
 
 Copy/Paste has been improved and unified between CLI and GUI.
 

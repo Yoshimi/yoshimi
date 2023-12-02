@@ -64,6 +64,7 @@ using file::isDirectory;
 using file::extendLocalPath;
 using file::setExtension;
 using file::renameFile;
+using file::loadText;
 
 using func::nearestPowerOf2;
 using func::asString;
@@ -405,7 +406,7 @@ bool Config::loadConfig(void)
 
     // find user guide
     bool man_ok = false;
-    string manual_source = file::loadText(file::configDir() + "/yoshimi-manual.source");
+    string manual_source = loadText(file::configDir() + "/yoshimi-manual.source");
     if (!manual_source.empty())
     {
         size_t pos = manual_source.find("\n");

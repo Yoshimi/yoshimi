@@ -5,7 +5,7 @@ Although marked as a bugfix release, there are a few useful additions and improv
 The most obvious of these is a change in the presentation of the Copy/Paste windows.
 The title bar now shows the section they represent, and the 'Type' field shows a human-friendly name. Less Obvious is that the clipboards are now persistent, so you can pick up the last ones used even over a computer reboot.
 
-Discovery of the built-in HTML user guide has been improved. It was found that one disto used a rather strange location for doccumentation. Now, on a first-time start (or version update), as you start Yoshimi a thorough search is made, and the location of the most recent copy is stored. As this can take some time it is performed in a background task so it doesn't slow dow Yoshimi's startup.. From then on, calling to display the guide is only delayed by as much time as your default browser takes!
+Discovery of the built-in HTML user guide has been improved. It was found that one disto used a rather strange location for documentation. Now, on a first-time start (or version update), as you start Yoshimi a thorough search is made, and the location of the most recent copy is stored. As this can take some time it is performed in a background task so it doesn't slow down Yoshimi's startup. From then on, calling to display the guide is only delayed by as much time as your default browser takes!
 
 The developer's information has been updated. The PDF file with all the command data had been causing problems with merges, so has been replaced with an HTML version. This has been further updated and expanded. Being separate files for each section it is also easier to maintain.
 

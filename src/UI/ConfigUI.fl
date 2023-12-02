@@ -1478,7 +1478,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   Function {setUserTable(string table)} {return_type int
   } {
     code {//
-        string colourText = loadText(table);
+        string colourText = file::loadText(table);
         std::size_t nextPos;
 
         // strip out preamble text
