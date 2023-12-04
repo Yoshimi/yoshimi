@@ -268,7 +268,7 @@ void *Config::findManual(void)
     if (pos != string::npos)
         guideVersion = guideVersion.substr(0, pos);
     Log("manual found");
-    string toSave = guideVersion;
+    string toSave = guideVersion + "\n";
     toSave += manualFile;
     file::saveText(toSave, file::configDir() + "/yoshimi-manual.source");
     return NULL;
@@ -419,6 +419,9 @@ bool Config::loadConfig(void)
             if (endCR != string::npos)
                 manualFile = manualFile.substr(0,endCR);
             string currentV = string(YOSHIMI_VERSION);
+            pos = currentV.find(" ");
+            if (pos != string::npos)
+                currentV = currentV.substr(0,pos);
 //cout << "\nm >" << manualFile << "<" << endl;
 //cout << "\nc " << currentV << "\ng " << guideVersion << endl;
             if (currentV == guideVersion && file::isRegularFile(manualFile) != 0)

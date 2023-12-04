@@ -52,7 +52,7 @@ add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 #add_definitions(-Wno-unqualified-std-cast-call) # supresses clang warning 'unqualified call'
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.3.1.3")
+set (YOSHIMI_VERSION "2.3.1.3 M")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=3)

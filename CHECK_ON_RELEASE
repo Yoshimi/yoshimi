@@ -1,4 +1,6 @@
 
+Test headless build.
+
 Ensure all new files have been added to commit!!!
 
 use /usr/bin/appstream-util validate {file} to check metadata
@@ -18,7 +20,7 @@ This will ensure the guide has the correct version number.
 
 /desktop/metainfo/yoshimi.metainfo.xml
     Ensure version number and dates are correct.
-    Check urls for images are correct.
+    Check that urls for images are correct.
     Check contact details.
 
 /dev-notes
