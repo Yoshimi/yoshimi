@@ -27,7 +27,6 @@
 
 
 ParamBase::ParamBase(SynthEngine *_synth) :
-    nelement(-1),
     synth(_synth),
     updatedAt(0)
 {

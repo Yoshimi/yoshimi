@@ -23,9 +23,6 @@
 #ifndef PARAMCHECK_H
 #define PARAMCHECK_H
 
-//#include "Misc/XMLwrapper.h"
-//#include <vector>
-
 class SynthEngine;
 
 struct Note
@@ -58,8 +55,7 @@ class ParamBase
         SynthEngine *getSynthEngine() {return synth;}
 
     private:
-        virtual void defaults(int /* n */) { }
-        int nelement;
+        virtual void defaults() =0;
 
     protected:
         SynthEngine *synth;

@@ -501,8 +501,7 @@ class MicrotonalUI {} {
                 anotecounter->value(func::string2int(splitline(msg)));
                 afreqinput->value(func::string2float(splitline(msg)));
                 //octavesizeoutput->value(func::string2float(splitline(msg))); // temporarily disabled
-                int formalOctave = func::string2float(splitline(msg));
-                formalOctave = formalOctave; // suppress warning
+                //int formalOctave = func::string2float(splitline(msg)); // temporarily disabled
                 string map;
                 for (int i = 0; i < mapsize; ++i)
                     map += (splitline(msg) + char(10));
@@ -733,12 +732,6 @@ class MicrotonalUI {} {
   decl {SynthEngine *synth;} {private local
   }
   decl {float refFreq;} {private local
-  }
-  decl {int oldFirst;} {private local
-  }
-  decl {int oldMid;} {private local
-  }
-  decl {int oldLast;} {private local
   }
   decl {int scaleDW;} {private local
   }

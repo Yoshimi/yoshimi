@@ -220,6 +220,4 @@ class ParametersUI {} {
   }
   decl {int lastParamW;} {private local
   }
-  decl {int ID;} {private local
-  }
 }

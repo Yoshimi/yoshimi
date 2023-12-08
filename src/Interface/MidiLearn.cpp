@@ -83,7 +83,7 @@ MidiLearn::~MidiLearn()
 
 void MidiLearn::setTransferBlock(CommandBlock *getData)
 {
-    //std::cout << "MIDI Control " << (int) getData->data.control << " Part " << (int) getData->data.part << "  Kit " << (int) getData->data.kit << " Engine " << (int) getData->data.engine << "  Insert " << (int) getData->data.insert << std::std::endl;
+    //synth->CBtest(getData);
 
     memcpy(learnTransferBlock.bytes, getData->bytes, sizeof(learnTransferBlock));
     learnedName = resolveAll(synth, getData, false);

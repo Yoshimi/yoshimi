@@ -370,7 +370,7 @@ Upastewin->hide();}
         if (UcopyW != Ucopywin->w())
         {
             UcopyW = Ucopywin->w();
-            pasteW = 0;
+            UpasteW = 0;
 
             float dScale = Ucopywin->w() / float(presetsDW);
 
@@ -418,10 +418,6 @@ Upastewin->hide();}
   decl {int presetsDW;} {private local
   }
   decl {int presetsDH;} {private local
-  }
-  decl {int copyW;} {private local
-  }
-  decl {int pasteW;} {private local
   }
   decl {int UcopyW;} {private local
   }
