@@ -1,7 +1,7 @@
 /*
     TextMsgBuffer.h
 
-    Copyright 2014-2022, Will Godfrey, Ichthyostega
+    Copyright 2014-2023, Will Godfrey, Ichthyostega
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -23,6 +23,9 @@
 
 //#define REPORT_MISCMSG
 // for testing message list leaks
+
+//#define MAX_MSG
+// for finding out the most we actually use
 
 #include <list>
 #include <string>
@@ -73,15 +76,14 @@ class TextMsgBuffer
             static TextMsgBuffer singleton{};
             return singleton;
         }
-
+#ifdef MAX_MSG
+    int count;
+#endif
         void init(void);
         void clear(void);
         int push(std::string text);
         std::string fetch(int pos, bool remove = true);
 };
-
-
-
 
 
 inline void TextMsgBuffer::init()
@@ -95,6 +97,9 @@ inline void TextMsgBuffer::init()
      * or removed.
      * We use 255 (NO_MSG) to denote an invalid entry.
      */
+#ifdef MAX_MSG
+    count = 0;
+#endif
 }
 
 
@@ -106,6 +111,10 @@ inline void TextMsgBuffer::clear()
     std::list<std::string>::iterator it = buffer.begin();
     for (it = buffer.begin(); it != buffer.end(); ++it)
         *it = "";
+#ifdef MAX_MSG
+    count = 0;
+    std::cout << "max " << count << std::endl;
+#endif
 }
 
 
@@ -140,6 +149,15 @@ inline int TextMsgBuffer::push(std::string _text)
 
     int result = idx; // in case of a new entry before return
     sem_post(&lock);
+#ifdef MAX_MSG
+    if (result > 0) // don't want background ones
+        std::cout << "last " << result << std::endl;
+    if (result > count)
+    {
+        count = result;
+        std::cout << "max " << count << std::endl;
+    }
+#endif
     return result;
 }
 

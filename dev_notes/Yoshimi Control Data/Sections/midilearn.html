@@ -6,7 +6,6 @@
 </head>
 
 <body>
-<div id=note>Note: 'offset' is always 255. This was not available when MIDI learn was created so 'type' was used.</div>
   <table>
     <thead>
       <tr>
@@ -26,7 +25,7 @@
     <tbody>
       <tr>
         <td>block</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>0</td>
         <td>216</td>
         <td>255</td>
@@ -35,11 +34,11 @@
         <td>255</td>
         <td>0,1</td>
         <td>msg No.</td>
-        <td>Set 'block' -- stop any other response to this CC</td>
+        <td>Set 'block' -- stop any later response to this CC</td>
       </tr>
       <tr>
         <td>limit</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>1</td>
         <td>216</td>
         <td>255</td>
@@ -52,7 +51,7 @@
       </tr>
       <tr>
         <td>mute</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>2</td>
         <td>216</td>
         <td>255</td>
@@ -78,7 +77,7 @@
       </tr>
       <tr>
         <td>sevenBit</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>4</td>
         <td>216</td>
         <td>255</td>
@@ -91,7 +90,7 @@
       </tr>
       <tr>
         <td>minimum</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>5</td>
         <td>216</td>
         <td>255</td>
@@ -104,7 +103,7 @@
       </tr>
       <tr>
         <td>maximum</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>6</td>
         <td>216</td>
         <td>255</td>
@@ -117,7 +116,7 @@
       </tr>
       <tr>
         <td>ignoreMove</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>7</td>
         <td>216</td>
         <td>255</td>
@@ -126,11 +125,11 @@
         <td>255</td>
         <td>0</td>
         <td>255</td>
-        <td>?</td>
+        <td>Don't change line position<br>(used internally when editing lines)</td>
       </tr>
       <tr>
         <td>deleteLine</td>
-        <td>~ ~</td>
+        <td>0~399</td>
         <td>8</td>
         <td>216</td>
         <td>255</td>
@@ -152,7 +151,7 @@
         <td>255</td>
         <td>0</td>
         <td>255</td>
-        <td>?</td>
+        <td>Mark incoming MIDI as an NRPN<br>(used internally translating data and for UI display)</td>
       </tr>
       <tr>
         <td>showGUI</td>
@@ -182,7 +181,7 @@
       </tr>
       <tr>
         <td>CCorChannel</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>16</td>
         <td>216</td>
         <td>0~119</td>
@@ -191,7 +190,7 @@
         <td>255</td>
         <td>0</td>
         <td>msg No.</td>
-        <td>Set CC or channel and rewrite line possibly moving it in the list (16, any channel)</td>
+        <td>Set CC or channel and rewrite line possibly moving it in the list (engine = 16, any channel)</td>
       </tr>
       <tr>
         <td>findSize</td>
@@ -204,7 +203,7 @@
         <td>255</td>
         <td>0</td>
         <td>255</td>
-        <td>Find currentlist size</td>
+        <td>Find current list size (not currently used)</td>
       </tr>
       <tr>
         <td>sendLearnMessage</td>
@@ -273,7 +272,7 @@
       </tr>
       <tr>
         <td>loadFromRecent</td>
-        <td>0~400</td>
+        <td>0~399</td>
         <td>129</td>
         <td>216</td>
         <td>255</td>
@@ -325,5 +324,6 @@
       </tr>
     </tbody>
   </table>
+  <div id=note><br>Note: 'offset' is always 255. This was not available when MIDI learn was created so 'type' was used.<br>'value' represents list postion.</div>
 </body>
 </html>

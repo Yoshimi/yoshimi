@@ -1951,6 +1951,7 @@ void SynthEngine::resetAll(bool andML)
         putData.data.control = MIDILEARN::control::clearAll;
         putData.data.part = TOPLEVEL::section::midiLearn;
         midilearn.generalOperations(&putData);
+        textMsgBuffer.clear();
     }
 }
 
