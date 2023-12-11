@@ -67,7 +67,11 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
                 return ""; // no entry of this type
             }
         }
-        value = synth->textMsgBuffer.push(group);
+        /*
+         * sending a message here was doubling the number of messages
+         * but only one was actually being read!
+         */
+        value = UNUSED;//synth->textMsgBuffer.push(group);
         return findPresetType(getData); // human friendly extension
     }
 
