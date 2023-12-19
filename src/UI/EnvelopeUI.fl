@@ -84,7 +84,7 @@ pair=NULL;} {}
   Function {send_data(int action, int control, int offset, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, offset);} {}
+        collect_writeData(synth, value, action, type, control, npart, kititem, engine, TOPLEVEL::insert::envelopePointChange, group, offset);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
@@ -913,7 +913,7 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
   }
   Function {send_data(int action, int group, int control, float value, int type, int insert = TOPLEVEL::insert::envelopeGroup, int offset = UNUSED)} {} {
     code {//
-    collect_data(synth, value, action, type, control, npart, kititem, engine, insert, group, offset);} {}
+    collect_writeData(synth, value, action, type, control, npart, kititem, engine, insert, group, offset);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

@@ -138,7 +138,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   Function {send_data(int action, int insert, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart, kititem, 1, insert);} {}
+        collect_writeData(synth, value, action, type, control, npart, kititem, 1, insert);} {}
   }
   Function {init(SUBnoteParameters *pars_, int n_, int npart_, int kititem_)} {} {
     code {//
@@ -800,7 +800,7 @@ class SUBnoteUI {: {public PresetsUI_}
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart, kititem, 1);} {}
+        collect_writeData(synth, value, action, type, control, npart, kititem, 1);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

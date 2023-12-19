@@ -434,7 +434,7 @@ class SysEffSend {: {public WidgetPDial}
   } {
     code {//
     if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
-        collect_data(synth, value(), 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), neff2, TOPLEVEL::section::systemEffects, UNUSED, neff1, TOPLEVEL::insert::systemEffectSend);
+        collect_writeData(synth, value(), 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), neff2, TOPLEVEL::section::systemEffects, UNUSED, neff1, TOPLEVEL::insert::systemEffectSend);
     return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {private local
@@ -594,7 +594,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
   Function {send_data(int action, int control, float value, int type, int parameter = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, npart + *plgroup, UNUSED, UNUSED, UNUSED, parameter);} {}
+        collect_writeData(synth, value, action, type, control, npart + *plgroup, UNUSED, UNUSED, UNUSED, parameter);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

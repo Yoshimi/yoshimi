@@ -1665,7 +1665,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
     {
         offset = dfp->value();
     }
-    collect_data(synth, value, action, type, control, npart, group, neff, UNUSED, parameter, offset);} {}
+    collect_writeData(synth, value, action, type, control, npart, group, neff, UNUSED, parameter, offset);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {

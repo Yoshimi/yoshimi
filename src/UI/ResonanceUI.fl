@@ -96,7 +96,7 @@ class ResonanceGraph {: {public Fl_Box}
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, type, RESONANCE::control::graphPoint, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert, control);} {}
+    collect_writeData(synth, value, action, type, RESONANCE::control::graphPoint, npart, kititem, engine, TOPLEVEL::insert::resonanceGraphInsert, control);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -503,7 +503,7 @@ class ResonanceUI {: PresetsUI_
     else
         insert = TOPLEVEL::insert::resonanceGroup;
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, type, control, npart, kititem, engine, insert);} {}
+    collect_writeData(synth, value, action, type, control, npart, kititem, engine, insert);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

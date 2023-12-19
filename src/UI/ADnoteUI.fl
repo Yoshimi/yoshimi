@@ -92,7 +92,7 @@ class ADvoicelistitem {: {public Fl_Group}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicevolume->selection_color(setSlider(vol,100));
             }*/
 
-            collect_data(synth, vol, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_writeData(synth, vol, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::volume, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip Volume xywh {155 4 122 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 maximum 127 step 1 textcolor 64
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
           code1 {o->selection_color(setSlider(o->value(),100));}
@@ -104,7 +104,7 @@ class ADvoicelistitem {: {public Fl_Group}
     bool enab = _SYS_::F2B(o->value());
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
 
-    collect_data(synth, enab, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
+    collect_writeData(synth, enab, 0, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::enableResonance, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Resonance On/Off} xywh {305 5 15 17} down_box DOWN_BOX selection_color 64 labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 labelcolor 64 align 4
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           class Fl_Check_Button2
@@ -116,7 +116,7 @@ class ADvoicelistitem {: {public Fl_Group}
             //if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
                 //synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->intensity->value(lfodepth);
 
-            collect_data(synth, lfodepth, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
+            collect_writeData(synth, lfodepth, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), 1, npart, kititem, PART::engine::addVoice1 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {535 4 95 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 labelcolor 64 align 5 maximum 127 step 1 textcolor 64 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
@@ -133,7 +133,7 @@ class ADvoicelistitem {: {public Fl_Group}
                 synth->getGuiMaster()->partui->adnoteui->advoice->voicerandompan->value(panning < 1);
             }*/
 
-            collect_data(synth, panning, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_writeData(synth, panning, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Write | TOPLEVEL::type::Integer), ADDVOICE::control::panning, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Voice panning} xywh {282 4 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 4 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(pars->VoicePar[nvoice].PPanning);}
@@ -184,7 +184,7 @@ class ADvoicelistitem {: {public Fl_Group}
           callback {//
             int detune = lrint(o->value());
             o->selection_color(setSlider(detune,0));
-            collect_data(synth, detune, TOPLEVEL::action::forceUpdate, TOPLEVEL::type::Write, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_writeData(synth, detune, TOPLEVEL::action::forceUpdate, TOPLEVEL::type::Write, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {365 4 164 20} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           code1 {o->selection_color(setSlider(o->value(),0));}
@@ -208,7 +208,7 @@ class ADvoicelistitem {: {public Fl_Group}
       Fl_Check_Button voiceenabled {
         callback {//
             bool enab = _SYS_::F2B(o->value());
-            collect_data(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
+            collect_writeData(synth, enab, TOPLEVEL::action::forceUpdate, (TOPLEVEL::type::Integer | TOPLEVEL::type::Write), ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice);}
         xywh {18 7 15 15} down_box DOWN_BOX selection_color 64 labeltype EMBOSSED_LABEL labelcolor 64
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
         class Fl_Check_Button2
@@ -1251,7 +1251,7 @@ send_data(0, ADDVOICE::control::bypassGlobalFilter, o->value(), TOPLEVEL::type::
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, type, control, npart, kititem, nvoice + PART::engine::addVoice1);} {}
+    collect_writeData(synth, value, action, type, control, npart, kititem, nvoice + PART::engine::addVoice1);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -2594,7 +2594,7 @@ o->hide();}
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_data(synth, value, action, type, control, npart, kititem, 0);} {}
+    collect_writeData(synth, value, action, type, control, npart, kititem, 0);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

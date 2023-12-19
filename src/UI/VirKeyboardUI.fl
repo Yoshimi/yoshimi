@@ -184,7 +184,7 @@ class VirKeys {: {public Fl_Box}
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
+        collect_writeData(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -625,7 +625,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
+        collect_writeData(synth, value, action, type, control, TOPLEVEL::section::midiIn, kititem, engine);} {}
   }
   Function {ShowKbd()} {} {
     code {//

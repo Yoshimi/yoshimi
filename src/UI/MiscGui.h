@@ -127,7 +127,7 @@ enum ValueType {
 
 float collect_readData(SynthEngine *synth, float value, unsigned char control, unsigned char part, unsigned char kititem = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = UNUSED, unsigned char request = UNUSED);
 
-void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = UNUSED);
+void collect_writeData(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = UNUSED, unsigned char engine = UNUSED, unsigned char insert = UNUSED, unsigned char parameter = UNUSED, unsigned char offset = UNUSED, unsigned char miscmsg = UNUSED);
 
 void alert(SynthEngine *synth, string message);
 int choice(SynthEngine *synth, string one, string two, string three, string message);

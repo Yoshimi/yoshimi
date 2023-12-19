@@ -2654,7 +2654,7 @@ Alan Calvert started the project}
         */
         if (control == MAIN::control::loadInstrumentByName && part == TOPLEVEL::section::main && miscmsg < NO_MSG)
         {
-            collect_data(synth, 0, action, type, control, part, engine, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+            collect_writeData(synth, 0, action, type, control, part, engine, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
             return;
         }
 
@@ -2662,11 +2662,11 @@ Alan Calvert started the project}
             type |= Fl::event_button();
         if (parameter == 0)
         {
-            collect_data(synth, 0, action, type, control, part, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
+            collect_writeData(synth, 0, action, type, control, part, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
             return;
         }
 
-        collect_data(synth, value, action, type, control, part, UNUSED, engine, insert, parameter, UNUSED, miscmsg);} {}
+        collect_writeData(synth, value, action, type, control, part, UNUSED, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {

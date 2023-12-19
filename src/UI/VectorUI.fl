@@ -435,7 +435,7 @@ switch (res)
             parameter = BaseChan;
         }
         type |= TOPLEVEL::type::Write;
-        collect_data(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
+        collect_writeData(synth, value, action, type, control, part, kit, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

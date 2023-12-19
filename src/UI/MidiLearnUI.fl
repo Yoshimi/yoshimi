@@ -281,7 +281,7 @@ class MidiLearnKitItem {: {public Fl_Group}
             break;
     }
     if (doit)
-        collect_data(synth, n, action, type, control, TOPLEVEL::section::midiLearn, CC, chan, min, max, UNUSED, 0);} {}
+        collect_writeData(synth, n, action, type, control, TOPLEVEL::section::midiLearn, CC, chan, min, max, UNUSED, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -470,7 +470,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   Function {send_data(int action, int control, float value, int type, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
-    collect_data(synth, value, action, type, control, TOPLEVEL::section::midiLearn, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
+    collect_writeData(synth, value, action, type, control, TOPLEVEL::section::midiLearn, kititem, engine, insert, parameter, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//

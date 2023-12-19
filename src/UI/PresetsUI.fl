@@ -360,7 +360,7 @@ Upastewin->hide();}
   }
   Function {send_data(float value, int action, int type, int control, int part = UNUSED, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
-        collect_data(synth, value, action, type, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
+        collect_writeData(synth, value, action, type, control, part, kititem, engine, insert, parameter, offset, miscmsg);} {}
   }
   Function {UpresetsRtext()} {} {
     code {//

@@ -63,21 +63,13 @@ float collect_readData(SynthEngine *synth, float value, unsigned char control, u
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    float result;
-    if (miscmsg != NO_MSG)
-    {
-        synth->interchange.readAllData(&putData);
-        result = putData.data.miscmsg;
-    }
-    else
-    {
-        result = synth->interchange.readAllData(&putData);
-    }
+    float result = synth->interchange.readAllData(&putData);
+    if (miscmsg != NO_MSG) // outgoing value - we want to read this text
+        result = putData.data.miscmsg; // returned message ID
     return result;
-
 }
 
-void collect_data(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
+void collect_writeData(SynthEngine *synth, float value, unsigned char action, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char offset, unsigned char miscmsg)
 {
     if (part < NUM_MIDI_PARTS && engine == PART::engine::padSynth)
     {
