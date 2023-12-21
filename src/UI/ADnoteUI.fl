@@ -2031,7 +2031,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group freqenv {
           label {Yoshimi : AddSynth Global - Frequency Envelope}
           xywh {10 295 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 0, 1);}
+          code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, PART::engine::addSynth, 1);}
           class EnvelopeUI
         } {}
         Fl_Text_Display octavetext {
@@ -2057,7 +2057,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group freqlfo {
           label {Frequency LFO}
           xywh {215 295 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 0, 1);}
+          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, PART::engine::addSynth, 1);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -2066,16 +2066,9 @@ class ADnoteUI {: {public PresetsUI_}
             detunevalueoutput->do_callback();
             send_data(0, ADDSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);}
           tooltip {Fine Detune (cents)} xywh {57 275 433 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
-          code0 {o->value(pars->GlobalPar.PDetune - 8192);}
+          code0 {o->value(collect_readData(synth, 0, ADDSYNTH::detuneFrequency, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
-        }
-        Fl_Value_Output detunevalueoutput {
-          label Detune
-          callback {o->value(getDetune(pars->GlobalPar.PDetuneType,0,pars->GlobalPar.PDetune));}
-          xywh {12 275 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
-          code0 {o->step(0.01, 1);}
-          code1 {o->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));}
         }
         Fl_Choice detunetype {
           label {Detune Type}
@@ -2085,6 +2078,13 @@ class ADnoteUI {: {public PresetsUI_}
           code0 {o->add("L35 cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->GlobalPar.PDetuneType-1);}
         } {}
+        Fl_Value_Output detunevalueoutput {
+          label Detune
+          callback {o->value(getDetune(detunetype->value()+1,0, freq->value()+8192));}
+          xywh {12 275 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
+          code0 {o->step(0.01, 1);}
+          code1 {o->value(getDetune(detunetype->value()+1, 0, freq->value()+8192));}
+        }
         Fl_Dial relBwidth {
           label relBW
           callback {//
@@ -2213,13 +2213,13 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group ampenv {
           label {Yoshimi : AddSynth Global - Amplitude Envelope}
           xywh {10 75 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 0, 0);}
+          code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, PART::engine::addSynth, 0);}
           class EnvelopeUI
         } {}
         Fl_Group amplfo {
           label {Amplitude LFO}
           xywh {10 145 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, 0, 0);}
+          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, PART::engine::addSynth, 0);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
@@ -2245,19 +2245,19 @@ send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer
         Fl_Group filterenv {
           label {Yoshimi : AddSynth Global - Filter Envelope}
           xywh {295 110 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, 0, 2);}
+          code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, PART::engine::addSynth, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterlfo {
           label {Filter LFO}
           xywh {295 180 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterLfo, npart, kititem, 0, 2);}
+          code0 {o->init(pars->GlobalPar.FilterLfo, npart, kititem, PART::engine::addSynth, 2);}
           class LFOUI
         } {}
         Fl_Group filterui {
           label {Yoshimi : AddSynth Global - Filter}
           xywh {295 35 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, 0);}
+          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, PART::engine::addSynth);}
           class FilterUI
         } {}
       }
@@ -2594,7 +2594,7 @@ o->hide();}
   Function {send_data(int action, int control, float value, int type)} {} {
     code {//
     type |= TOPLEVEL::type::Write;
-    collect_writeData(synth, value, action, type, control, npart, kititem, 0);} {}
+    collect_writeData(synth, value, action, type, control, npart, kititem, PART::engine::addSynth);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -2716,7 +2716,7 @@ o->hide();}
         voiceSeen = false;
         lastvoiceW = 0;
         nvoice = 0;
-        resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
+        resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, PART::engine::addSynth);
         lastlistW = 0;
         listSeen = false;
         lastResuiW = 0;
@@ -2749,43 +2749,48 @@ o->hide();}
   }
   Function {refresh()} {} {
     code {//
-        globalvolume->value(pars->GlobalPar.PVolume);
-        globalvolume->selection_color(setKnob(globalvolume->value(),90));
-        vsns->value(pars->GlobalPar.PAmpVelocityScaleFunction);
-        vsns->selection_color(setKnob(vsns->value(),64));
-        globalpan->value(pars->GlobalPar.PPanning);
-        globalpan->selection_color(setKnob(globalpan->value(),64));
-        globalwidth->value(pars->GlobalPar.PWidth);
-        globalwidth->selection_color(setKnob(globalwidth->value(),63));
+        globalvolume->value(collect_readData(synth, 0, ADDSYNTH::volume, npart, kititem, PART::engine::addSynth));
+            globalvolume->selection_color(setKnob(globalvolume->value(),90));
+        vsns->value(collect_readData(synth, 0, ADDSYNTH::velocitySense, npart, kititem, PART::engine::addSynth));
+            vsns->selection_color(setKnob(vsns->value(),64));
+        globalpan->value(collect_readData(synth, 0, ADDSYNTH::panning, npart, kititem, PART::engine::addSynth));
+            globalpan->selection_color(setKnob(globalpan->value(),64));
+        globalwidth->value(collect_readData(synth, 0, ADDSYNTH::randomWidth, npart, kititem, PART::engine::addSynth));
+            globalwidth->selection_color(setKnob(globalwidth->value(),63));
+        relBwidth->value(collect_readData(synth, 0, ADDSYNTH::relativeBandwidth, npart, kititem, PART::engine::addSynth));
+            relBwidth->selection_color(setKnob(relBwidth->value(),64));
+        stereo->value(collect_readData(synth, 0, ADDSYNTH::stereo, npart, kititem, PART::engine::addSynth));
 
-        relBwidth->value(pars->GlobalPar.PBandwidth);
-        relBwidth->selection_color(setKnob(relBwidth->value(),64));
-        stereo->value(pars->GlobalPar.PStereo);
-        rndgrp->value(pars->GlobalPar.Hrandgrouping);
-        pstr->value(pars->GlobalPar.PPunchStrength);
-        pstr->selection_color(setKnob(pstr->value(),0));
-        depop->value(pars->GlobalPar.Fadein_adjustment);
-        depop->selection_color(setKnob(depop->value(),20));
-        pt->value(pars->GlobalPar.PPunchTime);
-        pt->selection_color(setKnob(pt->value(),60));
-        pstc->value(pars->GlobalPar.PPunchStretch);
-        pstc->selection_color(setKnob(pstc->value(),64));
-        pvel->value(pars->GlobalPar.PPunchVelocitySensing);
-        pvel->selection_color(setKnob(pvel->value(),72));
-        detunevalueoutput->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));
-        freq->value(pars->GlobalPar.PDetune -8192);
-        freq->selection_color(setSlider(freq->value(), 0));
+        //rndgrp->value(collect_readData(synth, ADDSYNTH::randomGroup, npart, kititem, PART::engine::addSynth)); // something wrong with this :(
 
-        int k = pars->GlobalPar.PCoarseDetune / 1024;
+        pstr->value(collect_readData(synth, 0, ADDSYNTH::punchStrength, npart, kititem, PART::engine::addSynth));
+            pstr->selection_color(setKnob(pstr->value(),0));
+        depop->value(collect_readData(synth, 0, ADDSYNTH::dePop, npart, kititem, PART::engine::addSynth));
+            depop->selection_color(setKnob(depop->value(),20));
+        pt->value(collect_readData(synth, 0, ADDSYNTH::punchDuration, npart, kititem, PART::engine::addSynth));
+            pt->selection_color(setKnob(pt->value(),60));
+        pstc->value(collect_readData(synth, 0, ADDSYNTH::punchStretch, npart, kititem, PART::engine::addSynth));
+            pstc->selection_color(setKnob(pstc->value(),64));
+        pvel->value(collect_readData(synth, 0,ADDSYNTH::punchVelocity, npart, kititem, PART::engine::addSynth));
+            pvel->selection_color(setKnob(pvel->value(),72));
+
+        int detFreq = collect_readData(synth, 0, ADDSYNTH::detuneFrequency, npart, kititem, PART::engine::addSynth);
+        freq->value(detFreq);
+            freq->selection_color(setSlider(freq->value(), 0));
+
+        int k = collect_readData(synth, 0, ADDSYNTH::coarseDetune, npart, kititem, PART::engine::addSynth) / 1024;
         if (k >= 8)
             k -= 16;
         octave->value(k);
 
-        detunetype->value(pars->GlobalPar.PDetuneType - 1);
+        int detType = collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth);
+        detunetype->value(detType - 1);
         k = pars->GlobalPar.PCoarseDetune % 1024;
         if (k >= 512)
             k -= 1024;
         coarsedet->value(k);
+        std::cout << "det " << detFreq << "  type " << detType << std::endl;
+        detunevalueoutput->value(getDetune(detType, 0, detFreq +8192));
         amplfo->refresh();
         freqlfo->refresh();
         filterlfo->refresh();

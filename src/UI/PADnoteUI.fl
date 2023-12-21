@@ -445,7 +445,7 @@ class PADnoteUI {: {public PresetsUI_}
                 delete (oscui);
             lastWaveW = 0;
             bool forPAD = true;
-            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, 2, forPAD);
+            oscui = new OscilEditor(pars->POscil.get(), osc, cbwidget, applybutton, synth, npart, kititem, PART::engine::padSynth, forPAD);
             if ((Fl::event_button() == 3))
                 padnotewindow->hide();}
             tooltip {Right click: also close this} xywh {451 272 85 20} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
@@ -732,13 +732,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group ampenv {
               label {Yoshimi : PadSynth - Amplitude Envelope}
               xywh {10 95 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpEnvelope.get(), npart, kititem, PART::engine::padSynth, 0);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
               label {Amplitude LFO     }
               xywh {10 165 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo.get(), npart, kititem, 2, 0);}
+              code0 {o->init(pars->AmpLfo.get(), npart, kititem, PART::engine::padSynth, 0);}
               class LFOUI
             } {}
             Fl_Box {} {
@@ -752,19 +752,19 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group filterenv {
               label {Yoshimi : PadSynth - Filter Envelope}
               xywh {295 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FilterEnvelope.get(), npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterEnvelope.get(), npart, kititem, PART::engine::padSynth, 2);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
               label {Filter LFO     }
               xywh {295 200 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->FilterLfo.get(), npart, kititem, 2, 2);}
+              code0 {o->init(pars->FilterLfo.get(), npart, kititem, PART::engine::padSynth, 2);}
               class LFOUI
             } {}
             Fl_Group filterui {
               label {Yoshimi : PadSynth - Filter}
               xywh {295 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-              code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
+              code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, PART::engine::padSynth);}
               class FilterUI
             } {}
           }
@@ -775,13 +775,13 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group freqenv {
               label {Yoshimi : PadSynth - Frequency Envelope}
               xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqEnvelope.get(), npart, kititem, PART::engine::padSynth, 1);}
               class EnvelopeUI
             } {}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo.get(), npart, kititem, 2, 1);}
+              code0 {o->init(pars->FreqLfo.get(), npart, kititem, PART::engine::padSynth, 1);}
               class LFOUI
             } {}
             Fl_Dial bend {
@@ -1258,7 +1258,7 @@ class PADnoteUI {: {public PresetsUI_}
         action = TOPLEVEL::action::lowPrio;
     }
     type |= TOPLEVEL::type::Write;
-    collect_writeData(synth, value, action, type, control, partnum, kititem, 2, insert, UNUSED, UNUSED, miscmsg);} {}
+    collect_writeData(synth, value, action, type, control, partnum, kititem, PART::engine::padSynth, insert, UNUSED, UNUSED, miscmsg);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1658,7 +1658,7 @@ class PADnoteUI {: {public PresetsUI_}
     lastpadW = 0;
     oscui = NULL;
     lastResuiW = 0;
-    resui = new ResonanceUI(pars->resonance.get(), npart, kititem, 2);
+    resui = new ResonanceUI(pars->resonance.get(), npart, kititem, PART::engine::padSynth);
     make_randWalkWindow();
     make_window();
     padStatus.reset(new PADStatus(npart,kititem));

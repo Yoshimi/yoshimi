@@ -138,7 +138,7 @@ class SUBnoteharmonic {: {public Fl_Group}
   Function {send_data(int action, int insert, int control, float value, int type)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
-        collect_writeData(synth, value, action, type, control, npart, kititem, 1, insert);} {}
+        collect_writeData(synth, value, action, type, control, npart, kititem, PART::engine::subSynth, insert);} {}
   }
   Function {init(SUBnoteParameters *pars_, int n_, int npart_, int kititem_)} {} {
     code {//
@@ -250,7 +250,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Group ampenv {
           label {Yoshimi : SubSynth - Amplitude Envelope}
           xywh {10 65 205 70} box FLAT_BOX color 51 labelcolor 64 align 144
-          code0 {o->init(pars->AmpEnvelope, npart, kititem, 1, 0);}
+          code0 {o->init(pars->AmpEnvelope, npart, kititem, PART::engine::subSynth, 0);}
           class EnvelopeUI
         } {}
         Fl_Dial panwidth {
@@ -289,7 +289,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Group freqenvelopegroup {
           label {Yoshimi : SubSynth - Frequency Envelope}
           xywh {445 65 205 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->FreqEnvelope, npart, kititem, 1, 1);}
+          code0 {o->init(pars->FreqEnvelope, npart, kititem, PART::engine::subSynth, 1);}
           code1 {if (pars->PFreqEnvelopeEnabled == 0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -415,7 +415,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Group bandwidthenvelopegroup {
           label {Yoshimi : SubSynth - BandWidth Envelope}
           xywh {225 65 210 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->BandWidthEnvelope, npart, kititem, 1, 3);}
+          code0 {o->init(pars->BandWidthEnvelope, npart, kititem, PART::engine::subSynth, 3);}
           code1 {if (pars->PBandWidthEnvelopeEnabled==0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -511,7 +511,7 @@ class SUBnoteUI {: {public PresetsUI_}
         Fl_Group filterenv {
           label {Yoshimi : SubSynth - Filter Envelope}
           xywh {447 328 275 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, 1, 2);}
+          code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, PART::engine::subSynth, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {
