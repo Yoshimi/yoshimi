@@ -4386,7 +4386,7 @@ void InterChange::commandAdd(CommandBlock *getData)
 
         case ADDSYNTH::control::detuneFrequency:
             if (write)
-                pars->GlobalPar.PDetune = value_int + 8182;
+                pars->GlobalPar.PDetune = value_int + 8192;
             else // these steps are done to keep the GUI happy - sliders are strange :(
                 value = pars->GlobalPar.PDetune - 8192;
             break;
