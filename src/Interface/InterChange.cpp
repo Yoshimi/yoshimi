@@ -2268,7 +2268,7 @@ bool InterChange::processVoice(CommandBlock *getData, SynthEngine *synth)
             else
             {
                 engine -= PART::engine::addVoice1;
-                if (control != PART::control::sustainPedalEnable) // how can this ever be true!!!
+                if (control != PART::control::sustainPedalEnable)
                 {
                     int voicechange = part->kit[kititem].adpars->VoicePar[engine].Pextoscil;
                     if (voicechange != -1)
