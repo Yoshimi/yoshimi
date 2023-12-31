@@ -4299,7 +4299,7 @@ int CmdInterpreter::subSynth(Parser& input, unsigned char controlType)
         insert = TOPLEVEL::insert::kitGroup;
     }
     int enable = (input.toggle());
-    // This is a part command, but looks like SubSynth the the CLI user
+    // This is a part command, but looks like SubSynth to the CLI user
     if (enable > -1)
         sendNormal(synth, 0, enable, controlType, PART::control::enableSub, npart, kit, UNUSED, insert);
 
