@@ -158,14 +158,14 @@ class ADvoiceUI {: {public Fl_Group}
                     send_data(0, ADDVOICE::control::modulatorOctave, o->value(), TOPLEVEL::type::Integer);
                     ;}
                 tooltip Octave xywh {667 270 52 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
-                code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::modulatorCoarseDetune, npart, kititem, PART::engine::addVoice1 + nvoice)) / 1024;}
+                code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::modulatorOctave, npart, kititem, PART::engine::addVoice1 + nvoice));}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
               }
               Fl_Value_Output fmdetunevalueoutput {
                 label Detune
                 callback {//
-    o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));
+                    o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));
     ;}
                 xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
                 code0 {o->step(0.01, 1);}
@@ -173,9 +173,9 @@ class ADvoiceUI {: {public Fl_Group}
               }
               Fl_Slider ModDetune {
                 callback {//
-            o->selection_color(setSlider(o->value(),0));
-            send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFrequency, o->value(), TOPLEVEL::type::Integer);
-            ;}
+                    o->selection_color(setSlider(o->value(),0));
+                    send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFrequency, o->value(), TOPLEVEL::type::Integer);
+                    ;}
                 tooltip {Fine Detune (cents)} xywh {623 239 168 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
                 code0 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorDetuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice));}
                 code1 {o->selection_color(setSlider(o->value(),0));}
@@ -184,8 +184,8 @@ class ADvoiceUI {: {public Fl_Group}
               Fl_Choice ModDetuneType {
                 label {Detune Type}
                 callback {//
-            send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneType, o->value(), TOPLEVEL::type::Integer);
-            ;}
+                    send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneType, o->value(), TOPLEVEL::type::Integer);
+                    ;}
                 xywh {585 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
                 code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
                 code1 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorDetuneType, npart, kititem, PART::engine::addVoice1 + nvoice));}
@@ -288,7 +288,7 @@ class ADvoiceUI {: {public Fl_Group}
                   tooltip {Use an earlier oscillator for this modulator. Only the base oscillator is used, not other voice parameters.} xywh {607 402 75 16} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                   code0 {o->add("Internal");}
                   code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Mod.%2d", i + 1); o->add(tmp);};}
-                  code3 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource + 1, npart, kititem, PART::engine::addVoice1 + nvoice));}
+                  code3 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice) + 1);}
                 } {}
                 Fl_Button changeFMoscilbutton {
                   label Waveform
@@ -298,14 +298,14 @@ class ADvoiceUI {: {public Fl_Group}
                     lastWaveW = 0;
                     int nv = nvoice;
                     int extMod = ExtModOsc->value() - 1;
-                    if (extMod >= 0)//pars->VoicePar[nvoice].PextFMoscil >= 0)
-                        nv = extMod;//pars->VoicePar[nvoice].PextFMoscil;
+                    if (extMod >= 0)
+                        nv = extMod;
                     oscedit = new OscilEditor(pars->VoicePar[nv].POscilFM, modOscDisplay, NULL, NULL, synth, npart, kititem, nvoice + PART::engine::addMod1);
                     if ((Fl::event_button() == 3))
                         synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();
                     ;}
                   xywh {712 370 72 18} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 10 labelcolor 64
-                  code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(alt_warn_tex);}
+                  code0 {if (ExtModOsc->value() > 0) o->labelcolor(alt_warn_tex);}
                 }
                 Fl_Slider ModPhase {
                   label Phase
@@ -314,7 +314,7 @@ class ADvoiceUI {: {public Fl_Group}
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorPhase, o->value(), TOPLEVEL::type::Integer);
                     ;}
                   tooltip {Phase offset} xywh {711 402 74 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
-                  code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
+                  code0 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice));}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   code2 {o->selection_color(setSlider(o->value(),0));}
                   class mwheel_slider_rev
@@ -328,8 +328,8 @@ class ADvoiceUI {: {public Fl_Group}
               Fl_Box modvoicelabel {
                 label Voice
                 callback {//
-        update_modvoicelabel();
-        ;}
+                    update_modvoicelabel();
+                    ;}
                 xywh {600 470 190 65} labelfont 1 labelsize 40 labelcolor 7
                 code0 {update_modvoicelabel();}
               }
@@ -350,7 +350,7 @@ class ADvoiceUI {: {public Fl_Group}
                 ;}
             xywh {580 32 90 20} box NO_BOX down_box BORDER_BOX selection_color 49 labelfont 3 labelsize 11 align 5 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
-            code1 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
+            code1 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorType, npart, kititem, PART::engine::addVoice1 + nvoice));}
             code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
           } {}
           Fl_Group freqencygrp {
@@ -361,7 +361,7 @@ class ADvoiceUI {: {public Fl_Group}
               label {Yoshimi : AddSynth Voice - Frequency Envelope}
               xywh {9 325 205 70} box FLAT_BOX color 51 align 144
               code0 {o->init(pars->VoicePar[nvoice].FreqEnvelope, npart, kititem, nvoice + PART::engine::addVoice1, 1);}
-              code1 {if (pars->VoicePar[nvoice].PFreqEnvelopeEnabled==0) o->deactivate();}
+              code1 {if (collect_readData(synth,0,ADDVOICE::control::enableFrequencyEnvelope, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
               class EnvelopeUI
             } {}
             Fl_Check_Button FreqEn {
@@ -375,14 +375,14 @@ class ADvoiceUI {: {public Fl_Group}
                   send_data(0, ADDVOICE::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);
                   ;}
               tooltip {Enable Frequency Envelope} xywh {14 330 38 14} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-              code0 {o->value(pars->VoicePar[nvoice].PFreqEnvelopeEnabled);}
+              code0 {o->value(collect_readData(synth,0,ADDVOICE::control::enableFrequencyEnvelope, npart, kititem, PART::engine::addVoice1 + nvoice));}
               class Fl_Check_Button2
             }
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 align 144
               code0 {o->init(pars->VoicePar[nvoice].FreqLfo, npart, kititem, PART::engine::addVoice1 + nvoice, 1);}
-              code1 {if (pars->VoicePar[nvoice].PFreqLfoEnabled==0) o->deactivate();}
+              code1 {if (collect_readData(synth,0,ADDVOICE::control::enableFrequencyLFO, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
               class LFOUI
             } {}
             Fl_Check_Button FreqLfoEn {
@@ -404,7 +404,7 @@ class ADvoiceUI {: {public Fl_Group}
             send_data(0, ADDVOICE::control::enableFrequencyLFO, o->value(), TOPLEVEL::type::Integer);
             ;}
               tooltip {Enable Frequency LFO} xywh {220 330 38 14} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-              code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
+              code0 {o->value(collect_readData(synth,0,ADDVOICE::control::enableFrequencyLFO, npart, kititem, PART::engine::addVoice1 + nvoice));}
               class Fl_Check_Button2
             }
             Fl_Text_Display voiceoctavetext {
@@ -416,7 +416,7 @@ class ADvoiceUI {: {public Fl_Group}
                   send_data(0, ADDVOICE::control::octave, o->value(), TOPLEVEL::type::Integer);
                   ;}
               tooltip Octave xywh {504 306 55 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
-              code0 {int k = pars->VoicePar[nvoice].PCoarseDetune / 1024;}
+              code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::octave, npart, kititem, PART::engine::addVoice1 + nvoice));}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
             }
@@ -426,10 +426,9 @@ class ADvoiceUI {: {public Fl_Group}
                   send_data(0, ADDVOICE::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);
                   ;}
               tooltip {Coarse Detune} xywh {493 375 78 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
-              code0 {int k = pars->VoicePar[nvoice].PCoarseDetune % 1024;}
-              code1 {if (k >= 512) k -= 1024;}
-              code2 {o->value(k);}
-              code3 {o->lstep(10);}
+              code0 {int k = collect_readData(synth,0,ADDVOICE::control::coarseDetune, npart, kititem, PART::engine::addVoice1 + nvoice);}
+              code1 {o->value(k);}
+              code2 {o->lstep(10);}
             }
             Fl_Choice FreqDetunetype {
               label {Detune Type}
