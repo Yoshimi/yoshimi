@@ -750,6 +750,7 @@ namespace ADDSYNTH // usage ADDSYNTH::control::volume
         detuneType, // L35 cents, L10 cents, E100 cents, E1200 cents
         coarseDetune,
         relativeBandwidth = 39,
+        bandwidthMultiplier,
 
         stereo = 112,
         randomGroup,

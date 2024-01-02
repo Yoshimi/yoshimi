@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -75,7 +75,7 @@ class ADvoiceUI {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
+      label Voice selected
       xywh {327 141 805 615} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
@@ -135,7 +135,7 @@ class ADvoiceUI {: {public Fl_Group}
                     send_data(0, ADDVOICE::control::enableModulatorFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);
                     ;}
                 tooltip {Enable Frequency Envelope} xywh {590 295 38 14} down_box DOWN_BOX color 7 selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-                code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
+                code0 {o->value(collect_readData(synth,0,ADDVOICE::control::enableModulatorFrequencyEnvelope, npart, kititem, PART::engine::addVoice1 + nvoice));}
                 class Fl_Check_Button2
               }
               Fl_Counter ModCoarseDetune {
@@ -162,15 +162,6 @@ class ADvoiceUI {: {public Fl_Group}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
               }
-              Fl_Value_Output fmdetunevalueoutput {
-                label Detune
-                callback {//
-                    o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));
-    ;}
-                xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
-                code0 {o->step(0.01, 1);}
-                code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-              }
               Fl_Slider ModDetune {
                 callback {//
                     o->selection_color(setSlider(o->value(),0));
@@ -190,6 +181,15 @@ class ADvoiceUI {: {public Fl_Group}
                 code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
                 code1 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorDetuneType, npart, kititem, PART::engine::addVoice1 + nvoice));}
               } {}
+              Fl_Value_Output fmdetunevalueoutput {
+                label Detune
+                callback {//
+                    o->value(getDetune((ModDetuneType->value() < 1) ? (pars->GlobalPar.PDetuneType) : (ModDetuneType->value()), 0, ModDetune->value()+8192));
+    ;}
+                xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
+                code0 {o->step(0.01, 1);}
+                code1 {o->value(getDetune((ModDetuneType->value() < 1) ? (pars->GlobalPar.PDetuneType) : (ModDetuneType->value()), 0, ModDetune->value()+8192));}
+              }
               Fl_Check_Button Mod440 {
                 label 440Hz
                 callback {//
@@ -453,11 +453,11 @@ class ADvoiceUI {: {public Fl_Group}
             Fl_Value_Output detunevalueoutput {
               label Detune
               callback {//
-		o->value(getDetune((FreqDetunetype->value()==0)?(pars->GlobalPar.PDetuneType) : (FreqDetunetype->value()),0,Detune->value()+8192)*pars->getBandwidthDetuneMultiplier());
-		;}
+                o->value(getDetune((FreqDetunetype->value()<1)?(pars->GlobalPar.PDetuneType) : (FreqDetunetype->value()),0,Detune->value()+8192)*collect_readData(synth, 0, ADDSYNTH::control::bandwidthMultiplier, npart, kititem, PART::engine::addSynth));
+                ;}
               xywh {9 306 53 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10 textcolor 64
               code0 {o->step(0.01, 1);}
-              code1 {o->value(getDetune((FreqDetunetype->value()==0)?(pars->GlobalPar.PDetuneType) : (FreqDetunetype->value()),0,Detune->value()+8192)*pars->getBandwidthDetuneMultiplier());}
+              code1 {o->value(getDetune((FreqDetunetype->value()<1)?(pars->GlobalPar.PDetuneType) : (FreqDetunetype->value()),0,Detune->value()+8192)*collect_readData(synth, 0, ADDSYNTH::control::bandwidthMultiplier, npart, kititem, PART::engine::addSynth));}
             }
             Fl_Dial bend {
               label Bend
@@ -482,7 +482,7 @@ class ADvoiceUI {: {public Fl_Group}
                   send_data(0, ADDVOICE::control::baseFrequencyAs440Hz, o->value(), TOPLEVEL::type::Integer);
                   ;}
               tooltip {Set the voice base frequency to 440Hz} xywh {400 286 55 15} down_box DOWN_BOX selection_color 64 labelfont 1 labelsize 11 labelcolor 64
-              code0 {o->value(pars->VoicePar[nvoice].Pfixedfreq);}
+              code0 {o->value(collect_readData(synth,0,ADDVOICE::control::baseFrequencyAs440Hz, npart, kititem, PART::engine::addVoice1 + nvoice));}
               class Fl_Check_Button2
             }
             Fl_Dial fixedfreqetdial {
@@ -492,8 +492,8 @@ class ADvoiceUI {: {public Fl_Group}
                 send_data(0, ADDVOICE::control::equalTemperVariation, o->value(), TOPLEVEL::type::Integer);
                 ;}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {460 284 20 20} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 8 maximum 127 step 1
-              code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
-              code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
+              code0 {o->value(collect_readData(synth,0,ADDVOICE::control::equalTemperVariation, npart, kititem, PART::engine::addVoice1 + nvoice));}
+              code1 {if (Freq440->value() ==0) o->deactivate();}
               code2 {o->setValueType(VC_FixedFreqET);}
               code3 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
@@ -1887,7 +1887,7 @@ class ADvoicelistitem {: {public Fl_Group}
         }
         Fl_Value_Output detunevalueoutput {
           callback {//
-	o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());
+	o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * collect_readData(synth, 0, ADDSYNTH::control::bandwidthMultiplier, npart, kititem, PART::engine::addSynth));
 	;}
           xywh {326 4 40 20} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 0 when 3 minimum -5000 maximum 5000 textsize 11 textcolor 64
           code0 {o->step(0.01, 1);}

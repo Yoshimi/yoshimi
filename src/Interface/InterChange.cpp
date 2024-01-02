@@ -4450,11 +4450,17 @@ void InterChange::commandAdd(CommandBlock *getData)
             if (write)
             {
                 pars->GlobalPar.PBandwidth = value_int;
-                 pars->getBandwidthDetuneMultiplier();
+                pars->getBandwidthDetuneMultiplier();
             }
             else
                 value = pars->GlobalPar.PBandwidth;
             break;
+
+        case ADDSYNTH::control::bandwidthMultiplier:
+            if (write)
+                write = false; // read only
+            value = pars->getBandwidthDetuneMultiplier();
+        break;
 
         case ADDSYNTH::control::stereo:
             if (write)
