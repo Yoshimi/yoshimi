@@ -792,13 +792,14 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
         enableFrequencyLFO,
 
         unisonFrequencySpread = 48,
+        unisonSpreadCents,
         unisonPhaseRandomise,
         unisonStereoSpread,
         unisonVibratoDepth,
         unisonVibratoSpeed,
         unisonSize,
         unisonPhaseInvert, // None, Random, 50%, 33%, 25%, 20%
-        enableUnison = 56,
+        enableUnison,
 
         bypassGlobalFilter = 64, // TODO not seen on return?
         enableFilter = 68,

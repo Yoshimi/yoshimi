@@ -4706,6 +4706,11 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
+        case ADDVOICE::control::unisonSpreadCents:
+            if (write)
+                write = false; // read only
+            value = pars->getUnisonFrequencySpreadCents(nvoice);
+            break;
         case ADDVOICE::control::unisonPhaseRandomise:
             if (write)
                 pars->VoicePar[nvoice].Unison_phase_randomness = value_int;
@@ -4756,7 +4761,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                     pars->VoicePar[nvoice].Unison_size = k;
             }
             else
-                value = (pars->VoicePar[nvoice].Unison_size > 1);
+                value = (pars->VoicePar[nvoice].Unison_size);
             break;
         }
 
