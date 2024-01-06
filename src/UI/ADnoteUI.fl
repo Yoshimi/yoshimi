@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/Fl_Box.H>
@@ -75,7 +75,7 @@ class ADvoiceUI {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice selected
+      label Voice
       xywh {327 141 805 615} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
@@ -102,17 +102,6 @@ class ADvoiceUI {: {public Fl_Group}
             label MODULATOR
             xywh {575 5 230 565} box THIN_UP_FRAME color 48 labelfont 1 labelsize 12 labelcolor 64 align 17
           } {
-            Fl_Choice ExtMod {
-              label Source
-              callback {//
-                  send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);
-                  ;}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
-              code0 {o->add("Local");}
-              code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
-              code2 {o->value(collect_readData(synth,0,ADDVOICE::control::externalModulator + 1, npart, kititem, PART::engine::addVoice1 + nvoice));}
-              code3 {if (lrint(o->value())) {modoscil->deactivate();}}
-            } {}
             Fl_Group modfrequency {
               label {Mod FREQUENCY}
               xywh {580 204 220 161} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
@@ -334,6 +323,17 @@ class ADvoiceUI {: {public Fl_Group}
                 code0 {update_modvoicelabel();}
               }
             }
+            Fl_Choice ExtMod {
+              label Source
+              callback {//
+                  send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);
+                  ;}
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
+              code0 {o->add("Local");}
+              code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
+              code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);//collect_readData(synth,0,ADDVOICE::control::externalModulator + 1, npart, kititem, PART::engine::addVoice1 + nvoice));}
+              code3 {if (lrint(o->value())) {modoscil->deactivate();}}
+            } {}
           }
           Fl_Text_Display modtypetext {
             label {Type:}
@@ -1458,20 +1458,21 @@ Oscillator}
   }
   Function {update_modvoicelabel()} {} {
     code {//
-        char fmVoice = ExtMod->value()-1;
-        char fmExtOsc = ExtModOsc->value()-1;
-    if (fmVoice >= 0)
+        //char fmVoice = ExtMod->value()-1;
+        //char fmExtOsc = ExtModOsc->value()-1;
+    //if (fmVoice >= 0)
+    if (pars->VoicePar[nvoice].PFMVoice >= 0)
     {
         char str[15];
-        snprintf(str, sizeof(str), "Voice %d", fmVoice + 1);
+        snprintf(str, sizeof(str), "Voice %d", pars->VoicePar[nvoice].PFMVoice + 1);// fmVoice + 1);
         modvoicelabel->copy_label(str);
         modvoicelabel->labelcolor(ext_voice);
         modvoicelabel->show();
     }
-    else if (fmExtOsc >= 0)
+    else if (pars->VoicePar[nvoice].PextFMoscil >= 0)//fmExtOsc >= 0)
     {
         char str[15];
-        snprintf(str, sizeof(str), "Mod. %d", fmExtOsc + 1);
+        snprintf(str, sizeof(str), "Mod. %d", pars->VoicePar[nvoice].PextFMoscil + 1);// fmExtOsc + 1);
         modvoicelabel->copy_label(str);
         modvoicelabel->labelcolor(ext_osc);
         modvoicelabel->show();
@@ -1500,11 +1501,12 @@ Oscillator}
   Function {update_fmoscil()} {} {
     code {//
         int nv=nvoice;
-        int fmVoice = ExtMod->value() -1;
-        int fmExtOsc = ExtModOsc->value() -1;
-        if (fmVoice >= 0)
+        //int fmVoice = ExtMod->value() -1;
+        //int fmExtOsc = ExtModOsc->value() -1;
+        //if (fmVoice >= 0)
+        if (pars->VoicePar[nvoice].PFMVoice >= 0)
         {
-            nv = fmVoice;
+            nv = pars->VoicePar[nvoice].PFMVoice;//fmVoice;
             while (pars->VoicePar[nv].PVoice >= 0)
             {
                 nv = pars->VoicePar[nv].PVoice;
@@ -1514,8 +1516,9 @@ Oscillator}
         }
         else
         {
-            if (fmExtOsc >= 0) {
-                nv = fmExtOsc;
+            if (pars->VoicePar[nvoice].PextFMoscil >= 0)
+            {
+                nv = pars->VoicePar[nvoice].PextFMoscil;//nv = fmExtOsc;
             }
             oscilFM->changeParams(pars->VoicePar[nv].POscilFM);
             oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
