@@ -1458,42 +1458,42 @@ Oscillator}
   }
   Function {update_modvoicelabel()} {} {
     code {//
-        //char fmVoice = ExtMod->value()-1;
-        //char fmExtOsc = ExtModOsc->value()-1;
-    //if (fmVoice >= 0)
-    if (pars->VoicePar[nvoice].PFMVoice >= 0)
-    {
-        char str[15];
-        snprintf(str, sizeof(str), "Voice %d", pars->VoicePar[nvoice].PFMVoice + 1);// fmVoice + 1);
-        modvoicelabel->copy_label(str);
-        modvoicelabel->labelcolor(ext_voice);
-        modvoicelabel->show();
-    }
-    else if (pars->VoicePar[nvoice].PextFMoscil >= 0)//fmExtOsc >= 0)
-    {
-        char str[15];
-        snprintf(str, sizeof(str), "Mod. %d", pars->VoicePar[nvoice].PextFMoscil + 1);// fmExtOsc + 1);
-        modvoicelabel->copy_label(str);
-        modvoicelabel->labelcolor(ext_osc);
-        modvoicelabel->show();
-    }
-    else
-    {
-        modvoicelabel->hide();
-    }
+        char fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);//pars->VoicePar[nvoice].PFMVoice;
+        char fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);//pars->VoicePar[nvoice].PextFMoscil;
+        if (fmVoice >= 0)
+        {
+            char str[15];
+            snprintf(str, sizeof(str), "Voice %d",fmVoice + 1);
+            modvoicelabel->copy_label(str);
+            modvoicelabel->labelcolor(ext_voice);
+            modvoicelabel->show();
+        }
+        else if (fmExtOsc >= 0)
+        {
+            char str[15];
+            snprintf(str, sizeof(str), "Mod. %d", fmExtOsc + 1);
+            modvoicelabel->copy_label(str);
+            modvoicelabel->labelcolor(ext_osc);
+            modvoicelabel->show();
+        }
+        else
+        {
+            modvoicelabel->hide();
+        }
     ;} {}
   }
   Function {update_voiceoscil()} {} {
     code {// updating
         int nvs = nvoice;
         int nvp = nvoice;
-        if (pars->VoicePar[nvoice].PVoice >= 0)
+        int extOsc= collect_readData(synth,0,ADDVOICE::control::voiceOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
+        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)//pars->VoicePar[nvoice].PVoice >= 0)
         {
-            while (pars->VoicePar[nvs].PVoice >= 0)
+            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvs) >= 0)//pars->VoicePar[nvs].PVoice >= 0)
                 nvp = nvs = pars->VoicePar[nvs].PVoice;
         }
-        else if (pars->VoicePar[nvoice].Pextoscil >= 0)
-            nvs = pars->VoicePar[nvoice].Pextoscil;
+        else if (extOsc >= 0)//pars->VoicePar[nvoice].Pextoscil >= 0)
+            nvs = extOsc;//pars->VoicePar[nvoice].Pextoscil;
         oscil->changeParams(pars->VoicePar[nvs].POscil);
         osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
         ;} {}
@@ -1501,24 +1501,23 @@ Oscillator}
   Function {update_fmoscil()} {} {
     code {//
         int nv=nvoice;
-        //int fmVoice = ExtMod->value() -1;
-        //int fmExtOsc = ExtModOsc->value() -1;
-        //if (fmVoice >= 0)
-        if (pars->VoicePar[nvoice].PFMVoice >= 0)
+        int fmVoice = pars->VoicePar[nvoice].PFMVoice;
+        int fmExtOsc = pars->VoicePar[nvoice].PextFMoscil;
+        if (fmVoice >= 0)
         {
-            nv = pars->VoicePar[nvoice].PFMVoice;//fmVoice;
-            while (pars->VoicePar[nv].PVoice >= 0)
+            nv = fmVoice;
+            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv) >= 0)//pars->VoicePar[nv].PVoice >= 0)
             {
-                nv = pars->VoicePar[nv].PVoice;
+                nv = collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv);//pars->VoicePar[nv].PVoice;
             }
             oscilFM->changeParams(pars->VoicePar[nv].POscil);
             oscFM->init(oscilFM,0,pars->VoicePar[nv].Poscilphase, synth);
         }
         else
         {
-            if (pars->VoicePar[nvoice].PextFMoscil >= 0)
+            if (fmExtOsc >= 0)
             {
-                nv = pars->VoicePar[nvoice].PextFMoscil;//nv = fmExtOsc;
+                nv = fmExtOsc;
             }
             oscilFM->changeParams(pars->VoicePar[nv].POscilFM);
             oscFM->init(oscilFM,0,pars->VoicePar[nvoice].PFMoscilphase, synth);
@@ -1973,7 +1972,7 @@ class ADvoicelistitem {: {public Fl_Group}
   }
   Function {update_voiceoscil()} {} {
     code {// this is identical to code // updating
-        int nvs = nvoice;
+        /*int nvs = nvoice;
         int nvp = nvoice;
         if (pars->VoicePar[nvoice].PVoice  >= 0)
         {
@@ -1984,8 +1983,22 @@ class ADvoicelistitem {: {public Fl_Group}
             nvs = pars->VoicePar[nvoice].Pextoscil;
         oscil->changeParams(pars->VoicePar[nvs].POscil);
         osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
+        */
+        int nvs = nvoice;
+        int nvp = nvoice;
+        int extOsc= collect_readData(synth,0,ADDVOICE::control::voiceOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
+        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)//pars->VoicePar[nvoice].PVoice >= 0)
+        {
+            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvs) >= 0)//pars->VoicePar[nvs].PVoice >= 0)
+                nvp = nvs = pars->VoicePar[nvs].PVoice;
+        }
+        else if (extOsc >= 0)//pars->VoicePar[nvoice].Pextoscil >= 0)
+            nvs = extOsc;//pars->VoicePar[nvoice].Pextoscil;
+        oscil->changeParams(pars->VoicePar[nvs].POscil);
+        osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
 
-        if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
+        //if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
+        if (nvs >= 0 || nvp >= 0)
             voiceoscil->deactivate();
         else
             voiceoscil->activate();
