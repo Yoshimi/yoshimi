@@ -526,7 +526,7 @@ Oscillator}
                 Fl_Choice UseOsc {
                   label Use
                   callback {//
-                send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorSource, o->value() - 1, TOPLEVEL::type::Integer);
+                    send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::voiceOscillatorSource, o->value() - 1, TOPLEVEL::type::Integer);
                 ;}
                   tooltip {Use an earlier oscillator for this voice. Only the base oscillator is used, not other voice parameters.} xywh {9 526 72 18} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                   code0 {o->add("Internal");}
@@ -931,7 +931,7 @@ Oscillator}
                       SoundType->activate();
                   }
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::soundType, 0, TOPLEVEL::type::Integer);
-                  send_data(0, ADDVOICE::control::externalOscillator, o->value() - 1, TOPLEVEL::type::Integer);
+                  send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalOscillator, o->value() - 1, TOPLEVEL::type::Integer);
                   ;}
             tooltip {Use an earlier voice as input to this voice. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the signal further.} xywh {8 430 74 18} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
             code0 {o->add("Local");}
@@ -1374,7 +1374,6 @@ Oscillator}
             changevoiceoscilbutton->redraw();
             update_voiceoscil();
             voiceoscil->redraw();
-            update_osclabels();
             break;
 
         case ADDVOICE::control::soundType:
@@ -1384,15 +1383,17 @@ Oscillator}
                 voicemodegroup->deactivate();
             else
                 voicemodegroup->activate();
+            update_voiceoscil();
             update_osclabels();
+            synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->refreshlist(nvoice);
             break;
 
         case ADDVOICE::control::externalOscillator:
             tmp = int(value);
             ExtOsc->value(tmp + 1);
             update_voiceoscil();
-            voiceoscil->redraw();
             update_osclabels();
+            voiceoscil->redraw();
             break;
     }
     ;} {}
@@ -1486,16 +1487,19 @@ Oscillator}
     code {// updating
         int nvs = nvoice;
         int nvp = nvoice;
-        int extOsc= collect_readData(synth,0,ADDVOICE::control::voiceOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
-        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)//pars->VoicePar[nvoice].PVoice >= 0)
-        {
-            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvs) >= 0)//pars->VoicePar[nvs].PVoice >= 0)
-                nvp = nvs = pars->VoicePar[nvs].PVoice;
-        }
-        else if (extOsc >= 0)//pars->VoicePar[nvoice].Pextoscil >= 0)
-            nvs = extOsc;//pars->VoicePar[nvoice].Pextoscil;
+
+        voiceOscUpdate(synth, npart, kititem, nvoice, nvs, nvp);
+
+        // we still need 'pars->' from here on :(
+
         oscil->changeParams(pars->VoicePar[nvs].POscil);
         osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
+
+        if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
+            voiceoscil->deactivate();
+        else
+            voiceoscil->activate();
+
         ;} {}
   }
   Function {update_fmoscil()} {} {
@@ -1971,34 +1975,18 @@ class ADvoicelistitem {: {public Fl_Group}
         ;} {}
   }
   Function {update_voiceoscil()} {} {
-    code {// this is identical to code // updating
-        /*int nvs = nvoice;
-        int nvp = nvoice;
-        if (pars->VoicePar[nvoice].PVoice  >= 0)
-        {
-            while (pars->VoicePar[nvs].PVoice  >= 0)
-                nvp = nvs = pars->VoicePar[nvs].PVoice;
-        }
-        else if (pars->VoicePar[nvoice].Pextoscil  >= 0)
-            nvs = pars->VoicePar[nvoice].Pextoscil;
-        oscil->changeParams(pars->VoicePar[nvs].POscil);
-        osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
-        */
+    code {// this is identical to code in // updating
         int nvs = nvoice;
         int nvp = nvoice;
-        int extOsc= collect_readData(synth,0,ADDVOICE::control::voiceOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
-        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)//pars->VoicePar[nvoice].PVoice >= 0)
-        {
-            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvs) >= 0)//pars->VoicePar[nvs].PVoice >= 0)
-                nvp = nvs = pars->VoicePar[nvs].PVoice;
-        }
-        else if (extOsc >= 0)//pars->VoicePar[nvoice].Pextoscil >= 0)
-            nvs = extOsc;//pars->VoicePar[nvoice].Pextoscil;
+
+        voiceOscUpdate(synth, npart, kititem, nvoice, nvs, nvp);
+
+        // we still need 'pars->' from here on :(
+
         oscil->changeParams(pars->VoicePar[nvs].POscil);
         osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
 
-        //if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
-        if (nvs >= 0 || nvp >= 0)
+        if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
             voiceoscil->deactivate();
         else
             voiceoscil->activate();
