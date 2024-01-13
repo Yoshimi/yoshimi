@@ -1374,6 +1374,7 @@ Oscillator}
             changevoiceoscilbutton->redraw();
             update_voiceoscil();
             voiceoscil->redraw();
+            update_osclabels();
             break;
 
         case ADDVOICE::control::soundType:
@@ -1459,8 +1460,8 @@ Oscillator}
   }
   Function {update_modvoicelabel()} {} {
     code {//
-        char fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);//pars->VoicePar[nvoice].PFMVoice;
-        char fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);//pars->VoicePar[nvoice].PextFMoscil;
+        char fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);
+        char fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
         if (fmVoice >= 0)
         {
             char str[15];
@@ -1490,12 +1491,14 @@ Oscillator}
 
         voiceOscUpdate(synth, npart, kititem, nvoice, nvs, nvp);
 
-        // we still need 'pars->' from here on :(
-
+        // we still need 'pars->' here :(
         oscil->changeParams(pars->VoicePar[nvs].POscil);
-        osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
 
-        if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
+        osc->init(oscil,0,collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+
+        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0
+            || collect_readData(synth,0,ADDVOICE::control::soundType, npart, kititem, PART::engine::addVoice1 + nvoice) > 0)
+
             voiceoscil->deactivate();
         else
             voiceoscil->activate();
@@ -1510,9 +1513,9 @@ Oscillator}
         if (fmVoice >= 0)
         {
             nv = fmVoice;
-            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv) >= 0)//pars->VoicePar[nv].PVoice >= 0)
+            while (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv) >= 0)
             {
-                nv = collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv);//pars->VoicePar[nv].PVoice;
+                nv = collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nv);
             }
             oscilFM->changeParams(pars->VoicePar[nv].POscil);
             oscFM->init(oscilFM,0,pars->VoicePar[nv].Poscilphase, synth);
@@ -1981,12 +1984,14 @@ class ADvoicelistitem {: {public Fl_Group}
 
         voiceOscUpdate(synth, npart, kititem, nvoice, nvs, nvp);
 
-        // we still need 'pars->' from here on :(
-
+        // we still need 'pars->' here :(
         oscil->changeParams(pars->VoicePar[nvs].POscil);
-        osc->init(oscil,0,pars->VoicePar[nvp].Poscilphase, synth);
 
-        if (pars->VoicePar[nvoice].PVoice >= 0 || pars->VoicePar[nvoice].Type != 0)
+        osc->init(oscil,0,collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+
+        if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0
+            || collect_readData(synth,0,ADDVOICE::control::soundType, npart, kititem, PART::engine::addVoice1 + nvoice) > 0)
+
             voiceoscil->deactivate();
         else
             voiceoscil->activate();
@@ -1995,75 +2000,73 @@ class ADvoicelistitem {: {public Fl_Group}
   }
   Function {update_noiselabel()} {} {
     code {//
-        if (pars->VoicePar[nvoice].PVoice >= 0)
+        int extVoice = collect_readData(synth, 0, ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice);
+        int extOsc = collect_readData(synth, 0, ADDVOICE::control::voiceOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
+        int type = collect_readData(synth, 0, ADDVOICE::control::soundType, npart, kititem, PART::engine::addVoice1 + nvoice);
+
+        bool showNoise = true;
+        if (extVoice >= 0)
         {
             char str[15];
-            snprintf(str, sizeof(str), "V%d", pars->VoicePar[nvoice].PVoice + 1);
+            snprintf(str, sizeof(str), "V%d", extVoice + 1);
             noiselabel->copy_label(str);
             noiselabel->labelcolor(ext_voice);
-            noiselabel->show();
         }
-        else if (pars->VoicePar[nvoice].Pextoscil >= 0)
+        else if (extOsc >= 0)
         {
             char str[15];
-            snprintf(str, sizeof(str), "O%d", pars->VoicePar[nvoice].Pextoscil + 1);
+            snprintf(str, sizeof(str), "O%d", extOsc + 1);
             noiselabel->copy_label(str);
             noiselabel->labelcolor(ext_osc);
-            noiselabel->show();
-        }
-        else if (pars->VoicePar[nvoice].Type == 1)
-        {
-            noiselabel->copy_label("N");
-            noiselabel->labelcolor(7);
-            noiselabel->show();
-        }
-        else if (pars->VoicePar[nvoice].Type == 2)
-        {
-            noiselabel->copy_label("N");
-            noiselabel->labelcolor(5);
-            noiselabel->show();
-        }
-        else if (pars->VoicePar[nvoice].Type == 3)
-        {
-            noiselabel->copy_label("N");
-            noiselabel->labelcolor(6);
-            noiselabel->show();
         }
         else
         {
-            noiselabel->hide();
+            noiselabel->copy_label("N");
+            switch (type)
+            {
+                case 1:
+                    noiselabel->labelcolor(7);
+                    break;
+                case 2:
+                    noiselabel->labelcolor(5);
+                    break;
+                case 3:
+                    noiselabel->labelcolor(6);
+                    break;
+                default:
+                    showNoise = false;
+            }
         }
+        if (showNoise)
+            noiselabel->show();
+        else
+            noiselabel->hide();
         ;} {}
   }
   Function {update_modoscil()} {} {
-    code {//
-        int nvs = nvoice, nvp = nvoice;
-        if (pars->VoicePar[nvoice].PFMVoice != -1) {
-            nvp = nvs = pars->VoicePar[nvs].PFMVoice;
-            while (pars->VoicePar[nvs].PVoice != -1)
-                nvp = nvs = pars->VoicePar[nvs].PVoice;
-            oscilFM->changeParams(pars->VoicePar[nvs].POscil);
-            modosc->init(oscilFM,0,pars->VoicePar[nvp].Poscilphase, synth);
-        }
-        else
-        {
-            if (pars->VoicePar[nvoice].PextFMoscil != -1)
-            {
-                nvs = pars->VoicePar[nvoice].PextFMoscil;
-            }
-            oscilFM->changeParams(pars->VoicePar[nvs].POscilFM);
-            modosc->init(oscilFM,0,pars->VoicePar[nvp].PFMoscilphase, synth);
-        }
+    code {// this is identical to code in // updating
+        int nvs = nvoice;
+        int nvp = nvoice;
 
-        if (pars->VoicePar[nvoice].PFMEnabled == NONE || pars->VoicePar[nvoice].PFMVoice >= 0)
+        voiceOscUpdate(synth, npart, kititem, nvoice, nvs, nvp);
+
+        // we still need 'pars->' here :(
+        oscilFM->changeParams(pars->VoicePar[nvs].POscil);
+
+        modosc->init(oscilFM,0,collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+
+        if (collect_readData(synth,0,ADDVOICE::control::modulatorType, npart, kititem, PART::engine::addVoice1 + nvoice) == NONE
+            || collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)
+
             modoscil->deactivate();
         else
             modoscil->activate();
+
         ;} {}
   }
   Function {update_modlabel()} {} {
     code {//
-        if (pars->VoicePar[nvoice].PFMEnabled == NONE)
+        if (collect_readData(synth,0,ADDVOICE::control::modulatorType, npart, kititem, PART::engine::addVoice1 + nvoice) == NONE)
         {
             modlabel->copy_label("OFF");
             modlabel->labelcolor(41);
@@ -2073,18 +2076,21 @@ class ADvoicelistitem {: {public Fl_Group}
         else
         {
             modlabel->activate();
-            if (pars->VoicePar[nvoice].PFMVoice >= 0)
+            int voice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);
+            int osc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
+
+            if (voice >= 0)
             {
                 char str[15];
-                snprintf(str, sizeof(str), "V%d", pars->VoicePar[nvoice].PFMVoice + 1);
+                snprintf(str, sizeof(str), "V%d", voice + 1);
                 modlabel->copy_label(str);
                 modlabel->labelcolor(ext_voice);
                 modlabel->show();
             }
-            else if (pars->VoicePar[nvoice].PextFMoscil >= 0)
+            else if (osc >= 0)
             {
                 char str[15];
-                snprintf(str, sizeof(str), "M%d", pars->VoicePar[nvoice].PextFMoscil + 1);
+                snprintf(str, sizeof(str), "M%d", osc + 1);
                 modlabel->copy_label(str);
                 modlabel->labelcolor(ext_osc);
                 modlabel->show();
@@ -2183,7 +2189,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip Octave xywh {495 275 45 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
-          code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
+          code0 {int k = collect_readData(synth,0,ADDSYNTH::control::octave, npart, kititem, PART::engine::addSynth) / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
         }
         Fl_Counter coarsedet {
@@ -2238,7 +2244,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::relativeBandwidth, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Bandwidth - modify the relative fine detune of the voices} xywh {545 270 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PBandwidth);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::relativeBandwidth, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
@@ -2257,7 +2263,7 @@ class ADnoteUI {: {public PresetsUI_}
             ;}
           tooltip Volume xywh {30 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
-          code1 {o->value(pars->GlobalPar.PVolume);}
+          code1 {o->value(collect_readData(synth,0,ADDSYNTH::control::volume, npart, kititem, PART::engine::addSynth));}
           code2 {o->selection_color(setKnob(o->value(),90));}
           class WidgetPDial
         }
@@ -2268,7 +2274,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {85 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::velocitySense, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),64));}
           code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
@@ -2281,7 +2287,7 @@ class ADnoteUI {: {public PresetsUI_}
             ;}
           tooltip {Global panning} xywh {155 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
-          code1 {o->value(pars->GlobalPar.PPanning);}
+          code1 {o->value(collect_readData(synth,0,ADDSYNTH::control::panning, npart, kititem, PART::engine::addSynth));}
           code2 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
@@ -2293,7 +2299,7 @@ class ADnoteUI {: {public PresetsUI_}
             ;}
           tooltip {Global random width} xywh {235 23 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
           code0 {o->setValueType(VC_PanningRandom);}
-          code1 {o->value(pars->GlobalPar.PWidth);}
+          code1 {o->value(collect_readData(synth,0,ADDSYNTH::control::randomWidth, npart, kititem, PART::engine::addSynth));}
           code2 {o->selection_color(setKnob(o->value(),63));}
           class WidgetPDial
         }
@@ -2308,7 +2314,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);
             ;}
           tooltip {Enable random panning} xywh {205 32 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
-          code0 {o->value(pars->GlobalPar.PRandom);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::enableRandomPan, npart, kititem, PART::engine::addSynth));}
           code1 {if (o->value() == 0) globalwidth->deactivate(); else globalwidth->activate();}
           class Fl_Check_Button2
         }
