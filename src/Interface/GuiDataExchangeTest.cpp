@@ -22,16 +22,37 @@
 /* ==================== TODO : 1/24 This is a Prototype : Throw-away when done ================== */ 
 
 #include "Interface/GuiDataExchange.h"
-//#include "Misc/FormatFuncs.h"
+#include "Misc/FormatFuncs.h"
 
 #include <iostream>
 
 //#include <functional>
-//#include <string>
-//#include <array>
+#include <algorithm>
+#include <string>
+#include <array>
 
 using std::cout;
 using std::endl;
+using std::string;
+
+#define CHECK(COND) \
+    if (not (COND)) {\
+        cout << "FAIL: Line "<<__LINE__<<": " #COND <<endl; \
+        std::terminate();\
+    }
+
+/** some »strange« test data we want to transport into the GUI */
+class Heffalump
+    : public std::array<char,20>
+{
+public:
+    Heffalump()
+    {
+        auto h = "Heffalump.."+func::asHexString(rand());
+        std::copy (h.begin(),h.end(), this->begin());
+        back() = '\0';
+    }
+};
 
 /**
  */
@@ -47,6 +68,20 @@ public:
 
 void run_GuiDataExchangeTest()
 {
-    cout << "Hello World" << endl;
+    srand(time(0));
+    cout << "\n■□■□■□■□■□■□■□■□◆•Gui-Data-Exchange-Test•◆□■□■□■□■□■□■□■□■\n"<<endl;
+    
+    // verify Heffalump (test data)
+    Heffalump h1,h2;
+    cout << "Hello " << h1.data() << endl;
+    CHECK (sizeof(Heffalump) == 20);
+    
+    // all Heffalumps are unique (and can be compared)
+    CHECK (h1 != h2);
+    
+    // Heffalumps can be copied and assigned
+    h2 = h1;
+    CHECK (h1 == h2);
+  
     cout << "Bye Bye Cruel World..." <<endl;
 }
