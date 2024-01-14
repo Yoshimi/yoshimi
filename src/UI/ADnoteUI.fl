@@ -331,7 +331,7 @@ class ADvoiceUI {: {public Fl_Group}
               tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
-              code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);//collect_readData(synth,0,ADDVOICE::control::externalModulator + 1, npart, kititem, PART::engine::addVoice1 + nvoice));}
+              code2 {o->value(collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice) + 1);}
               code3 {if (lrint(o->value())) {modoscil->deactivate();}}
             } {}
           }
@@ -1508,8 +1508,8 @@ Oscillator}
   Function {update_fmoscil()} {} {
     code {//
         int nv=nvoice;
-        int fmVoice = pars->VoicePar[nvoice].PFMVoice;
-        int fmExtOsc = pars->VoicePar[nvoice].PextFMoscil;
+        int fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);
+        int fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
         if (fmVoice >= 0)
         {
             nv = fmVoice;
@@ -1956,6 +1956,7 @@ class ADvoicelistitem {: {public Fl_Group}
             voicelistvibratto->deactivate();
         else
             voicelistvibratto->activate();
+        // this line dips into the LFO code. needs to be handled differently.
         voicelistvibratto->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
             voicelistvibratto->selection_color(setKnob(voicelistvibratto->value(),40));
 
@@ -2325,7 +2326,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::dePop, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Pop Suppression} xywh {130 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::dePop, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),20));}
           class WidgetPDial
         }
@@ -2336,7 +2337,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::punchStrength, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Punch Strength} xywh {170 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PPunchStrength);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::punchStrength, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),0));}
           class WidgetPDial
         }
@@ -2347,7 +2348,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::punchDuration, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Punch Time (duration)} xywh {200 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PPunchTime);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::punchDuration, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),60));}
           class WidgetPDial
         }
@@ -2358,7 +2359,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::punchStretch, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Punch Stretch} xywh {230 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PPunchStretch);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::punchStretch, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),64));}
           class WidgetPDial
         }
@@ -2369,7 +2370,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::punchVelocity, o->value(), TOPLEVEL::type::Integer);
             ;}
           tooltip {Punch Velocity Sensing} xywh {260 227 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 align 1 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::punchVelocity, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setKnob(o->value(),72));}
           class WidgetPDial
         }
@@ -2388,11 +2389,10 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Check_Button rndgrp {
           label {Rnd Grp}
           callback {//
-	pars->GlobalPar.Hrandgrouping = lrint(o->value());
-        send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer);
+            send_data(0, ADDSYNTH::control::randomGroup, o->value(), TOPLEVEL::type::Integer);
         ;}
           tooltip {Disable individual Harmonic Amplitude randomisation for voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
-          code0 {o->value(pars->GlobalPar.Hrandgrouping);}
+          code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::randomGroup, npart, kititem, PART::engine::addSynth));}
           class Fl_Check_Button2
         }
         Fl_Box {} {
@@ -2432,7 +2432,7 @@ class ADnoteUI {: {public PresetsUI_}
             send_data(0, ADDSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);
             ;}
         xywh {8 220 61 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 11 labelcolor 226
-        code0 {o->value(pars->GlobalPar.PStereo);}
+        code0 {o->value(collect_readData(synth,0,ADDSYNTH::control::stereo, npart, kititem, PART::engine::addSynth));}
         class Fl_Check_Button2
       }
       Fl_Button showvoicelist {
@@ -2740,13 +2740,13 @@ class ADnoteUI {: {public PresetsUI_}
         }
     ;} {}
   }
-  Function {setTabColour(int num)} {} {
+  Function {setTabColour(int nvoice)} {} {
     code {//
-        int set = 169;//42;
-        if (pars->VoicePar[num].Enabled)
+        int set = voice_off;
+        if (collect_readData(synth,0,ADDVOICE::control::enableVoice, npart, kititem, PART::engine::addVoice1 + nvoice))
             set = gen_text;
 
-        switch (num)
+        switch (nvoice) // there should be a better way to do this
         {
             case 0:
                 g1->labelcolor(set);
@@ -2972,7 +2972,7 @@ class ADnoteUI {: {public PresetsUI_}
 
         int detType = collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth);
         detunetype->value(detType - 1);
-        k = pars->GlobalPar.PCoarseDetune % 1024;
+        k = collect_readData(synth,0,ADDSYNTH::control::octave, npart, kititem, PART::engine::addSynth);
         if (k >= 512)
             k -= 1024;
         coarsedet->value(k);
