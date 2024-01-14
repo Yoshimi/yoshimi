@@ -23,11 +23,14 @@
 
 #include "globals.h"
 #include "Interface/InterChange.h"
+#include "Interface/RingBuffer.h"
+
 //#include "Misc/FormatFuncs.h"
 
 #include <functional>
 //#include <string>
 //#include <array>
+#include <utility>
 
 
 /**
@@ -37,9 +40,83 @@
  */
 class GuiDataExchange
 {
-    using HandlerFun = std::function<void()>;
-
+    using PublishFun = std::function<void(CommandBlock const&)>;
+    
+    PublishFun publish;
+    
+    
+    // must not be copied nor moved
+    GuiDataExchange(GuiDataExchange &&)                =delete;
+    GuiDataExchange(GuiDataExchange const&)            =delete;
+    GuiDataExchange& operator=(GuiDataExchange &&)     =delete;
+    GuiDataExchange& operator=(GuiDataExchange const&) =delete;
+    
 public:
+    /**
+     * Create a protocol/mediator for data connection Core -> GUI
+     * @param how_to_publish a function allowing to push a CommandBlock
+     *        into some communication channel
+     */
+    template<typename FUN>
+    GuiDataExchange(FUN&& how_to_publish)
+        : publish(std::forward<FUN> (how_to_publish))
+        { }
+    
+    
+    /**
+     * Connection-handle and front-End for clients,
+     * allowing to push data into the GUI asynchronously
+     */
+    class Connection
+    {
+        GuiDataExchange* hub;
+        
+    public:
+        Connection(GuiDataExchange& dataExchangeLink)
+            : hub(&dataExchangeLink)
+            { }
+        
+        // standard copy operations acceptable
+        
+        template<typename DAT>
+        void publish(DAT const& data)
+        {
+            throw std::logic_error("unimplemented");
+        }
+        
+        
+        friend bool operator==(Connection const& lc, Connection const& rc)
+        {
+            throw std::logic_error("unimplemented");
+        }
+        
+        friend bool operator!=(Connection const& lc, Connection const& rc)
+        {
+            return not (lc == rc);
+        }
+    };
+    
+    
+    /**
+     * Create an unique new connection handle
+     * configured to transport data of type \a DAT
+     */
+    template<typename DAT>
+    Connection createConnection()
+    {
+        return Connection(*this);
+    }
+    
+    /**
+     * Dispatch a notification regarding data updates -> GUI.
+     * The given CommandBlock contains a data handle and destination designation;
+     * actual data is fetched from the DataBlockBuff and pushed synchronously to all
+     * MirrorData receivers currently enrolled actively within the GUI.
+     */
+    void dispatchUpdates(CommandBlock const& notification)
+    {
+        throw std::logic_error("unimplemented");
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!

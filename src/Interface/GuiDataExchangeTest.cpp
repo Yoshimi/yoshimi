@@ -22,6 +22,7 @@
 /* ==================== TODO : 1/24 This is a Prototype : Throw-away when done ================== */ 
 
 #include "Interface/GuiDataExchange.h"
+#include "Misc/MirrorData.h"
 #include "Misc/FormatFuncs.h"
 
 #include <iostream>
@@ -54,16 +55,6 @@ public:
     }
 };
 
-/**
- */
-class GuiDataExchangeTest
-{
-public:
-    void run()
-    {
-        
-    }
-};
 
 
 void run_GuiDataExchangeTest()
@@ -71,7 +62,8 @@ void run_GuiDataExchangeTest()
     srand(time(0));
     cout << "\n■□■□■□■□■□■□■□■□◆•Gui-Data-Exchange-Test•◆□■□■□■□■□■□■□■□■\n"<<endl;
     
-    // verify Heffalump (test data)
+    
+    // =============================================== verify Heffalump (test data)
     Heffalump h1,h2;
     cout << "Hello " << h1.data() << endl;
     CHECK (sizeof(Heffalump) == 20);
@@ -82,6 +74,81 @@ void run_GuiDataExchangeTest()
     // Heffalumps can be copied and assigned
     h2 = h1;
     CHECK (h1 == h2);
-  
-    cout << "Bye Bye Cruel World..." <<endl;
+    
+    
+    // =============================================== setup a connection-identity
+    // use a dummy-ringbuffer for this test...
+    static constexpr size_t commandBlockSize = sizeof (CommandBlock);
+    RingBuffer <10, log2 (commandBlockSize)> simulatedGUI;
+    auto sendData = [&simulatedGUI](CommandBlock const& block)
+                                    {
+                                        simulatedGUI.write(block.bytes);
+                                    };
+    auto pullData = [&simulatedGUI]() -> CommandBlock
+                                    {
+                                        CommandBlock getData;
+                                        simulatedGUI.read(getData.bytes);
+                                        return getData;
+                                    };
+    
+    // Central instance to manage exchange connections
+    GuiDataExchange guiDataExchange(sendData);
+    
+    auto con = guiDataExchange.createConnection<Heffalump>();
+    // has unique identity
+    CHECK (con != guiDataExchange.createConnection<Heffalump>());
+    CHECK (con != guiDataExchange.createConnection<float>());
+    // can be copied and assigned
+    GuiDataExchange::Connection c2(con);
+    CHECK (con == c2);
+    c2 = guiDataExchange.createConnection<Heffalump>();
+    CHECK (con != c2);
+    // can not be assigned with the wrong data buffer type
+//  c2 = GuiDataExchange::connection<float>();              //////// throws logic_error
+    
+    
+    // =============================================== setup a receiver
+    MirrorData<Heffalump> receiver(con);
+    // holds default-constructed data
+    Heffalump& receivedData = receiver.get();
+    CHECK (receivedData != h1);
+    CHECK (receivedData != h2);
+    
+    
+    // =============================================== Core publishes data
+    con.publish(h1);
+    // not transported to the GUI yet
+    CHECK (receivedData != h1);
+    
+    
+    // =============================================== GUI loop pulls and dispatches updates
+    guiDataExchange.dispatchUpdates(pullData());
+    // buffer contents were push-updated
+    CHECK (receivedData == h1);
+    
+    
+    // =============================================== dynamic registration of multiple receivers
+    { //nested scope
+        MirrorData<Heffalump> receiver2(con);
+        CHECK (h1 != receiver2.get());
+        CHECK (h1 == receiver.get());
+        
+        con.publish(h2);
+        CHECK (h2 != receiver2.get());
+        CHECK (h2 != receiver.get());
+        CHECK (h1 == receiver.get());
+        
+        guiDataExchange.dispatchUpdates(pullData());
+        CHECK (h2 == receiver2.get());
+        CHECK (h2 == receiver.get());
+        
+        con.publish(h1);
+        CHECK (h2 == receiver2.get());
+        CHECK (h2 == receiver.get());
+    }//(End)nested scope
+    // receiver2 does not exist anymore...
+    guiDataExchange.dispatchUpdates(pullData());
+    CHECK (h1 == receiver.get());
+    
+    cout << "Bye Bye "<<receiver.get().data() <<endl;
 }

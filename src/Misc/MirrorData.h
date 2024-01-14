@@ -22,6 +22,7 @@
 #define MIRROR_DATA_H
 
 #include "globals.h"
+#include "Interface/GuiDataExchange.h"
 //#include "Misc/FormatFuncs.h"
 
 //#include <functional>
@@ -39,6 +40,13 @@ class MirrorData
 {
 
 public:
+    MirrorData(GuiDataExchange::Connection const& con)
+    { }
+    
+    DAT& get()
+    {
+        throw std::logic_error("unimplemented");
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
