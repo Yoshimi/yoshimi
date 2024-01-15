@@ -41,16 +41,17 @@
 class GuiDataExchange
 {
     using PublishFun = std::function<void(CommandBlock const&)>;
-    
+
     PublishFun publish;
-    
-    
+
+    static size_t generateUniqueID();
+
     // must not be copied nor moved
     GuiDataExchange(GuiDataExchange &&)                =delete;
     GuiDataExchange(GuiDataExchange const&)            =delete;
     GuiDataExchange& operator=(GuiDataExchange &&)     =delete;
     GuiDataExchange& operator=(GuiDataExchange const&) =delete;
-    
+
 public:
     /**
      * Create a protocol/mediator for data connection Core -> GUI
@@ -61,52 +62,73 @@ public:
     GuiDataExchange(FUN&& how_to_publish)
         : publish(std::forward<FUN> (how_to_publish))
         { }
-    
-    
+
+
+    /* ========== Types used to implement the communictaion protocol ========== */
+
+    /** @internal tag to organise routing */
+    struct RoutingTag
+    {
+        size_t identity;
+    };
+
+    class Subscription
+    {
+    public:
+        virtual ~Subscription();  ///< this is an interface
+
+        Subscription* next{nullptr};
+        virtual void pushUpdate(RoutingTag)   =0;
+    };
+
     /**
      * Connection-handle and front-End for clients,
      * allowing to push data into the GUI asynchronously
      */
+    template<typename DAT>
     class Connection
     {
         GuiDataExchange* hub;
-        
+        RoutingTag       tag;
+
     public:
         Connection(GuiDataExchange& dataExchangeLink)
-            : hub(&dataExchangeLink)
+            : hub{&dataExchangeLink}
+            , tag{generateUniqueID()}
             { }
-        
+
         // standard copy operations acceptable
-        
-        template<typename DAT>
+
         void publish(DAT const& data)
         {
             throw std::logic_error("unimplemented");
         }
-        
-        
-        friend bool operator==(Connection const& lc, Connection const& rc)
+
+
+        template<typename DX>
+        bool operator==(Connection<DX> const& otherCon)
         {
             throw std::logic_error("unimplemented");
         }
-        
-        friend bool operator!=(Connection const& lc, Connection const& rc)
+
+        template<typename DX>
+        bool operator!=(Connection<DX> const& otherCon)
         {
-            return not (lc == rc);
+            return not (*this == otherCon);
         }
     };
-    
-    
+
+
     /**
      * Create an unique new connection handle
      * configured to transport data of type \a DAT
      */
     template<typename DAT>
-    Connection createConnection()
+    Connection<DAT> createConnection()
     {
-        return Connection(*this);
+        return Connection<DAT>(*this);
     }
-    
+
     /**
      * Dispatch a notification regarding data updates -> GUI.
      * The given CommandBlock contains a data handle and destination designation;

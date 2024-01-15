@@ -76,7 +76,7 @@ void run_GuiDataExchangeTest()
     CHECK (h1 == h2);
     
     
-    // =============================================== setup a connection-identity
+    // =============================================== setup (fake) communication infrastructure (for this test)
     // use a dummy-ringbuffer for this test...
     static constexpr size_t commandBlockSize = sizeof (CommandBlock);
     RingBuffer <10, log2 (commandBlockSize)> simulatedGUI;
@@ -94,12 +94,13 @@ void run_GuiDataExchangeTest()
     // Central instance to manage exchange connections
     GuiDataExchange guiDataExchange(sendData);
     
+    // =============================================== setup a connection-identity
     auto con = guiDataExchange.createConnection<Heffalump>();
     // has unique identity
     CHECK (con != guiDataExchange.createConnection<Heffalump>());
     CHECK (con != guiDataExchange.createConnection<float>());
     // can be copied and assigned
-    GuiDataExchange::Connection c2(con);
+    GuiDataExchange::Connection<Heffalump> c2(con);
     CHECK (con == c2);
     c2 = guiDataExchange.createConnection<Heffalump>();
     CHECK (con != c2);

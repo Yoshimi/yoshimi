@@ -27,6 +27,13 @@
 //#include <array>
 
 
+// emit VTable for the interface here....
+GuiDataExchange::Subscription::~Subscription() { }
+
+
 /**
  */
-
+size_t GuiDataExchange::generateUniqueID()
+{
+    /////TODO lala
+}

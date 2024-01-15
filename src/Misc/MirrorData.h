@@ -33,16 +33,16 @@
 /**
  * A »data mirror« component for the GUI.
  * As part of the GuiDataExchange protocol, this component is attached to some
- * GUI window or control and will then receive data updates pushed by the Core. 
+ * GUI window or control and will then receive data updates pushed by the Core.
  */
 template<class DAT>
 class MirrorData
 {
 
 public:
-    MirrorData(GuiDataExchange::Connection const& con)
+    MirrorData(GuiDataExchange::Connection<DAT> const& con)
     { }
-    
+
     DAT& get()
     {
         throw std::logic_error("unimplemented");
