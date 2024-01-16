@@ -31,6 +31,7 @@
 //#include <string>
 //#include <array>
 #include <utility>
+#include <memory>
 
 
 /**
@@ -40,9 +41,12 @@
  */
 class GuiDataExchange
 {
+    class ProtocolManager;
+    using PManager  = std::unique_ptr<ProtocolManager>;
     using PublishFun = std::function<void(CommandBlock const&)>;
 
     PublishFun publish;
+    PManager manager;
 
     static size_t generateUniqueID();
 
@@ -53,18 +57,13 @@ class GuiDataExchange
     GuiDataExchange& operator=(GuiDataExchange const&) =delete;
 
 public:
-    /**
-     * Create a protocol/mediator for data connection Core -> GUI
-     * @param how_to_publish a function allowing to push a CommandBlock
-     *        into some communication channel
-     */
-    template<typename FUN>
-    GuiDataExchange(FUN&& how_to_publish)
-        : publish(std::forward<FUN> (how_to_publish))
-        { }
+   ~GuiDataExchange();
+    
+    GuiDataExchange(PublishFun how_to_publish);
 
 
-    /* ========== Types used to implement the communictaion protocol ========== */
+
+    /* ========== Types used to implement the communication protocol ========== */
 
     /** @internal tag to organise routing */
     struct RoutingTag
@@ -94,28 +93,16 @@ public:
     public:
         Connection(GuiDataExchange& dataExchangeLink)
             : hub{&dataExchangeLink}
-            , tag{generateUniqueID()}
+            , tag{hub->generateNewTag<DAT>()}
             { }
 
         // standard copy operations acceptable
 
-        void publish(DAT const& data)
-        {
-            throw std::logic_error("unimplemented");
-        }
+        void publish(DAT const& data);
 
-
-        template<typename DX>
-        bool operator==(Connection<DX> const& otherCon)
-        {
-            throw std::logic_error("unimplemented");
-        }
-
-        template<typename DX>
-        bool operator!=(Connection<DX> const& otherCon)
-        {
-            return not (*this == otherCon);
-        }
+        // Equality: Connections to the same routing tag are equivalent...
+        template<typename DX, typename DY>
+        friend bool operator==(Connection<DX> const&, Connection<DY> const&);
     };
 
 
@@ -139,7 +126,55 @@ public:
     {
         throw std::logic_error("unimplemented");
     }
+
+
+private:
+    template<typename DAT>
+    RoutingTag generateNewTag()
+    {
+        return RoutingTag{generateUniqueID()
+                         /////////////////////////////////////////////////////TODO also generate runtime tags to represent the type DAT and the required buffer size
+                         };
+    }
+
+    template<typename DAT>
+    auto claimSlot(RoutingTag tag)
+    {
+        void* rawStorageBuff = claimBuffer(tag);
+        return [rawStorageBuff](DAT const& data)
+                                {   // copy-construct the data into the buffer
+                                    new(rawStorageBuff) DAT{data};
+                                };
+    }
+
+    void* claimBuffer(RoutingTag tag);
 };
+
+
+
+template<typename DX, typename DY>
+inline bool operator==(GuiDataExchange::Connection<DX> const& con1
+                      ,GuiDataExchange::Connection<DY> const& con2)
+{
+    return con1.tag.identity == con2.tag.identity;
+}
+
+template<typename DX, typename DY>
+inline bool operator!=(GuiDataExchange::Connection<DX> const& con1
+                      ,GuiDataExchange::Connection<DY> const& con2)
+{
+    return not (con1 == con2);
+}
+
+
+template<typename DAT>
+void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
+{
+    auto copyToBuffer = hub->claimSlot<DAT>(tag);
+    copyToBuffer(data);
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
 void run_GuiDataExchangeTest();

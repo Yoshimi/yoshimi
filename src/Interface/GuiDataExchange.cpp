@@ -23,17 +23,65 @@
 //#include "Misc/FormatFuncs.h"
 
 //#include <functional>
+#include <atomic>
 //#include <string>
 //#include <array>
+
+
+
+
+namespace {
+    std::atomic_size_t dataExchangeID{1};
+}
+
+/**
+ * Generate a new unique ID on each invocation, to be used as _Identity._
+ * This allows to keep track of different connections and update receivers.
+ */
+size_t GuiDataExchange::generateUniqueID()
+{          // Note : returning previous value before increment
+    return dataExchangeID.fetch_add(+1, std::memory_order_relaxed);
+}
+
+
+/**
+ * »PImpl« to maintain the block storage and manage the actual data exchange.
+ */
+class GuiDataExchange::ProtocolManager
+{
+public:
+    ProtocolManager()
+    {
+        throw std::logic_error("Work-In-Progress: implement data management");
+    }
+};
 
 
 // emit VTable for the interface here....
 GuiDataExchange::Subscription::~Subscription() { }
 
+// destructor needs the definition of ProtocolManager
+GuiDataExchange::~GuiDataExchange() { }
 
 /**
+ * Create a protocol/mediator for data connection Core -> GUI
+ * @param how_to_publish a function allowing to push a CommandBlock
+ *        into some communication channel
  */
-size_t GuiDataExchange::generateUniqueID()
+GuiDataExchange::GuiDataExchange(PublishFun how_to_publish)
+    : publish{std::move(how_to_publish)}
+    , manager{std::make_unique<ProtocolManager>()}
+    { }
+
+
+/**
+ * Open new storage slot by re-using the oldest storage buffer;
+ * @param tag connection-ID to mark the new buffer, so it's contents
+ *        can later be published to the correct receivers by dispatchUpdates()
+ * @note using information encoded into the tag to ensure the buffer is suitable
+ *        to hold a copy of the data to be published
+ */
+void* GuiDataExchange::claimBuffer(RoutingTag tag)
 {
-    /////TODO lala
+    throw std::logic_error("unimplemented");
 }

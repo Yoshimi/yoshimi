@@ -31,6 +31,14 @@
 
 
 /**
+ * 
+ */
+class ItemDescriptor
+{
+    
+};
+
+/**
  * A service to manage blocks of data for exchange through a communication protocol.
  */
 class DataBlockBuff
