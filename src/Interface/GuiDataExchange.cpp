@@ -20,6 +20,7 @@
 
 
 #include "Interface/GuiDataExchange.h"
+#include "Misc/DataBlockBuff.h"
 //#include "Misc/FormatFuncs.h"
 
 //#include <functional>
@@ -32,6 +33,9 @@
 
 namespace {
     std::atomic_size_t dataExchangeID{1};
+
+    const size_t SIZ = 512; /////////////////////TODO find a way to derive sizes
+    const size_t CAP = 64;
 }
 
 /**
@@ -49,11 +53,12 @@ size_t GuiDataExchange::generateUniqueID()
  */
 class GuiDataExchange::ProtocolManager
 {
+    using Storage = DataBlockBuff<GuiDataExchange::RoutingTag, CAP, SIZ>;
+    Storage storage;
 public:
     ProtocolManager()
-    {
-        throw std::logic_error("Work-In-Progress: implement data management");
-    }
+        : storage{}
+        { }
 };
 
 

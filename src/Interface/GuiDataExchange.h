@@ -58,7 +58,7 @@ class GuiDataExchange
 
 public:
    ~GuiDataExchange();
-    
+
     GuiDataExchange(PublishFun how_to_publish);
 
 
@@ -69,6 +69,12 @@ public:
     struct RoutingTag
     {
         size_t identity;
+
+        template<typename DAT>
+        bool verifyType()
+        {
+            throw std::logic_error("unimplemented: type tagging");
+        }
     };
 
     class Subscription

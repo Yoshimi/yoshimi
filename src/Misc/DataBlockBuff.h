@@ -22,31 +22,102 @@
 #define DATA_BLOCK_BUFF_H
 
 #include "globals.h"
-//#include "Interface/InterChange.h"
 //#include "Misc/FormatFuncs.h"
 
 //#include <functional>
 //#include <string>
-//#include <array>
+#include <cassert>
+#include <chrono>
+#include <array>
 
+using std::chrono::steady_clock;
+using TimePoint = std::chrono::time_point<steady_clock>;
 
 /**
- * 
+ * Uninitialised memory block
+ * @todo C++17 use std::byte and std::launder
  */
+template<size_t siz>
+class BufferBlock
+{
+    alignas(size_t) char buffer[siz];
+public:
+    // Standard layout, trivially constructible and copyable
+
+    void* accessStorage()
+    {
+        return static_cast<void*>(&buffer);
+    }
+
+    template<typename T>
+    T& accessAs()
+    {
+        static_assert(sizeof(T) <= siz, "insufficient storage in BufferBlock");
+        return * reinterpret_cast<T*>(&buffer);
+    }
+};
+
+/**
+ * Index entry to organise the contents of the data block ringbuffer
+ */
+template<class TAG>
 class ItemDescriptor
 {
-    
+    TimePoint timestamp{};
+    TAG tag{};
 };
 
 /**
  * A service to manage blocks of data for exchange through a communication protocol.
+ * @warning destructor for data blocks in the buffer will *not* be invoked
  */
+template<class TAG, size_t cap, size_t siz>
 class DataBlockBuff
 {
-    
+    using Index = std::array<ItemDescriptor<TAG>, cap>;
+    using Buffer = std::array<BufferBlock<siz>, cap>;
+
+    Index index;
+    Buffer buffer;
+
+    size_t oldest;
+
+    // must not be copied nor moved
+    DataBlockBuff(DataBlockBuff &&)                =delete;
+    DataBlockBuff(DataBlockBuff const&)            =delete;
+    DataBlockBuff& operator=(DataBlockBuff &&)     =delete;
+    DataBlockBuff& operator=(DataBlockBuff const&) =delete;
+
 public:
+    DataBlockBuff()
+        : index{}
+        , oldest{0}
+        { }
+
+    size_t claimNextBuffer(TAG const& tag)
+    {
+        index[oldest].timestamp = steady_clock::now();
+        index[oldest].tag = tag;
+        size_t curr{oldest};
+        incWrap(oldest);
+        return curr;
+    }
+
+    template<typename DAT>
+    DAT& accessSlot(size_t idx)
+    {
+        assert(idx < cap);
+        assert(index[idx].tag.template verifyType<DAT>());
+        return buffer[idx].template accessAs<DAT>();
+    }
+
+private:
+    /** increment index, but wrap at array end.
+     * @remark using the array cyclically */
+    size_t incWrap(size_t idx, size_t inc = 1)
+    {
+        return (idx + inc) % cap;
+    }
 };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
 #endif /*DATA_BLOCK_BUFF_H*/
