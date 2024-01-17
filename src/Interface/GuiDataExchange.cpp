@@ -51,12 +51,13 @@ size_t GuiDataExchange::generateUniqueID()
 /**
  * »PImpl« to maintain the block storage and manage the actual data exchange.
  */
-class GuiDataExchange::ProtocolManager
+class GuiDataExchange::DataManager
 {
+public:
     using Storage = DataBlockBuff<GuiDataExchange::RoutingTag, CAP, SIZ>;
     Storage storage;
-public:
-    ProtocolManager()
+
+    DataManager()
         : storage{}
         { }
 };
@@ -75,7 +76,7 @@ GuiDataExchange::~GuiDataExchange() { }
  */
 GuiDataExchange::GuiDataExchange(PublishFun how_to_publish)
     : publish{std::move(how_to_publish)}
-    , manager{std::make_unique<ProtocolManager>()}
+    , manager{std::make_unique<DataManager>()}
     { }
 
 
@@ -86,7 +87,18 @@ GuiDataExchange::GuiDataExchange(PublishFun how_to_publish)
  * @note using information encoded into the tag to ensure the buffer is suitable
  *        to hold a copy of the data to be published
  */
-void* GuiDataExchange::claimBuffer(RoutingTag tag)
+size_t GuiDataExchange::claimBuffer(RoutingTag const& tag)
+{
+    return manager->storage.claimNextBuffer(tag);
+}
+
+void* GuiDataExchange::getRawStorageBuff(size_t idx)
+{
+    return manager->storage.accessRawStorage(idx);
+}
+
+void GuiDataExchange::publishSlot(size_t idx)
 {
     throw std::logic_error("unimplemented");
 }
+

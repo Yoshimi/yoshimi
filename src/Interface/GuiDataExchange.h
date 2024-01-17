@@ -41,8 +41,8 @@
  */
 class GuiDataExchange
 {
-    class ProtocolManager;
-    using PManager  = std::unique_ptr<ProtocolManager>;
+    class DataManager;
+    using PManager  = std::unique_ptr<DataManager>;
     using PublishFun = std::function<void(CommandBlock const&)>;
 
     PublishFun publish;
@@ -154,17 +154,29 @@ private:
     }
 
     template<typename DAT>
-    auto claimSlot(RoutingTag tag)
+    auto claimSlot(RoutingTag const& tag)
     {
-        void* rawStorageBuff = claimBuffer(tag);
-        return [rawStorageBuff](DAT const& data)
-                                {   // copy-construct the data into the buffer
-                                    new(rawStorageBuff) DAT{data};
-                                };
+        size_t idx = claimBuffer(tag);
+        return [this,idx](DAT const& data)
+                        {   // copy-construct the data into the buffer
+                            new(getRawStorageBuff(idx)) DAT{data};
+                            publishSlot(idx);
+                        };
     }
 
-    void* claimBuffer(RoutingTag tag);
+    size_t claimBuffer(RoutingTag const& tag);
+    void*  getRawStorageBuff(size_t idx);
+    void   publishSlot(size_t idx);
 };
+
+
+
+template<typename DAT>
+void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
+{
+    auto copy_and_publish = hub->claimSlot<DAT>(tag);
+    copy_and_publish(data);
+}
 
 
 
@@ -180,14 +192,6 @@ inline bool operator!=(GuiDataExchange::Connection<DX> const& con1
                       ,GuiDataExchange::Connection<DY> const& con2)
 {
     return not (con1 == con2);
-}
-
-
-template<typename DAT>
-void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
-{
-    auto copyToBuffer = hub->claimSlot<DAT>(tag);
-    copyToBuffer(data);
 }
 
 

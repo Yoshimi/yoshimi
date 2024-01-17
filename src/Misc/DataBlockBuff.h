@@ -61,7 +61,7 @@ public:
  * Index entry to organise the contents of the data block ringbuffer
  */
 template<class TAG>
-class ItemDescriptor
+struct ItemDescriptor
 {
     TimePoint timestamp{};
     TAG tag{};
@@ -109,6 +109,12 @@ public:
         assert(idx < cap);
         assert(index[idx].tag.template verifyType<DAT>());
         return buffer[idx].template accessAs<DAT>();
+    }
+
+    void* accessRawStorage(size_t idx)
+    {
+        assert(idx < cap);
+        return buffer[idx].accessStorage();
     }
 
 private:
