@@ -38,6 +38,25 @@
  * A communication protocol to exchange blocks of data with the GUI.
  * Based on a publish-subscribe model with "push" from the core, but in the
  * GUI the message blocks are retrieved by "pull" by the command handling hook.
+ *
+ * GuiDataExchange can handle several distinct _communication channels,_ each
+ * allowing to publish some _arbitrary_ yet _specifically typed_ data blocks
+ * to several "listeners" / "subscribers".
+ * - A new channel is opened by [creating a connection](\ref GuiDataExchange::createConnection)
+ *   Note that the type `Connection<DAT>` is templated to a specific data type to transport
+ * - Connection objects are handles and freely copyable. All equivalent handles represent
+ *   the same connection, and can be used to operate on that connection
+ * - A receiver (typically in the GUI) must be created from such a connection handle;
+ *   it must be a subclass of GuiDataExchange::Subscription and implement the single
+ *   pure virtual method Subscription::pushUpdate
+ * - Registration and de-registration of Subscriptions is managed automatically
+ *   (by the constructor / the destructor)
+ * - to publish new data, invoke Connection<DAT>::publish(data)
+ * - this causes a _copy_ of that data to be stored into an internal data ringbuffer;
+ *   moreover, a notification-message is sent through the Yoshimi CommandBlock system.
+ * - The code handling GUI updates in the »main thread« will receive this notification
+ *   and has then to invoke GuiDataExchange::dispatchUpdates(commandBlock), which will
+ *   use the internal registry of Subscribers to push an update to each active receiver.
  */
 class GuiDataExchange
 {
@@ -77,13 +96,9 @@ public:
             return typehash == func::getTypeHash<DAT>();
         }
 
-        size_t getHash()
-        {
-            size_t hash{0};
-            func::hash_combine(hash, identity);
-            func::hash_combine(hash, typehash);
-            return hash;
-        }
+        static size_t getHash(RoutingTag const&);
+        bool operator==(RoutingTag const& otag) const;
+        bool operator!=(RoutingTag const& otag) const;
     };
 
 
@@ -127,7 +142,7 @@ public:
     }
 
 
-
+    /**Interface used to mark and track all receivers of data push-updates */
     class Subscription
     {
         DetachHook detach;
@@ -216,6 +231,24 @@ inline bool operator!=(GuiDataExchange::Connection<DX> const& con1
     return not (con1 == con2);
 }
 
+
+inline size_t GuiDataExchange::RoutingTag::getHash(RoutingTag const& tag)
+{
+    size_t hash{0};
+    func::hash_combine(hash, tag.identity);
+    func::hash_combine(hash, tag.typehash);
+    return hash;
+}
+
+inline bool GuiDataExchange::RoutingTag::operator==(RoutingTag const& otag)  const
+{
+    return this->identity == otag.identity
+       and this->typehash == otag.typehash;
+}
+inline bool GuiDataExchange::RoutingTag::operator!=(RoutingTag const& otag)  const
+{
+    return not (*this == otag);
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!

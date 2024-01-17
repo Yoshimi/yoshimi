@@ -25,6 +25,7 @@
 
 //#include <functional>
 #include <atomic>
+#include <unordered_map>
 //#include <string>
 //#include <array>
 
@@ -36,7 +37,13 @@ namespace {
 
     const size_t SIZ = 512; /////////////////////TODO find a way to derive sizes
     const size_t CAP = 64;
+
+    const size_t INITIAL_REGISTRY_BUCKETS = 64;
 }
+
+using RoutingTag = GuiDataExchange::RoutingTag;
+using Subscription = GuiDataExchange::Subscription;
+
 
 /**
  * Generate a new unique ID on each invocation, to be used as _Identity._
@@ -54,11 +61,15 @@ size_t GuiDataExchange::generateUniqueID()
 class GuiDataExchange::DataManager
 {
 public:
-    using Storage = DataBlockBuff<GuiDataExchange::RoutingTag, CAP, SIZ>;
+    using Storage = DataBlockBuff<RoutingTag, CAP, SIZ>;
     Storage storage;
+
+    using Registry = std::unordered_map<RoutingTag, Subscription*, size_t(&)(RoutingTag const&)>;
+    Registry registry;
 
     DataManager()
         : storage{}
+        , registry{INITIAL_REGISTRY_BUCKETS, RoutingTag::getHash}
         { }
 };
 
@@ -95,13 +106,32 @@ void* GuiDataExchange::getRawStorageBuff(size_t idx)
     return manager->storage.accessRawStorage(idx);
 }
 
+
 /**
  * This function is called automatically whenever a Subscription (=data receiver) is created.
  * The Subscription is associated with the RoutingTag and gets a callback for detaching on destruction
  */
 GuiDataExchange::DetachHook GuiDataExchange::attachReceiver(RoutingTag const& tag, Subscription& client)
 {
-    throw std::logic_error("unimplemented");
+    DataManager::Registry& reg{manager->registry};
+    // prepend to single-linked list in Registry
+    client.next = reg[tag];
+    reg[tag] = &client;
+    return [tag,&reg](Subscription const& entry)
+            {// will be called from the Subscription's destructor....
+                bool found{false};
+                for (Subscription** p = & reg[tag]; *p != nullptr; p = & (*p)->next)
+                    if (*p == &entry)
+                    {// remove entry from registry
+                        *p = entry.next;
+                        found = true;
+                        break;
+                    }
+                if (not found)
+                    throw std::logic_error("GuiDataExchange: registration of push data receivers corrupted.");
+                if (reg[tag] == nullptr)
+                    reg.erase(tag);
+            };
 }
 
 
