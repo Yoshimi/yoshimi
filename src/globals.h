@@ -1105,7 +1105,7 @@ namespace EFFECT // usage EFFECT::control::level
     };
 
     enum type : unsigned char { // sits above part kits
-        none = NUM_KIT_ITEMS,
+        none = NUM_KIT_ITEMS, // must not be moved
         reverb,
         echo,
         chorus,

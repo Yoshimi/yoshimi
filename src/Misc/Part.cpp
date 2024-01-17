@@ -1481,12 +1481,12 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         int found = xml->getpar("type", 0, -20, 255); // should cover all!
         int type = 0;
         int offset = 0;
-        while (offset != 255 && offset != found)
+        while (offset != UNUSED && offset != found)
         {
             ++type;
             offset = type_offset[type];
         }
-        if (offset == 255)
+        if (offset == UNUSED)
             type = 0; // undefined
         info.Ptype = type;
 

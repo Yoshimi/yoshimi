@@ -399,12 +399,12 @@ float filterLimit::getFilterLimits(CommandBlock *getData)
     int control = getData->data.control;
     int effType = getData->data.kit;
     int engine = getData->data.engine;
+    int offset = getData->data.offset;
     int dynPreset = 0;
 
     if (effType == EFFECT::type::dynFilter)
     {
-        dynPreset = getData->data.spare1;
-        //std::cout << "pres " << dynPreset << std::endl;
+        dynPreset = offset << 4;
     }
     unsigned char type = 0;
 

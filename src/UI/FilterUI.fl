@@ -458,9 +458,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, FILTERINSERT::control::Q, o->value(), TOPLEVEL::type::Write);}
           tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 deactivate
-          code0 {o->value(pars->Pq);}
-          code1 {updateVCforQ();}
-          code2 {if (filtertype->value() == TOPLEVEL::filter::Low1 && analogfiltertypechoice->value() < TOPLEVEL::filter::Low2) o->deactivate(); else o->activate();}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
@@ -535,16 +532,14 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
       }
       Fl_Button filtC {
         label C
-        callback {
-            //
+        callback {//
             synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::filterGroup);
             ;}
         xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
       }
       Fl_Button filtP {
         label P
-        callback {
-            //
+        callback {//
             synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::filterGroup);
             ;}
         xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 197
@@ -822,8 +817,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
         Fl_Button formCopy {
           label C
-          callback {
-              //
+          callback {//
               synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, engine, TOPLEVEL::insert::filterGroup,0, nvowel);
               // dummy parameter always stores all possible formants
               ;}
@@ -831,8 +825,7 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         }
         Fl_Button formPaste {
           label P
-          callback {
-              //
+          callback {//
               synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, engine, TOPLEVEL::insert::filterGroup,0, nvowel);
               // dummy parameter always stores all possible formants
               ;}
@@ -983,14 +976,23 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
             else
                 qdial->selection_color(setKnob(qdial->value(),FILTDEF::qVal.def));
         }
-
+        
+        if (categ == 0)
+        {
+            if (parstype < 2)
+                qdial->deactivate();
+            else
+                qdial->activate();
+        }
+        updateVCforQ();
+        
         freqtrdial->selection_color(setKnob(freqtrdial->value(),FILTDEF::freqTrack.def));
 
         if (engine >= PART::engine::addVoice1 && engine < PART::addVoiceModEnd)
             vsnsadial->selection_color(setKnob(vsnsadial->value(),FILTDEF::voiceVelSense.def));
         else
             vsnsadial->selection_color(setKnob(vsnsadial->value(),FILTDEF::velSense.def));
-
+            
         vsnsdial->selection_color(setKnob(vsnsdial->value(),FILTDEF::velFuncSense.def));
 
         gaindial->selection_color(setKnob(gaindial->value(),FILTDEF::gain.def));
@@ -1265,7 +1267,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
         case FILTERINSERT::control::baseType:
             filtertype->value(value_int);
             cfreqdial->setValueType(getFilterFreqType(value));
-            updateVCforQ();
             refresh();
             break;
 
@@ -1564,7 +1565,6 @@ class FilterUI {: {public Fl_Group,PresetsUI_}
     else
         vsnsdial->value(*velsns);
     cfreqdial->setValueType(getFilterFreqType(pars->Pcategory));
-    updateVCforQ();
 
     analogfiltertypechoice->value(0);
     svfiltertypechoice->value(0);
