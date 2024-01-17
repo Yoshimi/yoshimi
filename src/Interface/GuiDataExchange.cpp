@@ -63,8 +63,6 @@ public:
 };
 
 
-// emit VTable for the interface here....
-GuiDataExchange::Subscription::~Subscription() { }
 
 // destructor needs the definition of ProtocolManager
 GuiDataExchange::~GuiDataExchange() { }
@@ -97,7 +95,22 @@ void* GuiDataExchange::getRawStorageBuff(size_t idx)
     return manager->storage.accessRawStorage(idx);
 }
 
+/**
+ * This function is called automatically whenever a Subscription (=data receiver) is created.
+ * The Subscription is associated with the RoutingTag and gets a callback for detaching on destruction
+ */
+GuiDataExchange::DetachHook GuiDataExchange::attachReceiver(RoutingTag const& tag, Subscription& client)
+{
+    throw std::logic_error("unimplemented");
+}
+
+
 void GuiDataExchange::publishSlot(size_t idx)
+{
+    throw std::logic_error("unimplemented");
+}
+
+void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
 {
     throw std::logic_error("unimplemented");
 }

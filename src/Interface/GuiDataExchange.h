@@ -86,15 +86,9 @@ public:
         }
     };
 
-    class Subscription
-    {
-    public:
-        virtual ~Subscription();  ///< this is an interface
 
-        Subscription* next{nullptr};
-        virtual void pushUpdate(RoutingTag)   =0;
-    };
-
+    class Subscription;
+    using DetachHook = std::function<void(Subscription const&)>;
 
     /**
      * Connection-handle and front-End for clients,
@@ -115,12 +109,12 @@ public:
         // standard copy operations acceptable
 
         void publish(DAT const& data);
+        DetachHook attach(Subscription&);
 
         // Equality: Connections to the same routing tag are equivalent...
         template<typename DX, typename DY>
         friend bool operator==(Connection<DX> const&, Connection<DY> const&);
     };
-
 
     /**
      * Create an unique new connection handle
@@ -132,16 +126,37 @@ public:
         return Connection<DAT>(*this);
     }
 
+
+
+    class Subscription
+    {
+        DetachHook detach;
+    protected:
+       ~Subscription(){ detach(*this); }
+    public:
+        Subscription* next{nullptr};
+        virtual void pushUpdate(size_t typeHash, void* data) =0;
+
+        template<typename DAT>
+        Subscription(Connection<DAT>& connection)
+            : detach{connection.attach(*this)}
+            { }
+
+        // must not be copied nor moved
+        Subscription(Subscription &&)                =delete;
+        Subscription(Subscription const&)            =delete;
+        Subscription& operator=(Subscription &&)     =delete;
+        Subscription& operator=(Subscription const&) =delete;
+    };
+
+
     /**
      * Dispatch a notification regarding data updates -> GUI.
      * The given CommandBlock contains a data handle and destination designation;
      * actual data is fetched from the DataBlockBuff and pushed synchronously to all
      * MirrorData receivers currently enrolled actively within the GUI.
      */
-    void dispatchUpdates(CommandBlock const& notification)
-    {
-        throw std::logic_error("unimplemented");
-    }
+    void dispatchUpdates(CommandBlock const& notification);
 
 
 private:
@@ -164,6 +179,7 @@ private:
                         };
     }
 
+    DetachHook attachReceiver(RoutingTag const&, Subscription&);
     size_t claimBuffer(RoutingTag const& tag);
     void*  getRawStorageBuff(size_t idx);
     void   publishSlot(size_t idx);
@@ -176,6 +192,12 @@ void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
 {
     auto copy_and_publish = hub->claimSlot<DAT>(tag);
     copy_and_publish(data);
+}
+
+template<typename DAT>
+GuiDataExchange::DetachHook GuiDataExchange::Connection<DAT>::attach(Subscription& client)
+{
+    return hub->attachReceiver(tag, client);
 }
 
 
