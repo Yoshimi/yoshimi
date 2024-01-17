@@ -24,7 +24,7 @@
 #include "globals.h"
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
-
+#include "Misc/Hash.h"
 //#include "Misc/FormatFuncs.h"
 
 #include <functional>
@@ -68,12 +68,21 @@ public:
     /** @internal tag to organise routing */
     struct RoutingTag
     {
-        size_t identity;
+        size_t identity{0};
+        size_t typehash{0};
 
         template<typename DAT>
         bool verifyType()
         {
-            throw std::logic_error("unimplemented: type tagging");
+            return typehash == func::getTypeHash<DAT>();
+        }
+
+        size_t getHash()
+        {
+            size_t hash{0};
+            func::hash_combine(hash, identity);
+            func::hash_combine(hash, typehash);
+            return hash;
         }
     };
 
@@ -85,6 +94,7 @@ public:
         Subscription* next{nullptr};
         virtual void pushUpdate(RoutingTag)   =0;
     };
+
 
     /**
      * Connection-handle and front-End for clients,
@@ -139,7 +149,7 @@ private:
     RoutingTag generateNewTag()
     {
         return RoutingTag{generateUniqueID()
-                         /////////////////////////////////////////////////////TODO also generate runtime tags to represent the type DAT and the required buffer size
+                         ,func::getTypeHash<DAT>()
                          };
     }
 
