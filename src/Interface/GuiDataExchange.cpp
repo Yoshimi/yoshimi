@@ -26,6 +26,7 @@
 //#include <functional>
 #include <atomic>
 #include <unordered_map>
+#include <climits>
 //#include <string>
 //#include <array>
 
@@ -60,6 +61,7 @@ size_t GuiDataExchange::generateUniqueID()
  */
 class GuiDataExchange::DataManager
 {
+    static_assert (CAP <= UCHAR_MAX, "index will be passed via CommandBlock");
 public:
     using Storage = DataBlockBuff<RoutingTag, CAP, SIZ>;
     Storage storage;
@@ -137,7 +139,25 @@ GuiDataExchange::DetachHook GuiDataExchange::attachReceiver(RoutingTag const& ta
 
 void GuiDataExchange::publishSlot(size_t idx)
 {
-    throw std::logic_error("unimplemented");
+    CommandBlock notifyMsg;
+
+    notifyMsg.data.type    = TOPLEVEL::type::Integer;
+    notifyMsg.data.control = TOPLEVEL::control::dataExchange;
+    notifyMsg.data.part    = TOPLEVEL::section::message;
+    notifyMsg.data.source  = TOPLEVEL::action::lowPrio | TOPLEVEL::action::noAction;
+    notifyMsg.data.offset  = static_cast<unsigned char>(idx);
+    //
+    notifyMsg.data.kit       = UNUSED;
+    notifyMsg.data.engine    = UNUSED;
+    notifyMsg.data.insert    = UNUSED;
+    notifyMsg.data.parameter = UNUSED;
+    notifyMsg.data.miscmsg   = UNUSED;
+    notifyMsg.data.spare0    = UNUSED;
+    notifyMsg.data.spare1    = UNUSED;
+    notifyMsg.data.value     = 0;
+
+    // send it via configured messaging channel
+    publish(notifyMsg);
 }
 
 void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
