@@ -366,22 +366,6 @@ class EnvelopeUI {: {public Fl_Group,PresetsUI_}
         code0 {o->init(env, npart, kititem, engine, group);}
         class EnvelopeFreeEdit
       }
-      Fl_Light_Button freemodebutto {
-        label FreeMode
-        callback {//
-        if (env->Pfreemode != 0)
-        {
-            bool answer = choice(synth, "", "Yes", "No", "Disable the free mode of the Envelope?") > 1;
-            if (!answer)
-            {
-                o->value(1); // back as it was
-                return;
-            }
-        }
-
-        send_data(TOPLEVEL::action::forceUpdate, group, ENVELOPEINSERT::control::enableFreeMode, o->value(), TOPLEVEL::type::Write);}
-        tooltip {Enable or disable the freemode} xywh {10 154 95 22} box PLASTIC_UP_BOX labelsize 11 labelcolor 64 hide deactivate
-      }
       Fl_Check_Button freemodebutton {
         label FreeMode
         callback {//
@@ -1242,14 +1226,14 @@ saveWin(synth, freemodeeditwindow->w(), freemodeeditwindow->h(), freemodeeditwin
     hide();
 
     envwindow->hide();
-    Fl_Group *par = envwindow->parent();
-    par->hide();
+    Fl_Group *parent = envwindow->parent();
+    parent->hide();
 
     refresh();
     envwindow->show();
-    par->redraw();
+    parent->redraw();
 
-    par->show();
+    parent->show();
     show();
 
     if (freemode)

@@ -1460,12 +1460,12 @@ Oscillator}
   }
   Function {update_modvoicelabel()} {} {
     code {//
-        char fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);
-        char fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
+        int fmVoice = collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice);
+        int fmExtOsc = collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice);
         if (fmVoice >= 0)
         {
             char str[15];
-            snprintf(str, sizeof(str), "Voice %d",fmVoice + 1);
+            snprintf(str, sizeof(str), "Voice %d",char(fmVoice) + 1);
             modvoicelabel->copy_label(str);
             modvoicelabel->labelcolor(ext_voice);
             modvoicelabel->show();
@@ -1473,7 +1473,7 @@ Oscillator}
         else if (fmExtOsc >= 0)
         {
             char str[15];
-            snprintf(str, sizeof(str), "Mod. %d", fmExtOsc + 1);
+            snprintf(str, sizeof(str), "Mod. %d", char(fmExtOsc) + 1);
             modvoicelabel->copy_label(str);
             modvoicelabel->labelcolor(ext_osc);
             modvoicelabel->show();
