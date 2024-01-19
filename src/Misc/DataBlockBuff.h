@@ -22,16 +22,17 @@
 #define DATA_BLOCK_BUFF_H
 
 #include "globals.h"
-//#include "Misc/FormatFuncs.h"
 
-//#include <functional>
-//#include <string>
 #include <cassert>
 #include <chrono>
 #include <array>
 
 using std::chrono::steady_clock;
 using TimePoint = std::chrono::time_point<steady_clock>;
+using std::chrono_literals::operator ""ms;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+
 
 /**
  * Uninitialised memory block
@@ -57,6 +58,7 @@ public:
     }
 };
 
+
 /**
  * Index entry to organise the contents of the data block ringbuffer
  */
@@ -66,6 +68,7 @@ struct ItemDescriptor
     TimePoint timestamp{};
     TAG tag{};
 };
+
 
 /**
  * A service to manage blocks of data for exchange through a communication protocol.
@@ -99,8 +102,18 @@ public:
         index[oldest].timestamp = steady_clock::now();
         index[oldest].tag = tag;
         size_t curr{oldest};
-        incWrap(oldest);
+        oldest = incWrap(oldest);
         return curr;
+    }
+
+    milliseconds entryAge(size_t idx)
+    {
+        return duration_cast<milliseconds>(steady_clock::now () - index[idx].timestamp);
+    }
+
+    TAG const& getRoutingTag(size_t idx)
+    {
+        return index[idx].tag;
     }
 
     template<typename DAT>

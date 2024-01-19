@@ -25,11 +25,8 @@
 #include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
 #include "Misc/Hash.h"
-//#include "Misc/FormatFuncs.h"
 
 #include <functional>
-//#include <string>
-//#include <array>
 #include <utility>
 #include <memory>
 
@@ -91,7 +88,7 @@ public:
         size_t typehash{0};
 
         template<typename DAT>
-        bool verifyType()
+        bool verifyType()  const
         {
             return typehash == func::getTypeHash<DAT>();
         }
@@ -121,7 +118,7 @@ public:
             , tag{hub->generateNewTag<DAT>()}
             { }
 
-        // standard copy operations acceptable
+        // standard copy operations acceptable (but only for same DAT)
 
         void publish(DAT const& data);
         DetachHook attach(Subscription&);
@@ -145,31 +142,34 @@ public:
     /**Interface used to mark and track all receivers of data push-updates */
     class Subscription
     {
-        DetachHook detach;
-    protected:
-       ~Subscription(){ detach(*this); }
-    public:
-        Subscription* next{nullptr};
-        virtual void pushUpdate(size_t typeHash, void* data) =0;
-
-        template<typename DAT>
-        Subscription(Connection<DAT>& connection)
-            : detach{connection.attach(*this)}
-            { }
-
         // must not be copied nor moved
         Subscription(Subscription &&)                =delete;
         Subscription(Subscription const&)            =delete;
         Subscription& operator=(Subscription &&)     =delete;
         Subscription& operator=(Subscription const&) =delete;
+
+    protected:
+        template<typename DAT>
+        Subscription(Connection<DAT>& connection)
+            : next{nullptr}
+            , detach{connection.attach(*this)}
+            { }
+
+        virtual ~Subscription(); ///< detaches automatically
+    public:
+        Subscription* next;
+        virtual void pushUpdate(RoutingTag const&, void* data) =0;
+    private:
+        DetachHook detach;
     };
 
 
     /**
      * Dispatch a notification regarding data updates -> GUI.
-     * The given CommandBlock contains a data handle and destination designation;
+     * The given CommandBlock contains a data handle(index); routing info an
      * actual data is fetched from the DataBlockBuff and pushed synchronously to all
-     * MirrorData receivers currently enrolled actively within the GUI.
+     * MirrorData receivers currently enrolled actively within the GUI and marked
+     * with the same RoutingTag as found in the index table.
      */
     void dispatchUpdates(CommandBlock const& notification);
 

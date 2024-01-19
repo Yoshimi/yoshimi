@@ -74,6 +74,8 @@ void run_GuiDataExchangeTest()
     // Heffalumps can be copied and assigned
     h2 = h1;
     CHECK (h1 == h2);
+    h2 = Heffalump();
+    CHECK (h1 != h2);
     
     
     // =============================================== setup (fake) communication infrastructure (for this test)
@@ -105,7 +107,7 @@ void run_GuiDataExchangeTest()
     c2 = guiDataExchange.createConnection<Heffalump>();
     CHECK (con != c2);
     // can not be assigned with the wrong data buffer type
-//  c2 = GuiDataExchange::connection<float>();              //////// throws logic_error
+//  c2 = guiDataExchange.createConnection<float>();             //////// does not compile due to different template argument DAT=float
     
     
     // =============================================== setup a receiver

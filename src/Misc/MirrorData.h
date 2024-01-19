@@ -37,18 +37,28 @@
  */
 template<class DAT>
 class MirrorData
+    : public GuiDataExchange::Subscription
 {
+    DAT data;
+
+    void pushUpdate(GuiDataExchange::RoutingTag const& tag, void* buffer)  override
+    {
+        assert(tag.verifyType<DAT>());
+        assert(buffer);
+        data.~DAT(); // copy-construct into data storage
+        new(&data) DAT{* reinterpret_cast<DAT*>(buffer)};
+    }
 
 public:
-    MirrorData(GuiDataExchange::Connection<DAT> const& con)
-    { }
+    MirrorData(GuiDataExchange::Connection<DAT>& con)
+        : Subscription{con}
+        , data{}
+        { }
 
     DAT& get()
     {
-        throw std::logic_error("unimplemented");
+        return data;
     }
 };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
 #endif /*MIRROR_DATA_H*/

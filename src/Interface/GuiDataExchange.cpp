@@ -21,14 +21,12 @@
 
 #include "Interface/GuiDataExchange.h"
 #include "Misc/DataBlockBuff.h"
-//#include "Misc/FormatFuncs.h"
+#include "Misc/FormatFuncs.h"
 
-//#include <functional>
-#include <atomic>
 #include <unordered_map>
 #include <climits>
-//#include <string>
-//#include <array>
+#include <chrono>
+#include <atomic>
 
 
 
@@ -40,6 +38,12 @@ namespace {
     const size_t CAP = 64;
 
     const size_t INITIAL_REGISTRY_BUCKETS = 64;
+
+    /** when to consider an asynchronous data message still "on time" */
+    inline bool isTimely(std::chrono::milliseconds millis)
+    {
+        return 0ms <= millis and millis < 500ms;
+    }
 }
 
 using RoutingTag = GuiDataExchange::RoutingTag;
@@ -79,6 +83,8 @@ public:
 
 // destructor needs the definition of ProtocolManager
 GuiDataExchange::~GuiDataExchange() { }
+GuiDataExchange::Subscription::~Subscription(){ detach(*this); }
+
 
 /**
  * Create a protocol/mediator for data connection Core -> GUI
@@ -89,7 +95,6 @@ GuiDataExchange::GuiDataExchange(PublishFun how_to_publish)
     : publish{std::move(how_to_publish)}
     , manager{std::make_unique<DataManager>()}
     { }
-
 
 /**
  * Open new storage slot by re-using the oldest storage buffer;
@@ -160,8 +165,23 @@ void GuiDataExchange::publishSlot(size_t idx)
     publish(notifyMsg);
 }
 
+
 void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
 {
-    throw std::logic_error("unimplemented");
+    if (notification.data.control != TOPLEVEL::control::dataExchange)
+        return;
+    size_t idx = notification.data.offset;
+    if (idx >= CAP)
+        throw std::logic_error("GuiDataExchange: invalid data slot index "+func::asString(idx));
+    if (not isTimely(manager->storage.entryAge(idx)))
+        return;
+    RoutingTag tag{manager->storage.getRoutingTag(idx)};
+    void* rawData = manager->storage.accessRawStorage(idx);
+    DataManager::Registry& reg{manager->registry};
+    auto entry = reg.find(tag);
+    if (entry == reg.end())
+        return; // no(longer any) subscribers for this conversation channel
+    for (Subscription* p = entry->second; p; p=p->next)
+        p->pushUpdate(tag, rawData);
 }
 
