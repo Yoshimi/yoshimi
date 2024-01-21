@@ -444,9 +444,9 @@ Run the LFO continuously even when the sound is not playing. If BPM is on, then 
     }
     ;} {}
   }
-  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
+  Function {init(SynthEngine *synth_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//
-        synth = lfopars_->getSynthEngine();
+        synth = synth_;
         npart = npart_;
         kititem = kititem_;
         engine = engine_;

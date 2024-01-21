@@ -381,7 +381,7 @@ class ADvoiceUI {: {public Fl_Group}
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 align 144
-              code0 {o->init(pars->VoicePar[nvoice].FreqLfo, npart, kititem, PART::engine::addVoice1 + nvoice, 1);}
+              code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 1);}
               code1 {if (collect_readData(synth,0,ADDVOICE::control::enableFrequencyLFO, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
               class LFOUI
             } {}
@@ -793,7 +793,7 @@ Oscillator}
           Fl_Group voiceamplfogroup {
             label {Amplitude LFO     }
             xywh {10 205 275 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(pars->VoicePar[nvoice].AmpLfo, npart, kititem, PART::engine::addVoice1 + nvoice, 0);}
+            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 0);}
             code1 {if (collect_readData(synth,0,ADDVOICE::control::enableAmplitudeLFO, npart, kititem, PART::engine::addVoice1 + nvoice) == 0) o->deactivate();}
             class LFOUI
           } {}
@@ -856,7 +856,7 @@ Oscillator}
           Fl_Group voicefilterlfogroup {
             label {Filter LFO     }
             xywh {295 205 275 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(pars->VoicePar[nvoice].FilterLfo, npart, kititem, PART::engine::addVoice1 + nvoice, 2);}
+            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 2);}
             code1 {if (collect_readData(synth, 0, ADDVOICE::control::enableFilterLFO, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
             class LFOUI
           } {}
@@ -2206,7 +2206,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group freqlfo {
           label {Frequency LFO}
           xywh {215 295 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, PART::engine::addSynth, 1);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 1);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -2383,7 +2383,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group amplfo {
           label {Amplitude LFO}
           xywh {10 145 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, PART::engine::addSynth, 0);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 0);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
@@ -2416,7 +2416,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group filterlfo {
           label {Filter LFO}
           xywh {295 180 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterLfo, npart, kititem, PART::engine::addSynth, 2);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 2);}
           class LFOUI
         } {}
         Fl_Group filterui {
