@@ -738,7 +738,7 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group amplfo {
               label {Amplitude LFO     }
               xywh {10 165 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, 0);}
+              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, TOPLEVEL::insertType::amplitude);}
               class LFOUI
             } {}
             Fl_Box {} {
@@ -758,7 +758,7 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group filterlfo {
               label {Filter LFO     }
               xywh {295 200 275 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, 2);}
+              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, TOPLEVEL::insertType::filter);}
               class LFOUI
             } {}
             Fl_Group filterui {
@@ -781,7 +781,7 @@ class PADnoteUI {: {public PresetsUI_}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, 1);}
+              code0 {o->init(synth, npart, kititem, PART::engine::padSynth, TOPLEVEL::insertType::frequency);}
               class LFOUI
             } {}
             Fl_Dial bend {

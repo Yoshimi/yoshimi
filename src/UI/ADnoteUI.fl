@@ -76,7 +76,7 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {327 141 805 615} type Double box NO_BOX hide resizable
+      xywh {950 165 805 615} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
       Fl_Box {} {
@@ -381,7 +381,7 @@ class ADvoiceUI {: {public Fl_Group}
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 325 275 70} box FLAT_BOX color 47 align 144
-              code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 1);}
+              code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, TOPLEVEL::insertType::frequency);}
               code1 {if (collect_readData(synth,0,ADDVOICE::control::enableFrequencyLFO, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
               class LFOUI
             } {}
@@ -793,7 +793,7 @@ Oscillator}
           Fl_Group voiceamplfogroup {
             label {Amplitude LFO     }
             xywh {10 205 275 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 0);}
+            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, TOPLEVEL::insertType::amplitude);}
             code1 {if (collect_readData(synth,0,ADDVOICE::control::enableAmplitudeLFO, npart, kititem, PART::engine::addVoice1 + nvoice) == 0) o->deactivate();}
             class LFOUI
           } {}
@@ -856,7 +856,7 @@ Oscillator}
           Fl_Group voicefilterlfogroup {
             label {Filter LFO     }
             xywh {295 205 275 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, 2);}
+            code0 {o->init(synth, npart, kititem, PART::engine::addVoice1 + nvoice, TOPLEVEL::insertType::filter);}
             code1 {if (collect_readData(synth, 0, ADDVOICE::control::enableFilterLFO, npart, kititem, PART::engine::addVoice1 + nvoice)==0) o->deactivate();}
             class LFOUI
           } {}
@@ -2166,7 +2166,7 @@ class ADnoteUI {: {public PresetsUI_}
         resui->resonancewindow->hide();
         o->hide();
         ;}
-      xywh {468 231 580 405} type Double hide resizable
+      xywh {842 203 580 405} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Global"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {addDW = 535; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
@@ -2206,7 +2206,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group freqlfo {
           label {Frequency LFO}
           xywh {215 295 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 1);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, TOPLEVEL::insertType::frequency);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -2383,7 +2383,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group amplfo {
           label {Amplitude LFO}
           xywh {10 145 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 0);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, TOPLEVEL::insertType::amplitude);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
@@ -2416,7 +2416,7 @@ class ADnoteUI {: {public PresetsUI_}
         Fl_Group filterlfo {
           label {Filter LFO}
           xywh {295 180 275 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, 2);}
+          code0 {o->init(synth, npart, kititem, PART::engine::addSynth, TOPLEVEL::insertType::filter);}
           class LFOUI
         } {}
         Fl_Group filterui {
