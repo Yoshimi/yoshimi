@@ -29,15 +29,21 @@
 #include <atomic>
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////TODO Prototype 1/24 - include the actual data types here
+using Heffalump_Placeholder = std::array<char,20>;
+/////////////////////////////////////////////////////////////////////////////////////////////////TODO Prototype 1/24 - include the actual data types here
 
 
+                                //////////////// !! NOTE important : add all relevant types here which shall be published via GuiDataExchange !!
 namespace {
+    const size_t SIZ = MaxSize<Types<Heffalump_Placeholder
+                                    /////////////////////////////////////////TODO 1/24 : add more actual types here
+                                    >>::value;
+
+    const size_t CAP = 64;                       ///< (fixed) number of slots (each with size SIZ) to pre-allocate
+    const size_t INITIAL_REGISTRY_BUCKETS = 64;  ///< initial size for the hashtable used for lookup of data receivers
+
     std::atomic_size_t dataExchangeID{1};
-
-    const size_t SIZ = 512; /////////////////////TODO find a way to derive sizes
-    const size_t CAP = 64;
-
-    const size_t INITIAL_REGISTRY_BUCKETS = 64;
 
     /** when to consider an asynchronous data message still "on time" */
     inline bool isTimely(std::chrono::milliseconds millis)
@@ -100,18 +106,29 @@ GuiDataExchange::GuiDataExchange(PublishFun how_to_publish)
  * Open new storage slot by re-using the oldest storage buffer;
  * @param tag connection-ID to mark the new buffer, so it's contents
  *        can later be published to the correct receivers by dispatchUpdates()
- * @note using information encoded into the tag to ensure the buffer is suitable
- *        to hold a copy of the data to be published
+ * @param dataSize size of the actual data to be copied into the buffer; could be used
+ *        to select from a differentiated storage pool (sanity check only as of 1/2024)
+ * @param storeIntoBuffer a function with signature `void(void*)` to _drop off_
+ *        the actual payload into the buffer slot.
+ * @return the indexNr of the claimed slot
+ * @note
+ *  - using information encoded into the tag to ensure the buffer
+ *    size is sufficient to hold a copy of the data to be published
+ *  - note this function also constitutes a _memory synchronisation bracket_
+ *    to ensure the changes to the buffer structure are visible to other threads
  */
-size_t GuiDataExchange::claimBuffer(RoutingTag const& tag)
+size_t GuiDataExchange::claimNextSlot(RoutingTag const& tag, size_t dataSize, EmplaceFun storeIntoBuffer)
 {
-    return manager->storage.claimNextBuffer(tag);
+    if (dataSize > SIZ)
+        throw std::logic_error("Insufficient preconfigured buffer size "
+                               "to hold an object of size="
+                              + func::asString(dataSize));
+    size_t slotIdx = manager->storage.claimNextBuffer(tag);
+    void* rawStorageBuff = manager->storage.accessRawStorage(slotIdx);
+    storeIntoBuffer(rawStorageBuff);
+    return slotIdx;
 }
 
-void* GuiDataExchange::getRawStorageBuff(size_t idx)
-{
-    return manager->storage.accessRawStorage(idx);
-}
 
 
 /**

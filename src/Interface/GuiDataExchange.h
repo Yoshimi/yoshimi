@@ -59,6 +59,7 @@ class GuiDataExchange
 {
     class DataManager;
     using PManager  = std::unique_ptr<DataManager>;
+    using EmplaceFun = std::function<void(void*)>;
     using PublishFun = std::function<void(CommandBlock const&)>;
 
     PublishFun publish;
@@ -183,34 +184,28 @@ private:
                          };
     }
 
-    template<typename DAT>
-    auto claimSlot(RoutingTag const& tag)
-    {
-        size_t idx = claimBuffer(tag);
-        return [this,idx](DAT const& data)
-                        {   // copy-construct the data into the buffer
-                            new(getRawStorageBuff(idx)) DAT{data};
-                            publishSlot(idx);
-                        };
-    }
-
     DetachHook attachReceiver(RoutingTag const&, Subscription&);
-    size_t claimBuffer(RoutingTag const& tag);
-    void*  getRawStorageBuff(size_t idx);
+    size_t claimNextSlot(RoutingTag const&, size_t, EmplaceFun);
     void   publishSlot(size_t idx);
 };
 
 
 
 template<typename DAT>
-void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
+inline void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
 {
-    auto copy_and_publish = hub->claimSlot<DAT>(tag);
-    copy_and_publish(data);
+    const size_t dataSiz = sizeof(DAT);
+    size_t idx = hub->claimNextSlot(this->tag
+                                   ,dataSiz
+                                   ,[&data](void* buffer)
+                                        {// copy-construct the data into the buffer
+                                            new(buffer) DAT{data};
+                                        });
+    hub->publishSlot(idx);
 }
 
 template<typename DAT>
-GuiDataExchange::DetachHook GuiDataExchange::Connection<DAT>::attach(Subscription& client)
+inline GuiDataExchange::DetachHook GuiDataExchange::Connection<DAT>::attach(Subscription& client)
 {
     return hub->attachReceiver(tag, client);
 }

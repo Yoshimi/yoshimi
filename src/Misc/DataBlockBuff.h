@@ -139,4 +139,30 @@ private:
     }
 };
 
+
+/* ==== Helper to calculate buffer sizes at compile time ==== */
+
+/* a compile time sequence of types */
+template<typename... TYPES>
+struct Types{ };
+
+/* Metafunction: find the largest size requirement over a sequence of types */
+template<typename... TYPES>
+struct MaxSize;
+
+template<>
+struct MaxSize<Types<>>
+{
+    static constexpr size_t value = 0;
+};
+
+template<typename TY, typename... TYPES>
+struct MaxSize<Types<TY,TYPES...>>
+{
+    static constexpr size_t thisval = sizeof(TY);
+    static constexpr size_t nextval = MaxSize<Types<TYPES...>>::value;
+    static constexpr size_t value   = nextval > thisval?  nextval:thisval;
+};
+
+
 #endif /*DATA_BLOCK_BUFF_H*/
