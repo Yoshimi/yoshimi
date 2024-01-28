@@ -27,6 +27,8 @@
 #include <climits>
 #include <chrono>
 #include <atomic>
+#include <mutex>
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////TODO Prototype 1/24 - include the actual data types here
@@ -52,8 +54,10 @@ namespace {
     }
 }
 
+using Guard = const std::lock_guard<std::mutex>;
 using RoutingTag = GuiDataExchange::RoutingTag;
 using Subscription = GuiDataExchange::Subscription;
+
 
 
 /**
@@ -66,6 +70,9 @@ size_t GuiDataExchange::generateUniqueID()
 }
 
 
+
+
+
 /**
  * »PImpl« to maintain the block storage and manage the actual data exchange.
  */
@@ -73,6 +80,8 @@ class GuiDataExchange::DataManager
 {
     static_assert (CAP <= UCHAR_MAX, "index will be passed via CommandBlock");
 public:
+    std::mutex mtx;
+
     using Storage = DataBlockBuff<RoutingTag, CAP, SIZ>;
     Storage storage;
 
@@ -80,10 +89,12 @@ public:
     Registry registry;
 
     DataManager()
-        : storage{}
+        : mtx{}
+        , storage{}
         , registry{INITIAL_REGISTRY_BUCKETS, RoutingTag::getHash}
         { }
 };
+
 
 
 
@@ -123,6 +134,9 @@ size_t GuiDataExchange::claimNextSlot(RoutingTag const& tag, size_t dataSize, Em
         throw std::logic_error("Insufficient preconfigured buffer size "
                                "to hold an object of size="
                               + func::asString(dataSize));
+    Guard lock(manager->mtx);
+    // protect against concurrent data corruption and ensure visibility of published data
+
     size_t slotIdx = manager->storage.claimNextBuffer(tag);
     void* rawStorageBuff = manager->storage.accessRawStorage(slotIdx);
     storeIntoBuffer(rawStorageBuff);
@@ -138,12 +152,15 @@ size_t GuiDataExchange::claimNextSlot(RoutingTag const& tag, size_t dataSize, Em
 GuiDataExchange::DetachHook GuiDataExchange::attachReceiver(RoutingTag const& tag, Subscription& client)
 {
     DataManager::Registry& reg{manager->registry};
+    std::mutex& mtx = manager->mtx;
+    Guard lock(mtx);
     // prepend to single-linked list in Registry
     client.next = reg[tag];
     reg[tag] = &client;
-    return [tag,&reg](Subscription const& entry)
+    return [tag,&reg,&mtx](Subscription const& entry)
             {// will be called from the Subscription's destructor....
                 bool found{false};
+                Guard lock(mtx);
                 for (Subscription** p = & reg[tag]; *p != nullptr; p = & (*p)->next)
                     if (*p == &entry)
                     {// remove entry from registry
@@ -190,6 +207,9 @@ void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
     size_t idx = notification.data.offset;
     if (idx >= CAP)
         throw std::logic_error("GuiDataExchange: invalid data slot index "+func::asString(idx));
+
+    Guard lock(manager->mtx); // sync barrier to ensure visibility of data published by other thread
+
     if (not isTimely(manager->storage.entryAge(idx)))
         return;
     RoutingTag tag{manager->storage.getRoutingTag(idx)};
