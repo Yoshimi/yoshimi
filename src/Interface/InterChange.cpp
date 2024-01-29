@@ -2290,32 +2290,40 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
 {
     Part *part = synth->part[getData->data.part];
     int kititem = getData->data.kit;
+    bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
     switch(getData->data.insert)
     {
         case UNUSED:
             commandSub(getData);
-            part->kit[kititem].subpars->paramsChanged();
+            if (write)
+                part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::harmonicAmplitude:
             commandSub(getData);
-            part->kit[kititem].subpars->paramsChanged();
+            if (write)
+                part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::harmonicBandwidth:
             commandSub(getData);
-            part->kit[kititem].subpars->paramsChanged();
+            if (write)
+                part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::filterGroup:
-            commandFilter(getData);
+            if (write)
+                commandFilter(getData);
             break;
         case TOPLEVEL::insert::envelopeGroup:
-            commandEnvelope(getData);
+            if (write)
+                commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointAdd:
         case TOPLEVEL::insert::envelopePointDelete:
-            commandEnvelope(getData);
+            if (write)
+                commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointChange:
-            commandEnvelope(getData);
+            if (write)
+                commandEnvelope(getData);
             break;
     }
     return true;

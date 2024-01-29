@@ -100,9 +100,7 @@ class SUBnoteharmonic {: {public Fl_Group}
             o->selection_color(setSlider(o->value(),0));
         send_data(0, TOPLEVEL::insert::harmonicAmplitude, n, x, TOPLEVEL::type::Integer);}
         tooltip {Harmonic's magnitude} xywh {0 2 15 131} type {Vert Knob} box FLAT_BOX labelcolor 64 minimum 127 maximum 0 step 1 value 127
-        code0 {o->value(pars->Phmag[n]);}
-        code1 {o->setValueType(VC_SubHarmonicMagnitude); o->useCustomTip(true);}
-        code2 {if (n == 0) o->selection_color(setSlider(o->value(),127)); else o->selection_color(setSlider(o->value(),0));}
+        code0 {o->setValueType(VC_SubHarmonicMagnitude); o->useCustomTip(true);}
         class mwheel_slider
       }
       Fl_Slider bw {
@@ -117,8 +115,6 @@ class SUBnoteharmonic {: {public Fl_Group}
         tooltip {Harmonic's bandwidth multiplier} xywh {0 166 15 128} type {Vert Knob} box FLAT_BOX labelcolor 64 minimum 63 maximum -64 step 1
         code0 {o->setValueType(VC_SubBandwidthRel);}
         code1 {o->useCustomTip(true);}
-        code2 {o->value(pars->Phrelbw[n] - 64);}
-        code3 {o->selection_color(setSlider(o->value(),0));}
         class mwheel_slider
       }
       Fl_Box h_dash {
@@ -148,18 +144,31 @@ class SUBnoteharmonic {: {public Fl_Group}
     npart = npart_;
     kititem = kititem_;
     make_window();
+    refresh();
     harmonic->show();
     end();} {}
   }
   Function {refresh()} {} {
     code {//
-        mag->value(pars->Phmag[n]);
+        /*
+         * doesn't like using collect_readData(
+         * need to find a way to inhibit paramsChanged()
+         * when bulk updating
+         */
+        unsigned char magVal = collect_readData(synth, 0, n, npart, kititem, PART::engine::subSynth, TOPLEVEL::insert::harmonicAmplitude);
+        mag->value(magVal);
         if (n == 0)
-            mag->selection_color(setSlider(pars->Phmag[n],127));
+            mag->selection_color(setSlider(magVal,127));
         else
-            mag->selection_color(setSlider(pars->Phmag[n],0));
-        bw->value(pars->Phrelbw[n] - 64);
-        bw->selection_color(setSlider(pars->Phrelbw[n],64));
+            mag->selection_color(setSlider(magVal,0));
+
+        unsigned char bwVal = collect_readData(synth, 0, n, npart, kititem, PART::engine::subSynth, TOPLEVEL::insert::harmonicBandwidth) - 64;
+        bw->value(bwVal);
+        bw->selection_color(setSlider(bwVal,0));
+        if (n == 63)
+        { // force just one normal write to trigger update for 'paste'.
+            send_data(0, TOPLEVEL::insert::harmonicAmplitude, 63, mag->value(), TOPLEVEL::type::Integer);
+        }
         ;} {}
   }
   Function {~SUBnoteharmonic()} {} {
