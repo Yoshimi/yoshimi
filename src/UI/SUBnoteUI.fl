@@ -150,11 +150,6 @@ class SUBnoteharmonic {: {public Fl_Group}
   }
   Function {refresh()} {} {
     code {//
-        /*
-         * doesn't like using collect_readData(
-         * need to find a way to inhibit paramsChanged()
-         * when bulk updating
-         */
         unsigned char magVal = collect_readData(synth, 0, n, npart, kititem, PART::engine::subSynth, TOPLEVEL::insert::harmonicAmplitude);
         mag->value(magVal);
         if (n == 0)

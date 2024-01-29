@@ -2309,21 +2309,17 @@ bool InterChange::processSub(CommandBlock *getData, SynthEngine *synth)
                 part->kit[kititem].subpars->paramsChanged();
             break;
         case TOPLEVEL::insert::filterGroup:
-            if (write)
-                commandFilter(getData);
+            commandFilter(getData);
             break;
         case TOPLEVEL::insert::envelopeGroup:
-            if (write)
-                commandEnvelope(getData);
+            commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointAdd:
         case TOPLEVEL::insert::envelopePointDelete:
-            if (write)
-                commandEnvelope(getData);
+            commandEnvelope(getData);
             break;
         case TOPLEVEL::insert::envelopePointChange:
-            if (write)
-                commandEnvelope(getData);
+            commandEnvelope(getData);
             break;
     }
     return true;
