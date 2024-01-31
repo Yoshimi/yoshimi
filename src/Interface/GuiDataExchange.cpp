@@ -200,11 +200,21 @@ void GuiDataExchange::publishSlot(size_t idx)
 }
 
 
+RoutingTag GuiDataExchange::fetchTag(size_t idx)
+{
+    return manager->storage.getRoutingTag(idx);
+}
+
+
 void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
 {
     if (notification.data.control != TOPLEVEL::control::dataExchange)
         return;
-    size_t idx = notification.data.offset;
+    pushUpdates(notification.data.offset);
+}
+
+void GuiDataExchange::pushUpdates(size_t idx)
+{
     if (idx >= CAP)
         throw std::logic_error("GuiDataExchange: invalid data slot index "+func::asString(idx));
 
@@ -212,7 +222,7 @@ void GuiDataExchange::dispatchUpdates(CommandBlock const& notification)
 
     if (not isTimely(manager->storage.entryAge(idx)))
         return;
-    RoutingTag tag{manager->storage.getRoutingTag(idx)};
+    RoutingTag tag = fetchTag(idx);
     void* rawData = manager->storage.accessRawStorage(idx);
     DataManager::Registry& reg{manager->registry};
     auto entry = reg.find(tag);

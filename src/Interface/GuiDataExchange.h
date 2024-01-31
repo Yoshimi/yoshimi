@@ -114,9 +114,9 @@ public:
         RoutingTag       tag;
 
     public:
-        Connection(GuiDataExchange& dataExchangeLink)
-            : hub{&dataExchangeLink}
-            , tag{hub->generateNewTag<DAT>()}
+        Connection(GuiDataExchange& link, RoutingTag id)
+            : hub{&link}
+            , tag{id}
             { }
 
         // standard copy operations acceptable (but only for same DAT)
@@ -136,7 +136,20 @@ public:
     template<typename DAT>
     Connection<DAT> createConnection()
     {
-        return Connection<DAT>(*this);
+        return Connection<DAT>(*this, generateNewTag<DAT>());
+    }
+
+    /**
+     * Establish a connection tag matching a given connection
+     * used in a data slot currently present in the buffer.
+     * Typically used to bootstrap a client-side end point.
+     */
+    template<typename DAT>
+    Connection<DAT> bootsrapConnection(size_t slotIdx)
+    {
+        RoutingTag routingTag = fetchTag(slotIdx);
+        assert (routingTag.verifyType<DAT>());
+        return Connection<DAT>(*this, routingTag);
     }
 
 
@@ -174,6 +187,11 @@ public:
      */
     void dispatchUpdates(CommandBlock const& notification);
 
+    /** performs the actual push-dispatch
+     * @param idx valid "slot" holding data to publish
+     */
+    void pushUpdates(size_t idx);
+
 
 private:
     template<typename DAT>
@@ -187,6 +205,7 @@ private:
     DetachHook attachReceiver(RoutingTag const&, Subscription&);
     size_t claimNextSlot(RoutingTag const&, size_t, EmplaceFun);
     void   publishSlot(size_t idx);
+    RoutingTag fetchTag(size_t idx);
 };
 
 
