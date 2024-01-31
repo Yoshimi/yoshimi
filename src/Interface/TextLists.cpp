@@ -19,6 +19,8 @@
 */
 #include <Interface/TextLists.h>
 
+#include <globals.h>
+
 /*
  * These are all handled bit-wise so that you can set several
  * at the same time. e.g. part, addSynth, resonance.
@@ -688,6 +690,21 @@ std::string reverblist [] = {
     "@end","@end"
 };
 
+int reverblistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    -1
+};
+
 std::string echolist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
@@ -698,6 +715,18 @@ std::string echolist [] = {
     "DAMp <n>",         "feedback damping",
     "BPM <s>",          "delay BPM sync (ON {other})",
     "@end","@end"
+};
+
+int echolistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    EFFECT::control::bpm,
+    -1
 };
 
 std::string choruslist [] = {
@@ -715,6 +744,24 @@ std::string choruslist [] = {
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
     "@end","@end"
+};
+
+int choruslistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    // 10, Pflangemode is defined in Chorus.cpp, but appears to be unused.
+    11,
+    EFFECT::control::bpm,
+    EFFECT::control::bpmStart,
+    -1
 };
 
 std::string phaserlist [] = {
@@ -738,6 +785,27 @@ std::string phaserlist [] = {
     "@end","@end"
 };
 
+int phaserlistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    EFFECT::control::bpm,
+    EFFECT::control::bpmStart,
+    -1
+};
+
 std::string alienwahlist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
@@ -753,6 +821,23 @@ std::string alienwahlist [] = {
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
     "@end","@end"
+};
+
+int alienwahlistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    EFFECT::control::bpm,
+    EFFECT::control::bpmStart,
+    -1
 };
 
 std::string distortionlist [] = {
@@ -771,6 +856,22 @@ std::string distortionlist [] = {
     "@end","@end"
 };
 
+int distortionlistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    5, // there is an extra line in the list names
+    6,
+    7,
+    8,
+    9,
+    10,
+    -1
+};
+
 std::string eqlist [] = {
     "LEVel <n>",        "intensity",
     "EQBand <n>",       "EQ band number for following controls",
@@ -781,6 +882,18 @@ std::string eqlist [] = {
     "Q <n>",            "filter Q",
     "STAges <n>",       "extra filter stages",
     "@end","@end"
+};
+
+int eqlistmap[] = {
+    0,
+    1,
+    10,
+    10, // there is an extra line in the list names
+    11,
+    12,
+    13,
+    14,
+    -1
 };
 
 std::string dynfilterlist [] = {
@@ -798,6 +911,22 @@ std::string dynfilterlist [] = {
     "BPM <s>",          "LFO BPM sync (ON {other})",
     "STArt <n>",        "LFO BPM phase start",
     "@end","@end"
+};
+
+int dynfilterlistmap[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    EFFECT::control::bpm,
+    EFFECT::control::bpmStart,
+    -1
 };
 
 std::string filtershapes [] = {"OFF" ,"ATA", "ASY", "POW", "SIN", "QNT", "ZIG", "LMT", "ULM", "LLM", "ILM", "CLI", "CLI", "AS2", "PO2", "SGM", "@end"};

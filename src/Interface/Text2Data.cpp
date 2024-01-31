@@ -143,7 +143,7 @@ bool TextData::findAndStep(std::string &line, std::string text, bool step)
     return false;
 }
 
-int TextData::findListEntry(std::string &line, int step, std::string list [])
+int TextData::findListEntry(std::string &line, int step, const std::string list [])
 {
     int count = 0;
     bool found = false;
@@ -161,6 +161,16 @@ int TextData::findListEntry(std::string &line, int step, std::string list [])
     if (count > 0)
         count = count / step; // gives actual list position
     return count;
+}
+
+int TextData::mapToEffectNumber(int textIndex, const int list [])
+{
+    return list[textIndex];
+}
+
+int TextData::findEffectFromText(string &line, int step, const string list [], const int listmap [])
+{
+    return mapToEffectNumber(findListEntry(line, step, list), listmap);
 }
 
 void TextData::encodeLoop(std::string source, CommandBlock &allData)
@@ -607,34 +617,22 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         switch (efftype)
         {
             case EFFECT::type::reverb:
-                result = findListEntry(source, 2, reverblist);
-                if (result > 4) // no 5 or 6
-                    result += 2;
+                result = findEffectFromText(source, 2, reverblist, reverblistmap);
                 break;
             case EFFECT::type::echo:
-                result = findListEntry(source, 2, echolist);
-                if (result == 7) // skip unused numbers
-                    result = EFFECT::control::bpm;
+                result = findEffectFromText(source, 2, echolist, echolistmap);
                 break;
             case EFFECT::type::chorus:
-                result = findListEntry(source, 2, choruslist);
-                if (result >= 11) // skip unused numbers
-                    result = result - 11 + EFFECT::control::bpm;
+                result = findEffectFromText(source, 2, choruslist, choruslistmap);
                 break;
             case EFFECT::type::phaser:
-                result = findListEntry(source, 2, phaserlist);
-                if (result >= 15) // skip unused numbers
-                    result = result - 15 + EFFECT::control::bpm;
+                result = findEffectFromText(source, 2, phaserlist, phaserlistmap);
                 break;
             case EFFECT::type::alienWah:
-                result = findListEntry(source, 2, alienwahlist);
-                if (result >= 11) // skip unused numbers
-                    result = result - 11 + EFFECT::control::bpm;
+                result = findEffectFromText(source, 2, alienwahlist, alienwahlistmap);
                 break;
             case EFFECT::type::distortion:
-                result = findListEntry(source, 2, distortionlist);
-                if (result > 5) // extra line
-                    result -= 1;
+                result = findEffectFromText(source, 2, distortionlist, distortionlistmap);
                 break;
 
             case EFFECT::type::eq:
@@ -644,11 +642,9 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
                     if (findCharNum(source, tmp))
                     allData.data.parameter = tmp;
                 }
-                result = findListEntry(source, 2, eqlist);
+                result = findEffectFromText(source, 2, eqlist, eqlistmap);
                 if (result > 0)
                 {
-                    if (result > 2)
-                        result += 7; // internal numbers start from 10
                     if (findAndStep(source, "(Band", true))
                     {
                         unsigned char tmp;
@@ -659,9 +655,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
                 break;
             case EFFECT::type::dynFilter:
-                result = findListEntry(source, 2, dynfilterlist);
-                if (result >= 11) // skip unused numbers
-                    result = result - 11 + EFFECT::control::bpm;
+                result = findEffectFromText(source, 2, dynfilterlist, dynfilterlistmap);
                 break;
             default:
                 log(source, "effect control out of range");
