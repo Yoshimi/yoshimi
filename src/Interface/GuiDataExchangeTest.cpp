@@ -153,5 +153,29 @@ void run_GuiDataExchangeTest()
     guiDataExchange.dispatchUpdates(pullData());
     CHECK (h1 == receiver.get());
     
+    
+    // =============================================== bootstrap a new receiver from a published data block
+    size_t slotIDX = con.emplace(h2);
+    
+    // the following happens »elsewhere« (e.g. in the GUI)
+    GuiDataExchange::Connection<Heffalump> c3 = guiDataExchange.bootsrapConnection<Heffalump>(slotIDX);
+    MirrorData<Heffalump> receiver3{c3};
+    
+    CHECK (h1 != receiver3.get());
+    CHECK (h2 != receiver3.get());
+    CHECK (h1 == receiver.get());
+    
+    // cause a push directly from given index
+    guiDataExchange.pushUpdates(slotIDX);
+    CHECK (h2 == receiver.get());
+    CHECK (h2 == receiver3.get());
+    
+    // the new connection is fully usable for publishing
+    c3.publish(h1);
+    guiDataExchange.dispatchUpdates(pullData());
+    CHECK (h1 == receiver.get());
+    CHECK (h1 == receiver3.get());
+    
+    
     cout << "Bye Bye "<<receiver.get().data() <<endl;
 }

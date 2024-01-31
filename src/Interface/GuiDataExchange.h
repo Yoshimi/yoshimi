@@ -122,6 +122,7 @@ public:
         // standard copy operations acceptable (but only for same DAT)
 
         void publish(DAT const& data);
+        size_t emplace(DAT const& data);
         DetachHook attach(Subscription&);
 
         // Equality: Connections to the same routing tag are equivalent...
@@ -211,17 +212,24 @@ private:
 
 
 template<typename DAT>
-inline void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
+inline size_t GuiDataExchange::Connection<DAT>::emplace(DAT const& data)
 {
     const size_t dataSiz = sizeof(DAT);
-    size_t idx = hub->claimNextSlot(this->tag
-                                   ,dataSiz
-                                   ,[&data](void* buffer)
-                                        {// copy-construct the data into the buffer
-                                            new(buffer) DAT{data};
-                                        });
+    return hub->claimNextSlot(this->tag
+                             ,dataSiz
+                             ,[&data](void* buffer)
+                                  {// copy-construct the data into the buffer
+                                      new(buffer) DAT{data};
+                                  });
+}
+
+template<typename DAT>
+inline void GuiDataExchange::Connection<DAT>::publish(DAT const& data)
+{
+    size_t idx = emplace(data);
     hub->publishSlot(idx);
 }
+
 
 template<typename DAT>
 inline GuiDataExchange::DetachHook GuiDataExchange::Connection<DAT>::attach(Subscription& client)
