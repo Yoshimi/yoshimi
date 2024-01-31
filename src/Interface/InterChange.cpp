@@ -100,6 +100,8 @@ InterChange::InterChange(SynthEngine *_synth) :
 #endif
     fromMIDI(),
     returnsBuffer(),
+    muteQueue(),
+    guiDataExchange{[this](CommandBlock const& block){ toGUI.write(block.bytes); }},
     syncWrite(false),
     lowPrioWrite(false),
     sortResultsThreadHandle(0),

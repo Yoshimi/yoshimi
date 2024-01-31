@@ -53,6 +53,7 @@ class EffectMgr;
 class XMLwrapper;
 class Controller;
 class TextMsgBuffer;
+class InterfaceAnchor;
 
 #ifdef GUI_FLTK
 class MasterUI;
@@ -84,6 +85,7 @@ class SynthEngine
         UnifiedPresets unifiedpresets;
     private:
         Config Runtime;
+        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
@@ -95,6 +97,7 @@ class SynthEngine
         SynthEngine& operator=(SynthEngine const&) = delete;
 
         bool Init(unsigned int audiosrate, int audiobufsize);
+        size_t publishGuiAnchor();
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper& xml);

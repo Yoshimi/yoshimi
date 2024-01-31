@@ -54,6 +54,7 @@
 #include "Synth/OscilGen.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/PADnoteParameters.h"
+#include "Interface/InterfaceAnchor.h"
 
 using file::isRegularFile;
 using file::setExtension;
@@ -133,6 +134,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     midilearn(this),
     mididecode(this),
     Runtime(this, allArgs, getIsLV2Plugin()),
+    rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
     fadeStepShort(0),
@@ -391,6 +393,25 @@ bail_out:
         sysefx[nefx] = NULL;
     }
     return false;
+}
+
+
+/**
+ * Prepare and wire a communication anchor, allowing the GUI to establish
+ * data connections with this SynthEngine. This InstanceAnchor record is
+ * pushed through the GuiDataExchange (maintained within InterChange,
+ * returning the index-slot allocated within the embedded data buffer.
+ */
+size_t SynthEngine::publishGuiAnchor()
+{
+    InterfaceAnchor anchorRecord;
+    anchorRecord.synth = this;
+    anchorRecord.synthID = uniqueId;
+
+    ///////////////////TODO 1/2024 : connect all routing-Tags used by embedded sub-components of the Synth
+
+    // store a copy into the data buffer for retrieval by the MasterUI
+    return rootCon.emplace(anchorRecord);
 }
 
 

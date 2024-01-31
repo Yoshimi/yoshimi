@@ -22,6 +22,7 @@
 /* ==================== TODO : 1/24 This is a Prototype : Throw-away when done ================== */ 
 
 #include "Interface/GuiDataExchange.h"
+#include "Interface/InterChange.h"
 #include "Misc/MirrorData.h"
 #include "Misc/FormatFuncs.h"
 

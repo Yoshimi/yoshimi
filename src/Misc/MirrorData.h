@@ -23,11 +23,8 @@
 
 #include "globals.h"
 #include "Interface/GuiDataExchange.h"
-//#include "Misc/FormatFuncs.h"
 
-//#include <functional>
-//#include <string>
-//#include <array>
+#include <cassert>
 
 
 /**
@@ -50,10 +47,15 @@ class MirrorData
     }
 
 public:
-    MirrorData(GuiDataExchange::Connection<DAT>& con)
+    MirrorData(GuiDataExchange::Connection<DAT> con)
         : Subscription{con}
         , data{}
         { }
+
+    MirrorData(GuiDataExchange& hub, GuiDataExchange::RoutingTag tag)
+        : MirrorData{GuiDataExchange::Connection<DAT>{hub,tag}}
+        { }
+
 
     DAT& get()
     {

@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "Interface/Data2Text.h"
 #include "Interface/RingBuffer.h"
+#include "Interface/GuiDataExchange.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
@@ -79,6 +80,8 @@ class InterChange : private DataText
         RingBuffer <10, log2 (commandBlockSize)> fromMIDI;
         RingBuffer <10, log2 (commandBlockSize)> returnsBuffer;
         RingBuffer <4, log2 (commandBlockSize)> muteQueue;
+
+        GuiDataExchange guiDataExchange;
 
         sem_t sortResultsThreadSemaphore;
         void spinSortResultsThread();

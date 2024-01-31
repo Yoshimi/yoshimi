@@ -22,11 +22,11 @@
 #define GUI_DATA_EXCHANGE_H
 
 #include "globals.h"
-#include "Interface/InterChange.h"
 #include "Interface/RingBuffer.h"
 #include "Misc/Hash.h"
 
 #include <functional>
+#include <cassert>
 #include <utility>
 #include <memory>
 
@@ -120,6 +120,8 @@ public:
             { }
 
         // standard copy operations acceptable (but only for same DAT)
+
+        operator RoutingTag const&()  const { return tag; }
 
         void publish(DAT const& data);
         size_t emplace(DAT const& data);
