@@ -111,6 +111,12 @@ decl {\#include "MasterMiscUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
+decl {\#include "Interface/InterChange.h"} {public local
+}
+
+decl {\#include "Interface/InterfaceAnchor.h"} {public local
+}
+
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
@@ -299,24 +305,25 @@ class KeyHandle {: {public Fl_Box}
 
 class MasterUI {: {private GuiUpdates}
 } {
-  Function {MasterUI(SynthEngine *_synth)} {} {
+  Function {MasterUI(InterChange& _interChange, size_t slotIDX)
+	 : GuiUpdates{_interChange, slotIDX}} {} {
     code {//
-      synth = _synth;
-      presetsui = NULL;
+      synth = nullptr;
+      presetsui = nullptr;
       ninseff = 0;
       nsyseff = 0;
       npart = 0;
       panelgroup = 0;
       panelScale = 1;
 
-      microtonalui = NULL;
-      bankui = NULL;
-      virkeyboard = NULL;
-      configui = NULL;
-      presetsui = NULL;
-      paramsui = NULL;
+      microtonalui = nullptr;
+      bankui = nullptr;
+      virkeyboard = nullptr;
+      configui = nullptr;
+      presetsui = nullptr;
+      paramsui = nullptr;
       activePart = 0;
-      yoshiLog = NULL;
+      yoshiLog = nullptr;
       queryDW = 0;
 
       lastmainW = -1;
@@ -396,9 +403,11 @@ class MasterUI {: {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init()} {} {
     code {//
-      current_ID = collect_readData(synth, 0, 0, TOPLEVEL::instanceID);
+      current_ID = anchor.get().synthID;
+      synth = anchor.get().synth;
+      assert(synth);
       file::createDir(file::configDir() + "/windows");
       panelType = 5;
       msgSeen = false;
@@ -432,7 +441,7 @@ class MasterUI {: {private GuiUpdates}
       string starterror = "";
       if (synth->getIsLV2Plugin())
       {
-          masterwindow->label(_label);
+          masterwindow->label(synth->getWindowTitle().c_str());
       }
       else
       {
@@ -4822,6 +4831,8 @@ bpmfallback->format(format);} {}
         partui->theme();
         ;} {}
   }
+  decl {SynthEngine *synth;} {public local
+  }
   decl {ConfigUI *configui;} {public local
   }
   decl {ParametersUI *paramsui;} {public local
@@ -4852,8 +4863,6 @@ bpmfallback->format(format);} {}
   decl {ConsoleUI *yoshiLog;} {public local
   }
   decl {PresetsUI *presetsui;} {private local
-  }
-  decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
   }

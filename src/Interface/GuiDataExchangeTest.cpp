@@ -159,7 +159,7 @@ void run_GuiDataExchangeTest()
     size_t slotIDX = con.emplace(h2);
     
     // the following happens »elsewhere« (e.g. in the GUI)
-    GuiDataExchange::Connection<Heffalump> c3 = guiDataExchange.bootsrapConnection<Heffalump>(slotIDX);
+    GuiDataExchange::Connection<Heffalump> c3 = guiDataExchange.bootstrapConnection<Heffalump>(slotIDX);
     MirrorData<Heffalump> receiver3{c3};
     
     CHECK (h1 != receiver3.get());

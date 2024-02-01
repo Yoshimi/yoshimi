@@ -301,8 +301,8 @@ class SynthEngine
 
     public:
 #ifdef GUI_FLTK
-        MasterUI *guiMaster; // need to read this in InterChange::returns
-        MasterUI *getGuiMaster(bool createGui = true);
+        ///////////////////TODO 1/2024 : retract direct usage of direct SynthEngine* from UI
+        MasterUI *getGuiMaster();
 #endif
     private:
         void( *guiClosedCallback)(void*);

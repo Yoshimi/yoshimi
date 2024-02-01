@@ -148,7 +148,7 @@ public:
      * Typically used to bootstrap a client-side end point.
      */
     template<typename DAT>
-    Connection<DAT> bootsrapConnection(size_t slotIdx)
+    Connection<DAT> bootstrapConnection(size_t slotIdx)
     {
         RoutingTag routingTag = fetchTag(slotIdx);
         assert (routingTag.verifyType<DAT>());

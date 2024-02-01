@@ -46,7 +46,7 @@ struct InterfaceAnchor
     SynthEngine* synth{nullptr};
     ///////////////////TODO 1/2024 : retract usage of direct SynthEngine* from UI
     ///////////////////TODO 1/2024 : can transport further generic info into here
-    
+
 
     using Tag = GuiDataExchange::RoutingTag;
 

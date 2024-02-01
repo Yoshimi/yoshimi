@@ -167,6 +167,15 @@ string input_text(SynthEngine *synth, string label, string text)
 }
 
 
+GuiUpdates::GuiUpdates(InterChange& _interChange, size_t slotIDX)
+    : interChange{_interChange}
+    , anchor{interChange.guiDataExchange.bootstrapConnection<InterfaceAnchor>(slotIDX)}
+{
+    // cause update to be pushed into MirrorData buffer
+    interChange.guiDataExchange.pushUpdates(slotIDX);
+}
+
+
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
@@ -252,7 +261,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char miscmsg = getData->data.miscmsg;
 
     //synth->CBtest(getData);
-    if (getData->data.control == TOPLEVEL::control::copyPaste)
+
+    if (control == TOPLEVEL::control::dataExchange)
+    {// push data messages via GuiDataExchange -> deliver directly to MirrorData receivers
+        synth->interchange.guiDataExchange.dispatchUpdates(*getData);
+        return;
+    }
+
+    if (control == TOPLEVEL::control::copyPaste)
     {
         if (getData->data.type == TOPLEVEL::type::Adjust)
             return; // just looking

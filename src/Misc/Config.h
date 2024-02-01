@@ -280,11 +280,11 @@ class GuiThreadMsg
 {
 private:
     GuiThreadMsg()
-    {
-        data = NULL;
-        length = 0;
-        type = GuiThreadMsg::UNDEFINED;
-    }
+        : data{nullptr}
+        , length{0}
+        , index{0}
+        , type{GuiThreadMsg::UNDEFINED}
+        { }
 public:
     enum
     {

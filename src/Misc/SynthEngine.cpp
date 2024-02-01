@@ -156,7 +156,6 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     microtonal(this),
     fft(),
 #ifdef GUI_FLTK
-    guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
 #endif
@@ -412,6 +411,29 @@ size_t SynthEngine::publishGuiAnchor()
 
     // store a copy into the data buffer for retrieval by the MasterUI
     return rootCon.emplace(anchorRecord);
+}
+
+
+#ifdef GUI_FLTK
+MasterUI *SynthEngine::getGuiMaster()
+{
+    return interchange.guiMaster.get();
+}
+
+void SynthEngine::closeGui()
+{
+    interchange.closeGui();
+}
+#endif /*GUI_FLTK*/
+
+void SynthEngine::guiClosed(bool stopSynth)
+{
+    if (stopSynth && !getIsLV2Plugin())
+        Runtime.runSynth = false;
+#ifdef GUI_FLTK
+    if (guiClosedCallback != NULL)
+        guiClosedCallback(guiCallbackArg);
+#endif
 }
 
 
@@ -3319,35 +3341,7 @@ SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
     synth = synthInstances.begin()->first;
     return synth;
 }
-#ifdef GUI_FLTK
-MasterUI *SynthEngine::getGuiMaster(bool createGui)
-{
-    if (guiMaster == NULL && createGui)
-        guiMaster = new MasterUI(this);
-    return guiMaster;
-}
-#endif
 
-void SynthEngine::guiClosed(bool stopSynth)
-{
-    if (stopSynth && !getIsLV2Plugin())
-        Runtime.runSynth = false;
-#ifdef GUI_FLTK
-    if (guiClosedCallback != NULL)
-        guiClosedCallback(guiCallbackArg);
-#endif
-}
-
-#ifdef GUI_FLTK
-void SynthEngine::closeGui()
-{
-    if (guiMaster != NULL)
-    {
-        delete guiMaster;
-        guiMaster = NULL;
-    }
-}
-#endif
 
 
 string SynthEngine::makeUniqueName(const string& name)

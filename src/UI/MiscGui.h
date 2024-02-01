@@ -27,6 +27,8 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
+#include "Misc/MirrorData.h"
+#include "Interface/InterfaceAnchor.h"
 
 #include "UI/Themes.h"
 
@@ -151,9 +153,26 @@ ValueType getFilterFreqTrackType(int offset);
 int millisec2logDial(unsigned int);
 unsigned int logDial2millisec(int);
 
-class GuiUpdates {
 
-public:
+/**
+ * Base class mixed into MasterUI, which is the root of the Yoshimi FLTK UI.
+ * Provides functions to establish communication with the Core.
+ */
+class GuiUpdates
+{
+protected:
+    InterChange& interChange;
+    MirrorData<InterfaceAnchor> anchor;
+
+    GuiUpdates(InterChange&, size_t);
+
+    // must not be copied nor moved
+    GuiUpdates(GuiUpdates &&)                =delete;
+    GuiUpdates(GuiUpdates const&)            =delete;
+    GuiUpdates& operator=(GuiUpdates &&)     =delete;
+    GuiUpdates& operator=(GuiUpdates const&) =delete;
+
+
     void read_updates(SynthEngine *synth);
 
 private:

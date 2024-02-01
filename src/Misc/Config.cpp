@@ -1505,30 +1505,17 @@ void GuiThreadMsg::processGuiMessages()
     GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
     if (msg)
     {
-        SynthEngine *synth = ((SynthEngine *)msg->data);
-        MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
+        assert(msg->data);
+        InterChange& interChange = * static_cast<InterChange*>(msg->data);
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
-            // This *defines* guiMaster
-            if (!guiMaster)
-                std::cerr << "Error starting Main UI!" << endl;
-            else
-            {
-                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            MasterUI& guiMaster = interChange.createGuiMaster(msg->index);
+            guiMaster.Init();
 
-                if (synth->getRuntime().audioEngine < 1)
-                    alert(synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
-                if (synth->getRuntime().midiEngine < 1)
-                    alert(synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
-            }
-        }
-        else if (guiMaster)
-        {
-            switch(msg->type)
-            {
-                default:
-                    break;
-            }
+            if (guiMaster.synth->getRuntime().audioEngine < 1)
+                alert(guiMaster.synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
+            if (guiMaster.synth->getRuntime().midiEngine < 1)
+                alert(guiMaster.synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
         }
         delete msg;
     }

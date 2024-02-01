@@ -149,6 +149,21 @@ bool InterChange::Init()
     }
 }
 
+#ifdef GUI_FLTK
+MasterUI& InterChange::createGuiMaster(size_t slotIDX)
+{
+    guiMaster.reset(new MasterUI(*this, slotIDX));
+    assert(guiMaster);
+    return *guiMaster;
+}
+
+void InterChange::closeGui()
+{
+    guiMaster.reset();
+}
+#endif
+
+
 void InterChange::spinSortResultsThread()
 {
     sem_post(&sortResultsThreadSemaphore);

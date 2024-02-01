@@ -30,15 +30,11 @@
 #include <mutex>
 
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////TODO Prototype 1/24 - include the actual data types here
-using Heffalump_Placeholder = std::array<char,20>;
-/////////////////////////////////////////////////////////////////////////////////////////////////TODO Prototype 1/24 - include the actual data types here
-
-
                                 //////////////// !! NOTE important : add all relevant types here which shall be published via GuiDataExchange !!
+#include "Interface/InterfaceAnchor.h"
+
 namespace {
-    const size_t SIZ = MaxSize<Types<Heffalump_Placeholder
+    const size_t SIZ = MaxSize<Types<InterfaceAnchor
                                     /////////////////////////////////////////TODO 1/24 : add more actual types here
                                     >>::value;
 
