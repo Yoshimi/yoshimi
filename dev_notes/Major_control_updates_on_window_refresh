@@ -1,0 +1,24 @@
+Main window 28 controls (one being text)
+
+Mixer panel 98 controls (16 being text)
+
+Part kits 145 controls (16 being text)
+Part controllers 24 controls
+
+Doesn't include sys/ins/part effects panels
+
+
+AddSynth 71 controls
+AddVoice 143 controls + graphs
+AddVoice List 48 controls + mini graphs
+
+Oscillator 285 controls + graphs
+
+SubSynth 191 controls
+
+PadSynth Harmonics 24 controls + graphs
+PadSynth Envelopes 81 controls
+
+Resonance 263 controls + graph
+
+MidiLearn 0 to 400 * 9 (0 to 400 being text)
