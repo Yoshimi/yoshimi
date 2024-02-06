@@ -19,6 +19,6 @@ SubSynth 191 controls
 PadSynth Harmonics 24 controls + graphs
 PadSynth Envelopes 81 controls
 
-Resonance 263 controls + graph
+Resonance 7 controls + graph
 
 MidiLearn 0 to 400 * 9 (0 to 400 being text)
