@@ -26,6 +26,7 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
+#include "globals.h"
 #include "Effects/Effect.h"
 #include "Effects/Reverb.h"
 #include "Effects/Echo.h"
@@ -39,6 +40,9 @@
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
+
+#include <array>
+
 
 class EffectMgr : public ParamBase
 {
@@ -90,5 +94,30 @@ class LimitMgr
         float geteffectlimits(CommandBlock *getData);
 };
 
-#endif
+
+
+static const int EFFECT_PARAM_CNT = 13;          //////TODO 2/24 find out what is the maximum number we actually need (they are all hard wired)
+static const int EFFECT_MAX_PRESETS = 13;       ///////TODO 2/24 not clear yet if these are hard wired or can be extended dynamically
+
+/**
+ * Data record used to transport effect settings into the UI
+ */
+struct EffectDTO
+{
+    int effectID{-1};
+    bool isInsert{false};
+
+    std::array<uchar, EFFECT_PARAM_CNT>   param{0};
+    std::array<uchar, EFFECT_MAX_PRESETS> preset{0};
+};
+
+/**
+ * Graph data for the EQ frequency response display in the UI
+ */
+struct EqGraphDTO
+{
+    std::array<float, MAX_EQ_BANDS> response{0};  ////TODO 2/24 probably not MAX_EQ_BANDS slots, rather granularity of display in the UI
+};
+
+#endif /*EFFECTMGR_H*/
 

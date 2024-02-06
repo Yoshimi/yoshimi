@@ -96,7 +96,12 @@ public:
 
 // destructor needs the definition of ProtocolManager
 GuiDataExchange::~GuiDataExchange() { }
-GuiDataExchange::Subscription::~Subscription(){ detach(*this); }
+
+GuiDataExchange::Subscription::~Subscription()
+{
+    if (detach)
+        detach(*this);
+}
 
 
 /**

@@ -168,13 +168,24 @@ public:
     protected:
         template<typename DAT>
         Subscription(Connection<DAT>& connection)
-            : next{nullptr}
-            , detach{connection.attach(*this)}
+            : detach{connection.attach(*this)}
             { }
 
         virtual ~Subscription(); ///< detaches automatically
+
+        Subscription() = default;
+
+        template<typename DAT>
+        void activate(Connection<DAT>& connection)
+        {
+            if (detach)
+                throw std::logic_error("Subscription already activated; "
+                                       "can only attach once.");
+            detach = connection.attach(*this);
+        }
+
     public:
-        Subscription* next;
+        Subscription* next{nullptr};
         virtual void pushUpdate(RoutingTag const&, void* data) =0;
     private:
         DetachHook detach;

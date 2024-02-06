@@ -152,6 +152,12 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     sent_buffersize(0),
     sent_bufferbytes(0),
     sent_buffersize_f(0),
+    sysEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    insEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    partEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    sysEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
+    insEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
+    partEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
     ctl(NULL),
     microtonal(this),
     fft(),
@@ -408,6 +414,12 @@ size_t SynthEngine::publishGuiAnchor()
     anchorRecord.synthID = uniqueId;
 
     ///////////////////TODO 1/2024 : connect all routing-Tags used by embedded sub-components of the Synth
+    anchorRecord.sysEffectParam  = sysEffectUiCon;
+    anchorRecord.sysEffectEQ     = sysEqGraphUiCon;
+    anchorRecord.insEffectParam  = insEffectUiCon;
+    anchorRecord.insEffectEQ     = insEqGraphUiCon;
+    anchorRecord.partEffectParam = partEffectUiCon;
+    anchorRecord.partEffectEQ    = partEqGraphUiCon;
 
     // store a copy into the data buffer for retrieval by the MasterUI
     return rootCon.emplace(anchorRecord);

@@ -25,7 +25,10 @@
 #include "Interface/GuiDataExchange.h"
 
 #include <cassert>
+#include <utility>
 #include <functional>
+
+using RoutingTag = GuiDataExchange::RoutingTag;
 
 
 /**
@@ -41,7 +44,7 @@ class MirrorData
     DAT data;
     std::function<void(DAT&)> updateHook{};
 
-    void pushUpdate(GuiDataExchange::RoutingTag const& tag, void* buffer)  override
+    void pushUpdate(RoutingTag const& tag, void* buffer)  override
     {
         assert(tag.verifyType<DAT>());
         assert(buffer);
@@ -52,14 +55,24 @@ class MirrorData
     }
 
 public:
+    MirrorData() = default;
+
     MirrorData(GuiDataExchange::Connection<DAT> con)
         : Subscription{con}
         , data{}
         { }
 
-    MirrorData(GuiDataExchange& hub, GuiDataExchange::RoutingTag tag)
+    MirrorData(GuiDataExchange& hub, RoutingTag tag)
         : MirrorData{GuiDataExchange::Connection<DAT>{hub,tag}}
         { }
+
+    void activate(GuiDataExchange::Connection<DAT> con)
+    {
+        RoutingTag const& tag(con);
+        if (not tag.verifyType<DAT>()) // is the template parameter DAT correct? did you use the proper ConnectionTag?
+            throw std::logic_error{"Connection type mismatch"};
+        GuiDataExchange::Subscription::activate(con);
+    }
 
     /** install a hook to be invoked on each push update */
     template<typename FUN>

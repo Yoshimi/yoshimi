@@ -50,6 +50,8 @@
 
 class Part;
 class EffectMgr;
+struct EffectDTO;
+struct EqGraphDTO;
 class XMLwrapper;
 class Controller;
 class TextMsgBuffer;
@@ -236,6 +238,14 @@ class SynthEngine
 
         // part that's apply the insertion effect; -1 to disable
         short int Pinsparts[NUM_INS_EFX];
+
+        // connection to the currently active effect UI
+        GuiDataExchange::Connection<EffectDTO> sysEffectUiCon;
+        GuiDataExchange::Connection<EffectDTO> insEffectUiCon;
+        GuiDataExchange::Connection<EffectDTO> partEffectUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> sysEqGraphUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> insEqGraphUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> partEqGraphUiCon;
 
         // others ...
         Controller *ctl;

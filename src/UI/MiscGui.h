@@ -28,9 +28,11 @@
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/MirrorData.h"
-#include "Interface/InterfaceAnchor.h"
 
 #include "UI/Themes.h"
+
+#include "Interface/InterfaceAnchor.h"
+using RoutingTag = GuiDataExchange::RoutingTag;
 
 using file::saveText;
 using file::loadText;
@@ -161,9 +163,6 @@ unsigned int logDial2millisec(int);
 class GuiUpdates
 {
 protected:
-    InterChange& interChange;
-    MirrorData<InterfaceAnchor> anchor;
-
     GuiUpdates(InterChange&, size_t);
 
     // must not be copied nor moved
@@ -172,8 +171,22 @@ protected:
     GuiUpdates& operator=(GuiUpdates &&)     =delete;
     GuiUpdates& operator=(GuiUpdates const&) =delete;
 
-
     void read_updates(SynthEngine *synth);
+
+public:
+    InterChange& interChange;
+    MirrorData<InterfaceAnchor> anchor;
+
+    auto connectSysEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().sysEffectParam); }
+    auto connectInsEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().insEffectParam); }
+    auto connectPartEffect(){ return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().partEffectParam);}
+
+    template<class DAT>
+    GuiDataExchange::Connection<DAT> connectCore(GuiDataExchange::RoutingTag InterfaceAnchor::*tag)
+    {
+        (anchor.get().*tag).verifyType<DAT>();
+        return GuiDataExchange::Connection<DAT>(interChange.guiDataExchange, anchor.get().*tag);
+    }
 
 private:
     void decode_envelope(SynthEngine *synth, CommandBlock *getData);

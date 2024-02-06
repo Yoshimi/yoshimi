@@ -45,12 +45,17 @@ struct InterfaceAnchor
     unsigned int synthID{0};
     SynthEngine* synth{nullptr};
     ///////////////////TODO 1/2024 : retract usage of direct SynthEngine* from UI
-    ///////////////////TODO 1/2024 : can transport further generic info into here
+    ///////////////////TODO 1/2024 : can transport further generic info up into the UI here
 
 
     using Tag = GuiDataExchange::RoutingTag;
 
-    Tag syseffectEQ;
+    Tag sysEffectParam;
+    Tag sysEffectEQ;
+    Tag insEffectParam;
+    Tag insEffectEQ;
+    Tag partEffectParam;
+    Tag partEffectEQ;
     //...........more connection tags here....
 };
 

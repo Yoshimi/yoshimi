@@ -60,6 +60,9 @@ decl {\#include "Misc/NumericFuncs.h"
 decl {\#include "Effects/EffectMgr.h"} {public local
 }
 
+decl {\#include "Misc/MirrorData.h"} {public local
+}
+
 decl {\#include "PresetsUI.h"} {public local
 }
 
@@ -79,11 +82,14 @@ class EQGraph {: {public Fl_Box}
     code {eff = NULL;
         maxdB = 30;} {}
   }
-  Function {init(EffectMgr *eff_)} {} {
+  Function {init(SynthEngine* synth_, RoutingTag conEQ)} {} {
+    code {//
+        synth = synth_;
+        graph.activate(GuiDataExchange::Connection<EqGraphDTO>{synth->interchange.guiDataExchange, conEQ});} {}
+  }
+  Function {refresh(EffectMgr *eff_)} {} {
     code {synth = eff_->getSynthEngine();
-eff = eff_;
-        oldx = -1;
-        khzval = -1;} {}
+        eff = eff_;} {}
   }
   Function {draw_freq_line(float freq, int type)} {} {
     code {//
@@ -198,15 +204,13 @@ eff = eff_;
             freq = 0.00001;
         return logf(freq / 20.0) / logf(1000.0);} {}
   }
-  decl {int oldx;} {private local
-  }
-  decl {float khzval;} {public local
-  }
   decl {EffectMgr *eff;} {private local
   }
   decl {int maxdB;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {MirrorData<EqGraphDTO> graph;} {private local
   }
 }
 
@@ -2277,12 +2281,13 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             break;
     };} {}
   }
-  Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
+  Function {init(SynthEngine* synth_, RoutingTag conEffect, RoutingTag conEQ, EffectMgr *eff_, int npart_, int neff_)} {} {
     code {//
+    synth = synth_;
+    effect.activate(GuiDataExchange::Connection<EffectDTO>{synth->interchange.guiDataExchange, conEffect});
     eff=eff_;
     npart = npart_;
     neff = neff_;
-    synth = eff->getSynthEngine();
 
     make_null_window();
     make_reverb_window();
@@ -2291,8 +2296,9 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     make_phaser_window();
     make_alienwah_window();
     make_distortion_window();
-    make_eq_window();
     make_dynamicfilter_window();
+    make_eq_window();
+    eqgraph->init(synth, conEQ);
 
     int px=this->parent()->x();
     int py=this->parent()->y();
@@ -2611,7 +2617,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             if (type < 6)
                 gaindial->deactivate();
             stagescounter->value(eff->geteffectpar(14));
-            eqgraph->init(eff);
+            eqgraph->refresh(eff);
             eqgraph->damage(1);
             eqgraph->redraw();
             effeqwindow->show();
@@ -2955,6 +2961,8 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   decl {EffectMgr *eff;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {MirrorData<EffectDTO> effect;} {private local
   }
   decl {int eqband;} {private local
   }
