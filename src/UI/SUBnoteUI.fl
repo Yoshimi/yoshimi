@@ -294,7 +294,7 @@ class SUBnoteUI {: {public PresetsUI_}
           label {Yoshimi : SubSynth - Frequency Envelope}
           xywh {445 65 205 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->FreqEnvelope, npart, kititem, PART::engine::subSynth, 1);}
-          code1 {if (pars->PFreqEnvelopeEnabled == 0) o->deactivate();}
+          code1 {if (collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyEnvelope, npart, kititem, PART::engine::subSynth) == 0) o->deactivate();}
           class EnvelopeUI
         } {}
         Fl_Check_Button freqee {
@@ -308,7 +308,7 @@ class SUBnoteUI {: {public PresetsUI_}
           freqsettingsui->redraw();
           send_data (0, SUBSYNTH::control::enableFrequencyEnvelope, o->value(), TOPLEVEL::type::Integer);}
           xywh {445 67 34 12} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-          code0 {o->value(pars->PFreqEnvelopeEnabled);}
+          code0 {o->value(collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyEnvelope, npart, kititem, PART::engine::subSynth));}
           class Fl_Check_Button2
         }
         Fl_Text_Display octavetext {
@@ -403,14 +403,14 @@ class SUBnoteUI {: {public PresetsUI_}
           code3 {o->lstep(10);}
         }
       }
-        Fl_Value_Output detunevalueoutput {
-          label Detune
-          callback {//
+      Fl_Value_Output detunevalueoutput {
+        label Detune
+        callback {//
               o->value(getDetune(detunetype->value()+1,0, detune->value()+8192));
               ;}
-          xywh {445 47 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
-          code0 {o->step(0.01, 1);}
-        }
+        xywh {445 47 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
+        code0 {o->step(0.01, 1);}
+      }
       Fl_Box {} {
         xywh {440 406 65 35} box THIN_UP_FRAME
       }
@@ -512,7 +512,7 @@ class SUBnoteUI {: {public PresetsUI_}
       Fl_Group globalfiltergroup {
         label { FILTER }
         xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
-        code0 {if (pars->PGlobalFilterEnabled==0) o->deactivate();}
+        code0 {if (collect_readData(synth, 0, SUBSYNTH::control::enableFilter, npart, kititem, PART::engine::subSynth)==0) o->deactivate();}
       } {
         Fl_Group filterenv {
           label {Yoshimi : SubSynth - Filter Envelope}
@@ -538,7 +538,7 @@ class SUBnoteUI {: {public PresetsUI_}
         globalfiltergroup->redraw();
         send_data (0, SUBSYNTH::control::enableFilter, o->value(), TOPLEVEL::type::Integer);}
         xywh {446 227 36 13} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-        code0 {o->value(pars->PGlobalFilterEnabled);}
+        code0 {o->value(collect_readData(synth, 0, SUBSYNTH::control::enableFilter, npart, kititem, PART::engine::subSynth));}
         class Fl_Check_Button2
       }
       Fl_Group {} {
@@ -549,7 +549,7 @@ class SUBnoteUI {: {public PresetsUI_}
           callback {//
           send_data (0, SUBSYNTH::control::filterStages, o->value(), TOPLEVEL::type::Integer);}
           tooltip {How many times the noise is filtered} xywh {513 421 66 15} type Simple selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 1 minimum 1 maximum 5 step 1 value 1 textsize 10 textcolor 64
-          code0 {o->value(pars->Pnumstages);}
+          code0 {o->value(collect_readData(synth, 0, SUBSYNTH::control::filterStages, npart, kititem, PART::engine::subSynth));}
         }
         Fl_Choice magtype {
           label {Mag.Type}
@@ -557,7 +557,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (0, SUBSYNTH::control::magType, o->value(), TOPLEVEL::type::Integer);}
           xywh {590 421 65 15} down_box BORDER_BOX selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 11 textcolor 64
           code0 {o->add("Linear");o->add("-40dB");o->add("-60dB");o->add("-80dB");o->add("-100dB");}
-          code1 {o->value(pars->Phmagtype);}
+          code1 {o->value(collect_readData(synth, 0, SUBSYNTH::control::magType, npart, kititem, PART::engine::subSynth));}
         } {}
         Fl_Choice start {
           label Start
@@ -565,7 +565,7 @@ class SUBnoteUI {: {public PresetsUI_}
           send_data (0, SUBSYNTH::control::startPosition, o->value(), TOPLEVEL::type::Integer);}
           xywh {670 421 50 15} down_box BORDER_BOX selection_color 64 labelfont 1 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 11 textcolor 64
           code0 {o->add("Zero");o->add("Rnd");o->add("Max.");}
-          code1 {o->value(pars->Pstart);}
+          code1 {o->value(collect_readData(synth, 0, SUBSYNTH::control::startPosition, npart, kititem, PART::engine::subSynth));}
         } {}
       }
       Fl_Check_Button stereo {
@@ -573,7 +573,7 @@ class SUBnoteUI {: {public PresetsUI_}
         callback {//
         send_data (0, SUBSYNTH::control::stereo, o->value(), TOPLEVEL::type::Integer);}
         xywh {442 415 59 15} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 10 labelcolor 226
-        code0 {o->value(pars->Pstereo);}
+        code0 {o->value(collect_readData(synth, 0, SUBSYNTH::control::stereo, npart, kititem, PART::engine::subSynth));}
         class Fl_Check_Button2
       }
       Fl_Button subClear {
@@ -584,15 +584,13 @@ class SUBnoteUI {: {public PresetsUI_}
       }
       Fl_Button subCopy {
         label C
-        callback {
-        //
+        callback {//
         synth->getGuiMaster()->getPresetsUi()->Ucopy(npart, kititem, PART::engine::subSynth);}
         xywh {540 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subPaste {
         label P
-        callback {
-        //
+        callback {//
         synth->getGuiMaster()->getPresetsUi()->Upaste(npart, kititem, PART::engine::subSynth);}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
@@ -617,46 +615,64 @@ class SUBnoteUI {: {public PresetsUI_}
     code {//
     for (int i = 0; i < MAX_SUB_HARMONICS; ++i)
         h[i]->refresh();
-    vol->value(pars->PVolume);
-    vsns->value(pars->PAmpVelocityScaleFunction);
-    pan->value(pars->PPanning);
+    vol->value(collect_readData(synth, 0, SUBSYNTH::control::volume, npart, kititem, PART::engine::subSynth));
+    vsns->value(collect_readData(synth, 0, SUBSYNTH::control::velocitySense, npart, kititem, PART::engine::subSynth));
+    pan->value(collect_readData(synth, 0, SUBSYNTH::control::panning, npart, kititem, PART::engine::subSynth));
+    randompan->value(collect_readData(synth, 0, SUBSYNTH::control::enableRandomPan, npart, kititem, PART::engine::subSynth));
+    if (randompan->value() == 0)
+        panwidth->deactivate();
+    else
+        panwidth->activate();
+    panwidth->value(collect_readData(synth, 0, SUBSYNTH::control::randomWidth, npart, kititem, PART::engine::subSynth));
 
-    bandwidth->value(pars->Pbandwidth);
-    bwidthscale->value(pars->Pbwscale-64);
-    bwee->value(pars->PBandWidthEnvelopeEnabled);
-    if (pars->PBandWidthEnvelopeEnabled == 0)
+    bandwidth->value(collect_readData(synth, 0, SUBSYNTH::control::bandwidth, npart, kititem, PART::engine::subSynth));
+        bandwidth->selection_color(setSlider(bandwidth->value(),40));
+    bwidthscale->value(collect_readData(synth, 0, SUBSYNTH::control::bandwidthScale, npart, kititem, PART::engine::subSynth));
+        bwidthscale->selection_color(setSlider(bwidthscale->value(),0));
+    bwee->value(collect_readData(synth, 0, SUBSYNTH::control::enableBandwidthEnvelope, npart, kititem, PART::engine::subSynth));
+    if (bwee->value() == 0)
         bandwidthenvelopegroup->deactivate();
     else
         bandwidthenvelopegroup->activate();
     bwee->show();
     bandwidthsettingsui->redraw();
 
-    detunevalueoutput->value(getDetune(pars->PDetuneType,0,pars->PDetune));
-    freqee->value(pars->PFreqEnvelopeEnabled);
-    if (pars->PFreqEnvelopeEnabled == 0)
+    bend->value(collect_readData(synth, 0, SUBSYNTH::control::pitchBendAdjustment, npart, kititem, PART::engine::subSynth));
+        bend->selection_color(setKnob(bend->value(),88));
+    offset->value(collect_readData(synth, 0, SUBSYNTH::control::pitchBendOffset, npart, kititem, PART::engine::subSynth));
+        offset->selection_color(setKnob(offset->value(),64));
+    hz440->value(collect_readData(synth, 0, SUBSYNTH::control::baseFrequencyAs440Hz, npart, kititem, PART::engine::subSynth));
+    if (hz440->value() == 0)
+        fixedfreqetdial->deactivate();
+    else
+        fixedfreqetdial->activate();
+    fixedfreqetdial->value(collect_readData(synth, 0, SUBSYNTH::control::equalTemperVariation, npart, kititem, PART::engine::subSynth));
+        fixedfreqetdial->selection_color(setKnob(fixedfreqetdial->value(),0));
+
+    freqee->value(collect_readData(synth, 0, SUBSYNTH::control::enableFrequencyEnvelope, npart, kititem, PART::engine::subSynth));
+    if (freqee->value() == 0)
         freqenvelopegroup->deactivate();
     else
         freqenvelopegroup->activate();
     freqee->show();
     freqsettingsui->redraw();
 
-    detune->value(pars->PDetune - 8192);
-    detune->selection_color(setSlider(detune->value(),0));
-    hz440->value(pars->Pfixedfreq);
 
-    fixedfreqetdial->value(pars->PfixedfreqET);
-
-    int k = pars->PCoarseDetune / 1024;
+    int k=collect_readData(synth, 0, SUBSYNTH::control::octave, npart, kititem, PART::engine::subSynth);
     if (k >= 8)
         k -= 16;
     octave->value(k);
 
-    detunetype->value(pars->PDetuneType - 1);
+    int detVal = collect_readData(synth, 0, SUBSYNTH::control::detuneFrequency, npart, kititem, PART::engine::subSynth);
+    detune->value(detVal);
+    detune->selection_color(setSlider(detVal,0));
 
-    k = pars->PCoarseDetune % 1024;
-    if (k >= 512)
-        k -= 1024;
+    int detType = collect_readData(synth, 0, SUBSYNTH::control::detuneType, npart, kititem, PART::engine::subSynth);
+    detunetype->value(detType - 1);
+
+    k = collect_readData(synth, 0, SUBSYNTH::control::coarseDetune, npart, kititem, PART::engine::subSynth);
     coarsedet->value(k);
+    detunevalueoutput->value(getDetune(detType,0,detVal+8192));
 
     spreadtype->value(collect_readData(synth, 0, SUBSYNTH::control::overtonePosition, npart, kititem, PART::engine::subSynth));
     if (collect_readData(synth, 0, SUBSYNTH::control::overtonePosition, npart, kititem, PART::engine::subSynth) > 0)
@@ -674,18 +690,19 @@ class SUBnoteUI {: {public PresetsUI_}
     spreadpar3->value(collect_readData(synth, 0, SUBSYNTH::control::overtoneForceHarmonics, npart, kititem, PART::engine::subSynth));
         spreadpar3->selection_color(setKnob(spreadpar1->value(),0));
 
-    filtere->value(pars->PGlobalFilterEnabled);
-    if (pars->PGlobalFilterEnabled == 0)
+    filtere->value(collect_readData(synth, 0, SUBSYNTH::control::enableFilter, npart, kititem, PART::engine::subSynth));
+    if (filtere->value() == 0)
         globalfiltergroup->deactivate();
     else
         globalfiltergroup->activate();
     filtere->show();
     globalfiltergroup->redraw();
 
-    stereo->value(pars->Pstereo);
-    filterstages->value(pars->Pnumstages);
-    magtype->value(pars->Phmagtype);
-    start->value(pars->Pstart);
+    filterstages->value(collect_readData(synth, 0, SUBSYNTH::control::filterStages, npart, kititem, PART::engine::subSynth));
+    magtype->value(collect_readData(synth, 0, SUBSYNTH::control::magType, npart, kititem, PART::engine::subSynth));
+    start->value(collect_readData(synth, 0, SUBSYNTH::control::startPosition, npart, kititem, PART::engine::subSynth));
+
+    stereo->value(collect_readData(synth, 0, SUBSYNTH::control::stereo, npart, kititem, PART::engine::subSynth));
 
     ampenv->refresh();
     bandwidthenvelopegroup->refresh();

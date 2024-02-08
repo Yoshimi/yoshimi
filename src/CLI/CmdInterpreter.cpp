@@ -6167,13 +6167,13 @@ int CmdInterpreter::commandReadnSet(Parser& input, unsigned char controlType)
     {
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
-        return sendNormal(synth, 0, string2int127(input), controlType, MAIN::control::volume, TOPLEVEL::section::main);
+        return sendNormal(synth, 0, string2float(input), controlType, MAIN::control::volume, TOPLEVEL::section::main);
     }
     if (input.matchnMove(2, "detune"))
     {
         if (input.lineEnd(controlType))
             return REPLY::value_msg;
-        return sendNormal(synth, TOPLEVEL::action::lowPrio, string2int127(input), controlType, MAIN::control::detune, TOPLEVEL::section::main);
+        return sendNormal(synth, TOPLEVEL::action::lowPrio, string2float(input), controlType, MAIN::control::detune, TOPLEVEL::section::main);
     }
 
     if (input.matchnMove(2, "shift"))
