@@ -713,6 +713,7 @@ std::string echolist [] = {
     "CROssover <n>",    "left-right crossover",
     "FEEdback <n>",     "echo feedback",
     "DAMp <n>",         "feedback damping",
+    "SEP <s>",          "separate left/right delays (ON {other})",
     "BPM <s>",          "delay BPM sync (ON {other})",
     "@end","@end"
 };
@@ -725,6 +726,7 @@ int echolistmap[] = {
     4,
     5,
     6,
+    EFFECT::control::sepLRDelay,
     EFFECT::control::bpm,
     -1
 };
