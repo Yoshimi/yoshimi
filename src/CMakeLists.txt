@@ -106,7 +106,7 @@ option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
 # developer info
 option (ShowNoteOnTimes "Report Note-On Times" OFF)
-option (ReportNotes "Report Notes On/Off" OFF)
+option (ReportNoteEvents "Report Notes On/Off" OFF)
 
 
 set (BuildOptions_X86
@@ -390,7 +390,7 @@ if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
 endif ()
 
-if (ReportNotes)
+if (ReportNoteEvents)
     add_definitions (-DREPORT_NOTES_ON_OFF)
 endif ()
 
