@@ -303,6 +303,7 @@ set (Interface_Sources
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/RingBuffer.h
+    Interface/TextLists.cpp
     Interface/TextLists.h
 )
 

@@ -507,6 +507,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
         xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay);}
+        code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "L.Delay" : "Delay");}
         class WidgetPDial
       }
       Fl_Dial echop3 {
@@ -520,8 +521,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip {Delay between L/R} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
-        code0 {o->setValueType(VC_FXEchoLRdel);}
+        tooltip {If Sep is disabled: Delay between L/R
+If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
+        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::sepLRDelay) ? (eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay) : VC_FXEchoLRdel);}
+        code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "R.Delay" : "LRdl.");}
         class WidgetPDial
       }
       Fl_Dial echop4 {
@@ -568,6 +571,12 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         tooltip Dampening xywh {334 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
+      }
+      Fl_Check_Button echop7 {
+        label Sep
+        callback {//
+        send_data(0, EFFECT::control::sepLRDelay, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
+        tooltip {Separate Left / Right Delay} xywh {152 45 15 15} down_box DOWN_BOX labelsize 10 align 1
       }
       Fl_Check_Button echop17 {
         label BPM
@@ -770,6 +779,10 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
         tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {190 45 50 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
+      }
+      Fl_Check_Button {} {
+        label sepLRDelay
+        xywh {25 25 70 15} down_box DOWN_BOX
       }
     }
   }
@@ -1796,12 +1809,39 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
                     echop6->value(value);
                     echop6->selection_color(setKnob(value,echoPresets[presetNum][6]));
                     break;
+                case EFFECT::control::sepLRDelay:
+                    echop7->value(value);
+                    if (value) {
+                        echop2->label("L.Delay");
+                        echop3->label("R.Delay");
+                        if (eff->geteffectpar(EFFECT::control::bpm)) {
+                            echop3->setValueType(VC_FXlfofreqBPM);
+                        } else {
+                            echop3->setValueType(VC_FXEchoDelay);
+                        }
+                    } else {
+                        echop2->label("Delay");
+                        echop3->label("LRdl.");
+                        echop3->setValueType(VC_FXEchoLRdel);
+                    }
+                    // This is needed because the labels do not draw cleanly on
+                    // top of each other.
+                    effechowindow->redraw();
+                    break;
                 case EFFECT::control::bpm:
                     echop17->value(value);
                     if (value)
                         echop2->setValueType(VC_FXlfofreqBPM);
                     else
                         echop2->setValueType(VC_FXEchoDelay);
+
+                    if (eff->geteffectpar(EFFECT::control::sepLRDelay)) {
+                        if (value) {
+                            echop3->setValueType(VC_FXlfofreqBPM);
+                        } else {
+                            echop3->setValueType(VC_FXEchoDelay);
+                        }
+                    }
                     break;
                 case EFFECT::control::preset:
                     refresh();
@@ -2352,6 +2392,20 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
             echop5->selection_color(setKnob(echop5->value(),echoPresets[presetNum][5]));
             echop6->value(eff->geteffectpar(6));
             echop6->selection_color(setKnob(echop6->value(),echoPresets[presetNum][6]));
+            echop7->value(eff->geteffectpar(EFFECT::control::sepLRDelay));
+            if (eff->geteffectpar(EFFECT::control::sepLRDelay)) {
+                echop2->label("L.Delay");
+                echop3->label("R.Delay");
+                if (eff->geteffectpar(EFFECT::control::bpm)) {
+                    echop3->setValueType(VC_FXlfofreqBPM);
+                } else {
+                    echop3->setValueType(VC_FXEchoDelay);
+                }
+            } else {
+                echop2->label("Delay");
+                echop3->label("LRdl.");
+                echop3->setValueType(VC_FXEchoLRdel);
+            }
             echop17->value(eff->geteffectpar(17));
             effechowindow->show();
             break;

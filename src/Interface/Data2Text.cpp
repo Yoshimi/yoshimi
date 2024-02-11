@@ -3374,8 +3374,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             break;
         case EFFECT::type::reverb:
         {
-            if (ref > 4) // there is no 5 or 6 in the list names
-                ref -= 2;
+            ref = mapFromEffectNumber(ref, reverblistmap);
             effname = " Reverb ";
             controlType = reverblist[(ref) * 2];
             if (control == 10 && addValue == true)// && offset > 0)
@@ -3398,8 +3397,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::echo:
             effname = " Echo ";
-            if (ref > 6) // there is no 7-16 in the list names
-                ref -= 10;
+            ref = mapFromEffectNumber(ref, echolistmap);
             controlType = echolist[ref * 2];
             if (addValue & isBPM)
             {
@@ -3410,10 +3408,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         case EFFECT::type::chorus:
         {
             effname = " Chorus ";
-            if (ref > 10) // there is no 11-16 in the list names
-                ref -= 6;
-            else if (ref > 9) // there is no 10 in the list names
-                ref --;
+            ref = mapFromEffectNumber(ref, choruslistmap);
             controlType = choruslist[ref * 2];
             if (addValue == true && offset > 0)
             {
@@ -3443,8 +3438,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::phaser:
             effname = " Phaser ";
-            if (ref > 14) // there is no 15-16 in the list names
-                ref -= 2;
+            ref = mapFromEffectNumber(ref, phaserlistmap);
             controlType = phaserlist[ref * 2];
             if (addValue == true && offset > 0)
             {
@@ -3476,8 +3470,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             break;
         case EFFECT::type::alienWah:
             effname = " AlienWah ";
-            if (ref > 10) // there is no 11-16 in the list names
-                ref -= 6;
+            ref = mapFromEffectNumber(ref, alienwahlistmap);
             controlType = alienwahlist[ref * 2];
             if (control == 4 && addValue == true  && offset > 0)
             {
@@ -3496,8 +3489,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         case EFFECT::type::distortion:
         {
             effname = " Distortion ";
-            if (ref > 5) // there is an extra line in the list names
-                ++ ref;
+            ref = mapFromEffectNumber(ref, distortionlistmap);
             if (addValue == true && offset > 0)
             {
                 switch (ref)
@@ -3543,16 +3535,11 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
             {
                 if (offset > 0)
                     effname += "(Band " + to_string(int(parameter) + 1) + ") ";
-                if (ref > 10)
-                    ref -= 7;
-                else    // there is no 3 to 9 in the list names
-                {       // but there is an extra line after 10
-                    ref -= 8;
-                    if (addValue == true && offset > 0)
-                    {
-                        showValue = false;
-                        contstr = " " + stringCaps(eqtypes[value], 1);
-                    }
+                ref = mapFromEffectNumber(ref, eqlistmap);
+                if (ref < 4 && addValue == true && offset > 0)
+                {
+                    showValue = false;
+                    contstr = " " + stringCaps(eqtypes[value], 1);
                 }
             }
             controlType = eqlist[ref * 2];
@@ -3560,8 +3547,7 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
         }
         case EFFECT::type::dynFilter:
             effname = " DynFilter ";
-            if (ref > 10) // there is no 11-16 in the list names
-                ref -= 6;
+            ref = mapFromEffectNumber(ref, dynfilterlistmap);
             controlType = dynfilterlist[ref * 2];
             if (addValue == true && offset > 0)
             {
@@ -3608,4 +3594,17 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 
 
     return (name + effname + contstr);
+}
+
+int DataText::mapFromEffectNumber(int effectIndex, const int list [])
+{
+    for (int index = 0; list[index] >= 0; index++) {
+        if (list[index] == effectIndex) {
+            return index;
+        }
+    }
+    // Kind of bad to return a bogus entry, but this function is often called
+    // even when the result will not be used, and the index is often out of
+    // range then.
+    return 0;
 }

@@ -75,6 +75,7 @@ class Echo : public Effect
         unsigned char Pfb;      // 6 Feedback
         unsigned char Phidamp;  // 7 Dampening of the Echo
         bool Pbpm;
+        bool PsepLRDelay;
 
         void setvolume(unsigned char Pvolume_);
         void setdelay(unsigned char Pdelay_);

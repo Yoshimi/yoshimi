@@ -63,5 +63,7 @@ class DataText
         std::string filterControl(CommandBlock *getData, bool addValue);
         std::string resolveEnvelope(CommandBlock *getData, bool addValue);
         std::string resolveEffects(CommandBlock *getData, bool addValue);
+
+        int mapFromEffectNumber(int effectIndex, const int list []);
 };
 #endif

@@ -86,38 +86,77 @@ void Echo::initdelays(void)
 {
     if (Pbpm)
     {
-        int olddelay = delay;
-
-        std::pair<float, float> frac = func::LFOfreqBPMFraction((float)Pdelay / 127.0f);
-        delay = roundf(60.0f * synth->samplerate_f * frac.first / (synth->getBPM() * frac.second));
-        if (delay > maxdelay)
-            delay = maxdelay;
-
-        if (!synth->isBPMAccurate())
+        auto calcDelay = [this](unsigned char paramDelay, int delay)
         {
-            // If we don't have an accurate BPM source, we may have
-            // fluctuations. Reject delay changes less than a certain amount to
-            // prevent Echo artifacts.
+            int olddelay = delay;
 
-            float ratio;
-            if (delay > olddelay)
-                ratio = (float)delay / (float)olddelay;
-            else
-                ratio = (float)olddelay / (float)delay;
-            if (ratio < ECHO_INACCURATE_BPM_THRESHOLD)
-                delay = olddelay;
+            std::pair<float, float> frac = func::LFOfreqBPMFraction((float)paramDelay / 127.0f);
+            delay = roundf(60.0f * synth->samplerate_f * frac.first / (synth->getBPM() * frac.second));
+            if (delay > maxdelay)
+                delay = maxdelay;
+
+            if (!synth->isBPMAccurate())
+            {
+                // If we don't have an accurate BPM source, we may have
+                // fluctuations. Reject delay changes less than a certain amount to
+                // prevent Echo artifacts.
+
+                float ratio;
+                if (delay > olddelay)
+                    ratio = (float)delay / (float)olddelay;
+                else
+                    ratio = (float)olddelay / (float)delay;
+                if (ratio < ECHO_INACCURATE_BPM_THRESHOLD)
+                    delay = olddelay;
+            }
+
+            return delay;
+        };
+
+        delay = calcDelay(Pdelay, delay);
+
+        if (PsepLRDelay)
+        {
+            // Reuse lrdelay for right delay only.
+            lrdelay = calcDelay(Plrdelay, lrdelay);
+
+            dl = delay;
+            dr = lrdelay;
         }
     }
     else
     {
-        delay = int(Pdelay / 127.0f * synth->samplerate_f * 1.5f);
-        delay += 1; // 0 .. 1.5 sec
+        auto calcDelay = [this](unsigned char paramDelay)
+        {
+            return int(paramDelay / 127.0f * synth->samplerate_f * 1.5f) + 1; // 0 .. 1.5 sec
+        };
+
+        delay = calcDelay(Pdelay);
+
+        if (PsepLRDelay)
+        {
+            // Reuse lrdelay for right delay only.
+            lrdelay = calcDelay(Plrdelay);
+
+            dl = delay;
+            dr = lrdelay;
+        }
     }
 
-    dl = delay - lrdelay;
+    if (!PsepLRDelay)
+    {
+        float tmp;
+        tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
+        if (Plrdelay < 64.0f)
+            tmp = -tmp;
+        lrdelay = (int)tmp;
+
+        dl = delay - lrdelay;
+        dr = delay + lrdelay;
+    }
+
     if (dl < 1)
         dl = 1;
-    dr = delay + lrdelay;
     if (dr < 1)
         dr = 1;
 }
@@ -231,12 +270,7 @@ void Echo::setdelay(const unsigned char Pdelay_)
 
 void Echo::setlrdelay(unsigned char Plrdelay_)
 {
-    float tmp;
     Plrdelay = Plrdelay_;
-    tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
-    if (Plrdelay < 64.0f)
-        tmp = -tmp;
-    lrdelay = (int)tmp;
 }
 
 
@@ -320,6 +354,10 @@ void Echo::changepar(int npar, unsigned char value)
             sethidamp(value);
             break;
 
+        case EFFECT::control::sepLRDelay:
+            PsepLRDelay = value;
+            break;
+
         case EFFECT::control::bpm:
             Pbpm = value;
             break;
@@ -343,6 +381,7 @@ unsigned char Echo::getpar(int npar)
         case 4: return Plrcross;
         case 5: return Pfb;
         case 6: return Phidamp;
+        case EFFECT::control::sepLRDelay: return PsepLRDelay;
         case EFFECT::control::bpm: return Pbpm;
         default: break;
     }
@@ -381,6 +420,7 @@ float Echolimit::getlimits(CommandBlock *getData)
             break;
         case 6:
             break;
+        case EFFECT::control::sepLRDelay:
         case EFFECT::control::bpm:
             max = 1;
             canLearn = 0;

@@ -1088,6 +1088,7 @@ namespace EFFECT // usage EFFECT::control::level
         level = 0, // volume, wet/dry, gain for EQ
         panning, // band for EQ
         frequency, // time reverb, delay echo, L/R-mix dist, Not EQ
+        sepLRDelay = 7, // Echo
         preset = 16, // not EQ
         bpm,
         bpmStart,

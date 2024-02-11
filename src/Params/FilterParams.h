@@ -195,7 +195,7 @@ namespace DYNform{
     const DYNinsert Preset4V0F1 {80,122,64};
     const DYNinsert Preset4V1F0 {20,127,64};
     const DYNinsert Preset4V1F1 {100,121,64};
-};
+}
 
 namespace FILTSWITCH{
     const bool trackRange = false;
