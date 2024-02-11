@@ -782,7 +782,7 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
       }
       Fl_Check_Button {} {
         label sepLRDelay
-        xywh {25 25 70 15} down_box DOWN_BOX
+        xywh {25 25 70 15} down_box DOWN_BOX hide
       }
     }
   }
