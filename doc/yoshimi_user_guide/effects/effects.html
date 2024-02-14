@@ -15,11 +15,11 @@
         Effects can be applied to single instruments or as Master System/Insertion effects.
         <br>
         Most effects have a <b>Preset</b> dropdown which allows you to select some 'factory' preset.
-        <br> For any effect, if you select a preset and then change controls this dropdown will become blue to remind you the preset has changed.
+        For any effect, if you select a preset and then change controls the text in this dropdown will become blue to remind you the preset has changed.
         <br><br>
         Note:
         <br>
-        &emsp;With the exception of the EQ effect, the D/W (Dry/Wet) control becomes a Vol (Volume) control when applied as a Master System effect. These are controlled from the <a href=../main.html#system>Main</a> window. In this section we always refer to D/W.
+        &emsp;With the exception of the EQ effect, the D/W (Dry/Wet) control becomes a Vol (Volume) control when applied as a Master System effect. These are found in the <a href=../main.html#system>Main</a> window. In this section we always refer to D/W.
     </p>
 
     <!-- REVERB -->
@@ -29,7 +29,7 @@
     </p>
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
             <br>
 
         </li>
@@ -82,7 +82,7 @@
     </p>
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>BPM</b> When checked locks the delay control to the incoming MIDI clock
@@ -94,7 +94,13 @@
             <b>Pan</b> The left/right panning (panorama) for the effect
         </li>
         <li>
-            <b>LRdl.</b> Delay between left and right. This can effectively be used to create a 'stereo echo/delay' effect
+            <b>Delay</b> The time between echo repeats
+        </li>
+        <li>
+            <b>Separate</b> When checked, the Delay and LRdl controls change to separate left and right delay times, so they become quite independent
+        </li>
+        <li>
+            <b>LRdl.</b> Shortens/lengthens the delay of left and right in opposite directions. This can effectively be used to create a 'stereo echo/delay' effect
         </li>
         <li>
             <b>LRc.</b> Left/Right crossover. This defines how echos cross left to right. Or how the delays are 'spread' over the stereo (left/right panorama). To hear a difference there also needs to be a non-zero value in the above LRdl. control
@@ -115,7 +121,7 @@
 
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>Subtract</b> Inverts the output if selected so it tends to subtract from the incoming signal rather than adding to it.
@@ -166,7 +172,7 @@
 
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>D/W</b> Dry/Wet balance. If completely to the left only the dry signal (no phaser) will be heard
@@ -230,7 +236,7 @@
 
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>Phase</b> Phase of the AlienWah effect. This sets the vocal sound between an 'Aahh' and an 'Eehh'
@@ -281,7 +287,7 @@
     </p>
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>Pan</b> The left/right panning (panorama) for the effect
@@ -326,7 +332,7 @@
             <b>Gain</b> Gain of the equalised signal
         </li>
         <li>
-            <b>Band</b> Band number. The EQ effect provides up to 8 'bands' each of which can be an independent filter
+            <b>Band</b> Band number. The EQ effect provides up to 8 'bands' each of which is an independent filter
         </li>
         <li>
             <b>Type</b> Filter type for the selected band
@@ -335,7 +341,7 @@
             <b>Freq</b> Filter frequency. Depending on the type of filter this can be the cut-off or centre frequency
         </li>
         <li>
-            <b>Gain</b> Gain for the filter, if foreseen by the type of filter (e.g. peak, high-shelf, low-shelf)
+            <b>Gain</b> Gain for the filter, if made available by the type of filter (e.g. peak, high-shelf, low-shelf)
         </li>
         <li>
             <b>Q</b> Q factor for the filter. Depending on the type of filter this can be the 'resonance', 'width', etc.
@@ -355,7 +361,7 @@
     <p>
     <ul>
         <li>
-            <b>Preset</b> select a default preset and set controls accordingly
+            <b>Preset</b> selects a default preset and set controls accordingly
         </li>
         <li>
             <b>D/W</b> Dry/Wet balance. If completely to the left only the dry signal (no DynFilter) will be heard
@@ -367,7 +373,7 @@
             <b>Freq</b> DynFilter LFO Frequency
         </li>
         <li>
-            <b>Start</b> The position (phase) in the LFO to set when the note starts
+            <b>Start</b> Only when BPM is active, this sets the position (phase) in the LFO when the note starts
         </li>
         <li>
             <b>Rnd</b> Randomness of the LFO Frequency
@@ -398,7 +404,7 @@
     </p>
     <p>
     <img src="images/dynfilter_filter_params.png" alt="DynFilter Filter Panel" class="image">
-    These controls are the same as the <a href="../filter/filter.html">Filter Type</a> ones. Here, of course, the velocity sense controls are disabled.
+    These controls are the same as the <a href="../filter/filter.html">Filter Type</a> ones. Here, however, the velocity sense controls are disabled.
     <img src="../images/boundry.png" alt="divider" class="wideline">
     <a href="#phaser">Back to Phaser</a>
     <a href="#top" class="up">Back to top</a>

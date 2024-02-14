@@ -7098,7 +7098,11 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
 
     if (eff->geteffectpar(EFFECT::control::bpm) == 1)
+    {
         getData->data.offset = 1; // mark this for reporting in Data2Text
+        if (eff->geteffectpar(EFFECT::control::sepLRDelay) == 1)
+            getData->data.offset = 3; // specific for Echo effect
+    }
 
     if (effSend == EFFECT::type::dynFilter && getData->data.insert != UNUSED)
     {

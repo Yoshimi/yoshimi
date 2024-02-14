@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2021, Will Godfrey
+    Copyright 2014-2024, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -297,7 +297,6 @@ float Choruslimit::getlimits(CommandBlock *getData)
     int value = getData->data.value;
     int control = getData->data.control;
     int request = getData->data.type & TOPLEVEL::type::Default; // clear flags
-    int npart = getData->data.part;
     int presetNum = getData->data.engine;
     int min = 0;
     int max = 127;
@@ -309,8 +308,6 @@ float Choruslimit::getlimits(CommandBlock *getData)
     switch (control)
     {
         case 0:
-            if (npart != TOPLEVEL::section::systemEffects)
-                def /= 2;
             break;
         case 1:
             break;

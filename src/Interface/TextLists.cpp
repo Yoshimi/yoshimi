@@ -708,12 +708,12 @@ int reverblistmap[] = {
 std::string echolist [] = {
     "LEVel <n>",        "intensity",
     "PANning <n>",      "L/R panning",
-    "DELay <n>",        "initial delay",
-    "LRDelay <n>",      "left-right delay",
+    "DELay <n>",        "initial delay, left delay only if separate",
+    "LRDelay <n>",      "left-right delay, right delay if separate",
     "CROssover <n>",    "left-right crossover",
     "FEEdback <n>",     "echo feedback",
     "DAMp <n>",         "feedback damping",
-    "SEP <s>",          "separate left/right delays (ON {other})",
+    "SEParate <s>",     "separate left/right delays (ON {other})",
     "BPM <s>",          "delay BPM sync (ON {other})",
     "@end","@end"
 };
@@ -926,6 +926,7 @@ int dynfilterlistmap[] = {
     7,
     8,
     9,
+    10,
     EFFECT::control::bpm,
     EFFECT::control::bpmStart,
     -1
@@ -1177,7 +1178,7 @@ std::string fx_presets [] = {
 
 // effect controls
 std::string effreverb [] = {"LEV", "PAN", "TIM", "DEL", "FEE", "none5", "none6", "LOW", "HIG", "DAM", "TYP", "ROO", "BAN", "@end"};
-std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM", "none7", "none8", "none9", "none10", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
+std::string effecho [] = {"LEV", "PAN", "DEL", "LRD", "CRO", "FEE", "DAM", "SEP", "none8", "none9", "none10", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
 std::string effchorus [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "DEL", "FEE", "CRO", "none10", "SUB", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
 std::string effphaser [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "STA", "CRO", "SUB", "REL", "HYP", "OVE", "ANA", "none15", "none16", "BPM", "@end"};
 std::string effalienwah [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "FEE", "DEL", "CRO", "REL", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
@@ -1185,7 +1186,7 @@ std::string effdistortion [] = {"LEV", "PAN", "MIX", "DRI", "OUT", "WAV", "INV",
 std::string effdistypes [] = {"ATAn", "ASYm1", "POWer", "SINe", "QNTs", "ZIGzag", "LMT", "ULMt", "LLMt", "ILMt", "CLIp", "AS2", "PO2", "SGM", "@end"};
 std::string effeq [] = {"LEV", "EQB", "FIL", "FRE", "GAI", "Q", "STA"};
 std::string eqtypes [] = {"OFF", "LP1", "HP1", "LP2", "HP2", "BP2", "NOT", "PEAk", "LOW shelf", "HIGh shelf", "@end"};
-std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "@end"};
+std::string effdynamicfilter [] = {"LEV", "PAN", "FRE", "RAN", "WAV", "SHI", "DEP", "SEN", "INV", "RAT", "FIL", "none11", "none12", "none13", "none14", "none15", "none16", "BPM", "STA", "@end"};
 
 // common controls
 std::string detuneType [] = {"DEFault", "L35", "L10", "E100", "E1200", "@end"};

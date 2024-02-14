@@ -11,7 +11,7 @@ comment {EffUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016-2023, Will Godfrey & others
+Copyright 2016-2024, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -475,7 +475,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);
 //        send_data(0, 0, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip {Effect volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
+        tooltip {Effect volume} xywh {10 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_FXEchoVol);}
         class WidgetPDial
       }
@@ -490,7 +490,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        xywh {64 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
+        xywh {64 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
@@ -505,7 +505,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
+        xywh {118 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay);}
         code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "L.Delay" : "Delay");}
         class WidgetPDial
@@ -522,7 +522,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
         tooltip {If Sep is disabled: Delay between L/R
-If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
+If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(eff->geteffectpar(EFFECT::control::sepLRDelay) ? (eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay) : VC_FXEchoLRdel);}
         code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "R.Delay" : "LRdl.");}
         class WidgetPDial
@@ -538,7 +538,7 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip {L/R crossover} xywh {226 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
+        tooltip {L/R crossover} xywh {226 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -553,7 +553,7 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip Feedback xywh {280 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
+        tooltip Feedback xywh {280 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
@@ -568,21 +568,21 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip Dampening xywh {334 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
+        tooltip Dampening xywh {334 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
         code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button echop7 {
-        label Sep
+        label Separate
         callback {//
         send_data(0, EFFECT::control::sepLRDelay, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip {Separate Left / Right Delay} xywh {152 45 15 15} down_box DOWN_BOX labelsize 10 align 1
+        tooltip {Separate Left / Right Delay} xywh {153 44 15 15} down_box DOWN_BOX labelsize 11 align 1
       }
       Fl_Check_Button echop17 {
         label BPM
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::echo), TOPLEVEL::type::Integer);}
-        tooltip {Synchronize the frequency to a multiple of the BPM. Note that the delay is capped at 5 seconds, even if the tempo is slower than this.} xywh {325 10 45 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
+        tooltip {Synchronize the frequency to a multiple of the BPM. Note that the delay is capped at 5 seconds, even if the tempo is slower than this.} xywh {325 15 15 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
       }
     }
   }
@@ -779,10 +779,6 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
         tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {190 45 50 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
-      }
-      Fl_Check_Button {} {
-        label sepLRDelay
-        xywh {25 25 70 15} down_box DOWN_BOX hide
       }
     }
   }
@@ -2653,7 +2649,11 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
             break;
     }
     lastEff = nextEff;
-    this->show();} {}
+    this->show();
+    if (nextEff != EFFECT::type::none)
+    {
+        effRtext(this->w()/380, nextEff - EFFECT::type::none);
+    }} {}
   }
   Function {refresh()} {} {
     code {refresh(eff, npart, neff);} {}
@@ -2705,7 +2705,6 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
         int size = int(10 * dScale);
         int size11 = int(11 * dScale);
         int size12 = int(12 * dScale);
-
         switch (efftype)
         {
             case 0:
@@ -2742,6 +2741,7 @@ If Sep is enabled: Right Delay} xywh {172 40 30 30} box ROUND_UP_BOX labelsize 1
                 echop4->labelsize(size11);
                 echop5->labelsize(size11);
                 echop6->labelsize(size11);
+                echop7->labelsize(size11);
                 echop17->labelsize(size11);
                 break;
             case 3: // chorus

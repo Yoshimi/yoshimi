@@ -1251,6 +1251,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
          */
         if (controlType == type_read)
             value = 1; // dummy value
+
         switch (nFXtype)
         {
             case 1:
@@ -1281,7 +1282,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
                     if (value < 0)
                         return REPLY::done_msg; // error already reported
                 }
-                else if (selected == EFFECT::control::bpm && value == -1)
+                else if ((selected == EFFECT::control::bpm || selected == EFFECT::control::sepLRDelay) && value == -1)
                 {
                     input.skipChars();
                     value = (input.toggle() == 1);
@@ -3668,7 +3669,7 @@ int CmdInterpreter::commandExportScale(Parser& input)
     if (name.empty())
         return REPLY::value_msg;
     size_t miscmsg = textMsgBuffer.push(name);
-    std::cout << "name >" << name << std::endl;
+    //std::cout << "name >" << name << std::endl;
     return sendDirect(synth, TOPLEVEL::action::lowPrio, 1, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
 }
 

@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2023, Will Godfrey & others
+Copyright 2014-2024, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -4037,7 +4037,8 @@ Alan Calvert started the project}
     syseffectui->activate();
     syseffectui->show();
     syseffectuigroup->activate();
-    syseffectuigroup->show();} {}
+    syseffectuigroup->show();
+    lastmainW = 0;} {}
   }
   Function {showInsEfxUI(void)} {private
   } {
@@ -4050,7 +4051,8 @@ Alan Calvert started the project}
     inseffectui->activate();
     inseffectui->show();
     inseffectuigroup->activate();
-    inseffectuigroup->show();} {}
+    inseffectuigroup->show();
+    lastmainW = 0;} {}
   }
   Function {showSysEffSends()} {} {
     code {//
