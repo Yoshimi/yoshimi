@@ -1494,7 +1494,7 @@ Oscillator}
         // we still need 'pars->' here :(
         oscil->changeParams(pars->VoicePar[nvs].POscil);
 
-        osc->init(oscil,0,collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+        osc->init(oscil,0,64-collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
 
         if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0
             || collect_readData(synth,0,ADDVOICE::control::soundType, npart, kititem, PART::engine::addVoice1 + nvoice) > 0)
@@ -1988,7 +1988,7 @@ class ADvoicelistitem {: {public Fl_Group}
         // we still need 'pars->' here :(
         oscil->changeParams(pars->VoicePar[nvs].POscil);
 
-        osc->init(oscil,0,collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+        osc->init(oscil,0,64-collect_readData(synth,0,ADDVOICE::control::voiceOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
 
         if (collect_readData(synth,0,ADDVOICE::control::externalOscillator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0
             || collect_readData(synth,0,ADDVOICE::control::soundType, npart, kititem, PART::engine::addVoice1 + nvoice) > 0)
@@ -2054,7 +2054,7 @@ class ADvoicelistitem {: {public Fl_Group}
         // we still need 'pars->' here :(
         oscilFM->changeParams(pars->VoicePar[nvs].POscil);
 
-        modosc->init(oscilFM,0,collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
+        modosc->init(oscilFM,0,64-collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice),synth);
 
         if (collect_readData(synth,0,ADDVOICE::control::modulatorType, npart, kititem, PART::engine::addVoice1 + nvoice) == NONE
             || collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice) >= 0)
