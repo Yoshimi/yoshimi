@@ -7,6 +7,9 @@ Updated HTML guide
 Cleaned up some coding style inconsistencies
 No code changes
 
+Set minimum C++ standard as 17
+Updated copyright notices
+
 2024-2-17 Will
 bn 2316
 BugFix: From Kristian: Missing file in LV2 code

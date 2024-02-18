@@ -6,7 +6,7 @@
     Copyright 2009-2010, Alan Calvert
     Copyright 2016 Will Godfrey
     Copyright 2017 Jesper Lloyd
-    Copyright 2018 Will Godfrey and others
+    Copyright 2018-2024 Will Godfrey and others
 
     Idea originally derived from work by Greg Ercolano
     (http://seriss.com/people/erco/fltk/)

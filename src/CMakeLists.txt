@@ -3,6 +3,7 @@
 #
 #   Copyright 2009-2011, Alan Calvert
 #   Copyright 2014-2023, Will Godfrey & others
+#   Copyright 2024, Kristian Amlie, Will Godfrey
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -30,8 +31,8 @@ endif ()
 
 #set(CMAKE_CXX_COMPILER "clang++")
 
-set (CMAKE_CXX_STANDARD 14) # we seem to need both for
-add_definitions(-std=gnu++14) # various versions of cmake
+set (CMAKE_CXX_STANDARD 17) # we seem to need both for
+add_definitions(-std=gnu++17) # various versions of cmake
 
 add_definitions(-Wall)
 

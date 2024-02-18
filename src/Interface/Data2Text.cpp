@@ -1,8 +1,8 @@
 /*
     Data2Text.cpp - conversion of commandBlock entries to text
 
-    Copyright 2021 - 2023 Will Godfrey
-    Copyright 2024 Will Godfrey, Kristian Amlie
+    Copyright 2021 - 2023, Will Godfrey
+    Copyright 2024, Will Godfrey, Kristian Amlie
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public

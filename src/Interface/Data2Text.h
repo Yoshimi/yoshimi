@@ -1,7 +1,8 @@
 /*
     Data2Text.h - conversion of commandBlock entries to text
 
-    Copyright 2019-2020 Will Godfrey
+    Copyright 2019-2020, Will Godfrey
+    Copyright 2024, Kristian Amlie, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
