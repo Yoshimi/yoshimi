@@ -215,7 +215,8 @@ float Envelope::envout_dB(void)
             envoutval = asDecibel(out);
         else
             envoutval = MIN_ENVELOPE_DB;
-    } else
+    }
+    else
         out = decibel(envout());
 
     return out;

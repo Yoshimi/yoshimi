@@ -250,6 +250,7 @@ std::string mcontrollist [] = {
 };
 
 std::string commonlist [] = {
+    "","The common list is deprecated and will eventually be removed.",
     "ON @",                     "enables the part/kit item/engine/insert etc,",
     "OFF @",                    "disables as above",
     "Volume <n> @",             "volume",
@@ -288,6 +289,7 @@ std::string commonlist [] = {
     "*-voice",                  "not AddVoice",
     "&",                        "AddSynth & PadSynth only",
     "#",                        "SubSynth & PadSynth only",
+    "","The common list is deprecated and will eventually be removed.",
     "@end","@end"
 };
 
@@ -1171,7 +1173,7 @@ std::string fx_presets [] = {
     "10, chorus 1, chorus 2, chorus 3, celeste 1, celeste 2, flange 1, flange 2, flange 3, flange 4, flange 5",
     "12, phaser 1, phaser 2, phaser 3, phaser 4, phaser 5, phaser 6, aphaser 1, aphaser 2, aphaser 3, aphaser 4, aphaser 5, aphaser 6",
     "4, alienwah 1, alienwah 2, alienwah 3, alienwah 4",
-    "6, overdrive 1, overdrive 2, exciter 1, exciter 2, guitar amp, quantisize",
+    "6, overdrive 1, overdrive 2, exciter 1, exciter 2, guitar amp, quantize",
     "1, not available",
     "4, wahwah, autowah, vocal morph 1, vocal morph 2"
 };

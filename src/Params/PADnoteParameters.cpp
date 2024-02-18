@@ -335,7 +335,9 @@ vector<float> PADnoteParameters::buildProfile(size_t size)
         {
             x = 0.0f;
             makezero = true;
-        } else {
+        }
+        else
+        {
             if (x >1.0f)
             {
                 x = 1.0f;

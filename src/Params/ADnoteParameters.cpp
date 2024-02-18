@@ -853,7 +853,8 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
             bool loadFMFreqParams = true;
             VoicePar[nvoice].PFMDetuneFromBaseOsc =
                 xml->getparbool("detune_from_base_osc", 127);
-            if (VoicePar[nvoice].PFMDetuneFromBaseOsc == 127) {
+            if (VoicePar[nvoice].PFMDetuneFromBaseOsc == 127)
+            {
                 // In the past it was not possible to choose whether to include
                 // detuning from the base oscillator. For local modulators it
                 // was always enabled, for imported voice modulators it was
@@ -868,7 +869,8 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
                 // are respected, we need to ignore those parameters for old
                 // instruments that saved them, but didn't use them, otherwise
                 // the instrument will sound different.
-                if (VoicePar[nvoice].PFMVoice >= 0) {
+                if (VoicePar[nvoice].PFMVoice >= 0)
+                {
                     VoicePar[nvoice].PFMDetuneFromBaseOsc = 0;
                     loadFMFreqParams = false;
 
@@ -878,11 +880,14 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
                     // from the imported voice.
                     VoicePar[nvoice].PFMFixedFreq =
                         VoicePar[VoicePar[nvoice].PFMVoice].Pfixedfreq;
-                } else {
+                }
+                else
+                {
                     VoicePar[nvoice].PFMDetuneFromBaseOsc = 1;
                 }
             }
-            if (loadFMFreqParams) {
+            if (loadFMFreqParams)
+            {
                 VoicePar[nvoice].PFMDetune =
                     xml->getpar("detune",VoicePar[nvoice].PFMDetune, 0, 16383);
                 VoicePar[nvoice].PFMCoarseDetune =

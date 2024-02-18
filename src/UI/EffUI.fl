@@ -1807,15 +1807,21 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     break;
                 case EFFECT::control::sepLRDelay:
                     echop7->value(value);
-                    if (value) {
+                    if (value)
+                    {
                         echop2->label("L.Delay");
                         echop3->label("R.Delay");
-                        if (eff->geteffectpar(EFFECT::control::bpm)) {
+                        if (eff->geteffectpar(EFFECT::control::bpm))
+                        {
                             echop3->setValueType(VC_FXlfofreqBPM);
-                        } else {
+                        }
+                        else
+                        {
                             echop3->setValueType(VC_FXEchoDelay);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         echop2->label("Delay");
                         echop3->label("LRdl.");
                         echop3->setValueType(VC_FXEchoLRdel);
@@ -1831,10 +1837,14 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     else
                         echop2->setValueType(VC_FXEchoDelay);
 
-                    if (eff->geteffectpar(EFFECT::control::sepLRDelay)) {
-                        if (value) {
+                    if (eff->geteffectpar(EFFECT::control::sepLRDelay))
+                    {
+                        if (value)
+                        {
                             echop3->setValueType(VC_FXlfofreqBPM);
-                        } else {
+                        }
+                        else
+                        {
                             echop3->setValueType(VC_FXEchoDelay);
                         }
                     }
@@ -2389,15 +2399,21 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             echop6->value(eff->geteffectpar(6));
             echop6->selection_color(setKnob(echop6->value(),echoPresets[presetNum][6]));
             echop7->value(eff->geteffectpar(EFFECT::control::sepLRDelay));
-            if (eff->geteffectpar(EFFECT::control::sepLRDelay)) {
+            if (eff->geteffectpar(EFFECT::control::sepLRDelay))
+            {
                 echop2->label("L.Delay");
                 echop3->label("R.Delay");
-                if (eff->geteffectpar(EFFECT::control::bpm)) {
+                if (eff->geteffectpar(EFFECT::control::bpm))
+                {
                     echop3->setValueType(VC_FXlfofreqBPM);
-                } else {
+                }
+                else
+                {
                     echop3->setValueType(VC_FXEchoDelay);
                 }
-            } else {
+            }
+            else
+            {
                 echop2->label("Delay");
                 echop3->label("LRdl.");
                 echop3->setValueType(VC_FXEchoLRdel);

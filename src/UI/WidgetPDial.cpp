@@ -204,7 +204,9 @@ void WidgetPDial::draw()
         * Will G.
         */
         cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
-    } else {
+    }
+    else
+    {
         cairo_set_source_rgb(cr,0.4,0.4,0.4);
     }
     cairo_arc(cr,0,0,dh,0,2*PI);
@@ -243,7 +245,9 @@ void WidgetPDial::draw()
     {
         Fl::get_color(knob_lit, r, g, b); // 0, 197, 255
         cairo_set_source_rgb(cr,r/255.0,g/255.0, b/255.0); //light blue
-    } else {
+    }
+    else
+    {
         cairo_set_source_rgb(cr,0.6,0.7,0.8);
     }
     cairo_set_line_width (cr, linewidth);
@@ -257,7 +261,9 @@ void WidgetPDial::draw()
             selection_color(knob_point);
         Fl::get_color(selection_color(), r, g, b); // 61, 61, 61
         cairo_set_source_rgb(cr,r/255.0,g/255.0,b/255.0);
-    } else {
+    }
+    else
+    {
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);
     }
     cairo_rotate(cr,val*3/2*PI+0.25*PI);

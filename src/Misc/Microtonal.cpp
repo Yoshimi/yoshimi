@@ -861,7 +861,8 @@ int Microtonal::getfromXML(XMLwrapper *xml)
                     octave[i].type = 2;
                     octave[i].tuning = double(octave[i].x1) / octave[i].x2;
                 }
-                else {
+                else
+                {
                     octave[i].type = 1;
                     //populate fields for display
                     double x = (log(octave[i].tuning) / LOG_2) * 1200.0;

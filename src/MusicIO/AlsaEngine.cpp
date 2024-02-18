@@ -104,14 +104,16 @@ std::string AlsaEngine::findMidiClients(snd_seq_t *seq)
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_port_info_alloca(&pinfo);
     snd_seq_client_info_set_client(cinfo, -1);
-    while (snd_seq_query_next_client(seq, cinfo) >= 0) {
+    while (snd_seq_query_next_client(seq, cinfo) >= 0)
+    {
         int client = snd_seq_client_info_get_client(cinfo);
 
         if (client == SND_SEQ_CLIENT_SYSTEM)
             continue; // don't show system timer and announce ports
         snd_seq_port_info_set_client(pinfo, client);
         snd_seq_port_info_set_port(pinfo, -1);
-        while (snd_seq_query_next_port(seq, pinfo) >= 0) {
+        while (snd_seq_query_next_port(seq, pinfo) >= 0)
+        {
             // port must understand MIDI messages
             if (!(snd_seq_port_info_get_type(pinfo)
                   & SND_SEQ_PORT_TYPE_MIDI_GENERIC))
@@ -686,10 +688,12 @@ void *AlsaEngine::MidiThread(void)
         // short enough to be able to quit relatively quickly.
         int pollResult = poll(pollfds, pollCount, 500);
 
-        if (pollResult < 0) {
+        if (pollResult < 0)
+        {
             if (errno == EINTR)
                 continue;
-            else {
+            else
+            {
                 char errMsg[200];
                 snprintf(errMsg, sizeof(errMsg),
                     "Unable to handle error in MIDI thread: %s. Shutting down MIDI.",
@@ -922,7 +926,8 @@ void AlsaEngine::handleMidiClock(uint64_t clock)
 
     beats = beatTracker->setBeatValues(beats);
 
-    if (midi.clockCount >= MIDI_CLOCK_DIVISION) {
+    if (midi.clockCount >= MIDI_CLOCK_DIVISION)
+    {
         // Possibly preserve wrapped around beat values, if we are on the start
         // of a clock division.
         midi.lastDivSongBeat = beats.songBeat;

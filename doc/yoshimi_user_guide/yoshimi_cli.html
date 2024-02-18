@@ -63,15 +63,16 @@ Usage: yoshimi [OPTION...]
   -J, --jack-audio[=&lt;server&gt;]   use jack audio output
   -k, --autostart-jack       auto start jack server
   -K, --auto-connect         auto connect jack audio
-  -l, --load=&lt;file&gt;          load .xmz file
-  -L, --load-instrument=&lt;file&gt;   load .xiz file
+  -l, --load=&lt;file&gt;          load .xmz parameters file
+  -L, --load-instrument=&lt;file&gt [@part];
+                             load .xiz instrument file(no space)@n to part 'n'
   -M, --load-midilearn=&lt;file&gt;   load .xly file
       --null                 use Null-backend without audio/midi
   -N, --name-tag=&lt;tag&gt;       add tag to clientname
   -o, --oscilsize=&lt;size&gt;     set AddSynth oscillator size
   -R, --samplerate=&lt;rate&gt;    set alsa audio sample rate
-  -S, --state[=&lt;file&gt;]       load saved state, defaults to
-                             '$HOME/.config/yoshimi/yoshimi-0.state'
+  -S, --state[=&lt;file&gt;]       load .state complete machine setup file
+  -S, --state[=<file>]             load .state complete machine setup file
   -u, --jack-session-file=&lt;file&gt;   load named jack session file
   -U, --jack-session-uuid=&lt;uuid&gt;   jack session uuid
   -?, --help                 Give this help list

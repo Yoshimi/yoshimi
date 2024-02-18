@@ -80,7 +80,8 @@ void EQ::out(float *smpsl, float *smpsr)
         float oldval = filter[i].freq.getValue();
         filter[i].freq.advanceValue(synth->sent_buffersize);
         float newval = filter[i].freq.getValue();
-        if (oldval != newval) {
+        if (oldval != newval)
+        {
             filter[i].l->interpolatenextbuffer();
             filter[i].l->setfreq(newval);
             filter[i].r->interpolatenextbuffer();
@@ -90,7 +91,8 @@ void EQ::out(float *smpsl, float *smpsr)
         oldval = filter[i].gain.getValue();
         filter[i].gain.advanceValue(synth->sent_buffersize);
         newval = filter[i].gain.getValue();
-        if (oldval != newval) {
+        if (oldval != newval)
+        {
             filter[i].l->interpolatenextbuffer();
             filter[i].l->setgain(newval);
             filter[i].r->interpolatenextbuffer();
@@ -100,7 +102,8 @@ void EQ::out(float *smpsl, float *smpsr)
         oldval = filter[i].q.getValue();
         filter[i].q.advanceValue(synth->sent_buffersize);
         newval = filter[i].q.getValue();
-        if (oldval != newval) {
+        if (oldval != newval)
+        {
             filter[i].l->interpolatenextbuffer();
             filter[i].l->setq(newval);
             filter[i].r->interpolatenextbuffer();

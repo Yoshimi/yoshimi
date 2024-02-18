@@ -70,7 +70,8 @@ inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char ty
                     smps[i] = (smps[i] - powf(smps[i], 3.0f)) * 3.0f;
                     if (ws < 1.0f)
                         smps[i] /= ws;
-                } else
+                }
+                else
                     smps[i] = 0.0f;
             }
             break;

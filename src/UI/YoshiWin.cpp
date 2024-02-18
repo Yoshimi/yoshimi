@@ -45,7 +45,8 @@ YoshiWin::~YoshiWin()
     ;
 }
 
-void textResize(void* done) {
+void textResize(void* done)
+{
 
   //printf("Timeout expired!\n");
   if (done != NULL)

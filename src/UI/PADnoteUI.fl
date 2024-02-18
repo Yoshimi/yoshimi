@@ -1825,7 +1825,8 @@ class PADnoteUI {: {public PresetsUI_}
         delete(oscui);
     if (resui)
         delete(resui);
-    if (randWalkWindow) {
+    if (randWalkWindow)
+    {
         if (randSeen)
             saveWin(synth, randWalkWindow->w(), randWalkWindow->h(), randWalkWindow->x(), randWalkWindow->y(),randWalkWindow->visible(), string("padRandWalk"));
         randWalkWindow->hide();

@@ -193,16 +193,20 @@ BeatTracker::BeatValues MultithreadedBeatTracker::setBeatValues(BeatTracker::Bea
 
     lastTimeUs = timeUs;
 
-    if (beats.songBeat >= LFO_BPM_LCM) {
+    if (beats.songBeat >= LFO_BPM_LCM)
+    {
         beats.songBeat -= LFO_BPM_LCM;
         lastSongBeat = songBeat - LFO_BPM_LCM;
-    } else
+    }
+    else
         lastSongBeat = songBeat;
 
-    if (beats.monotonicBeat >= LFO_BPM_LCM) {
+    if (beats.monotonicBeat >= LFO_BPM_LCM)
+    {
         beats.monotonicBeat -= LFO_BPM_LCM;
         lastMonotonicBeat = monotonicBeat - LFO_BPM_LCM;
-    } else
+    }
+    else
         lastMonotonicBeat = monotonicBeat;
 
     timeUs = clock;
@@ -235,11 +239,14 @@ BeatTracker::BeatValues MultithreadedBeatTracker::getBeatValues()
     ret.bpm = bpm;
     pthread_mutex_unlock(&mutex);
 
-    if (time == lastTime) {
+    if (time == lastTime)
+    {
         // Can only happen on the very first iteration. Avoid division by zero.
         ret.songBeat = 0;
         ret.monotonicBeat = 0;
-    } else {
+    }
+    else
+    {
         // Based on beat and clock from MIDI thread, interpolate and find the
         // beat for audio thread.
         float ratio = (float)(clock - lastTime) / (time - lastTime);

@@ -3596,8 +3596,10 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
 
 int DataText::mapFromEffectNumber(int effectIndex, const int list [])
 {
-    for (int index = 0; list[index] >= 0; index++) {
-        if (list[index] == effectIndex) {
+    for (int index = 0; list[index] >= 0; index++)
+    {
+        if (list[index] == effectIndex)
+        {
             return index;
         }
     }

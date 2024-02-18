@@ -191,7 +191,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                                 _atom_bpm, &bpm,
                                 NULL);
 
-            if (bpm && bpm->type == _atom_float) {
+            if (bpm && bpm->type == _atom_float)
+            {
                 beats.bpm = ((LV2_Atom_Float *)bpm)->body;
                 bpmProvided = true;
             }

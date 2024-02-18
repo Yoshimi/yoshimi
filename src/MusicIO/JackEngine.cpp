@@ -390,7 +390,8 @@ int JackEngine::processCallback(jack_nframes_t nframes)
     bool okaudio = true;
     bool okmidi = true;
 
-    if (midiPort) {
+    if (midiPort)
+    {
         // input exists, using jack midi
         handleBeatValues(nframes);
         okmidi = processMidi(nframes);

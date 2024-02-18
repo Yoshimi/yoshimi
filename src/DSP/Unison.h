@@ -64,7 +64,8 @@ class Unison
                 , relative_amplitude{1.0f}
             { }
 
-            void setPosition(float newPos) {
+            void setPosition(float newPos)
+            {
                 position = newPos;
             }
         };

@@ -296,7 +296,8 @@ float LFO::lfoout()
             amp2 = (1 - lfornd) + lfornd * synth->numRandom();
             computenextincrnd();
         }
-    } else
+    }
+    else
         lfoelapsed += synth->sent_buffersize_f / synth->samplerate_f;
 
     return out;

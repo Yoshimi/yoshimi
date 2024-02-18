@@ -90,7 +90,8 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 
     fr = lpffr.getValue();
     lpffr.advanceValue(synth->sent_buffersize);
-    if (fr != lpffr.getValue()) {
+    if (fr != lpffr.getValue())
+    {
         lpfl->interpolatenextbuffer();
         lpfl->setfreq(lpffr.getValue());
         lpfr->interpolatenextbuffer();
@@ -101,7 +102,8 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 
     fr = hpffr.getValue();
     hpffr.advanceValue(synth->sent_buffersize);
-    if (fr != hpffr.getValue()) {
+    if (fr != hpffr.getValue())
+    {
         hpfl->interpolatenextbuffer();
         hpfl->setfreq(hpffr.getValue());
         hpfr->interpolatenextbuffer();

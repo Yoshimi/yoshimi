@@ -199,7 +199,9 @@ void EffectMgr::out(float *smpsl, float *smpsr)
             {
                 v1 = 1.0f;
                 v2 = volume * 2.0f;
-            } else {
+            }
+            else
+            {
                 v1 = (1.0f - volume) * 2.0f;
                 v2 = 1.0f;
             }
@@ -213,13 +215,17 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 smpsr[i] *= v1;
                 efxoutl[i] *= v2;
                 efxoutr[i] *= v2;
-            } else {
+            }
+            else
+            {
                 // normal instrument/insertion effect
                 smpsl[i] = smpsl[i] * v1 + efxoutl[i] * v2;
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
-    } else { // System effect
+    }
+    else
+    { // System effect
         for (int i = 0; i < synth->sent_buffersize; ++i)
         {
             float volume = efx->volume.getAndAdvanceValue();

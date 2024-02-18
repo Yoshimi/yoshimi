@@ -95,7 +95,9 @@ void mwheel_val_slider::tooltip(const char* tip)
     if (customTip)
     {
         Fl_Widget::tooltip("");
-    } else {
+    }
+    else
+    {
         Fl_Widget::tooltip(tip);
     }
 }
@@ -122,7 +124,9 @@ int mwheel_val_slider::_handle(int res, int event)
             step_size *= step();
             if (range > 2560) // Scale stepping for large ranges
                 step_size *= 10;
-        } else {
+        }
+        else
+        {
             step_size *= range / 20;
         }
 

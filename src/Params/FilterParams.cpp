@@ -230,7 +230,8 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
             c[2] = -alpha / tmp * sqrtf(filter_q + 1);
             d[1] = -2.0f * cs / tmp * (-1);
             d[2] = (1 - alpha) / tmp * (-1);
-        } else
+        }
+        else
             continue;
 
         for (int i = 0; i < nfreqs; ++i)

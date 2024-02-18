@@ -99,7 +99,9 @@ void DynTooltip::dynshow(float timeout)
         reposition();
         update();
         Fl_Menu_Window::show();
-    } else {
+    }
+    else
+    {
         Fl::add_timeout(timeout, delayedShow, this);
     }
 }

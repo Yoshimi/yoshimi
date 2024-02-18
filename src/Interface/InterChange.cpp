@@ -195,7 +195,8 @@ void *InterChange::sortResultsThread(void)
 
 InterChange::~InterChange()
 {
-    if (sortResultsThreadHandle) {
+    if (sortResultsThreadHandle)
+    {
         // Get it to quit.
         spinSortResultsThread();
         pthread_join(sortResultsThreadHandle, 0);

@@ -1525,9 +1525,12 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::kitMode:
-            if (part->Pkitfade) {
+            if (part->Pkitfade)
+            {
                 kitMode->value(3);
-            } else {
+            }
+            else
+            {
                 kitMode->value(valInt);
             }
             partKitOn =  (kitMode->value() > 0);
@@ -1934,9 +1937,12 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         instrumentkitlist->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Kit List"), npart, TOPLEVEL::windowTitle)).c_str());
         drumMode->value(part->Pdrummode);
-            if (part->Pkitfade) {
+            if (part->Pkitfade)
+            {
                 kitMode->value(3);
-            } else {
+            }
+            else
+            {
                 kitMode->value(part->Pkitmode);
             }
         if (kitMode->value())

@@ -25,7 +25,8 @@
 #include "UI/WidgetCheckButton.h"
 
 
-void Fl_Light_Button2::draw() {
+void Fl_Light_Button2::draw()
+{
   if (box()) draw_box(this==Fl::pushed() ? fl_down(box()) : box(), color());
   Fl_Color col = value() ? (active_r() ? selection_color() :
                             fl_inactive(selection_color())) : color();
@@ -47,10 +48,14 @@ void Fl_Light_Button2::draw() {
       case _FL_PLASTIC_UP_BOX :
         // Check box...
         draw_box(down_box(), x()+dx, y()+dy, W, W, FL_BACKGROUND2_COLOR);
-        if (value()) {
-          if (Fl::is_scheme("gtk+")) {
+        if (value())
+        {
+          if (Fl::is_scheme("gtk+"))
+          {
             fl_color(FL_SELECTION_COLOR);
-          } else {
+          }
+          else
+          {
             fl_color(col);
           }
           /* The only difference to the fltk original is the checkmark line width
@@ -64,7 +69,8 @@ void Fl_Light_Button2::draw() {
           int ty = y() + dy + (W+d2)/2-d1-2;
           fl_line_style(FL_JOIN_ROUND | FL_CAP_ROUND, lw);
           fl_begin_line();
-          for (int n = 0; n < 3; n++, ty++) {
+          for (int n = 0; n < 3; n++, ty++)
+          {
             fl_line(tx, ty, tx+d1, ty+d1);
             fl_line(tx+d1, ty+d1, tx+tw-1, ty+d1-d2+1);
           }
@@ -76,20 +82,24 @@ void Fl_Light_Button2::draw() {
       case _FL_ROUND_UP_BOX :
         // Radio button...
         draw_box(down_box(), x()+dx, y()+dy, W, W, FL_BACKGROUND2_COLOR);
-        if (value()) {
+        if (value())
+        {
           int tW = (W - Fl::box_dw(down_box())) / 2 + 1;
           if ((W - tW) & 1) tW++; // Make sure difference is even to center
           int tdx = dx + (W - tW) / 2;
           int tdy = dy + (W - tW) / 2;
 
-          if (Fl::is_scheme("gtk+")) {
+          if (Fl::is_scheme("gtk+"))
+          {
             fl_color(FL_SELECTION_COLOR);
             tW --;
             fl_pie(x() + tdx - 1, y() + tdy - 1, tW + 3, tW + 3, 0.0, 360.0);
             fl_color(fl_color_average(FL_WHITE, FL_SELECTION_COLOR, 0.2f));
-          } else fl_color(col);
+          }
+          else fl_color(col);
 
-          switch (tW) {
+          switch (tW)
+          {
             // Larger circles draw fine...
             default :
               fl_pie(x() + tdx, y() + tdy, tW, tW, 0.0, 360.0);
@@ -115,7 +125,8 @@ void Fl_Light_Button2::draw() {
               break;
           }
 
-          if (Fl::is_scheme("gtk+")) {
+          if (Fl::is_scheme("gtk+"))
+          {
             fl_color(fl_color_average(FL_WHITE, FL_SELECTION_COLOR, 0.5));
             fl_arc(x() + tdx, y() + tdy, tW + 1, tW + 1, 60.0, 180.0);
           }
@@ -134,11 +145,14 @@ void Fl_Light_Button2::draw() {
     int ww = W/2+1;
     int xx = dx;
     if (w()<ww+2*xx) xx = (w()-ww)/2;
-    if (Fl::is_scheme("plastic")) {
+    if (Fl::is_scheme("plastic"))
+    {
       col = active_r() ? selection_color() : fl_inactive(selection_color());
       fl_color(value() ? col : fl_color_average(col, FL_BLACK, 0.5f));
       fl_pie(x()+xx, y()+dy+1, ww, hh, 0, 360);
-    } else {
+    }
+    else
+    {
       draw_box(FL_THIN_DOWN_BOX, x()+xx, y()+dy+1, ww, hh, col);
     }
     lx = dx + ww + 2;

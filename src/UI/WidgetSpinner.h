@@ -36,7 +36,8 @@ class WidgetSpinner : public Fl_Spinner {
         *down_button_;      // Down button
 public:
   WidgetSpinner(int x,int y,int w,int h,const char *l = 0);
-  void labelsize(int size) {
+  void labelsize(int size)
+  {
     Fl_Spinner::labelsize(size);
     this->up_button_->labelsize(1 + size/5);
     this->down_button_->labelsize(1 + size/5);

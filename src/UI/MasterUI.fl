@@ -4177,7 +4177,8 @@ size_t len = strlen(tmp);
 // Use const char references, since Fl_Spinner does not make an
 // internal copy.
 const char *format = "%.2f";
-if (tmp[len-1] == '0') {
+if (tmp[len-1] == '0')
+{
     format = "%.1f";
     if (tmp[len-2] == '0')
         format = "%.0f";
