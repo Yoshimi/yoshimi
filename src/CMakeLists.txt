@@ -46,14 +46,14 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
-add_definitions(-Wfatal-errors) # stop on first
-add_definitions(-Werror=format-security)
-add_definitions(-Wextra)
-add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
+#add_definitions(-Wfatal-errors) # stop on first
+#add_definitions(-Werror=format-security)
+#add_definitions(-Wextra)
+#add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 #add_definitions(-Wno-unqualified-std-cast-call) # supresses clang warning 'unqualified call'
 # ^^^ comment these out on release pushes
 
-set (YOSHIMI_VERSION "2.3.2 rc2")
+set (YOSHIMI_VERSION "2.3.2")
 
 add_definitions (-DMIN_CONFIG_MAJOR=2)
 add_definitions (-DMIN_CONFIG_MINOR=3)
@@ -304,8 +304,8 @@ set (Interface_Sources
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp
     Interface/RingBuffer.h
-    Interface/TextLists.cpp
     Interface/TextLists.h
+    Interface/TextLists.cpp
 )
 
 set (CLI_Sources
@@ -345,9 +345,6 @@ if (BuildWithFLTK)
         "MidiLearnUI"
     )
 
-    set (guitmp generated-gui-sources)
-    file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${guitmp}")
-
 # workaround fltk_wrap_ui breakage
     set (FltkUI_sources)
     set (FltkUI_headers)
@@ -357,10 +354,7 @@ if (BuildWithFLTK)
         set (headerfile "${basename}.h")
         add_custom_command(
             OUTPUT ${sourcefile}
-            WORKING_DIRECTORY ${guitmp}
             COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${sourcefile} ..
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${headerfile} ..
             DEPENDS ${fluidfile}
         )
         set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
