@@ -105,6 +105,8 @@ static const int EFFECT_MAX_PRESETS = 13;       ///////TODO 2/24 not clear yet i
 struct EffectDTO
 {
     int effectID{-1};
+    uchar effectNum{0};
+    bool enabled{false};
     bool isInsert{false};
 
     std::array<uchar, EFFECT_PARAM_CNT>   param{0};

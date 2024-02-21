@@ -247,6 +247,10 @@ class SynthEngine
         GuiDataExchange::Connection<EqGraphDTO> insEqGraphUiCon;
         GuiDataExchange::Connection<EqGraphDTO> partEqGraphUiCon;
 
+        void pushGlobalEffectUpdate(bool isInsert);
+        void maybePublishEffectsToGui();
+    ////////////////////////////////////////////////////////////////////TODO 24/2 ////OOO similar for insert- and part-effects
+
         // others ...
         Controller *ctl;
         Microtonal microtonal;
