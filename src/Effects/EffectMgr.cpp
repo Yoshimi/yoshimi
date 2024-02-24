@@ -258,69 +258,69 @@ void EffectMgr::setdryonly(bool value)
 }
 
 
-void EffectMgr::add2XML(XMLwrapper *xml)
+void EffectMgr::add2XML(XMLwrapper& xml)
 {
-    xml->addpar("type", geteffect());
+    xml.addpar("type", geteffect());
 
     if (!efx || !geteffect())
         return;
-    xml->addpar("preset", efx->Ppreset);
+    xml.addpar("preset", efx->Ppreset);
 
-    xml->beginbranch("EFFECT_PARAMETERS");
+    xml.beginbranch("EFFECT_PARAMETERS");
     for (int n = 0; n < 128; ++n)
     {   // \todo evaluate who should oversee saving and loading of parameters
         int par = geteffectpar(n);
         if (par == 0)
             continue;
-        xml->beginbranch("par_no", n);
-        xml->addpar("par", par);
-        xml->endbranch();
+        xml.beginbranch("par_no", n);
+        xml.addpar("par", par);
+        xml.endbranch();
     }
     if (filterpars)
     {
-        xml->beginbranch("FILTER");
+        xml.beginbranch("FILTER");
         filterpars->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
-    xml->endbranch();
+    xml.endbranch();
 }
 
 
-void EffectMgr::getfromXML(XMLwrapper *xml)
+void EffectMgr::getfromXML(XMLwrapper& xml)
 {
-    changeeffect(xml->getpar127("type", geteffect())); // not convinced this is OK?
+    changeeffect(xml.getpar127("type", geteffect())); // not convinced this is OK?
     if (!efx || !geteffect())
         return;
-    changepreset(xml->getpar127("preset", efx->Ppreset));
+    changepreset(xml.getpar127("preset", efx->Ppreset));
 
     bool isChanged = false;
-    if (xml->enterbranch("EFFECT_PARAMETERS"))
+    if (xml.enterbranch("EFFECT_PARAMETERS"))
     {
         for (int n = 0; n < 128; ++n)
         {
             int par = geteffectpar(n); // find default
             seteffectpar(n, 0); // erase effect parameter
-            if (xml->enterbranch("par_no", n) == 0)
+            if (xml.enterbranch("par_no", n) == 0)
                 continue;
-            seteffectpar(n, xml->getpar127("par", par));
+            seteffectpar(n, xml.getpar127("par", par));
             if (par != geteffectpar(n))
             {
                 isChanged = true;
                 //cout << "changed par " << n << endl;
                 //may use this later to ID
             }
-            xml->exitbranch();
+            xml.exitbranch();
         }
         seteffectpar(-1, isChanged);
         if (filterpars)
         {
-            if (xml->enterbranch("FILTER"))
+            if (xml.enterbranch("FILTER"))
             {
                 filterpars->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
         }
-        xml->exitbranch();
+        xml.exitbranch();
         //if (geteffectpar(-1))
             //cout << "Some pars changed" << endl;
     }

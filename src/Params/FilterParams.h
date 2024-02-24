@@ -45,11 +45,11 @@ class FilterParams : public ParamBase
         FilterParams(unsigned char Ptype_, float Pfreq, float Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
         ~FilterParams() { }
 
-        void add2XML(XMLwrapper *xml);
-        void add2XMLsection(XMLwrapper *xml, int n);
+        void add2XML(XMLwrapper& xml);
+        void add2XMLsection(XMLwrapper& xml, int n);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
-        void getfromXMLsection(XMLwrapper *xml, int n);
+        void getfromXML(XMLwrapper& xml);
+        void getfromXMLsection(XMLwrapper& xml, int n);
 
 
         void getfromFilterParams(FilterParams *pars);

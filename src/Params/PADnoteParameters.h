@@ -183,8 +183,8 @@ class PADnoteParameters : public ParamBase
         void reseed(int value);
         void setPan(char pan, unsigned char panLaw);
 
-        void add2XML(XMLwrapper *xml);
-        void getfromXML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
+        void getfromXML(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
         float getBandwithInCent(); // convert Pbandwith setting into cents
 

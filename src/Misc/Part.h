@@ -83,10 +83,10 @@ class Part
 
         bool saveXML(std::string filename, bool yoshiFormat); // result true for load ok, otherwise false
         int loadXMLinstrument(std::string filename);
-        void add2XML(XMLwrapper *xml, bool subset = false);
-        void add2XMLinstrument(XMLwrapper *xml);
-        void getfromXML(XMLwrapper *xml);
-        void getfromXMLinstrument(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml, bool subset = false);
+        void add2XMLinstrument(XMLwrapper& xml);
+        void getfromXML(XMLwrapper& xml);
+        void getfromXMLinstrument(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
 
         std::unique_ptr<Controller> ctl;

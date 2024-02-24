@@ -45,10 +45,10 @@ class LFOParams : public ParamBase
                   float Pdelay_, unsigned char Pcontinous, int fel_, SynthEngine *_synth);
         ~LFOParams() { }
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
         void setPfreq(int32_t n);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
         void setPintensity(float n) { Pintensity = n; paramsChanged(); }
         void setPstartphase(float n) { Pstartphase = n; }
         void setPLFOtype(unsigned char n) { PLFOtype = n; paramsChanged(); }

@@ -46,9 +46,9 @@ class EffectMgr : public ParamBase
        ~EffectMgr() = default;
         EffectMgr(const bool insertion_, SynthEngine *_synth);
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
 
         void out(float *smpsl, float *smpsr);
 

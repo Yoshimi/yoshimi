@@ -52,15 +52,15 @@ class UnifiedPresets
         string section(SynthEngine *synth, CommandBlock *getData);
         string findPresetType(CommandBlock *getData);
         void list(string dirname, string& name);
-        string findXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string filterXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string lfoXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        bool saveUnif(CommandBlock *getData);
-        bool load(CommandBlock *getData);
-        bool remove(CommandBlock *getData);
+        string findXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string oscilXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string filterXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        void saveUnif(CommandBlock *getData);
+        void load(CommandBlock *getData);
+        void remove(CommandBlock *getData);
 };
 
 #endif

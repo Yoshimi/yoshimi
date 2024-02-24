@@ -881,13 +881,8 @@ bool MidiLearn::saveList(const string& name)
 
     string file = setExtension(name, EXTEN::mlearn);
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        synth->getRuntime().Log("Save Midi Learn failed xml allocation");
-        return false;
-    }
-    bool ok = insertMidiListData(xml);
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    bool ok = insertMidiListData(*xml);
     if (xml->saveXMLfile(file))
         synth->addHistory(file, TOPLEVEL::XML::MLearn);
     else
@@ -895,26 +890,25 @@ bool MidiLearn::saveList(const string& name)
         synth->getRuntime().Log("Failed to save data to " + file);
         ok = false;
     }
-    delete xml;
     return ok;
 }
 
 
-bool MidiLearn::insertMidiListData(XMLwrapper *xml)
+bool MidiLearn::insertMidiListData(XMLwrapper& xml)
 {
     if (midi_list.size() == 0)
         return false;
     int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
-    xml->beginbranch("MIDILEARN");
+    xml.beginbranch("MIDILEARN");
         while (it != midi_list.end())
         {
-            xml->beginbranch("LINE", ID);
-            xml->addparbool("Mute", (it->status & 4) > 0);
-            xml->addparbool("NRPN", (it->status & 8) > 0);
-            xml->addparbool("7_bit", (it->status & 16) > 0);
-            xml->addpar("Midi_Controller", it->CC & 0x7fff);
+            xml.beginbranch("LINE", ID);
+            xml.addparbool("Mute", (it->status & 4) > 0);
+            xml.addparbool("NRPN", (it->status & 8) > 0);
+            xml.addparbool("7_bit", (it->status & 16) > 0);
+            xml.addpar("Midi_Controller", it->CC & 0x7fff);
             /*
              * Clear out top bit - NRPN marker
              * Yoshimi NRPNs are internally stored as
@@ -923,29 +917,29 @@ bool MidiLearn::insertMidiListData(XMLwrapper *xml)
              * For user display they are split and shown as
              * MSB and LSB.
              */
-            xml->addpar("Midi_Channel", it->chan);
-            xml->addparreal("Midi_Min", it->min_in / 1.575f);
-            xml->addparreal("Midi_Max", it->max_in / 1.575f);
-            xml->addparbool("Limit", (it->status & 2) > 0);
-            xml->addparbool("Block", (it->status & 1) > 0);
-            xml->addpar("Convert_Min", it->min_out);
-            xml->addpar("Convert_Max", it->max_out);
-            xml->beginbranch("COMMAND");
-                xml->addpar("Type", it->frame.data.type);
-                xml->addpar("Control", it->frame.data.control);
-                xml->addpar("Part", it->frame.data.part);
-                xml->addpar("Kit_Item", it->frame.data.kit);
-                xml->addpar("Engine", it->frame.data.engine);
-                xml->addpar("Insert", it->frame.data.insert);
-                xml->addpar("Parameter", it->frame.data.parameter);
-                xml->addpar("Secondary_Parameter", it->frame.data.offset);
-                xml->addparstr("Command_Name",findName(it));
-                xml->endbranch();
-            xml->endbranch();
+            xml.addpar("Midi_Channel", it->chan);
+            xml.addparreal("Midi_Min", it->min_in / 1.575f);
+            xml.addparreal("Midi_Max", it->max_in / 1.575f);
+            xml.addparbool("Limit", (it->status & 2) > 0);
+            xml.addparbool("Block", (it->status & 1) > 0);
+            xml.addpar("Convert_Min", it->min_out);
+            xml.addpar("Convert_Max", it->max_out);
+            xml.beginbranch("COMMAND");
+                xml.addpar("Type", it->frame.data.type);
+                xml.addpar("Control", it->frame.data.control);
+                xml.addpar("Part", it->frame.data.part);
+                xml.addpar("Kit_Item", it->frame.data.kit);
+                xml.addpar("Engine", it->frame.data.engine);
+                xml.addpar("Insert", it->frame.data.insert);
+                xml.addpar("Parameter", it->frame.data.parameter);
+                xml.addpar("Secondary_Parameter", it->frame.data.offset);
+                xml.addparstr("Command_Name",findName(it));
+                xml.endbranch();
+            xml.endbranch();
             ++it;
             ++ID;
         }
-    xml->endbranch(); // MIDILEARN
+    xml.endbranch(); // MIDILEARN
     return true;
 }
 
@@ -963,15 +957,10 @@ bool MidiLearn::loadList(const string& name)
         synth->getRuntime().Log("Can't find " + file);
         return false;
     }
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        synth->getRuntime().Log("Load Midi Learn failed XMLwrapper allocation");
-        return false;
-    }
+
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
     xml->loadXMLfile(file);
-    bool ok = extractMidiListData(true,  xml);
-    delete xml;
+    bool ok = extractMidiListData(true,  *xml);
     if (!ok)
         return false;
     synth->addHistory(file, TOPLEVEL::XML::MLearn);
@@ -979,10 +968,10 @@ bool MidiLearn::loadList(const string& name)
 }
 
 
-bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
+bool MidiLearn::extractMidiListData(bool full,  XMLwrapper& xml)
 {
     midi_list.clear();
-    if (!xml->enterbranch("MIDILEARN"))
+    if (!xml.enterbranch("MIDILEARN"))
     {
         if (full)
             synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
@@ -998,49 +987,49 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
     {
         status = 0;
         ident = 0;
-        if (!xml->enterbranch("LINE", ID))
+        if (!xml.enterbranch("LINE", ID))
             break;
         else
         {
-            if (xml->getparbool("Mute", 0))
+            if (xml.getparbool("Mute", 0))
                 status |= 4;
-            if (xml->getparbool("NRPN", 0))
+            if (xml.getparbool("NRPN", 0))
             {
                 ident = MIDI::CC::identNRPN; // set top bit for NRPN indication
                 status |= 8;
             }
-            if (xml->getparbool("7_bit",0))
+            if (xml.getparbool("7_bit",0))
                 status |= 16;
 
-            entry.CC = ident | xml->getpar("Midi_Controller", 0, 0, MIDI::CC::maxNRPN);
+            entry.CC = ident | xml.getpar("Midi_Controller", 0, 0, MIDI::CC::maxNRPN);
 
-            entry.chan = xml->getpar127("Midi_Channel", 0);
+            entry.chan = xml.getpar127("Midi_Channel", 0);
 
-            int min = int((xml->getparreal("Midi_Min", 200.0f) * 1.575f) + 0.1f);
+            int min = int((xml.getparreal("Midi_Min", 200.0f) * 1.575f) + 0.1f);
             entry.min_in = min;
 
-            int max = int((xml->getparreal("Midi_Max", 200.0f) * 1.575f) + 0.1f);
+            int max = int((xml.getparreal("Midi_Max", 200.0f) * 1.575f) + 0.1f);
             entry.max_in = max;
 
-            if (xml->getparbool("Limit",0))
+            if (xml.getparbool("Limit",0))
                 status |= 2;
-            if (xml->getparbool("Block",0))
+            if (xml.getparbool("Block",0))
                 status |= 1;
-            entry.min_out = xml->getpar("Convert_Min", 0, -16384, 16383);
-            entry.max_out = xml->getpar("Convert_Max", 0, -16384, 16383);
-            xml->enterbranch("COMMAND");
-                entry.frame.data.type = xml->getpar255("Type", 0); // ??
-                entry.frame.data.control = xml->getpar255("Control", 0);
-                entry.frame.data.part = xml->getpar255("Part", 0);
-                entry.frame.data.kit = xml->getpar255("Kit_Item", 0);
-                entry.frame.data.engine = xml->getpar255("Engine", 0);
-                entry.frame.data.insert = xml->getpar255("Insert", 0);
-                entry.frame.data.parameter = xml->getpar255("Parameter", 0);
-                entry.frame.data.offset = xml->getpar255("Secondary_Parameter", 0);
+            entry.min_out = xml.getpar("Convert_Min", 0, -16384, 16383);
+            entry.max_out = xml.getpar("Convert_Max", 0, -16384, 16383);
+            xml.enterbranch("COMMAND");
+                entry.frame.data.type      = xml.getpar255("Type", 0); // ??
+                entry.frame.data.control   = xml.getpar255("Control", 0);
+                entry.frame.data.part      = xml.getpar255("Part", 0);
+                entry.frame.data.kit       = xml.getpar255("Kit_Item", 0);
+                entry.frame.data.engine    = xml.getpar255("Engine", 0);
+                entry.frame.data.insert    = xml.getpar255("Insert", 0);
+                entry.frame.data.parameter = xml.getpar255("Parameter", 0);
+                entry.frame.data.offset    = xml.getpar255("Secondary_Parameter", 0);
 
 if (fromText)
 {
-                string test = xml->getparstr("Command_Name");
+                string test = xml.getparstr("Command_Name");
                 TextData::encodeAll(synth, test, allData);
                 //synth->CBtest(&allData);
 }
@@ -1101,14 +1090,14 @@ if (fromText & 1)
                 entry.frame.data.parameter = allData.data.parameter;
                 entry.frame.data.offset = allData.data.offset;
 }
-                xml->exitbranch();
-            xml->exitbranch();
+                xml.exitbranch();
+            xml.exitbranch();
             entry.status = status;
             midi_list.push_back(entry);
             ++ ID;
         }
     }
-    xml->exitbranch(); // MIDILEARN
+    xml.exitbranch(); // MIDILEARN
     //synth->CBtest(&allData);
     return true;
 }

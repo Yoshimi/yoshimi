@@ -97,7 +97,7 @@ class SynthEngine
         bool Init(unsigned int audiosrate, int audiobufsize);
 
         bool savePatchesXML(string filename);
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         string manualname();
         void defaults(void);
 
@@ -117,11 +117,11 @@ class SynthEngine
         bool saveHistory(void);
         unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
         unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, const string& name);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
         unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, const string& name);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
 
-        bool getfromXML(XMLwrapper *xml);
+        bool getfromXML(XMLwrapper& xml);
 
         int getalldata(char **data);
         void putalldata(const char *data, int size);

@@ -338,66 +338,66 @@ void Controller::setresonancebw(int value)
 }
 
 
-void Controller::add2XML(XMLwrapper *xml)
+void Controller::add2XML(XMLwrapper& xml)
 {
-    xml->addpar("pitchwheel_bendrange", pitchwheel.bendrange);
+    xml.addpar("pitchwheel_bendrange", pitchwheel.bendrange);
 
-    xml->addparbool("expression_receive",expression.receive);
-    xml->addpar("panning_depth", (char)panning.depth);
-    xml->addpar("filter_cutoff_depth",filtercutoff.depth);
-    xml->addpar("filter_q_depth",filterq.depth);
-    xml->addpar("bandwidth_depth",bandwidth.depth);
-    xml->addpar("mod_wheel_depth",modwheel.depth);
-    xml->addparbool("mod_wheel_exponential",modwheel.exponential);
-    xml->addparbool("fm_amp_receive",fmamp.receive);
-    xml->addparbool("volume_receive",volume.receive);
-    xml->addpar("volume_range",volume.data);
-    xml->addparbool("sustain_receive",sustain.receive);
+    xml.addparbool("expression_receive",expression.receive);
+    xml.addpar("panning_depth", (char)panning.depth);
+    xml.addpar("filter_cutoff_depth",filtercutoff.depth);
+    xml.addpar("filter_q_depth",filterq.depth);
+    xml.addpar("bandwidth_depth",bandwidth.depth);
+    xml.addpar("mod_wheel_depth",modwheel.depth);
+    xml.addparbool("mod_wheel_exponential",modwheel.exponential);
+    xml.addparbool("fm_amp_receive",fmamp.receive);
+    xml.addparbool("volume_receive",volume.receive);
+    xml.addpar("volume_range",volume.data);
+    xml.addparbool("sustain_receive",sustain.receive);
 
-    xml->addparbool("portamento_receive",portamento.receive);
-    xml->addpar("portamento_time",portamento.time);
-    xml->addpar("portamento_pitchthresh",portamento.pitchthresh);
-    xml->addpar("portamento_pitchthreshtype",portamento.pitchthreshtype);
-    xml->addpar("portamento_portamento",portamento.portamento);
-    xml->addpar("portamento_updowntimestretch",portamento.updowntimestretch);
-    xml->addpar("portamento_proportional", portamento.proportional);
-    xml->addpar("portamento_proprate", portamento.propRate);
-    xml->addpar("portamento_propdepth", portamento.propDepth);
+    xml.addparbool("portamento_receive",portamento.receive);
+    xml.addpar("portamento_time",portamento.time);
+    xml.addpar("portamento_pitchthresh",portamento.pitchthresh);
+    xml.addpar("portamento_pitchthreshtype",portamento.pitchthreshtype);
+    xml.addpar("portamento_portamento",portamento.portamento);
+    xml.addpar("portamento_updowntimestretch",portamento.updowntimestretch);
+    xml.addpar("portamento_proportional", portamento.proportional);
+    xml.addpar("portamento_proprate", portamento.propRate);
+    xml.addpar("portamento_propdepth", portamento.propDepth);
 
-    xml->addpar("resonance_center_depth",resonancecenter.depth);
-    xml->addpar("resonance_bandwidth_depth",resonancebandwidth.depth);
+    xml.addpar("resonance_center_depth",resonancecenter.depth);
+    xml.addpar("resonance_bandwidth_depth",resonancebandwidth.depth);
 }
 
 
-void Controller::getfromXML(XMLwrapper *xml)
+void Controller::getfromXML(XMLwrapper& xml)
 {
-    pitchwheel.bendrange=xml->getpar("pitchwheel_bendrange",pitchwheel.bendrange,-6400,6400);
+    pitchwheel.bendrange= xml.getpar("pitchwheel_bendrange",pitchwheel.bendrange,-6400,6400);
 
-    expression.receive=xml->getparbool("expression_receive",expression.receive);
-    panning.depth = xml->getpar127("panning_depth", panning.depth);
-    filtercutoff.depth=xml->getpar127("filter_cutoff_depth",filtercutoff.depth);
-    filterq.depth=xml->getpar127("filter_q_depth",filterq.depth);
-    bandwidth.depth=xml->getpar127("bandwidth_depth",bandwidth.depth);
-    modwheel.depth=xml->getpar127("mod_wheel_depth",modwheel.depth);
-    modwheel.exponential=xml->getparbool("mod_wheel_exponential",modwheel.exponential);
-    fmamp.receive=xml->getparbool("fm_amp_receive",fmamp.receive);
-    volume.receive=xml->getparbool("volume_receive",volume.receive);
-    setvolume(xml->getpar127("volume_range",volume.data));
+    expression.receive  = xml.getparbool("expression_receive",expression.receive);
+    panning.depth       = xml.getpar127("panning_depth", panning.depth);
+    filtercutoff.depth  = xml.getpar127("filter_cutoff_depth",filtercutoff.depth);
+    filterq.depth       = xml.getpar127("filter_q_depth",filterq.depth);
+    bandwidth.depth     = xml.getpar127("bandwidth_depth",bandwidth.depth);
+    modwheel.depth      = xml.getpar127("mod_wheel_depth",modwheel.depth);
+    modwheel.exponential= xml.getparbool("mod_wheel_exponential",modwheel.exponential);
+    fmamp.receive       = xml.getparbool("fm_amp_receive",fmamp.receive);
+    volume.receive      = xml.getparbool("volume_receive",volume.receive);
+    setvolume(xml.getpar127("volume_range",volume.data));
 
-    sustain.receive=xml->getparbool("sustain_receive",sustain.receive);
+    sustain.receive     = xml.getparbool("sustain_receive",sustain.receive);
 
-    portamento.receive=xml->getparbool("portamento_receive",portamento.receive);
-    portamento.time=xml->getpar127("portamento_time",portamento.time);
-    portamento.pitchthresh=xml->getpar127("portamento_pitchthresh",portamento.pitchthresh);
-    portamento.pitchthreshtype=xml->getpar127("portamento_pitchthreshtype",portamento.pitchthreshtype);
-    portamento.portamento=xml->getpar127("portamento_portamento",portamento.portamento);
-    portamento.updowntimestretch=xml->getpar127("portamento_updowntimestretch",portamento.updowntimestretch);
-    portamento.proportional = xml->getpar127("portamento_proportional",portamento.proportional);
-    portamento.propRate = xml->getpar127("portamento_proprate",portamento.propRate);
-    portamento.propDepth = xml->getpar127("portamento_propdepth",portamento.propDepth);
+    portamento.receive          = xml.getparbool("portamento_receive",portamento.receive);
+    portamento.time             = xml.getpar127("portamento_time",portamento.time);
+    portamento.pitchthresh      = xml.getpar127("portamento_pitchthresh",portamento.pitchthresh);
+    portamento.pitchthreshtype  = xml.getpar127("portamento_pitchthreshtype",portamento.pitchthreshtype);
+    portamento.portamento       = xml.getpar127("portamento_portamento",portamento.portamento);
+    portamento.updowntimestretch= xml.getpar127("portamento_updowntimestretch",portamento.updowntimestretch);
+    portamento.proportional     = xml.getpar127("portamento_proportional",portamento.proportional);
+    portamento.propRate         = xml.getpar127("portamento_proprate",portamento.propRate);
+    portamento.propDepth        = xml.getpar127("portamento_propdepth",portamento.propDepth);
 
-    resonancecenter.depth=xml->getpar127("resonance_center_depth",resonancecenter.depth);
-    resonancebandwidth.depth=xml->getpar127("resonance_bandwidth_depth",resonancebandwidth.depth);
+    resonancecenter.depth    = xml.getpar127("resonance_center_depth",resonancecenter.depth);
+    resonancebandwidth.depth = xml.getpar127("resonance_bandwidth_depth",resonancebandwidth.depth);
 }
 
 

@@ -205,60 +205,60 @@ void EnvelopeParams::converttofree(void)
 }
 
 
-void EnvelopeParams::add2XML(XMLwrapper *xml)
+void EnvelopeParams::add2XML(XMLwrapper& xml)
 {
-    xml->addparbool("free_mode",Pfreemode);
-    xml->addpar("env_points",Penvpoints);
-    xml->addpar("env_sustain",Penvsustain);
-    xml->addpar("env_stretch",Penvstretch);
-    xml->addparbool("forced_release",Pforcedrelease);
-    xml->addparbool("linear_envelope",Plinearenvelope);
-    xml->addparcombi("A_dt",PA_dt);
-    xml->addparcombi("D_dt",PD_dt);
-    xml->addparcombi("R_dt",PR_dt);
-    xml->addparcombi("A_val",PA_val);
-    xml->addparcombi("D_val",PD_val);
-    xml->addparcombi("S_val",PS_val);
-    xml->addparcombi("R_val",PR_val);
+    xml.addparbool("free_mode",Pfreemode);
+    xml.addpar("env_points",Penvpoints);
+    xml.addpar("env_sustain",Penvsustain);
+    xml.addpar("env_stretch",Penvstretch);
+    xml.addparbool("forced_release",Pforcedrelease);
+    xml.addparbool("linear_envelope",Plinearenvelope);
+    xml.addparcombi("A_dt",PA_dt);
+    xml.addparcombi("D_dt",PD_dt);
+    xml.addparcombi("R_dt",PR_dt);
+    xml.addparcombi("A_val",PA_val);
+    xml.addparcombi("D_val",PD_val);
+    xml.addparcombi("S_val",PS_val);
+    xml.addparcombi("R_val",PR_val);
 
-    if ((Pfreemode!=0)||(!xml->minimal))
+    if ((Pfreemode!=0)||(!xml.minimal))
     {
         for (size_t i=0; i<Penvpoints; ++i)
         {
-            xml->beginbranch("POINT",i);
+            xml.beginbranch("POINT",i);
             if (i > 0)
-                xml->addparcombi("dt",Penvdt[i]);
-            xml->addparcombi("val",Penvval[i]);
-            xml->endbranch();
+                xml.addparcombi("dt",Penvdt[i]);
+            xml.addparcombi("val",Penvval[i]);
+            xml.endbranch();
         }
     }
 }
 
 
-void EnvelopeParams::getfromXML(XMLwrapper *xml)
+void EnvelopeParams::getfromXML(XMLwrapper& xml)
 {
-    Pfreemode=xml->getparbool("free_mode",Pfreemode);
-    Penvpoints=xml->getpar127("env_points",Penvpoints);
-    Penvsustain=xml->getpar127("env_sustain",Penvsustain);
-    Penvstretch=xml->getpar127("env_stretch",Penvstretch);
-    Pforcedrelease=xml->getparbool("forced_release",Pforcedrelease);
-    Plinearenvelope=xml->getparbool("linear_envelope",Plinearenvelope);
+    Pfreemode=xml.getparbool("free_mode",Pfreemode);
+    Penvpoints=xml.getpar127("env_points",Penvpoints);
+    Penvsustain=xml.getpar127("env_sustain",Penvsustain);
+    Penvstretch=xml.getpar127("env_stretch",Penvstretch);
+    Pforcedrelease=xml.getparbool("forced_release",Pforcedrelease);
+    Plinearenvelope=xml.getparbool("linear_envelope",Plinearenvelope);
 
-    PA_dt=xml->getparcombi("A_dt",PA_dt,0,127);
-    PD_dt=xml->getparcombi("D_dt",PD_dt,0,127);
-    PR_dt=xml->getparcombi("R_dt",PR_dt,0,127);
-    PA_val=xml->getparcombi("A_val",PA_val,0,127);
-    PD_val=xml->getparcombi("D_val",PD_val,0,127);
-    PS_val=xml->getparcombi("S_val",PS_val,0,127);
-    PR_val=xml->getparcombi("R_val",PR_val,0,127);
+    PA_dt=xml.getparcombi("A_dt",PA_dt,0,127);
+    PD_dt=xml.getparcombi("D_dt",PD_dt,0,127);
+    PR_dt=xml.getparcombi("R_dt",PR_dt,0,127);
+    PA_val=xml.getparcombi("A_val",PA_val,0,127);
+    PD_val=xml.getparcombi("D_val",PD_val,0,127);
+    PS_val=xml.getparcombi("S_val",PS_val,0,127);
+    PR_val=xml.getparcombi("R_val",PR_val,0,127);
 
     for (size_t i=0;i<Penvpoints;i++)
     {
-        if (xml->enterbranch("POINT",i)==0) continue;
+        if (xml.enterbranch("POINT",i)==0) continue;
         if (i > 0)
-            Penvdt[i]=xml->getparcombi("dt",Penvdt[i], 0,127);
-        Penvval[i]=xml->getparcombi("val",Penvval[i], 0,127);
-        xml->exitbranch();
+            Penvdt[i]=xml.getparcombi("dt",Penvdt[i], 0,127);
+        Penvval[i]=xml.getparcombi("val",Penvval[i], 0,127);
+        xml.exitbranch();
     }
 
     if (!Pfreemode)

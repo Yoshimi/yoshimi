@@ -19,6 +19,7 @@
 */
 
 #include <string>
+#include <memory>
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
@@ -242,7 +243,7 @@ void UnifiedPresets::list(string dirname, string& name)
 }
 
 
-string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::findXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -276,15 +277,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
             if (isLoad)
             {
                 sectionType->defaults();
-                xml->enterbranch(name);
+                xml.enterbranch(name);
                 sectionType->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
             else
             {
-                xml->beginbranch(name);
+                xml.beginbranch(name);
                 sectionType->add2XML(xml);
-                xml->endbranch();
+                xml.endbranch();
             }
         }
     }
@@ -336,15 +337,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
         if (isLoad)
         {
             sectionType->defaults();
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
         else
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
 
@@ -357,15 +358,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
         if (isLoad)
         {
             sectionType->voiceDefaults(voice);
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXMLsection(xml, voice);
-            xml->exitbranch();
+            xml.exitbranch();
         }
         else
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XMLsection(xml, voice);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
 
@@ -377,15 +378,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
         if (isLoad)
         {
             sectionType->defaults();
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
         else
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
 
@@ -397,15 +398,15 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
         if (isLoad)
         {
             sectionType->defaults();
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
         else
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
 
@@ -413,7 +414,7 @@ string UnifiedPresets::findXML(XMLwrapper *xml, CommandBlock *getData, bool isLo
 }
 
 
-string UnifiedPresets::resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -434,22 +435,22 @@ string UnifiedPresets::resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool 
 
     if (isLoad)
     {
-        xml->enterbranch(name);
+        xml.enterbranch(name);
         sectionType->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
     else
     {
-        xml->beginbranch(name);
+        xml.beginbranch(name);
         sectionType->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
 
     return name;
 }
 
 
-string UnifiedPresets::oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::oscilXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -479,22 +480,22 @@ string UnifiedPresets::oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLo
 
     if (isLoad)
     {
-        xml->enterbranch(name);
+        xml.enterbranch(name);
         sectionType->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
     else
     {
-        xml->beginbranch(name);
+        xml.beginbranch(name);
         sectionType->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
 
     return name;
 }
 
 
-string UnifiedPresets::filterXML(XMLwrapper *xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::filterXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -552,30 +553,30 @@ string UnifiedPresets::filterXML(XMLwrapper *xml, CommandBlock *getData, bool is
     {
         if (offset == UNUSED)
         {
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
         else
         {
-            xml->enterbranch(name);
+            xml.enterbranch(name);
             sectionType->getfromXMLsection(xml, offset);
-            xml->exitbranch();
+            xml.exitbranch();
         }
     }
     else
     {
         if (offset == UNUSED)
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
         else
         {
-            xml->beginbranch(name);
+            xml.beginbranch(name);
             sectionType->add2XMLsection(xml, offset);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
 
@@ -583,7 +584,7 @@ string UnifiedPresets::filterXML(XMLwrapper *xml, CommandBlock *getData, bool is
 }
 
 
-string UnifiedPresets::lfoXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -653,22 +654,22 @@ string UnifiedPresets::lfoXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad
 
     if (isLoad)
     {
-        xml->enterbranch(name);
+        xml.enterbranch(name);
         sectionType->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
     else
     {
-        xml->beginbranch(name);
+        xml.beginbranch(name);
         sectionType->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
 
     return name;
 }
 
 
-string UnifiedPresets::envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -762,26 +763,26 @@ string UnifiedPresets::envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool i
 
     if (isLoad)
     {
-        xml->enterbranch(name);
+        xml.enterbranch(name);
         sectionType->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
     else
     {
-        xml->beginbranch(name);
+        xml.beginbranch(name);
         sectionType->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
 
     return name;
 }
 
 
-bool UnifiedPresets::saveUnif(CommandBlock *getData)
+void UnifiedPresets::saveUnif(CommandBlock *getData)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
-    XMLwrapper *xml = new XMLwrapper(synth, false);
-    string type = findXML(xml, getData, false);
+    auto xml{std::make_unique<XMLwrapper>(synth, false)};
+    string type = findXML(*xml, getData, false);
     if (type.empty())
         synth->getRuntime().Log("Unrecognised preset type");
     else
@@ -802,16 +803,14 @@ bool UnifiedPresets::saveUnif(CommandBlock *getData)
             xml->saveXMLfile(dirname + "/" + name + "." + type + EXTEN::presets);
         }
     }
-    delete xml;
-    return false;
 }
 
 
-bool UnifiedPresets::load(CommandBlock *getData)
+void UnifiedPresets::load(CommandBlock *getData)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     string type = findPresetType(getData);
-    XMLwrapper *xml = new XMLwrapper(synth, false);
+    auto xml{std::make_unique<XMLwrapper>(synth, false)};
     string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
     string dirname;
     string prefix;
@@ -836,18 +835,14 @@ bool UnifiedPresets::load(CommandBlock *getData)
     string filename = prefix + type + EXTEN::presets;
 
     if (file::isRegularFile(prefix + type + EXTEN::presets) == 0)
-    {
         synth->getRuntime().Log("Can't match " + filename + " here.");
-        return false;
-    }
 
     xml->loadXMLfile(filename);
-    findXML(xml, getData, true);
-    delete xml;
-    return false;
+    findXML(*xml, getData, true);
 }
 
-bool UnifiedPresets::remove(CommandBlock *getData)
+
+void UnifiedPresets::remove(CommandBlock *getData)
 {
     human = 0; // we need the extension this time.
     string type = findPresetType(getData);
@@ -856,5 +851,4 @@ bool UnifiedPresets::remove(CommandBlock *getData)
     string filename = dirname + "/" + name + "." + type + EXTEN::presets;
     //std::cout << "file >" << filename << std::endl;
     file::deleteFile(filename);
-    return false;
 }

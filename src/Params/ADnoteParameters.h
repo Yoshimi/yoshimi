@@ -199,8 +199,8 @@ class ADnoteParameters : public ParamBase
         ~ADnoteParameters();
         void defaults(void);
         void voiceDefaults(int n) {defaults(n);};
-        void add2XML(XMLwrapper *xml);
-        void getfromXML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
+        void getfromXML(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
         float getBandwidthDetuneMultiplier(void);
         float getUnisonFrequencySpreadCents(int nvoice);
@@ -213,8 +213,8 @@ class ADnoteParameters : public ParamBase
          * no other way to access them from UnifiedPresets.
          * Will.
          */
-        void add2XMLsection(XMLwrapper *xml, int n);
-        void getfromXMLsection(XMLwrapper *xml, int n);
+        void add2XMLsection(XMLwrapper& xml, int n);
+        void getfromXMLsection(XMLwrapper& xml, int n);
         static int ADnote_unison_sizes[15];
 
     private:

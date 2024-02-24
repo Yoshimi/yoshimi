@@ -42,10 +42,8 @@ using std::list;
 class MidiLearn : private DataText, TextData
 {
     public:
-        MidiLearn(SynthEngine *_synth);
+        MidiLearn(SynthEngine*);
         ~MidiLearn();
-        void add2XML(XMLwrapper *xml);
-        void getfromXML(XMLwrapper *xml);
         CommandBlock data;//commandData;
 
 /*        struct Control{
@@ -84,9 +82,9 @@ class MidiLearn : private DataText, TextData
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
         void generalOperations(CommandBlock *getData);
-        bool insertMidiListData(XMLwrapper *xml);
+        bool insertMidiListData(XMLwrapper&);
         bool loadList(const string& name);
-        bool extractMidiListData(bool full,  XMLwrapper *xml);
+        bool extractMidiListData(bool full, XMLwrapper&);
         void updateGui(int opp = 0);
 
 
