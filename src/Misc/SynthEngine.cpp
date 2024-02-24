@@ -2459,13 +2459,13 @@ void SynthEngine::ShutUp(void)
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
     interchange.undoRedoClear();
-    defaults();
     //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
     Runtime.stateChanged = true;
-    bool result = Runtime.restoreSessionData(filename);
-    ShutUp();
-    return result;
+    bool success = Runtime.restoreSessionData(filename);
+    if (!success)
+        defaults();
+    return success;
 }
 
 
@@ -3269,7 +3269,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    sysefx[0]->changeeffect(0);
+    sysefx[0]->defaults();
     if (xml->enterbranch("SYSTEM_EFFECTS"))
     {
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
