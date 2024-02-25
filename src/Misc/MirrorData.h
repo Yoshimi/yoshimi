@@ -25,18 +25,21 @@
 #include "Interface/GuiDataExchange.h"
 
 #include <cassert>
+#include <functional>
 
 
 /**
  * A »data mirror« component for the GUI.
  * As part of the GuiDataExchange protocol, this component is attached to some
  * GUI window or control and will then receive data updates pushed by the Core.
+ * Optionally a callback hook can be installed to be henceforth invoked on »push«.
  */
 template<class DAT>
 class MirrorData
     : public GuiDataExchange::Subscription
 {
     DAT data;
+    std::function<void(DAT&)> updateHook{};
 
     void pushUpdate(GuiDataExchange::RoutingTag const& tag, void* buffer)  override
     {
@@ -44,6 +47,8 @@ class MirrorData
         assert(buffer);
         data.~DAT(); // copy-construct into data storage
         new(&data) DAT{* reinterpret_cast<DAT*>(buffer)};
+        if (updateHook)
+            updateHook(data);
     }
 
 public:
@@ -55,6 +60,13 @@ public:
     MirrorData(GuiDataExchange& hub, GuiDataExchange::RoutingTag tag)
         : MirrorData{GuiDataExchange::Connection<DAT>{hub,tag}}
         { }
+
+    /** install a hook to be invoked on each push update */
+    template<typename FUN>
+    void onUpdate(FUN&& callback)
+    {
+        updateHook = std::forward<FUN>(callback);
+    }
 
 
     DAT& get()

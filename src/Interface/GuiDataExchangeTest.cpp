@@ -178,5 +178,18 @@ void run_GuiDataExchangeTest()
     CHECK (h1 == receiver3.get());
     
     
+    // =============================================== can install a hook to be activated on each push
+    string proofMark{};
+    receiver3.onUpdate([&](Heffalump const& h)
+                        {
+                            proofMark = string{h.data()};
+                        });
+    
+    // on next push-update...
+    con.publish(h2);
+    guiDataExchange.dispatchUpdates(pullData());
+    CHECK (proofMark == h2.data());
+    
+    
     cout << "Bye Bye "<<receiver.get().data() <<endl;
 }
