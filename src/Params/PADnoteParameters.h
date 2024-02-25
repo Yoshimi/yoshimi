@@ -38,6 +38,7 @@
 #include "DSP/FFTwrapper.h"
 
 #include <memory>
+#include <optional>
 #include <utility>
 #include <cassert>
 #include <vector>
@@ -189,7 +190,7 @@ class PADnoteParameters : public ParamBase
 
         // (re)Building the Wavetable
         void buildNewWavetable(bool blocking =false);
-        Optional<PADTables> render_wavetable();
+        std::optional<PADTables> render_wavetable();
         void activate_wavetable();
         bool export2wav(std::string basefilename);
 
@@ -347,7 +348,7 @@ class PADnoteParameters : public ParamBase
 
         // type abbreviations
         using FutureVal = std::future<PADTables>;
-        using ResultVal = Optional<PADTables>;
+        using ResultVal = std::optional<PADTables>;
         using BuildOperation = std::function<ResultVal()>;
         using ScheduleAction = std::function<FutureVal()>;
         using SchedulerSetup = std::function<ScheduleAction(BuildOperation)>;

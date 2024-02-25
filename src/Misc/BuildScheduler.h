@@ -24,93 +24,20 @@
 #include <atomic>
 #include <future>
 #include <utility>
-//#include <optional>
+#include <optional>
 #include <functional>
 #include <stdexcept>
 #include <cassert>
 
 using std::move;
+using std::optional;
 
 
 
 
 
-/* »Result« type — with the ability to yield "no result"
- *
- * NOTE: starting with C++17 we should use just std::optional here.
- */
-template<class VAL>
-class Optional
-{
-    struct EmptyPlaceholder { };
-    union {
-        EmptyPlaceholder empty;
-        VAL resultVal;
-    };
-    bool hasResult;
 
-
-public:
-    Optional(EmptyPlaceholder const&)
-        : empty()
-        , hasResult{false}
-    { }
-    static const EmptyPlaceholder NoResult;
-
-    Optional(VAL&& result)
-        : resultVal{move(result)}
-        , hasResult{true}
-    { }
-
-   ~Optional()
-    {
-        if (hasResult)
-          resultVal.~VAL();
-    }
-
-    // may only be moved, not copied...
-    Optional(Optional const&)            = delete;
-    Optional& operator=(Optional&&)      = delete;
-    Optional& operator=(Optional const&) = delete;
-
-    Optional(Optional&& rr)
-        : empty()
-        , hasResult{rr.hasResult}
-    {
-        if (hasResult)
-        {
-            new(&resultVal) VAL{move(rr.resultVal)};
-        }
-    }
-
-
-    explicit operator bool()  const
-    {
-        return hasResult;
-    }
-
-    VAL& operator*()
-    {
-        if (not hasResult)
-            throw std::logic_error{"Accessing empty result value"};
-        return resultVal;
-    }
-    VAL const& operator*()  const
-    {
-        if (not hasResult)
-            throw std::logic_error{"Accessing empty result value"};
-        return resultVal;
-    }
-};
-
-/* marker for the »missing result« */
-template<class VAL>
-const typename Optional<VAL>::EmptyPlaceholder Optional<VAL>::NoResult{};
-
-
-
-
-/* Workaround for a long-standing problem in C++ : std::function to bind move-only values.
+/* Workaround for a long-standing problem in C++ : std::function binding move-only values.
  * This problem notoriously appears when dealing with std::promise in "Task"-Functions.
  * The official solution is proposed for C++23 (std::move_only_function).
  *
@@ -184,7 +111,7 @@ class FutureBuild
 {
     // Type abbreviations
     using FutureVal = std::future<TAB>;
-    using ResultVal = Optional<TAB>;
+    using ResultVal = std::optional<TAB>;
     using BuildOp = std::function<ResultVal()>;
 
     /* the managed data value under construction */
@@ -263,7 +190,7 @@ namespace task {
         using FutureVal = std::future<TAB>;
         using Promise   = std::promise<TAB>;
 
-        using OptionalResult = Optional<TAB>;
+        using OptionalResult = optional<TAB>;
         using BuildOperation = std::function<OptionalResult()>;
         using ScheduleAction = std::function<FutureVal()>;
 
