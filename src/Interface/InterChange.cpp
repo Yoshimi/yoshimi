@@ -2028,6 +2028,7 @@ void InterChange::doClearPartInstrument(int npart)
     synth->part[npart]->cleanup();
     synth->getRuntime().currentPart = npart;
     synth->partonoffWrite(npart, 2);
+    synth->pushEffectUpdate(npart);
 }
 
 bool InterChange::commandSend(CommandBlock *getData)
@@ -3605,6 +3606,7 @@ void InterChange::commandPart(CommandBlock *getData)
     char value_bool = _SYS_::F2B(value);
 
     Part *part;
+    assert(npart < NUM_MIDI_PARTS);
     part = synth->part[npart];
     if (not part->Pkitmode)
     {
@@ -3682,6 +3684,7 @@ void InterChange::commandPart(CommandBlock *getData)
                     getData->data.value = npart;
                     getData->data.control = MAIN::control::partNumber;
                     getData->data.part = TOPLEVEL::section::main;
+                    synth->pushEffectUpdate(npart); // send current part-effect data to GUI
                 }
                 else
                     synth->partonoffWrite(npart, value_int);
@@ -4039,7 +4042,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 getData->data.engine = value_int;
                 getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
                 // the line above is to show it's changed from preset values
-
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Peffnum;
@@ -4047,7 +4050,10 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case PART::control::effectType:
             if (write)
+            {
                 part->partefx[effNum]->changeeffect(value_int);
+                synth->pushEffectUpdate(npart);
+            }
             else
                 value = part->partefx[effNum]->geteffect();
             getData->data.offset = 0;
@@ -4057,6 +4063,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 part->Pefxroute[effNum] = value_int;
                 part->partefx[effNum]->setdryonly(value_int == 2);
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Pefxroute[effNum];
@@ -4072,6 +4079,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Pefxbypass[engine] = newSwitch;
                 if (newSwitch != oldSwitch)
                     part->partefx[engine]->cleanup();
+                // no GUI update since bypass toggle is not part of EffUI
             }
             else
                 value = part->Pefxbypass[engine];
@@ -7001,7 +7009,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         synth->inseffnum = value_int;
                         getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
                     }
-                    synth->pushGlobalEffectUpdate(not isSysEff);
+                    synth->pushEffectUpdate(npart);
                     getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
                     // the line above is to show it's changed from preset values
                     getData->data.engine = value_int;
@@ -7025,7 +7033,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     {
                         synth->insefx[effnum]->changeeffect(value_int);
                     }   // push GUI update since module for effnum is currently exposed in GUI
-                    synth->pushGlobalEffectUpdate(not isSysEff);
+                    synth->pushEffectUpdate(npart);
                     getData->data.offset = 0;
                 }
                 else
@@ -7042,7 +7050,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     synth->Pinsparts[effnum] = value_int;
                     if (value_int == -1)
                         synth->insefx[effnum]->cleanup();
-                    synth->pushGlobalEffectUpdate(true); // isInsert and currently exposed in GUI
+                    synth->pushEffectUpdate(npart); // isInsert and currently exposed in GUI
                 }
                 else
                     value = synth->Pinsparts[effnum];
@@ -7056,7 +7064,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     if (newSwitch != oldSwitch)
                     {
                         synth->sysefx[effnum]->cleanup();
-                        synth->pushGlobalEffectUpdate(false); // not isInsert currently exposed in GUI
+                        synth->pushEffectUpdate(npart); // not isInsert currently exposed in GUI
                     }
                 }
                 else
@@ -7069,7 +7077,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
         if (write)
         {
             synth->setPsysefxsend(effnum, control, value);
-            synth->pushGlobalEffectUpdate(not isSysEff);
+            synth->pushEffectUpdate(npart);
         }
         else
             value = synth->Psysefxsend[effnum][control];
@@ -7103,7 +7111,6 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (npart == TOPLEVEL::section::systemEffects)
         eff = synth->sysefx[effnum];
-
     else if (npart == TOPLEVEL::section::insertEffects)
         eff = synth->insefx[effnum];
     else if (npart < NUM_MIDI_PARTS)
@@ -7115,17 +7122,14 @@ void InterChange::commandEffects(CommandBlock *getData)
         return; // invalid kit number
 
 
-    auto maybeUpdateGui = [&]{  // possibly push update to GUI
-                                if (npart < NUM_MIDI_PARTS)
-                                {// handle change to part effect
-                                        /////////////////////////////////////////////////TODO 24/2 ////OOO handle push update to part effect
-                                }
-                                else
-                                {
-                                    bool isInsert = (npart == TOPLEVEL::section::insertEffects);
-                                    if (effnum == isInsert? synth->inseffnum : synth->syseffnum)
-                                        synth->pushGlobalEffectUpdate(isInsert);
-                                }
+    auto maybeUpdateGui = [&]{
+                                bool isPart{npart < NUM_MIDI_PARTS};
+                                bool isInsert{npart != TOPLEVEL::section::systemEffects};
+                                int currPartNr = synth->getRuntime().currentPart;
+                                uchar currEff = isPart? synth->part[currPartNr]->Peffnum : isInsert? synth->inseffnum : synth->syseffnum;
+                                // push update to GUI if the change affects the current effect module exposed in GUI
+                                if (effnum == currEff && (!isPart || npart == currPartNr))
+                                    synth->pushEffectUpdate(npart);
                              };
 
     if (control != PART::control::effectType && effSend != (eff->geteffect() + EFFECT::type::none)) // geteffect not yet converted

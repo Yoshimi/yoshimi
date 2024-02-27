@@ -1296,6 +1296,8 @@ size_t Bank::generateSingleRoot(const string& newRoot, bool clear)
 
     if (clear)
         synth->part[npart]->defaultsinstrument();
+
+    synth->maybePublishEffectsToGui();
     return idx;
 }
 

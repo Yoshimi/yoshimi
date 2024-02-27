@@ -426,15 +426,9 @@ class MasterUI {: {public GuiUpdates}
       Fl_Tooltip::color(tooltip_back);
       Fl_Tooltip::textcolor(tooltip_text);
       make_window();
-      bool foundWindows = Showmaster();
-
-      partui = new PartUI(0, 0, 0, 0);
-      partuigroup->add(partui); // why?
-      partui->init(synth->part[npart], npart, bankui);
-      partui->kitRtext(true);
-      partui->redraw();
-
       partui->checkEngines();
+
+      bool foundWindows = Showmaster();
       if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
@@ -1049,7 +1043,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group partui {
           xywh {3 285 379 172} color 47
-          code0 {o->init(synth->part[0],0,bankui);}
+          code0 { partui->init(synth->part[npart], npart, bankui); }
           class PartUI
         } {}
         Fl_Group partControls {

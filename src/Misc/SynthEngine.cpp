@@ -2507,21 +2507,39 @@ void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
  * Data Transfer Objects into the GUI, activated by sending a notification through
  * the toGUI ringbuffer. When receiving such a push, the GUI invokes EffUI::refresh().
  */
-void SynthEngine::pushGlobalEffectUpdate(bool isInsert)
+void SynthEngine::pushEffectUpdate(uchar partNr)
 {
+    bool isPart{partNr < NUM_MIDI_PARTS};
+    bool isInsert{partNr != TOPLEVEL::section::systemEffects};
+
+    assert(isPart
+        || partNr == TOPLEVEL::section::systemEffects
+        || partNr == TOPLEVEL::section::insertEffects);
+    assert(part[getRuntime().currentPart]);
+    Part& currPart{*part[getRuntime().currentPart]};
     // the "current" effect as selected / exposed in the GUI
-    uchar effnum = isInsert? inseffnum : syseffnum;
-    assert(effnum < (isInsert? NUM_INS_EFX : NUM_SYS_EFX));
-    EffectMgr** effInstance = isInsert? insefx : sysefx;
+    uchar effnum = isPart? currPart.Peffnum
+                 : isInsert? inseffnum : syseffnum;
+    assert(effnum < (isPart? NUM_PART_EFX : isInsert? NUM_INS_EFX : NUM_SYS_EFX));
+
+    EffectMgr** effInstance = isPart? currPart.partefx
+                            : isInsert? insefx : sysefx;
 
     EffectDTO dto;
     dto.effectNum = effnum;
     dto.isInsert = isInsert;
     dto.effectID = effInstance[effnum]->geteffect();
-    dto.enabled  = (0 != dto.effectID && (isInsert || syseffEnable[effnum]));
+    dto.enabled  = (0 != dto.effectID && ((isPart && !currPart.Pefxbypass[effnum])
+                                         ||(isInsert && int(Pinsparts[effnum]) != -1)
+                                         ||(!isInsert && syseffEnable[effnum])));
     ////////////////////////////////////////////////////////////////////TODO 24/2 ////OOO package extended data here
 
-    sysEffectUiCon.publish(dto);
+    if (isPart)
+        partEffectUiCon.publish(dto);
+    else if (isInsert)
+        insEffectUiCon.publish(dto);
+    else
+        sysEffectUiCon.publish(dto);
 }
 
 
@@ -2529,8 +2547,8 @@ void SynthEngine::pushGlobalEffectUpdate(bool isInsert)
  * Push a complete update of Effect state, in case the GUI is active.
  * There are three distinct EffUI modules, each receiving the state of "the current"
  * selected effect. Calling this function is only required when effect state changes
- * are _not_ propagated via InterChange (commandSysIns() etc). Especially it must be
- * invoked after loading or pasting state, and this is covered by getfromXML().
+ * are _not_ propagated via InterChange::commandSysIns(), commandEffects() or commandPart().
+ * Especially it must be invoked after loading or pasting state, and this is covered by getfromXML().
  * Init() and defaults() do not call this function; either it is covered otherwise
  * or because the default constructed GUI widgets do not need an initial push
  * Thus, the only other situation to cover is a call to SynthEngine::resetAll().
@@ -2541,9 +2559,9 @@ void SynthEngine::maybePublishEffectsToGui()
     if (not interchange.guiMaster)
         return; // publish only while GUI is active
 
-    pushGlobalEffectUpdate(false);
-    pushGlobalEffectUpdate(true);
-    ////////////////////////////////////////////////////////////////////TODO 24/2 ////OOO also publish all part-effects from here
+    pushEffectUpdate(TOPLEVEL::section::systemEffects);
+    pushEffectUpdate(TOPLEVEL::section::insertEffects);
+    pushEffectUpdate(getRuntime().currentPart);
 #endif
 }
 
