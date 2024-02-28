@@ -218,7 +218,6 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
-    eff = NULL;
     filterwindow = NULL;
     fwin_filterui = NULL;} {}
   }
@@ -284,7 +283,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         if (Fl::event_button() == 3)
         {
             value = reverbPresets[presetNum][butt];
-            if (eff->insertion != 0) // D/W
+            if (isInsert()) // D/W
             {
                 value = value / 2;
             }
@@ -367,7 +366,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         send_data(0, butt, value, (EFFECT::type::reverb), TOPLEVEL::type::Integer);}
         xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 deactivate
-        code0 {if (eff->geteffectpar(10)==2) o->activate();}
+        code0 {if (effParam(10)==2) o->activate();}
         code1 {o->setValueType(VC_FXReverbBandwidth);}
         class WidgetPDial
       }
@@ -471,7 +470,7 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         if (Fl::event_button() == 3)
         {
             value = echoPresets[presetNum][butt];
-            if (eff->insertion != 0) // D/W
+            if (isInsert()) // D/W
             {
                 value = value / 2;
             }
@@ -510,8 +509,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
 
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
         xywh {118 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay);}
-        code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "L.Delay" : "Delay");}
+        code0 {o->setValueType(isBeatSync() ? VC_FXlfofreqBPM : VC_FXEchoDelay);}
+        code1 {o->label(isSepDelay() ? "L.Delay" : "Delay");}
         class WidgetPDial
       }
       Fl_Dial echop3 {
@@ -527,8 +526,8 @@ class EffUI {: {public Fl_Group,public PresetsUI_}
         send_data(0, butt, value, (EFFECT::type::echo), TOPLEVEL::type::Integer);}
         tooltip {If Sep is disabled: Delay between L/R
 If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::sepLRDelay) ? (eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXEchoDelay) : VC_FXEchoLRdel);}
-        code1 {o->label(eff->geteffectpar(EFFECT::control::sepLRDelay) ? "R.Delay" : "LRdl.");}
+        code0 {o->setValueType(isSepDelay() ? (isBeatSync() ? VC_FXlfofreqBPM : VC_FXEchoDelay) : VC_FXEchoLRdel);}
+        code1 {o->label(isSepDelay() ? "R.Delay" : "LRdl.");}
         class WidgetPDial
       }
       Fl_Dial echop4 {
@@ -655,7 +654,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
 
         send_data(0, butt, value, (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
         tooltip {LFO frequency} xywh {85 49 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXlfofreq);}
+        code0 {o->setValueType(isBeatSync() ? VC_FXlfofreqBPM : VC_FXlfofreq);}
         class WidgetPDial
       }
       Fl_Dial chorusp18 {
@@ -670,7 +669,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         send_data(0, EFFECT::control::bpmStart, value, (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
         tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {120 50 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127
         code0 {o->setValueType(VC_PhaseOffset);}
-        code1 {if (eff->geteffectpar(EFFECT::control::bpm)) o->activate(); else o->deactivate();}
+        code1 {if (isBeatSync()) o->activate(); else o->deactivate();}
         class WidgetPDial
       }
       Fl_Dial chorusp3 {
@@ -768,7 +767,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         callback {//
         send_data(0, 10, o->value(), (EFFECT::type::chorus), TOPLEVEL::type::Integer);}
         xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 223 selection_color 64 labelfont 1 labelsize 10 labelcolor 64 hide deactivate
-        code0 {o->value(eff->geteffectpar(10));}
+        code0 {o->value(effParam(10));}
         class Fl_Check_Button2
       }
       Fl_Check_Button chorusp11 {
@@ -851,7 +850,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
 
         send_data(0, butt, value, (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
         tooltip {LFO frequency} xywh {84 50 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXlfofreq);}
+        code0 {o->setValueType(isBeatSync() ? VC_FXlfofreqBPM : VC_FXlfofreq);}
         class WidgetPDial
       }
       Fl_Dial phaserp18 {
@@ -867,7 +866,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         send_data(0, butt, value, (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
         tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {125 50 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(VC_PhaseOffset);}
-        code1 {if (eff->geteffectpar(EFFECT::control::bpm)) o->activate(); else o->deactivate();}
+        code1 {if (isBeatSync()) o->activate(); else o->deactivate();}
         class WidgetPDial
       }
       Fl_Dial phaserp3 {
@@ -890,7 +889,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::phaser), TOPLEVEL::type::Integer);}
         tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {200 47 17 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64 align 8
-        code0 {o->value(eff->geteffectpar(EFFECT::control::bpm));}
+        code0 {o->value(isBeatSync());}
         class Fl_Check_Button2
       }
       Fl_Dial phaserp5 {
@@ -1043,7 +1042,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         if (Fl::event_button() == 3)
         {
             value = alienPresets[presetNum][butt];
-            if (eff->insertion != 0) // D/W
+            if (isInsert()) // D/W
             {
                 value = value / 2;
             }
@@ -1079,7 +1078,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
 
         send_data(0, butt, value, (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
         tooltip {LFO frequency} xywh {80 49 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXlfofreq);}
+        code0 {o->setValueType(isBeatSync() ? VC_FXlfofreqBPM : VC_FXlfofreq);}
         class WidgetPDial
       }
       Fl_Dial awp3 {
@@ -1110,7 +1109,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         send_data(0, butt, value, (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
         tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {115 50 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(VC_PhaseOffset);}
-        code1 {if (eff->geteffectpar(EFFECT::control::bpm)) o->activate(); else o->deactivate();}
+        code1 {if (isBeatSync()) o->activate(); else o->deactivate();}
         class WidgetPDial
       }
       Fl_Dial awp5 {
@@ -1194,7 +1193,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::alienWah), TOPLEVEL::type::Integer);}
         tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {185 45 45 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
-        code0 {o->value(eff->geteffectpar(EFFECT::control::bpm));}
+        code0 {o->value(isBeatSync());}
       }
     }
   }
@@ -1229,7 +1228,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         if (Fl::event_button() == 3)
         {
             value = distPresets[presetNum][butt];
-            if (eff->insertion != 0) // D/W
+            if (isInsert()) // D/W
             {
                 value = value / 2;
             }
@@ -1488,7 +1487,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         if (Fl::event_button() == 3)
         {
             value = dynPresets[presetNum][butt];
-            if (eff->insertion == 0) // D/W - yes this one is reversed!
+            if (not isInsert()) // D/W - yes this one is reversed!
             {
                 value = value / 2;
             }
@@ -1524,7 +1523,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
 
         send_data(0, butt, value, EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
         tooltip {LFO frequency} xywh {80 44 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 maximum 127 step 1
-        code0 {o->setValueType(eff->geteffectpar(EFFECT::control::bpm) ? VC_FXlfofreqBPM : VC_FXlfofreq);}
+        code0 {o->setValueType(isBeatSync() ? VC_FXlfofreqBPM : VC_FXlfofreq);}
         class WidgetPDial
       }
       Fl_Dial dfp3 {
@@ -1555,7 +1554,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         send_data(0, butt, value, EFFECT::type::dynFilter, TOPLEVEL::type::Integer);}
         tooltip {Start of LFO phase relative to start of beat. This has no effect unless you are syncing to a song position, using MIDI or a plugin host.} xywh {118 44 30 30} box ROUND_UP_BOX labelsize 11 labelcolor 64 when 4 maximum 127 step 1
         code0 {o->setValueType(VC_PhaseOffset);}
-        code1 {if (eff->geteffectpar(EFFECT::control::bpm)) o->activate(); else o->deactivate();}
+        code1 {if (isBeatSync()) o->activate(); else o->deactivate();}
         class WidgetPDial
       }
       Fl_Dial dfp5 {
@@ -1636,7 +1635,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         callback {//
         send_data(0, EFFECT::control::bpm, o->value(), (EFFECT::type::dynFilter), TOPLEVEL::type::Integer);}
         tooltip {Synchronize the frequency to a multiple of the BPM.} xywh {191 41 45 15} down_box DOWN_BOX selection_color 64 labelsize 11 labelcolor 64
-        code0 {o->value(eff->geteffectpar(EFFECT::control::bpm));}
+        code0 {o->value(isBeatSync());}
       }
     }
   }
@@ -1653,7 +1652,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter}
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-        code0 {o->init(eff->filterpars,NULL,NULL, npart, (EFFECT::type::dynFilter), neff);}
+        code0 {o->init(effect.get().eff_in_core_TODO_deprecated->filterpars,NULL,NULL, npart, (EFFECT::type::dynFilter), neff);}
         class FilterUI
       } {}
       Fl_Button filterclose {
@@ -1664,6 +1663,26 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         xywh {124 86 46 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
+  }
+  Function {isInsert()} {return_type bool
+  } {
+    code { return effect.get().isInsert;} {}
+  }
+  Function {isBeatSync()} {return_type bool
+  } {
+    code { return effect.get().param[EFFECT::control::bpm];} {}
+  }
+  Function {isSepDelay()} {return_type bool
+  } {
+    code { return effect.get().param[EFFECT::control::sepLRDelay];} {}
+  }
+  Function {effParam(uint paramNr)} {return_type uchar
+  } {
+    code { return effect.get().param[paramNr]; } {}
+  }
+  Function {effPreset()} {return_type uchar
+  } {
+    code { return effect.get().currPreset; } {}
   }
   Function {send_data(int action, int control, float value, int group, int type)} {} {
     code {//
@@ -1678,6 +1697,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     {
         offset = dfp->value();
     }
+std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" ctrl="<<control<<" npart="<<npart<<" grp="<<group<<" neff="<<neff<<" param="<<parameter<<" off="<<offset<<std::endl;
     collect_writeData(synth, value, action, type, control, npart, group, neff, UNUSED, parameter, offset);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
@@ -1696,12 +1716,13 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     unsigned char eqband =  getData->data.parameter;
     unsigned char secondary = getData->data.offset;
     if (efftype != EFFECT::type::eq)
-        presetNum = eff->getpreset();
+        presetNum = effPreset();
 
     int textCol = eff_preset;
     if (fetchData(0, EFFECT::control::changed, getData->data.part, efftype, effnum) != 0)
         textCol = eff_preset_changed;
-    //std::cout << "colour " << textCol << std::endl;
+    auto __setColor = [this,value](auto& widget, auto& preset, uint paramIdx)
+                      {widget->selection_color(setKnob(value,preset[presetNum][paramIdx]));};
     switch(efftype)
     {
         case EFFECT::type::none:
@@ -1712,42 +1733,42 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     revp0->value(value);
-                    if (eff->insertion != 0) // D/W
-                        revp0->selection_color(setKnob(value * 2,reverbPresets[presetNum][0]));
+                    if (isInsert()) // D/W
+                        revp0->selection_color(setKnob(value,int(reverbPresets[presetNum][0])/2));
                     else
-                        revp0->selection_color(setKnob(value,reverbPresets[presetNum][0]));
+                        __setColor(revp0,reverbPresets,0);
                     break;
                 case EFFECT::control::panning:
                     revp1->value(value);
-                    revp1->selection_color(setKnob(value,reverbPresets[presetNum][1]));
+                    __setColor(revp1,reverbPresets,1);
                     break;
                 case EFFECT::control::frequency: // time here
                     revp2->value(value);
-                    revp2->selection_color(setKnob(value,reverbPresets[presetNum][2]));
+                    __setColor(revp2,reverbPresets,2);
                     break;
                 case 3:
                     revp3->value(value);
-                    revp3->selection_color(setKnob(value,reverbPresets[presetNum][3]));
+                    __setColor(revp3,reverbPresets,3);
                     break;
                 case 4:
                     revp4->value(value);
-                    revp4->selection_color(setKnob(value,reverbPresets[presetNum][4]));
+                    __setColor(revp4,reverbPresets,4);
                     break;
                 case 6:
                     revp6->value(value);
-                    revp6->selection_color(setKnob(value,reverbPresets[presetNum][6]));
+                    __setColor(revp6,reverbPresets,6);
                     break;
                 case 7:
                     revp7->value(value);
-                    revp7->selection_color(setKnob(value,reverbPresets[presetNum][7]));
+                    __setColor(revp7,reverbPresets,7);
                     break;
                 case 8:
                     revp8->value(value);
-                    revp8->selection_color(setKnob(value,reverbPresets[presetNum][8]));
+                    __setColor(revp8,reverbPresets,8);
                     break;
                 case 9:
                     revp9->value(value);
-                    revp9->selection_color(setKnob(value,reverbPresets[presetNum][9]));
+                    __setColor(revp9,reverbPresets,9);
                     break;
                 case 10:
                     revp10->value(value_int);
@@ -1761,11 +1782,11 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     break;
                 case 11:
                     revp11->value(value);
-                    revp11->selection_color(setKnob(value,reverbPresets[presetNum][11]));
+                    __setColor(revp11,reverbPresets,11);
                     break;
                 case 12:
                     revp12->value(value);
-                    revp12->selection_color(setKnob(value,reverbPresets[presetNum][12]));
+                    __setColor(revp12,reverbPresets,12);
                     break;
                 case EFFECT::control::preset:
                     refresh();
@@ -1780,34 +1801,34 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     echop0->value(value);
-                    if (eff->insertion != 0) // D/W
+                    if (isInsert()) // D/W
                         echop0->selection_color(setKnob(value,int(echoPresets[presetNum][0])/2));
                     else
-                        echop0->selection_color(setKnob(value,echoPresets[presetNum][0]));
+                        __setColor(echop0,echoPresets,0);
                     break;
                 case EFFECT::control::panning:
                     echop1->value(value);
-                    echop1->selection_color(setKnob(value,echoPresets[presetNum][1]));
+                    __setColor(echop1,echoPresets,1);
                     break;
                 case EFFECT::control::frequency: // delay here
                     echop2->value(value);
-                    echop2->selection_color(setKnob(value,echoPresets[presetNum][2]));
+                    __setColor(echop2,echoPresets,2);
                     break;
                 case 3:
                     echop3->value(value);
-                    echop3->selection_color(setKnob(value,echoPresets[presetNum][3]));
+                    __setColor(echop3,echoPresets,3);
                     break;
                 case 4:
                     echop4->value(value);
-                    echop4->selection_color(setKnob(value,echoPresets[presetNum][4]));
+                    __setColor(echop4,echoPresets,4);
                     break;
                 case 5:
                     echop5->value(value);
-                    echop5->selection_color(setKnob(value,echoPresets[presetNum][5]));
+                    __setColor(echop5,echoPresets,5);
                     break;
                 case 6:
                     echop6->value(value);
-                    echop6->selection_color(setKnob(value,echoPresets[presetNum][6]));
+                    __setColor(echop6,echoPresets,6);
                     break;
                 case EFFECT::control::sepLRDelay:
                     echop7->value(value);
@@ -1815,7 +1836,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     {
                         echop2->label("L.Delay");
                         echop3->label("R.Delay");
-                        if (eff->geteffectpar(EFFECT::control::bpm))
+                        if (isBeatSync())
                         {
                             echop3->setValueType(VC_FXlfofreqBPM);
                         }
@@ -1841,7 +1862,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     else
                         echop2->setValueType(VC_FXEchoDelay);
 
-                    if (eff->geteffectpar(EFFECT::control::sepLRDelay))
+                    if (isSepDelay())
                     {
                         if (value)
                         {
@@ -1866,39 +1887,39 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     chorusp0->value(value);
-                    chorusp0->selection_color(setKnob(value,chorusPresets[presetNum][0]));
+                    __setColor(chorusp0,chorusPresets,0);
                     break;
                 case EFFECT::control::panning:
                     chorusp1->value(value);
-                    chorusp1->selection_color(setKnob(value,chorusPresets[presetNum][1]));
+                    __setColor(chorusp1,chorusPresets,1);
                     break;
                 case EFFECT::control::frequency:
                     chorusp2->value(value);
-                    chorusp2->selection_color(setKnob(value,chorusPresets[presetNum][2]));
+                    __setColor(chorusp2,chorusPresets,2);
                     break;
                 case 3:
                     chorusp3->value(value);
-                    chorusp3->selection_color(setKnob(value,chorusPresets[presetNum][3]));
+                    __setColor(chorusp3,chorusPresets,3);
                     break;
                 case 5:
                     chorusp5->value(value);
-                    chorusp5->selection_color(setKnob(value,chorusPresets[presetNum][5]));
+                    __setColor(chorusp5,chorusPresets,5);
                     break;
                 case 6:
                     chorusp6->value(value_int);
-                    chorusp6->selection_color(setKnob(value,chorusPresets[presetNum][6]));
+                    __setColor(chorusp6,chorusPresets,6);
                     break;
                 case 7:
                     chorusp7->value(value);
-                    chorusp7->selection_color(setKnob(value,chorusPresets[presetNum][7]));
+                    __setColor(chorusp7,chorusPresets,7);
                     break;
                 case 8:
                     chorusp8->value(value);
-                    chorusp8->selection_color(setKnob(value,chorusPresets[presetNum][8]));
+                    __setColor(chorusp8,chorusPresets,8);
                     break;
                 case 9:
                     chorusp9->value(value);
-                    chorusp9->selection_color(setKnob(value,chorusPresets[presetNum][9]));
+                    __setColor(chorusp9,chorusPresets,9);
                     break;
                 case 11:
                     chorusp11->value(value_int);
@@ -1933,55 +1954,55 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     phaserp0->value(value);
-                    phaserp0->selection_color(setKnob(value,phaserPresets[presetNum][0]));
+                    __setColor(phaserp0,phaserPresets,0);
                     break;
                 case EFFECT::control::panning:
                     phaserp1->value(value);
-                    phaserp1->selection_color(setKnob(value,phaserPresets[presetNum][1]));
+                    __setColor(phaserp1,phaserPresets,1);
                     break;
                 case EFFECT::control::frequency:
                     phaserp2->value(value);
-                    phaserp2->selection_color(setKnob(value,phaserPresets[presetNum][2]));
+                    __setColor(phaserp2,phaserPresets,2);
                     break;
                 case 3:
                     phaserp3->value(value);
-                    phaserp3->selection_color(setKnob(value,phaserPresets[presetNum][3]));
+                    __setColor(phaserp3,phaserPresets,3);
                     break;
                 case 4:
                     phaserp4->value(value_int);
                     break;
                 case 5:
                     phaserp5->value(value);
-                    phaserp5->selection_color(setKnob(value,phaserPresets[presetNum][5]));
+                    __setColor(phaserp5,phaserPresets,5);
                     break;
                 case 6:
                     phaserp6->value(value);
-                    phaserp6->selection_color(setKnob(value,phaserPresets[presetNum][6]));
+                    __setColor(phaserp6,phaserPresets,6);
                     break;
                 case 7:
                     phaserp7->value(value);
-                    phaserp7->selection_color(setKnob(value,phaserPresets[presetNum][7]));
+                    __setColor(phaserp7,phaserPresets,7);
                     break;
                 case 8:
                     phaserp8->value(value_int);
                     break;
                 case 9:
                     phaserp9->value(value);
-                    phaserp9->selection_color(setKnob(value,phaserPresets[presetNum][9]));
+                    __setColor(phaserp9,phaserPresets,9);
                     break;
                 case 10:
                     phaserp10->value(value_int);
                     break;
                 case 11:
                     phaserp11->value(value);
-                    phaserp11->selection_color(setKnob(value,phaserPresets[presetNum][11]));
+                    __setColor(phaserp11,phaserPresets,11);
                     break;
                 case 12:
                     phaserp12->value(value_int);
                     break;
                 case 13:
                     phaserp13->value(value);
-                    phaserp13->selection_color(setKnob(value,phaserPresets[presetNum][13]));
+                    __setColor(phaserp13,phaserPresets,13);
                     break;
                 case 14:
                     phaserp14->value(value_int);
@@ -2031,48 +2052,48 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 case EFFECT::control::level:
                     awp0->value(value);
                     echop0->value(value);
-                    if (eff->insertion != 0) // D/W
+                    if (isInsert()) // D/W
                         awp0->selection_color(setKnob(value,int(alienPresets[presetNum][0])/2));
                     else
-                        awp0->selection_color(setKnob(value,alienPresets[presetNum][0]));
+                        __setColor(awp0,alienPresets,0);
                     break;
                 case EFFECT::control::panning:
                     awp1->value(value);
-                    awp1->selection_color(setKnob(value,alienPresets[presetNum][1]));
+                    __setColor(awp1,alienPresets,1);
                     break;
                 case EFFECT::control::frequency:
                     awp2->value(value);
-                    awp2->selection_color(setKnob(value,alienPresets[presetNum][2]));
+                    __setColor(awp2,alienPresets,2);
                     break;
                 case 3:
                     awp3->value(value);
-                    awp3->selection_color(setKnob(value,alienPresets[presetNum][3]));
+                    __setColor(awp3,alienPresets,3);
                     break;
                 case 4:
                     awp4->value(value_int);
                     break;
                 case 5:
                     awp5->value(value);
-                    awp5->selection_color(setKnob(value,alienPresets[presetNum][5]));
+                    __setColor(awp5,alienPresets,5);
                     break;
                 case 6:
                     awp6->value(value);
-                    awp6->selection_color(setKnob(value,alienPresets[presetNum][6]));
+                    __setColor(awp6,alienPresets,6);
                     break;
                 case 7:
                     awp7->value(value);
-                    awp7->selection_color(setKnob(value,alienPresets[presetNum][7]));
+                    __setColor(awp7,alienPresets,7);
                     break;
                 case 8:
                     awp8->value(value_int);
                     break;
                 case 9:
                     awp9->value(value);
-                    awp9->selection_color(setKnob(value,alienPresets[presetNum][9]));
+                    __setColor(awp9,alienPresets,9);
                     break;
                 case 10:
                     awp10->value(value);
-                    awp10->selection_color(setKnob(value,alienPresets[presetNum][10]));
+                    __setColor(awp10,alienPresets,10);
                     break;
                 case EFFECT::control::bpm:
                     awp17->value(value);
@@ -2104,26 +2125,26 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     distp0->value(value);
-                    if (eff->insertion != 0) // D/W
+                    if (isInsert()) // D/W
                         distp0->selection_color(setKnob(value,int(distPresets[presetNum][0])/2));
                     else
-                        distp0->selection_color(setKnob(value,distPresets[presetNum][0]));
+                        __setColor(distp0,distPresets,0);
                     break;
                 case EFFECT::control::panning:
                     distp1->value(value);
-                    distp1->selection_color(setKnob(value,distPresets[presetNum][1]));
+                    __setColor(distp1,distPresets,1);   
                     break;
                 case EFFECT::control::frequency: // LR-mix here
                     distp2->value(value);
-                    distp2->selection_color(setKnob(value,distPresets[presetNum][2]));
+                    __setColor(distp2,distPresets,2);   
                     break;
                 case 3:
                     distp3->value(value);
-                    distp3->selection_color(setKnob(value,distPresets[presetNum][3]));
+                    __setColor(distp3,distPresets,3);   
                     break;
                 case 4:
                     distp4->value(value);
-                    distp4->selection_color(setKnob(value,distPresets[presetNum][4]));
+                    __setColor(distp4,distPresets,4);   
                     break;
                 case 5:
                     distp5->value(value_int);
@@ -2133,11 +2154,11 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                     break;
                 case 7:
                     distp7->value(value);
-                    distp7->selection_color(setKnob(value,distPresets[presetNum][7]));
+                    __setColor(distp7,distPresets,7);   
                     break;
                 case 8:
                     distp8->value(value);
-                    distp8->selection_color(setKnob(value,distPresets[presetNum][8]));
+                    __setColor(distp8,distPresets,8);   
                     break;
                 case 9:
                     distp9->value(value_int);
@@ -2215,45 +2236,45 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             {
                 case EFFECT::control::level:
                     dfp0->value(value);
-                    if (eff->insertion == 0) // D/W
+                    if (not isInsert()) // D/W (reversed)
                         dfp0->selection_color(setKnob(value,int(dynPresets[presetNum][0])/2));
                     else
-                        dfp0->selection_color(setKnob(value,dynPresets[presetNum][0]));
+                        __setColor(dfp0,dynPresets,0);
                     break;
                 case EFFECT::control::panning:
                     dfp1->value(value);
-                    dfp1->selection_color(setKnob(value,dynPresets[presetNum][1]));
+                    __setColor(dfp1,dynPresets,1);
                     break;
                 case EFFECT::control::frequency:
                     dfp2->value(value);
-                    dfp2->selection_color(setKnob(value,dynPresets[presetNum][2]));
+                    __setColor(dfp2,dynPresets,2);
                     break;
                 case 3:
                     dfp3->value(value);
-                    dfp3->selection_color(setKnob(value,dynPresets[presetNum][3]));
+                    __setColor(dfp3,dynPresets,3);
                     break;
                 case 4:
                     dfp4->value(value_int);
-                    dfp4->selection_color(setKnob(value,dynPresets[presetNum][4]));
+                    __setColor(dfp4,dynPresets,4);
                     break;
                 case 5:
                     dfp5->value(value);
-                    dfp5->selection_color(setKnob(value,dynPresets[presetNum][5]));
+                    __setColor(dfp5,dynPresets,5);
                     break;
                 case 6:
                     dfp6->value(value);
-                    dfp6->selection_color(setKnob(value,dynPresets[presetNum][6]));
+                    __setColor(dfp6,dynPresets,6);
                     break;
                 case 7:
                     dfp7->value(value);
-                    dfp7->selection_color(setKnob(value,dynPresets[presetNum][7]));
+                    __setColor(dfp7,dynPresets,7);
                     break;
                 case 8:
                     dfp8->value(value_int);
                     break;
                 case 9:
                     dfp9->value(value);
-                    dfp9->selection_color(setKnob(value,dynPresets[presetNum][9]));
+                    __setColor(dfp9,dynPresets,9);
                     break;
                 case EFFECT::control::bpm:
                     dfp17->value(value);
@@ -2281,11 +2302,10 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
             break;
     };} {}
   }
-  Function {init(SynthEngine* synth_, RoutingTag conEffect, RoutingTag conEQ, EffectMgr *eff_, int npart_, int neff_)} {} {
+  Function {init(SynthEngine* synth_, RoutingTag conEffect, RoutingTag conEQ, int npart_, int neff_)} {} {
     code {//
     synth = synth_;
     effect.activate(GuiDataExchange::Connection<EffectDTO>{synth->interchange.guiDataExchange, conEffect});
-    eff=eff_;
     npart = npart_;
     neff = neff_;
 
@@ -2314,11 +2334,10 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     effdistortionwindow->position(px,py);
     effeqwindow->position(px,py);
     effdynamicfilterwindow->position(px,py);
-    refresh(eff, npart, neff);} {}
+    refresh(npart, neff);} {}
   }
-  Function {refresh(EffectMgr *eff_, int npart_, int neff_)} {} {
+  Function {refresh(int npart_, int neff_)} {} {
     code {//
-    eff = eff_;
     npart = npart_;
     neff = neff_;
     this->hide();
@@ -2338,78 +2357,80 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         delete(filterwindow);
         filterwindow=NULL;
     }
-    int nextEff = eff->geteffect() + EFFECT::type::none; // get effect not yet converted
+    int nextEff = effect.get().effectID + EFFECT::type::none; // get effect not yet converted
     if (lastEff != nextEff)
     {
         presetNum = 0;
         //std::cout << "EFF changed" << std::endl;
     }
+    auto __setColor = [this](auto& widget, auto& preset, uint paramIdx)
+                      {widget->selection_color(setKnob(widget->value(),preset[presetNum][paramIdx]));};
     switch(nextEff)
     {
         case EFFECT::type::reverb:
-            revp->value(eff->getpreset());
-            revp0->value(eff->geteffectpar(0));
-             if (eff->insertion != 0) // D/W
+            revp->value(effPreset());
+            revp0->value(effParam(0));
+             if (isInsert()) // D/W
                  revp0->selection_color(setKnob(revp0->value(),int(reverbPresets[presetNum][0] / 2)));
              else
-                 revp0->selection_color(setKnob(revp0->value(),reverbPresets[presetNum][0]));
-            if (eff->insertion != 0)
+                __setColor(revp0,reverbPresets,0);
+            if (isInsert())
             {
                 revp0->label("D/W");
                 revp0->setValueType(VC_FXReverbDW);
             }
-            revp1->value(eff->geteffectpar(1));
-            revp1->selection_color(setKnob(revp1->value(),reverbPresets[presetNum][1]));
-            revp2->value(eff->geteffectpar(2));
-            revp2->selection_color(setKnob(revp2->value(),reverbPresets[presetNum][2]));
-            revp3->value(eff->geteffectpar(3));
-            revp3->selection_color(setKnob(revp3->value(),reverbPresets[presetNum][3]));
-            revp4->value(eff->geteffectpar(4));
-            revp4->selection_color(setKnob(revp4->value(),reverbPresets[presetNum][4]));
-            revp6->value(eff->geteffectpar(6));
-            revp6->selection_color(setKnob(revp6->value(),reverbPresets[presetNum][6]));
-            revp7->value(eff->geteffectpar(7));
-            revp7->selection_color(setKnob(revp7->value(),reverbPresets[presetNum][7]));
-            revp8->value(eff->geteffectpar(8));
-            revp8->selection_color(setKnob(revp8->value(),reverbPresets[presetNum][8]));
-            revp9->value(eff->geteffectpar(9));
-            revp9->selection_color(setKnob(revp9->value(),reverbPresets[presetNum][9]));
-            revp10->value(eff->geteffectpar(10));
-            revp11->value(eff->geteffectpar(11));
-            revp11->selection_color(setKnob(revp11->value(),reverbPresets[presetNum][11]));
-            revp12->value(eff->geteffectpar(12));
-            revp12->selection_color(setKnob(revp12->value(),reverbPresets[presetNum][12]));
+            revp1->value(effParam(1));
+            __setColor(revp1,reverbPresets,1);
+            revp2->value(effParam(2));
+            __setColor(revp2,reverbPresets,2);
+            revp3->value(effParam(3));
+            __setColor(revp3,reverbPresets,3);
+            revp4->value(effParam(4));
+            __setColor(revp4,reverbPresets,4);
+            revp6->value(effParam(6));
+            __setColor(revp6,reverbPresets,6);
+            revp7->value(effParam(7));
+            __setColor(revp7,reverbPresets,7);
+            revp8->value(effParam(8));
+            __setColor(revp8,reverbPresets,8);
+            revp9->value(effParam(9));
+            __setColor(revp9,reverbPresets,9);
+            revp10->value(effParam(10));
+            revp11->value(effParam(11));
+            __setColor(revp11,reverbPresets,11);
+            revp12->value(effParam(12));
+            __setColor(revp12,reverbPresets,12);
             effreverbwindow->show();
             break;
         case EFFECT::type::echo:
-            echop->value(eff->getpreset());
-            echop0->value(eff->geteffectpar(0));
-            if (eff->insertion != 0)
+            echop->value(effPreset());
+            echop0->value(effParam(0));
+            if (isInsert())
             {
                 echop0->label("D/W");
                 echop0->setValueType(VC_FXEchoDW);
                 echop0->selection_color(setKnob(echop0->value(),int(echoPresets[presetNum][0])/2));
             }
             else
-                echop0->selection_color(setKnob(echop0->value(),echoPresets[presetNum][0]));
-            echop1->value(eff->geteffectpar(1));
-            echop1->selection_color(setKnob(echop1->value(),echoPresets[presetNum][1]));
-            echop2->value(eff->geteffectpar(2));
-            echop2->selection_color(setKnob(echop2->value(),echoPresets[presetNum][2]));
-            echop3->value(eff->geteffectpar(3));
-            echop3->selection_color(setKnob(echop3->value(),echoPresets[presetNum][3]));
-            echop4->value(eff->geteffectpar(4));
-            echop4->selection_color(setKnob(echop4->value(),echoPresets[presetNum][4]));
-            echop5->value(eff->geteffectpar(5));
-            echop5->selection_color(setKnob(echop5->value(),echoPresets[presetNum][5]));
-            echop6->value(eff->geteffectpar(6));
-            echop6->selection_color(setKnob(echop6->value(),echoPresets[presetNum][6]));
-            echop7->value(eff->geteffectpar(EFFECT::control::sepLRDelay));
-            if (eff->geteffectpar(EFFECT::control::sepLRDelay))
+                __setColor(echop0,echoPresets,0);
+            echop1->value(effParam(1));
+            __setColor(echop1,echoPresets,1);
+            echop2->value(effParam(2));
+            __setColor(echop2,echoPresets,2);
+            echop3->value(effParam(3));
+            __setColor(echop3,echoPresets,3);
+            echop4->value(effParam(4));
+            __setColor(echop4,echoPresets,4);
+            echop5->value(effParam(5));
+            __setColor(echop5,echoPresets,5);
+            echop6->value(effParam(6));
+            __setColor(echop6,echoPresets,6);
+            echop7->value(isSepDelay());
+            if (isSepDelay())
             {
                 echop2->label("L.Delay");
                 echop3->label("R.Delay");
-                if (eff->geteffectpar(EFFECT::control::bpm))
+                if (isBeatSync())
                 {
                     echop3->setValueType(VC_FXlfofreqBPM);
                 }
@@ -2424,38 +2445,38 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 echop3->label("LRdl.");
                 echop3->setValueType(VC_FXEchoLRdel);
             }
-            echop17->value(eff->geteffectpar(17));
+            echop17->value(effParam(EFFECT::control::bpm));
             effechowindow->show();
             break;
         case EFFECT::type::chorus:
-            chorusp->value(eff->getpreset());
-            chorusp0->value(eff->geteffectpar(0));
-            chorusp0->selection_color(setKnob(chorusp0->value(),chorusPresets[presetNum][0]));
-            if (eff->insertion != 0)
+            chorusp->value(effPreset());
+            chorusp0->value(effParam(0));
+            __setColor(chorusp0,chorusPresets,0);
+            if (isInsert())
             {
                 chorusp0->label("D/W");
                 chorusp0->setValueType(VC_FXdefaultDW);
             }
-            chorusp1->value(eff->geteffectpar(1));
-            chorusp1->selection_color(setKnob(chorusp1->value(),chorusPresets[presetNum][1]));
-            chorusp2->value(eff->geteffectpar(2));
-            chorusp2->selection_color(setKnob(chorusp2->value(),chorusPresets[presetNum][2]));
-            chorusp3->value(eff->geteffectpar(3));
-            chorusp3->selection_color(setKnob(chorusp3->value(),chorusPresets[presetNum][3]));
-            chorusp4->value(eff->geteffectpar(4));
-            chorusp4->selection_color(setKnob(chorusp4->value(),chorusPresets[presetNum][4]));
-            chorusp5->value(eff->geteffectpar(5));
-            chorusp5->selection_color(setKnob(chorusp5->value(),chorusPresets[presetNum][5]));
-            chorusp6->value(eff->geteffectpar(6));
-            chorusp6->selection_color(setKnob(chorusp6->value(),chorusPresets[presetNum][6]));
-            chorusp7->value(eff->geteffectpar(7));
-            chorusp7->selection_color(setKnob(chorusp7->value(),chorusPresets[presetNum][7]));
-            chorusp8->value(eff->geteffectpar(8));
-            chorusp8->selection_color(setKnob(chorusp8->value(),chorusPresets[presetNum][8]));
-            chorusp9->value(eff->geteffectpar(9));
-            chorusp9->selection_color(setKnob(chorusp9->value(),chorusPresets[presetNum][9]));
-            chorusp11->value(eff->geteffectpar(11));
-            chorusp17->value(eff->geteffectpar(17));
+            chorusp1->value(effParam(1));
+            __setColor(chorusp1,chorusPresets,1);
+            chorusp2->value(effParam(2));
+            __setColor(chorusp2,chorusPresets,2);
+            chorusp3->value(effParam(3));
+            __setColor(chorusp3,chorusPresets,3);
+            chorusp4->value(effParam(4));
+            __setColor(chorusp4,chorusPresets,4);
+            chorusp5->value(effParam(5));
+            __setColor(chorusp5,chorusPresets,5);
+            chorusp6->value(effParam(6));
+            __setColor(chorusp6,chorusPresets,6);
+            chorusp7->value(effParam(7));
+            __setColor(chorusp7,chorusPresets,7);
+            chorusp8->value(effParam(8));
+            __setColor(chorusp8,chorusPresets,8);
+            chorusp9->value(effParam(9));
+            __setColor(chorusp9,chorusPresets,9);
+            chorusp11->value(effParam(11));
+            chorusp17->value(effParam(EFFECT::control::bpm));
             if (chorusp17->value())
             {
                 chorusp2->setValueType(VC_FXlfofreqBPM);
@@ -2466,42 +2487,42 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 chorusp2->setValueType(VC_FXlfofreq);
                 chorusp18->deactivate();
             }
-            chorusp18->value(eff->geteffectpar(18));
+            chorusp18->value(effParam(EFFECT::control::bpmStart));
             chorusp18->selection_color(setKnob(chorusp18->value(),0));
             effchoruswindow->show();
             break;
         case EFFECT::type::phaser:
-            phaserp->value(eff->getpreset());
-            phaserp0->value(eff->geteffectpar(0));
-            phaserp0->selection_color(setKnob(phaserp0->value(),phaserPresets[presetNum][0]));
-            if (eff->insertion != 0)
+            phaserp->value(effPreset());
+            phaserp0->value(effParam(0));
+            __setColor(phaserp0,phaserPresets,0);
+            if (isInsert())
             {
                 phaserp0->label("D/W");
                 phaserp0->setValueType(VC_FXdefaultDW);
             }
-            phaserp1->value(eff->geteffectpar(1));
-            phaserp1->selection_color(setKnob(phaserp1->value(),phaserPresets[presetNum][1]));
-            phaserp2->value(eff->geteffectpar(2));
-            phaserp2->selection_color(setKnob(phaserp2->value(),phaserPresets[presetNum][2]));
-            phaserp3->value(eff->geteffectpar(3));
-            phaserp3->selection_color(setKnob(phaserp3->value(),phaserPresets[presetNum][3]));
-            phaserp4->value(eff->geteffectpar(4));
-            phaserp5->value(eff->geteffectpar(5));
-            phaserp5->selection_color(setKnob(phaserp5->value(),phaserPresets[presetNum][5]));
-            phaserp6->value(eff->geteffectpar(6));
-            phaserp6->selection_color(setKnob(phaserp6->value(),phaserPresets[presetNum][6]));
-            phaserp7->value(eff->geteffectpar(7));
-            phaserp7->selection_color(setKnob(phaserp7->value(),phaserPresets[presetNum][7]));
-            phaserp8->value(eff->geteffectpar(8));
-            phaserp9->value(eff->geteffectpar(9));
-            phaserp9->selection_color(setKnob(phaserp9->value(),phaserPresets[presetNum][9]));
-            phaserp10->value(eff->geteffectpar(10));
-            phaserp11->value(eff->geteffectpar(11));
-            phaserp11->selection_color(setKnob(phaserp11->value(),phaserPresets[presetNum][11]));
-            phaserp12->value(eff->geteffectpar(12));
-            phaserp13->value(eff->geteffectpar(13));
-            phaserp13->selection_color(setKnob(phaserp13->value(),phaserPresets[presetNum][13]));
-            phaserp14->value(eff->geteffectpar(14));
+            phaserp1->value(effParam(1));
+            __setColor(phaserp1,phaserPresets,1);
+            phaserp2->value(effParam(2));
+            __setColor(phaserp2,phaserPresets,2);
+            phaserp3->value(effParam(3));
+            __setColor(phaserp3,phaserPresets,3);
+            phaserp4->value(effParam(4));
+            phaserp5->value(effParam(5));
+            __setColor(phaserp5,phaserPresets,5);
+            phaserp6->value(effParam(6));
+            __setColor(phaserp6,phaserPresets,6);
+            phaserp7->value(effParam(7));
+            __setColor(phaserp7,phaserPresets,7);
+            phaserp8->value(effParam(8));
+            phaserp9->value(effParam(9));
+            __setColor(phaserp9,phaserPresets,9);
+            phaserp10->value(effParam(10));
+            phaserp11->value(effParam(11));
+            __setColor(phaserp11,phaserPresets,11);
+            phaserp12->value(effParam(12));
+            phaserp13->value(effParam(13));
+            __setColor(phaserp13,phaserPresets,13);
+            phaserp14->value(effParam(14));
             if (phaserp14->value() != 0)
             {
                 phaserp9->deactivate();
@@ -2516,7 +2537,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 phaserp12->deactivate();
                 phaserp13->deactivate();
             }
-            phaserp17->value(eff->geteffectpar(17));
+            phaserp17->value(effParam(EFFECT::control::bpm));
             if (phaserp17->value())
             {
                 phaserp2->setValueType(VC_FXlfofreqBPM);
@@ -2527,39 +2548,39 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 phaserp2->setValueType(VC_FXlfofreq);
                 phaserp18->deactivate();
             }
-            phaserp18->value(eff->geteffectpar(18));
+            phaserp18->value(effParam(EFFECT::control::bpmStart));
             phaserp18->selection_color(setKnob(phaserp18->value(),0));
             effphaserwindow->show();
             break;
         case EFFECT::type::alienWah:
-            awp->value(eff->getpreset());
-            awp0->value(eff->geteffectpar(0));
-            if (eff->insertion != 0)
+            awp->value(effPreset());
+            awp0->value(effParam(0));
+            if (isInsert())
             {
                 awp0->label("D/W");
                 awp0->selection_color(setKnob(awp0->value(),int(alienPresets[presetNum][0])/2));
             }
             else
-                awp0->selection_color(setKnob(awp0->value(),alienPresets[presetNum][0]));
-            awp1->value(eff->geteffectpar(1));
-            awp1->selection_color(setKnob(awp1->value(),alienPresets[presetNum][1]));
-            awp2->value(eff->geteffectpar(2));
-            awp2->selection_color(setKnob(awp2->value(),alienPresets[presetNum][2]));
-            awp3->value(eff->geteffectpar(3));
-            awp3->selection_color(setKnob(awp3->value(),alienPresets[presetNum][3]));
-            awp4->value(eff->geteffectpar(4));
-            awp5->value(eff->geteffectpar(5));
-            awp5->selection_color(setKnob(awp5->value(),alienPresets[presetNum][5]));
-            awp6->value(eff->geteffectpar(6));
-            awp6->selection_color(setKnob(awp6->value(),alienPresets[presetNum][6]));
-            awp7->value(eff->geteffectpar(7));
-            awp7->selection_color(setKnob(awp7->value(),alienPresets[presetNum][7]));
-            awp8->value(eff->geteffectpar(8));
-            awp9->value(eff->geteffectpar(9));
-            awp9->selection_color(setKnob(awp9->value(),alienPresets[presetNum][9]));
-            awp10->value(eff->geteffectpar(10));
-            awp10->selection_color(setKnob(awp10->value(),alienPresets[presetNum][10]));
-            awp17->value(eff->geteffectpar(17));
+                __setColor(awp0,alienPresets,0);
+            awp1->value(effParam(1));
+            __setColor(awp1,alienPresets,1);
+            awp2->value(effParam(2));
+            __setColor(awp2,alienPresets,2);
+            awp3->value(effParam(3));
+            __setColor(awp3,alienPresets,3);
+            awp4->value(effParam(4));
+            awp5->value(effParam(5));
+            __setColor(awp5,alienPresets,5);
+            awp6->value(effParam(6));
+            __setColor(awp6,alienPresets,6);
+            awp7->value(effParam(7));
+            __setColor(awp7,alienPresets,7);
+            awp8->value(effParam(8));
+            awp9->value(effParam(9));
+            __setColor(awp9,alienPresets,9);
+            awp10->value(effParam(10));
+            __setColor(awp10,alienPresets,10);
+            awp17->value(effParam(EFFECT::control::bpm));
             if (awp17->value())
             {
                 awp2->setValueType(VC_FXlfofreqBPM);
@@ -2570,54 +2591,65 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 awp2->setValueType(VC_FXlfofreq);
                 awp18->deactivate();
             }
-            awp18->value(eff->geteffectpar(18));
+            awp18->value(effParam(EFFECT::control::bpmStart));
             awp18->selection_color(setKnob(awp18->value(),0));
             effalienwahwindow->show();
             break;
         case EFFECT::type::distortion:
-            distp->value(eff->getpreset());
-            distp0->value(eff->geteffectpar(0));
-            if (eff->insertion != 0)
+            distp->value(effPreset());
+            distp0->value(effParam(0));
+            __setColor(distp0,distPresets,0);
+            if (isInsert())
             {
                 distp0->label("D/W");
                 distp0->setValueType(VC_FXdefaultDW);
             }
-            distp1->value(eff->geteffectpar(1));
-            distp2->value(eff->geteffectpar(2));
-            distp3->value(eff->geteffectpar(3));
-            distp4->value(eff->geteffectpar(4));
-            distp5->value(eff->geteffectpar(5));
-            distp6->value(eff->geteffectpar(6));
-            distp7->value(eff->geteffectpar(7));
-            distp8->value(eff->geteffectpar(8));
-            distp9->value(eff->geteffectpar(9));
-            distp10->value(eff->geteffectpar(10));
+            distp1->value(effParam(1));
+            __setColor(distp1,distPresets,1);
+            distp2->value(effParam(2));
+            __setColor(distp2,distPresets,2);
+            distp3->value(effParam(3));
+            __setColor(distp3,distPresets,3);
+            distp4->value(effParam(4));
+            __setColor(distp4,distPresets,4);
+            distp5->value(effParam(5));
+            __setColor(distp5,distPresets,5);
+            distp6->value(effParam(6));
+            __setColor(distp6,distPresets,6);
+            distp7->value(effParam(7));
+            __setColor(distp7,distPresets,7);
+            distp8->value(effParam(8));
+            __setColor(distp8,distPresets,8);
+            distp9->value(effParam(9));
+            __setColor(distp9,distPresets,9);
+            distp10->value(effParam(10));
+            __setColor(distp10,distPresets,10);
             effdistortionwindow->show();
             break;
         case EFFECT::type::eq:
         {
             eqband = 0;
-            int type = eff->geteffectpar(10);
+            int type = effParam(10);
             if (type > 0)
                 bandgroup->activate();
             else
                 bandgroup->activate();
-            eqp0->value(eff->geteffectpar(0));
+            eqp0->value(effParam(0));
             eqp0->selection_color(setKnob(eqp0->value(),EQmaster_def));
             bandcounter->value(eqband + 1);
             typechoice->value(type);
-            freqdial->value(eff->geteffectpar(11));
+            freqdial->value(effParam(11));
             freqdial->selection_color(setKnob(freqdial->value(),EQfreq_def));
-            gaindial->value(eff->geteffectpar(12));
+            gaindial->value(effParam(12));
             gaindial->selection_color(setKnob(gaindial->value(),EQgain_def));
-            qdial->value(eff->geteffectpar(13));
+            qdial->value(effParam(13));
             qdial->selection_color(setKnob(qdial->value(),EQq_def));
             if (type < 3)
                 qdial->deactivate();
             if (type < 6)
                 gaindial->deactivate();
-            stagescounter->value(eff->geteffectpar(14));
-            eqgraph->refresh(eff);
+            stagescounter->value(effParam(14));
+            eqgraph->refresh(effect.get().eff_in_core_TODO_deprecated);
             eqgraph->damage(1);
             eqgraph->redraw();
             effeqwindow->show();
@@ -2625,33 +2657,33 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         }
         case EFFECT::type::dynFilter:
             make_filter_window();
-            dfp->value(eff->getpreset());
-            dfp0->value(eff->geteffectpar(0));
-            if (eff->insertion!=0)
+            dfp->value(effPreset());
+            dfp0->value(effParam(0));
+            if (isInsert())
             {
                 dfp0->label("D/W");
-                dfp0->selection_color(setKnob(dfp0->value(),int(dynPresets[presetNum][0])));
+                dfp0->selection_color(setKnob(dfp0->value(),int(dynPresets[presetNum][0])/2));
             }
             else
-                dfp0->selection_color(setKnob(dfp0->value(),int(dynPresets[presetNum][0])/2));
-            dfp1->value(eff->geteffectpar(1));
-            dfp1->selection_color(setKnob(dfp1->value(),int(dynPresets[presetNum][1])));
-            dfp2->value(eff->geteffectpar(2));
-            dfp2->selection_color(setKnob(dfp2->value(),int(dynPresets[presetNum][2])));
-            dfp3->value(eff->geteffectpar(3));
-            dfp3->selection_color(setKnob(dfp3->value(),int(dynPresets[presetNum][3])));
-            dfp4->value(eff->geteffectpar(4));
-            dfp4->selection_color(setKnob(dfp4->value(),int(dynPresets[presetNum][4])));
-            dfp5->value(eff->geteffectpar(5));
-            dfp5->selection_color(setKnob(dfp5->value(),int(dynPresets[presetNum][5])));
-            dfp6->value(eff->geteffectpar(6));
-            dfp6->selection_color(setKnob(dfp6->value(),int(dynPresets[presetNum][6])));
-            dfp7->value(eff->geteffectpar(7));
-            dfp7->selection_color(setKnob(dfp7->value(),int(dynPresets[presetNum][7])));
-            dfp8->value(eff->geteffectpar(8));
-            dfp9->value(eff->geteffectpar(9));
-            dfp9->selection_color(setKnob(dfp9->value(),int(dynPresets[presetNum][9])));
-            dfp17->value(eff->geteffectpar(17));
+                __setColor(dfp0,dynPresets,0);
+            dfp1->value(effParam(1));
+            __setColor(dfp1,dynPresets,1);
+            dfp2->value(effParam(2));
+            __setColor(dfp2,dynPresets,2);
+            dfp3->value(effParam(3));
+            __setColor(dfp3,dynPresets,3);
+            dfp4->value(effParam(4));
+            __setColor(dfp4,dynPresets,4);
+            dfp5->value(effParam(5));
+            __setColor(dfp5,dynPresets,5);
+            dfp6->value(effParam(6));
+            __setColor(dfp6,dynPresets,6);
+            dfp7->value(effParam(7));
+            __setColor(dfp7,dynPresets,7);
+            dfp8->value(effParam(8));
+            dfp9->value(effParam(9));
+            __setColor(dfp9,dynPresets,9);
+            dfp17->value(effParam(EFFECT::control::bpm));
             if (dfp17->value())
             {
                 dfp2->setValueType(VC_FXlfofreqBPM);
@@ -2662,7 +2694,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
                 dfp2->setValueType(VC_FXlfofreq);
                 dfp18->deactivate();
             }
-            dfp18->value(eff->geteffectpar(18));
+            dfp18->value(effParam(EFFECT::control::bpmStart));
             dfp18->selection_color(setKnob(dfp1->value(),0));
             effdynamicfilterwindow->show();
             break;
@@ -2678,7 +2710,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     }} {}
   }
   Function {refresh()} {} {
-    code {refresh(eff, npart, neff);} {}
+    code {refresh(npart, neff);} {}
   }
   Function {UpdatePresetColour(int changed, int efftype)} {} {
     code {//
@@ -2928,7 +2960,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   Function {EQbandUpdate(int eqband)} {} {
     code {//
     int npb = (eqband) * 5 + 10;
-    int type = eff->geteffectpar(npb);
+    int type = effParam(npb);
     typechoice->value(type);
 
     if (type == 0)
@@ -2946,19 +2978,17 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     else
         gaindial->deactivate();
 
-    int freq = eff->geteffectpar(npb + 1);
+    int freq = effParam(npb + 1);
     freqdial->value(freq);
 
-    int gain = eff->geteffectpar(npb + 2);
+    int gain = effParam(npb + 2);
     gaindial->value(gain);
 
-    int q = eff->geteffectpar(npb + 3);
+    int q = effParam(npb + 3);
     qdial->value(q);
 
-    int dbl = eff->geteffectpar(npb + 4);
+    int dbl = effParam(npb + 4);
     stagescounter->value(dbl);} {}
-  }
-  decl {EffectMgr *eff;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

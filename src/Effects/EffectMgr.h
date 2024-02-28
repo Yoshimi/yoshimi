@@ -109,6 +109,8 @@ struct EffectDTO
     uchar currPreset{0};
 
     EffectParArray param{0};
+    //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed
+    EffectMgr* eff_in_core_TODO_deprecated;
 };
 
 /**

@@ -1020,7 +1020,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group syseffectui {
           xywh {3 188 379 95} labeltype NO_LABEL labelcolor 64
-          code0 {o->init(synth, anchor.get().sysEffectParam, anchor.get().sysEffectEQ, synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+          code0 {o->init(synth, anchor.get().sysEffectParam, anchor.get().sysEffectEQ, TOPLEVEL::section::systemEffects, nsyseff);
                  o->activate();
                  o->show();}
           class EffUI
@@ -1032,7 +1032,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group inseffectui {
           xywh {3 188 379 95} color 52 labelcolor 64
-          code0 {o->init(synth, anchor.get().insEffectParam, anchor.get().insEffectEQ, synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
+          code0 {o->init(synth, anchor.get().insEffectParam, anchor.get().insEffectEQ, TOPLEVEL::section::insertEffects, ninseff);
                  o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
@@ -3069,7 +3069,7 @@ Alan Calvert started the project}
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
                 sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->refresh(TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
                 SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
                 if (SysEffOn->value())
@@ -3082,7 +3082,7 @@ Alan Calvert started the project}
                 syseffnocounter->value(engine + 1);
                 nsyseff = engine;
                 sysefftype->value(value_int);
-                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffectui->refresh(TOPLEVEL::section::systemEffects, nsyseff);
                 syseffectui->UpdatePresetColour(0, sysefftype->value());
                 // changing effect type always sets default values
                 if (sysinsgroup->value() == SystemEffectsGrp)
@@ -3428,7 +3428,7 @@ Alan Calvert started the project}
             sysefftype->value(type);
             nsyseff = fetchData(0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, 0);
             syseffnocounter->value(nsyseff + 1);
-            syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+            syseffectui->refresh(TOPLEVEL::section::systemEffects, nsyseff);
             syseffectui->UpdatePresetColour(0, sysefftype->value());
             showSysEfxUI();
         }
@@ -3957,7 +3957,7 @@ Alan Calvert started the project}
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
     sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-    syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+    syseffectui->refresh();
 
     ninseff = 0;
     inseffnocounter->value(nsyseff + 1);
@@ -4117,7 +4117,7 @@ Alan Calvert started the project}
     int ninseff = effnum;
     insefftype->value(synth->insefx[ninseff]->geteffect());
     inseffpart->value(synth->Pinsparts[ninseff] + 2);
-    inseffectui->refresh(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
+    inseffectui->refresh(TOPLEVEL::section::insertEffects, ninseff);
     if (synth->Pinsparts[ninseff] != -1)
     {
         insefftype->activate();

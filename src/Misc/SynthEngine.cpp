@@ -2535,6 +2535,8 @@ void SynthEngine::pushEffectUpdate(uchar partNr)
     dto.changed = effInstance[effnum]->geteffectpar(-1);
     dto.currPreset = effInstance[effnum]->getpreset();
     effInstance[effnum]->getAllPar(dto.param);
+    //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed
+    dto.eff_in_core_TODO_deprecated = effInstance[effnum];
 
     if (isPart)
         partEffectUiCon.publish(dto);

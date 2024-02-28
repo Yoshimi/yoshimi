@@ -714,7 +714,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Group inseffectui {
           xywh {5 38 379 95}
           code0 {InterfaceAnchor& anchor = synth->getGuiMaster()->anchor.get();
-                 o->init(synth, anchor.partEffectParam, anchor.partEffectEQ, part->partefx[ninseff], npart, ninseff);}
+                 o->init(synth, anchor.partEffectParam, anchor.partEffectEQ, npart, ninseff);}
           class EffUI
         } {}
       }
@@ -1565,7 +1565,7 @@ class PartUI {: {public Fl_Group, PartUI_}
                 part->partefx[engine]->geteffect();
                 inseffectui->UpdatePresetColour(0, insefftype->value());
                 // changing effect type always sets default values
-                inseffectui->refresh(part->partefx[engine], npart, engine);
+                inseffectui->refresh(npart, engine);
                 fxRtext();
             }
             break;
@@ -2375,7 +2375,7 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {setEffNum()} {} {
     code {//
         insefftype->value(part->partefx[ninseff]->geteffect());
-        inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
+        inseffectui->refresh(npart, ninseff);
         int x = part->Pefxroute[ninseff];
         if (x == 127)
             x = 1;
