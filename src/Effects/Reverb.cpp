@@ -272,7 +272,7 @@ void Reverb::cleanup()
 
 
 // Parameter control
-void Reverb::setvolume(unsigned char Pvolume_)
+void Reverb::setvolume(uchar Pvolume_)
 {
     Pvolume = Pvolume_;
     if (!insertion)
@@ -291,7 +291,7 @@ void Reverb::setvolume(unsigned char Pvolume_)
 }
 
 
-void Reverb::settime(unsigned char Ptime_)
+void Reverb::settime(uchar Ptime_)
 {
     Ptime = Ptime_;
     float t = power<60>(Ptime / 127.0f) - 0.97f;
@@ -301,7 +301,7 @@ void Reverb::settime(unsigned char Ptime_)
 }
 
 
-void Reverb::setlohidamp(unsigned char Plohidamp_)
+void Reverb::setlohidamp(uchar Plohidamp_)
 {
     Plohidamp = (Plohidamp_ < 64) ? 64 : Plohidamp_;
                        // remove this when the high part from lohidamp is added
@@ -322,7 +322,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp_)
 }
 
 
-void Reverb::setidelay(unsigned char Pidelay_)
+void Reverb::setidelay(uchar Pidelay_)
 {
     Pidelay = Pidelay_;
     float delay = powf(50.0f * Pidelay / 127.0f, 2.0f) - 1.0f;
@@ -341,14 +341,14 @@ void Reverb::setidelay(unsigned char Pidelay_)
 }
 
 
-void Reverb::setidelayfb(unsigned char Pidelayfb_)
+void Reverb::setidelayfb(uchar Pidelayfb_)
 {
     Pidelayfb = Pidelayfb_;
     idelayfb = Pidelayfb / 128.0f;
 }
 
 
-void Reverb::sethpf(unsigned char Phpf_)
+void Reverb::sethpf(uchar Phpf_)
 {
     Phpf = Phpf_;
     if (Phpf == 0)
@@ -366,7 +366,7 @@ void Reverb::sethpf(unsigned char Phpf_)
 }
 
 
-void Reverb::setlpf(unsigned char Plpf_)
+void Reverb::setlpf(uchar Plpf_)
 {
     Plpf = Plpf_;
     if (Plpf == 127)
@@ -384,7 +384,7 @@ void Reverb::setlpf(unsigned char Plpf_)
 }
 
 
-void Reverb::settype(unsigned char Ptype_)
+void Reverb::settype(uchar Ptype_)
 {
     Ptype = Ptype_;
     if (Ptype >= NUM_TYPES)
@@ -473,7 +473,7 @@ void Reverb::setupPipelines()
 }
 
 
-void Reverb::setroomsize(unsigned char Proomsize_)
+void Reverb::setroomsize(uchar Proomsize_)
 {
     Proomsize = Proomsize_;
     if (!Proomsize)
@@ -487,7 +487,7 @@ void Reverb::setroomsize(unsigned char Proomsize_)
 }
 
 
-void Reverb::setbandwidth(unsigned char Pbandwidth_)
+void Reverb::setbandwidth(uchar Pbandwidth_)
 {
     Pbandwidth = Pbandwidth_;
     float v = Pbandwidth / 127.0f;
@@ -496,7 +496,7 @@ void Reverb::setbandwidth(unsigned char Pbandwidth_)
 }
 
 
-void Reverb::setpreset(unsigned char npreset)
+void Reverb::setpreset(uchar npreset)
 {
     if (npreset < 0xf)
     {
@@ -510,8 +510,8 @@ void Reverb::setpreset(unsigned char npreset)
     }
     else
     {
-        unsigned char preset = npreset & 0xf;
-        unsigned char param = npreset >> 4;
+        uchar preset = npreset & 0xf;
+        uchar param = npreset >> 4;
         if (param == 0xf)
             param = 0;
         changepar(param, reverbPresets[preset][param]);
@@ -522,7 +522,7 @@ void Reverb::setpreset(unsigned char npreset)
 }
 
 
-void Reverb::changepar(int npar, unsigned char value)
+void Reverb::changepar(int npar, uchar value)
 {
     if (npar == -1)
     {
@@ -575,7 +575,7 @@ void Reverb::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Reverb::getpar(int npar)
+uchar Reverb::getpar(int npar) const
 {
     switch (npar)
     {
@@ -612,8 +612,8 @@ float Revlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = reverbPresets[presetNum][control];
-    unsigned char canLearn = TOPLEVEL::type::Learnable;
-    unsigned char isInteger = TOPLEVEL::type::Integer;
+    uchar canLearn = TOPLEVEL::type::Learnable;
+    uchar isInteger = TOPLEVEL::type::Integer;
 
     switch (control)
     {

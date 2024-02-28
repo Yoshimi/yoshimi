@@ -37,7 +37,7 @@
 
 static const int reverbPRESET_SIZE = 13;
 static const int reverbNUM_PRESETS = 13;
-static const unsigned char reverbPresets[reverbNUM_PRESETS][reverbPRESET_SIZE] = {
+static const uchar reverbPresets[reverbNUM_PRESETS][reverbPRESET_SIZE] = {
         // Cathedral1
         {80,  64,  63,  24,  0,  0,  0, 85,  5,  83,   1,  64,  20 },
         // Cathedral2
@@ -76,12 +76,12 @@ class Reverb : public Effect
     public:
         Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Reverb();
-        void out(float *rawL, float *rawR);
-        void cleanup(void);
+        void out(float *rawL, float *rawR) override;
+        void cleanup(void) override;
 
-        void setpreset(unsigned char npreset);
-        void changepar(int npar, unsigned char value);
-        unsigned char getpar(int npar);
+        void setpreset(uchar npreset) override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar) const override;
 
 
     private:
@@ -89,30 +89,30 @@ class Reverb : public Effect
 
         // Parametrii
         bool Pchanged;
-        unsigned char Pvolume;
-        unsigned char Ptime;
-        unsigned char Pidelay;
-        unsigned char Pidelayfb;
-//        unsigned char Prdelay;  // **** RHL ****
-//        unsigned char Perbalance;   // **** RHL ****
-        unsigned char Plpf;
-        unsigned char Phpf; // todo 0..63 lpf, 64 = off, 65..127 = hpf(TODO)
-        unsigned char Plohidamp;
-        unsigned char Ptype;
-        unsigned char Proomsize;
-        unsigned char Pbandwidth;
+        uchar Pvolume;
+        uchar Ptime;
+        uchar Pidelay;
+        uchar Pidelayfb;
+//        uchar Prdelay;  // **** RHL ****
+//        uchar Perbalance;   // **** RHL ****
+        uchar Plpf;
+        uchar Phpf; // todo 0..63 lpf, 64 = off, 65..127 = hpf(TODO)
+        uchar Plohidamp;
+        uchar Ptype;
+        uchar Proomsize;
+        uchar Pbandwidth;
 
         // parameter control
-        void setvolume(unsigned char Pvolume_);
-        void settime(unsigned char Ptime_);
-        void setlohidamp(unsigned char Plohidamp_);
-        void setidelay(unsigned char Pidelay_);
-        void setidelayfb(unsigned char Pidelayfb_);
-        void sethpf(unsigned char Phpf_);
-        void setlpf(unsigned char Plpf_);
-        void settype(unsigned char Ptype_);
-        void setroomsize(unsigned char Proomsize_);
-        void setbandwidth(unsigned char Pbandwidth_);
+        void setvolume(uchar Pvolume_);
+        void settime(uchar Ptime_);
+        void setlohidamp(uchar Plohidamp_);
+        void setidelay(uchar Pidelay_);
+        void setidelayfb(uchar Pidelayfb_);
+        void sethpf(uchar Phpf_);
+        void setlpf(uchar Plpf_);
+        void settype(uchar Ptype_);
+        void setroomsize(uchar Proomsize_);
+        void setbandwidth(uchar Pbandwidth_);
 
 //        float erbalance;    // **** RHL ****
 

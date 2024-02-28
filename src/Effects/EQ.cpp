@@ -118,7 +118,7 @@ void EQ::out(float *smpsl, float *smpsr)
 
 // Parameter control
 
-void EQ::setvolume(unsigned char Pvolume_)
+void EQ::setvolume(uchar Pvolume_)
 {
     Pvolume = Pvolume_;
     float tmp = 10.0f * powFrac<200>(1.0f - Pvolume / 127.0f);
@@ -127,11 +127,11 @@ void EQ::setvolume(unsigned char Pvolume_)
 }
 
 
-void EQ::setpreset(unsigned char npreset)
+void EQ::setpreset(uchar npreset)
 {
     const int PRESET_SIZE = 1;
     const int NUM_PRESETS = 2;
-    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
+    uchar presets[NUM_PRESETS][PRESET_SIZE] = {
         { EQmaster_def }, // EQ 1
         { EQmaster_def }  // EQ 2
     };
@@ -145,7 +145,7 @@ void EQ::setpreset(unsigned char npreset)
 }
 
 
-void EQ::changepar(int npar, unsigned char value)
+void EQ::changepar(int npar, uchar value)
 {
     if (npar == -1)
     {
@@ -213,7 +213,7 @@ void EQ::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char EQ::getpar(int npar)
+uchar EQ::getpar(int npar) const
 {
     switch (npar)
     {
@@ -257,6 +257,16 @@ unsigned char EQ::getpar(int npar)
 }
 
 
+/**
+ * Special implementation, since only EQ uses the high number of parameters.
+ */
+void EQ::getAllPar(EffectParArray& target) const
+{
+    for (uint i=0; i<target.size(); ++i)
+        target[i] = this->getpar(i);
+}
+
+
 float EQ::getfreqresponse(float freq)
 {
     float resp = 1.0f;
@@ -280,8 +290,8 @@ float EQlimit::getlimits(CommandBlock *getData)
     int min = 0;
     int max = 127;
     int def = 0;
-    unsigned char canLearn = TOPLEVEL::type::Learnable;
-    unsigned char isInteger = TOPLEVEL::type::Integer;
+    uchar canLearn = TOPLEVEL::type::Learnable;
+    uchar isInteger = TOPLEVEL::type::Integer;
 
     switch (control)
     {

@@ -2532,7 +2532,9 @@ void SynthEngine::pushEffectUpdate(uchar partNr)
     dto.enabled  = (0 != dto.effectID && ((isPart && !currPart.Pefxbypass[effnum])
                                          ||(isInsert && int(Pinsparts[effnum]) != -1)
                                          ||(!isInsert && syseffEnable[effnum])));
-    ////////////////////////////////////////////////////////////////////TODO 24/2 ////OOO package extended data here
+    dto.changed = effInstance[effnum]->geteffectpar(-1);
+    dto.currPreset = effInstance[effnum]->getpreset();
+    effInstance[effnum]->getAllPar(dto.param);
 
     if (isPart)
         partEffectUiCon.publish(dto);

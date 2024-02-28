@@ -41,7 +41,6 @@
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
 
-#include <array>
 
 
 class EffectMgr : public ParamBase
@@ -66,10 +65,10 @@ class EffectMgr : public ParamBase
         int geteffect(void);
 
         void changepreset(unsigned char npreset);
-        void changepreset_nolock(unsigned char npreset);
         unsigned char getpreset(void);
         void seteffectpar(int npar, unsigned char value);
         unsigned char geteffectpar(int npar);
+        void getAllPar(EffectParArray&) const;
 
         SynthEngine *getSynthEngine() {return synth;}
 
@@ -96,8 +95,6 @@ class LimitMgr
 
 
 
-static const int EFFECT_PARAM_CNT = 13;          //////TODO 2/24 find out what is the maximum number we actually need (they are all hard wired)
-static const int EFFECT_MAX_PRESETS = 13;       ///////TODO 2/24 not clear yet if these are hard wired or can be extended dynamically
 
 /**
  * Data record used to transport effect settings into the UI
@@ -107,10 +104,11 @@ struct EffectDTO
     int effectID{-1};
     uchar effectNum{0};
     bool enabled{false};
+    bool changed{false};
     bool isInsert{false};
+    uchar currPreset{0};
 
-    std::array<uchar, EFFECT_PARAM_CNT>   param{0};
-    std::array<uchar, EFFECT_MAX_PRESETS> preset{0};
+    EffectParArray param{0};
 };
 
 /**

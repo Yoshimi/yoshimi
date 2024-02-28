@@ -34,7 +34,7 @@ namespace {
 }
 
 Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
-               FilterParams *filterpars_, unsigned char Ppreset_,
+               FilterParams *filterpars_, uchar Ppreset_,
                SynthEngine *synth_) :
     Ppreset(Ppreset_),
     efxoutl(efxoutl_),
@@ -87,3 +87,16 @@ void Effect::setlrcross(char Plrcross_)
     Plrcross = Plrcross_;
     lrcross.setTargetValue(Plrcross / 127.0f);
 }
+
+
+/**
+ * Base implementation: fetch through `virtual getpar(n)`
+ * Only the EQ uses the high number of (band) parameters.
+ */
+void Effect::getAllPar(EffectParArray& target) const
+{
+    const uint LIM = EFFECT::control::bpmStart;
+    for (uint i=0; i<=LIM; ++i)
+        target[i] = this->getpar(i);
+}
+

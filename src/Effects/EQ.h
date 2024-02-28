@@ -35,34 +35,35 @@
 
 #include <memory>
 
-const unsigned char EQmaster_def = 67;
-const unsigned char EQfreq_def = 64;
-const unsigned char EQgain_def = 64;
-const unsigned char EQq_def = 64;
+const uchar EQmaster_def = 67;
+const uchar EQfreq_def = 64;
+const uchar EQgain_def = 64;
+const uchar EQq_def = 64;
 
 class EQ : public Effect
 {
     public:
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~EQ() { };
-        void out(float *smpsl, float *smpr);
-        void setpreset(unsigned char npreset);
-        void changepar(int npar, unsigned char value);
-        unsigned char getpar(int npar);
-        void cleanup(void);
-        float getfreqresponse(float freq);
+        void out(float *smpsl, float *smpr)   override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)          const override;
+        void getAllPar(EffectParArray&) const override;
+        void cleanup(void)                    override;
+        float getfreqresponse(float freq)     override;
 
     private:
-        void setvolume(unsigned char Pvolume_);
+        void setvolume(uchar Pvolume_);
 
         // Parameters
         bool Pchanged;
-        unsigned char Pvolume;
-        unsigned char Pband;
+        uchar Pvolume;
+        uchar Pband;
 
         struct FilterParam
         {
-            unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
+            uchar Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
             synth::InterpolatedValue<float> freq, gain, q;
             std::unique_ptr<AnalogFilter> l; // internal values
             std::unique_ptr<AnalogFilter> r; // internal values

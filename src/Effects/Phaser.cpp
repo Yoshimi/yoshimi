@@ -483,7 +483,7 @@ void Phaser::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Phaser::getpar(int npar)
+unsigned char Phaser::getpar(int npar) const
 {
     switch (npar)
     {

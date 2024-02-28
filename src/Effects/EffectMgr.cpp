@@ -162,6 +162,15 @@ unsigned char EffectMgr::geteffectpar(int npar)
     return efx->getpar(npar);
 }
 
+void EffectMgr::getAllPar(EffectParArray& target) const
+{
+    if (efx)
+        efx->getAllPar(target);
+    else
+        target = {0};
+}
+
+
 
 // Apply the effect
 void EffectMgr::out(float *smpsl, float *smpsr)
