@@ -2507,14 +2507,14 @@ void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
  * Data Transfer Objects into the GUI, activated by sending a notification through
  * the toGUI ringbuffer. When receiving such a push, the GUI invokes EffUI::refresh().
  */
-void SynthEngine::pushEffectUpdate(uchar partNr)
+void SynthEngine::pushEffectUpdate(uchar partNum)
 {
-    bool isPart{partNr < NUM_MIDI_PARTS};
-    bool isInsert{partNr != TOPLEVEL::section::systemEffects};
+    bool isPart{partNum < NUM_MIDI_PARTS};
+    bool isInsert{partNum != TOPLEVEL::section::systemEffects};
 
     assert(isPart
-        || partNr == TOPLEVEL::section::systemEffects
-        || partNr == TOPLEVEL::section::insertEffects);
+        || partNum == TOPLEVEL::section::systemEffects
+        || partNum == TOPLEVEL::section::insertEffects);
     assert(part[getRuntime().currentPart]);
     Part& currPart{*part[getRuntime().currentPart]};
     // the "current" effect as selected / exposed in the GUI
@@ -2526,14 +2526,17 @@ void SynthEngine::pushEffectUpdate(uchar partNr)
                             : isInsert? insefx : sysefx;
 
     EffectDTO dto;
-    dto.effectNum = effnum;
+    dto.effNum = effnum;
+    dto.effType = effInstance[effnum]->geteffect();
     dto.isInsert = isInsert;
-    dto.effectID = effInstance[effnum]->geteffect();
-    dto.enabled  = (0 != dto.effectID && ((isPart && !currPart.Pefxbypass[effnum])
-                                         ||(isInsert && int(Pinsparts[effnum]) != -1)
-                                         ||(!isInsert && syseffEnable[effnum])));
+    dto.enabled  = (0 != dto.effType && ((isPart && !currPart.Pefxbypass[effnum])
+                                        ||(isInsert && Pinsparts[effnum] != -1)
+                                        ||(!isInsert && syseffEnable[effnum])));
     dto.changed = effInstance[effnum]->geteffectpar(-1);
     dto.currPreset = effInstance[effnum]->getpreset();
+    dto.insertFxRouting = isPart || !isInsert? -1 : Pinsparts[effnum];
+    dto.partFxRouting = !isPart?    +1 : currPart.Pefxroute[effnum];
+    dto.partFxBypass  = !isPart? false : currPart.Pefxbypass[effnum];
     effInstance[effnum]->getAllPar(dto.param);
     //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed
     dto.eff_in_core_TODO_deprecated = effInstance[effnum];

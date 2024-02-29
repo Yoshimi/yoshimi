@@ -1429,6 +1429,7 @@ int Part::loadXMLinstrument(string filename)
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(*xml);
+    ///////////////////////////////////////////////OOO push update for effects
 
     if (hasYoshi)
     {

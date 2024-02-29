@@ -280,6 +280,7 @@ string UnifiedPresets::findXML(XMLwrapper& xml, CommandBlock *getData, bool isLo
                 xml.enterbranch(name);
                 sectionType->getfromXML(xml);
                 xml.exitbranch();
+    ///////////////////////////////////////////////OOO push update for effects
             }
             else
             {

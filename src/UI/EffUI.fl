@@ -1676,13 +1676,37 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   } {
     code { return effect.get().param[EFFECT::control::sepLRDelay];} {}
   }
-  Function {effParam(uint paramNr)} {return_type uchar
+  Function {isEnabled()} {return_type bool
   } {
-    code { return effect.get().param[paramNr]; } {}
+    code { return effect.get().enabled;} {}
+  }
+  Function {effNum()} {return_type uchar
+  } {
+    code { return effect.get().effNum; } {}
+  }
+  Function {effType()} {return_type int
+  } {
+    code { return effect.get().effType; } {}
+  }
+  Function {effParam(uint paramNum)} {return_type uchar
+  } {
+    code { return effect.get().param[paramNum]; } {}
   }
   Function {effPreset()} {return_type uchar
   } {
     code { return effect.get().currPreset; } {}
+  }
+  Function {getInsertFxRouting()} {return_type int
+  } {
+    code { return effect.get().insertFxRouting; } {}
+  }
+  Function {getPartFxRouting()} {return_type uchar
+  } {
+    code { return effect.get().partFxRouting; } {}
+  }
+  Function {getPartFxBypass()} {return_type bool
+  } {
+    code { return effect.get().partFxBypass; } {}
   }
   Function {send_data(int action, int control, float value, int group, int type)} {} {
     code {//
@@ -2357,7 +2381,7 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
         delete(filterwindow);
         filterwindow=NULL;
     }
-    int nextEff = effect.get().effectID + EFFECT::type::none; // get effect not yet converted
+    int nextEff = effect.get().effType + EFFECT::type::none; // get effect not yet converted
     if (lastEff != nextEff)
     {
         presetNum = 0;

@@ -101,12 +101,15 @@ class LimitMgr
  */
 struct EffectDTO
 {
-    int effectID{-1};
-    uchar effectNum{0};
+    int effType{-1};
+    uchar effNum{0};
     bool enabled{false};
     bool changed{false};
     bool isInsert{false};
     uchar currPreset{0};
+    int insertFxRouting{-1};
+    uchar partFxRouting{1};
+    bool  partFxBypass{false};
 
     EffectParArray param{0};
     //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed

@@ -724,8 +724,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
         xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("Next Effect");o->add("Part Out");o->add("Dry Out");}
-        code1 {int x = part->Pefxroute[ninseff]; if (x == 127) x = 1;}
-        code2 {o->value(x);}
+        code1 {o->value(part->Pefxroute[ninseff]);}
       } {}
       Fl_Button effCopy {
         label C
@@ -2376,11 +2375,8 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         insefftype->value(part->partefx[ninseff]->geteffect());
         inseffectui->refresh(npart, ninseff);
-        int x = part->Pefxroute[ninseff];
-        if (x == 127)
-            x = 1;
         bypasseff->value(part->Pefxbypass[ninseff]);
-        sendtochoice->value(x);} {}
+        sendtochoice->value(part->Pefxroute[ninseff]);} {}
   }
   Function {seteditname()} {} {
     code {//

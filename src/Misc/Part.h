@@ -160,7 +160,7 @@ class Part
         Samples partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass-through part effects
         Samples partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
-        unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
+        uchar Pefxroute[NUM_PART_EFX];         // how the effect's output is
                                                // routed (to next effect/to out)
         bool Pefxbypass[NUM_PART_EFX + 1];     // if the effects are bypassed,
                                                // [NUM_PART_EFX] is for "no effect" buffer
