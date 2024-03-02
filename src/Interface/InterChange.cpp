@@ -269,7 +269,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     if (control == TOPLEVEL::control::copyPaste)
     {
-        string name = synth->unifiedpresets.section(synth, getData);
+        string name = synth->unifiedpresets.handleStoreLoad(synth, getData);
         /*
          * for Paste (load) 'name' is the type of the preset being loaded
          * for List 'name' lists all the stored presets of the wanted preset type
@@ -3253,7 +3253,10 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::partNumber:
             if (write)
+            {   // from various causes which change the current active part
                 synth->getRuntime().currentPart = value_int;
+                synth->pushEffectUpdate(value_int);
+            }           // send current part-effect data to GUI
             else
                 value = synth->getRuntime().currentPart;
             break;
@@ -3263,6 +3266,9 @@ void InterChange::commandMain(CommandBlock *getData)
                 if (value < synth->getRuntime().NumAvailableParts)
                     undoRedoClear(); // references might no longer exist
                 synth->getRuntime().NumAvailableParts = value;
+                // Note: in MasterUI::updatepart() the current part number
+                //       will possibly be capped, causing npartcounter->do_callback();
+                //       to send a command MAIN::control::partNumber ...
             }
             else
                 value = synth->getRuntime().NumAvailableParts;
@@ -4079,7 +4085,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Pefxbypass[engine] = newSwitch;
                 if (newSwitch != oldSwitch)
                     part->partefx[engine]->cleanup();
-                // no GUI update since bypass toggle is not part of EffUI
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Pefxbypass[engine];

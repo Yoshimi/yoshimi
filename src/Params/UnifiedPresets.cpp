@@ -47,7 +47,7 @@ using std::string;
    no name given - from/to clipboard))
  */
 
-string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
+string UnifiedPresets::handleStoreLoad(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
     //synth->CBtest(getData, true);
@@ -97,7 +97,7 @@ string UnifiedPresets::section(SynthEngine *_synth, CommandBlock *getData)
     {
         if (type & TOPLEVEL::type::Copy)
         {
-            saveUnif(getData);
+            save(getData);
             name = "";
         }
         else if (type & TOPLEVEL::type::Paste)
@@ -243,7 +243,7 @@ void UnifiedPresets::list(string dirname, string& name)
 }
 
 
-string UnifiedPresets::findXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::accessXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -280,7 +280,7 @@ string UnifiedPresets::findXML(XMLwrapper& xml, CommandBlock *getData, bool isLo
                 xml.enterbranch(name);
                 sectionType->getfromXML(xml);
                 xml.exitbranch();
-    ///////////////////////////////////////////////OOO push update for effects
+                synth->pushEffectUpdate(npart);
             }
             else
             {
@@ -779,11 +779,11 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool i
 }
 
 
-void UnifiedPresets::saveUnif(CommandBlock *getData)
+void UnifiedPresets::save(CommandBlock *getData)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     auto xml{std::make_unique<XMLwrapper>(synth, false)};
-    string type = findXML(*xml, getData, false);
+    string type = accessXML(*xml, getData, false);
     if (type.empty())
         synth->getRuntime().Log("Unrecognised preset type");
     else
@@ -839,7 +839,7 @@ void UnifiedPresets::load(CommandBlock *getData)
         synth->getRuntime().Log("Can't match " + filename + " here.");
 
     xml->loadXMLfile(filename);
-    findXML(*xml, getData, true);
+    accessXML(*xml, getData, true);
 }
 
 

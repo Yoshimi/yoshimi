@@ -1642,17 +1642,16 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   Function {make_filter_window()} {} {
     Fl_Window filterwindow {
       label {Yoshimi : Filter Parameters for DynFilter Effect}
-      callback {//
-    filterclose->do_callback();}
+      callback { filterclose->do_callback(); }
       xywh {1109 779 285 110} type Double hide resizable
       code0 {filtDW = o->w(); filtDH = o->h();}
       code1 {o->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);}
-      code2 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("DynFilter"), npart, TOPLEVEL::windowTitle,UNUSED, neff)).c_str());}
+      code2 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("DynFilter"), npart, TOPLEVEL::windowTitle,UNUSED, effNum())).c_str());}
     } {
       Fl_Group fwin_filterui {
         label {DynFilter effect  - Filter}
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-        code0 {o->init(effect.get().eff_in_core_TODO_deprecated->filterpars,NULL,NULL, npart, (EFFECT::type::dynFilter), neff);}
+        code0 {o->init(effect.get().eff_in_core_TODO_deprecated->filterpars,NULL,NULL, npart, (EFFECT::type::dynFilter), effNum());}
         class FilterUI
       } {}
       Fl_Button filterclose {
@@ -1679,6 +1678,10 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   Function {isEnabled()} {return_type bool
   } {
     code { return effect.get().enabled;} {}
+  }
+  Function {isChanged()} {return_type bool
+  } {
+    code { return effect.get().changed;} {}
   }
   Function {effNum()} {return_type uchar
   } {
@@ -1721,8 +1724,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
     {
         offset = dfp->value();
     }
-std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" ctrl="<<control<<" npart="<<npart<<" grp="<<group<<" neff="<<neff<<" param="<<parameter<<" off="<<offset<<std::endl;
-    collect_writeData(synth, value, action, type, control, npart, group, neff, UNUSED, parameter, offset);} {}
+    collect_writeData(synth, value, action, type, control, npart, group, effNum(), UNUSED, parameter, offset);} {}
   }
   Function {fetchData(float value, int control, int part, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int offset = UNUSED, int miscmsg = UNUSED, int request = UNUSED)} {return_type float
   } {
@@ -1743,7 +1745,7 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
         presetNum = effPreset();
 
     int textCol = eff_preset;
-    if (fetchData(0, EFFECT::control::changed, getData->data.part, efftype, effnum) != 0)
+    if (isChanged())
         textCol = eff_preset_changed;
     auto __setColor = [this,value](auto& widget, auto& preset, uint paramIdx)
                       {widget->selection_color(setKnob(value,preset[presetNum][paramIdx]));};
@@ -2326,12 +2328,11 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
             break;
     };} {}
   }
-  Function {init(SynthEngine* synth_, RoutingTag conEffect, RoutingTag conEQ, int npart_, int neff_)} {} {
+  Function {init(SynthEngine* synth_, RoutingTag conEffect, RoutingTag conEQ, int npart_)} {} {
     code {//
     synth = synth_;
     effect.activate(GuiDataExchange::Connection<EffectDTO>{synth->interchange.guiDataExchange, conEffect});
     npart = npart_;
-    neff = neff_;
 
     make_null_window();
     make_reverb_window();
@@ -2358,12 +2359,11 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
     effdistortionwindow->position(px,py);
     effeqwindow->position(px,py);
     effdynamicfilterwindow->position(px,py);
-    refresh(npart, neff);} {}
+    refresh();} {}
   }
-  Function {refresh(int npart_, int neff_)} {} {
+  Function {refresh(int npart_)} {} {
     code {//
     npart = npart_;
-    neff = neff_;
     this->hide();
     effnullwindow->hide();
     effreverbwindow->hide();
@@ -2734,7 +2734,7 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
     }} {}
   }
   Function {refresh()} {} {
-    code {refresh(npart, neff);} {}
+    code {refresh(npart);} {}
   }
   Function {UpdatePresetColour(int changed, int efftype)} {} {
     code {//
@@ -3021,8 +3021,6 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
   decl {int eqband;} {private local
   }
   decl {int npart;} {private local
-  }
-  decl {int neff;} {private local
   }
   decl {float filtDW;} {private local
   }

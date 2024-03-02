@@ -322,41 +322,41 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.restoreSessionData(Runtime.StateFile);
     if (Runtime.paramsLoad.size())
     {
-        string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);
+        string filename = setExtension(Runtime.paramsLoad, EXTEN::patchset);
         ShutUp();
-        if (!loadXML(file))
+        if (!loadXML(filename))
         {
-            Runtime.Log("Failed to load parameters " + file);
+            Runtime.Log("Failed to load parameters " + filename);
             Runtime.paramsLoad = "";
         }
     }
     if (Runtime.instrumentLoad.size())
     {
-        string feli = Runtime.instrumentLoad;
-        if (part[Runtime.load2part]->loadXMLinstrument(feli))
+        string filename = Runtime.instrumentLoad;
+        if (part[Runtime.load2part]->loadXMLinstrument(filename))
         {
             part[Runtime.load2part]->Penabled = 1;
-            Runtime.Log("Instrument file " + feli + " loaded");
+            Runtime.Log("Instrument file " + filename + " loaded");
         }
         else
         {
-            Runtime.Log("Failed to load instrument file " + feli);
+            Runtime.Log("Failed to load instrument file " + filename);
             Runtime.instrumentLoad = "";
         }
     }
     if (Runtime.midiLearnLoad.size())
     {
-        string feml = Runtime.midiLearnLoad;
-        if (midilearn.loadList(feml))
+        string filename = Runtime.midiLearnLoad;
+        if (midilearn.loadList(filename))
         {
 #ifdef GUI_FLTK
             midilearn.updateGui(); // does nothing if --no-gui
 #endif
-            Runtime.Log("midiLearn file " + feml + " loaded");
+            Runtime.Log("midiLearn file " + filename + " loaded");
         }
         else
         {
-            Runtime.Log("Failed to load midiLearn file " + feml);
+            Runtime.Log("Failed to load midiLearn file " + filename);
             Runtime.midiLearnLoad = "";
         }
     }

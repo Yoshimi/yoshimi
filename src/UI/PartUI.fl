@@ -694,19 +694,21 @@ class PartUI {: {public Fl_Group, PartUI_}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
-                ninseff = o->value() - 1;
-                setEffNum();
-                send_data(0, PART::control::effectNumber, ninseff, TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+            int effNum = o->value() - 1;
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::effectNumber, effNum, TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect No.} xywh {20 8 35 22} labelsize 12 labelcolor 64 maximum 3 textsize 12 textcolor 64
-        code1 {o->value(ninseff+1);}
+        code0 {o->range(1, NUM_PART_EFX);}
+        code1 {o->value(1);}
         class WidgetSpinner
       }
       Fl_Choice insefftype {
         callback {//
-        send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+            uchar effNum = inseffectui->effNum();
+            uchar effType = o->value();
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::effectType, effType, TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
         tooltip {Effect Type} xywh {86 8 92 22} box UP_BOX down_box BORDER_BOX labelsize 11 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
-        code1 {o->value(part->partefx[ninseff]->geteffect());}
+        code1 {o->value(0); // initially "No Effect"}
       } {}
       Fl_Group inseffectuigroup {
         xywh {3 37 380 96} box FLAT_BOX color 48
@@ -714,17 +716,18 @@ class PartUI {: {public Fl_Group, PartUI_}
         Fl_Group inseffectui {
           xywh {5 38 379 95}
           code0 {InterfaceAnchor& anchor = synth->getGuiMaster()->anchor.get();
-                 o->init(synth, anchor.partEffectParam, anchor.partEffectEQ, npart, ninseff);}
+                 o->init(synth, anchor.partEffectParam, anchor.partEffectEQ, npart);}
           class EffUI
         } {}
       }
       Fl_Choice sendtochoice {
         label To
         callback {//
-        send_data(0, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
+            uchar effNum = inseffectui->effNum();
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::effectDestination, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
         xywh {225 8 102 22} down_box BORDER_BOX labelfont 1 labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
         code0 {o->add("Next Effect");o->add("Part Out");o->add("Dry Out");}
-        code1 {o->value(part->Pefxroute[ninseff]);}
+        code1 {o->value(0);}
       } {}
       Fl_Button effCopy {
         label C
@@ -743,9 +746,11 @@ class PartUI {: {public Fl_Group, PartUI_}
       Fl_Check_Button bypasseff {
         label Bypass
         callback {//
-        send_data(0, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, ninseff, TOPLEVEL::insert::partEffectSelect);}
-        tooltip {if the effect is not used (is bypassed)} xywh {20 135 63 21} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226
-        code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
+            uchar effNum = inseffectui->effNum();
+            send_data(TOPLEVEL::action::forceUpdate, PART::control::effectBypass, o->value(), TOPLEVEL::type::Integer, npart, UNUSED, effNum, TOPLEVEL::insert::partEffectSelect);}
+        xywh {20 135 63 21} down_box DOWN_BOX selection_color 64 labelfont 3 labelsize 12 labelcolor 226
+        tooltip {if the effect is not used (is bypassed)}
+        code0 {o->value(false);}
         class Fl_Check_Button2
       }
       Fl_Button effClose {
@@ -1385,7 +1390,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     unsigned char parameter = getData->data.parameter;
     unsigned char miscmsg = getData->data.miscmsg;
     bool valBool = _SYS_::F2B(value);
-    bool fromUs = ((getData->data.source & TOPLEVEL::action::noAction) == TOPLEVEL::action::fromGUI);
     int valInt = lrint(value);
     string text;
     if (miscmsg != NO_MSG)
@@ -1393,7 +1397,7 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (npart != newpart)
         return;
 
-    bool sameEff = (engine == ninseff);
+    bool forCurrentEff = (engine == inseffectui->effNum());
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     if (!kitType)
         kititem = 0;
@@ -1542,13 +1546,8 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::effectNumber:
-            if (!fromUs)
-            {
-                ninseff = valInt;
-                inseffnocounter->value(ninseff + 1);
-                setEffNum();
-            }
-            if (sameEff)
+            refreshEffUI();
+            if (forCurrentEff)
                 inseffectui->UpdatePresetColour(parameter, insefftype->value());
             else
             {
@@ -1558,25 +1557,22 @@ class PartUI {: {public Fl_Group, PartUI_}
             break;
 
         case PART::control::effectType:
-            if (sameEff)
-            {
-                insefftype->value(valInt);
-                part->partefx[engine]->geteffect();
+            if (forCurrentEff)
+            {   // changing effect type always sets default values
+                refreshEffUI();
                 inseffectui->UpdatePresetColour(0, insefftype->value());
-                // changing effect type always sets default values
-                inseffectui->refresh(npart, engine);
                 fxRtext();
             }
             break;
 
         case PART::control::effectDestination:
-            if (sameEff)
-                sendtochoice->value(valInt);
+            if (forCurrentEff)
+                sendtochoice->value(inseffectui->getPartFxRouting());
             break;
 
         case PART::control::effectBypass:
-            if (sameEff)
-                bypasseff->value(valBool);
+            if (forCurrentEff)
+                bypasseff->value(inseffectui->getPartFxBypass());
             break;
 
 // controllers
@@ -1753,7 +1749,7 @@ class PartUI {: {public Fl_Group, PartUI_}
 
         if (kititem >= EFFECT::type::none && kititem < EFFECT::type::count)
         {
-            bool show = partfx->visible() && engine == ninseff;
+            bool show = partfx->visible() && engine == inseffectui->effNum();
             effectsrefresh();
             if (show)
                 partfx->show();
@@ -1928,9 +1924,9 @@ class PartUI {: {public Fl_Group, PartUI_}
   Function {effectsrefresh()} {} {
     code {//
         partfx->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Effects"), npart, TOPLEVEL::windowTitle)).c_str());
-        setEffNum();
-        bool res = fetchData(0, EFFECT::control::changed, npart,  EFFECT::type::none + insefftype->value(), inseffnocounter->value() - 1);
-        inseffectui->UpdatePresetColour(res, insefftype->value());
+        refreshEffUI();
+        bool isChanged = inseffectui->isChanged();
+        inseffectui->UpdatePresetColour(isChanged, insefftype->value());
         lastfxW = 0;
         lastDynFiltW = 0;} {}
   }
@@ -2220,7 +2216,6 @@ class PartUI {: {public Fl_Group, PartUI_}
     part = part_;
     npart = npart_;
     plgroup = &synth->getGuiMaster()->panelgroup;
-    ninseff = 0;
     make_window();
     end();} {}
   }
@@ -2371,12 +2366,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     partname = text;
     synth->getGuiMaster()->instrumentlabel->copy_label(text.c_str());} {}
   }
-  Function {setEffNum()} {} {
+  Function {refreshEffUI()} {} {
     code {//
-        insefftype->value(part->partefx[ninseff]->geteffect());
-        inseffectui->refresh(npart, ninseff);
-        bypasseff->value(part->Pefxbypass[ninseff]);
-        sendtochoice->value(part->Pefxroute[ninseff]);} {}
+        insefftype->value(inseffectui->effType());
+        inseffnocounter->value(inseffectui->effNum() + 1);
+        inseffectui->refresh(npart);
+        bypasseff->value(inseffectui->getPartFxBypass());
+        sendtochoice->value(inseffectui->getPartFxRouting());} {}
   }
   Function {seteditname()} {} {
     code {//
@@ -2882,8 +2878,6 @@ class PartUI {: {public Fl_Group, PartUI_}
   decl {PADnoteUI *padnoteui;} {public local
   }
   decl {int npart;} {public local
-  }
-  decl {int ninseff;} {public local
   }
   decl {int lastkititem;} {public local
   }

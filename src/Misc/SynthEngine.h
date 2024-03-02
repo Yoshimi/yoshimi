@@ -249,7 +249,6 @@ class SynthEngine
 
         void pushEffectUpdate(uchar partNr);
         void maybePublishEffectsToGui();
-    ////////////////////////////////////////////////////////////////////TODO 24/2 ////OOO similar for insert- and part-effects
 
         // others ...
         Controller *ctl;
