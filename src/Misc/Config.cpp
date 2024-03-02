@@ -1511,6 +1511,8 @@ void GuiThreadMsg::processGuiMessages()
         {
             MasterUI& guiMaster = interChange.createGuiMaster(msg->index);
             guiMaster.Init();
+            ///////////////////////////////////////TODO 3/2024 the following should be done from the Synth thread
+            guiMaster.synth->postGuiStartHook();   //// this is a premature hack to fix missing push-updates from early load / state files
 
             if (guiMaster.synth->getRuntime().audioEngine < 1)
                 alert(guiMaster.synth, "Yoshimi could not connect to any sound system. Running with no Audio.");

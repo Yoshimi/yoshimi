@@ -426,6 +426,38 @@ size_t SynthEngine::publishGuiAnchor()
 }
 
 
+/**
+ * This function is invoked on the primary Synth instance after GUI becomes ready.
+ * TODO 3/2024 this is more of a draft, various points still to be worked out
+ * - multiple Synth instances??
+ * - GUI for LV2 plugin????!?
+ * - should run in the Synth thread (but as intial hack, it runs in the GUI thread)
+ */
+void SynthEngine::postGuiStartHook()
+{
+    Part& currPart{*part[getRuntime().currentPart]};
+    if (currPart.Pname != DEFAULT_NAME || currPart.Poriginal != UNTITLED)
+    {// Heuristics that probably an early load via config took place
+        maybePublishEffectsToGui();
+
+        // TODO 3/2024 another hack to force the GUI to do a refresh()
+        CommandBlock putData;
+        putData.data.source  = TOPLEVEL::action::toAll;
+        putData.data.control = MAIN::control::masterReset;
+        putData.data.part    = TOPLEVEL::section::main;
+        putData.data.value   = 0;
+        putData.data.type    = UNUSED;
+        putData.data.kit     = UNUSED;
+        putData.data.engine  = UNUSED;
+        putData.data.insert  = UNUSED;
+        putData.data.parameter = UNUSED;
+        putData.data.offset    = UNUSED;
+        putData.data.miscmsg   = UNUSED;
+        interchange.toGUI.write(putData.bytes);
+    }
+}
+
+
 #ifdef GUI_FLTK
 MasterUI *SynthEngine::getGuiMaster()
 {
