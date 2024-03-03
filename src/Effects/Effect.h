@@ -38,6 +38,11 @@ constexpr int EFFECT_PARAM_CNT = 46;
 
 using EffectParArray = std::array<uchar, EFFECT_PARAM_CNT>;
 
+ /// resolution (distinct points) for rendering the EQ transfer function
+constexpr int EQ_GRAPH_STEPS = 50;
+
+using EQGraphArray = std::array<float, EQ_GRAPH_STEPS>;
+
 
 
 class Effect

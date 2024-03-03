@@ -2579,6 +2579,18 @@ void SynthEngine::pushEffectUpdate(uchar partNum)
         insEffectUiCon.publish(dto);
     else
         sysEffectUiCon.publish(dto);
+
+    if (dto.effType == EFFECT::type::eq)
+    {// cascading update for the embedded EQ graph
+        EqGraphDTO graphDto;
+        effInstance[effnum]->renderEQresponse(graphDto.response);
+        if (isPart)
+            partEqGraphUiCon.publish(graphDto);
+        else if (isInsert)
+            insEqGraphUiCon.publish(graphDto);
+        else
+            sysEqGraphUiCon.publish(graphDto);
+    }
 }
 
 

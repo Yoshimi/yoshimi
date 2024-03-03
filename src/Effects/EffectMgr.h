@@ -77,12 +77,13 @@ class EffectMgr : public ParamBase
         bool insertion; // the effect is connected as insertion effect (or not)
 
         // used by UI
+        void renderEQresponse(EQGraphArray&) const;
         float getEQfreqresponse(float freq);
 
         FilterParams *filterpars;
 
     private:
-        int nefx;
+        int effectType;
         bool dryonly;
         unique_ptr<Effect> efx;
 };
@@ -121,7 +122,7 @@ struct EffectDTO
  */
 struct EqGraphDTO
 {
-    std::array<float, MAX_EQ_BANDS> response{0};  ////TODO 2/24 probably not MAX_EQ_BANDS slots, rather granularity of display in the UI
+    EQGraphArray response{0};
 };
 
 #endif /*EFFECTMGR_H*/

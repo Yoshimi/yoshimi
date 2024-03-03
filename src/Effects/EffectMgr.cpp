@@ -28,6 +28,7 @@
 
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
+#include "Effects/EQ.h"
 
 EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     ParamBase{_synth},
@@ -35,7 +36,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr{size_t(_synth->buffersize)},
     insertion{insertion_},
     filterpars{NULL},
-    nefx{0}, // type none resolves to zero internally
+    effectType{0}, // type none resolves to zero internally
     dryonly{false},
     efx{}
 {
@@ -56,11 +57,11 @@ void EffectMgr::defaults(void)
 void EffectMgr::changeeffect(int _nefx)
 {
     cleanup();
-    if (nefx == _nefx)
+    if (effectType == _nefx)
         return;
     //std::cout << "Change eff" << std::endl;
-    nefx = _nefx;
-    switch (nefx + EFFECT::type::none)
+    effectType = _nefx;
+    switch (effectType + EFFECT::type::none)
     {
         case EFFECT::type::reverb:
             efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), synth});
@@ -107,7 +108,7 @@ void EffectMgr::changeeffect(int _nefx)
 // Obtain the effect number
 int EffectMgr::geteffect(void)
 {
-    return (nefx);
+    return (effectType);
 }
 
 
@@ -190,7 +191,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     memset(efxoutr.get(), 0, synth->sent_bufferbytes);
     efx->out(smpsl, smpsr);
 
-    if (nefx == (EFFECT::type::eq - EFFECT::type::none))
+    if (effectType == (EFFECT::type::eq - EFFECT::type::none))
     {   // this is need only for the EQ effect
         memcpy(smpsl, efxoutl.get(), synth->sent_bufferbytes);
         memcpy(smpsr, efxoutr.get(), synth->sent_bufferbytes);
@@ -214,8 +215,9 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 v1 = (1.0f - volume) * 2.0f;
                 v2 = 1.0f;
             }
-            if (nefx == 1 || nefx==2)
-                v2 *= v2; // for Reverb and Echo, the wet function is not linear
+            if (effectType == (EFFECT::type::reverb - EFFECT::type::none)
+                || effectType==(EFFECT::type::echo - EFFECT::type::none))
+                v2 *= v2; //  wet function is not linear for Reverb/Echo
 
             if (dryonly)
             {
@@ -254,10 +256,20 @@ float EffectMgr::sysefxgetvolume(void)
 }
 
 
-// Get the EQ response
+/**
+ * Prepare a LUT for the UI to display the current
+ * amplitude/frequency response of the EQ's filter
+ */
+void EffectMgr::renderEQresponse(EQGraphArray& lut) const
+{
+    if (effectType != (EFFECT::type::eq - EFFECT::type::none))
+        return;
+    auto eqImpl = static_cast<EQ const*> (efx.get());
+    eqImpl->renderResponse(lut);
+}
 float EffectMgr::getEQfreqresponse(float freq)
 {
-    return  (nefx == 7) ? efx->getfreqresponse(freq) : 0.0f;
+    return  effectType == (EFFECT::type::eq - EFFECT::type::none) ? efx->getfreqresponse(freq) : 0.0f;
 }
 
 

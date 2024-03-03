@@ -53,7 +53,18 @@ class EQ : public Effect
         void cleanup(void)                    override;
         float getfreqresponse(float freq)     override;
 
+        /** render transfer function for UI */
+        void renderResponse(EQGraphArray & lut) const;
+
+        /** scale helpers for the response diagram */
+        static float xScaleFreq(float fac);
+        static float xScaleFac(float freq);
+        static float yScaleFac(float dB);
+
     private:
+        constexpr static auto GRAPH_MIN_FREQ = 20;
+        constexpr static auto GRAPH_MAX_dB   = 30;
+
         void setvolume(uchar Pvolume_);
 
         // Parameters
@@ -91,6 +102,27 @@ class EQlimit
         float getlimits(CommandBlock *getData);
 };
 
-#endif
 
 
+
+inline float EQ::xScaleFreq(float fac)
+{
+    if (fac > 1.0)
+        fac = 1.0;
+    return GRAPH_MIN_FREQ * power<1000>(fac);
+}
+
+inline float EQ::xScaleFac(float freq)
+{
+    if (freq < GRAPH_MIN_FREQ)
+        freq = GRAPH_MIN_FREQ;
+    return logf(freq / GRAPH_MIN_FREQ) / logf(1000.0);
+}
+
+inline float EQ::yScaleFac(float dB)
+{
+    return (1 + dB / GRAPH_MAX_dB) / 2.0;
+}
+
+
+#endif /*EQ.h*/

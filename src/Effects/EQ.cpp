@@ -267,20 +267,6 @@ void EQ::getAllPar(EffectParArray& target) const
 }
 
 
-float EQ::getfreqresponse(float freq)
-{
-    float resp = 1.0f;
-    for (int i = 0; i < MAX_EQ_BANDS; ++i)
-    {
-        if (filter[i].Ptype == 0)
-            continue;
-        resp *= filter[i].l->H(freq);
-    }
-    // Only for UI purposes, use target value.
-    return asDecibel(resp * outvolume.getTargetValue());
-}
-
-
 float EQlimit::getlimits(CommandBlock *getData)
 {
     int value = getData->data.value;
@@ -347,3 +333,21 @@ float EQlimit::getlimits(CommandBlock *getData)
     return float(value);
 }
 
+
+///////////////////////////////////////////////TODO 3/2024 /////OOO deprecated will be removed
+float EQ::getfreqresponse(float freq)
+{
+    float resp = 1.0f;
+    for (int i = 0; i < MAX_EQ_BANDS; ++i)
+    {
+        if (filter[i].Ptype == 0)
+            continue;
+        resp *= filter[i].l->H(freq);
+    }
+    // Only for UI purposes, use target value.
+    return asDecibel(resp * outvolume.getTargetValue());
+}
+void EQ::renderResponse(EQGraphArray & lut) const
+{
+    
+}
