@@ -79,17 +79,11 @@ decl {using std::to_string;} {private global
 class EQGraph {: {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {eff = NULL;
-        maxdB = 30;} {}
+    code {//}{}
   }
-  Function {init(SynthEngine* synth_, RoutingTag conEQ)} {} {
+  Function {init(SynthEngine* synth, RoutingTag conEQ)} {} {
     code {//
-        synth = synth_;
         graph.activate(GuiDataExchange::Connection<EqGraphDTO>{synth->interchange.guiDataExchange, conEQ});} {}
-  }
-  Function {refresh(EffectMgr *eff_)} {} {
-    code {synth = eff_->getSynthEngine();
-        eff = eff_;} {}
   }
   Function {draw_freq_line(float freq, bool major = false)} {} {
     code {//
@@ -158,33 +152,23 @@ class EQGraph {: {public Fl_Box}
             fl_color(EQ_line);
         //else
             //fl_color(EQ_line_off);
-        float half_samplerate_f = synth->samplerate_f * 0.5f;
         int oix = 0;
-        int oiy = getresponse(h(), EQ::xScaleFreq(0.0));
+        int oiy( h() * lookupResponse(0.0));
         for (int i = 1; i < w(); ++i)
         {
-            float frq = EQ::xScaleFreq(float(i) / w());
-            if (frq > half_samplerate_f)
-                break;
-            int iy = getresponse(h(), frq);
+            float scalePos = float(i) / w();
+            auto iy = int( h() * lookupResponse(scalePos));
             if (oiy >= 0 && oiy < h() && iy >= 0 && iy < h())
                 fl_line(ox + oix, oy+h() - oiy
-                       ,ox + i,   oy+h() - oiy);
+                       ,ox + i,   oy+h() - iy);
             oix = i;
             oiy = iy;
         }
         fl_line_style(0, 1);} {}
   }
-  Function {getresponse(int maxy, float freq)} {return_type int
+  Function {lookupResponse(float scaleFac)} {return_type float
   } {
-    code {float dB = eff->getEQfreqresponse(freq);
-        return int(EQ::yScaleFac(dB) * maxy);} {}
-  }
-  decl {EffectMgr *eff;} {private local
-  }
-  decl {int maxdB;} {private local
-  }
-  decl {SynthEngine *synth;} {private local
+    code {return graph.get().lookup(scaleFac);} {}
   }
   decl {MirrorData<EqGraphDTO> graph;} {private local
   }
@@ -2650,7 +2634,6 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
             if (type < 6)
                 gaindial->deactivate();
             stagescounter->value(effParam(14));
-            eqgraph->refresh(effect.get().eff_in_core_TODO_deprecated);
             eqgraph->damage(1);
             eqgraph->redraw();
             effeqwindow->show();

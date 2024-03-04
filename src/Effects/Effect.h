@@ -39,7 +39,7 @@ constexpr int EFFECT_PARAM_CNT = 46;
 using EffectParArray = std::array<uchar, EFFECT_PARAM_CNT>;
 
  /// resolution (distinct points) for rendering the EQ transfer function
-constexpr int EQ_GRAPH_STEPS = 50;
+constexpr int EQ_GRAPH_STEPS = 300;
 
 using EQGraphArray = std::array<float, EQ_GRAPH_STEPS>;
 
@@ -60,7 +60,6 @@ class Effect
 
         virtual void out(float *smpsl, float *smpsr) = 0;
         virtual void cleanup();
-        virtual float getfreqresponse(float /* freq */) { return (0); };
 
         uchar Ppreset; // Current preset
         float *const efxoutl;

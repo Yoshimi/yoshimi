@@ -32,9 +32,12 @@
 
                                 //////////////// !! NOTE important : add all relevant types here which shall be published via GuiDataExchange !!
 #include "Interface/InterfaceAnchor.h"
+#include "Effects/EffectMgr.h"
 
 namespace {
     const size_t SIZ = MaxSize<Types<InterfaceAnchor
+                                    ,EffectDTO
+                                    ,EqGraphDTO
                                     /////////////////////////////////////////TODO 1/24 : add more actual types here
                                     >>::value;
 

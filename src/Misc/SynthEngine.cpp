@@ -2580,7 +2580,7 @@ void SynthEngine::pushEffectUpdate(uchar partNum)
     else
         sysEffectUiCon.publish(dto);
 
-    if (dto.effType == EFFECT::type::eq)
+    if (dto.effType == (EFFECT::type::eq - EFFECT::type::none))
     {// cascading update for the embedded EQ graph
         EqGraphDTO graphDto;
         effInstance[effnum]->renderEQresponse(graphDto.response);

@@ -33,6 +33,7 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
+#include <algorithm>
 #include <memory>
 
 const uchar EQmaster_def = 67;
@@ -51,7 +52,6 @@ class EQ : public Effect
         uchar getpar(int npar)          const override;
         void getAllPar(EffectParArray&) const override;
         void cleanup(void)                    override;
-        float getfreqresponse(float freq)     override;
 
         /** render transfer function for UI */
         void renderResponse(EQGraphArray & lut) const;
@@ -66,6 +66,7 @@ class EQ : public Effect
         constexpr static auto GRAPH_MAX_dB   = 30;
 
         void setvolume(uchar Pvolume_);
+        float calcResponse(float freq) const;
 
         // Parameters
         bool Pchanged;

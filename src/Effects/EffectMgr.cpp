@@ -267,10 +267,6 @@ void EffectMgr::renderEQresponse(EQGraphArray& lut) const
     auto eqImpl = static_cast<EQ const*> (efx.get());
     eqImpl->renderResponse(lut);
 }
-float EffectMgr::getEQfreqresponse(float freq)
-{
-    return  effectType == (EFFECT::type::eq - EFFECT::type::none) ? efx->getfreqresponse(freq) : 0.0f;
-}
 
 
 void EffectMgr::setdryonly(bool value)

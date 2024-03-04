@@ -42,7 +42,6 @@
 #include "Params/FilterParams.h"
 
 
-
 class EffectMgr : public ParamBase
 {
     public:
@@ -78,7 +77,6 @@ class EffectMgr : public ParamBase
 
         // used by UI
         void renderEQresponse(EQGraphArray&) const;
-        float getEQfreqresponse(float freq);
 
         FilterParams *filterpars;
 
@@ -123,7 +121,19 @@ struct EffectDTO
 struct EqGraphDTO
 {
     EQGraphArray response{0};
+
+    /** LUT with linear interpolation */
+    float lookup(float scaleFac)
+    {
+        scaleFac = std::clamp(scaleFac, 0.0f, 0.99999f);
+        const uint UPPER_BOUND = response.size()-1;
+        uint slot(UPPER_BOUND*scaleFac);
+        assert (slot < UPPER_BOUND);
+        float pl = response[slot];
+        float pu = response[slot+1];
+        float rel = std::clamp(UPPER_BOUND*scaleFac - slot, 0.0f,1.0f);
+        return pl*(1-rel) + pu*rel;
+    }
 };
 
 #endif /*EFFECTMGR_H*/
-

@@ -334,8 +334,28 @@ float EQlimit::getlimits(CommandBlock *getData)
 }
 
 
-///////////////////////////////////////////////TODO 3/2024 /////OOO deprecated will be removed
-float EQ::getfreqresponse(float freq)
+/**
+ * Prepare the Lookup-Table used by the EQGraph-UI to display the
+ * gain response as function of the frequency. The number of step points in the LUT
+ * is defined by EQ_GRAPH_STEPS; these »slots« span an X-axis running from [0.0 ... 1.0].
+ * The translation of these scale points into actual frequencies is defined by xScaleFac(freq),
+ * where 0.0 corresponds to 20Hz and 1.0 corresponds to 20kHz. This render calculation is
+ * invoked on each push-update for an EQ -- see SynthEngine::pushEffectUpdate(part);
+ * this is unconditionally invoked on each parameter change (yet seems to be fast enough).
+ */
+void EQ::renderResponse(EQGraphArray & lut) const
+{
+    auto subNyquist = [this](float f){ return f <= synth->halfsamplerate_f; };
+    for (uint i=0; i<lut.size(); ++i)
+    {
+        float gridFactor = float(i) / (lut.size()-1);  // »fence post problem« : both 0.0 and 1.0 included
+        float slotFreq = xScaleFreq(gridFactor);
+        lut[i] = subNyquist(slotFreq)? yScaleFac(calcResponse(slotFreq))
+                                     : -1.0f;
+    }
+}
+
+float EQ::calcResponse(float freq) const
 {
     float resp = 1.0f;
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
@@ -346,8 +366,4 @@ float EQ::getfreqresponse(float freq)
     }
     // Only for UI purposes, use target value.
     return asDecibel(resp * outvolume.getTargetValue());
-}
-void EQ::renderResponse(EQGraphArray & lut) const
-{
-    
 }
