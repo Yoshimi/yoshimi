@@ -778,14 +778,14 @@ void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
 
 void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 {
-    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;
     static_cast<YoshimiLV2PluginUI *>(arg)->_plugin->_synth->closeGui();
+    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = nullptr;
 }
 
 
 void YoshimiLV2PluginUI::run()
 {
-    if (_masterUI != NULL)
+    if (_masterUI)
     {
         _masterUI->checkBuffer();
         Fl::check();
@@ -801,17 +801,13 @@ void YoshimiLV2PluginUI::run()
 void YoshimiLV2PluginUI::show()
 {
     _plugin->_synth->getRuntime().showGui = true;
-    bool bInit = false;
-    if (_masterUI == NULL)
-        bInit = true;
-    _masterUI = _plugin->_synth->getGuiMaster();
-    if (_masterUI == NULL)
+    if (not _masterUI)
     {
-        _plugin->_synth->getRuntime().Log("Failed to instantiate gui");
-        return;
+        size_t slotIDX = _plugin->_synth->publishGuiAnchor();
+        _masterUI = & _plugin->_synth->interchange.createGuiMaster(slotIDX);
+        _plugin->_synth->setWindowTitle(uiHost.plugin_human_id);
+        _masterUI->Init();
     }
-    if (bInit)
-        _masterUI->Init(uiHost.plugin_human_id);
 }
 
 
