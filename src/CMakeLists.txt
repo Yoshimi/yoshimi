@@ -302,7 +302,6 @@ set (Interface_Sources
     Interface/Data2Text.cpp
     Interface/GuiDataExchange.h
     Interface/GuiDataExchange.cpp
-    Interface/GuiDataExchangeTest.cpp
     Interface/InterfaceAnchor.h
     Interface/Text2Data.cpp
     Interface/MidiLearn.cpp

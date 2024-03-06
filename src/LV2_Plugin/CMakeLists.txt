@@ -50,7 +50,6 @@ file (GLOB yoshimi_misc_files
     ../Misc/WaveShapeSamples.h)
 file (GLOB yoshimi_interface_files
     ../Interface/GuiDataExchange.cpp ../Interface/GuiDataExchange.h
-    ../Interface/GuiDataExchangeTest.cpp
     ../Interface/InterfaceAnchor.h
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h

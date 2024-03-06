@@ -1,5 +1,5 @@
 /*
-    GuiDataExchangeTest.cpp - TEMPORARY / PROTOTYPE
+    GuiDataExchangeTest.cpp - TEMPORARY / PROTOTYPE / DEMO
 
     Copyright 2024,  Ichthyostega
 
@@ -19,7 +19,7 @@
 */
 
 /* ============================================================================================== */ 
-/* ==================== TODO : 1/24 This is a Prototype : Throw-away when done ================== */ 
+/* ================ 1/24 This is a demonstration how GuiDataExchange works  ===================== */ 
 
 #include "Interface/GuiDataExchange.h"
 #include "Interface/InterChange.h"
@@ -28,7 +28,6 @@
 
 #include <iostream>
 
-//#include <functional>
 #include <algorithm>
 #include <string>
 #include <array>
@@ -94,8 +93,9 @@ void run_GuiDataExchangeTest()
                                         return getData;
                                     };
     
-    // Central instance to manage exchange connections
+    // *Gui-Data-Exchange* : central facility to manage exchange connections
     GuiDataExchange guiDataExchange(sendData);
+    
     
     // =============================================== setup a connection-identity
     auto con = guiDataExchange.createConnection<Heffalump>();

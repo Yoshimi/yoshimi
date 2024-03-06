@@ -37,9 +37,6 @@
 #include "Misc/CliFuncs.h"
 #include "Misc/Alloc.h"
 #include "CLI/Parser.h"
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
-#include "Interface/GuiDataExchange.h"
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
 
 
 namespace test {
@@ -330,10 +327,6 @@ class TestInvoker
             synth.setReproducibleState(0);
 
             synth.getRuntime().Log("TEST::Launch");
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
-            run_GuiDataExchangeTest();
-            return;
-/////////////////////////////////////////////////////////////////////////////////////////////////WIP Prototype 1/24 - throw away when done!!!!!
             smpCnt = 0;
             StopWatch timer;
             pullSound(synth, buffer, output, timer);
