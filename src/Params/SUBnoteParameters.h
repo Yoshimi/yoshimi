@@ -42,9 +42,9 @@ class SUBnoteParameters : public ParamBase
         ~SUBnoteParameters();
         void setPan(char pan, unsigned char panLaw);
         //bool randomPan(void) { return !PPanning; }
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
         void updateFrequencyMultipliers(void);
 

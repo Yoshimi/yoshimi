@@ -49,18 +49,20 @@ class UnifiedPresets
         SynthEngine *synth;
 
     public:
-        string section(SynthEngine *synth, CommandBlock *getData);
-        string findPresetType(CommandBlock *getData);
+        string handleStoreLoad(SynthEngine *synth, CommandBlock *getData);
+
+    private:
+        void save(CommandBlock *getData);
+        void load(CommandBlock *getData);
+        void remove(CommandBlock *getData);
         void list(string dirname, string& name);
-        string findXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string resonanceXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string oscilXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string filterXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string lfoXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        string envelopeXML(XMLwrapper *xml,CommandBlock *getData, bool isLoad);
-        bool saveUnif(CommandBlock *getData);
-        bool load(CommandBlock *getData);
-        bool remove(CommandBlock *getData);
+        string findPresetType(CommandBlock *getData);
+        string accessXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string oscilXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string filterXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+        string envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
 };
 
 #endif

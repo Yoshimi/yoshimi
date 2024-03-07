@@ -370,7 +370,7 @@ void Echo::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Echo::getpar(int npar)
+unsigned char Echo::getpar(int npar) const
 {
     switch (npar)
     {

@@ -50,9 +50,12 @@
 
 class Part;
 class EffectMgr;
+struct EffectDTO;
+struct EqGraphDTO;
 class XMLwrapper;
 class Controller;
 class TextMsgBuffer;
+class InterfaceAnchor;
 
 #ifdef GUI_FLTK
 class MasterUI;
@@ -84,6 +87,7 @@ class SynthEngine
         UnifiedPresets unifiedpresets;
     private:
         Config Runtime;
+        GuiDataExchange::Connection<InterfaceAnchor> rootCon;
     public:
         TextMsgBuffer& textMsgBuffer;
         SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
@@ -95,9 +99,11 @@ class SynthEngine
         SynthEngine& operator=(SynthEngine const&) = delete;
 
         bool Init(unsigned int audiosrate, int audiobufsize);
+        size_t publishGuiAnchor();
+        void postGuiStartHook();
 
         bool savePatchesXML(string filename);
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         string manualname();
         void defaults(void);
 
@@ -117,11 +123,11 @@ class SynthEngine
         bool saveHistory(void);
         unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
         unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper *xml, const string& name);
+        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
         unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, const string& name);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
 
-        bool getfromXML(XMLwrapper *xml);
+        bool getfromXML(XMLwrapper& xml);
 
         int getalldata(char **data);
         void putalldata(const char *data, int size);
@@ -232,7 +238,18 @@ class SynthEngine
         EffectMgr *insefx[NUM_INS_EFX]; // insertion
 
         // part that's apply the insertion effect; -1 to disable
-        short int Pinsparts[NUM_INS_EFX];
+        int Pinsparts[NUM_INS_EFX];
+
+        // connection to the currently active effect UI
+        GuiDataExchange::Connection<EffectDTO> sysEffectUiCon;
+        GuiDataExchange::Connection<EffectDTO> insEffectUiCon;
+        GuiDataExchange::Connection<EffectDTO> partEffectUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> sysEqGraphUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> insEqGraphUiCon;
+        GuiDataExchange::Connection<EqGraphDTO> partEqGraphUiCon;
+
+        void pushEffectUpdate(uchar partNr);
+        void maybePublishEffectsToGui();
 
         // others ...
         Controller *ctl;
@@ -298,8 +315,8 @@ class SynthEngine
 
     public:
 #ifdef GUI_FLTK
-        MasterUI *guiMaster; // need to read this in InterChange::returns
-        MasterUI *getGuiMaster(bool createGui = true);
+        ///////////////////TODO 1/2024 : retract direct usage of direct SynthEngine* from UI
+        MasterUI *getGuiMaster();
 #endif
     private:
         void( *guiClosedCallback)(void*);

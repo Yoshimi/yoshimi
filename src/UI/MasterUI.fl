@@ -111,6 +111,13 @@ decl {\#include "MasterMiscUI.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 }
 
+decl {\#include "Interface/InterChange.h"} {public local
+}
+
+decl {\#include "Interface/InterfaceAnchor.h"
+    using RoutingTag = GuiDataExchange::RoutingTag;
+} {public local}
+
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
@@ -297,26 +304,27 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {: {private GuiUpdates}
+class MasterUI {: {public GuiUpdates}
 } {
-  Function {MasterUI(SynthEngine *_synth)} {} {
+  Function {MasterUI(InterChange& _interChange, size_t slotIDX)
+	 : GuiUpdates{_interChange, slotIDX}} {} {
     code {//
-      synth = _synth;
-      presetsui = NULL;
-      ninseff = 0;
-      nsyseff = 0;
+      synth = nullptr;
+      presetsui = nullptr;
       npart = 0;
       panelgroup = 0;
       panelScale = 1;
 
-      microtonalui = NULL;
-      bankui = NULL;
-      virkeyboard = NULL;
-      configui = NULL;
-      presetsui = NULL;
-      paramsui = NULL;
+      microtonalui = nullptr;
+      bankui = nullptr;
+      virkeyboard = nullptr;
+      configui = nullptr;
+      presetsui = nullptr;
+      paramsui = nullptr;
+      syseffectui = nullptr;
+      inseffectui = nullptr;
       activePart = 0;
-      yoshiLog = NULL;
+      yoshiLog = nullptr;
       queryDW = 0;
 
       lastmainW = -1;
@@ -396,9 +404,11 @@ class MasterUI {: {private GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {} {
+  Function {Init()} {} {
     code {//
-      current_ID = collect_readData(synth, 0, 0, TOPLEVEL::instanceID);
+      current_ID = anchor.get().synthID;
+      synth = anchor.get().synth;
+      assert(synth);
       file::createDir(file::configDir() + "/windows");
       panelType = 5;
       msgSeen = false;
@@ -416,15 +426,9 @@ class MasterUI {: {private GuiUpdates}
       Fl_Tooltip::color(tooltip_back);
       Fl_Tooltip::textcolor(tooltip_text);
       make_window();
-      bool foundWindows = Showmaster();
-
-      partui = new PartUI(0, 0, 0, 0);
-      partuigroup->add(partui); // why?
-      partui->init(synth->part[npart], npart, bankui);
-      partui->kitRtext(true);
-      partui->redraw();
-
       partui->checkEngines();
+
+      bool foundWindows = Showmaster();
       if (current_ID > 0)
           foundWindows = true; //  not relevant for later windows
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
@@ -432,7 +436,7 @@ class MasterUI {: {private GuiUpdates}
       string starterror = "";
       if (synth->getIsLV2Plugin())
       {
-          masterwindow->label(_label);
+          masterwindow->label(synth->getWindowTitle().c_str());
       }
       else
       {
@@ -909,58 +913,60 @@ class MasterUI {: {private GuiUpdates}
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, o->value() - 1);}
+                int effNum = o->value() - 1;
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, effNum, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
             xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 maximum 4 textfont 1 textsize 11 textcolor 64
             code0 {o->range(1, NUM_SYS_EFX);}
-            code1 {o->value(nsyseff + 1);}
+            code1 {o->value(1);}
             class WidgetSpinner
           }
           Fl_Choice sysefftype {
             label Type
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
+                uchar effType = o->value();
+                uchar effNum = syseffectui->effNum();
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
             xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 16 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
-            code1 {o->value(synth->sysefx[nsyseff]->geteffect());}
+            code1 {o->value(0); // initially disabled}
           } {}
           Fl_Check_Button SysEffOn {
             label On
             callback {//
-            if (o->value())
-            {
-                sysefftype->activate();
-                sysCopy->activate();
-                sysPaste->activate();
-            }
-            else
-            {
-                sysefftype->deactivate();
-                sysCopy->deactivate();
-                sysPaste->deactivate();
-            }
-            send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, nsyseff);}
+                if (o->value())
+                {
+                    sysefftype->activate();
+                    sysCopy->activate();
+                    sysPaste->activate();
+                }
+                else
+                {
+                    sysefftype->deactivate();
+                    sysCopy->deactivate();
+                    sysPaste->deactivate();
+                }
+                uchar effNum = syseffectui->effNum();
+                send_data(0, EFFECT::sysIns::effectEnable, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
             xywh {247 156 20 20} down_box DOWN_BOX value 1 selection_color 64 labelfont 3 labelcolor 226 align 4
             class Fl_Check_Button2
           }
           Fl_Button sysEffSend {
             label {Send to}
-            callback {//
-    showSysEffSends();}
+            callback { showSysEffSends();}
             xywh {275 156 62 20} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button sysCopy {
             label C
             callback {//
-    synth->getGuiMaster()->getPresetsUi()->Ucopy(TOPLEVEL::section::systemEffects, 16, syseffnocounter->value()-1);
-;}
+                uchar effNum = syseffectui->effNum();
+                synth->getGuiMaster()->getPresetsUi()->Ucopy(TOPLEVEL::section::systemEffects, 16, effNum);}
             xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
           Fl_Button sysPaste {
             label P
             callback {//
-            //
-            synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::systemEffects, 16, syseffnocounter->value()-1);
-;}
+                uchar effNum = syseffectui->effNum();
+                synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::systemEffects, 16, effNum);}
             xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
         }
@@ -971,41 +977,46 @@ class MasterUI {: {private GuiUpdates}
           Fl_Spinner inseffnocounter {
             label Effect
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, o->value() - 1, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, o->value() - 1);}
+                int effNum = o->value() - 1;
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, effNum, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, effNum);}
             xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 20 maximum 8 textfont 1 textsize 11 textcolor 64
             code0 {o->range(1, NUM_INS_EFX);}
-            code1 {o->value(ninseff + 1);}
+            code1 {o->value(1);}
             class WidgetSpinner
           }
           Fl_Choice insefftype {
             label Type
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
+                uchar effType = o->value();
+                uchar effNum = inseffectui->effNum();
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectType, effType, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, effNum);}
             xywh {120 156 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 textfont 1 textsize 11 textcolor 64
             code0 {o->add("No Effect");o->add("Reverb");o->add("Echo");o->add("Chorus");o->add("Phaser");o->add("AlienWah");o->add("Distortion");o->add("EQ");o->add("DynFilter");}
-            code1 {o->value(synth->insefx[ninseff]->geteffect());}
-            code2 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
+            code1 {o->value(0);}
+            code2 {o->deactivate(); // initially deactivated}
           } {}
           Fl_Choice inseffpart {
             label {To }
             callback {//
-            send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectDestination, o->value() - 2, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, ninseff);}
+                int routing = o->value() - 2;
+                uchar effNum = inseffectui->effNum();
+                send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectDestination, routing, TOPLEVEL::type::Integer, TOPLEVEL::section::insertEffects, effNum);}
             xywh {242 156 96 20} down_box BORDER_BOX labelfont 1 labelsize 11 labelcolor 64 textfont 1 textsize 11 textcolor 64
             code0 {setinspartlist();}
-            code3 {o->value(synth->Pinsparts[ninseff]+2);}
+            code3 {o->value(1); // initially deactivated}
           } {}
           Fl_Button insCopy {
             label C
             callback {//
-       synth->getGuiMaster()->getPresetsUi()->Ucopy(TOPLEVEL::section::insertEffects, 16, inseffnocounter->value()-1);
-       ;}
+                uchar effNum = inseffectui->effNum();
+                synth->getGuiMaster()->getPresetsUi()->Ucopy(TOPLEVEL::section::insertEffects, 16, effNum);}
             xywh {350 152 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
           Fl_Button insPaste {
             label P
             callback {//
-            synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::insertEffects, 16, inseffnocounter->value()-1);
-;}
+                uchar effNum = inseffectui->effNum();
+                synth->getGuiMaster()->getPresetsUi()->Upaste(TOPLEVEL::section::insertEffects, 16, effNum);}
             xywh {350 167 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
           }
         }
@@ -1016,7 +1027,9 @@ class MasterUI {: {private GuiUpdates}
       } {
         Fl_Group syseffectui {
           xywh {3 188 379 95} labeltype NO_LABEL labelcolor 64
-          code0 {o->init(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);o->activate();o->show();}
+          code0 {o->init(synth, anchor.get().sysEffectParam, anchor.get().sysEffectEQ, TOPLEVEL::section::systemEffects);
+                 o->activate();
+                 o->show();}
           class EffUI
         } {}
       }
@@ -1026,8 +1039,9 @@ class MasterUI {: {private GuiUpdates}
       } {
         Fl_Group inseffectui {
           xywh {3 188 379 95} color 52 labelcolor 64
-          code0 {o->init(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);o->hide();}
-          code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
+          code0 {o->init(synth, anchor.get().insEffectParam, anchor.get().insEffectEQ, TOPLEVEL::section::insertEffects);
+                 o->hide();}
+          code1 {o->deactivate(); // initially deactivated}
           class EffUI
         } {}
       }
@@ -1036,7 +1050,7 @@ class MasterUI {: {private GuiUpdates}
       } {
         Fl_Group partui {
           xywh {3 285 379 172} color 47
-          code0 {o->init(synth->part[0],0,bankui);}
+          code0 { partui->init(synth->part[npart], npart, bankui); }
           class PartUI
         } {}
         Fl_Group partControls {
@@ -3058,13 +3072,12 @@ Alan Calvert started the project}
         else
         {
             if (control == EFFECT::sysIns::effectNumber)
-            {
-                syseffnocounter->value(engine + 1);
-                nsyseff = engine;
-                sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+            {   //note: using local settings from the last push-update into MirrorData
+                syseffnocounter->value(syseffectui->effNum() + 1);
+                sysefftype->value(syseffectui->effType());
+                syseffectui->refresh();
                 syseffectui->UpdatePresetColour(parameter, sysefftype->value());
-                SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
+                SysEffOn->value(syseffectui->isEnabled());
                 if (SysEffOn->value())
                     sysefftype->activate();
                 else
@@ -3072,10 +3085,9 @@ Alan Calvert started the project}
             }
             else if (control == EFFECT::sysIns::effectType)
             {
-                syseffnocounter->value(engine + 1);
-                nsyseff = engine;
-                sysefftype->value(value_int);
-                syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+                syseffnocounter->value(syseffectui->effNum() + 1);
+                sysefftype->value(syseffectui->effType());
+                syseffectui->refresh();
                 syseffectui->UpdatePresetColour(0, sysefftype->value());
                 // changing effect type always sets default values
                 if (sysinsgroup->value() == SystemEffectsGrp)
@@ -3099,8 +3111,7 @@ Alan Calvert started the project}
     {
         if (control == EFFECT::sysIns::effectNumber)
         {
-            ninseff = engine;
-            setInsEff(ninseff);
+            refreshInsEffUI();
             if (sysinsgroup->value() == InsertionEffectsGrp)
                 showInsEfxUI();
             inseffectui->UpdatePresetColour(parameter, insefftype->value());
@@ -3108,10 +3119,7 @@ Alan Calvert started the project}
         }
         else if (control == EFFECT::sysIns::effectType)
         {
-            inseffnocounter->value(engine + 1);
-            ninseff = engine;
-            insefftype->value(value_int);
-            setInsEff(ninseff);
+            refreshInsEffUI();
             inseffectui->UpdatePresetColour(0, insefftype->value());
             // changing effect type always sets default values
             if (sysinsgroup->value() == InsertionEffectsGrp)
@@ -3128,7 +3136,7 @@ Alan Calvert started the project}
             else
             {
                 insefftype->activate();
-                setInsEff(ninseff);
+                refreshInsEffUI();
                 if (sysinsgroup->value() == InsertionEffectsGrp)
                     showInsEfxUI();
             }
@@ -3412,30 +3420,22 @@ Alan Calvert started the project}
   }
   Function {paste(CommandBlock *getData)} {} {
     code {//
-        //synth->CBtest(getData);
-
-        if (getData->data.part == TOPLEVEL::section::systemEffects)
-        {
-            sysinsgroup->value(SystemEffectsGrp);
-            int type = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, 0);
-            sysefftype->value(type);
-            nsyseff = fetchData(0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::systemEffects, UNUSED, 0);
-            syseffnocounter->value(nsyseff + 1);
-            syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
-            syseffectui->UpdatePresetColour(0, sysefftype->value());
-            showSysEfxUI();
-        }
-        else
-        {
-            sysinsgroup->value(InsertionEffectsGrp);
-            int type = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, 0);
-            insefftype->value(type);
-            ninseff = fetchData(0, EFFECT::sysIns::effectNumber, TOPLEVEL::section::insertEffects, UNUSED, 0);
-            inseffnocounter->value(ninseff + 1);
-            setInsEff(ninseff);
-            inseffectui->UpdatePresetColour(0, insefftype->value());
-            showInsEfxUI();
-        }} {}
+          if (getData->data.part == TOPLEVEL::section::systemEffects)
+          {
+              sysinsgroup->value(SystemEffectsGrp);
+              sysefftype->value(syseffectui->effType());
+              syseffnocounter->value(syseffectui->effNum() + 1);
+              syseffectui->refresh();
+              syseffectui->UpdatePresetColour(0, sysefftype->value());
+              showSysEfxUI();
+          }
+          else
+          {
+              sysinsgroup->value(InsertionEffectsGrp);
+              refreshInsEffUI();
+              inseffectui->UpdatePresetColour(0, insefftype->value());
+              showInsEfxUI();
+          }} {}
   }
   Function {query(string one, string two, string three, string text)} {return_type int
   } {
@@ -3947,34 +3947,30 @@ Alan Calvert started the project}
     int next = synth->getRuntime().currentPart;
     partSwitch(next);
 
-    nsyseff = 0;
-    syseffnocounter->value(nsyseff + 1);
-    sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-    syseffectui->refresh(synth->sysefx[nsyseff], TOPLEVEL::section::systemEffects, nsyseff);
+    // resync to effect data from last push-update
+    syseffnocounter->value(syseffectui->effNum() + 1);
+    sysefftype->value(syseffectui->effType());
+    syseffectui->refresh();
 
-    ninseff = 0;
-    inseffnocounter->value(nsyseff + 1);
-    setInsEff(ninseff);
+    refreshInsEffUI();
 
     sysinsgroup->value(SystemEffectsGrp);
 
-    bool status;
-    SysEffOn->value(fetchData(0, EFFECT::sysIns::effectEnable, TOPLEVEL::section::systemEffects, UNUSED, 0));
+    bool isDirty;
+    SysEffOn->value(syseffectui->isEnabled());
     if (SysEffOn->value())
         sysefftype->activate();
     else
         sysefftype->deactivate();
-    int efftype = fetchData(0, EFFECT::sysIns::effectType, TOPLEVEL::section::systemEffects, UNUSED, 0);
-    if (efftype > 0)
+    if (syseffectui->effType() > 0)
     {
-        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::systemEffects, efftype + EFFECT::type::none, ninseff);
-        syseffectui->UpdatePresetColour(status, sysefftype->value());
+        isDirty = syseffectui->isChanged();
+        syseffectui->UpdatePresetColour(isDirty, sysefftype->value());
     }
-    efftype = fetchData(0,EFFECT::sysIns::effectType, TOPLEVEL::section::insertEffects, UNUSED, 0);
-    if (efftype > 0)
+    if (inseffectui->effType() > 0)
     {
-        status = fetchData(0, EFFECT::control::changed, TOPLEVEL::section::insertEffects, efftype + EFFECT::type::none, ninseff);
-        inseffectui->UpdatePresetColour(status, insefftype->value());
+        isDirty = inseffectui->isChanged();
+        inseffectui->UpdatePresetColour(isDirty, insefftype->value());
     }
 
     showSysEfxUI();
@@ -4074,20 +4070,16 @@ Alan Calvert started the project}
   Function {setinspartlist()} {} {
     code {//
     inseffpart->clear();
-    inseffpart->add("Master Out");
-    inseffpart->add("Off");
+    inseffpart->add("Master Out"); // 0
+    inseffpart->add("Off");        // 1
     int size = synth->getRuntime().NumAvailableParts;
     for (int i = 0; i < size; ++i)
     {
         string num = string("00") + asString(i + 1);
         inseffpart->add((string("Part ") + asString(i + 1)).c_str());
     }
-    int current = synth->Pinsparts[ninseff];
-    if (current >= size)
-    {
-        current = -1; // off is safe
-        synth->Pinsparts[ninseff] = current;
-    }
+    int current = inseffectui? inseffectui->getInsertFxRouting() : 2;
+    assert(current < size);
     inseffpart->value(current + 2);} {}
   }
   Function {getPresetsUi()} {return_type {PresetsUI *}
@@ -4105,13 +4097,14 @@ Alan Calvert started the project}
         }
     }} {}
   }
-  Function {setInsEff(int effnum)} {} {
+  Function {refreshInsEffUI()} {} {
     code {//
-    int ninseff = effnum;
-    insefftype->value(synth->insefx[ninseff]->geteffect());
-    inseffpart->value(synth->Pinsparts[ninseff] + 2);
-    inseffectui->refresh(synth->insefx[ninseff], TOPLEVEL::section::insertEffects, ninseff);
-    if (synth->Pinsparts[ninseff] != -1)
+    insefftype->value(inseffectui->effType());
+    inseffnocounter->value(inseffectui->effNum() + 1);
+    int routing = inseffectui->getInsertFxRouting();
+    inseffpart->value(routing + 2); // offset since -2 ≙ master-out and -1 ≙ disabled
+    inseffectui->refresh();
+    if (routing != -1)
     {
         insefftype->activate();
         inseffectui->activate();
@@ -4822,6 +4815,8 @@ bpmfallback->format(format);} {}
         partui->theme();
         ;} {}
   }
+  decl {SynthEngine *synth;} {public local
+  }
   decl {ConfigUI *configui;} {public local
   }
   decl {ParametersUI *paramsui;} {public local
@@ -4836,13 +4831,9 @@ bpmfallback->format(format);} {}
   }
   decl {VirKeyboard *virkeyboard;} {public local
   }
-  decl {int ninseff;} {public local
-  }
   decl {int npart;} {public local
   }
   decl {int activePart;} {public local
-  }
-  decl {int nsyseff;} {public local
   }
   decl {int partmax;} {
     comment {This is only public for vector control} public local
@@ -4852,8 +4843,6 @@ bpmfallback->format(format);} {}
   decl {ConsoleUI *yoshiLog;} {public local
   }
   decl {PresetsUI *presetsui;} {private local
-  }
-  decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
   }

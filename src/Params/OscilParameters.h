@@ -36,9 +36,9 @@ class OscilParameters : public ParamBase
         OscilParameters(fft::Calc const& fft, SynthEngine *_synth);
         virtual ~OscilParameters() = default;
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
         float getLimits(CommandBlock *getData);
 
         void updatebasefuncSpectrum(fft::Spectrum const& src);

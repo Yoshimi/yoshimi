@@ -33,6 +33,8 @@
 #include <libgen.h>
 #include <limits.h>
 #include <unistd.h>
+#include <cassert>
+#include <memory>
 
 #if defined(__SSE__)
 #include <xmmintrin.h>
@@ -354,7 +356,7 @@ bool Config::loadConfig(void)
             defaultPresets();
     }
 
-    bool isok = true;
+    bool success{false};
     if (!isRegularFile(ConfigFile))
     {
         Log("Configuration " + ConfigFile + " not found, will use default settings");
@@ -362,45 +364,33 @@ bool Config::loadConfig(void)
     }
     else
     {
-        XMLwrapper *xml = new XMLwrapper(synth, true);
-        if (!xml)
-            Log("loadConfig failed XMLwrapper allocation");
+        // get base first
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(baseConfig);
+        if (success)
+            success = extractBaseParameters(*xml);
         else
-        {
-            // get base first
-            isok = xml->loadXMLfile(baseConfig);
-            if (isok)
-                isok = extractBaseParameters(xml);
-            else
-                Log("loadConfig load base failed");
-            delete xml;
+            Log("loadConfig load base failed");
+    }
 
-            // now the instance data
-            if (isok)
-            {
-                XMLwrapper *xml = new XMLwrapper(synth, true);
-                if (!xml)
-                    Log("loadConfig failed XMLwrapper allocation");
-                else
-                {
-                    isok = xml->loadXMLfile(ConfigFile);
-                    if (isok)
-                        isok = extractConfigData(xml);
-                    else
-                        Log("loadConfig load instance failed");
-                    delete xml;
-                }
-            }
-            if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
-            {
-                int currentVersion = lastXMLmajor * 10 + lastXMLminor;
-                int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
-                if (currentVersion < storedVersion)
-                    oldConfig = true;
-                else
-                    oldConfig = false;
-            }
-        }
+    if (success)
+    {
+        // now the instance data
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(ConfigFile);
+        if (success)
+            success = extractConfigData(*xml);
+        else
+            Log("loadConfig load instance failed");
+    }
+    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    {
+        int currentVersion = lastXMLmajor * 10 + lastXMLminor;
+        int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
+        if (currentVersion < storedVersion)
+            oldConfig = true;
+        else
+            oldConfig = false;
     }
     loadPresetsList();
 
@@ -440,26 +430,20 @@ bool Config::loadConfig(void)
 
     if (sessionStage != _SYS_::type::Normal)
     {
-        XMLwrapper *xml = new XMLwrapper(synth, true);
-        if (!xml)
-            Log("loadConfig failed XMLwrapper allocation");
-        else
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(StateFile);
+        if (success)
         {
-            isok = xml->loadXMLfile(StateFile);
-            if (isok)
-            {
-                if (sessionStage == _SYS_::type::StartupFirst)
-                    sessionStage = _SYS_::type::StartupSecond;
-                else if (sessionStage == _SYS_::type::JackFirst)
-                    sessionStage = _SYS_::type::JackSecond;
-                isok = extractConfigData(xml);
-            }
-            else
-                Log("loadConfig load instance failed");
-            delete xml;
+            if (sessionStage == _SYS_::type::StartupFirst)
+                sessionStage = _SYS_::type::StartupSecond;
+            else if (sessionStage == _SYS_::type::JackFirst)
+                sessionStage = _SYS_::type::JackSecond;
+            success = extractConfigData(*xml);
         }
+        else
+            Log("loadConfig load instance failed");
     }
-    return isok;
+    return success;
 }
 
 void Config::restoreConfig(SynthEngine *_synth)
@@ -511,37 +495,32 @@ void Config::defaultPresets(void)
 }
 
 
-bool Config::extractBaseParameters(XMLwrapper *xml)
+bool Config::extractBaseParameters(XMLwrapper& xml)
 {
     if (synth->getUniqueId() != 0)
         return true;
 
-    if (!xml)
-    {
-        Log("extractConfigData on NULL");
-        return false;
-    }
-    if (!xml->enterbranch("BASE_PARAMETERS"))
+    if (!xml.enterbranch("BASE_PARAMETERS"))
     {
         Log("extractConfigData, no BASE_PARAMETERS branch");
         return false;
     }
 
     if (!guiChanged)
-        showGui = xml->getparbool("enable_gui", showGui);
-    showSplash = xml->getparbool("enable_splash", showSplash);
+        showGui = xml.getparbool("enable_gui", showGui);
+    showSplash = xml.getparbool("enable_splash", showSplash);
     if (!cliChanged)
-        showCli = xml->getparbool("enable_CLI", showCli);
-    singlePath = xml->getparbool("enable_single_master", singlePath);
-    banksChecked = xml->getparbool("banks_checked", banksChecked);
-    autoInstance = xml->getparbool("enable_auto_instance", autoInstance);
+        showCli = xml.getparbool("enable_CLI", showCli);
+    singlePath  = xml.getparbool("enable_single_master", singlePath);
+    banksChecked = xml.getparbool("banks_checked", banksChecked);
+    autoInstance = xml.getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
-        activeInstance = xml->getparU("active_instances", 0);
+        activeInstance = xml.getparU("active_instances", 0);
     else
         activeInstance = 1;
-    handlePadSynthBuild = xml->getparU("handle_padsynth_build", 1, 0, 2);  // 0 = blocking/muted, 1 = background thread (=default), 2 = auto-Apply on param change
-    showCLIcontext = xml->getpar("show_CLI_context", 1, 0, 2);
-    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
+    handlePadSynthBuild = xml.getparU("handle_padsynth_build", 1, 0, 2);  // 0 = blocking/muted, 1 = background thread (=default), 2 = auto-Apply on param change
+    showCLIcontext  = xml.getpar("show_CLI_context", 1, 0, 2);
+    GzipCompression = xml.getpar("gzip_compression", GzipCompression, 0, 9);
 
     // get preset dirs
     int count = 0;
@@ -550,16 +529,16 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     {
         for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         {
-            if (xml->enterbranch("PRESETSROOT", i))
+            if (xml.enterbranch("PRESETSROOT", i))
             {
-                string dir = xml->getparstr("presets_root");
+                string dir = xml.getparstr("presets_root");
                 if (isDirectory(dir))
                 {
                     presetsDirlist[count] = dir;
                     found = true;
                     ++count;
                 }
-                xml->exitbranch();
+                xml.exitbranch();
             }
         }
 
@@ -573,18 +552,13 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         }
     }
 
-    xml->exitbranch(); // BaseParameters
+    xml.exitbranch(); // BaseParameters
     return true;
 }
 
-bool Config::extractConfigData(XMLwrapper *xml)
+bool Config::extractConfigData(XMLwrapper& xml)
 {
-    if (!xml)
-    {
-        Log("extractConfigData on NULL");
-        return false;
-    }
-    if (!xml->enterbranch("CONFIGURATION"))
+    if (!xml.enterbranch("CONFIGURATION"))
     {
         Log("extractConfigData, no CONFIGURATION branch");
         Log("Running with defaults");
@@ -596,10 +570,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
      */
     if (sessionStage == _SYS_::type::Normal)
     {
-        loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
+        loadDefaultState = xml.getpar("defaultState", loadDefaultState, 0, 1);
         if (loadDefaultState)
         {
-            xml->exitbranch(); // CONFIGURATION
+            xml.exitbranch(); // CONFIGURATION
             configChanged = true;
             sessionStage = _SYS_::type::Default;
             StateFile = defaultSession;
@@ -612,161 +586,149 @@ bool Config::extractConfigData(XMLwrapper *xml)
     {
 
         if (!rateChanged)
-            Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+            Samplerate = xml.getpar("sample_rate", Samplerate, 44100, 192000);
         if (!bufferChanged)
-            Buffersize = xml->getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+            Buffersize = xml.getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
         if (!oscilChanged)
-            Oscilsize = xml->getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
-        single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
-        toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
-        consoleTextSize = xml->getpar("console_text_size", consoleTextSize, 11, 100);
-        hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
-        showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
-        logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
-        VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
-        xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
+            Oscilsize = xml.getpar("oscil_size", Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+        single_row_panel = xml.getpar("single_row_panel", single_row_panel, 0, 1);
+        toConsole = xml.getpar("reports_destination", toConsole, 0, 1);
+        consoleTextSize = xml.getpar("console_text_size", consoleTextSize, 11, 100);
+        hideErrors = xml.getpar("hide_system_errors", hideErrors, 0, 1);
+        showTimes = xml.getpar("report_load_times", showTimes, 0, 1);
+        logXMLheaders = xml.getpar("report_XMLheaders", logXMLheaders, 0, 1);
+        VirKeybLayout = xml.getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
+        xmlmax = xml.getpar("full_parameters", xmlmax, 0, 1);
 
-        bankHighlight = xml->getparbool("bank_highlight", bankHighlight);
+        bankHighlight = xml.getparbool("bank_highlight", bankHighlight);
         loadPresetsList();
-        presetsRootID = xml->getpar("presetsCurrentRootID", presetsRootID, 0, MAX_PRESETS);
+        presetsRootID = xml.getpar("presetsCurrentRootID", presetsRootID, 0, MAX_PRESETS);
 
-        Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
+        Interpolation = xml.getpar("interpolation", Interpolation, 0, 1);
 
         // engines
         if (!engineChanged)
-            audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+            audioEngine = (audio_drivers)xml.getpar("audio_engine", audioEngine, no_audio, alsa_audio);
         if (!midiChanged)
-            midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
-        alsaMidiType = xml->getpar("alsa_midi_type", 0, 0, 2);
+            midiEngine = (midi_drivers)xml.getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+        alsaMidiType = xml.getpar("alsa_midi_type", 0, 0, 2);
 
         // alsa settings
-        alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
-        alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
+        alsaAudioDevice = xml.getparstr("linux_alsa_audio_dev");
+        alsaMidiDevice = xml.getparstr("linux_alsa_midi_dev");
 
         // jack settings
-        jackServer = xml->getparstr("linux_jack_server");
-        jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
+        jackServer = xml.getparstr("linux_jack_server");
+        jackMidiDevice = xml.getparstr("linux_jack_midi_dev");
         if (!connectJackChanged)
-            connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
+            connectJackaudio = xml.getpar("connect_jack_audio", connectJackaudio, 0, 1);
 
         // midi options
-        midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
-        midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
-        midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
-        EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
-        instrumentFormat = xml->getpar("saved_instrument_format",instrumentFormat, 1, 3);
-        enable_NRPN = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
-        ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
-        monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
-        showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
+        midi_bank_root = xml.getpar("midi_bank_root", midi_bank_root, 0, 128);
+        midi_bank_C = xml.getpar("midi_bank_C", midi_bank_C, 0, 128);
+        midi_upper_voice_C = xml.getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
+        EnableProgChange = 1 - xml.getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
+        instrumentFormat = xml.getpar("saved_instrument_format",instrumentFormat, 1, 3);
+        enable_NRPN = xml.getparbool("enable_incoming_NRPNs", enable_NRPN);
+        ignoreResetCCs = xml.getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
+        monitorCCin = xml.getparbool("monitor-incoming_CCs", monitorCCin);
+        showLearnedCC = xml.getparbool("open_editor_on_learned_CC", showLearnedCC);
     }
     if (tempRoot == 0)
-        tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
+        tempRoot = xml.getpar("root_current_ID", 0, 0, 127);
 
     if (tempBank == 0)
-    tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
-    xml->exitbranch(); // CONFIGURATION
+    tempBank = xml.getpar("bank_current_ID", 0, 0, 127);
+    xml.exitbranch(); // CONFIGURATION
     return true;
 }
 
 
 bool Config::saveConfig(bool master)
 {
-    bool result = false;
+    bool success{false};
     if (master)
     {
         //cout << "saving master" << endl;
         xmlType = TOPLEVEL::XML::MasterConfig;
-        XMLwrapper *xml = new XMLwrapper(synth, true);
-        if (!xml)
-        {
-            Log("saveConfig failed xml allocation", _SYS_::LogNotSerious);
-            return result;
-        }
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
         string resConfigFile = baseConfig;
 
         if (xml->saveXMLfile(resConfigFile, false))
         {
             configChanged = false;
-            result = true;
+            success = true;
         }
         else
             Log("Failed to save master config to " + resConfigFile, _SYS_::LogNotSerious);
+    }
 
-        delete xml;
-    }
     xmlType = TOPLEVEL::XML::Config;
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        Log("saveConfig failed xml allocation", _SYS_::LogNotSerious);
-        return result;
-    }
-    addConfigXML(xml);
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    addConfigXML(*xml);
     string resConfigFile = ConfigFile;
 
     if (xml->saveXMLfile(resConfigFile))
     {
         configChanged = false;
-        result = true;
+        success = true;
     }
     else
         Log("Failed to save instance to " + resConfigFile, _SYS_::LogNotSerious);
 
-    delete xml;
-    return result;
+    return success;
 }
 
 
-void Config::addConfigXML(XMLwrapper *xml)
+void Config::addConfigXML(XMLwrapper& xml)
 {
-    xml->beginbranch("CONFIGURATION");
-    xml->addpar("defaultState", loadDefaultState);
+    xml.beginbranch("CONFIGURATION");
+    xml.addpar("defaultState", loadDefaultState);
 
-    xml->addpar("sample_rate", synth->getRuntime().Samplerate);
-    xml->addpar("sound_buffer_size", synth->getRuntime().Buffersize);
-    xml->addpar("oscil_size", synth->getRuntime().Oscilsize);
+    xml.addpar("sample_rate", synth->getRuntime().Samplerate);
+    xml.addpar("sound_buffer_size", synth->getRuntime().Buffersize);
+    xml.addpar("oscil_size", synth->getRuntime().Oscilsize);
 
-    xml->addpar("single_row_panel", single_row_panel);
-    xml->addpar("reports_destination", toConsole);
-    xml->addpar("console_text_size", consoleTextSize);
-    xml->addpar("hide_system_errors", hideErrors);
-    xml->addpar("report_load_times", showTimes);
-    xml->addpar("report_XMLheaders", logXMLheaders);
-    xml->addpar("virtual_keyboard_layout", VirKeybLayout + 1);
-    xml->addpar("full_parameters", xmlmax);
+    xml.addpar("single_row_panel", single_row_panel);
+    xml.addpar("reports_destination", toConsole);
+    xml.addpar("console_text_size", consoleTextSize);
+    xml.addpar("hide_system_errors", hideErrors);
+    xml.addpar("report_load_times", showTimes);
+    xml.addpar("report_XMLheaders", logXMLheaders);
+    xml.addpar("virtual_keyboard_layout", VirKeybLayout + 1);
+    xml.addpar("full_parameters", xmlmax);
 
-    xml->addparbool("bank_highlight", bankHighlight);
+    xml.addparbool("bank_highlight", bankHighlight);
 
-    xml->addpar("presetsCurrentRootID", presetsRootID);
+    xml.addpar("presetsCurrentRootID", presetsRootID);
 
-    xml->addpar("interpolation", Interpolation);
+    xml.addpar("interpolation", Interpolation);
 
-    xml->addpar("audio_engine", synth->getRuntime().audioEngine);
-    xml->addpar("midi_engine", synth->getRuntime().midiEngine);
-    xml->addpar("alsa_midi_type", synth->getRuntime().alsaMidiType);
+    xml.addpar("audio_engine", synth->getRuntime().audioEngine);
+    xml.addpar("midi_engine", synth->getRuntime().midiEngine);
+    xml.addpar("alsa_midi_type", synth->getRuntime().alsaMidiType);
 
-    xml->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
-    xml->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
+    xml.addparstr("linux_alsa_audio_dev", alsaAudioDevice);
+    xml.addparstr("linux_alsa_midi_dev", alsaMidiDevice);
 
-    xml->addparstr("linux_jack_server", jackServer);
-    xml->addparstr("linux_jack_midi_dev", jackMidiDevice);
-    xml->addpar("connect_jack_audio", connectJackaudio);
+    xml.addparstr("linux_jack_server", jackServer);
+    xml.addparstr("linux_jack_midi_dev", jackMidiDevice);
+    xml.addpar("connect_jack_audio", connectJackaudio);
 
-    xml->addpar("midi_bank_root", midi_bank_root);
-    xml->addpar("midi_bank_C", midi_bank_C);
-    xml->addpar("midi_upper_voice_C", midi_upper_voice_C);
-    xml->addpar("ignore_program_change", (1 - EnableProgChange));
-    xml->addpar("enable_part_on_voice_load", 1); // for backward compatibility
-    xml->addpar("saved_instrument_format", instrumentFormat);
-    xml->addparbool("enable_incoming_NRPNs", enable_NRPN);
-    xml->addpar("ignore_reset_all_CCs",ignoreResetCCs);
-    xml->addparbool("monitor-incoming_CCs", monitorCCin);
-    xml->addparbool("open_editor_on_learned_CC",showLearnedCC);
-    xml->addpar("check_pad_synth", 1); // for backward compatibility
-    xml->addpar("root_current_ID", synth->ReadBankRoot());
-    xml->addpar("bank_current_ID", synth->ReadBank());
-    xml->endbranch(); // CONFIGURATION
+    xml.addpar("midi_bank_root", midi_bank_root);
+    xml.addpar("midi_bank_C", midi_bank_C);
+    xml.addpar("midi_upper_voice_C", midi_upper_voice_C);
+    xml.addpar("ignore_program_change", (1 - EnableProgChange));
+    xml.addpar("enable_part_on_voice_load", 1); // for backward compatibility
+    xml.addpar("saved_instrument_format", instrumentFormat);
+    xml.addparbool("enable_incoming_NRPNs", enable_NRPN);
+    xml.addpar("ignore_reset_all_CCs",ignoreResetCCs);
+    xml.addparbool("monitor-incoming_CCs", monitorCCin);
+    xml.addparbool("open_editor_on_learned_CC",showLearnedCC);
+    xml.addpar("check_pad_synth", 1); // for backward compatibility
+    xml.addpar("root_current_ID", synth->ReadBankRoot());
+    xml.addpar("bank_current_ID", synth->ReadBank());
+    xml.endbranch(); // CONFIGURATION
 }
 
 
@@ -774,78 +736,63 @@ bool Config::saveSessionData(string savefile)
 {
     savefile = setExtension(savefile, EXTEN::state);
     synth->getRuntime().xmlType = TOPLEVEL::XML::State;
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        Log("saveSessionData failed xml allocation", _SYS_::LogNotSerious | _SYS_::LogError);
-        return false;
-    }
-    bool ok = true;
-    addConfigXML(xml);
-    synth->add2XML(xml);
-    synth->midilearn.insertMidiListData(xml);
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    bool success{false};
+    addConfigXML(*xml);
+    synth->add2XML(*xml);
+    synth->midilearn.insertMidiListData(*xml);
     if (xml->saveXMLfile(savefile))
-        Log("Session data saved to " + savefile, _SYS_::LogNotSerious);
-    else
     {
-        ok = false;
-        Log("Failed to save session data to " + savefile, _SYS_::LogNotSerious);
+        Log("Session data saved to " + savefile, _SYS_::LogNotSerious);
+        success = true;
     }
-    if (xml)
-        delete xml;
-    return ok;
+    else
+        Log("Failed to save session data to " + savefile, _SYS_::LogNotSerious);
+
+    return success;
 }
 
 
 bool Config::restoreSessionData(string sessionfile)
 {
-    XMLwrapper *xml = NULL;
-    bool ok = false;
+    bool success{false};
 
     if (sessionfile.size() && !isRegularFile(sessionfile))
         sessionfile = setExtension(sessionfile, EXTEN::state);
     if (!sessionfile.size() || !isRegularFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", _SYS_::LogNotSerious);
-        goto end_game;
+        return false;
     }
-    if (!(xml = new XMLwrapper(synth, true)))
-    {
-        Log("Failed to init xml for restoreState", _SYS_::LogNotSerious | _SYS_::LogError);
-        goto end_game;
-    }
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
     if (!xml->loadXMLfile(sessionfile))
     {
         Log("Failed to load xml file " + sessionfile, _SYS_::LogNotSerious);
-        goto end_game;
+        return false;
     }
 
 
-    ok = extractConfigData(xml);
-    if (ok)
+    success = extractConfigData(*xml);
+    if (success)
     {
         // mark as soon as anything changes
         synth->getRuntime().stateChanged = true;
-        for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
-            synth->part[npart]->defaults(npart);
 
-        ok = synth->getfromXML(xml);
-        if (ok)
+        synth->defaults();
+        success = synth->getfromXML(*xml);
+        if (success)
             synth->setAllPartMaps();
-        bool oklearn = synth->midilearn.extractMidiListData(false, xml);
+        bool oklearn = synth->midilearn.extractMidiListData(false, *xml);
         if (oklearn)
             synth->midilearn.updateGui(MIDILEARN::control::hideGUI);
             // handles possibly undefined window
-        }
+    }
 
-end_game:
-    if (xml)
-        delete xml;
-    return ok;
+    return success;
 }
 
 
-bool Config::loadPresetsList(void)
+bool Config::loadPresetsList()
 {
     string presetDirname = file::localDir()  + "/presetDirs";
     if (!isRegularFile(presetDirname))
@@ -855,22 +802,16 @@ bool Config::loadPresetsList(void)
     }
     xmlType = TOPLEVEL::XML::PresetDirs;
 
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        Log("loadPresetDirs failed xml allocation");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
     xml->loadXMLfile(presetDirname);
 
     if (!xml->enterbranch("PRESETDIRS"))
     {
         Log("loadPresetDirsData, no PRESETDIRS branch");
-        delete xml;
         return false;
     }
     int count = 0;
-    bool ok = false;
+    bool ok{false};
     do
     {
         if (xml->enterbranch("XMZ_FILE", count))
@@ -885,23 +826,17 @@ bool Config::loadPresetsList(void)
     }
     while (ok);
     xml->endbranch();
-    delete xml;
 
     return true;
 }
 
 
-bool Config::savePresetsList(void)
+bool Config::savePresetsList()
 {
     string presetDirname = file::localDir()  + "/presetDirs";
     xmlType = TOPLEVEL::XML::PresetDirs;
 
-    XMLwrapper *xml = new XMLwrapper(synth, true);
-    if (!xml)
-    {
-        Log("savePresetDirs failed xml allocation");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
     xml->beginbranch("PRESETDIRS");
     {
         int count = 0;
@@ -916,7 +851,7 @@ bool Config::savePresetsList(void)
     xml->endbranch();
     if (!xml->saveXMLfile(presetDirname))
         Log("Failed to save data to " + presetDirname);
-    delete xml;
+
     return true;
 }
 
@@ -1570,30 +1505,19 @@ void GuiThreadMsg::processGuiMessages()
     GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
     if (msg)
     {
-        SynthEngine *synth = ((SynthEngine *)msg->data);
-        MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
+        assert(msg->data);
+        InterChange& interChange = * static_cast<InterChange*>(msg->data);
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
-            // This *defines* guiMaster
-            if (!guiMaster)
-                std::cerr << "Error starting Main UI!" << endl;
-            else
-            {
-                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            MasterUI& guiMaster = interChange.createGuiMaster(msg->index);
+            guiMaster.Init();
+            ///////////////////////////////////////TODO 3/2024 the following should be done from the Synth thread
+            guiMaster.synth->postGuiStartHook();   //// this is a premature hack to fix missing push-updates from early load / state files
 
-                if (synth->getRuntime().audioEngine < 1)
-                    alert(synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
-                if (synth->getRuntime().midiEngine < 1)
-                    alert(synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
-            }
-        }
-        else if (guiMaster)
-        {
-            switch(msg->type)
-            {
-                default:
-                    break;
-            }
+            if (guiMaster.synth->getRuntime().audioEngine < 1)
+                alert(guiMaster.synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
+            if (guiMaster.synth->getRuntime().midiEngine < 1)
+                alert(guiMaster.synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
         }
         delete msg;
     }

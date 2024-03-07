@@ -46,9 +46,9 @@ class EnvelopeParams : public ParamBase
         void ASRinit_bw(float A_val, float A_dt, float R_val, float R_dt);
         void converttofree(void);
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
 
         float getdt(size_t i);
 

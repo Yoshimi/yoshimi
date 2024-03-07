@@ -45,9 +45,9 @@ class Resonance : public ParamBase
         void interpolatepeaks(int type);
         void randomize(int type);
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
 
         float getfreqpos(float freq);
         float getfreqx(float x);

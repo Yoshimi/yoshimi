@@ -292,14 +292,17 @@ set (Effects_sources
 )
 
 set (Misc_sources
-    Misc/CmdOptions.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp
-    Misc/BuildScheduler.cpp Misc/Microtonal.cpp   Misc/Part.cpp Misc/Splash.cpp
-    Misc/WavFile.cpp Misc/XMLwrapper.cpp
+    Misc/Bank.cpp Misc/DataBlockBuff.cpp  Misc/CmdOptions.cpp  Misc/Config.cpp
+    Misc/BuildScheduler.cpp  Misc/Microtonal.cpp   Misc/Part.cpp Misc/Splash.cpp
+    Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLwrapper.cpp
 )
 
 set (Interface_Sources
     Interface/InterChange.cpp
     Interface/Data2Text.cpp
+    Interface/GuiDataExchange.h
+    Interface/GuiDataExchange.cpp
+    Interface/InterfaceAnchor.h
     Interface/Text2Data.cpp
     Interface/MidiLearn.cpp
     Interface/MidiDecode.cpp

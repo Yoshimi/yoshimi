@@ -90,8 +90,8 @@ class Microtonal
         string Pname;
         string Pcomment;
 
-        void add2XML(XMLwrapper *xml);
-        int getfromXML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
+        int getfromXML(XMLwrapper& xml);
         bool saveXML(const string& filename);
         int loadXML(const string& filename);
 

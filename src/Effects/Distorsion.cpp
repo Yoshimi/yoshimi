@@ -290,7 +290,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Distorsion::getpar(int npar)
+unsigned char Distorsion::getpar(int npar) const
 {
     switch (npar)
     {

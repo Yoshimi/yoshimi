@@ -27,8 +27,12 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/FileMgrFuncs.h"
 #include "Misc/FormatFuncs.h"
+#include "Misc/MirrorData.h"
 
 #include "UI/Themes.h"
+
+#include "Interface/InterfaceAnchor.h"
+using RoutingTag = GuiDataExchange::RoutingTag;
 
 using file::saveText;
 using file::loadText;
@@ -151,10 +155,38 @@ ValueType getFilterFreqTrackType(int offset);
 int millisec2logDial(unsigned int);
 unsigned int logDial2millisec(int);
 
-class GuiUpdates {
+
+/**
+ * Base class mixed into MasterUI, which is the root of the Yoshimi FLTK UI.
+ * Provides functions to establish communication with the Core.
+ */
+class GuiUpdates
+{
+protected:
+    GuiUpdates(InterChange&, size_t);
+
+    // must not be copied nor moved
+    GuiUpdates(GuiUpdates &&)                =delete;
+    GuiUpdates(GuiUpdates const&)            =delete;
+    GuiUpdates& operator=(GuiUpdates &&)     =delete;
+    GuiUpdates& operator=(GuiUpdates const&) =delete;
+
+    void read_updates(SynthEngine *synth);
 
 public:
-    void read_updates(SynthEngine *synth);
+    InterChange& interChange;
+    MirrorData<InterfaceAnchor> anchor;
+
+    auto connectSysEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().sysEffectParam); }
+    auto connectInsEffect() { return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().insEffectParam); }
+    auto connectPartEffect(){ return GuiDataExchange::Connection<EffectDTO>(interChange.guiDataExchange, anchor.get().partEffectParam);}
+
+    template<class DAT>
+    GuiDataExchange::Connection<DAT> connectCore(GuiDataExchange::RoutingTag InterfaceAnchor::*tag)
+    {
+        (anchor.get().*tag).verifyType<DAT>();
+        return GuiDataExchange::Connection<DAT>(interChange.guiDataExchange, anchor.get().*tag);
+    }
 
 private:
     void decode_envelope(SynthEngine *synth, CommandBlock *getData);

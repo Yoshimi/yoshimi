@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "Interface/Data2Text.h"
 #include "Interface/RingBuffer.h"
+#include "Interface/GuiDataExchange.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
@@ -36,8 +37,10 @@
 #include <semaphore.h>
 
 #include <list>
+#include <memory>
 
 class DataText;
+class MasterUI;
 class SynthEngine;
 class PADnoteParameters;
 
@@ -62,10 +65,22 @@ class InterChange : private DataText
         static constexpr size_t commandBlockSize = sizeof (CommandBlock);
         SynthEngine *synth;
 
+#ifdef GUI_FLTK
+        std::unique_ptr<MasterUI> guiMaster;
+
+        ///////////////////TODO 1/2024 : retract usage of direct SynthEngine* from UI
+        friend class SynthEngine;
+#endif
+
     public:
         InterChange(SynthEngine *_synth);
         ~InterChange();
         bool Init();
+
+#ifdef GUI_FLTK
+        MasterUI& createGuiMaster(size_t slotIDX);
+        void closeGui();
+#endif
 
         CommandBlock commandData;
 #ifndef YOSHIMI_LV2_PLUGIN
@@ -79,6 +94,8 @@ class InterChange : private DataText
         RingBuffer <10, log2 (commandBlockSize)> fromMIDI;
         RingBuffer <10, log2 (commandBlockSize)> returnsBuffer;
         RingBuffer <4, log2 (commandBlockSize)> muteQueue;
+
+        GuiDataExchange guiDataExchange;
 
         sem_t sortResultsThreadSemaphore;
         void spinSortResultsThread();

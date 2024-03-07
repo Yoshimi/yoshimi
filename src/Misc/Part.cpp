@@ -1251,125 +1251,125 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 }
 
 
-void Part::add2XMLinstrument(XMLwrapper *xml)
+void Part::add2XMLinstrument(XMLwrapper& xml)
 {
-    xml->beginbranch("INFO");
-    xml->addparstr("name", Poriginal);
-    xml->addparstr("author", info.Pauthor);
-    xml->addparstr("comments", info.Pcomments);
-    xml->addpar("type", type_offset[info.Ptype]);
-    xml->addparstr("file", Pname);
-    xml->endbranch();
+    xml.beginbranch("INFO");
+    xml.addparstr("name", Poriginal);
+    xml.addparstr("author", info.Pauthor);
+    xml.addparstr("comments", info.Pcomments);
+    xml.addpar("type", type_offset[info.Ptype]);
+    xml.addparstr("file", Pname);
+    xml.endbranch();
     if (Pname == DEFAULT_NAME)
         return;
 
-    xml->beginbranch("INSTRUMENT_KIT");
-    xml->addpar("kit_mode", Pkitmode);
-    xml->addparbool("kit_crossfade", Pkitfade);
-    xml->addparbool("drum_mode", Pdrummode);
+    xml.beginbranch("INSTRUMENT_KIT");
+    xml.addpar("kit_mode", Pkitmode);
+    xml.addparbool("kit_crossfade", Pkitfade);
+    xml.addparbool("drum_mode", Pdrummode);
 
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
-        xml->beginbranch("INSTRUMENT_KIT_ITEM",i);
-        xml->addparbool("enabled", kit[i].Penabled);
+        xml.beginbranch("INSTRUMENT_KIT_ITEM",i);
+        xml.addparbool("enabled", kit[i].Penabled);
         if (kit[i].Penabled)
         {
-            xml->addparstr("name", kit[i].Pname);
+            xml.addparstr("name", kit[i].Pname);
 
-            xml->addparbool("muted", kit[i].Pmuted);
-            xml->addpar("min_key", kit[i].Pminkey);
-            xml->addpar("max_key", kit[i].Pmaxkey);
+            xml.addparbool("muted", kit[i].Pmuted);
+            xml.addpar("min_key", kit[i].Pminkey);
+            xml.addpar("max_key", kit[i].Pmaxkey);
 
-            xml->addpar("send_to_instrument_effect", kit[i].Psendtoparteffect);
+            xml.addpar("send_to_instrument_effect", kit[i].Psendtoparteffect);
 
-            xml->addparbool("add_enabled", kit[i].Padenabled);
+            xml.addparbool("add_enabled", kit[i].Padenabled);
             if (kit[i].Padenabled && kit[i].adpars)
             {
-                xml->beginbranch("ADD_SYNTH_PARAMETERS");
+                xml.beginbranch("ADD_SYNTH_PARAMETERS");
                 kit[i].adpars->add2XML(xml);
-                xml->endbranch();
+                xml.endbranch();
             }
 
-            xml->addparbool("sub_enabled", kit[i].Psubenabled);
+            xml.addparbool("sub_enabled", kit[i].Psubenabled);
             if (kit[i].Psubenabled && kit[i].subpars)
             {
-                xml->beginbranch("SUB_SYNTH_PARAMETERS");
+                xml.beginbranch("SUB_SYNTH_PARAMETERS");
                 kit[i].subpars->add2XML(xml);
-                xml->endbranch();
+                xml.endbranch();
             }
 
-            xml->addparbool("pad_enabled", kit[i].Ppadenabled);
+            xml.addparbool("pad_enabled", kit[i].Ppadenabled);
             if (kit[i].Ppadenabled && kit[i].padpars)
             {
-                xml->beginbranch("PAD_SYNTH_PARAMETERS");
+                xml.beginbranch("PAD_SYNTH_PARAMETERS");
                 kit[i].padpars->add2XML(xml);
-                xml->endbranch();
+                xml.endbranch();
             }
         }
-        xml->endbranch();
+        xml.endbranch();
     }
-    xml->endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("INSTRUMENT_EFFECTS");
+    xml.beginbranch("INSTRUMENT_EFFECTS");
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
-        xml->beginbranch("INSTRUMENT_EFFECT",nefx);
-        xml->beginbranch("EFFECT");
+        xml.beginbranch("INSTRUMENT_EFFECT",nefx);
+        xml.beginbranch("EFFECT");
         partefx[nefx]->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
 
-        xml->addpar("route", Pefxroute[nefx]);
+        xml.addpar("route", Pefxroute[nefx]);
         partefx[nefx]->setdryonly(Pefxroute[nefx] == 2);
-        xml->addparbool("bypass",Pefxbypass[nefx]);
-        xml->endbranch();
+        xml.addparbool("bypass",Pefxbypass[nefx]);
+        xml.endbranch();
     }
-    xml->endbranch();
+    xml.endbranch();
 }
 
 
-void Part::add2XML(XMLwrapper *xml, bool subset)
+void Part::add2XML(XMLwrapper& xml, bool subset)
 {
     // parameters
     if (!subset)
     {
-        xml->addparbool("enabled", (Penabled == 1));
+        xml.addparbool("enabled", (Penabled == 1));
 
-        xml->addpar("volume", Pvolume);
-        xml->addpar("panning", Ppanning);
+        xml.addpar("volume", Pvolume);
+        xml.addpar("panning", Ppanning);
 
-        xml->addpar("min_key", Pminkey);
-        xml->addpar("max_key", Pmaxkey);
-        xml->addpar("key_shift", Pkeyshift);
-        xml->addpar("rcv_chn", Prcvchn);
+        xml.addpar("min_key", Pminkey);
+        xml.addpar("max_key", Pmaxkey);
+        xml.addpar("key_shift", Pkeyshift);
+        xml.addpar("rcv_chn", Prcvchn);
 
-        xml->addpar("velocity_sensing", Pvelsns);
-        xml->addpar("velocity_offset", Pveloffs);
+        xml.addpar("velocity_sensing", Pvelsns);
+        xml.addpar("velocity_offset", Pveloffs);
     // the following two lines maintain backward compatibility
-        xml->addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_NORMAL);
-        xml->addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
-        xml->addpar("channel_aftertouch", PchannelATchoice);
-        xml->addpar("key_aftertouch", PkeyATchoice);
-        xml->addpar("key_limit", Pkeylimit);
-        xml->addpar("random_detune", Pfrand);
-        xml->addpar("random_velocity", Pvelrand);
-        xml->addpar("destination", Paudiodest);
+        xml.addparbool("poly_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_NORMAL);
+        xml.addpar("legato_mode", (Pkeymode & MIDI_NOT_LEGATO) == PART_LEGATO);
+        xml.addpar("channel_aftertouch", PchannelATchoice);
+        xml.addpar("key_aftertouch", PkeyATchoice);
+        xml.addpar("key_limit", Pkeylimit);
+        xml.addpar("random_detune", Pfrand);
+        xml.addpar("random_velocity", Pvelrand);
+        xml.addpar("destination", Paudiodest);
     }
-    xml->beginbranch("INSTRUMENT");
+    xml.beginbranch("INSTRUMENT");
     add2XMLinstrument(xml);
     if (subset)
     {
-        xml->addpar("key_mode", Pkeymode & MIDI_NOT_LEGATO);
-        xml->addpar("channel_aftertouch", PchannelATchoice);
-        xml->addpar("key_aftertouch", PkeyATchoice);
-        xml->addpar("random_detune", Pfrand);
-        xml->addpar("random_velocity", Pvelrand);
-        xml->addparbool("breath_disable", PbreathControl != MIDI::CC::breath);
+        xml.addpar("key_mode", Pkeymode & MIDI_NOT_LEGATO);
+        xml.addpar("channel_aftertouch", PchannelATchoice);
+        xml.addpar("key_aftertouch", PkeyATchoice);
+        xml.addpar("random_detune", Pfrand);
+        xml.addpar("random_velocity", Pvelrand);
+        xml.addparbool("breath_disable", PbreathControl != MIDI::CC::breath);
     }
-    xml->endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("CONTROLLER");
+    xml.beginbranch("CONTROLLER");
     ctl->add2XML(xml);
-    xml->endbranch();
+    xml.endbranch();
 }
 
 
@@ -1377,12 +1377,8 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 {
     synth->usingYoshiType = yoshiFormat;
     synth->getRuntime().xmlType = TOPLEVEL::XML::Instrument;
-    XMLwrapper *xml = new XMLwrapper(synth, yoshiFormat);
-    if (!xml)
-    {
-        synth->getRuntime().Log("Part: saveXML failed to instantiate new XMLwrapper");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(synth, yoshiFormat)};
+
     if (Pname < "!") // this shouldn't be possible
         Pname = UNTITLED;
     else if ((Poriginal.empty() || Poriginal == UNTITLED) && Pname != UNTITLED)
@@ -1391,17 +1387,16 @@ bool Part::saveXML(string filename, bool yoshiFormat)
     if (yoshiFormat)
     {
         filename = setExtension(filename, EXTEN::yoshInst);
-        add2XML(xml, yoshiFormat);
+        add2XML(*xml, yoshiFormat);
     }
     else
     {
         filename = setExtension(filename, EXTEN::zynInst);
         xml->beginbranch("INSTRUMENT");
-        add2XMLinstrument(xml);
+        add2XMLinstrument(*xml);
         xml->endbranch();
     }
     bool result = xml->saveXMLfile(filename);
-    delete xml;
     return result;
 }
 
@@ -1416,22 +1411,15 @@ int Part::loadXMLinstrument(string filename)
         filename = setExtension(filename, EXTEN::zynInst);
     }
 
-    XMLwrapper *xml = new XMLwrapper(synth, hasYoshi);
-    if (!xml)
-    {
-        synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
-        return 0;
-    }
+    auto xml{std::make_unique<XMLwrapper>(synth, hasYoshi)};
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);
-        delete xml;
         return 0;
     }
     if (xml->enterbranch("INSTRUMENT") == 0)
     {
         synth->getRuntime().Log(filename + " is not an instrument file");
-        delete xml;
         return 0;
     }
     defaultsinstrument();
@@ -1440,7 +1428,10 @@ int Part::loadXMLinstrument(string filename)
     int chk = findSplitPoint(Pname);
     if (chk > 0)
         Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
-    getfromXMLinstrument(xml);
+    getfromXMLinstrument(*xml);
+    // possibly changed part-effect; publish to GUI if current part
+    if (int(partID) == synth->getRuntime().currentPart)
+        synth->pushEffectUpdate(partID);
 
     if (hasYoshi)
     {
@@ -1460,25 +1451,24 @@ int Part::loadXMLinstrument(string filename)
     xml->exitbranch();
     if (xml->enterbranch("CONTROLLER"))
     {
-        ctl->getfromXML(xml);
+        ctl->getfromXML(*xml);
         xml->exitbranch();
     }
     xml->exitbranch();
-    delete xml;
     return 1;
 }
 
 
-void Part::getfromXMLinstrument(XMLwrapper *xml)
+void Part::getfromXMLinstrument(XMLwrapper& xml)
 {
     string tempname;
-    if (xml->enterbranch("INFO"))
+    if (xml.enterbranch("INFO"))
     {
-        Poriginal = xml->getparstr("name");
+        Poriginal = xml.getparstr("name");
         // counting type numbers but checking the *contents* of type_offset()
-        info.Pauthor = func::formatTextLines(xml->getparstr("author"), 54);
-        info.Pcomments = func::formatTextLines(xml->getparstr("comments"), 54);
-        int found = xml->getpar("type", 0, -20, 255); // should cover all!
+        info.Pauthor = func::formatTextLines(xml.getparstr("author"), 54);
+        info.Pcomments = func::formatTextLines(xml.getparstr("comments"), 54);
+        int found = xml.getpar("type", 0, -20, 255); // should cover all!
         int type = 0;
         int offset = 0;
         while (offset != UNUSED && offset != found)
@@ -1492,7 +1482,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
 
         // The following is surprisingly complex!
         if (Pname.empty())
-            Pname = xml->getparstr("file");
+            Pname = xml.getparstr("file");
 
         if (Poriginal == DEFAULT_NAME) // it's an old one
             Poriginal = UNTITLED;
@@ -1510,103 +1500,103 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
             Pname = UNTITLED;
             Poriginal = UNTITLED;
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    if (!xml->enterbranch("INSTRUMENT_KIT"))
+    if (!xml.enterbranch("INSTRUMENT_KIT"))
     {
         defaultsinstrument();
         return;
     }
     else
     {
-        Pkitmode = xml->getpar127("kit_mode", Pkitmode);    // 0=off, 1=on, 2="single": only first applicable kit item is playing
-        Pkitfade = xml->getparbool("kit_crossfade", Pkitfade);
-        Pdrummode = xml->getparbool("drum_mode", Pdrummode);
+        Pkitmode = xml.getpar127("kit_mode", Pkitmode);    // 0=off, 1=on, 2="single": only first applicable kit item is playing
+        Pkitfade = xml.getparbool("kit_crossfade", Pkitfade);
+        Pdrummode = xml.getparbool("drum_mode", Pdrummode);
 
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
-            if (!xml->enterbranch("INSTRUMENT_KIT_ITEM", i))
+            if (!xml.enterbranch("INSTRUMENT_KIT_ITEM", i))
                 continue;
-            setkititemstatus(i, xml->getparbool("enabled", kit[i].Penabled));
+            setkititemstatus(i, xml.getparbool("enabled", kit[i].Penabled));
             if (!kit[i].Penabled)
             {
-                xml->exitbranch();
+                xml.exitbranch();
                 continue;
             }
-            kit[i].Pname = xml->getparstr("name");
-            kit[i].Pmuted = xml->getparbool("muted", kit[i].Pmuted);
-            kit[i].Pminkey = xml->getpar127("min_key", kit[i].Pminkey);
-            kit[i].Pmaxkey = xml->getpar127("max_key", kit[i].Pmaxkey);
-            kit[i].Psendtoparteffect = xml->getpar127("send_to_instrument_effect",
+            kit[i].Pname = xml.getparstr("name");
+            kit[i].Pmuted = xml.getparbool("muted", kit[i].Pmuted);
+            kit[i].Pminkey = xml.getpar127("min_key", kit[i].Pminkey);
+            kit[i].Pmaxkey = xml.getpar127("max_key", kit[i].Pmaxkey);
+            kit[i].Psendtoparteffect = xml.getpar127("send_to_instrument_effect",
                                                       kit[i].Psendtoparteffect);
-            kit[i].Padenabled = xml->getparbool("add_enabled", kit[i].Padenabled);
-            if (xml->enterbranch("ADD_SYNTH_PARAMETERS"))
+            kit[i].Padenabled = xml.getparbool("add_enabled", kit[i].Padenabled);
+            if (xml.enterbranch("ADD_SYNTH_PARAMETERS"))
             {
                 kit[i].adpars->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
-            kit[i].Psubenabled = xml->getparbool("sub_enabled", kit[i].Psubenabled);
-            if (xml->enterbranch("SUB_SYNTH_PARAMETERS"))
+            kit[i].Psubenabled = xml.getparbool("sub_enabled", kit[i].Psubenabled);
+            if (xml.enterbranch("SUB_SYNTH_PARAMETERS"))
             {
                 kit[i].subpars->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
-            kit[i].Ppadenabled = xml->getparbool("pad_enabled", kit[i].Ppadenabled);
-            if (xml->enterbranch("PAD_SYNTH_PARAMETERS"))
+            kit[i].Ppadenabled = xml.getparbool("pad_enabled", kit[i].Ppadenabled);
+            if (xml.enterbranch("PAD_SYNTH_PARAMETERS"))
             {
                 busy = true;
                 kit[i].padpars->getfromXML(xml);
                 busy = false;
-                xml->exitbranch();
+                xml.exitbranch();
             }
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
-    if (xml->enterbranch("INSTRUMENT_EFFECTS"))
+    if (xml.enterbranch("INSTRUMENT_EFFECTS"))
     {
         for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         {
-            if (!xml->enterbranch("INSTRUMENT_EFFECT", nefx))
+            if (!xml.enterbranch("INSTRUMENT_EFFECT", nefx))
                 continue;
-            if (xml->enterbranch("EFFECT"))
+            if (xml.enterbranch("EFFECT"))
             {
                 partefx[nefx]->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
-            Pefxroute[nefx] = xml->getpar("route", Pefxroute[nefx], 0, NUM_PART_EFX);
+            Pefxroute[nefx] = xml.getpar("route", Pefxroute[nefx], 0, NUM_PART_EFX);
             partefx[nefx]->setdryonly(Pefxroute[nefx] == 2);
-            Pefxbypass[nefx] = xml->getparbool("bypass", Pefxbypass[nefx]);
-            xml->exitbranch();
+            Pefxbypass[nefx] = xml.getparbool("bypass", Pefxbypass[nefx]);
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 }
 
 
-void Part::getfromXML(XMLwrapper *xml)
+void Part::getfromXML(XMLwrapper& xml)
 {
-    Penabled = (xml->getparbool("enabled", Penabled) == 1);
+    Penabled = (xml.getparbool("enabled", Penabled) == 1);
 
-    setVolume(xml->getpar127("volume", Pvolume));
-    setPan(xml->getpar127("panning", Ppanning));
+    setVolume(xml.getpar127("volume", Pvolume));
+    setPan(xml.getpar127("panning", Ppanning));
 
-    Pminkey = xml->getpar127("min_key", Pminkey);
-    Pmaxkey = xml->getpar127("max_key", Pmaxkey);
-    Pkeyshift = xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64);
+    Pminkey = xml.getpar127("min_key", Pminkey);
+    Pmaxkey = xml.getpar127("max_key", Pmaxkey);
+    Pkeyshift = xml.getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64);
 
-    Prcvchn = xml->getpar127("rcv_chn", Prcvchn);
+    Prcvchn = xml.getpar127("rcv_chn", Prcvchn);
 
-    Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
-    Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
+    Pvelsns = xml.getpar127("velocity_sensing", Pvelsns);
+    Pveloffs = xml.getpar127("velocity_offset", Pveloffs);
 
     bool Ppolymode = 1;
     bool Plegatomode = 0;
-    Ppolymode = xml->getparbool("poly_mode", Ppolymode);
-    Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
+    Ppolymode = xml.getparbool("poly_mode", Ppolymode);
+    Plegatomode = xml.getparbool("legato_mode", Plegatomode); // older versions
     if (!Plegatomode)
-        Plegatomode = xml->getpar127("legato_mode", Plegatomode);
+        Plegatomode = xml.getpar127("legato_mode", Plegatomode);
     if (Plegatomode) // these lines are for backward compatibility
         Pkeymode = PART_LEGATO;
     else if (Ppolymode)
@@ -1614,30 +1604,30 @@ void Part::getfromXML(XMLwrapper *xml)
     else
         Pkeymode = PART_MONO;
 
-    PchannelATchoice = xml->getpar("channel_aftertouch", PchannelATchoice, 0, 255);
-    PkeyATchoice = xml->getpar("key_aftertouch", PkeyATchoice, 0, 255);
+    PchannelATchoice = xml.getpar("channel_aftertouch", PchannelATchoice, 0, 255);
+    PkeyATchoice = xml.getpar("key_aftertouch", PkeyATchoice, 0, 255);
 
-    Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
+    Pkeylimit = xml.getpar127("key_limit", Pkeylimit);
     if (Pkeylimit < 1 || Pkeylimit > POLYPHONY)
         Pkeylimit = POLYPHONY;
-    Pfrand = xml->getpar127("random_detune", Pfrand);
+    Pfrand = xml.getpar127("random_detune", Pfrand);
     if (Pfrand > 50)
         Pfrand = 50;
-    Pvelrand = xml->getpar127("random_velocity", Pvelrand);
+    Pvelrand = xml.getpar127("random_velocity", Pvelrand);
     if (Pvelrand > 50)
         Pvelrand = 50;
-    setDestination(xml->getpar127("destination", Paudiodest));
+    setDestination(xml.getpar127("destination", Paudiodest));
 
-    if (xml->enterbranch("INSTRUMENT"))
+    if (xml.enterbranch("INSTRUMENT"))
     {
         Pname.clear(); // erase any previous name
         getfromXMLinstrument(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
-    if (xml->enterbranch("CONTROLLER"))
+    if (xml.enterbranch("CONTROLLER"))
     {
         ctl->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
 }
 

@@ -268,7 +268,7 @@ void Chorus::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Chorus::getpar(int npar)
+unsigned char Chorus::getpar(int npar) const
 {
     switch (npar)
     {

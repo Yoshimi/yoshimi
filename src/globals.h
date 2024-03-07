@@ -219,6 +219,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
          * the following values must never appear in any other sections
          * they are all callable from any section
          */
+        dataExchange = 250,//FA
         copyPaste =  251, // FB
         partBusy, // internally generated - read only
         unrecognised,

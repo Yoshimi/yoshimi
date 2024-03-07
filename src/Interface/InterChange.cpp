@@ -100,6 +100,8 @@ InterChange::InterChange(SynthEngine *_synth) :
 #endif
     fromMIDI(),
     returnsBuffer(),
+    muteQueue(),
+    guiDataExchange{[this](CommandBlock const& block){ toGUI.write(block.bytes); }},
     syncWrite(false),
     lowPrioWrite(false),
     sortResultsThreadHandle(0),
@@ -146,6 +148,21 @@ bool InterChange::Init()
         return true;
     }
 }
+
+#ifdef GUI_FLTK
+MasterUI& InterChange::createGuiMaster(size_t slotIDX)
+{
+    guiMaster.reset(new MasterUI(*this, slotIDX));
+    assert(guiMaster);
+    return *guiMaster;
+}
+
+void InterChange::closeGui()
+{
+    guiMaster.reset();
+}
+#endif
+
 
 void InterChange::spinSortResultsThread()
 {
@@ -252,7 +269,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     if (control == TOPLEVEL::control::copyPaste)
     {
-        string name = synth->unifiedpresets.section(synth, getData);
+        string name = synth->unifiedpresets.handleStoreLoad(synth, getData);
         /*
          * for Paste (load) 'name' is the type of the preset being loaded
          * for List 'name' lists all the stored presets of the wanted preset type
@@ -2011,6 +2028,7 @@ void InterChange::doClearPartInstrument(int npart)
     synth->part[npart]->cleanup();
     synth->getRuntime().currentPart = npart;
     synth->partonoffWrite(npart, 2);
+    synth->pushEffectUpdate(npart);
 }
 
 bool InterChange::commandSend(CommandBlock *getData)
@@ -3235,7 +3253,10 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case MAIN::control::partNumber:
             if (write)
+            {   // from various causes which change the current active part
                 synth->getRuntime().currentPart = value_int;
+                synth->pushEffectUpdate(value_int);
+            }           // send current part-effect data to GUI
             else
                 value = synth->getRuntime().currentPart;
             break;
@@ -3245,6 +3266,9 @@ void InterChange::commandMain(CommandBlock *getData)
                 if (value < synth->getRuntime().NumAvailableParts)
                     undoRedoClear(); // references might no longer exist
                 synth->getRuntime().NumAvailableParts = value;
+                // Note: in MasterUI::updatepart() the current part number
+                //       will possibly be capped, causing npartcounter->do_callback();
+                //       to send a command MAIN::control::partNumber ...
             }
             else
                 value = synth->getRuntime().NumAvailableParts;
@@ -3588,6 +3612,7 @@ void InterChange::commandPart(CommandBlock *getData)
     char value_bool = _SYS_::F2B(value);
 
     Part *part;
+    assert(npart < NUM_MIDI_PARTS);
     part = synth->part[npart];
     if (not part->Pkitmode)
     {
@@ -3665,6 +3690,7 @@ void InterChange::commandPart(CommandBlock *getData)
                     getData->data.value = npart;
                     getData->data.control = MAIN::control::partNumber;
                     getData->data.part = TOPLEVEL::section::main;
+                    synth->pushEffectUpdate(npart); // send current part-effect data to GUI
                 }
                 else
                     synth->partonoffWrite(npart, value_int);
@@ -4022,7 +4048,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 getData->data.engine = value_int;
                 getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
                 // the line above is to show it's changed from preset values
-
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Peffnum;
@@ -4030,7 +4056,10 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case PART::control::effectType:
             if (write)
+            {
                 part->partefx[effNum]->changeeffect(value_int);
+                synth->pushEffectUpdate(npart);
+            }
             else
                 value = part->partefx[effNum]->geteffect();
             getData->data.offset = 0;
@@ -4040,6 +4069,7 @@ void InterChange::commandPart(CommandBlock *getData)
             {
                 part->Pefxroute[effNum] = value_int;
                 part->partefx[effNum]->setdryonly(value_int == 2);
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Pefxroute[effNum];
@@ -4055,6 +4085,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Pefxbypass[engine] = newSwitch;
                 if (newSwitch != oldSwitch)
                     part->partefx[engine]->cleanup();
+                synth->pushEffectUpdate(npart);
             }
             else
                 value = part->Pefxbypass[engine];
@@ -6957,7 +6988,6 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char effnum = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
     bool write = (type & TOPLEVEL::type::Write) > 0;
@@ -6965,10 +6995,8 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
     int value_int = lrint(value);
     bool isSysEff = (npart == TOPLEVEL::section::systemEffects);
-    if (isSysEff)
-        effnum = synth->syseffnum;
-    else
-        effnum = synth->inseffnum;
+    uchar effnum = isSysEff? synth->syseffnum
+                           : synth->inseffnum;
 
     if (insert == UNUSED)
     {
@@ -6987,6 +7015,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                         synth->inseffnum = value_int;
                         getData->data.parameter = (synth->insefx[value_int]->geteffectpar(-1) != 0);
                     }
+                    synth->pushEffectUpdate(npart);
                     getData->data.source |= getData->data.source |= TOPLEVEL::action::forceUpdate;
                     // the line above is to show it's changed from preset values
                     getData->data.engine = value_int;
@@ -7009,7 +7038,8 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     else
                     {
                         synth->insefx[effnum]->changeeffect(value_int);
-                    }
+                    }   // push GUI update since module for effnum is currently exposed in GUI
+                    synth->pushEffectUpdate(npart);
                     getData->data.offset = 0;
                 }
                 else
@@ -7026,6 +7056,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     synth->Pinsparts[effnum] = value_int;
                     if (value_int == -1)
                         synth->insefx[effnum]->cleanup();
+                    synth->pushEffectUpdate(npart); // isInsert and currently exposed in GUI
                 }
                 else
                     value = synth->Pinsparts[effnum];
@@ -7037,7 +7068,10 @@ void InterChange::commandSysIns(CommandBlock *getData)
                     bool oldSwitch = synth->syseffEnable[effnum];
                     synth->syseffEnable[effnum] = newSwitch;
                     if (newSwitch != oldSwitch)
+                    {
                         synth->sysefx[effnum]->cleanup();
+                        synth->pushEffectUpdate(npart); // not isInsert currently exposed in GUI
+                    }
                 }
                 else
                     value = synth->syseffEnable[effnum];
@@ -7047,13 +7081,17 @@ void InterChange::commandSysIns(CommandBlock *getData)
     else // system only
     {
         if (write)
+        {
             synth->setPsysefxsend(effnum, control, value);
+            synth->pushEffectUpdate(npart);
+        }
         else
             value = synth->Psysefxsend[effnum][control];
     }
 
     if (!write)
         getData->data.value = value;
+
 }
 
 
@@ -7079,7 +7117,6 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (npart == TOPLEVEL::section::systemEffects)
         eff = synth->sysefx[effnum];
-
     else if (npart == TOPLEVEL::section::insertEffects)
         eff = synth->insefx[effnum];
     else if (npart < NUM_MIDI_PARTS)
@@ -7089,6 +7126,17 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (effSend >= EFFECT::type::count)
         return; // invalid kit number
+
+
+    auto maybeUpdateGui = [&]{
+                                bool isPart{npart < NUM_MIDI_PARTS};
+                                bool isInsert{npart != TOPLEVEL::section::systemEffects};
+                                int currPartNr = synth->getRuntime().currentPart;
+                                uchar currEff = isPart? synth->part[currPartNr]->Peffnum : isInsert? synth->inseffnum : synth->syseffnum;
+                                // push update to GUI if the change affects the current effect module exposed in GUI
+                                if (effnum == currEff && (!isPart || npart == currPartNr))
+                                    synth->pushEffectUpdate(npart);
+                             };
 
     if (control != PART::control::effectType && effSend != (eff->geteffect() + EFFECT::type::none)) // geteffect not yet converted
     {
@@ -7110,6 +7158,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         if (write)
             eff->seteffectpar(-1, true); // effect changed
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
+        if (write)
+            maybeUpdateGui();
         return;
     }
     if (control == EFFECT::control::changed)
@@ -7160,6 +7210,7 @@ void InterChange::commandEffects(CommandBlock *getData)
                     getData->data.offset = eff->geteffectpar(12);
             }
         }
+        maybeUpdateGui();
     }
     else
     {

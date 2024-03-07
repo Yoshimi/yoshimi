@@ -33,6 +33,8 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <optional>
+#include <memory>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -52,6 +54,7 @@
 #include "Synth/OscilGen.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/PADnoteParameters.h"
+#include "Interface/InterfaceAnchor.h"
 
 using file::isRegularFile;
 using file::setExtension;
@@ -131,6 +134,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     midilearn(this),
     mididecode(this),
     Runtime(this, allArgs, getIsLV2Plugin()),
+    rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
     fadeStepShort(0),
@@ -148,11 +152,16 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     sent_buffersize(0),
     sent_bufferbytes(0),
     sent_buffersize_f(0),
+    sysEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    insEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    partEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
+    sysEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
+    insEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
+    partEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
     ctl(NULL),
     microtonal(this),
     fft(),
 #ifdef GUI_FLTK
-    guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
 #endif
@@ -313,41 +322,41 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.restoreSessionData(Runtime.StateFile);
     if (Runtime.paramsLoad.size())
     {
-        string file = setExtension(Runtime.paramsLoad, EXTEN::patchset);
+        string filename = setExtension(Runtime.paramsLoad, EXTEN::patchset);
         ShutUp();
-        if (!loadXML(file))
+        if (!loadXML(filename))
         {
-            Runtime.Log("Failed to load parameters " + file);
+            Runtime.Log("Failed to load parameters " + filename);
             Runtime.paramsLoad = "";
         }
     }
     if (Runtime.instrumentLoad.size())
     {
-        string feli = Runtime.instrumentLoad;
-        if (part[Runtime.load2part]->loadXMLinstrument(feli))
+        string filename = Runtime.instrumentLoad;
+        if (part[Runtime.load2part]->loadXMLinstrument(filename))
         {
             part[Runtime.load2part]->Penabled = 1;
-            Runtime.Log("Instrument file " + feli + " loaded");
+            Runtime.Log("Instrument file " + filename + " loaded");
         }
         else
         {
-            Runtime.Log("Failed to load instrument file " + feli);
+            Runtime.Log("Failed to load instrument file " + filename);
             Runtime.instrumentLoad = "";
         }
     }
     if (Runtime.midiLearnLoad.size())
     {
-        string feml = Runtime.midiLearnLoad;
-        if (midilearn.loadList(feml))
+        string filename = Runtime.midiLearnLoad;
+        if (midilearn.loadList(filename))
         {
 #ifdef GUI_FLTK
             midilearn.updateGui(); // does nothing if --no-gui
 #endif
-            Runtime.Log("midiLearn file " + feml + " loaded");
+            Runtime.Log("midiLearn file " + filename + " loaded");
         }
         else
         {
-            Runtime.Log("Failed to load midiLearn file " + feml);
+            Runtime.Log("Failed to load midiLearn file " + filename);
             Runtime.midiLearnLoad = "";
         }
     }
@@ -389,6 +398,86 @@ bail_out:
         sysefx[nefx] = NULL;
     }
     return false;
+}
+
+
+/**
+ * Prepare and wire a communication anchor, allowing the GUI to establish
+ * data connections with this SynthEngine. This InstanceAnchor record is
+ * pushed through the GuiDataExchange (maintained within InterChange,
+ * returning the index-slot allocated within the embedded data buffer.
+ */
+size_t SynthEngine::publishGuiAnchor()
+{
+    InterfaceAnchor anchorRecord;
+    anchorRecord.synth = this;
+    anchorRecord.synthID = uniqueId;
+
+    ///////////////////TODO 1/2024 : connect all routing-Tags used by embedded sub-components of the Synth
+    anchorRecord.sysEffectParam  = sysEffectUiCon;
+    anchorRecord.sysEffectEQ     = sysEqGraphUiCon;
+    anchorRecord.insEffectParam  = insEffectUiCon;
+    anchorRecord.insEffectEQ     = insEqGraphUiCon;
+    anchorRecord.partEffectParam = partEffectUiCon;
+    anchorRecord.partEffectEQ    = partEqGraphUiCon;
+
+    // store a copy into the data buffer for retrieval by the MasterUI
+    return rootCon.emplace(anchorRecord);
+}
+
+
+/**
+ * This function is invoked on the primary Synth instance after GUI becomes ready.
+ * TODO 3/2024 this is more of a draft, various points still to be worked out
+ * - multiple Synth instances??
+ * - GUI for LV2 plugin????!?
+ * - should run in the Synth thread (but as intial hack, it runs in the GUI thread)
+ */
+void SynthEngine::postGuiStartHook()
+{
+    Part& currPart{*part[getRuntime().currentPart]};
+    if (currPart.Pname != DEFAULT_NAME || currPart.Poriginal != UNTITLED)
+    {// Heuristics that probably an early load via config took place
+        maybePublishEffectsToGui();
+
+        // TODO 3/2024 another hack to force the GUI to do a refresh()
+        CommandBlock putData;
+        putData.data.source  = TOPLEVEL::action::toAll;
+        putData.data.control = MAIN::control::masterReset;
+        putData.data.part    = TOPLEVEL::section::main;
+        putData.data.value   = 0;
+        putData.data.type    = UNUSED;
+        putData.data.kit     = UNUSED;
+        putData.data.engine  = UNUSED;
+        putData.data.insert  = UNUSED;
+        putData.data.parameter = UNUSED;
+        putData.data.offset    = UNUSED;
+        putData.data.miscmsg   = UNUSED;
+        interchange.toGUI.write(putData.bytes);
+    }
+}
+
+
+#ifdef GUI_FLTK
+MasterUI *SynthEngine::getGuiMaster()
+{
+    return interchange.guiMaster.get();
+}
+
+void SynthEngine::closeGui()
+{
+    interchange.closeGui();
+}
+#endif /*GUI_FLTK*/
+
+void SynthEngine::guiClosed(bool stopSynth)
+{
+    if (stopSynth && !getIsLV2Plugin())
+        Runtime.runSynth = false;
+#ifdef GUI_FLTK
+    if (guiClosedCallback != NULL)
+        guiClosedCallback(guiCallbackArg);
+#endif
 }
 
 
@@ -458,6 +547,10 @@ void SynthEngine::defaults(void)
         for (int nefxto = 0; nefxto < NUM_SYS_EFX; ++nefxto)
             setPsysefxsend(nefx, nefxto, 0);
     }
+    // avoid direct GUI push-update from here, since it's already covered in
+    // getfromXML() and resetAll() -- which happens to cover all relevant cases
+    // see SynthEngine::maybePublishEffectsToGui()
+
     microtonal.defaults();
     setAllPartMaps();
     VUcount = 0;
@@ -1954,6 +2047,8 @@ void SynthEngine::resetAll(bool andML)
         midilearn.generalOperations(&putData);
         textMsgBuffer.clear();
     }
+    // possibly push changed effect state to GUI
+    maybePublishEffectsToGui();
 }
 
 
@@ -2418,6 +2513,12 @@ void SynthEngine::setPkeyshift(int Pkeyshift_)
 }
 
 
+void SynthEngine::setPaudiodest(int value)
+{
+    Paudiodest = value;
+}
+
+
 void SynthEngine::setPsysefxvol(int Ppart, int Pefx, char Pvol)
 {
     Psysefxvol[Pefx][Ppart] = Pvol;
@@ -2431,9 +2532,88 @@ void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
     sysefxsend[Pefxfrom][Pefxto]  = decibel<-40>(1.0f - Pvol / 96.0f);
 }
 
-void SynthEngine::setPaudiodest(int value)
+/**
+ * Triggered by Param change or general init;
+ * Collect current state of complex effect data and push an update towards GUI.
+ * The GuiDataExchange system (located in InterChange) is used to publish the
+ * Data Transfer Objects into the GUI, activated by sending a notification through
+ * the toGUI ringbuffer. When receiving such a push, the GUI invokes EffUI::refresh().
+ */
+void SynthEngine::pushEffectUpdate(uchar partNum)
 {
-    Paudiodest = value;
+    bool isPart{partNum < NUM_MIDI_PARTS};
+    bool isInsert{partNum != TOPLEVEL::section::systemEffects};
+
+    assert(isPart
+        || partNum == TOPLEVEL::section::systemEffects
+        || partNum == TOPLEVEL::section::insertEffects);
+    assert(part[getRuntime().currentPart]);
+    Part& currPart{*part[getRuntime().currentPart]};
+    // the "current" effect as selected / exposed in the GUI
+    uchar effnum = isPart? currPart.Peffnum
+                 : isInsert? inseffnum : syseffnum;
+    assert(effnum < (isPart? NUM_PART_EFX : isInsert? NUM_INS_EFX : NUM_SYS_EFX));
+
+    EffectMgr** effInstance = isPart? currPart.partefx
+                            : isInsert? insefx : sysefx;
+
+    EffectDTO dto;
+    dto.effNum = effnum;
+    dto.effType = effInstance[effnum]->geteffect();
+    dto.isInsert = isInsert;
+    dto.enabled  = (0 != dto.effType && ((isPart && !currPart.Pefxbypass[effnum])
+                                        ||(isInsert && Pinsparts[effnum] != -1)
+                                        ||(!isInsert && syseffEnable[effnum])));
+    dto.changed = effInstance[effnum]->geteffectpar(-1);
+    dto.currPreset = effInstance[effnum]->getpreset();
+    dto.insertFxRouting = isPart || !isInsert? -1 : Pinsparts[effnum];
+    dto.partFxRouting = !isPart?    +1 : currPart.Pefxroute[effnum];
+    dto.partFxBypass  = !isPart? false : currPart.Pefxbypass[effnum];
+    effInstance[effnum]->getAllPar(dto.param);
+    //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed
+    dto.eff_in_core_TODO_deprecated = effInstance[effnum];
+
+    if (isPart)
+        partEffectUiCon.publish(dto);
+    else if (isInsert)
+        insEffectUiCon.publish(dto);
+    else
+        sysEffectUiCon.publish(dto);
+
+    if (dto.effType == (EFFECT::type::eq - EFFECT::type::none))
+    {// cascading update for the embedded EQ graph
+        EqGraphDTO graphDto;
+        effInstance[effnum]->renderEQresponse(graphDto.response);
+        if (isPart)
+            partEqGraphUiCon.publish(graphDto);
+        else if (isInsert)
+            insEqGraphUiCon.publish(graphDto);
+        else
+            sysEqGraphUiCon.publish(graphDto);
+    }
+}
+
+
+/**
+ * Push a complete update of Effect state, in case the GUI is active.
+ * There are three distinct EffUI modules, each receiving the state of "the current"
+ * selected effect. Calling this function is only required when effect state changes
+ * are _not_ propagated via InterChange::commandSysIns(), commandEffects() or commandPart().
+ * Especially it must be invoked after loading or pasting state, and this is covered by getfromXML().
+ * Init() and defaults() do not call this function; either it is covered otherwise
+ * or because the default constructed GUI widgets do not need an initial push
+ * Thus, the only other situation to cover is a call to SynthEngine::resetAll().
+ */
+void SynthEngine::maybePublishEffectsToGui()
+{
+#ifdef GUI_FLTK
+    if (not interchange.guiMaster)
+        return; // publish only while GUI is active
+
+    pushEffectUpdate(TOPLEVEL::section::systemEffects);
+    pushEffectUpdate(TOPLEVEL::section::insertEffects);
+    pushEffectUpdate(getRuntime().currentPart);
+#endif
 }
 
 
@@ -2459,13 +2639,13 @@ void SynthEngine::ShutUp(void)
 bool SynthEngine::loadStateAndUpdate(const string& filename)
 {
     interchange.undoRedoClear();
-    defaults();
     //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
     Runtime.stateChanged = true;
-    bool result = Runtime.restoreSessionData(filename);
-    ShutUp();
-    return result;
+    bool success = Runtime.restoreSessionData(filename);
+    if (!success)
+        defaults();
+    return success;
 }
 
 
@@ -2491,25 +2671,18 @@ bool SynthEngine::installBanks()
 {
     string name = file::configDir() + '/' + YOSHIMI;
     string bankname = name + ".banks";
-    bool banksGood = false;
     bool newBanks = false;
     if (isRegularFile(bankname))
     {
-        XMLwrapper *xml = new XMLwrapper(this);
-        if (xml)
-        {
-            banksGood = true;
-            xml->loadXMLfile(bankname);
-            newBanks = bank.parseBanksFile(xml);
-            delete xml;
-        }
+        newBanks = bank.establishBanks(bankname);
     }
-    if (!banksGood){
-       newBanks = bank.parseBanksFile(NULL);
+    else
+    {
+       newBanks = bank.establishBanks(std::nullopt);
        Runtime.currentRoot = 5;
     }
-
     Runtime.Log("\nFound " + asString(bank.InstrumentsInBanks) + " instruments in " + asString(bank.BanksInRoots) + " banks");
+
     if (newBanks)
         Runtime.Log(textMsgBuffer.fetch(setRootBank(5, 5) & 0xff));
     else
@@ -2524,20 +2697,13 @@ bool SynthEngine::saveBanks()
     string bankname = name + ".banks";
     Runtime.xmlType = TOPLEVEL::XML::Bank;
 
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (!xml)
-    {
-        Runtime.Log("saveBanks failed xml allocation");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     xml->beginbranch("BANKLIST");
-    bank.saveToConfigFile(xml);
+    bank.saveToConfigFile(*xml);
     xml->endbranch();
 
     if (!xml->saveXMLfile(bankname))
         Runtime.Log("Failed to save config to " + bankname);
-
-    delete xml;
 
     return true;
 }
@@ -2662,17 +2828,11 @@ bool SynthEngine::loadHistory()
             return false;
         }
     }
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (!xml)
-    {
-        Runtime.Log("loadHistory failed XMLwrapper allocation");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     xml->loadXMLfile(historyname);
     if (!xml->enterbranch("HISTORY"))
     {
         Runtime. Log("extractHistoryData, no HISTORY branch");
-        delete xml;
         return false;
     }
     int hist_size;
@@ -2758,7 +2918,6 @@ bool SynthEngine::loadHistory()
         }
     }
     xml->exitbranch();
-    delete xml;
     return true;
 }
 
@@ -2768,12 +2927,7 @@ bool SynthEngine::saveHistory()
     string historyname = file::localDir()  + "/recent";
     Runtime.xmlType = TOPLEVEL::XML::History;
 
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (!xml)
-    {
-        Runtime.Log("saveHistory failed xml allocation");
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     xml->beginbranch("HISTORY");
     {
         int count;
@@ -2847,7 +3001,6 @@ bool SynthEngine::saveHistory()
     xml->endbranch();
     if (!xml->saveXMLfile(historyname))
         Runtime.Log("Failed to save data to " + historyname);
-    delete xml;
     return true;
 }
 
@@ -2875,20 +3028,16 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name
         Runtime.Log("Can't find " + file, _SYS_::LogNotSerious);
         return actualBase;
     }
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (!xml)
-    {
-        Runtime.Log("Load Vector failed XMLwrapper allocation", _SYS_::LogNotSerious);
-        return actualBase;
-    }
+
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     xml->loadXMLfile(file);
     if (!xml->enterbranch("VECTOR"))
     {
-            Runtime. Log("Extract Data, no VECTOR branch", _SYS_::LogNotSerious);
+        Runtime. Log("Extract Data, no VECTOR branch", _SYS_::LogNotSerious);
     }
     else
     {
-        actualBase = extractVectorData(baseChan, xml, findLeafName(name));
+        actualBase = extractVectorData(baseChan, *xml, findLeafName(name));
         int lastPart = NUM_MIDI_PARTS;
         if (Runtime.vectordata.Yaxis[actualBase] >= 0x7f)
             lastPart = NUM_MIDI_CHANNELS * 2;
@@ -2896,7 +3045,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name
         {
             if (xml->enterbranch("PART", npart))
             {
-                part[npart + actualBase]->getfromXML(xml);
+                part[npart + actualBase]->getfromXML(*xml);
                 part[npart + actualBase]->Prcvchn = actualBase;
                 xml->exitbranch();
                 setPartMap(npart + actualBase);
@@ -2908,19 +3057,18 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, const string& name
         }
         xml->endbranch(); // VECTOR
     }
-    delete xml;
     return actualBase;
 }
 
 
-unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper *xml, const string& name)
+unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name)
 {
     int lastPart = NUM_MIDI_PARTS;
     unsigned char tmp;
-    string newname = xml->getparstr("name");
+    string newname = xml.getparstr("name");
 
     if (baseChan >= NUM_MIDI_CHANNELS)
-        baseChan = xml->getpar255("Source_channel", 0);
+        baseChan = xml.getpar255("Source_channel", 0);
 
     if (newname > "!" && newname.find("No Name") != 1)
         Runtime.vectordata.Name[baseChan] = newname;
@@ -2929,7 +3077,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
     else
         Runtime.vectordata.Name[baseChan] = "No Name " + to_string(baseChan);
 
-    tmp = xml->getpar255("X_sweep_CC", 0xff);
+    tmp = xml.getpar255("X_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
     {
         Runtime.vectordata.Xaxis[baseChan] = tmp;
@@ -2943,7 +3091,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 
     // should exit here if not enabled
 
-    tmp = xml->getpar255("Y_sweep_CC", 0xff);
+    tmp = xml.getpar255("Y_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
         Runtime.vectordata.Yaxis[baseChan] = tmp;
     else
@@ -2957,47 +3105,47 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper 
 
     int x_feat = 0;
     int y_feat = 0;
-    if (xml->getparbool("X_feature_1", false))
+    if (xml.getparbool("X_feature_1", false))
         x_feat |= 1;
-    if (xml->getparbool("X_feature_2", false))
+    if (xml.getparbool("X_feature_2", false))
         x_feat |= 2;
-    if (xml->getparbool("X_feature_2_R", false))
+    if (xml.getparbool("X_feature_2_R", false))
         x_feat |= 0x10;
-    if (xml->getparbool("X_feature_4", false))
+    if (xml.getparbool("X_feature_4", false))
         x_feat |= 4;
-    if (xml->getparbool("X_feature_4_R", false))
+    if (xml.getparbool("X_feature_4_R", false))
         x_feat |= 0x20;
-    if (xml->getparbool("X_feature_8", false))
+    if (xml.getparbool("X_feature_8", false))
         x_feat |= 8;
-    if (xml->getparbool("X_feature_8_R", false))
+    if (xml.getparbool("X_feature_8_R", false))
         x_feat |= 0x40;
-    Runtime.vectordata.Xcc2[baseChan] = xml->getpar255("X_CCout_2", 10);
-    Runtime.vectordata.Xcc4[baseChan] = xml->getpar255("X_CCout_4", 74);
-    Runtime.vectordata.Xcc8[baseChan] = xml->getpar255("X_CCout_8", 1);
+    Runtime.vectordata.Xcc2[baseChan] = xml.getpar255("X_CCout_2", 10);
+    Runtime.vectordata.Xcc4[baseChan] = xml.getpar255("X_CCout_4", 74);
+    Runtime.vectordata.Xcc8[baseChan] = xml.getpar255("X_CCout_8", 1);
     if (lastPart == NUM_MIDI_PARTS)
     {
-        if (xml->getparbool("Y_feature_1", false))
+        if (xml.getparbool("Y_feature_1", false))
             y_feat |= 1;
-        if (xml->getparbool("Y_feature_2", false))
+        if (xml.getparbool("Y_feature_2", false))
             y_feat |= 2;
-        if (xml->getparbool("Y_feature_2_R", false))
+        if (xml.getparbool("Y_feature_2_R", false))
             y_feat |= 0x10;
-        if (xml->getparbool("Y_feature_4", false))
+        if (xml.getparbool("Y_feature_4", false))
             y_feat |= 4;
-        if (xml->getparbool("Y_feature_4_R", false))
+        if (xml.getparbool("Y_feature_4_R", false))
             y_feat |= 0x20;
-        if (xml->getparbool("Y_feature_8", false))
+        if (xml.getparbool("Y_feature_8", false))
             y_feat |= 8;
-        if (xml->getparbool("Y_feature_8_R", false))
+        if (xml.getparbool("Y_feature_8_R", false))
             y_feat |= 0x40;
-        Runtime.vectordata.Ycc2[baseChan] = xml->getpar255("Y_CCout_2", 10);
-        Runtime.vectordata.Ycc4[baseChan] = xml->getpar255("Y_CCout_4", 74);
-        Runtime.vectordata.Ycc8[baseChan] = xml->getpar255("Y_CCout_8", 1);
+        Runtime.vectordata.Ycc2[baseChan] = xml.getpar255("Y_CCout_2", 10);
+        Runtime.vectordata.Ycc4[baseChan] = xml.getpar255("Y_CCout_4", 74);
+        Runtime.vectordata.Ycc8[baseChan] = xml.getpar255("Y_CCout_8", 1);
     }
     Runtime.vectordata.Xfeatures[baseChan] = x_feat;
     Runtime.vectordata.Yfeatures[baseChan] = y_feat;
     if (Runtime.NumAvailableParts < lastPart)
-        Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
+        Runtime.NumAvailableParts = xml.getpar255("current_midi_parts", Runtime.NumAvailableParts);
     return baseChan;
 }
 
@@ -3017,14 +3165,10 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name
     string file = setExtension(name, EXTEN::vector);
 
     Runtime.xmlType = TOPLEVEL::XML::Vector;
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (!xml)
-    {
-        Runtime.Log("Save Vector failed xml allocation", 2);
-        return textMsgBuffer.push("FAIL");
-    }
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
+
     xml->beginbranch("VECTOR");
-        insertVectorData(baseChan, true, xml, findLeafName(file));
+        insertVectorData(baseChan, true, *xml, findLeafName(file));
     xml->endbranch();
 
     if (!xml->saveXMLfile(file))
@@ -3032,135 +3176,134 @@ unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name
         Runtime.Log("Failed to save data to " + file, _SYS_::LogNotSerious);
         result = textMsgBuffer.push("FAIL");
     }
-    delete xml;
     return result;
 }
 
 
-bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml, const string& name)
+bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name)
 {
     int lastPart = NUM_MIDI_PARTS;
     int x_feat = Runtime.vectordata.Xfeatures[baseChan];
     int y_feat = Runtime.vectordata.Yfeatures[baseChan];
 
     if (Runtime.vectordata.Name[baseChan].find("No Name") != 1)
-        xml->addparstr("name", Runtime.vectordata.Name[baseChan]);
+        xml.addparstr("name", Runtime.vectordata.Name[baseChan]);
     else
-        xml->addparstr("name", name);
+        xml.addparstr("name", name);
 
-    xml->addpar("Source_channel", baseChan);
-    xml->addpar("X_sweep_CC", Runtime.vectordata.Xaxis[baseChan]);
-    xml->addpar("Y_sweep_CC", Runtime.vectordata.Yaxis[baseChan]);
-    xml->addparbool("X_feature_1", (x_feat & 1) > 0);
-    xml->addparbool("X_feature_2", (x_feat & 2) > 0);
-    xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
-    xml->addparbool("X_feature_4", (x_feat & 4) > 0);
-    xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
-    xml->addparbool("X_feature_8", (x_feat & 8) > 0);
-    xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
-    xml->addpar("X_CCout_2",Runtime.vectordata.Xcc2[baseChan]);
-    xml->addpar("X_CCout_4",Runtime.vectordata.Xcc4[baseChan]);
-    xml->addpar("X_CCout_8",Runtime.vectordata.Xcc8[baseChan]);
+    xml.addpar("Source_channel", baseChan);
+    xml.addpar("X_sweep_CC", Runtime.vectordata.Xaxis[baseChan]);
+    xml.addpar("Y_sweep_CC", Runtime.vectordata.Yaxis[baseChan]);
+    xml.addparbool("X_feature_1", (x_feat & 1) > 0);
+    xml.addparbool("X_feature_2", (x_feat & 2) > 0);
+    xml.addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
+    xml.addparbool("X_feature_4", (x_feat & 4) > 0);
+    xml.addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
+    xml.addparbool("X_feature_8", (x_feat & 8) > 0);
+    xml.addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
+    xml.addpar("X_CCout_2",Runtime.vectordata.Xcc2[baseChan]);
+    xml.addpar("X_CCout_4",Runtime.vectordata.Xcc4[baseChan]);
+    xml.addpar("X_CCout_8",Runtime.vectordata.Xcc8[baseChan]);
     if (Runtime.vectordata.Yaxis[baseChan] > 0x7f)
     {
         lastPart /= 2;
     }
     else
     {
-        xml->addparbool("Y_feature_1", (y_feat & 1) > 0);
-        xml->addparbool("Y_feature_2", (y_feat & 2) > 0);
-        xml->addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
-        xml->addparbool("Y_feature_4", (y_feat & 4) > 0);
-        xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
-        xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
-        xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
-        xml->addpar("Y_CCout_2",Runtime.vectordata.Ycc2[baseChan]);
-        xml->addpar("Y_CCout_4",Runtime.vectordata.Ycc4[baseChan]);
-        xml->addpar("Y_CCout_8",Runtime.vectordata.Ycc8[baseChan]);
+        xml.addparbool("Y_feature_1", (y_feat & 1) > 0);
+        xml.addparbool("Y_feature_2", (y_feat & 2) > 0);
+        xml.addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
+        xml.addparbool("Y_feature_4", (y_feat & 4) > 0);
+        xml.addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
+        xml.addparbool("Y_feature_8", (y_feat & 8) > 0);
+        xml.addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
+        xml.addpar("Y_CCout_2",Runtime.vectordata.Ycc2[baseChan]);
+        xml.addpar("Y_CCout_4",Runtime.vectordata.Ycc4[baseChan]);
+        xml.addpar("Y_CCout_8",Runtime.vectordata.Ycc8[baseChan]);
     }
     if (full)
     {
-        xml->addpar("current_midi_parts", lastPart);
+        xml.addpar("current_midi_parts", lastPart);
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
-            xml->beginbranch("PART",npart);
+            xml.beginbranch("PART",npart);
             part[npart + baseChan]->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
     }
     return true;
 }
 
 
-void SynthEngine::add2XML(XMLwrapper *xml)
+void SynthEngine::add2XML(XMLwrapper& xml)
 {
-    xml->beginbranch("MASTER");
-    xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
-    xml->addpar("panning_law", Runtime.panLaw);
-    xml->addparcombi("volume", Pvolume);
-    xml->addpar("key_shift", Pkeyshift);
-    xml->addparreal("bpm_fallback", PbpmFallback);
-    xml->addpar("channel_switch_type", Runtime.channelSwitchType);
-    xml->addpar("channel_switch_CC", Runtime.channelSwitchCC);
+    xml.beginbranch("MASTER");
+    xml.addpar("current_midi_parts", Runtime.NumAvailableParts);
+    xml.addpar("panning_law", Runtime.panLaw);
+    xml.addparcombi("volume", Pvolume);
+    xml.addpar("key_shift", Pkeyshift);
+    xml.addparreal("bpm_fallback", PbpmFallback);
+    xml.addpar("channel_switch_type", Runtime.channelSwitchType);
+    xml.addpar("channel_switch_CC", Runtime.channelSwitchCC);
 
-    xml->beginbranch("MICROTONAL");
+    xml.beginbranch("MICROTONAL");
     microtonal.add2XML(xml);
-    xml->endbranch();
+    xml.endbranch();
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        xml->beginbranch("PART",npart);
+        xml.beginbranch("PART",npart);
         part[npart]->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
     }
 
-    xml->beginbranch("SYSTEM_EFFECTS");
+    xml.beginbranch("SYSTEM_EFFECTS");
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        xml->beginbranch("SYSTEM_EFFECT", nefx);
-        xml->beginbranch("EFFECT");
+        xml.beginbranch("SYSTEM_EFFECT", nefx);
+        xml.beginbranch("EFFECT");
         sysefx[nefx]->add2XML(xml);
-        xml->endbranch();
+        xml.endbranch();
 
         for (int pefx = 0; pefx < NUM_MIDI_PARTS; ++pefx)
         {
-            xml->beginbranch("VOLUME", pefx);
-            xml->addpar("vol", Psysefxvol[nefx][pefx]);
-            xml->endbranch();
+            xml.beginbranch("VOLUME", pefx);
+            xml.addpar("vol", Psysefxvol[nefx][pefx]);
+            xml.endbranch();
         }
 
         for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
         {
-            xml->beginbranch("SENDTO", tonefx);
-            xml->addpar("send_vol", Psysefxsend[nefx][tonefx]);
-            xml->endbranch();
+            xml.beginbranch("SENDTO", tonefx);
+            xml.addpar("send_vol", Psysefxsend[nefx][tonefx]);
+            xml.endbranch();
         }
-        xml->endbranch();
+        xml.endbranch();
     }
-    xml->endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("INSERTION_EFFECTS");
+    xml.beginbranch("INSERTION_EFFECTS");
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        xml->beginbranch("INSERTION_EFFECT", nefx);
-        xml->addpar("part", Pinsparts[nefx]);
+        xml.beginbranch("INSERTION_EFFECT", nefx);
+        xml.addpar("part", Pinsparts[nefx]);
 
-        xml->beginbranch("EFFECT");
+        xml.beginbranch("EFFECT");
         insefx[nefx]->add2XML(xml);
-        xml->endbranch();
-        xml->endbranch();
+        xml.endbranch();
+        xml.endbranch();
     }
-    xml->endbranch(); // INSERTION_EFFECTS
+    xml.endbranch(); // INSERTION_EFFECTS
     for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
     {
         if (Runtime.vectordata.Xaxis[i] < 127)
         {
-            xml->beginbranch("VECTOR", i);
+            xml.beginbranch("VECTOR", i);
             insertVectorData(i, false, xml, "");
-            xml->endbranch(); // VECTOR
+            xml.endbranch(); // VECTOR
         }
     }
-    xml->endbranch(); // MASTER
+    xml.endbranch(); // MASTER
 }
 
 
@@ -3170,11 +3313,10 @@ int SynthEngine::getalldata(char **data) // to state from instance
     bool oldFormat = usingYoshiType;
     usingYoshiType = true; // make sure everything is saved
     getRuntime().xmlType = TOPLEVEL::XML::State;
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    add2XML(xml);
-    midilearn.insertMidiListData(xml);
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    add2XML(*xml);
+    midilearn.insertMidiListData(*xml);
     *data = xml->getXMLdata();
-    delete xml;
     usingYoshiType = oldFormat;
     return strlen(*data) + 1;
 }
@@ -3186,18 +3328,16 @@ void SynthEngine::putalldata(const char *data, int size) // to instance from sta
     while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
-    XMLwrapper *xml = new XMLwrapper(this, true);
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     if (!xml->putXMLdata(data))
     {
         Runtime.Log("SynthEngine: putXMLdata failed");
-        delete xml;
         return;
     }
     defaults();
-    getfromXML(xml);
-    midilearn.extractMidiListData(false, xml);
+    getfromXML(*xml);
+    midilearn.extractMidiListData(false, *xml);
     setAllPartMaps();
-    delete xml;
 //std::cout << "putend" << std::endl;
 }
 
@@ -3208,125 +3348,119 @@ bool SynthEngine::savePatchesXML(string filename)
     usingYoshiType = true; // make sure everything is saved
     filename = setExtension(filename, EXTEN::patchset);
     Runtime.xmlType = TOPLEVEL::XML::Patch;
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    add2XML(xml);
-    bool result = xml->saveXMLfile(filename);
-    delete xml;
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    add2XML(*xml);
+    bool succes = xml->saveXMLfile(filename);
     usingYoshiType = oldFormat;
-    return result;
+    return succes;
 }
 
 
 bool SynthEngine::loadXML(const string& filename)
 {
-    XMLwrapper *xml = new XMLwrapper(this, true);
-    if (NULL == xml)
-    {
-        Runtime.Log("Failed to init xml tree", _SYS_::LogNotSerious);
-        return false;
-    }
+    auto xml{std::make_unique<XMLwrapper>(this, true)};
     if (!xml->loadXMLfile(filename))
     {
-        delete xml;
         return false;
     }
     defaults();
-    bool isok = getfromXML(xml);
-    delete xml;
+    bool success = getfromXML(*xml);
     setAllPartMaps();
-    return isok;
+    return success;
 }
 
 
-bool SynthEngine::getfromXML(XMLwrapper *xml)
+bool SynthEngine::getfromXML(XMLwrapper& xml)
 {
-    if (!xml->enterbranch("MASTER"))
+    if (!xml.enterbranch("MASTER"))
     {
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");
         return false;
     }
-    Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
-    Runtime.panLaw = xml->getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
-    setPvolume(xml->getparcombi("volume", Pvolume, 0, 127));
-    setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    PbpmFallback = xml->getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
-    Runtime.channelSwitchCC = xml->getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
+    Runtime.NumAvailableParts = xml.getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
+    Runtime.panLaw = xml.getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
+    setPvolume(xml.getparcombi("volume", Pvolume, 0, 127));
+    setPkeyshift(xml.getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    PbpmFallback = xml.getparreal("bpm_fallback", PbpmFallback, BPM_FALLBACK_MIN, BPM_FALLBACK_MAX);
+    Runtime.channelSwitchType = xml.getpar("channel_switch_type", Runtime.channelSwitchType, 0, 5);
+    Runtime.channelSwitchCC = xml.getpar("channel_switch_CC", Runtime.channelSwitchCC, 0, 128);
     Runtime.channelSwitchValue = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if (!xml->enterbranch("PART", npart))
+        if (!xml.enterbranch("PART", npart))
             continue;
         part[npart]->getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
         if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
             mainRegisterAudioPort(this, npart);
     }
 
-    if (xml->enterbranch("MICROTONAL"))
+    if (xml.enterbranch("MICROTONAL"))
     {
         microtonal.getfromXML(xml);
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    sysefx[0]->changeeffect(0);
-    if (xml->enterbranch("SYSTEM_EFFECTS"))
+    sysefx[0]->defaults();
+    if (xml.enterbranch("SYSTEM_EFFECTS"))
     {
         for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         {
-            if (!xml->enterbranch("SYSTEM_EFFECT", nefx))
+            if (!xml.enterbranch("SYSTEM_EFFECT", nefx))
                 continue;
-            if (xml->enterbranch("EFFECT"))
+            if (xml.enterbranch("EFFECT"))
             {
                 sysefx[nefx]->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
 
             for (int partefx = 0; partefx < NUM_MIDI_PARTS; ++partefx)
             {
-                if (!xml->enterbranch("VOLUME", partefx))
+                if (!xml.enterbranch("VOLUME", partefx))
                     continue;
-                setPsysefxvol(partefx, nefx,xml->getpar127("vol", Psysefxvol[partefx][nefx]));
-                xml->exitbranch();
+                setPsysefxvol(partefx, nefx,xml.getpar127("vol", Psysefxvol[partefx][nefx]));
+                xml.exitbranch();
             }
 
             for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
             {
-                if (!xml->enterbranch("SENDTO", tonefx))
+                if (!xml.enterbranch("SENDTO", tonefx))
                     continue;
-                setPsysefxsend(nefx, tonefx, xml->getpar127("send_vol", Psysefxsend[nefx][tonefx]));
-                xml->exitbranch();
+                setPsysefxsend(nefx, tonefx, xml.getpar127("send_vol", Psysefxsend[nefx][tonefx]));
+                xml.exitbranch();
             }
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    if (xml->enterbranch("INSERTION_EFFECTS"))
+    if (xml.enterbranch("INSERTION_EFFECTS"))
     {
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         {
-            if (!xml->enterbranch("INSERTION_EFFECT", nefx))
+            if (!xml.enterbranch("INSERTION_EFFECT", nefx))
                 continue;
-            Pinsparts[nefx] = xml->getpar("part", Pinsparts[nefx], -2, NUM_MIDI_PARTS);
-            if (xml->enterbranch("EFFECT"))
+            Pinsparts[nefx] = xml.getpar("part", Pinsparts[nefx], -2, NUM_MIDI_PARTS);
+            if (xml.enterbranch("EFFECT"))
             {
                 insefx[nefx]->getfromXML(xml);
-                xml->exitbranch();
+                xml.exitbranch();
             }
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
     for (unsigned char i = 0; i < NUM_MIDI_CHANNELS; ++i)
     {
-        if (xml->enterbranch("VECTOR", i))
+        if (xml.enterbranch("VECTOR", i))
         {
             extractVectorData(i, xml, "");
-            xml->endbranch();
+            xml.endbranch();
         }
     }
-    xml->endbranch(); // MASTER
+    xml.endbranch(); // MASTER
+    // possibly push changed effect state to GUI
+    maybePublishEffectsToGui();
     return true;
 }
 
@@ -3344,35 +3478,7 @@ SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
     synth = synthInstances.begin()->first;
     return synth;
 }
-#ifdef GUI_FLTK
-MasterUI *SynthEngine::getGuiMaster(bool createGui)
-{
-    if (guiMaster == NULL && createGui)
-        guiMaster = new MasterUI(this);
-    return guiMaster;
-}
-#endif
 
-void SynthEngine::guiClosed(bool stopSynth)
-{
-    if (stopSynth && !getIsLV2Plugin())
-        Runtime.runSynth = false;
-#ifdef GUI_FLTK
-    if (guiClosedCallback != NULL)
-        guiClosedCallback(guiCallbackArg);
-#endif
-}
-
-#ifdef GUI_FLTK
-void SynthEngine::closeGui()
-{
-    if (guiMaster != NULL)
-    {
-        delete guiMaster;
-        guiMaster = NULL;
-    }
-}
-#endif
 
 
 string SynthEngine::makeUniqueName(const string& name)

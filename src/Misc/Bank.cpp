@@ -74,6 +74,7 @@ using func::findSplitPoint;
 using func::isDigits;
 
 using std::list;
+using std::optional;
 using std::to_string;
 using std::string;
 using std::cout;
@@ -1128,9 +1129,8 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, c
         checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
     unsigned int names = 0;
     int type = 0;
-    XMLwrapper *xml = new XMLwrapper(synth, true, false);
+    auto xml{std::make_unique<XMLwrapper>(synth, true, false)};
     xml->checkfileinformation(checkfile, names, type);
-    delete xml;
 
     instrRef.type = type;
     instrRef.ADDsynth_used = (names & 1);
@@ -1296,6 +1296,8 @@ size_t Bank::generateSingleRoot(const string& newRoot, bool clear)
 
     if (clear)
         synth->part[npart]->defaultsinstrument();
+
+    synth->maybePublishEffectsToGui();
     return idx;
 }
 
@@ -1528,7 +1530,7 @@ size_t Bank::addRootDir(const string& newRootDir)
 }
 
 
-bool Bank::parseBanksFile(XMLwrapper *xml)
+bool Bank::establishBanks(optional<string> bankFile)
 {
     /*
      * This list is used in transferDefaultDirs( to find and copy
@@ -1559,17 +1561,23 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
     bool newRoots = true;
     roots.clear();
 
-    if (xml)
+    if (bankFile)
     {
-        if (xml->enterbranch("INFORMATION"))
-        { // going negative to catch all previous versions and to be backward compatible
-            writeVersion(xml->getpar("Banks_Version", 0, 0, 999));
-            xml->exitbranch();
+        auto xml{std::make_unique<XMLwrapper>(synth)};
+        if (xml->loadXMLfile(*bankFile))
+        {
+            if (xml->enterbranch("INFORMATION"))
+            { // going negative to catch all previous versions and to be backward compatible
+                writeVersion(xml->getpar("Banks_Version", 0, 0, 999));
+                xml->exitbranch();
+            }
+            if (xml->enterbranch("BANKLIST"))
+            {
+                loadFromConfigFile(*xml);
+                newRoots = false;
+            }
         }
-        if (xml->enterbranch("BANKLIST"))
-            newRoots = false;
     }
-
 
     if (newRoots)
     {
@@ -1588,56 +1596,6 @@ bool Bank::parseBanksFile(XMLwrapper *xml)
         }
         synth->getRuntime().currentRoot = 5;
         synth->getRuntime().banksChecked = true;
-    }
-
-
-    if (!newRoots)
-    {
-        string nodename = "BANKROOT";
-        for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        {
-            if (xml->enterbranch(nodename, i))
-            {
-                string dir = xml->getparstr("bank_root");
-                if (!dir.empty())
-                {
-                    size_t newIndex = addRootDir(dir);
-                    if (newIndex != i)
-                    {
-                        changeRootID(newIndex, i);
-                    }
-                    for (size_t k = 0; k < MAX_INSTRUMENTS_IN_BANK; k++)
-                    {
-                        if (xml->enterbranch("bank_id", k))
-                        {
-                            string bankDirname = xml->getparstr("dirname");
-                            roots[i].banks[k].dirname = bankDirname;
-                            BankEntry &bank = roots [i].banks [k];
-                            size_t pos = 0;
-                            while (pos < MAX_INSTRUMENTS_IN_BANK)
-                            {
-                                if (xml->enterbranch("instrument_id", pos))
-                                {
-                                    bank.instruments[pos].used = xml->getparbool("isUsed", false);
-                                    bank.instruments[pos].name = xml->getparstr("listname");
-                                    bank.instruments[pos].filename = xml->getparstr("filename");
-                                    bank.instruments[pos].type = xml->getpar("type",0 , -50, 100);
-                                    bank.instruments[pos].ADDsynth_used = xml->getparbool("ADDsynth", false);
-                                    bank.instruments[pos].SUBsynth_used = xml->getparbool("SUBsynth", false);
-                                    bank.instruments[pos].PADsynth_used = xml->getparbool("PADsynth", false);
-                                    bank.instruments[pos].yoshiType = xml->getparbool("Yoshimi", false);
-                                    xml->exitbranch();
-                                }
-                                ++pos;
-                            }
-                            xml->exitbranch();
-                        }
-                    }
-                }
-                xml->exitbranch();
-            }
-        }
-        xml->exitbranch();
     }
 
     if (!synth->getRuntime().rootDefine.empty())
@@ -1818,7 +1776,7 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
 }
 
 
-void Bank::saveToConfigFile(XMLwrapper *xml)
+void Bank::saveToConfigFile(XMLwrapper& xml)
 {
     writeVersion(BANKS_VERSION); // set current format
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
@@ -1827,13 +1785,13 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
         {
             string nodename = "BANKROOT";
 
-            xml->beginbranch(nodename, i);
-            xml->addparstr("bank_root", roots [i].path);
+            xml.beginbranch(nodename, i);
+            xml.addparstr("bank_root", roots [i].path);
             BankEntryMap::const_iterator it;
             for (it = roots [i].banks.begin(); it != roots [i].banks.end(); ++it)
             {
-                xml->beginbranch("bank_id", it->first);
-                xml->addparstr("dirname", it->second.dirname);
+                xml.beginbranch("bank_id", it->first);
+                xml.addparstr("dirname", it->second.dirname);
                 BankEntry &bank = roots [i].banks [it->first];
                 size_t pos = 0;
 
@@ -1841,24 +1799,74 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
                 {
                     if (bank.instruments [pos].used)
                     {
-                        xml->beginbranch("instrument_id", pos);
-                        xml->addparbool("isUsed", bank.instruments [pos].used);
-                        xml->addparstr("listname", bank.instruments [pos].name);
-                        xml->addparstr("filename", bank.instruments [pos].filename);
-                        xml->addpar("type", bank.instruments [pos].type);
-                        xml->addparbool("ADDsynth", bank.instruments [pos].ADDsynth_used);
-                        xml->addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
-                        xml->addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
-                        xml->addparbool("Yoshimi", bank.instruments [pos].yoshiType);
+                        xml.beginbranch("instrument_id", pos);
+                        xml.addparbool("isUsed", bank.instruments [pos].used);
+                        xml.addparstr("listname", bank.instruments [pos].name);
+                        xml.addparstr("filename", bank.instruments [pos].filename);
+                        xml.addpar("type", bank.instruments [pos].type);
+                        xml.addparbool("ADDsynth", bank.instruments [pos].ADDsynth_used);
+                        xml.addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
+                        xml.addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
+                        xml.addparbool("Yoshimi", bank.instruments [pos].yoshiType);
                         //cout << bank.instruments [pos].filename << endl;
-                        xml->endbranch();
+                        xml.endbranch();
                     }
                     ++pos;
                 }
-                xml->endbranch();
+                xml.endbranch();
             }
 
-            xml->endbranch();
+            xml.endbranch();
         }
     }
+}
+
+
+void Bank::loadFromConfigFile(XMLwrapper& xml)
+{
+    string nodename = "BANKROOT";
+    for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        if (xml.enterbranch(nodename, i))
+        {
+            string dir = xml.getparstr("bank_root");
+            if (!dir.empty())
+            {
+                size_t newIndex = addRootDir(dir);
+                if (newIndex != i)
+                {
+                    changeRootID(newIndex, i);
+                }
+                for (size_t k = 0; k < MAX_INSTRUMENTS_IN_BANK; k++)
+                {
+                    if (xml.enterbranch("bank_id", k))
+                    {
+                        string bankDirname = xml.getparstr("dirname");
+                        roots[i].banks[k].dirname = bankDirname;
+                        BankEntry &bank = roots [i].banks [k];
+                        size_t pos = 0;
+                        while (pos < MAX_INSTRUMENTS_IN_BANK)
+                        {
+                            if (xml.enterbranch("instrument_id", pos))
+                            {
+                                bank.instruments[pos].used     = xml.getparbool("isUsed", false);
+                                bank.instruments[pos].name     = xml.getparstr("listname");
+                                bank.instruments[pos].filename = xml.getparstr("filename");
+                                bank.instruments[pos].type     = xml.getpar("type",0 , -50, 100);
+                                bank.instruments[pos].ADDsynth_used = xml.getparbool("ADDsynth", false);
+                                bank.instruments[pos].SUBsynth_used = xml.getparbool("SUBsynth", false);
+                                bank.instruments[pos].PADsynth_used = xml.getparbool("PADsynth", false);
+                                bank.instruments[pos].yoshiType = xml.getparbool("Yoshimi", false);
+                                xml.exitbranch();
+                            }
+                            ++pos;
+                        }
+                        xml.exitbranch();
+                    }
+                }
+            }
+            xml.exitbranch();
+        }
+    }
+    xml.exitbranch();
 }

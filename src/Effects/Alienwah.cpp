@@ -120,13 +120,13 @@ void Alienwah::cleanup(void)
 
 
 // Parameter control
-void Alienwah::setdepth(unsigned char _depth)
+void Alienwah::setdepth(uchar _depth)
 {
     Pdepth = _depth;
     depth = Pdepth / 127.0f;
 }
 
-void Alienwah::setfb(unsigned char _fb)
+void Alienwah::setfb(uchar _fb)
 {
     Pfb = _fb;
     fb = fabs((Pfb - 64.0f) / 64.1f);
@@ -138,7 +138,7 @@ void Alienwah::setfb(unsigned char _fb)
 }
 
 
-void Alienwah::setvolume(unsigned char _volume)
+void Alienwah::setvolume(uchar _volume)
 {
     Pvolume = _volume;
     float tmp = Pvolume / 127.0f;
@@ -150,14 +150,14 @@ void Alienwah::setvolume(unsigned char _volume)
 }
 
 
-void Alienwah::setphase(unsigned char _phase)
+void Alienwah::setphase(uchar _phase)
 {
     Pphase = _phase;
     phase = (Pphase - 64.0f) / 64.0f * PI;
 }
 
 
-void Alienwah::setdelay(unsigned char _delay)
+void Alienwah::setdelay(uchar _delay)
 {
     if (oldl != NULL)
         delete [] oldl;
@@ -170,7 +170,7 @@ void Alienwah::setdelay(unsigned char _delay)
 }
 
 
-void Alienwah::setpreset(unsigned char npreset)
+void Alienwah::setpreset(uchar npreset)
 {
     if (npreset < 0xf)
     {
@@ -186,8 +186,8 @@ void Alienwah::setpreset(unsigned char npreset)
     }
     else
     {
-        unsigned char preset = npreset & 0xf;
-        unsigned char param = npreset >> 4;
+        uchar preset = npreset & 0xf;
+        uchar param = npreset >> 4;
         if (param == 0xf)
             param = 0;
         changepar(param, alienPresets[preset][param]);
@@ -198,7 +198,7 @@ void Alienwah::setpreset(unsigned char npreset)
 }
 
 
-void Alienwah::changepar(int npar, unsigned char value)
+void Alienwah::changepar(int npar, uchar value)
 {
     if (npar == -1)
     {
@@ -255,7 +255,7 @@ void Alienwah::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Alienwah::getpar(int npar)
+uchar Alienwah::getpar(int npar) const
 {
     switch (npar)
     {
@@ -290,8 +290,8 @@ float Alienlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = alienPresets[presetNum][control];
-    unsigned char canLearn = TOPLEVEL::type::Learnable;
-    unsigned char isInteger = TOPLEVEL::type::Integer;
+    uchar canLearn = TOPLEVEL::type::Learnable;
+    uchar isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:

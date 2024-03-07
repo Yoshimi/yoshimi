@@ -119,97 +119,97 @@ void SUBnoteParameters::setPan(char pan, unsigned char panLaw)
 }
 
 
-void SUBnoteParameters::add2XML(XMLwrapper *xml)
+void SUBnoteParameters::add2XML(XMLwrapper& xml)
 {
     // currently not used
     // bool yoshiFormat = synth->usingYoshiType;
-    xml->information.SUBsynth_used = 1;
+    xml.information.SUBsynth_used = 1;
 
-    xml->addpar("num_stages",Pnumstages);
-    xml->addpar("harmonic_mag_type",Phmagtype);
-    xml->addpar("start",Pstart);
+    xml.addpar("num_stages",Pnumstages);
+    xml.addpar("harmonic_mag_type",Phmagtype);
+    xml.addpar("start",Pstart);
 
-    xml->beginbranch("HARMONICS");
-    for (int i=0;i<MAX_SUB_HARMONICS;i++)
+    xml.beginbranch("HARMONICS");
+    for (int i=0; i<MAX_SUB_HARMONICS; i++)
     {
-        if ((Phmag[i]==0)&&(xml->minimal)) continue;
-        xml->beginbranch("HARMONIC",i);
-        xml->addpar("mag",Phmag[i]);
-        xml->addpar("relbw",Phrelbw[i]);
-        xml->endbranch();
+        if ((Phmag[i]==0) && (xml.minimal)) continue;
+        xml.beginbranch("HARMONIC",i);
+        xml.addpar("mag",Phmag[i]);
+        xml.addpar("relbw",Phrelbw[i]);
+        xml.endbranch();
     }
-    xml->endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("AMPLITUDE_PARAMETERS");
-        xml->addparbool("stereo", (Pstereo) ? 1 : 0);
-        xml->addpar("volume",PVolume);
+    xml.beginbranch("AMPLITUDE_PARAMETERS");
+        xml.addparbool("stereo", (Pstereo) ? 1 : 0);
+        xml.addpar("volume",PVolume);
         // new yoshi type
-        xml->addpar("pan_pos", PPanning);
-        xml->addparbool("random_pan", PRandom);
-        xml->addpar("random_width", PWidth);
+        xml.addpar("pan_pos", PPanning);
+        xml.addparbool("random_pan", PRandom);
+        xml.addpar("random_width", PWidth);
 
         // legacy
         if (PRandom)
-            xml->addpar("panning", 0);
+            xml.addpar("panning", 0);
         else
-            xml->addpar("panning",PPanning);
+            xml.addpar("panning",PPanning);
 
-        xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
-        xml->beginbranch("AMPLITUDE_ENVELOPE");
+        xml.addpar("velocity_sensing",PAmpVelocityScaleFunction);
+        xml.beginbranch("AMPLITUDE_ENVELOPE");
             AmpEnvelope->add2XML(xml);
-        xml->endbranch();
-    xml->endbranch();
+        xml.endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("FREQUENCY_PARAMETERS");
-        xml->addparbool("fixed_freq",Pfixedfreq);
-        xml->addpar("fixed_freq_et",PfixedfreqET);
-        xml->addpar("bend_adjust", PBendAdjust);
-        xml->addpar("offset_hz", POffsetHz);
+    xml.beginbranch("FREQUENCY_PARAMETERS");
+        xml.addparbool("fixed_freq",Pfixedfreq);
+        xml.addpar("fixed_freq_et",PfixedfreqET);
+        xml.addpar("bend_adjust", PBendAdjust);
+        xml.addpar("offset_hz", POffsetHz);
 
-        xml->addpar("detune",PDetune);
-        xml->addpar("coarse_detune",PCoarseDetune);
-        xml->addpar("overtone_spread_type", POvertoneSpread.type);
-        xml->addpar("overtone_spread_par1", POvertoneSpread.par1);
-        xml->addpar("overtone_spread_par2", POvertoneSpread.par2);
-        xml->addpar("overtone_spread_par3", POvertoneSpread.par3);
-        xml->addpar("detune_type",PDetuneType);
+        xml.addpar("detune",PDetune);
+        xml.addpar("coarse_detune",PCoarseDetune);
+        xml.addpar("overtone_spread_type", POvertoneSpread.type);
+        xml.addpar("overtone_spread_par1", POvertoneSpread.par1);
+        xml.addpar("overtone_spread_par2", POvertoneSpread.par2);
+        xml.addpar("overtone_spread_par3", POvertoneSpread.par3);
+        xml.addpar("detune_type",PDetuneType);
 
-        xml->addpar("bandwidth",Pbandwidth);
-        xml->addpar("bandwidth_scale",Pbwscale);
+        xml.addpar("bandwidth",Pbandwidth);
+        xml.addpar("bandwidth_scale",Pbwscale);
 
-        xml->addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-        if ((PFreqEnvelopeEnabled!=0)||(!xml->minimal))
+        xml.addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
+        if ((PFreqEnvelopeEnabled!=0)||(!xml.minimal))
         {
-            xml->beginbranch("FREQUENCY_ENVELOPE");
+            xml.beginbranch("FREQUENCY_ENVELOPE");
             FreqEnvelope->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
 
-        xml->addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-        if ((PBandWidthEnvelopeEnabled!=0)||(!xml->minimal))
+        xml.addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
+        if ((PBandWidthEnvelopeEnabled!=0)||(!xml.minimal))
         {
-            xml->beginbranch("BANDWIDTH_ENVELOPE");
+            xml.beginbranch("BANDWIDTH_ENVELOPE");
                 BandWidthEnvelope->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
-    xml->endbranch();
+    xml.endbranch();
 
-    xml->beginbranch("FILTER_PARAMETERS");
-        xml->addparbool("enabled",PGlobalFilterEnabled);
-        if ((PGlobalFilterEnabled!=0)||(!xml->minimal))
+    xml.beginbranch("FILTER_PARAMETERS");
+        xml.addparbool("enabled",PGlobalFilterEnabled);
+        if ((PGlobalFilterEnabled!=0)||(!xml.minimal))
         {
-            xml->beginbranch("FILTER");
+            xml.beginbranch("FILTER");
                 GlobalFilter->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
 
-            xml->addpar("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
-            xml->addpar("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
+            xml.addpar("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
+            xml.addpar("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
 
-            xml->beginbranch("FILTER_ENVELOPE");
+            xml.beginbranch("FILTER_ENVELOPE");
                 GlobalFilterEnvelope->add2XML(xml);
-            xml->endbranch();
+            xml.endbranch();
         }
-        xml->endbranch();
+        xml.endbranch();
 }
 
 
@@ -280,40 +280,40 @@ void SUBnoteParameters::updateFrequencyMultipliers(void)
 }
 
 
-void SUBnoteParameters::getfromXML(XMLwrapper *xml)
+void SUBnoteParameters::getfromXML(XMLwrapper& xml)
 {
-    Pnumstages=xml->getpar127("num_stages",Pnumstages);
-    Phmagtype=xml->getpar127("harmonic_mag_type",Phmagtype);
-    Pstart=xml->getpar127("start",Pstart);
+    Pnumstages=xml.getpar127("num_stages",Pnumstages);
+    Phmagtype=xml.getpar127("harmonic_mag_type",Phmagtype);
+    Pstart=xml.getpar127("start",Pstart);
 
-    if (xml->enterbranch("HARMONICS"))
+    if (xml.enterbranch("HARMONICS"))
     {
         Phmag[0]=0;
-        for (int i=0;i<MAX_SUB_HARMONICS;i++)
+        for (int i=0; i<MAX_SUB_HARMONICS; i++)
         {
-            if (xml->enterbranch("HARMONIC",i)==0) continue;
-            Phmag[i]=xml->getpar127("mag",Phmag[i]);
-            Phrelbw[i]=xml->getpar127("relbw",Phrelbw[i]);
-            xml->exitbranch();
+            if (xml.enterbranch("HARMONIC",i)==0) continue;
+            Phmag[i]=xml.getpar127("mag",Phmag[i]);
+            Phrelbw[i]=xml.getpar127("relbw",Phrelbw[i]);
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
+    if (xml.enterbranch("AMPLITUDE_PARAMETERS"))
     {
-        int xpar = xml->getparbool("stereo", (Pstereo) ? 1 : 0);
+        int xpar = xml.getparbool("stereo", (Pstereo) ? 1 : 0);
         Pstereo = (xpar != 0) ? true : false;
-        PVolume=xml->getpar127("volume",PVolume);
-        int test = xml->getpar127("random_width", UNUSED);
+        PVolume=xml.getpar127("volume",PVolume);
+        int test = xml.getpar127("random_width", UNUSED);
         if (test < 64) // new Yoshi type
         {
             PWidth = test;
-            setPan(xml->getpar127("pan_pos",PPanning), synth->getRuntime().panLaw);
-            PRandom = xml->getparbool("random_pan", PRandom);
+            setPan(xml.getpar127("pan_pos",PPanning), synth->getRuntime().panLaw);
+            PRandom = xml.getparbool("random_pan", PRandom);
         }
         else // legacy
         {
-            setPan(xml->getpar127("panning",PPanning), synth->getRuntime().panLaw);
+            setPan(xml.getpar127("panning",PPanning), synth->getRuntime().panLaw);
             if (PPanning == 0)
             {
                 PPanning = 64;
@@ -322,72 +322,72 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
             }
         }
 
-        PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
-        if (xml->enterbranch("AMPLITUDE_ENVELOPE"))
+        PAmpVelocityScaleFunction=xml.getpar127("velocity_sensing",PAmpVelocityScaleFunction);
+        if (xml.enterbranch("AMPLITUDE_ENVELOPE"))
         {
             AmpEnvelope->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    if (xml->enterbranch("FREQUENCY_PARAMETERS"))
+    if (xml.enterbranch("FREQUENCY_PARAMETERS"))
     {
-        Pfixedfreq=xml->getparbool("fixed_freq",Pfixedfreq);
-        PfixedfreqET=xml->getpar127("fixed_freq_et",PfixedfreqET);
-        PBendAdjust  = xml->getpar127("bend_adjust", PBendAdjust);
-        POffsetHz  = xml->getpar127("offset_hz", POffsetHz);
+        Pfixedfreq=xml.getparbool("fixed_freq",Pfixedfreq);
+        PfixedfreqET=xml.getpar127("fixed_freq_et",PfixedfreqET);
+        PBendAdjust  = xml.getpar127("bend_adjust", PBendAdjust);
+        POffsetHz  = xml.getpar127("offset_hz", POffsetHz);
 
-        PDetune=xml->getpar("detune",PDetune,0,16383);
-        PCoarseDetune=xml->getpar("coarse_detune",PCoarseDetune,0,16383);
+        PDetune=xml.getpar("detune",PDetune,0,16383);
+        PCoarseDetune=xml.getpar("coarse_detune",PCoarseDetune,0,16383);
         POvertoneSpread.type =
-            xml->getpar127("overtone_spread_type", POvertoneSpread.type);
+            xml.getpar127("overtone_spread_type", POvertoneSpread.type);
         POvertoneSpread.par1 =
-            xml->getpar("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
+            xml.getpar("overtone_spread_par1", POvertoneSpread.par1, 0, 255);
         POvertoneSpread.par2 =
-            xml->getpar("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
+            xml.getpar("overtone_spread_par2", POvertoneSpread.par2, 0, 255);
         POvertoneSpread.par3 =
-            xml->getpar("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
+            xml.getpar("overtone_spread_par3", POvertoneSpread.par3, 0, 255);
         updateFrequencyMultipliers();
-        PDetuneType=xml->getpar127("detune_type",PDetuneType);
+        PDetuneType=xml.getpar127("detune_type",PDetuneType);
 
-        Pbandwidth=xml->getpar127("bandwidth",Pbandwidth);
-        Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
+        Pbandwidth=xml.getpar127("bandwidth",Pbandwidth);
+        Pbwscale=xml.getpar127("bandwidth_scale",Pbwscale);
 
-        PFreqEnvelopeEnabled=xml->getparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-        if (xml->enterbranch("FREQUENCY_ENVELOPE"))
+        PFreqEnvelopeEnabled=xml.getparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
+        if (xml.enterbranch("FREQUENCY_ENVELOPE"))
         {
             FreqEnvelope->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
 
-        PBandWidthEnvelopeEnabled=xml->getparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-        if (xml->enterbranch("BANDWIDTH_ENVELOPE"))
+        PBandWidthEnvelopeEnabled=xml.getparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
+        if (xml.enterbranch("BANDWIDTH_ENVELOPE"))
         {
             BandWidthEnvelope->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 
-    if (xml->enterbranch("FILTER_PARAMETERS"))
+    if (xml.enterbranch("FILTER_PARAMETERS"))
     {
-        PGlobalFilterEnabled=xml->getparbool("enabled",PGlobalFilterEnabled);
-        if (xml->enterbranch("FILTER"))
+        PGlobalFilterEnabled=xml.getparbool("enabled",PGlobalFilterEnabled);
+        if (xml.enterbranch("FILTER"))
         {
             GlobalFilter->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
 
-        PGlobalFilterVelocityScaleFunction=xml->getpar127("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
-        PGlobalFilterVelocityScale=xml->getpar127("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
+        PGlobalFilterVelocityScaleFunction=xml.getpar127("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
+        PGlobalFilterVelocityScale=xml.getpar127("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
 
-        if (xml->enterbranch("FILTER_ENVELOPE"))
+        if (xml.enterbranch("FILTER_ENVELOPE"))
         {
             GlobalFilterEnvelope->getfromXML(xml);
-            xml->exitbranch();
+            xml.exitbranch();
         }
-        xml->exitbranch();
+        xml.exitbranch();
     }
 }
 

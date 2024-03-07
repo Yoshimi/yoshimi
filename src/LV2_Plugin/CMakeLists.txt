@@ -39,6 +39,8 @@ file (GLOB yoshimi_effects_files
     ../Effects/Distorsion.h  ../Effects/DynamicFilter.h)
 file (GLOB yoshimi_misc_files
     ../Misc/Config.cpp ../Misc/Config.h ../Misc/ConfBuild.h
+    ../Misc/DataBlockBuff.cpp ../Misc/DataBlockBuff.h
+    ../Misc/MirrorData.h ../Misc/OpaqueBlock.h
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
@@ -47,6 +49,8 @@ file (GLOB yoshimi_misc_files
     ../Misc/TestInvoker.h ../Misc/TestSequence.h
     ../Misc/WaveShapeSamples.h)
 file (GLOB yoshimi_interface_files
+    ../Interface/GuiDataExchange.cpp ../Interface/GuiDataExchange.h
+    ../Interface/InterfaceAnchor.h
     ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
     ../Interface/Data2Text.cpp ../Interface/Data2text.h

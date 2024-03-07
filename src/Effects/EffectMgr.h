@@ -26,6 +26,7 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
+#include "globals.h"
 #include "Effects/Effect.h"
 #include "Effects/Reverb.h"
 #include "Effects/Echo.h"
@@ -40,15 +41,16 @@
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
 
+
 class EffectMgr : public ParamBase
 {
     public:
        ~EffectMgr() = default;
         EffectMgr(const bool insertion_, SynthEngine *_synth);
 
-        void add2XML(XMLwrapper *xml);
+        void add2XML(XMLwrapper& xml);
         void defaults(void);
-        void getfromXML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper& xml);
 
         void out(float *smpsl, float *smpsr);
 
@@ -62,10 +64,10 @@ class EffectMgr : public ParamBase
         int geteffect(void);
 
         void changepreset(unsigned char npreset);
-        void changepreset_nolock(unsigned char npreset);
         unsigned char getpreset(void);
         void seteffectpar(int npar, unsigned char value);
         unsigned char geteffectpar(int npar);
+        void getAllPar(EffectParArray&) const;
 
         SynthEngine *getSynthEngine() {return synth;}
 
@@ -74,12 +76,12 @@ class EffectMgr : public ParamBase
         bool insertion; // the effect is connected as insertion effect (or not)
 
         // used by UI
-        float getEQfreqresponse(float freq);
+        void renderEQresponse(EQGraphArray&) const;
 
         FilterParams *filterpars;
 
     private:
-        int nefx;
+        int effectType;
         bool dryonly;
         unique_ptr<Effect> efx;
 };
@@ -90,5 +92,48 @@ class LimitMgr
         float geteffectlimits(CommandBlock *getData);
 };
 
-#endif
 
+
+
+/**
+ * Data record used to transport effect settings into the UI
+ */
+struct EffectDTO
+{
+    int effType{-1};
+    uchar effNum{0};
+    bool enabled{false};
+    bool changed{false};
+    bool isInsert{false};
+    uchar currPreset{0};
+    int insertFxRouting{-1};
+    uchar partFxRouting{1};
+    bool  partFxBypass{false};
+
+    EffectParArray param{0};
+    //////////////////////////////////////////////////TODO 2/24 as partial workaround until all further direct core accesses are addressed
+    EffectMgr* eff_in_core_TODO_deprecated;
+};
+
+/**
+ * Graph data for the EQ frequency response display in the UI
+ */
+struct EqGraphDTO
+{
+    EQGraphArray response{0};
+
+    /** LUT with linear interpolation */
+    float lookup(float scaleFac)
+    {
+        scaleFac = std::clamp(scaleFac, 0.0f, 0.99999f);
+        const uint UPPER_BOUND = response.size()-1;
+        uint slot(UPPER_BOUND*scaleFac);
+        assert (slot < UPPER_BOUND);
+        float pl = response[slot];
+        float pu = response[slot+1];
+        float rel = std::clamp(UPPER_BOUND*scaleFac - slot, 0.0f,1.0f);
+        return pl*(1-rel) + pu*rel;
+    }
+};
+
+#endif /*EFFECTMGR_H*/

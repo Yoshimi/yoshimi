@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <functional>
+#include <algorithm>
 #include <vector>
 #include <memory>
 #include <cmath>
@@ -42,6 +43,7 @@ namespace test {
 
 using std::cout;
 using std::endl;
+using std::clamp;
 using std::string;
 using std::function;
 using std::ios_base;
@@ -156,20 +158,13 @@ namespace { // local implementation details
     inline string showTestParam(int val)           { return asString(val);      }
     inline string showTestParam(string s)          { return string{"\""}+s+"\"";}
 
-    template<typename NUM>
-    inline NUM clamped(NUM rawVal, NUM min, NUM max)
-    {
-        return rawVal > max? max
-             : rawVal < min? min
-             :               rawVal;
-    }
 
     inline function<int(string)> limited(int min, int max)
     {
         return [=](string s)
                   {
                       int rawVal = string2int(s);
-                      return clamped(rawVal,min,max);
+                      return clamp(rawVal,min,max);
                   };
     }
 
@@ -178,7 +173,7 @@ namespace { // local implementation details
         return [=](string s)
                   {
                       float rawVal = string2float(s);
-                      return clamped(rawVal,min,max);
+                      return clamp(rawVal,min,max);
                   };
     }
 

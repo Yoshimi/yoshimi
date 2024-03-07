@@ -343,7 +343,7 @@ void DynamicFilter::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char DynamicFilter::getpar(int npar)
+unsigned char DynamicFilter::getpar(int npar) const
 {
     switch (npar)
     {

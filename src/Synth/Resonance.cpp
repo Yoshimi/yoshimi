@@ -238,39 +238,39 @@ void Resonance::sendcontroller(unsigned short int ctl, float par)
 }
 
 
-void Resonance::add2XML(XMLwrapper *xml)
+void Resonance::add2XML(XMLwrapper& xml)
 {
-    xml->addparbool("enabled",Penabled);
+    xml.addparbool("enabled",Penabled);
 
-    if ((Penabled==0)&&(xml->minimal)) return;
+    if ((Penabled==0)&&(xml.minimal)) return;
 
-    xml->addparcombi("max_db",PmaxdB);
-    xml->addparcombi("center_freq",Pcenterfreq);
-    xml->addparcombi("octaves_freq",Poctavesfreq);
-    xml->addparbool("protect_fundamental_frequency",Pprotectthefundamental);
-    xml->addpar("resonance_points",MAX_RESONANCE_POINTS);
-    for (int i=0;i<MAX_RESONANCE_POINTS;i++)
+    xml.addparcombi("max_db",PmaxdB);
+    xml.addparcombi("center_freq",Pcenterfreq);
+    xml.addparcombi("octaves_freq",Poctavesfreq);
+    xml.addparbool("protect_fundamental_frequency",Pprotectthefundamental);
+    xml.addpar("resonance_points",MAX_RESONANCE_POINTS);
+    for (int i=0; i<MAX_RESONANCE_POINTS; i++)
     {
-        xml->beginbranch("RESPOINT",i);
-        xml->addpar("val",Prespoints[i]);
-        xml->endbranch();
+        xml.beginbranch("RESPOINT",i);
+        xml.addpar("val",Prespoints[i]);
+        xml.endbranch();
     }
 }
 
 
-void Resonance::getfromXML(XMLwrapper *xml)
+void Resonance::getfromXML(XMLwrapper& xml)
 {
-    Penabled=xml->getparbool("enabled",Penabled);
+    Penabled=xml.getparbool("enabled",Penabled);
 
-    PmaxdB=xml->getparcombi("max_db",PmaxdB,0,127);
-    Pcenterfreq=xml->getparcombi("center_freq",Pcenterfreq,0,127);
-    Poctavesfreq=xml->getparcombi("octaves_freq",Poctavesfreq,0,127);
-    Pprotectthefundamental=xml->getparbool("protect_fundamental_frequency",Pprotectthefundamental);
-    for (int i=0;i<MAX_RESONANCE_POINTS;i++)
+    PmaxdB=xml.getparcombi("max_db",PmaxdB,0,127);
+    Pcenterfreq=xml.getparcombi("center_freq",Pcenterfreq,0,127);
+    Poctavesfreq=xml.getparcombi("octaves_freq",Poctavesfreq,0,127);
+    Pprotectthefundamental=xml.getparbool("protect_fundamental_frequency",Pprotectthefundamental);
+    for (int i=0; i<MAX_RESONANCE_POINTS; i++)
     {
-        if (xml->enterbranch("RESPOINT",i)==0) continue;
-        Prespoints[i]=xml->getpar127("val",Prespoints[i]);
-        xml->exitbranch();
+        if (xml.enterbranch("RESPOINT",i)==0) continue;
+        Prespoints[i]=xml.getpar127("val",Prespoints[i]);
+        xml.exitbranch();
     }
 }
 

@@ -167,6 +167,15 @@ string input_text(SynthEngine *synth, string label, string text)
 }
 
 
+GuiUpdates::GuiUpdates(InterChange& _interChange, size_t slotIDX)
+    : interChange{_interChange}
+    , anchor{interChange.guiDataExchange.bootstrapConnection<InterfaceAnchor>(slotIDX)}
+{
+    // cause update to be pushed into MirrorData buffer
+    interChange.guiDataExchange.pushUpdates(slotIDX);
+}
+
+
 void GuiUpdates::read_updates(SynthEngine *synth)
 {
     CommandBlock getData;
@@ -252,7 +261,14 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char miscmsg = getData->data.miscmsg;
 
     //synth->CBtest(getData);
-    if (getData->data.control == TOPLEVEL::control::copyPaste)
+
+    if (control == TOPLEVEL::control::dataExchange)
+    {// push data messages via GuiDataExchange -> deliver directly to MirrorData receivers
+        synth->interchange.guiDataExchange.dispatchUpdates(*getData);
+        return;
+    }
+
+    if (control == TOPLEVEL::control::copyPaste)
     {
         if (getData->data.type == TOPLEVEL::type::Adjust)
             return; // just looking
@@ -319,8 +335,8 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (npart != TOPLEVEL::section::main && kititem >= EFFECT::type::none && kititem < EFFECT::type::count) // effects
     { // maybe we should go to main first?
         if (npart == TOPLEVEL::section::systemEffects)
-        {
-            if (engine != synth->getGuiMaster()->nsyseff)
+        {   // note: prior to processing the returns, a push-update has been sent to the effect-UI
+            if (engine != synth->getGuiMaster()->syseffectui->effNum())
                 return;
             if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->syseffectui->fwin_filterui->returns_update(getData);
@@ -329,7 +345,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         }
         else if (npart == TOPLEVEL::section::insertEffects)
         {
-            if (engine != synth->getGuiMaster()->ninseff)
+            if (engine != synth->getGuiMaster()->inseffectui->effNum())
                 return;
             if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->inseffectui->fwin_filterui->returns_update(getData);
@@ -338,7 +354,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
         }
         else if (npart < NUM_MIDI_PARTS && allowPartUpdate)
         {
-            if (engine != synth->getGuiMaster()->partui->ninseff)
+            if (engine != synth->getGuiMaster()->partui->inseffectui->effNum())
                 return;
             if (insert == TOPLEVEL::insert::filterGroup) // dynefilter filter insert
                 synth->getGuiMaster()->partui->inseffectui->fwin_filterui->returns_update(getData);

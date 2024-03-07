@@ -254,7 +254,7 @@ static void *mainThread(void *arg)
 #ifdef GUI_FLTK
             if (bShowGui)
             {
-                MasterUI *guiMaster = _synth->getGuiMaster(false);
+                MasterUI *guiMaster = _synth->getGuiMaster();
                 if (guiMaster)
                 {
                     if (guiMaster->masterwindow)
@@ -349,7 +349,10 @@ int mainCreateNewInstance(unsigned int forceId)
     {
         synth->setWindowTitle(musicClient->midiClientName());
         if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+        {
+            size_t slotIDX = synth->publishGuiAnchor();
+            GuiThreadMsg::sendMessage(&synth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
+        }
     }
     else
         synth->getRuntime().toConsole = false;
@@ -542,7 +545,10 @@ int main(int argc, char *argv[])
     firstSynth->installBanks();
 #ifdef GUI_FLTK
     if (bShowGui)
-        GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+    {
+        size_t slotIDX = firstSynth->publishGuiAnchor();
+        GuiThreadMsg::sendMessage(&firstSynth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
+    }
 #endif
 
     //create command line processing thread

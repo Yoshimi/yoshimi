@@ -54,12 +54,12 @@ class Alienwah : public Effect
     public:
         Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Alienwah();
-        void out(float *smpsl, float *smpsr);
+        void out(float *smpsl, float *smpsr) override;
 
-        void setpreset(unsigned char npreset);
-        void changepar(int npar, unsigned char value);
-        unsigned char getpar(int npar);
-        void cleanup(void);
+        void setpreset(unsigned char npreset) override;
+        void changepar(int npar, unsigned char value) override;
+        unsigned char getpar(int npar)  const  override;
+        void cleanup(void) override;
 
     private:
         // Alienwah Parameters

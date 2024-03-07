@@ -246,9 +246,9 @@ class Config
 
         void applyOptions(Config*settings, list<string>& allArgs);
         void defaultPresets(void);
-        bool extractBaseParameters(XMLwrapper *xml);
-        bool extractConfigData(XMLwrapper *xml);
-        void addConfigXML(XMLwrapper *xml);
+        bool extractBaseParameters(XMLwrapper& xml);
+        bool extractConfigData(XMLwrapper& xml);
+        void addConfigXML(XMLwrapper& xml);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
@@ -280,11 +280,11 @@ class GuiThreadMsg
 {
 private:
     GuiThreadMsg()
-    {
-        data = NULL;
-        length = 0;
-        type = GuiThreadMsg::UNDEFINED;
-    }
+        : data{nullptr}
+        , length{0}
+        , index{0}
+        , type{GuiThreadMsg::UNDEFINED}
+        { }
 public:
     enum
     {
