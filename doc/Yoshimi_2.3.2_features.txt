@@ -1,6 +1,6 @@
 Version 2.3.2
 
-There is a new feature here that was requested by one of our users. This is the ability to have independent Left and Right delay times on the Echo effect. This can result in (apparently) random left/right bounces. If BPM is fixed as well quite complex repeatable bounce patterns cam be generated.
+There is a new feature here that was requested by one of our users. This is the ability to have independent Left and Right delay times on the Echo effect. This can result in (apparently) random left/right bounces. If BPM is fixed as well quite complex repeatable bounce patterns can be generated.
 
 There have also been a number of relatively minor bugfixes, and some significant code refactoring, such that the code size is now less than half what it used to be, and runs more efficiently.
 
