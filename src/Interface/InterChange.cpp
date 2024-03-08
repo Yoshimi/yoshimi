@@ -859,7 +859,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             if (synth->loadStateAndUpdate(text))
             {
                 text = setExtension(text, EXTEN::state);
-                string name = file::configDir() + "/yoshimi";
+                string name = file::configDir() + string(YOSHIMI);
                 name += ("-" + to_string(synth->getUniqueId()));
                 name += ".state";
                 if ((text != name)) // never include default state
@@ -876,7 +876,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             string filename = setExtension(text, EXTEN::state);
             if (synth->saveState(filename))
             {
-                string name = file::configDir() + "/yoshimi";
+                string name = file::configDir() + string(YOSHIMI);
                 name += ("-" + to_string(synth->getUniqueId()));
                 name += ".state";
                 if ((text != name)) // never include default state

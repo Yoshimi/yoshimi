@@ -813,7 +813,7 @@ return home + '/';
 
 inline string localDir(void)
 {
-    string local = userHome() + ".local/share/yoshimi";
+    string local = userHome() + ".local/share/" + YOSHIMI;
     if (!isDirectory(local))
     {
         if (createDir(local))
@@ -860,13 +860,13 @@ inline string findExampleFile(string leafname)
         }
         if (fullname.empty())
         {
-            string tmp = "/usr/local/share/yoshimi/examples/" + leafname;
+            string tmp = "/usr/local/share/" + string(YOSHIMI) + "/examples/" + leafname;
             if (isRegularFile(tmp))
                 fullname = tmp;
         }
         if (fullname.empty())
         {
-            string tmp = "/usr/share/yoshimi/examples/" + leafname;
+            string tmp = "/usr/share/" + string(YOSHIMI) + "/examples/" + leafname;
             if (isRegularFile(tmp))
                 fullname = tmp;
         }

@@ -483,7 +483,7 @@ int main(int argc, char *argv[])
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
 
-    std::cout << "Yoshimi " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
+    std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
 
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;

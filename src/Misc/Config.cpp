@@ -466,18 +466,14 @@ void Config::restoreConfig(SynthEngine *_synth)
 void Config::defaultPresets(void)
 {
     string presetdirs[]  = {
-        //string(getenv("HOME")) + "/.local/yoshimi/presets",
         presetDir,
         extendLocalPath("/presets"),
-        // The following is not a default one.
-        //string(getenv("HOME")) + "/" + string(EXTEN::config) + "/yoshimi/presets",
+        /*
+         * TODO
+         * We shouldn't be setting these directly
+         */
         "/usr/share/yoshimi/presets",
         "/usr/local/share/yoshimi/presets",
-        /*
-         * We no longer include zyn presets as they changed the filenames.
-        "/usr/share/zynaddsubfx/presets",
-        "/usr/local/share/zynaddsubfx/presets",
-        */
         "@end"
     };
     int i = 0;
@@ -1460,7 +1456,6 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
 
 std::string Config::findHtmlManual(void)
 {
-    //string namestring = "doc/yoshimi/yoshimi_user_guide/files/yoshimi_user_guide_version";
     string namelist = "";
     string tempnames = "";
     if(file::cmd2string("find /usr/share/ -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
