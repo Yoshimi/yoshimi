@@ -7443,7 +7443,10 @@ float InterChange::returnLimits(CommandBlock *getData)
     getData->data.type |= TOPLEVEL::type::Integer; // default is integer & not learnable
 
     if (npart == TOPLEVEL::section::config)
-        return synth->getConfigLimits(getData);
+    {
+        std::cout << "calling config limits" << std::endl;
+        return synth->getRuntime().getConfigLimits(getData);
+    }
 
     if (npart == TOPLEVEL::section::bank)
         return value;

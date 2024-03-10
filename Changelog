@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+Moved config limits from SynthEngine to Config.
+    Don't seem to be used anywhere though.
+
 Transfered Vector load/save from SynthEngine to
     new /Interchange/Vectors
 

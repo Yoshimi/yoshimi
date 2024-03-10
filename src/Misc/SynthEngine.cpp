@@ -3711,7 +3711,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 }*/
 
 
-float SynthEngine::getConfigLimits(CommandBlock *getData)
+/*float SynthEngine::getConfigLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
@@ -3879,7 +3879,7 @@ float SynthEngine::getConfigLimits(CommandBlock *getData)
             break;
     }
     return value;
-}
+}*/
 
 
 void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg) // default - don't read message

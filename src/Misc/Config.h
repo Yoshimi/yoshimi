@@ -71,6 +71,7 @@ class Config
         bool restoreSessionData(string sessionfile);
         bool restoreJsession();
         void setJackSessionSave(int event_type, const string& session_file);
+        float getConfigLimits(CommandBlock *getData);
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
@@ -252,6 +253,7 @@ class Config
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
+
         std::string findHtmlManual(void);
 
 

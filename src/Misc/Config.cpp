@@ -72,6 +72,11 @@ using func::nearestPowerOf2;
 using func::asString;
 using func::string2int;
 
+namespace { // Implementation details...
+
+    TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
+}
+
 unsigned char panLaw = 1;
 
 bool         Config::showSplash = true;
@@ -1491,6 +1496,177 @@ std::string Config::findHtmlManual(void)
         }
     }
     return found;
+}
+
+
+float Config::getConfigLimits(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    int request = int(getData->data.type & TOPLEVEL::type::Default);
+    int control = getData->data.control;
+
+    unsigned char type = 0;
+
+    // config defaults
+    int min = 0;
+    float def = 0;
+    int max = 1;
+    type |= TOPLEVEL::type::Integer;
+
+    switch (control)
+    {
+        case CONFIG::control::oscillatorSize:
+            min = MIN_OSCIL_SIZE;
+            def = 1024;
+            max = MAX_OSCIL_SIZE;
+            break;
+        case CONFIG::control::bufferSize:
+            min = MIN_BUFFER_SIZE;
+            def = 512;
+            max = MAX_BUFFER_SIZE;
+           break;
+        case CONFIG::control::padSynthInterpolation:
+            break;
+        case CONFIG::control::handlePadSynthBuild:
+            max = 2;
+            break;
+        case CONFIG::control::virtualKeyboardLayout:
+            max = 3;
+            break;
+        case CONFIG::control::XMLcompressionLevel:
+            def = 3;
+            max = 9;
+            break;
+        case CONFIG::control::reportsDestination:
+            break;
+        case CONFIG::control::logTextSize:
+            def = 12;
+            min = 11;
+            max = 100;
+            break;
+        case CONFIG::control::savedInstrumentFormat:
+            max = 3;
+            break;
+        case CONFIG::control::defaultStateStart:
+            break;
+        case CONFIG::control::hideNonFatalErrors:
+            break;
+        case CONFIG::control::showSplash:
+            def = 1;
+            break;
+        case CONFIG::control::logInstrumentLoadTimes:
+            break;
+        case CONFIG::control::logXMLheaders:
+            break;
+        case CONFIG::control::saveAllXMLdata:
+            break;
+        case CONFIG::control::enableGUI:
+            def = 1;
+            break;
+        case CONFIG::control::enableCLI:
+            def = 1;
+            break;
+        case CONFIG::control::enableAutoInstance:
+            def = 1;
+            break;
+        case CONFIG::control::exposeStatus:
+            def = 1;
+            max = 2;
+            break;
+        case CONFIG::control::enableHighlight:
+            break;
+
+        case CONFIG::control::jackMidiSource:
+            min = 3; // anything greater than max
+            def = textMsgBuffer.push("default");
+            break;
+        case CONFIG::control::jackPreferredMidi:
+            def = 1;
+            break;
+        case CONFIG::control::jackServer:
+            min = 3;
+            def = textMsgBuffer.push("default");
+            break;
+        case CONFIG::control::jackPreferredAudio:
+            def = 1;
+            break;
+        case CONFIG::control::jackAutoConnectAudio:
+            def = 1;
+            break;
+
+        case CONFIG::control::alsaMidiSource:
+            min = 3;
+            def = textMsgBuffer.push("default");
+            break;
+        case CONFIG::control::alsaPreferredMidi:
+            def = 1;
+            break;
+        case CONFIG::control::alsaAudioDevice:
+            min = 3;
+            def = textMsgBuffer.push("default");
+            break;
+        case CONFIG::control::alsaPreferredAudio:
+            break;
+        case CONFIG::control::alsaSampleRate:
+            def = 2;
+            max = 3;
+            break;
+
+        case CONFIG::control::bankRootCC: // runtime midi checked elsewhere
+            def = 0;
+            max = 119;
+            break;
+        case CONFIG::control::bankCC: // runtime midi checked elsewhere
+            def = 32;
+            max = 119;
+            break;
+        case CONFIG::control::enableProgramChange:
+            break;
+        case CONFIG::control::extendedProgramChangeCC: // runtime midi checked elsewhere
+            def = 110;
+            max = 119;
+            break;
+        case CONFIG::control::ignoreResetAllCCs:
+            break;
+        case CONFIG::control::logIncomingCCs:
+            break;
+        case CONFIG::control::showLearnEditor:
+            def = 1;
+            break;
+        case CONFIG::control::enableNRPNs:
+            def = 1;
+            break;
+
+        case CONFIG::control::saveCurrentConfig:
+            break;
+
+        default:
+            type |= TOPLEVEL::type::Error;
+            break;
+    }
+    getData->data.type = type;
+    if (type & TOPLEVEL::type::Error)
+        return 1;
+
+    switch (request)
+    {
+        case TOPLEVEL::type::Adjust:
+            if (value < min)
+                value = min;
+            else if (value > max)
+                value = max;
+        break;
+        case TOPLEVEL::type::Minimum:
+            value = min;
+            break;
+        case TOPLEVEL::type::Maximum:
+            value = max;
+            break;
+        case TOPLEVEL::type::Default:
+            value = def;
+            break;
+    }
+    return value;
 }
 
 
