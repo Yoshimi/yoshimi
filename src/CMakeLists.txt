@@ -293,7 +293,7 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/Bank.cpp Misc/DataBlockBuff.cpp  Misc/CmdOptions.cpp  Misc/Config.cpp
-    Misc/BuildScheduler.cpp  Misc/Microtonal.cpp   Misc/Part.cpp Misc/Splash.cpp
+    Misc/BuildScheduler.cpp  Misc/Microtonal.cpp  Misc/Part.cpp  Misc/Splash.cpp
     Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLwrapper.cpp
 )
 
@@ -305,6 +305,7 @@ set (Interface_Sources
     Interface/InterfaceAnchor.h
     Interface/Text2Data.cpp
     Interface/MidiLearn.cpp
+    Interface/Vectors.cpp
     Interface/MidiDecode.cpp
     Interface/RingBuffer.h
     Interface/TextLists.h

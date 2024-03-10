@@ -44,6 +44,7 @@
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
 #include "Interface/MidiDecode.h"
+#include "Interface/Vectors.h"
 #include "Misc/Config.h"
 #include "Params/UnifiedPresets.h"
 #include "globals.h"
@@ -84,6 +85,7 @@ class SynthEngine
         InterChange interchange;
         MidiLearn midilearn;
         MidiDecode mididecode;
+        Vectors vectorcontrol;
         UnifiedPresets unifiedpresets;
     private:
         Config Runtime;
@@ -121,11 +123,11 @@ class SynthEngine
         string lastItemSeen(int group);
         bool loadHistory(void);
         bool saveHistory(void);
-        unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
-        unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
-        unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
-        unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
-        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
+        //unsigned char loadVectorAndUpdate(unsigned char baseChan, const string& name);
+        //unsigned char loadVector(unsigned char baseChan, const string& name, bool full);
+        //unsigned char extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name);
+        //unsigned char saveVector(unsigned char baseChan, const string& name, bool full);
+        //bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name);
 
         bool getfromXML(XMLwrapper& xml);
 

@@ -133,6 +133,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     interchange(this),
     midilearn(this),
     mididecode(this),
+    vectorcontrol(this),
     Runtime(this, allArgs, getIsLV2Plugin()),
     rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
@@ -3004,7 +3005,7 @@ bool SynthEngine::saveHistory()
     return true;
 }
 
-
+/*
 unsigned char SynthEngine::loadVectorAndUpdate(unsigned char baseChan, const string& name)
 {
     unsigned char result = loadVector(baseChan, name, true);
@@ -3148,8 +3149,9 @@ unsigned char SynthEngine::extractVectorData(unsigned char baseChan, XMLwrapper&
         Runtime.NumAvailableParts = xml.getpar255("current_midi_parts", Runtime.NumAvailableParts);
     return baseChan;
 }
+*/
 
-
+/*
 unsigned char SynthEngine::saveVector(unsigned char baseChan, const string& name, bool full)
 {
     bool a = full; full = a; // suppress warning
@@ -3233,6 +3235,7 @@ bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper
     }
     return true;
 }
+*/
 
 
 void SynthEngine::add2XML(XMLwrapper& xml)
@@ -3299,7 +3302,7 @@ void SynthEngine::add2XML(XMLwrapper& xml)
         if (Runtime.vectordata.Xaxis[i] < 127)
         {
             xml.beginbranch("VECTOR", i);
-            insertVectorData(i, false, xml, "");
+            vectorcontrol.insertVectorData(i, false, xml, "");
             xml.endbranch(); // VECTOR
         }
     }
@@ -3454,7 +3457,7 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
     {
         if (xml.enterbranch("VECTOR", i))
         {
-            extractVectorData(i, xml, "");
+            vectorcontrol.extractVectorData(i, xml, "");
             xml.endbranch();
         }
     }
@@ -3615,7 +3618,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 }
 
 
-float SynthEngine::getVectorLimits(CommandBlock *getData)
+/*float SynthEngine::getVectorLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char request = int(getData->data.type & TOPLEVEL::type::Default);
@@ -3705,7 +3708,7 @@ float SynthEngine::getVectorLimits(CommandBlock *getData)
             break;
     }
     return value;
-}
+}*/
 
 
 float SynthEngine::getConfigLimits(CommandBlock *getData)

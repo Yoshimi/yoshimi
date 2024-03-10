@@ -2967,13 +2967,13 @@ int CmdInterpreter::commandVector(Parser& input, unsigned char controlType)
         tmp = string2int(input);
         if (axis == 0)
         {
-            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
+            sendNormal(synth, 0, tmp, controlType, VECTOR::control::Xcontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
             bitSet(context, LEVEL::Vector);
             return REPLY::done_msg;
         }
         if (Runtime.vectordata.Enabled[chan])
         {
-            sendDirect(synth, 0, tmp, controlType, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
+            sendNormal(synth, 0, tmp, controlType, VECTOR::control::Ycontroller, TOPLEVEL::section::vector, UNUSED, UNUSED, UNUSED, chan);
             return REPLY::done_msg;
         }
     }

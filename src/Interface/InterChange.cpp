@@ -32,6 +32,7 @@
 #include <atomic>
 
 #include "Interface/InterChange.h"
+#include "Interface/Vectors.h"
 #include "Interface/Data2Text.h"
 #include "Interface/TextLists.h"
 #include "Misc/FileMgrFuncs.h"
@@ -787,7 +788,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             break;
         case MAIN::control::loadNamedVector:
         {
-            int tmp = synth->loadVectorAndUpdate(insert, text);
+            int tmp = synth->vectorcontrol.loadVectorAndUpdate(insert, text);
             if (tmp < NO_MSG)
             {
                 getData->data.insert = tmp;
@@ -806,7 +807,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             int pos = oldname.find("No Name");
             if (pos >=0 && pos < 2)
                 synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
-            int tmp = synth->saveVector(insert, text, true);
+            int tmp = synth->vectorcontrol.saveVector(insert, text, true);
             if (tmp == NO_MSG)
             {
                 synth->addHistory(setExtension(text, EXTEN::vector), TOPLEVEL::XML::Vector);
@@ -7454,7 +7455,10 @@ float InterChange::returnLimits(CommandBlock *getData)
         return synth->microtonal.getLimits(getData);
 
     if (npart == TOPLEVEL::section::vector)
-        return synth->getVectorLimits(getData);
+    {
+        std::cout << "calling vector limits" << std::endl;
+        return synth->vectorcontrol.getVectorLimits(getData);
+    }
 
     float min;
     float max;

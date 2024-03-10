@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+Transfered Vector load/save from SynthEngine to
+    new /Interchange/Vectors
+
 2024-3-7 Will
 bn 2319
 Merged in new GUI/core interface from Hermann
