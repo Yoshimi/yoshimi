@@ -139,7 +139,7 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),   // 128 is used as 'disabled'
-    midi_upper_voice_C(128),
+    midi_upper_voice_C(128), // disabled
     enable_NRPN(true),
     ignoreResetCCs(false),
     monitorCCin(false),
@@ -156,10 +156,10 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     tempRoot(0),
     VUcount(0),
     channelSwitchType(0),
-    channelSwitchCC(128),
+    channelSwitchCC(128), // disabled
     channelSwitchValue(0),
-    nrpnL(127),
-    nrpnH(127),
+    nrpnL(127), // off
+    nrpnH(127), // off
     nrpnActive(false),
     sigIntActive(0),
     ladi1IntActive(0),

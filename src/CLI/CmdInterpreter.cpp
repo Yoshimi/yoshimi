@@ -3153,9 +3153,6 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
 
-    // TODO not entirely sure this is the right place or way to set this
-    controlType |= TOPLEVEL::type::Integer;
-
     if (input.isAtEnd())
         return REPLY::done_msg; // someone just came in for a look :)
     if (input.matchnMove(1, "oscillator"))
@@ -3673,7 +3670,7 @@ int CmdInterpreter::commandExportScale(Parser& input)
     if (name.empty())
         return REPLY::value_msg;
     size_t miscmsg = textMsgBuffer.push(name);
-    //std::cout << "name >" << name << std::endl;
+    //cout << "name >" << name << endl;
     return sendDirect(synth, TOPLEVEL::action::lowPrio, 1, TOPLEVEL::type::Write, command, TOPLEVEL::section::scales, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, miscmsg);
 }
 

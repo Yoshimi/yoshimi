@@ -3540,6 +3540,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             break;
 
         case MAIN::control::detune:
+            type &= ~TOPLEVEL::type::Integer;
             break;
 
         case MAIN::control::keyShift:

@@ -207,7 +207,8 @@ inline int sendNormal(SynthEngine *synth,
     if (part != TOPLEVEL::section::midiLearn)
     {
         putData.data.type |= TOPLEVEL::type::Limits;
-        float newValue = synth->interchange.readAllData(&putData);
+        float newValue = synth->interchange.readAllData(&putData); // adjust within limits
+        type |= (putData.data.type & TOPLEVEL::type::Integer); // so everyone knows if it is!
         if (type & TOPLEVEL::type::LearnRequest)
         {
             if ((putData.data.type & TOPLEVEL::type::Learnable) == 0)
