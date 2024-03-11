@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+BugFix: CLI not checking XML copmpression range.
+Forced type to integer for all CLI config tests.
+
 Moved config limits from SynthEngine to Config.
     Don't seem to be used anywhere though.
 

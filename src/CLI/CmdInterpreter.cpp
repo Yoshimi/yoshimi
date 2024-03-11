@@ -3153,6 +3153,9 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
     unsigned char action = 0;
     unsigned char miscmsg = UNUSED;
 
+    // TODO not entirely sure this is the right place or way to set this
+    controlType |= TOPLEVEL::type::Integer;
+
     if (input.isAtEnd())
         return REPLY::done_msg; // someone just came in for a look :)
     if (input.matchnMove(1, "oscillator"))
@@ -3199,6 +3202,7 @@ int CmdInterpreter::commandConfig(Parser& input, unsigned char controlType)
         if (controlType == TOPLEVEL::type::Write && input.isAtEnd())
             return REPLY::value_msg;
         value = string2int(input);
+        return sendNormal(synth, TOPLEVEL::action::fromCLI, value, controlType, command, TOPLEVEL::section::config);
     }
     else if (input.matchnMove(2, "reports"))
     {

@@ -1507,7 +1507,8 @@ float Config::getConfigLimits(CommandBlock *getData)
 
     unsigned char type = 0;
 
-    // config defaults
+    std::cout << "In config defaults" << std::endl;
+
     int min = 0;
     float def = 0;
     int max = 1;
