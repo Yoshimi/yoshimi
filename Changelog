@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+BugFix: "Enable Single Master" accesssable on secondary instances.
+Removed (now redundant) disabled code from SynthEngine.cpp
+Also removed long unused SSE code from Config.cpp
 
 2024-3-11 Will
 bn 2320

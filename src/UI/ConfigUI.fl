@@ -8,7 +8,7 @@ decl {\#include <cmath>} {public local
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2023, Will Godfrey
+Copyright 2014 -2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -367,6 +367,7 @@ fillThemes();
           send_data(0, CONFIG::control::enableSinglePath, o->value(), TOPLEVEL::type::Integer);}
             tooltip {Redirect new start from desktop to create new instance instead.} xywh {190 220 27 25} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64 align 4
             code0 {o->value(fetchData(0, CONFIG::control::enableSinglePath, TOPLEVEL::section::config));}
+            code1 {if (current_ID != 0) o->hide(); else if (synth->getIsLV2Plugin()) o->deactivate();}
             class Fl_Check_Button2
           }
           Fl_Check_Button setDefaultState {

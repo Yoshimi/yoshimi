@@ -250,8 +250,6 @@ class Config
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);
         void addConfigXML(XMLwrapper& xml);
-        int SSEcapability(void);
-        void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
 
         std::string findHtmlManual(void);

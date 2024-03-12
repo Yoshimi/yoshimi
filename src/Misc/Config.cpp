@@ -36,10 +36,6 @@
 #include <cassert>
 #include <memory>
 
-#if defined(__SSE__)
-#include <xmmintrin.h>
-#endif
-
 #if defined(JACK_SESSION)
 #include <jack/session.h>
 #endif
@@ -1207,72 +1203,6 @@ void Config::saveJackSession(void)
     jackSessionFile.clear();
 }
 
-
-int Config::SSEcapability(void)
-{
-    #if !defined(__SSE__)
-        return 0;
-    #else
-        #if defined(__x86_64__)
-            int64_t edx;
-            __asm__ __volatile__ (
-                "mov %%rbx,%%rdi\n\t" // save PIC register
-                "movl $1,%%eax\n\t"
-                "cpuid\n\t"
-                "mov %%rdi,%%rbx\n\t" // restore PIC register
-                : "=d" (edx)
-                : : "%rax", "%rcx", "%rdi"
-            );
-        #else
-            int32_t edx;
-            __asm__ __volatile__ (
-                "movl %%ebx,%%edi\n\t" // save PIC register
-                "movl $1,%%eax\n\t"
-                "cpuid\n\t"
-                "movl %%edi,%%ebx\n\t" // restore PIC register
-                : "=d" (edx)
-                : : "%eax", "%ecx", "%edi"
-            );
-        #endif
-        return ((edx & 0x02000000 /*SSE*/) | (edx & 0x04000000 /*SSE2*/)) >> 25;
-    #endif
-}
-/*
-SSEcapability() draws gratefully on the work of others.
-*/
-
-/*
- * The code below has been replaced with specific anti-denormal code where needed.
- * Although the new code is slightly less efficient it is compatible across platforms,
- * where as the 'daz' processor code is not available on platforms such as ARM.
- */
-
-/*void Config::AntiDenormals(bool set_daz_ftz)
-{
-    return;
-    if (synth->getIsLV2Plugin())
-    {
-        return;// no need to set floating point rules for lv2 - host should control it.
-    }
-    #if defined(__SSE__)
-        if (set_daz_ftz)
-        {
-            sse_level = SSEcapability();
-            if (sse_level & 0x01)
-                // SSE, turn on flush to zero (FTZ) and round towards zero (RZ)
-                _mm_setcsr(_mm_getcsr() | 0x8000|0x6000);
-            if (sse_level & 0x02)
-                // SSE2, turn on denormals are zero (DAZ)
-               _mm_setcsr(_mm_getcsr() | 0x0040);
-        }
-        else if (sse_level)
-        {
-            // Clear underflow and precision flags,
-            // turn DAZ, FTZ off, restore round to nearest (RN)
-            _mm_setcsr(_mm_getcsr() & ~(0x0030|0x8000|0x0040|0x6000));
-        }
-    #endif
-}*/
 
 void Config::applyOptions(Config* settings, std::list<string>& allArgs)
 {
