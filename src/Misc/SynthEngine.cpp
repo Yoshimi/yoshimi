@@ -3077,6 +3077,9 @@ void SynthEngine::add2XML(XMLwrapper& xml)
     xml.endbranch(); // MASTER
 }
 
+/*
+ * the following two functions are only used by LV2
+ */
 
 int SynthEngine::getalldata(char **data) // to state from instance
 {

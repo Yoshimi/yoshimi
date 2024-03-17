@@ -167,10 +167,12 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
 {
     std::cerr.precision(4);
 
+    int thisInstance = synth->getUniqueId();
+
     if (isLV2Plugin)
     {
         //Log("LV2 only");
-        if (!loadConfig())
+        if (!loadConfig(thisInstance))
             Log("\n\nCould not load config. Using default values.\n");
         bRuntimeSetupCompleted = true;
         //skip further setup, which is irrelevant for lv2 plugin instance.
@@ -184,9 +186,15 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
         applyOptions(this, allArgs);
         torun = false;
     }
-    if (!loadConfig())
+    if (!loadConfig(thisInstance))
     {
         string message = "Could not load config. Using default values.";
+        TextMsgBuffer::instance().push(message); // needed for CLI
+        Log("\n\n" + message + "\n");
+    }
+    if (!loadConfigState(thisInstance))
+    {
+        string message = "Could not load config state. Using default values.";
         TextMsgBuffer::instance().push(message); // needed for CLI
         Log("\n\n" + message + "\n");
     }
@@ -278,7 +286,7 @@ void *Config::findManual(void)
 }
 
 
-bool Config::loadConfig(void)
+bool Config::loadConfig(int thisInstance)
 {
     if (file::userHome() == "/tmp")
         Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
@@ -299,7 +307,6 @@ bool Config::loadConfig(void)
 
     baseConfig = foundConfig + yoshimi + string(EXTEN::config);
 
-    int thisInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
     yoshimi += ("-" + asString(thisInstance));
     //cout << "\nsession >" << defaultSession << "<\n" << endl;
@@ -374,25 +381,6 @@ bool Config::loadConfig(void)
             Log("loadConfig load base failed");
     }
 
-    if (success)
-    {
-        // now the instance data
-        auto xml{std::make_unique<XMLwrapper>(synth, true)};
-        success = xml->loadXMLfile(ConfigFile);
-        if (success)
-            success = extractConfigData(*xml);
-        else
-            Log("loadConfig load instance failed");
-    }
-    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
-    {
-        int currentVersion = lastXMLmajor * 10 + lastXMLminor;
-        int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
-        if (currentVersion < storedVersion)
-            oldConfig = true;
-        else
-            oldConfig = false;
-    }
     loadPresetsList();
 
     // find user guide
@@ -424,7 +412,30 @@ bool Config::loadConfig(void)
     {
         startThread(&findManualHandle, _findManual, this, false, 0, "CFG");
     }
-    //cout << "Session Stage " << sessionStage << endl;
+    return success;
+}
+
+bool Config::loadConfigState(int thisInstance)
+{
+    bool success = true;
+    {
+        // the instance data
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(ConfigFile);
+        if (success)
+            success = extractConfigData(*xml);
+        else
+            Log("loadConfig load instance failed");
+    }
+    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    {
+        int currentVersion = lastXMLmajor * 10 + lastXMLminor;
+        int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
+        if (currentVersion < storedVersion)
+            oldConfig = true;
+        else
+            oldConfig = false;
+    }
 
     if (sessionStage == _SYS_::type::RestoreConf)
         return true;
@@ -455,7 +466,7 @@ void Config::restoreConfig(SynthEngine *_synth)
     sessionStage = _SYS_::type::RestoreConf;
 
     // restore old settings
-    loadConfig();
+    loadConfig(synth->getUniqueId());
 
     // but keep current root and bank
     _synth->setRootBank(tmpRoot, tmpBank);

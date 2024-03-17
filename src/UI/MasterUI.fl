@@ -115,8 +115,8 @@ decl {\#include "Interface/InterChange.h"} {public local
 }
 
 decl {\#include "Interface/InterfaceAnchor.h"
-    using RoutingTag = GuiDataExchange::RoutingTag;
-} {public local}
+    using RoutingTag = GuiDataExchange::RoutingTag;} {public local
+}
 
 decl {\#include "MidiLearnUI.h"} {public local
 }
@@ -952,7 +952,7 @@ class MasterUI {: {public GuiUpdates}
           }
           Fl_Button sysEffSend {
             label {Send to}
-            callback { showSysEffSends();}
+            callback {showSysEffSends();}
             xywh {275 156 62 20} box GTK_THIN_UP_BOX color 221 labelfont 1 labelsize 11 labelcolor 64
           }
           Fl_Button sysCopy {
@@ -1050,7 +1050,7 @@ class MasterUI {: {public GuiUpdates}
       } {
         Fl_Group partui {
           xywh {3 285 379 172} color 47
-          code0 { partui->init(synth->part[npart], npart, bankui); }
+          code0 {partui->init(synth->part[npart], npart, bankui);}
           class PartUI
         } {}
         Fl_Group partControls {
@@ -1282,7 +1282,7 @@ class MasterUI {: {public GuiUpdates}
             label Portamento
             callback {//
           send_data(0, PART::control::portamento, o->value(), TOPLEVEL::type::Integer, npart);}
-            tooltip {Enable/Disable the portamento} xywh {84 351 18 18} down_box DOWN_BOX labelfont 3 labelsize 11 labelcolor 226 align 8
+            tooltip {Enable/Disable the portamento} xywh {84 351 14 18} down_box DOWN_BOX labelfont 3 labelsize 11 labelcolor 226 align 8
             code0 {o->value(fetchData(0, PART::control::portamento, npart));}
             class Fl_Check_Button2
           }
