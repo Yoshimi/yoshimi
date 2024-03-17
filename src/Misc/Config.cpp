@@ -167,12 +167,12 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
 {
     std::cerr.precision(4);
 
-    int thisInstance = synth->getUniqueId();
+    int currentInstance = synth->getUniqueId();
 
     if (isLV2Plugin)
     {
         //Log("LV2 only");
-        if (!loadConfig(thisInstance))
+        if (!loadConfig())
             Log("\n\nCould not load config. Using default values.\n");
         bRuntimeSetupCompleted = true;
         //skip further setup, which is irrelevant for lv2 plugin instance.
@@ -186,15 +186,9 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
         applyOptions(this, allArgs);
         torun = false;
     }
-    if (!loadConfig(thisInstance))
+    if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
-        TextMsgBuffer::instance().push(message); // needed for CLI
-        Log("\n\n" + message + "\n");
-    }
-    if (!loadConfigState(thisInstance))
-    {
-        string message = "Could not load config state. Using default values.";
         TextMsgBuffer::instance().push(message); // needed for CLI
         Log("\n\n" + message + "\n");
     }
@@ -286,7 +280,7 @@ void *Config::findManual(void)
 }
 
 
-bool Config::loadConfig(int thisInstance)
+bool Config::loadConfig(void)
 {
     if (file::userHome() == "/tmp")
         Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
@@ -307,13 +301,14 @@ bool Config::loadConfig(int thisInstance)
 
     baseConfig = foundConfig + yoshimi + string(EXTEN::config);
 
-    defaultSession = defaultStateName + "-" + asString(thisInstance) + EXTEN::state;
-    yoshimi += ("-" + asString(thisInstance));
+    int currentInstance = synth->getUniqueId();
+    defaultSession = defaultStateName + "-" + asString(currentInstance) + EXTEN::state;
+    yoshimi += ("-" + asString(currentInstance));
     //cout << "\nsession >" << defaultSession << "<\n" << endl;
 
     ConfigFile = foundConfig + yoshimi + EXTEN::instance;
 
-    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    if (currentInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         TextMsgBuffer::instance().init(); // sneaked it in here so it's early
 
@@ -381,43 +376,7 @@ bool Config::loadConfig(int thisInstance)
             Log("loadConfig load base failed");
     }
 
-    loadPresetsList();
-
-    // find user guide
-    bool man_ok = false;
-    string manual_source = loadText(file::configDir() + "/yoshimi-manual.source");
-    if (!manual_source.empty())
-    {
-        size_t pos = manual_source.find("\n");
-        if (pos != string::npos)
-        {
-            guideVersion = manual_source.substr(0,pos);
-
-            manualFile = manual_source.substr(pos + 1);
-            size_t endCR = manualFile.rfind("\n");
-            if (endCR != string::npos)
-                manualFile = manualFile.substr(0,endCR);
-            string currentV = string(YOSHIMI_VERSION);
-            pos = currentV.find(" ");
-            if (pos != string::npos)
-                currentV = currentV.substr(0,pos);
-//cout << "\nm >" << manualFile << "<" << endl;
-//cout << "\nc " << currentV << "\ng " << guideVersion << endl;
-            if (currentV == guideVersion && file::isRegularFile(manualFile) != 0)
-                man_ok = true;
-        }
-    }
-//cout << "OK " << int(man_ok) << endl;;
-    if (!man_ok)
-    {
-        startThread(&findManualHandle, _findManual, this, false, 0, "CFG");
-    }
-    return success;
-}
-
-bool Config::loadConfigState(int thisInstance)
-{
-    bool success = true;
+    if (success)
     {
         // the instance data
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
@@ -427,7 +386,7 @@ bool Config::loadConfigState(int thisInstance)
         else
             Log("loadConfig load instance failed");
     }
-    if (thisInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
+    if (currentInstance == 0 && sessionStage != _SYS_::type::RestoreConf)
     {
         int currentVersion = lastXMLmajor * 10 + lastXMLminor;
         int storedVersion = MIN_CONFIG_MAJOR * 10 + MIN_CONFIG_MINOR;
@@ -455,6 +414,41 @@ bool Config::loadConfigState(int thisInstance)
         else
             Log("loadConfig load instance failed");
     }
+    if (success)
+        loadPresetsList();
+
+    if (success && currentInstance == 0)
+    {
+        // find user guide
+        bool man_ok = false;
+        string manual_source = loadText(file::configDir() + "/yoshimi-manual.source");
+        if (!manual_source.empty())
+        {
+            size_t pos = manual_source.find("\n");
+            if (pos != string::npos)
+            {
+                guideVersion = manual_source.substr(0,pos);
+
+                manualFile = manual_source.substr(pos + 1);
+                size_t endCR = manualFile.rfind("\n");
+                if (endCR != string::npos)
+                    manualFile = manualFile.substr(0,endCR);
+                string currentV = string(YOSHIMI_VERSION);
+                pos = currentV.find(" ");
+                if (pos != string::npos)
+                    currentV = currentV.substr(0,pos);
+//cout << "\nm >" << manualFile << "<" << endl;
+//cout << "\nc " << currentV << "\ng " << guideVersion << endl;
+                if (currentV == guideVersion && file::isRegularFile(manualFile) != 0)
+                    man_ok = true;
+            }
+        }
+//cout << "OK " << int(man_ok) << endl;;
+        if (!man_ok)
+        {
+            startThread(&findManualHandle, _findManual, this, false, 0, "CFG");
+        }
+    }
     return success;
 }
 
@@ -466,7 +460,7 @@ void Config::restoreConfig(SynthEngine *_synth)
     sessionStage = _SYS_::type::RestoreConf;
 
     // restore old settings
-    loadConfig(synth->getUniqueId());
+    loadConfig();
 
     // but keep current root and bank
     _synth->setRootBank(tmpRoot, tmpBank);

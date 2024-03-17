@@ -4,6 +4,8 @@ yoshimi 2.3.2 M
 bn 2321
 Split off config state loading from LV2
 
+**Reverted this change**
+
 BugFix: "Enable Single Master" accesssable on secondary instances.
 Removed (now redundant) disabled code from SynthEngine.cpp
 Also removed long unused SSE code from Config.cpp
