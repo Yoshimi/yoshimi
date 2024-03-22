@@ -673,8 +673,8 @@ string convert_value(ValueType type, float val)
         case VC_pitchWheel:
             return(custom_value_units(-val,"",1));
 
-        case VC_percent127:
-            return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
+        case VC_percent127: // removed offset to get zero W.G.
+            return(custom_value_units(val / 127.0f * 100.0f,"%",1));
 
         case VC_percent128:
             return(custom_value_units(val / 128.0f * 100.0f+0.05f,"%",1));

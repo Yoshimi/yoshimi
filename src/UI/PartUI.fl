@@ -782,7 +782,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::midiModWheel, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Modulation Wheel} xywh {20 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.data);}
-        code1 {o->selection_color(setKnob(o->value(),64));}
+        code1 {o->setValueType(VC_percent127);}
+        code2 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial expression {
@@ -792,7 +793,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::midiExpression,  o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip Expression xywh {80 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->expression.data);}
-        code1 {o->selection_color(setKnob(o->value(),127));}
+        code1 {o->setValueType(VC_percent127);}
+        code2 {o->selection_color(setKnob(o->value(),127));}
         class WidgetPDial
       }
       Fl_Dial filterq {
@@ -802,7 +804,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::midiFilterQ, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Q} xywh {140 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.data);}
-        code1 {o->selection_color(setKnob(o->value(),64));}
+        code1 {o->setValueType(VC_percent127);}
+        code2 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial filtercutoff {
@@ -812,7 +815,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::midiFilterCutoff, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Filter Cutoff} xywh {200 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.data);}
-        code1 {o->selection_color(setKnob(o->value(),64));}
+        code1 {o->setValueType(VC_percent127);}
+        code2 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Dial masterbandwidth {
@@ -822,7 +826,8 @@ class PartUI {: {public Fl_Group, PartUI_}
         send_data(0, PART::control::midiBandwidth, o->value(), TOPLEVEL::type::Integer, npart);}
         tooltip {Master Bandwidth} xywh {260 10 30 30} labelsize 10 labelcolor 64 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.data);}
-        code1 {o->selection_color(setKnob(o->value(),64));}
+        code1 {o->setValueType(VC_percent127);}
+        code2 {o->selection_color(setKnob(o->value(),64));}
         class WidgetPDial
       }
       Fl_Button ctlmidiclose {

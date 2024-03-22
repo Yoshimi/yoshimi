@@ -1045,7 +1045,7 @@ class MasterUI {: {public GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -1053,7 +1053,7 @@ class MasterUI {: {public GuiUpdates}
           code0 {partui->init(synth->part[npart], npart, bankui);}
           class PartUI
         } {}
-        Fl_Group partControls {
+        Fl_Group partControls {open
           xywh {3 286 378 175}
         } {
           Fl_Dial partVol {
@@ -1066,7 +1066,8 @@ class MasterUI {: {public GuiUpdates}
             send_data(0, PART::control::volume, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {340 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::volume, npart));}
-            code1 {o->selection_color(setKnob(o->value(),96));}
+            code1 {o->setValueType(VC_PartVolume);}
+            code2 {o->selection_color(setKnob(o->value(),96));}
             class WidgetPDial
           }
           Fl_Dial partPan {
@@ -1077,7 +1078,8 @@ class MasterUI {: {public GuiUpdates}
             send_data(TOPLEVEL::action::forceUpdate, PART::control::panning, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {292 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::panning, npart));}
-            code1 {o->selection_color(setKnob(o->value(),64));}
+            code1 {o->setValueType(VC_PanningStd);}
+            code2 {o->selection_color(setKnob(o->value(),64));}
             class WidgetPDial
           }
           Fl_Dial partVelOffset {
@@ -1097,7 +1099,8 @@ class MasterUI {: {public GuiUpdates}
                 send_data(0, PART::control::velocitySense, o->value(), TOPLEVEL::type::Integer, npart);}
             xywh {196 327 32 32} labelsize 10 labelcolor 64 maximum 127 step 1
             code0 {o->value(fetchData(0, PART::control::velocitySense, npart));}
-            code1 {o->selection_color(setKnob(o->value(),64));}
+            code1 {o->setValueType(VC_AmpVelocitySense);}
+            code2 {o->selection_color(setKnob(o->value(),64));}
             class WidgetPDial
           }
           Fl_Group instrumentGroup {
@@ -1380,7 +1383,8 @@ class MasterUI {: {public GuiUpdates}
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect1, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {246 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect1, npart));}
-              code1 {o->selection_color(setKnob(o->value(),0));}
+              code1 {o->setValueType(VC_percent127);}
+              code2 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial sysEff2 {
@@ -1390,7 +1394,8 @@ class MasterUI {: {public GuiUpdates}
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect2, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {278 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect2, npart));}
-              code1 {o->selection_color(setKnob(o->value(),0));}
+              code1 {o->setValueType(VC_percent127);}
+              code2 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial sysEff3 {
@@ -1400,7 +1405,8 @@ class MasterUI {: {public GuiUpdates}
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect3, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {310 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect3, npart));}
-              code1 {o->selection_color(setKnob(o->value(),0));}
+              code1 {o->setValueType(VC_percent127);}
+              code2 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
             Fl_Dial sysEff4 {
@@ -1410,7 +1416,8 @@ class MasterUI {: {public GuiUpdates}
     send_data(TOPLEVEL::action::forceUpdate, PART::partToSystemEffect4, o->value(), TOPLEVEL::type::Integer, npart);}
               xywh {342 415 25 25} labelfont 1 labelsize 10 labelcolor 64 align 1 maximum 127 step 1
               code0 {o->value(fetchData(0, PART::control::partToSystemEffect4, npart));}
-              code1 {o->selection_color(setKnob(o->value(),0));}
+              code1 {o->setValueType(VC_percent127);}
+              code2 {o->selection_color(setKnob(o->value(),0));}
               class WidgetPDial
             }
           }
@@ -1695,6 +1702,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 1, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
         xywh {9 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial syseff02 {
@@ -1709,6 +1717,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 2, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
         xywh {45 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial syseff03 {
@@ -1723,6 +1732,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,0,TOPLEVEL::insert::systemEffectSend);}
         xywh {83 65 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial syseff12 {
@@ -1737,6 +1747,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 2, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,1,TOPLEVEL::insert::systemEffectSend);}
         xywh {45 118 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial syseff13 {
@@ -1751,6 +1762,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,1,TOPLEVEL::insert::systemEffectSend);}
         xywh {83 118 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial syseff23 {
@@ -1765,6 +1777,7 @@ Alan Calvert started the project}
         o->selection_color(setKnob(val,0));
         send_data(TOPLEVEL::action:: forceUpdate, 3, val, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects,2,TOPLEVEL::insert::systemEffectSend);}
         xywh {83 171 30 30} labelsize 10 align 1 maximum 127 step 1
+        code0 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
     }

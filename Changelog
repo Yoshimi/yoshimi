@@ -1,5 +1,13 @@
 yoshimi 2.3.2 M
 
+2024-3-22 Will
+bn 2322
+Added more instruments to Drums and Noises
+Updated User Guide
+System effect sends now show percentages
+MIDI CCs now show percentages
+Master window volume panning velocity show real values
+
 2024-3-17 Will
 bn 2321
 Split off config state loading from LV2
