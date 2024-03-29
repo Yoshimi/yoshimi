@@ -141,9 +141,9 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
     if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
-            addparbool("enable_gui", synth->getRuntime().showGui);
+            addparbool("enable_gui", synth->getRuntime().storedGui);
             addparbool("enable_splash", synth->getRuntime().showSplash);
-            addparbool("enable_CLI", synth->getRuntime().showCli);
+            addparbool("enable_CLI", synth->getRuntime().storedCli);
             addparbool("enable_single_master", synth->getRuntime().singlePath);
             addparbool("banks_checked", synth->getRuntime().banksChecked);
             addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);

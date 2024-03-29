@@ -124,8 +124,10 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     Oscilsize(512),
     oscilChanged(false),
     showGui(true),
+    storedGui(true),
     guiChanged(false),
     showCli(true),
+    storedCli(true),
     cliChanged(false),
     singlePath(false),
     banksChecked(false),
@@ -578,11 +580,16 @@ bool Config::extractBaseParameters(XMLwrapper& xml)
         return false;
     }
 
+    storedGui = xml.getparbool("enable_gui", showGui);
     if (!guiChanged)
-        showGui = xml.getparbool("enable_gui", showGui);
+        showGui = storedGui;
+
     showSplash = xml.getparbool("enable_splash", showSplash);
+
+    storedCli = xml.getparbool("enable_CLI", showCli);
     if (!cliChanged)
-        showCli = xml.getparbool("enable_CLI", showCli);
+        showCli = storedCli;
+
     singlePath  = xml.getparbool("enable_single_master", singlePath);
     banksChecked = xml.getparbool("banks_checked", banksChecked);
     autoInstance = xml.getparbool("enable_auto_instance", autoInstance);
@@ -1319,13 +1326,13 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'c':
-            settings->configChanged = true;
+            //settings->configChanged = true;
             settings->cliChanged = true;
             settings->showCli = false;
             break;
 
         case 'C':
-            settings->configChanged = true;
+            //settings->configChanged = true;
             settings->cliChanged = true;
             settings->showCli = true;
             break;
@@ -1336,13 +1343,13 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'i':
-            settings->configChanged = true;
+            //settings->configChanged = true;
             settings->guiChanged = true;
             settings->showGui = false;
             break;
 
         case 'I':
-            settings->configChanged = true;
+            //settings->configChanged = true;
             settings->guiChanged = true;
             settings->showGui = true;
             break;

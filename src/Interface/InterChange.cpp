@@ -2988,13 +2988,19 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableGUI:
             if (write)
+            {
+                synth->getRuntime().storedGui = value_bool;
                 synth->getRuntime().showGui = value_bool;
+            }
             else
                 value = synth->getRuntime().showGui;
             break;
         case CONFIG::control::enableCLI:
             if (write)
+            {
+                synth->getRuntime().storedCli = value_bool;
                 synth->getRuntime().showCli = value_bool;
+            }
             else
                 value = synth->getRuntime().showCli;
             break;

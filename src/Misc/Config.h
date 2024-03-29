@@ -164,8 +164,10 @@ class Config
         unsigned int  Oscilsize;
         bool          oscilChanged;
         bool          showGui;
+        bool          storedGui;
         bool          guiChanged;
         bool          showCli;
+        bool          storedCli;
         bool          cliChanged;
         bool          singlePath;
         bool          banksChecked;
