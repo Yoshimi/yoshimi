@@ -469,6 +469,76 @@ void Config::restoreConfig(SynthEngine *_synth)
 }
 
 
+bool Config::updateConfig(bool session, unsigned char kititem, int value)
+{
+    bool success = true;
+std::cout << "session " << int(session) << std::endl;
+std::cout << "kititem " << int(kititem) << std::endl;
+std::cout << "value " << int(value) << std::endl;
+    if (!session)
+    { // handling base config
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(baseConfig);
+        if (success)
+        {
+            success = extractBaseParameters(*xml);
+            if (success)
+            {
+                switch (kititem)
+                {
+                    case CONFIG::control::enableGUI:
+                        xml->addparbool("enable_gui", value);
+                        break;
+                    case CONFIG::control::enableCLI:
+                        xml->addparbool("enable_CLI", value);
+                        break;
+                    case CONFIG::control::showSplash:
+                        xml->addparbool("enable_splash", value);
+                        std::cout << "splash" << std::endl;
+                        break;
+                    case CONFIG::control::enableSinglePath:
+                        xml->addparbool("enable_single_master", value);
+                        break;
+                    case CONFIG::control::enableAutoInstance:
+                        xml->addparbool("enable_auto_instance", value);
+                        break;
+                    case CONFIG::control::exposeStatus:
+                        xml->addpar("show_CLI_context", value);
+                        break;
+                    case CONFIG::control::XMLcompressionLevel:
+                        xml->addpar("gzip_compression", value);
+                        break;
+                    case CONFIG::control::handlePadSynthBuild:
+                        xml->addparU("handle_padsynth_build", value);
+                        break;
+
+                    default:
+                        Log("unrecognised base parameter", _SYS_::LogNotSerious);
+                }
+            }
+            if (false)//xml->saveXMLfile(baseConfig, false))
+            {
+                configChanged = false;
+                success = true;
+            }
+            else
+            {
+                Log("Failed to save master config to " + baseConfig, _SYS_::LogNotSerious);
+            }
+        }
+        else
+        {
+            Log("loadConfig load base failed");
+        }
+    }
+    else
+    { // handling current session (needs synth ID)
+        ;
+    }
+    return success;
+}
+
+
 void Config::defaultPresets(void)
 {
     string presetdirs[]  = {

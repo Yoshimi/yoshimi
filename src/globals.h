@@ -178,11 +178,11 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         enum {
             // bits 0, 1 as values
             Adjust = 0, // return value adjusted within limits
-            Minimum, // return this value
-            Maximum, // return this value
-            Default, // return this value
+            Minimum, // 1 return this value
+            Maximum, // 2 return this value
+            Default, // 3 return this value
             // remaining used bit-wise
-            Limits, // read limits shown above
+            Limits, // 4 read limits shown above
             Error = 8,
             LearnRequest = 16,
             Learnable = 32,
