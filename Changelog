@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-3-30 Will
+bn 2323
+CLI startup disabling GUI is now temporary and not marked changed.
+CLI startup disabling itself is now temporary and not marked changed.
+Started work on immediate saving of config changes (not yet active).
+
 2024-3-24 Will
 Added missing .xiy file needed for Dooo Flute.
 Added True Drawbars instrument.

@@ -169,8 +169,6 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
 {
     std::cerr.precision(4);
 
-    int currentInstance = synth->getUniqueId();
-
     if (isLV2Plugin)
     {
         //Log("LV2 only");
