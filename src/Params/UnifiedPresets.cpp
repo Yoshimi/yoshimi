@@ -593,7 +593,7 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad
     int parameter = getData->data.parameter;
 
     string name;
-    LFOParams *sectionType;
+    LFOParams *sectionType = NULL;
 
     if (engineType == PART::engine::addSynth)
     {
@@ -678,7 +678,7 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool i
     int parameter = getData->data.parameter;
 
     string name;
-    EnvelopeParams *sectionType;
+    EnvelopeParams *sectionType = NULL;
     if (engineType == PART::engine::addSynth)
     {
         switch (parameter)
