@@ -302,28 +302,30 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 namespace CONFIG // usage CONFIG::control::oscillatorSize
 {
     enum control : unsigned char {
-        oscillatorSize = 0,
+        enableGUI = 0,
+        showSplash,
+        enableCLI,
+        exposeStatus, // CLI only
+        enableSinglePath,
+        enableAutoInstance,
+        handlePadSynthBuild,   // how to build PADSynth wavetable;
+        // 0=legacy/muted, 1=background thread, 2=autoApply
+        XMLcompressionLevel, // this must be the last entry for base config.
+
+        defaultStateStart = 16, // must be first entry for state/session data
         bufferSize,
-        padSynthInterpolation,
-        virtualKeyboardLayout,
-        XMLcompressionLevel,
+        oscillatorSize,
         reportsDestination,
         logTextSize,
+        padSynthInterpolation,
+        virtualKeyboardLayout,
         savedInstrumentFormat,
-        defaultStateStart = 16,
         hideNonFatalErrors,
-        showSplash,
         logInstrumentLoadTimes,
         logXMLheaders,
         saveAllXMLdata,
-        enableGUI,
-        enableCLI,
-        enableAutoInstance,
-        enableSinglePath,
-        historyLock,
-        exposeStatus, // CLI only
-        enableHighlight, // in banks
-        handlePadSynthBuild,   // how to build PADSynth wavetable; 0=legacy/muted, 1=background thread, 2=autoApply
+        enableHighlight,
+
 
         // start of engine controls
         jackMidiSource = 32,
@@ -352,7 +354,10 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         logIncomingCCs,
         showLearnEditor,
         enableNRPNs,
-        saveCurrentConfig = 80
+        saveCurrentConfig = 80,
+
+        historyLock // these are stored in banks/recent at the start of each group
+        // we should probably change this!
     };
 }
 

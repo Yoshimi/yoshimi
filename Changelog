@@ -1,5 +1,14 @@
 yoshimi 2.3.2 M
 
+2024-4-13 Will
+bn 2324
+Reorganised control values for config so all base ones are together
+    and order in files matches list order.
+Removed 'check_pad_synth' from config.
+    It's not been relevant for years!
+Most of base config now changed immediately.
+Updated Control Data
+
 2024-3-30 Will
 bn 2323
 CLI startup disabling GUI is now temporary and not marked changed.

@@ -23,9 +23,10 @@
       </tr>
     </thead>
     <tbody>
+
       <tr>
-        <td>oscillatorSize</td>
-        <td>256~16384</td>
+        <td>enableGUI</td>
+        <td>0,1</td>
         <td>0</td>
         <td>248</td>
         <td>255</td>
@@ -34,11 +35,11 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Oscillator size (powers of 2)</td>
+        <td>Enable GUI</td>
       </tr>
       <tr>
-        <td>bufferSize</td>
-        <td>16~4096</td>
+        <td>showSplash</td>
+        <td>0,1</td>
         <td>1</td>
         <td>248</td>
         <td>255</td>
@@ -47,10 +48,10 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Internal Buffer size (powers of 2)</td>
+        <td>Show splash screen at start</td>
       </tr>
       <tr>
-        <td>padSynthInterpolation</td>
+        <td>enableCLI</td>
         <td>0,1</td>
         <td>2</td>
         <td>248</td>
@@ -60,11 +61,11 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>PadSynth interploation -- linear, cubic</td>
+        <td>Enable CLI</td>
       </tr>
       <tr>
-        <td>virtualKeyboardLayout</td>
-        <td>0~3</td>
+        <td>exposeStatus</td>
+        <td>0~2</td>
         <td>3</td>
         <td>248</td>
         <td>255</td>
@@ -73,11 +74,12 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Virtual keyboard layout<br>QWERTY, Dvorak, QWERTZ, AZERTY</td>
+        <td>Show CLI context level -- off, on, prompt</td>
       </tr>
+
       <tr>
-        <td>XMLcompressionLevel</td>
-        <td>0~9</td>
+        <td>enableSinglePath</td>
+        <td>0,1</td>
         <td>4</td>
         <td>248</td>
         <td>255</td>
@@ -86,10 +88,10 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>XML compression level</td>
+        <td>Make later external starts open new instance of first one instead</td>
       </tr>
       <tr>
-        <td>reportsDestination</td>
+        <td>enableAutoInstance</td>
         <td>0,1</td>
         <td>5</td>
         <td>248</td>
@@ -99,24 +101,24 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Reports destination -- Console, terminal</td>
+        <td>Enable auto start of stand-alone child instances</td>
       </tr>
       <tr>
-        <td>logTextSize</td>
-        <td>0~100</td>
+        <td>handlePadSynthBuild</td>
+        <td>0~2</td>
         <td>6</td>
         <td>248</td>
         <td>255</td>
+        <td>2</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>255</td>
-        <td>Font size for console window</td>
+        <td>Set PadSynth build method<br>Legacy, Background Auto-apply</td>
       </tr>
       <tr>
-        <td>savedInstrumentFormat</td>
-        <td>1~3</td>
+        <td>XMLcompressionLevel</td>
+        <td>0~9</td>
         <td>7</td>
         <td>248</td>
         <td>255</td>
@@ -125,7 +127,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Saved instrument format -- Legacy, Yoshimi, Both</td>
+        <td>XML compression level</td>
       </tr>
       <tr>
         <td></td>
@@ -153,10 +155,100 @@
         <td>255</td>
         <td>Start with default state</td>
       </tr>
+        <td>bufferSize</td>
+        <td>16~4096</td>
+        <td>17</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Internal Buffer size (powers of 2)</td>
+      </tr>
+      <tr>
+        <td>oscillatorSize</td>
+        <td>256~16384</td>
+        <td>18</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Oscillator size (powers of 2)</td>
+      </tr>
+      <tr>
+        <td>reportsDestination</td>
+        <td>0,1</td>
+        <td>19</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Reports destination -- Console, terminal</td>
+      </tr>
+      <tr>
+        <td>logTextSize</td>
+        <td>0~100</td>
+        <td>20</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Font size for console window</td>
+      </tr>
+      <tr>
+        <td>padSynthInterpolation</td>
+        <td>0,1</td>
+        <td>21</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>PadSynth interploation -- linear, cubic</td>
+      </tr>
+      <tr>
+        <td>virtualKeyboardLayout</td>
+        <td>0~3</td>
+        <td>22</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Virtual keyboard layout<br>QWERTY, Dvorak, QWERTZ, AZERTY</td>
+      </tr>
+      <tr>
+        <td>savedInstrumentFormat</td>
+        <td>1~3</td>
+        <td>23</td>
+        <td>248</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Saved instrument format -- Legacy, Yoshimi, Both</td>
+      </tr>
       <tr>
         <td>hideNonFatalErrors</td>
         <td>0,1</td>
-        <td>17</td>
+        <td>24</td>
         <td>248</td>
         <td>255</td>
         <td>255</td>
@@ -167,22 +259,9 @@
         <td>Hide non-fatal errors</td>
       </tr>
       <tr>
-        <td>showSplash</td>
-        <td>0,1</td>
-        <td>18</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Show splash screen at start</td>
-      </tr>
-      <tr>
         <td>logInstrumentLoadTimes</td>
         <td>0,1</td>
-        <td>19</td>
+        <td>25</td>
         <td>248</td>
         <td>255</td>
         <td>255</td>
@@ -195,7 +274,7 @@
       <tr>
         <td>logXMLheaders</td>
         <td>0,1</td>
-        <td>20</td>
+        <td>26</td>
         <td>248</td>
         <td>255</td>
         <td>255</td>
@@ -208,84 +287,6 @@
       <tr>
         <td>saveAllXMLdata</td>
         <td>0,1</td>
-        <td>21</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Include disabled data in XML files when saving </td>
-      </tr>
-      <tr>
-        <td>enableGUI</td>
-        <td>0,1</td>
-        <td>22</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Enable GUI</td>
-      </tr>
-      <tr>
-        <td>enableCLI</td>
-        <td>0,1</td>
-        <td>23</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Enable CLI</td>
-      </tr>
-      <tr>
-        <td>enableAutoInstance</td>
-        <td>0,1</td>
-        <td>24</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Enable auto start of stand-alone child instances</td>
-      </tr>
-      <tr>
-        <td>enableSinglePath</td>
-        <td>0,1</td>
-        <td>25</td>
-        <td>248</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Make later external starts open new instance of first one instead</td>
-      </tr>
-      <tr>
-        <td>historyLock</td>
-        <td>0,1</td>
-        <td>26</td>
-        <td>248</td>
-        <td>0~5</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Lock given history file group against changes.</td>
-      </tr>
-      <tr>
-        <td>exposeStatus</td>
-        <td>0~2</td>
         <td>27</td>
         <td>248</td>
         <td>255</td>
@@ -294,7 +295,7 @@
         <td>255</td>
         <td>255</td>
         <td>255</td>
-        <td>Show CLI context level -- off, on, prompt</td>
+        <td>Include disabled data in XML files when saving </td>
       </tr>
       <tr>
         <td>enableHighlight</td>
@@ -308,19 +309,6 @@
         <td>255</td>
         <td>255</td>
         <td>Highigh latest instrument loaded in GUI</td>
-      </tr>
-      <tr>
-        <td>handlePadSynthBuild</td>
-        <td>0~2</td>
-        <td>29</td>
-        <td>248</td>
-        <td>255</td>
-        <td>2</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>255</td>
-        <td>Set PadSynth build method<br>Legacy, Background Auto-apply</td>
       </tr>
       <tr>
         <td></td>
@@ -676,7 +664,7 @@
       <tr>
         <td>enableNRPNs</td>
         <td>0,1</td>
-        <td>74</td>
+        <td>75</td>
         <td>248</td>
         <td>255</td>
         <td>255</td>
@@ -712,6 +700,20 @@
         <td>msg No.</td>
         <td>Save the complete configuration regardless of whether or not it has changed (dummy text)</td>
       </tr>
+      <tr>
+        <td>historyLock</td>
+        <td>0,1</td>
+        <td>81</td>
+        <td>248</td>
+        <td>0~5</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>255</td>
+        <td>Lock given history file group against changes. This is actually stored in the yoshimi.banks file.</td>
+      </tr>
+
     </tbody>
   </table>
   <div class="titles">

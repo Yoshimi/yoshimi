@@ -1001,7 +1001,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                     }
                     osc_size->value(tmp);
                     break;
-                case 1:
+                case CONFIG::control::bufferSize:
                     tmp = CONFIG::control::bufferSize;
                     while (value_int > 16)
                     {

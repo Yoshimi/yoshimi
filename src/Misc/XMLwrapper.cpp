@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2023, Will Godfrey
+    Copyright 2014-2024, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -144,13 +144,13 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparbool("enable_gui", synth->getRuntime().storedGui);
             addparbool("enable_splash", synth->getRuntime().showSplash);
             addparbool("enable_CLI", synth->getRuntime().storedCli);
-            addparbool("enable_single_master", synth->getRuntime().singlePath);
-            addparbool("banks_checked", synth->getRuntime().banksChecked);
-            addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
-            addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
-            addparU("active_instances", synth->getRuntime().activeInstance);
             addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
+            addparbool("enable_single_master", synth->getRuntime().singlePath);
+            addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
+            addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
+            addparbool("banks_checked", synth->getRuntime().banksChecked);
+            addparU("active_instances", synth->getRuntime().activeInstance);
             addparstr("guide_version", synth->getRuntime().guideVersion);
             addparstr("manual", synth->getRuntime().manualFile);
         endbranch();
@@ -475,6 +475,47 @@ void XMLwrapper::addparbool(const std::string& name, int val)
         addparams2("par_bool", "name", name.c_str(), "value", "yes");
     else
         addparams2("par_bool", "name", name.c_str(), "value", "no");
+}
+
+
+
+void XMLwrapper::changeparbool(const std::string& name, int val)
+{
+    node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+    {
+        std::cout << "failed" << std::endl;
+        return;
+    }
+    std::string tmp;
+    if (val == 0)
+        tmp = "no";
+    else
+        tmp = "yes";
+    mxmlElementSetAttr(node, "value", tmp.c_str());
+    return;
+}
+
+void XMLwrapper::changeparU(const std::string& name, unsigned int val)
+{
+    node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+    {
+        std::cout << "failed" << std::endl;
+        return;
+    }
+    mxmlElementSetAttr(node, "value", asString(val).c_str());
+}
+
+void XMLwrapper::changepar(const std::string& name, int val)
+{
+    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
+    if (!node)
+    {
+        std::cout << "failed" << std::endl;
+        return;
+    }
+    mxmlElementSetAttr(node, "value", asString(val).c_str());
 }
 
 

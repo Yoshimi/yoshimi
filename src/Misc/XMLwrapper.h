@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2023, Will Godfrey
+    Copyright 2014-2024, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -61,7 +61,6 @@ class XMLwrapper
 
         void addparbool(const std::string& name, int val); // 1 => "yes", else "no"
 
-
         // add string parameter (name and string)
         void addparstr(const std::string& name, const std::string& val);
 
@@ -71,6 +70,14 @@ class XMLwrapper
 
         // this must be called after each branch (nodes that contains child nodes)
         void endbranch(void);
+
+
+        // modify in place
+        void changeparbool(const std::string& name, int val); // 1 => "yes", else "no"
+        void changeparU(const std::string& name, unsigned int val);
+
+        void changepar(const std::string& name, int val);
+
 
         // we always save with a blank first line
         const char *removeBlanks(const char *c)

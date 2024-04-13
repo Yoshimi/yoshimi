@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2023, Will Godfrey & others
+    Copyright 2014-2024, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -469,59 +469,65 @@ void Config::restoreConfig(SynthEngine *_synth)
 }
 
 
-bool Config::updateConfig(bool session, unsigned char kititem, int value)
+bool Config::updateConfig(unsigned char control, int value)
 {
-    bool success = true;
-std::cout << "session " << int(session) << std::endl;
-std::cout << "kititem " << int(kititem) << std::endl;
-std::cout << "value " << int(value) << std::endl;
-    if (!session)
+    bool success{false};
+    if (control <= CONFIG::control::XMLcompressionLevel)
     { // handling base config
+
+        xmlType = TOPLEVEL::XML::MasterConfig;
+        baseConfig = file::configDir() + "/yoshimi" + string(EXTEN::config);
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(baseConfig);
         if (success)
         {
-            success = extractBaseParameters(*xml);
-            if (success)
+            xml->enterbranch("BASE_PARAMETERS");
+            switch (control)
             {
-                switch (kititem)
-                {
-                    case CONFIG::control::enableGUI:
-                        xml->addparbool("enable_gui", value);
-                        break;
-                    case CONFIG::control::enableCLI:
-                        xml->addparbool("enable_CLI", value);
-                        break;
-                    case CONFIG::control::showSplash:
-                        xml->addparbool("enable_splash", value);
-                        std::cout << "splash" << std::endl;
-                        break;
-                    case CONFIG::control::enableSinglePath:
-                        xml->addparbool("enable_single_master", value);
-                        break;
-                    case CONFIG::control::enableAutoInstance:
-                        xml->addparbool("enable_auto_instance", value);
-                        break;
-                    case CONFIG::control::exposeStatus:
-                        xml->addpar("show_CLI_context", value);
-                        break;
-                    case CONFIG::control::XMLcompressionLevel:
-                        xml->addpar("gzip_compression", value);
-                        break;
-                    case CONFIG::control::handlePadSynthBuild:
-                        xml->addparU("handle_padsynth_build", value);
-                        break;
+                case CONFIG::control::enableGUI:
+                    xml->changeparbool("enable_gui", value);
+                    showGui = value;
+                    storedGui = value;
+                    break;
+                case CONFIG::control::enableCLI:
+                    xml->changeparbool("enable_CLI", value);
+                    showCli = value;
+                    storedCli = value;
+                    break;
+                case CONFIG::control::showSplash:
+                    xml->changeparbool("enable_splash", value);
+                    showSplash = value;
+                    break;
+                case CONFIG::control::enableSinglePath:
+                    xml->changeparbool("enable_single_master", value);
+                    singlePath = value;
+                    break;
+                case CONFIG::control::enableAutoInstance:
+                    xml->changeparbool("enable_auto_instance", value);
+                    autoInstance = value;
+                    break;
+                case CONFIG::control::exposeStatus:
+                    xml->changepar("show_CLI_context", value);
+                    showCLIcontext = value;
+                    break;
+                case CONFIG::control::handlePadSynthBuild:
+                    xml->addparU("handle_padsynth_build", value);
+                    handlePadSynthBuild = value;
+                    break;
+                case CONFIG::control::XMLcompressionLevel:
+                    xml->changepar("gzip_compression", value);
+                    GzipCompression = value;
+                    break;
 
-                    default:
-                        Log("unrecognised base parameter", _SYS_::LogNotSerious);
-                }
+                default:
+                    Log("unrecognised base parameter", _SYS_::LogNotSerious);
             }
-            if (false)//xml->saveXMLfile(baseConfig, false))
-            {
-                configChanged = false;
-                success = true;
-            }
-            else
+            xml->exitbranch(); // BASE
+        }
+        if (success)
+        {
+            auto xml{std::make_unique<XMLwrapper>(synth, true)};
+            if (!xml->saveXMLfile(baseConfig, false))
             {
                 Log("Failed to save master config to " + baseConfig, _SYS_::LogNotSerious);
             }
@@ -532,7 +538,7 @@ std::cout << "value " << int(value) << std::endl;
         }
     }
     else
-    { // handling current session (needs synth ID)
+    { // does handling current session need synth ID?
         ;
     }
     return success;
@@ -662,8 +668,6 @@ bool Config::extractConfigData(XMLwrapper& xml)
     if (sessionStage != _SYS_::type::InProgram)
     {
 
-        if (!rateChanged)
-            Samplerate = xml.getpar("sample_rate", Samplerate, 44100, 192000);
         if (!bufferChanged)
             Buffersize = xml.getpar("sound_buffer_size", Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
         if (!oscilChanged)
@@ -671,17 +675,17 @@ bool Config::extractConfigData(XMLwrapper& xml)
         single_row_panel = xml.getpar("single_row_panel", single_row_panel, 0, 1);
         toConsole = xml.getpar("reports_destination", toConsole, 0, 1);
         consoleTextSize = xml.getpar("console_text_size", consoleTextSize, 11, 100);
+        Interpolation = xml.getpar("interpolation", Interpolation, 0, 1);
+        VirKeybLayout = xml.getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
         hideErrors = xml.getpar("hide_system_errors", hideErrors, 0, 1);
         showTimes = xml.getpar("report_load_times", showTimes, 0, 1);
         logXMLheaders = xml.getpar("report_XMLheaders", logXMLheaders, 0, 1);
-        VirKeybLayout = xml.getpar("virtual_keyboard_layout", VirKeybLayout, 1, 6) - 1;
         xmlmax = xml.getpar("full_parameters", xmlmax, 0, 1);
 
         bankHighlight = xml.getparbool("bank_highlight", bankHighlight);
         loadPresetsList();
         presetsRootID = xml.getpar("presetsCurrentRootID", presetsRootID, 0, MAX_PRESETS);
 
-        Interpolation = xml.getpar("interpolation", Interpolation, 0, 1);
 
         // engines
         if (!engineChanged)
@@ -693,6 +697,8 @@ bool Config::extractConfigData(XMLwrapper& xml)
         // alsa settings
         alsaAudioDevice = xml.getparstr("linux_alsa_audio_dev");
         alsaMidiDevice = xml.getparstr("linux_alsa_midi_dev");
+        if (!rateChanged)
+            Samplerate = xml.getpar("sample_rate", Samplerate, 44100, 192000);
 
         // jack settings
         jackServer = xml.getparstr("linux_jack_server");
@@ -762,47 +768,46 @@ void Config::addConfigXML(XMLwrapper& xml)
     xml.beginbranch("CONFIGURATION");
     xml.addpar("defaultState", loadDefaultState);
 
-    xml.addpar("sample_rate", synth->getRuntime().Samplerate);
     xml.addpar("sound_buffer_size", synth->getRuntime().Buffersize);
     xml.addpar("oscil_size", synth->getRuntime().Oscilsize);
 
     xml.addpar("single_row_panel", single_row_panel);
     xml.addpar("reports_destination", toConsole);
     xml.addpar("console_text_size", consoleTextSize);
+    xml.addpar("interpolation", Interpolation);
+    xml.addpar("virtual_keyboard_layout", VirKeybLayout + 1);
+    xml.addpar("saved_instrument_format", instrumentFormat);
     xml.addpar("hide_system_errors", hideErrors);
     xml.addpar("report_load_times", showTimes);
     xml.addpar("report_XMLheaders", logXMLheaders);
-    xml.addpar("virtual_keyboard_layout", VirKeybLayout + 1);
     xml.addpar("full_parameters", xmlmax);
 
     xml.addparbool("bank_highlight", bankHighlight);
 
-    xml.addpar("presetsCurrentRootID", presetsRootID);
 
-    xml.addpar("interpolation", Interpolation);
 
     xml.addpar("audio_engine", synth->getRuntime().audioEngine);
     xml.addpar("midi_engine", synth->getRuntime().midiEngine);
-    xml.addpar("alsa_midi_type", synth->getRuntime().alsaMidiType);
-
-    xml.addparstr("linux_alsa_audio_dev", alsaAudioDevice);
-    xml.addparstr("linux_alsa_midi_dev", alsaMidiDevice);
 
     xml.addparstr("linux_jack_server", jackServer);
     xml.addparstr("linux_jack_midi_dev", jackMidiDevice);
     xml.addpar("connect_jack_audio", connectJackaudio);
 
+    xml.addpar("alsa_midi_type", synth->getRuntime().alsaMidiType);
+    xml.addparstr("linux_alsa_audio_dev", alsaAudioDevice);
+    xml.addparstr("linux_alsa_midi_dev", alsaMidiDevice);
+    xml.addpar("sample_rate", synth->getRuntime().Samplerate);
+
+    xml.addpar("presetsCurrentRootID", presetsRootID);
     xml.addpar("midi_bank_root", midi_bank_root);
     xml.addpar("midi_bank_C", midi_bank_C);
     xml.addpar("midi_upper_voice_C", midi_upper_voice_C);
     xml.addpar("ignore_program_change", (1 - EnableProgChange));
     xml.addpar("enable_part_on_voice_load", 1); // for backward compatibility
-    xml.addpar("saved_instrument_format", instrumentFormat);
     xml.addparbool("enable_incoming_NRPNs", enable_NRPN);
     xml.addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xml.addparbool("monitor-incoming_CCs", monitorCCin);
     xml.addparbool("open_editor_on_learned_CC",showLearnedCC);
-    xml.addpar("check_pad_synth", 1); // for backward compatibility
     xml.addpar("root_current_ID", synth->ReadBankRoot());
     xml.addpar("bank_current_ID", synth->ReadBank());
     xml.endbranch(); // CONFIGURATION

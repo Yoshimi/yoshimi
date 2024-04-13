@@ -55,10 +55,10 @@ void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId);
 Config *firstRuntime = NULL;
 static std::list<std::string> globalAllArgs;
-bool isSingleMaster = false;
 bool bShowGui = true;
-bool bShowCmdLine = true;
 bool showSplash = false;
+bool bShowCmdLine = true;
+bool isSingleMaster = false;
 bool splashSet = true;
 bool configuring = false;
 #ifdef GUI_FLTK
@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
     {
         int count = 0;
         int found = 0;
-        while (!Config.empty() && count < 16 && found < 3)
+        while (!Config.empty() && count < 16 && found < 2)
         { // no need to count beyond 16 lines!
             std::string line = func::nextLine(Config);
             ++ count;
