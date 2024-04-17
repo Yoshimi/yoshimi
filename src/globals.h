@@ -292,6 +292,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         // only file types from here onwards
         Config,
         MasterConfig,
+        MasterUpdate,
         Bank,
         History,
         PresetDirs,

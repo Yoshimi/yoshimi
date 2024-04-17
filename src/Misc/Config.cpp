@@ -471,65 +471,75 @@ void Config::restoreConfig(SynthEngine *_synth)
 
 bool Config::updateConfig(unsigned char control, int value)
 {
+    /*
+     * This routine only stores settings that the user has directly changed
+     * and not those changed via CLI startup parameters, nor changes made
+     * by loading sessions etc.
+     *
+     * This loads the previously saved config into an array so it doesn't
+     * disrupt the complete config currently in place. It then overwrites
+     * just the parameter the user changed, and resaves everything
+     * including system generated entries.
+     *
+     * Some assumptions are made based on the fact the parameters must be
+     * in the correct range as they otherwise couldn't have been created.
+     */
     bool success{false};
     if (control <= CONFIG::control::XMLcompressionLevel)
     { // handling base config
-
-        xmlType = TOPLEVEL::XML::MasterConfig;
+        int baseData[CONFIG::control::XMLcompressionLevel+1];
+        xmlType = TOPLEVEL::XML::MasterUpdate;
         baseConfig = file::configDir() + "/yoshimi" + string(EXTEN::config);
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(baseConfig);
+
+        // the following two are system defined;
+        bool banks = false; // default
+        unsigned int instances = 1; // default
         if (success)
         {
             xml->enterbranch("BASE_PARAMETERS");
-            switch (control)
-            {
-                case CONFIG::control::enableGUI:
-                    xml->changeparbool("enable_gui", value);
-                    showGui = value;
-                    storedGui = value;
-                    break;
-                case CONFIG::control::enableCLI:
-                    xml->changeparbool("enable_CLI", value);
-                    showCli = value;
-                    storedCli = value;
-                    break;
-                case CONFIG::control::showSplash:
-                    xml->changeparbool("enable_splash", value);
-                    showSplash = value;
-                    break;
-                case CONFIG::control::enableSinglePath:
-                    xml->changeparbool("enable_single_master", value);
-                    singlePath = value;
-                    break;
-                case CONFIG::control::enableAutoInstance:
-                    xml->changeparbool("enable_auto_instance", value);
-                    autoInstance = value;
-                    break;
-                case CONFIG::control::exposeStatus:
-                    xml->changepar("show_CLI_context", value);
-                    showCLIcontext = value;
-                    break;
-                case CONFIG::control::handlePadSynthBuild:
-                    xml->addparU("handle_padsynth_build", value);
-                    handlePadSynthBuild = value;
-                    break;
-                case CONFIG::control::XMLcompressionLevel:
-                    xml->changepar("gzip_compression", value);
-                    GzipCompression = value;
-                    break;
+            baseData[CONFIG::control::enableGUI] = xml->getparbool("enable_gui",true);
+            baseData[CONFIG::control::showSplash] = xml->getparbool("enable_splash",true);
+            baseData[CONFIG::control::enableCLI] = xml->getparbool("enable_cli",true);
+            baseData[CONFIG::control::exposeStatus] = xml->getpar("show_cli_context",0,3,3);
+            baseData[CONFIG::control::enableSinglePath] = xml->getparbool("enable_single_master",false);
+            baseData[CONFIG::control::enableAutoInstance] = xml->getparbool("enable_auto_instance",false);
+            baseData[CONFIG::control::handlePadSynthBuild] = xml->getparU("handle_padsynth_build",0);
+            baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",0,3,9);
 
-                default:
-                    Log("unrecognised base parameter", _SYS_::LogNotSerious);
-            }
-            xml->exitbranch(); // BASE
+            banks = xml->getparbool("banks_checked",false);
+            instances = xml->getparU("active_instances",1);
+            xml->exitbranch();
+
+             // this is the one that changed
+            baseData[control] = value;
         }
+
         if (success)
         {
             auto xml{std::make_unique<XMLwrapper>(synth, true)};
+            xml->beginbranch("BASE_PARAMETERS");
+            xml->addparbool("enable_gui",baseData[CONFIG::control::enableGUI]);
+            xml->addparbool("enable_splash",baseData[CONFIG::control::showSplash]);
+            xml->addparbool("enable_cli",baseData[CONFIG::control::enableCLI]);
+            xml->addpar("show_cli_context",baseData[CONFIG::control::exposeStatus]);
+            xml->addparbool("enable_single_master",baseData[CONFIG::control::enableSinglePath]);
+            xml->addparbool("enable_auto_instance",baseData[CONFIG::control::enableAutoInstance]);
+            xml->addparU("handle_padsynth_build",baseData[CONFIG::control::handlePadSynthBuild]);
+            xml->addpar("gzip_compression",baseData[CONFIG::control::XMLcompressionLevel]);
+
+            // the following four are system defined;
+            xml->addparbool("banks_checked",banks);
+            xml->addparU("active_instances",instances);
+            xml->addparstr("guide_version", synth->getRuntime().guideVersion);
+            xml->addparstr("manual", synth->getRuntime().manualFile);
+
+            xml->endbranch();
+
             if (!xml->saveXMLfile(baseConfig, false))
             {
-                Log("Failed to save master config to " + baseConfig, _SYS_::LogNotSerious);
+                Log("Failed to update master config", _SYS_::LogNotSerious);
             }
         }
         else
@@ -538,7 +548,7 @@ bool Config::updateConfig(unsigned char control, int value)
         }
     }
     else
-    { // does handling current session need synth ID?
+    { // handling current session
         ;
     }
     return success;

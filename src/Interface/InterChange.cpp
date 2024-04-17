@@ -2939,7 +2939,10 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::handlePadSynthBuild:
             if (write)
+            {
+                synth->getRuntime().handlePadSynthBuild = value_int;
                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().handlePadSynthBuild;
             break;
@@ -2949,6 +2952,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             {
                 synth->getRuntime().storedGui = value_bool;
                 synth->getRuntime().showGui = value_bool;
+                synth->getRuntime().updateConfig(control, value);
             }
             else
                 value = synth->getRuntime().showGui;
@@ -2958,37 +2962,53 @@ void InterChange::commandConfig(CommandBlock *getData)
             {
                 synth->getRuntime().storedCli = value_bool;
                 synth->getRuntime().showCli = value_bool;
+                synth->getRuntime().updateConfig(control, value);
             }
             else
                 value = synth->getRuntime().showCli;
             break;
         case CONFIG::control::showSplash:
             if (write)
+            {
                 synth->getRuntime().updateConfig(control, value);
+                synth->getRuntime().showSplash = value;
+            }
             else
                 value = synth->getRuntime().showSplash;
             break;
         case CONFIG::control::enableSinglePath:
             if (write)
+            {
+                synth->getRuntime().singlePath = value;
                 synth->getRuntime().updateConfig(control, value);
+            }
             else
                 value = synth->getRuntime().singlePath;
             break;
         case CONFIG::control::enableAutoInstance:
             if (write)
+            {
+                synth->getRuntime().autoInstance = value;
                 synth->getRuntime().updateConfig(control, value);
+            }
             else
                 value = synth->getRuntime().autoInstance;
             break;
         case CONFIG::control::exposeStatus:
             if (write)
+            {
+                synth->getRuntime().showCLIcontext = value;
                 synth->getRuntime().updateConfig(control, value);
+            }
             else
                 value = firstSynth->getRuntime().showCLIcontext;
             break;
         case CONFIG::control::XMLcompressionLevel:
             if (write)
+            {
+                synth->getRuntime().GzipCompression = value;
                 synth->getRuntime().updateConfig(control, value);
+            }
             else
                 value = synth->getRuntime().GzipCompression;
             break;

@@ -395,6 +395,7 @@ char *XMLwrapper::getXMLdata()
             break;
 
         case TOPLEVEL::XML::MasterConfig:
+        case TOPLEVEL::XML::MasterUpdate:
             addparstr("XMLtype", "Config Base");
             break;
 
@@ -475,47 +476,6 @@ void XMLwrapper::addparbool(const std::string& name, int val)
         addparams2("par_bool", "name", name.c_str(), "value", "yes");
     else
         addparams2("par_bool", "name", name.c_str(), "value", "no");
-}
-
-
-
-void XMLwrapper::changeparbool(const std::string& name, int val)
-{
-    node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
-    {
-        std::cout << "failed" << std::endl;
-        return;
-    }
-    std::string tmp;
-    if (val == 0)
-        tmp = "no";
-    else
-        tmp = "yes";
-    mxmlElementSetAttr(node, "value", tmp.c_str());
-    return;
-}
-
-void XMLwrapper::changeparU(const std::string& name, unsigned int val)
-{
-    node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
-    {
-        std::cout << "failed" << std::endl;
-        return;
-    }
-    mxmlElementSetAttr(node, "value", asString(val).c_str());
-}
-
-void XMLwrapper::changepar(const std::string& name, int val)
-{
-    node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
-    if (!node)
-    {
-        std::cout << "failed" << std::endl;
-        return;
-    }
-    mxmlElementSetAttr(node, "value", asString(val).c_str());
 }
 
 
