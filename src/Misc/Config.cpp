@@ -469,14 +469,14 @@ void Config::restoreConfig(SynthEngine *_synth)
 }
 
 
-bool Config::updateConfig(unsigned char control, int value)
+bool Config::updateConfig(int control, int value, bool isString)
 {
     /*
      * This routine only stores settings that the user has directly changed
      * and not those changed via CLI startup parameters, nor changes made
      * by loading sessions etc.
      *
-     * This loads the previously saved config into an array so it doesn't
+     * It loads the previously saved config into an array so it doesn't
      * disrupt the complete config currently in place. It then overwrites
      * just the parameter the user changed, and resaves everything
      * including system generated entries.
@@ -484,9 +484,13 @@ bool Config::updateConfig(unsigned char control, int value)
      * Some assumptions are made based on the fact the parameters must be
      * in the correct range as they otherwise couldn't have been created.
      */
+
     bool success{false};
     if (control <= CONFIG::control::XMLcompressionLevel)
     { // handling base config
+
+        std::cout << "in base conf" << std::endl;
+
         int baseData[CONFIG::control::XMLcompressionLevel+1];
         xmlType = TOPLEVEL::XML::MasterUpdate;
         baseConfig = file::configDir() + "/yoshimi" + string(EXTEN::config);
@@ -534,8 +538,7 @@ bool Config::updateConfig(unsigned char control, int value)
             xml->addparU("active_instances",instances);
             xml->addparstr("guide_version", synth->getRuntime().guideVersion);
             xml->addparstr("manual", synth->getRuntime().manualFile);
-
-            xml->endbranch();
+            xml->endbranch(); // BASE_PARAMETERS
 
             if (!xml->saveXMLfile(baseConfig, false))
             {
@@ -549,6 +552,136 @@ bool Config::updateConfig(unsigned char control, int value)
     }
     else
     { // handling current session
+        const int offset = CONFIG::control::defaultStateStart;
+        const int arraySize = CONFIG::control::historyLock - offset;
+        const string instance = asString(synth->getUniqueId());
+
+        xmlType = TOPLEVEL::XML::Config;
+        string configFile = file::configDir() + "/yoshimi-" + instance + string(EXTEN::instance);
+        int configData[arraySize]; // historyLock is handled elsewhere
+        auto xml{std::make_unique<XMLwrapper>(synth, true)};
+        success = xml->loadXMLfile(configFile);
+
+                std::cout << "in session control " << std::endl;
+
+
+        // the following two are system defined;
+        int tempRoot = 5; // default
+        int tempBank = 5; // default
+        string tempText = "";
+
+        if (success)
+        {
+            xml->enterbranch("CONFIGURATION");
+            configData[CONFIG::control::defaultStateStart - offset] = xml->getpar("defaultState", 0, 0, 1);
+            configData[CONFIG::control::bufferSize - offset] = xml->getpar("sound_buffer_size", 0, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+            configData[CONFIG::control::oscillatorSize - offset] = xml->getpar("oscil_size", 0, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
+            single_row_panel = xml->getpar("single_row_panel",single_row_panel,0,1); // TODO integrate properly
+            configData[CONFIG::control::reportsDestination - offset] = xml->getpar("reports_destination", 0, 0, 1);
+
+            configData[CONFIG::control::logTextSize - offset] = xml->getpar("console_text_size", 0, 11, 100);
+            configData[CONFIG::control::padSynthInterpolation - offset] = xml->getpar("interpolation", 0, 0, 1);
+            configData[CONFIG::control::virtualKeyboardLayout - offset] = xml->getpar("virtual_keyboard_layout", 0, 1, 6) - 1;
+            configData[CONFIG::control::savedInstrumentFormat - offset] = xml->getpar("saved_instrument_format",0, 1, 3);
+            configData[CONFIG::control::hideNonFatalErrors - offset] = xml->getpar("hide_system_errors", 0, 0, 1);
+            configData[CONFIG::control::logInstrumentLoadTimes - offset] = xml->getpar("report_load_times", 0, 0, 1);
+            configData[CONFIG::control::logXMLheaders - offset] = xml->getpar("report_XMLheaders", 0, 0, 1);
+            configData[CONFIG::control::saveAllXMLdata - offset] = xml->getpar("full_parameters", 0, 0, 1);
+            configData[CONFIG::control::enableHighlight - offset] = xml->getparbool("bank_highlight", bankHighlight);
+            configData[CONFIG::control::jackMidiSource - offset] = textMsgBuffer.push(xml->getparstr("linux_jack_midi_dev"));// string
+            configData[CONFIG::control::jackServer - offset] =  textMsgBuffer.push(xml->getparstr("linux_jack_server"));// string
+            configData[CONFIG::control::jackAutoConnectAudio - offset] = xml->getpar("connect_jack_audio", 0, 0, 1);
+            configData[CONFIG::control::alsaMidiSource - offset] = textMsgBuffer.push(xml->getparstr("linux_alsa_midi_dev"));// string
+            configData[CONFIG::control::alsaMidiType - offset] = xml->getpar("alsa_midi_type", 0, 0, 2);
+            configData[CONFIG::control::alsaAudioDevice - offset] = textMsgBuffer.push(xml->getparstr("linux_alsa_audio_dev"));// string
+            configData[CONFIG::control::alsaSampleRate - offset] = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+            configData[CONFIG::control::readAudio - offset] = (audio_drivers)xml->getpar("audio_engine", 0, no_audio, alsa_audio);
+            configData[CONFIG::control::readMIDI - offset] = (midi_drivers)xml->getpar("midi_engine", 0, no_midi, alsa_midi);
+
+                configData[CONFIG::control::jackPreferredAudio - offset] = (configData[CONFIG::control::readAudio - offset] == jack_audio);
+                configData[CONFIG::control::alsaPreferredAudio - offset] = (configData[CONFIG::control::readAudio - offset] == alsa_audio);
+                configData[CONFIG::control::jackPreferredMidi - offset] = (configData[CONFIG::control::readMIDI - offset] == jack_midi);
+                configData[CONFIG::control::alsaPreferredMidi - offset] = (configData[CONFIG::control::readMIDI - offset] == alsa_midi);
+            //configData[CONFIG::control::addPresetRootDir - offset] = // string
+            //configData[CONFIG::control::removePresetRootDir - offset] = // returns string
+            configData[CONFIG::control::currentPresetRoot - offset] = xml->getpar("presetsCurrentRootID", 0, 0, MAX_PRESETS);
+            configData[CONFIG::control::bankRootCC - offset] = xml->getpar("midi_bank_root", 0, 0, 128);
+            configData[CONFIG::control::bankCC - offset] = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
+            configData[CONFIG::control::enableProgramChange - offset] = 1 - xml->getpar("ignore_program_change", 0, 0, 1); // inverted for Zyn compatibility
+            configData[CONFIG::control::extendedProgramChangeCC - offset] = xml->getpar("midi_upper_voice_C", 0, 0, 128);// return string (in use)
+            configData[CONFIG::control::ignoreResetAllCCs - offset] = xml->getpar("ignore_reset_all_CCs",0,0, 1);
+            configData[CONFIG::control::logIncomingCCs - offset] = xml->getparbool("monitor-incoming_CCs", monitorCCin);
+            configData[CONFIG::control::showLearnEditor - offset] = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
+            configData[CONFIG::control::enableNRPNs - offset] = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
+            //configData[CONFIG::control::saveCurrentConfig - offset] = // return string (dummy)
+
+            single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1); // GUI only TODO integrate properly
+
+            tempRoot = xml->getpar("root_current_ID", tempRoot, 0, 127);
+            tempBank = xml->getpar("bank_current_ID", tempBank, 0, 127);
+            xml->exitbranch();
+
+            // this is the one that changed
+            std::cout << "control "<< control << "  val " << value << std::endl;
+            std::cout << control - offset << std::endl;
+            configData[control - offset] = value;
+            if (isString)
+            {
+                tempText = textMsgBuffer.fetch(value); //string conversion via textmsg
+            }
+
+            if (success)
+            {
+                auto xml{std::make_unique<XMLwrapper>(synth, true)};
+                xml->beginbranch("CONFIGURATION");
+                xml->addpar("defaultState", CONFIG::control::defaultStateStart - offset);
+                xml->addpar("sound_buffer_size", CONFIG::control::bufferSize - offset);
+                xml->addpar("oscil_size", configData[CONFIG::control::oscillatorSize - offset]);
+                xml->addpar("single_row_panel", single_row_panel);
+                xml->addpar("reports_destination", configData[CONFIG::control::reportsDestination - offset]);
+                xml->addpar("console_text_size", configData[CONFIG::control::logTextSize - offset]);
+                xml->addpar("interpolation", configData[CONFIG::control::padSynthInterpolation - offset]);
+                xml->addpar("virtual_keyboard_layout", configData[CONFIG::control::virtualKeyboardLayout - offset] + 1);
+                xml->addpar("saved_instrument_format", configData[CONFIG::control::savedInstrumentFormat - offset]);
+                xml->addpar("hide_system_errors", configData[CONFIG::control::hideNonFatalErrors - offset]);
+                xml->addpar("report_load_times", configData[CONFIG::control::logInstrumentLoadTimes - offset]);
+                xml->addpar("report_XMLheaders", configData[CONFIG::control::logXMLheaders - offset]);
+                xml->addpar("full_parameters", configData[CONFIG::control::saveAllXMLdata - offset]);
+                xml->addparbool("bank_highlight", configData[CONFIG::control::enableHighlight - offset]);
+                xml->addpar("audio_engine", configData[CONFIG::control::readAudio - offset]);
+                xml->addpar("midi_engine", configData[CONFIG::control::readMIDI - offset]);
+                xml->addparstr("linux_jack_server", textMsgBuffer.fetch(configData[CONFIG::control::jackServer - offset]));
+                xml->addparstr("linux_jack_midi_dev", textMsgBuffer.fetch(configData[CONFIG::control::jackMidiSource - offset]));
+                xml->addpar("connect_jack_audio", configData[CONFIG::control::jackAutoConnectAudio - offset]);
+                xml->addpar("alsa_midi_type", configData[CONFIG::control::alsaMidiType - offset]);
+                xml->addparstr("linux_alsa_audio_dev", textMsgBuffer.fetch(configData[CONFIG::control::alsaAudioDevice - offset]));
+                xml->addparstr("linux_alsa_midi_dev", textMsgBuffer.fetch(configData[CONFIG::control::alsaMidiSource - offset]));
+                xml->addpar("sample_rate", configData[CONFIG::control::alsaSampleRate - offset]);
+                xml->addpar("presetsCurrentRootID", configData[CONFIG::control::currentPresetRoot - offset]);
+                xml->addpar("midi_bank_root", configData[CONFIG::control::bankRootCC - offset]);
+                xml->addpar("midi_bank_C", configData[CONFIG::control::bankCC - offset]);
+                xml->addpar("midi_upper_voice_C", configData[CONFIG::control::extendedProgramChangeCC - offset]);
+                xml->addpar("ignore_program_change", (1 - configData[CONFIG::control::enableProgramChange - offset]));
+                xml->addpar("enable_part_on_voice_load", 1); // for backward compatibility
+                xml->addparbool("enable_incoming_NRPNs", configData[CONFIG::control::enableNRPNs - offset]);
+                xml->addpar("ignore_reset_all_CCs",configData[CONFIG::control::ignoreResetAllCCs - offset]);
+                xml->addparbool("monitor-incoming_CCs", configData[CONFIG::control::logIncomingCCs - offset]);
+                xml->addparbool("open_editor_on_learned_CC",configData[CONFIG::control::showLearnEditor - offset]);
+
+                xml->addpar("root_current_ID", tempRoot);
+                xml->addpar("bank_current_ID", tempBank);
+                xml->endbranch(); // CONFIGURATION
+
+                if (!xml->saveXMLfile(configFile, false))
+                {
+                    Log("Failed to update instance", _SYS_::LogNotSerious);
+                }
+            }
+        }
+        else
+        {
+            Log("loadConfig load instance " + instance + " failed");
+        }
         ;
     }
     return success;

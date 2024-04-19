@@ -66,7 +66,7 @@ class Config
         bool savePresetsList(void);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
-        bool updateConfig(unsigned char control, int value);
+        bool updateConfig(int control, int value, bool isString = false);
         void restoreConfig(SynthEngine *_synth);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);

@@ -2893,6 +2893,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = nearestPowerOf2(value_int, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
                 getData->data.value = value;
                 synth->getRuntime().Oscilsize = value;
+                synth->getRuntime().updateConfig(CONFIG::control::oscillatorSize, value_int);
             }
             else
                 value = synth->getRuntime().Oscilsize;
@@ -2907,6 +2908,18 @@ void InterChange::commandConfig(CommandBlock *getData)
             else
                 value = synth->getRuntime().Buffersize;
             break;
+
+        case CONFIG::control::singleRowPanel:
+            if (write)
+            {
+                ; // TODO integrate this properly
+            }
+            else
+            {
+                ;
+            }
+            break;
+
         case CONFIG::control::padSynthInterpolation:
             if (write)
                  synth->getRuntime().Interpolation = value_bool;
@@ -3015,7 +3028,10 @@ void InterChange::commandConfig(CommandBlock *getData)
 
         case CONFIG::control::defaultStateStart:
             if (write)
+            {
                 synth->getRuntime().loadDefaultState = value_bool;
+                synth->getRuntime().updateConfig(control, value);
+            }
             else
                 value = synth->getRuntime().loadDefaultState;
             break;
@@ -3237,7 +3253,10 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::enableNRPNs:
             if (write)
+            {
                 synth->getRuntime().enable_NRPN = value_bool;
+                synth->getRuntime().updateConfig(CONFIG::control::enableNRPNs, value_int);
+            }
             else
                 value = synth->getRuntime().enable_NRPN;
             break;

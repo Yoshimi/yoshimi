@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-4-19 Will
+bn 2325
+Structure of UpdateConfig now complete. Just details to fill in now.
+Added missing Control Data entries.
+Corrected some Control Data labels.
+Collapsed config numbers from 'defaultStateStert' onwards.
 
 2024-4-17 Will
 Further revision of base config for better isolation and correctness.

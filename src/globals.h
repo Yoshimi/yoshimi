@@ -316,6 +316,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         defaultStateStart = 16, // must be first entry for state/session data
         bufferSize,
         oscillatorSize,
+        singleRowPanel,
         reportsDestination,
         logTextSize,
         padSynthInterpolation,
@@ -329,12 +330,12 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
 
 
         // start of engine controls
-        jackMidiSource = 32,
+        jackMidiSource,
         jackPreferredMidi,
         jackServer,
         jackPreferredAudio,
         jackAutoConnectAudio,
-        alsaMidiSource = 48,
+        alsaMidiSource,
         alsaPreferredMidi,
         alsaMidiType,
         alsaAudioDevice,
@@ -344,18 +345,18 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         readMIDI,
         // end of engine controls
 
-        addPresetRootDir = 60,
+        addPresetRootDir,
         removePresetRootDir,
         currentPresetRoot,
-        bankRootCC = 65,
-        bankCC = 67,
+        bankRootCC,
+        bankCC,
         enableProgramChange,
-        extendedProgramChangeCC = 71,
+        extendedProgramChangeCC,
         ignoreResetAllCCs,
         logIncomingCCs,
         showLearnEditor,
         enableNRPNs,
-        saveCurrentConfig = 80,
+        saveCurrentConfig,
 
         historyLock // these are stored in banks/recent at the start of each group
         // we should probably change this!
