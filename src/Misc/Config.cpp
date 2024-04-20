@@ -273,9 +273,8 @@ void *Config::findManual(void)
     if (pos != string::npos)
         guideVersion = guideVersion.substr(0, pos);
     Log("manual found");
-    string toSave = guideVersion + "\n";
-    toSave += manualFile;
-    file::saveText(toSave, file::configDir() + "/yoshimi-manual.source");
+
+    saveConfig(true);
     return NULL;
 }
 
@@ -363,7 +362,6 @@ bool Config::loadConfig(void)
     if (!isRegularFile(ConfigFile))
     {
         Log("Configuration " + ConfigFile + " not found, will use default settings");
-        configChanged = true; // give the user the choice
     }
     else
     {
@@ -421,29 +419,15 @@ bool Config::loadConfig(void)
     {
         // find user guide
         bool man_ok = false;
-        string manual_source = loadText(file::configDir() + "/yoshimi-manual.source");
-        if (!manual_source.empty())
-        {
-            size_t pos = manual_source.find("\n");
-            if (pos != string::npos)
-            {
-                guideVersion = manual_source.substr(0,pos);
-
-                manualFile = manual_source.substr(pos + 1);
-                size_t endCR = manualFile.rfind("\n");
-                if (endCR != string::npos)
-                    manualFile = manualFile.substr(0,endCR);
-                string currentV = string(YOSHIMI_VERSION);
-                pos = currentV.find(" ");
-                if (pos != string::npos)
-                    currentV = currentV.substr(0,pos);
+        string currentV = string(YOSHIMI_VERSION);
+        size_t pos = currentV.find(" ");
+        if (pos != string::npos)
+            currentV = currentV.substr(0,pos);
 //cout << "\nm >" << manualFile << "<" << endl;
 //cout << "\nc " << currentV << "\ng " << guideVersion << endl;
-                if (currentV == guideVersion && file::isRegularFile(manualFile) != 0)
-                    man_ok = true;
-            }
-        }
-//cout << "OK " << int(man_ok) << endl;;
+        if (currentV == guideVersion && isRegularFile(manualFile))
+            man_ok = true;
+
         if (!man_ok)
         {
             startThread(&findManualHandle, _findManual, this, false, 0, "CFG");
@@ -469,7 +453,7 @@ void Config::restoreConfig(SynthEngine *_synth)
 }
 
 
-bool Config::updateConfig(int control, int value, bool isString)
+bool Config::updateConfig(int control, int value)
 {
     /*
      * This routine only stores settings that the user has directly changed
@@ -480,6 +464,9 @@ bool Config::updateConfig(int control, int value, bool isString)
      * disrupt the complete config currently in place. It then overwrites
      * just the parameter the user changed, and resaves everything
      * including system generated entries.
+     *
+     * Text entries are handled via textMsgBuffer so only a single array
+     * type is needed, simplifying the code.
      *
      * Some assumptions are made based on the fact the parameters must be
      * in the correct range as they otherwise couldn't have been created.
@@ -512,6 +499,7 @@ bool Config::updateConfig(int control, int value, bool isString)
             baseData[CONFIG::control::handlePadSynthBuild] = xml->getparU("handle_padsynth_build",0);
             baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",0,3,9);
 
+            // the following two are system defined;
             banks = xml->getparbool("banks_checked",false);
             instances = xml->getparU("active_instances",1);
             xml->exitbranch();
@@ -597,13 +585,8 @@ bool Config::updateConfig(int control, int value, bool isString)
             configData[CONFIG::control::alsaSampleRate - offset] = xml->getpar("sample_rate", Samplerate, 44100, 192000);
             configData[CONFIG::control::readAudio - offset] = (audio_drivers)xml->getpar("audio_engine", 0, no_audio, alsa_audio);
             configData[CONFIG::control::readMIDI - offset] = (midi_drivers)xml->getpar("midi_engine", 0, no_midi, alsa_midi);
-
-                configData[CONFIG::control::jackPreferredAudio - offset] = (configData[CONFIG::control::readAudio - offset] == jack_audio);
-                configData[CONFIG::control::alsaPreferredAudio - offset] = (configData[CONFIG::control::readAudio - offset] == alsa_audio);
-                configData[CONFIG::control::jackPreferredMidi - offset] = (configData[CONFIG::control::readMIDI - offset] == jack_midi);
-                configData[CONFIG::control::alsaPreferredMidi - offset] = (configData[CONFIG::control::readMIDI - offset] == alsa_midi);
-            //configData[CONFIG::control::addPresetRootDir - offset] = // string
-            //configData[CONFIG::control::removePresetRootDir - offset] = // returns string
+            //configData[CONFIG::control::addPresetRootDir - offset] = // string NOT stored
+            //configData[CONFIG::control::removePresetRootDir - offset] = // returns string NOT used
             configData[CONFIG::control::currentPresetRoot - offset] = xml->getpar("presetsCurrentRootID", 0, 0, MAX_PRESETS);
             configData[CONFIG::control::bankRootCC - offset] = xml->getpar("midi_bank_root", 0, 0, 128);
             configData[CONFIG::control::bankCC - offset] = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
@@ -625,17 +608,13 @@ bool Config::updateConfig(int control, int value, bool isString)
             std::cout << "control "<< control << "  val " << value << std::endl;
             std::cout << control - offset << std::endl;
             configData[control - offset] = value;
-            if (isString)
-            {
-                tempText = textMsgBuffer.fetch(value); //string conversion via textmsg
-            }
 
             if (success)
             {
                 auto xml{std::make_unique<XMLwrapper>(synth, true)};
                 xml->beginbranch("CONFIGURATION");
-                xml->addpar("defaultState", CONFIG::control::defaultStateStart - offset);
-                xml->addpar("sound_buffer_size", CONFIG::control::bufferSize - offset);
+                xml->addpar("defaultState", configData[CONFIG::control::defaultStateStart - offset]);
+                xml->addpar("sound_buffer_size", configData[CONFIG::control::bufferSize - offset]);
                 xml->addpar("oscil_size", configData[CONFIG::control::oscillatorSize - offset]);
                 xml->addpar("single_row_panel", single_row_panel);
                 xml->addpar("reports_destination", configData[CONFIG::control::reportsDestination - offset]);
@@ -777,6 +756,10 @@ bool Config::extractBaseParameters(XMLwrapper& xml)
             savePresetsList(); // move these to new location
         }
     }
+
+
+    guideVersion = xml.getparstr("guide_version");
+    manualFile = xml.getparstr("manual");
 
     xml.exitbranch(); // BaseParameters
     return true;
@@ -926,8 +909,6 @@ void Config::addConfigXML(XMLwrapper& xml)
     xml.addpar("full_parameters", xmlmax);
 
     xml.addparbool("bank_highlight", bankHighlight);
-
-
 
     xml.addpar("audio_engine", synth->getRuntime().audioEngine);
     xml.addpar("midi_engine", synth->getRuntime().midiEngine);

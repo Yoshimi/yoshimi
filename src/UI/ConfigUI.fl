@@ -905,10 +905,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
+        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64 hide deactivate
       }
       Fl_Button close {
-        label {Close Unsaved}
+        label Close
         callback {//
          configwindow->hide();
          configSeen = false;

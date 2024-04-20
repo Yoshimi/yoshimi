@@ -1309,6 +1309,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 synth->getRuntime().jackMidiDevice = text;
                 synth->getRuntime().configChanged = true;
+                synth->getRuntime().updateConfig(CONFIG::control::jackMidiSource, textMsgBuffer.push(text));
             }
             else
                 text = synth->getRuntime().jackMidiDevice;
@@ -1319,6 +1320,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 synth->getRuntime().jackServer = text;
                 synth->getRuntime().configChanged = true;
+                synth->getRuntime().updateConfig(CONFIG::control::jackServer, textMsgBuffer.push(text));
             }
             else
                 text = synth->getRuntime().jackServer;
@@ -1329,6 +1331,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 synth->getRuntime().alsaMidiDevice = text;
                 synth->getRuntime().configChanged = true;
+                synth->getRuntime().updateConfig(control, textMsgBuffer.push(text));
             }
             else
                 text = synth->getRuntime().alsaMidiDevice;
@@ -1339,6 +1342,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             {
                 synth->getRuntime().alsaAudioDevice = text;
                 synth->getRuntime().configChanged = true;
+                synth->getRuntime().updateConfig(control, textMsgBuffer.push(text));
             }
             else
                 text = synth->getRuntime().alsaAudioDevice;
@@ -2893,7 +2897,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = nearestPowerOf2(value_int, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
                 getData->data.value = value;
                 synth->getRuntime().Oscilsize = value;
-                synth->getRuntime().updateConfig(CONFIG::control::oscillatorSize, value_int);
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().Oscilsize;
@@ -2904,9 +2908,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                 value = nearestPowerOf2(value_int, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
                 getData->data.value = value;
                 synth->getRuntime().Buffersize = value;
+                synth->getRuntime().updateConfig(control, value);
             }
             else
+            {
                 value = synth->getRuntime().Buffersize;
+            }
             break;
 
         case CONFIG::control::singleRowPanel:
@@ -2922,31 +2929,46 @@ void InterChange::commandConfig(CommandBlock *getData)
 
         case CONFIG::control::padSynthInterpolation:
             if (write)
+            {
                  synth->getRuntime().Interpolation = value_bool;
+                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().Interpolation;
             break;
         case CONFIG::control::virtualKeyboardLayout:
             if (write)
+            {
                  synth->getRuntime().VirKeybLayout = value_int;
+                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().VirKeybLayout;
             break;
         case CONFIG::control::reportsDestination:
             if (write)
+            {
                  synth->getRuntime().toConsole = value_bool;
+                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().toConsole;
             break;
         case CONFIG::control::logTextSize:
             if (write)
+            {
                  synth->getRuntime().consoleTextSize = value_int;
+                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().consoleTextSize;
             break;
         case CONFIG::control::savedInstrumentFormat:
             if (write)
+            {
                  synth->getRuntime().instrumentFormat = value_int;
+                 synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().instrumentFormat;
             break;
@@ -3037,40 +3059,61 @@ void InterChange::commandConfig(CommandBlock *getData)
             break;
         case CONFIG::control::hideNonFatalErrors:
             if (write)
+            {
                 synth->getRuntime().hideErrors = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().hideErrors;
             break;
         case CONFIG::control::logInstrumentLoadTimes:
             if (write)
+            {
                 synth->getRuntime().showTimes = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().showTimes;
             break;
         case CONFIG::control::logXMLheaders:
             if (write)
+            {
                 synth->getRuntime().logXMLheaders = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().logXMLheaders;
             break;
         case CONFIG::control::saveAllXMLdata:
             if (write)
+            {
                 synth->getRuntime().xmlmax = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().xmlmax;
             break;
         case CONFIG::control::enableHighlight:
             if (write)
+            {
                 synth->getRuntime().bankHighlight = value;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().bankHighlight;
             break;
 
         case CONFIG::control::readAudio:
+        {
             value = int(synth->getRuntime().audioEngine);
+            synth->getRuntime().updateConfig(control, value_int);
+        }
             break;
         case CONFIG::control::readMIDI:
+        {
             value = int(synth->getRuntime().midiEngine);
+            synth->getRuntime().updateConfig(control, value_int);
+        }
             break;
 // jack
         case CONFIG::control::jackMidiSource: // done elsewhere
@@ -3079,9 +3122,15 @@ void InterChange::commandConfig(CommandBlock *getData)
             if (write)
             {
                 if (value_bool)
+                {
                     synth->getRuntime().midiEngine = jack_midi;
+                    synth->getRuntime().updateConfig(CONFIG::control::readMIDI, jack_midi);
+                }
                 else
+                {
                     synth->getRuntime().midiEngine = alsa_midi;
+                    synth->getRuntime().updateConfig(CONFIG::control::readMIDI, alsa_midi);
+                }
             }
             else
                 value = (synth->getRuntime().midiEngine == jack_midi);
@@ -3092,9 +3141,15 @@ void InterChange::commandConfig(CommandBlock *getData)
             if (write)
             {
                 if (value_bool)
+                {
                     synth->getRuntime().audioEngine = jack_audio;
+                    synth->getRuntime().updateConfig(CONFIG::control::readAudio, jack_audio);
+                }
                 else
+                {
                     synth->getRuntime().audioEngine = alsa_audio;
+                    synth->getRuntime().updateConfig(CONFIG::control::readAudio, alsa_audio);
+                }
             }
             else
                 value = (synth->getRuntime().audioEngine == jack_audio);
@@ -3104,6 +3159,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             {
                 synth->getRuntime().connectJackaudio = value_bool;
                 synth->getRuntime().audioEngine = jack_audio;
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().connectJackaudio;
@@ -3115,16 +3171,25 @@ void InterChange::commandConfig(CommandBlock *getData)
             if (write)
             {
                 if (value_bool)
+                {
                     synth->getRuntime().midiEngine = alsa_midi;
+                    synth->getRuntime().updateConfig(CONFIG::control::readMIDI, alsa_midi);
+                }
                 else
+                {
                     synth->getRuntime().midiEngine = jack_midi;
+                    synth->getRuntime().updateConfig(CONFIG::control::readMIDI, jack_midi);
+                }
             }
             else
                 value = (synth->getRuntime().midiEngine == alsa_midi);
             break;
         case CONFIG::control::alsaMidiType:
             if (write)
+            {
                 synth->getRuntime().alsaMidiType = value_int;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().alsaMidiType;
             break;
@@ -3135,9 +3200,16 @@ void InterChange::commandConfig(CommandBlock *getData)
             if (write)
             {
                 if (value_bool)
+                {
                     synth->getRuntime().audioEngine = alsa_audio;
+                    synth->getRuntime().updateConfig(CONFIG::control::readAudio, alsa_audio);
+                }
                 else
+                {
                     synth->getRuntime().audioEngine = jack_audio;
+                    synth->getRuntime().updateConfig(CONFIG::control::readAudio, jack_audio);
+                }
+
             }
             else
                 value = (synth->getRuntime().audioEngine == alsa_audio);
@@ -3165,6 +3237,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 }
                 synth->getRuntime().Samplerate = value;
                 getData->data.value = value;
+                synth->getRuntime().updateConfig(control, value);
             }
             else
                 switch(synth->getRuntime().Samplerate)
@@ -3196,6 +3269,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                     getData->data.value = value_int;
                 }
                 synth->getRuntime().midi_bank_root = value_int;
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().midi_bank_root;
@@ -3210,13 +3284,17 @@ void InterChange::commandConfig(CommandBlock *getData)
                     getData->data.value = value_int;
                 }
                 synth->getRuntime().midi_bank_C = value_int;
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().midi_bank_C;
             break;
         case CONFIG::control::enableProgramChange:
             if (write)
+            {
                 synth->getRuntime().EnableProgChange = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().EnableProgChange;
             break;
@@ -3229,25 +3307,35 @@ void InterChange::commandConfig(CommandBlock *getData)
                     getData->data.value = value_int;
                 }
                 synth->getRuntime().midi_upper_voice_C = value_int;
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().midi_upper_voice_C;
             break;
         case CONFIG::control::ignoreResetAllCCs:
             if (write)
+            {
                 synth->getRuntime().ignoreResetCCs = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().ignoreResetCCs;
             break;
         case CONFIG::control::logIncomingCCs:
             if (write)
+            {
                 synth->getRuntime().monitorCCin = value_bool;
+                synth->getRuntime().updateConfig(control, value_int);
+            }
             else
                 value = synth->getRuntime().monitorCCin;
             break;
         case CONFIG::control::showLearnEditor:
             if (write)
+            {
                 synth->getRuntime().showLearnedCC = value_bool;
+                synth->getRuntime().updateConfig(control, value_bool);
+            }
             else
                 value = synth->getRuntime().showLearnedCC;
             break;
@@ -3255,7 +3343,7 @@ void InterChange::commandConfig(CommandBlock *getData)
             if (write)
             {
                 synth->getRuntime().enable_NRPN = value_bool;
-                synth->getRuntime().updateConfig(CONFIG::control::enableNRPNs, value_int);
+                synth->getRuntime().updateConfig(control, value_int);
             }
             else
                 value = synth->getRuntime().enable_NRPN;
