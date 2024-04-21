@@ -316,7 +316,6 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         defaultStateStart = 16, // must be first entry for state/session data
         bufferSize,
         oscillatorSize,
-        singleRowPanel,
         reportsDestination,
         logTextSize,
         padSynthInterpolation,

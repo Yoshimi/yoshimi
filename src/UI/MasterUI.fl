@@ -494,7 +494,7 @@ class MasterUI {: {public GuiUpdates}
       callback {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
-            if (!force && synth->getRuntime().configChanged)
+            /*if (!force && synth->getRuntime().configChanged)
             {
                 int r = query("!", "!", "!", "Parameters Changed.\\nSave on exit?");
                 switch (r)
@@ -510,7 +510,7 @@ class MasterUI {: {public GuiUpdates}
                         close = false;
                         break;
                 }
-            }
+            }*/
             if (close)
             {
                 if (force)

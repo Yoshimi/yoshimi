@@ -1,5 +1,13 @@
 yoshimi 2.3.2 M
 
+2024-4-21 Will
+bn 2326
+Removed all reference to singleRowPanel.
+All currently defined config setting now immediate.
+Updated GUI.
+Disabled automatic config save on exit.
+User manual location now properly integrated into config.
+
 2024-4-19 Will
 bn 2325
 Structure of UpdateConfig now complete. Just details to fill in now.

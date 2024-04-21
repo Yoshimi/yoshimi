@@ -66,7 +66,7 @@ class Config
         bool savePresetsList(void);
         bool saveConfig(bool master = false);
         bool loadConfig(void);
-        bool updateConfig(int control, int value, bool isString = false);
+        bool updateConfig(int control, int value);
         void restoreConfig(SynthEngine *_synth);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);
@@ -186,7 +186,6 @@ class Config
         bool          ignoreResetCCs;
         bool          monitorCCin;
         bool          showLearnedCC;
-        int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
         unsigned int  currentBank;
@@ -260,7 +259,7 @@ class Config
 
         int sigIntActive;
         int ladi1IntActive;
-        int sse_level;
+        //int sse_level;
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;

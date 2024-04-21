@@ -265,7 +265,6 @@ fillThemes();
     synth->getGuiMaster()->changepanelstyle(style);}
             tooltip {Select single row or compact format} xywh {200 250 150 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("2 row x 8 entries");o->add("1 row x 16 entries");}
-            code1 {o->value(synth->getRuntime().single_row_panel);}
           } {}
           Fl_Box settingsNote {
             label {* Changing these settings requires a restart}
@@ -905,10 +904,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
+        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64 hide deactivate
       }
       Fl_Button close {
-        label {Close Unsaved}
+        label Close
         callback {//
          configwindow->hide();
          configSeen = false;
