@@ -354,13 +354,15 @@ bool Config::loadConfig(void)
     if (!isRegularFile(baseConfig))
     {
         Log("Basic configuration " + baseConfig + " not found, will use default settings");
-            defaultPresets();
+        defaultPresets();
+        saveConfig(true);
     }
 
     bool success{false};
     if (!isRegularFile(ConfigFile))
     {
         Log("Configuration " + ConfigFile + " not found, will use default settings");
+        saveConfig(false);
     }
     else
     {
