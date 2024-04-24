@@ -1201,6 +1201,8 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 
 bool SynthEngine::setProgram(const string& fname, int npart)
 {
+    // switch active part (UI will do the same on returns_update)
+    getRuntime().currentPart = npart;
     interchange.undoRedoClear();
     bool ok = true;
     if (!part[npart]->loadXMLinstrument(fname))

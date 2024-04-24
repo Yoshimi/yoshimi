@@ -897,22 +897,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           xywh {305 24 57 3} box FLAT_BOX labelcolor 64
         }
       }
-      Fl_Button save {
-        label {Save and Close}
-        callback {//
-         send_data(TOPLEVEL::action::lowPrio | TOPLEVEL::action::forceUpdate, CONFIG::control::saveCurrentConfig, o->value(), TOPLEVEL::type::Integer, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, textMsgBuffer.push("DUMMY"));
-         configwindow->hide();
-         configSeen = false;
-         saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {150 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64 hide deactivate
-      }
       Fl_Button close {
         label Close
         callback {//
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {270 306 105 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
+        xywh {280 306 80 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
     Fl_Window presets {
@@ -2139,7 +2130,6 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     setAsStored->labelsize(size);
 //
     close->labelsize(size);
-    save->labelsize(size);
 
     configwindow->redraw();} {}
   }

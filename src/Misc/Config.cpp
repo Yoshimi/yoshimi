@@ -449,7 +449,7 @@ void Config::restoreConfig(SynthEngine *_synth)
 
     // but keep current root and bank
     _synth->setRootBank(tmpRoot, tmpBank);
-    // and ESPECIALLY 'load as default' status!
+    // and ESPECIALLY change status!
     configChanged = tmpChanged;
 }
 
@@ -503,7 +503,7 @@ bool Config::updateConfig(int control, int value)
             // the following two are system defined;
             banks = xml->getparbool("banks_checked",false);
             instances = xml->getparU("active_instances",1);
-            xml->exitbranch();
+            xml->exitbranch(); // BASE_PARAMETERS
 
              // this is the one that changed
             baseData[control] = value;
@@ -540,7 +540,7 @@ bool Config::updateConfig(int control, int value)
         }
     }
     else
-    { // handling current session
+    { // handling current session config
         const int offset = CONFIG::control::defaultStateStart;
         const int arraySize = CONFIG::control::historyLock - offset;
         const string instance = asString(synth->getUniqueId());
@@ -599,7 +599,7 @@ bool Config::updateConfig(int control, int value)
 
             tempRoot = xml->getpar("root_current_ID", tempRoot, 0, 127);
             tempBank = xml->getpar("bank_current_ID", tempBank, 0, 127);
-            xml->exitbranch();
+            xml->exitbranch(); // CONFIGURATION
 
             // this is the one that changed
             std::cout << "control "<< control << "  val " << value << std::endl;
@@ -647,17 +647,16 @@ bool Config::updateConfig(int control, int value)
                 xml->addpar("bank_current_ID", tempBank);
                 xml->endbranch(); // CONFIGURATION
 
-                if (!xml->saveXMLfile(configFile, false))
+                if (!xml->saveXMLfile(configFile, true))
                 {
-                    Log("Failed to update instance", _SYS_::LogNotSerious);
+                    Log("Failed to update instance config", _SYS_::LogNotSerious);
                 }
             }
         }
         else
         {
-            Log("loadConfig load instance " + instance + " failed");
+            Log("loadConfig load instance config" + instance + " failed");
         }
-        ;
     }
     return success;
 }
@@ -747,8 +746,6 @@ bool Config::extractBaseParameters(XMLwrapper& xml)
         {
             defaultPresets();
             presetsRootID = 0;
-            configChanged = true; // give the user the choice
-
             savePresetsList(); // move these to new location
         }
     }
@@ -1419,7 +1416,6 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
         switch (cmd)
         {
             case 'A':
-                settings->configChanged = true;
                 settings->engineChanged = true;
                 settings->audioEngine = alsa_audio;
                 if (!line.empty())
@@ -1429,7 +1425,6 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'a':
-            settings->configChanged = true;
             settings->midiChanged = true;
             settings->midiEngine = alsa_midi;
             if (!line.empty())
@@ -1446,13 +1441,11 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'c':
-            //settings->configChanged = true;
             settings->cliChanged = true;
             settings->showCli = false;
             break;
 
         case 'C':
-            //settings->configChanged = true;
             settings->cliChanged = true;
             settings->showCli = true;
             break;
@@ -1463,19 +1456,16 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'i':
-            //settings->configChanged = true;
             settings->guiChanged = true;
             settings->showGui = false;
             break;
 
         case 'I':
-            //settings->configChanged = true;
             settings->guiChanged = true;
             settings->showGui = true;
             break;
 
         case 'J':
-            settings->configChanged = true;
             settings->engineChanged = true;
             settings->audioEngine = jack_audio;
             if (!line.empty())
@@ -1483,7 +1473,6 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'j':
-            settings->configChanged = true;
             settings->midiChanged = true;
             settings->midiEngine = jack_midi;
             if (!line.empty())
@@ -1493,7 +1482,6 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             break;
 
         case 'K':
-            settings->configChanged = true;
             settings->connectJackChanged = true;
             settings->connectJackaudio = true;
             break;
@@ -1521,6 +1509,7 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
             }
             settings->load2part = partLoad;
             settings->instrumentLoad = line;
+            settings->configChanged = true;
             break;
         }
 
@@ -1587,7 +1576,10 @@ void Config::applyOptions(Config* settings, std::list<string>& allArgs)
         //cout << cmd << " line " << line << endl;
     }
     if (jackSessionUuid.size() && jackSessionFile.size())
+    {
         restoreJackSession = true;
+        settings->configChanged = true;
+    }
 }
 
 

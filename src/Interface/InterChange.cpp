@@ -1308,7 +1308,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->getRuntime().jackMidiDevice = text;
-                synth->getRuntime().configChanged = true;
                 synth->getRuntime().updateConfig(CONFIG::control::jackMidiSource, textMsgBuffer.push(text));
             }
             else
@@ -1319,7 +1318,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->getRuntime().jackServer = text;
-                synth->getRuntime().configChanged = true;
                 synth->getRuntime().updateConfig(CONFIG::control::jackServer, textMsgBuffer.push(text));
             }
             else
@@ -1330,7 +1328,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->getRuntime().alsaMidiDevice = text;
-                synth->getRuntime().configChanged = true;
                 synth->getRuntime().updateConfig(control, textMsgBuffer.push(text));
             }
             else
@@ -1341,7 +1338,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->getRuntime().alsaAudioDevice = text;
-                synth->getRuntime().configChanged = true;
                 synth->getRuntime().updateConfig(control, textMsgBuffer.push(text));
             }
             else
@@ -1377,7 +1373,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
                 synth->getRuntime().savePresetsList();
             }
             newMsg = true;
-            synth->getRuntime().configChanged = true;
             break;
         }
         case CONFIG::control::removePresetRootDir:
@@ -1400,7 +1395,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->getRuntime().presetsRootID = value;
-                synth->getRuntime().configChanged = true;
             }
             else
                 value = synth->getRuntime().presetsRootID = value;
@@ -1427,7 +1421,6 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 synth->setHistoryLock(kititem, value);
-                synth->getRuntime().configChanged = true;
             }
             else
                 value = synth->getHistoryLock(kititem);

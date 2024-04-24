@@ -494,23 +494,6 @@ class MasterUI {: {public GuiUpdates}
       callback {//
             bool close = true;
             bool force = Fl::event_state(FL_CTRL);
-            /*if (!force && synth->getRuntime().configChanged)
-            {
-                int r = query("!", "!", "!", "Parameters Changed.\\nSave on exit?");
-                switch (r)
-                {
-                    case 3:
-                        synth->getRuntime().configChanged = false;
-                        // this seems backwards but it *always* saves.
-                        // seeing configChanged makes it reload the old settings first.
-                        break;
-                    case 2:
-                        break;
-                    default:
-                        close = false;
-                        break;
-                }
-            }*/
             if (close)
             {
                 if (force)

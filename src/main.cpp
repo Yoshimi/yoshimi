@@ -227,9 +227,6 @@ static void *mainThread(void *arg)
             MusicClient *_client = it->second;
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
-                //if (_synth->getRuntime().configChanged)
-                    //_synth->getRuntime().restoreConfig(_synth);
-                //_synth->getRuntime().saveConfig();
                 unsigned int instanceID =  _synth->getUniqueId();
                 if (_client)
                 {
@@ -304,10 +301,6 @@ static void *mainThread(void *arg)
         // Test runs single threaded and we do not want to persist test state.
         return NULL;
 
-    //if (firstRuntime->configChanged && (bShowGui | bShowCmdLine)) // don't want this if no cli or gui
-        //firstSynth->getRuntime().restoreConfig(firstSynth);
-
-    //firstRuntime->saveConfig(true);
     firstSynth->saveHistory();
     firstSynth->saveBanks();
     return NULL;

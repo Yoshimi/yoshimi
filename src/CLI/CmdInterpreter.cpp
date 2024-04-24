@@ -6427,22 +6427,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             return Reply::DONE;
         }
         string message;
-        if (Runtime.configChanged)
+        if (echo)
+            cout << "All data will be lost. Still exit N/y?" << endl;
+        message = "All data will be lost. Still exit";
+        if (query(message, true))
         {
-            if (echo)
-                cout << "System config has been changed. Still exit N/y?" << endl;
-            message = "System config has been changed. Still exit";
-        }
-        else
-        {
-            if (echo)
-                cout << "All data will be lost. Still exit N/y?" << endl;
-            message = "All data will be lost. Still exit";
-        }
-        if (query(message, false))
-        {
-            // this seems backwards but it *always* saves.
-            // seeing configChanged makes it reload the old config first.
             Runtime.runSynth = false;
             return Reply{REPLY::exit_msg};
         }
