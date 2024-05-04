@@ -2,7 +2,7 @@ A darker gray theme which tries to be balanced and not too heavy or
 contrasted
 
 ------------------ data start marker
-15,100,78,82,82 Grey scale min-max (can be reversed) optional + R,G,B, (tint)
+15,100,78,82,82, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
 15,15,15, Panels (R,G,B or #rrggbb)
 0,0,0, RESERVED
 30,30,40, Knob shadow

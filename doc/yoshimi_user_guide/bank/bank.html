@@ -15,7 +15,7 @@
     <br><br>
     Note that Yoshimi uses the standard MIDI numbers, starting from 1 for program (instrument) changes, and 0 for banks and roots.
     <br><br>
-    As well as instrument files themselves, a bank will have a hidden ID file <em>.bankdir</em>. This serves two purposes. It speeds up bank searches. If this is present there is no need to positively identify at least one instrument. It also contains the version number from the last time it was updated.
+    As well as instrument files themselves, a bank will have a hidden ID file <em>.bankdir</em>. This serves two purposes. It speeds up bank searches. If this is present there is no need to positively identify at least one instrument. It also contains the version number from the last time the bank was updated.
     <br><br>
     We advise against making any changes to the bank structure through any external means (such as a desktop filer) as it is possible to invalidate Yoshimi's records and cause it to perform a complete bank reset. This in turn could change all the MIDI numbers, breaking any previous projects.
     </p>
@@ -54,7 +54,7 @@
     <br><br>
     The table of banks also behaves in a similar way to the Instruments one.
     <br><br>
-    The first four buttons on the bottom row also operate in the same way. However, when deleting you will be warned that you will also be completely removing the instrument files, and exactly how many there are.
+    The first five buttons on the bottom row also operate in the same way. However, when deleting you will be warned that you will also be completely removing the instrument files, and exactly how many there are.
     <br><br>
     We suggest you avoid Bank 0, as this is the one that many sequencers automatically send from time to time. Yoshimi reports attempts to access non-existent banks, but otherwise does nothing.
     <br><br>

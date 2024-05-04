@@ -74,7 +74,7 @@ class ConfigUI {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {close->do_callback();}
-      xywh {1226 24 390 330} type Double hide resizable
+      xywh {905 61 390 330} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Settings"), UNUSED, TOPLEVEL::windowTitle)).c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
       code2 {confDW = o->w();confDH = o->h();}
@@ -855,7 +855,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             xywh {255 132 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 align 64
           }
           Fl_Group nuTheme {
-            xywh {242 158 123 106} deactivate
+            xywh {242 158 123 86} deactivate
           } {
             Fl_Box currentLabel {
               label {Current Theme}
@@ -876,6 +876,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
               label {Current Theme}
               xywh {255 187 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 labelcolor 64 align 64
             }
+          }
+          Fl_Check_Button monochrome {
+            label Monochrome
+            callback {monoChrome = o->value();}
+            xywh {256 250 102 20} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
+            code0 {o->value(0);}
           }
         }
         Fl_Box patch1 {
@@ -903,7 +909,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
          configwindow->hide();
          configSeen = false;
          saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), false, "Config")}
-        xywh {280 306 80 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
+        xywh {300 306 60 20} box THIN_UP_BOX color 196 labelsize 12 labelcolor 64
       }
     }
     Fl_Window presets {
@@ -1227,7 +1233,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             string name = file::loadText(file::localDir() + "/themes/ID/current.txt");
             size_t pos = name.rfind('.');
             defTheme = name.substr(0, pos);
-            curTheme = defTheme;} {}
+            curTheme = defTheme;
+            monoChrome = 0;} {}
   }
   Function {~ConfigUI()} {} {
     code {//
@@ -1458,7 +1465,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         setGreyScale(colourData[0]);
         for (int lineCount = 0; lineCount < COLOURLIST; ++ lineCount)
         {
-            if (setColourLine(colourData[lineCount + 1], lineCount, 1) != 0) // we don't want the greyscale line!
+            if (setColourLine(colourData[lineCount + 1], lineCount) != 0) // we don't want the greyscale line!
             {
                 synth->getRuntime().Log("Corrupted Classic theme data.");
                 return false;
@@ -1532,7 +1539,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             else
             {
-                test = setColourLine(colourText.substr(0, nextPos), lineCount, scaletype);
+                test = setColourLine(colourText.substr(0, nextPos), lineCount);
             }
 
             if (test == -1)
@@ -1657,6 +1664,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
         float Rmult, Gmult, Bmult = 1;
         bool useTint = false;
+        if(!monoChrome)
         {
             text = text.substr(nextPos + 1);
             if(isdigit(text.at(0)))
@@ -1730,7 +1738,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   return 1;
   ;} {}
   }
-  Function {setColourLine(string text, int item, int type)} {return_type int
+  Function {setColourLine(string text, int item)} {return_type int
   } {
     code {//
         size_t nextPos = text.find(",");
@@ -1766,10 +1774,10 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         int blue = string2int(text); // don't need comma test here
         if (blue < 0 || blue > 255)
             return -1;
-        if (type == 2)
+        if (monoChrome == 1)
         {
-            int grey = (red+green+blue)/3;
-            red = green = blue = grey;
+            int allGrey = (red+green+blue)/3;
+            red = green = blue = allGrey;
         }
         Fl::set_color(colourNumbers[item], red, green, blue);
         return 0;
@@ -2128,6 +2136,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     currentLabel->labelsize(size);
     currentTheme->labelsize(size);
     setAsStored->labelsize(size);
+    monochrome->labelsize(size);
 //
     close->labelsize(size);
 
@@ -2196,5 +2205,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   decl {string curTheme;} {private local
   }
   decl {int nativeTable[768];} {private local
+  }
+  decl {int monoChrome;} {private local
   }
 }

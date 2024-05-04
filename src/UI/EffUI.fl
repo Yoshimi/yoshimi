@@ -79,7 +79,7 @@ decl {using std::to_string;} {private global
 class EQGraph {: {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {//}{}
+    code {//} {}
   }
   Function {init(SynthEngine* synth, RoutingTag conEQ)} {} {
     code {//
@@ -1314,7 +1314,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {753 685 380 100} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
+      xywh {753 685 380 95} type Double box PLASTIC_UP_BOX color 223 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display eqname {
@@ -1351,7 +1351,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         code0 {o->add("Off");o->add("Lp1");o->add("Hp1");o->add("Lp2");o->add("Hp2");o->add("Bp2");o->add("N2");o->add("Pk");o->add("LSh");o->add("HSh");}
       } {}
       Fl_Group bandgroup {
-        xywh {241 40 134 50} box ENGRAVED_FRAME deactivate
+        xywh {241 40 134 45} box ENGRAVED_FRAME deactivate
       } {
         Fl_Dial freqdial {
           label Freq
@@ -1364,7 +1364,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(TOPLEVEL::action::forceUpdate, butt, value, (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-          xywh {247 50 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127
+          xywh {247 45 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQfreq);}
           class WidgetPDial
         }
@@ -1379,7 +1379,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(TOPLEVEL::action::forceUpdate, butt, value, (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-          xywh {277 50 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127 step 1
+          xywh {277 45 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127 step 1
           code0 {o->setValueType(VC_FXEQfilterGain);}
           class WidgetPDial
         }
@@ -1394,7 +1394,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
         }
 
         send_data(TOPLEVEL::action::forceUpdate, butt, value, (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-          tooltip {Resonance/Bandwidth} xywh {307 50 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127
+          tooltip {Resonance/Bandwidth} xywh {307 45 25 25} box ROUND_UP_BOX labelsize 10 labelcolor 64 when 3 maximum 127
           code0 {o->setValueType(VC_FXEQq);}
           class WidgetPDial
         }
@@ -1402,12 +1402,12 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
           label Stages
           callback {//
           send_data(TOPLEVEL::action::forceUpdate, 14, o->value(), (EFFECT::type::eq), TOPLEVEL::type::Integer);}
-          tooltip {Additional filter stages} xywh {337 60 30 15} type Simple labelsize 10 labelcolor 64 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11 textcolor 64
+          tooltip {Additional filter stages} xywh {337 55 30 15} type Simple labelsize 10 labelcolor 64 minimum 1 maximum 127 step 1 value 1 textfont 1 textsize 11 textcolor 64
           code0 {o->bounds(0,MAX_FILTER_STAGES - 1);}
         }
         Fl_Text_Display extra {
           label Extra
-          xywh {334 60 35 0} labelsize 11 labelcolor 64 textsize 9 textcolor 64
+          xywh {334 55 35 0} labelsize 11 labelcolor 64 textsize 9 textcolor 64
         }
       }
       Fl_Box eqgraph {
@@ -1602,7 +1602,7 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   Function {make_filter_window()} {} {
     Fl_Window filterwindow {
       label {Yoshimi : Filter Parameters for DynFilter Effect}
-      callback { filterclose->do_callback(); }
+      callback {filterclose->do_callback();}
       xywh {1109 779 285 110} type Double hide resizable
       code0 {filtDW = o->w(); filtDH = o->h();}
       code1 {o->size_range(filtDW, filtDH, 0, 0, 0, 0, 1);}
@@ -1625,51 +1625,51 @@ If Sep is enabled: Right Delay} xywh {172 45 30 30} box ROUND_UP_BOX labelsize 1
   }
   Function {isInsert()} {return_type bool
   } {
-    code { return effect.get().isInsert;} {}
+    code {return effect.get().isInsert;} {}
   }
   Function {isBeatSync()} {return_type bool
   } {
-    code { return effect.get().param[EFFECT::control::bpm];} {}
+    code {return effect.get().param[EFFECT::control::bpm];} {}
   }
   Function {isSepDelay()} {return_type bool
   } {
-    code { return effect.get().param[EFFECT::control::sepLRDelay];} {}
+    code {return effect.get().param[EFFECT::control::sepLRDelay];} {}
   }
   Function {isEnabled()} {return_type bool
   } {
-    code { return effect.get().enabled;} {}
+    code {return effect.get().enabled;} {}
   }
   Function {isChanged()} {return_type bool
   } {
-    code { return effect.get().changed;} {}
+    code {return effect.get().changed;} {}
   }
   Function {effNum()} {return_type uchar
   } {
-    code { return effect.get().effNum; } {}
+    code {return effect.get().effNum;} {}
   }
   Function {effType()} {return_type int
   } {
-    code { return effect.get().effType; } {}
+    code {return effect.get().effType;} {}
   }
   Function {effParam(uint paramNum)} {return_type uchar
   } {
-    code { return effect.get().param[paramNum]; } {}
+    code {return effect.get().param[paramNum];} {}
   }
   Function {effPreset()} {return_type uchar
   } {
-    code { return effect.get().currPreset; } {}
+    code {return effect.get().currPreset;} {}
   }
   Function {getInsertFxRouting()} {return_type int
   } {
-    code { return effect.get().insertFxRouting; } {}
+    code {return effect.get().insertFxRouting;} {}
   }
   Function {getPartFxRouting()} {return_type uchar
   } {
-    code { return effect.get().partFxRouting; } {}
+    code {return effect.get().partFxRouting;} {}
   }
   Function {getPartFxBypass()} {return_type bool
   } {
-    code { return effect.get().partFxBypass; } {}
+    code {return effect.get().partFxBypass;} {}
   }
   Function {send_data(int action, int control, float value, int group, int type)} {} {
     code {//
