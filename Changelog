@@ -1,5 +1,9 @@
 yoshimi 2.3.2 M
 
+2024-5-6 Will
+bn 2329
+BugFix: Not updating 'banks_checked' in config file.
+
 2024-5-3 Will
 bn 2328
 Updated config images in user guide.

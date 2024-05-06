@@ -311,6 +311,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         enableAutoInstance,
         handlePadSynthBuild,   // how to build PADSynth wavetable;
         // 0=legacy/muted, 1=background thread, 2=autoApply
+        banksChecked,
         XMLcompressionLevel, // this must be the last entry for base config.
 
         defaultStateStart = 16, // must be first entry for state/session data

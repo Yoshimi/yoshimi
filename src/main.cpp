@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
     if (firstRuntime->oldConfig)
     {
 
-        std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings, save and restart.\n"<< std::endl;
+        std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings.\n"<< std::endl;
     }
     if (sem_init(&semMain, 0, 0) == 0)
     {

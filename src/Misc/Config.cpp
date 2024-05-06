@@ -485,9 +485,7 @@ bool Config::updateConfig(int control, int value)
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(baseConfig);
 
-        // the following two are system defined;
-        bool banks = false; // default
-        unsigned int instances = 1; // default
+        unsigned int instances = 1; // default (system defined)
         if (success)
         {
             xml->enterbranch("BASE_PARAMETERS");
@@ -500,9 +498,7 @@ bool Config::updateConfig(int control, int value)
             baseData[CONFIG::control::handlePadSynthBuild] = xml->getparU("handle_padsynth_build",0);
             baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",0,3,9);
 
-            // the following two are system defined;
-            banks = xml->getparbool("banks_checked",false);
-            instances = xml->getparU("active_instances",1);
+            instances = xml->getparU("active_instances",1); // this is system defined
             xml->exitbranch(); // BASE_PARAMETERS
 
              // this is the one that changed
@@ -520,10 +516,10 @@ bool Config::updateConfig(int control, int value)
             xml->addparbool("enable_single_master",baseData[CONFIG::control::enableSinglePath]);
             xml->addparbool("enable_auto_instance",baseData[CONFIG::control::enableAutoInstance]);
             xml->addparU("handle_padsynth_build",baseData[CONFIG::control::handlePadSynthBuild]);
+            xml->addparbool("banks_checked",baseData[CONFIG::control::banksChecked]);
             xml->addpar("gzip_compression",baseData[CONFIG::control::XMLcompressionLevel]);
 
-            // the following four are system defined;
-            xml->addparbool("banks_checked",banks);
+            // the following are system defined;
             xml->addparU("active_instances",instances);
             xml->addparstr("guide_version", synth->getRuntime().guideVersion);
             xml->addparstr("manual", synth->getRuntime().manualFile);

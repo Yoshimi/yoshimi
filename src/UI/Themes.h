@@ -326,7 +326,7 @@ static std::string colourPreamble [] = {
     "This would corrupt the colour map.",
     "------------------ data start marker",
     "END"
-}; // Do not change the previous two text lines!
+}; // Do not change the previous text lines!
 
 static std::string colourData [] = {
     "0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)",

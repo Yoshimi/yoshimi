@@ -455,13 +455,13 @@ class MasterUI {: {public GuiUpdates}
           virkeyboard->ShowKbd();
           panelwindow->resize(masterwindow->x(), masterwindow->y(), PANEL_SINGLE_X, PANEL_SINGLE_Y);
           saveWin(synth, panelwindow->w(), panelwindow->h(), panelwindow->x(), panelwindow->y(), panelType, "Mixer");
-          string msg = "As this is a first time start, please check 'Yoshimi->Settings' then save and restart. More information can be found in the manual.";
+          string msg = "As this is a first time start, please check 'Yoshimi->Settings'. More information can be found in the manual.";
           setmessage(UNUSED, true, msg, "Close");
       }
       else if (synth->getRuntime().oldConfig)
       {
           string msg;
-          msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings, save and restart.";
+          msg = "Existing config older than V " + to_string(MIN_CONFIG_MAJOR) + "." + to_string(MIN_CONFIG_MINOR) + " \\nCheck settings.";
           setmessage(UNUSED, true, msg, "Close");
       }
       else if (current_ID == 0 && synth->getRuntime().banksChecked == false)

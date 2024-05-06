@@ -1289,6 +1289,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             if (value)
                 synth->bank.checkLocalBanks();
             synth->getRuntime().banksChecked = true;
+            synth->getRuntime().updateConfig(CONFIG::control::banksChecked, 1);
         break;
     }
     getData->data.source &= ~TOPLEVEL::action::lowPrio;
