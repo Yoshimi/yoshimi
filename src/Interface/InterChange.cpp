@@ -836,7 +836,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
             else
             {
                 text = " FAILED " + text;
-                if (err < 0)
+                if (err < 0) // incoming negative values inverted for the text list
                     text += (" " + scale_errors [0 - err]);
             }
             newMsg = true;

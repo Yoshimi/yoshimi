@@ -998,7 +998,7 @@ std::string scale_errors [] = {
     "Invalid octave size",
     "Invalid keymap size",
     "Invalid note number",
-    "Value out of range",
+    "Value out of range", // translated as -12
     "@end"
 
 };

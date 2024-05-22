@@ -11,7 +11,7 @@ comment {Microtonal.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016-2023, Will Godfrey
+Copyright 2016-2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -723,6 +723,7 @@ class MicrotonalUI {} {
             Keymap should see this
                 "Invalid characters"
     */
+    // incoming negative values inverted for text list
     alert(synth, message + scale_errors[0 - value]);} {}
   }
   decl {Microtonal *microtonal;} {private local

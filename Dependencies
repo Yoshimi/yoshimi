@@ -2,7 +2,7 @@ Packages known to be needed to build in debian jessie and later.
 Some of these will pull in other ones.
 
     automake
-    build-essential    * we now require C++14
+    build-essential    * we now require C++17
     cmake-curses-gui   * 3.0 or later
     fluid              * not needed if compiling headless
     libcairo2-dev      * not needed if compiling headless

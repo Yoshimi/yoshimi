@@ -476,8 +476,7 @@ bool Config::updateConfig(int control, int value)
     bool success{false};
     if (control <= CONFIG::control::XMLcompressionLevel)
     { // handling base config
-
-        std::cout << "in base conf" << std::endl;
+     // std::cout << "in base conf" << std::endl;
 
         int baseData[CONFIG::control::XMLcompressionLevel+1];
         xmlType = TOPLEVEL::XML::MasterUpdate;
@@ -537,6 +536,8 @@ bool Config::updateConfig(int control, int value)
     }
     else
     { // handling current session config
+      // std::cout << "in session control " << std::endl;
+
         const int offset = CONFIG::control::defaultStateStart;
         const int arraySize = CONFIG::control::historyLock - offset;
         const string instance = asString(synth->getUniqueId());
@@ -546,9 +547,6 @@ bool Config::updateConfig(int control, int value)
         int configData[arraySize]; // historyLock is handled elsewhere
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(configFile);
-
-                std::cout << "in session control " << std::endl;
-
 
         // the following two are system defined;
         int tempRoot = 5; // default
