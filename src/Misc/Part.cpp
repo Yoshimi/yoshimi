@@ -194,7 +194,7 @@ void Part::defaultsinstrument(void)
     info.Pcomments.clear();
 
     Pkitmode = 0;
-    Pkitfade = false;
+    PkitfadeType = 0;
     Pdrummode = 0;
     Pfrand = 0;
     Pvelrand = 0;
@@ -710,7 +710,11 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         continue;
 
                     size_t currItem = partnote[pos].itemsplaying;
-                    float itemVelocity = Pkitfade? computeKitItemCrossfade(item, note, vel) : vel;
+                    float itemVelocity;
+                    if (PkitfadeType == 1) // expanded for future changes
+                        itemVelocity = computeKitItemCrossfade(item, note, vel);
+                    else
+                        itemVelocity = vel;
                     startNewNotes(pos,item,currItem, Note{note,noteFreq,itemVelocity}, portamento);
 
                     if (Pkitmode == 2 // "single" kit item mode
@@ -1265,7 +1269,8 @@ void Part::add2XMLinstrument(XMLwrapper& xml)
 
     xml.beginbranch("INSTRUMENT_KIT");
     xml.addpar("kit_mode", Pkitmode);
-    xml.addparbool("kit_crossfade", Pkitfade);
+    xml.addparbool("kit_crossfade", PkitfadeType != 0); // for backward compatibility
+    xml.addpar("kit_fadetype", PkitfadeType);
     xml.addparbool("drum_mode", Pdrummode);
 
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
@@ -1511,7 +1516,11 @@ void Part::getfromXMLinstrument(XMLwrapper& xml)
     else
     {
         Pkitmode = xml.getpar127("kit_mode", Pkitmode);    // 0=off, 1=on, 2="single": only first applicable kit item is playing
-        Pkitfade = xml.getparbool("kit_crossfade", Pkitfade);
+        bool oldfade = xml.getparbool("kit_crossfade", false);
+        PkitfadeType = xml.getpar127("kit_fadetype", 0);
+        if (PkitfadeType == 0 && oldfade == true)
+            PkitfadeType = 1; // it's an older instrument
+//        std::cout << "fade " << int(PkitfadeType) << std::endl;
         Pdrummode = xml.getparbool("drum_mode", Pdrummode);
 
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)

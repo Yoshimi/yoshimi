@@ -52,9 +52,6 @@
 #endif
 #include "ConfBuild.h"
 
-using std::cout;
-using std::endl;
-
 using file::isRegularFile;
 using file::createDir;
 using file::copyDir;
@@ -596,8 +593,9 @@ bool Config::updateConfig(int control, int value)
             xml->exitbranch(); // CONFIGURATION
 
             // this is the one that changed
-            std::cout << "control "<< control << "  val " << value << std::endl;
-            std::cout << control - offset << std::endl;
+
+            //std::cout << "control "<< control << "  val " << value << std::endl;
+            //std::cout << control - offset << std::endl;
             configData[control - offset] = value;
 
             if (success)
@@ -1055,16 +1053,16 @@ void Config::Log(const string& msg, char tostderr)
         if (showGui && toConsole)
             LogList.push_back(msg);
         else
-            cout << msg << endl;
+            std::cout << msg << std::endl;
     }
     else
-        std::cerr << msg << endl; // error log
+        std::cerr << msg << std::endl; // error log
 }
 
 
 void Config::LogError(const string &msg)
 {
-    std::cerr << "[ERROR] " << msg << endl;
+    std::cerr << "[ERROR] " << msg << std::endl;
 }
 
 

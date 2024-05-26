@@ -131,7 +131,7 @@ class Part
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pkitmode;    // Part uses kit mode: 0 == off, 1 == on, 2 == "Single": only first applicable kit item can play
-        bool          Pkitfade;    // enables cross fading
+        unsigned char PkitfadeType;// type of cross fade, 0 off (multi)
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
         unsigned char Pkeymode;    // 0 = poly, 1 = mono, > 1 = legato;
         unsigned int  PchannelATchoice;

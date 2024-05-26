@@ -1,6 +1,14 @@
 yoshimi 2.3.2 M
 
-2024-5-24
+2024-5-26 Will
+bn 2331
+Changed crossfade ID to uchar crossfadeType ready for alternative types,
+reading and retaining old saved xml bool type for backward compatibility.
+
+Added superFat instument to 'companion' and updated user guide.
+
+
+2024-5-24 Will
 bn 2330
 Updated some dev-notes.
 Clarified microtonal error reporting.

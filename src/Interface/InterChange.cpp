@@ -4140,20 +4140,20 @@ void InterChange::commandPart(CommandBlock *getData)
                 if (value_int == 3) // crossfade
                 {
                     part->Pkitmode = 1; // normal kit mode (multiple kit items playing)
-                    part->Pkitfade = true;
+                    part->PkitfadeType = 1;
                     value = 1; // just to be sure
                 }
                 else
                 {
-                    part->Pkitfade = false;
+                    part->PkitfadeType = 0;
                     part->Pkitmode = value_int;
                 }
             }
             else
             {
                 value = part->Pkitmode;
-                if (value == 1 && part->Pkitfade == true)
-                    value = 3; // encode crossfade mode
+                if (value == 1 && part->PkitfadeType == 1)
+                    value = 3; // encode crossfade velocity mode
             }
             break;
 
