@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2014-2023, Will Godfrey
+    Copyright 2014-2024, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -183,7 +183,7 @@ class Part
         void startNewNotes        (int pos, size_t item, size_t currItem, Note, bool portamento);
         void startLegato          (int pos, size_t item, size_t currItem, Note);
         void startLegatoPortamento(int pos, size_t item, size_t currItem, Note);
-        float computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity);
+        float computeKitItemCrossfade(size_t item, int midiNote);
         void incrementItemsPlaying(int pos, size_t currItem);
 
         Samples& tmpoutl;

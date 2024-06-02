@@ -7,7 +7,7 @@
     Copyright 2009-2011, Alan Calvert
     Copyright 2014-2019, Will Godfrey
     Copyright 2021 Kristian Amlie & others
-    Copyright 2022-2023 Ichthyostega & others
+    Copyright 2022-2024 Ichthyostega & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -486,7 +486,7 @@ void Part::incrementItemsPlaying(int pos, size_t currItem)
 
 
 // Modified velocity for the given kit item to blend the overlap with the neighbouring item
-float Part::computeKitItemCrossfade(size_t item, int midiNote, float inputVelocity)
+float Part::computeKitItemCrossfade(size_t item, int midiNote)
 {
     int range = 0;
     int position = 0;
@@ -532,8 +532,9 @@ float Part::computeKitItemCrossfade(size_t item, int midiNote, float inputVeloci
     assert(range >= 0);
     assert(position >= 0);
     if (range)
-        inputVelocity *= float(position) / float(range);
-    return inputVelocity;
+        return float(position) / float(range);
+    else
+        return -1;
 }
 
 
@@ -710,13 +711,15 @@ void Part::NoteOn(int note, int velocity, bool renote)
                         continue;
 
                     size_t currItem = partnote[pos].itemsplaying;
-                    float itemVelocity;
-                    if (PkitfadeType == 1) // expanded for future changes
-                        itemVelocity = computeKitItemCrossfade(item, note, vel);
-                    else
-                        itemVelocity = vel;
+                    float itemVelocity = vel;
+                    if (PkitfadeType > 0) // expanded for future changes
+                    {
+                        float mult = -1;
+                        mult = computeKitItemCrossfade(item, note);
+                        if (mult >= 0)
+                            itemVelocity *= mult;
+                    }
                     startNewNotes(pos,item,currItem, Note{note,noteFreq,itemVelocity}, portamento);
-
                     if (Pkitmode == 2 // "single" kit item mode
                         and 0 < partnote[pos].itemsplaying
                        ) // successfully started at least one note

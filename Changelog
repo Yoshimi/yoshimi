@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+
+Performed initial separation of crossfade multiplier from fade type.
+
 2024-6-2 Will
 bn 2332
 BugFix: Not saving root and bank changes.
