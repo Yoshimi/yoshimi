@@ -1,5 +1,10 @@
 yoshimi 2.3.2 M
 
+2024-6-2 Will
+bn 2332
+BugFix: Not saving root and bank changes.
+Updated Control Data.
+
 2024-5-26 Will
 bn 2331
 Changed crossfade ID to uchar crossfadeType ready for alternative types,

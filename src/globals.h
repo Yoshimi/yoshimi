@@ -357,9 +357,12 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         showLearnEditor,
         enableNRPNs,
         saveCurrentConfig,
+        changeRoot, // dummy command - always save current root
+        changeBank, // dummy command - always save current bank
 
         historyLock // these are stored in banks/recent at the start of each group
         // we should probably change this!
+
     };
 }
 

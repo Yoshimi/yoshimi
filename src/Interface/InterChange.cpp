@@ -1123,6 +1123,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             if (write)
             {
                 text = textMsgBuffer.fetch(synth->setRootBank(engine, value) & NO_MSG);
+                synth->getRuntime().updateConfig(CONFIG::control::changeBank, synth->getRuntime().currentBank);
 
             }
             else
@@ -1235,6 +1236,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                 if (msgID < NO_MSG)
                     synth->saveBanks(); // do we need this when only selecting?
                 text = textMsgBuffer.fetch(msgID & NO_MSG);
+                synth->getRuntime().updateConfig(CONFIG::control::changeRoot, synth->getRuntime().currentRoot);
             }
             else
             {

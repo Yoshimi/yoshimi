@@ -544,10 +544,6 @@ bool Config::updateConfig(int control, int value)
         int configData[arraySize]; // historyLock is handled elsewhere
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(configFile);
-
-        // the following two are system defined;
-        int tempRoot = 5; // default
-        int tempBank = 5; // default
         string tempText = "";
 
         if (success)
@@ -588,8 +584,6 @@ bool Config::updateConfig(int control, int value)
             configData[CONFIG::control::enableNRPNs - offset] = xml->getparbool("enable_incoming_NRPNs", enable_NRPN);
             //configData[CONFIG::control::saveCurrentConfig - offset] = // return string (dummy)
 
-            tempRoot = xml->getpar("root_current_ID", tempRoot, 0, 127);
-            tempBank = xml->getpar("bank_current_ID", tempBank, 0, 127);
             xml->exitbranch(); // CONFIGURATION
 
             // this is the one that changed
@@ -635,8 +629,8 @@ bool Config::updateConfig(int control, int value)
                 xml->addparbool("monitor-incoming_CCs", configData[CONFIG::control::logIncomingCCs - offset]);
                 xml->addparbool("open_editor_on_learned_CC",configData[CONFIG::control::showLearnEditor - offset]);
 
-                xml->addpar("root_current_ID", tempRoot);
-                xml->addpar("bank_current_ID", tempBank);
+                xml->addpar("root_current_ID", synth->getRuntime().currentRoot); // always store the current root
+                xml->addpar("bank_current_ID", synth->getRuntime().currentBank); // always store the current bank
                 xml->endbranch(); // CONFIGURATION
 
                 if (!xml->saveXMLfile(configFile, true))
