@@ -1,5 +1,8 @@
 yoshimi 2.3.2 M
 
+Further refined crossfade action.
+Changed internal note velocity to float.
+Added internal note volume.
 
 Performed initial separation of crossfade multiplier from fade type.
 

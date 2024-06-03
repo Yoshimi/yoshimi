@@ -490,42 +490,21 @@ float Part::computeKitItemCrossfade(size_t item, int midiNote)
 {
     int range = 0;
     int position = 0;
-    if ((item & 1) == 0 && kit[item + 1].Penabled) // crossfade lower item of pair
+
+    if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
     {
-        if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
+        if (midiNote >= kit[item + 1].Pminkey)
         {
-            if (midiNote >= kit[item + 1].Pminkey)
-            {
-                range = kit[item].Pmaxkey - kit[item + 1].Pminkey;
-                position = kit[item].Pmaxkey - midiNote;
-            }
-        }
-        else if (kit[item + 1].Pmaxkey > kit[item].Pminkey && kit[item + 1].Pmaxkey < kit[item].Pmaxkey ) // eliminate equal state
-        {
-            if (midiNote <= kit[item + 1].Pmaxkey)
-            {
-                range = kit[item + 1].Pmaxkey - kit[item].Pminkey;
-                position = (midiNote - kit[item].Pminkey);
-            }
+            range = kit[item].Pmaxkey - kit[item + 1].Pminkey;
+            position = kit[item].Pmaxkey - midiNote;
         }
     }
-    else if ((item & 1) == 1 && kit[item - 1].Penabled) // crossfade upper item of pair
+    else if (kit[item + 1].Pmaxkey > kit[item].Pminkey && kit[item + 1].Pmaxkey < kit[item].Pmaxkey ) // eliminate equal state
     {
-        if (kit[item - 1].Pmaxkey > kit[item ].Pminkey && kit[item - 1].Pmaxkey < kit[item ].Pmaxkey)
+        if (midiNote <= kit[item + 1].Pmaxkey)
         {
-            if (midiNote <= kit[item - 1].Pmaxkey)
-            {
-                range = kit[item - 1].Pmaxkey - kit[item].Pminkey;
-                position = (midiNote - kit[item].Pminkey);
-            }
-        }
-        else if (kit[item].Pmaxkey > kit[item - 1].Pminkey && kit[item].Pmaxkey < kit[item - 1].Pmaxkey) // eliminate equal state
-        {
-            if (midiNote >= kit[item - 1].Pminkey)
-            {
-                range = kit[item].Pmaxkey - kit[item - 1].Pminkey;
-                position = kit[item].Pmaxkey - midiNote;
-            }
+            range = kit[item + 1].Pmaxkey - kit[item].Pminkey;
+            position = (midiNote - kit[item].Pminkey);
         }
     }
 
@@ -553,6 +532,8 @@ void Part::NoteOn(int note, int velocity, bool renote)
     bool performLegato = false;   // the current note actually applies legato.
     bool isMonoFirstNote = false; // (In Mono/Legato) true when we determined
                                   // no other notes are held down or sustained.
+
+    monoNote[note].noteVolume = 1.0f; // not in use yet
 
     if (Pkeymode == PART_NORMAL)
     {// Polyphony is on
@@ -703,6 +684,7 @@ void Part::NoteOn(int note, int velocity, bool renote)
 
             else
             {// init new notes in "kit mode"
+                float mult = -1;
                 for (int item = 0; item < NUM_KIT_ITEMS; ++item)
                 {
                     if (kit[item].Pmuted)
@@ -714,10 +696,17 @@ void Part::NoteOn(int note, int velocity, bool renote)
                     float itemVelocity = vel;
                     if (PkitfadeType > 0) // expanded for future changes
                     {
-                        float mult = -1;
-                        mult = computeKitItemCrossfade(item, note);
+                        if ((item & 1) == 0)
+                        {
+                            mult = computeKitItemCrossfade(item, note);
+                        }
+                        else if (mult != -1)
+                            mult = 1 - mult; // second in a pair is always the inverse
                         if (mult >= 0)
+                        {
+                            std::cout << "mult " << mult << std::endl;
                             itemVelocity *= mult;
+                        }
                     }
                     startNewNotes(pos,item,currItem, Note{note,noteFreq,itemVelocity}, portamento);
                     if (Pkitmode == 2 // "single" kit item mode

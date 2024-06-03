@@ -228,7 +228,8 @@ class Part
         // MonoNote stuff
         std::list<unsigned char> monoNoteHistory; // held notes.
         struct {
-            unsigned char velocity;
+            float velocity;
+            float noteVolume;
         } monoNote[256];   // 256 is to cover all possible note values. monoNote[]
                            // is used in conjunction with the list to store the velocity value of a given note
                            // (the list only store note values). For example:
