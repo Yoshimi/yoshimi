@@ -18,9 +18,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-project (Yoshimi)
-cmake_minimum_required (VERSION 3.0)
-cmake_policy (VERSION 3.0)
+cmake_minimum_required (VERSION 3.5)
+cmake_policy (VERSION 3.5)
 cmake_policy (SET CMP0004 NEW)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 NEW)
@@ -42,7 +41,6 @@ cmake_policy (SET CMP0063 NEW)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
-
 # vvv
 #add_definitions(-Wpedantic) # full ISO spec
 #add_definitions(-Werror) # warnings as errors
@@ -53,6 +51,9 @@ add_definitions(-Wextra)
 add_definitions(-Wno-vla) # Nothing wrong with variable length arrays
 #add_definitions(-Wno-unqualified-std-cast-call) # supresses clang warning 'unqualified call'
 # ^^^ comment these out on release pushes
+
+
+project (Yoshimi)
 
 set (YOSHIMI_VERSION "2.3.2 M")
 
