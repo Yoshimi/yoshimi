@@ -783,12 +783,12 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
             //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
         }
-        currentTheme->copy_label(line.c_str());
-        curTheme = line;
-        while (defTheme.at(defTheme.length() - 1) < '!') // tidy up
-            defTheme.pop_back(); // deals with spurious trailing whitespace
+        selectedTheme->copy_label(line.c_str());
+        currentTheme = line;
+        while (defaultTheme.at(defaultTheme.length() - 1) < '!') // tidy up
+            defaultTheme.pop_back(); // deals with spurious trailing whitespace
 
-       if (line == defTheme)
+       if (line == defaultTheme)
         {
             nuTheme->deactivate();
         }
@@ -825,8 +825,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           Fl_Button themeExport {
             label {Export Theme}
             callback {//
-            string source = file::localDir() + "/themes/" + curTheme + EXTEN::theme;
-            string filename = setfiler(synth,"", curTheme, true, TOPLEVEL::XML::Themes);
+            string source = file::localDir() + "/themes/" + currentTheme + EXTEN::theme;
+            string filename = setfiler(synth,"", currentTheme, true, TOPLEVEL::XML::Themes);
             size_t found = filename.find(file::localDir());
             if (found!=std::string::npos)
             {
@@ -864,15 +864,15 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             Fl_Button setAsStored {
               label {Make Default}
               callback {//
-        string name = curTheme + EXTEN::theme;
+        string name = currentTheme + EXTEN::theme;
         string file = file::localDir() + "/themes/ID/current.txt";
         file::saveText(name, file);
-        defTheme = curTheme;
-        storedTheme->copy_label(defTheme.c_str());
+        defaultTheme = currentTheme;
+        storedTheme->copy_label(defaultTheme.c_str());
         nuTheme->deactivate();}
               xywh {255 220 100 20} box PLASTIC_THIN_UP_BOX color 228 labelsize 12 labelcolor 64
             }
-            Fl_Button currentTheme {
+            Fl_Button selectedTheme {
               label {Current Theme}
               xywh {255 187 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 labelcolor 64 align 64
             }
@@ -881,13 +881,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             label Monochrome
             callback {//
         monoChrome = o->value();
-        if (curTheme == "classic")
+        if (currentTheme == "classic")
         {
             setClassicTable();
         }
         else
         {
-            string fileName = file::localDir()+ "/themes/" + curTheme + EXTEN::theme;
+            string fileName = file::localDir()+ "/themes/" + currentTheme + EXTEN::theme;
             int errLine = setUserTable(fileName);
             if (errLine != -1)
                 themeError(errLine);
@@ -1248,8 +1248,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             Tab1->do_callback();
             string name = file::loadText(file::localDir() + "/themes/ID/current.txt");
             size_t pos = name.rfind('.');
-            defTheme = name.substr(0, pos);
-            curTheme = defTheme;
+            defaultTheme = name.substr(0, pos);
+            currentTheme = defaultTheme;
             monoChrome = 0;} {}
   }
   Function {~ConfigUI()} {} {
@@ -1304,8 +1304,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             ++itr;
         }
-        storedTheme->copy_label(defTheme.c_str());
-        currentTheme->copy_label(curTheme.c_str());
+        storedTheme->copy_label(defaultTheme.c_str());
+        selectedTheme->copy_label(currentTheme.c_str());
         return count;
         ;} {}
   }
@@ -1357,13 +1357,13 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
       string themeDir = file::localDir() + "/themes/";
 
-      string currentTheme = file::loadText(themeDir+"ID/current.txt");
-      while (currentTheme.at(currentTheme.length() - 1) < '!') // tidy up
-          currentTheme.pop_back(); // deals with spurious trailing whitespace
+      string selectedTheme = file::loadText(themeDir+"ID/current.txt");
+      while (selectedTheme.at(selectedTheme.length() - 1) < '!') // tidy up
+          selectedTheme.pop_back(); // deals with spurious trailing whitespace
 
-      if (currentTheme != "classic.clr")
+      if (selectedTheme != "classic.clr")
       {
-          string fileName = themeDir+ currentTheme;
+          string fileName = themeDir+ selectedTheme;
           if (file::isRegularFile(fileName))
           {
                 int errLine = setUserTable(fileName);
@@ -1444,14 +1444,14 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
        bool ok = true;
-       string currentTheme = synth->getRuntime().remoteGuiTheme;
-       if ((!file::isRegularFile(currentTheme)))
+       string selectedTheme = synth->getRuntime().remoteGuiTheme;
+       if ((!file::isRegularFile(selectedTheme)))
        {
            return false;
        }
-       if (!currentTheme.empty())
+       if (!selectedTheme.empty())
        {
-           int errLine = setUserTable(currentTheme);
+           int errLine = setUserTable(selectedTheme);
            if (errLine != -1)
            {
                themeError(errLine);
@@ -2150,7 +2150,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     storedLabel->labelsize(size);
     storedTheme->labelsize(size);
     currentLabel->labelsize(size);
-    currentTheme->labelsize(size);
+    selectedTheme->labelsize(size);
     setAsStored->labelsize(size);
     monochrome->labelsize(size);
 //
@@ -2216,9 +2216,9 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {bool presetsSeen;} {private local
   }
-  decl {string defTheme;} {private local
+  decl {string defaultTheme;} {private local
   }
-  decl {string curTheme;} {private local
+  decl {string currentTheme;} {private local
   }
   decl {int nativeTable[768];} {private local
   }
