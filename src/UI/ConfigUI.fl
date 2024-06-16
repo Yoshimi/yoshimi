@@ -879,7 +879,23 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           }
           Fl_Check_Button monochrome {
             label Monochrome
-            callback {monoChrome = o->value();}
+            callback {//
+        monoChrome = o->value();
+        if (curTheme == "classic")
+        {
+            setClassicTable();
+        }
+        else
+        {
+            string fileName = file::localDir()+ "/themes/" + curTheme + EXTEN::theme;
+            int errLine = setUserTable(fileName);
+            if (errLine != -1)
+                themeError(errLine);
+
+            //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
+        }
+        synth->getGuiMaster()->theme();
+        }
             xywh {256 250 102 20} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
             code0 {o->value(0);}
           }
