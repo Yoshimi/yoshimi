@@ -8,7 +8,7 @@ comment {MidiLearnUI.h} {not_in_source in_header
 comment {MidiLearnUI.cc} {in_source not_in_header
 }
 
-comment {Copyright (C) 2016-2023, Will Godfrey
+comment {Copyright (C) 2016-2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -678,7 +678,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
   }
   decl {int learnDH;} {private local
   }
-  decl {int learnW;} {private local
+  decl {int learnW;} {public local
   }
   decl {bool learnSeen;} {private local
   }

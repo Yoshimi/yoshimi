@@ -3,7 +3,7 @@ version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014 - 2023, Will Godfrey
+Copyright 2014 - 2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -218,6 +218,6 @@ class ParametersUI {} {
   }
   decl {int paramDH;} {private local
   }
-  decl {int lastParamW;} {private local
+  decl {int lastParamW;} {public local
   }
 }

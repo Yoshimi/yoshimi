@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2023, Will Godfrey
+Copyright 2014-2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -665,6 +665,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
 
     key->labelsize(size);
         key->textsize(size);
+    key->damage();
     oct1->labelsize(size);
     maps->labelsize(size);
         maps->textsize(size);
@@ -694,7 +695,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
   }
   decl {int virtDH;} {private local
   }
-  decl {int lastvirtW;} {private local
+  decl {int lastvirtW;} {public local
   }
   decl {bool virtSeen;} {private local
   }

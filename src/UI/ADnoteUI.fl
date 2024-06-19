@@ -76,7 +76,7 @@ class ADvoiceUI {: {public Fl_Group}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {950 165 805 615} type Double box NO_BOX hide resizable
+      xywh {486 185 805 615} type Double box NO_BOX hide resizable
       class Fl_Group
     } {
       Fl_Box {} {
@@ -1679,21 +1679,16 @@ Oscillator}
         ExtModOsc->textsize(size);
 
     modvoicelabel->labelsize(int(40 * dScale));
-    ;} {}
+    
+    ADnoteVoiceParameters->redraw();} {}
   }
   Function {voicetheme()} {} {
     code {//
-        if (ADnoteVoiceParameters->visible())
-        {
-            ADnoteVoiceParameters->hide();
-            ADnoteVoiceParameters->show();
-        }
         if (oscedit)
         {
             if (oscedit->osceditUI->visible())
             {
-                oscedit->osceditUI->hide();
-                oscedit->osceditUI->show();
+                oscedit->waveRtext();
             }
         }
 
@@ -3061,23 +3056,26 @@ class ADnoteUI {: {public PresetsUI_}
     code {//
         if(ADnoteGlobalParameters->visible())
         {
-            ADnoteGlobalParameters->hide();
-            ADnoteGlobalParameters->show();
+            lastglobalW = 0;
+            addRtext();
         }
         if (ADnoteVoiceList->visible())
         {
-            ADnoteVoiceList->hide();
-            ADnoteVoiceList->show();
+            lastlistW = 0;
+            addVoiceListRtext();
         }
         if (resui->resonancewindow->visible())
         {
-            resui->resonancewindow->hide();
-            resui->resonancewindow->show();
+            lastResuiW = 0;
+            resui->resonanceRtext();
         }
         ampenv->theme();
         freqenv->theme();
         filterenv->theme();
         filterui->theme();
+        
+        lastvoiceW = 0;
+        addVoiceRtext();
         advoice->voicetheme();
         ;} {}
   }
@@ -3138,6 +3136,7 @@ class ADnoteUI {: {public PresetsUI_}
             detunevalueoutput->textsize(size);
         octavetext->labelsize(size);
             octave->textsize(size11);
+            octave->redraw();
         relBwidth->labelsize(size);
         detunetype->labelsize(size);
             detunetype->textsize(size11);

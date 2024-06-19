@@ -11,7 +11,7 @@ comment {BankUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2023, Will Godfrey & others
+Copyright 2014-2024, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -867,7 +867,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
       Fl_Spinner changeIDbutton {
         label {New ID}
         callback {Pend->show();}
-        xywh {344 240 45 19} labelsize 12 labelcolor 64 align 5 minimum 0 maximum 126 textsize 12 textcolor 64 deactivate
+        xywh {344 240 45 19} selection_color 64 labelsize 12 labelcolor 64 align 5 minimum 0 maximum 126 textsize 12 textcolor 64 deactivate
         code0 {oldrootID = o->value();}
         class WidgetSpinner
       }
@@ -1504,32 +1504,32 @@ class BankUI {: {public BankProcess_, RootProcess_}
           {
               if(instrumentuiwindow->visible())
               {
-                  instrumentuiwindow->hide();
-                  instrumentuiwindow->show();
+                  lastinstrumentW = 0;
+                  instrumentRtext();
               }
           }
           if (searchSeen)
           {
               if(searchwin->visible())
               {
-                  searchwin->hide();
-                  searchwin->show();
+                  lastsearchW = 0;
+                  searchRtext();
               }
           }
           if (bankSeen)
           {
               if(bankuiwindow->visible())
               {
-                  bankuiwindow->hide();
-                  bankuiwindow->show();
+                  lastbankW = 0;
+                  bankRtext();
               }
           }
           if (rootSeen)
           {
               if(rootuiwindow->visible())
               {
-                  rootuiwindow->hide();
-                  rootuiwindow->show();
+                  lastrootW = 0;
+                  rootRtext();
               }
           }
          ;} {}
@@ -1699,6 +1699,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     Pend->labelsize(int(10 * dScale));
     changeIDbutton->labelsize(size);
         changeIDbutton->textsize(size);
+    changeIDbutton->redraw();
 
     rootClose->labelsize(size);
     rootsbrowse->textsize(size);

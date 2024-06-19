@@ -778,8 +778,8 @@ class SUBnoteUI {: {public PresetsUI_}
     code {//
         if(SUBparameters->visible())
         {
-            SUBparameters->hide();
-            SUBparameters->show();
+            lastsubW = 0;
+            subRtext();
         }
         ampenv->theme();
         freqenvelopegroup->theme();

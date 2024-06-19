@@ -796,7 +796,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
         {
             nuTheme->activate();
         }
-        synth->getGuiMaster()->theme();
+        synth->getGuiMaster()->themeTrigger = true;
         //send_data(TOPLEVEL::action::muteAndLoop | TOPLEVEL::action::forceUpdate, MAIN::control::masterResetAndMlearn, 0, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
             xywh {40 50 190 215} type Select labelcolor 64 align 1 textcolor 64
           }
@@ -894,8 +894,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
 
             //synth->getRuntime().remoteGuiTheme = file::localDir()+ "/themes/" + line + ".clr";
         }
-        synth->getGuiMaster()->theme();
-        }
+        synth->getGuiMaster()->themeTrigger = true;}
             xywh {256 250 102 20} down_box DOWN_BOX selection_color 64 labelsize 12 labelcolor 64
             code0 {o->value(0);}
           }
@@ -2210,7 +2209,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {int lastconfigW;} {private local
   }
-  decl {int lastpresetW;} {private local
+  decl {int lastpresetW;} {public local
   }
   decl {bool configSeen;} {private local
   }

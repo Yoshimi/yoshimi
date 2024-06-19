@@ -2688,9 +2688,9 @@ std::cout<<"EffUI::send_data value="<<value<<" act="<<action<<" type="<<type<<" 
     }
     lastEff = nextEff;
     this->show();
-    if (nextEff != EFFECT::type::none)
+    //if (nextEff != EFFECT::type::none)
     {
-        effRtext(this->w()/380, nextEff - EFFECT::type::none);
+        //effRtext(this->w()/380, nextEff - EFFECT::type::none);
     }} {}
   }
   Function {refresh()} {} {

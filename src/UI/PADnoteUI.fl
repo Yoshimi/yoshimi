@@ -12,7 +12,7 @@ comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2015-2021, Will Godfrey
-Copyright 2022-2023, Ichthyostega, Will Godfrey
+Copyright 2022-2024, Ichthyostega, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU General Public
@@ -1056,7 +1056,9 @@ class PADnoteUI {: {public PresetsUI_}
           randWalkFilterFreq->labelsize(size10);
           randWalkProfileWidth->labelsize(size10);
           randWalkProfileStretch->labelsize(size10);
-          randClose->labelsize(size12);} {}
+          randClose->labelsize(size12);
+
+          randWalkWindow->redraw();} {}
   }
   Function {Showpad()} {} {
     code {//
@@ -1218,29 +1220,28 @@ class PADnoteUI {: {public PresetsUI_}
     code {//
         if (padnotewindow->visible())
         {
-            padnotewindow->hide();
-            padnotewindow->show();
+            lastpadW = 0;
+            padRtext();
         }
         if (randWalkWindow)
         {
             if (randWalkWindow->visible())
             {
-                randWalkWindow->hide();
-                randWalkWindow->show();
+                randRtext();
             }
         }
         if (oscui)
         {
             if (oscui->osceditUI->visible())
             {
-                oscui->osceditUI->hide();
-                oscui->osceditUI->show();
+                lastWaveW = 0;
+                oscui->waveRtext();
             }
         }
         if (resui->resonancewindow->visible())
         {
-            resui->resonancewindow->hide();
-            resui->resonancewindow->show();
+            lastResuiW = 0;
+            resui->resonanceRtext();
         }
 
         ampenv->theme();

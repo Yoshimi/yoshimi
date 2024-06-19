@@ -2532,13 +2532,13 @@ class PartUI {: {public Fl_Group, PartUI_}
     code {//
         if (instrumenteditwindow->visible())
         {
-            instrumenteditwindow->hide();
-            instrumenteditwindow->show();
+            lasteditW=0;
+            editRtext();
         }
         if (partfx->visible())
         {
-            partfx->hide();
-            partfx->show();
+            lastfxW = 0;
+            fxRtext();
             if (insefftype->value() == (EFFECT::type::dynFilter - EFFECT::type::none))
             {
                 if(inseffectui->filterwindow != NULL)
@@ -2555,23 +2555,21 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
         if (instrumentkitlist->visible())
         {
-            instrumentkitlist->hide();
-            instrumentkitlist->show();
+            kitRtext();
         }
         if (ctlwindow->visible())
         {
-            ctlwindow->hide();
-            ctlwindow->show();
+            lastctlW = 0;
+            ctlRtext();
         }
         if (ctlmidi->visible())
         {
-            ctlmidi->hide();
-            ctlmidi->show();
+            lastmidiW = 0;
+            ctlmidiRtext();
         }
         if (aftertouchcontrol->visible())
         {
-            aftertouchcontrol->hide();
-            aftertouchcontrol->show();
+            ATRtext();
         }
         if (adnoteui)
             adnoteui->theme();
@@ -2743,11 +2741,11 @@ class PartUI {: {public Fl_Group, PartUI_}
   }
   Function {fxRtext()} {} {
     code {//
-    if (lastfxW < 6)
+    /*if (lastfxW < 6)
     {
         ++lastfxW;
         return;
-    }
+    }*/
     if (lastfxW == partfx->w())
         return;
     lastfxW = partfx->w();

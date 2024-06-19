@@ -3,7 +3,7 @@ version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {
-Copyright 2016-2023, Will Godfrey
+Copyright 2016-2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -968,6 +968,6 @@ for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
   }
   decl {bool vectorSeen;} {private local
   }
-  decl {int lastvectorW;} {private local
+  decl {int lastvectorW;} {public local
   }
 }

@@ -1,6 +1,13 @@
 yoshimi 2.3.2 M
 
 
+2024-6-19 Will
+bn 2335
+BugFix: Scales->Center *doesn't* need microtonal to be enabled.
+Temporarily disabled delay in PartUI->fxRtext()
+Temporarily disabled delay in EffUI from line 2691.
+Theme changes no longer close and reopen windows.
+
 Revised some theme labels for improved clarity.
 
 2024-6-16 Will
