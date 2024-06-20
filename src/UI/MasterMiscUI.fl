@@ -115,6 +115,7 @@ class VUMeter {: {public Fl_Box}
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
     synth = _synth;
     label(NULL);
+    lngTick = 0;
     npart = part_;
     oldpeakl = 0;
     oldpeakr = 0;
@@ -331,7 +332,15 @@ class VUMeter {: {public Fl_Box}
     if (npart >= 0)
         draw_part();
     else
-        draw_master();} {}
+    {
+        draw_master();
+        ++lngTick;
+        if (lngTick == 16)
+        {
+            lngTick = 0;
+            synth->getGuiMaster()->configui->halfSecTimer();
+        }
+    }} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -367,6 +376,8 @@ class VUMeter {: {public Fl_Box}
             return 1;
     }
     return 0;} {}
+  }
+  decl {int lngTick;} {private local
   }
   decl {int npart;} {private local
   }

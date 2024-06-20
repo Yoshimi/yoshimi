@@ -852,7 +852,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
           }
           Fl_Button storedTheme {
             label {Default Theme}
-            xywh {255 132 100 20} box THIN_DOWN_BOX color 7 selection_color 7 labelsize 12 align 64
+            xywh {255 132 100 20} box THIN_DOWN_BOX color 7 selection_color 64 labelsize 12 labelcolor 64 align 64
           }
           Fl_Group nuTheme {
             xywh {242 158 123 86} deactivate
@@ -1249,7 +1249,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             size_t pos = name.rfind('.');
             defaultTheme = name.substr(0, pos);
             currentTheme = defaultTheme;
-            monoChrome = 0;} {}
+            monoChrome = 0;
+            themeTime = 0;} {}
   }
   Function {~ConfigUI()} {} {
     code {//
@@ -1262,6 +1263,23 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             saveWin(synth, configwindow->w(), configwindow->h(),configwindow->x(), configwindow->y(), true, "Config");
         configwindow->hide();
         delete configwindow;} {}
+  }
+  Function {halfSecTimer()} {} {
+    code {//
+        if (themeTab->visible())
+        {
+            if (currentTheme != "classic")
+            {
+                string fileName = file::localDir() + "/themes/" + currentTheme +".clr";
+                int testTime = file::isRegularFile(fileName);
+                if (testTime != themeTime)
+                {
+                    std::cout << "test " << testTime << "  theme " << themeTime << std::endl;
+                    setUserTable(fileName);
+                    synth->getGuiMaster()->theme();
+                }
+            }
+        }} {}
   }
   Function {fillNative()} {} {
     code {//
@@ -1348,6 +1366,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       if (!checkVersions())
       {
           setClassicTable();
+          themeTime = 0;
           return;
       }
 
@@ -1363,7 +1382,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       if (selectedTheme != "classic.clr")
       {
           string fileName = themeDir+ selectedTheme;
-          if (file::isRegularFile(fileName))
+          themeTime = file::isRegularFile(fileName);
+          if (themeTime != 0)
           {
                 int errLine = setUserTable(fileName);
                 if (errLine != -1)
@@ -1492,6 +1512,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   } {
     code {//
         string colourText = file::loadText(table);
+        themeTime = file::isRegularFile(table);
         std::size_t nextPos;
 
         // strip out preamble text
@@ -1813,6 +1834,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {themeError(int errLine)} {} {
     code {//
+        themeTime = 0;
         if (errLine == -2)
             synth->getRuntime().Log("Theme: Missing data start marker");
         else if (errLine == -3)
@@ -2222,5 +2244,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   decl {int nativeTable[768];} {private local
   }
   decl {int monoChrome;} {private local
+  }
+  decl {int themeTime;} {private local
   }
 }
