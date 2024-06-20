@@ -70,6 +70,7 @@ time_t old_father_time, here_and_now;
 static struct sigaction yoshimiSigAction;
 
 
+//////////////////////////////////////////////////////////////////////////////////OOO move instance launching -> InstanceManager
 void newBlock()
 {
     for (int i = 1; i < 32; ++i)
@@ -221,6 +222,7 @@ static void *mainThread(void *arg)
     {
         firstRuntime->signalCheck();
 
+    //////////////////////////////////////////////////////////////////////////////////OOO move instance launching -> InstanceManager
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
@@ -308,6 +310,7 @@ static void *mainThread(void *arg)
 
 int mainCreateNewInstance(unsigned int forceId)
 {
+    //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(globalAllArgs, LV2PluginTypeNone, forceId);
@@ -446,6 +449,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    auto& instances = Config::instances();
+    ////////////////////////////////////////////////////////////////////////////OOO instance handling -> InstanceManager
     if (isSingleMaster)
     {
 
@@ -478,6 +483,7 @@ int main(int argc, char *argv[])
 
     std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
 
+    //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
     bool bExitSuccess = false;
     map<SynthEngine *, MusicClient *>::iterator it;
 

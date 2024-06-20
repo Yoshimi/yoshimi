@@ -32,6 +32,7 @@
 #include <list>
 
 #include "Misc/Alloc.h"
+#include "Misc/InstanceManager.h"
 #include "MusicIO/MusicClient.h"
 #ifdef GUI_FLTK
 #include "FL/Fl.H"
@@ -47,6 +48,10 @@ class SynthEngine;
 class Config
 {
     public:
+        /** convenience access to the global InstanceManager */
+        static InstanceManager& instances() { return InstanceManager::get(); }
+        
+        
         Config(SynthEngine *_synth, list<string>& allArgs, bool isLV2Plugin);
        ~Config();
         // shall not be copied or moved or assigned
