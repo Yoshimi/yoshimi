@@ -24,12 +24,16 @@
 
 
 #include "Misc/InstanceManager.h"
+#include "Misc/SynthEngine.h"
+#include "MusicIO/MusicClient.h"
 
 //#include <string>
+#include <memory>
 #include <unordered_map>
 
 //using std::string;
 using std::make_unique;
+using std::unique_ptr;
 
 //namespace fs = std::filesystem;
 
@@ -45,15 +49,23 @@ namespace { // implementation details...
  * Descriptor: Synth-Engine instance 
  */
 class InstanceManager::Instance {
-    
+        
+        unique_ptr<SynthEngine> synth;
+        unique_ptr<MusicClient> client;
+        
     public: // can be moved and swapped, but not copied...
        ~Instance()                           = default;
         Instance(Instance&&)                 = default;
         Instance(Instance const&)            = delete;
         Instance& operator=(Instance&&)      = delete;
         Instance& operator=(Instance const&) = delete;
-    
+        
+        Instance(); //////////////////////////////////OOO need a new combined parameter set
+        
+        void startUp();
+        void shutDown();
 };
+
 
 /** A »State Table« of all currently active Synth instances */
 class InstanceManager::SynthIdx {
@@ -89,3 +101,22 @@ InstanceManager::~InstanceManager() { }
 
 
 /** */
+InstanceManager::Instance::Instance()/////////////////OOO define and use parameter set
+    : synth{}                     ////////////////////OOO create Synth object
+    , client{}                    ////////////////////OOO create MusicClient object
+    { }
+
+
+/** */
+void InstanceManager::Instance::startUp()
+{
+    
+}
+
+
+/** */
+void InstanceManager::Instance::shutDown()
+{
+    
+}
+
