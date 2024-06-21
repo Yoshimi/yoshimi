@@ -44,11 +44,13 @@ decl {\#include "UI/MiscGui.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
-    \#include "UI/WidgetSpinner.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "UI/WidgetCheckButton.h"
     \#include "Interface/TextLists.h"
-    \#include "Params/Controller.h"} {public global
+    \#include "Params/Controller.h"} {public local
+}
+
+decl {\#include "UI/WidgetSpinner.h"} {public local
 }
 
 decl {\#include "Misc/FileMgrFuncs.h"} {private local
@@ -66,7 +68,7 @@ class MicrotonalUI {} {
     Fl_Window microtonaluiwindow {
       label Scales
       callback {scaleClose->do_callback();}
-      xywh {921 270 410 485} type Double hide resizable
+      xywh {460 128 410 485} type Double hide resizable
       code0 {scaleDW = o->w(); scaleDH = o->h();}
       code1 {o->size_range(scaleDW, scaleDH, 0, 0, 0, 0, 1);}
     } {
@@ -96,9 +98,10 @@ class MicrotonalUI {} {
         Fl_Spinner centerinvertcounter {
           callback {//
           send_data(0, SCALES::control::invertedScaleCenter, o->value(), TOPLEVEL::type::Integer);}
-          xywh {339 20 47 20} labelsize 11 labelcolor 64 align 129 minimum 0 maximum 127 value 0 textfont 1 textsize 12 textcolor 64
+          xywh {339 20 47 22} labelsize 11 labelcolor 64 align 1 minimum -0 maximum 127 value 0 textfont 1 textsize 12 textcolor 64
           code0 {o->value(microtonal->Pinvertupdowncenter);}
           code1 {if (microtonal->Pinvertupdown==0) o->deactivate();}
+          code2 {o->step(1.0);}
           class WidgetSpinner
         }
       }
@@ -116,7 +119,7 @@ class MicrotonalUI {} {
         Fl_Spinner anotecounter {
           callback {//
           send_data(0, SCALES::control::refNote, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Midi note range: 24 (C1) to 84 (C6)} xywh {192 23 45 17} box FLAT_BOX labelsize 11 labelcolor 64 align 1 minimum 24 maximum 84 value 69 textfont 1 textsize 11 textcolor 64
+          tooltip {Midi note range: 24 (C1) to 84 (C6)} xywh {192 23 44 20} labelsize 11 labelcolor 64 align 1 minimum 24 maximum 84 value 69 textfont 1 textsize 11 textcolor 64
           code0 {o->value(microtonal->PrefNote);}
           class WidgetSpinner
         }
@@ -194,8 +197,9 @@ class MicrotonalUI {} {
         Fl_Spinner scaleShift {
           callback {//
           send_data(0, SCALES::control::scaleShift, o->value(), TOPLEVEL::type::Integer);}
-          tooltip {Octave base offset} xywh {320 68 47 20} labelsize 10 labelcolor 64 align 1 minimum -63 maximum 64 value 0 textfont 1 textsize 12 textcolor 64
+          tooltip {Octave base offset} xywh {320 68 47 22} labelsize 11 labelcolor 64 align 1 minimum -63 maximum 64 value 0 textfont 1 textsize 12 textcolor 64
           code0 {o->value(microtonal->Pscaleshift-64);}
+          code1 {o->step(1.0);}
           class WidgetSpinner
         }
         Fl_Group Tuning {
@@ -240,7 +244,7 @@ class MicrotonalUI {} {
           }
         }
         Fl_Group Keymap {
-          label {Keyboard Map:}
+          label {Keyboard Map:} open
           xywh {196 144 205 300} box ENGRAVED_FRAME labelfont 1 labelsize 11 labelcolor 64
         } {
           Fl_Input mappinginput {
@@ -265,8 +269,9 @@ class MicrotonalUI {} {
                 tmp = max;
             o->value(tmp);
             send_data(0, SCALES::control::lowKey, tmp, TOPLEVEL::type::Integer);}
-            tooltip {First MIDI note number} xywh {203 228 42 18} selection_color 64 labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 textfont 1 textsize 11 textcolor 64
+            tooltip {First MIDI note number} xywh {203 228 44 20} selection_color 64 labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 textfont 1 textsize 11 textcolor 64
             code0 {o->value(microtonal->Pfirstkey);}
+            code1 {o->step(1.0);}
             class WidgetSpinner
           }
           Fl_Box middle1 {
@@ -289,7 +294,7 @@ class MicrotonalUI {} {
             o->value(tmp);
 
             send_data(0, SCALES::control::middleKey, o->value(), TOPLEVEL::type::Integer);}
-            tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 value 60 textfont 1 textsize 11 textcolor 64
+            tooltip {Middle note (where scale degree 0 is mapped to)} xywh {203 293 44 20} labelsize 11 labelcolor 64 align 1 minimum -1 maximum 128 value 60 textfont 1 textsize 11 textcolor 64
             code0 {o->value(microtonal->Pmiddlenote);}
             class WidgetSpinner
           }
@@ -312,13 +317,13 @@ class MicrotonalUI {} {
             o->value(tmp);
 
             send_data(0, SCALES::control::highKey, tmp, TOPLEVEL::type::Integer);}
-            tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 128 value 127 textfont 1 textsize 11 textcolor 64
+            tooltip {Last MIDI note number} xywh {203 357 44 20} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 128 value 127 textfont 1 textsize 11 textcolor 64
             code0 {o->value(microtonal->Plastkey);}
             class WidgetSpinner
           }
           Fl_Spinner mapsizecounter {
             label {Map Size}
-            tooltip {The actual kemap size. This can be greater or smaller than the number of entries in the map} xywh {203 415 42 18} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 127 value 0 textfont 1 textsize 11 textcolor 64
+            tooltip {The actual kemap size. This can be greater or smaller than the number of entries in the map} xywh {203 415 42 22} labelsize 11 labelcolor 64 align 1 minimum 0 maximum 127 value 0 textfont 1 textsize 11 textcolor 64
             code0 {o->value(microtonal->Pmapsize);}
             class WidgetSpinner
           }
@@ -642,24 +647,33 @@ class MicrotonalUI {} {
     invertlabel->labelsize(size12);
     keyslabel->labelsize(size12);
     invertKeys->labelsize(size14);
+
     centerlabel->labelsize(size11);
-    centerinvertcounter->textsize(size12);
-    centerinvertcounter->damage(1);
-    centerinvertcounter->redraw();
+
+    centerinvertcounter->labelsize(size11);
+        centerinvertcounter->textsize(size12);
+
     reflabel->labelsize(size12);
     notelabel->labelsize(size11);
-    anotecounter->textsize(size11);
+    anotecounter->labelsize(size11);
+        anotecounter->textsize(size11);
+
     afreqinput->labelsize(size11);
         afreqinput->textsize(size);
+
     AsetBack->labelsize(size14);
     afreqset->labelsize(size14);
+
     nameinput->labelsize(size11);
         nameinput->textsize(size14);
+
     commentinput->labelsize(size11);
         commentinput->textsize(size14);
+
     shiftlabel->labelsize(size11);
-    scaleShift->labelsize(size);
+    scaleShift->labelsize(size11);
         scaleShift->textsize(size12);
+
     Tuning->labelsize(size11);
     tuningsinput->textsize(size14);
     octavesizeoutput->textsize(size14);
@@ -667,16 +681,24 @@ class MicrotonalUI {} {
     exportscl->labelsize(size);
     Keymap->labelsize(size11);
     mappinginput->textsize(size14);
+
     first1->labelsize(size11);
     first2->labelsize(size11);
-        firstnotecounter->textsize(size11);;
+    firstnotecounter->labelsize(size11);
+        firstnotecounter->textsize(size11);
+
     middle1->labelsize(size11);
     middle2->labelsize(size11);
+    middlenotecounter->labelsize(size11);
         middlenotecounter->textsize(size11);
+
     last1->labelsize(size11);
     last2->labelsize(size11);
+    lastnotecounter->labelsize(size11);
         lastnotecounter->textsize(size11);
-    mapsizecounter->textsize(size11);
+
+    mapsizecounter->labelsize(size11);
+        mapsizecounter->textsize(size11);
     importkbm->labelsize(size);
     exportkbm->labelsize(size);
     mappingenabledbutton->labelsize(size14);

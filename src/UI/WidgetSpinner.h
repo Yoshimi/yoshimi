@@ -2,7 +2,8 @@
     Custom Checkbox
 
     Original ZynAddSubFX author Nasca Octavian Paul
-    Copyright 2021 William Godfrey
+    Copyright 2021 Will Godfrey, Jesper Lloyd
+    Copyright 2024 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -38,9 +39,10 @@ public:
   WidgetSpinner(int x,int y,int w,int h,const char *l = 0);
   void labelsize(int size)
   {
+    float sizeMod = size * 0.7f - 6; // scaling only works if all similar size
     Fl_Spinner::labelsize(size);
-    this->up_button_->labelsize(1 + size/5);
-    this->down_button_->labelsize(1 + size/5);
+    this->up_button_->labelsize(sizeMod);
+    this->down_button_->labelsize(sizeMod);
     // TODO: find out where to move this, putting it in
     // the constructor does not work.
     this->box(FL_FLAT_BOX);

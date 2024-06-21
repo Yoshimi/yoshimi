@@ -1,6 +1,9 @@
 
 BUG! stand-alone GUI freezes and no further system changes if new instance started while instrument change in progress.
 
+BUG! Vector window instrument label colours not updated when engines are manually changed.
+    OK when loading instruments etc.
+
 Minor bug Multi instances produce jack error reports when main instance closed, even if they have been closed first - been there since V 1.4.1 :(
 
 Add dynfilter filter types to CLI prompt.

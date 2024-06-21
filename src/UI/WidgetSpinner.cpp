@@ -1,7 +1,8 @@
 /*
     Custom Spinner
 
-    Copyright 2021-2024 Will Godfrey
+    Copyright 2021 Will Godfrey, Jesper Lloyd
+    Copyright 2024 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -29,6 +30,8 @@ WidgetSpinner::WidgetSpinner(int X, int Y, int W, int H, const char *L)
 {
   this->up_button_ = (Fl_Repeat_Button*) this->child(1);
   this->up_button_->label("@+42<");
+  this->up_button_->labelcolor(64);
   this->down_button_ = (Fl_Repeat_Button*) this->child(2);
   this->down_button_->label("@+42>");
+  this->down_button_->labelcolor(64);
 }

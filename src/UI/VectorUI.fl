@@ -3,7 +3,7 @@ version 1.0308
 header_name {.h}
 code_name {.cc}
 comment {
-Copyright 2016-2024, Will Godfrey
+Copyright (C) 2016-2024, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+along with yoshimi; if not, write to the Free Software Foundation,
+Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 } {selected in_source in_header
 }
@@ -470,17 +471,12 @@ switch (res)
                 Ycontrol->value(0);
                 Ygroup->deactivate();
                 Ycontrol->deactivate();
-                Xcontrol->redraw();
-                Ycontrol->redraw();
             }
             else
             {
                 Xgroup->activate();
                 Xcontrol->value(value_int);
-                Xcontrol->redraw();
                 Ycontrol->activate();
-                Xcontrol->redraw();
-                Ycontrol->redraw();
             }
             break;
 
@@ -509,16 +505,12 @@ switch (res)
             {
                 Ygroup->deactivate();
                 Ycontrol->value(0);
-                Ycontrol->damage(1);
-                Ycontrol->redraw();
                 Ycc = 0;
             }
             else
             {
                 Ygroup->activate();
                 Ycontrol->value(value_int);
-                Ycontrol->damage(1);
-                Ycontrol->redraw();
             }
             break;
 
@@ -546,7 +538,10 @@ switch (res)
             else
                 clearVector(parameter);
             break;
-}} {}
+    };
+    vectorwindow->redraw();
+
+} {}
   }
   Function {setRecent(bool active)} {} {
     code {//
@@ -785,45 +780,33 @@ switch (res)
 
     if (npart == BaseChan)
     {
-        AddBackL->damage(1);
         AddBackL->color(addcol);
-        SubBackL->damage(1);
         SubBackL->color(subcol);
-        PadBackL->damage(1l);
         PadBackL->color(padcol);
         XinstL->copy_label(synth->part[npart]->Pname.c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS)
     {
-        AddBackR->damage(1);
         AddBackR->color(addcol);
-        SubBackR->damage(1);
         SubBackR->color(subcol);
-        PadBackR->damage(1l);
         PadBackR->color(padcol);
         XinstR->copy_label(synth->part[npart]->Pname.c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS * 2)
     {
-        AddBackU->damage(1);
         AddBackU->color(addcol);
-        SubBackU->damage(1);
         SubBackU->color(subcol);
-        PadBackU->damage(1l);
         PadBackU->color(padcol);
         YinstU->copy_label(synth->part[npart]->Pname.c_str());
     }
     else if (npart == BaseChan + NUM_MIDI_CHANNELS * 3)
     {
-        AddBackD->damage(1);
         AddBackD->color(addcol);
-        SubBackD->damage(1);
         SubBackD->color(subcol);
-        PadBackD->damage(1l);
         PadBackD->color(padcol);
         YinstD->copy_label(synth->part[npart]->Pname.c_str());
     }
-
+    vectorwindow->redraw();
     Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
   }
   Function {setLoadLabelRemote(int chan, string name)} {} {

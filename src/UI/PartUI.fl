@@ -2244,7 +2244,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         adeditbutton->deactivate();
         addbox->color(FL_BACKGROUND_COLOR);
     }
-    ADD->damage(1);
     if (part->kit[0].Psubenabled)
     {
         engine |= 2;
@@ -2258,7 +2257,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         subeditbutton->deactivate();
         subbox->color(FL_BACKGROUND_COLOR);
     }
-    SUB->damage(1);
     if (part->kit[0].Ppadenabled)
     {
         engine |= 4;
@@ -2272,7 +2270,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         padeditbutton->deactivate();
         padbox->color(FL_BACKGROUND_COLOR);
     }
-    PAD->damage(1);
     for (int i = 1; i < NUM_KIT_ITEMS; ++i)
     {
         if (part->kit[i].Penabled)

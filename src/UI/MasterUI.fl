@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original.} {in_source in_header
+This file is a derivative of the ZynAddSubFX original.} {selected in_source in_header
 }
 
 decl {\#define PANEL_SINGLE_X 1040} {public local
@@ -304,7 +304,7 @@ class KeyHandle {: {public Fl_Box}
   }
 }
 
-class MasterUI {open : {public GuiUpdates}
+class MasterUI {: {public GuiUpdates}
 } {
   Function {MasterUI(InterChange& _interChange, size_t slotIDX)
 	 : GuiUpdates{_interChange, slotIDX}} {} {
@@ -404,8 +404,7 @@ class MasterUI {open : {public GuiUpdates}
       masterwindow->hide();
       delete masterwindow;} {}
   }
-  Function {Init()} {open
-  } {
+  Function {Init()} {} {
     code {//
       current_ID = anchor.get().synthID;
       synth = anchor.get().synth;
@@ -469,8 +468,7 @@ class MasterUI {open : {public GuiUpdates}
       else if (current_ID == 0 && synth->getRuntime().banksChecked == false)
       {
           string msg = "Default banks have been copied to {user}.local/share/yoshimi/found \\nAdd these to the bank roots window?";
-          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {selected
-    }
+          setmessage(TOPLEVEL::msgResponse::refreshBankDefaults, true, msg, "Ask Later", "No", "Yes");} {}} {}
   }
   Function {Showmaster()} {return_type bool
   } {
@@ -901,7 +899,7 @@ class MasterUI {open : {public GuiUpdates}
             callback {//
                 int effNum = o->value() - 1;
                 send_data(TOPLEVEL::action::forceUpdate, EFFECT::sysIns::effectNumber, effNum, TOPLEVEL::type::Integer, TOPLEVEL::section::systemEffects, effNum);}
-            xywh {40 156 36 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 maximum 4 textfont 1 textsize 11 textcolor 64
+            xywh {40 156 44 20} labeltype NO_LABEL labelsize 11 labelcolor 64 align 0 maximum 4 textfont 1 textsize 11 textcolor 64
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(1);}
             class WidgetSpinner
@@ -1031,7 +1029,7 @@ class MasterUI {open : {public GuiUpdates}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 285 379 178} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -1039,7 +1037,7 @@ class MasterUI {open : {public GuiUpdates}
           code0 {partui->init(synth->part[npart], npart, bankui);}
           class PartUI
         } {}
-        Fl_Group partControls {open
+        Fl_Group partControls {
           xywh {3 286 378 175}
         } {
           Fl_Dial partVol {
@@ -1462,7 +1460,7 @@ class MasterUI {open : {public GuiUpdates}
         label {Key Shift}
         callback {//
         send_data(TOPLEVEL::action::lowPrio, MAIN::control::keyShift, o->value(), TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Shift pitch +/- N semitones} xywh {328 88 43 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textfont 1 textsize 12 textcolor 64
+        tooltip {Shift pitch +/- N semitones} xywh {328 88 44 20} labelsize 10 labelcolor 64 minimum -36 maximum 36 textfont 1 textsize 12 textcolor 64
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
         class WidgetSpinner
@@ -1483,7 +1481,7 @@ class MasterUI {open : {public GuiUpdates}
         int nval = o->value() - 1;
         activePart = nval;
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::partNumber, nval, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        xywh {36 292 40 23} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
+        xywh {36 292 40 20} labelsize 11 labelcolor 64 when 6 minimum 0 maximum 127 textsize 11 textcolor 64
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -1501,7 +1499,7 @@ class MasterUI {open : {public GuiUpdates}
                 tmp = 32;
         }
         send_data(TOPLEVEL::action::forceUpdate, MAIN::control::availableParts, tmp, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Set the number of available parts} xywh {93 292 40 23} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
+        tooltip {Set the number of available parts} xywh {93 292 40 20} labelsize 11 labelcolor 64 minimum 16 maximum 64 step 16 value 16 textsize 11 textcolor 64
         code0 {o->value(partmax);}
         class WidgetSpinner
       }
@@ -3791,11 +3789,7 @@ Alan Calvert started the project}
     else
         instrumentpadbox->color(instr_back);
 
-    instrumentaddbox->damage(1);
-    instrumentsubbox->damage(1);
-    instrumentpadbox->damage(1);
     instrumentlabel->copy_label(instrumentName.c_str());
-    instrumentlabel->damage(1);
 
     if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
     {
@@ -3813,10 +3807,8 @@ Alan Calvert started the project}
         else
             panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
 
-        panellistitem[num]->partadd->damage(1);
-        panellistitem[num]->partsub->damage(1);
-        panellistitem[num]->partpad->damage(1);
         panellistitem[num]->partname->copy_label(instrumentName.c_str());
+        panellistitem[num]->redraw();
     }} {}
   }
   Function {updateModepatch(bool inactive)} {} {
