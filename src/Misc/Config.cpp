@@ -77,9 +77,10 @@ bool         Config::autoInstance = false;
 unsigned int Config::activeInstance = 0;
 int          Config::showCLIcontext = 1;
 
-string jUuid = "";
+string Config::globalJackSessionUuid = "";
 
-Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin) :
+
+Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
     build_ID(BUILD_NUMBER),
     stateChanged(false),
     restoreJackSession(false),
@@ -179,7 +180,8 @@ Config::Config(SynthEngine *_synth, std::list<string>& allArgs, bool isLV2Plugin
     static bool torun = true;
     if (torun) // only the first stand-alone synth can read args
     {
-        applyOptions(this, allArgs);
+        //////////////////////////////////////////////////////////////////////////////OOO should better handle this directly in InstanceManager for the primarySynth!!
+        instances().getCmdOptions().applyTo(*this);
         torun = false;
     }
     if (!loadConfig())
@@ -230,8 +232,8 @@ bool Config::Setup(void)
     Oscilsize = nearestPowerOf2(Oscilsize, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
     Buffersize = nearestPowerOf2(Buffersize, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
 
-    if (!jUuid.empty())
-        jackSessionUuid = jUuid;
+    if (!Config::globalJackSessionUuid.empty())
+        jackSessionUuid = Config::globalJackSessionUuid;
     return true;
 }
 
@@ -1386,186 +1388,6 @@ void Config::saveJackSession(void)
 {
     saveSessionData(jackSessionFile);
     jackSessionFile.clear();
-}
-
-
-void Config::applyOptions(Config* settings, std::list<string>& allArgs)
-{
-    if (allArgs.empty())
-        return;
-    for (std::list<string>::iterator it = allArgs.begin(); it != allArgs.end(); ++it)
-    {
-        string line = *it;
-        size_t pos = line.find(":");
-        char cmd = line.at(0);
-        line = line.substr(pos +1);
-        switch (cmd)
-        {
-            case 'A':
-                settings->engineChanged = true;
-                settings->audioEngine = alsa_audio;
-                if (!line.empty())
-                    settings->audioDevice = line;
-                else
-                    settings->audioDevice = settings->alsaAudioDevice;
-            break;
-
-        case 'a':
-            settings->midiChanged = true;
-            settings->midiEngine = alsa_midi;
-            if (!line.empty())
-                settings->midiDevice = line;
-            else
-                settings->midiDevice = string(settings->alsaMidiDevice);
-            break;
-
-        case 'b':
-            settings->configChanged = true;
-            settings->bufferChanged = true;
-            settings->Buffersize = string2int(line);
-            //cout << "B "<< line << endl;
-            break;
-
-        case 'c':
-            settings->cliChanged = true;
-            settings->showCli = false;
-            break;
-
-        case 'C':
-            settings->cliChanged = true;
-            settings->showCli = true;
-            break;
-
-        case 'D':
-            if (!line.empty())
-                settings->rootDefine = line;
-            break;
-
-        case 'i':
-            settings->guiChanged = true;
-            settings->showGui = false;
-            break;
-
-        case 'I':
-            settings->guiChanged = true;
-            settings->showGui = true;
-            break;
-
-        case 'J':
-            settings->engineChanged = true;
-            settings->audioEngine = jack_audio;
-            if (!line.empty())
-                settings->audioDevice = line;
-            break;
-
-        case 'j':
-            settings->midiChanged = true;
-            settings->midiEngine = jack_midi;
-            if (!line.empty())
-                settings->midiDevice = line;
-            else
-                settings->midiDevice = string(settings->jackMidiDevice);
-            break;
-
-        case 'K':
-            settings->connectJackChanged = true;
-            settings->connectJackaudio = true;
-            break;
-
-        case 'k':
-            settings->startJack = true;
-            break;
-
-        case 'l': settings->paramsLoad = line; break;
-
-        case 'L':
-        {
-            unsigned int partLoad = 0;
-            size_t pos = line.rfind("@");
-            // this provides a way to specify which part to load to
-            if (pos != string::npos)
-            {
-                if (line.length() - pos <= 3)
-                {
-                    partLoad = (stoi("0" + line.substr(pos + 1))) - 1;
-                }
-                if (partLoad >= 64)
-                    partLoad = 0;
-                line = line.substr(0, pos);
-            }
-            settings->load2part = partLoad;
-            settings->instrumentLoad = line;
-            settings->configChanged = true;
-            break;
-        }
-
-        case 'M':settings->midiLearnLoad = line; break;
-
-        case 'N': settings->nameTag = line; break;
-
-        case 'o':
-            settings->configChanged = true;
-            settings->oscilChanged = true;
-            settings->Oscilsize = string2int(line);
-            break;
-
-        case 'R':
-        {
-            settings->configChanged = true;
-            settings->rateChanged = true;
-            int num = (string2int(line) / 48 ) * 48;
-            if (num < 48000 || num > 192000)
-                num = 44100; // play safe
-            settings->Samplerate = num;
-            break;
-        }
-
-        case 'S':
-            if (!line.empty())
-            {
-                settings->sessionStage = _SYS_::type::StartupFirst;
-                settings->configChanged = true;
-                settings->StateFile = line;
-            }
-            break;
-
-        case 'T':
-            if (!line.empty())
-            {
-                settings->remoteGuiTheme = line;
-            }
-            break;
-
-        case 'u':
-            if (!line.empty())
-            {
-                settings->sessionStage = _SYS_::type::JackFirst;
-                settings->configChanged = true;
-                settings->StateFile = setExtension(line, EXTEN::state);
-            }
-            break;
-
-        case 'U':
-            if (!line.empty())
-                jUuid = line;
-            break;
-
-        case '@':
-            settings->configChanged = true;
-            settings->engineChanged = true;
-            settings->midiChanged = true;
-            settings->audioEngine = no_audio;
-            settings->midiEngine  = no_midi;
-            break;
-        }
-
-        //cout << cmd << " line " << line << endl;
-    }
-    if (jackSessionUuid.size() && jackSessionFile.size())
-    {
-        restoreJackSession = true;
-        settings->configChanged = true;
-    }
 }
 
 

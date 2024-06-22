@@ -418,13 +418,12 @@ bool YoshimiLV2Plugin::init()
 
 LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
-    std::list<string> dummy;
     LV2PluginType lv2Type;
     if (std::string(desc->URI) == std::string(yoshimi_lv2_multi_desc.URI))
         lv2Type = LV2PluginTypeMulti;
     else
         lv2Type = LV2PluginTypeSingle;
-    SynthEngine *synth = new SynthEngine(dummy, lv2Type);
+    SynthEngine *synth = new SynthEngine(lv2Type);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
     {
         delete synth;

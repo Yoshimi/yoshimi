@@ -52,7 +52,7 @@ class Config
         static InstanceManager& instances() { return InstanceManager::get(); }
         
         
-        Config(SynthEngine *_synth, list<string>& allArgs, bool isLV2Plugin);
+        Config(SynthEngine *_synth, bool isLV2Plugin);
        ~Config();
         // shall not be copied or moved or assigned
         Config(Config&&)                 = delete;
@@ -138,6 +138,7 @@ class Config
         bool          connectJackaudio;
         bool          connectJackChanged;
         string        jackSessionUuid;
+        static string globalJackSessionUuid;
 
         string        alsaAudioDevice;
         string        alsaMidiDevice;
@@ -252,7 +253,6 @@ class Config
         static void *_findManual(void *arg);
         pthread_t  findManualHandle;
 
-        void applyOptions(Config*settings, list<string>& allArgs);
         void defaultPresets(void);
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);

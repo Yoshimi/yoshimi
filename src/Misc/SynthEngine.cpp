@@ -125,7 +125,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 }
 
 
-SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType, unsigned int forceId) :
+SynthEngine::SynthEngine(LV2PluginType _lv2PluginType, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
     lv2PluginType(_lv2PluginType),
     needsSaving(false),
@@ -134,7 +134,7 @@ SynthEngine::SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginTyp
     midilearn(this),
     mididecode(this),
     vectorcontrol(this),
-    Runtime(this, allArgs, getIsLV2Plugin()),
+    Runtime(this, getIsLV2Plugin()),
     rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),

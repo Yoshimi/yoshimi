@@ -92,7 +92,7 @@ class SynthEngine
         GuiDataExchange::Connection<InterfaceAnchor> rootCon;
     public:
         TextMsgBuffer& textMsgBuffer;
-        SynthEngine(std::list<string>& allArgs, LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
+        SynthEngine(LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
        ~SynthEngine();
         // shall not be copied or moved
         SynthEngine(SynthEngine&&)                 = delete;

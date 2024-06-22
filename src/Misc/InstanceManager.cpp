@@ -48,7 +48,8 @@ namespace { // implementation details...
 /**
  * Descriptor: Synth-Engine instance 
  */
-class InstanceManager::Instance {
+class InstanceManager::Instance
+{
         
         unique_ptr<SynthEngine> synth;
         unique_ptr<MusicClient> client;
@@ -68,7 +69,8 @@ class InstanceManager::Instance {
 
 
 /** A »State Table« of all currently active Synth instances */
-class InstanceManager::SynthIdx {
+class InstanceManager::SynthIdx
+{
         
         using Location = void*;
         struct LocationHash
@@ -94,6 +96,7 @@ class InstanceManager::SynthIdx {
 
 InstanceManager::InstanceManager()
     : index{make_unique<SynthIdx>()}
+    , cmdOptions{}
     { }
     
 InstanceManager::~InstanceManager() { }

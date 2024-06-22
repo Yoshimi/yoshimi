@@ -27,6 +27,7 @@
 
 //#include "globals.h"
 //#include "Misc/FormatFuncs.h"
+#include "Misc/CmdOptions.h"
 //#include <iostream>
 //#include <iomanip>
 //#include <fstream>
@@ -35,12 +36,15 @@
 //using std::cout;
 //using std::endl;
 
-class InstanceManager {
-    
+class InstanceManager
+{
+
     class Instance;
     class SynthIdx;
-    
+
         std::unique_ptr<SynthIdx> index;
+
+        CmdOptions cmdOptions;
 
          // can not be created nor copied or moved...
         InstanceManager();
@@ -50,11 +54,17 @@ class InstanceManager {
         InstanceManager(InstanceManager const&)            = delete;
         InstanceManager& operator=(InstanceManager&&)      = delete;
         InstanceManager& operator=(InstanceManager const&) = delete;
-        
+
         /** Access: Meyer's Singleton */
-        static InstanceManager& get() {
+        static InstanceManager& get()
+        {
             static InstanceManager singleton{};
             return singleton;
+        }
+
+        CmdOptions const& getCmdOptions()
+        {
+            return cmdOptions;
         }
 };
 

@@ -54,7 +54,7 @@ std::atomic <bool> waitForTest{false};
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 int mainCreateNewInstance(unsigned int forceId);
 Config *firstRuntime = NULL;
-static std::list<std::string> globalAllArgs;
+
 bool bShowGui = true;
 bool showSplash = false;
 bool bShowCmdLine = true;
@@ -313,7 +313,7 @@ int mainCreateNewInstance(unsigned int forceId)
     //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
-    SynthEngine *synth = new SynthEngine(globalAllArgs, LV2PluginTypeNone, forceId);
+    SynthEngine *synth = new SynthEngine(LV2PluginTypeNone, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();
@@ -467,10 +467,8 @@ int main(int argc, char *argv[])
 
     std::list<std::string> allArgs;
 
-    int gui;
-    int cmd;
-    CmdOptions(argc, argv, allArgs, gui, cmd);
-    globalAllArgs = allArgs;
+    ////////////////////////////////////////////////////////////////////////////////OOO parse CmdOptions and pass them to the primarySynth!
+//  CmdOptions(argc, argv);
     bool mainThreadStarted = false;
 
 #ifdef GUI_FLTK
