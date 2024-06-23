@@ -3,7 +3,8 @@
 
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2016-2019, Will Godfrey & others
+    Copyright 2016-2020, Will Godfrey, Andrew Deryabin & others
+    Copyright 2021-2024, Will Godfrey, Ichthyostega, Kristian Amlie & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -24,16 +25,22 @@
 #ifndef MUSIC_CLIENT_H
 #define MUSIC_CLIENT_H
 
+#include "globals.h"
+#include "Misc/Alloc.h"
+
 #include <string>
+#include <memory>
 #include <pthread.h>
 
-#include "globals.h"
+using std::shared_ptr;
+using std::unique_ptr;
 
 enum audio_drivers { no_audio = 0, jack_audio, alsa_audio};
 enum midi_drivers { no_midi = 0, jack_midi, alsa_midi};
 
-class SynthEngine;
+class Config;
 class MusicIO;
+class SynthEngine;
 class BeatTracker;
 
 struct music_clients
@@ -52,20 +59,27 @@ struct music_clients
 class MusicClient
 {
 private:
-    SynthEngine *synth;
-    pthread_t timerThreadId;
-    static void *timerThread_fn(void*);
-    bool timerWorking;
-    float *buffersL [NUM_MIDI_PARTS + 1];
-    float *buffersR [NUM_MIDI_PARTS + 1];
+    SynthEngine& synth;
     audio_drivers audioDrv;
     midi_drivers midiDrv;
-    MusicIO *audioIO;
-    MusicIO *midiIO;
-    BeatTracker *beatTracker;
+    shared_ptr<MusicIO> audioIO;
+    shared_ptr<MusicIO> midiIO;
+
+    pthread_t timerThreadId;
+    static void* timerThread_fn(void*);
+    bool timerWorking;
+    Samples dummyAllocation;
+    float*  dummyL[NUM_MIDI_PARTS + 1];
+    float*  dummyR[NUM_MIDI_PARTS + 1];
 public:
-    MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_drivers _midiDrv);
-    ~MusicClient();
+   ~MusicClient() = default;
+    // shall not be copied nor moved
+    MusicClient(MusicClient&&)                 = delete;
+    MusicClient(MusicClient const&)            = delete;
+    MusicClient& operator=(MusicClient&&)      = delete;
+    MusicClient& operator=(MusicClient const&) = delete;
+
+    MusicClient(SynthEngine&, audio_drivers _audioDrv, midi_drivers _midiDrv);
     bool Open(void);
     bool Start(void);
     void Close(void);
@@ -75,9 +89,13 @@ public:
     std::string midiClientName(void);
     int audioClientId(void);
     int midiClientId(void);
-    void registerAudioPort(int /*portnum*/);
+    void registerAudioPort(int portnum);
 
     static MusicClient *newMusicClient(SynthEngine *_synth);
+private:
+    bool launchReplacementThread();
+    bool prepDummyBuffers();
+    Config& runtime();
 };
 
 #endif

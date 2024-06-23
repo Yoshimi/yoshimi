@@ -32,6 +32,9 @@
     #include "MasterUI.h"
 #endif
 
+#include <memory>
+
+using std::make_unique;
 
 #define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
 
@@ -150,12 +153,12 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (_bFreeWheel && *_bFreeWheel != 0)
             frameAlignment = 1;
         else
-            frameAlignment = synth->buffersize;
+            frameAlignment = synth.buffersize;
         while (next_frame - processed >= frameAlignment)
         {
-            float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-            synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, next_frame - processed);
+            float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth.samplerate_f * 60.f);
+            synth.setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+            int mastered_chunk = _synth.MasterAudio(tmpLeft, tmpRight, next_frame - processed);
             for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
             {
                 tmpLeft [i] += mastered_chunk;
@@ -209,7 +212,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             }
 
             uint32_t frame = event->time.frames;
-            float bpmInc = (float)(frame - processed) * beats.bpm / (synth->samplerate_f * 60.f);
+            float bpmInc = (float)(frame - processed) * beats.bpm / (synth.samplerate_f * 60.f);
 
             if (bpb && bpb->type == _atom_float
                 && bar && bar->type == _atom_long
@@ -232,9 +235,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
     while (processed < sample_count)
     {
-        float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-        synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-        int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, sample_count - processed);
+        float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth.samplerate_f * 60.f);
+        synth.setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+        int mastered_chunk = _synth.MasterAudio(tmpLeft, tmpRight, sample_count - processed);
         for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
         {
             tmpLeft [i] += mastered_chunk;
@@ -243,20 +246,20 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += mastered_chunk;
     }
 
-    float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
+    float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth.samplerate_f * 60.f);
     beats.songBeat += bpmInc;
     beats.monotonicBeat += bpmInc;
-    if (!bpmProvided && _lastFallbackBpm != synth->PbpmFallback)
-        beats.bpm = synth->PbpmFallback;
-    _lastFallbackBpm = synth->PbpmFallback;
+    if (!bpmProvided && _lastFallbackBpm != synth.PbpmFallback)
+        beats.bpm = synth.PbpmFallback;
+    _lastFallbackBpm = synth.PbpmFallback;
     beatTracker->setBeatValues(beats);
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
     size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
     size_t paddedSize = (neededAtomSize + 7U) & (~7U);
-    if (synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
+    if (synth.getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
     {
-        synth->setNeedsSaving(false);
+        synth.setNeedsSaving(false);
         aSeq->atom.type = _atom_type_sequence;
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
         aSeq->body.unit = 0;
@@ -282,13 +285,12 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
     bool in_place = _bFreeWheel ? ((*_bFreeWheel == 0) ? false : true) : false;
-    setMidi(msg[0], msg[1], msg[2], in_place);
+    handleMidi(msg[0], msg[1], msg[2], in_place);
 }
 
 
-YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
-    MusicIO(synth, new SinglethreadedBeatTracker),
-    _synth(synth),
+YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth_, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
+    MusicIO(synth_, make_unique<SinglethreadedBeatTracker>()),
     _sampleRate(static_cast<uint32_t>(sampleRate)),
     _bufferSize(0),
     _bundlePath(bundlePath),
@@ -359,27 +361,29 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         }
     }
 
-    //_synth->getRuntime().Log("Buffer size " + to_string(nomBufSize));
+    //runtime().Log("Buffer size " + to_string(nomBufSize));
     if (nomBufSize > 0)
         _bufferSize = nomBufSize;
     else if (_bufferSize == 0)
         _bufferSize = MAX_BUFFER_SIZE;
 
-    synth->setBPMAccurate(true);
+    synth.setBPMAccurate(true);
 }
 
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
 {
-    if (_synth != NULL)
+    //////////////////////////////////////////////OOO TODO the LV2-plugin can no longer *own* the Synth! It must delegate to InstanceManager!
+    if (synth != NULL)
     {
         if (!flatbankprgs.empty())
         {
             getProgram(flatbankprgs.size() + 1);
         }
-        _synth->getRuntime().runSynth = false;
-        delete _synth;
-        _synth = NULL;
+        //////////////////////////////////////////OOO can't do that Dave!
+//      runtime().runSynth = false;
+//      delete _synth;
+//      _synth = NULL;
     }
 
     delete beatTracker;
@@ -393,25 +397,26 @@ bool YoshimiLV2Plugin::init()
     if (!prepBuffers())
         return false;
 
-    if (!_synth->Init(_sampleRate, _bufferSize))
+    //////////////////////////////////////////////OOO TODO the LV2-plugin must collaborate with InstanceManager for Initialisation!
+    if (!synth.Init(_sampleRate, _bufferSize))
     {
-        synth->getRuntime().LogError("Can't init synth engine");
+        runtime().LogError("Can't init synth engine");
 	return false;
     }
-    if (_synth->getUniqueId() == 0)
+    if (synth.getUniqueId() == 0)
     {
-        firstSynth = _synth;
+        firstSynth = synth;
         //firstSynth->getRuntime().Log("Started first");
     }
 
-    _synth->getRuntime().showGui = false;
+    runtime().showGui = false;
 
     memset(lv2Left, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
 
-    _synth->getRuntime().runSynth = true;
+    runtime().runSynth = true;
 
-    synth->getRuntime().Log("Starting in LV2 plugin mode");
+    runtime().Log("Starting in LV2 plugin mode");
     return true;
 }
 
@@ -423,7 +428,8 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const LV2_Descriptor *desc, double sam
         lv2Type = LV2PluginTypeMulti;
     else
         lv2Type = LV2PluginTypeSingle;
-    SynthEngine *synth = new SynthEngine(lv2Type);
+    //////////////////////////////////////////////////////////////OOO TODO this must somehow be delegated to InstanceManager
+    SynthEngine *synth = new SynthEngine(0, lv2Type);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
     {
         delete synth;
@@ -569,7 +575,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
     // suppress warnings - may use later
 
     char *data = NULL;
-    int sz = _synth->getalldata(&data);
+    int sz = synth.getalldata(&data);
 
     store(handle, _yoshimi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
     free(data);
@@ -591,7 +597,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     const char *data = (const char *)retrieve(handle, _yoshimi_state_id, &sz, &type, &new_flags);
 
     if (sz > 0)
-        _synth->putalldata(data, sz);
+        synth.putalldata(data, sz);
     return LV2_STATE_SUCCESS;
 }
 
@@ -600,8 +606,8 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
 {
     if (flatbankprgs.empty())
     {
-        Bank &bankObj = synth->getBankRef();
-        const BankEntryMap &banks = bankObj.getBanks(synth->getRuntime().currentRoot);
+        Bank &bankObj = synth.getBankRef();
+        const BankEntryMap &banks = bankObj.getBanks(runtime().currentRoot);
         BankEntryMap::const_iterator itB;
         InstrumentEntryMap::const_iterator itI;
         for (itB = banks.begin(); itB != banks.end(); ++itB)
@@ -645,11 +651,11 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
     bool isFreeWheel = false;
     if (_bFreeWheel && *_bFreeWheel == 1)
         isFreeWheel = true;
-    if (_synth->getRuntime().midi_bank_C != 128)
+    if (runtime().midi_bank_C != 128)
     {
-        synth->mididecode.setMidiBankOrRootDir((short)bank, isFreeWheel);
+        synth.mididecode.setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
-    synth->mididecode.setMidiProgram(channel, program, isFreeWheel);
+    synth.mididecode.setMidiProgram(channel, program, isFreeWheel);
 }
 
 
@@ -738,7 +744,7 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
         free(const_cast<char *>(uiHost.plugin_human_id));
         uiHost.plugin_human_id = NULL;
     }
-    _plugin->_synth->closeGui();
+    engine().closeGui();
     Fl::check(); // TODO do we need this?
 }
 
@@ -748,7 +754,7 @@ bool YoshimiLV2PluginUI::init()
     if (_plugin == NULL || uiHost.ui_closed == NULL)
         return false;
 
-    _plugin->_synth->setGuiClosedCallback(YoshimiLV2PluginUI::static_guiClosed, this);
+    engine().setGuiClosedCallback(YoshimiLV2PluginUI::static_guiClosed, this);
 
     return true;
 }
@@ -782,7 +788,7 @@ void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
 
 void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 {
-    static_cast<YoshimiLV2PluginUI *>(arg)->_plugin->_synth->closeGui();
+    static_cast<YoshimiLV2PluginUI *>(arg)->engine().closeGui();
     static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = nullptr;
 }
 
@@ -804,12 +810,12 @@ void YoshimiLV2PluginUI::run()
 
 void YoshimiLV2PluginUI::show()
 {
-    _plugin->_synth->getRuntime().showGui = true;
+    engine().getRuntime().showGui = true;
     if (not _masterUI)
     {
-        size_t slotIDX = _plugin->_synth->publishGuiAnchor();
-        _masterUI = & _plugin->_synth->interchange.createGuiMaster(slotIDX);
-        _plugin->_synth->setWindowTitle(uiHost.plugin_human_id);
+        size_t slotIDX = engine().publishGuiAnchor();
+        _masterUI = & engine().interchange.createGuiMaster(slotIDX);
+        engine().setWindowTitle(uiHost.plugin_human_id);
         _masterUI->Init();
     }
 }

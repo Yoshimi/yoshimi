@@ -1081,6 +1081,7 @@ void Config::StartupReport(const string& clientName)
 
         default:
             report += "nada";
+            break;
     }
     report += (" -> '" + audioDevice + "'");
     Log(report, _SYS_::LogNotSerious);
@@ -1097,6 +1098,7 @@ void Config::StartupReport(const string& clientName)
 
         default:
             report += "nada";
+            break;
     }
     if (!midiDevice.size())
         midiDevice = "default";
@@ -1119,7 +1121,7 @@ void Config::setRtprio(int prio)
 
 
 // general thread start service
-bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
+bool Config::startThread(pthread_t *pth, ThreadFun* threadFun, void *arg,
                          bool schedfifo, char priodec, const string& name)
 {
     pthread_attr_t attr;
@@ -1163,7 +1165,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     continue;
                 }
             }
-            if (!(chk = pthread_create(pth, &attr, thread_fn, arg)))
+            if (!(chk = pthread_create(pth, &attr, threadFun, arg)))
             {
                 outcome = true;
                 break;
@@ -1303,6 +1305,7 @@ string Config::testCCvalue(int cc)
 
         default:
             result = masterCCtest(cc);
+            break;
     }
     return result;
 }
@@ -1366,7 +1369,6 @@ string Config::masterCCtest(int cc)
             break;
 
         default:
-        {
             if (cc < 128) // don't compare with 'disabled' state
             {
                 if (cc == midi_bank_C)
@@ -1378,7 +1380,7 @@ string Config::masterCCtest(int cc)
                 else if (cc == channelSwitchCC)
                     result = "channel switcher";
             }
-        }
+            break;
     }
     return result;
 }

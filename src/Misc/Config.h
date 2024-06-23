@@ -87,7 +87,8 @@ class Config
         void setLadi1Active(void);
         void signalCheck(void);
         void setRtprio(int prio);
-        bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
+        using ThreadFun = void*(void*);
+        bool startThread(pthread_t*, ThreadFun*, void *arg,
                          bool schedfifo, char lowprio, const string& name = "");
         const string& programCmd(void) { return programcommand; }
 

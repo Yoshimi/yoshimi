@@ -35,7 +35,7 @@
 #include <map>
 #include <list>
 #include <sstream>
-#include <sys/time.h>
+#include <thread>
 
 #include "Misc/Bank.h"
 
@@ -45,10 +45,12 @@
 #include "Misc/FormatFuncs.h"
 #include "Misc/CliFuncs.h"
 
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""ms;
+
 using std::string;
 
 using func::asString;
-
 using cli::readControl;
 
 
@@ -107,7 +109,7 @@ void CmdInterface::cmdIfaceCommandLoop()
         {
             do
             { // create enough delay for most ops to complete
-                usleep(2000);
+                sleep_for(2ms);
             }
             while (getRuntime().runSynth && !getRuntime().finishedCLI);
         }
@@ -132,6 +134,6 @@ void CmdInterface::cmdIfaceCommandLoop()
         }
 
         if (!exit && getRuntime().runSynth)
-            usleep(20000);
+            sleep_for(20ms);
     }
 }

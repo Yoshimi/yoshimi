@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <cfloat>
 #include <bitset>
-#include <unistd.h>
 #include <thread>
 #include <atomic>
 
@@ -63,6 +62,10 @@ enum envControl: unsigned char {
     undo,
     redo
 };
+
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""us;
+using std::chrono_literals::operator ""ms;
 
 using std::to_string;
 using file::localPath;
@@ -260,7 +263,7 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
     //unsigned char miscmsg = getData->data.miscmsg;
 //synth->CBtest(getData);
     while (syncWrite)
-        usleep(10);
+        sleep_for(10us);
     bool write = (type & TOPLEVEL::type::Write);
     if (write)
         lowPrioWrite = true;
@@ -963,7 +966,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 else
                     startInstance = 0x81; // next available
                 while (startInstance > 0x80)
-                    usleep(1000);
+                    sleep_for(1ms);
                 value = startInstance; // actual instance found
                 startInstance = 0; // just to be sure
             }
@@ -1710,7 +1713,7 @@ float InterChange::readAllData(CommandBlock *getData)
     reTry:
     memcpy(tryData.bytes, getData->bytes, sizeof(tryData));
     while (syncWrite || lowPrioWrite)
-        usleep(10);
+        sleep_for(10us);
     if (indirect)
     {
         /*

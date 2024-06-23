@@ -40,10 +40,11 @@ const int fromText = 1;
 #include <list>
 #include <vector>
 #include <string>
-#include <unistd.h>  // for usleep()
+#include <thread>
 #include <iostream>
 
-//#include <sys/time.h>
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""us;
 
 using file::isRegularFile;
 using file::make_legit_filename;
@@ -212,7 +213,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, bool in_place)
             ++ tries;
             ok = synth->interchange.fromMIDI.write(putData->bytes);
             if (!ok)
-                usleep(1);
+                sleep_for(1us);
         // we can afford a short delay for buffer to clear
         }
         while (!ok && tries < 3);
@@ -772,7 +773,7 @@ void MidiLearn::writeToGui(CommandBlock *putData)
         ok = synth->interchange.toGUI.write(putData->bytes);
         ++tries;
         if (!ok)
-                usleep(100);
+                sleep_for(100us);
         // we can afford a short delay for buffer to clear
     }
     while (!ok && tries < 3);
@@ -845,7 +846,7 @@ void MidiLearn::updateGui(int opp)
         ++it;
         ++lineNo;
         if (lineNo & 32)
-            usleep(10); // allow message list to clear a bit
+            sleep_for(10us); // allow message list to clear a bit
     }
 /*
     gettimeofday(&tv2, NULL);

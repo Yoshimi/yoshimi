@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <unistd.h>
 #include <pwd.h>
 #include <cstdio>
 #include <cerrno>
@@ -33,6 +32,7 @@
 #include <readline/history.h>
 #include <algorithm>
 #include <iterator>
+#include <thread>
 #include <atomic>
 #include <map>
 #include <list>
@@ -50,6 +50,7 @@
 #include "Misc/NumericFuncs.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/CliFuncs.h"
+#include "Misc/Util.h"
 
 
 // global variable; see SynthEngine.cpp and main.cpp
@@ -63,6 +64,10 @@ extern std::atomic <bool> waitForTest;
 const unsigned char type_read = TOPLEVEL::type::Adjust;
 
 namespace cli {
+
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""ms;
+using std::chrono::duration;
 
 using std::string;
 using std::to_string;
@@ -5911,16 +5916,17 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     // proceed to launch the test invocation and then cause termination of Yoshimi
     if (controlType == TOPLEVEL::type::Write && input.matchnMove(3, "execute"))
     {
-        size_t wait_at_least_one_cycle = ceil(1.1 * (synth->buffersize_f / synth->samplerate_f) * 1000*1000);
+        using Seconds = duration<float>;
+        auto at_least_one_cycle = Seconds(synth->buffersize_f / synth->samplerate_f);
 
         sendNormal(synth, 0, 0, TOPLEVEL::type::Write,MAIN::control::stopSound, TOPLEVEL::section::main);
-        do usleep(wait_at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
+        do sleep_for(at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
         while (synth->audioOut != _SYS_::mute::Idle);
 
         // NOTE: the following initiates a shutdown
         waitForTest = true;
         synth->getRuntime().runSynth = false;
-        usleep(wait_at_least_one_cycle);
+        sleep_for(at_least_one_cycle);
 
         // Launch computation for automated acceptance test
         getTestInvoker().performSoundCalculation(*synth);
@@ -6327,23 +6333,15 @@ Reply CmdInterpreter::processSrcriptFile(const string& filename, bool toplevel)
         }
         if (scriptParser.matchnMove(4, "wait"))
         {
-            int mSec = string2int(scriptParser);
-            if (mSec < 2)
-                mSec = 2;
-            else if (mSec > 30000)
-                mSec = 30000;
-            mSec -= 1; //allow for internal time
-            Runtime.Log("Waiting " + to_string(mSec) + "mS");
-            if (mSec > 1000)
-            {
-                sleep (mSec / 1000);
-                mSec = mSec % 1000;
-            }
-            usleep(mSec * 1000);
+            using MilliSec = duration<int, std::milli>;
+            MilliSec mSec{string2int(scriptParser) - 1};            // -1ms for internal overhead
+            mSec = util::limited(MilliSec{2}, mSec, MilliSec{30000});
+            Runtime.Log("Waiting " + to_string(mSec.count()) + "ms");
+            sleep_for(mSec);
         }
         else
         {
-            usleep(2000); // the loop is too fast otherwise!
+            sleep_for(2ms); // the loop is too fast otherwise!
             Reply reply = cmdIfaceProcessCommand(scriptParser);
             if (reply.code > REPLY::done_msg)
             {

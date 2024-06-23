@@ -92,9 +92,9 @@ class SynthEngine
         GuiDataExchange::Connection<InterfaceAnchor> rootCon;
     public:
         TextMsgBuffer& textMsgBuffer;
-        SynthEngine(LV2PluginType _lv2PluginType = LV2PluginTypeNone, unsigned int forceId = 0);
+        SynthEngine(uint instanceID, LV2PluginType _lv2PluginType = LV2PluginTypeNone);
        ~SynthEngine();
-        // shall not be copied or moved
+        // shall not be copied nor moved
         SynthEngine(SynthEngine&&)                 = delete;
         SynthEngine(SynthEngine const&)            = delete;
         SynthEngine& operator=(SynthEngine&&)      = delete;
@@ -279,8 +279,8 @@ class SynthEngine
         inline LV2PluginType getLV2PluginType() {return lv2PluginType;}
         inline bool getIsLV2Plugin() {return lv2PluginType != LV2PluginTypeNone; }
         inline Config &getRuntime() {return Runtime;}
-        unsigned int getUniqueId() {return uniqueId;}
-        SynthEngine *getSynthFromId(unsigned int uniqueId);
+        uint getUniqueId() const    {return uniqueId;}
+        SynthEngine* getSynthFromId(uint uniqueId);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
         {

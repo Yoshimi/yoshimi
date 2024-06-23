@@ -24,6 +24,7 @@
 #include <list>
 #include <termios.h>
 #include <pthread.h>
+#include <thread>
 #include <atomic>
 
 #include <readline/readline.h>
@@ -43,6 +44,11 @@
     #include <FL/Fl_PNG_Image.H>
     #include "Misc/Splash.h"
 #endif
+
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""us;
+using std::chrono_literals::operator ""ms;
+
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 extern SynthEngine *firstSynth;
@@ -78,7 +84,7 @@ void newBlock()
         if ((firstRuntime->activeInstance >> i) & 1)
         {
             while (configuring)
-                usleep(1000);
+                sleep_for(1ms);
             // in case there is still an instance starting from elsewhere
             configuring = true;
             mainCreateNewInstance(i);
@@ -91,7 +97,7 @@ void newBlock()
 void newInstance()
 {
     while (configuring)
-        usleep(1000);
+        sleep_for(1ms);
     // in case there is still an instance starting from elsewhere
     configuring = true;
     startInstance = 0x81;
@@ -205,7 +211,7 @@ static void *mainThread(void *arg)
         do
         {
             winSplash.show();
-            usleep(33333);
+            sleep_for(33333us);
         }
         while (firstSynth == NULL); // just wait
     }
@@ -294,7 +300,7 @@ static void *mainThread(void *arg)
             startInstance = testInstance; // to prevent repeats!
         }
         if (!bShowGui)
-            usleep(33333);
+            sleep_for(33333us);
     }
 
     if (waitForTest)
@@ -313,7 +319,7 @@ int mainCreateNewInstance(unsigned int forceId)
     //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
-    SynthEngine *synth = new SynthEngine(LV2PluginTypeNone, forceId);
+    SynthEngine *synth = new SynthEngine(forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
     instanceID = synth->getUniqueId();

@@ -46,7 +46,6 @@
 class YoshimiLV2Plugin : public MusicIO
 {
 private:
-   SynthEngine *_synth;
    uint32_t _sampleRate;
    uint32_t _bufferSize;
    std::string _bundlePath;
@@ -91,28 +90,32 @@ private:
    std::vector <LV2_Program_Descriptor> flatbankprgs;
    const LV2_Descriptor *_lv2_desc;
 public:
-   YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc);
-   virtual ~YoshimiLV2Plugin();
-   bool init();
+   ~YoshimiLV2Plugin();
+    // shall not be copied nor moved
+    YoshimiLV2Plugin(YoshimiLV2Plugin&&)                 = delete;
+    YoshimiLV2Plugin(YoshimiLV2Plugin const&)            = delete;
+    YoshimiLV2Plugin& operator=(YoshimiLV2Plugin&&)      = delete;
+    YoshimiLV2Plugin& operator=(YoshimiLV2Plugin const&) = delete;
+    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc);
+    
+    bool init();
 
-   //virtual methods from MusicIO
-   unsigned int getSamplerate(void) {return _sampleRate; }
-   int getBuffersize(void) {return _bufferSize; }
-   bool Start(void) { return true; }
-   void Close(void){;}
+    /* ====== MusicIO interface ======== */
+    bool Start()                   override { return true; /*ignore*/ }
+    bool openAudio()               override { return true; /*ignore*/ }
+    bool openMidi()                override { return true; /*ignore*/ }
+    void Close()                   override { /*ignore*/ }
+    void registerAudioPort(int)    override { /*ignore*/ }
 
-   bool openAudio() { return true; }
-   bool openMidi() { return true; }
-
-   virtual std::string audioClientName(void) { return "LV2 plugin"; }
-   virtual int audioClientId(void) { return 0; }
-   virtual std::string midiClientName(void) { return "LV2 plugin"; }
-   virtual int midiClientId(void) { return 0; }
-
-   virtual void registerAudioPort(int) {}
+    uint getSamplerate()     const override { return _sampleRate; }
+    int getBuffersize()      const override { return _bufferSize; }
+    string audioClientName() const override { return "LV2 plugin"; }
+    int audioClientId()      const override { return 0; }
+    string midiClientName()  const override { return "LV2 plugin"; }
+    int midiClientId()       const override { return 0; }
 
    //static methods
-   static LV2_Handle	instantiate (const LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
+   static LV2_Handle instantiate (const LV2_Descriptor*, double sample_rate, const char* bundle_path, LV2_Feature const* const* features);
    static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);
    static void activate(LV2_Handle instance);
    static void deactivate(LV2_Handle instance);
@@ -120,14 +123,14 @@ public:
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
 
-   LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
-   LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+   LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+   LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
 
    const LV2_Program_Descriptor * getProgram(uint32_t index);
    void selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program);
 
-   static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
-   static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+   static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
+   static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, LV2_Feature const* const* features);
 
    static const LV2_Program_Descriptor * static_GetProgram(LV2_Handle handle, uint32_t index);
    static void static_SelectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
@@ -172,6 +175,8 @@ public:
     static void static_Run(struct _LV2_External_UI_Widget * _this_);
     static void static_Show(struct _LV2_External_UI_Widget * _this_);
     static void static_Hide(struct _LV2_External_UI_Widget * _this_);
+private:
+    SynthEngine& engine() { return _plugin->synth; } // use friend access
 };
 
 #endif

@@ -35,6 +35,7 @@
 #include <iterator>
 #include <optional>
 #include <memory>
+#include <thread>
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -68,6 +69,8 @@ using func::bitTest;
 using func::asString;
 using func::string2int;
 
+using std::this_thread::sleep_for;
+using std::chrono_literals::operator ""us;
 using std::to_string;
 using std::ofstream;
 using std::ios_base;
@@ -125,9 +128,9 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 }
 
 
-SynthEngine::SynthEngine(LV2PluginType _lv2PluginType, unsigned int forceId) :
-    uniqueId(getRemoveSynthId(false, forceId)),
-    lv2PluginType(_lv2PluginType),
+SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
+    uniqueId(instanceID),
+    lv2PluginType(pluginType),
     needsSaving(false),
     bank(this),
     interchange(this),
@@ -1674,7 +1677,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                             ++ tries;
                             ok = interchange.fromMIDI.write(putData.bytes);
                             if (!ok)
-                                usleep(1);
+                                sleep_for(1us);
                         // we can afford a short delay for buffer to clear
                         }
                         while (!ok && tries < 3);
@@ -1792,7 +1795,7 @@ int SynthEngine::SetSystemValue(int type, int value)
         ++ tries;
         ok = interchange.fromMIDI.write(putData.bytes);
         if (!ok)
-            usleep(1);
+            sleep_for(1us);
     // we can afford a short delay for buffer to clear
     }
     while (!ok && tries < 3);
