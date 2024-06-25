@@ -571,8 +571,8 @@ bool Config::updateConfig(int control, int value)
             configData[CONFIG::control::alsaMidiType - offset] = xml->getpar("alsa_midi_type", 0, 0, 2);
             configData[CONFIG::control::alsaAudioDevice - offset] = textMsgBuffer.push(xml->getparstr("linux_alsa_audio_dev"));// string
             configData[CONFIG::control::alsaSampleRate - offset] = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-            configData[CONFIG::control::readAudio - offset] = (audio_drivers)xml->getpar("audio_engine", 0, no_audio, alsa_audio);
-            configData[CONFIG::control::readMIDI - offset] = (midi_drivers)xml->getpar("midi_engine", 0, no_midi, alsa_midi);
+            configData[CONFIG::control::readAudio - offset] = (audio_driver)xml->getpar("audio_engine", 0, no_audio, alsa_audio);
+            configData[CONFIG::control::readMIDI - offset] = (midi_driver)xml->getpar("midi_engine", 0, no_midi, alsa_midi);
             //configData[CONFIG::control::addPresetRootDir - offset] = // string NOT stored
             //configData[CONFIG::control::removePresetRootDir - offset] = // returns string NOT used
             configData[CONFIG::control::currentPresetRoot - offset] = xml->getpar("presetsCurrentRootID", 0, 0, MAX_PRESETS);
@@ -795,9 +795,9 @@ bool Config::extractConfigData(XMLwrapper& xml)
 
         // engines
         if (!engineChanged)
-            audioEngine = (audio_drivers)xml.getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+            audioEngine = (audio_driver)xml.getpar("audio_engine", audioEngine, no_audio, alsa_audio);
         if (!midiChanged)
-            midiEngine = (midi_drivers)xml.getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+            midiEngine = (midi_driver)xml.getpar("midi_engine", midiEngine, no_midi, alsa_midi);
         alsaMidiType = xml.getpar("alsa_midi_type", 0, 0, 2);
 
         // alsa settings

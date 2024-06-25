@@ -101,6 +101,8 @@ class AlsaEngine : public MusicIO
         using PcmOutput = snd_pcm_sframes_t(snd_pcm_t*, const void*, snd_pcm_uframes_t);
         PcmOutput* pcmWrite;
 
+        unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
+
         struct Audio {
             std::string       device{};
             snd_pcm_t*        handle{nullptr};

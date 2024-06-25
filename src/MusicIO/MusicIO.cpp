@@ -43,7 +43,6 @@ MusicIO::MusicIO(SynthEngine& _synth, shared_ptr<BeatTracker>&& _beatTracker)
     , bufferAllocation{}   // Allocation happens later in prepBuffers()
     , zynLeft{0}
     , zynRight{0}
-    , interleaved{}
     , beatTracker{std::move(_beatTracker)}
     , synth{_synth}
     { }

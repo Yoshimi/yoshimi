@@ -39,69 +39,14 @@ using std::chrono::duration;
 using std::this_thread::sleep_for;
 
 
-string audio_drivers_str [] = {"no_audio", "jack_audio"
-#if defined(HAVE_ALSA)
-                               , "alsa_audio"
-#endif
-                              };
-string midi_drivers_str [] = {"no_midi", "jack_midi"
-#if defined(HAVE_ALSA)
-                              , "alsa_midi"
-#endif
-                             };
-
-MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
-{
-    std::set<music_clients> clSet;
-    music_clients c1 = {0, _synth->getRuntime().audioEngine, _synth->getRuntime().midiEngine};
-    clSet.insert(c1);
-    music_clients c2 = {1, jack_audio, alsa_midi};
-    clSet.insert(c2);
-    music_clients c3 = {2, jack_audio, jack_midi};
-    clSet.insert(c3);
-    music_clients c4 = {3, alsa_audio, alsa_midi};
-    clSet.insert(c4);
-    music_clients c5 = {4, jack_audio, no_midi};
-    clSet.insert(c5);
-    music_clients c6 = {5, alsa_audio, no_midi};
-    clSet.insert(c6);
-    music_clients c7 = {6, no_audio, alsa_midi};
-    clSet.insert(c7);
-    music_clients c8 = {7, no_audio, jack_midi};
-    clSet.insert(c8);
-    music_clients c9 = {8, no_audio, no_midi}; //this one always will do the work :)
-    clSet.insert(c9);
-
-    for (std::set<music_clients>::iterator it = clSet.begin(); it != clSet.end(); ++it)
-    {
-        MusicClient *client = new MusicClient(*_synth, it->audioDrv, it->midiDrv);
-        if (client)
-        {
-            if (client->Open()) //found working client combination
-            {
-                if (it != clSet.begin())
-                    _synth->getRuntime().configChanged = true;
-                _synth->getRuntime().runSynth = true; //reset to true
-                _synth->getRuntime().audioEngine = it->audioDrv;
-                _synth->getRuntime().midiEngine = it->midiDrv;
-                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi", _SYS_::LogError);
-                return client;
-            }
-            delete client;
-        }
-    }
-    return 0;
-}
 
 
 
 Config& MusicClient::runtime() { return synth.getRuntime(); }
 
 
-MusicClient::MusicClient(SynthEngine& _synth, audio_drivers _audioDrv, midi_drivers _midiDrv)
-    : synth{_synth}
-    , audioDrv{_audioDrv}
-    , midiDrv{_midiDrv}
+MusicClient::MusicClient(SynthEngine& connect_to_engine)
+    : synth{connect_to_engine}
     , audioIO{}
     , midiIO{}
     , timerThreadId{0}
@@ -109,14 +54,19 @@ MusicClient::MusicClient(SynthEngine& _synth, audio_drivers _audioDrv, midi_driv
     , dummyAllocation{}
     , dummyL{0}
     , dummyR{0}
+    { }
+
+
+
+void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 {
     shared_ptr<BeatTracker> beat;
-    if (audioDrv == jack_audio && midiDrv == jack_midi)
+    if (useAudio == jack_audio && useMidi == jack_midi)
         beat = make_shared<SinglethreadedBeatTracker>();
     else
         beat = make_shared<MultithreadedBeatTracker>();
 
-    switch(audioDrv)
+    switch(useAudio)
     {
         case jack_audio:
             audioIO = make_shared<JackEngine>(synth, beat);
@@ -130,17 +80,17 @@ MusicClient::MusicClient(SynthEngine& _synth, audio_drivers _audioDrv, midi_driv
             break;
     }
 
-    switch(midiDrv)
+    switch(useMidi)
     {
         case jack_midi:
-            if (audioDrv == jack_audio)
+            if (useAudio == jack_audio)
                 midiIO = audioIO;
             else
                 midiIO = make_shared<JackEngine>(synth, beat);
             break;
 #if defined(HAVE_ALSA)
         case alsa_midi:
-            if (audioDrv == alsa_audio)
+            if (useAudio == alsa_audio)
                 midiIO = audioIO;
             else
                 midiIO = make_shared<AlsaEngine>(synth, beat);
@@ -150,26 +100,20 @@ MusicClient::MusicClient(SynthEngine& _synth, audio_drivers _audioDrv, midi_driv
             break;
     }
 
-    assert (audioIO or audioDrv == no_audio);
-    assert (midiIO or midiDrv == no_midi);
+    assert (audioIO or useAudio == no_audio);
+    assert (midiIO or useMidi == no_midi);
 }
 
 
-bool MusicClient::Open()
+bool MusicClient::open(audio_driver tryAudio, midi_driver tryMidi)
 {
-    bool validAudio = !audioIO or audioIO->openAudio();
-    bool validMidi  = !midiIO or midiIO->openMidi();
-
-    if (validAudio and validMidi)
-    {
-        runtime().audioEngine = audioDrv;
-        runtime().midiEngine = midiDrv;
-    }
-    return validAudio and validMidi;
+    createEngines(tryAudio, tryMidi);
+    return (not audioIO or audioIO->openAudio())
+       and (not midiIO  or midiIO->openMidi());
 }
 
 
-bool MusicClient::Start()
+bool MusicClient::start()
 {
     assert(timerThreadId == 0 && !timerWorking);
 
@@ -188,7 +132,7 @@ bool MusicClient::Start()
 }
 
 
-void MusicClient::Close()
+void MusicClient::close()
 {
     if (midiIO and midiIO != audioIO)
         midiIO->Close();
@@ -254,13 +198,13 @@ void* MusicClient::timerThread_fn(void *arg)
 
 
 
-unsigned int MusicClient::getSamplerate()
+uint MusicClient::getSamplerate()
 {
     return audioIO? audioIO->getSamplerate()
                   : runtime().Samplerate;
 }
 
-int MusicClient::getBuffersize()
+uint MusicClient::getBuffersize()
 {
     return audioIO? audioIO->getBuffersize()
                   : runtime().Buffersize;

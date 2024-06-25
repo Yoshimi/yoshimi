@@ -74,8 +74,6 @@ class MusicIO
         float*  zynLeft[NUM_MIDI_PARTS + 1];
         float* zynRight[NUM_MIDI_PARTS + 1];
 
-        unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
-
         // The engine which tracks song beats (MIDI driver).
         shared_ptr<BeatTracker> beatTracker;
         SynthEngine& synth;

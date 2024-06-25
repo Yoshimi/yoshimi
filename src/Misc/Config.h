@@ -125,9 +125,9 @@ class Config
         bool          finishedCLI;
         int           VirKeybLayout;
 
-        audio_drivers audioEngine;
+        audio_driver  audioEngine;
         bool          engineChanged;
-        midi_drivers  midiEngine;
+        midi_driver   midiEngine;
         bool          midiChanged;
         int           alsaMidiType;
         string        audioDevice;

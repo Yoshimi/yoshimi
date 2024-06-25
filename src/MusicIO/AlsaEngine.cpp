@@ -49,6 +49,7 @@ AlsaEngine::AlsaEngine(SynthEngine& _synth, shared_ptr<BeatTracker> beat)
     , card_chans{2}   // got to start somewhere}
     , card_bits{0}
     , pcmWrite{nullptr}
+    , interleaved{}
     , audio{}
     , midi{}
 {
@@ -69,27 +70,23 @@ bool AlsaEngine::openAudio()
     audio.period_size = runtime().Buffersize;
     audio.period_count = 2;
     audio.buffer_size = audio.period_size * audio.period_count;
-    if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
-                             SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
-            "failed to open alsa audio device:" + audio.device))
-        goto bail_out;
-
-    if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
-    {
-        if (prepHwparams())
-        {
-            if (prepSwparams())
-            {
-                prepBuffers();
-                interleaved.reset(new int[getBuffersize() * card_chans]{0});
-            }
-        }
-    }
-    return true;
-bail_out:
+    if (not alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
+                                 SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
+                                 "failed to open alsa audio device:" + audio.device))
+        if (not alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
+            if (prepHwparams())
+                if (prepSwparams())
+                {
+                    prepBuffers();
+                    // Buffers for interleaved audio only used by AlsaEngine
+                    interleaved.reset(new int[getBuffersize() * card_chans]{0});
+                    return true;
+                }
+    // if anything did not go well...
     Close();
     return false;
 }
+
 
 string AlsaEngine::findMidiClients(snd_seq_t *seq)
 {
@@ -324,10 +321,10 @@ bool AlsaEngine::prepHwparams()
     snd_pcm_hw_params_alloca(&hwparams);
     if (alsaBad(snd_pcm_hw_params_any(audio.handle, hwparams),
                 "alsa audio no playback configurations available"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_periods_integer(audio.handle, hwparams),
                 "alsa audio cannot restrict period size to integral value"))
-        goto bail_out;
+        return false;
     if (!alsaBad(snd_pcm_hw_params_set_access(audio.handle, hwparams, axs),
                  "alsa audio mmap not possible"))
         pcmWrite = &snd_pcm_mmap_writei;
@@ -336,7 +333,7 @@ bool AlsaEngine::prepHwparams()
         axs = SND_PCM_ACCESS_RW_INTERLEAVED;
         if (alsaBad(snd_pcm_hw_params_set_access(audio.handle, hwparams, axs),
                      "alsa audio failed to set access, both mmap and rw failed"))
-            goto bail_out;
+            return false;
         pcmWrite = &snd_pcm_writei;
     }
 
@@ -347,7 +344,7 @@ bool AlsaEngine::prepHwparams()
         if (card_formats[formidx].card_bits == 0)
         {
             runtime().Log("alsa audio failed to find matching format");
-            goto bail_out;
+            return false;
         }
     }
     card_bits = card_formats[formidx].card_bits;
@@ -378,25 +375,25 @@ bool AlsaEngine::prepHwparams()
                                                 &audio.samplerate, NULL),
                 "alsa audio failed to set sample rate (asked for "
                 + asString(ask_samplerate) + ")"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_channels_near(audio.handle, hwparams, &card_chans),
                 "alsa audio failed to set requested channels"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_periods_near(audio.handle, hwparams, &audio.period_count, 0), "failed to set number of periods"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams, &audio.buffer_size), "failed to set buffer size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params (audio.handle, hwparams),
                 "alsa audio failed to set hardware parameters"))
-		goto bail_out;
+		return false;
     if (alsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &audio.buffer_size),
                 "alsa audio failed to get buffer size"))
-        goto bail_out;
+        return false;
     if (alsaBad(snd_pcm_hw_params_get_period_size(hwparams, &audio.period_size,
                 NULL), "failed to get period size"))
-        goto bail_out;
+        return false;
 
     runtime().Log("Card Format is " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
     if (ask_buffersize != audio.period_size)
@@ -406,40 +403,29 @@ bool AlsaEngine::prepHwparams()
         runtime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
-
-bail_out:
-    if (audio.handle != NULL)
-        Close();
-    return false;
 }
 
 
 bool AlsaEngine::prepSwparams()
 {
     snd_pcm_sw_params_t *swparams;
-    snd_pcm_sw_params_alloca(&swparams);
+    snd_pcm_sw_params_alloca(&swparams); // allocated on stack and automatically freed when leaving this scope
 	snd_pcm_uframes_t boundary;
-    if (alsaBad(snd_pcm_sw_params_current(audio.handle, swparams),
-                 "alsa audio failed to get swparams"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_get_boundary(swparams, &boundary),
-                "alsa audio failed to get boundary"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_set_start_threshold(audio.handle, swparams,
-                                                      boundary + 1),
-                "failed to set start threshold")) // explicit start, not auto start
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params_set_stop_threshold(audio.handle, swparams,
-                                                    boundary),
-               "alsa audio failed to set stop threshold"))
-        goto bail_out;
-    if (alsaBad(snd_pcm_sw_params(audio.handle, swparams),
-                "alsa audio failed to set software parameters"))
-        goto bail_out;
-    return true;
-
-bail_out:
-    return false;
+	return (not alsaBad(snd_pcm_sw_params_current(audio.handle, swparams),
+                        "alsa audio failed to get swparams"))
+       and (not alsaBad(snd_pcm_sw_params_get_boundary(swparams, &boundary),
+                        "alsa audio failed to get boundary"))
+       and (not alsaBad(snd_pcm_sw_params_set_start_threshold(audio.handle
+                                                             ,swparams
+                                                             ,boundary + 1)
+                       ,"failed to set start threshold"))  // explicit start, not auto start
+       and (not alsaBad(snd_pcm_sw_params_set_stop_threshold(audio.handle
+                                                            ,swparams
+                                                            ,boundary)
+                       ,"alsa audio failed to set stop threshold"))
+       and (not alsaBad(snd_pcm_sw_params(audio.handle, swparams)
+                       ,"alsa audio failed to set software parameters"))
+         ;
 }
 
 

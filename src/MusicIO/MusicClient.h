@@ -34,25 +34,16 @@
 
 using std::shared_ptr;
 using std::unique_ptr;
+using std::string;
 
-enum audio_drivers { no_audio = 0, jack_audio, alsa_audio};
-enum midi_drivers { no_midi = 0, jack_midi, alsa_midi};
+enum audio_driver { no_audio = 0, jack_audio, alsa_audio};
+enum midi_driver  { no_midi = 0, jack_midi, alsa_midi};
 
 class Config;
 class MusicIO;
 class SynthEngine;
 class BeatTracker;
 
-struct music_clients
-{
-    int order;
-    audio_drivers audioDrv;
-    midi_drivers midiDrv;
-    bool operator ==(const music_clients& other) const { return audioDrv == other.audioDrv && midiDrv == other.midiDrv; }
-    bool operator >(const music_clients& other) const { return (order > other.order) && (other != *this); }
-    bool operator <(const music_clients& other) const { return (order < other.order)  && (other != *this); }
-    bool operator !=(const music_clients& other) const { return audioDrv != other.audioDrv || midiDrv != other.midiDrv; }
-};
 
 #define NMC_SRATE 44100
 
@@ -60,8 +51,6 @@ class MusicClient
 {
 private:
     SynthEngine& synth;
-    audio_drivers audioDrv;
-    midi_drivers midiDrv;
     shared_ptr<MusicIO> audioIO;
     shared_ptr<MusicIO> midiIO;
 
@@ -71,6 +60,7 @@ private:
     Samples dummyAllocation;
     float*  dummyL[NUM_MIDI_PARTS + 1];
     float*  dummyR[NUM_MIDI_PARTS + 1];
+
 public:
    ~MusicClient() = default;
     // shall not be copied nor moved
@@ -79,20 +69,20 @@ public:
     MusicClient& operator=(MusicClient&&)      = delete;
     MusicClient& operator=(MusicClient const&) = delete;
 
-    MusicClient(SynthEngine&, audio_drivers _audioDrv, midi_drivers _midiDrv);
-    bool Open(void);
-    bool Start(void);
-    void Close(void);
-    unsigned int getSamplerate(void);
-    int getBuffersize(void);
-    std::string audioClientName(void);
-    std::string midiClientName(void);
-    int audioClientId(void);
-    int midiClientId(void);
+    MusicClient(SynthEngine&);
+    bool open(audio_driver, midi_driver);
+    bool start();
+    void close();
+    uint getSamplerate();
+    uint getBuffersize();
+    string audioClientName();
+    string midiClientName();
+    int audioClientId();
+    int midiClientId();
     void registerAudioPort(int portnum);
 
-    static MusicClient *newMusicClient(SynthEngine *_synth);
 private:
+    void createEngines(audio_driver, midi_driver);
     bool launchReplacementThread();
     bool prepDummyBuffers();
     Config& runtime();

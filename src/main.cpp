@@ -238,7 +238,7 @@ static void *mainThread(void *arg)
                 unsigned int instanceID =  _synth->getUniqueId();
                 if (_client)
                 {
-                    _client->Close();
+                    _client->close();
                     delete _client;
                 }
 
@@ -329,11 +329,13 @@ int mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     }
 
+/*
     if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
         synth->getRuntime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
         goto bail_out;
     }
+*/
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
@@ -341,7 +343,7 @@ int mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     }
 
-    if (!musicClient->Start())
+    if (!musicClient->start())
     {
         synth->getRuntime().Log("Failed to start MusicIO",_SYS_::LogError);
         goto bail_out;
@@ -387,7 +389,7 @@ bail_out:
     synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
     if (musicClient)
     {
-        musicClient->Close();
+        musicClient->close();
         delete musicClient;
     }
     if (synth)
@@ -583,7 +585,7 @@ int main(int argc, char *argv[])
     if (waitForTest && threadCmd)
     {   // CLI about to launch TestRunner for automated test
         MusicClient* music = synthInstances[firstSynth];
-        if (music) music->Close(); // causes esp. JackClient to detach
+        if (music) music->close(); // causes esp. JackClient to detach
 
         pthread_join(threadCmd, &res);
         if (res == (void *)1)
@@ -608,7 +610,7 @@ bail_out:
 
         if (_client)
         {
-            _client->Close();
+            _client->close();
             delete _client;
         }
 

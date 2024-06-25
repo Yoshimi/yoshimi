@@ -210,26 +210,26 @@ void JackEngine::Close()
         runtime().runSynth = false;
     }
 
-    if (NULL != jackClient)
+    if (nullptr != jackClient)
     {
         int chk;
         for (int chan = 0; chan < (2*NUM_MIDI_PARTS+2); ++chan)
         {
-            if (NULL != audio.ports[chan])
+            if (nullptr != audio.ports[chan])
                 jack_port_unregister(jackClient, audio.ports[chan]);
-            audio.ports[chan] = NULL;
+            audio.ports[chan] = nullptr;
         }
-        if (NULL != midiPort)
+        if (nullptr != midiPort)
         {
             if ((chk = jack_port_unregister(jackClient, midiPort)))
                 runtime().Log("Failed to close jack client, status: " + asString(chk));
-            midiPort = NULL;
+            midiPort = nullptr;
         }
         chk = jack_deactivate(jackClient);
         if (chk)
             runtime().Log("Failed to close jack client, status: " + asString(chk));
 
-        jackClient = NULL;
+        jackClient = nullptr;
     }
 }
 
@@ -314,6 +314,7 @@ bool JackEngine::openMidi()
     if (!midiPort)
     {
         runtime().Log("Failed to register jack midi port");
+        Close();
         return false;
     }
 
