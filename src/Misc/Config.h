@@ -50,8 +50,8 @@ class Config
     public:
         /** convenience access to the global InstanceManager */
         static InstanceManager& instances() { return InstanceManager::get(); }
-        
-        
+
+
         Config(SynthEngine *_synth, bool isLV2Plugin);
        ~Config();
         // shall not be copied or moved or assigned
@@ -233,7 +233,7 @@ class Config
             bool Enabled[NUM_MIDI_CHANNELS];
         }vectordata;
 
-        list<string> LogList;
+        list<string> logList;
 
         /*
          * These replace local memory allocations that

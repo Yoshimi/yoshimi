@@ -84,6 +84,7 @@ public:
 private:
     void createEngines(audio_driver, midi_driver);
     bool launchReplacementThread();
+    void stopReplacementThread();
     bool prepDummyBuffers();
     Config& runtime();
 };

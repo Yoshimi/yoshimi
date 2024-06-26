@@ -203,10 +203,10 @@ void GuiUpdates::read_updates(SynthEngine *synth)
     */
 
     // and pull up to 5 entries from log
-    for (int i = 0; !synth->getRuntime().LogList.empty() && i < 5; ++i)
+    for (int i = 0; !synth->getRuntime().logList.empty() && i < 5; ++i)
     {
-        synth->getGuiMaster()->Log(synth->getRuntime().LogList.front());
-        synth->getRuntime().LogList.pop_front();
+        synth->getGuiMaster()->Log(synth->getRuntime().logList.front());
+        synth->getRuntime().logList.pop_front();
     }
 }
 

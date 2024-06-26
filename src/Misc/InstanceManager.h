@@ -40,9 +40,9 @@ class InstanceManager
 {
 
     class Instance;
-    class SynthIdx;
+    class SynthGroom;
 
-        std::unique_ptr<SynthIdx> index;
+        std::unique_ptr<SynthGroom> groom;
 
         CmdOptions cmdOptions;
 

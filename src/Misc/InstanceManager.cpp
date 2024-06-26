@@ -80,6 +80,18 @@ namespace { // implementation details...
                 throw std::logic_error("Unknown MIDI driver ID");
         }
     }
+
+
+    /**
+     * Instance Lifecycle
+     */
+    enum LifePhase {
+        PENDING = 0,
+        BOOTING,
+        RUNNING,
+        EXPIRING,
+        DEFUNCT
+    };
 }
 
 
@@ -92,6 +104,8 @@ class InstanceManager::Instance
         unique_ptr<SynthEngine> synth;
         unique_ptr<MusicClient> client;
 
+        LifePhase state{PENDING};
+
     public: // can be moved and swapped, but not copied...
        ~Instance()                           = default;
         Instance(Instance&&)                 = default;
@@ -101,17 +115,23 @@ class InstanceManager::Instance
 
         Instance(uint id);
 
-        void startUp();
+        bool startUp();
         void shutDown();
 
         auto& getSynth() { return *synth; }
     private:
         Config& runtime() { return synth->getRuntime(); }
+        bool isPrimary()  { return 0 == synth->getUniqueId(); }
 };
 
 
-/** A »State Table« of all currently active Synth instances */
-class InstanceManager::SynthIdx
+/**
+ * A housekeeper and caretaker responsible for clear-out of droppings.
+ * - maintains a registry of all engine instances
+ * - serves to further the lifecycle
+ * - operates a running state duty cycle
+ */
+class InstanceManager::SynthGroom
 {
 
         using Location = void*;
@@ -125,14 +145,14 @@ class InstanceManager::SynthIdx
         Table registry;
 
     public: // can be moved and swapped, but not copied...
-       ~SynthIdx()                           = default;
-        SynthIdx(SynthIdx&&)                 = default;
-        SynthIdx(SynthIdx const&)            = delete;
-        SynthIdx& operator=(SynthIdx&&)      = delete;
-        SynthIdx& operator=(SynthIdx const&) = delete;
+       ~SynthGroom()                             = default;
+        SynthGroom(SynthGroom &&)                = default;
+        SynthGroom(SynthGroom const&)            = delete;
+        SynthGroom& operator=(SynthGroom &&)     = delete;
+        SynthGroom& operator=(SynthGroom const&) = delete;
 
         // can be default created
-        SynthIdx() = default;
+        SynthGroom() = default;
 
         Instance& createInstance(uint instanceID)
         {
@@ -144,7 +164,7 @@ class InstanceManager::SynthIdx
 
 
 InstanceManager::InstanceManager()
-    : index{make_unique<SynthIdx>()}
+    : groom{make_unique<SynthGroom>()}
     , cmdOptions{}
     { }
 
@@ -161,9 +181,23 @@ InstanceManager::Instance::Instance(uint id)
     { }
 
 
-/** */
-void InstanceManager::Instance::startUp()
+
+/** boot up this engine instance into working state.
+ * - probe a working IO / client setup
+ * - init the SynthEngine
+ * - start the IO backend
+ * @return `true` on success
+ * @note after a successful boot, `state == BOOTING`,
+ *       which enables some post-boot-hooks to run,
+ *       and notably prompts the GUI to become visible;
+ *       after that, the state will transition to `RUNNING`.
+ *       However, if boot-up fails, `state == EXPIRING` and
+ *       further transitioning to `DEFUNCT` after shutdown.
+ */
+bool InstanceManager::Instance::startUp()
 {
+    state = BOOTING;
+    assert (not runtime().runSynth);
     for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
     {
         if (client->open(tryAudio, tryMidi))
@@ -173,10 +207,46 @@ void InstanceManager::Instance::startUp()
                 runtime().configChanged = true;
             runtime().audioEngine = tryAudio;
             runtime().midiEngine = tryMidi;
-            runtime().runSynth = true;  // mark as active
+            runtime().runSynth = true;  // mark as active and enable background threads
             runtime().Log("Using "+display(tryAudio)+" for audio and "+display(tryMidi)+" for midi", _SYS_::LogError);
+            break;
         }
     }
+    if (not runtime().runSynth)
+        runtime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
+    else
+    {
+        if (not synth->Init(client->getSamplerate(), client->getBuffersize()))
+            runtime().Log("SynthEngine init failed",_SYS_::LogError);
+        else
+        {
+            if (not client->start())
+                runtime().Log("Failed to start MusicIO",_SYS_::LogError);
+            else
+            {// engine started successfully....
+#ifdef GUI_FLTK
+                if (runtime().showGui)
+                    synth->setWindowTitle(client->midiClientName());
+                else
+                    runtime().toConsole = false;
+#else
+                runtime().toConsole = false;
+#endif
+                runtime().StartupReport(client->midiClientName());
+
+                if (isPrimary())
+                    std::cout << "\nYay! We're up and running :-)\n";
+                else
+                    std::cout << "\nStarted "<< synth->getUniqueId() << "\n";
+
+                state = BOOTING;
+                return true;
+    }   }   }
+
+    state = EXPIRING;
+    runtime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
+    shutDown();
+    return false;
 }
 
 
@@ -185,6 +255,9 @@ void InstanceManager::Instance::startUp()
 /** */
 void InstanceManager::Instance::shutDown()
 {
-
+    runtime().runSynth = false;
+    client->close();
+    runtime().flushLog();
+    state = DEFUNCT;
 }
 

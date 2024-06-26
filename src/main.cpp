@@ -371,7 +371,7 @@ int mainCreateNewInstance(unsigned int forceId)
     {
         std::cout << "\nStarted "<< instanceID << "\n";
         // following copied here for other instances
-        synth->installBanks();
+        synth->installBanks(); /////////////////////////////////////////OOO must care to get those post-boot-actions performed
     }
 
     synthInstances.insert(std::make_pair(synth, musicClient));
@@ -597,6 +597,7 @@ int main(int argc, char *argv[])
 
 bail_out:
     // firstSynth is freed in the for loop below, so save this for later
+////////////////////////////////////////////////////////////////////////////////////////OOO rework: shut-down now done by InstanceManager
     int exitType = firstSynth->getRuntime().exitType;
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
@@ -620,6 +621,7 @@ bail_out:
             delete _synth;
         }
     }
+////////////////////////////////////////////////////////////////////////////////////////OOO (END): shut-down now done by InstanceManager
     if (bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)

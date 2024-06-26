@@ -140,14 +140,18 @@ void MusicClient::close()
     if (audioIO)
         audioIO->Close();
     else
-    {// stop the replacement timer thread...
-        if (timerThreadId == 0 || timerWorking == false)
-            return;
-        timerWorking = false;
-        void* ret = 0;
-        pthread_join(timerThreadId, &ret);
-        timerThreadId = 0;
-    }
+        stopReplacementThread();
+}
+
+
+void MusicClient::stopReplacementThread()
+{
+    if (timerThreadId == 0 || timerWorking == false)
+        return;
+    timerWorking = false;
+    void* ret = 0;
+    pthread_join(timerThreadId, &ret);
+    timerThreadId = 0;
 }
 
 
