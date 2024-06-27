@@ -277,7 +277,7 @@ class PADnoteUI {: {public PresetsUI_}
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
       callback {padClose->do_callback();}
-      xywh {1235 133 580 440} type Double hide resizable
+      xywh {464 151 580 440} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("PadSynth"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
       code1 {padDW = o->w(); padDH = o->h();}
       code2 {padnotewindow->size_range(padDW, padDH, 0, 0, 0, 0, 1);}
@@ -609,7 +609,6 @@ class PADnoteUI {: {public PresetsUI_}
             xywh {10 27 275 68} box PLASTIC_UP_BOX color 223 labelcolor 64
           }
           Fl_Group ampgrp {
-            label AMPLITUDE
             xywh {5 25 285 250} box THIN_UP_FRAME labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Dial volume {
@@ -617,7 +616,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),90));
               send_data(0, PADSYNTH::control::volume, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Volume xywh {30 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip Volume xywh {30 43 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->setValueType(VC_InstrumentVolume);}
               code1 {o->value(pars->PVolume);}
               code2 {o->selection_color(setKnob(o->value(),90));}
@@ -628,7 +627,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(0, PADSYNTH::control::velocitySense, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {85 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip {Velocity Sensing Function (rightmost to disable)} xywh {85 43 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
               code1 {o->setValueType(VC_AmpVelocitySense);}
               code2 {o->selection_color(setKnob(o->value(),64));}
@@ -639,7 +638,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
               o->selection_color(setKnob(o->value(),64));
               send_data(TOPLEVEL::action::forceUpdate, PADSYNTH::control::panning, o->value(), TOPLEVEL::type::Integer);}
-              tooltip Panning xywh {155 42 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
+              tooltip Panning xywh {155 43 34 34} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 127 step 1
               code0 {o->setValueType(VC_PanningStd);}
               code1 {o->value(pars->PPanning);}
               code2 {o->selection_color(setKnob(o->value(),64));}
@@ -650,7 +649,7 @@ class PADnoteUI {: {public PresetsUI_}
               callback {//
         o->selection_color(setKnob(o->value(),63));
         send_data(0, PADSYNTH::control::randomWidth, o->value(), TOPLEVEL::type::Integer);}
-              tooltip {Random width} xywh {235 42 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
+              tooltip {Random width} xywh {235 43 35 35} box ROUND_UP_BOX labelsize 10 labelcolor 64 maximum 63 step 1 value 63
               code0 {o->setValueType(VC_PanningRandom);}
               code1 {o->value(pars->PWidth);}
               code2 {o->selection_color(setKnob(o->value(),63));}
@@ -665,7 +664,7 @@ class PADnoteUI {: {public PresetsUI_}
         else
             panwidth->activate();
         send_data(0, PADSYNTH::control::enableRandomPan, tmp, TOPLEVEL::type::Integer);}
-              tooltip {Enable random panning} xywh {205 51 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
+              tooltip {Enable random panning} xywh {205 53 15 15} down_box DOWN_BOX color 48 selection_color 64 labelsize 11 labelcolor 64 align 1
               code0 {o->value(pars->PRandom);}
               code1 {if (o->value() == 0) panwidth->deactivate(); else panwidth->activate();}
               class Fl_Check_Button2
@@ -742,11 +741,14 @@ class PADnoteUI {: {public PresetsUI_}
               class LFOUI
             } {}
             Fl_Box {} {
-              xywh {135 41 4 47} box THIN_DOWN_FRAME
+              xywh {135 42 4 46} box THIN_DOWN_FRAME
+            }
+            Fl_Box amplabel {
+              label AMPLITUDE
+              xywh {124 28 35 17} labelfont 1 labelsize 11 labelcolor 64
             }
           }
           Fl_Group filtergrp {
-            label FILTER
             xywh {290 25 285 250} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 64 align 17
           } {
             Fl_Group filterenv {
@@ -767,6 +769,10 @@ class PADnoteUI {: {public PresetsUI_}
               code0 {o->init(pars->GlobalFilter.get(), &pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, PART::engine::padSynth);}
               class FilterUI
             } {}
+            Fl_Box filterlabel {
+              label FILTER
+              xywh {416 29 35 17} labelfont 1 labelsize 11
+            }
           }
           Fl_Group frequencygrp {
             label FREQUENCY
@@ -1177,10 +1183,10 @@ class PADnoteUI {: {public PresetsUI_}
     resonance->labelsize(size12);
     waveform->labelsize(size12);
 
-    filtergrp->labelsize(size11);
+    filterlabel->labelsize(size11);
 
     envelopes->labelsize(size12);
-    ampgrp->labelsize(size11);
+    amplabel->labelsize(size11);
     volume->labelsize(size);
     vsns->labelsize(size);
     pan->labelsize(size);

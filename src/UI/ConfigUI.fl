@@ -1274,7 +1274,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                 int testTime = file::isRegularFile(fileName);
                 if (testTime != themeTime)
                 {
-                    std::cout << "test " << testTime << "  theme " << themeTime << std::endl;
+                    //std::cout << "test " << testTime << "  theme " << themeTime << std::endl;
                     setUserTable(fileName);
                     synth->getGuiMaster()->theme();
                 }

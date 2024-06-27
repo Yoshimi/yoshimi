@@ -695,7 +695,6 @@ Oscillator}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE
           xywh {5 68 285 212} box UP_FRAME labelfont 1 labelsize 12 labelcolor 64 align 17
         } {
           Fl_Dial voicevolume {
@@ -823,7 +822,11 @@ Oscillator}
             class Fl_Check_Button2
           }
           Fl_Box {} {
-            xywh {140 85 4 44} box THIN_DOWN_FRAME
+            xywh {140 88 4 40} box THIN_DOWN_FRAME
+          }
+          Fl_Box ampVoiceLabel {
+            label AMPLITUDE
+            xywh {128 72 35 17} labelfont 1 labelsize 10 labelcolor 64
           }
         }
         Fl_Group voicefiltergroup {
@@ -1576,7 +1579,7 @@ Oscillator}
     Vname->labelsize(size14);
 
     ResonanceEn->labelsize(size11);
-    amplitudegroup->labelsize(size12);
+    ampVoiceLabel->labelsize(size);
     voicevolume->labelsize(size);
     voicevsns->labelsize(size);
     voicepan->labelsize(size);
@@ -1679,7 +1682,7 @@ Oscillator}
         ExtModOsc->textsize(size);
 
     modvoicelabel->labelsize(int(40 * dScale));
-    
+
     ADnoteVoiceParameters->redraw();} {}
   }
   Function {voicetheme()} {} {
@@ -2391,11 +2394,11 @@ class ADnoteUI {: {public PresetsUI_}
           class Fl_Check_Button2
         }
         Fl_Box {} {
-          xywh {135 21 4 47} box THIN_DOWN_FRAME
+          xywh {135 24 4 44} box THIN_DOWN_FRAME
         }
         Fl_Box amplitudelabel {
           label AMPLITUDE
-          xywh {128 10 35 8} labelfont 1 labelsize 12 labelcolor 64
+          xywh {128 12 35 8} labelfont 1 labelsize 12 labelcolor 64
         }
       }
       Fl_Group filtergrp {
@@ -3073,7 +3076,7 @@ class ADnoteUI {: {public PresetsUI_}
         freqenv->theme();
         filterenv->theme();
         filterui->theme();
-        
+
         lastvoiceW = 0;
         addVoiceRtext();
         advoice->voicetheme();

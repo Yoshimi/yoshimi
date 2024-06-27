@@ -1,7 +1,7 @@
 /*
     FileMgr.h - all file operations
 
-    Copyright 2019-2023 Will Godfrey and others.
+    Copyright 2019-2024 Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -42,9 +42,9 @@
 #define OUR_PATH_MAX 4096
 /*
  * PATH_MAX is a poorly defined constant, and not very
- * portable. As this function is only used for a simple
- * tightly defined purpose we set a value to replace it
- * that should be safe for any reasonable architecture.
+ * portable. As this is only used for a simple tightly
+ * defined purpose we set a value to replace it that
+ * should be safe for any reasonable architecture.
  */
 
 
@@ -345,11 +345,11 @@ inline bool copyFile(const string& source, const string& destination, char optio
         if(isRegularFile(destination))
         {
             //std::cout << "Not writing " << destination << std::endl;
-            return 0; // counts as a successful write
+            return 0; // treated as a successful write when copying banks
         }
         else
         {
-            ;//std::cout << "Writing " << destination << std::endl;
+            ;//std::cout << "Is writing " << destination << std::endl;
         }
     }
 
