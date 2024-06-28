@@ -26,16 +26,23 @@
 #include "Misc/InstanceManager.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
+#ifdef GUI_FLTK
+    #include "MasterUI.h"
+#endif
 
 //#include <string>
 #include <memory>
 #include <utility>
 #include <unordered_map>
 #include <array>
+#include <algorithm>
 
 //using std::string;
+using std::function;
 using std::make_unique;
 using std::unique_ptr;
+using std::remove_if;
+using std::find_if;
 using std::move;
 
 
@@ -89,7 +96,7 @@ namespace { // implementation details...
         PENDING = 0,
         BOOTING,
         RUNNING,
-        EXPIRING,
+        WANING,
         DEFUNCT
     };
 }
@@ -117,12 +124,16 @@ class InstanceManager::Instance
 
         bool startUp();
         void shutDown();
+        void buildGuiMaster();
+        void enterRunningState();
 
         auto& getSynth() { return *synth; }
-    private:
         Config& runtime() { return synth->getRuntime(); }
+        LifePhase getState() { return state; }
+    private:
         bool isPrimary()  { return 0 == synth->getUniqueId(); }
 };
+
 
 
 /**
@@ -143,6 +154,7 @@ class InstanceManager::SynthGroom
         using Table = std::unordered_map<const Location, Instance, LocationHash>;
 
         Table registry;
+        Instance* primary{nullptr};
 
     public: // can be moved and swapped, but not copied...
        ~SynthGroom()                             = default;
@@ -156,10 +168,27 @@ class InstanceManager::SynthGroom
 
         Instance& createInstance(uint instanceID)
         {
+            assert( (!primary and 0==instanceID)
+                  or(primary and 0!=instanceID));
+
             Instance newEntry{instanceID};
-            return registry.emplace(&newEntry.getSynth(), move(newEntry))
-                           .first->second;
+            auto& instance = registry.emplace(&newEntry.getSynth(), move(newEntry))
+                                     .first->second;
+            if (!primary)
+                primary = & instance;
+            return instance;
         }
+
+        Instance& getPrimary()
+        {
+            assert(primary);
+            return *primary;
+        }
+
+        void dutyCycle(function<void(SynthEngine&)>& handleEvents);
+    private:
+        void handleStartRequest();
+        void clearZombies();
 };
 
 
@@ -243,12 +272,11 @@ bool InstanceManager::Instance::startUp()
                 return true;
     }   }   }
 
-    state = EXPIRING;
+    state = WANING;
     runtime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
     shutDown();
     return false;
 }
-
 
 
 
@@ -261,3 +289,77 @@ void InstanceManager::Instance::shutDown()
     state = DEFUNCT;
 }
 
+
+void InstanceManager::performWhileActive(function<void(SynthEngine&)> handleEvents)
+{
+    while (groom->getPrimary().runtime().runSynth)
+    {
+        groom->dutyCycle(handleEvents);
+    }
+}
+
+void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handleEvents)
+{
+    for (auto& [_,instance] : registry)
+    {
+        switch (instance.getState())
+        {
+            case BOOTING:
+                 // successfully booted, make ready for use
+                if (primary->runtime().showGui)
+                    instance.buildGuiMaster();
+                instance.enterRunningState();
+            break;
+            case RUNNING:
+                 // perform event handling for this instance
+                handleEvents(instance.getSynth());
+            break;
+            default:
+                /* do nothing */
+            break;
+        }
+    }
+    clearZombies();
+    handleStartRequest();
+}
+
+
+/**
+ * respond to the request to start a new engine instance, if any
+ * @note deliberately handling only a single request, as start-up is
+ *       time consuming and risks tailback in other instances' GUI queues.
+ */
+void InstanceManager::SynthGroom::handleStartRequest()
+{
+    for (auto& [_,instance] : registry)
+        if (PENDING == instance.getState())
+        {
+            instance.startUp();
+            return;  // only one per duty cycle
+        }
+}
+
+void InstanceManager::SynthGroom::clearZombies()
+{
+    for (auto it = registry.begin(); it != registry.end();)
+    {
+        if (it->second.getState() == DEFUNCT)
+            it = registry.erase(it);
+        else
+            ++it;
+    }
+}
+
+void InstanceManager::Instance::buildGuiMaster()
+{
+#ifdef GUI_FLTK
+    MasterUI& guiMaster = synth->interchange.createGuiMaster();
+    guiMaster.Init();
+#endif
+}
+
+void InstanceManager::Instance::enterRunningState()
+{
+    //////////////////////////////////OOO should also integrate a post-boot-Hook at this point
+    state = RUNNING;
+}

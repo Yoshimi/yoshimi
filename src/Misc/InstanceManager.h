@@ -31,7 +31,10 @@
 //#include <iostream>
 //#include <iomanip>
 //#include <fstream>
+#include <functional>
 #include <memory>
+
+class SynthEngine;
 
 //using std::cout;
 //using std::endl;
@@ -66,6 +69,9 @@ class InstanceManager
         {
             return cmdOptions;
         }
+
+        /** Event handling loop during regular operation */
+        void performWhileActive(std::function<void(SynthEngine&)> handleEvents);
 };
 
 

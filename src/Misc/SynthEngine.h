@@ -101,7 +101,7 @@ class SynthEngine
         SynthEngine& operator=(SynthEngine const&) = delete;
 
         bool Init(unsigned int audiosrate, int audiobufsize);
-        size_t publishGuiAnchor();
+        void publishGuiAnchor();
         void postGuiStartHook();
 
         bool savePatchesXML(string filename);
@@ -318,7 +318,7 @@ class SynthEngine
     public:
 #ifdef GUI_FLTK
         ///////////////////TODO 1/2024 : retract direct usage of direct SynthEngine* from UI
-        MasterUI *getGuiMaster();
+        MasterUI* getGuiMaster();
 #endif
     private:
         void( *guiClosedCallback)(void*);

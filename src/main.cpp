@@ -354,8 +354,9 @@ int mainCreateNewInstance(unsigned int forceId)
         synth->setWindowTitle(musicClient->midiClientName());
         if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
         {
-            size_t slotIDX = synth->publishGuiAnchor();
-            GuiThreadMsg::sendMessage(&synth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
+///////////////////////////////////////////////////////////////////////////////////////////////////OOO obsolete, now done via Synth.Init() -> Ringbuffer            
+//          size_t slotIDX = synth->publishGuiAnchor();
+//          GuiThreadMsg::sendMessage(&synth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
         }
     }
     else
@@ -551,8 +552,9 @@ int main(int argc, char *argv[])
 #ifdef GUI_FLTK
     if (bShowGui)
     {
-        size_t slotIDX = firstSynth->publishGuiAnchor();
-        GuiThreadMsg::sendMessage(&firstSynth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
+///////////////////////////////////////////////////////////////////////////////////////////////////OOO obsolete, now done via Synth.Init() -> Ringbuffer            
+//      size_t slotIDX = firstSynth->publishGuiAnchor();
+//      GuiThreadMsg::sendMessage(&firstSynth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
     }
 #endif
 

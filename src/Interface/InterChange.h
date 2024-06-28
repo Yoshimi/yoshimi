@@ -78,7 +78,7 @@ class InterChange : private DataText
         bool Init();
 
 #ifdef GUI_FLTK
-        MasterUI& createGuiMaster(size_t slotIDX);
+        MasterUI& createGuiMaster();
         void closeGui();
 #endif
 

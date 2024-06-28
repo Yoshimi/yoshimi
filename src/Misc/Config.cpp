@@ -1610,6 +1610,8 @@ void GuiThreadMsg::processGuiMessages()
         InterChange& interChange = * static_cast<InterChange*>(msg->data);
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////OOO the following is obsolete and moves into InstanceManager
+/* 
             MasterUI& guiMaster = interChange.createGuiMaster(msg->index);
             guiMaster.Init();
             ///////////////////////////////////////TODO 3/2024 the following should be done from the Synth thread
@@ -1619,6 +1621,7 @@ void GuiThreadMsg::processGuiMessages()
                 alert(guiMaster.synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
             if (guiMaster.synth->getRuntime().midiEngine < 1)
                 alert(guiMaster.synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+*/
         }
         delete msg;
     }

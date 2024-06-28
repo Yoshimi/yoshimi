@@ -373,6 +373,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
+#ifdef GUI_FLTK
+    // Init the Gui-Data-Exchange
+    if (Runtime.showGui)
+        publishGuiAnchor();
+#endif
+
+
     // we seem to need this here only for first time startup :(
     bank.setCurrentBankID(Runtime.tempBank, false);
     return true;
@@ -411,7 +418,7 @@ bail_out:
  * pushed through the GuiDataExchange (maintained within InterChange,
  * returning the index-slot allocated within the embedded data buffer.
  */
-size_t SynthEngine::publishGuiAnchor()
+void SynthEngine::publishGuiAnchor()
 {
     InterfaceAnchor anchorRecord;
     anchorRecord.synth = this;
@@ -425,8 +432,8 @@ size_t SynthEngine::publishGuiAnchor()
     anchorRecord.partEffectParam = partEffectUiCon;
     anchorRecord.partEffectEQ    = partEqGraphUiCon;
 
-    // store a copy into the data buffer for retrieval by the MasterUI
-    return rootCon.emplace(anchorRecord);
+    // bootstrap message picked up when event-thread creates MasterUI
+    rootCon.publish(anchorRecord);
 }
 
 
@@ -463,7 +470,7 @@ void SynthEngine::postGuiStartHook()
 
 
 #ifdef GUI_FLTK
-MasterUI *SynthEngine::getGuiMaster()
+MasterUI* SynthEngine::getGuiMaster()
 {
     return interchange.guiMaster.get();
 }
