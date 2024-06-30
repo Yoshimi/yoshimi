@@ -1579,7 +1579,7 @@ std::string Config::findHtmlManual(void)
     if(file::cmd2string("find /usr/local/share/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
         namelist += tempnames;
 
-    if(file::cmd2string("find /home/ -type f -xdev -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
+    if(file::cmd2string("find /home/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
         namelist += tempnames;
 
     //cout << "man list" << namelist << endl;
