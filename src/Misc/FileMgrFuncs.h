@@ -153,6 +153,10 @@ inline size_t isRegularFile(const string& chkpath)
 }
 
 
+/* TODO work this (or practical alternative) into isDirectory
+ * so last change time can be found
+ *    stat -c %Y filename
+*/
 inline bool isDirectory(const string& chkpath)
 {
     struct stat st;
