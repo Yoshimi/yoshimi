@@ -1245,12 +1245,28 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             presetsSeen = false;
             selectedRootID = -1;
             Tab1->do_callback();
-            string name = file::loadText(file::localDir() + "/themes/ID/current.txt");
-            size_t pos = name.rfind('.');
-            defaultTheme = name.substr(0, pos);
-            currentTheme = defaultTheme;
+            string themeDir = file::localDir() + "/themes/";
+            string name = file::loadText(themeDir + "ID/current.txt");
+            string fullName = themeDir + name;
+
+            while (fullName.at(fullName.length() - 1) < '!') // tidy up
+            fullName.pop_back(); // deals with spurious trailing whitespace
+
+            themeTime = file::isRegularFile(fullName);
+            if (themeTime == 0)
+            {
+                defaultTheme = "classic";
+                currentTheme = defaultTheme;
+                themeDirTime = 1;
+            }
+            else
+            {
+                size_t pos = name.rfind('.');
+                defaultTheme = name.substr(0, pos);
+                currentTheme = defaultTheme;
+            }
             monoChrome = 0;
-            themeTime = 0;} {}
+            themeDirTime = 1;} {}
   }
   Function {~ConfigUI()} {} {
     code {//
@@ -1268,17 +1284,32 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     code {//
         if (themeTab->visible())
         {
+            string themeDir = file::localDir() + "/themes/";
+            bool changed = false;
             if (currentTheme != "classic")
             {
-                string fileName = file::localDir() + "/themes/" + currentTheme +".clr";
-                int testTime = file::isRegularFile(fileName);
+                string fileName = themeDir + currentTheme +".clr";
+                size_t testTime = file::isRegularFile(fileName);
                 if (testTime != themeTime)
                 {
                     //std::cout << "test " << testTime << "  theme " << themeTime << std::endl;
                     setUserTable(fileName);
                     synth->getGuiMaster()->theme();
+                    changed = true;
+                    themeTime = testTime;
                 }
             }
+            if (!changed) // we don't want to rebuild the menu if it's just a theme change
+            {
+                size_t testDirTime = file::isDirectory(themeDir);
+                if (testDirTime != themeDirTime)
+                {
+                    //std::cout << "test " << testDirTime << "  theme dir " << themeDirTime << std::endl;
+                    fillThemes();
+                    themeDirTime = testDirTime;
+                }
+            }
+
         }} {}
   }
   Function {fillNative()} {} {
@@ -1366,7 +1397,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
       if (!checkVersions())
       {
           setClassicTable();
-          themeTime = 0;
+          themeTime = 1;
           return;
       }
 
@@ -1834,7 +1865,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   Function {themeError(int errLine)} {} {
     code {//
-        themeTime = 0;
+        themeTime = 1;
         if (errLine == -2)
             synth->getRuntime().Log("Theme: Missing data start marker");
         else if (errLine == -3)
@@ -2245,6 +2276,8 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
   }
   decl {int monoChrome;} {private local
   }
-  decl {int themeTime;} {private local
+  decl {size_t themeTime;} {private local
+  }
+  decl {size_t themeDirTime;} {private local
   }
 }

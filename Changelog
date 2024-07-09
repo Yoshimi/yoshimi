@@ -1,5 +1,10 @@
 yoshimi 2.3.2 M
 
+2024-7-9 Will
+bn 2340
+file::isDirectory() now reports the last change time.
+Adding or removing themes now updates the window.
+
 2024-7-1 Will
 bn 2339
 Corrected minor errors in HTML Control Data files.
