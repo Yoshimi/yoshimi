@@ -246,8 +246,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
     beats.songBeat += bpmInc;
     beats.monotonicBeat += bpmInc;
-    if (!bpmProvided)
+    if (!bpmProvided && _lastFallbackBpm != synth->PbpmFallback)
         beats.bpm = synth->PbpmFallback;
+    _lastFallbackBpm = synth->PbpmFallback;
     beatTracker->setBeatValues(beats);
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);

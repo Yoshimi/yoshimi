@@ -81,6 +81,8 @@ private:
 
    float *_bFreeWheel;
 
+   float _lastFallbackBpm {-1};
+
    float *lv2Left [NUM_MIDI_PARTS + 1];
    float *lv2Right [NUM_MIDI_PARTS + 1];
 
