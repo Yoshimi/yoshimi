@@ -139,7 +139,19 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (next_frame >= sample_count)
             continue;
 
-        while (processed < next_frame)
+        // Avoid sample perfect alignment when not free wheeling (running
+        // offline, as when rendering a track), because it is extremely
+        // expensive when there are many MIDI events with just small timing
+        // differences. It is also not real time safe, because the amount of
+        // processing depends on the timing of the notes, not only by the number
+        // of notes. Let the user control the granularity using buffer size
+        // instead.
+        uint32_t frameAlignment;
+        if (_bFreeWheel && *_bFreeWheel != 0)
+            frameAlignment = 1;
+        else
+            frameAlignment = synth->buffersize;
+        while (next_frame - processed >= frameAlignment)
         {
             float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
             synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
