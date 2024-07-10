@@ -114,8 +114,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
      * However, Yoshimi is always correct when working standalone.
      */
 
-    int offs = 0;
-    uint32_t next_frame = 0;
     uint32_t processed = 0;
     BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
     uint32_t beatsAt = 0;
@@ -142,32 +140,21 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             if (event->body.size > sizeof(intMidiEvent.data))
                 continue;
 
-            next_frame = event->time.frames;
+            uint32_t next_frame = event->time.frames;
             if (next_frame >= sample_count)
                 continue;
 
-            uint32_t to_process = next_frame - offs;
-
-            if ((to_process > 0)
-               && (processed < sample_count)
-               && (to_process <= (sample_count - processed)))
+            while (processed < next_frame)
             {
-                int mastered = 0;
-                offs = next_frame;
-                while (to_process - mastered > 0)
+                float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
+                synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+                int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, next_frame - processed);
+                for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
                 {
-                    float bpmInc = (float)(processed + mastered - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-                    synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-                    int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-                    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-                    {
-                        tmpLeft [i] += mastered_chunk;
-                        tmpRight [i] += mastered_chunk;
-                    }
-
-                    mastered += mastered_chunk;
+                    tmpLeft [i] += mastered_chunk;
+                    tmpRight [i] += mastered_chunk;
                 }
-                processed += to_process;
+                processed += mastered_chunk;
             }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
@@ -219,25 +206,17 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if (processed < sample_count)
+    while (processed < sample_count)
     {
-        uint32_t to_process = sample_count - processed;
-        int mastered = 0;
-        offs = next_frame;
-        while (to_process - mastered > 0)
+        float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
+        synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+        int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, sample_count - processed);
+        for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
         {
-            float bpmInc = (float)(processed + mastered - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-            synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-            {
-                tmpLeft [i] += mastered_chunk;
-                tmpRight [i] += mastered_chunk;
-            }
-            mastered += mastered_chunk;
+            tmpLeft [i] += mastered_chunk;
+            tmpRight [i] += mastered_chunk;
         }
-        processed += to_process;
-
+        processed += mastered_chunk;
     }
 
     float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
