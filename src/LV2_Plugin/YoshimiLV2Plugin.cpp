@@ -114,8 +114,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
      * However, Yoshimi is always correct when working standalone.
      */
 
-    int offs = 0;
-    uint32_t next_frame = 0;
     uint32_t processed = 0;
     BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
     uint32_t beatsAt = 0;
@@ -137,38 +135,40 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         if (event == NULL)
             continue;
 
+        uint32_t next_frame = event->time.frames;
+        if (next_frame >= sample_count)
+            continue;
+
+        // Avoid sample perfect alignment when not free wheeling (running
+        // offline, as when rendering a track), because it is extremely
+        // expensive when there are many MIDI events with just small timing
+        // differences. It is also not real time safe, because the amount of
+        // processing depends on the timing of the notes, not only by the number
+        // of notes. Let the user control the granularity using buffer size
+        // instead.
+        uint32_t frameAlignment;
+        if (_bFreeWheel && *_bFreeWheel != 0)
+            frameAlignment = 1;
+        else
+            frameAlignment = synth->buffersize;
+        while (next_frame - processed >= frameAlignment)
+        {
+            float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
+            synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, next_frame - processed);
+            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+            {
+                tmpLeft [i] += mastered_chunk;
+                tmpRight [i] += mastered_chunk;
+            }
+            processed += mastered_chunk;
+        }
+
         if (event->body.type == _midi_event_id)
         {
             if (event->body.size > sizeof(intMidiEvent.data))
                 continue;
 
-            next_frame = event->time.frames;
-            if (next_frame >= sample_count)
-                continue;
-
-            uint32_t to_process = next_frame - offs;
-
-            if ((to_process > 0)
-               && (processed < sample_count)
-               && (to_process <= (sample_count - processed)))
-            {
-                int mastered = 0;
-                offs = next_frame;
-                while (to_process - mastered > 0)
-                {
-                    float bpmInc = (float)(processed + mastered - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-                    synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-                    int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-                    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-                    {
-                        tmpLeft [i] += mastered_chunk;
-                        tmpRight [i] += mastered_chunk;
-                    }
-
-                    mastered += mastered_chunk;
-                }
-                processed += to_process;
-            }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
             if (_bFreeWheel != NULL)
@@ -184,17 +184,28 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             LV2_Atom *bar = NULL;
             LV2_Atom *barBeat = NULL;
             LV2_Atom *bpm = NULL;
+            LV2_Atom *beatUnit = NULL;
             lv2_atom_object_get(obj,
                                 _atom_bpb, &bpb,
                                 _atom_bar, &bar,
                                 _atom_bar_beat, &barBeat,
                                 _atom_bpm, &bpm,
+                                _atom_beatUnit, &beatUnit,
                                 NULL);
 
             if (bpm && bpm->type == _atom_float)
             {
                 beats.bpm = ((LV2_Atom_Float *)bpm)->body;
                 bpmProvided = true;
+                if (beatUnit && beatUnit->type == _atom_int)
+                {
+                    // In DAWs, Beats Per Minute really mean Quarter Beats Per
+                    // Minute. Therefore we need to divide by four first, to
+                    // get a whole beat, and then multiply that according to
+                    // the time signature denominator. See this link for some
+                    // background: https://music.stackexchange.com/a/109743
+                    beats.bpm = beats.bpm / 4 * ((LV2_Atom_Int *)beatUnit)->body;
+                }
             }
 
             uint32_t frame = event->time.frames;
@@ -219,32 +230,25 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if (processed < sample_count)
+    while (processed < sample_count)
     {
-        uint32_t to_process = sample_count - processed;
-        int mastered = 0;
-        offs = next_frame;
-        while (to_process - mastered > 0)
+        float bpmInc = (float)(processed - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
+        synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
+        int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, sample_count - processed);
+        for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
         {
-            float bpmInc = (float)(processed + mastered - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
-            synth->setBeatValues(beats.songBeat + bpmInc, beats.monotonicBeat + bpmInc, beats.bpm);
-            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
-            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
-            {
-                tmpLeft [i] += mastered_chunk;
-                tmpRight [i] += mastered_chunk;
-            }
-            mastered += mastered_chunk;
+            tmpLeft [i] += mastered_chunk;
+            tmpRight [i] += mastered_chunk;
         }
-        processed += to_process;
-
+        processed += mastered_chunk;
     }
 
     float bpmInc = (float)(sample_count - beatsAt) * beats.bpm / (synth->samplerate_f * 60.f);
     beats.songBeat += bpmInc;
     beats.monotonicBeat += bpmInc;
-    if (!bpmProvided)
+    if (!bpmProvided && _lastFallbackBpm != synth->PbpmFallback)
         beats.bpm = synth->PbpmFallback;
+    _lastFallbackBpm = synth->PbpmFallback;
     beatTracker->setBeatValues(beats);
 
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
@@ -323,7 +327,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID nomBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__nominalBlockLength);
-        LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        _atom_int = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         _atom_long = _uridMap.map(_uridMap.handle, LV2_ATOM__Long);
         _atom_float = _uridMap.map(_uridMap.handle, LV2_ATOM__Float);
         _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
@@ -337,17 +341,18 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         _atom_bar = _uridMap.map(_uridMap.handle, LV2_TIME__bar);
         _atom_bar_beat = _uridMap.map(_uridMap.handle, LV2_TIME__barBeat);
         _atom_bpm = _uridMap.map(_uridMap.handle, LV2_TIME__beatsPerMinute);
+        _atom_beatUnit = _uridMap.map(_uridMap.handle, LV2_TIME__beatUnit);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
             {
-                if ((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
+                if ((options->key == minBufSz || options->key == maxBufSz) && options->type == _atom_int)
                 {
                     uint32_t bufSz = *static_cast<const uint32_t *>(options->value);
                     if (_bufferSize < bufSz)
                         _bufferSize = bufSz;
                 }
-                if (options->key == nomBufSz && options->type == atomInt)
+                if (options->key == nomBufSz && options->type == _atom_int)
                     nomBufSize = *static_cast<const uint32_t *>(options->value);
             }
             ++options;
