@@ -525,7 +525,15 @@ void JackEngine::handleBeatValues(jack_nframes_t nframes)
     BeatTracker::BeatValues beats(beatTracker->getRawBeatValues());
 
     if (pos.valid & JackPositionBBT)
+    {
         beats.bpm = pos.beats_per_minute;
+        // In DAWs, Beats Per Minute really mean Quarter Beats Per
+        // Minute. Therefore we need to divide by four first, to get a whole
+        // beat, and then multiply that according to the time signature
+        // denominator. See this link for some background:
+        // https://music.stackexchange.com/a/109743
+        beats.bpm = beats.bpm / 4 * pos.beat_type;
+    }
     else
         beats.bpm = synth->PbpmFallback;
 

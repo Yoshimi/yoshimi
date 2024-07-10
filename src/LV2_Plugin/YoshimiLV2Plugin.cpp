@@ -184,17 +184,28 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             LV2_Atom *bar = NULL;
             LV2_Atom *barBeat = NULL;
             LV2_Atom *bpm = NULL;
+            LV2_Atom *beatUnit = NULL;
             lv2_atom_object_get(obj,
                                 _atom_bpb, &bpb,
                                 _atom_bar, &bar,
                                 _atom_bar_beat, &barBeat,
                                 _atom_bpm, &bpm,
+                                _atom_beatUnit, &beatUnit,
                                 NULL);
 
             if (bpm && bpm->type == _atom_float)
             {
                 beats.bpm = ((LV2_Atom_Float *)bpm)->body;
                 bpmProvided = true;
+                if (beatUnit && beatUnit->type == _atom_int)
+                {
+                    // In DAWs, Beats Per Minute really mean Quarter Beats Per
+                    // Minute. Therefore we need to divide by four first, to
+                    // get a whole beat, and then multiply that according to
+                    // the time signature denominator. See this link for some
+                    // background: https://music.stackexchange.com/a/109743
+                    beats.bpm = beats.bpm / 4 * ((LV2_Atom_Int *)beatUnit)->body;
+                }
             }
 
             uint32_t frame = event->time.frames;
@@ -315,7 +326,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID nomBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__nominalBlockLength);
-        LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        _atom_int = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         _atom_long = _uridMap.map(_uridMap.handle, LV2_ATOM__Long);
         _atom_float = _uridMap.map(_uridMap.handle, LV2_ATOM__Float);
         _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
@@ -329,17 +340,18 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         _atom_bar = _uridMap.map(_uridMap.handle, LV2_TIME__bar);
         _atom_bar_beat = _uridMap.map(_uridMap.handle, LV2_TIME__barBeat);
         _atom_bpm = _uridMap.map(_uridMap.handle, LV2_TIME__beatsPerMinute);
+        _atom_beatUnit = _uridMap.map(_uridMap.handle, LV2_TIME__beatUnit);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
             {
-                if ((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
+                if ((options->key == minBufSz || options->key == maxBufSz) && options->type == _atom_int)
                 {
                     uint32_t bufSz = *static_cast<const uint32_t *>(options->value);
                     if (_bufferSize < bufSz)
                         _bufferSize = bufSz;
                 }
-                if (options->key == nomBufSz && options->type == atomInt)
+                if (options->key == nomBufSz && options->type == _atom_int)
                     nomBufSize = *static_cast<const uint32_t *>(options->value);
             }
             ++options;

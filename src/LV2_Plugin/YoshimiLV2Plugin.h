@@ -56,6 +56,7 @@ private:
    LV2_URID _midi_event_id;
    LV2_URID _yoshimi_state_id;
    LV2_URID _atom_string_id;
+   LV2_URID _atom_int;
    LV2_URID _atom_long;
    LV2_URID _atom_float;
    LV2_URID _atom_type_chunk;
@@ -69,6 +70,7 @@ private:
    LV2_URID _atom_bar;
    LV2_URID _atom_bar_beat;
    LV2_URID _atom_bpm;
+   LV2_URID _atom_beatUnit;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
 
