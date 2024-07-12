@@ -132,7 +132,7 @@ class ADvoiceUI {: {public Fl_Group}
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorCoarseDetune, o->value(), TOPLEVEL::type::Integer);
                     ;}
-                tooltip {Coarse Detune} xywh {723 270 73 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+                tooltip {Coarse Detune} xywh {723 270 73 13} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::modulatorCoarseDetune, npart, kititem, PART::engine::addVoice1 + nvoice)) % 1024;}
                 code1 {if (k >= 512) k-= 1024;}
                 code2 {o->value(k);}
@@ -146,7 +146,7 @@ class ADvoiceUI {: {public Fl_Group}
                 callback {//
                     send_data(0, ADDVOICE::control::modulatorOctave, o->value(), TOPLEVEL::type::Integer);
                     ;}
-                tooltip Octave xywh {667 270 52 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+                tooltip Octave xywh {665 270 54 13} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
                 code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::modulatorOctave, npart, kititem, PART::engine::addVoice1 + nvoice));}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
@@ -156,7 +156,7 @@ class ADvoiceUI {: {public Fl_Group}
                     o->selection_color(setSlider(o->value(),0));
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneFrequency, o->value(), TOPLEVEL::type::Integer);
                     ;}
-                tooltip {Fine Detune (cents)} xywh {623 239 168 16} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
+                tooltip {Fine Detune (cents)} xywh {623 239 168 13} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
                 code0 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorDetuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice));}
                 code1 {o->selection_color(setSlider(o->value(),0));}
                 class mwheel_slider_rev
@@ -166,7 +166,7 @@ class ADvoiceUI {: {public Fl_Group}
                 callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorDetuneType, o->value(), TOPLEVEL::type::Integer);
                     ;}
-                xywh {585 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
+                xywh {585 270 75 13} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
                 code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
                 code1 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorDetuneType, npart, kititem, PART::engine::addVoice1 + nvoice));}
               } {}
@@ -175,7 +175,7 @@ class ADvoiceUI {: {public Fl_Group}
                 callback {//
                     o->value(getDetune((ModDetuneType->value() < 1) ? (collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth)) : (ModDetuneType->value()), 0, ModDetune->value()+8192));
     ;}
-                xywh {587 239 36 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
+                xywh {587 239 36 13} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
                 code0 {o->step(0.01, 1);}
                 code1 {o->value(getDetune((ModDetuneType->value() < 1) ? (collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth)) : (ModDetuneType->value()), 0, ModDetune->value()+8192));}
               }
@@ -274,7 +274,7 @@ class ADvoiceUI {: {public Fl_Group}
                   callback {//
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorSource, o->value() - 1, TOPLEVEL::type::Integer);
                     ;}
-                  tooltip {Use an earlier oscillator for this modulator. Only the base oscillator is used, not other voice parameters.} xywh {607 402 75 16} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
+                  tooltip {Use an earlier oscillator for this modulator. Only the base oscillator is used, not other voice parameters.} xywh {607 402 75 14} down_box BORDER_BOX selection_color 49 labelsize 10 labelcolor 64 align 1 textfont 1 textsize 10 textcolor 64
                   code0 {o->add("Internal");}
                   code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Mod.%2d", i + 1); o->add(tmp);};}
                   code3 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorSource, npart, kititem, PART::engine::addVoice1 + nvoice) + 1);}
@@ -302,7 +302,7 @@ class ADvoiceUI {: {public Fl_Group}
                     o->selection_color(setSlider(o->value(),0));
                     send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorOscillatorPhase, o->value(), TOPLEVEL::type::Integer);
                     ;}
-                  tooltip {Phase offset} xywh {711 402 74 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
+                  tooltip {Phase offset} xywh {708 402 80 14} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1
                   code0 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorOscillatorPhase, npart, kititem, PART::engine::addVoice1 + nvoice));}
                   code1 {o->setValueType(VC_PhaseOffset); o->useCustomTip(true);}
                   code2 {o->selection_color(setSlider(o->value(),0));}
@@ -328,7 +328,7 @@ class ADvoiceUI {: {public Fl_Group}
               callback {//
                   send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::externalModulator, o->value() - 1, TOPLEVEL::type::Integer);
                   ;}
-              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 20} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
+              tooltip {Use an earlier voice as modulator. All parameters from the imported voice remain in effect, except for volume, panning, base frequency and pitch bend scaling factor. The voice is also converted to mono. Parameters in the current voice will then tweak the modulator further.} xywh {692 32 104 17} down_box BORDER_BOX selection_color 49 labelsize 11 labelcolor 64 align 9 textfont 1 textcolor 64
               code0 {o->add("Local");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Voice %2d", i + 1); o->add(tmp);};}
               code2 {o->value(collect_readData(synth,0,ADDVOICE::control::externalModulator, npart, kititem, PART::engine::addVoice1 + nvoice) + 1);}
@@ -348,7 +348,7 @@ class ADvoiceUI {: {public Fl_Group}
                 o->redraw();
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::modulatorType, o->value(), TOPLEVEL::type::Integer);
                 ;}
-            xywh {580 32 90 20} box NO_BOX down_box BORDER_BOX selection_color 49 labelfont 3 labelsize 11 align 5 textfont 1 textsize 11 textcolor 64
+            xywh {580 32 90 17} box NO_BOX down_box BORDER_BOX selection_color 49 labelfont 3 labelsize 11 align 5 textfont 1 textsize 11 textcolor 64
             code0 {o->add("Off");o->add("Morph");o->add("Ring");o->add("PM");o->add("FM");o->add("PWM");}
             code1 {o->value(collect_readData(synth,0,ADDVOICE::control::modulatorType, npart, kititem, PART::engine::addVoice1 + nvoice));}
             code2 {if (o->value() == 0) voiceFMparametersgroup->deactivate();}
@@ -415,7 +415,7 @@ class ADvoiceUI {: {public Fl_Group}
               callback {//
                   send_data(0, ADDVOICE::control::octave, o->value(), TOPLEVEL::type::Integer);
                   ;}
-              tooltip Octave xywh {504 306 55 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
+              tooltip Octave xywh {504 306 58 13} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11 textcolor 64
               code0 {int k = int(collect_readData(synth,0,ADDVOICE::control::octave, npart, kititem, PART::engine::addVoice1 + nvoice));}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
@@ -425,7 +425,7 @@ class ADvoiceUI {: {public Fl_Group}
               callback {//
                   send_data(0, ADDVOICE::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);
                   ;}
-              tooltip {Coarse Detune} xywh {493 375 78 15} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+              tooltip {Coarse Detune} xywh {493 375 78 13} selection_color 64 labelsize 10 labelcolor 64 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
               code0 {int k = collect_readData(synth,0,ADDVOICE::control::coarseDetune, npart, kititem, PART::engine::addVoice1 + nvoice);}
               code1 {o->value(k);}
               code2 {o->lstep(10);}
@@ -435,7 +435,7 @@ class ADvoiceUI {: {public Fl_Group}
               callback {//
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneType, o->value(), TOPLEVEL::type::Integer);
                 ;}
-              xywh {495 340 75 17} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
+              xywh {495 340 75 13} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 10 textcolor 64
               code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(collect_readData(synth, 0, ADDVOICE::control::detuneType, npart, kititem, PART::engine::addVoice1 + nvoice));}
             } {}
@@ -445,7 +445,7 @@ class ADvoiceUI {: {public Fl_Group}
                 o->selection_color(setSlider(o->value(),0));
                 send_data(TOPLEVEL::action::forceUpdate, ADDVOICE::control::detuneFrequency, detune, TOPLEVEL::type::Integer);
                 ;}
-              tooltip {Fine Detune (cents)} xywh {62 306 428 16} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
+              tooltip {Fine Detune (cents)} xywh {62 306 428 14} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(collect_readData(synth, 0, ADDVOICE::control::detuneFrequency, npart, kititem, PART::engine::addVoice1 + nvoice));}
               code1 {o->selection_color(setSlider(o->value(),0));}
               class mwheel_slider_rev
@@ -455,7 +455,7 @@ class ADvoiceUI {: {public Fl_Group}
               callback {//
                 o->value(getDetune((FreqDetunetype->value()<1)?(collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth)) : (FreqDetunetype->value()),0,Detune->value()+8192)*collect_readData(synth, 0, ADDSYNTH::control::bandwidthMultiplier, npart, kititem, PART::engine::addSynth));
                 ;}
-              xywh {9 306 53 16} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10 textcolor 64
+              xywh {9 306 53 14} box THIN_DOWN_BOX labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10 textcolor 64
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune((FreqDetunetype->value()<1)?(collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth)) : (FreqDetunetype->value()),0,Detune->value()+8192)*collect_readData(synth, 0, ADDSYNTH::control::bandwidthMultiplier, npart, kititem, PART::engine::addSynth));}
             }
@@ -2164,9 +2164,9 @@ class ADnoteUI {: {public PresetsUI_}
         resui->resonancewindow->hide();
         o->hide();
         ;}
-      xywh {842 203 580 405} type Double hide resizable
+      xywh {447 196 580 405} type Double hide resizable
       code0 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("AddSynth Global"), npart, TOPLEVEL::windowTitle, kititem)).c_str());}
-      code1 {addDW = 535; addDH = 405;}
+      code1 {addDW = 580; addDH = 405;}
       code2 {o->size_range(addDW, addDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group globalfreq {
@@ -2187,7 +2187,7 @@ class ADnoteUI {: {public PresetsUI_}
           callback {//
             send_data(0, ADDSYNTH::control::octave, o->value(), TOPLEVEL::type::Integer);
             ;}
-          tooltip Octave xywh {495 275 45 15} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip Octave xywh {495 275 47 13} type Simple selection_color 49 labelfont 3 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k = collect_readData(synth,0,ADDSYNTH::control::octave, npart, kititem, PART::engine::addSynth) / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
         }
@@ -2196,7 +2196,7 @@ class ADnoteUI {: {public PresetsUI_}
           callback {//
             send_data(0, ADDSYNTH::control::coarseDetune, o->value(), TOPLEVEL::type::Integer);
             ;}
-          tooltip {Coarse Detune} xywh {495 346 77 15} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
+          tooltip {Coarse Detune} xywh {495 346 77 13} selection_color 64 labelsize 10 labelcolor 64 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11 textcolor 64
           code0 {int k = collect_readData(synth, 0, ADDSYNTH::control::coarseDetune, npart, kititem, PART::engine::addSynth);}
           code1 {o->value(k);}
           code2 {o->lstep(10);}
@@ -2213,7 +2213,7 @@ class ADnoteUI {: {public PresetsUI_}
             detunevalueoutput->do_callback();
             send_data(0, ADDSYNTH::control::detuneFrequency, o->value(), TOPLEVEL::type::Integer);
             ;}
-          tooltip {Fine Detune (cents)} xywh {57 275 433 15} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
+          tooltip {Fine Detune (cents)} xywh {57 275 433 13} type {Horz Knob} box THIN_DOWN_BOX labelcolor 64 minimum -8192 maximum 8191 step 1
           code0 {o->value(collect_readData(synth, 0, ADDSYNTH::detuneFrequency, npart, kititem, PART::engine::addSynth));}
           code1 {o->selection_color(setSlider(o->value(),0));}
           class mwheel_slider_rev
@@ -2223,7 +2223,7 @@ class ADnoteUI {: {public PresetsUI_}
           callback {//
             send_data(0, ADDSYNTH::control::detuneType, o->value() + 1, TOPLEVEL::type::Integer);
             ;}
-          xywh {495 313 75 17} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 11 textcolor 64
+          xywh {494 313 78 14} down_box BORDER_BOX selection_color 64 labelsize 10 labelcolor 64 align 5 textfont 1 textsize 11 textcolor 64
           code0 {o->add("L35 cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(collect_readData(synth, 0, ADDSYNTH::detuneType, npart, kititem, PART::engine::addSynth)-1);}
         } {}
@@ -2232,7 +2232,7 @@ class ADnoteUI {: {public PresetsUI_}
           callback {//
     o->value(getDetune(detunetype->value()+1,0, freq->value()+8192));
     ;}
-          xywh {12 275 45 15} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
+          xywh {12 275 45 13} labelsize 10 labelcolor 64 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10 textcolor 64
           code0 {o->step(0.01, 1);}
           code1 {o->value(getDetune(detunetype->value()+1, 0, freq->value()+8192));}
         }

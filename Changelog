@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-7-12 Will
+bn 2341
+Added synTaiko to banks/Drums.
+Uodate User Guide (miscellany).
+Cosmetic changes to some windows.
+
 2024-7-9 Will
 bn 2340
 file::isDirectory() now reports the last change time.
