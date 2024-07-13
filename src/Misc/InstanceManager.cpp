@@ -311,7 +311,7 @@ void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handle
                 instance.enterRunningState();
             break;
             case RUNNING:
-                 // perform event handling for this instance
+                 // perform GUI and command returns for this instance
                 handleEvents(instance.getSynth());
             break;
             default:
@@ -360,6 +360,27 @@ void InstanceManager::Instance::buildGuiMaster()
 
 void InstanceManager::Instance::enterRunningState()
 {
-    //////////////////////////////////OOO should also integrate a post-boot-Hook at this point
+    // trigger post-boot-Hook to run in the Synth-thread...
+    CommandBlock triggerMsg;
+
+    triggerMsg.data.type    = TOPLEVEL::type::Integer | TOPLEVEL::type::Write;
+    triggerMsg.data.control = TOPLEVEL::control::dataExchange;
+    triggerMsg.data.part    = TOPLEVEL::section::main;
+    triggerMsg.data.source  = TOPLEVEL::action::noAction;
+    //                               // Important: not(action::lowPrio) since we want direct execution in Synth
+    triggerMsg.data.offset    = UNUSED;
+    triggerMsg.data.kit       = UNUSED;
+    triggerMsg.data.engine    = UNUSED;
+    triggerMsg.data.insert    = UNUSED;
+    triggerMsg.data.parameter = UNUSED;
+    triggerMsg.data.miscmsg   = UNUSED;
+    triggerMsg.data.spare0    = UNUSED;
+    triggerMsg.data.spare1    = UNUSED;
+    triggerMsg.data.value     = 0;
+
+    // MIDI ringbuffer is the only one always active
+    synth->interchange.fromMIDI.write(triggerMsg.bytes);
+
+    // this instance is now in fully operational state...
     state = RUNNING;
 }

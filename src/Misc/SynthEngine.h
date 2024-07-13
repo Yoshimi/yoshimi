@@ -102,7 +102,7 @@ class SynthEngine
 
         bool Init(unsigned int audiosrate, int audiobufsize);
         void publishGuiAnchor();
-        void postGuiStartHook();
+        bool postGuiStartHook();
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper& xml);

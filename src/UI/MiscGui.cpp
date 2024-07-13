@@ -262,7 +262,7 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     //synth->CBtest(getData);
 
-    if (control == TOPLEVEL::control::dataExchange)
+    if (control == TOPLEVEL::control::dataExchange && npart == TOPLEVEL::section::message)
     {// push data messages via GuiDataExchange -> deliver directly to MirrorData receivers
         synth->interchange.guiDataExchange.dispatchUpdates(*getData);
         return;

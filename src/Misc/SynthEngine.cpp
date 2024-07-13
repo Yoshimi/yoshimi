@@ -415,8 +415,10 @@ bail_out:
 /**
  * Prepare and wire a communication anchor, allowing the GUI to establish
  * data connections with this SynthEngine. This InstanceAnchor record is
- * pushed through the GuiDataExchange (maintained within InterChange,
- * returning the index-slot allocated within the embedded data buffer.
+ * pushed through the GuiDataExchange (maintained within InterChange),
+ * and the corresponding notification is placed into the toGUI ringbuffer,
+ * where it typically is the very first message, since this function is
+ * invoked from SynthEngine::Init().
  */
 void SynthEngine::publishGuiAnchor()
 {
@@ -438,34 +440,19 @@ void SynthEngine::publishGuiAnchor()
 
 
 /**
- * This function is invoked on the primary Synth instance after GUI becomes ready.
- * TODO 3/2024 this is more of a draft, various points still to be worked out
- * - multiple Synth instances??
- * - GUI for LV2 plugin????!?
- * - should run in the Synth thread (but as intial hack, it runs in the GUI thread)
+ * This callback is triggered whenever a new Synth instance becomes fully operational.
+ * If running with GUI, the GuiMaster has been created and communication via GuiDataExchange
+ * has been primed
  */
-void SynthEngine::postGuiStartHook()
+bool SynthEngine::postGuiStartHook()
 {
     Part& currPart{*part[getRuntime().currentPart]};
     if (currPart.Pname != DEFAULT_NAME || currPart.Poriginal != UNTITLED)
     {// Heuristics that probably an early load via config took place
         maybePublishEffectsToGui();
-
-        // TODO 3/2024 another hack to force the GUI to do a refresh()
-        CommandBlock putData;
-        putData.data.source  = TOPLEVEL::action::toAll;
-        putData.data.control = MAIN::control::masterReset;
-        putData.data.part    = TOPLEVEL::section::main;
-        putData.data.value   = 0;
-        putData.data.type    = UNUSED;
-        putData.data.kit     = UNUSED;
-        putData.data.engine  = UNUSED;
-        putData.data.insert  = UNUSED;
-        putData.data.parameter = UNUSED;
-        putData.data.offset    = UNUSED;
-        putData.data.miscmsg   = UNUSED;
-        interchange.toGUI.write(putData.bytes);
+        return true; // push "control::masterReset" into GUI
     }
+    return false;
 }
 
 
