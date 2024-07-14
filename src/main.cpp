@@ -81,7 +81,7 @@ void newBlock()
 {
     for (int i = 1; i < 32; ++i)
     {
-        if ((firstRuntime->activeInstance >> i) & 1)
+        if ((firstRuntime->activeInstance_OBSOLETE >> i) & 1)
         {
             while (configuring)
                 sleep_for(1ms);
@@ -245,8 +245,8 @@ static void *mainThread(void *arg)
                 if (_synth)
                 {
                     int instancebit = (1 << instanceID);
-                    if (_synth->getRuntime().activeInstance & instancebit)
-                        _synth->getRuntime().activeInstance -= instancebit;
+                    if (_synth->getRuntime().activeInstance_OBSOLETE & instancebit)
+                        _synth->getRuntime().activeInstance_OBSOLETE -= instancebit;
                     _synth->saveBanks();
                     _synth->getRuntime().flushLog();
                     delete _synth;
@@ -382,7 +382,7 @@ int mainCreateNewInstance(unsigned int forceId)
         if (synth->partonoffRead(npart))
             mainRegisterAudioPort(synth, npart);
     }
-    synth->getRuntime().activeInstance |= (1 << instanceID);
+    synth->getRuntime().activeInstance_OBSOLETE |= (1 << instanceID);
     return instanceID;
 
 bail_out:

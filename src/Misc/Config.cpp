@@ -74,7 +74,8 @@ unsigned char panLaw = 1;
 
 bool         Config::showSplash = true;
 bool         Config::autoInstance = false;
-unsigned int Config::activeInstance = 0;
+unsigned int Config::activeInstance_OBSOLETE = 0;
+bitset<32>   Config::activeInstances{0};
 int          Config::showCLIcontext = 1;
 
 string Config::globalJackSessionUuid = "";
@@ -698,9 +699,10 @@ bool Config::extractBaseParameters(XMLwrapper& xml)
     banksChecked = xml.getparbool("banks_checked", banksChecked);
     autoInstance = xml.getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
-        activeInstance = xml.getparU("active_instances", 0);
-    else
-        activeInstance = 1;
+//      activeInstance_OBSOLETE = xml.getparU("active_instances", 0);///////////////////////OOO
+        activeInstances = bitset<32>{xml.getparU("active_instances", 0)};
+//    else
+//        activeInstance_OBSOLETE = 1; ////////////////////////////////////////////////////OOO this could corrupt existing state
     handlePadSynthBuild = xml.getparU("handle_padsynth_build", 1, 0, 2);  // 0 = blocking/muted, 1 = background thread (=default), 2 = auto-Apply on param change
     showCLIcontext  = xml.getpar("show_CLI_context", 1, 0, 2);
     GzipCompression = xml.getpar("gzip_compression", GzipCompression, 0, 9);

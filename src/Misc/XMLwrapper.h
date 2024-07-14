@@ -29,6 +29,7 @@
 
 #include <mxml.h>
 #include <string>
+#include <limits>
 
 // max tree depth
 #define STACKSIZE 128
@@ -72,13 +73,6 @@ class XMLwrapper
         void endbranch(void);
 
 
-        // modify in place
-        void changeparbool(const std::string& name, int val); // 1 => "yes", else "no"
-        void changeparU(const std::string& name, unsigned int val);
-
-        void changepar(const std::string& name, int val);
-
-
         // we always save with a blank first line
         const char *removeBlanks(const char *c)
         {while (isspace(*c)) ++c; return c;}
@@ -109,7 +103,7 @@ class XMLwrapper
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
-        unsigned int getparU(const std::string& name, unsigned int defaultpar, unsigned int min = 0, unsigned int max = 0xffffffff);
+        uint getparU(const std::string& name, uint defaultpar, uint min = 0, uint max = std::numeric_limits<uint>::max());
 
         int getpar(const std::string& name, int defaultpar, int min, int max);
 

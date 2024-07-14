@@ -28,6 +28,7 @@
 
 #include <csignal>
 #include <cstring>
+#include <bitset>
 #include <deque>
 #include <list>
 
@@ -39,6 +40,7 @@
 #endif
 #include "globals.h"
 
+using std::bitset;
 using std::string;
 using std::list;
 
@@ -114,7 +116,8 @@ class Config
 
         static bool          showSplash;
         static bool          autoInstance;
-        static unsigned int  activeInstance;
+        static unsigned int  activeInstance_OBSOLETE;
+        static bitset<32>    activeInstances;
         static int           showCLIcontext;
 
         unsigned int  guiThemeID;

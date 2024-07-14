@@ -26,28 +26,44 @@
 #include "Misc/InstanceManager.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
+#include "Misc/FormatFuncs.h"
+#include "Misc/Util.h"
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
 
-//#include <string>
+#include <mutex>
 #include <memory>
+#include <thread>
 #include <utility>
-#include <unordered_map>
-#include <array>
 #include <algorithm>
+#include <unordered_map>
+#include <string>
+#include <array>
+#include <set>
 
-//using std::string;
+using std::string;
 using std::function;
 using std::make_unique;
 using std::unique_ptr;
-using std::remove_if;
-using std::find_if;
+using std::for_each;
 using std::move;
+using std::set;
+
+using func::asString;
+
+using Guard = const std::lock_guard<std::mutex>;
 
 
 
 namespace { // implementation details...
+
+    // Maximum number of SynthEngine instances allowed.
+    // Historically, this limit was imposed due to using a 32bit field;
+    // theoretically this number is unlimited, yet in practice, the system's
+    // available resources will likely impose an even stricter limit...
+    const uint MAX_INSTANCES = 32;
+
 
     /** Combinations to try, in given order, when booting an instance */
     auto drivers_to_probe(Config const& current)
@@ -130,8 +146,9 @@ class InstanceManager::Instance
         auto& getSynth() { return *synth; }
         Config& runtime() { return synth->getRuntime(); }
         LifePhase getState() { return state; }
+        uint getID() const { return synth->getUniqueId(); }
     private:
-        bool isPrimary()  { return 0 == synth->getUniqueId(); }
+        bool isPrimary()  { return 0 == getID(); }
 };
 
 
@@ -144,6 +161,7 @@ class InstanceManager::Instance
  */
 class InstanceManager::SynthGroom
 {
+        std::mutex mtx;
 
         using Location = void*;
         struct LocationHash
@@ -166,11 +184,10 @@ class InstanceManager::SynthGroom
         // can be default created
         SynthGroom() = default;
 
-        Instance& createInstance(uint instanceID)
+        Instance& createInstance(uint instanceID =0)
         {
-            assert( (!primary and 0==instanceID)
-                  or(primary and 0!=instanceID));
-
+            Guard lock(mtx);
+            instanceID = allocateID(instanceID);
             Instance newEntry{instanceID};
             auto& instance = registry.emplace(&newEntry.getSynth(), move(newEntry))
                                      .first->second;
@@ -185,8 +202,15 @@ class InstanceManager::SynthGroom
             return *primary;
         }
 
+        uint instanceCnt()  const
+        {
+            return registry.size();
+        }
+
         void dutyCycle(function<void(SynthEngine&)>& handleEvents);
+
     private:
+        uint allocateID(uint);
         void handleStartRequest();
         void clearZombies();
 };
@@ -290,16 +314,59 @@ void InstanceManager::Instance::shutDown()
 }
 
 
+/** install and start-up the primary SynthEngine and runtime */
+bool InstanceManager::bootPrimary()
+{
+    assert (0 == groom->instanceCnt());
+    return groom->createInstance(0).startUp();
+    //////////////////////////////////////////OOO TODO ensure that the command options are parsed and special handling for the primary is done!!
+    //////////////////////////////////////////OOO do we somehow need to /wait/ for the primary instance to become live?
+}
+
+/**
+ * Request to allocate a new SynthEngine instance.
+ * @return ID of the new instance or zero, if no further instance can be created
+ * @remark the new instance will start up asynchronously
+ * @warning this function can block for an extended time (>33ms),
+ *          since it contends with the event handling duty cycle.
+ */
+uint InstanceManager::requestNewInstance()
+{
+    if (groom->instanceCnt() < MAX_INSTANCES)
+        return groom->createInstance().getID();
+
+    groom->getPrimary().runtime().LogError("Maximum number("+asString(MAX_INSTANCES)
+                                          +") of Synth-Engine instances exceeded.");
+    return 0;
+}
+
+/**
+ * Initiate restoring of specific instances, as persisted in the base config.
+ * This function must be called after the »primary« SynthEngine was started, but prior
+ * to launching any further instances; the new allotted engines will start asynchronously
+ */
+void InstanceManager::triggerRestoreInstances()
+{
+    assert (1 == groom->instanceCnt());
+    for (uint id=1; id<MAX_INSTANCES; ++id)
+        if (groom->getPrimary().runtime().activeInstances.test(id))
+            groom->createInstance(id);
+}
+
+
 void InstanceManager::performWhileActive(function<void(SynthEngine&)> handleEvents)
 {
     while (groom->getPrimary().runtime().runSynth)
     {
         groom->dutyCycle(handleEvents);
-    }
+        std::this_thread::yield();
+    }     // tiny break allowing other threads to acquire the mutex
 }
 
 void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handleEvents)
 {
+    Guard lock(mtx); // warning: concurrent modifications could corrupt instance lifecycle
+
     for (auto& [_,instance] : registry)
     {
         switch (instance.getState())
@@ -350,6 +417,44 @@ void InstanceManager::SynthGroom::clearZombies()
     }
 }
 
+/**
+ * Allocate an unique Synth-ID not yet in use.
+ * @param desiredID explicitly given desired ID;
+ *                  set to zero to request allocation of next free ID
+ * @throws std::logic_error if a desired ID is given which is already in use
+ * @return new ID which is not currently in use.
+ * @remark when called for the first time, ID = 0 will be returned, which
+ *         also marks the associated instance as »primary instance«, responsible
+ *         for coordinates some application global aspects.
+ */
+uint InstanceManager::SynthGroom::allocateID(uint desiredID)
+{
+    set<uint> allIDs;
+    for_each(registry.begin(),registry.end()
+            ,[&](auto& entry){ allIDs.insert(entry.second.getID()); });
+
+    if (desiredID > 0
+        and allIDs.find(desiredID) != allIDs.end())
+        throw std::logic_error("Instance Lifecycle broken: "
+                               "attempt to allocate a duplicate Synth-ID.");
+
+    if (not desiredID)
+    {
+        for (uint id : allIDs)
+            if (desiredID < id)
+                break;
+            else
+                ++desiredID;
+    }
+
+    assert(desiredID < MAX_INSTANCES);
+    assert((!primary and 0==desiredID)
+          or(primary and 0 < desiredID));
+
+    return desiredID;
+}
+
+
 void InstanceManager::Instance::buildGuiMaster()
 {
 #ifdef GUI_FLTK
@@ -382,5 +487,6 @@ void InstanceManager::Instance::enterRunningState()
     synth->interchange.fromMIDI.write(triggerMsg.bytes);
 
     // this instance is now in fully operational state...
+    runtime().activeInstances.set(this->getID());
     state = RUNNING;
 }

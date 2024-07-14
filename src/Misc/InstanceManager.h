@@ -26,18 +26,13 @@
 #define INSTANCE_MANAGER_H
 
 //#include "globals.h"
-//#include "Misc/FormatFuncs.h"
 #include "Misc/CmdOptions.h"
-//#include <iostream>
-//#include <iomanip>
-//#include <fstream>
+
 #include <functional>
 #include <memory>
 
 class SynthEngine;
 
-//using std::cout;
-//using std::endl;
 
 class InstanceManager
 {
@@ -69,6 +64,10 @@ class InstanceManager
         {
             return cmdOptions;
         }
+
+        bool bootPrimary();
+        uint requestNewInstance();
+        void triggerRestoreInstances();
 
         /** Event handling loop during regular operation */
         void performWhileActive(std::function<void(SynthEngine&)> handleEvents);

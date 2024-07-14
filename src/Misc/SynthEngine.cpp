@@ -100,33 +100,6 @@ namespace { // Global implementation internal history data
 }
 
 
-static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
-{
-    static set<unsigned int> idMap;
-    if (remove)
-    {
-        if (idMap.count(idx) > 0)
-            idMap.erase(idx);
-        return 0;
-    }
-    else if (idx > 0)
-    {
-        if (idMap.count(idx) == 0)
-        {
-            idMap.insert(idx);
-            return idx;
-        }
-    }
-    set<unsigned int>::const_iterator itEnd = idMap.end();
-    set<unsigned int>::const_iterator it;
-    unsigned int nextId = 0;
-    for (it = idMap.begin(); it != itEnd && nextId == *it; ++it, ++nextId)
-    {
-    }
-    idMap.insert(nextId);
-    return nextId;
-}
-
 
 SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
     uniqueId(instanceID),
@@ -220,7 +193,6 @@ SynthEngine::~SynthEngine()
     sem_destroy(&partlock);
     if (ctl)
         delete ctl;
-    getRemoveSynthId(true, uniqueId);
 }
 
 

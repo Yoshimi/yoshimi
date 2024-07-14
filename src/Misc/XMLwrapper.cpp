@@ -41,6 +41,7 @@ using file::loadGzipped;
 using file::saveGzipped;
 using file::findExtension;
 using func::string2int;
+using func::string2uint;
 using func::string2float;
 using func::asLongString;
 using func::asString;
@@ -150,7 +151,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth, bool _isYoshi, bool includeBase) :
             addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
             addpar("gzip_compression", synth->getRuntime().GzipCompression);
             addparbool("banks_checked", synth->getRuntime().banksChecked);
-            addparU("active_instances", synth->getRuntime().activeInstance);
+            addparU("active_instances", synth->getRuntime().activeInstances.to_ulong());
             addparstr("guide_version", synth->getRuntime().guideVersion);
             addparstr("manual", synth->getRuntime().manualFile);
         endbranch();
@@ -432,7 +433,7 @@ char *XMLwrapper::getXMLdata()
 }
 
 
-void XMLwrapper::addparU(const std::string& name, unsigned int val)
+void XMLwrapper::addparU(const std::string& name, uint val)
 {
     addparams2("parU", "name", name.c_str(), "value", asString(val));
 }
@@ -677,7 +678,7 @@ int XMLwrapper::getbranchid(int min, int max)
 }
 
 
-unsigned int XMLwrapper::getparU(const std::string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
+uint XMLwrapper::getparU(const std::string& name, unsigned int defaultpar, unsigned int min, unsigned int max)
 {
     node = mxmlFindElement(peek(), peek(), "parU", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (!node)
@@ -685,7 +686,7 @@ unsigned int XMLwrapper::getparU(const std::string& name, unsigned int defaultpa
     const char *strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
-    unsigned int val = string2int(strval);
+    unsigned int val = string2uint(strval);
     if (val < min)
         val = min;
     else if (val > max)
