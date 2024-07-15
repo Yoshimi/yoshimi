@@ -3264,6 +3264,13 @@ float SynthEngine::getLimits(CommandBlock *getData)
             type |= learnable;
             break;
 
+        case MAIN::control::startInstance:
+        case MAIN::control::stopInstance:
+            min = 0;
+            def = 1;
+            max = 31;
+            break;
+
         case MAIN::control::partNumber:
             def = 0;
             max = Runtime.NumAvailableParts -1;
@@ -3274,6 +3281,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
             def = 16;
             max = 64;
             break;
+
         case MAIN::control::panLawType:
             min = MAIN::panningType::cut;
             def = MAIN::panningType::normal;

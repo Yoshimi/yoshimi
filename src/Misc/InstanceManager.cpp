@@ -51,6 +51,7 @@ using std::move;
 using std::set;
 
 using func::asString;
+using util::contains;
 
 using Guard = const std::lock_guard<std::mutex>;
 
@@ -330,10 +331,10 @@ bool InstanceManager::bootPrimary()
  * @warning this function can block for an extended time (>33ms),
  *          since it contends with the event handling duty cycle.
  */
-uint InstanceManager::requestNewInstance()
+uint InstanceManager::requestNewInstance(uint desiredID)
 {
     if (groom->instanceCnt() < MAX_INSTANCES)
-        return groom->createInstance().getID();
+        return groom->createInstance(desiredID).getID();
 
     groom->getPrimary().runtime().LogError("Maximum number("+asString(MAX_INSTANCES)
                                           +") of Synth-Engine instances exceeded.");
@@ -351,6 +352,35 @@ void InstanceManager::triggerRestoreInstances()
     for (uint id=1; id<MAX_INSTANCES; ++id)
         if (groom->getPrimary().runtime().activeInstances.test(id))
             groom->createInstance(id);
+}
+
+/**
+ * Handle an OS-signal to start a new instance.
+ * @remark to avoid any blocking, we send this indirect through the command system;
+ *         it will handled in the background thread and from there invoke requestNewInstance()
+ */
+void InstanceManager::handleNewInstanceSignal()
+{
+    assert (1 <= groom->instanceCnt());
+
+    CommandBlock triggerMsg;
+    triggerMsg.data.control = MAIN::control::startInstance;
+    triggerMsg.data.source  = TOPLEVEL::action::lowPrio;
+    triggerMsg.data.part    = TOPLEVEL::section::main;
+    triggerMsg.data.type    = TOPLEVEL::type::Integer;
+    triggerMsg.data.value   = 0;     // request next free Synth-ID
+    //
+    triggerMsg.data.offset    = UNUSED;
+    triggerMsg.data.kit       = UNUSED;
+    triggerMsg.data.engine    = UNUSED;
+    triggerMsg.data.insert    = UNUSED;
+    triggerMsg.data.parameter = UNUSED;
+    triggerMsg.data.miscmsg   = UNUSED;
+    triggerMsg.data.spare0    = UNUSED;
+    triggerMsg.data.spare1    = UNUSED;
+
+    // MIDI ringbuffer is the only one always active
+    groom->getPrimary().getSynth().interchange.fromMIDI.write(triggerMsg.bytes);
 }
 
 
@@ -421,8 +451,8 @@ void InstanceManager::SynthGroom::clearZombies()
  * Allocate an unique Synth-ID not yet in use.
  * @param desiredID explicitly given desired ID;
  *                  set to zero to request allocation of next free ID
- * @throws std::logic_error if a desired ID is given which is already in use
  * @return new ID which is not currently in use.
+ * @note   assuming that only a limited number of Synth instances is requested
  * @remark when called for the first time, ID = 0 will be returned, which
  *         also marks the associated instance as »primary instance«, responsible
  *         for coordinates some application global aspects.
@@ -433,10 +463,8 @@ uint InstanceManager::SynthGroom::allocateID(uint desiredID)
     for_each(registry.begin(),registry.end()
             ,[&](auto& entry){ allIDs.insert(entry.second.getID()); });
 
-    if (desiredID > 0
-        and allIDs.find(desiredID) != allIDs.end())
-        throw std::logic_error("Instance Lifecycle broken: "
-                               "attempt to allocate a duplicate Synth-ID.");
+    if (desiredID >= 32 or (desiredID > 0 and contains(allIDs, desiredID)))
+        desiredID = 0; // use the next free ID instead
 
     if (not desiredID)
     {

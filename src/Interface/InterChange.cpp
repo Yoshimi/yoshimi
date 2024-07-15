@@ -972,17 +972,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
 
         }
         case MAIN::control::startInstance:
-            if (synth == firstSynth)
-            {
-                if (value > 0 && value < 32)
-                    startInstance = value | 0x80;
-                else
-                    startInstance = 0x81; // next available
-                while (startInstance > 0x80)
-                    sleep_for(1ms);
-                value = startInstance; // actual instance found
-                startInstance = 0; // just to be sure
-            }
+            value = Config::instances().requestNewInstance(value);
             break;
         case MAIN::control::stopInstance:
             text = std::to_string(value) + " ";
@@ -3582,10 +3572,6 @@ void InterChange::commandMain(CommandBlock *getData)
                 getData->data.control = MAIN::control::masterReset;
                 getData->data.source  = TOPLEVEL::action::toAll | TOPLEVEL::action::forceUpdate;
         }   }                                // cause InterChange::returns() to push masterReset into GUI
-            break;
-        case MAIN::control::startInstance: // done elsewhere
-            break;
-        case MAIN::control::stopInstance: // done elsewhere
             break;
         case MAIN::control::undo:
         case MAIN::control::redo:

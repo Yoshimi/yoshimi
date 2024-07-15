@@ -21,6 +21,19 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <string>
+
+namespace std {// forward declarations to avoid pervasive includes
+
+  template<typename T>
+  class allocator;
+  template<typename K, typename CMP, class ALLO>
+  class set;
+
+  template<typename IT, typename V>
+  IT find (IT, IT, V const&);
+}
+
 
 namespace util {
 
@@ -40,7 +53,7 @@ unConst(OBJ const &ro)
     return const_cast<OBJ&>(ro);
 }
 
-  
+
 template<class N1, class N2>
 inline N1 constexpr min(N1 n1, N2 n2)
 {
@@ -67,6 +80,37 @@ inline bool constexpr isLimited(NB lowerBound, NUM val, NB upperBound)
     return lowerBound <= val and val <= upperBound;
 }
 
+/** shortcut for containment test on a map */
+template<typename MAP>
+inline bool contains(MAP& map, typename MAP::key_type const& key)
+{
+    return map.find(key) != map.end();
+}
+
+/** shortcut for set value containment test */
+template<typename T, class CMP, class ALO>
+inline bool contains(std::set<T, CMP, ALO> const& set, T const& val)
+{
+    return set.end() != set.find(val);
+}
+
+/** shortcut for string value containment test */
+template<typename T>
+inline bool contains(std::string const& str, const T& val)
+{
+    return str.find(val) != std::string::npos;
+}
+
+/** shortcut for brute-force containment test
+ *  in any sequential container */
+template<typename SEQ>
+inline bool contains(SEQ const& cont, typename SEQ::const_reference val)
+{
+    auto begin = cont.begin();
+    auto end   = cont.end();
+
+    return end != std::find(begin, end, val);
+}
 
 } //(End)namespace util
 #endif /*UTIL_H*/

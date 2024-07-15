@@ -121,7 +121,8 @@ void yoshimiSigHandler(int sig)
             break;
         case SIGUSR2: // start next instance
             if (isSingleMaster)
-                newInstance();
+                Config::instances().handleNewInstanceSignal();
+//              newInstance(); ///////////////////////////////////////OOO cleanup newInstance
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
         default:

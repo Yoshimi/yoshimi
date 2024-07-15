@@ -66,8 +66,9 @@ class InstanceManager
         }
 
         bool bootPrimary();
-        uint requestNewInstance();
+        uint requestNewInstance(uint);
         void triggerRestoreInstances();
+        void handleNewInstanceSignal();
 
         /** Event handling loop during regular operation */
         void performWhileActive(std::function<void(SynthEngine&)> handleEvents);
