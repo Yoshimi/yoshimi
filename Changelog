@@ -1,5 +1,10 @@
 yoshimi 2.3.2 M
 
+2024-7-15 Will
+bn 2342
+Removed redundant CLI common controls list.
+Updated User Guide.
+
 2024-7-12 Will
 bn 2341
 Added synTaiko to banks/Drums.

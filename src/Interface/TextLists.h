@@ -93,7 +93,6 @@ namespace LISTS {
     eff, // effect types
     part,
     mcontrol,
-    common,
     addsynth,
     subsynth,
     padsynth,

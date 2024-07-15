@@ -667,8 +667,6 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
             listnum = LISTS::part;
         else if (input.matchnMove(2, "mcontrol"))
             listnum = LISTS::mcontrol;
-        else if (input.matchnMove(3, "common"))
-            listnum = LISTS::common;
         else if (input.matchnMove(3, "addsynth"))
             listnum = LISTS::addsynth;
         else if (input.matchnMove(3, "subsynth"))
@@ -819,10 +817,6 @@ char CmdInterpreter::helpList(Parser& input, unsigned int local)
         case LISTS::mcontrol:
             msg.push_back("Midi Control:");
             helpLoop(msg, mcontrollist, 2);
-            break;
-        case LISTS::common:
-            msg.push_back("Part Common:");
-            helpLoop(msg, commonlist, 2);
             break;
         case LISTS::addsynth:
             msg.push_back("Part AddSynth:");

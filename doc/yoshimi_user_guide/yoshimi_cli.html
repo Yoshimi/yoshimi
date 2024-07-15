@@ -12,7 +12,7 @@
     <h2 style="text-align: center">Command Line Interface</h2>
     <p>
     Yoshimi supplies a command line interface (CLI) that can perform any action that is available in the graphical interface (GUI). The CLI closely follows the GUi with respect to context levels.
-    However, some control names are changed to enable shorter abbreviations to be used.
+    However, some control names are changed to enable shorter, unambiguous abbreviations to be used.
     <br><br>
     With Yoshimi installed, open a terminal window and type 'yoshimi' to start. Unless you have disabled the GUI it will also show, but the prompt you will see will be something like the following:
     <div class = "code">
@@ -35,7 +35,7 @@ Root 9. Bank set to 115 "The_Mysterious_Bank"
 GUI refreshed
 yoshimi>
     </div>
-    A minor annoyance is that the GUI will take input focus as it opens, so you will have to click in the terminal window again to make further commands.
+    A minor annoyance is that the GUI (if it is enabled) will take input focus as it opens, so you will have to click in the terminal window again to make further commands.
     <br><br>
     There are a number of commands that can be set at the time you start Yoshimi. Before starting you can view these with:
     <div class = "code">
@@ -86,7 +86,7 @@ music@devuan:~$
     <div class = "code">
     yoshimi -b=128 -i -j
     </div>
-    In the above example we are setting the buffer size to 128 frames, disabling the GUI and setting MIDI input to Jack.
+    In the above example we are setting the buffer size to 128 frames, disabling the GUI and setting MIDI input to Jack. These settings only apply to the current instance, and don't change the stored ones.
     <br><br>
     Once running in the CLI you will be at the top level. Entering '<b>help</b>', or just a '<b>?</B>' will list all the available commands and also the names of the available contexts. If reporting is set for the CLI this will be paged as shown below.
     <div class = "code">
