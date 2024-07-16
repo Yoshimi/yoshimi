@@ -311,7 +311,8 @@ static void *mainThread(void *arg)
         return NULL;
 
     firstSynth->saveHistory();
-    firstSynth->saveBanks();
+    firstSynth->saveBanks(); /////////////////////////////////////OOO must do this via InstanceManager....
+
     return NULL;
 }
 
@@ -321,8 +322,8 @@ int mainCreateNewInstance(unsigned int forceId)
     MusicClient *musicClient = NULL;
     unsigned int instanceID;
     SynthEngine *synth = new SynthEngine(forceId);
-    if (!synth->getRuntime().isRuntimeSetupCompleted())
-        goto bail_out;
+//    if (!synth->getRuntime().isRuntimeSetupCompleted())  /////////////////OOO sort out LV2 init; Config::setup() now invoked explicitly from Instance::startUp()
+//        goto bail_out;
     instanceID = synth->getUniqueId();
     if (!synth)
     { // this has to be a direct call - no synth for log!
@@ -365,7 +366,7 @@ int mainCreateNewInstance(unsigned int forceId)
 #else
     synth->getRuntime().toConsole = false;
 #endif
-    synth->getRuntime().StartupReport(musicClient->midiClientName());
+    synth->getRuntime().startupReport(musicClient->midiClientName());
 
     if (instanceID == 0)
         std::cout << "\nYay! We're up and running :-)\n";

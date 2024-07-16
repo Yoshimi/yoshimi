@@ -26,6 +26,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <atomic>
 #include <csignal>
 #include <cstring>
 #include <bitset>
@@ -40,6 +41,7 @@
 #endif
 #include "globals.h"
 
+using std::atomic_bool;
 using std::bitset;
 using std::string;
 using std::list;
@@ -62,39 +64,37 @@ class Config
         Config& operator=(Config&&)      = delete;
         Config& operator=(Config const&) = delete;
 
-        bool Setup(void);
-        void StartupReport(const string& clientName);
-        void Announce(void);
-        void Usage(void);
-        void Log(const string& msg, char tostderr = _SYS_::LogNormal);
-        void LogError(const string& msg);
-        void flushLog(void);
-        bool loadPresetsList(void);
-        bool savePresetsList(void);
+        void setup();
+        void startupReport(const string& clientName);
+        void announce();
+        void usage();
+        void Log(string const& msg, char tostderr = _SYS_::LogNormal);
+        void LogError(string const& msg);
+        void flushLog();
+        bool loadPresetsList();
+        bool savePresetsList();
         bool saveConfig(bool master = false);
-        bool loadConfig(void);
+        bool loadConfig();
         bool updateConfig(int control, int value);
-        void restoreConfig(SynthEngine *_synth);
+        void restoreConfig(SynthEngine*);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);
         bool restoreJsession();
-        void setJackSessionSave(int event_type, const string& session_file);
-        float getConfigLimits(CommandBlock *getData);
+        void setJackSessionSave(int event_type, string const& session_file);
+        float getConfigLimits(CommandBlock*);
 
         string testCCvalue(int cc);
         string masterCCtest(int cc);
 
         static void sigHandler(int sig);
-        void setInterruptActive(void);
-        void setLadi1Active(void);
-        void signalCheck(void);
+        void setInterruptActive();
+        void setLadi1Active();
+        void signalCheck();
         void setRtprio(int prio);
         using ThreadFun = void*(void*);
-        bool startThread(pthread_t*, ThreadFun*, void *arg,
-                         bool schedfifo, char lowprio, const string& name = "");
-        const string& programCmd(void) { return programcommand; }
-
-        bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
+        bool startThread(pthread_t*, ThreadFun*, void* arg,
+                         bool schedfifo, char lowprio, string const& name = "");
+        const string& programCmd()     { return programcommand; }
 
         string        defaultStateName;
         string        defaultSession;
@@ -123,7 +123,7 @@ class Config
         unsigned int  guiThemeID;
         string        guiTheme;
 
-        bool          runSynth;
+        atomic_bool   runSynth;
         bool          isLittleEndian;
         bool          finishedCLI;
         int           VirKeybLayout;
@@ -253,17 +253,17 @@ class Config
         Samples genMixr;
 
     private:
-        void *findManual(void);
-        static void *_findManual(void *arg);
+        void* findManual();
+        static void* _findManual(void*);
         pthread_t  findManualHandle;
 
-        void defaultPresets(void);
+        void defaultPresets();
         bool extractBaseParameters(XMLwrapper& xml);
         bool extractConfigData(XMLwrapper& xml);
         void addConfigXML(XMLwrapper& xml);
-        void saveJackSession(void);
+        void saveJackSession();
 
-        std::string findHtmlManual(void);
+        string findHtmlManual();
 
 
         int sigIntActive;
@@ -275,8 +275,7 @@ class Config
         string baseConfig;
         string presetDir;
 
-        SynthEngine *synth;
-        bool bRuntimeSetupCompleted;
+        SynthEngine* synth;
 
         friend class YoshimiLV2Plugin;
 
@@ -286,6 +285,7 @@ class Config
 };
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////OOO alltogether obsolete
 //struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
 class GuiThreadMsg
 {

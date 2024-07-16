@@ -131,13 +131,13 @@ class InstanceManager::Instance
         LifePhase state{PENDING};
 
     public: // can be moved and swapped, but not copied...
-       ~Instance()                           = default;
         Instance(Instance&&)                 = default;
         Instance(Instance const&)            = delete;
         Instance& operator=(Instance&&)      = delete;
         Instance& operator=(Instance const&) = delete;
 
         Instance(uint id);
+       ~Instance();
 
         bool startUp();
         void shutDown();
@@ -219,7 +219,6 @@ class InstanceManager::SynthGroom
 
 InstanceManager::InstanceManager()
     : groom{make_unique<SynthGroom>()}
-    , cmdOptions{}
     { }
 
 InstanceManager::~InstanceManager() { }
@@ -233,6 +232,16 @@ InstanceManager::Instance::Instance(uint id)
     : synth{make_unique<SynthEngine>(id)}
     , client{make_unique<MusicClient>(*synth)}
     { }
+
+
+/** @note unwinding of instances happens automatically by destructor.
+ *        Yet shutDown() can be invoked explicitly for secondary instances.
+ */
+InstanceManager::Instance::~Instance()
+{
+    assert(synth);
+    shutDown();
+}
 
 
 
@@ -251,6 +260,7 @@ InstanceManager::Instance::Instance(uint id)
 bool InstanceManager::Instance::startUp()
 {
     state = BOOTING;
+    runtime().setup();
     assert (not runtime().runSynth);
     for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
     {
@@ -286,7 +296,7 @@ bool InstanceManager::Instance::startUp()
 #else
                 runtime().toConsole = false;
 #endif
-                runtime().StartupReport(client->midiClientName());
+                runtime().startupReport(client->midiClientName());
 
                 if (isPrimary())
                     std::cout << "\nYay! We're up and running :-)\n";
@@ -294,10 +304,10 @@ bool InstanceManager::Instance::startUp()
                     std::cout << "\nStarted "<< synth->getUniqueId() << "\n";
 
                 state = BOOTING;
+                assert (runtime().runSynth);
                 return true;
     }   }   }
 
-    state = WANING;
     runtime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
     shutDown();
     return false;
@@ -305,10 +315,16 @@ bool InstanceManager::Instance::startUp()
 
 
 
-/** */
+/**
+ * ensure the instance ends active operation...
+ * - signal all background threads to stop
+ * - possibly disconnect from audio/MIDI (blocking!)
+ * - mark instance for clean-up
+ */
 void InstanceManager::Instance::shutDown()
 {
-    runtime().runSynth = false;
+    state = WANING;
+    runtime().runSynth.store(false, std::memory_order_release); // signal to synth and background threads
     client->close();
     runtime().flushLog();
     state = DEFUNCT;
@@ -316,18 +332,20 @@ void InstanceManager::Instance::shutDown()
 
 
 /** install and start-up the primary SynthEngine and runtime */
-bool InstanceManager::bootPrimary()
+bool InstanceManager::bootPrimary(int argc, char *argv[])
 {
     assert (0 == groom->instanceCnt());
-    return groom->createInstance(0).startUp();
-    //////////////////////////////////////////OOO TODO ensure that the command options are parsed and special handling for the primary is done!!
-    //////////////////////////////////////////OOO do we somehow need to /wait/ for the primary instance to become live?
+    CmdOptions baseSettings(argc,argv);
+    Instance& primary = groom->createInstance(0);
+    baseSettings.applyTo(primary.runtime());
+    //////////////////////////////////////////OOO TODO ensure that further special handling for the primary is done!!
+    return primary.startUp();
 }
 
 /**
  * Request to allocate a new SynthEngine instance.
  * @return ID of the new instance or zero, if no further instance can be created
- * @remark the new instance will start up asynchronously
+ * @remark the new instance will start up asynchronously, see SynthGroom::dutyCycle()
  * @warning this function can block for an extended time (>33ms),
  *          since it contends with the event handling duty cycle.
  */
@@ -386,7 +404,7 @@ void InstanceManager::handleNewInstanceSignal()
 
 void InstanceManager::performWhileActive(function<void(SynthEngine&)> handleEvents)
 {
-    while (groom->getPrimary().runtime().runSynth)
+    while (groom->getPrimary().runtime().runSynth.load(std::memory_order_acquire))
     {
         groom->dutyCycle(handleEvents);
         std::this_thread::yield();
@@ -408,8 +426,11 @@ void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handle
                 instance.enterRunningState();
             break;
             case RUNNING:
-                 // perform GUI and command returns for this instance
-                handleEvents(instance.getSynth());
+                if (instance.runtime().runSynth.load(std::memory_order_acquire))
+                     // perform GUI and command returns for this instance
+                    handleEvents(instance.getSynth());
+                else
+                    instance.shutDown();
             break;
             default:
                 /* do nothing */
@@ -422,7 +443,7 @@ void InstanceManager::SynthGroom::dutyCycle(function<void(SynthEngine&)>& handle
 
 
 /**
- * respond to the request to start a new engine instance, if any
+ * respond to the request to start a new engine instance, if any.
  * @note deliberately handling only a single request, as start-up is
  *       time consuming and risks tailback in other instances' GUI queues.
  */

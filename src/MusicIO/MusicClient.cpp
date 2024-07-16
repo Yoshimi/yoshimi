@@ -57,6 +57,12 @@ MusicClient::MusicClient(SynthEngine& connect_to_engine)
     { }
 
 
+MusicClient::~MusicClient()
+try { close(); }
+catch(std::exception& ex){ std::cerr << "Failure closing Music-IO: "<<ex.what()<<std::endl; }
+catch(...)               { std::cerr << "Unidentified problem while closing Music-IO."<<std::endl; }
+
+
 
 void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 {
@@ -192,7 +198,7 @@ void* MusicClient::timerThread_fn(void *arg)
     using Seconds = duration<double>;
     auto sleepInterval = Seconds(double(self.runtime().Buffersize) / self.runtime().Samplerate);
     self.timerWorking = true;
-    while (self.timerWorking && self.runtime().runSynth)
+    while (self.timerWorking and self.runtime().runSynth.load(std::memory_order_relaxed))
     {
         self.synth.MasterAudio(self.dummyL, self.dummyR);
         sleep_for(sleepInterval);

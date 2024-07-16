@@ -487,7 +487,7 @@ void *AlsaEngine::_AudioThread(void* arg)
 void *AlsaEngine::AudioThread()
 {
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
-    while (runtime().runSynth)
+    while (runtime().runSynth.load(std::memory_order_relaxed))  // read the atomic flag as we happen to see it, without forcing any sync
     {
         BeatTracker::BeatValues beats(beatTracker->getBeatValues());
         synth.setBeatValues(beats.songBeat, beats.monotonicBeat, beats.bpm);
@@ -662,7 +662,7 @@ void* AlsaEngine::MidiThread()
     unsigned int pollCount = snd_seq_poll_descriptors_count(midi.handle, POLLIN);
     struct pollfd pollfds[pollCount];
 
-    while (runtime().runSynth)
+    while (runtime().runSynth.load(std::memory_order_relaxed))
     {
         snd_seq_poll_descriptors(midi.handle, pollfds, pollCount, POLLIN);
 

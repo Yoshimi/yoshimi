@@ -42,8 +42,6 @@ class InstanceManager
 
         std::unique_ptr<SynthGroom> groom;
 
-        CmdOptions cmdOptions;
-
          // can not be created nor copied or moved...
         InstanceManager();
     public:
@@ -60,12 +58,7 @@ class InstanceManager
             return singleton;
         }
 
-        CmdOptions const& getCmdOptions()
-        {
-            return cmdOptions;
-        }
-
-        bool bootPrimary();
+        bool bootPrimary(int, char*[]);
         uint requestNewInstance(uint);
         void triggerRestoreInstances();
         void handleNewInstanceSignal();

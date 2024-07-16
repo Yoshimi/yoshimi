@@ -162,41 +162,32 @@ Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
     //sse_level(0),
     programcommand("yoshimi"),
     synth(_synth),
-    bRuntimeSetupCompleted(false),
     exitType(EXIT_SUCCESS)
+{ }
+
+
+void Config::setup()
 {
     std::cerr.precision(4);
-
-    if (isLV2Plugin)
+/*
+    if (isLV2Plugin)  ///////////////////////////////////////////////////OOO need better way to do a special handling for LV2
     {
         //Log("LV2 only");
         if (!loadConfig())
             Log("\n\nCould not load config. Using default values.\n");
-        bRuntimeSetupCompleted = true;
         //skip further setup, which is irrelevant for lv2 plugin instance.
         return;
     }
+*/
 
     //Log("Standalone Only");
-    static bool torun = true;
-    if (torun) // only the first stand-alone synth can read args
-    {
-        //////////////////////////////////////////////////////////////////////////////OOO should better handle this directly in InstanceManager for the primarySynth!!
-        instances().getCmdOptions().applyTo(*this);
-        torun = false;
-    }
     if (!loadConfig())
     {
         string message = "Could not load config. Using default values.";
         TextMsgBuffer::instance().push(message); // needed for CLI
         Log("\n\n" + message + "\n");
     }
-    bRuntimeSetupCompleted = Setup();
-}
 
-
-bool Config::Setup(void)
-{
     switch (audioEngine)
     {
         case alsa_audio:
@@ -235,7 +226,6 @@ bool Config::Setup(void)
 
     if (!Config::globalJackSessionUuid.empty())
         jackSessionUuid = Config::globalJackSessionUuid;
-    return true;
 }
 
 
@@ -1059,7 +1049,7 @@ void Config::LogError(const string &msg)
 }
 
 
-void Config::StartupReport(const string& clientName)
+void Config::startupReport(const string& clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
     if (fullInfo)
@@ -1209,7 +1199,7 @@ void Config::signalCheck(void)
 
                 case JackSessionSaveAndQuit:
                     saveJackSession();
-                    runSynth = false;
+                    runSynth.store(false, std::memory_order_release);
                     break;
 
                 case JackSessionSaveTemplate: // not implemented
@@ -1228,7 +1218,7 @@ void Config::signalCheck(void)
     }
 
     if (sigIntActive)
-        runSynth = false;
+        runSynth.store(false, std::memory_order_release);
 }
 
 

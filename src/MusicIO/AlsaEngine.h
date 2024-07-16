@@ -45,13 +45,13 @@ class SynthEngine;
 class AlsaEngine : public MusicIO
 {
     public:
-       ~AlsaEngine()  = default;
         // shall not be copied nor moved
         AlsaEngine(AlsaEngine&&)                 = delete;
         AlsaEngine(AlsaEngine const&)            = delete;
         AlsaEngine& operator=(AlsaEngine&&)      = delete;
         AlsaEngine& operator=(AlsaEngine const&) = delete;
         AlsaEngine(SynthEngine&, shared_ptr<BeatTracker>);
+       ~AlsaEngine() { Close(); }
 
 
         /* ====== MusicIO interface ======== */

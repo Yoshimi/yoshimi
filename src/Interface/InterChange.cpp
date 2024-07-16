@@ -194,7 +194,7 @@ void *InterChange::_sortResultsThread(void *arg)
 
 void *InterChange::sortResultsThread(void)
 {
-    while (synth->getRuntime().runSynth)
+    while (synth->getRuntime().runSynth.load(std::memory_order_relaxed))
     {
         CommandBlock getData;
 
@@ -1946,7 +1946,7 @@ void InterChange::mediate()
             more = true;
         }
     }
-    while (more && synth->getRuntime().runSynth);
+    while (more and synth->getRuntime().runSynth.load(std::memory_order_relaxed));
     syncWrite = false;
 }
 

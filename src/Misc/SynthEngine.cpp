@@ -418,6 +418,9 @@ void SynthEngine::publishGuiAnchor()
  */
 bool SynthEngine::postGuiStartHook()
 {
+    if (0 == getUniqueId())
+        loadHistory();
+    installBanks();
     Part& currPart{*part[getRuntime().currentPart]};
     if (currPart.Pname != DEFAULT_NAME || currPart.Poriginal != UNTITLED)
     {// Heuristics that probably an early load via config took place
@@ -443,7 +446,7 @@ void SynthEngine::closeGui()
 void SynthEngine::guiClosed(bool stopSynth)
 {
     if (stopSynth && !getIsLV2Plugin())
-        Runtime.runSynth = false;
+        Runtime.runSynth.store(false, std::memory_order_release);
 #ifdef GUI_FLTK
     if (guiClosedCallback != NULL)
         guiClosedCallback(guiCallbackArg);

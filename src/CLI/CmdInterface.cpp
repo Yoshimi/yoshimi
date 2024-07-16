@@ -111,9 +111,10 @@ void CmdInterface::cmdIfaceCommandLoop()
             { // create enough delay for most ops to complete
                 sleep_for(2ms);
             }
-            while (getRuntime().runSynth && !getRuntime().finishedCLI);
+            while (getRuntime().runSynth.load(std::memory_order_relaxed)
+                   and not getRuntime().finishedCLI);
         }
-        if (getRuntime().runSynth)
+        if (getRuntime().runSynth.load(std::memory_order_acquire))
         {
             string prompt = "yoshimi";
             if (interpreter.currentInstance > 0)
@@ -133,7 +134,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             parser.setPrompt(prompt);
         }
 
-        if (!exit && getRuntime().runSynth)
+        if (!exit and getRuntime().runSynth.load(std::memory_order_relaxed))
             sleep_for(20ms);
     }
 }

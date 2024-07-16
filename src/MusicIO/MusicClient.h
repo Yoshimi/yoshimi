@@ -62,7 +62,6 @@ private:
     float*  dummyR[NUM_MIDI_PARTS + 1];
 
 public:
-   ~MusicClient() = default;
     // shall not be copied nor moved
     MusicClient(MusicClient&&)                 = delete;
     MusicClient(MusicClient const&)            = delete;
@@ -70,6 +69,8 @@ public:
     MusicClient& operator=(MusicClient const&) = delete;
 
     MusicClient(SynthEngine&);
+   ~MusicClient();
+
     bool open(audio_driver, midi_driver);
     bool start();
     void close();
