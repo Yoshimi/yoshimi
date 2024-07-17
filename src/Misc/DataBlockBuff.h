@@ -24,6 +24,7 @@
 #include "globals.h"
 
 #include <cassert>
+#include <cstddef>
 #include <chrono>
 #include <array>
 
@@ -36,12 +37,11 @@ using std::chrono::milliseconds;
 
 /**
  * Uninitialised memory block
- * @todo C++17 use std::byte and std::launder
  */
 template<size_t siz>
 class BufferBlock
 {
-    alignas(size_t) char buffer[siz];
+    alignas(size_t) std::byte buffer[siz];
 public:
     // Standard layout, trivially constructible and copyable
 
@@ -54,7 +54,7 @@ public:
     T& accessAs()
     {
         static_assert(sizeof(T) <= siz, "insufficient storage in BufferBlock");
-        return * reinterpret_cast<T*>(&buffer);
+        return * std::launder (reinterpret_cast<T*>(&buffer));
     }
 };
 

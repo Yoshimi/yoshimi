@@ -1591,31 +1591,3 @@ float Config::getConfigLimits(CommandBlock *getData)
     return value;
 }
 
-
-#ifdef GUI_FLTK
-void GuiThreadMsg::processGuiMessages()
-{
-    GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
-    if (msg)
-    {
-        assert(msg->data);
-        InterChange& interChange = * static_cast<InterChange*>(msg->data);
-        if (msg->type == GuiThreadMsg::NewSynthEngine)
-        {
-///////////////////////////////////////////////////////////////////////////////////////////////////////////OOO the following is obsolete and moves into InstanceManager
-/* 
-            MasterUI& guiMaster = interChange.createGuiMaster(msg->index);
-            guiMaster.Init();
-            ///////////////////////////////////////TODO 3/2024 the following should be done from the Synth thread
-            guiMaster.synth->postGuiStartHook();   //// this is a premature hack to fix missing push-updates from early load / state files
-
-            if (guiMaster.synth->getRuntime().audioEngine < 1)
-                alert(guiMaster.synth, "Yoshimi could not connect to any sound system. Running with no Audio.");
-            if (guiMaster.synth->getRuntime().midiEngine < 1)
-                alert(guiMaster.synth, "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
-*/
-        }
-        delete msg;
-    }
-}
-#endif

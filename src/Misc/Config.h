@@ -54,6 +54,7 @@ class Config
     public:
         /** convenience access to the global InstanceManager */
         static InstanceManager& instances() { return InstanceManager::get(); }
+        static Config&          primary()   { return instances().accessPrimaryConfig(); }
 
 
         Config(SynthEngine *_synth, bool isLV2Plugin);
@@ -282,41 +283,6 @@ class Config
     public:
         std::string manualFile;
         int exitType;
-};
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////OOO alltogether obsolete
-//struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
-class GuiThreadMsg
-{
-private:
-    GuiThreadMsg()
-        : data{nullptr}
-        , length{0}
-        , index{0}
-        , type{GuiThreadMsg::UNDEFINED}
-        { }
-public:
-    enum
-    {
-        NewSynthEngine,
-        UNDEFINED = 9999
-    };
-    void *data; //custom data, must be static or handled by called, does nod freed by receiver
-    unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
-    unsigned int index; // if there is integer data, it can be passed through index (to remove additional receiver logic)
-    unsigned int type; // type of gui message (see enum above)
-    static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
-    {
-        GuiThreadMsg *msg = new GuiThreadMsg;
-        msg->data = _data;
-        msg->type = _type;
-        msg->index = _index;
-#ifdef GUI_FLTK
-        Fl::awake((void *)msg); // we probably need to review all of this :(
-#endif
-    }
-    static void processGuiMessages();
 };
 
 #endif

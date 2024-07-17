@@ -177,7 +177,7 @@ void CmdInterpreter::defaults()
 void CmdInterpreter::resetInstance(unsigned int newInstance)
 {
     currentInstance = newInstance;
-    synth = firstSynth->getSynthFromId(currentInstance);
+    synth = & Config::instances().findSynthByID(currentInstance);
     unsigned int newID = synth->getUniqueId();
     if (newID != currentInstance)
     {

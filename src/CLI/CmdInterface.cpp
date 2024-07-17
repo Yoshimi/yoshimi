@@ -84,7 +84,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     cli::Parser parser;
     parser.setHistoryFile(hist_filename);
-    interpreter.synth = firstSynth;
+    interpreter.synth = & Config::instances().findSynthByID(0);
     bool exit = false;
     while (!exit)
     {
@@ -94,7 +94,7 @@ void CmdInterface::cmdIfaceCommandLoop()
         else if (parser.isValid())
         {
             // in case it's been changed from elsewhere
-            interpreter.synth = firstSynth->getSynthFromId(interpreter.currentInstance);
+            interpreter.synth = & Config::instances().findSynthByID(interpreter.currentInstance);
 
             cli::Reply reply = interpreter.cmdIfaceProcessCommand(parser);
             exit = (reply.code == REPLY::exit_msg);

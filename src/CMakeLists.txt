@@ -295,7 +295,7 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/Bank.cpp  Misc/BuildScheduler.cpp  Misc/CmdOptions.cpp  Misc/DataBlockBuff.cpp
-    Misc/Config.cpp  Misc/InstanceManager.cpp  Misc/Microtonal.cpp  Misc/Part.cpp  Misc/Splash.cpp
+    Misc/Config.cpp  Misc/InstanceManager.cpp  Misc/Microtonal.cpp  Misc/Part.cpp
     Misc/SynthEngine.cpp  Misc/WavFile.cpp  Misc/XMLwrapper.cpp
 )
 
@@ -382,6 +382,7 @@ if (BuildWithFLTK)
         UI/WidgetMWSlider.cpp
         UI/YoshiWin.cpp
         UI/MiscGui.cpp
+        UI/Splash.cpp
     )
     set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 endif ()

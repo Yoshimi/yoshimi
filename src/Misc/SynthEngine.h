@@ -76,7 +76,7 @@ enum LV2PluginType
 class SynthEngine
 {
     private:
-        unsigned int uniqueId;
+        const uint uniqueId;
         LV2PluginType lv2PluginType;
         bool needsSaving;
     public:
@@ -102,7 +102,7 @@ class SynthEngine
 
         bool Init(unsigned int audiosrate, int audiobufsize);
         void publishGuiAnchor();
-        bool postGuiStartHook();
+        void postBootHook();
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper& xml);
@@ -165,9 +165,9 @@ class SynthEngine
         void resetAll(bool andML);
         void ShutUp(void);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
-        void partonoffLock(int npart, int what);
-        void partonoffWrite(int npart, int what);
-        char partonoffRead(int npart);
+        void partonoffLock(uint npart, int what);
+        void partonoffWrite(uint npart, int what);
+        char partonoffRead(uint npart);
         sem_t partlock;
         unsigned char legatoPart;
         void setPartMap(int npart);
@@ -280,7 +280,6 @@ class SynthEngine
         inline bool getIsLV2Plugin() {return lv2PluginType != LV2PluginTypeNone; }
         inline Config &getRuntime() {return Runtime;}
         uint getUniqueId() const    {return uniqueId;}
-        SynthEngine* getSynthFromId(uint uniqueId);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
         {

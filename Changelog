@@ -1,9 +1,16 @@
 yoshimi 2.3.2 M
 
+2024-9-15 Hermann
+bn ##TODO
+Rework main() to introduce an InstanceManager.
+* Instances of SynthEngine and MusicIO maintained with lifecycle state
+* Start-up, GUI connection and post-boot-hook rearranged
+* request to start a new instance always via command system
+* remove FLTK messaging and locking, rework LV2 plugin top-level
+
 2024-9-7 Will
 bn 2352
 Updated HTML User Guide images to reflect current appearance.
-
 
 2024-9-5 Will
 bn 2351
@@ -11,7 +18,6 @@ BugFix: mixer panel not updating with correct colours.
     MasterUI was duplicating MasterMiscUI and hadn't had
     background colours changed.
 More work on high contrast theme.
-
 
 2024-9-2 Will
 bn 2350

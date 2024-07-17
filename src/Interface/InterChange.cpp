@@ -87,10 +87,7 @@ using func::nearestPowerOf2;
 
 using func::asString;
 
-extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-extern SynthEngine *firstSynth;
 
-int startInstance = 0;
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth),
@@ -980,8 +977,8 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
                 text += "Out of range";
             else
             {
-                SynthEngine *toClose = firstSynth->getSynthFromId(value);
-                if (toClose == firstSynth && value > 0)
+                SynthEngine *toClose = & Config::instances().findSynthByID(value);
+                if (toClose->getUniqueId() == 0 && value > 0)
                     text += "Can't find";
                 else
                 {
@@ -1448,7 +1445,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
     bool write = (getData->data.type & TOPLEVEL::type::Write);
     int value = getData->data.value;
     int control = getData->data.control;
-    int npart = getData->data.part;
+    uint npart = getData->data.part;
     int kititem = getData->data.kit;
     int parameter = getData->data.parameter;
 
@@ -1496,7 +1493,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             {
                 if (value & 2)
                 {
-                    mainRegisterAudioPort(synth, npart);
+                    Config::instances().registerAudioPort(synth->getUniqueId(), npart);
                 }
                 getData->data.source &= ~TOPLEVEL::action::lowPrio;
             }
@@ -2072,8 +2069,8 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     if (getData->data.control == TOPLEVEL::control::forceExit)
     {
         getData->data.source = TOPLEVEL::action::noAction;
-        firstSynth->getRuntime().exitType = FORCED_EXIT;
-        firstSynth->getRuntime().runSynth = false;
+        Config::primary().exitType = FORCED_EXIT;
+        Config::primary().runSynth = false;
         return false;
     }
     if (npart == TOPLEVEL::section::undoMark)
@@ -3026,7 +3023,7 @@ void InterChange::commandConfig(CommandBlock *getData)
                 synth->getRuntime().updateConfig(control, value);
             }
             else
-                value = firstSynth->getRuntime().showCLIcontext;
+                value = Config::primary().showCLIcontext;
             break;
         case CONFIG::control::XMLcompressionLevel:
             if (write)
@@ -3565,13 +3562,11 @@ void InterChange::commandMain(CommandBlock *getData)
             }
             break;
         case TOPLEVEL::control::dataExchange:
-        {// this trigger is sent immediately after a new instance becomes operational
-            bool refresh = synth->postGuiStartHook();
-            if (refresh)
-            {
-                getData->data.control = MAIN::control::masterReset;
-                getData->data.source  = TOPLEVEL::action::toAll | TOPLEVEL::action::forceUpdate;
-        }   }                                // cause InterChange::returns() to push masterReset into GUI
+            // this trigger is sent immediately after a new instance becomes operational
+            synth->postBootHook();
+            getData->data.control = MAIN::control::masterReset;
+            getData->data.source  = TOPLEVEL::action::toAll | TOPLEVEL::action::forceUpdate;
+                                    // cause InterChange::returns() to push masterReset into GUI
             break;
         case MAIN::control::undo:
         case MAIN::control::redo:

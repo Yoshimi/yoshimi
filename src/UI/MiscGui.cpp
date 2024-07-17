@@ -181,9 +181,7 @@ void GuiUpdates::read_updates(SynthEngine *synth)
     CommandBlock getData;
     while (synth->interchange.toGUI.read(getData.bytes))
     {
-        Fl::lock();
         decode_updates(synth, &getData);
-        Fl::unlock();
     }
 
     // test refresh time

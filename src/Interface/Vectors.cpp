@@ -28,16 +28,15 @@
 #include "Misc/XMLwrapper.h"
 #include <Interface/Vectors.h>
 
-extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-
 using file::isRegularFile;
 using file::setExtension;
 using file::findLeafName;
 
 namespace { // Implementation details...
-
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
 }
+
+
 
 Vectors::Vectors(SynthEngine *_synth) :
     synth(_synth)
@@ -99,7 +98,7 @@ unsigned char Vectors::loadVector(unsigned char baseChan, const string& name, bo
 
                 synth->partonoffWrite(npart + baseChan, 1);
                 if (synth->part[npart + actualBase]->Paudiodest & 2)
-                    mainRegisterAudioPort(synth, npart + actualBase);
+                    Config::instances().registerAudioPort(synth->getUniqueId(), npart+actualBase);
             }
         }
         xml->endbranch(); // VECTOR

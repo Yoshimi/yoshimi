@@ -52,6 +52,7 @@ using std::set;
 
 using func::asString;
 using util::contains;
+using util::isLimited;
 
 using Guard = const std::lock_guard<std::mutex>;
 
@@ -144,12 +145,15 @@ class InstanceManager::Instance
         void buildGuiMaster();
         void enterRunningState();
 
-        auto& getSynth() { return *synth; }
-        Config& runtime() { return synth->getRuntime(); }
-        LifePhase getState() { return state; }
-        uint getID() const { return synth->getUniqueId(); }
+        SynthEngine& getSynth()    { return *synth; }
+        MusicClient& getClient()   { return *client; }
+        Config& runtime()          { return synth->getRuntime(); }
+        LifePhase getState() const { return state; }
+        uint getID()         const { return synth->getUniqueId(); }
+        bool isPrimary()     const { return 0 == getID(); }
     private:
-        bool isPrimary()  { return 0 == getID(); }
+        void triggerPostBootHook();
+        void registerAudioPorts();
 };
 
 
@@ -207,13 +211,15 @@ class InstanceManager::SynthGroom
         {
             return registry.size();
         }
+        Instance& find(uint);
 
         void dutyCycle(function<void(SynthEngine&)>& handleEvents);
-
+        void shutdownRunningInstances();
+        void persistRunningInstances();
     private:
-        uint allocateID(uint);
-        void handleStartRequest();
         void clearZombies();
+        void handleStartRequest();
+        uint allocateID(uint);
 };
 
 
@@ -239,8 +245,29 @@ InstanceManager::Instance::Instance(uint id)
  */
 InstanceManager::Instance::~Instance()
 {
-    assert(synth);
-    shutDown();
+    if (synth and state == RUNNING)
+        try { shutDown();       }
+        catch(...) {/* ignore */}
+}
+
+
+Config& InstanceManager::accessPrimaryConfig()
+{
+    return groom->getPrimary().runtime();
+}
+
+SynthEngine& InstanceManager::findSynthByID(uint id)
+{
+    return groom->find(id).getSynth();
+}
+
+InstanceManager::Instance& InstanceManager::SynthGroom::find(uint id)
+{
+    for (auto& [_,instance] : registry)
+        if (instance.getID() == id)
+            return instance;
+    assert(primary);
+    return *primary;
 }
 
 
@@ -259,11 +286,13 @@ InstanceManager::Instance::~Instance()
  */
 bool InstanceManager::Instance::startUp()
 {
+    std::cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< std::endl;
     state = BOOTING;
     runtime().setup();
     assert (not runtime().runSynth);
     for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
     {
+        runtime().Log("\n-----Connect-attempt----("+display(tryAudio)+"/"+display(tryMidi)+")----");
         if (client->open(tryAudio, tryMidi))
         {
             if (tryAudio == runtime().audioEngine and
@@ -272,6 +301,7 @@ bool InstanceManager::Instance::startUp()
             runtime().audioEngine = tryAudio;
             runtime().midiEngine = tryMidi;
             runtime().runSynth = true;  // mark as active and enable background threads
+            runtime().Log("-----Connect-SUCCESS-------------------\n");
             runtime().Log("Using "+display(tryAudio)+" for audio and "+display(tryMidi)+" for midi", _SYS_::LogError);
             break;
         }
@@ -324,8 +354,10 @@ bool InstanceManager::Instance::startUp()
 void InstanceManager::Instance::shutDown()
 {
     state = WANING;
+    std::cout << "Stopping Synth-Instance("<< getID() << ")..."<< std::endl;
     runtime().runSynth.store(false, std::memory_order_release); // signal to synth and background threads
-    client->close();
+    synth->saveBanks();
+    client->close();  // may block until background threads terminate
     runtime().flushLog();
     state = DEFUNCT;
 }
@@ -338,7 +370,6 @@ bool InstanceManager::bootPrimary(int argc, char *argv[])
     CmdOptions baseSettings(argc,argv);
     Instance& primary = groom->createInstance(0);
     baseSettings.applyTo(primary.runtime());
-    //////////////////////////////////////////OOO TODO ensure that further special handling for the primary is done!!
     return primary.startUp();
 }
 
@@ -367,9 +398,11 @@ uint InstanceManager::requestNewInstance(uint desiredID)
 void InstanceManager::triggerRestoreInstances()
 {
     assert (1 == groom->instanceCnt());
-    for (uint id=1; id<MAX_INSTANCES; ++id)
-        if (groom->getPrimary().runtime().activeInstances.test(id))
-            groom->createInstance(id);
+    Config& cfg{accessPrimaryConfig()};
+    if (cfg.autoInstance)
+        for (uint id=1; id<MAX_INSTANCES; ++id)
+            if (cfg.activeInstances.test(id))
+                groom->createInstance(id);
 }
 
 /**
@@ -406,6 +439,7 @@ void InstanceManager::performWhileActive(function<void(SynthEngine&)> handleEven
 {
     while (groom->getPrimary().runtime().runSynth.load(std::memory_order_acquire))
     {
+        groom->getPrimary().runtime().signalCheck();
         groom->dutyCycle(handleEvents);
         std::this_thread::yield();
     }     // tiny break allowing other threads to acquire the mutex
@@ -452,7 +486,10 @@ void InstanceManager::SynthGroom::handleStartRequest()
     for (auto& [_,instance] : registry)
         if (PENDING == instance.getState())
         {
-            instance.startUp();
+            bool success = instance.startUp();
+            if (not success)
+                primary->runtime().Log("FAILED to launch Synth-Instance("
+                                      +asString(instance.getID())+")", _SYS_::LogError);
             return;  // only one per duty cycle
         }
 }
@@ -461,12 +498,49 @@ void InstanceManager::SynthGroom::clearZombies()
 {
     for (auto it = registry.begin(); it != registry.end();)
     {
-        if (it->second.getState() == DEFUNCT)
+        Instance& instance{it->second};
+        if (instance.getState() == DEFUNCT
+                and not instance.isPrimary())
             it = registry.erase(it);
         else
             ++it;
     }
 }
+
+
+/** invoked when leaving main-event-thread because primary synth stopped */
+void InstanceManager::performShutdownActions()
+{
+    groom->persistRunningInstances();
+    groom->getPrimary().getSynth().saveHistory();
+}
+
+/** detect all instances currently running and store this information persistently */
+void InstanceManager::SynthGroom::persistRunningInstances()
+{
+    auto& cfg = getPrimary().runtime();
+    cfg.activeInstances.reset();
+    cfg.activeInstances.set(0); // always mark the primary
+    for (auto& [id,instance] : registry)
+        if (instance.getState() == RUNNING
+                and instance.runtime().runSynth.load(std::memory_order_acquire))
+            cfg.activeInstances.set(id);
+    // persist the running instances
+    cfg.saveMasterConfig();
+}
+
+/** terminate and disconnect all IO on all instances */
+void InstanceManager::disconnectAll()
+{
+    groom->shutdownRunningInstances();
+}
+void InstanceManager::SynthGroom::shutdownRunningInstances()
+{
+    for (auto& [_,instance] : registry)
+        if (instance.getState() == RUNNING)
+            instance.shutDown();
+}
+
 
 /**
  * Allocate an unique Synth-ID not yet in use.
@@ -509,19 +583,33 @@ void InstanceManager::Instance::buildGuiMaster()
 #ifdef GUI_FLTK
     MasterUI& guiMaster = synth->interchange.createGuiMaster();
     guiMaster.Init();
+
+    if (runtime().audioEngine < 1)
+        alert(synth.get(), "Yoshimi could not connect to any sound system. Running with no Audio.");
+    if (runtime().midiEngine < 1)
+        alert(synth.get(), "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
 #endif
 }
 
 void InstanceManager::Instance::enterRunningState()
 {
-    // trigger post-boot-Hook to run in the Synth-thread...
+    triggerPostBootHook();
+    registerAudioPorts();
+
+    // this instance is now in fully operational state...
+    state = RUNNING;
+}
+
+/** send command to invoke the SynthEngine::postBootHook() in the Synth-thread */
+void InstanceManager::Instance::triggerPostBootHook()
+{
     CommandBlock triggerMsg;
 
     triggerMsg.data.type    = TOPLEVEL::type::Integer | TOPLEVEL::type::Write;
     triggerMsg.data.control = TOPLEVEL::control::dataExchange;
     triggerMsg.data.part    = TOPLEVEL::section::main;
     triggerMsg.data.source  = TOPLEVEL::action::noAction;
-    //                               // Important: not(action::lowPrio) since we want direct execution in Synth
+    //                               // Important: not(action::lowPrio) since we want direct execution in Synth-thread
     triggerMsg.data.offset    = UNUSED;
     triggerMsg.data.kit       = UNUSED;
     triggerMsg.data.engine    = UNUSED;
@@ -534,8 +622,18 @@ void InstanceManager::Instance::enterRunningState()
 
     // MIDI ringbuffer is the only one always active
     synth->interchange.fromMIDI.write(triggerMsg.bytes);
+}
 
-    // this instance is now in fully operational state...
-    runtime().activeInstances.set(this->getID());
-    state = RUNNING;
+void InstanceManager::Instance::registerAudioPorts()
+{
+    for (uint portNum=0; portNum < NUM_MIDI_PARTS; ++portNum)
+        if (synth->partonoffRead(portNum))
+            client->registerAudioPort(portNum);
+}
+
+void InstanceManager::registerAudioPort(uint synthID, uint portNum)
+{
+    auto& instance = groom->find(synthID);
+    if (isLimited(0u, portNum, uint(NUM_MIDI_PARTS-1)))
+        instance.getClient().registerAudioPort(portNum);
 }

@@ -405,7 +405,7 @@ bool YoshimiLV2Plugin::init()
     }
     if (synth.getUniqueId() == 0)
     {
-        firstSynth = synth;
+//      firstSynth = synth;   ////////////////////////////////OOO boooooooooo
         //firstSynth->getRuntime().Log("Started first");
     }
 
@@ -894,7 +894,3 @@ int mainCreateNewInstance(unsigned int) //stub
 }
 
 
-void mainRegisterAudioPort(SynthEngine *, int ) //stub
-{
-
-}

@@ -31,6 +31,7 @@
 #include <functional>
 #include <memory>
 
+class Config;
 class SynthEngine;
 
 
@@ -65,6 +66,12 @@ class InstanceManager
 
         /** Event handling loop during regular operation */
         void performWhileActive(std::function<void(SynthEngine&)> handleEvents);
+        void performShutdownActions();
+        void disconnectAll();
+
+        Config& accessPrimaryConfig();
+        SynthEngine& findSynthByID(uint);
+        void registerAudioPort(uint synth, uint port);
 };
 
 

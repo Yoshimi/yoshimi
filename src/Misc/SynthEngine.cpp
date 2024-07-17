@@ -79,10 +79,7 @@ using std::cout;
 using std::endl;
 
 
-extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
-map<SynthEngine *, MusicClient *> synthInstances;
-SynthEngine *firstSynth = NULL;
 
 namespace { // Global implementation internal history data
     static vector<string> InstrumentHistory;
@@ -412,23 +409,17 @@ void SynthEngine::publishGuiAnchor()
 
 
 /**
- * This callback is triggered whenever a new Synth instance becomes fully operational.
+ * This callback is triggered whenever a new SynthEngine instance becomes fully operational.
  * If running with GUI, the GuiMaster has been created and communication via GuiDataExchange
  * has been primed
  */
-bool SynthEngine::postGuiStartHook()
+void SynthEngine::postBootHook()
 {
     if (0 == getUniqueId())
         loadHistory();
     installBanks();
-    Part& currPart{*part[getRuntime().currentPart]};
-    if (currPart.Pname != DEFAULT_NAME || currPart.Poriginal != UNTITLED)
-    {// Heuristics that probably an early load via config took place
-        maybePublishEffectsToGui();
-        return true; // push "control::masterReset" into GUI
-    }
-    return false;
-}
+    maybePublishEffectsToGui();
+}// push "control::masterReset" into GUI
 
 
 #ifdef GUI_FLTK
@@ -2028,7 +2019,7 @@ void SynthEngine::resetAll(bool andML)
 
 
 // Enable/Disable a part
-void SynthEngine::partonoffLock(int npart, int what)
+void SynthEngine::partonoffLock(uint npart, int what)
 {
     sem_wait(&partlock);
     partonoffWrite(npart, what);
@@ -2039,9 +2030,9 @@ void SynthEngine::partonoffLock(int npart, int what)
  * Intelligent switch for unknown part status that always
  * switches off and later returns original unknown state
  */
-void SynthEngine::partonoffWrite(int npart, int what)
+void SynthEngine::partonoffWrite(uint npart, int what)
 {
-    if (npart >= Runtime.NumAvailableParts)
+    if (npart >= uint(Runtime.NumAvailableParts))
         return;
     unsigned char original = part[npart]->Penabled;
     if (original > 1)
@@ -2077,7 +2068,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         {
-            if (Pinsparts[nefx] == npart)
+            if (Pinsparts[nefx] == int(npart))
                 insefx[nefx]->cleanup();
         }
         VUpeak.values.parts[npart] = -1.0f;
@@ -2086,7 +2077,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
 }
 
 
-char SynthEngine::partonoffRead(int npart)
+char SynthEngine::partonoffRead(uint npart)
 {
     return (part[npart]->Penabled == 1);
 }
@@ -3140,7 +3131,7 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
         part[npart]->getfromXML(xml);
         xml.exitbranch();
         if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
-            mainRegisterAudioPort(this, npart);
+            Config::instances().registerAudioPort(getUniqueId(), npart);
     }
 
     if (xml.enterbranch("MICROTONAL"))
@@ -3210,21 +3201,6 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
     // possibly push changed effect state to GUI
     maybePublishEffectsToGui();
     return true;
-}
-
-
-SynthEngine *SynthEngine::getSynthFromId(unsigned int uniqueId)
-{
-    map<SynthEngine *, MusicClient *>::iterator itSynth;
-    SynthEngine *synth;
-    for (itSynth = synthInstances.begin(); itSynth != synthInstances.end(); ++ itSynth)
-    {
-        synth = itSynth->first;
-        if (synth->getUniqueId() == uniqueId)
-            return synth;
-    }
-    synth = synthInstances.begin()->first;
-    return synth;
 }
 
 

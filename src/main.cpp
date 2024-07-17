@@ -2,7 +2,8 @@
     main.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2021, Will Godfrey & others
+    Copyright 2014-2024, Will Godfrey & others
+    Copyright 2024, Ichthyostega
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -42,7 +43,7 @@
     #include <FL/Fl.H>
     #include <FL/Fl_Window.H>
     #include <FL/Fl_PNG_Image.H>
-    #include "Misc/Splash.h"
+    #include "UI/Splash.h"
 #endif
 
 using std::this_thread::sleep_for;
@@ -50,23 +51,14 @@ using std::chrono_literals::operator ""us;
 using std::chrono_literals::operator ""ms;
 
 
-extern map<SynthEngine *, MusicClient *> synthInstances;
-extern SynthEngine *firstSynth;
 
 // used by automated test launched via CLI
 std::atomic <bool> waitForTest{false};
 
-
-void mainRegisterAudioPort(SynthEngine *s, int portnum);
-int mainCreateNewInstance(unsigned int forceId);
-Config *firstRuntime = NULL;
-
-bool bShowGui = true;
 bool showSplash = false;
-bool bShowCmdLine = true;
 bool isSingleMaster = false;
 bool splashSet = true;
-bool configuring = false;
+
 #ifdef GUI_FLTK
 time_t old_father_time, here_and_now;
 #endif
@@ -76,32 +68,6 @@ time_t old_father_time, here_and_now;
 static struct sigaction yoshimiSigAction;
 
 
-//////////////////////////////////////////////////////////////////////////////////OOO move instance launching -> InstanceManager
-void newBlock()
-{
-    for (int i = 1; i < 32; ++i)
-    {
-        if ((firstRuntime->activeInstance_OBSOLETE >> i) & 1)
-        {
-            while (configuring)
-                sleep_for(1ms);
-            // in case there is still an instance starting from elsewhere
-            configuring = true;
-            mainCreateNewInstance(i);
-            configuring = false;
-        }
-    }
-}
-
-
-void newInstance()
-{
-    while (configuring)
-        sleep_for(1ms);
-    // in case there is still an instance starting from elsewhere
-    configuring = true;
-    startInstance = 0x81;
-}
 
 
 void yoshimiSigHandler(int sig)
@@ -112,17 +78,16 @@ void yoshimiSigHandler(int sig)
         case SIGHUP:
         case SIGTERM:
         case SIGQUIT:
-            firstRuntime->setInterruptActive();
+            Config::primary().setInterruptActive();
             break;
 
         case SIGUSR1:
-            firstRuntime->setLadi1Active();
+            Config::primary().setLadi1Active();
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
         case SIGUSR2: // start next instance
             if (isSingleMaster)
                 Config::instances().handleNewInstanceSignal();
-//              newInstance(); ///////////////////////////////////////OOO cleanup newInstance
             sigaction(SIGUSR2, &yoshimiSigAction, NULL);
             break;
         default:
@@ -131,15 +96,16 @@ void yoshimiSigHandler(int sig)
 }
 
 
-static void *mainThread(void *arg)
-{
-#ifndef GUI_FLTK
-    bShowGui = false; // just to be sure
-#endif
-    sem_post((sem_t *)arg);
-    map<SynthEngine *, MusicClient *>::iterator it;
 
-#ifdef GUI_FLTK
+
+static void *mainThread(void*)
+{
+    bool showGUI = Config::primary().showGui;
+    InstanceManager& instanceManager{Config::instances()};
+
+#ifndef GUI_FLTK
+    assert (not showGUI);
+#else
     const int textHeight = 15;
     const int textY = 10;
     const unsigned char lred = 0xd7;
@@ -150,10 +116,8 @@ static void *mainThread(void *arg)
     int timeout =3;
     std::string startup = YOSHIMI_VERSION;
 
-    if (bShowGui)
+    if (showGUI)
     {
-        Fl::lock();
-
         if (showSplash)
         {
             startup = "V " + startup;
@@ -176,14 +140,14 @@ static void *mainThread(void *arg)
             LbH = winH -4;
             timeout = 3;
         }
-    }//bShowGui
+    }
 
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
     Fl_Window winSplash(winW, winH, "yoshimi splash screen");
     Fl_Box box(0, 0, winW,winH);
     Fl_Box boxLb(LbX, LbY, LbW, LbH, startup.c_str());
 
-    if (bShowGui)
+    if (showGUI)
     {
         if (showSplash)
         {
@@ -203,73 +167,30 @@ static void *mainThread(void *arg)
             boxLb.labelcolor(0x0000e100);
         }
         winSplash.border(false);
-        if (splashSet && bShowGui)
+        if (splashSet && showGUI)
         {
             winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
         }
         else
             splashSet = false;
-        do
-        {
-            winSplash.show();
-            sleep_for(33333us);
-        }
-        while (firstSynth == NULL); // just wait
+
+        winSplash.show();
     }
-    else /* not bShowGui */
 #endif /*GUI_FLTK*/
-    {
-        while (firstSynth == NULL); // just wait
-    }
 
 
-    if (firstRuntime->autoInstance)
-        newBlock();
-    while (firstRuntime->runSynth)
-    {
-        firstRuntime->signalCheck();
+    instanceManager.triggerRestoreInstances();
+    instanceManager.performWhileActive(
+    [&](SynthEngine& synth)
+        {// Duty-cycle : Event-handling
 
-    //////////////////////////////////////////////////////////////////////////////////OOO move instance launching -> InstanceManager
-        for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
-        {
-            SynthEngine *_synth = it->first;
-            MusicClient *_client = it->second;
-            if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
-            {
-                unsigned int instanceID =  _synth->getUniqueId();
-                if (_client)
-                {
-                    _client->close();
-                    delete _client;
-                }
-
-                if (_synth)
-                {
-                    int instancebit = (1 << instanceID);
-                    if (_synth->getRuntime().activeInstance_OBSOLETE & instancebit)
-                        _synth->getRuntime().activeInstance_OBSOLETE -= instancebit;
-                    _synth->saveBanks();
-                    _synth->getRuntime().flushLog();
-                    delete _synth;
-                }
-
-                synthInstances.erase(it);
-                std::cout << "\nStopped " << instanceID << "\n";
-                break;
-            }
 #ifdef GUI_FLTK
-            if (bShowGui)
-            {
-                MasterUI *guiMaster = _synth->getGuiMaster();
-                if (guiMaster)
-                {
-                    if (guiMaster->masterwindow)
-                    {
-                        guiMaster->checkBuffer();
-                    }
-                }
-                else
-                    GuiThreadMsg::processGuiMessages();
+            if (showGUI)
+            {// where all the action is ...
+                MasterUI *guiMaster = synth.getGuiMaster();
+                assert(guiMaster);
+                if (guiMaster->masterwindow)
+                    guiMaster->checkBuffer();
                 Fl::wait(33333);
 
                 if (splashSet)
@@ -286,23 +207,11 @@ static void *mainThread(void *arg)
                         winSplash.hide();
                     }
                 }
-
-            }
-#endif
-        }
-
-        // where all the action is ...
-        if (startInstance > 0x80)
-        {
-            int testInstance = startInstance &= 0x7f;
-            configuring = true;
-            mainCreateNewInstance(testInstance);
-            configuring = false;
-            startInstance = testInstance; // to prevent repeats!
-        }
-        if (!bShowGui)
+            }// if(showGUI)
+            else
+#endif/*GUI_FLTK*/
             sleep_for(33333us);
-    }
+        });//(End) Duty-cycle : Event-handling
 
     if (waitForTest)
         // After launching an automated test,
@@ -310,108 +219,20 @@ static void *mainThread(void *arg)
         // Test runs single threaded and we do not want to persist test state.
         return NULL;
 
-    firstSynth->saveHistory();
-    firstSynth->saveBanks(); /////////////////////////////////////OOO must do this via InstanceManager....
+    instanceManager.performShutdownActions();
 
     return NULL;
 }
 
-int mainCreateNewInstance(unsigned int forceId)
+
+void *commandThread(void *)
 {
-    //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
-    MusicClient *musicClient = NULL;
-    unsigned int instanceID;
-    SynthEngine *synth = new SynthEngine(forceId);
-//    if (!synth->getRuntime().isRuntimeSetupCompleted())  /////////////////OOO sort out LV2 init; Config::setup() now invoked explicitly from Instance::startUp()
-//        goto bail_out;
-    instanceID = synth->getUniqueId();
-    if (!synth)
-    { // this has to be a direct call - no synth for log!
-        std::cerr << "Failed to allocate SynthEngine" << std::endl;
-        goto bail_out;
-    }
-
-/*
-    if (!(musicClient = MusicClient::newMusicClient(synth)))
-    {
-        synth->getRuntime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
-        goto bail_out;
-    }
-*/
-
-    if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
-    {
-        synth->getRuntime().Log("SynthEngine init failed",_SYS_::LogError);
-        goto bail_out;
-    }
-
-    if (!musicClient->start())
-    {
-        synth->getRuntime().Log("Failed to start MusicIO",_SYS_::LogError);
-        goto bail_out;
-    }
-#ifdef GUI_FLTK
-    if (synth->getRuntime().showGui)
-    {
-        synth->setWindowTitle(musicClient->midiClientName());
-        if (firstSynth != NULL) //FLTK is not ready yet - send this message later for first synth
-        {
-///////////////////////////////////////////////////////////////////////////////////////////////////OOO obsolete, now done via Synth.Init() -> Ringbuffer            
-//          size_t slotIDX = synth->publishGuiAnchor();
-//          GuiThreadMsg::sendMessage(&synth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
-        }
-    }
-    else
-        synth->getRuntime().toConsole = false;
-#else
-    synth->getRuntime().toConsole = false;
-#endif
-    synth->getRuntime().startupReport(musicClient->midiClientName());
-
-    if (instanceID == 0)
-        std::cout << "\nYay! We're up and running :-)\n";
-    else
-    {
-        std::cout << "\nStarted "<< instanceID << "\n";
-        // following copied here for other instances
-        synth->installBanks(); /////////////////////////////////////////OOO must care to get those post-boot-actions performed
-    }
-
-    synthInstances.insert(std::make_pair(synth, musicClient));
-    //register jack ports for enabled parts
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (synth->partonoffRead(npart))
-            mainRegisterAudioPort(synth, npart);
-    }
-    synth->getRuntime().activeInstance_OBSOLETE |= (1 << instanceID);
-    return instanceID;
-
-bail_out:
-    synth->getRuntime().runSynth = false;
-    synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
-    if (musicClient)
-    {
-        musicClient->close();
-        delete musicClient;
-    }
-    if (synth)
-    {
-        synth->getRuntime().flushLog();
-        delete synth;
-    }
-
-    return -1;
-}
-
-void *commandThread(void *) // silence warning (was *arg = NULL)
-{
-    CmdInterface commandInit;
-    commandInit.cmdIfaceCommandLoop();
+    CmdInterface cli;
+    cli.cmdIfaceCommandLoop();
     return 0;
 }
 
-std::string runCommand(std::string command)
+std::string runShellCommand(std::string command)
 {
     string returnLine = "";
     file::cmd2string(command, returnLine);
@@ -419,6 +240,12 @@ std::string runCommand(std::string command)
     return returnLine;
 }
 
+
+
+
+/******************************//**
+ * Run the Yoshimi Application
+ */
 int main(int argc, char *argv[])
 {
     /*
@@ -460,15 +287,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    auto& instances = Config::instances();
-    ////////////////////////////////////////////////////////////////////////////OOO instance handling -> InstanceManager
     if (isSingleMaster)
     {
 
-        std::string firstText = runCommand("pgrep -o -x yoshimi");
+        std::string firstText = runShellCommand("pgrep -o -x yoshimi");
         int firstpid = std::stoi(firstText);
-        int firstTime = std::stoi(runCommand("ps -o etimes= -p " + firstText));
-        int secondTime = std::stoi(runCommand("ps -o etimes= -p " + std::to_string(getpid())));
+        int firstTime = std::stoi(runShellCommand("ps -o etimes= -p " + firstText));
+        int secondTime = std::stoi(runShellCommand("ps -o etimes= -p " + std::to_string(getpid())));
         if ((firstTime - secondTime) > 0)
         {
                 kill(firstpid, SIGUSR2); // send message to 1st instance
@@ -476,11 +301,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    std::list<std::string> allArgs;
+    std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
 
-    ////////////////////////////////////////////////////////////////////////////////OOO parse CmdOptions and pass them to the primarySynth!
-//  CmdOptions(argc, argv);
-    bool mainThreadStarted = false;
 
 #ifdef GUI_FLTK
     time(&old_father_time);
@@ -489,85 +311,60 @@ int main(int argc, char *argv[])
 
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
-
-    std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
-
-    //////////////////////////////////////////////////////////////////////////////////OOO move start of first instance -> InstanceManager
     bool bExitSuccess = false;
-    map<SynthEngine *, MusicClient *>::iterator it;
+    bool mainThreadStarted = false;
 
-    pthread_t threadMainLoop;
-    pthread_attr_t pthreadAttr;
-    sem_t semMain;
 
-    if (mainCreateNewInstance(0) == -1)
+    if (not Config::instances().bootPrimary(argc,argv))
     {
         goto bail_out;
     }
 
-    it = synthInstances.begin();
-    firstRuntime = &it->first->getRuntime();
-    firstSynth = it->first;
-    bShowGui = firstRuntime->showGui;
-    bShowCmdLine = firstRuntime->showCli;
-
-    if (firstRuntime->oldConfig)
+    if (Config::primary().oldConfig)
     {
 
         std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings.\n"<< std::endl;
     }
-    if (sem_init(&semMain, 0, 0) == 0)
-    {
+
+    pthread_t threadMainLoop;
+    pthread_attr_t pthreadAttr;
         if (pthread_attr_init(&pthreadAttr) == 0)
         {
-            if (pthread_create(&threadMainLoop, &pthreadAttr, mainThread, (void *)&semMain) == 0)
+            if (pthread_create(&threadMainLoop, &pthreadAttr, mainThread, nullptr) == 0)
                 mainThreadStarted = true;
             pthread_attr_destroy(&pthreadAttr);
         }
-    }
 
     if (!mainThreadStarted)
     {
         std::cout << "Yoshimi can't start main loop!" << std::endl;
         goto bail_out;
     }
-    sem_wait(&semMain);
-    sem_destroy(&semMain);
 
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGUSR1 handler failed",_SYS_::LogError);
+        Config::primary().Log("Setting SIGUSR1 handler failed",_SYS_::LogError);
     if (sigaction(SIGUSR2, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGUSR2 handler failed",_SYS_::LogError);
+        Config::primary().Log("Setting SIGUSR2 handler failed",_SYS_::LogError);
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGINT handler failed",_SYS_::LogError);
+        Config::primary().Log("Setting SIGINT handler failed",_SYS_::LogError);
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGHUP handler failed",_SYS_::LogError);
+        Config::primary().Log("Setting SIGHUP handler failed",_SYS_::LogError);
     if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGTERM handler failed",_SYS_::LogError);
+        Config::primary().Log("Setting SIGTERM handler failed",_SYS_::LogError);
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        firstRuntime->Log("Setting SIGQUIT handler failed",_SYS_::LogError);
-    // following moved here for faster first synth startup
-    firstSynth->loadHistory();
-    firstSynth->installBanks();
-#ifdef GUI_FLTK
-    if (bShowGui)
-    {
-///////////////////////////////////////////////////////////////////////////////////////////////////OOO obsolete, now done via Synth.Init() -> Ringbuffer            
-//      size_t slotIDX = firstSynth->publishGuiAnchor();
-//      GuiThreadMsg::sendMessage(&firstSynth->interchange, GuiThreadMsg::NewSynthEngine, slotIDX);
-    }
-#endif
+        Config::primary().Log("Setting SIGQUIT handler failed",_SYS_::LogError);
+
 
     //create command line processing thread
     pthread_t threadCmd;
 
-    if (bShowCmdLine)
+    if (Config::primary().showCli)
     {
         if (pthread_attr_init(&pthreadAttr) == 0)
         {
-            if (pthread_create(&threadCmd, &pthreadAttr, commandThread, (void *)firstSynth) == 0)
+            if (pthread_create(&threadCmd, &pthreadAttr, commandThread, nullptr) == 0)
             {
                 ;
             }
@@ -575,10 +372,10 @@ int main(int argc, char *argv[])
         }
     }
 
-//firstRuntime->Log("test normal msg");
-//firstRuntime->Log("test not serious",_SYS_::LogNotSerious);
-//firstRuntime->Log("test error msg",_SYS_::LogError);
-//firstRuntime->Log("test not serious error",_SYS_::LogNotSerious | _SYS_::LogError);
+//Config::primary().Log("test normal msg");
+//Config::primary().Log("test not serious",_SYS_::LogNotSerious);
+//Config::primary().Log("test error msg",_SYS_::LogError);
+//Config::primary().Log("test not serious error",_SYS_::LogNotSerious | _SYS_::LogError);
 
     void *res;
     pthread_join(threadMainLoop, &res);
@@ -586,11 +383,11 @@ int main(int argc, char *argv[])
     {
         goto bail_out;
     }
+
+    Config::instances().disconnectAll();
+
     if (waitForTest && threadCmd)
     {   // CLI about to launch TestRunner for automated test
-        MusicClient* music = synthInstances[firstSynth];
-        if (music) music->close(); // causes esp. JackClient to detach
-
         pthread_join(threadCmd, &res);
         if (res == (void *)1)
         {
@@ -600,36 +397,12 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    // firstSynth is freed in the for loop below, so save this for later
-////////////////////////////////////////////////////////////////////////////////////////OOO rework: shut-down now done by InstanceManager
-    int exitType = firstSynth->getRuntime().exitType;
-    for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
-    {
-        SynthEngine *_synth = it->first;
-        MusicClient *_client = it->second;
-        _synth->getRuntime().runSynth = false;
-        if (!bExitSuccess)
-        {
-            _synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
-        }
-
-        if (_client)
-        {
-            _client->close();
-            delete _client;
-        }
-
-        if (_synth)
-        {
-            _synth->getRuntime().flushLog();
-            delete _synth;
-        }
-    }
-////////////////////////////////////////////////////////////////////////////////////////OOO (END): shut-down now done by InstanceManager
-    if (bShowCmdLine)
+    if (Config::primary().showCli)
         tcsetattr(0, TCSANOW, &oldTerm);
+
     if (bExitSuccess)
     {
+        int exitType = Config::primary().exitType;
         if (exitType == FORCED_EXIT)
             std::cout << "\nExit was forced :(" << std::endl;
         else
@@ -637,17 +410,8 @@ bail_out:
         exit(exitType);
     }
     else
-        exit(EXIT_FAILURE);
-}
-
-void mainRegisterAudioPort(SynthEngine *s, int portnum)
-{
-    if (s && (portnum < NUM_MIDI_PARTS) && (portnum >= 0))
     {
-        map<SynthEngine *, MusicClient *>::iterator it = synthInstances.find(s);
-        if (it != synthInstances.end())
-        {
-            it->second->registerAudioPort(portnum);
-        }
+        Config::primary().Log("Those evil-natured robots are programmed to destroy us...", _SYS_::LogError);
+        exit(EXIT_FAILURE);
     }
 }

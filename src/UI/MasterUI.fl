@@ -503,7 +503,7 @@ class MasterUI {: {public GuiUpdates}
             if (close)
             {
                 if (force)
-                    firstSynth->getRuntime().exitType = FORCED_EXIT;
+                    Config::primary().exitType = FORCED_EXIT;
                     /*
                     * The above line shouldn't be necessary!
                     * It works fine on jack but fails on ALSA.
