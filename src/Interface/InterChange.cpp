@@ -3564,9 +3564,8 @@ void InterChange::commandMain(CommandBlock *getData)
         case TOPLEVEL::control::dataExchange:
             // this trigger is sent immediately after a new instance becomes operational
             synth->postBootHook();
-            getData->data.control = MAIN::control::masterReset;
             getData->data.source  = TOPLEVEL::action::toAll | TOPLEVEL::action::forceUpdate;
-                                    // cause InterChange::returns() to push masterReset into GUI
+                              //    cause InterChange::returns() to also to forward this into GUI -> MasterUI::refreshInit()
             break;
         case MAIN::control::undo:
         case MAIN::control::redo:

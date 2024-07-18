@@ -314,6 +314,12 @@ bool InstanceManager::Instance::startUp()
             runtime().Log("SynthEngine init failed",_SYS_::LogError);
         else
         {
+            if (isPrimary())
+                synth->loadHistory();
+            // discover persistent bank file structure
+            synth->installBanks();
+            //
+            // Note: the following launches or connects to the processing threads
             if (not client->start())
                 runtime().Log("Failed to start MusicIO",_SYS_::LogError);
             else

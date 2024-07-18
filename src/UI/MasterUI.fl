@@ -494,6 +494,14 @@ class MasterUI {: {public GuiUpdates}
 
     return (fetchO != 0);} {}
   }
+  Function {refreshInit()} {} {
+    code {// update to current state and refresh sub-UIs and config
+    refresh_master_ui(1);
+    resetPartsClip();
+    bankui->readbankcfg();
+    bankui->rescan_for_banks();
+    //} {}
+  }
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}

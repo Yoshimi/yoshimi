@@ -1299,6 +1299,10 @@ string DataText::resolveMain(CommandBlock *getData, bool addValue)
             showValue = false;
             contstr = "Reset All including MIDI-learn";
             break;
+        case TOPLEVEL::control::dataExchange:
+            showValue = false;
+            contstr = "Engine initialised";
+            break;
 
         case MAIN::control::openManual:
             showValue = false;

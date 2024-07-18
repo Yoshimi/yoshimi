@@ -260,11 +260,17 @@ void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     //synth->CBtest(getData);
 
-    if (control == TOPLEVEL::control::dataExchange && npart == TOPLEVEL::section::message)
-    {// push data messages via GuiDataExchange -> deliver directly to MirrorData receivers
-        synth->interchange.guiDataExchange.dispatchUpdates(*getData);
-        return;
-    }
+    if (control == TOPLEVEL::control::dataExchange)
+    {
+        if (npart == TOPLEVEL::section::message)
+        {// push data messages via GuiDataExchange -> deliver directly to MirrorData receivers
+            synth->interchange.guiDataExchange.dispatchUpdates(*getData);
+            return;
+        }
+        else if (npart == TOPLEVEL::section::main)
+        {// Global refresh when SynthEngine becomes ready
+            synth->getGuiMaster()->refreshInit();
+    }   }
 
     if (control == TOPLEVEL::control::copyPaste)
     {

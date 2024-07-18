@@ -415,11 +415,12 @@ void SynthEngine::publishGuiAnchor()
  */
 void SynthEngine::postBootHook()
 {
-    if (0 == getUniqueId())
-        loadHistory();
-    installBanks();
+    /////TODO : add here generic things to init post-boot
+    //
     maybePublishEffectsToGui();
-}// push "control::masterReset" into GUI
+    // more initial push-updates will be added here...
+    //
+}// note InterChange::commandMain() will also push into GUI: (control=control::dataExchange, part=section::main)
 
 
 #ifdef GUI_FLTK
