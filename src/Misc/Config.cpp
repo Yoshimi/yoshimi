@@ -488,11 +488,11 @@ bool Config::updateConfig(int control, int value)
             baseData[CONFIG::control::enableGUI] = xml->getparbool("enable_gui",true);
             baseData[CONFIG::control::showSplash] = xml->getparbool("enable_splash",true);
             baseData[CONFIG::control::enableCLI] = xml->getparbool("enable_cli",true);
-            baseData[CONFIG::control::exposeStatus] = xml->getpar("show_cli_context",0,3,3);
+            baseData[CONFIG::control::exposeStatus] = xml->getpar("show_cli_context",3,0,3);
             baseData[CONFIG::control::enableSinglePath] = xml->getparbool("enable_single_master",false);
             baseData[CONFIG::control::enableAutoInstance] = xml->getparbool("enable_auto_instance",false);
             baseData[CONFIG::control::handlePadSynthBuild] = xml->getparU("handle_padsynth_build",0);
-            baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",0,3,9);
+            baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",3,0,9);
 
             instances = xml->getparU("active_instances",1); // this is system defined
             xml->exitbranch(); // BASE_PARAMETERS
