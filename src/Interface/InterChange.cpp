@@ -1412,7 +1412,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
             if (write)
             {
                 text = synth->getRuntime().ConfigFile;
-                if (synth->getRuntime().saveConfig())
+                if (synth->getRuntime().saveInstanceConfig())
                     text = "d " + text;
                 else
                     text = " FAILED " + text;

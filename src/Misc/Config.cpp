@@ -72,11 +72,12 @@ namespace { // Implementation details...
 
 unsigned char panLaw = 1;
 
-bool         Config::showSplash = true;
-bool         Config::autoInstance = false;
+bool         Config::showSplash{true};
+bool         Config::singlePath{false};
+bool         Config::autoInstance{false};
 unsigned int Config::activeInstance_OBSOLETE = 0;
 bitset<32>   Config::activeInstances{0};
-int          Config::showCLIcontext = 1;
+int          Config::showCLIcontext{1};
 
 string Config::globalJackSessionUuid = "";
 
@@ -128,7 +129,6 @@ Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
     showCli(true),
     storedCli(true),
     cliChanged(false),
-    singlePath(false),
     banksChecked(false),
     panLaw(1),
     configChanged(false),
@@ -166,27 +166,13 @@ Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
 { }
 
 
-void Config::setup()
+void Config::setup(bool isLV2Plugin)
 {
     std::cerr.precision(4);
-/*
-    if (isLV2Plugin)  ///////////////////////////////////////////////////OOO need better way to do a special handling for LV2
-    {
-        //Log("LV2 only");
-        if (!loadConfig())
-            Log("\n\nCould not load config. Using default values.\n");
-        //skip further setup, which is irrelevant for lv2 plugin instance.
-        return;
-    }
-*/
 
-    //Log("Standalone Only");
-    if (!loadConfig())
-    {
-        string message = "Could not load config. Using default values.";
-        TextMsgBuffer::instance().push(message); // needed for CLI
-        Log("\n\n" + message + "\n");
-    }
+    if (isLV2Plugin)  ///////////////////////////////////////////////////OOO need better way to do a special handling for LV2
+        return; //skip further setup, which is irrelevant for LV2 plugin instance.
+
 
     switch (audioEngine)
     {
@@ -233,6 +219,68 @@ Config::~Config()
 {;}
 
 
+/**
+ * when starting a new instance without pre-existing instance config,
+ * fill in some relevant base settings from the primary config.
+ */
+void Config::populateFromPrimary()
+{
+    assert (0 < synth->getUniqueId());
+    Config& primary = instances().accessPrimaryConfig();
+
+    // The following are actually base config values,
+    // yet unfortunately they are duplicated in each config instance,
+    // and thus undesirable default values can sometimes spread around,
+    // since parts of the code blindly use the values from current Synth.
+    handlePadSynthBuild = primary.handlePadSynthBuild;
+    GzipCompression     = primary.GzipCompression;
+    guideVersion        = primary.guideVersion;
+    manualFile          = primary.manualFile;
+
+    // The following are instance settings, yet still desirable to initialise
+    // with the values from the primary engine instance in case a config is missing
+    paramsLoad          = primary.paramsLoad;
+    instrumentLoad      = primary.instrumentLoad;
+    load2part           = primary.load2part;
+    midiLearnLoad       = primary.midiLearnLoad;
+    rootDefine          = primary.rootDefine;
+    lastXMLmajor        = primary.lastXMLmajor;
+    lastXMLminor        = primary.lastXMLminor;
+    VirKeybLayout       = primary.VirKeybLayout;
+    audioEngine         = primary.audioEngine;
+    midiEngine          = primary.midiEngine;
+    alsaMidiType        = primary.alsaMidiType;
+    connectJackaudio    = primary.connectJackaudio;
+    loadDefaultState    = primary.loadDefaultState;
+    Interpolation       = primary.Interpolation;
+//presetsDirlist                                        /////TODO shouldn't we populate these too? if yes -> use a STL container (e.g. std::array), which can be bulk copied
+    instrumentFormat    = primary.instrumentFormat;
+    EnableProgChange    = primary.EnableProgChange;
+    toConsole           = primary.toConsole;
+    consoleTextSize     = primary.consoleTextSize;
+    hideErrors          = primary.hideErrors;
+    showTimes           = primary.showTimes;
+    logXMLheaders       = primary.logXMLheaders;
+    xmlmax              = primary.xmlmax;
+    Samplerate          = primary.Samplerate;
+    Buffersize          = primary.Buffersize;
+    Oscilsize           = primary.Oscilsize;
+    panLaw              = primary.panLaw;
+    midi_bank_root      = primary.midi_bank_root;
+    midi_bank_C         = primary.midi_bank_C;
+    midi_upper_voice_C  = primary.midi_upper_voice_C;
+    enable_NRPN         = primary.enable_NRPN;
+    ignoreResetCCs      = primary.ignoreResetCCs;
+    monitorCCin         = primary.monitorCCin;
+    showLearnedCC       = primary.showLearnedCC;
+    bankHighlight       = primary.bankHighlight;
+    presetsRootID       = primary.presetsRootID;
+    channelSwitchType   = primary.channelSwitchType;
+    channelSwitchCC     = primary.channelSwitchCC;
+    channelSwitchValue  = primary.channelSwitchValue;
+}
+
+
 void Config::flushLog(void)
 {
 //  for (auto& line : logList)
@@ -243,11 +291,13 @@ void Config::flushLog(void)
 
 void *Config::_findManual(void *arg)
 {
-    return static_cast<Config*>(arg)->findManual();
+    assert(arg);
+    static_cast<Config*>(arg)->findManual();
+    return nullptr;
 }
 
 
-void *Config::findManual(void)
+void Config::findManual()
 {
     Log("finding manual");
     string currentV = string(YOSHIMI_VERSION);
@@ -258,12 +308,22 @@ void *Config::findManual(void)
         guideVersion = guideVersion.substr(0, pos);
     Log("manual found");
 
-    saveConfig(true);
-    return NULL;
+    saveMasterConfig();
 }
 
 
-bool Config::loadConfig(void)
+void Config::loadConfig(void)
+{
+    bool success = initFromPersistentConfig();
+    if (not success)
+    {
+        string message = "Problems loading config. Using default values.";
+        TextMsgBuffer::instance().push(message); // needed for CLI
+        Log("\n\n" + message + "\n");
+    }
+}
+
+bool Config::initFromPersistentConfig()
 {
     if (file::userHome() == "/tmp")
         Log ("Failed to find 'Home' directory - using tmp.\nSettings will be lost on computer shutdown.");
@@ -338,22 +398,30 @@ bool Config::loadConfig(void)
 
     if (!isRegularFile(baseConfig))
     {
-        Log("Basic configuration " + baseConfig + " not found, will use default settings");
+        Log("Basic configuration " + baseConfig + " not found, will use default settings.");
         defaultPresets();
-        saveConfig(true);
+        saveMasterConfig(); // generates a pristine "yoshimi.config"
     }
 
     bool success{false};
     if (!isRegularFile(ConfigFile))
     {
-        Log("Configuration " + ConfigFile + " not found, will use default settings");
-        saveConfig(false);
+        if (0 < synth->getUniqueId())
+        {
+            populateFromPrimary();
+            Log("Create new file " + ConfigFile + " with initial values from primary Synth instance.");
+        }
+        else
+        {
+            Log("Configuration " + ConfigFile + " not found, will use default settings.");
+        }
+        saveInstanceConfig(); // generates a new "yoshimi-#.instance"
     }
     else
     {
-        // get base first
+        // load baseConfig (always from the primary file)
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
-        success = xml->loadXMLfile(baseConfig);
+        success = xml->loadXMLfile(baseConfig);   // note: we want correct base values even in a secondary config instance
         if (success)
             success = extractBaseParameters(*xml);
         else
@@ -460,16 +528,13 @@ bool Config::updateConfig(int control, int value)
 
     bool success{false};
     if (control <= CONFIG::control::XMLcompressionLevel)
-    { // handling base config
-     // std::cout << "in base conf" << std::endl;
-
+    {// handling base config
         int baseData[CONFIG::control::XMLcompressionLevel+1];
         xmlType = TOPLEVEL::XML::MasterUpdate;
         baseConfig = file::configDir() + "/yoshimi" + string(EXTEN::config);
         auto xml{std::make_unique<XMLwrapper>(synth, true)};
         success = xml->loadXMLfile(baseConfig);
 
-        unsigned int instances = 1; // default (system defined)
         if (success)
         {
             xml->enterbranch("BASE_PARAMETERS");
@@ -482,15 +547,12 @@ bool Config::updateConfig(int control, int value)
             baseData[CONFIG::control::handlePadSynthBuild] = xml->getparU("handle_padsynth_build",0);
             baseData[CONFIG::control::XMLcompressionLevel] = xml->getpar("gzip_compression",3,0,9);
 
-            instances = xml->getparU("active_instances",1); // this is system defined
             xml->exitbranch(); // BASE_PARAMETERS
 
-             // this is the one that changed
+            // Change the specific config value given
             baseData[control] = value;
-        }
 
-        if (success)
-        {
+            // Write back the consolidated base config
             auto xml{std::make_unique<XMLwrapper>(synth, true)};
             xml->beginbranch("BASE_PARAMETERS");
             xml->addparbool("enable_gui",baseData[CONFIG::control::enableGUI]);
@@ -504,7 +566,7 @@ bool Config::updateConfig(int control, int value)
             xml->addpar("gzip_compression",baseData[CONFIG::control::XMLcompressionLevel]);
 
             // the following are system defined;
-            xml->addparU("active_instances",instances);
+            xml->addparU("active_instances",synth->getRuntime().activeInstances.to_ulong());
             xml->addparstr("guide_version", synth->getRuntime().guideVersion);
             xml->addparstr("manual", synth->getRuntime().manualFile);
             xml->endbranch(); // BASE_PARAMETERS
@@ -520,9 +582,7 @@ bool Config::updateConfig(int control, int value)
         }
     }
     else
-    { // handling current session config
-      // std::cout << "in session control " << std::endl;
-
+    {// handling current session config
         const int offset = CONFIG::control::defaultStateStart;
         const int arraySize = CONFIG::control::historyLock - offset;
         const string instance = asString(synth->getUniqueId());
@@ -666,9 +726,6 @@ void Config::defaultPresets(void)
 
 bool Config::extractBaseParameters(XMLwrapper& xml)
 {
-    if (synth->getUniqueId() != 0)
-        return true;
-
     if (!xml.enterbranch("BASE_PARAMETERS"))
     {
         Log("extractConfigData, no BASE_PARAMETERS branch");
@@ -820,38 +877,33 @@ bool Config::extractConfigData(XMLwrapper& xml)
 }
 
 
-bool Config::saveConfig(bool master)
+bool Config::saveMasterConfig()
 {
-    bool success{false};
-    if (master)
-    {
-        //cout << "saving master" << endl;
-        xmlType = TOPLEVEL::XML::MasterConfig;
-        auto xml{std::make_unique<XMLwrapper>(synth, true)};
-        string resConfigFile = baseConfig;
+    xmlType = TOPLEVEL::XML::MasterConfig;
+    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    // Note: the XMLwrapper ctor automatically populates the BASE_PARAMETERS
+    string resConfigFile = baseConfig;
 
-        if (xml->saveXMLfile(resConfigFile, false))
-        {
-            configChanged = false;
-            success = true;
-        }
-        else
-            Log("Failed to save master config to " + resConfigFile, _SYS_::LogNotSerious);
-    }
+    bool success = xml->saveXMLfile(resConfigFile, false);
+    if (success)
+        configChanged = false;
+    else
+        Log("Failed to save master config to " + resConfigFile, _SYS_::LogNotSerious);
+    return success;
+}
 
+bool Config::saveInstanceConfig()
+{
     xmlType = TOPLEVEL::XML::Config;
     auto xml{std::make_unique<XMLwrapper>(synth, true)};
     addConfigXML(*xml);
     string resConfigFile = ConfigFile;
 
-    if (xml->saveXMLfile(resConfigFile))
-    {
+    bool success = xml->saveXMLfile(resConfigFile);
+    if (success)
         configChanged = false;
-        success = true;
-    }
     else
         Log("Failed to save instance to " + resConfigFile, _SYS_::LogNotSerious);
-
     return success;
 }
 

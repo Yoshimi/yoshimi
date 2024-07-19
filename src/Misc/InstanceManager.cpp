@@ -288,7 +288,8 @@ bool InstanceManager::Instance::startUp()
 {
     std::cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< std::endl;
     state = BOOTING;
-    runtime().setup();
+    runtime().loadConfig();
+    runtime().setup(false); // not LV2 ////////////////////OOO clarify how to configure LV2
     assert (not runtime().runSynth);
     for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
     {

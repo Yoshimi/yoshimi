@@ -332,7 +332,7 @@ bool XMLwrapper::saveXMLfile(std::string _filename, bool useCompression)
         return false;
     }
 
-    unsigned int compression = 0;
+    uint compression = 0;
     if (useCompression)
         compression = synth->getRuntime().GzipCompression;
     if (compression <= 0)
