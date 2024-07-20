@@ -37,10 +37,9 @@
 #include <thread>
 #include <utility>
 #include <algorithm>
-#include <unordered_map>
 #include <string>
 #include <array>
-#include <set>
+#include <map>
 
 using std::string;
 using std::function;
@@ -48,7 +47,6 @@ using std::make_unique;
 using std::unique_ptr;
 using std::for_each;
 using std::move;
-using std::set;
 
 using func::asString;
 using util::contains;
@@ -168,13 +166,7 @@ class InstanceManager::SynthGroom
 {
         std::mutex mtx;
 
-        using Location = void*;
-        struct LocationHash
-        {
-            size_t operator()(Location const& loc) const { return size_t(loc); }
-        };
-
-        using Table = std::unordered_map<const Location, Instance, LocationHash>;
+        using Table = std::map<const uint, Instance>;
 
         Table registry;
         Instance* primary{nullptr};
@@ -194,7 +186,7 @@ class InstanceManager::SynthGroom
             Guard lock(mtx);
             instanceID = allocateID(instanceID);
             Instance newEntry{instanceID};
-            auto& instance = registry.emplace(&newEntry.getSynth(), move(newEntry))
+            auto& instance = registry.emplace(instanceID, move(newEntry))
                                      .first->second;
             if (!primary)
                 primary = & instance;
@@ -263,9 +255,9 @@ SynthEngine& InstanceManager::findSynthByID(uint id)
 
 InstanceManager::Instance& InstanceManager::SynthGroom::find(uint id)
 {
-    for (auto& [_,instance] : registry)
-        if (instance.getID() == id)
-            return instance;
+    auto entry = registry.find(id);
+        if (entry != registry.end())
+            return entry->second;
     assert(primary);
     return *primary;
 }
@@ -503,14 +495,14 @@ void InstanceManager::SynthGroom::handleStartRequest()
 
 void InstanceManager::SynthGroom::clearZombies()
 {
-    for (auto it = registry.begin(); it != registry.end();)
+    for (auto elm = registry.begin(); elm != registry.end();)
     {
-        Instance& instance{it->second};
+        Instance& instance{elm->second};
         if (instance.getState() == DEFUNCT
                 and not instance.isPrimary())
-            it = registry.erase(it);
+            elm = registry.erase(elm);
         else
-            ++it;
+            ++elm;
     }
 }
 
@@ -561,16 +553,12 @@ void InstanceManager::SynthGroom::shutdownRunningInstances()
  */
 uint InstanceManager::SynthGroom::allocateID(uint desiredID)
 {
-    set<uint> allIDs;
-    for_each(registry.begin(),registry.end()
-            ,[&](auto& entry){ allIDs.insert(entry.second.getID()); });
-
-    if (desiredID >= 32 or (desiredID > 0 and contains(allIDs, desiredID)))
+    if (desiredID >= 32 or (desiredID > 0 and contains(registry, desiredID)))
         desiredID = 0; // use the next free ID instead
 
     if (not desiredID)
     {
-        for (uint id : allIDs)
+        for (auto& [id,_] : registry)
             if (desiredID < id)
                 break;
             else
