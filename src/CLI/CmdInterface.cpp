@@ -54,7 +54,6 @@ using func::asString;
 using cli::readControl;
 
 
-extern SynthEngine *firstSynth;
 
 CmdInterface::CmdInterface() :
     interpreter{}
@@ -85,8 +84,8 @@ void CmdInterface::cmdIfaceCommandLoop()
     cli::Parser parser;
     parser.setHistoryFile(hist_filename);
     interpreter.synth = & Config::instances().findSynthByID(0);
-    bool exit = false;
-    while (!exit)
+    bool exit{false};
+    while (not exit)
     {
         parser.readline();
         if (parser.isTooLarge())
@@ -105,7 +104,8 @@ void CmdInterface::cmdIfaceCommandLoop()
                 Log(replies[reply.code]);
         }
 
-        if (!exit)
+        exit |= not getRuntime().runSynth.load(std::memory_order_acquire);
+        if (not exit)
         {
             do
             { // create enough delay for most ops to complete
@@ -134,7 +134,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             parser.setPrompt(prompt);
         }
 
-        if (!exit and getRuntime().runSynth.load(std::memory_order_relaxed))
+        if (not exit and getRuntime().runSynth.load(std::memory_order_relaxed))
             sleep_for(20ms);
     }
 }

@@ -26,6 +26,7 @@
 #include "Misc/InstanceManager.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
+#include "Misc/TestInvoker.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/Util.h"
 #ifdef GUI_FLTK
@@ -538,6 +539,20 @@ void InstanceManager::SynthGroom::shutdownRunningInstances()
     for (auto& [_,instance] : registry)
         if (instance.getState() == RUNNING)
             instance.shutDown();
+}
+
+
+bool InstanceManager::requestedSoundTest()
+{
+    return test::TestInvoker::access().activated;
+}
+
+void InstanceManager::launchSoundTest()
+{
+    auto& soundTest{test::TestInvoker::access()};
+    auto& primarySynth{groom->getPrimary().getSynth()};
+    assert(soundTest.activated);
+    soundTest.performSoundCalculation(primarySynth);
 }
 
 

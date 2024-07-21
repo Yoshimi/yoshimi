@@ -67,6 +67,8 @@ class InstanceManager
         /** Event handling loop during regular operation */
         void performWhileActive(std::function<void(SynthEngine&)> handleEvents);
         void performShutdownActions();
+        bool requestedSoundTest();
+        void launchSoundTest();
         void disconnectAll();
 
         Config& accessPrimaryConfig();

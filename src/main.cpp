@@ -36,6 +36,7 @@
 #include "MusicIO/MusicClient.h"
 #include "CLI/CmdInterface.h"
 #include "Misc/FileMgrFuncs.h"
+#include "Misc/TestInvoker.h"
 
 #ifdef GUI_FLTK
     #include "MasterUI.h"
@@ -51,9 +52,6 @@ using std::chrono_literals::operator ""us;
 using std::chrono_literals::operator ""ms;
 
 
-
-// used by automated test launched via CLI
-std::atomic <bool> waitForTest{false};
 
 bool showSplash = false;
 bool isSingleMaster = false;
@@ -213,7 +211,7 @@ static void *mainThread(void*)
             sleep_for(33333us);
         });//(End) Duty-cycle : Event-handling
 
-    if (waitForTest)
+    if (test::TestInvoker::access().activated)
         // After launching an automated test,
         // get out of the way and leave main thread without persisting state...
         // Test runs single threaded and we do not want to persist test state.
@@ -386,13 +384,10 @@ int main(int argc, char *argv[])
 
     Config::instances().disconnectAll();
 
-    if (waitForTest && threadCmd)
-    {   // CLI about to launch TestRunner for automated test
+    if (Config::instances().requestedSoundTest())
+    {
         pthread_join(threadCmd, &res);
-        if (res == (void *)1)
-        {
-            goto bail_out;
-        }
+        Config::instances().launchSoundTest();
     }
     bExitSuccess = true;
 

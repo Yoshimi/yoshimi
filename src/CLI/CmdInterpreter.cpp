@@ -53,9 +53,6 @@
 #include "Misc/Util.h"
 
 
-// global variable; see SynthEngine.cpp and main.cpp
-extern SynthEngine *firstSynth;
-
 // used to hold back shutdown when running sound generation for test
 extern std::atomic <bool> waitForTest;
 
@@ -92,6 +89,8 @@ using func::string2float;
 
 using cli::readControl;
 
+using test::TestInvoker;
+
 
 /*
  * There are two routes that 'write' commands can take.
@@ -122,7 +121,6 @@ CmdInterpreter::CmdInterpreter() :
     synth{nullptr},
     instrumentGroup{},
     textMsgBuffer{TextMsgBuffer::instance()},
-    testInvoker{},
 
     context{LEVEL::Top},
     section{UNUSED},
@@ -187,13 +185,6 @@ void CmdInterpreter::resetInstance(unsigned int newInstance)
     defaults();
 }
 
-
-test::TestInvoker& CmdInterpreter::getTestInvoker()
-{
-    if (!testInvoker)
-        testInvoker.reset(new test::TestInvoker());
-    return *testInvoker;
-}
 
 
 string CmdInterpreter::buildStatus(bool showPartDetails)
@@ -572,7 +563,7 @@ string CmdInterpreter::buildTestStatus()
 {
     int expose = readControl(synth, 0, CONFIG::control::exposeStatus, TOPLEVEL::section::config);
     // render compact form when status is part of prompt
-    return getTestInvoker().showTestParams(expose == 2);
+    return TestInvoker::access().showTestParams(expose == 2);
 }
 
 
@@ -5910,7 +5901,7 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
     }// note: the following handler will consume the "swapwave" command and store the offset parameter
 
     string response;
-    if (getTestInvoker().handleParameterChange(input, controlType, response, synth->buffersize))
+    if (TestInvoker::access().handleParameterChange(input, controlType, response, synth->buffersize))
         synth->getRuntime().Log(response);
 
     // proceed to launch the test invocation and then cause termination of Yoshimi
@@ -5923,13 +5914,11 @@ int CmdInterpreter::commandTest(Parser& input, unsigned char controlType)
         do sleep_for(at_least_one_cycle); // with buffersize 128 and 48kHz -> one buffer lasts ~ 2.6ms
         while (synth->audioOut != _SYS_::mute::Idle);
 
+        // Activate test sound computation at end of main()
+        TestInvoker::access().activated = true;
         // NOTE: the following initiates a shutdown
-        waitForTest = true;
         synth->getRuntime().runSynth = false;
-        sleep_for(at_least_one_cycle);
 
-        // Launch computation for automated acceptance test
-        getTestInvoker().performSoundCalculation(*synth);
         return REPLY::exit_msg;
     }
     else if (!input.isAtEnd())
