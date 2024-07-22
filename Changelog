@@ -1,5 +1,10 @@
 yoshimi 2.3.2 M
 
+2024-7-22 Will
+bn 2344
+Revised and simplified CLI Y/N query code.
+A few updates to User Guide.
+
 2024-7-18 Will
 bn 2343
 BugFix: Config code not correctly readingXML getPar(

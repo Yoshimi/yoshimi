@@ -571,39 +571,24 @@ string CmdInterpreter::buildTestStatus()
 }
 
 
-bool CmdInterpreter::query(string text, bool priority)
+bool CmdInterpreter::query(string text)
 {
     char *line = NULL;
-    string suffix;
-    char result;
-    char test;
-
-    priority = !priority; // so calls make more sense
-
-    if (priority)
-    {
-        suffix = " N/y? ";
-        test = 'n';
-    }
-    else
-    {
-        suffix = " Y/n? ";
-        test = 'y';
-    }
-    result = test;
-    text += suffix;
+    bool result = false;;
+    text += "? (y / {other})";
     synth->getRuntime().Log(text);
-    // changed this so that all messages go to same destination.
-    //line = readline(text.c_str());
+
     line = readline("");
     if (line)
     {
-        if (line[0] != 0)
-            result = line[0];
-        free(line);
-        line = NULL;
+        if (*line == 'y' || *line == 'Y')
+        {
+            result = true;
+            free(line);
+            line = NULL;
+        }
     }
-    return (((result | 32) == test) ^ priority);
+    return result;
 }
 
 
@@ -3105,7 +3090,7 @@ int CmdInterpreter::commandBank(Parser& input, unsigned char controlType, bool j
             string line = textMsgBuffer.fetch(readControl(synth, 0, BANK::control::readInstrumentName, TOPLEVEL::section::bank, UNUSED, UNUSED, UNUSED, tmp));
             if (line > "!")
             {
-                if (!query("Slot " + to_string(tmp + 1) + " contains '" + line + "'. Overwrite", false))
+                if (!query("Slot " + to_string(tmp + 1) + " contains '" + line + "'. Overwrite"))
                     return REPLY::done_msg;
             }
             return sendNormal(synth, TOPLEVEL::action::lowPrio, 0, controlType, BANK::control::saveInstrument, TOPLEVEL::section::bank, UNUSED, UNUSED, tmp);
@@ -6420,11 +6405,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             Runtime.Log("Can only exit from instance 0", _SYS_::LogError);
             return Reply::DONE;
         }
-        string message;
+        string message = "All unsaved data will be lost. Still exit";;
         if (echo)
-            cout << "All data will be lost. Still exit N/y?" << endl;
-        message = "All data will be lost. Still exit";
-        if (query(message, true))
+            cout << message << "? (y / {other})" << endl;
+
+        if (query(message))
         {
             Runtime.runSynth = false;
             return Reply{REPLY::exit_msg};
@@ -6451,7 +6436,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         int control = MAIN::control::masterReset;
         if (input.matchnMove(3, "all"))
             control = MAIN::control::masterResetAndMlearn;
-        if (query("Restore to basic settings", false))
+        if (query("Restore to basic settings"))
         {
             sendDirect(synth, TOPLEVEL::action::muteAndLoop, 0, TOPLEVEL::type::Write, control, TOPLEVEL::section::main);
             defaults();
@@ -6724,7 +6709,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             else if (tmp)
             {
                 Runtime.Log("Bank " + to_string(bankID) + " has " + asString(tmp) + " Instruments");
-                if (!query("Delete bank and all of these", false))
+                if (!query("Delete bank and all of these"))
                 {
                     Runtime.Log("Aborted");
                     return Reply::DONE;
@@ -6777,7 +6762,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             int tmp = string2int(input);
             if (tmp <= 0 || tmp > MAX_INSTRUMENTS_IN_BANK)
                     return Reply{REPLY::range_msg};
-            if (query("Permanently remove instrument " + to_string(tmp) + " from bank", false))
+            if (query("Permanently remove instrument " + to_string(tmp) + " from bank"))
                 sendDirect(synth, TOPLEVEL::action::lowPrio, tmp - 1, TOPLEVEL::type::Write, BANK::control::deleteInstrument, TOPLEVEL::section::bank);
             return Reply::DONE;
         }
