@@ -1,0 +1,17 @@
+This command is not documented in the User Guide as it is intended only for test purposes.
+
+It is used to populate a command block with raw byte values in the normal sequence starting from 'control' but preceeded by a 'repeat' value. If this is zero it simply performs a read of the given data reporting the results to either the GUI console window, or the CLI stdout. If 'repeat' is any other positive value, the call is looped that many times and the time taken printed in the CLI.
+
+It therefore gives the means to test whether Yoshimi's internal error checks respond well to out of band values, as well as giving an idea of how long read commands take (writes take longer).
+
+Entries:
+    repeat
+    control
+    part
+    kit
+    engine
+    insert
+    parameter
+    offset
+
+Currently we don't make use of 'value' or 'miscmsg' also 'type' and 'source' are fixed.

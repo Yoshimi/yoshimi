@@ -7089,33 +7089,21 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
     if (input.matchnMove(2, "zread"))
     {
         /*
-         * This is a very specific test for reading values and is intended to measure
-         * the time these calls take. For that reason the return echos to the CLI and
-         * GUI are suppressed, and all results are sent to the CLI only.
-         *
-         * It is only the selection time we are measuring, and that the correct
-         * value is returned.
-         *
-         * The limit to the number of repeats is INT max. Using high repeat numbers
-         * reduces the effect of the processing overhead outside the call loop itself.
+         * For testing only
+         * See dev_notes/CLI_zread
          */
-
-        cout << "here zread" << endl;
-
-        // repeats, control, part, kit, engine, insert, parameter, miscmsg
-        float result;
+        float value = 0;
         unsigned char control, part;
         unsigned char kit = UNUSED;
         unsigned char engine = UNUSED;
         unsigned char insert = UNUSED;
         unsigned char parameter = UNUSED;
+        unsigned char offset = UNUSED;
         unsigned char miscmsg = UNUSED;
-        int repeats;
+        int repeat = 0;
         if (input.isAtEnd())
             return REPLY::value_msg;
-        repeats = string2int(input);
-        if (repeats < 1)
-            repeats = 1;
+        repeat = string2int(input);
         input.skipChars();
         if (input.isAtEnd())
             return REPLY::value_msg;
@@ -7142,37 +7130,48 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                         parameter = string2int(input);
                         input.skipChars();
                         if (!input.isAtEnd())
-                            miscmsg = string2int(input);
+                        {
+                            offset = string2int(input);
+                        }
                     }
                 }
             }
         }
 
         CommandBlock putData;
-        putData.data.value = 0;
+        putData.data.value = value;
         putData.data.control = control;
         putData.data.part = part;
         putData.data.kit = kit;
         putData.data.engine = engine;
         putData.data.insert = insert;
         putData.data.parameter = parameter;
+        putData.data.offset = offset;
         putData.data.miscmsg = miscmsg;
         putData.data.type = 0;
         putData.data.source = 0;
-        struct timeval tv1, tv2;
-        gettimeofday(&tv1, NULL);
-        for (int i = 0; i < repeats; ++ i)
-            result = synth->interchange.readAllData(&putData);
-        gettimeofday(&tv2, NULL);
+        synth->CBtest(&putData);
 
-        if (tv1.tv_usec > tv2.tv_usec)
+        if (repeat == 0)
         {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
+            synth->interchange.fromCLI.write(putData.bytes);
+        }
+        else
+        {
+            struct timeval tv1, tv2;
+            gettimeofday(&tv1, NULL);
+            for (int i = 0; i < repeat; ++ i)
+                synth->interchange.fromCLI.write(putData.bytes);
+            gettimeofday(&tv2, NULL);
+
+            if (tv1.tv_usec > tv2.tv_usec)
+            {
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
             }
-        float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-        cout << "result " << result << endl;
-        cout << "Loops " << repeats << "  Total time " << actual << "uS" << "  average call time " << actual/repeats * 1000.0f << "nS" << endl;
+            float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+            cout << "\nLoops " << repeat << "  Total time " << actual << "uS" << "  average call time " << actual/repeat * 1000.0f << "nS" << endl;
+        }
         return REPLY::done_msg;
     }
 
