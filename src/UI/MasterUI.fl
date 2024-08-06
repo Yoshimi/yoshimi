@@ -286,15 +286,38 @@ class KeyHandle {: {public Fl_Box}
         }
         else if (Fl::event_alt())
         {
-            if(key == 'r')
+            switch (key)
             {
-                synth->getGuiMaster()->redo->do_callback();
-                ev = 1;
-            }
-            else if(key == 'u')
-            {
-                synth->getGuiMaster()->undo->do_callback();
-                ev = 1;
+                case 'r':
+                {
+                    synth->getGuiMaster()->redo->do_callback();
+                    ev = 1;
+                    break;
+                }
+                case 'u':
+                {
+                    synth->getGuiMaster()->undo->do_callback();
+                    ev = 1;
+                    break;
+                }
+                case 'e':
+                {
+                    synth->getGuiMaster()->partui->Showedit();
+                    ev = 1;
+                    break;
+                }
+                case 't':
+                {
+                    synth->getGuiMaster()->partui->Showctl();
+                    ev = 1;
+                    break;
+                }
+                case 'm':
+                {
+                    synth->getGuiMaster()->partui->Showctlmidi();
+                    ev = 1;
+                    break;
+                }
             }
         }
     }
@@ -782,12 +805,12 @@ class MasterUI {: {public GuiUpdates}
         o->add("&PatchSet  /&Save External...");
         o->add("&PatchSet  /&Recent sets...");
 
-        o->add("Pat&h  /&Bank Root Dirs...");
-        o->add("Pat&h  /&Preset Dirs...");
+        o->add("P&ath  /&Bank Root Dirs...");
+        o->add("P&ath  /&Preset Dirs...");
 
         o->add("&State  /&Load...");
         o->add("&State  /&Save...");
-        o->add("&State  /&Save As default");
+        o->add("&State  /Save As &default");
         o->add("&State  /&Recent States");
 
         o->add("S&cale/S&how Settings...");
@@ -869,13 +892,13 @@ class MasterUI {: {public GuiUpdates}
           tooltip {Vector Setup Window} xywh {197 30 68 24} box GTK_THIN_UP_BOX color 198 labelsize 11 labelcolor 64
         }
         Fl_Button undo {
-          label Undo
+          label &Undo
           callback {//
         send_data(0, MAIN::control::undo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
           tooltip {Revert last change} xywh {197 60 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
         }
         Fl_Button redo {
-          label Redo
+          label &Redo
           callback {//
         send_data(0, MAIN::control::redo,  0, TOPLEVEL::type::Integer, TOPLEVEL::section::undoMark);}
           tooltip {Re-apply last change} xywh {197 90 68 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 64
@@ -1147,7 +1170,7 @@ class MasterUI {: {public GuiUpdates}
             class WidgetSpinner
           }
           Fl_Button partEdit {
-            label Edit
+            label &Edit
             callback {//
        /* bool divert = true;
         if (lastkey >= 49 && lastkey <= 56)
@@ -1241,13 +1264,13 @@ class MasterUI {: {public GuiUpdates}
             tooltip {View/change instrument sound and details} xywh {334 291 42 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
           }
           Fl_Button partControllers {
-            label Controllers
+            label Con&trollers
             callback {//
           partui->Showctl();}
             tooltip {MIDI Controller range settings} xywh {8 373 86 22} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64
           }
           Fl_Button partMidiCCs {
-            label {Midi CCs}
+            label {&Midi CCs}
             callback {//
           partui->Showctlmidi();}
             tooltip {Emulates common MIDI CCs} xywh {100 373 60 22} box GTK_THIN_UP_BOX color 198 labelsize 12 labelcolor 64

@@ -294,7 +294,7 @@ class PADnoteUI {: {public PresetsUI_}
         xywh {0 0 580 405} labelcolor 64
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure}
+          label {Harmonic &Structure}
           xywh {0 20 580 385} box ENGRAVED_FRAME labelsize 12 labelcolor 64
         } {
           Fl_Group bwprofilegroup {

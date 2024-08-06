@@ -7158,10 +7158,11 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
         }
         else
         {
+            float value = 0;
             struct timeval tv1, tv2;
             gettimeofday(&tv1, NULL);
             for (int i = 0; i < repeat; ++ i)
-                synth->interchange.fromCLI.write(putData.bytes);
+                value = synth->interchange.readAllData(&putData);
             gettimeofday(&tv2, NULL);
 
             if (tv1.tv_usec > tv2.tv_usec)
@@ -7171,6 +7172,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
             }
             float actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
             cout << "\nLoops " << repeat << "  Total time " << actual << "uS" << "  average call time " << actual/repeat * 1000.0f << "nS" << endl;
+            cout << "\nValue " << value << endl << endl;
         }
         return REPLY::done_msg;
     }

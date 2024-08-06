@@ -85,7 +85,7 @@ class VectorUI {} {
         class WidgetSpinner
       }
       Fl_Menu_Button options {
-        label Options
+        label &Options
         callback {int res = o->value();
 switch (res)
 {

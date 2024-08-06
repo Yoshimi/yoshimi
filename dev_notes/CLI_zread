@@ -1,8 +1,10 @@
-This command is not documented in the User Guide as it is intended only for test purposes.
+This command is not documented in the User Guide as it is intended only for test purposes. It intenetionally performs no error checks itself so it's possible to discover the response to values that should never normally be set.
 
-It is used to populate a command block with raw byte values in the normal sequence starting from 'control' but preceeded by a 'repeat' value. If this is zero it simply performs a read of the given data reporting the results to either the GUI console window, or the CLI stdout. If 'repeat' is any other positive value, the call is looped that many times and the time taken printed in the CLI.
+It is used to populate a command block with raw byte values in the normal sequence starting from 'control' but preceeded by a 'repeat' value. If this is zero it simply performs a read of the given data reporting the results to either the GUI console window, or the CLI stdout, so reflects what a user would see.
 
-It therefore gives the means to test whether Yoshimi's internal error checks respond well to out of band values, as well as giving an idea of how long read commands take (writes take longer).
+If 'repeat' is any other positive value, the call is looped that many times and the time taken printed in the CLI. As we return the value here, rather than passing it on to the normal controls this time is a fairly realistic round-trip average.
+
+Overall this gives the means to test whether Yoshimi's internal error checks respond well to out of band values, as well as giving an idea of how long read commands take (writes would take longer).
 
 Entries:
     repeat
@@ -14,4 +16,4 @@ Entries:
     parameter
     offset
 
-Currently we don't make use of 'value' or 'miscmsg' also 'type' and 'source' are fixed.
+Currently we only use 'value' as a return for timed reads and don't use 'miscmsg' at  all. Also 'type' and 'source' are fixed.
