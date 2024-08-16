@@ -1,5 +1,15 @@
 yoshimi 2.3.2 M
 
+2024-8-16 Will
+bn 2347
+BugFix: temporary fix for segfault in SubSynth
+    See src/Synth/SUBnote.cpp/initparameters(
+Changed new drum sound name from:
+    Pitched Bass Drum
+to:
+    Soft Bass Drum
+Updated HTML User Guide
+
 2024-8-6 Will
 bn 2346
 Corrected State menu options.

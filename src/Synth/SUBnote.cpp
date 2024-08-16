@@ -482,7 +482,15 @@ void SUBnote::initparameters(float freq)
     if (pars.PGlobalFilterEnabled != 0)
     {
         globalFilterL.reset(new Filter{pars.GlobalFilter, &synth});
-        if (stereo)
+        /* TODO
+         * Sort this properly it is a temporary fix to stop a segfault
+         * with the following very specific settings:
+         * Part Mode set to Legato
+         * Subsynth enabled
+         * Subsynth Filter enabled
+         * Subsynth Stereo disabled
+         */
+        //if (stereo)
             globalFilterR.reset(new Filter{pars.GlobalFilter, &synth});
         globalFilterEnvelope.reset(new Envelope{pars.GlobalFilterEnvelope, freq, &synth});
     }
