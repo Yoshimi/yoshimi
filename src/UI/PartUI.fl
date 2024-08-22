@@ -1339,40 +1339,6 @@ class PartUI {: {public Fl_Group, PartUI_}
       }
     }
   }
-  Function {handle(int event)} {return_type int
-  } {
-    code {//
-        int ret = Fl_Group::handle(event);
-        return 0;
-
-        /*
-         * I don't know why we need to do this but it screws up
-         * MasterUi if it is either active or fully removed.
-        */
-
-        switch(event)
-        {
-            case FL_FOCUS:
-            case FL_UNFOCUS:
-                ret = 1;
-                break;
-            case FL_SHORTCUT:           // in case widget that isn't ours has focus
-            case FL_KEYDOWN:            // keyboard key pushed
-            //case FL_KEYUP:              // keyboard key released
-            {
-                if (lastkey != Fl::event_key())
-                    lastkey = Fl::event_key();
-                break;
-            }
-            case FL_KEYUP:
-            {
-                if (lastkey == Fl::event_key())
-                    lastkey = -1;
-                break;
-            }
-        }
-        return(ret);} {}
-  }
   Function {send_data(int action, int control, float value, int type, int npart, int kititem = UNUSED, int engine = UNUSED, int insert = UNUSED, int parameter = UNUSED, int miscmsg = UNUSED)} {} {
     code {//
         type |= TOPLEVEL::type::Write;
