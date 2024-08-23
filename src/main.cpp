@@ -41,9 +41,6 @@
 #ifdef GUI_FLTK
     #include "MasterUI.h"
     #include "UI/MiscGui.h"
-    #include <FL/Fl.H>
-    #include <FL/Fl_Window.H>
-    #include <FL/Fl_PNG_Image.H>
     #include "UI/Splash.h"
 #endif
 
@@ -55,11 +52,7 @@ using std::chrono_literals::operator ""ms;
 
 bool showSplash = false;
 bool isSingleMaster = false;
-bool splashSet = true;
 
-#ifdef GUI_FLTK
-time_t old_father_time, here_and_now;
-#endif
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -104,75 +97,14 @@ static void *mainThread(void*)
 #ifndef GUI_FLTK
     assert (not showGUI);
 #else
-    const int textHeight = 15;
-    const int textY = 10;
-    const unsigned char lred = 0xd7;
-    const unsigned char lgreen = 0xf7;
-    const unsigned char lblue = 0xff;
-    int winH=10, winW=50;
-    int LbX=2, LbY=2, LbW=2, LbH=2;
-    int timeout =3;
-    std::string startup = YOSHIMI_VERSION;
-
+    SplashScreen splash;
     if (showGUI)
     {
         if (showSplash)
-        {
-            startup = "V " + startup;
-            winH = splashHeight;
-            winW = splashWidth;
-            LbX = 0;
-            LbY = winH - textY - textHeight;
-            LbW = winW;
-            LbH = textHeight;
-            timeout = 5;
-        }
+            splash.showPopup();
         else
-        {
-            startup = "Yoshimi V " + startup + " is starting";
-            winH = 36;
-            winW = 300;
-            LbX = 2;
-            LbY = 2;
-            LbW = winW - 4;
-            LbH = winH -4;
-            timeout = 3;
-        }
-    }
-
-    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
-    Fl_Window winSplash(winW, winH, "yoshimi splash screen");
-    Fl_Box box(0, 0, winW,winH);
-    Fl_Box boxLb(LbX, LbY, LbW, LbH, startup.c_str());
-
-    if (showGUI)
-    {
-        if (showSplash)
-        {
-            box.image(pix);
-            boxLb.box(FL_NO_BOX);
-            boxLb.align(FL_ALIGN_CENTER);
-            boxLb.labelsize(textHeight);
-            boxLb.labeltype(FL_NORMAL_LABEL);
-            boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
-            boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-        }
-        else
-        {
-            boxLb.box(FL_EMBOSSED_FRAME);
-            boxLb.labelsize(16);
-            boxLb.labelfont(FL_BOLD);
-            boxLb.labelcolor(0x0000e100);
-        }
-        winSplash.border(false);
-        if (splashSet && showGUI)
-        {
-            winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
-        }
-        else
-            splashSet = false;
-
-        winSplash.show();
+            splash.showIndicator();
+        Fl::wait(10); // allow to draw the splash
     }
 #endif /*GUI_FLTK*/
 
@@ -189,23 +121,8 @@ static void *mainThread(void*)
                 assert(guiMaster);
                 if (guiMaster->masterwindow)
                     guiMaster->checkBuffer();
-                Fl::wait(33333);
-
-                if (splashSet)
-                {
-                    if (showSplash)
-                    {
-                        winSplash.show(); // keeps it in front;
-                    }
-                    if (time(&here_and_now) < 0) // no time?
-                        here_and_now = old_father_time + timeout;
-                    if ((here_and_now - old_father_time) >= timeout)
-                    {
-                        splashSet = false;
-                        winSplash.hide();
-                    }
-                }
-            }// if(showGUI)
+                Fl::wait(33333); // process GUI events
+            }
             else
 #endif/*GUI_FLTK*/
             sleep_for(33333us);
@@ -301,11 +218,6 @@ int main(int argc, char *argv[])
 
     std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
 
-
-#ifdef GUI_FLTK
-    time(&old_father_time);
-    here_and_now = old_father_time;
-#endif
 
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
