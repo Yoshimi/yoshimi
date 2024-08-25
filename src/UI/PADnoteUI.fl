@@ -910,7 +910,7 @@ class PADnoteUI {: {public PresetsUI_}
         xywh {449 414 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button padClose {
-        label Close
+        label &Close
         callback {//
         saveWin(synth, padnotewindow->w(), padnotewindow->h(), padnotewindow->x(), padnotewindow->y(), false, "PadSynth");
         padSeen = false;

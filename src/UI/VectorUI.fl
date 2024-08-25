@@ -280,7 +280,7 @@ switch (res)
         class WidgetSpinner
       }
       Fl_Button Closevector {
-        label Close
+        label &Close
         callback {//
             saveWin(synth, vectorwindow->w(), vectorwindow->h(), vectorwindow->x(), vectorwindow->y(), false, "Vector");
         vectorwindow->hide();

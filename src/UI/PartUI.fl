@@ -346,14 +346,14 @@ class PartUI {: {public Fl_Group, PartUI_}
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       callback {editClose->do_callback();}
-      xywh {675 275 395 385} type Double hide resizable
+      xywh {1051 172 395 385} type Double hide resizable
       code0 {seteditname();}
       code1 {o->copy_label(textMsgBuffer.fetch(collect_readData(synth, textMsgBuffer.push("Edit"), npart, TOPLEVEL::windowTitle)).c_str());}
       code2 {editDW = 395; editDH = 385;}
       code3 {o->size_range(editDW, editDH, 0, 0, 0, 0, 1);}
     } {
       Fl_Group {} {
-        xywh {0 222 395 100} box GTK_THIN_UP_BOX
+        xywh {0 222 395 162} box GTK_THIN_UP_BOX
       } {
         Fl_Group ADD {
           label ADDsynth
@@ -373,7 +373,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(add_back); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button adeditbutton {
-            label Edit
+            label {Edit &Add}
             callback {//
             showparameters(0,PART::engine::addSynth);
             //checkEngines();
@@ -403,7 +403,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(sub_back); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button subeditbutton {
-            label Edit
+            label {Edit &Sub}
             callback {//
             showparameters(0,PART::engine::subSynth);
             //checkEngines();
@@ -433,7 +433,7 @@ class PartUI {: {public Fl_Group, PartUI_}
             code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(pad_back); else o->color(FL_BACKGROUND_COLOR);}
           }
           Fl_Button padeditbutton {
-            label Edit
+            label {Edit &Pad}
             callback {//
             showparameters(0,PART::engine::padSynth);
             //checkEngines();
@@ -446,7 +446,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           }
         }
         Fl_Button kitedit {
-          label {Kit Edit}
+          label {&Kit Edit}
           callback {//
           Showkit();
           if ((Fl::event_button() == 3))
@@ -455,7 +455,7 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Right click: also close this} xywh {295 227 94 28} box GTK_THIN_UP_BOX color 198 selection_color 64 labelfont 1 labelcolor 64 align 128
         }
         Fl_Button effects {
-          label Effects
+          label {&Effects}
           callback {//
           Showefx();
           if ((Fl::event_button() == 3))
@@ -464,13 +464,43 @@ class PartUI {: {public Fl_Group, PartUI_}
           tooltip {Right click: also close this} xywh {295 258 94 28} box GTK_THIN_UP_BOX color 198 labelfont 1 labelcolor 64
         }
         Fl_Button editAT {
-          label Aftertouch
+          label {After&touch}
           callback {//
                 ShowAT();
                 atSeen = 2;
                 if ((Fl::event_button() == 3))
                     instrumenteditwindow->hide();}
           xywh {295 290 94 28} box GTK_THIN_UP_BOX color 198 labelfont 1 labelcolor 64
+        }
+        Fl_Button instrumentReset {
+          label {&Reset}
+          callback {//
+         if (!fetchData(0, PART::control::enable, npart))
+         {
+             alert(synth, "Selected part is disabled");
+             return;
+         }
+
+         if (Fl::event_state(FL_CTRL))
+         {
+             if (choice(synth, "", "Yes", "No", "Set entire part " + std::to_string(npart + 1) + " controls to default values ?") > 1)
+                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
+             return;
+         }
+         if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
+                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
+          tooltip {Revert to default instrument
+ +Ctrl, clear entire part} xywh {283 327 100 26} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
+        }
+        Fl_Button editClose {
+          label {&Close}
+          callback {//
+                  saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "Part-edit");
+                  editSeen = false;
+                  lasteditW = 0;
+                  instrumenteditwindow->hide();
+                  o->parent()->show();}
+          xywh {283 357 100 24} box THIN_UP_BOX color 196 labelfont 1 labelcolor 64
         }
       }
       Fl_Group {} {
@@ -540,35 +570,6 @@ class PartUI {: {public Fl_Group, PartUI_}
         code1 {o->setValueType(VC_PartHumaniseVelocity);o->useCustomTip(true);}
         code2 {o->selection_color(setSlider(o->value(),0));}
         class mwheel_slider_rev
-      }
-      Fl_Button instrumentReset {
-        label Reset
-        callback {//
-         if (!fetchData(0, PART::control::enable, npart))
-         {
-             alert(synth, "Selected part is disabled");
-             return;
-         }
-
-         if (Fl::event_state(FL_CTRL))
-         {
-             if (choice(synth, "", "Yes", "No", "Set entire part " + std::to_string(npart + 1) + " controls to default values ?") > 1)
-                 send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultPart, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);
-             return;
-         }
-         if (choice(synth, "", "Yes", "No", "Set part " + std::to_string(npart + 1) + " instrument to 'Simple Sound' ?") > 1)
-                send_data(TOPLEVEL::action::forceUpdate, MAIN::control::defaultInstrument, npart, TOPLEVEL::type::Integer, TOPLEVEL::section::main);}
-        tooltip {Revert to default instrument
- +Ctrl, clear entire part} xywh {282 327 100 26} box PLASTIC_UP_BOX color 89 labelfont 1 labelcolor 64
-      }
-      Fl_Button editClose {
-        label Close
-        callback {//
-                  saveWin(synth, instrumenteditwindow->w(), instrumenteditwindow->h(), instrumenteditwindow->x(),instrumenteditwindow->y(), false, "Part-edit");
-                  editSeen = false;
-                  lasteditW = 0;
-                  instrumenteditwindow->hide();}
-        xywh {282 358 100 24} box THIN_UP_BOX color 196 labelfont 1 labelcolor 64
       }
       Fl_Text_Display originalname {
         label {Derived From}
@@ -672,7 +673,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         class Fl_Check_Button2
       }
       Fl_Button kitClose {
-        label Close
+        label {&Close}
         callback {//
         saveWin(synth, instrumentkitlist->w(), instrumentkitlist->h(), instrumentkitlist->x(), instrumentkitlist->y(), false, "Part-kit");
         instrumentkitlist->hide();
@@ -753,7 +754,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         class Fl_Check_Button2
       }
       Fl_Button effClose {
-        label Close
+        label {&Close}
         callback {//
         saveWin(synth, partfx->w(), partfx->h(),  partfx->x(),  partfx->y(), false, "Part-effects");
         if(inseffectui->filterwindow != NULL)
@@ -830,7 +831,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         class WidgetPDial
       }
       Fl_Button ctlmidiclose {
-        label Close
+        label {&Close}
         callback {//
                 saveWin(synth,  ctlmidi->w(),  ctlmidi->h(), ctlmidi->x(), ctlmidi->y(), false, "Part-ctlmidi");
                 ctlmidiSeen = false;
@@ -1094,13 +1095,13 @@ class PartUI {: {public Fl_Group, PartUI_}
         }
       }
       Fl_Button resetallctl {
-        label {Reset all controllers}
+        label {&Reset all controllers}
         callback {//
         send_data(TOPLEVEL::action::forceUpdate, PART::control::resetAllControllers, o->value(), TOPLEVEL::type::Integer, npart);}
         xywh {5 105 210 20} box PLASTIC_UP_BOX color 228 labelcolor 64
       }
       Fl_Button aftertouch {
-        label Aftertouch
+        label {&Aftertouch}
         callback {//;
                 ShowAT();
                 atSeen = 1;
@@ -1109,7 +1110,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         xywh {245 105 130 20} box GTK_THIN_UP_BOX color 198 labelcolor 64
       }
       Fl_Button ctlclose {
-        label Close
+        label {&Close}
         callback {//;
         saveWin(synth, ctlwindow->w(), ctlwindow->h(), ctlwindow->x(), ctlwindow->y(), false, "Part-controllers");
         ctlSeen = false;
@@ -1323,7 +1324,7 @@ class PartUI {: {public Fl_Group, PartUI_}
         class Fl_Check_Button2
       }
       Fl_Button atClose {
-        label Close
+        label {&Close}
         callback {//
         saveWin(synth, aftertouchcontrol->w(), aftertouchcontrol->h(), aftertouchcontrol->x(), aftertouchcontrol->y(), false, "Part-aftertouch");
         if ((Fl::event_button() == 3))

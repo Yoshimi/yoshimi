@@ -551,7 +551,7 @@ class SUBnoteUI {: {public PresetsUI_}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 197
       }
       Fl_Button subClose {
-        label Close
+        label &Close
         callback {//
         saveWin(synth, SUBparameters->w(), SUBparameters->h(), SUBparameters->x(), SUBparameters->y(), false, "SubSynth");
         subSeen = false;

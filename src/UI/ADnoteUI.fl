@@ -2468,7 +2468,7 @@ class ADnoteUI {: {public PresetsUI_}
         tooltip {Right click: also close this} xywh {5 375 180 25} box GTK_THIN_UP_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
       }
       Fl_Button globalclose {
-        label Close
+        label {&Close}
         callback {//
             saveWin(synth,  ADnoteGlobalParameters->w(),  ADnoteGlobalParameters->h(), ADnoteGlobalParameters->x(), ADnoteGlobalParameters->y(), false, "AddSynth");
             globalSeen = false;

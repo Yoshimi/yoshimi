@@ -1,4 +1,4 @@
-This command is not documented in the User Guide as it is intended only for test purposes. It intenetionally performs no error checks itself so it's possible to discover the response to values that should never normally be set.
+This command is not documented in the User Guide as it is intended only for test purposes. It intentionally performs no error checks itself so it's possible to discover the response to values that should never normally be set.
 
 It is used to populate a command block with raw byte values in the normal sequence starting from 'control' but preceeded by a 'repeat' value. If this is zero it simply performs a read of the given data reporting the results to either the GUI console window, or the CLI stdout, so reflects what a user would see.
 

@@ -403,7 +403,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         xywh {263 0 40 15} labelfont 1 labelsize 11 labelcolor 64 align 18
       }
       Fl_Button close {
-        label Close
+        label &Close
         callback {//
     saveWin(synth, midilearnwindow->w(), midilearnwindow->h(), midilearnwindow->x(), midilearnwindow->y(), false, "Midi-learn");
     midilearnwindow->hide();

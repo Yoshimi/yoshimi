@@ -193,12 +193,18 @@ class VirKeys {: {public Fl_Box}
     int ly = h();
     int x_ = Fl::event_x() - x();
     int y_ = Fl::event_y() - y();
+    if (Fl::event_alt())
+    {
+        auto key = Fl::event_key();
+        if (key == 'c')
+            return 0;
+    }
+
     if (x_ < 0 && x_ > w() && y_ < 0 && y_>h())
         return 0;
     if (event == FL_PUSH || event == FL_DRAG || event == FL_RELEASE)
     {
         int kpos = -1;
-
         if (y_ > ly * 3 / 5)
         {   // white keys
             int pos = x_ / (*keyWhite);
@@ -422,7 +428,7 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
         code0 {o->value(virkeys->midioct);}
       }
       Fl_Button virtClose {
-        label Close
+        label {&Close}
         callback {//
         relaseallkeys();
         virkeyboardwindow->hide();
@@ -643,7 +649,8 @@ z x c v b n m ...} xywh {365 110 45 15} type Simple labelsize 10 align 4 when 6 
     virtSeen = true;
     lastvirtW = 0;} {}
   }
-  Function {Hide()} {} {
+  Function {Hide()} {open
+  } {
     code {//
     virkeyboardwindow->hide();} {}
   }

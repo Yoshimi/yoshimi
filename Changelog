@@ -1,5 +1,11 @@
 yoshimi 2.3.2 M
 
+2024-8-25 Will
+bn 2349
+Most keyboard shortcuts (alt+underlined) at the first couple
+    of context levels now working.
+User guide partly updated - not graphics.
+
 2024-8-22 Will
 bn 2348
 Theme tab now changes its own display when setting 'Monochrome'.
