@@ -154,14 +154,14 @@ bool InterChange::Init()
 MasterUI& InterChange::createGuiMaster()
 {
     CommandBlock bootstrapMsg;
-    if (toGUI.read(bootstrapMsg.bytes)
-        and bootstrapMsg.data.control == TOPLEVEL::control::dataExchange)
-    {
-        size_t slotIDX = bootstrapMsg.data.offset;
-        guiMaster.reset(new MasterUI(*this, slotIDX));
-        assert(guiMaster);
-        return *guiMaster;
-    }
+    while (toGUI.read(bootstrapMsg.bytes))
+        if (guiDataExchange.isValidPushMsg(bootstrapMsg))
+        {
+            size_t slotIDX = bootstrapMsg.data.offset;
+            guiMaster.reset(new MasterUI(*this, slotIDX));
+            assert(guiMaster);
+            return *guiMaster;
+        }
     throw std::logic_error("Instance Lifecycle broken: expect bootstrap message.");
     // Explanation: after a suitable MusicIO backend has been established, the SynthEngine::Init()
     //              will initialise the InterChange for this Synth and then prime the toGUI ringbuffer
@@ -171,7 +171,7 @@ MasterUI& InterChange::createGuiMaster()
     //              receive push-updates from the Core and is thus embedded directly into MasterUI.
 }
 
-void InterChange::closeGui()
+void InterChange::shutdownGui()
 {
     guiMaster.reset();
 }
@@ -3563,7 +3563,7 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case TOPLEVEL::control::dataExchange:
             // this trigger is sent immediately after a new instance becomes operational
-            synth->postBootHook();
+            synth->postBootHook(getData->data.parameter);
             getData->data.source  = TOPLEVEL::action::toAll | TOPLEVEL::action::forceUpdate;
                               //    cause InterChange::returns() to also to forward this into GUI -> MasterUI::refreshInit()
             break;

@@ -31,6 +31,7 @@
 #include <string>
 #include <memory>
 #include <pthread.h>
+#include <functional>
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -72,6 +73,7 @@ public:
    ~MusicClient();
 
     bool open(audio_driver, midi_driver);
+    bool open(std::function<MusicIO*(SynthEngine&)>&);
     bool start();
     void close();
     uint getSamplerate();

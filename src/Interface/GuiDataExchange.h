@@ -192,6 +192,9 @@ public:
     };
 
 
+    /** message describes a push update, corresponding to GuiDataExchange data? */
+    bool isValidPushMsg(CommandBlock const&);
+
     /**
      * Dispatch a notification regarding data updates -> GUI.
      * The given CommandBlock contains a data handle(index); routing info an

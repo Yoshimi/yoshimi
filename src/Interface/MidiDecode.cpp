@@ -51,7 +51,7 @@ MidiDecode::~MidiDecode()
 
 void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync)
 {
-    bool a = inSync; inSync = a; // suppress warning (may need this later)
+    (void)inSync;          // currently unused (may need this later)
     unsigned char channel; // , note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;

@@ -39,8 +39,7 @@ using func::asString;
 
 
 MusicIO::MusicIO(SynthEngine& _synth, shared_ptr<BeatTracker>&& _beatTracker)
-    : LV2_engine{_synth.getIsLV2Plugin()}
-    , bufferAllocation{}   // Allocation happens later in prepBuffers()
+    : bufferAllocation{}   // Allocation happens later in prepBuffers()
     , zynLeft{0}
     , zynRight{0}
     , beatTracker{std::move(_beatTracker)}
@@ -56,7 +55,7 @@ void MusicIO::handleMidi(uchar par0, uchar par1, uchar par2, bool in_place)
     if (synth.audioOut.load() != _SYS_::mute::Idle)
         return; // nobody listening!
 
-    bool inSync = LV2_engine || (runtime().audioEngine == jack_audio && runtime().midiEngine == jack_midi);
+    bool inSync = runtime().isLV2 or (runtime().audioEngine == jack_audio and runtime().midiEngine == jack_midi);
 
     CommandBlock putData;
 

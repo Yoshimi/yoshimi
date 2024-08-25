@@ -43,6 +43,7 @@ JackEngine::JackEngine(SynthEngine& _synth, shared_ptr<BeatTracker> _beatTracker
     , midiPort{nullptr}
     , internalbuff{0}
 {
+    runtime().isMultiFeed = true;
     audio.jackSamplerate = 0;
     audio.jackNframes = 0;
     for (int i = 0; i < (2 * NUM_MIDI_PARTS + 2); ++i)

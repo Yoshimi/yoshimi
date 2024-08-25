@@ -57,7 +57,7 @@ class Config
         static Config&          primary()   { return instances().accessPrimaryConfig(); }
 
 
-        Config(SynthEngine *_synth, bool isLV2Plugin);
+        Config(SynthEngine *_synth);
        ~Config();
         // shall not be copied or moved or assigned
         Config(Config&&)                 = delete;
@@ -65,7 +65,7 @@ class Config
         Config& operator=(Config&&)      = delete;
         Config& operator=(Config const&) = delete;
 
-        void setup(bool);
+        void init();
         void populateFromPrimary();
         void startupReport(const string& clientName);
         void announce();
@@ -99,6 +99,8 @@ class Config
                          bool schedfifo, char lowprio, string const& name = "");
         const string& programCmd()     { return programcommand; }
 
+        bool          isLV2;
+        bool          isMultiFeed;       // can produce separate audio feeds for each part (Jack or LV2)
         string        defaultStateName;
         string        defaultSession;
         string        ConfigFile;

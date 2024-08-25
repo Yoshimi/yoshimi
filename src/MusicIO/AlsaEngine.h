@@ -55,9 +55,9 @@ class AlsaEngine : public MusicIO
 
 
         /* ====== MusicIO interface ======== */
-        bool Start()                   override;
         bool openAudio()               override;
         bool openMidi()                override;
+        bool Start()                   override;
         void Close()                   override;
         void registerAudioPort(int)    override { /*ignore*/ }
 

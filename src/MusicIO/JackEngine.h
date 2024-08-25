@@ -51,9 +51,9 @@ class JackEngine : public MusicIO
        ~JackEngine() { Close(); }
 
         /* ====== MusicIO interface ======== */
-        bool Start()                   override;
         bool openAudio()               override;
         bool openMidi()                override;
+        bool Start()                   override;
         void Close()                   override;
         void registerAudioPort(int)    override;
 

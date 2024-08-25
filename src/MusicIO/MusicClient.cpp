@@ -74,6 +74,7 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 
     switch(useAudio)
     {
+#ifndef YOSHIMI_LV2_PLUGIN
         case jack_audio:
             audioIO = make_shared<JackEngine>(synth, beat);
             break;
@@ -81,13 +82,15 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
         case alsa_audio:
             audioIO = make_shared<AlsaEngine>(synth, beat);
             break;
-#endif
+#endif /*ALSA*/
+#endif /*LV2*/
         default:
             break;
     }
 
     switch(useMidi)
     {
+#ifndef YOSHIMI_LV2_PLUGIN
         case jack_midi:
             if (useAudio == jack_audio)
                 midiIO = audioIO;
@@ -101,7 +104,8 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
             else
                 midiIO = make_shared<AlsaEngine>(synth, beat);
             break;
-#endif
+#endif /*ALSA*/
+#endif /*LV2*/
         default:
             break;
     }
@@ -111,11 +115,30 @@ void MusicClient::createEngines(audio_driver useAudio, midi_driver useMidi)
 }
 
 
+/**
+ * Attempt to establish the given combination of audio and MIDI backends.
+ * @return `true` if both back-ends could be opened successfully
+ */
 bool MusicClient::open(audio_driver tryAudio, midi_driver tryMidi)
 {
     createEngines(tryAudio, tryMidi);
     return (not audioIO or audioIO->openAudio())
        and (not midiIO  or midiIO->openMidi());
+}
+
+/**
+ * Attach to an external back-end or plugin-host (notably LV2), handling both audio and MIDI.
+ * @param createBackend a functor which creates/attaches the backend to the SynthEngine
+ */
+bool MusicClient::open(InstanceManager::PluginCreator& createBackend)
+{
+    audioIO.reset(createBackend(synth));
+    // BeatTracker assumed to be created implicitly
+    midiIO = audioIO;
+    bool success = audioIO->openAudio() and midiIO->openMidi();
+    if (not success)
+        audioIO.reset();
+    return success;
 }
 
 

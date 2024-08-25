@@ -30,8 +30,10 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 
 class Config;
+class MusicIO;
 class SynthEngine;
 
 
@@ -63,6 +65,11 @@ class InstanceManager
         uint requestNewInstance(uint);
         void triggerRestoreInstances();
         void handleNewInstanceSignal();
+        
+        using PluginCreator = std::function<MusicIO*(SynthEngine&)>;
+        bool startPluginInstance(PluginCreator);
+        void terminatePluginInstance(uint synthID);
+        void launchGui_forPlugin(uint synthID, std::string);
 
         /** Event handling loop during regular operation */
         void performWhileActive(std::function<void(SynthEngine&)> handleEvents);

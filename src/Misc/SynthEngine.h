@@ -31,6 +31,7 @@
 #include <limits.h>
 #include <cstdlib>
 #include <semaphore.h>
+#include <functional>
 #include <string>
 #include <memory>
 #include <vector>
@@ -102,7 +103,7 @@ class SynthEngine
 
         bool Init(unsigned int audiosrate, int audiobufsize);
         void publishGuiAnchor();
-        void postBootHook();
+        void postBootHook(bool);
 
         bool savePatchesXML(string filename);
         void add2XML(XMLwrapper& xml);
@@ -276,17 +277,16 @@ class SynthEngine
         bool VUready;
         void fetchMeterData(void);
 
-        inline LV2PluginType getLV2PluginType() {return lv2PluginType;}
-        inline bool getIsLV2Plugin() {return lv2PluginType != LV2PluginTypeNone; }
         inline Config &getRuntime() {return Runtime;}
         uint getUniqueId() const    {return uniqueId;}
-        void guiClosed(bool stopSynth);
-        void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
+
+        using CallbackGuiClosed = std::function<void()>;
+        void installGuiClosedCallback(CallbackGuiClosed callback)
         {
-            guiClosedCallback = _guiClosedCallback;
-            guiCallbackArg = arg;
+            callbackGuiClosed = std::move(callback);
         }
-        void closeGui();
+        void signalGuiWindowClosed();
+        void shutdownGui();
         int64_t getLFOtime() {return LFOtime;}
         float getSongBeat() {return songBeat;}
         float getMonotonicBeat() {return monotonicBeat;}
@@ -320,8 +320,7 @@ class SynthEngine
         MasterUI* getGuiMaster();
 #endif
     private:
-        void( *guiClosedCallback)(void*);
-        void *guiCallbackArg;
+        CallbackGuiClosed callbackGuiClosed;
 
         int64_t CHtimer;
 

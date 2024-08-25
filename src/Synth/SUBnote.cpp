@@ -394,7 +394,7 @@ inline void SubFilterB(const float coeff[4], float &src, float work[4])
 //in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
 {
-    if (synth.getIsLV2Plugin()){
+    if (synth.getRuntime().isLV2){
         filterVarRun(filter, smps);
         return;
     }

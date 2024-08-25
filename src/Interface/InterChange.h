@@ -79,7 +79,7 @@ class InterChange : private DataText
 
 #ifdef GUI_FLTK
         MasterUI& createGuiMaster();
-        void closeGui();
+        void shutdownGui();
 #endif
 
         CommandBlock commandData;

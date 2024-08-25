@@ -107,7 +107,7 @@ SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
     midilearn(this),
     mididecode(this),
     vectorcontrol(this),
-    Runtime(this, getIsLV2Plugin()),
+    Runtime(this),
     rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
@@ -135,10 +135,7 @@ SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
     ctl(NULL),
     microtonal(this),
     fft(),
-#ifdef GUI_FLTK
-    guiClosedCallback(NULL),
-    guiCallbackArg(NULL),
-#endif
+    callbackGuiClosed{},
     CHtimer(0),
     LFOtime(0),
     songBeat(0.0f),
@@ -172,7 +169,7 @@ SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
 SynthEngine::~SynthEngine()
 {
 #ifdef GUI_FLTK
-    closeGui();
+    shutdownGui();
 #endif
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -195,6 +192,7 @@ SynthEngine::~SynthEngine()
 
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
+    Runtime.init();
     audioOutStore(_SYS_::mute::Active);
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
@@ -411,12 +409,12 @@ void SynthEngine::publishGuiAnchor()
 /**
  * This callback is triggered whenever a new SynthEngine instance becomes fully operational.
  * If running with GUI, the GuiMaster has been created and communication via GuiDataExchange
- * has been primed
+ * has been primed. The LV2-plugin calls this later when the GUI is opened, with `isFirstInit==false`
  */
-void SynthEngine::postBootHook()
+void SynthEngine::postBootHook(bool isFirstInit)
 {
-    /////TODO : add here generic things to init post-boot
-    //
+    if (isFirstInit)
+    { /* nothing special for first init to do currently */ }
     maybePublishEffectsToGui();
     // more initial push-updates will be added here...
     //
@@ -429,20 +427,18 @@ MasterUI* SynthEngine::getGuiMaster()
     return interchange.guiMaster.get();
 }
 
-void SynthEngine::closeGui()
+void SynthEngine::shutdownGui()
 {
-    interchange.closeGui();
+    interchange.shutdownGui();
 }
 #endif /*GUI_FLTK*/
 
-void SynthEngine::guiClosed(bool stopSynth)
+void SynthEngine::signalGuiWindowClosed()
 {
-    if (stopSynth && !getIsLV2Plugin())
+    if (not Runtime.isLV2)
         Runtime.runSynth.store(false, std::memory_order_release);
-#ifdef GUI_FLTK
-    if (guiClosedCallback != NULL)
-        guiClosedCallback(guiCallbackArg);
-#endif
+    if (callbackGuiClosed)
+        callbackGuiClosed(); // if defined, invoke it
 }
 
 

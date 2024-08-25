@@ -82,7 +82,9 @@ int          Config::showCLIcontext{1};
 string Config::globalJackSessionUuid = "";
 
 
-Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
+Config::Config(SynthEngine *_synth) :
+    isLV2{false},
+    isMultiFeed{false},
     build_ID(BUILD_NUMBER),
     stateChanged(false),
     restoreJackSession(false),
@@ -163,16 +165,19 @@ Config::Config(SynthEngine *_synth, bool isLV2Plugin) :
     programcommand("yoshimi"),
     synth(_synth),
     exitType(EXIT_SUCCESS)
-{ }
-
-
-void Config::setup(bool isLV2Plugin)
 {
     std::cerr.precision(4);
+}
 
-    if (isLV2Plugin)  ///////////////////////////////////////////////////OOO need better way to do a special handling for LV2
-        return; //skip further setup, which is irrelevant for LV2 plugin instance.
 
+
+Config::~Config(){ }
+
+
+
+void Config::init()
+{
+    if (isLV2) return; //skip further setup, which is irrelevant for LV2 plugin instance.
 
     switch (audioEngine)
     {
@@ -188,7 +193,7 @@ void Config::setup(bool isLV2Plugin)
             audioDevice.clear();
             break;
     }
-    if (!audioDevice.size())
+    if (audioDevice.empty())
         audioDevice = "default";
     switch (midiEngine)
     {
@@ -214,9 +219,6 @@ void Config::setup(bool isLV2Plugin)
         jackSessionUuid = Config::globalJackSessionUuid;
 }
 
-
-Config::~Config()
-{;}
 
 
 /**

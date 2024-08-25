@@ -440,7 +440,7 @@ class MasterUI {: {public GuiUpdates}
       //std::cout << "Found windows " << int(foundWindows) << std::endl;
       loadWindowData();
       string starterror = "";
-      if (synth->getIsLV2Plugin())
+      if (synth->getRuntime().isLV2)
       {
           masterwindow->label(synth->getWindowTitle().c_str());
       }
@@ -521,7 +521,7 @@ class MasterUI {: {public GuiUpdates}
                     */
                     //send_data(0, TOPLEVEL::control::forceExit, 0, UNUSED);
 
-                synth->guiClosed(true);
+                synth->signalGuiWindowClosed();
             }}
       xywh {123 76 385 500} type Double labelfont 13 labelsize 12 hide resizable
       code0 {mainDW = 385; mainDH = 470;}
@@ -557,7 +557,7 @@ class MasterUI {: {public GuiUpdates}
             }
             break;
         case 2: // new instance
-            if (synth->getIsLV2Plugin())
+            if (synth->getRuntime().isLV2)
             {
                 query("", "", "", "Start new instances from host");
                 return;

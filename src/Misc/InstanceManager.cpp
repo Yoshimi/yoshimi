@@ -26,9 +26,11 @@
 #include "Misc/InstanceManager.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
-#include "Misc/TestInvoker.h"
 #include "Misc/FormatFuncs.h"
 #include "Misc/Util.h"
+#ifndef YOSHIMI_LV2_PLUGIN
+#include "Misc/TestInvoker.h"
+#endif
 #ifdef GUI_FLTK
     #include "MasterUI.h"
 #endif
@@ -38,6 +40,7 @@
 #include <thread>
 #include <utility>
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 #include <array>
 #include <map>
@@ -139,7 +142,7 @@ class InstanceManager::Instance
         Instance(uint id);
        ~Instance();
 
-        bool startUp();
+        bool startUp(PluginCreator =PluginCreator());
         void shutDown();
         void buildGuiMaster();
         void enterRunningState();
@@ -150,7 +153,7 @@ class InstanceManager::Instance
         LifePhase getState() const { return state; }
         uint getID()         const { return synth->getUniqueId(); }
         bool isPrimary()     const { return 0 == getID(); }
-    private:
+
         void triggerPostBootHook();
         void registerAudioPorts();
 };
@@ -182,18 +185,6 @@ class InstanceManager::SynthGroom
         // can be default created
         SynthGroom() = default;
 
-        Instance& createInstance(uint instanceID =0)
-        {
-            Guard lock(mtx);
-            instanceID = allocateID(instanceID);
-            Instance newEntry{instanceID};
-            auto& instance = registry.emplace(instanceID, move(newEntry))
-                                     .first->second;
-            if (!primary)
-                primary = & instance;
-            return instance;
-        }
-
         Instance& getPrimary()
         {
             assert(primary);
@@ -204,11 +195,15 @@ class InstanceManager::SynthGroom
         {
             return registry.size();
         }
+
         Instance& find(uint);
+
+        Instance& createInstance(uint instanceID =0);
 
         void dutyCycle(function<void(SynthEngine&)>& handleEvents);
         void shutdownRunningInstances();
         void persistRunningInstances();
+        void discardInstance(uint);
     private:
         void clearZombies();
         void handleStartRequest();
@@ -264,11 +259,27 @@ InstanceManager::Instance& InstanceManager::SynthGroom::find(uint id)
 }
 
 
+InstanceManager::Instance& InstanceManager::SynthGroom::createInstance(uint instanceID)
+{
+    Guard lock(mtx);
+    instanceID = allocateID(instanceID);
+    Instance newEntry{instanceID};
+    auto& instance = registry.emplace(instanceID, move(newEntry))
+                             .first->second;
+    if (!primary)
+        primary = & instance;
+    return instance;
+}
+
+
 
 /** boot up this engine instance into working state.
  * - probe a working IO / client setup
  * - init the SynthEngine
  * - start the IO backend
+ * @param pluginCreator (optional) a functor to attach to an external host (notably LV2).
+ *       If _not_ given (which is the default for standalone Yoshimi), then several
+ *       combinations of ALSA and Jack are probed to find a working backend.
  * @return `true` on success
  * @note after a successful boot, `state == BOOTING`,
  *       which enables some post-boot-hooks to run,
@@ -277,29 +288,36 @@ InstanceManager::Instance& InstanceManager::SynthGroom::find(uint id)
  *       However, if boot-up fails, `state == EXPIRING` and
  *       further transitioning to `DEFUNCT` after shutdown.
  */
-bool InstanceManager::Instance::startUp()
+bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
 {
     std::cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< std::endl;
     state = BOOTING;
     runtime().loadConfig();
-    runtime().setup(false); // not LV2 ////////////////////OOO clarify how to configure LV2
+    bool isLV2 = bool(pluginCreator);
     assert (not runtime().runSynth);
-    for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
+    if (isLV2)
     {
-        runtime().Log("\n-----Connect-attempt----("+display(tryAudio)+"/"+display(tryMidi)+")----");
-        if (client->open(tryAudio, tryMidi))
-        {
-            if (tryAudio == runtime().audioEngine and
-                tryMidi == runtime().midiEngine)
-                runtime().configChanged = true;
-            runtime().audioEngine = tryAudio;
-            runtime().midiEngine = tryMidi;
-            runtime().runSynth = true;  // mark as active and enable background threads
-            runtime().Log("-----Connect-SUCCESS-------------------\n");
-            runtime().Log("Using "+display(tryAudio)+" for audio and "+display(tryMidi)+" for midi", _SYS_::LogError);
-            break;
-        }
+        runtime().Log("\n----Start-LV2-Plugin--ID("+asString(getID())+")----");
+        if (client->open(pluginCreator))
+            runtime().runSynth = true;
     }
+    else
+        for (auto [tryAudio,tryMidi] : drivers_to_probe(runtime()))
+        {
+            runtime().Log("\n-----Connect-attempt----("+display(tryAudio)+"/"+display(tryMidi)+")----");
+            if (client->open(tryAudio, tryMidi))
+            {
+                if (tryAudio == runtime().audioEngine and
+                    tryMidi == runtime().midiEngine)
+                    runtime().configChanged = true;
+                runtime().audioEngine = tryAudio;
+                runtime().midiEngine = tryMidi;
+                runtime().runSynth = true;  // mark as active and enable background threads
+                runtime().Log("-----Connect-SUCCESS-------------------\n");
+                runtime().Log("Using "+display(tryAudio)+" for audio and "+display(tryMidi)+" for midi", _SYS_::LogError);
+                break;
+            }
+        }
     if (not runtime().runSynth)
         runtime().Log("Failed to instantiate MusicClient",_SYS_::LogError);
     else
@@ -334,11 +352,14 @@ bool InstanceManager::Instance::startUp()
                     std::cout << "\nStarted "<< synth->getUniqueId() << "\n";
 
                 state = BOOTING;
+                if (isLV2) enterRunningState();
                 assert (runtime().runSynth);
                 return true;
     }   }   }
 
-    runtime().Log("Bail: Yoshimi stages a strategic retreat :-(",_SYS_::LogError);
+    auto failureMsg = isLV2? string{"Failed to start Yoshimi as LV2 plugin"}
+                           : string{"Bail: Yoshimi stages a strategic retreat :-("};
+    runtime().Log(failureMsg, _SYS_::LogError);
     shutDown();
     return false;
 }
@@ -366,11 +387,55 @@ void InstanceManager::Instance::shutDown()
 /** install and start-up the primary SynthEngine and runtime */
 bool InstanceManager::bootPrimary(int argc, char *argv[])
 {
+#ifndef YOSHIMI_LV2_PLUGIN
     assert (0 == groom->instanceCnt());
     CmdOptions baseSettings(argc,argv);
     Instance& primary = groom->createInstance(0);
     baseSettings.applyTo(primary.runtime());
     return primary.startUp();
+#else
+    (void)argc; (void)argv;
+    throw std::logic_error("Must not boot a standalone primary Synth for LV2");
+#endif                  //(actual reason is: we do not link in CmdOptions.cpp)
+}
+
+/** create and manage a SynthEngine instance attached to a (LV2) plugin */
+bool InstanceManager::startPluginInstance(PluginCreator buildPluginInstance)
+{
+    return groom->instanceCnt() < MAX_INSTANCES
+       and groom->createInstance(0)  // choose next free ID
+                   .startUp(buildPluginInstance);
+}
+
+void InstanceManager::terminatePluginInstance(uint synthID)
+{
+    groom->discardInstance(synthID);
+}
+void InstanceManager::SynthGroom::discardInstance(uint synthID)
+{
+    auto& instance{find(synthID)};
+    if (instance.getID() == synthID)
+    {
+        instance.shutDown();
+        {
+            Guard lock(mtx);
+            clearZombies();
+}   }   }
+
+/**
+ * Launch the GUI at any time on-demand while Synth is already running.
+ * @note LV2 possibly re-creates the GUI-Plugin after it has been closed;
+ *       for that reason, everything in this function must be idempotent.
+ */
+void InstanceManager::launchGui_forPlugin(uint synthID, string windowTitle)
+{
+    auto& instance{groom->find(synthID)};
+    assert (instance.getID() == synthID);
+    instance.runtime().showGui = true;
+    instance.getSynth().setWindowTitle(windowTitle);
+    instance.getSynth().publishGuiAnchor();
+    instance.triggerPostBootHook();
+    instance.buildGuiMaster();
 }
 
 /**
@@ -433,6 +498,7 @@ void InstanceManager::handleNewInstanceSignal()
     // MIDI ringbuffer is the only one always active
     groom->getPrimary().getSynth().interchange.fromMIDI.write(triggerMsg.bytes);
 }
+
 
 
 void InstanceManager::performWhileActive(function<void(SynthEngine&)> handleEvents)
@@ -542,6 +608,7 @@ void InstanceManager::SynthGroom::shutdownRunningInstances()
 }
 
 
+#ifndef YOSHIMI_LV2_PLUGIN
 bool InstanceManager::requestedSoundTest()
 {
     return test::TestInvoker::access().activated;
@@ -554,6 +621,7 @@ void InstanceManager::launchSoundTest()
     assert(soundTest.activated);
     soundTest.performSoundCalculation(primarySynth);
 }
+#endif
 
 
 /**
@@ -594,10 +662,13 @@ void InstanceManager::Instance::buildGuiMaster()
     MasterUI& guiMaster = synth->interchange.createGuiMaster();
     guiMaster.Init();
 
-    if (runtime().audioEngine < 1)
-        alert(synth.get(), "Yoshimi could not connect to any sound system. Running with no Audio.");
-    if (runtime().midiEngine < 1)
-        alert(synth.get(), "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+    if (not runtime().isLV2)
+    {
+        if (runtime().audioEngine < 1)
+            alert(synth.get(), "Yoshimi could not connect to any sound system. Running with no Audio.");
+        if (runtime().midiEngine < 1)
+            alert(synth.get(), "Yoshimi could not connect to any MIDI system. Running with no MIDI.");
+    }
 #endif
 }
 
@@ -624,7 +695,7 @@ void InstanceManager::Instance::triggerPostBootHook()
     triggerMsg.data.kit       = UNUSED;
     triggerMsg.data.engine    = UNUSED;
     triggerMsg.data.insert    = UNUSED;
-    triggerMsg.data.parameter = UNUSED;
+    triggerMsg.data.parameter = (state != RUNNING? 1 : 0);  // initial boot-up init or later refresh for GUI
     triggerMsg.data.miscmsg   = UNUSED;
     triggerMsg.data.spare0    = UNUSED;
     triggerMsg.data.spare1    = UNUSED;

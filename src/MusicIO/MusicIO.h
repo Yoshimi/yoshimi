@@ -51,9 +51,9 @@ class MusicIO
         MusicIO& operator=(MusicIO&&)      = delete;
         MusicIO& operator=(MusicIO const&) = delete;
 
-        virtual bool Start()                   = 0;
         virtual bool openAudio()               = 0;
         virtual bool openMidi()                = 0;
+        virtual bool Start()                   = 0;
         virtual void Close()                   = 0;
         virtual void registerAudioPort(int)    = 0;
 
@@ -69,7 +69,6 @@ class MusicIO
         void getAudio()    { synth.MasterAudio(zynLeft, zynRight); }
         void handleMidi(uchar par0, uchar par1, uchar par2, bool in_place = false);
 
-        bool LV2_engine;
         Samples bufferAllocation;
         float*  zynLeft[NUM_MIDI_PARTS + 1];
         float* zynRight[NUM_MIDI_PARTS + 1];
