@@ -42,12 +42,6 @@
   Ideally there should be no reserved colours, as that means we are
   not managing them!
 
-  These 4 are in the grey scale so will depend on theme settings.
-  45* root/bank slot normal background
-  47* bank extended instruments background
-  50* root/bank 'occupied' normal background
-  55* bank 'occupied' extended instruments background
-
   56
   58 - 61
   68 - 79
@@ -78,8 +72,12 @@
   248 - 250
 */
 
-const int gen_text_back = 7;
-const int instr_back = 17;
+const int gen_text_back = 7; // we shouldn't really use this - it's complicated!
+const int instr_back = 17; // we shouldn't really use this - it's complicated!
+const int bank_back = 46; //  root/bank slot background
+const int bank_back_ext = bank_back; //       bank extended instruments background
+const int bank_back_used = bank_back; //      root/bank 'occupied' normal background
+const int bank_back_ext_used = bank_back; // bank 'occupied' extended instruments background
 const int reserved_0 = 56;
 const int graph_back = 57;
 const int slider_track = 62;

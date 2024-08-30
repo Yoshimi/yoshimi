@@ -67,6 +67,8 @@ decl {\#include "Interface/TextLists.h"} {public local
 
 decl {\#include "MasterUI.h"} {private local
 }
+decl {\#include "UI/Themes.h"} {private local
+}
 
 decl {\#include "Misc/FormatFuncs.h"
     using func::string2int;
@@ -161,48 +163,30 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   } {
     code {//
     if (type() == FL_HIDDEN_BUTTON) return;
-    int acol, scol, pcol, bcol;
+    int acol, scol, pcol;
     int wid = w() * 0.334;
     int engine = bank->engines_used(rootID, bankID, nslot);
+
+    acol = bank_back; // normal background
+    scol = bank_back;
+    pcol = bank_back;
+
     if (*nselected == nslot)
     {
         acol = bank_swap_back; // selected item background
         scol = bank_swap_back;
         pcol = bank_swap_back;
     }
-    else if (bank->emptyslot(rootID, bankID, nslot))
-    {
-        if (nslot < 128)
-        {
-            acol = 45; // normal background
-            scol = 45;
-            pcol = 45;
-        }
-        else
-        {
-            acol = 47; // extended instruments background
-            scol = 47;
-            pcol = 47;
-        }
-    }
     else
     {
-        if (nslot < 128)
-            bcol = 50; // 'occupied' normal background
-        else
-            bcol = 55; // 'occupied' extended instruments background
         if (engine & 1)
             acol = add_back;
-        else
-            acol = bcol;
+
         if (engine & 2)
             scol = sub_back;
-        else
-            scol = bcol;
+
         if (engine & 4)
             pcol = pad_back;
-        else
-            pcol = bcol;
 
         if ((lastSeen & 0x7f) == rootID && ((lastSeen >> 8) & 0x7f) == bankID  && ((lastSeen >> 15) == nslot))
             labelfont(1);
@@ -299,16 +283,16 @@ class RootSlot {: {public Fl_Button, RootProcess_}
     code {//
         string bankName = root->getBankName(nslot, rootID);
         if (bankName.empty())
-            color(46);
+            color(bank_back);
         else
         {
              bankName = std::to_string(nslot) + ". " + bankName;
              if ((unsigned int) nslot == currentBank)
-                color(252);
+                color(bank_highlight);
             else
-                color(51);
+                color(bank_back_used);
             if (*rselected == nslot)
-                color(6);
+                color(bank_swap_back);
         }
         copy_label(bankName.c_str());} {}
   }
