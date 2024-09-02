@@ -1,5 +1,10 @@
 yoshimi 2.3.2 M
 
+2024-9-2 Will
+bn 2350
+Revised theme colour control, providing better bank colours.
+Also started development of high contrast theme.
+
 2024-8-25 Will
 bn 2349
 Most keyboard shortcuts (alt+underlined) at the first couple

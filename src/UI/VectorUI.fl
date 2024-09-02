@@ -848,7 +848,7 @@ switch (res)
             col = pad_back;
             break;
         default:
-            col = instr_back;
+            col = bank_back_used;
             break;
     }
     return col;} {}

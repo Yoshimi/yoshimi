@@ -1,7 +1,7 @@
 /*
     Themes.h - FLTK theme colours
 
-    Copyright 2023 Will Godfrey & others
+    Copyright 2023-2024 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public
@@ -55,7 +55,6 @@
   125 - 127
   138 - 141
   148 - 154
-  156
   160 - 161
   164 - 166
   170 - 172
@@ -73,11 +72,6 @@
 */
 
 const int gen_text_back = 7; // we shouldn't really use this - it's complicated!
-const int instr_back = 17; // we shouldn't really use this - it's complicated!
-const int bank_back = 46; //  root/bank slot background
-const int bank_back_ext = bank_back; //       bank extended instruments background
-const int bank_back_used = bank_back; //      root/bank 'occupied' normal background
-const int bank_back_ext_used = bank_back; // bank 'occupied' extended instruments background
 const int reserved_0 = 56;
 const int graph_back = 57;
 const int slider_track = 62;
@@ -104,7 +98,7 @@ const int EQ_line_off = 94;
 const int EQ_line = 95;
 const int EQ_back = 96;
 const int EQ_back_off = 97;
-const int reserved_3 = 101;
+const int bank_text = 101;
 const int bank_select = 103;
 const int reserved_4 = 104;
 const int tooltip_major_grid = 105;
@@ -127,6 +121,7 @@ const int knob_point = 145;
 const int tooltip_grid = 146;
 const int EQ_grid = 147;
 const int EQ_major_grid = 155;
+const int reserved_6 = 156;
 const int ext_voice = 157;
 const int pad_back = 158;
 const int pad_equiv_back = 159;
@@ -157,7 +152,7 @@ const int pad_building = 202;
 const int filer_text_back = 206;
 const int knob_high = 207;
 const int bank_rename = 208;
-const int reserved_8 = 209;
+const int bank_back_used = 209;
 const int add_back = 214;
 const int tooltip_back = 215;
 const int graph_Harmonics_grid = 216;
@@ -185,7 +180,7 @@ const int knob_low = 244;
 const int graph_resonance_grid = 245;
 const int env_line = 246;
 const int midi_text_back = 247;
-const int reserved_9 = 251;
+const int bank_back = 251;
 const int bank_highlight = 252;
 const int env_ctl = 253;
 const int graph_pad_back = 254;
@@ -243,7 +238,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     tooltip_curve,
     tooltip_text,
     tooltip_faint_text,
-    reserved_3,
+    bank_text,
     VU_bar_1dB,
     VU_bar_5dB,
     VU_bar_10dB,
@@ -274,7 +269,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     reson_graph_line,
     yoshi_ins_typ,
     instr_info_back,
-    instr_back,
+    reserved_6,
     voice_off,
     add_back,
     ext_voice,
@@ -297,7 +292,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     pad_fading,
     pad_built,
     pending_button,
-    reserved_8,
+    bank_back_used,
     formant_marker,
     formant_ghost_marker,
     dynfilter_button,
@@ -309,7 +304,7 @@ const unsigned char colourNumbers [COLOURLIST] = {
     EQ_line_off,
     eff_preset,
     eff_preset_changed,
-    reserved_9,
+    bank_back,
     env_ctl,
     env_ctl_sel,
     env_sus,
@@ -370,7 +365,7 @@ static std::string colourData [] = {
     "0,0,255, Tooltip curve",
     "0,0,0, Tooltip text",
     "150,150,150, Tooltip faint text",
-    "0,0,0, RESERVED",
+    "0,0,0, Bank/Instrument text",
     "0,145,255, VU 1dB marker",
     "63,218,255, VU 5dB marker",
     "140,180,220, VU 10dB marker",
@@ -401,7 +396,7 @@ static std::string colourData [] = {
     "255,0,0, Resonance graph line",
     "0,0,225, Yoshimi instrument type",
     "240,250,230, Instrument info background",
-    "253,246,230, Instrument background",
+    "253,246,230, RESERVED",
     "127,127,127, AddVoice tab off",
     "223,175,191, AddSynth background",
     "159,223,143, External voice",
@@ -424,7 +419,7 @@ static std::string colourData [] = {
     "255,255,0, PadSynth fading",
     "150,150,150, PadSynth built",
     "255,120,0, Pending button",
-    "0,0,0, RESERVED",
+    "225,225,205, Occupied bank tile",
     "255,255,0, Formant filter marker",
     "150,150,0, Formant filter ghost marker",
     "0,182,191, Dynfilter filter insert",
@@ -436,7 +431,7 @@ static std::string colourData [] = {
     "200,200,80, EQ graph line disabled",
     "0,0,0, Effect preset",
     "0,0,255, Effect preset changed",
-    "0,0,0, RESERVED",
+    "120,120,120, Unused bank tile",
     "255,255,255, Envelope control point",
     "0,255,255, Envelope control point selected",
     "255,255,0, Envelope sustain line",

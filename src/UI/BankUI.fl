@@ -166,10 +166,18 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     int acol, scol, pcol;
     int wid = w() * 0.334;
     int engine = bank->engines_used(rootID, bankID, nslot);
-
-    acol = bank_back; // normal background
-    scol = bank_back;
-    pcol = bank_back;
+    if (engine > 0)
+    {
+        acol = bank_back_used; // occupied background
+        scol = bank_back_used;
+        pcol = bank_back_used;
+    }
+    else
+    {
+        acol = bank_back; // normal background
+        scol = bank_back;
+        pcol = bank_back;
+    }
 
     if (*nselected == nslot)
     {
@@ -200,17 +208,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     //frame for label
     draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), Fl_Color(17));
 
-    //draw_backdrop();
-
-    Fl_Color col = value() ? selection_color() : color();
-    if (labeltype() == FL_NORMAL_LABEL && value())
-    {
-        Fl_Color c = labelcolor();
-        labelcolor(fl_contrast(c, col));
-        draw_label();
-        labelcolor(c);
-    }
-    else
+    labelcolor(bank_text);
         draw_label();
 
     if (Fl::focus() == this) draw_focus();} {}
@@ -294,6 +292,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
             if (*rselected == nslot)
                 color(bank_swap_back);
         }
+        labelcolor(bank_text);
         copy_label(bankName.c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected, *rselected;} {private local

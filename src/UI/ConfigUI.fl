@@ -1609,7 +1609,14 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             }
             else
             {
-                test = setColourLine(colourText.substr(0, nextPos), lineCount);
+                string lineText = colourText.substr(0, nextPos);
+                if (lineText.find("RESERVED") != std::string::npos)
+                {
+                    // use actual default value, stepping over greyscale line
+                    test = setColourLine(colourData[lineCount + 1], lineCount);
+                }
+                else
+                    test = setColourLine(lineText, lineCount);
             }
 
             if (test == -1)

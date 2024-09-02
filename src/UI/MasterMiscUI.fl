@@ -672,15 +672,15 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if (engine & 1)
         partadd->color(add_back);
     else
-        partadd->color(FL_BACKGROUND_COLOR);
+        partadd->color(bank_back_used);
     if (engine & 2)
         partsub->color(sub_back);
     else
-        partsub->color(FL_BACKGROUND_COLOR);
+        partsub->color(bank_back_used);
     if (engine & 4)
         partpad->color(pad_back);
     else
-        partpad->color(FL_BACKGROUND_COLOR);
+        partpad->color(bank_back_used);
     if (synth->part[npart | *plgroup]->PyoshiType)
         partname->labelcolor(yoshi_ins_typ);
     else

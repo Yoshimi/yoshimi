@@ -3782,17 +3782,17 @@ Alan Calvert started the project}
         if (engine & 1) // addsynth
         instrumentaddbox->color(add_back);
     else
-        instrumentaddbox->color(instr_back);
+        instrumentaddbox->color(bank_back_used);
 
     if (engine & 2) // subsynth
         instrumentsubbox->color(sub_back);
     else
-        instrumentsubbox->color(instr_back);
+        instrumentsubbox->color(bank_back_used);
 
     if (engine & 4) // padsynth
         instrumentpadbox->color(pad_back);
     else
-        instrumentpadbox->color(instr_back);
+        instrumentpadbox->color(bank_back_used);
 
     instrumentlabel->copy_label(instrumentName.c_str());
 

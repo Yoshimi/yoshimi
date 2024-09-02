@@ -2313,17 +2313,17 @@ class PartUI {: {public Fl_Group, PartUI_}
     if (engine & 1)
         synth->getGuiMaster()->instrumentaddbox->color(add_back);
     else
-        synth->getGuiMaster()->instrumentaddbox->color(instr_back);
+        synth->getGuiMaster()->instrumentaddbox->color(bank_back_used);
 
     if (engine & 2)
         synth->getGuiMaster()->instrumentsubbox->color(sub_back);
     else
-        synth->getGuiMaster()->instrumentsubbox->color(instr_back);
+        synth->getGuiMaster()->instrumentsubbox->color(bank_back_used);
 
     if (engine & 4)
         synth->getGuiMaster()->instrumentpadbox->color(pad_back);
     else
-        synth->getGuiMaster()->instrumentpadbox->color(instr_back);
+        synth->getGuiMaster()->instrumentpadbox->color(bank_back_used);
 
     if (part->PyoshiType)
         synth->getGuiMaster()->instrumentlabel->labelcolor(yoshi_ins_typ);

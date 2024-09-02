@@ -45,7 +45,7 @@ contrasted
 0,240,0, Tooltip curve
 250,250,250, Tooltip text
 180,180,180, Tooltip faint text
-0,0,0, RESERVED
+0,0,0, Bank/Instrument text
 50,55,55, VU 1dB marker
 60,65,65, VU 5dB marker
 75,75,75, VU 10dB marker
@@ -99,7 +99,7 @@ contrasted
 255,255,0, PadSynth fading
 150,150,150, PadSynth built
 255,120,0, Pending button
-0,0,0, RESERVED
+100,100,100, Occupied bank tile
 255,255,0, Formant filter marker
 150,150,0, Formant filter ghost marker
 50,50,80, Dynfilter filter button
@@ -111,7 +111,7 @@ contrasted
 200,200,80, EQ graph line disabled
 200,200,200, Effect preset
 140,200,255, Effect preset changed
-0,0,0, RESERVED
+60,60,60, Unused bank tile
 255,255,255, Envelope control point
 0,0,255, Envelope control point selected
 255,255,0, Envelope sustain line

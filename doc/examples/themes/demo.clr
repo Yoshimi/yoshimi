@@ -1,3 +1,5 @@
+Demo
+
 ------------------ data start marker
 0,120, Grey scale min-max
 255,255,127, Panels
@@ -42,7 +44,7 @@
 0,0,255, Tooltip curve
 0,0,200, Tooltip text
 150,150,150, Tooltip faint text
-0,0,0, RESERVED
+250,250,0, Bank/Instrument text
 0,145,255, VU 1dB marker
 63,218,255, VU 5dB marker
 100,220,120, VU 10dB marker
@@ -96,7 +98,7 @@
 125,125,0, PadSynth fading
 100,100,100, PadSynth built
 255,0,255, Pending button
-0,0,0, RESERVED
+140,140,140, Occupied bank tile
 200,255,200, Formant filter marker
 100,155,100, Formant filter ghost marker
 0,182,191, Dynfilter filter insert
@@ -108,7 +110,7 @@
 200,200,80, EQ graph line disabled
 255,255,0, Effect preset
 0,255,255, Effect preset changed
-0,0,0, RESERVED
+80,80,80, Unused bank tile
 255,255,255, Envelope control point
 0,255,255, Envelope control point selected
 255,255,0, Envelope sustain line

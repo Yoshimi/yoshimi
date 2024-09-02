@@ -1,5 +1,5 @@
-Don't add or remove lines between and including dashes.
-This would corrupt the colour map.
+Demo
+
 ------------------ data start marker
 0,255, Grey scale min-max (can be reversed) optional + R,G,B, (tint)
 0,200,255, Panels (R,G,B, or #rrggbb,)
@@ -44,7 +44,7 @@ This would corrupt the colour map.
 0,0,255, Tooltip curve
 0,0,0, Tooltip text
 150,150,150, Tooltip faint text
-0,0,0, RESERVED
+0,0,0, Bank/Instrument text
 0,145,255, VU 1dB marker
 63,218,255, VU 5dB marker
 140,180,220, VU 10dB marker
@@ -98,7 +98,7 @@ This would corrupt the colour map.
 255,255,0, PadSynth fading
 150,150,150, PadSynth built
 255,120,0, Pending button
-0,0,0, RESERVED
+200,200,200, Occupied bank tile
 255,255,0, Formant filter marker
 150,150,0, Formant filter ghost marker
 0,182,191, Dynfilter filter insert
@@ -110,7 +110,7 @@ This would corrupt the colour map.
 200,200,80, EQ graph line disabled
 0,0,0, Effect preset
 0,0,255, Effect preset changed
-0,0,0, RESERVED
+120,120,120, Unused bank tile
 255,255,255, Envelope control point
 0,255,255, Envelope control point selected
 255,255,0, Envelope sustain line
@@ -119,4 +119,4 @@ This would corrupt the colour map.
 =================== data end marker
 Add your own notes here:
 Copyright © 2020 A. N. Other
-The default theme
+Retro Classic
