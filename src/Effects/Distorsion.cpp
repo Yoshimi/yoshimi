@@ -49,10 +49,10 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     hpffr(0, synth->samplerate)
 {
     level.setTargetValue(Plevel / 127.0f);
-    lpfl = new AnalogFilter(TOPLEVEL::filter::Low2, 22000, 1, 0, synth);
-    lpfr = new AnalogFilter(TOPLEVEL::filter::Low2, 22000, 1, 0, synth);
-    hpfl = new AnalogFilter(TOPLEVEL::filter::High2, 20, 1, 0, synth);
-    hpfr = new AnalogFilter(TOPLEVEL::filter::High2, 20, 1, 0, synth);
+    lpfl = new AnalogFilter(*synth, TOPLEVEL::filter::Low2, 22000, 1, 0);
+    lpfr = new AnalogFilter(*synth, TOPLEVEL::filter::Low2, 22000, 1, 0);
+    hpfl = new AnalogFilter(*synth, TOPLEVEL::filter::High2, 20, 1, 0);
+    hpfr = new AnalogFilter(*synth, TOPLEVEL::filter::High2, 20, 1, 0);
     setpreset(Ppreset);
     changepar(2, 35);
     Pchanged = false;

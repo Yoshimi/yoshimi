@@ -361,7 +361,7 @@ void Reverb::sethpf(uchar Phpf_)
     {
         hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f);
         if (hpf == NULL)
-            hpf = new AnalogFilter(TOPLEVEL::filter::High2, hpffr.getValue(), 1, 0, synth);
+            hpf = new AnalogFilter(*synth, TOPLEVEL::filter::High2, hpffr.getValue(), 1, 0);
     }
 }
 
@@ -379,7 +379,7 @@ void Reverb::setlpf(uchar Plpf_)
     {
         lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
         if (!lpf)
-            lpf = new AnalogFilter(TOPLEVEL::filter::Low2, lpffr.getValue(), 1, 0, synth);
+            lpf = new AnalogFilter(*synth, TOPLEVEL::filter::Low2, lpffr.getValue(), 1, 0);
     }
 }
 

@@ -45,7 +45,8 @@ class EQ : public Effect
 {
     public:
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~EQ() { };
+       ~EQ() = default;
+
         void out(float *smpsl, float *smpr)   override;
         void setpreset(uchar npreset)         override;
         void changepar(int npar, uchar value) override;
@@ -89,12 +90,15 @@ class EQ : public Effect
                 ,freq{0, synth.samplerate}
                 ,gain{0, synth.samplerate}
                 ,q   {0, synth.samplerate}
-                ,l{new AnalogFilter(TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0, &synth)}
-                ,r{new AnalogFilter(TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0, &synth)}
+                ,l{new AnalogFilter(synth, TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0)}
+                ,r{new AnalogFilter(synth, TOPLEVEL::filter::Peak2, 1000.0, 1.0, 0)}
             { }
         };
 
         FilterParam filter[MAX_EQ_BANDS];
+
+        class FilterSnapshot;
+        mutable std::unique_ptr<FilterSnapshot> filterSnapshot;
 };
 
 class EQlimit

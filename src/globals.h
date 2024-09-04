@@ -271,7 +271,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         Notch2,
         Peak2,
         LowShelf2,
-        HighShelf2
+        HighShelf2             // NOTE: also used to limit valid filter type codes. See AnalogFilter
     };
 
     enum XML : unsigned char { // file and history types

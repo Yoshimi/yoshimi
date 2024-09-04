@@ -26,11 +26,19 @@
 
 #include "Misc/NumericFuncs.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/Util.h"
 #include "Effects/EQ.h"
+
+#include <cstddef>
+#include <cassert>
 
 using func::power;
 using func::powFrac;
 using func::asDecibel;
+using util::unConst;
+using util::max;
+
+using std::make_unique;
 
 
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth)
@@ -39,6 +47,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth)
     , Pvolume{}
     , Pband{0}
     , filter{*synth,*synth,*synth,*synth,*synth,*synth,*synth,*synth} // MAX_EQ_BANDS
+    , filterSnapshot{}
 {
     // default values
     setvolume(50);
@@ -174,8 +183,8 @@ void EQ::changepar(int npar, uchar value)
     {
         case 0:
             filter[nb].Ptype = value;
-            if (value > 9)
-                filter[nb].Ptype = 0; // has to be changed if more filters will be added
+            if (value > AnalogFilter::MAX_TYPES)
+                filter[nb].Ptype = 0;
             if (filter[nb].Ptype != 0)
             {
                 filter[nb].l->settype(value - 1);
@@ -334,6 +343,63 @@ float EQlimit::getlimits(CommandBlock *getData)
 }
 
 
+
+/**
+ * Helper: an inline buffer to maintain a temporary copy of an AnalogFilter,
+ * used to compute the filter coefficients and then the response for GUI presentation.
+ * We can not use the actual filters, since their values will be interpolated gradually.
+ * Rather, we need to work from the pristine FilterParameter settings of this EQ.
+ */
+class EQ::FilterSnapshot
+{
+    // a chunk of raw uninitialised storage of suitable size
+    alignas(AnalogFilter)
+        std::byte buffer_[sizeof(AnalogFilter)];
+
+    EQ const& eq;
+
+public:
+   ~FilterSnapshot()
+    { destroy(); }
+
+    FilterSnapshot(EQ const& outer)
+        : eq{outer}
+    {
+        emplaceFilter(0, 1000, 1.0, 1, 1.0);
+    }// ensure there is always a dummy object emplaced
+
+
+    void captureBand(uint idx)
+    {
+        assert(idx < MAX_EQ_BANDS);
+        FilterParam const& par{eq.filter[idx]};
+        destroy();
+        emplaceFilter(max(0, par.Ptype-1)       // Ptype == 0 means disabled -- skipped in calcResponse()
+                     ,par.freq.getTargetValue()
+                     ,par.q.getTargetValue()
+                     ,par.Pstages
+                     ,par.gain.getTargetValue()
+                     );
+    }
+
+    AnalogFilter& access()
+    {
+        return * std::launder (reinterpret_cast<AnalogFilter*> (&buffer_));
+    }
+
+private:
+    void emplaceFilter(uchar type, float freq, float q, uchar stages, float dBgain)
+    {
+        new(&buffer_) AnalogFilter(* unConst(eq).synth, type,freq,q,stages,dBgain);
+    }
+
+    void destroy()
+    {
+        access().~AnalogFilter();
+    }
+};
+
+
 /**
  * Prepare the Lookup-Table used by the EQGraph-UI to display the
  * gain response as function of the frequency. The number of step points in the LUT
@@ -357,13 +423,17 @@ void EQ::renderResponse(EQGraphArray & lut) const
 
 float EQ::calcResponse(float freq) const
 {
-    float resp = 1.0f;
+    if (not filterSnapshot)
+        filterSnapshot = make_unique<FilterSnapshot>(*this);
+
+    float response{1.0};
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
         if (filter[i].Ptype == 0)
             continue;
-        resp *= filter[i].l->H(freq);
+        filterSnapshot->captureBand(i);
+        response *= filterSnapshot->access().calcFilterResponse(freq);
     }
     // Only for UI purposes, use target value.
-    return asDecibel(resp * outvolume.getTargetValue());
+    return asDecibel(response * outvolume.getTargetValue());
 }

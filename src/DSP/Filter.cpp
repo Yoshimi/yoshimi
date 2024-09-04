@@ -30,28 +30,28 @@ using func::decibel;
 using func::power;
 
 
-Filter::Filter(FilterParams *pars_, SynthEngine *_synth):
-    pars(pars_),
-    parsUpdate(*pars_),
-    synth(_synth)
+Filter::Filter(FilterParams* _pars, SynthEngine* _synth)
+    : pars(_pars)
+    , parsUpdate(*_pars)
+    , synth(_synth)
 {
-    unsigned char Ftype = pars->Ptype;
-    unsigned char Fstages = pars->Pstages;
+    uchar type = pars->Ptype;
+    uchar stages = pars->Pstages;
 
     category = pars->Pcategory;
 
     switch (category)
     {
         case 1:
-            filter = new FormantFilter(pars, synth);
+            filter = new FormantFilter(synth, pars);
             break;
 
         case 2:
-            filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
+            filter = new SVFilter(synth, type, 1000.0f, pars->getq(), stages);
             break;
 
         default:
-            filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
+            filter = new AnalogFilter(*synth, type, 1000.0f, pars->getq(), stages);
             break;
     }
 

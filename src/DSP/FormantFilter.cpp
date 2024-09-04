@@ -36,7 +36,7 @@ using func::powFrac;
 using func::power;
 
 
-FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
+FormantFilter::FormantFilter(SynthEngine* _synth, FilterParams* pars_):
     pars(pars_),
     parsUpdate(*pars_),
     synth(_synth),
@@ -45,7 +45,7 @@ FormantFilter::FormantFilter(FilterParams *pars_, SynthEngine *_synth):
 {
     numformants = pars->Pnumformants;
     for (int i = 0; i < numformants; ++i)
-        formant[i] = new AnalogFilter(TOPLEVEL::filter::Band2, 1000.0f, 10.0f, pars->Pstages, synth);
+        formant[i] = new AnalogFilter(*synth, TOPLEVEL::filter::Band2, 1000.0f, 10.0f, pars->Pstages);
     cleanup();
 
     for (int i = 0; i < FF_MAX_FORMANTS; ++i)

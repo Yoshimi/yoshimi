@@ -48,10 +48,16 @@ using EQGraphArray = std::array<float, EQ_GRAPH_STEPS>;
 class Effect
 {
     public:
+        virtual ~Effect()  = default; ///< this is an interface
+
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
                FilterParams *filterpars_, uchar Ppreset_,
                SynthEngine *synth_);
-        virtual ~Effect() { };
+        // shall not be copied nor moved
+        Effect(Effect&&)                 = delete;
+        Effect(Effect const&)            = delete;
+        Effect& operator=(Effect&&)      = delete;
+        Effect& operator=(Effect const&) = delete;
 
         virtual void setpreset(uchar npreset) = 0;
         virtual void changepar(int npar, uchar value) = 0;
