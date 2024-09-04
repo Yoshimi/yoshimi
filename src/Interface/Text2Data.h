@@ -35,39 +35,39 @@ class TextMsgBuffer;
 class TextData
 {
     public:
-        void encodeAll(SynthEngine *_synth, string &sendCommand, CommandBlock &allData);
+        void encodeAll(SynthEngine*, string& sendCommand, CommandBlock&);
 
     private:
-        SynthEngine *oursynth;
-        void log(string &line, string text);
-        void strip(string &line);
-        void nextWord(string &line);
-        bool findCharNum(string &line, unsigned char &value);
-        bool findAndStep(string &line, string text, bool step = true);
-        int findListEntry(string &line, int step, const string list []);
+        SynthEngine* oursynth;
+
+        void log(string& line, string text);
+        void strip(string& line);
+        void nextWord(string& line);
+        bool findCharNum(string& line, uchar& value);
+        bool findAndStep(string& line, string text, bool step = true);
+        int findListEntry(string& line, int step, const string list []);
         int mapToEffectNumber(int textIndex, const int list []);
-        int findEffectFromText(string &line, int step, const string list [], const int listmap []);
-        void encodeLoop(string source, CommandBlock &allData);
+        int findEffectFromText(string& line, int step, const string list [], const int listmap []);
+        void encodeLoop(string source, CommandBlock&);
 
-        void encodeMain(string &source, CommandBlock &allData);
-        void encodeScale(string &source, CommandBlock &allData);
-        void encodePart(string &source, CommandBlock &allData);
+        void encodeMain (string& source, CommandBlock&);
+        void encodeScale(string& source, CommandBlock&);
+        void encodePart (string& source, CommandBlock&);
 
-        void encodeController(string &source, CommandBlock &allData);
-        void encodeMidi(string &source, CommandBlock &allData);
-        void encodeEffects(string &source, CommandBlock &allData);
+        void encodeController(string& source, CommandBlock&);
+        void encodeMidi     (string& source, CommandBlock&);
+        void encodeEffects  (string& source, CommandBlock&);
 
-        void encodeAddSynth(string &source, CommandBlock &allData);
-        void encodeAddVoice(string &source, CommandBlock &allData);
-        void encodeSubSynth(string &source, CommandBlock &allData);
-        void encodePadSynth(string &source, CommandBlock &allData);
+        void encodeAddSynth (string& source, CommandBlock&);
+        void encodeAddVoice (string& source, CommandBlock&);
+        void encodeSubSynth (string& source, CommandBlock&);
+        void encodePadSynth (string& source, CommandBlock&);
 
-        void encodeWaveform(string &source, CommandBlock &allData);
-        void encodeResonance(string &source, CommandBlock &allData);
+        void encodeWaveform (string& source, CommandBlock&);
+        void encodeResonance(string& source, CommandBlock&);
 
-        void encodeLFO(string &source, CommandBlock &allData);
-        void encodeEnvelope(string &source, CommandBlock &allData);
-        void encodeFilter(string &source, CommandBlock &allData);
-
+        void encodeLFO      (string& source, CommandBlock&);
+        void encodeEnvelope (string& source, CommandBlock&);
+        void encodeFilter   (string& source, CommandBlock&);
 };
-#endif // TEXTDATA_H
+#endif /*TEXTDATA_H*/

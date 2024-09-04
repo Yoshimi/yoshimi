@@ -35,13 +35,13 @@
 using func::power;
 
 
-Resonance::Resonance(SynthEngine *_synth) : ParamBase(_synth)
+Resonance::Resonance(SynthEngine* _synth) : ParamBase{_synth}
 {
     defaults();
 }
 
 
-void Resonance::defaults(void)
+void Resonance::defaults()
 {
     Penabled = 0;
     PmaxdB = 20;
@@ -216,20 +216,20 @@ float Resonance::getfreqpos(float freq)
 
 
 // Get the center frequency of the resonance graph
-float Resonance::getcenterfreq(void)
+float Resonance::getcenterfreq()
 {
     return 10000.0 * power<10>(-(1.0f - Pcenterfreq / 127.0f) * 2.0f);
 }
 
 
 // Get the number of octave that the resonance functions applies to
-float Resonance::getoctavesfreq(void)
+float Resonance::getoctavesfreq()
 {
     return 0.25 + 10.0 * Poctavesfreq / 127.0;
 }
 
 
-void Resonance::sendcontroller(unsigned short int ctl, float par)
+void Resonance::sendcontroller(ushort ctl, float par)
 {
     if (ctl == MIDI::CC::resonanceCenter)
         ctlcenter = par;

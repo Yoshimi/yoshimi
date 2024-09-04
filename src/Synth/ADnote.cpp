@@ -650,7 +650,7 @@ void ADnote::allocateUnison(size_t unisonCnt, size_t buffSize)
     }
 }
 
-void ADnote::initSubVoices(void)
+void ADnote::initSubVoices()
 {
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
@@ -847,7 +847,7 @@ void ADnote::killNote()
 
 
 // Init the parameters
-void ADnote::initParameters(void)
+void ADnote::initParameters()
 {
     int nvoice, i;
 
@@ -1002,7 +1002,7 @@ void ADnote::initParameters(void)
 }
 
 
-void ADnote::computeNoteParameters(void)
+void ADnote::computeNoteParameters()
 {
     paramRNG.init(paramSeed);
 
@@ -1477,7 +1477,7 @@ float ADnote::getVoiceBaseFreq(int nvoice)
 
 
 // Computes all the parameters for each tick
-void ADnote::computeWorkingParameters(void)
+void ADnote::computeWorkingParameters()
 {
     float filterCenterPitch =
         adpars.GlobalPar.GlobalFilter->getfreq() // center freq
@@ -2677,7 +2677,7 @@ void ADnote::noteout(float *outl, float *outr)
 
 
 // Release the key (NoteOff)
-void ADnote::releasekey(void)
+void ADnote::releasekey()
 {
     if (noteStatus == NOTE_LEGATOFADEOUT)
         return; // keep envelopes in sustained state (thereby blocking NoteOff)

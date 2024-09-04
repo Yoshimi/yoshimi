@@ -106,7 +106,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Alienwah::cleanup(void)
+void Alienwah::cleanup()
 {
     Effect::cleanup();
     for (int i = 0; i < Pdelay; ++i)

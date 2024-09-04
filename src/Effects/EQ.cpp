@@ -57,7 +57,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth)
 
 
 // Cleanup the effect
-void EQ::cleanup(void)
+void EQ::cleanup()
 {
     Effect::cleanup();
     for (int i = 0; i < MAX_EQ_BANDS; ++i)

@@ -44,21 +44,23 @@
     #include "UI/Splash.h"
 #endif
 
+using std::cout;
+using std::endl;
+using std::string;
 using std::this_thread::sleep_for;
 using std::chrono_literals::operator ""us;
 using std::chrono_literals::operator ""ms;
 
 
+namespace { // private global implementation state of Yoshimi main
 
-bool showSplash = false;
-bool isSingleMaster = false;
+    bool showSplash = false;
+    bool isSingleMaster = false;
 
-
-//Andrew Deryabin: signal handling moved to main from Config Runtime
-//It's only suitable for single instance app support
-static struct sigaction yoshimiSigAction;
-
-
+    //Andrew Deryabin: signal handling moved to main from Config Runtime
+    //It's only suitable for single instance app support
+    static struct sigaction yoshimiSigAction;
+}
 
 
 void yoshimiSigHandler(int sig)
@@ -86,10 +88,28 @@ void yoshimiSigHandler(int sig)
     }
 }
 
+void setupSignalHandler()
+{
+    memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
+    yoshimiSigAction.sa_handler = yoshimiSigHandler;
+    if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGUSR1 handler failed",_SYS_::LogError);
+    if (sigaction(SIGUSR2, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGUSR2 handler failed",_SYS_::LogError);
+    if (sigaction(SIGINT, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGINT handler failed",_SYS_::LogError);
+    if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGHUP handler failed",_SYS_::LogError);
+    if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGTERM handler failed",_SYS_::LogError);
+    if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
+        Config::primary().Log("Setting SIGQUIT handler failed",_SYS_::LogError);
+}
 
 
 
-static void *mainThread(void*)
+
+static void* mainThread(void*)
 {
     bool showGUI = Config::primary().showGui;
     InstanceManager& instanceManager{Config::instances()};
@@ -140,18 +160,17 @@ static void *mainThread(void*)
 }
 
 
-void *commandThread(void *)
+void* commandThread(void*)
 {
     CmdInterface cli;
     cli.cmdIfaceCommandLoop();
     return 0;
 }
 
-std::string runShellCommand(std::string command)
+string runShellCommand(string command)
 {
     string returnLine = "";
     file::cmd2string(command, returnLine);
-    //std::cout << returnLine << std::endl;
     return returnLine;
 }
 
@@ -170,11 +189,11 @@ int main(int argc, char *argv[])
      * (regardless of settings) as it is useful to be able to read and/or manually
      * change settings under fault conditions.
      */
-    std::string Home = getenv("HOME");
-    std::string Config = file::loadText(Home + "/.config/yoshimi/yoshimi.config");
-    if (Config.empty())
+    string Home = getenv("HOME");
+    string baseConfig = file::loadText(Home + "/.config/yoshimi/yoshimi.config");
+    if (baseConfig.empty())
     {
-        std::cout << "Config not there" << std::endl;
+        cout << "Missing application start-up configuration." << endl;
 #ifdef GUI_FLTK
         showSplash = true;
 #endif
@@ -183,20 +202,20 @@ int main(int argc, char *argv[])
     {
         int count = 0;
         int found = 0;
-        while (!Config.empty() && count < 16 && found < 2)
+        while (!baseConfig.empty() && count < 16 && found < 2)
         { // no need to count beyond 16 lines!
-            std::string line = func::nextLine(Config);
+            string line = func::nextLine(baseConfig);
             ++ count;
-            if (line.find("enable_splash") != std::string::npos)
+            if (line.find("enable_splash") != string::npos)
             {
                 ++ found;
-                if (line.find("yes") != std::string::npos)
+                if (line.find("yes") != string::npos)
                     showSplash = true;
             }
-            if (line.find("enable_single_master") != std::string::npos)
+            if (line.find("enable_single_master") != string::npos)
             {
                 ++ found;
-                if (line.find("yes") != std::string::npos)
+                if (line.find("yes") != string::npos)
                     isSingleMaster = true;
             }
         }
@@ -205,7 +224,7 @@ int main(int argc, char *argv[])
     if (isSingleMaster)
     {
 
-        std::string firstText = runShellCommand("pgrep -o -x yoshimi");
+        string firstText = runShellCommand("pgrep -o -x yoshimi");
         int firstpid = std::stoi(firstText);
         int firstTime = std::stoi(runShellCommand("ps -o etimes= -p " + firstText));
         int secondTime = std::stoi(runShellCommand("ps -o etimes= -p " + std::to_string(getpid())));
@@ -216,7 +235,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    std::cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting" << std::endl; // guaranteed start message
+    cout << YOSHIMI<< " " << YOSHIMI_VERSION << " is starting...\n" << endl; // guaranteed start message
 
 
     struct termios  oldTerm;
@@ -233,7 +252,7 @@ int main(int argc, char *argv[])
     if (Config::primary().oldConfig)
     {
 
-        std::cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings.\n"<< std::endl;
+        cout << "\nExisting config older than " << MIN_CONFIG_MAJOR << "." << MIN_CONFIG_MINOR << "\nCheck settings.\n"<< endl;
     }
 
     pthread_t threadMainLoop;
@@ -247,25 +266,11 @@ int main(int argc, char *argv[])
 
     if (!mainThreadStarted)
     {
-        std::cout << "Yoshimi can't start main loop!" << std::endl;
+        cout << "Yoshimi can't start main loop!" << endl;
         goto bail_out;
     }
 
-    memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
-    yoshimiSigAction.sa_handler = yoshimiSigHandler;
-    if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGUSR1 handler failed",_SYS_::LogError);
-    if (sigaction(SIGUSR2, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGUSR2 handler failed",_SYS_::LogError);
-    if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGINT handler failed",_SYS_::LogError);
-    if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGHUP handler failed",_SYS_::LogError);
-    if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGTERM handler failed",_SYS_::LogError);
-    if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        Config::primary().Log("Setting SIGQUIT handler failed",_SYS_::LogError);
-
+    setupSignalHandler();
 
     //create command line processing thread
     pthread_t threadCmd;
@@ -311,9 +316,9 @@ bail_out:
     {
         int exitType = Config::primary().exitType;
         if (exitType == FORCED_EXIT)
-            std::cout << "\nExit was forced :(" << std::endl;
+            cout << "\nExit was forced :(" << endl;
         else
-            std::cout << "\nGoodbye - Play again soon?"<< std::endl;
+            cout << "\nGoodbye - Play again soon?" << endl;
         exit(exitType);
     }
     else

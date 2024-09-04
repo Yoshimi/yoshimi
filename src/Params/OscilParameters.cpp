@@ -30,9 +30,9 @@
 #include "Misc/SynthEngine.h"
 #include "Params/OscilParameters.h" // **** RHL ****
 
-OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine *_synth) :
-    ParamBase(_synth),
-    basefuncSpectrum(fft.spectrumSize())
+OscilParameters::OscilParameters(fft::Calc const& fft, SynthEngine* _synth)
+    : ParamBase{_synth}
+    , basefuncSpectrum{fft.spectrumSize()}
 {
     defaults();
 }
@@ -275,14 +275,14 @@ float OscilParameters::getLimits(CommandBlock *getData)
     int control = getData->data.control;
     int insert = getData->data.insert;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // oscillator defaults
     int min = 0;
     int max = 127;
     float def = 0;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
     if (insert == TOPLEVEL::insert::harmonicAmplitude || insert == TOPLEVEL::insert::harmonicPhase)

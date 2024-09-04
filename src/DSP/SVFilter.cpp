@@ -76,7 +76,7 @@ void SVFilter::cleanup()
 }
 
 
-void SVFilter::computefiltercoefs(void)
+void SVFilter::computefiltercoefs()
 {
     // calculations done in doubles for better portability of results
     par.f = double(freq) / synth->samplerate * 4.0;

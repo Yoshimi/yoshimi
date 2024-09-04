@@ -22,31 +22,31 @@
 #ifndef MIDIDECODE_H
 #define MIDIDECODE_H
 
-#include <list>
-#include <string>
 
 #include "Interface/InterChange.h"
+
+#include <list>
 
 class SynthEngine;
 
 class MidiDecode
 {
     public:
+       ~MidiDecode() = default;
         MidiDecode(SynthEngine *_synth);
-        ~MidiDecode();
-        void midiProcess(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place, bool inSync = false);
-        void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
-        void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
+        void midiProcess(uchar par0, uchar par1, uchar par2, bool in_place, bool inSync = false);
+        void setMidiBankOrRootDir(uint bank_or_root_num, bool in_place = false, bool setRootDir = false);
+        void setMidiProgram(uchar ch, int prg, bool in_place = false);
 
     private:
-        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false, bool inSync = false);
-        void sendMidiCC(bool inSync, unsigned char chan, int type, short int par);
-        bool nrpnDecode(unsigned char ch, int ctrl, int param, bool in_place);
-        bool nrpnRunVector(unsigned char ch, int ctrl, int param, bool inSync);
-        void nrpnProcessData(unsigned char chan, int type, int par, bool in_place);
-        bool nrpnProcessHistory(unsigned char nLow, unsigned char dHigh, unsigned char dLow, bool in_place);
+        void setMidiController(uchar ch, int ctrl, int param, bool in_place = false, bool inSync = false);
+        void sendMidiCC(bool inSync, uchar chan, int type, short par);
+        bool nrpnDecode(uchar ch, int ctrl, int param, bool in_place);
+        bool nrpnRunVector(uchar ch, int ctrl, int param, bool inSync);
+        void nrpnProcessData(uchar chan, int type, int par, bool in_place);
+        bool nrpnProcessHistory(uchar nLow, uchar dHigh, uchar dLow, bool in_place);
         void nrpnDirectPart(int dHigh, int par);
-        void nrpnSetVector(int dHigh, unsigned char chan,  int par);
+        void nrpnSetVector(int dHigh, uchar chan,  int par);
 
         SynthEngine *synth;
 };

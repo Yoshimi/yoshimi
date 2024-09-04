@@ -29,10 +29,13 @@
 
 #include <iostream>
 #include <chrono>
+#include <string>
 
 using Mircos = std::chrono::duration<int64_t, std::micro>;
 using std::chrono::steady_clock;
 using std::chrono::floor;
+using std::string;
+using std::move;
 
 using func::asString;
 using util::unConst;
@@ -88,11 +91,11 @@ bool AlsaEngine::openAudio()
 }
 
 
-string AlsaEngine::findMidiClients(snd_seq_t *seq)
+string AlsaEngine::findMidiClients(snd_seq_t* seq)
 {
-    string result = "";
-    snd_seq_client_info_t *cinfo;
-    snd_seq_port_info_t *pinfo;
+    string result;
+    snd_seq_client_info_t* cinfo;
+    snd_seq_port_info_t* pinfo;
 
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_port_info_alloca(&pinfo);
@@ -116,7 +119,7 @@ string AlsaEngine::findMidiClients(snd_seq_t *seq)
                  & (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
                 != (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
                 continue;
-            if (string(snd_seq_client_info_get_name(cinfo)) == "Midi Through")
+            if (string{snd_seq_client_info_get_name(cinfo)} == "Midi Through")
                 continue; // don't want midi through
             result = result + snd_seq_client_info_get_name(cinfo) + ":" + std::to_string(snd_seq_port_info_get_port(pinfo)) + ", ";
         }
@@ -184,7 +187,7 @@ bool AlsaEngine::openMidi()
             runtime().midiDevice = "";
             return true;
     }
-    string found = "";
+    string found;
     if (midilist != "default")
     {
         while (!midilist.empty())
@@ -260,7 +263,7 @@ void AlsaEngine::Close()
 
 string AlsaEngine::audioClientName()  const
 {
-    string name = "yoshimi";
+    string name{"yoshimi"};
     auto& rt = unConst(this)->runtime();
     if (!rt.nameTag.empty())
         name += ("-" + rt.nameTag);
@@ -269,7 +272,7 @@ string AlsaEngine::audioClientName()  const
 
 string AlsaEngine::midiClientName()  const
 {
-    string name = "yoshimi";
+    string name{"yoshimi"};
     auto& rt = unConst(this)->runtime();
     if (!rt.nameTag.empty())
         name += ("-" + rt.nameTag);
@@ -311,7 +314,7 @@ bool AlsaEngine::prepHwparams()
         {SND_PCM_FORMAT_UNKNOWN, 0, false, true}
     };
     int formidx;
-    string formattxt = "";
+    string formattxt;
 
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
@@ -433,10 +436,10 @@ void AlsaEngine::Interleave(int buffersize)
 {
     size_t idx = 0;
     bool byte_swap = (little_endian != card_endian);
-    unsigned short int tmp16a, tmp16b;
+    ushort tmp16a, tmp16b;
     size_t chans;
-    unsigned int tmp32a, tmp32b;
-    unsigned int shift = 0x78000000;
+    uint tmp32a, tmp32b;
+    uint shift = 0x78000000;
     if (card_bits == 24)
         shift = 0x780000;
 
@@ -445,14 +448,14 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans / 2; // because we're pairing them on a single integer
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp16a = (unsigned short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            tmp16b = (unsigned short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16a = ushort(lrint( zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16b = ushort(lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
             if (byte_swap)
             {
-                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));
+                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));        //TODO shouldn't that be a cast to unsigned short? IIRC, the assignment promotes to unsigned
                 tmp16b = ((tmp16b >> 8) | (tmp16b << 8));
             }
-            interleaved[idx] = tmp16a | (int) (tmp16b << 16);
+            interleaved[idx] = tmp16a | int(tmp16b << 16);
             idx += chans;
         }
     }
@@ -461,8 +464,8 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans;
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * shift));
-            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
+            tmp32a = uint(lrint( zynLeft[NUM_MIDI_PARTS][frame] * shift));
+            tmp32b = uint(lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
             // how should we do an endian swap for 24 bit, 3 byte?
             // is it really the same, just swapping the 'unused' byte?
             if (byte_swap)
@@ -470,21 +473,21 @@ void AlsaEngine::Interleave(int buffersize)
                 tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
                 tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
             }
-            interleaved[idx] = (int) tmp32a;
-            interleaved[idx + 1] = (int) tmp32b;
+            interleaved[idx] = int(tmp32a);
+            interleaved[idx + 1] = int(tmp32b);
             idx += chans;
         }
     }
 }
 
 
-void *AlsaEngine::_AudioThread(void* arg)
+void* AlsaEngine::_AudioThread(void* arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
 }
 
 
-void *AlsaEngine::AudioThread()
+void* AlsaEngine::AudioThread()
 {
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     while (runtime().runSynth.load(std::memory_order_relaxed))  // read the atomic flag as we happen to see it, without forcing any sync
@@ -616,7 +619,7 @@ bool AlsaEngine::xrunRecover()
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
         runtime().Log("Alsa xrun recovery "
-                     + ((isgood) ? string("good") : string("not good")));
+                     + (isgood? string{"good"} : string{"not good"}));
     }
     return isgood;
 }
@@ -835,7 +838,7 @@ bool AlsaEngine::alsaBad(int op_result, string err_msg)
     bool isbad = (op_result < 0);
     if (isbad)
         runtime().Log("Error, alsa audio: " +err_msg + ": "
-                     + string(snd_strerror(op_result)));
+                     + string{snd_strerror(op_result)});
     return isbad;
 }
 

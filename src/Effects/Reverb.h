@@ -87,7 +87,7 @@ class Reverb : public Effect
     private:
         static constexpr size_t NUM_TYPES = 3;
 
-        // Parametrii
+        // Parameters
         bool Pchanged;
         uchar Pvolume;
         uchar Ptime;

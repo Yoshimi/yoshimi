@@ -39,8 +39,7 @@ file (GLOB yoshimi_effects_files
     ../Effects/Distorsion.h  ../Effects/DynamicFilter.h)
 file (GLOB yoshimi_misc_files
     ../Misc/Alloc.h ../Misc/Bank.cpp ../Misc/Bank.h
-    ../Misc/BuildScheduler.cpp ../Misc/BuildScheduler.h
-    ../Misc/DataBlockBuff.cpp ../Misc/DataBlockBuff.h
+    ../Misc/BuildScheduler.cpp ../Misc/BuildScheduler.h ../Misc/DataBlockBuff.h
     ../Misc/Config.cpp ../Misc/Config.h ../Misc/ConfBuild.h
     ../Misc/InstanceManager.cpp ../Misc/InstanceManager.h
     ../Misc/Microtonal.cpp ../Misc/Microtonal.h ../Misc/MirrorData.h

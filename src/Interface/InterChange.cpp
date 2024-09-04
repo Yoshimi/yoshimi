@@ -57,7 +57,7 @@
     #include "MasterUI.h"
 #endif
 
-enum envControl: unsigned char {
+enum envControl: uchar {
     input,
     undo,
     redo
@@ -183,13 +183,13 @@ void InterChange::spinSortResultsThread()
     sem_post(&sortResultsThreadSemaphore);
 }
 
-void *InterChange::_sortResultsThread(void *arg)
+void* InterChange::_sortResultsThread(void* arg)
 {
     return static_cast<InterChange*>(arg)->sortResultsThread();
 }
 
 
-void *InterChange::sortResultsThread(void)
+void* InterChange::sortResultsThread()
 {
     while (synth->getRuntime().runSynth.load(std::memory_order_relaxed))
     {
@@ -816,7 +816,7 @@ int InterChange::indirectMain(CommandBlock *getData, SynthEngine *synth, unsigne
         }
         case MAIN::control::saveNamedVector:
         {
-            std::string oldname = synth->getRuntime().vectordata.Name[insert];
+            string oldname = synth->getRuntime().vectordata.Name[insert];
             int pos = oldname.find("No Name");
             if (pos >=0 && pos < 2)
                 synth->getRuntime().vectordata.Name[insert] = findLeafName(text);
@@ -1568,7 +1568,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             getData->data.source &= ~TOPLEVEL::action::lowPrio;
             break;
         case PART::control::defaultInstrumentCopyright:
-            std::string name = file::configDir() + "/copyright.txt";
+            string name = file::configDir() + "/copyright.txt";
             if (parameter == 0) // load
             {
                 text = loadText(name); // TODO provide failure warning
@@ -1588,15 +1588,14 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
     return value;
 }
 
-std::string InterChange::formatScales(std::string text)
+string InterChange::formatScales(string text)
 {
-    //text = func::trimEnds(text);
-    std::string delimiters = ",";
+    string delimiters{","};
     size_t current;
     size_t next = -1;
     size_t found;
-    std::string word;
-    std::string newtext = "";
+    string word;
+    string newtext;
     do
     {
         current = next + 1;
@@ -1608,13 +1607,13 @@ std::string InterChange::formatScales(std::string text)
         {
             if (found < 4)
             {
-                std::string tmp (4 - found, '0'); // leading zeros
+                string tmp (4 - found, '0'); // leading zeros
                 word = tmp + word;
             }
             found = word.size();
             if (found < 11)
             {
-                std::string tmp  (11 - found, '0'); // trailing zeros
+                string tmp  (11 - found, '0'); // trailing zeros
                 word += tmp;
             }
         }
@@ -1627,13 +1626,13 @@ std::string InterChange::formatScales(std::string text)
 }
 
 
-std::string InterChange::formatKeys(std::string text)
+string InterChange::formatKeys(string text)
 {
-    std::string delimiters = ",";
+    string delimiters{","};
     size_t current;
     size_t next = -1;
-    std::string word;
-    std::string newtext = "";
+    string word;
+    string newtext;
     do
     {
         current = next + 1;
@@ -1856,7 +1855,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
 
 // This is only used when no valid banks can be found
-void InterChange::generateSpecialInstrument(int npart, std::string name)
+void InterChange::generateSpecialInstrument(int npart, string name)
 {
     synth->part[npart]->Pname = name;
     Part *part;
@@ -7490,7 +7489,7 @@ void InterChange::undoLast(CommandBlock *candidate)
 }
 
 
-void InterChange::undoRedoClear(void)
+void InterChange::undoRedoClear()
 {
     undoList.clear();
     redoList.clear();
@@ -7522,9 +7521,9 @@ void InterChange::testLimits(CommandBlock *getData)
         getData->data.miscmsg = NO_MSG; // just to be sure
         if (value > 119) // we don't want controllers above this
             return;
-        std::string text = "";
         // TODO can bank and bankroot be combined
         // as they now have the same options?
+        string text;
         if (control == CONFIG::control::bankRootCC)
         {
             text = synth->getRuntime().masterCCtest(int(value));

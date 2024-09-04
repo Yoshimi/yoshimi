@@ -31,6 +31,7 @@
 
 using std::to_string;
 using std::vector;
+using std::string;
 
 inline string listpos(int count, int human)
 {
@@ -42,11 +43,9 @@ class SynthEngine;
 
 class UnifiedPresets
 {
-    private:
         int human;
-        string listpos(int count);
-        vector<std::string> presetList;
-        SynthEngine *synth;
+        vector<string> presetList;
+        SynthEngine*   synth;
 
     public:
         string handleStoreLoad(SynthEngine *synth, CommandBlock *getData);
@@ -63,6 +62,8 @@ class UnifiedPresets
         string filterXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
         string lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
         string envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad);
+
+        string listpos(int count) const;
 };
 
 #endif

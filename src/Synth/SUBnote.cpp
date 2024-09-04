@@ -213,7 +213,7 @@ SUBnote::~SUBnote()
 
 
 // Kill the note
-void SUBnote::killNote(void)
+void SUBnote::killNote()
 {
     if (noteStatus != NOTE_DISABLED)
     {
@@ -580,7 +580,7 @@ void SUBnote::computeallfiltercoefs()
 }
 
 // Compute Parameters of SUBnote for each tick
-void SUBnote::computecurrentparameters(void)
+void SUBnote::computecurrentparameters()
 {
     if (freqEnvelope != NULL
         || bandWidthEnvelope != NULL
@@ -752,7 +752,7 @@ void SUBnote::noteout(float *outl, float *outr)
 
 
 // Release Key (Note Off)
-void SUBnote::releasekey(void)
+void SUBnote::releasekey()
 {
     if (noteStatus == NOTE_LEGATOFADEOUT)
         return; // keep envelopes in sustained state (thereby blocking NoteOff)
@@ -801,7 +801,7 @@ float SUBnote::getHgain(int harmonic)
     return hgain;
 }
 
-void SUBnote::updatefilterbank(void)
+void SUBnote::updatefilterbank()
 {
     int createdFilters = createNewFilters();
 

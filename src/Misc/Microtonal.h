@@ -40,20 +40,20 @@ using func::power;
 class Microtonal
 {
     public:
+       ~Microtonal() = default;
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
-        ~Microtonal() { }
-        void defaults(int type = 0);
+        void  defaults(int type = 0);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
         float getLimits(CommandBlock *getData);
 
         // Parameters
-        unsigned char Pinvertupdown;
-        int           Pinvertupdowncenter;
-        unsigned char Penabled;
-        int           PrefNote;
-        int           Pscaleshift;
-        float         PrefFreq;
+        uchar Pinvertupdown;
+        int   Pinvertupdowncenter;
+        uchar Penabled;
+        int   PrefNote;
+        int   Pscaleshift;
+        float PrefFreq;
 
         // first and last key (to retune)
         int Pfirstkey;
@@ -65,9 +65,9 @@ class Microtonal
         // Map size
         int Pmapsize;
 
-        int PformalOctaveSize;
+        int PformalOctaveSize;         //////////////TODO seems not to be actually used as of 9/2024
 
-        unsigned char Pmappingenabled; // Mapping ON/OFF
+        uchar Pmappingenabled; // Mapping ON/OFF
         int Pmapping[MAX_OCTAVE_SIZE];             // Mapping (keys)
         string PmapComment[MAX_OCTAVE_SIZE];       // comments for mapping (if they exist)
 
@@ -75,30 +75,30 @@ class Microtonal
         float globalfinedetunerap;
         void setglobalfinedetune(float control);
 
-        int getoctavesize(void);
-        void tuningtoline(unsigned int n, string& line);
-        string tuningtotext(void);
-        string keymaptotext(void);
-        int loadscl(const string& filename); // load the tunings from a .scl file
-        int loadkbm(const string& filename); // load the mapping from .kbm file
+        int getoctavesize();
+        void tuningtoline(uint n, string& line);
+        string tuningtotext();
+        string keymaptotext();
+        int loadscl(string const& filename); // load the tunings from a .scl file
+        int loadkbm(string const& filename); // load the mapping from .kbm file
         int texttotunings(string page);
         int texttomapping(string page);
 
-        string scale2scl(void);
-        string map2kbm(void);
+        string scale2scl();
+        string map2kbm();
 
         string Pname;
         string Pcomment;
 
-        void add2XML(XMLwrapper& xml);
-        int getfromXML(XMLwrapper& xml);
-        bool saveXML(const string& filename);
-        int loadXML(const string& filename);
+        void add2XML(XMLwrapper&);
+        int  getfromXML(XMLwrapper&);
+        bool saveXML(string const& filename);
+        int  loadXML(string const& filename);
 
     private:
         int getLineFromText(string& page, string& line);
         string reformatline(string text);
-        int linetotunings(unsigned int nline, string text);
+        int linetotunings(uint nline, string text);
         // extracts a line from a text file, ignoring the lines beginning with "!"
 
     public:
@@ -106,11 +106,10 @@ class Microtonal
         size_t octavesize;
 
         struct Octave {
-            unsigned char type; // 1 for cents or 2 for division
-            double tuning;       // the real tuning (eg. +1.05946 for one halftone)
-                                // or 2.0 for one octave
-            unsigned int x1; // the real tuning is x1 / x2
-            unsigned int x2;
+            uchar type;    // 1 for cents or 2 for division
+            double tuning; // the real tuning (eg. +1.05946 for one halftone) or 2.0 for one octave
+            uint x1;       // the real tuning is x1 / x2
+            uint x2;
             string text;
             string comment;
         };
@@ -119,7 +118,7 @@ class Microtonal
         SynthEngine *synth;
 };
 
-inline int Microtonal::getoctavesize(void)
+inline int Microtonal::getoctavesize()
 {
     return ((Penabled != 0) ? octavesize : 12);
 }

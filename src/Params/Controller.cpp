@@ -45,7 +45,7 @@ Controller::Controller(SynthEngine *_synth):
 }
 
 
-void Controller::defaults(void)
+void Controller::defaults()
 {
     setpitchwheelbendrange(200); // 2 halftones
     expression.receive = 1;
@@ -132,7 +132,7 @@ void Controller::setpitchwheel(int value)
 }
 
 
-void Controller::setpitchwheelbendrange(unsigned short int value)
+void Controller::setpitchwheelbendrange(ushort value)
 {
     pitchwheel.bendrange = value;
 }
@@ -304,7 +304,7 @@ bool Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
 }
 
 
-void Controller::updateportamento(void)
+void Controller::updateportamento()
 {
     if (portamento.used)
     {

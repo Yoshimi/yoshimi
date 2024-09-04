@@ -1,8 +1,7 @@
 /*
-    ZynAddSubFX - a software synthesizer
-
     Unison.h - Unison effect (multivoice chorus)
-    Original author: Nasca Octavian Paul
+
+    Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
 
@@ -37,18 +36,18 @@ class SynthEngine;
 class Unison
 {
     public:
-        Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth);
+        Unison(int update_period_samples_, float max_delay_sec_, SynthEngine*);
        ~Unison() = default;
 
         void setSize(int new_size);
         void setBaseFrequency(float freq);
         void setBandwidth(float bandwidth_cents);
 
-        void process(int bufsize, float *inbuf, float *outbuf = NULL);
+        void process(int bufsize, float* inbuf, float* outbuf = nullptr);
 
     private:
-        void updateParameters(void);
-        void updateUnisonData(void);
+        void updateParameters();
+        void updateUnisonData();
 
         struct UnisonVoice {
             float step;     // base LFO
@@ -77,13 +76,12 @@ class Unison
         std::unique_ptr<UnisonVoice[]> voice;
         std::unique_ptr<float[]> delay_buffer;
 
-        int           update_period_samples;
-        int           update_period_sample_k;
-        float         unison_amplitude_samples;
-        float         unison_bandwidth_cents;
+        int   update_period_samples;
+        int   update_period_sample_k;
+        float unison_amplitude_samples;
+        float unison_bandwidth_cents;
 
         SynthEngine *synth;
 };
 
-#endif
-
+#endif /*UNISON_H*/

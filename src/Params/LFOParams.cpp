@@ -36,9 +36,9 @@ using func::power;
 
 
 LFOParams::LFOParams(float Pfreq_, float Pintensity_,
-                     float Pstartphase_, unsigned char PLFOtype_,
+                     float Pstartphase_, uchar PLFOtype_,
                      float Prandomness_, float Pdelay_,
-                     unsigned char Pcontinous_, int fel_, SynthEngine *_synth) :
+                     uchar Pcontinous_, int fel_, SynthEngine* _synth) :
     ParamBase(_synth),
     fel(fel_),
     Dfreq(Pfreq_),
@@ -54,7 +54,7 @@ LFOParams::LFOParams(float Pfreq_, float Pintensity_,
 }
 
 
-void LFOParams::defaults(void)
+void LFOParams::defaults()
 {
     setPfreq(Dfreq << Cshift2I);
     Pintensity = Dintensity;
@@ -125,14 +125,14 @@ float LFOlimit::getLFOlimits(CommandBlock *getData)
     int engine = getData->data.engine;
     int insertType = getData->data.parameter;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // LFO defaults
     int min = 0;
     int max = 127;
     float def = 0;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
     type |= learnable;
 
     switch (control)

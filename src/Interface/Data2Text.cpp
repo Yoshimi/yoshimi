@@ -3370,8 +3370,6 @@ string DataText::resolveEffects(CommandBlock *getData, bool addValue)
     string controlType = "";
     int ref = control; // we frequently modify this#
     bool isBPM = ((ref == 2 && (offset == 1 || offset == 3)) || (ref == 3 && offset == 3));
-    //std::cout << "control " << int(control) << std::endl;
-    //std::cout << "offset " << int(offset) << std::endl;
     switch (effType)
     {
         case EFFECT::type::none:

@@ -30,7 +30,6 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <iostream>
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -77,8 +76,6 @@ using std::list;
 using std::optional;
 using std::to_string;
 using std::string;
-using std::cout;
-using std::endl;
 
 
 Bank::Bank(SynthEngine *_synth) :
@@ -313,8 +310,6 @@ bool Bank::isDuplicateBankName(size_t rootID, const string& name)
         string check = getBankName(i,rootID);
         if (check > "" && check == name)
             return true;
-        //if (check > "")
-            //cout << check << endl;
     }
     return false;
 }
@@ -392,7 +387,6 @@ void Bank::checkbank(size_t rootID, size_t banknum)
             string chkpath = path + getInstrumentReference(rootID, banknum, pos).filename;
             if (!isRegularFile(chkpath))
             {
-                //cout << chkpath << endl;
                 getInstrumentReference(rootID, banknum, pos).clear();
             }
         }
@@ -923,11 +917,6 @@ string Bank::swapbanks(unsigned int firstID, unsigned int secondID, size_t first
         else // actual swap
         {
             // due to possible identical names we need to go via a temp file
-
-            //cout << "first " << firstBankPath << endl;
-            //cout << "second " << secondBankPath << endl;
-            //cout << "newfirst " << newfirstBankPath << endl;
-            //cout << "newsecond " << newsecondBankPath << endl;
             deleteDir(tempBankPath); // just to be sure
             if (!renameDir(firstBankPath, tempBankPath))
             {
@@ -1060,8 +1049,6 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, c
     int pos = _pos;
     string filename = _filename;
 
-    //cout << "add root " << rootID << "  bank " << bankID << "\nname "<< name << "  file " << filename << endl;
-
     BankEntry &bank = roots [rootID].banks [bankID];
     string exten = file::findExtension(filename);
 
@@ -1075,7 +1062,6 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, c
             */
         if (name == oldName) // duplicate
         {
-            //cout << "duplicate " << name << endl;
             if (exten == EXTEN::yoshInst) // yoshiType takes priority
                 getInstrumentReference(rootID, bankID, pos).yoshiType = true;
             return 0; // no actual insertion necessary
@@ -1094,7 +1080,6 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, c
                 wanted = true;
             else if (name == getname(pos, bankID, rootID))
             {
-                //cout << name << " already placed" << endl;
                 pos = -1;
             }
         }
@@ -1166,7 +1151,6 @@ void Bank::updateShare(string bankdirs[], string baseDir, string shareID)
     string destinationDir = baseDir + "yoshimi/banks/Will_Godfrey_Companion"; // currently only concerned with this one.
     if (!isDirectory(destinationDir))
         return;
-    //cout << bankdirs[1] << endl;
     if (isDirectory(bankdirs[1] + next))
         checkShare(bankdirs[1] + next, destinationDir);
 
@@ -1586,7 +1570,6 @@ bool Bank::establishBanks(optional<string> bankFile)
             addDefaultRootDirs(bankdirs);
         else
         {
-            //cout << "generating" << endl;
             string newRoot = foundLocal + "yoshimi/banks";
             size_t idx = generateSingleRoot(newRoot);
             changeRootID(idx, 5);
@@ -1615,7 +1598,7 @@ bool Bank::establishBanks(optional<string> bankFile)
 }
 
 
-bool Bank::installRoots(void)
+bool Bank::installRoots()
 {
     RootEntryMap::const_iterator it;
     for (it = roots.begin(); it != roots.end(); ++it)
@@ -1760,7 +1743,6 @@ bool Bank::installNewRoot(size_t rootID, string rootdir, bool reload)
         {
             if (roots [rootID].banks [id].dirname.empty())
             {
-                //cout << "Removed unnamed bank " << id << "  in root " << rootID << endl;
                 roots [rootID].banks.erase(id);
             }
             else if (!banksSet[id])
@@ -1808,7 +1790,6 @@ void Bank::saveToConfigFile(XMLwrapper& xml)
                         xml.addparbool("SUBsynth", bank.instruments [pos].SUBsynth_used);
                         xml.addparbool("PADsynth", bank.instruments [pos].PADsynth_used);
                         xml.addparbool("Yoshimi", bank.instruments [pos].yoshiType);
-                        //cout << bank.instruments [pos].filename << endl;
                         xml.endbranch();
                     }
                     ++pos;

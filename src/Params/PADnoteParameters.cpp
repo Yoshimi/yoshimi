@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <thread>
 #include <memory>
+#include <string>
 #include <iostream>
 
 #include "Misc/XMLwrapper.h"
@@ -46,6 +47,7 @@
 #include "Params/PADnoteParameters.h"
 #include "Misc/WavFile.h"
 
+using std::string;
 using std::vector;
 using file::saveData;
 using func::setAllPan;
@@ -95,7 +97,7 @@ namespace{ // Implementation helpers...
 
 
 
-PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine *_synth)
+PADnoteParameters::PADnoteParameters(uchar pID, uchar kID, SynthEngine* _synth)
     : ParamBase(_synth)
     , Pmode{0}
     , Pquality{}
@@ -201,7 +203,7 @@ void PADnoteParameters::HarmonicPos::defaults()
     par3 = 0;
 }
 
-void PADnoteParameters::defaults(void)
+void PADnoteParameters::defaults()
 {
     Pmode = 0;
     Pquality.resetToDefaults();
@@ -859,7 +861,7 @@ void PADnoteParameters::mute_and_rebuild_synchronous()
 
 
 
-void PADnoteParameters::setPan(char pan, unsigned char panLaw)
+void PADnoteParameters::setPan(char pan, uchar panLaw)
 {
     PPanning = pan;
     if (!PRandom)
@@ -869,7 +871,7 @@ void PADnoteParameters::setPan(char pan, unsigned char panLaw)
 }
 
 
-bool PADnoteParameters::export2wav(std::string basefilename)
+bool PADnoteParameters::export2wav(string basefilename)
 {
     string type;
     if (synth->getRuntime().isLittleEndian)
@@ -884,10 +886,10 @@ bool PADnoteParameters::export2wav(std::string basefilename)
         char tmpstr[22];
         snprintf(tmpstr, 22, "-%02zu", tab + 1);
         string filename = basefilename + string(tmpstr) + EXTEN::MSwave;
-        unsigned int block;
-        unsigned short int sBlock;
-        unsigned int buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
-        char *buffer = (char*) malloc (buffSize);
+        uint   block;
+        ushort sBlock;
+        uint  buffSize = 44 + sizeof(short int) * waveTable.tableSize; // total size
+        char* buffer = (char*) malloc (buffSize);
         strcpy(buffer, type.c_str());
         block = waveTable.tableSize * 4 + 36; // 2 channel shorts + part header
         buffer[4] = block & 0xff;
@@ -1223,14 +1225,14 @@ float PADnoteParameters::getLimits(CommandBlock *getData)
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // padnote defaults
     int min = 0;
     int def = 64;
     int max = 127;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
     switch (control)
     {
         case PADSYNTH::control::volume:

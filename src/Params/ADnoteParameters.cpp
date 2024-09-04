@@ -39,9 +39,9 @@ using func::power;
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
-    ParamBase(_synth),
-    fft(fft_)
+ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine* _synth)
+    : ParamBase{_synth}
+    , fft(fft_)
 {
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0, synth);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
@@ -63,7 +63,7 @@ ADnoteParameters::ADnoteParameters(fft::Calc& fft_, SynthEngine *_synth) :
 }
 
 
-void ADnoteParameters::defaults(void)
+void ADnoteParameters::defaults()
 {
     // Frequency Global Parameters
     GlobalPar.PStereo = true; // stereo
@@ -213,7 +213,7 @@ void ADnoteParameters::enableVoice(int nvoice)
 
 
 // Get the Multiplier of the fine detunes of the voices
-float ADnoteParameters::getBandwidthDetuneMultiplier(void)
+float ADnoteParameters::getBandwidthDetuneMultiplier()
 {
     float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
     bw = power<2>(bw * pow(fabs(bw), 0.2f) * 5.0f);

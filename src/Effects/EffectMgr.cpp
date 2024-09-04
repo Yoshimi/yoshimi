@@ -59,7 +59,6 @@ void EffectMgr::changeeffect(int _nefx)
     cleanup();
     if (effectType == _nefx)
         return;
-    //std::cout << "Change eff" << std::endl;
     effectType = _nefx;
     switch (effectType + EFFECT::type::none)
     {
@@ -106,14 +105,14 @@ void EffectMgr::changeeffect(int _nefx)
 
 
 // Obtain the effect number
-int EffectMgr::geteffect(void)
+int EffectMgr::geteffect()
 {
     return (effectType);
 }
 
 
 // Cleanup the current effect
-void EffectMgr::cleanup(void)
+void EffectMgr::cleanup()
 {
     memset(efxoutl.get(), 0, synth->bufferbytes);
     memset(efxoutr.get(), 0, synth->bufferbytes);
@@ -123,23 +122,15 @@ void EffectMgr::cleanup(void)
 
 
 // Get the preset of the current effect
-unsigned char EffectMgr::getpreset(void)
+uchar EffectMgr::getpreset()
 {
-    if (efx)
-    {
-        //cout << "Effect preset " << int(efx->Ppreset) << endl;
-        return efx->Ppreset;
-    }
-    else
-    {
-        //cout << "No effect" << endl;
-        return 0;
-    }
+    return efx? efx->Ppreset
+              : 0;
 }
 
 
 // Change the preset of the current effect
-void EffectMgr::changepreset(unsigned char npreset)
+void EffectMgr::changepreset(uchar npreset)
 {
     if (efx)
         efx->setpreset(npreset);
@@ -147,7 +138,7 @@ void EffectMgr::changepreset(unsigned char npreset)
 
 
 // Change a parameter of the current effect
-void EffectMgr::seteffectpar(int npar, unsigned char value)
+void EffectMgr::seteffectpar(int npar, uchar value)
 {
     if (!efx)
         return;
@@ -156,7 +147,7 @@ void EffectMgr::seteffectpar(int npar, unsigned char value)
 
 
 // Get a parameter of the current effect
-unsigned char EffectMgr::geteffectpar(int npar)
+uchar EffectMgr::geteffectpar(int npar)
 {
     if (!efx)
         return 0;
@@ -250,7 +241,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 
 
 // Get the effect volume for the system effect
-float EffectMgr::sysefxgetvolume(void)
+float EffectMgr::sysefxgetvolume()
 {
     return (!efx) ? 1.0f : efx->outvolume.getValue();
 }
@@ -323,8 +314,6 @@ void EffectMgr::getfromXML(XMLwrapper& xml)
             if (par != geteffectpar(n))
             {
                 isChanged = true;
-                //cout << "changed par " << n << endl;
-                //may use this later to ID
             }
             xml.exitbranch();
         }
@@ -338,8 +327,6 @@ void EffectMgr::getfromXML(XMLwrapper& xml)
             }
         }
         xml.exitbranch();
-        //if (geteffectpar(-1))
-            //cout << "Some pars changed" << endl;
     }
     cleanup();
 }

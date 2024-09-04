@@ -23,32 +23,33 @@
 #ifndef NUMERICFUNCS_H
 #define NUMERICFUNCS_H
 
+#include "globals.h"
+#include "Interface/TextLists.h"
 
 #include <cmath>
 #include <cstddef>
 #include <stdio.h>
-#include <string.h>
-#include "globals.h"
-#include "Interface/TextLists.h"
+#include <string>
+#include <cstring>
 
 namespace func {
 
 
 template<class T>
 inline T limit(T val, T min, T max)
-{ // currently doesn't seem to be used
+{
     return val < min ? min : (val > max ? max : val);
 }
 
 
-inline void invSignal(float *sig, size_t len)
+inline void invSignal(float* sig, size_t len)
 { // only used by phaser effect
     for (size_t i = 0; i < len; ++i)
         sig[i] *= -1.0f;
 }
 
 
-inline int version2value(void)
+inline int version2value()
 {
     /*
      * expected text string format

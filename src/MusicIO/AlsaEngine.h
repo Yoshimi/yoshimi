@@ -25,11 +25,13 @@
 #ifndef ALSA_ENGINE_H
 #define ALSA_ENGINE_H
 
+#include "MusicIO/MusicIO.h"
+
 #include <pthread.h>
 #include <alsa/asoundlib.h>
 #include <string>
 
-#include "MusicIO/MusicIO.h"
+using std::string;
 
 #define MIDI_CLOCKS_PER_BEAT 24
 #define MIDI_CLOCK_DIVISION 3
@@ -61,12 +63,12 @@ class AlsaEngine : public MusicIO
         void Close()                   override;
         void registerAudioPort(int)    override { /*ignore*/ }
 
-        uint getSamplerate()     const override { return audio.samplerate; }
-        int getBuffersize()      const override { return audio.period_size; }
+        uint   getSamplerate()   const override { return audio.samplerate; }
+        int    getBuffersize()   const override { return audio.period_size; }
         string audioClientName() const override ;
-        int audioClientId()      const override { return audio.alsaId; }
+        int    audioClientId()   const override { return audio.alsaId; }
         string midiClientName()  const override ;
-        int midiClientId()       const override { return midi.alsaId; }
+        int    midiClientId()    const override { return midi.alsaId; }
 
     private:
         bool prepHwparams();
@@ -75,11 +77,11 @@ class AlsaEngine : public MusicIO
         void Write(snd_pcm_uframes_t towrite);
         bool Recover(int err);
         bool xrunRecover();
-        bool alsaBad(int op_result, std::string err_msg);
+        bool alsaBad(int op_result, string err_msg);
         void closeAudio();
         void closeMidi();
 
-        std::string findMidiClients(snd_seq_t *seq);
+        string findMidiClients(snd_seq_t* seq);
 
         void* AudioThread();
         static void* _AudioThread(void* arg);
@@ -104,7 +106,7 @@ class AlsaEngine : public MusicIO
         unique_ptr<int[]> interleaved; // output buffer for 16bit interleaved audio
 
         struct Audio {
-            std::string       device{};
+            string            device{};
             snd_pcm_t*        handle{nullptr};
             uint              period_count{0}; // re-used as number of periods
             uint              samplerate{0};
@@ -116,7 +118,7 @@ class AlsaEngine : public MusicIO
         };
 
         struct Midi {
-            std::string       device{};
+            string            device{};
             snd_seq_t*        handle{nullptr};
             snd_seq_addr_t    addr{0,0};
             int               alsaId{-1};

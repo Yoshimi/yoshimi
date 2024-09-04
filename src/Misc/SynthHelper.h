@@ -227,9 +227,9 @@ inline float velF(float velocity, unsigned char scaling)
 
 
 
-inline float getDetune(unsigned char type,
-                       unsigned short int coarsedetune,
-                       unsigned short int finedetune)
+inline float getDetune(uchar type,
+                       ushort coarsedetune,
+                       ushort finedetune)
 {
     float det = 0.0f;
     float octdet = 0.0f;

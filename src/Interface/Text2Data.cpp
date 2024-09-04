@@ -83,7 +83,7 @@ void TextData::encodeAll(SynthEngine *_synth, string &sentCommand, CommandBlock 
 }
 
 
-void TextData::log(std::string &line, std::string text)
+void TextData::log(string& line, string text)
 {
     oursynth->getRuntime().Log("Error: " + text);
     // we may later decide to print the string before emptying it
@@ -92,7 +92,7 @@ void TextData::log(std::string &line, std::string text)
 }
 
 
-void TextData::strip(std::string &line)
+void TextData::strip(string& line)
 {
     size_t pos = line.find_first_not_of(" ");
     if (pos == string::npos)
@@ -102,7 +102,7 @@ void TextData::strip(std::string &line)
 }
 
 
-void TextData::nextWord(std::string &line)
+void TextData::nextWord(string& line)
 {
     size_t pos = line.find_first_of(" ");
     if (pos == string::npos)
@@ -115,7 +115,7 @@ void TextData::nextWord(std::string &line)
 }
 
 
-bool TextData::findCharNum(string &line, unsigned char &value)
+bool TextData::findCharNum(string& line, uchar& value)
 {
     if (!isdigit(line[0]))
         return false;
@@ -124,11 +124,11 @@ bool TextData::findCharNum(string &line, unsigned char &value)
     return true;
 }
 
-bool TextData::findAndStep(std::string &line, std::string text, bool step)
+bool TextData::findAndStep(string& line, string text, bool step)
 {
     // now case insensitive
     transform(text.begin(), text.end(), text.begin(), ::tolower);
-    std::string lineCopy = line;
+    string lineCopy{line};
     transform(lineCopy.begin(), lineCopy.end(), lineCopy.begin(), ::tolower);
     size_t pos = lineCopy.find(text);
     if (pos != string::npos && pos < 3) // allow leading spaces
@@ -144,11 +144,11 @@ bool TextData::findAndStep(std::string &line, std::string text, bool step)
     return false;
 }
 
-int TextData::findListEntry(std::string &line, int step, const std::string list [])
+int TextData::findListEntry(string& line, int step, const string list [])
 {
     int count = 0;
     bool found = false;
-    std::string test;
+    string test;
     do {
         test = list [count];
         size_t split = test.find(" ");
@@ -174,7 +174,7 @@ int TextData::findEffectFromText(string &line, int step, const string list [], c
     return mapToEffectNumber(findListEntry(line, step, list), listmap);
 }
 
-void TextData::encodeLoop(std::string source, CommandBlock &allData)
+void TextData::encodeLoop(string source, CommandBlock& allData)
 {
     /* NOTE
      * subsections must *always* come before local controls!
@@ -219,10 +219,9 @@ void TextData::encodeLoop(std::string source, CommandBlock &allData)
 }
 
 
-void TextData::encodeMain(std::string &source, CommandBlock &allData)
+void TextData::encodeMain(string& source, CommandBlock& allData)
 {
     strip (source);
-    //cout << ">" << source << endl;
     allData.data.part = TOPLEVEL::section::main;
     if (findAndStep(source, "Master"))
     {
@@ -244,12 +243,12 @@ void TextData::encodeMain(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeScale(std::string &source, CommandBlock &allData)
+void TextData::encodeScale(string& source, CommandBlock& allData)
 {
     strip (source);
     allData.data.part = TOPLEVEL::section::scales;
 
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     if (findAndStep(source, "Enable"))
     {
         if (findAndStep(source, "Microtonal"))
@@ -286,13 +285,12 @@ void TextData::encodeScale(std::string &source, CommandBlock &allData)
     cout << "scale overflow >" << source << endl;
 }
 
-void TextData::encodePart(std::string &source, CommandBlock &allData)
+void TextData::encodePart(string& source, CommandBlock& allData)
 {
     strip (source);
-    unsigned char npart = UNUSED;
+    uchar npart = UNUSED;
     if (findCharNum(source, npart))
     {
-        //cout << "part " << int(npart) << endl;
         if (npart >= NUM_MIDI_PARTS)
         {
             log(source, "part number out of range");
@@ -308,7 +306,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
     else
         return; // must have a part number!
 
-    unsigned char kitnum = UNUSED;
+    uchar kitnum = UNUSED;
     if (findAndStep(source, "Kit"))
     {
         if (findCharNum(source, kitnum))
@@ -320,11 +318,10 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
             }
 
             allData.data.kit = kitnum;
-            //cout << "kitnum " << int(kitnum) << endl;
         }
 
         //allData.data.insert = TOPLEVEL::insert::kitGroup;
-        unsigned char kitctl = UNUSED;
+        uchar kitctl = UNUSED;
         if (findAndStep(source, "Mute"))
             kitctl = PART::control::kitItemMute;
         // we may add other controls later
@@ -354,7 +351,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
 
     if (findAndStep(source, "Add Voice") || findAndStep(source, "Adsynth Voice") || findAndStep(source, "addvoice"))
     {
-        unsigned char voiceNum = UNUSED;
+        uchar voiceNum = UNUSED;
         if (findCharNum(source, voiceNum))
         {
             if (voiceNum >= NUM_VOICES)
@@ -378,7 +375,7 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
         return;
     }
 
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     if (findAndStep(source, "Vel"))
     {
         if (findAndStep(source, "Sens"))
@@ -413,9 +410,9 @@ void TextData::encodePart(std::string &source, CommandBlock &allData)
 
 // ----------------------------
 
-void TextData::encodeController(std::string &source, CommandBlock &allData)
+void TextData::encodeController(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     if (findAndStep(source,"Vol"))
     {
         if (findAndStep(source,"Range"))
@@ -526,9 +523,9 @@ void TextData::encodeController(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeMidi(std::string &source, CommandBlock &allData)
+void TextData::encodeMidi(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     if (findAndStep(source,"Modulation"))
         ctl = PART::control::midiModWheel;
     else if (findAndStep(source,"Expression"))
@@ -555,22 +552,21 @@ void TextData::encodeMidi(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeEffects(std::string &source, CommandBlock &allData)
+void TextData::encodeEffects(string& source, CommandBlock& allData)
 {
     if (findAndStep(source, "Send"))
     {
-        unsigned char sendto = UNUSED;
+        uchar sendto = UNUSED;
         if (findCharNum(source, sendto))
         {
             allData.data.control = PART::control::partToSystemEffect1 + sendto;
             return;
         }
     }
-    unsigned char effnum = UNUSED;
+    uchar effnum = UNUSED;
     if (findCharNum(source, effnum)) // need to find number ranges
     {
         allData.data.engine = effnum;
-        //cout << "effnum " << int(effnum) << endl;
         if (findAndStep(source, "DynFilter ~ Filter"))
         {
             allData.data.kit = EFFECT::type::dynFilter;
@@ -605,7 +601,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
             }
         }
 
-        unsigned char efftype = findListEntry(source, 1, fx_list) + EFFECT::type::none;
+        uchar efftype = findListEntry(source, 1, fx_list) + EFFECT::type::none;
         if (efftype >= EFFECT::type::count || efftype <= EFFECT::type::none)
         {
             log(source, "effect type out of range");
@@ -614,7 +610,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
         allData.data.kit = efftype;
 
         // now need to do actual control
-        unsigned char result = UNUSED;
+        uchar result = UNUSED;
         switch (efftype)
         {
             case EFFECT::type::reverb:
@@ -639,7 +635,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
             case EFFECT::type::eq:
                 if (findAndStep(source, "(Band", true))
                 {
-                    unsigned char tmp;
+                    uchar tmp;
                     if (findCharNum(source, tmp))
                     allData.data.parameter = tmp;
                 }
@@ -648,7 +644,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
                 {
                     if (findAndStep(source, "(Band", true))
                     {
-                        unsigned char tmp;
+                        uchar tmp;
                         if (findCharNum(source, tmp))
                             allData.data.parameter = tmp;
                     }
@@ -674,7 +670,7 @@ void TextData::encodeEffects(std::string &source, CommandBlock &allData)
 
 // ----------------------------
 
-void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
+void TextData::encodeAddSynth(string& source, CommandBlock& allData)
 {
     if (findAndStep(source, "Enable"))
     {
@@ -684,7 +680,7 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
         return;
     }
     allData.data.engine = PART::engine::addSynth;
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
 
     if (findAndStep(source, "Resonance"))
     {
@@ -779,9 +775,9 @@ void TextData::encodeAddSynth(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
+void TextData::encodeAddVoice(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
 
     if (findAndStep(source, "Enable"))
         ctl = ADDVOICE::control::enableVoice;
@@ -964,7 +960,7 @@ void TextData::encodeAddVoice(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
+void TextData::encodeSubSynth(string& source, CommandBlock& allData)
 {
     if (findAndStep(source, "Enable"))
     {
@@ -975,7 +971,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     }
 
     allData.data.engine = PART::engine::subSynth;
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
 
     if (findAndStep(source, "Amp Env"))
     {
@@ -1028,7 +1024,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
     }
     else if (findAndStep(source, "Harmonic"))
     { // has to be before anything starting with Amplitude or Bandwidth
-        unsigned char harmonicNum = UNUSED;
+        uchar harmonicNum = UNUSED;
         if (!findCharNum(source, harmonicNum))
         {
             log (source, "no harmonic number");
@@ -1101,7 +1097,7 @@ void TextData::encodeSubSynth(std::string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
+void TextData::encodePadSynth(string& source, CommandBlock& allData)
 {
     if (findAndStep(source, "Enable"))
     {
@@ -1113,7 +1109,7 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 
 
     allData.data.engine = PART::engine::padSynth;
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
 
     if (findAndStep(source, "Resonance"))
     {
@@ -1286,9 +1282,9 @@ void TextData::encodePadSynth(std::string &source, CommandBlock &allData)
 
 // ----------------------------
 
-void TextData::encodeWaveform(string &source, CommandBlock &allData)
+void TextData::encodeWaveform(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::oscillatorGroup;
 
     if (findAndStep(source, "Harmonic"))
@@ -1368,9 +1364,9 @@ void TextData::encodeWaveform(string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeResonance(string &source, CommandBlock &allData)
+void TextData::encodeResonance(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::resonanceGroup;
      // this might be changed for graph inserts
 
@@ -1396,9 +1392,9 @@ void TextData::encodeResonance(string &source, CommandBlock &allData)
 
 // ----------------------------
 
-void TextData::encodeLFO(string &source, CommandBlock &allData)
+void TextData::encodeLFO(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::LFOgroup;
 
     if (findAndStep(source, "Freq Random") ||findAndStep(source, "FreqRand")) // must be before Freq
@@ -1428,9 +1424,9 @@ void TextData::encodeLFO(string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeEnvelope(string &source, CommandBlock &allData)
+void TextData::encodeEnvelope(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::envelopeGroup;
     // this might be changed for freemode points
 
@@ -1463,9 +1459,9 @@ void TextData::encodeEnvelope(string &source, CommandBlock &allData)
 }
 
 
-void TextData::encodeFilter(string &source, CommandBlock &allData)
+void TextData::encodeFilter(string& source, CommandBlock& allData)
 {
-    unsigned char ctl = UNUSED;
+    uchar ctl = UNUSED;
     allData.data.insert = TOPLEVEL::insert::filterGroup;
 
     if (findAndStep(source, "C_Freq") || findAndStep(source, "C Freq") || findAndStep(source, "Cent Freq"))
@@ -1497,8 +1493,8 @@ void TextData::encodeFilter(string &source, CommandBlock &allData)
 
     else if (findAndStep(source, "Vowel"))
     {
-        unsigned char Vnum = UNUSED - 1; // special cases
-        unsigned char Fnum = UNUSED - 1; // actually have printed zeros
+        uchar Vnum = UNUSED - 1; // special cases
+        uchar Fnum = UNUSED - 1; // actually have printed zeros
         if (findCharNum(source, Vnum))
             allData.data.offset = Vnum + 1;
         else

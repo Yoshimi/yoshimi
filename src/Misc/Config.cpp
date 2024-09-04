@@ -65,17 +65,21 @@ using func::nearestPowerOf2;
 using func::asString;
 using func::string2int;
 
+using std::string;
+using std::cout;
+using std::cerr;
+using std::endl;
+
 namespace { // Implementation details...
 
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
 }
 
-unsigned char panLaw = 1;
+uchar panLaw = 1;
 
 bool         Config::showSplash{true};
 bool         Config::singlePath{false};
 bool         Config::autoInstance{false};
-unsigned int Config::activeInstance_OBSOLETE = 0;
 bitset<32>   Config::activeInstances{0};
 int          Config::showCLIcontext{1};
 
@@ -283,10 +287,10 @@ void Config::populateFromPrimary()
 }
 
 
-void Config::flushLog(void)
+void Config::flushLog()
 {
-//  for (auto& line : logList)
-//      cout << line <<endl;
+    for (auto& line : logList)
+        cout << line << endl;
     logList.clear();
 }
 
@@ -314,7 +318,7 @@ void Config::findManual()
 }
 
 
-void Config::loadConfig(void)
+void Config::loadConfig()
 {
     bool success = initFromPersistentConfig();
     if (not success)
@@ -349,7 +353,6 @@ bool Config::initFromPersistentConfig()
     int currentInstance = synth->getUniqueId();
     defaultSession = defaultStateName + "-" + asString(currentInstance) + EXTEN::state;
     yoshimi += ("-" + asString(currentInstance));
-    //cout << "\nsession >" << defaultSession << "<\n" << endl;
 
     ConfigFile = foundConfig + yoshimi + EXTEN::instance;
 
@@ -479,8 +482,6 @@ bool Config::initFromPersistentConfig()
         size_t pos = currentV.find(" ");
         if (pos != string::npos)
             currentV = currentV.substr(0,pos);
-//cout << "\nm >" << manualFile << "<" << endl;
-//cout << "\nc " << currentV << "\ng " << guideVersion << endl;
         if (currentV == guideVersion && isRegularFile(manualFile))
             man_ok = true;
 
@@ -638,8 +639,8 @@ bool Config::updateConfig(int control, int value)
 
             // this is the one that changed
 
-            //std::cout << "control "<< control << "  val " << value << std::endl;
-            //std::cout << control - offset << std::endl;
+            //cout << "control "<< control << "  val " << value << std::endl;
+            //cout << control - offset << std::endl;
             configData[control - offset] = value;
 
             if (success)
@@ -698,7 +699,7 @@ bool Config::updateConfig(int control, int value)
 }
 
 
-void Config::defaultPresets(void)
+void Config::defaultPresets()
 {
     string presetdirs[]  = {
         presetDir,
@@ -748,10 +749,7 @@ bool Config::extractBaseParameters(XMLwrapper& xml)
     banksChecked = xml.getparbool("banks_checked", banksChecked);
     autoInstance = xml.getparbool("enable_auto_instance", autoInstance);
     if (autoInstance)
-//      activeInstance_OBSOLETE = xml.getparU("active_instances", 0);///////////////////////OOO
         activeInstances = bitset<32>{xml.getparU("active_instances", 0)};
-//    else
-//        activeInstance_OBSOLETE = 1; ////////////////////////////////////////////////////OOO this could corrupt existing state
     handlePadSynthBuild = xml.getparU("handle_padsynth_build", 1, 0, 2);  // 0 = blocking/muted, 1 = background thread (=default), 2 = auto-Apply on param change
     showCLIcontext  = xml.getpar("show_CLI_context", 1, 0, 2);
     GzipCompression = xml.getpar("gzip_compression", GzipCompression, 0, 9);
@@ -1081,7 +1079,7 @@ bool Config::savePresetsList()
 }
 
 
-void Config::Log(const string& msg, char tostderr)
+void Config::Log(string const& msg, char tostderr)
 {
     if ((tostderr & _SYS_::LogNotSerious) && hideErrors)
         return;
@@ -1090,20 +1088,20 @@ void Config::Log(const string& msg, char tostderr)
         if (showGui && toConsole)
             logList.push_back(msg);
         else
-            std::cout << msg << std::endl;
+            cout << msg << endl;
     }
     else
-        std::cerr << msg << std::endl; // error log
+        cerr << msg << endl; // error log
 }
 
 
 void Config::LogError(const string &msg)
 {
-    std::cerr << "[ERROR] " << msg << std::endl;
+    cerr << "[ERROR] " << msg << endl;
 }
 
 
-void Config::startupReport(const string& clientName)
+void Config::startupReport(string const& clientName)
 {
     bool fullInfo = (synth->getUniqueId() == 0);
     if (fullInfo)
@@ -1163,7 +1161,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, ThreadFun* threadFun, void *arg,
-                         bool schedfifo, char priodec, const string& name)
+                         bool schedfifo, char priodec, string const& name)
 {
     pthread_attr_t attr;
     int chk;
@@ -1238,7 +1236,7 @@ bool Config::startThread(pthread_t *pth, ThreadFun* threadFun, void *arg,
 }
 
 
-void Config::signalCheck(void)
+void Config::signalCheck()
 {
     #if defined(JACK_SESSION)
         int jsev = __sync_fetch_and_add(&jsessionSave, 0);
@@ -1276,20 +1274,20 @@ void Config::signalCheck(void)
 }
 
 
-void Config::setInterruptActive(void)
+void Config::setInterruptActive()
 {
     Log("Interrupt received", _SYS_::LogError);
     __sync_or_and_fetch(&sigIntActive, 0xFF);
 }
 
 
-void Config::setLadi1Active(void)
+void Config::setLadi1Active()
 {
     __sync_or_and_fetch(&ladi1IntActive, 0xFF);
 }
 
 
-bool Config::restoreJsession(void)
+bool Config::restoreJsession()
 {
     #if defined(JACK_SESSION)
         return restoreSessionData(jackSessionFile);
@@ -1299,7 +1297,7 @@ bool Config::restoreJsession(void)
 }
 
 
-void Config::setJackSessionSave(int event_type, const string& session_file)
+void Config::setJackSessionSave(int event_type, string const& session_file)
 {
     jackSessionFile = session_file;
     __sync_and_and_fetch(&jsessionSave, 0);
@@ -1427,14 +1425,14 @@ string Config::masterCCtest(int cc)
 }
 
 
-void Config::saveJackSession(void)
+void Config::saveJackSession()
 {
     saveSessionData(jackSessionFile);
     jackSessionFile.clear();
 }
 
 
-std::string Config::findHtmlManual(void)
+std::string Config::findHtmlManual()
 {
     string namelist = "";
     string tempnames = "";
@@ -1446,8 +1444,6 @@ std::string Config::findHtmlManual(void)
 
     if(file::cmd2string("find /home/ -xdev -type f -name 'yoshimi_user_guide_version' 2>/dev/null", tempnames))
         namelist += tempnames;
-
-    //cout << "man list" << namelist << endl;
 
     size_t next = 0;
     string lastversion = "";
@@ -1465,7 +1461,6 @@ std::string Config::findHtmlManual(void)
             {
                 lastversion = current;
                 found = name;
-                //cout << "found >" << found << endl;
             }
             namelist = namelist.substr( next +1);
         }
@@ -1474,20 +1469,16 @@ std::string Config::findHtmlManual(void)
 }
 
 
-float Config::getConfigLimits(CommandBlock *getData)
+float Config::getConfigLimits(CommandBlock* getData)
 {
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
-
-    std::cout << "In config defaults" << std::endl;
-
     int min = 0;
-    float def = 0;
     int max = 1;
-    type |= TOPLEVEL::type::Integer;
+    float def{0};
+    uchar type{TOPLEVEL::type::Integer};
 
     switch (control)
     {

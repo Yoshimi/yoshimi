@@ -52,7 +52,7 @@ class EQ : public Effect
         void changepar(int npar, uchar value) override;
         uchar getpar(int npar)          const override;
         void getAllPar(EffectParArray&) const override;
-        void cleanup(void)                    override;
+        void cleanup()                        override;
 
         /** render transfer function for UI */
         void renderResponse(EQGraphArray & lut) const;

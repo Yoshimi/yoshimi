@@ -46,7 +46,7 @@ class FormantFilter : public Filter_
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
         void setq(float q_);
-        void cleanup(void);
+        void cleanup();
 
     private:
         void setpos(float input);

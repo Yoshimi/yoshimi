@@ -144,7 +144,7 @@ public:
 
     /**
      * Establish a connection with a routing tag retrieved from
-     * a designated data lot currently present in the buffer.
+     * a designated data slot currently present in the buffer.
      * Typically used to bootstrap a client-side end point.
      */
     template<typename DAT>

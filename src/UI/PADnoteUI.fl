@@ -1676,7 +1676,7 @@ class PADnoteUI {: {public PresetsUI_}
     padStatus->on(PADStatus::BUILDING,[&]() { applyButton(pad_building, "rebuilding..."); });
     padStatus->on(PADStatus::DIRTY,   [&]() { applyButton(pad_apply, "Apply Changes"); });} {}
   }
-  Function {refresh(void)} {} {
+  Function {refresh()} {} {
     code {//
         volume->value(pars->PVolume);
             volume->selection_color(setKnob(volume->value(), 90));

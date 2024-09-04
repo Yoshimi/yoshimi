@@ -38,6 +38,7 @@
 
 #include <list>
 #include <memory>
+#include <string>
 
 class DataText;
 class MasterUI;
@@ -101,7 +102,7 @@ class InterChange : private DataText
         void spinSortResultsThread();
 
         void generateSpecialInstrument(int npart, std::string name);
-        void mediate(void);
+        void mediate();
         void historyActionCheck(CommandBlock *getData);
         void returns(CommandBlock *getData);
         void doClearPartInstrument(int npart);
@@ -118,8 +119,8 @@ class InterChange : private DataText
         std::atomic<bool> lowPrioWrite;
 
     private:
-        void *sortResultsThread(void);
-        static void *_sortResultsThread(void *arg);
+        void* sortResultsThread();
+        static void* _sortResultsThread(void* arg);
         pthread_t  sortResultsThreadHandle;
         void muteQueueWrite(CommandBlock *getData);
         void indirectTransfers(CommandBlock *getData, bool noForward = false);
@@ -183,7 +184,7 @@ class InterChange : private DataText
 
     public:
         bool noteSeen;
-        void undoRedoClear(void);
+        void undoRedoClear();
         /*
          * this is made public specifically so that it can be
          * reached from SynthEngine by jack freewheeling NRPNs.

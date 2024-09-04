@@ -74,7 +74,6 @@ inline float readControl(SynthEngine *synth,
                          unsigned char offset = UNUSED,
                          unsigned char miscmsg = NO_MSG)
 {
-    float value;
     CommandBlock putData;
 
     putData.data.value = 0;
@@ -88,11 +87,7 @@ inline float readControl(SynthEngine *synth,
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    value = synth->interchange.readAllData(&putData);
-    //if (putData.data.type & TOPLEVEL::type::Error)
-        //return 0xfffff;
-        //std::cout << "err" << std::endl;
-    return value;
+    return synth->interchange.readAllData(&putData);
 }
 
 

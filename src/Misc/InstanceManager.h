@@ -25,8 +25,7 @@
 #ifndef INSTANCE_MANAGER_H
 #define INSTANCE_MANAGER_H
 
-//#include "globals.h"
-#include "Misc/CmdOptions.h"
+#include "globals.h"
 
 #include <functional>
 #include <memory>
@@ -65,7 +64,7 @@ class InstanceManager
         uint requestNewInstance(uint);
         void triggerRestoreInstances();
         void handleNewInstanceSignal();
-        
+
         using PluginCreator = std::function<MusicIO*(SynthEngine&)>;
         bool startPluginInstance(PluginCreator);
         void terminatePluginInstance(uint synthID);

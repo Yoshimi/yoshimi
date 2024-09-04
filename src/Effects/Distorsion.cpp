@@ -70,7 +70,7 @@ Distorsion::~Distorsion()
 
 
 // Cleanup the effect
-void Distorsion::cleanup(void)
+void Distorsion::cleanup()
 {
     Effect::cleanup();
     level.pushToTarget();

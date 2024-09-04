@@ -43,8 +43,6 @@
 
 namespace test {
 
-using std::cout;
-using std::endl;
 using std::clamp;
 using std::string;
 using std::function;

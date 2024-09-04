@@ -27,8 +27,9 @@
 #include <string>
 #include <iostream>
 
-typedef unsigned char uchar;
-typedef unsigned int  uint;
+using uint = unsigned int;
+using uchar = unsigned char;
+using ushort = unsigned short;
 
 /*
  * For test purposes where you want guaranteed identical results, enable the
@@ -148,7 +149,7 @@ namespace _SYS_
 
 namespace TOPLEVEL // usage TOPLEVEL::section::vector
 {
-    enum section : unsigned char {
+    enum section : uchar {
         part1 = 0,   // nothing must come
         part64 = 63, // between these two
 
@@ -213,7 +214,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         };
     }
 
-    enum control : unsigned char {
+    enum control : uchar {
         // insert any new entries here
         /*
          * the following values must never appear in any other sections
@@ -227,7 +228,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         forceExit
     };
 
-    enum msgResponse : unsigned char {
+    enum msgResponse : uchar {
         refreshBankDefaults,
         cancelBankDefaults,
         cancelMidiLearn
@@ -237,7 +238,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
     // inserts are here as they are split between many
     // sections but must remain distinct.
-    enum insert : unsigned char {
+    enum insert : uchar {
         LFOgroup = 0,
         filterGroup,
         envelopeGroup,
@@ -255,14 +256,14 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         kitGroup
     };
 
-    enum insertType : unsigned char {
+    enum insertType : uchar {
         amplitude = 0,
         frequency,
         filter,
         bandwidth
     };
 
-    enum filter :unsigned char {
+    enum filter : uchar {
         Low1 = 0,
         High1,
         Low2,
@@ -274,7 +275,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
         HighShelf2             // NOTE: also used to limit valid filter type codes. See AnalogFilter
     };
 
-    enum XML : unsigned char { // file and history types
+    enum XML : uchar {  // file and history types
         Instrument = 0, // individual externally sourced Instruments
         Patch, //      full instrument Patch Sets
         Scale, //      complete Microtonal settings
@@ -302,7 +303,7 @@ namespace TOPLEVEL // usage TOPLEVEL::section::vector
 
 namespace CONFIG // usage CONFIG::control::oscillatorSize
 {
-    enum control : unsigned char {
+    enum control : uchar {
         enableGUI = 0,
         showSplash,
         enableCLI,
@@ -312,7 +313,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
         handlePadSynthBuild,   // how to build PADSynth wavetable;
         // 0=legacy/muted, 1=background thread, 2=autoApply
         banksChecked,
-        XMLcompressionLevel, // this must be the last entry for base config.
+        XMLcompressionLevel,   // this must be the last entry for base config.
 
         defaultStateStart = 16, // must be first entry for state/session data
         bufferSize,
@@ -368,7 +369,7 @@ namespace CONFIG // usage CONFIG::control::oscillatorSize
 
 namespace BANK // usage BANK::control::
 {
-    enum control : unsigned char {
+    enum control : uchar {
         // instrument selection done in 'part'
         // actual control should probably be here
         readInstrumentName = 0, // in bank, by ID
@@ -401,7 +402,7 @@ namespace BANK // usage BANK::control::
 
 namespace VECTOR // usage VECTOR::control::name
 {
-    enum control : unsigned char {
+    enum control : uchar {
         undefined = 0,
         name = 8,
         Xcontroller = 16,
@@ -424,7 +425,7 @@ namespace VECTOR // usage VECTOR::control::name
 
 namespace MIDILEARN // usage MIDILEARN::control::block
 {
-    enum control : unsigned char {
+    enum control : uchar {
         block = 0,
         limit,
         mute,
@@ -453,7 +454,7 @@ namespace MIDILEARN // usage MIDILEARN::control::block
 
 namespace MIDI // usage MIDI::control::noteOn
 {
-    enum control : unsigned char {
+    enum control : uchar {
         noteOn = 0,
         noteOff,
         controller,
@@ -462,7 +463,7 @@ namespace MIDI // usage MIDI::control::noteOn
     };
 // the following are actual MIDI numbers
 // not to be confused with part controls!
-    enum CC : unsigned short int {
+    enum CC : ushort {
         bankSelectMSB = 0,
         modulation,
         breath,
@@ -508,7 +509,7 @@ namespace MIDI // usage MIDI::control::noteOn
         null
     };
 
-    enum SoloType : unsigned char {
+    enum SoloType : uchar {
         Disabled = 0,
         Row,
         Column,
@@ -520,7 +521,7 @@ namespace MIDI // usage MIDI::control::noteOn
 
 namespace SCALES // usage SCALES::control::refFrequency
 {
-    enum control : unsigned char {
+    enum control : uchar {
         enableMicrotonal = 0,
         refFrequency,
         refNote,
@@ -561,7 +562,7 @@ namespace SCALES // usage SCALES::control::refFrequency
 
 namespace MAIN // usage MAIN::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         mono = 0,
         volume,
         partNumber = 14,
@@ -607,7 +608,7 @@ namespace MAIN // usage MAIN::control::volume
         readMainLRrms
     };
 
-    enum panningType : unsigned char {
+    enum panningType : uchar {
         cut = 0,
         normal,
         boost
@@ -617,7 +618,7 @@ namespace MAIN // usage MAIN::control::volume
 
 namespace PART // usage PART::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         enable = 0,
         enableAdd,
         enableSub,
@@ -704,14 +705,14 @@ namespace PART // usage PART::control::volume
         defaultInstrumentCopyright, // this needs to be split into two for load/save
     };
 
-    enum kitType : unsigned char {
+    enum kitType : uchar {
         Off = 0,
         Multi,
         Single,
         CrossFade
     };
 
-    enum engine : unsigned char {
+    enum engine : uchar {
         addSynth = 0,
         subSynth,
         padSynth,
@@ -750,7 +751,7 @@ namespace PART // usage PART::control::volume
 
 namespace ADDSYNTH // usage ADDSYNTH::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         volume = 0,
         velocitySense,
         panning,
@@ -777,7 +778,7 @@ namespace ADDSYNTH // usage ADDSYNTH::control::volume
 
 namespace ADDVOICE // usage ADDVOICE::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         enableVoice = 0,
         volume,
         velocitySense,
@@ -843,7 +844,7 @@ namespace ADDVOICE // usage ADDVOICE::control::volume
 
 namespace SUBSYNTH // usage SUBSYNTH::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         volume = 0,
         velocitySense,
         panning,
@@ -881,7 +882,7 @@ namespace SUBSYNTH // usage SUBSYNTH::control::volume
 
 namespace PADSYNTH // usage PADSYNTH::control::volume
 {
-    enum control : unsigned char {
+    enum control : uchar {
         volume = 0,
         velocitySense,
         panning,
@@ -945,7 +946,7 @@ namespace PADSYNTH // usage PADSYNTH::control::volume
 
 namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
 {
-    enum control : unsigned char {
+    enum control : uchar {
         phaseRandomness = 0,
         magType, // Linear, -40dB, -60dB, -80dB, -100dB
         harmonicAmplitudeRandomness,
@@ -986,7 +987,7 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
         clearHarmonics = 96,
         convertToSine
     };
-    enum wave : unsigned char {
+    enum wave : uchar {
         sine = 0,
         triangle,
         pulse,
@@ -1010,7 +1011,7 @@ namespace OSCILLATOR // usage OSCILLATOR::control::phaseRandomness
 
 namespace RESONANCE // usage RESONANCE::control::maxDb
 {
-    enum control : unsigned char {
+    enum control : uchar {
         enableResonance = 0,
         maxDb,
         centerFrequency,
@@ -1027,7 +1028,7 @@ namespace RESONANCE // usage RESONANCE::control::maxDb
 
 namespace LFOINSERT // usage LFOINSERT::control::speed
 {
-    enum control : unsigned char {
+    enum control : uchar {
         speed = 0,
         depth,
         delay,
@@ -1043,7 +1044,7 @@ namespace LFOINSERT // usage LFOINSERT::control::speed
 
 namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
 {
-    enum control : unsigned char {
+    enum control : uchar {
         centerFrequency = 0,
         Q,
         frequencyTracking,
@@ -1075,7 +1076,7 @@ namespace FILTERINSERT // usage FILTERINSERT::control::centerFrequency
 
 namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
 {
-    enum control : unsigned char {
+    enum control : uchar {
         attackLevel = 0,
         attackTime,
         decayLevel,
@@ -1096,7 +1097,7 @@ namespace ENVELOPEINSERT // usage ENVELOPEINSERT::control::attackLevel
 
 namespace EFFECT // usage EFFECT::control::level
 {
-    enum control : unsigned char {
+    enum control : uchar {
         level = 0, // volume, wet/dry, gain for EQ
         panning, // band for EQ
         frequency, // time reverb, delay echo, L/R-mix dist, Not EQ
@@ -1107,7 +1108,7 @@ namespace EFFECT // usage EFFECT::control::level
         changed = 129 // not EQ
     };
 
-    enum sysIns : unsigned char {
+    enum sysIns : uchar {
         toEffect1 = 1, // system only
         toEffect2, // system only
         toEffect3, // system only
@@ -1117,7 +1118,7 @@ namespace EFFECT // usage EFFECT::control::level
         effectEnable // system only
     };
 
-    enum type : unsigned char { // sits above part kits
+    enum type : uchar { // sits above part kits
         none = NUM_KIT_ITEMS, // must not be moved
         reverb,
         echo,
@@ -1138,18 +1139,18 @@ namespace EFFECT // usage EFFECT::control::level
 union CommandBlock{
     struct{
         float value;
-        unsigned char type;
-        unsigned char source;
-        unsigned char control;
-        unsigned char part;
-        unsigned char kit;
-        unsigned char engine;
-        unsigned char insert;
-        unsigned char parameter;
-        unsigned char offset;
-        unsigned char miscmsg;
-        unsigned char spare1;
-        unsigned char spare0;
+        uchar type;
+        uchar source;
+        uchar control;
+        uchar part;
+        uchar kit;
+        uchar engine;
+        uchar insert;
+        uchar parameter;
+        uchar offset;
+        uchar miscmsg;
+        uchar spare1;
+        uchar spare0;
     } data;
     char bytes [sizeof(data)];
 };

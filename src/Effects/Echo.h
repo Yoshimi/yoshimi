@@ -87,10 +87,10 @@ class Echo : public Effect
         synth::InterpolatedValue<float> feedback, hidamp;
         int dl, dr, delay, lrdelay;
 
-        void initdelays(void);
-        float *ldelay;
-        float *rdelay;
-        int maxdelay;
+        void initdelays();
+        float* ldelay;
+        float* rdelay;
+        int  maxdelay;
         float  oldl, oldr; // pt. lpf
 
         float prevBeat; // Used to calculate BPM.

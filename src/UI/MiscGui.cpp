@@ -32,6 +32,8 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
+#include <iostream>
+
 using std::to_string;
 using std::ostringstream;
 
@@ -89,7 +91,6 @@ void collect_writeData(SynthEngine *synth, float value, unsigned char action, un
     putData.data.parameter = parameter;
     putData.data.offset = offset;
     putData.data.miscmsg = miscmsg;
-    //synth->CBtest(&putData);
     if (action == TOPLEVEL::action::fromMIDI)
         type = type | 1; // faking MIDI from virtual keyboard
     else
@@ -107,8 +108,6 @@ void collect_writeData(SynthEngine *synth, float value, unsigned char action, un
                 float newValue;
                 putData.data.type = 3 | TOPLEVEL::type::Limits;
                 newValue = synth->interchange.readAllData(&putData);
-                //if (newValue != value)
-                    //std::cout << "Gui limits " << value <<" to " << newValue << std::endl;
                 if (Fl::event_state(FL_CTRL) != 0)
                 {
                     if (putData.data.type & TOPLEVEL::type::Learnable)
@@ -125,7 +124,6 @@ void collect_writeData(SynthEngine *synth, float value, unsigned char action, un
                 }
                 else if (insert != TOPLEVEL::insert::filterGroup  || parameter == UNUSED)
                 {
-                    //std::cout << "setting for button 3";
                     putData.data.value = newValue;
                     type = TOPLEVEL::type::Write;
                     action |= TOPLEVEL::action::forceUpdate;
@@ -250,15 +248,13 @@ void GuiUpdates::decode_envelope(SynthEngine *synth, CommandBlock *getData)
 
 void GuiUpdates::decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char miscmsg = getData->data.miscmsg;
-
-    //synth->CBtest(getData);
+    uchar control   = getData->data.control;
+    uchar npart     = getData->data.part;
+    uchar kititem   = getData->data.kit;
+    uchar engine    = getData->data.engine;
+    uchar insert    = getData->data.insert;
+    uchar parameter = getData->data.parameter;
+    uchar miscmsg   = getData->data.miscmsg;
 
     if (control == TOPLEVEL::control::dataExchange)
     {
@@ -1520,14 +1516,14 @@ ValueType getFilterFreqTrackType(int offset)
     }
 }
 
-/** convert a millesconds value to a logarithmic dial setting */
+/** convert a milliseconds value to a logarithmic dial setting */
 int millisec2logDial(unsigned int ms)
 {
     return ms==0? -1
                 : log10f(float(ms)) * 1000;
 }
 
-/** convert setting from a logarithmic dial back to millesconds */
+/** convert setting from a logarithmic dial back to milliseconds */
 unsigned int logDial2millisec(int dial)
 {
     return dial<0? 0

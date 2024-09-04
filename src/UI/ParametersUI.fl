@@ -44,7 +44,7 @@ decl {using std::vector;} {private global
 }
 
 class ParametersUI {} {
-  Function {make_window(void)} {} {
+  Function {make_window()} {} {
     Fl_Window Recent {
       label {Yoshimi : Parameters}
       callback {CloseRecent->do_callback();}

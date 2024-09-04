@@ -19,7 +19,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <iostream>
 #include "WavFile.h"
 
 /*  ######## currently none of this is used
@@ -30,7 +29,6 @@ WavFile::WavFile(string filename, int samplerate, int channels)
 {
     if (file)
     {
- //       cout << "INFO: Making space for wave file header" << endl;
         //making space for the header written at destruction
         char tmp[44];
         memset(tmp, 0, 44 * sizeof(char));
@@ -43,7 +41,6 @@ WavFile::~WavFile()
 {
     if (file)
     {
-//        cout << "INFO: Writing wave file header" << endl;
 
         unsigned int chunksize;
         rewind(file);

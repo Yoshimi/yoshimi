@@ -19,25 +19,29 @@
 
 */
 
-#include <errno.h>
-#include <iostream>
-
-#include <jack/midiport.h>
-#include <jack/thread.h>
-#include <thread>
 
 #include "Misc/Config.h"
 #include "Misc/FormatFuncs.h"
 #include "MusicIO/JackEngine.h"
 
+#include <errno.h>
+#include <iostream>
+#include <string>
+
+#include <jack/midiport.h>
+#include <jack/thread.h>
+#include <thread>
+
+using std::move;
+using std::string;
 using func::asString;
 using func::asHexString;
 using std::this_thread::sleep_for;
 using std::chrono_literals::operator ""us;
 
 
-JackEngine::JackEngine(SynthEngine& _synth, shared_ptr<BeatTracker> _beatTracker)
-    : MusicIO{_synth, move(_beatTracker)}
+JackEngine::JackEngine(SynthEngine& _synth, shared_ptr<BeatTracker> beat)
+    : MusicIO{_synth, move(beat)}
     , jackClient{nullptr}
     , audio{}
     , midiPort{nullptr}
@@ -54,7 +58,7 @@ JackEngine::JackEngine(SynthEngine& _synth, shared_ptr<BeatTracker> _beatTracker
 }
 
 
-bool JackEngine::connectServer(std::string server)
+bool JackEngine::connectServer(string server)
 {
     for (int tries = 0; tries < 3 && !jackClient; ++tries)
     {
@@ -83,8 +87,8 @@ bool JackEngine::openJackClient(string server)
 {
     int jopts = JackNullOption;
     jack_status_t jstatus;
-    std::string clientname = "yoshimi";
-    if (runtime().nameTag.size())
+    string clientname{"yoshimi"};
+    if (not runtime().nameTag.empty())
         clientname += ("-" + runtime().nameTag);
 
     //Andrew Deryabin: for multi-instance support add unique id to
@@ -97,7 +101,6 @@ bool JackEngine::openJackClient(string server)
         snprintf(sUniqueId, sizeof(sUniqueId), "%d", synthUniqueId);
         clientname += ("-" + string{sUniqueId});
     }
-    //std::cout << " C name " << clientname << std::endl;
     bool named_server = server.size() > 0 && server.compare("default") != 0;
     if (named_server)
         jopts |= JackServerName;
@@ -249,7 +252,7 @@ void JackEngine::registerAudioPort(int partnum)
          * individual ports (at startup) if part is not configured for
          * direct O/P.
          */
-        std::string portName;
+        string portName;
         if (synth.part [partnum] && synth.partonoffRead(partnum) && (synth.part [partnum]->Paudiodest > 1))
         {
             portName = "track_" + asString(partnum + 1) + "_l";
@@ -511,13 +514,8 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     for (idx = 0; idx < eventCount; ++idx)
     {
         if (!jack_midi_event_get(&jEvent, portBuf, idx))
-        {
             if (jEvent.size >= 1 && jEvent.size <= 4) // no interest in zero sized or long events
-            {
-                //std::cout << "Offset " << int(jEvent.time) << std::endl;
                 handleMidi(jEvent.buffer[0], jEvent.buffer[1], jEvent.buffer[2]);
-            }
-        }
     }
     return true;
 }
@@ -604,12 +602,12 @@ void JackEngine::_jsessionCallback(jack_session_event_t* event, void* arg)
 
 void JackEngine::jsessionCallback(jack_session_event_t* event)
 {
-    std::string uuid = std::string(event->client_uuid);
-    std::string filename = std::string("yoshimi-") + uuid + std::string(".xml");
-    std::string filepath = std::string(event->session_dir) + filename;
+    string uuid = string(event->client_uuid);
+    string filename = string("yoshimi-") + uuid + string(".xml");
+    string filepath = string(event->session_dir) + filename;
     runtime().setJackSessionSave((int)event->type, filepath);
-    std::string cmd = runtime().programCmd() + std::string(" -U ") + uuid
-                 + std::string(" -u ${SESSION_DIR}") + filename;
+    string cmd = runtime().programCmd() + string(" -U ") + uuid
+                 + string(" -u ${SESSION_DIR}") + filename;
     event->command_line = strdup(cmd.c_str());
     if (jack_session_reply(jackClient, event))
         runtime().Log("Jack session reply failed");
@@ -645,4 +643,4 @@ void JackEngine::latencyCallback(jack_latency_callback_mode_t mode)
     }
 }
 
-#endif
+#endif /*defined JACK_LATENCY*/

@@ -74,9 +74,8 @@ using std::chrono_literals::operator ""us;
 using std::to_string;
 using std::ofstream;
 using std::ios_base;
+using std::string;
 using std::set;
-using std::cout;
-using std::endl;
 
 
 
@@ -442,7 +441,7 @@ void SynthEngine::signalGuiWindowClosed()
 }
 
 
-string SynthEngine::manualname(void)
+string SynthEngine::manualname()
 {
     string manfile = "yoshimi-user-manual-";
     manfile += YOSHIMI_VERSION;
@@ -463,7 +462,7 @@ string SynthEngine::manualname(void)
 }
 
 
-void SynthEngine::defaults(void)
+void SynthEngine::defaults()
 {
     for (int i = 0; i <NUM_MIDI_PARTS; ++i)
         partonoffLock(i, 0); // ensure parts are disabled
@@ -549,7 +548,7 @@ void SynthEngine::setPartMap(int npart)
 }
 
 
-void SynthEngine::setAllPartMaps(void)
+void SynthEngine::setAllPartMaps()
 {
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         setPartMap(npart);
@@ -651,7 +650,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
 #endif
-    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         if (chan == part[npart]->Prcvchn)
         {
@@ -684,7 +683,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
         Runtime.Log("Note off diff " + to_string(Runtime.noteOffSent - Runtime.noteOffSeen));
 #endif
 
-    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
@@ -856,8 +855,6 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
 
     for (int npart = minPart; npart < maxPart; ++ npart)
     {   // Send the controller to all part assigned to the channel
-
-        //std::cout << "  min " << minPart<< "  max " << maxPart << "  Rec " << int(part[npart]->Prcvchn) << "  Chan " << int(chan) <<std::endl;
         if (part[npart]->Prcvchn == chan)
         {
             if (CCtype == part[npart]->PbreathControl) // breath
@@ -875,7 +872,6 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
             }
             else
             {
-                //std::cout << "CCtype " << int(CCtype) << "  par " << int(par) << std::endl;
                 part[npart]->SetController(CCtype, par);
             }
         }
@@ -896,14 +892,12 @@ void SynthEngine::SetZynControls(bool in_place)
      * Data LSB param value
      */
 
-    unsigned char group = Runtime.nrpnH | 0x20;
-    unsigned char effnum = Runtime.nrpnL;
-    unsigned char parnum = Runtime.dataH;
-    unsigned char value = Runtime.dataL;
-    unsigned char efftype = (parnum & 0x60);
+    uchar group = Runtime.nrpnH | 0x20;
+    uchar effnum = Runtime.nrpnL;
+    uchar parnum = Runtime.dataH;
+    uchar value = Runtime.dataL;
+    uchar efftype = (parnum & 0x60);
     Runtime.dataL = 0xff; // use once then clear it out
-
-    //std::cout << "isSys " << int(group == 36) << "  num " << int(effnum) << "  par " << int(parnum) << "  val " << int(value) << std::endl;
 
     CommandBlock putData;
     memset(&putData, 0xff, sizeof(putData));
@@ -932,7 +926,6 @@ void SynthEngine::SetZynControls(bool in_place)
     else // ins
     {
         putData.data.part = TOPLEVEL::section::insertEffects;
-        //std::cout << "efftype " << int(efftype) << std::endl;
         if (efftype == 0x40)
             putData.data.control = 1;
         else if (efftype == 0x60)
@@ -944,9 +937,6 @@ void SynthEngine::SetZynControls(bool in_place)
         }
     }
     putData.data.engine = effnum;
-
-    //if ((npart < NUM_MIDI_PARTS && control == PART::control::effectType) || (npart > TOPLEVEL::section::main && kititem == UNUSED && control == 1))
-        //control = EFFECT::sysIns::effectType;
 
     if (in_place)
         interchange.commandEffects(&putData);
@@ -1061,8 +1051,6 @@ int SynthEngine::setProgramByName(CommandBlock *getData)
     if (ok)
     {
         ok = setProgram(fname, npart);
-        //if (ok && part[npart]->Poriginal == UNTITLED)
-            //part[npart]->Poriginal = "";
         if (!ok)
             name = "File " + name + "unrecognised or corrupted";
     }
@@ -1123,8 +1111,6 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
     else
     {
         ok = setProgram(fname, npart);
-        //if (ok && part[npart]->Poriginal == UNTITLED)
-            //part[npart]->Poriginal = "";
         if (notinplace)
         {
             if (!ok)
@@ -1159,7 +1145,7 @@ int SynthEngine::setProgramFromBank(CommandBlock *getData, bool notinplace)
 }
 
 
-bool SynthEngine::setProgram(const string& fname, int npart)
+bool SynthEngine::setProgram(string const& fname, int npart)
 {
     // switch active part (UI will do the same on returns_update)
     getRuntime().currentPart = npart;
@@ -1171,13 +1157,13 @@ bool SynthEngine::setProgram(const string& fname, int npart)
 }
 
 
-int SynthEngine::ReadBankRoot(void)
+int SynthEngine::ReadBankRoot()
 {
     return Runtime.currentRoot;
 }
 
 
-int SynthEngine::ReadBank(void)
+int SynthEngine::ReadBank()
 {
     return Runtime.currentBank;
 }
@@ -1239,7 +1225,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             Runtime.Log(*it);
             // we need this in case someone is working headless
-        cout << "\nReports sent to console window\n\n";
+        std::cout << "\nReports sent to console window\n\n";
     }
     else if (msg_buf.size() < lines) // Output will fit the screen
     {
@@ -1257,7 +1243,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
         string page_filename = "/tmp/yoshimi-pager-" + asString(getpid()) + ".log";
         ofstream fout(page_filename,(ios_base::out | ios_base::trunc));
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
-            fout << *it << endl;
+            fout << *it << std::endl;
         fout.close();
         string cmd = "less -X -i -M -PM\"q=quit /=search PgUp/PgDown=scroll (line %lt of %L)\" " + page_filename;
         system(cmd.c_str());
@@ -1558,8 +1544,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 
 
 /*
- * Provides a way of setting dynamic system variables
- * via NRPNs
+ * Provides a way of setting dynamic system variables via NRPNs
  */
 int SynthEngine::SetSystemValue(int type, int value)
 {
@@ -1622,7 +1607,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 putData.data.source = TOPLEVEL::action::fromCLI | TOPLEVEL::action::lowPrio;
                 putData.data.control = PART::control::keyShift;
 
-                for (int i = 0; i < Runtime.NumAvailableParts; ++ i)
+                for (uint i = 0; i < Runtime.NumAvailableParts; ++ i)
                 {
                     if (partonoffRead(i) && part[i]->Prcvchn == (type - 64))
                     {
@@ -1789,7 +1774,7 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
             Runtime.Log(name);
             return true;
         }
-        int parts = 2* NUM_MIDI_CHANNELS * (dHigh + 1);
+        uint parts = 2* NUM_MIDI_CHANNELS * (dHigh + 1);
         if (parts > Runtime.NumAvailableParts)
             Runtime.NumAvailableParts = parts;
         if (dHigh == 0)
@@ -1963,7 +1948,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
 }
 
 
-void SynthEngine::ClearNRPNs(void)
+void SynthEngine::ClearNRPNs()
 {
     Runtime.nrpnL = 127;
     Runtime.nrpnH = 127;
@@ -2117,7 +2102,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             fadeLevel = 1.0f;
             audioOutStore(_SYS_::mute::Fading);
             sound = _SYS_::mute::Fading;
-            //std::cout << "here fading" << std:: endl;
             break;
         case _SYS_::mute::Fading:
             if (fadeLevel < 0.001f)
@@ -2133,13 +2117,11 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         case _SYS_::mute::Complete:
             // set by resolver and paste
             audioOutStore(_SYS_::mute::Idle);
-            //std::cout << "here complete" << std:: endl;
             break;
         case _SYS_::mute::Request:
             // set by paste routine
             audioOutStore(_SYS_::mute::Immediate);
             sound = _SYS_::mute::Active;
-            //std::cout << "here requesting" << std:: endl;
             break;
         case _SYS_::mute::Immediate:
             // cleared by paste routine
@@ -2157,12 +2139,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
      * prio thread completes and re-enables the part, it will not
      * actually be seen until the start of the next period.
      */
-    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
     if (sound == _SYS_::mute::Active)
     {
-        for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+        for (uint npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
             if (partLocal[npart])
             {
@@ -2179,7 +2161,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     else
     {
         // Compute part samples and store them ->partoutl,partoutr
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (partLocal[npart])
             {
@@ -2202,7 +2184,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         // Apply the part volumes and pannings (after insertion effects)
         unsigned char panLaw = Runtime.panLaw;
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (!partLocal[npart])
                 continue;
@@ -2236,7 +2218,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 continue; // is off
 
             // Mix the channels according to the part settings about System Effect
-            for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+            for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart]               // it's enabled
                  && Psysefxvol[nefx][npart]        // it's sending an output
@@ -2278,7 +2260,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (part[npart]->Paudiodest & 2){    // Copy separate parts
 
@@ -2323,7 +2305,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             mainR[idx] *= volume;
             if (sound == _SYS_::mute::Fading) // fadeLevel must also have been set
             {
-                for (int npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+                for (uint npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
                     if (part[npart]->Paudiodest & 2)
                     {
@@ -2354,7 +2336,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
         // Peak computation for part vu meters
-        for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
             if (partLocal[npart])
             {
@@ -2385,7 +2367,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuOutPeakR = 1e-12f;
             VUpeak.values.vuRmsPeakL = 1e-12f;
             VUpeak.values.vuRmsPeakR = 1e-12f;
-            for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+            for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
                 if (partLocal[npart])
                 {
@@ -2435,7 +2417,7 @@ void SynthEngine::fetchMeterData()
     else
         VUdata.values.vuOutPeakR = fade;
 
-    for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         if (VUpeak.values.parts[npart] < 0.0)
             VUdata.values.parts[npart] = -1.0f;
@@ -2581,7 +2563,7 @@ void SynthEngine::maybePublishEffectsToGui()
 
 
 // Panic! (Clean up all parts and effects)
-void SynthEngine::ShutUp(void)
+void SynthEngine::ShutUp()
 {
     VUpeak.values.vuOutPeakL = 1e-12f;
     VUpeak.values.vuOutPeakR = 1e-12f;
@@ -2599,10 +2581,9 @@ void SynthEngine::ShutUp(void)
 }
 
 
-bool SynthEngine::loadStateAndUpdate(const string& filename)
+bool SynthEngine::loadStateAndUpdate(string const& filename)
 {
     interchange.undoRedoClear();
-    //std::cout << "file " << filename << std::endl;
     Runtime.sessionStage = _SYS_::type::InProgram;
     Runtime.stateChanged = true;
     bool success = Runtime.restoreSessionData(filename);
@@ -2612,7 +2593,7 @@ bool SynthEngine::loadStateAndUpdate(const string& filename)
 }
 
 
-bool SynthEngine::saveState(const string& filename)
+bool SynthEngine::saveState(string const& filename)
 {
     return Runtime.saveSessionData(filename);
 }
@@ -2683,12 +2664,10 @@ void SynthEngine::newHistory(string name, int group)
 }
 
 
-void SynthEngine::addHistory(const string& name, int group)
+void SynthEngine::addHistory(string const& name, int group)
 {
-    //std::cout << "history name " << name << "  group " << group << std::endl;
     if (findLeafName(name) < "!")
     {
-        //std::cout << "failed leafname" << std::endl;
         return;
     }
     if (group > TOPLEVEL::XML::ScalaMap)
@@ -2698,11 +2677,10 @@ void SynthEngine::addHistory(const string& name, int group)
 
     if (Runtime.historyLock[group])
     {
-        //std::cout << "history locked" << std::endl;
         return;
     }
 
-    vector<string> &listType = *getHistory(group);
+    vector<string>& listType = *getHistory(group);
     vector<string>::iterator itn = listType.begin();
     listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
     listType.insert(listType.begin(), name);
@@ -2713,7 +2691,6 @@ void SynthEngine::addHistory(const string& name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    //std::cout << "group " << group << std::endl;
     switch(group)
     {
         case TOPLEVEL::XML::Instrument: // 0
@@ -2873,7 +2850,6 @@ bool SynthEngine::loadHistory()
                 }
 
                 string tryRecent = xml->getparstr("most_recent");
-                //std::cout << "new >" << tryRecent << "<" << std::endl;
                 if (!tryRecent.empty())
                     historyLastSeen.at(count) = tryRecent;
             }
@@ -3045,7 +3021,6 @@ void SynthEngine::add2XML(XMLwrapper& xml)
 
 int SynthEngine::getalldata(char **data) // to state from instance
 {
-    std::cout << "getstart" << std::endl;
     bool oldFormat = usingYoshiType;
     usingYoshiType = true; // make sure everything is saved
     getRuntime().xmlType = TOPLEVEL::XML::State;
@@ -3060,7 +3035,6 @@ int SynthEngine::getalldata(char **data) // to state from instance
 
 void SynthEngine::putalldata(const char *data, int size) // to instance from state
 {
-//std::cout << "putstart" << std::endl;
     while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
@@ -3074,7 +3048,6 @@ void SynthEngine::putalldata(const char *data, int size) // to instance from sta
     getfromXML(*xml);
     midilearn.extractMidiListData(false, *xml);
     setAllPartMaps(); // TODO this seems to be a duplicate - already done in defaults()
-//std::cout << "putend" << std::endl;
 }
 
 
@@ -3092,7 +3065,7 @@ bool SynthEngine::savePatchesXML(string filename)
 }
 
 
-bool SynthEngine::loadXML(const string& filename)
+bool SynthEngine::loadXML(string const& filename)
 {
     auto xml{std::make_unique<XMLwrapper>(this, true)};
     if (!xml->loadXMLfile(filename))
@@ -3201,7 +3174,7 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
 }
 
 
-string SynthEngine::makeUniqueName(const string& name)
+string SynthEngine::makeUniqueName(string const& name)
 {
     string result = "Yoshimi";
     if (uniqueId > 0)
@@ -3211,7 +3184,7 @@ string SynthEngine::makeUniqueName(const string& name)
 }
 
 
-void SynthEngine::setWindowTitle(const string& _windowTitle)
+void SynthEngine::setWindowTitle(string const& _windowTitle)
 {
     if (!_windowTitle.empty())
         windowTitle = _windowTitle;
@@ -3346,17 +3319,17 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
 void SynthEngine::CBtest(CommandBlock *candidate, bool miscmsg) // default - don't read message
 {
-    std::cout << "\n value " << candidate->data.value
-            << "\n type " << int(candidate->data.type)
-            << "\n source " << int(candidate->data.source)
-            << "\n cont " << int(candidate->data.control)
-            << "\n part " << int(candidate->data.part)
-            << "\n kit " << int(candidate->data.kit)
-            << "\n engine " << int(candidate->data.engine)
-            << "\n insert " << int(candidate->data.insert)
-            << "\n parameter " << int(candidate->data.parameter)
-            << "\n offset " << int(candidate->data.offset)
-            << std::endl;
+    std::cout << "\n value "     << candidate->data.value
+              << "\n type "      << int(candidate->data.type)
+              << "\n source "    << int(candidate->data.source)
+              << "\n cont "      << int(candidate->data.control)
+              << "\n part "      << int(candidate->data.part)
+              << "\n kit "       << int(candidate->data.kit)
+              << "\n engine "    << int(candidate->data.engine)
+              << "\n insert "    << int(candidate->data.insert)
+              << "\n parameter " << int(candidate->data.parameter)
+              << "\n offset "    << int(candidate->data.offset)
+              << std::endl;
     if (miscmsg) // read this *without* deleting it
         std::cout << ">" << textMsgBuffer.fetch(candidate->data.miscmsg, false) << "<" << std::endl;
     else

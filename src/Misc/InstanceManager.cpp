@@ -29,6 +29,7 @@
 #include "Misc/FormatFuncs.h"
 #include "Misc/Util.h"
 #ifndef YOSHIMI_LV2_PLUGIN
+#include "Misc/CmdOptions.h"
 #include "Misc/TestInvoker.h"
 #endif
 #ifdef GUI_FLTK
@@ -39,6 +40,7 @@
 #include <memory>
 #include <thread>
 #include <utility>
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
 #include <string>
@@ -51,6 +53,8 @@ using std::make_unique;
 using std::unique_ptr;
 using std::for_each;
 using std::move;
+using std::cout;
+using std::endl;
 
 using func::asString;
 using util::contains;
@@ -123,7 +127,9 @@ namespace { // implementation details...
 
 
 /**
- * Descriptor: Synth-Engine instance
+ * An instance of the Synth-Engine,
+ * packaged together with a MusicClient
+ * and marked with lifecycle (#LifePhase) state.
  */
 class InstanceManager::Instance
 {
@@ -162,8 +168,8 @@ class InstanceManager::Instance
 
 /**
  * A housekeeper and caretaker responsible for clear-out of droppings.
- * - maintains a registry of all engine instances
- * - serves to further the lifecycle
+ * - maintains a registry of all engine instances, keyed by Synth-ID
+ * - the dutyCycle watches and drives instance lifecycle
  * - operates a running state duty cycle
  */
 class InstanceManager::SynthGroom
@@ -218,7 +224,7 @@ InstanceManager::InstanceManager()
 InstanceManager::~InstanceManager() { }
 
 
-/** Create Synth-Engine and Connector for a given ID,
+/** Create Synth-Engine and back-end connector for a given ID,
  *  possibly loading an existing config for that ID.
  * @remark Engines are created but not yet activated
  */
@@ -290,7 +296,7 @@ InstanceManager::Instance& InstanceManager::SynthGroom::createInstance(uint inst
  */
 bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
 {
-    std::cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< std::endl;
+    cout << "\nStart-up Synth-Instance("<< getID() << ")..."<< endl;
     state = BOOTING;
     runtime().loadConfig();
     bool isLV2 = bool(pluginCreator);
@@ -347,9 +353,9 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
                 runtime().startupReport(client->midiClientName());
 
                 if (isPrimary())
-                    std::cout << "\nYay! We're up and running :-)\n";
+                    cout << "\nYay! We're up and running :-)\n";
                 else
-                    std::cout << "\nStarted "<< synth->getUniqueId() << "\n";
+                    cout << "\nStarted Synth-Instance("<< getID() << ")\n";
 
                 state = BOOTING;
                 if (isLV2) enterRunningState();
@@ -375,7 +381,7 @@ bool InstanceManager::Instance::startUp(PluginCreator pluginCreator)
 void InstanceManager::Instance::shutDown()
 {
     state = WANING;
-    std::cout << "Stopping Synth-Instance("<< getID() << ")..."<< std::endl;
+    cout << "Stopping Synth-Instance("<< getID() << ")..."<< endl;
     runtime().runSynth.store(false, std::memory_order_release); // signal to synth and background threads
     synth->saveBanks();
     client->close();  // may block until background threads terminate
@@ -556,8 +562,8 @@ void InstanceManager::SynthGroom::handleStartRequest()
             if (not success)
                 primary->runtime().Log("FAILED to launch Synth-Instance("
                                       +asString(instance.getID())+")", _SYS_::LogError);
-            return;  // only one per duty cycle
-        }
+            return;
+        }// only one per duty cycle
 }
 
 void InstanceManager::SynthGroom::clearZombies()

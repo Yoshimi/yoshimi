@@ -151,12 +151,12 @@ class Bank
         string getRootFileTitle(size_t root);
         int InstrumentsInBanks;
         int BanksInRoots;
-        int readVersion(void)
+        int readVersion()
             {return BanksVersion;}
         void writeVersion(int version)
             {BanksVersion = version;}
         int BanksVersion;
-        void checkLocalBanks(void);
+        void checkLocalBanks();
         size_t generateSingleRoot(const string& newRoot, bool clear = true);
 
     private:

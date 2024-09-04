@@ -56,8 +56,9 @@ using file::findLeafName;
 using func::findSplitPoint;
 using func::setAllPan;
 using func::decibel;
+using std::string;
 
-Part::Part(uchar id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_synth) :
+Part::Part(uchar id, Microtonal* microtonal_, fft::Calc& fft_, SynthEngine* _synth) :
     ctl{new Controller(_synth)},
     partID{id},
     partoutl(_synth->buffersize),
@@ -88,7 +89,7 @@ Part::Part(uchar id, Microtonal *microtonal_, fft::Calc& fft_, SynthEngine *_syn
         kit[n].padpars = NULL;
     }
 
-    kit[0].adpars = new ADnoteParameters(fft, synth);
+    kit[0].adpars  = new ADnoteParameters(fft, synth);
     kit[0].subpars = new SUBnoteParameters(synth);
     kit[0].padpars = new PADnoteParameters(partID, 0, synth);
 
@@ -184,7 +185,7 @@ void Part::setNoteMap(int keyshift)
 }
 
 
-void Part::defaultsinstrument(void)
+void Part::defaultsinstrument()
 {
     Pname = DEFAULT_NAME;
     Poriginal = UNTITLED;
@@ -229,7 +230,7 @@ void Part::defaultsinstrument(void)
 
 
 // Cleanup the part
-void Part::cleanup(void)
+void Part::cleanup()
 {
     int enablepart = Penabled;
     Penabled = 0;
@@ -704,7 +705,6 @@ void Part::NoteOn(int note, int velocity, bool renote)
                             mult = 1 - mult; // second in a pair is always the inverse
                         if (mult >= 0)
                         {
-                            std::cout << "mult " << mult << std::endl;
                             itemVelocity *= mult;
                         }
                     }
@@ -869,7 +869,7 @@ void Part::SetController(unsigned int type, int par)
 
 
 // Release the sustained keys
-void Part::ReleaseSustainedKeys(void)
+void Part::ReleaseSustainedKeys()
 {
     //in non-Polyphony mode, reactivate previous active keys when last one is released
     if ((Pkeymode < PART_MONO || Pkeymode > PART_LEGATO) && (!monoNoteHistory.empty()))
@@ -884,7 +884,7 @@ void Part::ReleaseSustainedKeys(void)
 
 
 // Release all keys
-void Part::ReleaseAllKeys(void)
+void Part::ReleaseAllKeys()
 {
     for (int i = 0; i < POLYPHONY; ++i)
     {
@@ -899,7 +899,7 @@ void Part::ReleaseAllKeys(void)
 
 // Call NoteOn(...) with the most recent still held key as new note
 // (Made for Mono/Legato).
-void Part::monoNoteHistoryRecall(void)
+void Part::monoNoteHistoryRecall()
 {
     unsigned char mmrtempnote = monoNoteHistory.back(); // Last list element.
     NoteOn(mmrtempnote, monoNote[mmrtempnote].velocity, true);
@@ -991,7 +991,7 @@ void Part::enforcekeylimit()
 
 
 // Compute Part samples and store them in the partoutl[] and partoutr[]
-void Part::ComputePartSmps(void)
+void Part::ComputePartSmps()
 {
     assert(tmpoutl.get() == synth->getRuntime().genMixl.get());
     assert(tmpoutr.get() == synth->getRuntime().genMixr.get());
@@ -1234,7 +1234,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     else
     {
         if (!kit[kititem].adpars)
-            kit[kititem].adpars = new ADnoteParameters(fft, synth);
+            kit[kititem].adpars  = new ADnoteParameters(fft, synth);
         if (!kit[kititem].subpars)
             kit[kititem].subpars = new SUBnoteParameters(synth);
         if (!kit[kititem].padpars)
@@ -1512,7 +1512,6 @@ void Part::getfromXMLinstrument(XMLwrapper& xml)
         PkitfadeType = xml.getpar127("kit_fadetype", 0);
         if (PkitfadeType == 0 && oldfade == true)
             PkitfadeType = 1; // it's an older instrument
-//        std::cout << "fade " << int(PkitfadeType) << std::endl;
         Pdrummode = xml.getparbool("drum_mode", Pdrummode);
 
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
@@ -1647,8 +1646,7 @@ float Part::getLimits(CommandBlock *getData)
     float def = 64;
     int max = 127;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
-    //cout << "part limits" << endl;
+    uchar learnable = TOPLEVEL::type::Learnable;
     if ((control >= PART::control::volumeRange && control <= PART::control::receivePortamento) || control == PART::control::resetAllControllers)
         return ctl->getLimits(getData);
 

@@ -50,7 +50,6 @@ using std::string;
 string UnifiedPresets::handleStoreLoad(SynthEngine *_synth, CommandBlock *getData)
 {
     synth = _synth;
-    //synth->CBtest(getData, true);
     int type = getData->data.type;
     int value = getData->data.value;
     human = value; // used for listing. 'value may change before it is read
@@ -72,7 +71,7 @@ string UnifiedPresets::handleStoreLoad(SynthEngine *_synth, CommandBlock *getDat
          * sending a message here was doubling the number of messages
          * but only one was actually being read!
          */
-        value = UNUSED;//synth->textMsgBuffer.push(group);
+        value = UNUSED;
         return findPresetType(getData); // human friendly extension
     }
 
@@ -111,9 +110,9 @@ string UnifiedPresets::handleStoreLoad(SynthEngine *_synth, CommandBlock *getDat
     return name;
 }
 
-string UnifiedPresets::listpos(int count)
+string UnifiedPresets::listpos(int count)  const
 {
- // If human = 2 we want to get the extension not the freindly name
+ // If human = 2 we want to get the extension not the friendly name
     int test = 0;
     if (human == 1)
         test = 1;
@@ -250,7 +249,7 @@ string UnifiedPresets::accessXML(XMLwrapper& xml, CommandBlock *getData, bool is
     int engineType = getData->data.engine;
     int insert = getData->data.insert;
 
-    string name = "";
+    string name;
 
     if (kitItem == EFFECT::type::dynFilter && insert == TOPLEVEL::insert::filterGroup)
     {
@@ -420,8 +419,8 @@ string UnifiedPresets::resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool 
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
-    string name = "Presonance";
-    Resonance *sectionType;
+    string name{"Presonance"};
+    Resonance* sectionType;
 
     if (engineType == PART::engine::addSynth)
     {
@@ -456,7 +455,7 @@ string UnifiedPresets::oscilXML(XMLwrapper& xml, CommandBlock *getData, bool isL
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
     int engineType = getData->data.engine;
-    string name = "Poscilgen";
+    string name{"Poscilgen"};
 
     OscilParameters *sectionType;
 
@@ -850,6 +849,5 @@ void UnifiedPresets::remove(CommandBlock *getData)
     string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
     string dirname = synth->getRuntime().presetsDirlist[synth->getRuntime().presetsRootID];
     string filename = dirname + "/" + name + "." + type + EXTEN::presets;
-    //std::cout << "file >" << filename << std::endl;
     file::deleteFile(filename);
 }

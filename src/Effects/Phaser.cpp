@@ -279,7 +279,7 @@ void Phaser::NormalPhase(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Phaser::cleanup(void)
+void Phaser::cleanup()
 {
     Effect::cleanup();
     fbl = fbr = oldlgain = oldrgain = 0.0f;

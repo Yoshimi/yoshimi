@@ -34,7 +34,7 @@ using func::setAllPan;
 using func::power;
 
 
-SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : ParamBase(_synth)
+SUBnoteParameters::SUBnoteParameters(SynthEngine* _synth) : ParamBase{_synth}
 {
     AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
@@ -50,7 +50,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : ParamBase(_synth)
 }
 
 
-void SUBnoteParameters::defaults(void)
+void SUBnoteParameters::defaults()
 {
     PVolume = 96;
     setPan(PPanning = 64, synth->getRuntime().panLaw);
@@ -213,7 +213,7 @@ void SUBnoteParameters::add2XML(XMLwrapper& xml)
 }
 
 
-void SUBnoteParameters::updateFrequencyMultipliers(void)
+void SUBnoteParameters::updateFrequencyMultipliers()
 {
     float par1 = POvertoneSpread.par1 / 255.0f;
     float par1pow = power<10>(-(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);

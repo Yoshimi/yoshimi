@@ -34,7 +34,9 @@
 
 #include "MusicIO/MusicIO.h"
 
+using std::string;
 using util::unConst;
+
 
 class SynthEngine;
 
@@ -57,12 +59,12 @@ class JackEngine : public MusicIO
         void Close()                   override;
         void registerAudioPort(int)    override;
 
-        uint getSamplerate()     const override { return audio.jackSamplerate; }
-        int getBuffersize()      const override { return audio.jackNframes; }
+        uint   getSamplerate()   const override { return audio.jackSamplerate; }
+        int    getBuffersize()   const override { return audio.jackNframes; }
         string audioClientName() const override { return unConst(this)->clientName(); }
-        int audioClientId()      const override { return unConst(this)->clientId();   }
+        int    audioClientId()   const override { return unConst(this)->clientId();   }
         string midiClientName()  const override { return unConst(this)->clientName(); }
-        int midiClientId()       const override { return unConst(this)->clientId();   }
+        int    midiClientId()    const override { return unConst(this)->clientId();   }
 
         bool isConnected()                      { return (NULL != jackClient); }
         bool connectServer(string server);

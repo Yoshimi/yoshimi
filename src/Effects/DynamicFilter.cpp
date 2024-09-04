@@ -104,7 +104,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void DynamicFilter::cleanup(void)
+void DynamicFilter::cleanup()
 {
     Effect::cleanup();
     reinitfilter();
@@ -114,14 +114,14 @@ void DynamicFilter::cleanup(void)
 
 
 // Parameter control
-void DynamicFilter::setdepth(unsigned char Pdepth_)
+void DynamicFilter::setdepth(uchar Pdepth_)
 {
     Pdepth = Pdepth_;
     depth = powf(Pdepth / 127.0f, 2.0f);
 }
 
 
-void DynamicFilter::setvolume(unsigned char Pvolume_)
+void DynamicFilter::setvolume(uchar Pvolume_)
 {
     Pvolume = Pvolume_;
     float tmp = Pvolume / 127.0f;
@@ -133,7 +133,7 @@ void DynamicFilter::setvolume(unsigned char Pvolume_)
 }
 
 
-void DynamicFilter::setampsns(unsigned char Pampsns_)
+void DynamicFilter::setampsns(uchar Pampsns_)
 {
     Pampsns = Pampsns_;
     ampsns = powf(Pampsns / 127.0f, 2.5f) * 10.0f;
@@ -143,7 +143,7 @@ void DynamicFilter::setampsns(unsigned char Pampsns_)
 }
 
 
-void DynamicFilter::reinitfilter(void)
+void DynamicFilter::reinitfilter()
 {
     if (filterl != NULL)
         delete filterl;
@@ -154,7 +154,7 @@ void DynamicFilter::reinitfilter(void)
 }
 
 
-void DynamicFilter::setpreset(unsigned char npreset)
+void DynamicFilter::setpreset(uchar npreset)
 {
     if (npreset < 0xf)
     {
@@ -264,8 +264,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
     }
     else
     {
-        unsigned char preset = npreset & 0xf;
-        unsigned char param = npreset >> 4;
+        uchar preset = npreset & 0xf;
+        uchar param = npreset >> 4;
         if (param == 0xf)
             param = 0;
         changepar(param, dynPresets[preset][param]);
@@ -276,7 +276,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
 }
 
 
-void DynamicFilter::changepar(int npar, unsigned char value)
+void DynamicFilter::changepar(int npar, uchar value)
 {
     if (npar == -1)
     {
@@ -343,7 +343,7 @@ void DynamicFilter::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char DynamicFilter::getpar(int npar) const
+uchar DynamicFilter::getpar(int npar) const
 {
     switch (npar)
     {
@@ -377,8 +377,8 @@ float Dynamlimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = dynPresets[presetNum][control];
-    unsigned char canLearn = TOPLEVEL::type::Learnable;
-    unsigned char isInteger = TOPLEVEL::type::Integer;
+    uchar canLearn = TOPLEVEL::type::Learnable;
+    uchar isInteger = TOPLEVEL::type::Integer;
     switch (control)
     {
         case 0:

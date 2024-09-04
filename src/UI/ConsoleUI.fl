@@ -57,7 +57,7 @@ class ConsoleTextDisplay {: {public Fl_Text_Display}
 }
 
 class ConsoleUI {} {
-  Function {make_window(void)} {} {
+  Function {make_window()} {} {
     Fl_Window logConsole {
       label {yoshimi console}
       callback {//

@@ -121,9 +121,6 @@ decl {\#include "Interface/InterfaceAnchor.h"
 decl {\#include "MidiLearnUI.h"} {public local
 }
 
-decl {extern SynthEngine *firstSynth;} {public local
-}
-
 decl {\#include "Misc/FileMgrFuncs.h"
     using file::isRegularFile;
     using file::findLeafName;} {private local
@@ -4017,13 +4014,13 @@ Alan Calvert started the project}
     }
     return changed;} {}
   }
-  Function {strategicRetreat(void)} {} {
+  Function {strategicRetreat()} {} {
     code {query("", "", "", "Bad things happened,\\nYoshimi strategically retreats.");} {}
   }
   Function {Log(string msg)} {} {
     code {yoshiLog->log(msg);} {}
   }
-  Function {showSysEfxUI(void)} {private
+  Function {showSysEfxUI()} {private
   } {
     code {//
     inseffectui->hide();
@@ -4037,7 +4034,7 @@ Alan Calvert started the project}
     syseffectuigroup->show();
     lastmainW = 0;} {}
   }
-  Function {showInsEfxUI(void)} {private
+  Function {showInsEfxUI()} {private
   } {
     code {//
     syseffectui->hide();
@@ -4277,14 +4274,14 @@ bpmfallback->format(format);} {}
     else
         partui->instrumenteditwindow->hide();} {}
   }
-  Function {checkBuffer(void)} {} {
+  Function {checkBuffer()} {} {
     code {//
             if (lastmainW < 0) // not ready yet!
                 return;
             read_updates(synth);
             wincheck();} {}
   }
-  Function {rescaleMain(void)} {} {
+  Function {rescaleMain()} {} {
     code {//
             if (lastmainW < 0) // not ready yet!
                 return;

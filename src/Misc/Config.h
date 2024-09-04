@@ -67,7 +67,7 @@ class Config
 
         void init();
         void populateFromPrimary();
-        void startupReport(const string& clientName);
+        void startupReport(string const& clientName);
         void announce();
         void usage();
         void Log(string const& msg, char tostderr = _SYS_::LogNormal);
@@ -97,36 +97,35 @@ class Config
         using ThreadFun = void*(void*);
         bool startThread(pthread_t*, ThreadFun*, void* arg,
                          bool schedfifo, char lowprio, string const& name = "");
-        const string& programCmd()     { return programcommand; }
+        string const& programCmd()     { return programcommand; }
 
-        bool          isLV2;
-        bool          isMultiFeed;       // can produce separate audio feeds for each part (Jack or LV2)
-        string        defaultStateName;
-        string        defaultSession;
-        string        ConfigFile;
-        string        paramsLoad;
-        string        instrumentLoad;
-        int           load2part;
-        string        midiLearnLoad;
-        string        rootDefine;
-        unsigned int  build_ID;
-        bool          stateChanged;
-        string        StateFile;
-        string        remoteGuiTheme;
-        bool          restoreJackSession;
-        string        jackSessionFile;
-        int           lastXMLmajor;
-        int           lastXMLminor;
-        bool          oldConfig;
+        bool    isLV2;
+        bool    isMultiFeed;        // can produce separate audio feeds for each part (Jack or LV2)
+        string  defaultStateName;
+        string  defaultSession;
+        string  ConfigFile;
+        string  paramsLoad;
+        string  instrumentLoad;
+        int     load2part;
+        string  midiLearnLoad;
+        string  rootDefine;
+        uint    build_ID;
+        bool    stateChanged;
+        string  StateFile;
+        string  remoteGuiTheme;
+        bool    restoreJackSession;
+        string  jackSessionFile;
+        int     lastXMLmajor;
+        int     lastXMLminor;
+        bool    oldConfig;
 
-        static bool          showSplash;
-        static bool          singlePath;
-        static bool          autoInstance;
-        static unsigned int  activeInstance_OBSOLETE;
-        static bitset<32>    activeInstances;
-        static int           showCLIcontext;
+        static bool        showSplash;
+        static bool        singlePath;
+        static bool        autoInstance;
+        static bitset<32>  activeInstances;
+        static int         showCLIcontext;
 
-        unsigned int  guiThemeID;
+        uint          guiThemeID;
         string        guiTheme;
 
         atomic_bool   runSynth;
@@ -158,11 +157,11 @@ class Config
         int           sessionStage;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
-        list<string> lastfileseen;
+        list<string>  lastfileseen;
         bool          sessionSeen[TOPLEVEL::XML::ScalaMap + 1];
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         int           xmlType;
-        unsigned char instrumentFormat;
+        uchar         instrumentFormat;
         int           EnableProgChange;
         bool          toConsole;
         int           consoleTextSize;
@@ -170,71 +169,71 @@ class Config
         bool          showTimes;
         bool          logXMLheaders;
         bool          xmlmax;
-        unsigned int  GzipCompression;
+        uint          GzipCompression;
         string        guideVersion;
 
-        unsigned int  Samplerate;
-        bool          rateChanged;
-        unsigned int  Buffersize;
-        bool          bufferChanged;
-        unsigned int  Oscilsize;
-        bool          oscilChanged;
-        bool          showGui;
-        bool          storedGui;
-        bool          guiChanged;
-        bool          showCli;
-        bool          storedCli;
-        bool          cliChanged;
-        bool          banksChecked;
-        unsigned char panLaw;
-        bool          configChanged;
+        uint  Samplerate;
+        bool  rateChanged;
+        uint  Buffersize;
+        bool  bufferChanged;
+        uint  Oscilsize;
+        bool  oscilChanged;
+        bool  showGui;
+        bool  storedGui;
+        bool  guiChanged;
+        bool  showCli;
+        bool  storedCli;
+        bool  cliChanged;
+        bool  banksChecked;
+        uchar panLaw;
+        bool  configChanged;
 
-        unsigned char handlePadSynthBuild;
-        bool useLegacyPadBuild() { return handlePadSynthBuild == 0; }
-        bool usePadAutoApply()   { return handlePadSynthBuild == 2; }
+        uchar handlePadSynthBuild;
+        bool  useLegacyPadBuild() { return handlePadSynthBuild == 0; }
+        bool  usePadAutoApply()   { return handlePadSynthBuild == 2; }
 
-        int           rtprio;
-        int           midi_bank_root;
-        int           midi_bank_C;
-        int           midi_upper_voice_C;
-        bool          enable_NRPN;
-        bool          ignoreResetCCs;
-        bool          monitorCCin;
-        bool          showLearnedCC;
-        int           NumAvailableParts;
-        int           currentPart;
-        unsigned int  currentBank;
-        unsigned int  currentRoot;
-        bool          bankHighlight;
-        int           lastBankPart;
-        int           presetsRootID;
-        int           tempBank;
-        int           tempRoot;
-        int           noteOnSent; // note test
-        int           noteOnSeen;
-        int           noteOffSent;
-        int           noteOffSeen;
-        unsigned int  VUcount;
-        unsigned char channelSwitchType;
-        unsigned char channelSwitchCC;
-        unsigned char channelSwitchValue;
-        unsigned char nrpnL;
-        unsigned char nrpnH;
-        unsigned char dataL;
-        unsigned char dataH;
+        int   rtprio;
+        int   midi_bank_root;
+        int   midi_bank_C;
+        int   midi_upper_voice_C;
+        bool  enable_NRPN;
+        bool  ignoreResetCCs;
+        bool  monitorCCin;
+        bool  showLearnedCC;
+        uint  NumAvailableParts;
+        int   currentPart;
+        uint  currentBank;
+        uint  currentRoot;
+        bool  bankHighlight;
+        int   lastBankPart;
+        int   presetsRootID;
+        int   tempBank;
+        int   tempRoot;
+        int   noteOnSent; // note test
+        int   noteOnSeen;
+        int   noteOffSent;
+        int   noteOffSeen;
+        uint  VUcount;
+        uchar channelSwitchType;
+        uchar channelSwitchCC;
+        uchar channelSwitchValue;
+        uchar nrpnL;
+        uchar nrpnH;
+        uchar dataL;
+        uchar dataH;
         bool          nrpnActive;
 
         struct{
-            unsigned char Xaxis[NUM_MIDI_CHANNELS];
-            unsigned char Yaxis[NUM_MIDI_CHANNELS];
-            unsigned char Xfeatures[NUM_MIDI_CHANNELS];
-            unsigned char Yfeatures[NUM_MIDI_CHANNELS];
-            unsigned char Xcc2[NUM_MIDI_CHANNELS];
-            unsigned char Ycc2[NUM_MIDI_CHANNELS];
-            unsigned char Xcc4[NUM_MIDI_CHANNELS];
-            unsigned char Ycc4[NUM_MIDI_CHANNELS];
-            unsigned char Xcc8[NUM_MIDI_CHANNELS];
-            unsigned char Ycc8[NUM_MIDI_CHANNELS];
+            uchar Xaxis[NUM_MIDI_CHANNELS];
+            uchar Yaxis[NUM_MIDI_CHANNELS];
+            uchar Xfeatures[NUM_MIDI_CHANNELS];
+            uchar Yfeatures[NUM_MIDI_CHANNELS];
+            uchar Xcc2[NUM_MIDI_CHANNELS];
+            uchar Ycc2[NUM_MIDI_CHANNELS];
+            uchar Xcc4[NUM_MIDI_CHANNELS];
+            uchar Ycc4[NUM_MIDI_CHANNELS];
+            uchar Xcc8[NUM_MIDI_CHANNELS];
+            uchar Ycc8[NUM_MIDI_CHANNELS];
             string Name[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
@@ -290,4 +289,5 @@ class Config
         int exitType;
 };
 
-#endif
+#endif /*CONFIG_H*/
+

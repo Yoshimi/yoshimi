@@ -22,7 +22,6 @@
 #ifndef TEST_SEQUENCE_H
 #define TEST_SEQUENCE_H
 
-#include <string>
 #include <cassert>
 #include <functional>
 #include <vector>

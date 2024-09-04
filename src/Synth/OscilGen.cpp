@@ -72,13 +72,13 @@ void OscilGen::changeParams(OscilParameters *params_)
     oscilupdate.changeParams(*params);
 }
 
-void OscilGen::defaults(void)
+void OscilGen::defaults()
 {
     params->defaults();
     genDefaults();
 }
 
-void OscilGen::genDefaults(void)
+void OscilGen::genDefaults()
 {
     oldbasefunc = 0;
     oldbasepar = 64;
@@ -502,7 +502,7 @@ void OscilGen::getbasefunction(fft::Waveform& smps)
 
 
 // Filter the oscillator
-void OscilGen::oscilfilter(void)
+void OscilGen::oscilfilter()
 {
     if (params->Pfiltertype == 0)
         return;
@@ -652,7 +652,7 @@ void OscilGen::oscilfilter(void)
  *   working space; since it is only ever called from OscilGen::prepare()
  *   the oscilSpectrium will be restored / updated immediately afterwards.
  */
-void OscilGen::changebasefunction(void)
+void OscilGen::changebasefunction()
 {
     if (params->Pcurrentbasefunc != OSCILLATOR::wave::user)
     {
@@ -679,7 +679,7 @@ void OscilGen::changebasefunction(void)
 
 
 // Waveshape
-void OscilGen::waveshape(void)
+void OscilGen::waveshape()
 {
     oldwaveshapingfunction = params->Pwaveshapingfunction;
     oldwaveshaping = params->Pwaveshaping;
@@ -721,7 +721,7 @@ void OscilGen::waveshape(void)
 
 
 // Do the Frequency Modulation of the Oscil
-void OscilGen::modulation(void)
+void OscilGen::modulation()
 {
     oldmodulation = params->Pmodulation;
     oldmodulationpar1 = params->Pmodulationpar1;
@@ -822,7 +822,7 @@ void OscilGen::modulation(void)
 
 
 // Adjust the spectrum
-void OscilGen::spectrumadjust(void)
+void OscilGen::spectrumadjust()
 {
     if (params->Psatype == 0)
         return;
@@ -884,7 +884,7 @@ void OscilGen::spectrumadjust(void)
 }
 
 
-void OscilGen::shiftharmonics(void)
+void OscilGen::shiftharmonics()
 {
     if (params->Pharmonicshift == 0)
         return;
@@ -953,7 +953,7 @@ void OscilGen::reseed(int value)
 
 
 // Prepare the Oscillator
-void OscilGen::prepare(void)
+void OscilGen::prepare()
 {
     // reseed local PRNGs from SynthEngine PRNG
     reseed(synth->randomINT() + INT_MAX/2);
@@ -1386,7 +1386,7 @@ void OscilGen::getBasefuncSpectrumIntensities(size_t n, float *spc)
 
 
 // Effective oscillator spectrum intensities for display in the UI
-void OscilGen::getOscilSpectrumIntensities(size_t n, float *spc)
+void OscilGen::getOscilSpectrumIntensities(size_t n, float* spc)
 {
     size_t specLen = outoscilSpectrum.size();
     if (n > specLen)
@@ -1397,10 +1397,10 @@ void OscilGen::getOscilSpectrumIntensities(size_t n, float *spc)
 
     // display of full OscilGen spectrum: show also the effect of adaptive harmonics
 
-    unsigned char bfreq = params->Padaptiveharmonicsbasefreq;
-    unsigned char type  = params->Padaptiveharmonics;
-    unsigned char ppow  = params->Padaptiveharmonicspower;
-    unsigned char ppar  = params->Padaptiveharmonicspar;
+    uchar bfreq = params->Padaptiveharmonicsbasefreq;
+    uchar type  = params->Padaptiveharmonics;
+    uchar ppow  = params->Padaptiveharmonicspower;
+    uchar ppar  = params->Padaptiveharmonicspar;
 
     Accessor accessLine = [spc](size_t i) -> float& { return spc[i]; };
 
@@ -1419,7 +1419,7 @@ void OscilGen::getOscilSpectrumIntensities(size_t n, float *spc)
 
 // Convert the current oscillator spectrum into a
 // "user base function", which can then be further mixed and processed.
-void OscilGen::useasbase(void)
+void OscilGen::useasbase()
 {
     params->updatebasefuncSpectrum(oscilSpectrum);
     oldbasefunc = params->Pcurrentbasefunc = OSCILLATOR::wave::user;

@@ -66,7 +66,7 @@ decl {\#include <vector>
 }
 
 class VectorUI {} {
-  Function {make_window(void)} {} {
+  Function {make_window()} {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
       callback {//

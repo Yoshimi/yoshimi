@@ -19,6 +19,7 @@
 */
 
 #include <string>
+#include <iostream>
 
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
@@ -31,6 +32,9 @@
 using file::isRegularFile;
 using file::setExtension;
 using file::findLeafName;
+
+using std::string;
+
 
 namespace { // Implementation details...
     TextMsgBuffer& textMsgBuffer = TextMsgBuffer::instance();
@@ -50,19 +54,19 @@ Vectors::~Vectors()
 }
 
 
-unsigned char Vectors::loadVectorAndUpdate(unsigned char baseChan, const string& name)
+uchar Vectors::loadVectorAndUpdate(uchar baseChan, string const& name)
 {
-    unsigned char result = loadVector(baseChan, name, true);
+    uchar result = loadVector(baseChan, name, true);
     synth->ShutUp();
     return result;
 }
 
 
-unsigned char Vectors::loadVector(unsigned char baseChan, const string& name, bool full)
+uchar Vectors::loadVector(uchar baseChan, string const& name, bool full)
 {
     std::cout << "loading vector" << std::endl;
     bool a = full; full = a; // suppress warning
-    unsigned char actualBase = NO_MSG; // error!
+    uchar actualBase = NO_MSG; // error!
     if (name.empty())
     {
         synth->getRuntime().Log("No filename", _SYS_::LogNotSerious);
@@ -107,10 +111,10 @@ unsigned char Vectors::loadVector(unsigned char baseChan, const string& name, bo
 }
 
 
-unsigned char Vectors::extractVectorData(unsigned char baseChan, XMLwrapper& xml, const string& name)
+uchar Vectors::extractVectorData(uchar baseChan, XMLwrapper& xml, string const& name)
 {
-    int lastPart = NUM_MIDI_PARTS;
-    unsigned char tmp;
+    uint lastPart = NUM_MIDI_PARTS;
+    uchar tmp;
     string newname = xml.getparstr("name");
 
     if (baseChan >= NUM_MIDI_CHANNELS)
@@ -196,10 +200,10 @@ unsigned char Vectors::extractVectorData(unsigned char baseChan, XMLwrapper& xml
 }
 
 
-unsigned char Vectors::saveVector(unsigned char baseChan, const string& name, bool full)
+uchar Vectors::saveVector(uchar baseChan, string const& name, bool full)
 {
     bool a = full; full = a; // suppress warning
-    unsigned char result = NO_MSG; // ok
+    uchar result = NO_MSG; // ok
 
     if (baseChan >= NUM_MIDI_CHANNELS)
         return textMsgBuffer.push("Invalid channel number");
@@ -226,7 +230,7 @@ unsigned char Vectors::saveVector(unsigned char baseChan, const string& name, bo
 }
 
 
-bool Vectors::insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xml, const string& name)
+bool Vectors::insertVectorData(uchar baseChan, bool full, XMLwrapper& xml, string const& name)
 {
     int lastPart = NUM_MIDI_PARTS;
     int x_feat = synth->getRuntime().vectordata.Xfeatures[baseChan];
@@ -281,13 +285,13 @@ bool Vectors::insertVectorData(unsigned char baseChan, bool full, XMLwrapper& xm
 }
 
 
-float Vectors::getVectorLimits(CommandBlock *getData)
+float Vectors::getVectorLimits(CommandBlock* getData)
 {
     float value = getData->data.value;
-    unsigned char request = int(getData->data.type & TOPLEVEL::type::Default);
+    uchar request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // vector defaults
     type |= TOPLEVEL::type::Integer;

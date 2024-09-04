@@ -69,7 +69,7 @@ Echo::~Echo()
 
 
 // Cleanup the effect
-void Echo::cleanup(void)
+void Echo::cleanup()
 {
     Effect::cleanup();
     feedback.pushToTarget();
@@ -83,7 +83,7 @@ void Echo::cleanup(void)
 
 
 // Initialize the delays
-void Echo::initdelays(void)
+void Echo::initdelays()
 {
     if (Pbpm)
     {
