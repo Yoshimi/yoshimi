@@ -1,5 +1,13 @@
 yoshimi 2.3.2 M
 
+2024-9-5 Will
+bn 2351
+BugFix: mixer panel not updating with correct colours.
+    MasterUI was duplicating MasterMiscUI and hadn't had
+    background colours changed.
+More work on high contrast theme.
+
+
 2024-9-2 Will
 bn 2350
 Revised theme colour control, providing better bank colours.

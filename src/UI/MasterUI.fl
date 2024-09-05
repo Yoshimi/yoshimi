@@ -3754,7 +3754,8 @@ Alan Calvert started the project}
         CSspinner->hide();
         CSpend->hide();
     }
-    panelwindow->changed();} {}
+    panelwindow->changed();
+    ;} {}
   }
   Function {partSwitch(int next)} {} {
     code {//
@@ -3799,21 +3800,7 @@ Alan Calvert started the project}
     if (npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
     {
         int num = npart % NUM_MIDI_CHANNELS;
-        if (engine & 1)
-            panellistitem[num]->partadd->color(add_back);
-        else
-            panellistitem[num]->partadd->color(FL_BACKGROUND_COLOR);
-        if (engine & 2)
-            panellistitem[num]->partsub->color(sub_back);
-        else
-            panellistitem[num]->partsub->color(FL_BACKGROUND_COLOR);
-        if (engine & 4)
-            panellistitem[num]->partpad->color(pad_back);
-        else
-            panellistitem[num]->partpad->color(FL_BACKGROUND_COLOR);
-
-        panellistitem[num]->partname->copy_label(instrumentName.c_str());
-        panellistitem[num]->redraw();
+        panellistitem[num]->refresh();
     }} {}
   }
   Function {updateModepatch(bool inactive)} {} {

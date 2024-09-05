@@ -459,8 +459,8 @@ class Panellistitem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window panellistitem {
-      xywh {648 54 65 270} type Double hide
-      class Fl_Group
+      xywh {648 54 65 270} type Double
+      class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {
         xywh {0 -5 65 279} box PLASTIC_THIN_UP_BOX
@@ -623,13 +623,9 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
   }
   Function {refresh()} {} {
     code {//
-
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 
     partenabled->value(synth->partonoffRead(setpart));
-
-    setPartLabel(setpart);
-
     partvolume->value(synth->part[setpart]->Pvolume);
     partvolume->selection_color(setSlider(partvolume->value(),96));
     partpanning->value(synth->part[setpart]->Ppanning);
@@ -648,7 +644,6 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     else
         partrcv->textcolor(midi_solo_release);
 
-    partname->copy_label(synth->part[setpart]->Pname.c_str());
     int tmp = synth->part[setpart]->Paudiodest - 1;
     if (tmp < 0 or tmp > 3)
         tmp = 0;
@@ -656,11 +651,11 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
     if ((int)bankui->cbwig->value() != (setpart + 1))
         panellistitemgroup->color(FL_BACKGROUND_COLOR);
     else
-        panellistitemgroup->color(223);
+        panellistitemgroup->color(panels);
     panellistitemgroup->redraw();
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
-
+    setPartLabel(setpart);
     if (synth->partonoffRead(setpart))
         panellistitemgroup->activate();
     else
@@ -669,6 +664,7 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
   Function {setPartLabel(int npart)} {} {
     code {//
     int engine = findengines(npart);
+
     if (engine & 1)
         partadd->color(add_back);
     else
@@ -685,7 +681,8 @@ Right mouse button: Instrument edit} xywh {12 248 40 20} box PLASTIC_UP_BOX labe
         partname->labelcolor(yoshi_ins_typ);
     else
         partname->labelcolor(gen_text);
-    partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());} {}
+    partname->copy_label(synth->part[npart | *plgroup]->Pname.c_str());
+    ;} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {
