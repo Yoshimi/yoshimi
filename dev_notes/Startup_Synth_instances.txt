@@ -5,108 +5,134 @@ Intances of the Synth-Engine
 On a global level, Yoshimi has differnt modes of operation:
 
 - when enable_single_master is **not** set (i.e. _false_) in the config,
-  then there can be several independent Yoshimi processes running at
-  the same time. There is **no** coordination between these; they can
-  stop on each other's changes and will compete for system resources.
+  then there can be several independent Yoshimi processes running at the
+  same time. There is **no** coordination between these; they can overwrite
+  each other's persistent changes and will compete for system resources.
 
 - otherwise, when enable_single_master= **true** then there is only
-  one single Yoshimi process, but it manages multiple "Instances".
+  one single Yoshimi process, which then manages multiple "Instances".
   These "Instances" are not segregated, rather they are different
   data entities within the same process memory space.
 
-- in case of LV2 there is a single process; with a trick we manage
+- in case of LV2 a single process is _assumed;_ with a trick we manage
   to access the engine from the plugin-instance (using a non-standard
   extension to the LV2 standard)
 
 The following discussions focus on the case of multiple "Instanecs"
-within the same process (since the other cases are special cases, using
-mostly the same internal organisation).
+within the same process, which can either be created by user request,
+by receiving a OS signal (in case of `enable_single_master==true`),
+or as consequence of loading furhter LV2 plugin instances into the
+same plugin host process.
 
 
-The firstSynth
-~~~~~~~~~~~~~~
-When Main starts, it always immediately creates a first "Instance".
-Pointers to this instance are accessible through a process-global variable,
-`firstSynth`, defined in SynthEngine.cpp and accessed from various other parts.
-This special Synth-Engine instance
-- has always ID=0
-- acts as a global "is in running state" flag for the whole process
-- coordinates a global shutdown
+The Instance Manager
+~~~~~~~~~~~~~~~~~~~~
+All these Synth-Engine Instances are owned and managed by a singleton
+component known as `InstanceManager` and accessible from anywhere in
+the code base through a static function interface `Config::instances()`.
+The Instance Manager is the only one assumed to create engine instances,
+and is responsible for progressing through a well defined lifecycle;
+the implementation is kept encapsulated and all other parts of the
+application shall use the InstanceManager interface to search for
+a specific SynthEngine by ID, access the global configuration
+or to trigger global actions.
+
+
+The Primary Synth
+~~~~~~~~~~~~~~~~~
+When Main starts, it always immediately creates a »primary Instance«.
+A reference to this `primarySynth` is maintained within the `InstanceManager`
+but not exposed globally, other than allowing to acces the configuration part
+through the function Config::instance().accessPrimaryConfig().
+This special primary Synth-Engine instance...
+- is always marked with Synth-ID == 0
+- acts as a proxy for the _global application configuration_
+- maintains a global "is in running state" flag for the whole appliacation
 - loads and saves configuration and history
+- coordinates the application shutdown
 
 
-The main thread
+The Main Thread
 ~~~~~~~~~~~~~~~
 The so called »main thread« is actually the GUI-Thread. All UI event processing
 for all Instances together is handled within this single thread. For this
 reason, it is not necessary to synchronise GUI code and one event handler can
 never corrupt the data or see inconsistent state of another UI event handler.
 
-- the »main thread« repeatedly loops over all synth instances
-- for each instance, it processes the UI end of InterChange with checkBuffer()
-- FLTK-event-handling for all instance together is then done through the call
-  Fl::wait(33333). This call processes all pending FLTK events, then processes
+As long as the application is in running state, the »duty-cycle« in main-thread
+- repeatedly loops over all synth instances currently known
+- for each instance, it processes the UI side of InterChange with checkBuffer()
+- FLTK-event-handling for all instances together is then done through the call
+  `Fl::wait(33333)`. This call processes all pending FLTK events, then processes
   all pending redraw-events, and then waits until at least 33ms. After that
   the main loop resumes.
 
 
 Starting an "Instance"
 ~~~~~~~~~~~~~~~~~~~~~~
-An "Instance" within the same Yoshimi-process is comprised of
+An »Instance« within the Yoshimi-process comprises:
 - a SynthEngine instance (allocated into heap memory)
-- an associated MusicClient instance, connected to sound/MIDI
-- the MusicClient launches one ore several Synth / MIDI threads
+- an associated MusicClient instance, connected to sound/MIDI backend(s)
+- typically, the MusicClient launches one or several Synth / MIDI threads
 - the SynthEngine instance embeds an InterChange instance
 - this InterChange instance holds a number of ringbuffers for the Command-System
 - triggered from the »main thread« the Synth Engine also manages the "guiMaster"
   which is an instance of the FLTK generated MasterUI class.
 
-An instance is created through mainCreateNewInstance() from the primary thread.
-This first creates the SynthEngine instance and attempts to connect audio/midi.
-It then sends a message through the FLTK messaging system with FL::awake()
+An new instance can be requested through InstanceManager::requestNewInstance(),
+which first creates a new instance record internally and allocates the SynthEngine
+and MusicClient objects. Any such a new instance record is flagged with lifecycle
+state `PENDING` — a marker recognised by the repeatedly running »duty-cycle« as
+a request to walk this instance into the boot-up phase. This entails to determine
+a working audio / midi backend combination and then to start active processing.
 
-This message is received by the »main thread« (=actually the GUI thread).
-But _only_ if there is still _at least one_ Synth-"Instance" with no MasterUI.
-The message embeds the pointer to the synth, which is then prompted to create
-a MasterUI instance. So this happens from the »main thread« (and this is
-correct, since that is actually the UI event thread).
+After successfully starting the processing backend, the new instance is placed into
+lifecycle phase `BOOTING` — which again is a marker instructing the duty-cycle
+to proceed to the next step and launch a GUI. Yoshimi relies on the FLTK toolkit,
+and thus a main window widget must be heap-allocated and maintained by some
+anchor point within the application. This role is taken on by the InterChange
+component, which resides in each Instance and maintains an std::unique_ptr
+known as `guiMaster` to hold onto this top-level widget. Any further FLTK
+widgets allocated after this point will be automatically associated with
+this top-level window and connected to UI event processing.
 
-The SynthEngine invokes the constructor of the MasterUI instance, and manages
-this object (i.e. it also deletes the heap allocations before terminating).
-The actual code of MasterUI is FLTK generated and configured through the
-FLTK UI-Builder, but it inhertits the Command-system functionality from
-its base class, which is class GuiUpdates (see MiscGui.h / cpp).
+For the Yoshimi UI, the actual code of MasterUI is FLTK generated and configured
+through the FLTK UI-Builder, but it inhertits the Command-system functionality from
+its base class, which is class GuiUpdates (see MiscGui.h / cpp). Furthermore,
+after creating the MasterUI instance, the function `MasterUI::Init()` will be
+invoked, which is alltogether Yoshimi specific code. This Init() function creates
+and configures a lot of further UI window / pannel classes and finally delegates
+to `MasterUI::create_window()` (which is FLTK generated). Notably the MasterUI
+is outfitted with a direct back-reference to its associated InterChange instance
+and (as of 3/2024) unfortunately uses that instance to access the associated Synth
+internals directly. As a long-term goal, any communication between GUI and core
+should be routed through the ringbuffers.
 
-Moreover, the message handler, after creating the MasterUI instance also
-directly invokes the function `MasterUI::Init()`, which is alltogether Yoshimi
-specific code. This Init() function creates a lot of further UI window / pannel
-classes and then also invokes `MasterUI::create_window()` (which is FLTK
-generated). Notably the MasterUI has a back-reference to its associated
-InterChange instance and (as of 3/2024) also reaches into that instance
-to access the associated Synth internals directly.
-
-So notably each "Instance" runs its own CommandBlock / ringbuffer system,
+So notably each Instance runs its own CommandBlock / ringbuffer system,
 completely separate from all the other instances present in the same process.
-As a special twist, the »main thread«, which is the common thread for all
-UI events together, performs a loop over all the Synth instances, and within
-this loop, it invokes
- - `MasterUI *guiMaster = _synth->getGuiMaster(create=false)`
- - and then invokes `guiMaster->checkBuffer()` on _this instance_
+However, all Instances share a common »main thread«, which handles the combined
+UI event processing. So, technically, there is only a single FLTK user interface,
+which is comprised of several top-level window widgets, one for each instance.
+The aforementioned »duty-cycle« in the »main thread« loops over all the Synth
+instances to invoke `guiMaster->checkBuffer()` for each of them.
 
-This function retrieves all messages out of the "toGUI" ringbuffer
+This function retrieves all messages currently in the "toGUI" ringbuffer
 /for this specific/ instance, and uses the associated MasterUI instance
 to dispatch these messages to the associated UI components and widgets,
-albeit all running within the same UI event thread.
+albeit all running within the same UI event thread. This may also entail
+retrieving and dispatching of _push-updates_ from the GuiDataExchange.
 
 Instance shutdown is initiated by the closing event of one instance, which
 invokes `MasterUI::cb_masterwindow_i()` on that instance. This causes the
-window widgets for this instance to be hidden and the associated heap
-allocated objects will be deleted. Then the associated Synth and MusicClient
-will be stopped and discarded.
+window widgets for this instance to be hidden (disabling all event processing)
+before the associated heap allocated objects will be deleted. The Instance will
+then be marked with lifecycle phase `WANING`, the associated Synth and MusicClient
+will be stopped and and finally the Instance is removed from the internal registry
+and allocated memory is discarded.
 
-If however the instance belongs to "firstSynth", a shutdown of the
-complete process is initiated, closing all other Instances and prompting
-all remaining threads to terminate.
+If however the instance represents to »primary Synth«, a shutdown of the
+complete process is initiated, closing and unwinding all other Instances
+and prompting all remaining threads to terminate.
 
 
 Running as LV2 plugin
@@ -114,7 +140,7 @@ Running as LV2 plugin
 While actually the processing scheme for LV2 is well defined, and the standard
 also mandates to create a «parameter port» for each setting (and based on that
 would be able to generate a generic UI), Yoshimi was only fitted superficially
-to the requirements of the LV2 standard. Relying on a non-standard extension
+to the requirements of the LV2 standard. By relying on a non-standard extension
 and assuming that actually the audio processing and the UI presentation both
 hapen within the same OS process of the plug-in host, Yoshimi kind of sneaks
 it its special and very elaborate UI.
@@ -123,28 +149,33 @@ Entrance-point: YoshimiLV2Plugin::instantiate()
 - invoked dirctly from the Plug-In descriptor
 - called by the Host initially when loading the Plug-in
 - Actions
-  ** creates a single SynthEngine instance
-  ** creates the (internal)Plug-in-Object
+  ** creates a new SynthEngine instance
+  ** creates the (internal)Plug-in-Object and installs this into the MusicClient
   ** invokes Init()
-     *** launches the background thread
   ** loads Banks and History
-  
-When Plug-In is »aktive«: run()
+
+Before actual processing starts, the LV2 host will invoke the YoshimiLV2Plugin::activate
+callback and starts or connects to the worker processing threads. Either before or
+after activating, the Host attaches the LV2 ports and thereby provides the output buffers.
+
+When Plug-In is in active processnig...
 - Host calls repeatedly YoshimiLV2Plugin::run(LV2_Handle instance, uint32_t sample_count)
 - does the audio-processing
      YoshimiLV2Plugin::process(uint32_t sample_count)
      SynthEngine::MasterAudio()
      InterChange::mediate()
-     
+
 GUI will only be launched on-demand
 - typically by "clicking", or "double clicking" or "editing" the Plug-in in the Host
-- already the Yoshimi UI start happens from some UI thread of the Host (not the audio thread)
-- invokes `YoshimiLV2PluginUI::show()`
+- often, already the YoshimiLV2PluginUI::instantiate() happens from some UI thread of
+  the Host, and not the audio thread...
+- `YoshimiLV2PluginUI::show()` is invoked, which delegates to the Yoshimi InstanceManager
+  to create the FLTK gui and to establish a connection between SynthEngine and GUI.
 
 While the Yoshimi UI is active...
 - the Host periodically invokes `YoshimiLV2PluginUI::run()`
 - this is the UI-Event-Loop and directly invokes
-  ** `_masterUI->checkBuffer()` (does the returns-processing of Yoshimi)
+  ** `masterUI().checkBuffer()` (which does the returns-processing of Yoshimi)
   ** `Fl::check()` (performs the FLTK event processing and redrawing() )
 
 The UI can be deactivated or hidden by the host:
@@ -156,7 +187,8 @@ The UI can be deactivated or hidden by the host:
 
 However, the Yoshimi-GUI can also be closed directly via FLTK
 - Callback on the main window
-- invokes `SynthEngine::guiClosed(stopSynth = true)`
+- invokes `SynthEngine::signalGuiWindowClosed()`
+- through an callback function, this also deactivates the YoshimiLV2PluginUI
 - NOTE: this does **not** terminate the Synth when running under LV2
 - but it hides all windows and destroys the MasterUI instance
 
