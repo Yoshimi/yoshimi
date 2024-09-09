@@ -243,7 +243,7 @@ Upastewin->hide();}
     else if (npart == TOPLEVEL::insertEffects)
         text = "insert";
     else
-        text = "part " + to_string(npart + 1);
+        text = "part " + std::to_string(npart + 1);
     return text;} {}
   }
   Function {Ucopy(int _npart, int _kititem, int _engine = UNUSED, int _insert =  UNUSED, int _parameter = UNUSED, int _offset = UNUSED)} {} {

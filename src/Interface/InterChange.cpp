@@ -41,6 +41,7 @@
 #include "Misc/SynthEngine.h"
 #include "Misc/Part.h"
 #include "Misc/TextMsgBuffer.h"
+#include "Params/UnifiedPresets.h"
 #include "Params/Controller.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -283,7 +284,8 @@ void InterChange::indirectTransfers(CommandBlock *getData, bool noForward)
 
     if (control == TOPLEVEL::control::copyPaste)
     {
-        string name = synth->unifiedpresets.handleStoreLoad(synth, getData);
+        string name = UnifiedPresets{*synth, *getData}
+                                    .handleStoreLoad();
         /*
          * for Paste (load) 'name' is the type of the preset being loaded
          * for List 'name' lists all the stored presets of the wanted preset type
@@ -1167,7 +1169,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                     for (int i = 0; i < MAX_BANKS_IN_ROOT; ++i)
                     {
                         newbank = (newbank + 5) & 0x7f;
-                        if (synth->getBankRef().getBankName(newbank, rootID).empty())
+                        if (synth->bank.getBankName(newbank, rootID).empty())
                         {
                             isOK = true;
                             break;
@@ -1185,7 +1187,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
                         isOK = false;
                     }
 
-                    if (isOK && !synth->getBankRef().newIDbank(text, newbank))
+                    if (isOK and not synth->bank.newIDbank(text, newbank))
                     {
                         text = "FAILED Could not create bank " + text + " for ID " + asString(newbank);
                         isOK = false;
@@ -1259,17 +1261,17 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
             {
                 if (kititem != UNUSED)
                 {
-                    kititem = synth->getBankRef().generateSingleRoot(text, false);
+                    kititem = synth->bank.generateSingleRoot(text, false);
                     getData->data.kit = kititem;
-                    synth->getBankRef().installNewRoot(kititem, text);
+                    synth->bank.installNewRoot(kititem, text);
                     synth->saveBanks();
                 }
                 else
                 {
-                    size_t found = synth->getBankRef().addRootDir(text);
+                    size_t found = synth->bank.addRootDir(text);
                     if (found)
                     {
-                        synth->getBankRef().installNewRoot(found, text);
+                        synth->bank.installNewRoot(found, text);
                         synth->saveBanks();
                     }
                     else
@@ -1284,7 +1286,7 @@ int InterChange::indirectBank(CommandBlock *getData, SynthEngine *synth, unsigne
         case BANK::deselectRoot:
             if (write) // not realistically readable
             {
-                if (synth->getBankRef().removeRoot(kititem))
+                if (synth->bank.removeRoot(kititem))
                     value = UNUSED;
                 synth->saveBanks();
             }
@@ -1847,7 +1849,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
 
     if (source != TOPLEVEL::action::fromMIDI && !setUndo)
-        synth->getRuntime().Log(resolveAll(synth, getData, _SYS_::LogNotSerious));
+        synth->getRuntime().Log(resolveAll(*synth, getData, _SYS_::LogNotSerious));
 
     if (source == TOPLEVEL::action::fromCLI)
         synth->getRuntime().finishedCLI = true;
@@ -3643,13 +3645,13 @@ void InterChange::commandBank(CommandBlock *getData)
                 engine = synth->getRuntime().currentRoot;
                 getData->data.engine = engine;
             }
-            textMsgBuffer.push(synth->getBankRef().getname(parameter, kititem, engine));
+            textMsgBuffer.push(synth->bank.getname(parameter, kititem, engine));
             break;
         }
         case BANK::control::findInstrumentName:
         {
             if (parameter == UNUSED) // return the name of a specific instrument.
-                textMsgBuffer.push(synth->getBankRef().getname(value_int, kititem, engine));
+                textMsgBuffer.push(synth->bank.getname(value_int, kititem, engine));
             else
             {
                 int offset = type_offset [parameter];
@@ -3669,9 +3671,9 @@ void InterChange::commandBank(CommandBlock *getData)
                 do {
                     do {
                         do {
-                            if (synth->getBankRef().getType(searchInst, searchBank, searchRoot) == offset)
+                            if (synth->bank.getType(searchInst, searchBank, searchRoot) == offset)
                             {
-                                textMsgBuffer.push(asString(searchRoot, 3) + ": " + asString(searchBank, 3) + ". " + asString(searchInst + 1, 3) + "  " + synth->getBankRef().getname(searchInst, searchBank, searchRoot));
+                                textMsgBuffer.push(asString(searchRoot, 3) + ": " + asString(searchBank, 3) + ". " + asString(searchInst + 1, 3) + "  " + synth->bank.getname(searchInst, searchBank, searchRoot));
                                 ++ searchInst;
                                 return;
                                 /*

@@ -143,10 +143,9 @@ switch (res)
         break;
 }}
         xywh {275 12 74 20} labelsize 12 labelcolor 64 textsize 12 textcolor 64
-        code0 {(void) o; // suppress warning}
-        code1 {vector <string> listType = *synth->getHistory(TOPLEVEL::XML::Vector);}
-        code2 {o->add("Load");o->add("Save");o->add("Recent");o->add("Clear Ch");o->add("Clear All");}
-        code3 {setRecent(listType.size() > 0);}
+        code0 {o->add("Load");o->add("Save");o->add("Recent");o->add("Clear Ch");o->add("Clear All");}
+        code1 {vector<string> const& history{synth->getHistory(TOPLEVEL::XML::Vector)};}
+        code2 {setRecent(not history.empty());}
       } {}
       Fl_Group Xgroup {
         label X

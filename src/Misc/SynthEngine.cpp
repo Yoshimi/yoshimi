@@ -97,49 +97,85 @@ namespace { // Global implementation internal history data
 
 
 
-SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
-    uniqueId(instanceID),
-    lv2PluginType(pluginType),
-    needsSaving(false),
-    bank(this),
-    interchange(this),
-    midilearn(this),
-    mididecode(this),
-    vectorcontrol(this),
-    Runtime(*this),
-    rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
-    textMsgBuffer(TextMsgBuffer::instance()),
-    fadeAll(0),
-    fadeStepShort(0),
-    fadeLevel(0),
-    samplerate(48000),
-    samplerate_f(samplerate),
-    halfsamplerate_f(samplerate / 2),
-    buffersize(512),
-    buffersize_f(buffersize),
-    bufferbytes(buffersize*sizeof(float)),
-    oscilsize(1024),
-    oscilsize_f(oscilsize),
-    halfoscilsize(oscilsize / 2),
-    halfoscilsize_f(halfoscilsize),
-    sent_buffersize(0),
-    sent_bufferbytes(0),
-    sent_buffersize_f(0),
-    sysEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
-    insEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
-    partEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()},
-    sysEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
-    insEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
-    partEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()},
-    ctl(NULL),
-    microtonal(this),
-    fft(),
-    callbackGuiClosed{},
-    CHtimer(0),
-    LFOtime(0),
-    songBeat(0.0f),
-    monotonicBeat(0.0f),
-    windowTitle("Yoshimi" + asString(uniqueId))
+SynthEngine::SynthEngine(uint instanceID)
+    : uniqueId{instanceID}
+    , Runtime{*this}
+    , rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()}
+    , bank{this}
+    , interchange{this}
+    , midilearn{*this}
+    , mididecode{this}
+    , vectorcontrol{this}
+    , audioOut{}
+    , partlock{}
+    , legatoPart{0}
+    , masterMono{false}
+    , fileCompatible{true}
+    , usingYoshiType{false}
+    // part[]
+    , fadeAll{0}
+    , fadeStep{0}
+    , fadeStepShort{0}
+    , fadeLevel{0}
+    , samplerate{48000}
+    , samplerate_f{float(samplerate)}
+    , halfsamplerate_f{float(samplerate / 2)}
+    , buffersize{512}
+    , buffersize_f{float(buffersize)}
+    , bufferbytes{int(buffersize*sizeof(float))}
+    , oscilsize{1024}
+    , oscilsize_f{float(oscilsize)}
+    , halfoscilsize{oscilsize / 2}
+    , halfoscilsize_f{float(halfoscilsize)}
+    , oscil_sample_step_f{1.0}
+    , oscil_norm_factor_pm{1.0}
+    , oscil_norm_factor_fm{1.0}
+    , sent_buffersize{0}
+    , sent_bufferbytes{0}
+    , sent_buffersize_f{0}
+    , fixed_sample_step_f{0}
+    , TransVolume{0}
+    , Pvolume{0}
+    , ControlStep{0}
+    , Paudiodest{0}
+    , Pkeyshift{0}
+    , PbpmFallback{0}
+    // Psysefxvol[][]
+    // Psysefxsend[][]
+    , syseffnum{0}
+    // syseffEnable[]
+    , inseffnum{0}
+    // sysefx[]
+    // insefx[]
+    // Pinsparts[]
+    , sysEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()}
+    , insEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()}
+    , partEffectUiCon{interchange.guiDataExchange.createConnection<EffectDTO>()}
+    , sysEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()}
+    , insEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()}
+    , partEqGraphUiCon{interchange.guiDataExchange.createConnection<EqGraphDTO>()}
+    , ctl{NULL}
+    , microtonal{this}
+    , fft{}
+    , textMsgBuffer{TextMsgBuffer::instance()}
+    , VUpeak{}
+    , VUcopy{}
+    , VUdata{}
+    , VUcount{0}
+    , VUready{false}
+    , volume{0.0}
+    // sysefxvol[][]
+    // sysefxsend[][]
+    , keyshift{0}
+    , callbackGuiClosed{}
+    , windowTitle{"Yoshimi" + asString(uniqueId)}
+    , needsSaving{false}
+    , channelTimer{0}
+    , LFOtime{0}
+    , songBeat{0.0}
+    , monotonicBeat{0.0}
+    , bpm{90}
+    , bpmAccurate{false}
 {
     union {
         uint32_t u32 = 0x11223344;
@@ -189,7 +225,7 @@ SynthEngine::~SynthEngine()
 }
 
 
-bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
+bool SynthEngine::Init(uint audiosrate, int audiobufsize)
 {
     Runtime.init();
     audioOutStore(_SYS_::mute::Active);
@@ -448,7 +484,7 @@ string SynthEngine::manualname()
     manfile = manfile.substr(0, manfile.find(" ")); // remove M or rc suffix
     int pos = 0;
     int count = 0;
-    for (unsigned i = 0; i < manfile.length(); ++i)
+    for (uint i = 0; i < manfile.length(); ++i)
     {
         if (manfile.at(i) == '.')
         {
@@ -638,7 +674,7 @@ void SynthEngine::swapTestPADtable()
 
 
 // Note On Messages
-void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
+void SynthEngine::NoteOn(uchar chan, uchar note, uchar velocity)
 {
 #ifdef REPORT_NOTES_ON_OFF
     ++Runtime.noteOnSeen; // note test
@@ -675,7 +711,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
 
 
 // Note Off Messages
-void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
+void SynthEngine::NoteOff(uchar chan, uchar note)
 {
 #ifdef REPORT_NOTES_ON_OFF
     ++Runtime.noteOffSeen; // note test
@@ -692,7 +728,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 }
 
 
-int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
+int SynthEngine::RunChannelSwitch(uchar chan, int value)
 {
     int switchtype = Runtime.channelSwitchType;
     if (switchtype > MIDI::SoloType::Channel)
@@ -711,8 +747,8 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
             timespec now_struct;
             clock_gettime(CLOCK_MONOTONIC, &now_struct);
             int64_t now_ms = int64_t(now_struct.tv_sec) * 1000 + int64_t(now_struct.tv_nsec) / 1000000;
-            if ((now_ms - CHtimer) > 60)
-                CHtimer = now_ms;
+            if ((now_ms - channelTimer) > 60)
+                channelTimer = now_ms;
             else
                 return 0; // de-bounced
         }
@@ -812,7 +848,7 @@ int SynthEngine::RunChannelSwitch(unsigned char chan, int value)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
+void SynthEngine::SetController(uchar chan, int CCtype, short int par)
 {
     if (CCtype == Runtime.midi_bank_C)
     {
@@ -1170,7 +1206,7 @@ int SynthEngine::ReadBank()
 
 
 // Set part's channel number
-void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
+void SynthEngine::SetPartChan(uchar npart, uchar nchan)
 {
     if (npart < Runtime.numAvailableParts)
     {
@@ -1216,7 +1252,7 @@ int SynthEngine::ReadPartKeyMode(int npart)
  * We also have to fake long pages when calling via NRPNs as there
  * is no readline entry to set the page length.
  */
-void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
+void SynthEngine::cliOutput(list<string>& msg_buf, uint lines)
 {
     list<string>::iterator it;
 
@@ -1257,10 +1293,9 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 {
     string label;
     string prefix;
-    unsigned int idx;
     msg_buf.push_back("Root Paths");
 
-    for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
+    for (uint idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
     {
         if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
         {
@@ -1291,7 +1326,7 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
             label = label.substr(0, label.size() - 1);
         msg_buf.push_back("Banks in Root ID " + asString(rootNum));
         msg_buf.push_back("    " + label);
-        for (unsigned int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        for (uint idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
         {
             if (bank.roots [rootNum].banks.count(idx))
             {
@@ -1552,10 +1587,10 @@ int SynthEngine::SetSystemValue(int type, int value)
     string label;
     label = "";
     bool to_send = false;
-    unsigned char  action = 0;
-    unsigned char  cmd = UNUSED;
-    unsigned char  setpart;
-    unsigned char  parameter = UNUSED;
+    uchar  action = 0;
+    uchar  cmd = UNUSED;
+    uchar  setpart;
+    uchar  parameter = UNUSED;
 
     switch (type)
     {
@@ -1750,18 +1785,17 @@ int SynthEngine::SetSystemValue(int type, int value)
 }
 
 
-int SynthEngine::LoadNumbered(unsigned char group, unsigned char entry)
+int SynthEngine::LoadNumbered(uchar group, uchar entry)
 {
-    string filename;
-    vector<string> &listType = *getHistory(group);
+    vector<string> const& listType{getHistory(group)};
     if (size_t(entry) >= listType.size())
         return (textMsgBuffer.push(" FAILED: List entry " + to_string(int(entry)) + " out of range") | 0xFF0000);
-    filename = listType.at(entry);
+    string const& filename{listType.at(entry)};
     return textMsgBuffer.push(filename);
 }
 
 
-bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
+bool SynthEngine::vectorInit(int dHigh, uchar chan, int par)
 {
     string name = "";
 
@@ -1800,7 +1834,7 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
 }
 
 
-void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
+void SynthEngine::vectorSet(int dHigh, uchar chan, int par)
 {
     string featureList = "";
 
@@ -1833,7 +1867,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         }
     }
 
-    unsigned char part = 0;
+    uchar part = 0;
     switch (dHigh)
     {
         case 0:
@@ -2016,10 +2050,10 @@ void SynthEngine::partonoffWrite(uint npart, int what)
 {
     if (npart >= uint(Runtime.numAvailableParts))
         return;
-    unsigned char original = part[npart]->Penabled;
+    uchar original = part[npart]->Penabled;
     if (original > 1)
         original = 1;
-    unsigned char tmp = original;
+    uchar tmp = original;
     switch (what)
     {
         case 0: // always off
@@ -2068,9 +2102,7 @@ char SynthEngine::partonoffRead(uint npart)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
-    //if (to_process < 64)
-        //Runtime.Log("Process " + to_string(to_process));
-    static unsigned int VUperiod = samplerate / 20;
+    static uint VUperiod = samplerate / 20;
     /*
      * The above line gives a VU refresh of at least 50mS
      * but it may be longer depending on the buffer size
@@ -2094,7 +2126,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     memset(mainL, 0, sent_bufferbytes);
     memset(mainR, 0, sent_bufferbytes);
 
-    unsigned char sound = audioOut.load();
+    uchar sound = audioOut.load();
     switch (sound)
     {
         case _SYS_::mute::Pending:
@@ -2183,7 +2215,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
         // Apply the part volumes and pannings (after insertion effects)
-        unsigned char panLaw = Runtime.panLaw;
+        uchar panLaw = Runtime.panLaw;
         for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
         {
             if (!partLocal[npart])
@@ -2659,8 +2691,7 @@ void SynthEngine::newHistory(string name, int group)
         return;
     if (group == TOPLEVEL::XML::Instrument && (name.rfind(EXTEN::yoshInst) != string::npos))
         name = setExtension(name, EXTEN::zynInst);
-    vector<string> &listType = *getHistory(group);
-    listType.push_back(name);
+    getHistory(group).push_back(name);
 }
 
 
@@ -2680,55 +2711,55 @@ void SynthEngine::addHistory(string const& name, int group)
         return;
     }
 
-    vector<string>& listType = *getHistory(group);
-    vector<string>::iterator itn = listType.begin();
-    listType.erase(std::remove(itn, listType.end(), name), listType.end()); // remove all matches
+    vector<string>& listType{getHistory(group)};
+    auto it = listType.begin();
+    listType.erase(std::remove(it, listType.end(), name), listType.end()); // remove all matches
     listType.insert(listType.begin(), name);
     while(listType.size() > MAX_HISTORY)
         listType.pop_back();
 }
 
 
-vector<string> * SynthEngine::getHistory(int group)
+vector<string>& SynthEngine::getHistory(int group)
 {
     switch(group)
     {
         case TOPLEVEL::XML::Instrument: // 0
-            return &InstrumentHistory;
+            return InstrumentHistory;
             break;
         case TOPLEVEL::XML::Patch: // 1
-            return &ParamsHistory;
+            return ParamsHistory;
             break;
         case TOPLEVEL::XML::Scale: // 2
-            return &ScaleHistory;
+            return ScaleHistory;
             break;
         case TOPLEVEL::XML::State: // 3
-            return &StateHistory;
+            return StateHistory;
             break;
         case TOPLEVEL::XML::Vector: // 4
-            return &VectorHistory;
+            return VectorHistory;
             break;
         case TOPLEVEL::XML::MLearn: // 5
-            return &MidiLearnHistory;
+            return MidiLearnHistory;
             break;
         case TOPLEVEL::XML::Presets: // 6
-            return &PresetHistory;
+            return PresetHistory;
             break;
 
         case TOPLEVEL::XML::PadSample: // 7
-            return &PadHistory;
+            return PadHistory;
             break;
         case TOPLEVEL::XML::ScalaTune: // 8
-            return &TuningHistory;
+            return TuningHistory;
             break;
         case TOPLEVEL::XML::ScalaMap: // 9
-            return &KeymapHistory;
+            return KeymapHistory;
             break;
         default:
             // can't identify what is calling this.
             // It's connected with opening the filer on presets
             Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
-            return &ParamsHistory;
+            return ParamsHistory;
     }
 }
 
@@ -2918,17 +2949,17 @@ bool SynthEngine::saveHistory()
                     extension = "kbm_file";
                     break;
             }
-            vector<string> listType = *getHistory(count);
+            vector<string> const& listType{getHistory(count)};
             if (listType.size())
             {
                 int x = 0;
                 xml->beginbranch(type);
                     xml->addparbool("lock_status", Runtime.historyLock[count]);
                     xml->addpar("history_size", listType.size());
-                    for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
+                    for (auto const& historyEntry : listType)
                     {
                         xml->beginbranch("XMZ_FILE", x);
-                            xml->addparstr(extension, *it);
+                            xml->addparstr(extension, historyEntry);
                         xml->endbranch();
                         ++x;
                     }
@@ -3159,7 +3190,7 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
         }
         xml.exitbranch();
     }
-    for (unsigned char i = 0; i < NUM_MIDI_CHANNELS; ++i)
+    for (uchar i = 0; i < NUM_MIDI_CHANNELS; ++i)
     {
         if (xml.enterbranch("VECTOR", i))
         {
@@ -3184,26 +3215,20 @@ string SynthEngine::makeUniqueName(string const& name)
 }
 
 
-void SynthEngine::setWindowTitle(string const& _windowTitle)
-{
-    if (!_windowTitle.empty())
-        windowTitle = _windowTitle;
-}
-
 float SynthEngine::getLimits(CommandBlock *getData)
 {
     float value = getData->data.value;
     int request = int(getData->data.type & TOPLEVEL::type::Default);
     int control = getData->data.control;
 
-    unsigned char type = 0;
+    uchar type = 0;
 
     // defaults
     int min = 0;
     float def = 64;
     int max = 127;
     type |= TOPLEVEL::type::Integer;
-    unsigned char learnable = TOPLEVEL::type::Learnable;
+    uchar learnable = TOPLEVEL::type::Learnable;
 
     switch (control)
     {

@@ -975,7 +975,7 @@ void CmdInterpreter::historyList(int listnum)
     }
     for (int type = start; type <= end; ++type)
     {
-        vector<string> listType = *synth->getHistory(type);
+        vector<string> const& listType{synth->getHistory(type)};
         if (listType.size() > 0)
         {
             msg.push_back(" ");
@@ -1001,8 +1001,10 @@ void CmdInterpreter::historyList(int listnum)
                     break;
             }
             int itemNo = 0;
-            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
-                msg.push_back(to_string(itemNo + 1) + "  " + *it);
+            for (auto const& historyEntry : listType)
+            {
+                msg.push_back(to_string(1 + itemNo++) + "  " + historyEntry);
+            }
             found = true;
         }
     }
@@ -1015,7 +1017,7 @@ void CmdInterpreter::historyList(int listnum)
 
 string CmdInterpreter::historySelect(int listnum, size_t selection)
 {
-    vector<string> listType = *synth->getHistory(listnum - 1);
+    vector<string> const& listType{synth->getHistory(listnum - 1)};
     if (listType.size() == 0)
     {
         synth->getRuntime().Log("No saved entries");

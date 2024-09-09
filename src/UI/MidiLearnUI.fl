@@ -447,8 +447,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
         synth->getGuiMaster()->paramsui->Show(TOPLEVEL::XML::MLearn);}
         tooltip {Load from recently seen list} xywh {230 264 70 18} box GTK_THIN_UP_BOX down_box DOWN_BOX color 198 labelfont 1 labelsize 12 labelcolor 64
-        code0 {vector<string> &listType = *synth->getHistory(TOPLEVEL::XML::MLearn);}
-        code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
+        code0 {if (synth->getHistory(TOPLEVEL::XML::MLearn).empty()) o->deactivate(); else o->activate();}
       }
     }
   }

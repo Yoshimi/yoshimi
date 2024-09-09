@@ -34,6 +34,7 @@ using file::setExtension;
 using file::findLeafName;
 
 using std::string;
+using std::to_string;
 
 
 namespace { // Implementation details...

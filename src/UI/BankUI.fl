@@ -814,7 +814,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
         callback {//
         if (selectedRootID >= 0)
         {
-            synth->getBankRef().removeRoot(selectedRootID);
+            synth->bank.removeRoot(selectedRootID);
             synth->saveBanks();
             readbankcfg();
         }
@@ -1091,9 +1091,9 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     synth = _synth;
     fnr = &RootProcess_::rootprocess;
-    root = synth->getBankPtr();
+    root = & synth->bank;
     fnc = &BankProcess_::process;
-    bank = synth->getBankPtr();
+    bank = & synth->bank;
     what = 0;
     nselected = -1;
     rselected = -1;
@@ -1777,7 +1777,7 @@ class BankUI {: {public BankProcess_, RootProcess_}
     code {//
     string tmp;
     rootsbrowse->clear();
-    const RootEntryMap &roots = synth->getBankRef().getRoots();
+    const RootEntryMap &roots = synth->bank.getRoots();
     RootEntryMap::const_iterator it;
     for (it = roots.begin(); it != roots.end(); ++it)
     {

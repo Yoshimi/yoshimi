@@ -43,15 +43,13 @@ using func::string2int;
 using func::stringCaps;
 using func::bpm2text;
 
-DataText::DataText() :
-    synth(nullptr),
-    showValue(false),
-    yesno(false),
-    textMsgBuffer(TextMsgBuffer::instance())
-{
-}
+DataText::DataText()
+    : showValue{false}
+    , yesno{false}
+    , textMsgBuffer{TextMsgBuffer::instance()}
+    { }
 
-std::string DataText::withValue(std::string resolved, unsigned char type, bool showValue, bool addValue, float value)
+std::string DataText::withValue(std::string resolved, uchar type, bool showValue, bool addValue, float value)
 {
     if (!addValue)
         return resolved;
@@ -78,22 +76,25 @@ std::string DataText::withValue(std::string resolved, unsigned char type, bool s
     return resolved;
 }
 
-string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool addValue)
+string DataText::resolveAll(SynthEngine& synth, CommandBlock* getData, bool addValue)
 {
-    SynthEngine *synth = _synth;
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char effSend = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+    float value   = getData->data.value;
+    uchar type    = getData->data.type;
+    //   (source)
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar effSend = getData->data.kit;       // (note: also the kit)
+    uchar engine  = getData->data.engine;
+    uchar insert  = getData->data.insert;
+    //   (parameter)
+    //   (offset)
+    //   (miscmsg)
 
     if (control == TOPLEVEL::control::textMessage) // special case for simple messages
     {
-        synth->getRuntime().Log(textMsgBuffer.fetch(lrint(value)));
-        synth->getRuntime().finishedCLI = true;
+        synth.getRuntime().Log(textMsgBuffer.fetch(lrint(value)));
+        synth.getRuntime().finishedCLI = true;
         return "";
     }
 
@@ -113,7 +114,7 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
     }
     if (npart == TOPLEVEL::section::config)
     {
-        commandName = resolveConfig(getData, addValue);
+        commandName = resolveConfig(synth, getData, addValue);
         return withValue(commandName, type, showValue, addValue, value);
     }
     if (npart == TOPLEVEL::section::bank)
@@ -302,11 +303,11 @@ string DataText::resolveAll(SynthEngine *_synth, CommandBlock *getData, bool add
 }
 
 
-string DataText::resolveVector(CommandBlock *getData, bool addValue)
+string DataText::resolveVector(CommandBlock* getData, bool addValue)
 {
     int value_int = lrint(getData->data.value);
-    unsigned char control = getData->data.control;
-    unsigned int chan = getData->data.parameter;
+    uchar control = getData->data.control;
+    uint chan     = getData->data.parameter;
 
     bool isFeature = false;
     string contstr = "";
@@ -410,11 +411,11 @@ string DataText::resolveVector(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
+string DataText::resolveMicrotonal(CommandBlock* getData, bool addValue)
 {
-    int value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char parameter = getData->data.parameter;
+    int value       = getData->data.value;
+    uchar control   = getData->data.control;
+    uchar parameter = getData->data.parameter;
 
     string contstr = "";
     switch (control)
@@ -534,15 +535,15 @@ string DataText::resolveMicrotonal(CommandBlock *getData, bool addValue)
     return ("Scales " + contstr);
 }
 
-string DataText::resolveConfig(CommandBlock *getData, bool addValue)
+string DataText::resolveConfig(SynthEngine& synth, CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char kititem = getData->data.kit;
-    unsigned char parameter = getData->data.parameter;
-    bool write = getData->data.type & TOPLEVEL::type::Write;
-    int value_int = lrint(value);
+    float value     = getData->data.value;
+    int value_int   = lrint(value);
     bool value_bool = _SYS_::F2B(value);
+    uchar control   = getData->data.control;
+    uchar kititem   = getData->data.kit;
+    uchar parameter = getData->data.parameter;
+    bool  write     = getData->data.type & TOPLEVEL::type::Write;
 
     string contstr = "";
     switch (control)
@@ -954,7 +955,7 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
             else
             {
                 contstr += "Condition - ";
-                 if (synth->getRuntime().configChanged)
+                 if (synth.getRuntime().configChanged)
                      contstr += "DIRTY";
                  else
                      contstr += "CLEAN";
@@ -971,15 +972,15 @@ string DataText::resolveConfig(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveBank(CommandBlock *getData, bool)
+string DataText::resolveBank(CommandBlock* getData, bool)
 {
     int value_int = lrint(getData->data.value);
-    int control = getData->data.control;
-    int kititem = getData->data.kit;
-    int engine = getData->data.engine;
-    int insert = getData->data.insert;
-    string name = textMsgBuffer.fetch(value_int);
-    string contstr = "";
+    int control   = getData->data.control;
+    int kititem   = getData->data.kit;
+    int engine    = getData->data.engine;
+    int insert    = getData->data.insert;
+    string name{textMsgBuffer.fetch(value_int)};
+    string contstr;
     showValue = false;
     switch(control)
     {
@@ -1064,17 +1065,17 @@ string DataText::resolveBank(CommandBlock *getData, bool)
     return ("Bank " + contstr);
 }
 
-string DataText::resolveMain(CommandBlock *getData, bool addValue)
+string DataText::resolveMain(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
+    float value   = getData->data.value;
     int value_int = lrint(value);
 
-    unsigned char control = getData->data.control;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+    uchar control = getData->data.control;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
 
     string name;
-    string contstr = "";
+    string contstr;
     if (getData->data.part == TOPLEVEL::section::midiIn)
     {
         switch (control)
@@ -1404,16 +1405,16 @@ string DataText::resolveAftertouch(bool type, int value, bool addValue)
 }
 
 
-string DataText::resolvePart(CommandBlock *getData, bool addValue)
+string DataText::resolvePart(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char effNum = engine;
+    float value     = getData->data.value;
+    uchar control   = getData->data.control;
+    uchar npart     = getData->data.part;
+    uchar kititem   = getData->data.kit;
+    uchar engine    = getData->data.engine;
+    uchar effNum    = engine;                  // note
+    uchar insert    = getData->data.insert;
+    uchar parameter = getData->data.parameter;
 
     bool kitType = (insert == TOPLEVEL::insert::kitGroup);
     int value_int = lrint(value);
@@ -1833,14 +1834,14 @@ string DataText::resolvePart(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveAdd(CommandBlock *getData, bool addValue)
+string DataText::resolveAdd(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
+    float value   = getData->data.value;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
 
-    string contstr = "";
+    string contstr;
 
     switch (control)
     {
@@ -1917,13 +1918,13 @@ string DataText::resolveAdd(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
+string DataText::resolveAddVoice(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+    float value   = getData->data.value;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
 
     int value_int = lrint(value);
     int nvoice;
@@ -2172,13 +2173,13 @@ string DataText::resolveAddVoice(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveSub(CommandBlock *getData, bool addValue)
+string DataText::resolveSub(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char insert = getData->data.insert;
+    float value   = getData->data.value;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar insert  = getData->data.insert;
 
     int value_int = int(value);
 
@@ -2322,19 +2323,18 @@ string DataText::resolveSub(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool addValue)
+string DataText::resolvePad(SynthEngine& synth, CommandBlock* getData, bool addValue)
 {
-    SynthEngine *synth = _synth;
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
+    float value   = getData->data.value;
+    int value_int = int(value);
+    uchar type    = getData->data.type;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
-    int value_int = int(value);
+    string contstr;
 
-    string contstr = "";
     switch (control)
     {
         case PADSYNTH::control::volume:
@@ -2465,8 +2465,8 @@ string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool add
             contstr = "RWStretchProfile";
             break;
     }
-    string padApply{synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
-                                                         : " - Need to Apply"};
+    string padApply{synth.getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                        : " - Need to Apply"};
     if (!contstr.empty())
     {
         if (write)
@@ -2549,16 +2549,15 @@ string DataText::resolvePad(SynthEngine *_synth, CommandBlock *getData, bool add
 }
 
 
-string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, bool addValue)
+string DataText::resolveOscillator(SynthEngine& synth, CommandBlock* getData, bool addValue)
 {
-    SynthEngine* synth = _synth;
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+    float value   = getData->data.value;
+    uchar type    = getData->data.type;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
+    uchar insert  = getData->data.insert;
     bool write = (type & TOPLEVEL::type::Write) > 0;
     int value_int = int(value);
 
@@ -2568,8 +2567,8 @@ string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, b
     {
         eng_name = " PadSynth";
         if (write)
-            isPad = synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
-                                                         : " - Need to Apply";
+            isPad = synth.getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                        : " - Need to Apply";
     }
     else
     {
@@ -2738,17 +2737,17 @@ string DataText::resolveOscillator(SynthEngine *_synth, CommandBlock *getData, b
 }
 
 
-string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bool addValue)
+string DataText::resolveResonance(SynthEngine& synth, CommandBlock* getData, bool addValue)
 {
-    SynthEngine *synth = _synth;
     int value = int(getData->data.value + 0.5f);
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
+
+    uchar type      = getData->data.type;
+    uchar control   = getData->data.control;
+    uchar npart     = getData->data.part;
+    uchar kititem   = getData->data.kit;
+    uchar engine    = getData->data.engine;
+    uchar insert    = getData->data.insert;
+    uchar parameter = getData->data.parameter;
     bool write = (type & TOPLEVEL::type::Write) > 0;
 
     string name;
@@ -2757,8 +2756,8 @@ string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bo
     {
         name = " PadSynth";
         if (write)
-            isPad = synth->getRuntime().usePadAutoApply()? " - rebuilding PAD"
-                                                         : " - Need to Apply";
+            isPad = synth.getRuntime().usePadAutoApply()? " - rebuilding PAD"
+                                                        : " - Need to Apply";
     }
     else
         name = " AddSynth";
@@ -2831,15 +2830,15 @@ string DataText::resolveResonance(SynthEngine *_synth, CommandBlock *getData, bo
 }
 
 
-string DataText::resolveLFO(CommandBlock *getData, bool addValue)
+string DataText::resolveLFO(CommandBlock* getData, bool addValue)
 {
-    float value = getData->data.value;
+    float value   = getData->data.value;
     int value_int = int(value);
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insertParam = getData->data.parameter;
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
+    uchar insertParam = getData->data.parameter;
 
     string name;
     string lfo;
@@ -2924,11 +2923,11 @@ string DataText::resolveLFO(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveFilter(CommandBlock *getData, bool addValue)
+string DataText::resolveFilter(CommandBlock* getData, bool addValue)
 {
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
 
     string name;
 
@@ -2946,16 +2945,16 @@ string DataText::resolveFilter(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::filterControl(CommandBlock *getData, bool addValue)
+string DataText::filterControl(CommandBlock* getData, bool addValue)
 {
     int value_int = int(getData->data.value);
-    unsigned char control = getData->data.control;
+    uchar control = getData->data.control;
 
     int nformant = getData->data.parameter;
     int nseqpos  = getData->data.parameter;
-    int nvowel = getData->data.offset;
+    int nvowel   = getData->data.offset;
 
-    string contstr = "";
+    string contstr;
     switch (control)
     {
         case FILTERINSERT::control::centerFrequency:
@@ -3111,17 +3110,18 @@ string DataText::filterControl(CommandBlock *getData, bool addValue)
 }
 
 
-string DataText::resolveEnvelope(CommandBlock *getData, bool)
+string DataText::resolveEnvelope(CommandBlock* getData, bool)
 {
     int value = lrint(getData->data.value);
     bool write = (getData->data.type & TOPLEVEL::type::Write) > 0;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char offset = getData->data.offset;
-    unsigned char insertParam = getData->data.parameter;
+
+    uchar control = getData->data.control;
+    uchar npart   = getData->data.part;
+    uchar kititem = getData->data.kit;
+    uchar engine  = getData->data.engine;
+    uchar insert  = getData->data.insert;
+    uchar offset  = getData->data.offset;
+    uchar insertParam = getData->data.parameter;
 
     string env;
     string name;
@@ -3243,16 +3243,16 @@ string DataText::resolveEnvelope(CommandBlock *getData, bool)
 }
 
 
-string DataText::resolveEffects(CommandBlock *getData, bool addValue)
+string DataText::resolveEffects(CommandBlock* getData, bool addValue)
 {
     int value = lrint(getData->data.value);
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char effType = getData->data.kit;
-    unsigned char effnum = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-    unsigned char parameter = getData->data.parameter;
-    unsigned char offset = getData->data.offset;
+    uchar control   = getData->data.control;
+    uchar npart     = getData->data.part;
+    uchar effType   = getData->data.kit;
+    uchar effnum    = getData->data.engine;
+    uchar insert    = getData->data.insert;
+    uchar parameter = getData->data.parameter;
+    uchar offset    = getData->data.offset;
 
     string name;
     string actual;

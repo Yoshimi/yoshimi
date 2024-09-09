@@ -41,9 +41,16 @@ using std::list;
 
 class MidiLearn : private DataText, TextData
 {
+        SynthEngine& synth;
+
     public:
        ~MidiLearn() = default;
-        MidiLearn(SynthEngine*);
+        MidiLearn(SynthEngine&);
+        // shall not be copied or moved or assigned
+        MidiLearn(MidiLearn&&)                 = delete;
+        MidiLearn(MidiLearn const&)            = delete;
+        MidiLearn& operator=(MidiLearn&&)      = delete;
+        MidiLearn& operator=(MidiLearn const&) = delete;
 
         //commandData
         CommandBlock data;
@@ -82,8 +89,6 @@ class MidiLearn : private DataText, TextData
         string       learnedName;
         CommandBlock learnTransferBlock;
 
-        SynthEngine* synth;
-
         int findEntry(list<LearnBlock>&, int lastpos, ushort CC, uchar chan, LearnBlock* block, bool show);
         string findName(list<LearnBlock>::iterator it);
         void insertLine(ushort CC, uchar chan);
@@ -91,4 +96,5 @@ class MidiLearn : private DataText, TextData
         void writeToGui(CommandBlock* putData);
 };
 
-#endif
+#endif /*MIDILEARN_H*/
+
