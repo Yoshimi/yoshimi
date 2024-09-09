@@ -155,7 +155,7 @@ void MidiDecode::setMidiController(uchar ch, int ctrl, int param, bool in_place,
         // force vectors to obey channel switcher
     else
         vecChan = ch;
-    if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+    if (synth->getRuntime().vectordata.Enabled[vecChan] && synth->getRuntime().numAvailableParts > NUM_MIDI_CHANNELS)
     { // vector control is direct to parts
         if (nrpnRunVector(vecChan, ctrl, param, inSync))
             return;
@@ -531,7 +531,7 @@ void MidiDecode::nrpnDirectPart(int dHigh, int par)
     switch (dHigh)
     {
         case 0: // set part number to use for later calls
-            if (par < int(synth->getRuntime().NumAvailableParts))
+            if (par < int(synth->getRuntime().numAvailableParts))
             {
                 synth->getRuntime().dataL = par;
                 synth->getRuntime().vectordata.Part = par;
@@ -696,9 +696,9 @@ void MidiDecode::setMidiBankOrRootDir(uint bank_or_root_num, bool in_place, bool
 
 void MidiDecode::setMidiProgram(uchar ch, int prg, bool in_place)
 {
-    if (!synth->getRuntime().EnableProgChange)
+    if (!synth->getRuntime().enableProgChange)
         return;
-    uint maxparts = synth->getRuntime().NumAvailableParts;
+    uint maxparts = synth->getRuntime().numAvailableParts;
     if (ch >= maxparts)
         return;
 

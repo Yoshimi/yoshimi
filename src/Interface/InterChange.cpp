@@ -1411,7 +1411,7 @@ int InterChange::indirectConfig(CommandBlock *getData, SynthEngine *synth, unsig
         case CONFIG::control::saveCurrentConfig:
             if (write)
             {
-                text = synth->getRuntime().ConfigFile;
+                text = synth->getRuntime().configFile;
                 if (synth->getRuntime().saveInstanceConfig())
                     text = "d " + text;
                 else
@@ -1489,7 +1489,7 @@ int InterChange::indirectPart(CommandBlock *getData, SynthEngine *synth, unsigne
             break;
 
         case PART::control::audioDestination:
-            if (npart < synth->getRuntime().NumAvailableParts)
+            if (npart < synth->getRuntime().numAvailableParts)
             {
                 if (value & 2)
                 {
@@ -2464,7 +2464,7 @@ void InterChange::commandMidi(CommandBlock *getData)
 
         case MIDI::control::bankChange:
             getData->data.source = TOPLEVEL::action::lowPrio;
-            if ((value_int != UNUSED || miscmsg != NO_MSG) && chan < synth->getRuntime().NumAvailableParts)
+            if ((value_int != UNUSED || miscmsg != NO_MSG) && chan < synth->getRuntime().numAvailableParts)
             {
                 synth->partonoffLock(chan & 0x3f, -1);
                 synth->getRuntime().finishedCLI = true;
@@ -2894,23 +2894,23 @@ void InterChange::commandConfig(CommandBlock *getData)
             {
                 value = nearestPowerOf2(value_int, MIN_OSCIL_SIZE, MAX_OSCIL_SIZE);
                 getData->data.value = value;
-                synth->getRuntime().Oscilsize = value;
+                synth->getRuntime().oscilsize = value;
                 synth->getRuntime().updateConfig(control, value_int);
             }
             else
-                value = synth->getRuntime().Oscilsize;
+                value = synth->getRuntime().oscilsize;
             break;
         case CONFIG::control::bufferSize:
             if (write)
             {
                 value = nearestPowerOf2(value_int, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
                 getData->data.value = value;
-                synth->getRuntime().Buffersize = value;
+                synth->getRuntime().buffersize = value;
                 synth->getRuntime().updateConfig(control, value);
             }
             else
             {
-                value = synth->getRuntime().Buffersize;
+                value = synth->getRuntime().buffersize;
             }
             break;
         case CONFIG::control::padSynthInterpolation:
@@ -2925,11 +2925,11 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::virtualKeyboardLayout:
             if (write)
             {
-                 synth->getRuntime().VirKeybLayout = value_int;
+                 synth->getRuntime().virKeybLayout = value_int;
                  synth->getRuntime().updateConfig(control, value_int);
             }
             else
-                value = synth->getRuntime().VirKeybLayout;
+                value = synth->getRuntime().virKeybLayout;
             break;
         case CONFIG::control::reportsDestination:
             if (write)
@@ -3027,11 +3027,11 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::XMLcompressionLevel:
             if (write)
             {
-                synth->getRuntime().GzipCompression = value;
+                synth->getRuntime().gzipCompression = value;
                 synth->getRuntime().updateConfig(control, value);
             }
             else
-                value = synth->getRuntime().GzipCompression;
+                value = synth->getRuntime().gzipCompression;
             break;
 
         case CONFIG::control::defaultStateStart:
@@ -3221,12 +3221,12 @@ void InterChange::commandConfig(CommandBlock *getData)
                         value = 44100;
                         break;
                 }
-                synth->getRuntime().Samplerate = value;
+                synth->getRuntime().samplerate = value;
                 getData->data.value = value;
                 synth->getRuntime().updateConfig(control, value);
             }
             else
-                switch(synth->getRuntime().Samplerate)
+                switch(synth->getRuntime().samplerate)
                 {
                     case 192000:
                         value = 0;
@@ -3278,11 +3278,11 @@ void InterChange::commandConfig(CommandBlock *getData)
         case CONFIG::control::enableProgramChange:
             if (write)
             {
-                synth->getRuntime().EnableProgChange = value_bool;
+                synth->getRuntime().enableProgChange = value_bool;
                 synth->getRuntime().updateConfig(control, value_int);
             }
             else
-                value = synth->getRuntime().EnableProgChange;
+                value = synth->getRuntime().enableProgChange;
             break;
         case CONFIG::control::extendedProgramChangeCC:
             if (write)
@@ -3384,15 +3384,15 @@ void InterChange::commandMain(CommandBlock *getData)
         case MAIN::control::availableParts:
             if ((write) && (value == 16 || value == 32 || value == 64))
             {
-                if (value < synth->getRuntime().NumAvailableParts)
+                if (value < synth->getRuntime().numAvailableParts)
                     undoRedoClear(); // references might no longer exist
-                synth->getRuntime().NumAvailableParts = value;
+                synth->getRuntime().numAvailableParts = value;
                 // Note: in MasterUI::updatepart() the current part number
                 //       will possibly be capped, causing npartcounter->do_callback();
                 //       to send a command MAIN::control::partNumber ...
             }
             else
-                value = synth->getRuntime().NumAvailableParts;
+                value = synth->getRuntime().numAvailableParts;
             break;
         case MAIN::control::panLawType:
             if (write)
@@ -4224,7 +4224,7 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             else if (write)
             {
-                if (npart < synth->getRuntime().NumAvailableParts)
+                if (npart < synth->getRuntime().numAvailableParts)
                     synth->part[npart]->Paudiodest = value_int;
                 getData->data.source = TOPLEVEL::action::lowPrio;
             }

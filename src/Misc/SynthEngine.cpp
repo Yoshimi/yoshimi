@@ -106,7 +106,7 @@ SynthEngine::SynthEngine(uint instanceID, LV2PluginType pluginType) :
     midilearn(this),
     mididecode(this),
     vectorcontrol(this),
-    Runtime(this),
+    Runtime(*this),
     rootCon{interchange.guiDataExchange.createConnection<InterfaceAnchor>()},
     textMsgBuffer(TextMsgBuffer::instance()),
     fadeAll(0),
@@ -196,14 +196,14 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate_f / 2;
 
-    buffersize = Runtime.Buffersize;
+    buffersize = Runtime.buffersize;
     if (buffersize > audiobufsize)
         buffersize = audiobufsize;
     buffersize_f = buffersize;
     fixed_sample_step_f = buffersize_f / samplerate_f;
     bufferbytes = buffersize * sizeof(float);
 
-    oscilsize_f = oscilsize = Runtime.Oscilsize;
+    oscilsize_f = oscilsize = Runtime.oscilsize;
     if (oscilsize < (buffersize / 2))
     {
         Runtime.Log("Enforcing oscilsize to half buffersize, "
@@ -289,7 +289,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     ClearNRPNs();
 
     if (Runtime.sessionStage == _SYS_::type::Default || Runtime.sessionStage == _SYS_::type::StartupSecond || Runtime.sessionStage == _SYS_::type::JackSecond)
-        Runtime.restoreSessionData(Runtime.StateFile);
+        Runtime.restoreSessionData(Runtime.stateFile);
     if (Runtime.paramsLoad.size())
     {
         string filename = setExtension(Runtime.paramsLoad, EXTEN::patchset);
@@ -521,7 +521,7 @@ void SynthEngine::defaults()
     Runtime.channelSwitchCC = 128;
     Runtime.channelSwitchValue = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
-    Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
+    Runtime.numAvailableParts = NUM_MIDI_CHANNELS;
     Runtime.panLaw = MAIN::panningType::normal;
     ShutUp();
     Runtime.lastfileseen.clear();
@@ -650,7 +650,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
 #endif
-    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
         if (chan == part[npart]->Prcvchn)
         {
@@ -683,7 +683,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
         Runtime.Log("Note off diff " + to_string(Runtime.noteOffSent - Runtime.noteOffSeen));
 #endif
 
-    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
@@ -838,13 +838,13 @@ void SynthEngine::SetController(unsigned char chan, int CCtype, short int par)
     if (chan < NUM_MIDI_CHANNELS)
     {
         minPart = 0;
-        maxPart = Runtime.NumAvailableParts;
+        maxPart = Runtime.numAvailableParts;
     }
     else
     {
         bool vector = (chan >= 0x80);
         chan &= 0x3f;
-        if (chan >= Runtime.NumAvailableParts)
+        if (chan >= Runtime.numAvailableParts)
             return; // shouldn't be possible
         minPart = chan;
         maxPart = chan + 1;
@@ -1172,7 +1172,7 @@ int SynthEngine::ReadBank()
 // Set part's channel number
 void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 {
-    if (npart < Runtime.NumAvailableParts)
+    if (npart < Runtime.numAvailableParts)
     {
         /* We allow direct controls to set out of range channel numbers.
          * This gives us a way to disable all channel messages to a part.
@@ -1393,7 +1393,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
     msg_buf.push_back("  L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
 
     if (Runtime.vectordata.Yaxis[chan] > 0x7f
-        || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
+        || Runtime.numAvailableParts < NUM_MIDI_CHANNELS * 4)
         msg_buf.push_back("  Y axis disabled");
     else
     {
@@ -1444,7 +1444,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
         msg_buf.push_back("  No paths set");
 
     msg_buf.push_back("  Number of available parts "
-                    + asString(Runtime.NumAvailableParts));
+                    + asString(Runtime.numAvailableParts));
 
     msg_buf.push_back("  Current part " + asString(Runtime.currentPart + 1));
 
@@ -1460,7 +1460,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     else
         msg_buf.push_back("  MIDI Bank CC " + asString(Runtime.midi_bank_C));
 
-    if (Runtime.EnableProgChange)
+    if (Runtime.enableProgChange)
         msg_buf.push_back("  MIDI Program Change on");
     else
         msg_buf.push_back("  MIDI program change off");
@@ -1607,7 +1607,7 @@ int SynthEngine::SetSystemValue(int type, int value)
                 putData.data.source = TOPLEVEL::action::fromCLI | TOPLEVEL::action::lowPrio;
                 putData.data.control = PART::control::keyShift;
 
-                for (uint i = 0; i < Runtime.NumAvailableParts; ++ i)
+                for (uint i = 0; i < Runtime.numAvailableParts; ++ i)
                 {
                     if (partonoffRead(i) && part[i]->Prcvchn == (type - 64))
                     {
@@ -1775,8 +1775,8 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
             return true;
         }
         uint parts = 2* NUM_MIDI_CHANNELS * (dHigh + 1);
-        if (parts > Runtime.NumAvailableParts)
-            Runtime.NumAvailableParts = parts;
+        if (parts > Runtime.numAvailableParts)
+            Runtime.numAvailableParts = parts;
         if (dHigh == 0)
         {
             partonoffLock(chan, 1);
@@ -1871,7 +1871,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
 
         case 3:
-            if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
+            if (Runtime.numAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
                 Runtime.vectordata.Yfeatures[chan] = par;
                 Runtime.Log("Set Y features " + featureList);
@@ -1980,8 +1980,8 @@ void SynthEngine::resetAll(bool andML)
         string filename = Runtime.defaultStateName + ("-" + to_string(this->getUniqueId()));
         if (isRegularFile(filename + ".state"))
         {
-            Runtime.StateFile = filename;
-            Runtime.restoreSessionData(Runtime.StateFile);
+            Runtime.stateFile = filename;
+            Runtime.restoreSessionData(Runtime.stateFile);
         }
     }
     if (andML)
@@ -2014,7 +2014,7 @@ void SynthEngine::partonoffLock(uint npart, int what)
  */
 void SynthEngine::partonoffWrite(uint npart, int what)
 {
-    if (npart >= uint(Runtime.NumAvailableParts))
+    if (npart >= uint(Runtime.numAvailableParts))
         return;
     unsigned char original = part[npart]->Penabled;
     if (original > 1)
@@ -2139,12 +2139,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
      * prio thread completes and re-enables the part, it will not
      * actually be seen until the start of the next period.
      */
-    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
             partLocal[npart] = partonoffRead(npart);
 
     if (sound == _SYS_::mute::Active)
     {
-        for (uint npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+        for (uint npart = 0; npart < (Runtime.numAvailableParts); ++npart)
         {
             if (partLocal[npart])
             {
@@ -2161,7 +2161,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     else
     {
         // Compute part samples and store them ->partoutl,partoutr
-        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
         {
             if (partLocal[npart])
             {
@@ -2184,7 +2184,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         // Apply the part volumes and pannings (after insertion effects)
         unsigned char panLaw = Runtime.panLaw;
-        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
         {
             if (!partLocal[npart])
                 continue;
@@ -2218,7 +2218,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 continue; // is off
 
             // Mix the channels according to the part settings about System Effect
-            for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+            for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
             {
                 if (partLocal[npart]               // it's enabled
                  && Psysefxvol[nefx][npart]        // it's sending an output
@@ -2260,7 +2260,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
 
-        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
         {
             if (part[npart]->Paudiodest & 2){    // Copy separate parts
 
@@ -2305,7 +2305,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             mainR[idx] *= volume;
             if (sound == _SYS_::mute::Fading) // fadeLevel must also have been set
             {
-                for (uint npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+                for (uint npart = 0; npart < (Runtime.numAvailableParts); ++npart)
                 {
                     if (part[npart]->Paudiodest & 2)
                     {
@@ -2336,7 +2336,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
         // Peak computation for part vu meters
-        for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
         {
             if (partLocal[npart])
             {
@@ -2367,7 +2367,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuOutPeakR = 1e-12f;
             VUpeak.values.vuRmsPeakL = 1e-12f;
             VUpeak.values.vuRmsPeakR = 1e-12f;
-            for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+            for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
             {
                 if (partLocal[npart])
                 {
@@ -2417,7 +2417,7 @@ void SynthEngine::fetchMeterData()
     else
         VUdata.values.vuOutPeakR = fade;
 
-    for (uint npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+    for (uint npart = 0; npart < Runtime.numAvailableParts; ++npart)
     {
         if (VUpeak.values.parts[npart] < 0.0)
             VUdata.values.parts[npart] = -1.0f;
@@ -2641,7 +2641,7 @@ bool SynthEngine::saveBanks()
     string bankname = name + ".banks";
     Runtime.xmlType = TOPLEVEL::XML::Bank;
 
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     xml->beginbranch("BANKLIST");
     bank.saveToConfigFile(*xml);
     xml->endbranch();
@@ -2768,7 +2768,7 @@ bool SynthEngine::loadHistory()
             return false;
         }
     }
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     xml->loadXMLfile(historyname);
     if (!xml->enterbranch("HISTORY"))
     {
@@ -2866,7 +2866,7 @@ bool SynthEngine::saveHistory()
     string historyname = file::localDir()  + "/recent";
     Runtime.xmlType = TOPLEVEL::XML::History;
 
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     xml->beginbranch("HISTORY");
     {
         int count;
@@ -2947,7 +2947,7 @@ bool SynthEngine::saveHistory()
 void SynthEngine::add2XML(XMLwrapper& xml)
 {
     xml.beginbranch("MASTER");
-    xml.addpar("current_midi_parts", Runtime.NumAvailableParts);
+    xml.addpar("current_midi_parts", Runtime.numAvailableParts);
     xml.addpar("panning_law", Runtime.panLaw);
     xml.addparcombi("volume", Pvolume);
     xml.addpar("key_shift", Pkeyshift);
@@ -3024,7 +3024,7 @@ int SynthEngine::getalldata(char **data) // to state from instance
     bool oldFormat = usingYoshiType;
     usingYoshiType = true; // make sure everything is saved
     getRuntime().xmlType = TOPLEVEL::XML::State;
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     add2XML(*xml);
     midilearn.insertMidiListData(*xml);
     *data = xml->getXMLdata();
@@ -3038,7 +3038,7 @@ void SynthEngine::putalldata(const char *data, int size) // to instance from sta
     while (isspace(*data))
         ++data;
     int a = size; size = a; // suppress warning (may be used later)
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     if (!xml->putXMLdata(data))
     {
         Runtime.Log("SynthEngine: putXMLdata failed");
@@ -3057,7 +3057,7 @@ bool SynthEngine::savePatchesXML(string filename)
     usingYoshiType = true; // make sure everything is saved
     filename = setExtension(filename, EXTEN::patchset);
     Runtime.xmlType = TOPLEVEL::XML::Patch;
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     add2XML(*xml);
     bool succes = xml->saveXMLfile(filename);
     usingYoshiType = oldFormat;
@@ -3067,7 +3067,7 @@ bool SynthEngine::savePatchesXML(string filename)
 
 bool SynthEngine::loadXML(string const& filename)
 {
-    auto xml{std::make_unique<XMLwrapper>(this, true)};
+    auto xml{std::make_unique<XMLwrapper>(*this, true)};
     if (!xml->loadXMLfile(filename))
     {
         return false;
@@ -3086,7 +3086,7 @@ bool SynthEngine::getfromXML(XMLwrapper& xml)
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");
         return false;
     }
-    Runtime.NumAvailableParts = xml.getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
+    Runtime.numAvailableParts = xml.getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     Runtime.panLaw = xml.getpar("panning_law", Runtime.panLaw, MAIN::panningType::cut, MAIN::panningType::boost);
     setPvolume(xml.getparcombi("volume", Pvolume, 0, 127));
     setPkeyshift(xml.getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
@@ -3222,7 +3222,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
 
         case MAIN::control::partNumber:
             def = 0;
-            max = Runtime.NumAvailableParts -1;
+            max = Runtime.numAvailableParts -1;
             break;
 
         case MAIN::control::availableParts:
@@ -3273,7 +3273,7 @@ float SynthEngine::getLimits(CommandBlock *getData)
         case MAIN::control::defaultPart:
         case MAIN::control::defaultInstrument:
             def = 0;
-            max = Runtime.NumAvailableParts -1;
+            max = Runtime.numAvailableParts -1;
             break;
         case MAIN::control::masterReset:
         case MAIN::control::masterResetAndMlearn:

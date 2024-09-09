@@ -1471,7 +1471,7 @@ int CmdInterpreter::effects(Parser& input, unsigned char controlType)
             else
             {
                 value = string2int(input) - 1;
-                if (value >= int(Runtime.NumAvailableParts) || value < 0)
+                if (value >= int(Runtime.numAvailableParts) || value < 0)
                     return REPLY::range_msg;
             }
             effSend = value;
@@ -5388,7 +5388,7 @@ int CmdInterpreter::commandPart(Parser& input, unsigned char controlType)
             num -= 1;
             if (!inKitEditor)
             {
-                if (num >= Runtime.NumAvailableParts)
+                if (num >= Runtime.numAvailableParts)
                 {
                     Runtime.Log("Part number too high");
                     return REPLY::done_msg;
@@ -6463,7 +6463,7 @@ Reply CmdInterpreter::cmdIfaceProcessCommand(Parser& input)
                 else
                 {
                     uint tmp = string2int(input);
-                    if (tmp < 1 || tmp > Runtime.NumAvailableParts)
+                    if (tmp < 1 || tmp > Runtime.numAvailableParts)
                         return REPLY::range_msg;
 
                     npart = tmp -1;

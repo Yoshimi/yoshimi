@@ -69,8 +69,8 @@ AlsaEngine::AlsaEngine(SynthEngine& _synth, shared_ptr<BeatTracker> beat)
 bool AlsaEngine::openAudio()
 {
     audio.device = runtime().audioDevice;
-    audio.samplerate = runtime().Samplerate;
-    audio.period_size = runtime().Buffersize;
+    audio.samplerate = runtime().samplerate;
+    audio.period_size = runtime().buffersize;
     audio.period_count = 2;
     audio.buffer_size = audio.period_size * audio.period_count;
     if (not alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
@@ -403,7 +403,7 @@ bool AlsaEngine::prepHwparams()
     {
         runtime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size), _SYS_::LogNotSerious);
-        runtime().Buffersize = audio.period_size; // we shouldn't need to do this :(
+        runtime().buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
 }

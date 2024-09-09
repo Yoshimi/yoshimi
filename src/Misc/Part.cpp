@@ -1374,7 +1374,7 @@ bool Part::saveXML(string filename, bool yoshiFormat)
 {
     synth->usingYoshiType = yoshiFormat;
     synth->getRuntime().xmlType = TOPLEVEL::XML::Instrument;
-    auto xml{std::make_unique<XMLwrapper>(synth, yoshiFormat)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, yoshiFormat)};
 
     if (Pname < "!") // this shouldn't be possible
         Pname = UNTITLED;
@@ -1408,7 +1408,7 @@ int Part::loadXMLinstrument(string filename)
         filename = setExtension(filename, EXTEN::zynInst);
     }
 
-    auto xml{std::make_unique<XMLwrapper>(synth, hasYoshi)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, hasYoshi)};
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);

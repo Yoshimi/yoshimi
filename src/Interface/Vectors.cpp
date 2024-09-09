@@ -79,7 +79,7 @@ uchar Vectors::loadVector(uchar baseChan, string const& name, bool full)
         return actualBase;
     }
 
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, true)};
     xml->loadXMLfile(file);
     if (!xml->enterbranch("VECTOR"))
     {
@@ -194,8 +194,8 @@ uchar Vectors::extractVectorData(uchar baseChan, XMLwrapper& xml, string const& 
     }
     synth->getRuntime().vectordata.Xfeatures[baseChan] = x_feat;
     synth->getRuntime().vectordata.Yfeatures[baseChan] = y_feat;
-    if (synth->getRuntime().NumAvailableParts < lastPart)
-        synth->getRuntime().NumAvailableParts = xml.getpar255("current_midi_parts", synth->getRuntime().NumAvailableParts);
+    if (synth->getRuntime().numAvailableParts < lastPart)
+        synth->getRuntime().numAvailableParts = xml.getpar255("current_midi_parts", synth->getRuntime().numAvailableParts);
     return baseChan;
 }
 
@@ -215,7 +215,7 @@ uchar Vectors::saveVector(uchar baseChan, string const& name, bool full)
     string file = setExtension(name, EXTEN::vector);
 
     synth->getRuntime().xmlType = TOPLEVEL::XML::Vector;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, true)};
 
     xml->beginbranch("VECTOR");
         insertVectorData(baseChan, true, *xml, findLeafName(file));

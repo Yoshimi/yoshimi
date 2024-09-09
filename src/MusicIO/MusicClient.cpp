@@ -196,7 +196,7 @@ bool MusicClient::launchReplacementThread()
  */
 bool MusicClient::prepDummyBuffers()
 {
-    size_t buffSize = runtime().Buffersize;
+    size_t buffSize = runtime().buffersize;
     if (buffSize == 0)
         return false;
 
@@ -219,7 +219,7 @@ void* MusicClient::timerThread_fn(void *arg)
     assert(arg);
     MusicClient& self = * static_cast<MusicClient*>(arg);
     using Seconds = duration<double>;
-    auto sleepInterval = Seconds(double(self.runtime().Buffersize) / self.runtime().Samplerate);
+    auto sleepInterval = Seconds(double(self.runtime().buffersize) / self.runtime().samplerate);
     self.timerWorking = true;
     while (self.timerWorking and self.runtime().runSynth.load(std::memory_order_relaxed))
     {
@@ -234,13 +234,13 @@ void* MusicClient::timerThread_fn(void *arg)
 uint MusicClient::getSamplerate()
 {
     return audioIO? audioIO->getSamplerate()
-                  : runtime().Samplerate;
+                  : runtime().samplerate;
 }
 
 uint MusicClient::getBuffersize()
 {
     return audioIO? audioIO->getBuffersize()
-                  : runtime().Buffersize;
+                  : runtime().buffersize;
 }
 
 string MusicClient::audioClientName()

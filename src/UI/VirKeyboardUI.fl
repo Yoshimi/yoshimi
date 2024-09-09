@@ -252,17 +252,17 @@ class VirKeys {: {public Fl_Box}
     const int *keysoct1 = keysoct1qwerty;
     const int *keysoct2 = keysoct2qwerty;
 
-    if (synth->getRuntime().VirKeybLayout == 1)
+    if (synth->getRuntime().virKeybLayout == 1)
     {
         keysoct1 = keysoct1dw;
         keysoct2 = keysoct2dw;
     }
-    else if (synth->getRuntime().VirKeybLayout == 2)
+    else if (synth->getRuntime().virKeybLayout == 2)
     {
         keysoct1 = keysoct1qwertz;
         keysoct2 = keysoct2qwertz;
     }
-    else if (synth->getRuntime().VirKeybLayout == 3)
+    else if (synth->getRuntime().virKeybLayout == 3)
     {
         keysoct1 = keysoct1azerty;
         keysoct2 = keysoct2azerty;

@@ -193,7 +193,7 @@ fillThemes();
                         send_data(0, CONFIG::control::bufferSize, 16 << o->value(), TOPLEVEL::type::Integer);}
             tooltip {Number of samples. Smaller has more accurate internal timings but this may change some sounds.} xywh {245 34 105 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("16");o->add("32");o->add("64");o->add("128");o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");}
-            code1 {o->value(func::bitFindHigh(synth->getRuntime().Buffersize) - 4);}
+            code1 {o->value(func::bitFindHigh(synth->getRuntime().buffersize) - 4);}
             code2 {//if (isLV2()) o->deactivate();}
           } {}
           Fl_Choice osc_size {
@@ -202,7 +202,7 @@ fillThemes();
                         send_data(0, CONFIG::control::oscillatorSize, 256 << o->value(), TOPLEVEL::type::Integer);}
             tooltip {ADSynth Oscillator Size (samples)} xywh {245 58 105 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("256");o->add("512");o->add("1024");o->add("2048");o->add("4096");o->add("8192");o->add("16384");}
-            code1 {o->value(func::bitFindHigh(synth->getRuntime().Oscilsize) - 8);}
+            code1 {o->value(func::bitFindHigh(synth->getRuntime().oscilsize) - 8);}
           } {}
           Fl_Choice pad_interpol {
             label {PadSynth Interpolation}
@@ -226,7 +226,7 @@ fillThemes();
                         send_data(0, CONFIG::control::virtualKeyboardLayout, o->value(), TOPLEVEL::type::Integer);}
             xywh {245 130 105 20} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("QWERTY");o->add("Dvorak");o->add("QWERTZ");o->add("AZERTY");}
-            code1 {o->value(synth->getRuntime().VirKeybLayout);}
+            code1 {o->value(synth->getRuntime().virKeybLayout);}
           } {}
           Fl_Choice reports {
             label {Send reports to:}
@@ -250,7 +250,7 @@ fillThemes();
             callback {//
                         send_data(0, CONFIG::control::XMLcompressionLevel, o->value(), TOPLEVEL::type::Integer);}
             tooltip {gzip compression level (0 - uncompressed)} xywh {260 154 90 20} type Simple labelsize 12 labelcolor 64 align 4 minimum 0 maximum 9 step 1 textfont 1 textsize 12 textcolor 64
-            code0 {o->value(synth->getRuntime().GzipCompression);}
+            code0 {o->value(synth->getRuntime().gzipCompression);}
             code1 {if (current_ID != 0) o->hide();}
           }
           Fl_Choice instrument {
@@ -536,7 +536,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
     send_data(0, CONFIG::control::alsaSampleRate, o->value(), TOPLEVEL::type::Integer);}
             xywh {195 199 80 22} down_box BORDER_BOX labelsize 12 labelcolor 64 textfont 1 textsize 12 textcolor 64
             code0 {o->add("192000");o->add("96000");o->add("48000");o->add("44100");}
-            code1 {o->value(convertSrate(synth->getRuntime().Samplerate));}
+            code1 {o->value(convertSrate(synth->getRuntime().samplerate));}
           } {}
           Fl_Check_Button alsaAudio {
             label {Set as preferred audio}
@@ -667,7 +667,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             callback {//
                         send_data(0, CONFIG::control::enableProgramChange, o->value(), TOPLEVEL::type::Integer);}
             tooltip {MIDI program change enable/disable} xywh {234 110 18 18} down_box DOWN_BOX value 1 selection_color 64 labelsize 12 labelcolor 64 align 4
-            code0 {o->value(synth->getRuntime().EnableProgChange);}
+            code0 {o->value(synth->getRuntime().enableProgChange);}
             class Fl_Check_Button2
           }
           Fl_Spinner EPCspinner {
@@ -1952,11 +1952,11 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
             switch (tabnumber)
             {
                 case 1 : // Main
-                    osc_size->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);
-                    buff_size->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
+                    osc_size->value( (int)(logf(synth->getRuntime().oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);
+                    buff_size->value( (int)(logf(synth->getRuntime().buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);
                     pad_interpol->value(synth->getRuntime().Interpolation);
-                    v_keyboard->value(synth->getRuntime().VirKeybLayout);
-                    compression->value(synth->getRuntime().GzipCompression);
+                    v_keyboard->value(synth->getRuntime().virKeybLayout);
+                    compression->value(synth->getRuntime().gzipCompression);
                     reports->value(synth->getRuntime().toConsole);
                     instrument->value(synth->getRuntime().instrumentFormat - 1);
                     break;
@@ -1990,7 +1990,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             alsaAudio->value(1);
                             jackAudio->value(0);
                         }
-                        alsaSamplerate->value(convertSrate(synth->getRuntime().Samplerate));
+                        alsaSamplerate->value(convertSrate(synth->getRuntime().samplerate));
                     }
                     break;
 
@@ -2020,7 +2020,7 @@ send_data (0, CONFIG::control::alsaMidiType, o->value(), TOPLEVEL::type::Integer
                             bankchange->value(2);
                             break;
                     }
-                    progenable->value(synth->getRuntime().EnableProgChange);
+                    progenable->value(synth->getRuntime().enableProgChange);
 
                     tmp = synth->getRuntime().midi_upper_voice_C;
                     if (tmp == 128)

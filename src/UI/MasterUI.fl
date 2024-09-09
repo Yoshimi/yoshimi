@@ -415,7 +415,7 @@ class MasterUI {: {public GuiUpdates}
       panelType = 5;
       msgSeen = false;
       syseffSeen = false;
-      partmax = synth->getRuntime().NumAvailableParts;
+      partmax = synth->getRuntime().numAvailableParts;
       microtonalui = new MicrotonalUI(&synth->microtonal, synth);
       bankui = new BankUI(synth);
       virkeyboard = new VirKeyboard(synth);
@@ -3939,7 +3939,7 @@ Alan Calvert started the project}
     code {//
     if (microtonalui) // not taking chances!
         delete microtonalui;
-    partmax = synth->getRuntime().NumAvailableParts;
+    partmax = synth->getRuntime().numAvailableParts;
     maxparts->value(partmax);
     checkmaxparts();
     panning_law->value(fetchData(0, MAIN::control::panLawType, TOPLEVEL::section::main));
@@ -4070,7 +4070,7 @@ Alan Calvert started the project}
     inseffpart->clear();
     inseffpart->add("Master Out"); // 0
     inseffpart->add("Off");        // 1
-    int size = synth->getRuntime().NumAvailableParts;
+    int size = synth->getRuntime().numAvailableParts;
     for (int i = 0; i < size; ++i)
     {
         string num = string("00") + asString(i + 1);

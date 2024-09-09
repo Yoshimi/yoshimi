@@ -51,14 +51,17 @@ class SynthEngine;
 
 class Config
 {
+        // each Config instance is hard wired to a specific SynthEngine instance
+        SynthEngine& synth;
+
     public:
         /** convenience access to the global InstanceManager */
         static InstanceManager& instances() { return InstanceManager::get(); }
         static Config&          primary()   { return instances().accessPrimaryConfig(); }
 
 
-        Config(SynthEngine *_synth);
-       ~Config();
+       ~Config() = default;
+        Config(SynthEngine&);
         // shall not be copied or moved or assigned
         Config(Config&&)                 = delete;
         Config(Config const&)            = delete;
@@ -79,7 +82,6 @@ class Config
         bool saveInstanceConfig();
         void loadConfig();
         bool updateConfig(int control, int value);
-        void restoreConfig(SynthEngine*);
         bool saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile);
         bool restoreJsession();
@@ -101,22 +103,10 @@ class Config
 
         bool    isLV2;
         bool    isMultiFeed;        // can produce separate audio feeds for each part (Jack or LV2)
-        string  defaultStateName;
-        string  defaultSession;
-        string  ConfigFile;
-        string  paramsLoad;
-        string  instrumentLoad;
-        int     load2part;
-        string  midiLearnLoad;
-        string  rootDefine;
         uint    build_ID;
-        bool    stateChanged;
-        string  StateFile;
-        string  remoteGuiTheme;
-        bool    restoreJackSession;
-        string  jackSessionFile;
         int     lastXMLmajor;
         int     lastXMLminor;
+        bool    stateChanged;
         bool    oldConfig;
 
         static bool        showSplash;
@@ -125,13 +115,10 @@ class Config
         static bitset<32>  activeInstances;
         static int         showCLIcontext;
 
-        uint          guiThemeID;
-        string        guiTheme;
-
         atomic_bool   runSynth;
-        bool          isLittleEndian;
         bool          finishedCLI;
-        int           VirKeybLayout;
+        bool          isLittleEndian;
+        int           virKeybLayout;
 
         audio_driver  audioEngine;
         bool          engineChanged;
@@ -154,6 +141,20 @@ class Config
         string        nameTag;
 
         bool          loadDefaultState;
+        string        defaultStateName;
+        string        defaultSession;
+        string        configFile;
+        string        paramsLoad;
+        string        instrumentLoad;
+        uint          load2part;
+        string        midiLearnLoad;
+        string        rootDefine;
+        string        stateFile;
+        uint          guiThemeID;
+        string        guiTheme;
+        string        remoteGuiTheme;
+        bool          restoreJackSession;
+        string        jackSessionFile;
         int           sessionStage;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
@@ -162,21 +163,21 @@ class Config
         bool          historyLock[TOPLEVEL::XML::ScalaMap + 1];
         int           xmlType;
         uchar         instrumentFormat;
-        int           EnableProgChange;
+        int           enableProgChange;
         bool          toConsole;
         int           consoleTextSize;
         bool          hideErrors;
         bool          showTimes;
         bool          logXMLheaders;
         bool          xmlmax;
-        uint          GzipCompression;
+        uint          gzipCompression;
         string        guideVersion;
 
-        uint  Samplerate;
+        uint  samplerate;
         bool  rateChanged;
-        uint  Buffersize;
+        uint  buffersize;
         bool  bufferChanged;
-        uint  Oscilsize;
+        uint  oscilsize;
         bool  oscilChanged;
         bool  showGui;
         bool  storedGui;
@@ -200,7 +201,7 @@ class Config
         bool  ignoreResetCCs;
         bool  monitorCCin;
         bool  showLearnedCC;
-        uint  NumAvailableParts;
+        uint  numAvailableParts;
         int   currentPart;
         uint  currentBank;
         uint  currentRoot;
@@ -209,10 +210,12 @@ class Config
         int   presetsRootID;
         int   tempBank;
         int   tempRoot;
+#ifdef REPORT_NOTES_ON_OFF
         int   noteOnSent; // note test
         int   noteOnSeen;
         int   noteOffSent;
         int   noteOffSeen;
+#endif //REPORT_NOTES_ON_OFF
         uint  VUcount;
         uchar channelSwitchType;
         uchar channelSwitchCC;
@@ -221,9 +224,9 @@ class Config
         uchar nrpnH;
         uchar dataL;
         uchar dataH;
-        bool          nrpnActive;
+        bool  nrpnActive;
 
-        struct{
+        struct Vectordata{
             uchar Xaxis[NUM_MIDI_CHANNELS];
             uchar Yaxis[NUM_MIDI_CHANNELS];
             uchar Xfeatures[NUM_MIDI_CHANNELS];
@@ -238,9 +241,12 @@ class Config
             int Part;
             int Controller;
             bool Enabled[NUM_MIDI_CHANNELS];
-        }vectordata;
+        };
+        Vectordata vectordata;
 
         list<string> logList;
+        string manualFile;
+        int exitType;
 
         /*
          * These replace local memory allocations that
@@ -259,7 +265,7 @@ class Config
     private:
         void findManual();
         static void* _findManual(void*);
-        pthread_t  findManualHandle;
+        pthread_t  findManual_Thread;
 
         void defaultPresets();
         bool initFromPersistentConfig();
@@ -273,20 +279,13 @@ class Config
 
         int sigIntActive;
         int ladi1IntActive;
-        //int sse_level;
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;
         string baseConfig;
         string presetDir;
 
-        SynthEngine* synth;
-
         friend class YoshimiLV2Plugin;
-
-    public:
-        std::string manualFile;
-        int exitType;
 };
 
 #endif /*CONFIG_H*/

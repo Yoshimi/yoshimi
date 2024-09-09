@@ -1114,7 +1114,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int _pos, string _filename, c
         checkfile = setExtension(getFullPath(rootID, bankID, pos), EXTEN::zynInst);
     unsigned int names = 0;
     int type = 0;
-    auto xml{std::make_unique<XMLwrapper>(synth, true, false)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, true, false)};
     xml->checkfileinformation(checkfile, names, type);
 
     instrRef.type = type;
@@ -1547,7 +1547,7 @@ bool Bank::establishBanks(optional<string> bankFile)
 
     if (bankFile)
     {
-        auto xml{std::make_unique<XMLwrapper>(synth)};
+        auto xml{std::make_unique<XMLwrapper>(*synth)};
         if (xml->loadXMLfile(*bankFile))
         {
             if (xml->enterbranch("INFORMATION"))

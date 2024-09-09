@@ -144,7 +144,7 @@ bool JackEngine::openJackClient(string server)
 bool JackEngine::Start()
 {
     bool jackPortsRegistered = true;
-    internalbuff = runtime().Buffersize;
+    internalbuff = runtime().buffersize;
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
         //if (jack_set_session_callback &&
@@ -468,7 +468,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
 void JackEngine::sendAudio(int framesize, uint offset)
 {
     // Part outputs
-    int currentmax = runtime().NumAvailableParts;
+    int currentmax = runtime().numAvailableParts;
     for (int port = 0, idx = 0; idx < 2 * NUM_MIDI_PARTS; port++ , idx += 2)
     {
         if (audio.ports [idx])

@@ -865,7 +865,7 @@ bool MidiLearn::saveList(string const& name)
 
     string file = setExtension(name, EXTEN::mlearn);
     synth->getRuntime().xmlType = TOPLEVEL::XML::MLearn;
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, true)};
     bool ok = insertMidiListData(*xml);
     if (xml->saveXMLfile(file))
         synth->addHistory(file, TOPLEVEL::XML::MLearn);
@@ -942,7 +942,7 @@ bool MidiLearn::loadList(string const& name)
         return false;
     }
 
-    auto xml{std::make_unique<XMLwrapper>(synth, true)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, true)};
     xml->loadXMLfile(file);
     bool ok = extractMidiListData(true,  *xml);
     if (!ok)

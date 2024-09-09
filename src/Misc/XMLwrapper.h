@@ -41,8 +41,13 @@ class SynthEngine;
 class XMLwrapper
 {
     public:
-        XMLwrapper(SynthEngine *_synth, bool _isYoshi = false, bool includeBase = true);
-        ~XMLwrapper();
+       ~XMLwrapper();
+        XMLwrapper(SynthEngine& _synth, bool _isYoshi = false, bool includeBase = true);
+        // shall not be copied nor moved
+        XMLwrapper(XMLwrapper&&)                 = delete;
+        XMLwrapper(XMLwrapper const&)            = delete;
+        XMLwrapper& operator=(XMLwrapper&&)      = delete;
+        XMLwrapper& operator=(XMLwrapper const&) = delete;
 
         // SAVE to XML
         bool saveXMLfile(std::string _filename, bool useCompression = true); // return true if ok, false otherwise
@@ -182,7 +187,7 @@ class XMLwrapper
         } xml_version;
 
         bool isYoshi;
-        SynthEngine *synth;
+        SynthEngine& synth;
 };
 
 #endif

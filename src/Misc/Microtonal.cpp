@@ -912,7 +912,7 @@ int Microtonal::getfromXML(XMLwrapper& xml)
 bool Microtonal::saveXML(string const& filename)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Scale;
-    auto xml{std::make_unique<XMLwrapper>(synth)};
+    auto xml{std::make_unique<XMLwrapper>(*synth)};
 
     xml->beginbranch("MICROTONAL");
     add2XML(*xml);
@@ -926,7 +926,7 @@ bool Microtonal::saveXML(string const& filename)
 int Microtonal::loadXML(string const& filename)
 {
     int err = 0;
-    auto xml{std::make_unique<XMLwrapper>(synth)};
+    auto xml{std::make_unique<XMLwrapper>(*synth)};
     if (!xml->loadXMLfile(filename))
     {
         return 1;

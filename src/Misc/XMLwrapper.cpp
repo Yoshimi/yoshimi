@@ -63,13 +63,13 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t* node, int where)
 }
 
 
-XMLwrapper::XMLwrapper(SynthEngine* _synth, bool _isYoshi, bool includeBase) :
+XMLwrapper::XMLwrapper(SynthEngine& _synth, bool _isYoshi, bool includeBase) :
     stackpos(0),
     xml_k(0),
     isYoshi(_isYoshi),
     synth(_synth)
 {
-    minimal = 1 - synth->getRuntime().xmlmax;
+    minimal = 1 - synth.getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
@@ -138,26 +138,26 @@ XMLwrapper::XMLwrapper(SynthEngine* _synth, bool _isYoshi, bool includeBase) :
 
     info = addparams0("INFORMATION"); // specifications
 
-    if (synth->getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
+    if (synth.getRuntime().xmlType == TOPLEVEL::XML::MasterConfig)
     {
         beginbranch("BASE_PARAMETERS");
-            addparbool("enable_gui", synth->getRuntime().storedGui);
-            addparbool("enable_splash", synth->getRuntime().showSplash);
-            addparbool("enable_CLI", synth->getRuntime().storedCli);
-            addpar("show_CLI_context", synth->getRuntime().showCLIcontext);
-            addparbool("enable_single_master", synth->getRuntime().singlePath);
-            addparbool("enable_auto_instance", synth->getRuntime().autoInstance);
-            addparU("handle_padsynth_build", synth->getRuntime().handlePadSynthBuild);
-            addpar("gzip_compression", synth->getRuntime().GzipCompression);
-            addparbool("banks_checked", synth->getRuntime().banksChecked);
-            addparU("active_instances", synth->getRuntime().activeInstances.to_ulong());
-            addparstr("guide_version", synth->getRuntime().guideVersion);
-            addparstr("manual", synth->getRuntime().manualFile);
+            addparbool("enable_gui", synth.getRuntime().storedGui);
+            addparbool("enable_splash", synth.getRuntime().showSplash);
+            addparbool("enable_CLI", synth.getRuntime().storedCli);
+            addpar("show_CLI_context", synth.getRuntime().showCLIcontext);
+            addparbool("enable_single_master", synth.getRuntime().singlePath);
+            addparbool("enable_auto_instance", synth.getRuntime().autoInstance);
+            addparU("handle_padsynth_build", synth.getRuntime().handlePadSynthBuild);
+            addpar("gzip_compression", synth.getRuntime().gzipCompression);
+            addparbool("banks_checked", synth.getRuntime().banksChecked);
+            addparU("active_instances", synth.getRuntime().activeInstances.to_ulong());
+            addparstr("guide_version", synth.getRuntime().guideVersion);
+            addparstr("manual", synth.getRuntime().manualFile);
         endbranch();
         return;
     }
 
-    if (synth->getRuntime().xmlType <= TOPLEVEL::XML::Scale)
+    if (synth.getRuntime().xmlType <= TOPLEVEL::XML::Scale)
     {
             beginbranch("BASE_PARAMETERS");
                 addpar("max_midi_parts", NUM_MIDI_CHANNELS);
@@ -190,7 +190,7 @@ void XMLwrapper::checkfileinformation(string const& filename, uint& names, int& 
     string report;
     char *xmldata = loadGzipped(filename, &report);
     if (not report.empty())
-        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
+        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (!xmldata)
         return;
     char* first = strstr(xmldata, "<!DOCTYPE Yoshimi-data>");
@@ -327,18 +327,18 @@ bool XMLwrapper::saveXMLfile(string _filename, bool useCompression)
 
     if (!xmldata)
     {
-        synth->getRuntime().Log("XML: Failed to allocate xml data space");
+        synth.getRuntime().Log("XML: Failed to allocate xml data space");
         return false;
     }
 
     uint compression = 0;
     if (useCompression)
-        compression = synth->getRuntime().GzipCompression;
+        compression = synth.getRuntime().gzipCompression;
     if (compression <= 0)
     {
         if (!saveText(xmldata, filename))
         {
-            synth->getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
+            synth.getRuntime().Log("XML: Failed to save xml file " + filename + " for save", _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -349,7 +349,7 @@ bool XMLwrapper::saveXMLfile(string _filename, bool useCompression)
         string result = saveGzipped(xmldata, filename, compression);
         if (result > "")
         {
-            synth->getRuntime().Log(result, _SYS_::LogNotSerious);
+            synth.getRuntime().Log(result, _SYS_::LogNotSerious);
             return false;
         }
     }
@@ -365,7 +365,7 @@ char *XMLwrapper::getXMLdata()
     mxml_node_t *oldnode=node;
     node = info;
 
-    switch (synth->getRuntime().xmlType)
+    switch (synth.getRuntime().xmlType)
     {
         case TOPLEVEL::XML::Instrument:
         {
@@ -410,7 +410,7 @@ char *XMLwrapper::getXMLdata()
         case TOPLEVEL::XML::Bank:
         {
             addparstr("XMLtype", "Roots and Banks");
-            addpar("Banks_Version", synth->bank.readVersion());
+            addpar("Banks_Version", synth.bank.readVersion());
             break;
         }
 
@@ -520,17 +520,17 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     string report = "";
     char* xmldata = loadGzipped(filename, &report);
     if (report != "")
-        synth->getRuntime().Log(report, _SYS_::LogNotSerious);
+        synth.getRuntime().Log(report, _SYS_::LogNotSerious);
     if (xmldata == NULL)
     {
-        synth->getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Could not load xml file: " + filename, _SYS_::LogNotSerious);
          return false;
     }
     root = tree = mxmlLoadString(NULL, removeBlanks(xmldata), MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
-        synth->getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: File " + filename + " is not XML", _SYS_::LogNotSerious);
         return false;
     }
     root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
@@ -542,12 +542,12 @@ bool XMLwrapper::loadXMLfile(string const& filename)
 
     if (!root)
     {
-        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", _SYS_::LogNotSerious);
         return false;
     }
     node = root;
     push(root);
-    synth->fileCompatible = true;
+    synth.fileCompatible = true;
     if (zynfile)
     {
         xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
@@ -564,9 +564,9 @@ bool XMLwrapper::loadXMLfile(string const& filename)
     }
     else
     {
-        synth->getRuntime().lastXMLmajor = 0;
+        synth.getRuntime().lastXMLmajor = 0;
         if (xml_version.major > 2)
-            synth->fileCompatible = false;
+            synth.fileCompatible = false;
     }
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
@@ -577,12 +577,12 @@ bool XMLwrapper::loadXMLfile(string const& filename)
             xml_version.y_revision = 0;
     }
     else
-        synth->getRuntime().lastXMLminor = 0;
+        synth.getRuntime().lastXMLminor = 0;
     string exten = findExtension(filename);
     if (exten.length() != 4 && exten != ".state")
         return true; // we don't want config stuff
 
-    if (synth->getRuntime().logXMLheaders)
+    if (synth.getRuntime().logXMLheaders)
     {
         if (yoshitoo && xml_version.major > 2)
         { // we were giving the wrong value :(
@@ -595,14 +595,14 @@ bool XMLwrapper::loadXMLfile(string const& filename)
             string text = "ZynAddSubFX version major " + asString(xml_version.major) + ", minor " + asString(xml_version.minor);
             if (xml_version.revision > 0)
                 text += (", revision " + asString(xml_version.revision));
-            synth->getRuntime().Log(text);
+            synth.getRuntime().Log(text);
         }
         if (yoshitoo)
         {
             string text = "Yoshimi version major " + asString(xml_version.y_major) + ", minor " + asString(xml_version.y_minor);
             if (xml_version.y_revision > 0)
                 text += (", revision " + asString(xml_version.y_revision));
-            synth->getRuntime().Log(text);
+            synth.getRuntime().Log(text);
         }
     }
     return true;
@@ -641,8 +641,8 @@ bool XMLwrapper::enterbranch(string const& name)
     push(node);
     if (name == "CONFIGURATION")
     {
-        synth->getRuntime().lastXMLmajor = xml_version.y_major;
-        synth->getRuntime().lastXMLminor = xml_version.y_minor;
+        synth.getRuntime().lastXMLmajor = xml_version.y_major;
+        synth.getRuntime().lastXMLminor = xml_version.y_minor;
     }
     return true;
 }
@@ -850,7 +850,7 @@ void XMLwrapper::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", _SYS_::LogNotSerious);
         return;
     }
     stackpos++;
@@ -862,7 +862,7 @@ mxml_node_t *XMLwrapper::pop()
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     mxml_node_t *node = parentstack[stackpos];
@@ -876,7 +876,7 @@ mxml_node_t *XMLwrapper::peek()
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
+        synth.getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", _SYS_::LogNotSerious);
         return root;
     }
     return parentstack[stackpos];

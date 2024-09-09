@@ -166,7 +166,7 @@ void CmdOptions::applyTo (Config& config)  const
             case 'b':
                 config.configChanged = true;
                 config.bufferChanged = true;
-                config.Buffersize = string2int(line);
+                config.buffersize = string2int(line);
                 break;
 
             case 'c':
@@ -255,7 +255,7 @@ void CmdOptions::applyTo (Config& config)  const
             case 'o':
                 config.configChanged = true;
                 config.oscilChanged = true;
-                config.Oscilsize = string2int(line);
+                config.oscilsize = string2int(line);
                 break;
 
             case 'R':
@@ -266,14 +266,14 @@ void CmdOptions::applyTo (Config& config)  const
                     int num = (string2int(line) / 48 ) * 48;
                     if (num < 48000 || num > 192000)
                         num = 44100; // play safe
-                    config.Samplerate = num;
+                    config.samplerate = num;
                 }
                 break;
 
             case 'S':
                 config.sessionStage = _SYS_::type::StartupFirst;
                 config.configChanged = true;
-                config.StateFile = line;
+                config.stateFile = line;
                 break;
 
             case 'T':
@@ -283,7 +283,7 @@ void CmdOptions::applyTo (Config& config)  const
             case 'u':
                 config.sessionStage = _SYS_::type::JackFirst;
                 config.configChanged = true;
-                config.StateFile = setExtension(line, EXTEN::state);
+                config.stateFile = setExtension(line, EXTEN::state);
                 break;
 
             case 'U':

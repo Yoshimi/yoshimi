@@ -242,7 +242,7 @@ void UnifiedPresets::list(string dirname, string& name)
 }
 
 
-string UnifiedPresets::accessXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::accessXML(XMLwrapper& xml, CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -414,7 +414,7 @@ string UnifiedPresets::accessXML(XMLwrapper& xml, CommandBlock *getData, bool is
 }
 
 
-string UnifiedPresets::resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::resonanceXML(XMLwrapper& xml, CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -450,7 +450,7 @@ string UnifiedPresets::resonanceXML(XMLwrapper& xml,CommandBlock *getData, bool 
 }
 
 
-string UnifiedPresets::oscilXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::oscilXML(XMLwrapper& xml, CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -495,7 +495,7 @@ string UnifiedPresets::oscilXML(XMLwrapper& xml, CommandBlock *getData, bool isL
 }
 
 
-string UnifiedPresets::filterXML(XMLwrapper& xml, CommandBlock *getData, bool isLoad)
+string UnifiedPresets::filterXML(XMLwrapper& xml, CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -584,7 +584,7 @@ string UnifiedPresets::filterXML(XMLwrapper& xml, CommandBlock *getData, bool is
 }
 
 
-string UnifiedPresets::lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::lfoXML(XMLwrapper& xml, CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -669,7 +669,7 @@ string UnifiedPresets::lfoXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad
 }
 
 
-string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool isLoad)
+string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock* getData, bool isLoad)
 {
     int npart = getData->data.part;
     int kitItem = getData->data.kit;
@@ -781,7 +781,7 @@ string UnifiedPresets::envelopeXML(XMLwrapper& xml,CommandBlock *getData, bool i
 void UnifiedPresets::save(CommandBlock *getData)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
-    auto xml{std::make_unique<XMLwrapper>(synth, false)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, false)};
     string type = accessXML(*xml, getData, false);
     if (type.empty())
         synth->getRuntime().Log("Unrecognised preset type");
@@ -810,7 +810,7 @@ void UnifiedPresets::load(CommandBlock *getData)
 {
     synth->getRuntime().xmlType = TOPLEVEL::XML::Presets;
     string type = findPresetType(getData);
-    auto xml{std::make_unique<XMLwrapper>(synth, false)};
+    auto xml{std::make_unique<XMLwrapper>(*synth, false)};
     string name = synth->textMsgBuffer.fetch(getData->data.miscmsg);
     string dirname;
     string prefix;
