@@ -52,30 +52,31 @@ class SynthEngine;
 class DynamicFilter : public Effect
 {
     public:
-        DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~DynamicFilter();
-        void out(float *smpsl, float *smpsr) override;
-        void setpreset(unsigned char npreset) override;
-        void changepar(int npar, unsigned char value) override;
-        unsigned char getpar(int npar) const override;
-        void cleanup(void) override;
-    //	void setdryonly();
+        DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine&);
+       ~DynamicFilter();
+
+        void out(float *smpsl, float *smpsr)  override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)          const override;
+        void cleanup()                        override;
+
 
     private:
-        // Parametrii DynamicFilter
+        // DynamicFilter parameters
         bool Pchanged;
         EffectLFO lfo; // lfo-ul DynamicFilter
-        unsigned char Pvolume;
-        unsigned char Pdepth;
-        unsigned char Pampsns;
-        unsigned char Pampsnsinv; // if the filter freq is lowered if the input amplitude rises
-        unsigned char Pampsmooth; // how smooth the input amplitude changes the filter
+        uchar Pvolume;
+        uchar Pdepth;
+        uchar Pampsns;
+        uchar Pampsnsinv; // if the filter freq is lowered if the input amplitude rises
+        uchar Pampsmooth; // how smooth the input amplitude changes the filter
 
         // Parameter Control
-        void setvolume(unsigned char Pvolume_);
-        void setdepth(unsigned char Pdepth_);
-        void setampsns(unsigned char Pampsns_);
-        void reinitfilter(void);
+        void setvolume(uchar Pvolume_);
+        void setdepth(uchar Pdepth_);
+        void setampsns(uchar Pampsns_);
+        void reinitfilter();
 
         // Internal Values
         float depth, ampsns, ampsmooth;

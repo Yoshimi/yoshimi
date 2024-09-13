@@ -52,7 +52,7 @@ class Effect
 
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
                FilterParams *filterpars_, uchar Ppreset_,
-               SynthEngine *synth_);
+               SynthEngine&);
         // shall not be copied nor moved
         Effect(Effect&&)                 = delete;
         Effect(Effect const&)            = delete;
@@ -85,7 +85,7 @@ class Effect
         char  Plrcross; // L/R mix
         synth::InterpolatedValue<float> lrcross;
 
-        SynthEngine *synth;
+        SynthEngine& synth;
 };
 
 #endif

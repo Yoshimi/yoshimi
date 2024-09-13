@@ -31,28 +31,22 @@
 using func::power;
 
 
-EffectLFO::EffectLFO(SynthEngine *_synth) :
-    Pfreq(40),
-    Prandomness(0),
-    PLFOtype(0),
-    Pstereo(64),
-    Pbpm(0),
-    xl(0.0f),
-    xr(0.0f),
-    ampl1(_synth->numRandom()),
-    ampl2(_synth->numRandom()),
-    ampr1(_synth->numRandom()),
-    ampr2(_synth->numRandom()),
-    lfornd(0.0f),
-    synth(_synth)
+EffectLFO::EffectLFO(SynthEngine& _synth)
+    : Pfreq{40}
+    , Prandomness{0}
+    , PLFOtype{0}
+    , Pstereo{64}
+    , Pbpm{0}
+    , xl{0.0f}
+    , xr{0.0f}
+    , ampl1{_synth.numRandom()}
+    , ampl2{_synth.numRandom()}
+    , ampr1{_synth.numRandom()}
+    , ampr2{_synth.numRandom()}
+    , lfornd{0.0f}
+    , synth{_synth}
 {
     updateparams();
-}
-
-
-EffectLFO::~EffectLFO()
-{
-
 }
 
 
@@ -61,10 +55,10 @@ EffectLFO::~EffectLFO()
 void EffectLFO::resetState()
 {
     xr = xl = 0.0f;
-    ampl1 = synth->numRandom();
-    ampl2 = synth->numRandom();
-    ampr1 = synth->numRandom();
-    ampr2 = synth->numRandom();
+    ampl1 = synth.numRandom();
+    ampl2 = synth.numRandom();
+    ampr1 = synth.numRandom();
+    ampr2 = synth.numRandom();
 }
 
 
@@ -72,7 +66,7 @@ void EffectLFO::resetState()
 void EffectLFO::updateparams()
 {
     float lfofreq = (power<2>(Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
-    incx = fabsf(lfofreq) * synth->fixed_sample_step_f;
+    incx = fabsf(lfofreq) * synth.fixed_sample_step_f;
     if (incx > 0.49999999f)
         incx = 0.499999999f; // Limit the Frequency
 
@@ -133,12 +127,12 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
         std::pair<float, float> frac = func::LFOfreqBPMFraction((float)Pfreq / 127.0f);
         float oldx = xl;
         xl = fmodf((float)PbpmStart / 127.0f +
-                   synth->getSongBeat() * frac.first / frac.second,
+                   synth.getSongBeat() * frac.first / frac.second,
                    1.0f);
         if (xl < 0.5 && oldx >= 0.5)
         {
             ampl1 = ampl2;
-            ampl2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+            ampl2 = (1.0f - lfornd) + lfornd * synth.numRandom();
         }
 
         oldx = xr;
@@ -148,7 +142,7 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
         if (xr < 0.5 && oldx >= 0.5)
         {
             ampr1 = ampr2;
-            ampr2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+            ampr2 = (1.0f - lfornd) + lfornd * synth.numRandom();
         }
     }
     else
@@ -158,7 +152,7 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
         {
             xl -= 1.0f;
             ampl1 = ampl2;
-            ampl2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+            ampl2 = (1.0f - lfornd) + lfornd * synth.numRandom();
         }
 
         xr += incx;
@@ -166,7 +160,7 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
         {
             xr -= 1.0f;
             ampr1 = ampr2;
-            ampr2 = (1.0f - lfornd) + lfornd * synth->numRandom();
+            ampr2 = (1.0f - lfornd) + lfornd * synth.numRandom();
         }
     }
 }

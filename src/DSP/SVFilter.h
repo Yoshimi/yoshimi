@@ -38,7 +38,8 @@ class SVFilter : public Filter_
        ~SVFilter() = default;
         SVFilter(SynthEngine* _synth, uchar Ftype, float Ffreq, float Fq, uchar Fstages);
         SVFilter(SVFilter const& orig);
-        Filter_* clone() { return new SVFilter(*this); };
+        Filter_* clone() override { return new SVFilter(*this); };
+
         void filterout(float* smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);

@@ -30,10 +30,10 @@
 #include "Effects/EffectMgr.h"
 #include "Effects/EQ.h"
 
-EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
-    ParamBase{*_synth},
-    efxoutl{size_t(_synth->buffersize)},
-    efxoutr{size_t(_synth->buffersize)},
+EffectMgr::EffectMgr(const bool insertion_, SynthEngine& _synth) :
+    ParamBase{_synth},
+    efxoutl{size_t(_synth.buffersize)},
+    efxoutr{size_t(_synth.buffersize)},
     insertion{insertion_},
     filterpars{NULL},
     effectType{0}, // type none resolves to zero internally
@@ -46,7 +46,7 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
 
 
 
-void EffectMgr::defaults(void)
+void EffectMgr::defaults()
 {
     changeeffect(0); // type none resolves to zero internally
     setdryonly(false);
@@ -63,35 +63,35 @@ void EffectMgr::changeeffect(int _nefx)
     switch (effectType + EFFECT::type::none)
     {
         case EFFECT::type::reverb:
-            efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Reverb{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::echo:
-            efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Echo{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::chorus:
-            efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Chorus{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::phaser:
-            efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Phaser{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::alienWah:
-            efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Alienwah{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::distortion:
-            efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new Distorsion{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::eq:
-            efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new EQ{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
         case EFFECT::type::dynFilter:
-            efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), &synth});
+            efx.reset(new DynamicFilter{insertion, efxoutl.get(), efxoutr.get(), synth});
             break;
 
             // put more effect here

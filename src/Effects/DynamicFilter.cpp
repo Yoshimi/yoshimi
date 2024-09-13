@@ -27,9 +27,9 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/DynamicFilter.h"
 
-DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, *_synth), 0, _synth),
-    lfo(_synth),
+DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine& _synth) :
+    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0, _synth),
+    lfo(synth),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
@@ -56,7 +56,7 @@ DynamicFilter::~DynamicFilter()
 // Apply the effect
 void DynamicFilter::out(float *smpsl, float *smpsr)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
     if (filterpars->changed)
     {
@@ -71,10 +71,10 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     float freq = filterpars->getfreq();
     float q = filterpars->getq();
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
-        memcpy(efxoutl, smpsl, synth->sent_bufferbytes);
-        memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
+        memcpy(efxoutl, smpsl, synth.sent_bufferbytes);
+        memcpy(efxoutr, smpsr, synth.sent_bufferbytes);
         float x = (fabsf(smpsl[i]) + fabsf(smpsr[i])) * 0.5f;
         ms1 = ms1 * (1.0f - ampsmooth) + x * ampsmooth + 1e-10f;
     }
@@ -95,7 +95,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     filterr->filterout(efxoutr);
 
     // panning
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         efxoutl[i] *= pangainL.getAndAdvanceValue();
         efxoutr[i] *= pangainR.getAndAdvanceValue();
@@ -149,8 +149,8 @@ void DynamicFilter::reinitfilter()
         delete filterl;
     if (filterr != NULL)
         delete filterr;
-    filterl = new Filter(filterpars, synth);
-    filterr = new Filter(filterpars, synth);
+    filterl = new Filter(*filterpars, synth);
+    filterr = new Filter(*filterpars, synth);
 }
 
 

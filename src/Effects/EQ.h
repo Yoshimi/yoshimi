@@ -44,7 +44,7 @@ const uchar EQq_def = 64;
 class EQ : public Effect
 {
     public:
-        EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
+        EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine&);
        ~EQ() = default;
 
         void out(float *smpsl, float *smpr)   override;

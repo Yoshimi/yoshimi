@@ -39,7 +39,7 @@ class AnalogFilter : public Filter_
     public:
        ~AnalogFilter() = default;
         AnalogFilter(SynthEngine&, uchar _type, float _freq, float _q, uchar _stages, float dBgain =1.0);
-        Filter_* clone() { return new AnalogFilter(*this); };
+        Filter_* clone() override { return new AnalogFilter(*this); };
 
         // can be cloned and moved, but not assigned
         AnalogFilter(AnalogFilter const&);

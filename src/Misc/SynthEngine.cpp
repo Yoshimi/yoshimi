@@ -294,7 +294,7 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
     // Insertion Effects init
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        if (!(insefx[nefx] = new EffectMgr(1, this)))
+        if (!(insefx[nefx] = new EffectMgr(1, *this)))
         {
             Runtime.Log("Failed to allocate new Insertion EffectMgr");
             goto bail_out;
@@ -304,7 +304,7 @@ bool SynthEngine::Init(uint audiosrate, int audiobufsize)
     // System Effects init
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        if (!(sysefx[nefx] = new EffectMgr(0, this)))
+        if (!(sysefx[nefx] = new EffectMgr(0, *this)))
         {
             Runtime.Log("Failed to allocate new System Effects EffectMgr");
             goto bail_out;

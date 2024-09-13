@@ -861,9 +861,9 @@ void ADnote::initParameters()
 
     noteGlobal.filterEnvelope.reset(new Envelope{adpars.GlobalPar.FilterEnvelope, note.freq, &synth});
     noteGlobal.filterLFO     .reset(new LFO{adpars.GlobalPar.FilterLfo, note.freq, &synth});
-    noteGlobal.filterL.reset(new Filter{adpars.GlobalPar.GlobalFilter, &synth});
+    noteGlobal.filterL.reset(new Filter{* adpars.GlobalPar.GlobalFilter, synth});
     if (stereo)
-        noteGlobal.filterR.reset(new Filter{adpars.GlobalPar.GlobalFilter, &synth});
+        noteGlobal.filterR.reset(new Filter{* adpars.GlobalPar.GlobalFilter, synth});
 
     // Forbids the Modulation Voice to be greater or equal than voice
     for (i = 0; i < NUM_VOICES; ++i)
@@ -909,8 +909,8 @@ void ADnote::initParameters()
         // Voice Filter Parameters Init
         if (adpars.VoicePar[nvoice].PFilterEnabled)
         {
-            NoteVoicePar[nvoice].voiceFilterL.reset(new Filter{adpars.VoicePar[nvoice].VoiceFilter, &synth});
-            NoteVoicePar[nvoice].voiceFilterR.reset(new Filter{adpars.VoicePar[nvoice].VoiceFilter, &synth});
+            NoteVoicePar[nvoice].voiceFilterL.reset(new Filter{* adpars.VoicePar[nvoice].VoiceFilter, synth});
+            NoteVoicePar[nvoice].voiceFilterR.reset(new Filter{* adpars.VoicePar[nvoice].VoiceFilter, synth});
         }
 
         if (adpars.VoicePar[nvoice].PFilterEnvelopeEnabled)

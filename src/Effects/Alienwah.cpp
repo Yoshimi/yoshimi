@@ -29,9 +29,9 @@
 
 using std::complex;
 
-Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine& _synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
-    lfo(_synth),
+    lfo(synth),
     oldl(NULL),
     oldr(NULL)
 {
@@ -55,9 +55,9 @@ Alienwah::~Alienwah()
 // Apply the effect
 void Alienwah::out(float *smpsl, float *smpsr)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
             smpsl[i] += float(1e-20); // anti-denormal
             smpsr[i] += float(1e-20); // anti-denormal
@@ -71,9 +71,9 @@ void Alienwah::out(float *smpsl, float *smpsr)
     clfol = complex<float>(cosf(lfol + phase) * fb, sinf(lfol + phase) * fb); //rework
     clfor = complex<float>(cosf(lfor + phase) * fb, sinf(lfor + phase) * fb); //rework
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
-        float x = (float)i / synth->sent_buffersize_f;
+        float x = (float)i / synth.sent_buffersize_f;
         float x1 = 1.0f - x;
         // left
         tmp = clfol * x + oldclfol * x1;

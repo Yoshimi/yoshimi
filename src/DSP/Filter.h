@@ -32,21 +32,36 @@
 #include "DSP/SVFilter.h"
 #include "Params/FilterParams.h"
 
+#include <memory>
+
 class SynthEngine;
 
 class Filter
 {
     public:
-        Filter(FilterParams *pars_, SynthEngine *_synth);
-        Filter(const Filter &orig) :
-            pars(orig.pars),
-            parsUpdate(orig.parsUpdate),
-            category(orig.category),
-            synth(orig.synth)
-        {
-            filter = orig.filter->clone();
-        };
-        ~Filter();
+       ~Filter() = default;
+
+        Filter(FilterParams& p, SynthEngine& synth)
+            : category{p.Pcategory}
+            , params{p}
+            , parsUpdate{p}
+            , filterImpl{buildImpl(synth)}
+            {
+                updateCurrentParameters();
+            }
+
+        // can be cloned
+        Filter(Filter const& o)
+            : category{o.category}
+            , params{o.params}
+            , parsUpdate{o.parsUpdate}
+            , filterImpl{o.filterImpl->clone()}
+            { };
+        // can be moved, but not assigned
+        Filter(Filter&&)                 = default;
+        Filter& operator=(Filter&&)      = delete;
+        Filter& operator=(Filter const&) = delete;
+
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
@@ -54,14 +69,13 @@ class Filter
         float getrealfreq(float freqpitch);
 
     private:
+        Filter_* buildImpl(SynthEngine&);
         void updateCurrentParameters();
 
-        FilterParams *pars;
+        uchar category;
+        FilterParams& params;
         ParamBase::ParamsUpdate parsUpdate;
-        Filter_ *filter;
-        unsigned char category;
-
-        SynthEngine *synth;
+        std::unique_ptr<Filter_> filterImpl;
 };
 
 #endif

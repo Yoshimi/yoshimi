@@ -45,28 +45,27 @@
 class EffectMgr : public ParamBase
 {
     public:
-       ~EffectMgr() = default;
-        EffectMgr(const bool insertion_, SynthEngine *_synth);
+        EffectMgr(const bool insertion_, SynthEngine&);
+
+        void defaults() override;
 
         void add2XML(XMLwrapper& xml);
-        void defaults(void);
         void getfromXML(XMLwrapper& xml);
 
         void out(float *smpsl, float *smpsr);
 
-        void setdryonly(bool value);
+        void  setdryonly(bool value);
+        float sysefxgetvolume();
 
-        float sysefxgetvolume(void);
-
-        void cleanup(void);
+        void cleanup();
 
         void changeeffect(int nefx_);
-        int geteffect(void);
+        int  geteffect();
 
-        void changepreset(unsigned char npreset);
-        unsigned char getpreset(void);
-        void seteffectpar(int npar, unsigned char value);
-        unsigned char geteffectpar(int npar);
+        void changepreset(uchar npreset);
+        uchar getpreset();
+        void seteffectpar(int npar, uchar value);
+        uchar geteffectpar(int npar);
         void getAllPar(EffectParArray&) const;
 
 
@@ -77,7 +76,7 @@ class EffectMgr : public ParamBase
         // used by UI
         void renderEQresponse(EQGraphArray&) const;
 
-        FilterParams *filterpars;
+        FilterParams* filterpars;
 
     private:
         int effectType;

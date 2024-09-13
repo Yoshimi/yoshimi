@@ -33,13 +33,13 @@ using func::power;
 
 #define MAX_CHORUS_DELAY 250.0f // ms
 
-Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine& _synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
-    lfo(_synth),
-    fb(0, _synth->samplerate)
+    lfo(synth),
+    fb(0, synth.samplerate)
 {
     dlk = drk = 0;
-    maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth->samplerate_f);
+    maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth.samplerate_f);
     delayl = new float[maxdelay];
     delayr = new float[maxdelay];
     setpreset(Ppreset);
@@ -56,12 +56,12 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEng
 // get the delay value in samples; xlfo is the current lfo value
 float Chorus::getdelay(float xlfo)
 {
-    float result = (Pflangemode) ? 0 : (delay + xlfo * depth) * synth->samplerate_f;
+    float result = (Pflangemode) ? 0 : (delay + xlfo * depth) * synth.samplerate_f;
 
     //check if it is too big delay (caused bu erroneous setDelay() and setDepth()
     if ((result + 0.5) >= maxdelay)
     {
-        synth->getRuntime().Log("WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)");
+        synth.getRuntime().Log("WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)");
         result = maxdelay - 1.0;
     }
     return result;
@@ -71,7 +71,7 @@ float Chorus::getdelay(float xlfo)
 // Apply the effect
 void Chorus::out(float *smpsl, float *smpsr)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
     const float one = 1.0f;
     dl1 = dl2;
@@ -82,7 +82,7 @@ void Chorus::out(float *smpsl, float *smpsr)
     dr2 = getdelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         tmpL = smpsl[i];
         tmpR = smpsr[i];
@@ -94,7 +94,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         // Left channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dl1 * (synth->sent_buffersize - i) + dl2 * i) / synth->sent_buffersize_f;
+        mdel = (dl1 * (synth.sent_buffersize - i) + dl2 * i) / synth.sent_buffersize_f;
         if (++dlk >= maxdelay)
             dlk = 0;
         tmp = dlk - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -109,7 +109,7 @@ void Chorus::out(float *smpsl, float *smpsr)
         // Right channel
 
         // compute the delay in samples using linear interpolation between the lfo delays
-        mdel = (dr1 * (synth->sent_buffersize - i) + dr2 * i) / synth->sent_buffersize_f;
+        mdel = (dr1 * (synth.sent_buffersize - i) + dr2 * i) / synth.sent_buffersize_f;
         if (++drk >= maxdelay)
             drk = 0;
         tmp = drk * 1.0f - mdel + maxdelay * 2.0f; // where should I get the sample from
@@ -124,13 +124,13 @@ void Chorus::out(float *smpsl, float *smpsr)
     }
 
     if (Poutsub)
-        for (int i = 0; i < synth->sent_buffersize; ++i)
+        for (int i = 0; i < synth.sent_buffersize; ++i)
         {
             efxoutl[i] *= -1.0f;
             efxoutr[i] *= -1.0f;
         }
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         efxoutl[i] *= pangainL.getAndAdvanceValue();
         efxoutr[i] *= pangainR.getAndAdvanceValue();
@@ -139,7 +139,7 @@ void Chorus::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Chorus::cleanup(void)
+void Chorus::cleanup()
 {
     Effect::cleanup();
     fb.pushToTarget();
@@ -302,7 +302,6 @@ float Choruslimit::getlimits(CommandBlock *getData)
     int max = 127;
 
     int def = chorusPresets[presetNum][control];
-    std::cout << "preset " << presetNum << "  control " << control << "  default " << def << std::endl;
     unsigned char canLearn = TOPLEVEL::type::Learnable;
     unsigned char isInteger = TOPLEVEL::type::Integer;
     switch (control)

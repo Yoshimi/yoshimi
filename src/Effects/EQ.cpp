@@ -41,12 +41,12 @@ using util::max;
 using std::make_unique;
 
 
-EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth)
+EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine& _synth)
     : Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth)
     , Pchanged{false}
     , Pvolume{}
     , Pband{0}
-    , filter{*synth,*synth,*synth,*synth,*synth,*synth,*synth,*synth} // MAX_EQ_BANDS
+    , filter{synth,synth,synth,synth,synth,synth,synth,synth} // MAX_EQ_BANDS
     , filterSnapshot{}
 {
     // default values
@@ -71,11 +71,11 @@ void EQ::cleanup()
 // Effect output
 void EQ::out(float *smpsl, float *smpsr)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
-    memcpy(efxoutl, smpsl, synth->sent_bufferbytes);
-    memcpy(efxoutr, smpsr, synth->sent_bufferbytes);
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    memcpy(efxoutl, smpsl, synth.sent_bufferbytes);
+    memcpy(efxoutr, smpsr, synth.sent_bufferbytes);
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         efxoutl[i] *= volume.getValue();
         efxoutr[i] *= volume.getValue();
@@ -87,7 +87,7 @@ void EQ::out(float *smpsl, float *smpsr)
             continue;
 
         float oldval = filter[i].freq.getValue();
-        filter[i].freq.advanceValue(synth->sent_buffersize);
+        filter[i].freq.advanceValue(synth.sent_buffersize);
         float newval = filter[i].freq.getValue();
         if (oldval != newval)
         {
@@ -98,7 +98,7 @@ void EQ::out(float *smpsl, float *smpsr)
         }
 
         oldval = filter[i].gain.getValue();
-        filter[i].gain.advanceValue(synth->sent_buffersize);
+        filter[i].gain.advanceValue(synth.sent_buffersize);
         newval = filter[i].gain.getValue();
         if (oldval != newval)
         {
@@ -109,7 +109,7 @@ void EQ::out(float *smpsl, float *smpsr)
         }
 
         oldval = filter[i].q.getValue();
-        filter[i].q.advanceValue(synth->sent_buffersize);
+        filter[i].q.advanceValue(synth.sent_buffersize);
         newval = filter[i].q.getValue();
         if (oldval != newval)
         {
@@ -390,7 +390,7 @@ public:
 private:
     void emplaceFilter(uchar type, float freq, float q, uchar stages, float dBgain)
     {
-        new(&buffer_) AnalogFilter(* unConst(eq).synth, type,freq,q,stages,dBgain);
+        new(&buffer_) AnalogFilter(unConst(eq).synth, type,freq,q,stages,dBgain);
     }
 
     void destroy()
@@ -411,7 +411,7 @@ private:
  */
 void EQ::renderResponse(EQGraphArray & lut) const
 {
-    auto subNyquist = [this](float f){ return f <= synth->halfsamplerate_f; };
+    auto subNyquist = [this](float f){ return f <= synth.halfsamplerate_f; };
     for (uint i=0; i<lut.size(); ++i)
     {
         float gridFactor = float(i) / (lut.size()-1);  // »fence post problem« : both 0.0 and 1.0 included

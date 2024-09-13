@@ -57,14 +57,16 @@ class SynthEngine;
 class Phaser : public Effect
 {
     public:
-        Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~Phaser();
-        void out(float *smpsl, float *smpsr) override;
-        void setpreset(unsigned char npreset) override;
-        void changepar(int npar, unsigned char value) override;
-        unsigned char getpar(int npar) const override;
-        void cleanup(void) override;
-        void setdryonly(void);
+        Phaser(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine&);
+       ~Phaser();
+
+        void out(float* smpsl, float* smpsr)  override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)          const override;
+        void cleanup()                        override;
+
+        void setdryonly();
 
     private:
         // Phaser Parameters

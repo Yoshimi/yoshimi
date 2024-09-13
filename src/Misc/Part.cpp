@@ -95,7 +95,7 @@ Part::Part(uchar id, Microtonal* microtonal_, fft::Calc& fft_, SynthEngine& _syn
 
     // Part's Insertion Effects init
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
-        partefx[nefx] = new EffectMgr(1, synth);
+        partefx[nefx] = new EffectMgr(1, *synth);
 
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {

@@ -55,39 +55,41 @@ class SynthEngine;
 class Distorsion : public Effect, WaveShapeSamples
 {
     public:
-        Distorsion(bool insertion, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~Distorsion();
-        void out(float *smpsl, float *smpr) override;
-        void setpreset(unsigned char npreset) override;
-        void changepar(int npar, unsigned char value) override;
-        unsigned char getpar(int npar) const override;
-        void cleanup(void) override;
-        void applyfilters(float *efxoutl, float *efxoutr);
+       ~Distorsion();
+        Distorsion(bool insertion, float* efxoutl_, float* efxoutr_, SynthEngine&);
+
+        void out(float* smpsl, float* smpr)   override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)          const override;
+        void cleanup()                        override;
+
+        void applyfilters(float* efxoutl, float* efxoutr);
 
     private:
         // Parameters
         bool Pchanged;
-        unsigned char Pvolume;       // Volume or E/R
-        unsigned char Pdrive;        // the input amplification
-        unsigned char Plevel;        // the output amplification
-        unsigned char Ptype;         // Distortion type
-        unsigned char Pnegate;       // if the input is negated
-        unsigned char Plpf;          // Lowpass filter
-        unsigned char Phpf;          // Highpass filter
-        unsigned char Pstereo;       // 0 = mono, 1 = stereo
-        unsigned char Pprefiltering; // if you want to do the filtering before the distortion
+        uchar Pvolume;       // Volume or E/R
+        uchar Pdrive;        // the input amplification
+        uchar Plevel;        // the output amplification
+        uchar Ptype;         // Distortion type
+        uchar Pnegate;       // if the input is negated
+        uchar Plpf;          // Lowpass filter
+        uchar Phpf;          // Highpass filter
+        uchar Pstereo;       // 0 = mono, 1 = stereo
+        uchar Pprefiltering; // if you want to do the filtering before the distortion
 
-        void setvolume(unsigned char Pvolume_);
-        void setlpf(unsigned char Plpf_);
-        void sethpf(unsigned char Phpf_);
+        void setvolume(uchar Pvolume_);
+        void setlpf(uchar Plpf_);
+        void sethpf(uchar Phpf_);
 
         synth::InterpolatedValue<float> level;
 
         // Real Parameters
-        AnalogFilter *lpfl;
-        AnalogFilter *lpfr;
-        AnalogFilter *hpfl;
-        AnalogFilter *hpfr;
+        AnalogFilter* lpfl;
+        AnalogFilter* lpfr;
+        AnalogFilter* hpfl;
+        AnalogFilter* hpfr;
         synth::InterpolatedValue<float> lpffr;
         synth::InterpolatedValue<float> hpffr;
 };

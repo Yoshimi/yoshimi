@@ -25,22 +25,31 @@
 #ifndef EFFECT_LFO_H
 #define EFFECT_LFO_H
 
+#include "globals.h"
+
 class SynthEngine;
 
 class EffectLFO
 {
     public:
-        EffectLFO(SynthEngine *_synth);
-        ~EffectLFO();
+       ~EffectLFO() = default;
+        EffectLFO(SynthEngine&);
+        // shall not be copied nor moved
+        EffectLFO(EffectLFO&&)                 = delete;
+        EffectLFO(EffectLFO const&)            = delete;
+        EffectLFO& operator=(EffectLFO&&)      = delete;
+        EffectLFO& operator=(EffectLFO const&) = delete;
+
         void effectlfoout(float *outl, float *outr);
         void updateparams();
         void resetState();
-        unsigned char Pfreq;
-        unsigned char Prandomness;
-        unsigned char PLFOtype;
-        unsigned char Pstereo; // 64 = center
-        unsigned char Pbpm;
-        unsigned char PbpmStart;
+        uchar Pfreq;
+        uchar Prandomness;
+        uchar PLFOtype;
+        uchar Pstereo; // 64 = center
+        uchar Pbpm;
+        uchar PbpmStart;
+
     private:
         float getlfoshape(float x);
 
@@ -51,7 +60,7 @@ class EffectLFO
         float lfornd;
         char lfotype;
 
-        SynthEngine *synth;
+        SynthEngine& synth;
 };
 
-#endif
+#endif /*EFFECT_LFO_H*/

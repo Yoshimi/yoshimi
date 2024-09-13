@@ -41,7 +41,8 @@ class FormantFilter : public Filter_
        ~FormantFilter();
         FormantFilter(SynthEngine*, FilterParams*);
         FormantFilter(FormantFilter const&);
-        Filter_* clone() { return new FormantFilter(*this); };
+        Filter_* clone() override { return new FormantFilter(*this); };
+
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);

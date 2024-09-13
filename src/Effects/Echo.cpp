@@ -34,17 +34,17 @@
 using func::power;
 using func::powFrac;
 
-Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
+Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine& _synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     Pdelay(60),
     Plrdelay(100),
-    feedback(1, _synth->samplerate),
-    hidamp(1, _synth->samplerate),
+    feedback(1, _synth.samplerate),
+    hidamp(1, _synth.samplerate),
     lrdelay(0),
     ldelay(NULL),
     rdelay(NULL),
-    lxfade(1, _synth->samplerate_f),
-    rxfade(1, _synth->samplerate_f)
+    lxfade(1, _synth.samplerate_f),
+    rxfade(1, _synth.samplerate_f)
 {
     setvolume(50);
     setfeedback(40);
@@ -52,7 +52,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     setpreset(Ppreset);
     changepar(4, 30); // lrcross
     Pchanged = false;
-    maxdelay = 5 * synth->samplerate;
+    maxdelay = 5 * synth.samplerate;
     ldelay = new float[maxdelay];
     rdelay = new float[maxdelay];
     realposl = realposr = 1;
@@ -92,11 +92,11 @@ void Echo::initdelays()
             int olddelay = delay;
 
             std::pair<float, float> frac = func::LFOfreqBPMFraction((float)paramDelay / 127.0f);
-            delay = roundf(60.0f * synth->samplerate_f * frac.first / (synth->getBPM() * frac.second));
+            delay = roundf(60.0f * synth.samplerate_f * frac.first / (synth.getBPM() * frac.second));
             if (delay > maxdelay)
                 delay = maxdelay;
 
-            if (!synth->isBPMAccurate())
+            if (not synth.isBPMAccurate())
             {
                 // If we don't have an accurate BPM source, we may have
                 // fluctuations. Reject delay changes less than a certain amount to
@@ -129,7 +129,7 @@ void Echo::initdelays()
     {
         auto calcDelay = [this](unsigned char paramDelay)
         {
-            return int(paramDelay / 127.0f * synth->samplerate_f * 1.5f) + 1; // 0 .. 1.5 sec
+            return int(paramDelay / 127.0f * synth.samplerate_f * 1.5f) + 1; // 0 .. 1.5 sec
         };
 
         delay = calcDelay(Pdelay);
@@ -147,7 +147,7 @@ void Echo::initdelays()
     if (!PsepLRDelay)
     {
         float tmp;
-        tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
+        tmp = (power<2>(fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth.samplerate_f;
         if (Plrdelay < 64.0f)
             tmp = -tmp;
         lrdelay = (int)tmp;
@@ -170,11 +170,11 @@ void Echo::out(float* smpsl, float* smpsr)
     float ldl;
     float rdl;
 
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
     initdelays();
 
-    for (int i = 0; i < synth->sent_buffersize; ++i)
+    for (int i = 0; i < synth.sent_buffersize; ++i)
     {
         lxfade.setTargetValue(dl);
         rxfade.setTargetValue(dr);

@@ -56,15 +56,16 @@ class SynthEngine;
 class Echo : public Effect
 {
     public:
-        Echo(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
-        ~Echo();
+        Echo(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine&);
+       ~Echo();
 
-        void out(float *smpsl, float *smpr)  override;
-        void setpreset(unsigned char npreset) override;
-        void changepar(int npar, unsigned char value) override;
-        unsigned char getpar(int npar) const override;
-        void cleanup(void)                   override;
-        void setdryonly(void);
+        void out(float* smpsl, float* smpr)   override;
+        void setpreset(uchar npreset)         override;
+        void changepar(int npar, uchar value) override;
+        uchar getpar(int npar)          const override;
+        void cleanup()                        override;
+
+        void setdryonly();
 
     private:
         // Parameters

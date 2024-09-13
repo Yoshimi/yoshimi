@@ -37,7 +37,7 @@ using func::powFrac;
 
 // todo: EarlyReflections, Prdelay, Perbalance
 
-Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine& _synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0, _synth),
     // defaults
 //    Pvolume(48),
@@ -58,15 +58,15 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
     idelay(NULL),
     lpf(NULL),
     hpf(NULL), // no filter
-    lpffr(0, synth->samplerate),
-    hpffr(0, synth->samplerate),
-    inputbuf(_synth->buffersize)
+    lpffr(0, synth.samplerate),
+    hpffr(0, synth.samplerate),
+    inputbuf(_synth.buffersize)
 {
     setvolume(48);
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
 
-        comblen[i] = 800 + synth->randomINT() / (INT32_MAX/1400);
+        comblen[i] = 800 + synth.randomINT() / (INT32_MAX/1400);
         combk[i] = 0;
         lpcomb[i] = 0;
         combfb[i] = -0.97f;
@@ -75,7 +75,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_
 
     for (int i = 0; i < REV_APS * 2; ++i)
     {
-        aplen[i] = 500 + synth->randomINT() / (INT32_MAX/500);
+        aplen[i] = 500 + synth.randomINT() / (INT32_MAX/500);
         apk[i] = 0;
         ap[i] = NULL;
     }
@@ -135,7 +135,7 @@ void Reverb::calculateReverb(size_t ch, Samples& inputFeed, float *output)
         size_t offset = combk[j];
         size_t combLen = comblen[j];
         float lowpassj = lpcomb[j];
-        for (size_t smp = 0; smp < size_t(synth->sent_buffersize); ++smp)
+        for (size_t smp = 0; smp < size_t(synth.sent_buffersize); ++smp)
         {
             float feedback = comb[j][offset] * combfb[j];
             feedback = feedback * (1.0f - lohifb) + lowpassj * lohifb;
@@ -157,7 +157,7 @@ void Reverb::calculateReverb(size_t ch, Samples& inputFeed, float *output)
     {
         size_t offset = apk[j];
         size_t allpassLen = aplen[j];
-        for (size_t smp = 0; smp < size_t(synth->sent_buffersize); ++smp)
+        for (size_t smp = 0; smp < size_t(synth.sent_buffersize); ++smp)
         {
             float feedback = ap[j][offset];
             ap[j][offset] = 0.7f * feedback + output[smp];
@@ -183,7 +183,7 @@ namespace { //Helper: detect change above rounding errors for frequency interpol
 
 void Reverb::preprocessInput(float *rawL, float *rawR, Samples& inputFeed)
 {
-    for (size_t i = 0; i < size_t(synth->sent_buffersize); ++i)
+    for (size_t i = 0; i < size_t(synth.sent_buffersize); ++i)
     {
         inputFeed[i] = float(1e-20) + ((rawL[i] + rawR[i]) / 2.0f); // includes anti-denormal
 
@@ -199,12 +199,12 @@ void Reverb::preprocessInput(float *rawL, float *rawR, Samples& inputFeed)
     }
 
     if (bandwidth)
-        bandwidth->process(synth->sent_buffersize, inputFeed.get());
+        bandwidth->process(synth.sent_buffersize, inputFeed.get());
 
     if (lpf)
     {
         float currFreq = lpf->getFreq();
-        lpffr.advanceValue(synth->sent_buffersize);
+        lpffr.advanceValue(synth.sent_buffersize);
         if (significantChange(currFreq, lpffr.getValue()))
         {
             lpf->interpolatenextbuffer();
@@ -215,7 +215,7 @@ void Reverb::preprocessInput(float *rawL, float *rawR, Samples& inputFeed)
      if (hpf)
     {
         float currFreq = hpf->getFreq();
-        hpffr.advanceValue(synth->sent_buffersize);
+        hpffr.advanceValue(synth.sent_buffersize);
         if (significantChange(currFreq, hpffr.getValue()))
         {
             hpf->interpolatenextbuffer();
@@ -230,7 +230,7 @@ void Reverb::preprocessInput(float *rawL, float *rawR, Samples& inputFeed)
 // Effect output
 void Reverb::out(float *rawL, float *rawR)
 {
-    outvolume.advanceValue(synth->sent_buffersize);
+    outvolume.advanceValue(synth.sent_buffersize);
 
     if (!Pvolume && insertion)
         return;
@@ -247,7 +247,7 @@ void Reverb::out(float *rawL, float *rawR)
         lvol *= 2.0f;
         rvol *= 2.0f;
     }
-    for (size_t i = 0; i < size_t(synth->sent_buffersize); ++i)
+    for (size_t i = 0; i < size_t(synth.sent_buffersize); ++i)
     {
         efxoutl[i] *= lvol;
         efxoutr[i] *= rvol;
@@ -296,7 +296,7 @@ void Reverb::settime(uchar Ptime_)
     Ptime = Ptime_;
     float t = power<60>(Ptime / 127.0f) - 0.97f;
     for (int i = 0; i < REV_COMBS * 2; ++i)
-        combfb[i] = -expf(float(comblen[i]) / synth->samplerate_f * logf(0.001f) / t);
+        combfb[i] = -expf(float(comblen[i]) / synth.samplerate_f * logf(0.001f) / t);
         // the feedback is negative because it removes the DC
 }
 
@@ -331,7 +331,7 @@ void Reverb::setidelay(uchar Pidelay_)
         delete [] idelay;
     idelay = NULL;
 
-    idelaylen = lrint(synth->samplerate_f * delay / 1000.0f);
+    idelaylen = lrint(synth.samplerate_f * delay / 1000.0f);
     if (idelaylen > 1)
     {
         idelayk = 0;
@@ -361,7 +361,7 @@ void Reverb::sethpf(uchar Phpf_)
     {
         hpffr.setTargetValue(expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f);
         if (hpf == NULL)
-            hpf = new AnalogFilter(*synth, TOPLEVEL::filter::High2, hpffr.getValue(), 1, 0);
+            hpf = new AnalogFilter(synth, TOPLEVEL::filter::High2, hpffr.getValue(), 1, 0);
     }
 }
 
@@ -379,7 +379,7 @@ void Reverb::setlpf(uchar Plpf_)
     {
         lpffr.setTargetValue(expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f);
         if (!lpf)
-            lpf = new AnalogFilter(*synth, TOPLEVEL::filter::Low2, lpffr.getValue(), 1, 0);
+            lpf = new AnalogFilter(synth, TOPLEVEL::filter::Low2, lpffr.getValue(), 1, 0);
     }
 }
 
@@ -410,14 +410,14 @@ void Reverb::setupPipelines()
         { 225, 341, 441, 556 }
     };
 
-    float samplerate_adjust = synth->samplerate_f / 44100.0f;
+    float samplerate_adjust = synth.samplerate_f / 44100.0f;
 
     // adjust the combs according to samplerate and room size
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
         float tmp;
         if (Ptype == 0)
-            tmp = 800.0f + synth->numRandom() * 1400.0f;
+            tmp = 800.0f + synth.numRandom() * 1400.0f;
         else
             tmp = combtunings[Ptype][i % REV_COMBS];
         tmp *= roomsize;
@@ -440,7 +440,7 @@ void Reverb::setupPipelines()
         float tmp;
         if (Ptype == 0)
         {
-            tmp = 500.0f + synth->numRandom() * 500.0f;
+            tmp = 500.0f + synth.numRandom() * 500.0f;
         }
         else
             tmp = aptunings[Ptype][i % REV_APS];
@@ -462,7 +462,7 @@ void Reverb::setupPipelines()
     bandwidth = NULL;
     if (Ptype == 2)
     { // bandwidth
-        bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
+        bandwidth = new Unison(synth.buffersize / 4 + 1, 2.0f, &synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
         //TODO the size of the unison buffer may be too small, though this has
